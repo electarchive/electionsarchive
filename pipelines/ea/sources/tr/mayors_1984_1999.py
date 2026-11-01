@@ -21,7 +21,7 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "8"
+VERSION = "14"
 YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 UNMERGED = Path(__file__).with_name("mayors_1984_1999_unmerged.tsv")
@@ -52,7 +52,43 @@ SUCCESSORS = {
     "siirt": ("batman", "sirnak"),
     "zonguldak": ("bartin", "karabuk"),
 }
-Row = tuple[str, str, str, int]
+APART = {
+    "balikesir-balya:mahmut-sari",
+    "balikesir-susurluk:yusuf-akin",
+    "burdur-bucak-kocaaliler:recep-ozcan",
+    "burdur-bucak:mehmet-topay",
+    "edirne-meric:mustafa-aksoy",
+    "gaziantep-sehitkamil-aril:ahmet-pehlivan",
+}
+TOWNS = {
+    "adiyaman-merkez-komurkoy": "tr/adiyaman/merkez/komur",
+    "afyonkarahisar-sandikli-ahirhisar": "tr/afyonkarahisar-hocalar-ahirhisar",
+    "afyonkarahisar-sincanli-sinanpasa-guneykoy": "tr/afyonkarahisar/sinanpasa/guney",
+    "ankara-camlidere-karagedik": "tr/ankara/golbasi/karagedik",
+    "ankara-camlidere-kutludugun": "tr/ankara/mamak/kutludugun",
+    "canakkale-yenice-kalkin": "tr/canakkale/yenice/kalkim",
+    "gumushane-aydintepe-arpali": "tr/bayburt/merkez/arpali",
+    "isparta-gelendost-yakakoy": "tr/isparta/gelendost/yaka",
+    "izmir-bergama-ayaz": "tr/izmir/bergama/ayaskent",
+    "izmir-bergama-ayazkent": "tr/izmir/bergama/ayaskent",
+    "izmir-kinik-yaya": "tr/izmir/kinik/yayakent",
+    "izmir-kinik-yayakoy": "tr/izmir/kinik/yayakent",
+    "kars-hanak-ortakoy": "tr/kars/hanak/ortakent",
+    "kayseri-merkez-anarat": "tr/kayseri/kocasinan/amarat",
+    "kayseri-sarioglan-ciftlikkoy": "tr/kayseri/sarioglan/ciftlik",
+    "kirsehir-kaman-savcili": "tr/kirsehir/kaman/savcilibuyukoba",
+    "kirsehir-kaman-savcilioba": "tr/kirsehir/kaman/savcilibuyukoba",
+    "konya-beysehir-cavus": "tr/konya/huyuk/cavus",
+    "kutahya-simav-demircikoy": "tr/kutahya/simav/demirci",
+    "malatya-akcadag-yukarikozluca": "tr/malatya/akcadag/kozluca",
+    "mugla-merkez-bayirkoy": "tr/mugla/merkez/bayir",
+    "nigde-aksaray-toprakkaya": "tr/aksaray/merkez/topakkaya",
+    "sivas-sarkisla-cakirseyh": "tr/sivas/sarkisla/cayirseyhi",
+    "trabzon-akcaabat-cayirbasi": "tr/trabzon/duzkoy/cayirbagi",
+}
+Row = tuple[str, str, str, int, bool]
+SHADED = re.compile(r'\|\s*style="?background')
+ALSO = re.compile(r"^(.+ )(\S+) \((\S+)\)$")
 
 
 def search(year: int) -> str:
@@ -88,10 +124,11 @@ def number(text: str) -> int | None:
     return int(text.replace(".", "")) if NUMBER.match(text) else None
 
 
-def read(years: tuple[int, ...] = YEARS) -> tuple[dict, dict, list[str]]:
+def read(years: tuple[int, ...] = YEARS) -> tuple[dict, dict, list[str], list[tuple[int, str, str]]]:
     tables: dict[tuple[int, str, str, str], tuple[str, list[Row], dict[str, int]]] = {}
     beldes: dict[tuple[int, str, str, str], list[tuple[str, str, str, int]]] = defaultdict(list)
     pages: list[str] = []
+    reruns: list[tuple[int, str, str]] = []
     for year in years:
         for hit in json.loads(raw.cached(SOURCE, search(year)).path.read_bytes())["query"]["search"]:
             match = TITLE.match(hit["title"])
@@ -116,15 +153,18 @@ def read(years: tuple[int, ...] = YEARS) -> tuple[dict, dict, list[str]]:
                 if "{{Seçim tablosu" in part:
                     rows: list[Row] = []
                     totals: dict[str, int] = {}
-                    for chunk in re.split(r"\n\|-", part):
-                        cells = [
-                            cell(line) for line in chunk.split("\n") if line.startswith(("|", "!")) and line[:2] != "|}"
-                        ]
+                    first, *later = part.split("{{Seçim tablosu")[1:]
+                    reruns.extend((year, province, district or province) for _ in later)
+                    for chunk in re.split(r"\n\|-", first):
+                        lines = [line for line in chunk.split("\n") if line.startswith(("|", "!")) and line[:2] != "|}"]
+                        cells = [cell(line) for line in lines]
+                        won = any(SHADED.match(line) for line in lines[1:4])
                         if len(cells) >= 6 and cells[0] == "" and number(cells[4]) is not None:
-                            rows.append((cells[1], cells[2], cells[3], number(cells[4])))
+                            rows.append((cells[1], cells[2], cells[3], number(cells[4]), won))
                         elif len(cells) == 4 and cells[0] == "" and rows and number(cells[3]) is None:
                             last = rows[-1]
-                            rows[-1] = (last[0], last[1], f"{last[2]}; {cells[3]}", last[3])
+                            names = f"{cells[3]}; {last[2]}" if won and not last[4] else f"{last[2]}; {cells[3]}"
+                            rows[-1] = (last[0], last[1], names, last[3], last[4] or won)
                         elif (
                             cells
                             and cells[0].startswith("Toplam")
@@ -159,11 +199,62 @@ def read(years: tuple[int, ...] = YEARS) -> tuple[dict, dict, list[str]]:
                             beldes[
                                 (year, province, section.endswith("merkez") and "merkez" or district, cells[0])
                             ].append((hit["title"], cells[1], cells[2], number(cells[3])))
-    return tables, beldes, pages
+    return tables, beldes, pages, reruns
+
+
+def also(text: str) -> tuple[str, str | None]:
+    match = ALSO.match(text)
+    return (match[1] + match[2], match[1] + match[3]) if match else (text, None)
+
+
+def named(cs: Changeset, person: UUID, text: str) -> None:
+    shown, other = also(text)
+    cs.add("name", entity_id=person, text=shown, lang="tr", kind="official", is_preferred=True)
+    if other is not None:
+        cs.add("name", entity_id=person, text=other, lang="tr", kind="official", is_preferred=False)
+
+
+def rename(cs: Changeset, pipeline: str, wanted: dict[UUID, list[str]]) -> None:
+    held: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for name_id, entity, text in cs.conn.execute(
+        """select n.id::text, n.entity_id::text, n.text from name n join changeset ch on ch.id = n.changeset_id
+           where ch.pipeline = %s and n.entity_id = any(%s::uuid[])
+             and exists (select from name p join changeset pc on pc.id = p.changeset_id
+                         where p.entity_id = n.entity_id and p.is_preferred and pc.pipeline = %s)""",
+        [pipeline, [person for person in wanted if person not in cs.minted], pipeline],
+    ).fetchall():
+        held[entity].append((name_id, text))
+    present = set(
+        cs.conn.execute(
+            "select entity_id, text from name where entity_id = any(%s::uuid[])",
+            [[person for person in wanted if person not in cs.minted]],
+        ).fetchall()
+    )
+    for person, spellings in wanted.items():
+        text, first = also(spellings[0])
+        others = {form for written in spellings for form in also(written) if form is not None} - {text}
+        names = held.get(str(person), [])
+        olds = {old for _, old in names}
+        for other in sorted(others):
+            if (person, other) not in present and not (person in cs.minted and other == first):
+                cs.add("name", entity_id=person, text=other, lang="tr", kind="official", is_preferred=False)
+        if all(old == text or old in others or (cell(f"|{old}") == old and ALSO.match(old) is None) for old in olds):
+            continue
+        if text not in olds:
+            cs.add("name", entity_id=person, text=text, lang="tr", kind="official", is_preferred=True)
+        for name_id, old in names:
+            if old != text and old not in others:
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=person,
+                    text=old,
+                    reason="Read from a misparsed Wikipedia table cell",
+                )
 
 
 def emit() -> Path:
-    tables, beldes, pages = read()
+    tables, beldes, pages, reruns = read()
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -216,7 +307,7 @@ def emit() -> Path:
         )
         abbreviations: dict[tuple[int, str], str] = {}
         for (year, _, _, _), (_, rows, _) in tables.items():
-            for abbreviation, party_text, _, _ in rows:
+            for abbreviation, party_text, _, _, _ in rows:
                 abbreviations[(year, fold(party_text))] = abbreviation
         mine = {
             value
@@ -235,6 +326,12 @@ def emit() -> Path:
             parts = path.split("/")
             (held_beldes if len(parts) == 4 else held_ilces)[(parts[1], parts[-1])][path] = value
         latest = dict(conn.execute("select polity_id, max(date_from) from election group by polity_id").fetchall())
+        at = dict(
+            conn.execute(
+                """select s.path, x.value from external_id x join slug s on s.entity_id = x.entity_id and s.is_current
+                   where x.scheme = 'tr.polity'"""
+            ).fetchall()
+        )
         matches: dict[str, tuple[str, dict[str, str]]] = {}
         races: list[tuple[int, list[str], str, str, list[Row], dict[str, int]]] = []
         for (year, province, kind, name), (page_title, rows, totals) in tables.items():
@@ -249,7 +346,9 @@ def emit() -> Path:
             province = PROVINCES.get(province, province)
             central = slug(district)
             keys = [f"{province}-{central}-{slug(name)}", f"{province}-{slug(name)}", f"{province}-merkez-{slug(name)}"]
-            if keys[0] in mine:
+            if keys[0] in TOWNS:
+                matches[keys[0]] = (name, {TOWNS[keys[0]]: at[TOWNS[keys[0]]]})
+            elif keys[0] in mine:
                 family = (province, *SUCCESSORS.get(province, ()))
                 words = [slug(part) for part in re.split(r"[()/,-]", name) if slug(part)]
                 found = {
@@ -283,7 +382,16 @@ def emit() -> Path:
                     held_on = {path: latest.get(cs.key("tr.polity", value)) or date.min for path, value in pool.items()}
                     pool = {path: value for path, value in pool.items() if held_on[path] == max(held_on.values())}
                 matches[keys[0]] = (name, pool if len(pool) == 1 else found)
-            races.append((year, keys, entries[0][0], name, [("", entries[0][1], entries[0][2], entries[0][3])], {}))
+            races.append(
+                (
+                    year,
+                    keys,
+                    entries[0][0],
+                    name,
+                    [("", entries[0][1], entries[0][2], entries[0][3], "; " not in entries[0][2])],
+                    {},
+                )
+            )
 
         for value, (_, found) in matches.items():
             if len(found) == 1:
@@ -304,6 +412,8 @@ def emit() -> Path:
                 if ours and into is not None and office != into:
                     cs.merge(office, into)
         careers: dict[tuple[UUID, str], dict[UUID, tuple[bool, set[int], set[UUID]]]] = defaultdict(dict)
+        posts: dict[UUID, set[UUID]] = defaultdict(set)
+        apart = {cs.key(f"{SOURCE}.person", f"{value}:apart") for value in APART}
         for office_id, person_id, text, year, contest_id, ours in conn.execute(
             """with held as (
                  select c.office_id, ca.person_id, e.date_from on_day, c.id contest_id from candidacy ca
@@ -325,11 +435,16 @@ def emit() -> Path:
                 person_id, (ours, set(), set())
             )
             career[1].add(year)
+            posts[person_id].add(cs.survivors.get(office_id, office_id))
             if contest_id is not None:
                 career[2].add(contest_id)
-        for people in careers.values():
+        for (office, _), people in careers.items():
             theirs = [person for person, (ours, _, _) in people.items() if not ours]
-            if len(people) < 2 or len(theirs) > 1:
+            if (
+                len(people) < 2
+                or len(theirs) > 1
+                or (people.keys() & apart and any(posts[person] - {office} for person in people))
+            ):
                 continue
             into = theirs[0] if theirs else min(people, key=lambda person: min(people[person][1]))
             pending = [person for person in people if person != into]
@@ -347,6 +462,13 @@ def emit() -> Path:
                     people[into][1].update(people[person][1])
                     people[into][2].update(people[person][2])
                     pending.remove(person)
+        holders: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select ca.id, ca.person_id from candidacy ca join changeset ch on ch.id = ca.changeset_id
+                   where ch.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
         namesakes: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
         for office, person, text in conn.execute(
             """select c.office_id, ca.person_id, n.text from candidacy ca
@@ -356,6 +478,12 @@ def emit() -> Path:
                where c.kind = 'office'"""
         ).fetchall():
             namesakes[(cs.survivors.get(office, office), fold(text))].add(cs.survivors.get(person, person))
+        own_polities = {
+            polity
+            for (polity,) in conn.execute(
+                "select p.id from polity p join changeset c on c.id = p.changeset_id where c.pipeline = %s", [SOURCE]
+            ).fetchall()
+        }
         with UNMERGED.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
             writer.writerow(("place", "name", "candidates"))
@@ -363,7 +491,7 @@ def emit() -> Path:
                 sorted(
                     (value, name, " ".join(sorted(found)))
                     for value, (name, found) in matches.items()
-                    if len(found) != 1
+                    if len(found) != 1 and cs.key("tr.polity", value) in own_polities
                 )
             )
         turkey = cs.polity("TR")
@@ -378,7 +506,7 @@ def emit() -> Path:
         ).fetchall():
             paths[entity] = text
         for entity, text in conn.execute(
-            "select entity_id, text from name where entity_id = any(%s) and lang = 'en' and kind = 'official'",
+            "select entity_id, text from name where entity_id = any(%s) and lang = 'en' and kind = 'official' and is_preferred",
             [polities],
         ).fetchall():
             english[entity] = re.sub(r" Municipality$", "", text)
@@ -407,12 +535,16 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         }
-        skipped: list[tuple[str, str, str]] = []
+        skipped: list[tuple[str, str, str]] = [
+            (str(year), f"{year} {province} {district}", "by-election after the regular race")
+            for year, province, district in reruns
+        ]
         made: set[str] = set()
         placed: dict[tuple[UUID, date], UUID] = {}
         moved: dict[str, UUID] = {}
         doubled: dict[str, UUID] = {}
         results: list[dict[str, str | int | float | None]] = []
+        wanted: dict[UUID, list[str]] = defaultdict(list)
         complete = 0
         for year, keys, page_title, name, rows, totals in sorted(races, key=lambda race: (race[0], race[1][0])):
             day = DAYS[year]
@@ -463,7 +595,7 @@ def emit() -> Path:
                 continue
             owners: list[str | None] = []
             unknown = None
-            for abbreviation, party_text, _, _ in rows:
+            for abbreviation, party_text, _, _, _ in rows:
                 owner = None
                 abbreviation = abbreviation or abbreviations.get((year, fold(party_text)), "")
                 if abbreviation not in ("BĞMSZ", "BAĞIMSIZ") and not fold(party_text).startswith("bagimsiz"):
@@ -574,10 +706,10 @@ def emit() -> Path:
                         }
                     )
             used: set[str] = set()
-            leader = max(rows, key=lambda row: row[3])
-            tied = sum(1 for row in rows if row[3] == leader[3]) > 1
-            for (_, party_text, candidates, votes), owner in zip(rows, owners, strict=True):
-                names = [word for word in candidates.split("; ") if fold(word) not in ("", "bilinmiyor")]
+            for (_, party_text, candidates, votes, won), owner in zip(rows, owners, strict=True):
+                names = [
+                    word for word in candidates.split("; ") if fold(word) not in ("", "bilinmiyor", "bilinmeyenadaylar")
+                ]
                 option_key = f"{contest_key}:{owner or slug(candidates)}"
                 if option_key in used:
                     option_key = f"{option_key}:{slug(candidates)}"
@@ -604,23 +736,21 @@ def emit() -> Path:
                     }
                 )
                 for person_name in names:
-                    reuse = namesakes.get((office, fold(person_name)), set())
+                    value = f"{key}:{slug(person_name)}"
+                    reuse = set() if value in APART else namesakes.get((office, fold(also(person_name)[0])), set())
+                    candidacy = cs.key("tr.candidacy", f"{option_key}:{slug(person_name)}")
+                    holder = holders.get(candidacy)
                     if len(reuse) == 1:
                         person = next(iter(reuse))
+                    elif holder is not None and cs.survivors.get(holder, holder) in reuse:
+                        person = cs.survivors.get(holder, holder)
                     else:
-                        person = cs.key(f"{SOURCE}.person", f"{key}:{slug(person_name)}")
-                        namesakes[(office, fold(person_name))] = {person}
+                        person = cs.key(f"{SOURCE}.person", f"{value}:apart" if value in APART else value)
+                        namesakes[(office, fold(also(person_name)[0]))] = {person}
                         if person in cs.minted:
                             cs.add("person", id=person)
-                            cs.add(
-                                "name",
-                                entity_id=person,
-                                text=person_name,
-                                lang="tr",
-                                kind="official",
-                                is_preferred=True,
-                            )
-                    candidacy = cs.key("tr.candidacy", f"{option_key}:{slug(person_name)}")
+                            named(cs, person, person_name)
+                    wanted[person].append(person_name)
                     cs.add(
                         "candidacy",
                         id=candidacy,
@@ -637,7 +767,7 @@ def emit() -> Path:
                             party_id=cs.key("tr.party", owner),
                             kind="nominated",
                         )
-                    if votes == leader[3] and not tied and len(names) == 1:
+                    if won and person_name == names[0]:
                         start, end = date(year, 4, 1), date(year + 5, 4, 1)
                         tenure = cs.key(f"{SOURCE}.tenure", contest_key)
                         cs.add(
@@ -679,7 +809,7 @@ def emit() -> Path:
             writer.writerow(("year", "race", "reason"))
             writer.writerows(sorted(skipped, key=lambda row: (row[2], row[0], row[1])))
         options = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
-        reason = "A duplicate of a mayoral option, left behind when the archive re-read the candidate's party."
+        reason = "An option an earlier reading of the Wikipedia article gave this race, from a misread party or a later by-election's table."
         for option, candidacy in conn.execute(
             """select o.id::text, ca.id::text from contest_option o join changeset c on c.id = o.changeset_id
                join entity e on e.id = o.id and e.retired_by is null
@@ -691,6 +821,34 @@ def emit() -> Path:
                 if candidacy is not None:
                     cs.add("entity_retirement", entity_id=candidacy, reason=reason)
                 cs.add("entity_retirement", entity_id=option, reason=reason)
+        candidacies = {str(row["id"]) for row in cs.rows.get("candidacy", [])}
+        stale = [
+            candidacy
+            for (candidacy,) in conn.execute(
+                """select ca.id::text from candidacy ca join changeset ch on ch.id = ca.changeset_id
+                   join contest_option o on o.id = ca.option_id
+                   where ch.pipeline = %s and o.id = any(%s::uuid[]) and ca.id <> all(%s::uuid[])""",
+                [SOURCE, list(options), list(candidacies)],
+            ).fetchall()
+        ]
+        for candidacy in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=candidacy,
+                reason="A candidacy read from a misparsed Wikipedia name cell, replaced by the candidates the cell names.",
+            )
+        terms = [str(row["id"]) for row in cs.rows.get("tenure", [])]
+        for (tenure,) in conn.execute(
+            """select t.id::text from tenure t join changeset ch on ch.id = t.changeset_id
+               where ch.pipeline = %s and t.contest_id = any(%s::uuid[]) and t.id <> all(%s::uuid[])""",
+            [SOURCE, [str(row["id"]) for row in cs.rows.get("contest", [])], terms],
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=tenure,
+                reason="A term an earlier reading of the Wikipedia article put on this race, whose winner the article shades differently or names only in a later by-election.",
+            )
+        rename(cs, SOURCE, wanted)
         survivors = dict(
             conn.execute(
                 """select c.election_id, c.id from contest c join office o on o.id = c.office_id and o.kind = 'mayor'
@@ -736,6 +894,23 @@ def emit() -> Path:
         ).fetchall():
             if UUID(person) not in cs.survivors:
                 cs.add("entity_retirement", entity_id=person, reason=reason)
+        retired = {str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])}
+        referenced = {str(row["person_id"]) for table in ("candidacy", "tenure") for row in cs.rows.get(table, [])}
+        for (person,) in conn.execute(
+            """select p.id::text from person p join changeset ch on ch.id = p.changeset_id
+               join entity e on e.id = p.id and e.retired_by is null
+               where ch.pipeline = %s
+                 and not exists (select from entity_merge m where m.entity_id = p.id or m.into_id = p.id)
+                 and not exists (select from candidacy c where c.person_id = p.id and c.id <> all(%s::uuid[]))
+                 and not exists (select from tenure t where t.person_id = p.id and t.id <> all(%s::uuid[]))""",
+            [SOURCE, [*retired, *candidacies], [*retired, *terms]],
+        ).fetchall():
+            if person not in retired and person not in referenced and UUID(person) not in cs.survivors:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=person,
+                    reason="A person read from the Wikipedia article whom the archive no longer links to any candidacy or term.",
+                )
         used = {row["unit_id"] for row in results}
         for (unit,) in conn.execute(
             """select ru.id::text from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
@@ -747,6 +922,25 @@ def emit() -> Path:
                     "entity_retirement",
                     entity_id=unit,
                     reason="A municipal reporting unit the archive no longer uses, after merging the town into its belde.",
+                )
+        fresh = {
+            (str(row["entity_id"]), row["lang"], row["kind"]): row["text"]
+            for row in cs.rows.get("name", [])
+            if row["is_preferred"]
+        }
+        dropping = {str(row["name_id"]) for row in cs.rows.get("name_drop", [])}
+        for name_id, entity, lang, kind, text in conn.execute(
+            """select n.id::text, n.entity_id::text, n.lang, n.kind, n.text from name n
+               join changeset ch on ch.id = n.changeset_id where ch.pipeline = %s and n.is_preferred""",
+            [SOURCE],
+        ).fetchall():
+            if name_id not in dropping and fresh.get((entity, lang, kind), text) != text:
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="Named with another or a misread spelling of the town instead of the municipality's preferred name.",
                 )
         print(f"{len(made)} contests ({complete} complete); {len(skipped)} unpublished")
         return cs.write()
