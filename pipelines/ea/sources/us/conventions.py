@@ -433,6 +433,8 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1904:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention held in St. Louis, Missouri, July 6, 7, 8, and 9, 1904", "publisher": "University of Kentucky Libraries, ExploreUK", "city": "St. Louis", "days": (date(1904, 7, 6), date(1904, 7, 9)), "ballots": {1: date(1904, 7, 9)}, "deciding": 1, "caveat": "Ohio's 46 votes for Parker stand under the unit rule: a poll of the delegation gave Parker 28, Hearst 6, McClellan 9, Cockrell 2, and Olney 1, and the chair let the announced vote stand. The table is the roll after the Idaho, Nevada, West Virginia, and Washington delegations changed their votes."},
     {"party": "democratic", "tables": {1: "1920:democratic:b1", 44: "1920:democratic:b44"}, "title": "Official report of the proceedings of the Democratic national convention, held in San Francisco, California, June 28, 29, 30, July 1, 2, 3, 5, and 6, 1920, resulting in the nomination of Hon. James M. Cox (of Ohio) for president and Hon. Franklin D. Roosevelt (of New York) for vice-president", "publisher": "Bookwalter-Ball Printing Co.", "city": "San Francisco", "days": (date(1920, 6, 28), date(1920, 7, 6)), "ballots": {1: date(1920, 7, 2), 44: date(1920, 7, 6)}, "deciding": 44, "acclamation": True},
     {"party": "democratic", "tables": {1: "1924:democratic:b1"}, "title": "Official report of the proceedings of the Democratic National Convention held in Madison Square Garden, New York City, June 24, 25, 26, 27, 28, 30, July 1, 2, 3, 4, 5, 7, 8, and 9, 1924, resulting in the nomination of John W. Davis (of West Virginia) for president and Charles W. Bryan (of Nebraska) for vice-president", "publisher": "Bookwalter-Ball-Greathouse Printing Co.", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {1: date(1924, 6, 30)}, "deciding": 103},
+    {"party": "democratic", "tables": {1: "1940:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 15–18, 1940", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1940, 7, 15), date(1940, 7, 18)), "ballots": {1: date(1940, 7, 17)}, "deciding": 1},
+    {"party": "democratic", "tables": {1: "1944:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 19–21, 1944", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1944, 7, 19), date(1944, 7, 21)), "ballots": {1: date(1944, 7, 20)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
@@ -633,7 +635,7 @@ CANDIDATES = {
     "1924:democratic:Thompson": ("Thompson", None),
     "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
     "democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
-    "democratic:Farley": ("James A. Farley", "Q954859"),
+    "democratic:Farley": ("James A. Farley", None),
     "democratic:Tydings": ("Millard Tydings", "Q354099"),
     "democratic:Garner": ("John Nance Garner", "Q298991"),
     "democratic:Hull": ("Cordell Hull", "Q202979"),
@@ -771,6 +773,15 @@ CORRECTIONS = {
         (259, "OR", (0.443, 0.602, 0.862, 0.614), {"Wall": 0, "McClellan": 1}, "1, set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
         (259, "WI", (0.443, 0.763, 0.862, 0.775), {"Olney": 0, "Wall": 26}, "26, set under Wall, whose printed total of 27 counts it"),
         (259, "OK", (0.443, 0.870, 0.862, 0.882), {"Wall": 0, "Towne": 0, "Olney": 1, "McClellan": 1}, "1 under Olney and 1 set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
+    ],
+    "1940:democratic": [
+        (226, "NY", (0.180, 0.470, 0.950, 0.484), {"votes": 94, "Roosevelt": 64.5, "Farley": 25, "Hull": 1, "not voting": 3.5}, "94 held, 90½ recorded; the printed totals (1,095½ of 1,100) leave 4½ not voting"),
+        (226, "WA", (0.180, 0.658, 0.950, 0.672), {"votes": 16, "Roosevelt": 15, "not voting": 1}, "16 held, 15 recorded; the printed totals (1,095½ of 1,100) leave 4½ not voting"),
+        (226, "VA", (0.180, 0.644, 0.950, 0.658), {"votes": 22, "Roosevelt": 5 + 14 / 15, "Farley": 3.4, "Garner": 8, "Hull": 4 + 2 / 3}, "5¹⁴⁄₁₅, 3⅖, 8, and 4⅔, which the delegation of 22 and the printed Hull total of 5⅔ count; one read runs the Roosevelt figure into 51 4/15 and another sets Hull at 4⅘"),
+    ],
+    "1944:democratic": [
+        (129, "AK", (0.160, 0.205, 0.760, 0.228), {"votes": 6, "Roosevelt": 6}, "its full 6 for Roosevelt, as the chair cast them once told he could vote the absent proxy; he first announced 5"),
+        (130, "TX", (0.160, 0.295, 0.780, 0.365), {"votes": 48, "Roosevelt": 36, "Byrd": 12}, "36 for Roosevelt and 12 for Byrd, as the chair recorded it: 24 for Roosevelt from one delegation and 12 each from the regular delegation"),
     ],
     "1920:democratic:b1": [
         (293, "DE", (0.330, 0.507, 0.880, 0.527), {"votes": 6, "McAdoo": 4, "Marshall": 4, "Wood": 0}, "4, set between the Marshall and Wood columns; the printed totals (Marshall 37, Wood 4) count it for Marshall"),
@@ -1430,6 +1441,8 @@ MISPRINTS = {
 }
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
 PAGES = DATA / "pages" / SOURCE
+VULGAR = re.compile(r"\s*([⁰¹²³⁴⁵⁶⁷⁸⁹]+)⁄([₀₁₂₃₄₅₆₇₈₉]+)$|\s+(\d+)/(\d+)$")
+SMALL = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉", "01234567890123456789")
 FRACTION = re.compile(r"\s*(?:([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])|1/2|'/2|\.5)$")
 
 
@@ -1571,6 +1584,10 @@ def number(cell: str) -> float:
     text = re.sub(r"(?<=\d)1-6$", "⅙", re.sub(r"[•*]+$", "", text))
     if re.fullmatch(r"[\dIl]+", text):
         text = text.replace("I", "1").replace("l", "1")
+    vulgar = VULGAR.search(text)
+    if vulgar:
+        over, under = (vulgar[1] or vulgar[3]).translate(SMALL), (vulgar[2] or vulgar[4]).translate(SMALL)
+        return number(text[: vulgar.start()]) + int(over) / int(under)
     fraction = FRACTION.search(text)
     text = re.sub(r"^[\s.\-—–·*…]+", "", text[: fraction.start()] if fraction else text)
     part = (unicodedata.numeric(fraction[1]) if fraction[1] else 0.5) if fraction else 0.0
