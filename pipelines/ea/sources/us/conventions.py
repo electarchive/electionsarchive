@@ -414,6 +414,9 @@ TABLES += [
     )
 ]
 TABLES += [
+    {"table": "1852:democratic:b49", "item": "proceedingsofde00demo", "leaves": (65,), "ballot": 49, "scatter": True, "bycandidate": True}
+]
+TABLES += [
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
     {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295), "rotate": True},
     {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
@@ -1456,6 +1459,19 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1852:democratic:b49": (
+        (
+            "The proceedings narrate this ballot state by state (pages 57 to 64). As first called, Vermont gave "
+            "Douglas 5; Massachusetts gave Pierce 7, Marcy 5, and Douglas 1 before making its 13 votes unanimous "
+            "for Pierce; New York gave Cass 10, Douglas 1, and Marcy 24; New Jersey gave Marcy 7; Pennsylvania gave "
+            "Buchanan 27; Delaware gave Cass 3; and Maryland gave Cass 1, Buchanan 1, Marcy 1, and Pierce 5. These "
+            "and the other delegations then changed their votes to Pierce before the result was announced; the "
+            "tabulation stored here is the one printed after the changes (page 64). It prints Maryland's 5 for "
+            "Pierce without the state's other 3 votes, and a Pierce total of 283, which the president announced "
+            "with 6 scattering, though its state figures add to 279. The rows are stored as printed."
+        ),
+        {"column Pierce": (283, 279, "the state figures add to 279")},
+    ),
     "1884:republican:b1": (
         (
             "The printed totals give John Sherman 30 votes and Hawley 13, against 31 and 12 in the state rows, "
