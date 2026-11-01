@@ -1163,6 +1163,15 @@ def amended(lines: pl.DataFrame) -> pl.DataFrame:
                     name=pl.when(at).then(pl.lit(fix["name"])).otherwise(pl.col("name")),
                     town=pl.when(at).then(pl.lit(fix["town"])).otherwise(pl.col("town")),
                 )
+            elif fix["op"] == "relabel":
+                at = pl.col("page").eq(page) & pl.col("year").eq(year) & ((pl.col("y0") - y0).abs() < 6e-5)
+                moved = 1_000_000 + hit["group"][0]
+                lines = lines.with_columns(
+                    side=pl.when(at).then(pl.lit(fix["name"])).otherwise(pl.col("side")),
+                    group=pl.when(at).then(pl.lit(moved, dtype=pl.Int64)).otherwise(pl.col("group")),
+                    printed=pl.when(at).then(pl.lit(fix["votes"], dtype=pl.Int64)).otherwise(pl.col("printed")),
+                )
+                touched.append((year, hit["stage"][0], moved))
             elif fix["op"] == "read":
                 lines = lines.with_columns(
                     agrees=pl.when(
