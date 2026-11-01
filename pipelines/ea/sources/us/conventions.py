@@ -351,13 +351,6 @@ TABLES += [
         {f"b{n}": (leaf,) for n, leaf in enumerate(DNC_1868, start=1)},
         party="democratic",
     ),
-    {
-        "table": "1868:democratic:b22",
-        "item": "officialproceedi00demo",
-        "leaves": (152, 155, 156, 157, 158),
-        "ballot": 22,
-        "narrated": True,
-    },
     *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
     *ballots(
         "officialpr00demo",
