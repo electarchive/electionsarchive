@@ -113,7 +113,13 @@ def parse() -> None:
                 print(f"{year} legislature {district}: {names} sum {sums} printed {total[0]}, skipped")
                 continue
             rows.extend(
-                (day, f"legislature:{district}:g", code, names[k], votes[k])
+                (
+                    day,
+                    f"legislature:{district}:{'gs' if (year, district) == (2012, 2) else 'g'}",
+                    code,
+                    names[k],
+                    votes[k],
+                )
                 for code, votes in parts
                 for k in range(len(names))
             )
@@ -131,7 +137,7 @@ def parse() -> None:
         special=pl.lit(False),
         state=pl.lit("NE"),
         measure=pl.lit(1, pl.Int16),
-        writein=pl.lit(False),
+        writein=pl.col("candidate").str.to_uppercase() == "SCATTERING",
         kind=pl.lit("county"),
         source=pl.lit("NE"),
     ).write_parquet(PARSED / "counties.parquet")
@@ -159,5 +165,12 @@ def emit() -> Path:
             )
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, BASE + BOOKS[year][1]), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NE": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet"),
+            {"NE": source},
+            strict=True,
+            authoritative="Source: the Secretary of State's canvass book, whose county rows add up to each candidate's printed total.",
+        )
         return cs.write()
