@@ -237,6 +237,7 @@ COUNTIES = {
         "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6",
         "RI-web/barrington-boc-booklet.pdf",
     ),
+    "44003-cv": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/0601.pdf"),
     "44005": (
         "RI",
         "https://portsmouthri.gov/DocumentCenter/View/7981/Portsmouth-Local-Ballot-Question-Explanation-2026",
@@ -247,6 +248,7 @@ COUNTIES = {
         "https://www.littlecomptonri.org/news_detail_T28_R81.php",
         "RI-web/littlecompton-questions.html",
     ),
+    "44005-jt": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/1501.pdf"),
     "44007": (
         "RI",
         "https://www.providenceri.gov/wp-content/uploads/2026/09/November-2026-Local-Question-Explanantions.pdf",
@@ -257,6 +259,7 @@ COUNTIES = {
         "https://cranstonri.gov/_resources/common/userfiles/file/Board%20of%20Canvassers/2026%20Election%20Items/Cranston%202026%20Voter%20Guide.pdf",
         "RI-web/cranston-voter-guide.pdf",
     ),
+    "44007-cf": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/0401.pdf"),
     "44007-pw": (
         "RI",
         "https://pawtucketri.gov/wp-content/uploads/2026/10/2026-Bond-Booklet-for-webpage-1.pdf",
@@ -267,6 +270,8 @@ COUNTIES = {
         "https://www.smithfieldri.gov/",
         "MF-481/smithfield/Smithfield State and Local Questions.pdf",
     ),
+    "44007-jo": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/1601.pdf"),
+    "44007-sc": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/3001.pdf"),
     "44009": (
         "RI",
         "https://www.richmondri.gov/DocumentCenter/View/4674/Chariho-Public-Notice-1022026",
@@ -282,6 +287,7 @@ COUNTIES = {
         "https://www.thewesterlysun.com/classifieds/community/announcements/legal/town-of-hopkinton-local-referendum-question/ad_0d68755c-52ac-5597-b590-c66345354519.html",
         "RI-web/hopkinton-local-question-7.html",
     ),
+    "44009-we": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/3601.pdf"),
     "38015": (
         "ND",
         "https://www.bismarckschools.org/fs/resource-manager/view/11ac6ea4-ff0d-4486-84da-16289d7f918f",
