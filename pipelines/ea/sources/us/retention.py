@@ -29,6 +29,25 @@ KANSAS_PRECINCTS = {
     "2022-11-08": "22elec/2022-General-Election-Supreme-Court-Results-By-Precinct.xlsx",
     "2024-11-05": "24elec/2024-General-Election-Court-of-Appeals-Precinct-Results.xlsx",
 }
+KANSAS_SCANNED = {
+    "2010-11-02": (
+        "https://kssos.org/elections/10elec/2010_General_Election_Results.pdf",
+        "MF-446/ks-2010-general-official-vote-totals.pdf",
+    )
+}
+KANSAS_JUDGES_2010 = {
+    ("supreme-court", 1): "Carol A. Beier",
+    ("supreme-court", 2): "Dan Biles",
+    ("supreme-court", 3): "Lawton R. Nuss",
+    ("supreme-court", 5): "Marla J. Luckert",
+    ("court-of-appeals", 1): "Stephen D. Hill",
+    ("court-of-appeals", 4): "Patrick D. McAnany",
+    ("court-of-appeals", 6): "Nancy L. Caplinger",
+    ("court-of-appeals", 7): "Henry W. Green Jr.",
+    ("court-of-appeals", 11): "Tom Malone",
+    ("court-of-appeals", 12): "Michael B. Buser",
+    ("court-of-appeals", 13): "Melissa Taylor Standridge",
+}
 KANSAS_FILES = {
     "2004-11-02": "04elec/2004GeneralOfficialResults.pdf",
     "2006-11-07": "06elec/2006GeneralElectionOfficialResults.pdf",
@@ -274,6 +293,19 @@ def fetch() -> None:
                 )
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
+    for url, name in KANSAS_SCANNED.values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            file = DATA / "inbox" / "manual" / name
+            raw.store(
+                SOURCE,
+                url,
+                file.read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
     for path in KANSAS_PRECINCTS.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".xlsx")
     for url in [*ARIZONA_CANVASSES.values(), *CALIFORNIA_FILES.values()]:
@@ -512,6 +544,63 @@ def kansas() -> list[dict[str, object]]:
                             }
                         )
                     race = None
+    return rows
+
+
+def kansas_scanned() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    printed: dict[tuple[tuple[str, int], str], tuple[int, float]] = {}
+    for day, (url, _) in KANSAS_SCANNED.items():
+        pdf = raw.cached(SOURCE, url).path
+        PAGES.mkdir(parents=True, exist_ok=True)
+        for page in range(1, 17):
+            found = scan.words(pdf, page, PAGES / f"{day}-{page}.tsv")
+            lines: dict[tuple[int, int, int], list[tuple[str, scan.Box]]] = defaultdict(list)
+            for text, box, line, _ in found:
+                lines[line].append((text, box))
+            race: tuple[str, int] | None = None
+            for words in lines.values():
+                text = " ".join(word for word, _ in words)
+                if head := re.search(r"(Supreme\s+\w+|Court of Appeals)\s+(Justice|Judge)\s+0*(\d+)", text):
+                    race = ("supreme-court" if head[1].startswith("Supreme") else "court-of-appeals", int(head[3]))
+                    continue
+                if "District" in text:
+                    race = None
+                    continue
+                said = re.search(r"[\"“”]\s*(YES|NO)\s*[\"“”]", text)
+                if race is None or said is None:
+                    continue
+                tail = text[said.end() :]
+                counted = re.search(r"(\d{1,3}(?:,\d{3})+)\D+(\d+\.\d)\s*%", tail)
+                if counted is None:
+                    raise ValueError(f"{day} page {page}: no votes in {text}")
+                box = next(box for word, box in words if re.sub(r"[^\d,]", "", word) == counted[1])
+                rows.append(
+                    {
+                        "day": day,
+                        "state": "KS",
+                        "court": race[0],
+                        "number": race[1],
+                        "post": None,
+                        "name": KANSAS_JUDGES_2010[race],
+                        "answer": said[1].lower(),
+                        "votes": int(counted[1].replace(",", "")),
+                        "page": page,
+                        "x0": box[0],
+                        "y0": box[1],
+                        "x1": box[2],
+                        "y1": box[3],
+                        "origin": url,
+                        "county": None,
+                        "flags": 0,
+                    }
+                )
+                printed[(race, said[1].lower())] = (int(counted[1].replace(",", "")), float(counted[2]))
+    for race in KANSAS_JUDGES_2010:
+        yes, no = printed[(race, "yes")], printed[(race, "no")]
+        for votes, percent in (yes, no):
+            if abs(int(votes / (yes[0] + no[0]) * 1000) / 10 - percent) > 0.1:
+                raise ValueError(f"Kansas 2010 {race}: {votes} is not {percent} percent of {yes[0] + no[0]}")
     return rows
 
 
@@ -812,7 +901,13 @@ def parse() -> None:
     inputs = [(year, raw.cached(source, url).path) for year, files in FILES.items() for source, url in files]
     wanted = selected_states()
     official = pl.DataFrame(
-        kansas() + oklahoma() + oklahoma_counties() + arizona() + california() + retention_iowa.rows(),
+        kansas()
+        + kansas_scanned()
+        + oklahoma()
+        + oklahoma_counties()
+        + arizona()
+        + california()
+        + retention_iowa.rows(),
         schema=OFFICIAL_SCHEMA,
     ).with_row_index("order")
     PARSED.mkdir(parents=True, exist_ok=True)
