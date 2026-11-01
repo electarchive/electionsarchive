@@ -70,10 +70,11 @@ CUTOFF = 0.25
 zones: list[tuple[list[list[float]], list[float] | None, Transformer, list[float] | None]] = []
 land: BaseGeometry
 inside: PreparedGeometry
+near: PreparedGeometry
 
 
 def setup(scheme: str) -> None:
-    global land, inside
+    global land, inside, near
     entry = REGISTRY["projections"][REGISTRY["schemes"][scheme]]
     zones.clear()
     for part in [*entry.get("insets", []), entry]:
@@ -88,6 +89,7 @@ def setup(scheme: str) -> None:
         ]
     ).buffer(0.02)
     inside = prep(land)
+    near = prep(unary_union([box(*b) for zone in zones for b in zone[0]] + surround(framed=True)))
 
 
 def tiles(z: int, w: float, s: float, e: float, n: float) -> list[tuple[int, int, int]]:
@@ -98,13 +100,22 @@ def tiles(z: int, w: float, s: float, e: float, n: float) -> list[tuple[int, int
     return [(z, x, y) for x in range(x0, min(x1, span - 1) + 1) for y in range(y0, min(y1, span - 1) + 1)]
 
 
-def surround() -> list[BaseGeometry]:
+def cell(z: int, x: int, y: int) -> BaseGeometry:
+    def lat(row: int) -> float:
+        return math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * row / 2**z))))
+
+    return box(x / 2**z * 360 - 180, lat(y + 1), (x + 1) / 2**z * 360 - 180, lat(y))
+
+
+def surround(framed: bool) -> list[BaseGeometry]:
     within, _, project, _ = zones[-1]
     back = Transformer.from_crs(project.target_crs, "EPSG:4326", always_xy=True)
     bounds = [project.transform_bounds(*b, densify_pts=64) for b in within]
     x0, y0 = min(b[0] for b in bounds), min(b[1] for b in bounds)
     x1, y1 = max(b[2] for b in bounds), max(b[3] for b in bounds)
-    wide, tall = max(x1 - x0, (y1 - y0) * ASPECTS[1]) * 0.6, max(y1 - y0, (x1 - x0) / ASPECTS[0]) * 0.6
+    ratio = min(2, max(0.8, (x1 - x0) / (y1 - y0) * 1.04))
+    low, high = (ratio * 0.84, ratio) if framed else ASPECTS
+    wide, tall = max(x1 - x0, (y1 - y0) * high) * 0.6, max(y1 - y0, (x1 - x0) / low) * 0.6
     xs, ys = np.meshgrid((x0 + x1) / 2 + np.linspace(-wide, wide, 257), (y0 + y1) / 2 + np.linspace(-tall, tall, 257))
     lons, lats = back.transform(xs.ravel(), ys.ravel())
     keep = np.isfinite(lons) & np.isfinite(lats) & (np.abs(lons) <= 180) & (np.abs(lats) <= 90)
@@ -113,12 +124,8 @@ def surround() -> list[BaseGeometry]:
     mercator = np.arcsinh(np.tan(np.radians(np.clip(lats[keep], -85.05, 85.05))))
     ty = np.clip(((1 - mercator / np.pi) / 2 * span).astype(int), 0, span - 1)
     hit = set(zip(tx.tolist(), ty.tolist(), strict=True))
-    near = {((x + dx) % span, y + dy) for x, y in hit for dx in (-1, 0, 1) for dy in (-1, 0, 1) if 0 <= y + dy < span}
-
-    def lat(row: int) -> float:
-        return math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * row / span))))
-
-    return [box(x / span * 360 - 180, lat(y + 1), (x + 1) / span * 360 - 180, lat(y)) for x, y in near]
+    reach = {((x + dx) % span, y + dy) for x, y in hit for dx in (-1, 0, 1) for dy in (-1, 0, 1) if 0 <= y + dy < span}
+    return [cell(BROAD, x, y) for x, y in reach]
 
 
 def walk(coords, fn):
@@ -261,6 +268,7 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
     )
     for feature in earth:
         push(feature["geometry"], "earth", {}, 0, True)
+    seen = metro or near.intersects(cell(z, x, y))
     ground = unary_union([make_valid(shape(f["geometry"])) for f in earth]) if earth else None
     for feature in [] if ground is None else tile.get("boundaries", {}).get("features", []):
         kind = feature["properties"].get("kind")
@@ -269,7 +277,7 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
         cut = shape(feature["geometry"]).intersection(ground)
         lines = [part for part in getattr(cut, "geoms", [cut]) if "LineString" in part.geom_type]
         if lines:
-            push(unary_union(lines), "bounds", {"kind": kind}, 8 if kind == "county" else 0, True)
+            push(unary_union(lines), "bounds", {"kind": kind}, 8 if kind == "county" else 0 if seen else 5, True)
     for feature in tile.get("roads", {}).get("features", []):
         p = feature["properties"]
         if p.get("is_tunnel"):
@@ -329,7 +337,7 @@ def build(scheme: str) -> str:
     country = folder / f"{scheme}.pmtiles"
     core = [b for zone in zones for b in zone[0]]
     extract(key, country, unary_union([box(*b) for b in core]), 0, 10)
-    wide = unary_union([box(*b) for b in core] + surround())
+    wide = unary_union([box(*b) for b in core] + surround(framed=False))
     broad = folder / f"{scheme}.wide.pmtiles"
     extract(key, broad, wide, 0, BROAD)
     fine = {z: {t for b in core for t in tiles(z, *b)} for z in (8, 10)}
@@ -382,14 +390,7 @@ def build(scheme: str) -> str:
         jobs += [
             (str(city), z, x, y, True, None)
             for z, x, y in {t for b in getattr(metros, "geoms", [metros]) for t in tiles(14, *b.bounds)}
-            if covered.intersects(
-                box(
-                    x / 2**14 * 360 - 180,
-                    math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + 1) / 2**14)))),
-                    (x + 1) / 2**14 * 360 - 180,
-                    math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / 2**14)))),
-                )
-            )
+            if covered.intersects(cell(z, x, y))
         ]
     staging = WORK / "staging" / scheme
     shutil.rmtree(staging, ignore_errors=True)
