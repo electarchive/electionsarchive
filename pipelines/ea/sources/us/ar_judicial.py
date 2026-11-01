@@ -51,6 +51,8 @@ WORKBOOKS = (
         {},
     ),
 )
+CERTIFIED_2000 = SOS + "2000_Certified_General_Election_Results.pdf"
+FIRST_ROUND = {date(2000, 11, 7)}
 TALLY = "https://results.tally-enr.com/results/arkansas/{}/FullDataFile.json"
 ELECTIONS = {
     1837: "2018-05-22:AR:primary",
@@ -81,6 +83,7 @@ def clean(name: str) -> str:
 def fetch() -> None:
     for url, *_rest in WORKBOOKS:
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+    raw.fetch(SOURCE, CERTIFIED_2000, suffix=".pdf")
     for election in ELECTIONS:
         raw.fetch(SOURCE, TALLY.format(election), suffix=".json")
 
@@ -132,6 +135,34 @@ def read(source: str, url: str) -> dict[tuple[str, str], dict[str | None, dict[s
             close()
             current, block = None, {}
     close()
+    return found
+
+
+def read_2000() -> dict[tuple[str, str], dict[str | None, dict[str, int]]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, CERTIFIED_2000).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    found: dict[tuple[str, str], dict[str | None, dict[str, int]]] = {}
+    for start, line in enumerate(text):
+        match = re.match(r"^State Supreme Court (Chief|Associate) Justice,? (Position \d+)$", line.strip())
+        if match is None or (match[1], match[2]) in found:
+            continue
+        totals: dict[str, int] = {}
+        names: dict[str, str] = {}
+        places: dict[str | None, dict[str, int]] = {}
+        for item in text[start + 1 : start + 140]:
+            item = item.strip()
+            if legend := re.match(r"# (\d) represents (.+?) \[([\d,]+) total votes", item):
+                names[legend[1]] = clean(legend[2])
+                totals[names[legend[1]]] = int(legend[3].replace(",", ""))
+            elif row := re.match(r"^(.+?) County\s+((?:\d+\s*)+)$", item):
+                places[row[1]] = dict(zip(names.values(), (int(v) for v in row[2].split()), strict=True))
+            elif re.match(r"^(State|Court of|Circuit|U\.S\.)", item):
+                break
+        found[(match[1], match[2])] = {**places, None: totals}
     return found
 
 
@@ -194,6 +225,19 @@ def emit() -> Path:
     for url, day, election_key, kind, _, sheets in WORKBOOKS:
         for (court, seat), places in workbook(url, sheets).items():
             contests.append((SOURCE, url, day, election_key, kind, court, seat, check(day, court, seat, places)))
+    for (court, seat), places in read_2000().items():
+        contests.append(
+            (
+                SOURCE,
+                CERTIFIED_2000,
+                date(2000, 11, 7),
+                "2000-11-07:AR",
+                "general",
+                court,
+                seat,
+                check(date(2000, 11, 7), court, seat, places),
+            )
+        )
     for source, url, day, election_key, kind in (PRIMARY, RUNOFF):
         for (court, seat), places in read(source, url).items():
             if court == "Chief" and kind == "general":
@@ -213,12 +257,14 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Arkansas Supreme Court nonpartisan contests by county: 2004 to 2010 from the Secretary of State's "
+            summary="Arkansas Supreme Court nonpartisan contests by county: 2000 to 2010 from the Secretary of State's "
             "reports and workbooks, and 2014 to 2024 from the Secretary of State's election night reporting files",
             polity="US-AR",
         )
         sources: dict[str, UUID] = {}
-        titles = {url: title for url, _, _, _, title, _ in WORKBOOKS}
+        titles = {url: title for url, _, _, _, title, _ in WORKBOOKS} | {
+            CERTIFIED_2000: "2000 general election certified results"
+        }
         for source, url, day, _, kind, *_rest in contests:
             if url in sources:
                 continue
@@ -284,7 +330,7 @@ def emit() -> Path:
             election = cs.key("us.election", election_key)
             contest_key = f"{day}:AR:{slug(title)}:{slug(seat)}"
             contest = cs.key("us.contest", contest_key)
-            runoff = kind == "general"
+            runoff = kind == "general" and day not in FIRST_ROUND
             previous = first_round.get((day.year, court, seat)) if runoff else None
             first_round[(day.year, court, seat)] = contest
             cs.add(
@@ -311,7 +357,7 @@ def emit() -> Path:
                 is_preferred=True,
             )
             if contest in cs.minted:
-                base = f"us/ar/{day}-{'general' if runoff else 'primary'}/{slug(title)}-{slug(seat)}"
+                base = f"us/ar/{day}-{'general' if kind == 'general' else 'primary'}/{slug(title)}-{slug(seat)}"
                 path, count = base, 1
                 while path in taken:
                     count += 1
