@@ -1,5 +1,6 @@
 import type * as Maplibre from "maplibre-gl";
 import type { PMTiles, Protocol } from "pmtiles";
+import { dev } from "$app/env";
 import { untrack } from "svelte";
 import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
@@ -52,6 +53,7 @@ const SLOTS: Array<Slot> = [
 const CSS = /^(var|color-mix)\(/u;
 const SIZE = 512;
 const FIT = 13;
+const CHECKED = { validate: dev };
 
 let library: Promise<{
   maplibre: typeof Maplibre;
@@ -64,6 +66,15 @@ const rasters = new Map<string, Promise<Raster | null>>();
 const loaded = new Map<string, Raster>();
 let serial = 0;
 let kit: { maplibre: typeof Maplibre; PMTiles: typeof PMTiles } | null = null;
+
+const attach = (
+  gl: Maplibre.Map,
+  id: string,
+  spec: Maplibre.SourceSpecification,
+) => {
+  gl.style.addSource(id, spec, CHECKED);
+  gl._update(true);
+};
 
 const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -812,7 +823,7 @@ export class Engine {
     if (gl == null || gl.getSource(id) != null) {
       return id;
     }
-    gl.addSource(id, {
+    attach(gl, id, {
       type: "vector",
       url: `pmtiles://${location.origin}/tiles/${key}.pmtiles`,
     });
@@ -879,7 +890,7 @@ export class Engine {
     if (source?.type === "geojson") {
       void (source as Maplibre.GeoJSONSource).setData(data);
     } else {
-      gl.addSource(id, { type: "geojson", data });
+      attach(gl, id, { type: "geojson", data });
       this.#sources.set(id, { group, isVector: false });
     }
     return id;
@@ -929,7 +940,8 @@ export class Engine {
         ]),
       ),
     } as Maplibre.LayerSpecification;
-    gl.addLayer(resolved, after ?? `slot:${slot}`);
+    gl.style.addLayer(resolved, after ?? `slot:${slot}`, CHECKED);
+    gl._update(true);
     this.#layers.set(spec.id, { spec, group: options.group ?? "", rank });
     this.#slots.set(spec.id, slot);
   }
@@ -940,7 +952,7 @@ export class Engine {
 
   filter(id: string, filter: Maplibre.FilterSpecification | null) {
     if (this.gl?.getLayer(id) != null) {
-      this.gl.setFilter(id, filter);
+      this.gl.setFilter(id, filter, CHECKED);
     }
   }
 
@@ -1082,7 +1094,7 @@ export class Engine {
       for (const isFocus of [false, true]) {
         const id = `${isFocus ? "spot" : "ids"}:${key}`;
         if (gl.getSource(id) == null) {
-          gl.addSource(id, {
+          attach(gl, id, {
             type: "raster",
             tiles: [this.#rasterUrl(key, isFocus)],
             tileSize: 256,
