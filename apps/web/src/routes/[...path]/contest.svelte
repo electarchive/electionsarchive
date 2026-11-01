@@ -451,10 +451,16 @@
       (entry) => entry.k != null && entry.frame != null,
     );
     const places = contest.locator ?? surround?.places ?? null;
+    const tiles =
+      own?.tiles ??
+      surround?.bounds.find(
+        (entry) => entry.scheme === own?.scheme && entry.tiles != null,
+      )?.tiles;
     if (
       drawn != null ||
       places == null ||
-      own?.tiles == null ||
+      own == null ||
+      tiles == null ||
       own.frame == null ||
       own.k == null ||
       places.rows.every((row) => row.k === own.k)
@@ -467,8 +473,8 @@
     );
     return {
       places,
-      tiles: own.tiles,
-      own: { tiles: own.tiles, k: own.k, parted: own.parted ?? null },
+      tiles,
+      own: { tiles, k: own.k, parted: own.parted ?? null },
       parted: own.parted ?? null,
       frame: own.frame,
       limit: parent?.frame ?? {
