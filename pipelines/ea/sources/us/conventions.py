@@ -420,6 +420,53 @@ COLUMNS = {
 LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1912:democratic:b2": [
+        (207, "CT", (0.755, 0.617, 0.795, 0.631), {"Baldwin": 14}, "the row prints only the delegation of 14; the announced and printed Baldwin total of 14 has no other source"),
+        (207, "IN", (0.803, 0.724, 0.843, 0.738), {"Marshall": 30}, "the row prints only the delegation of 30; the announced and printed Marshall total of 31 is Indiana's 30 and Michigan's 1"),
+        (208, "OK", (0.487, 0.375, 0.643, 0.39), {"Clark": 10, "Wilson": 10, "Harmon": 0}, "10 and 10, printed one column to the right; the printed totals count them for Clark and Wilson"),
+        (208, "OR", (0.545, 0.392, 0.643, 0.408), {"Wilson": 10, "Harmon": 0}, "10, printed in the Harmon column; the printed totals count it for Wilson"),
+        (208, "NC", (0.545, 0.321, 0.705, 0.337), {"Wilson": 16.25, "Underwood": 7.25}, "16¼ and 7¼, which the delegation of 24 and the printed totals count"),
+    ],
+    "1912:democratic:b4": [
+        (213, "FL", (0.58, 0.244, 0.62, 0.258), {"Wilson": 0}, "a stray mark; Florida's 12 are all for Underwood"),
+        (213, "ND", (0.735, 0.672, 0.785, 0.688), {"Wilson": 10, "Underwood": 0}, "10, printed in the Underwood column; the printed totals (Wilson 349½, Underwood 112) count it for Wilson"),
+    ],
+    "1912:democratic:b7": [
+        (221, "MI", (0.808, 0.73, 0.845, 0.748), {"Marshall": 1, "Kern": 0}, "1, set between the Marshall and Kern columns; the printed totals and the announced result count it for Marshall"),
+    ],
+    "1912:democratic:b10": [
+        (227, "CT", (0.728, 0.628, 0.778, 0.646), {"Wilson": 0, "Underwood": 7, "Marshall": 0}, "7 in the Underwood column, which the printed Underwood total of 117½ counts; the Wilson cell holds a pen mark"),
+    ],
+    "1912:democratic:b12": [
+        (234, "TN", (0.455, 0.63, 0.6, 0.646), {"votes": 24, "Wilson": 7, "not voting": 2.5}, "24*, with the footnote '*Not voting, 2½'; the Wilson cell prints 7 beside a pen mark"),
+        (234, "SD", (0.512, 0.612, 0.6, 0.627), {"Clark": 0, "Wilson": 10}, "10, printed in the Clark column; the printed totals (Clark 547½, Wilson 354) count it for Wilson"),
+    ],
+    "1912:democratic:b14": [
+        (249, "OH", (0.75, 0.53, 0.79, 0.546), {"Harmon": 29}, "the Harmon cell is blank; Ohio's 48 less its 19 printed votes, and the printed Harmon total of 29"),
+        (249, "VT", (0.633, 0.709, 0.673, 0.725), {"Underwood": 0}, "the delegation of 8 is filled by Clark 1 and Wilson 7, and the printed Underwood total of 111 leaves no room for it"),
+    ],
+    "1912:democratic:b16": [
+        (254, "WI", (0.645, 0.799, 0.701, 0.816), {"Harmon": 0, "Bryan": 1}, "1, printed in the Harmon column; the printed totals (Harmon 29, Bryan 1) count it for Bryan"),
+    ],
+    "1912:democratic:b23": [
+        (273, "VT", (0.754, 0.649, 0.777, 0.665), {"Bryan": 0, "Foss": 8}, "8, printed in the Bryan column; the printed totals (Bryan 1, Foss 45) count it for Foss"),
+    ],
+    "1912:democratic:b28": [
+        (297, "MO", (0.56, 0.808, 0.6, 0.825), {"Wilson": 0}, "a stray mark; Missouri's 36 are all for Clark"),
+        (298, "TX", (0.465, 0.423, 0.495, 0.435), {"Clark": 0, "Wilson": 40}, "40, printed in the Clark column; the printed totals (Clark 468½, Wilson 437½) count it for Wilson"),
+    ],
+    "1912:democratic:b31": [
+        (311, "MD", (0.855, 0.59, 0.892, 0.606), {"Not voting": 0.5}, "½, which the delegation of 16 and the printed total of ½ count"),
+    ],
+    "1912:democratic:b37": [
+        (324, "IN", (0.835, 0.366, 0.885, 0.382), {"Kern": 1, "Not voting": 0}, "1, printed in the not-voting column; the printed totals (Kern 1, not voting ½) count it for Kern"),
+    ],
+    "1912:democratic:b38": [
+        (328, "NC", (0.53, 0.421, 0.695, 0.455), {"Clark": 0, "Wilson": 20, "Underwood": 4}, "20 and 4, printed one column to the left; the printed totals (Clark 425, Wilson 498½, Underwood 106) count them for Wilson and Underwood"),
+    ],
+    "1912:democratic:b42": [
+        (336, "MA", (0.66, 0.685, 0.7, 0.701), {"Foss": 27, "J. H. Lewis": 0}, "27 in the Foss column, which the printed Foss total of 28 counts"),
+    ],
     "1876:republican:b2": [
         (87, "SC", (0.573, 0.622, 0.618, 0.634), {"Bristow": 1, "Hayes": 0}, "the figure sits in the Bristow column, whose printed total counts it"),
         (87, "TX", (0.573, 0.634, 0.618, 0.647), {"Bristow": 1, "Hayes": 0}, "the figure sits in the Bristow column, whose printed total counts it"),
@@ -569,6 +616,8 @@ CORRECTIONS = {
     ],
 }  # fmt: skip
 TOTALS = {
+    "1912:democratic:b4": {"Marshall": 31, "Kern": 2},
+    "1912:democratic:b15": {"Harmon": 29},
     "1920:republican:b10": {"Harding": 692.2, "Johnson": 80.8},
     "1868:democratic:b1": {"Hancock": 33.5},
     "1868:democratic:b6": {"Blair": 5},
@@ -664,7 +713,7 @@ def number(cell: str) -> float:
 
 
 def candidate(label: str, table: str) -> str:
-    label = label.strip().rstrip(".:")
+    label = label.strip().rstrip(".:- ")
     if ":democratic" in table:
         label = re.sub(r"^For\s+", "", label)
         if sum(ch.isupper() for ch in label) > sum(ch.islower() for ch in label):
@@ -727,7 +776,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             or tuple(
                 "votes"
                 if re.search(r"vot(?!ing)|delegate|whole|^\s*total\.?\s*$", column["label"], re.IGNORECASE)
-                else candidate(column["label"], spec["table"])
+                else candidate(column["label"], spec["table"]) or None
                 for column in header
             )
         )
@@ -770,6 +819,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                 problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
                 continue
             for role, column, value in zip(roles, header, values, strict=True):
+                if role is None and code is not None and not column["label"].strip() and value.strip(" .…"):
+                    problems.append(f"leaf {leaf}: {row['label']} has {value!r} under an unlabeled column")
                 if role is None or (not value.strip() and roles.count(role) > 1):
                     continue
                 try:
@@ -827,7 +878,7 @@ def parse() -> None:
         (first, printed, problems), (second, _, others) = reads["low"], reads["medium"]
         values = {(cell["state"], cell["column"]): cell["value"] for cell in first}
         other = {(cell["state"], cell["column"]): cell["value"] for cell in second}
-        disagree = sorted(key for key in values.keys() | other.keys() if values.get(key) != other.get(key))
+        disagree = sorted(key for key in values.keys() | other.keys() if values.get(key, 0) != other.get(key, 0))
         failures = [*problems, *others, *(f"reads disagree on {state} {column}" for state, column in disagree)]
         if len(values) != len(first):
             failures.append(f"{len(first) - len(values)} cells read twice")
@@ -843,11 +894,14 @@ def parse() -> None:
             summed = sum(value for (_, name), value in values.items() if name == column)
             if abs(summed - total) > 1e-6:
                 failures.append(f"column {column}: states sum to {summed:g}, printed total {total:g}")
+        placed = next((read for read in (first, second) if all(max(cell["box"]) <= 1 for cell in read)), None)
+        if placed is None:
+            failures.append("no read places its cells on the page")
         report.append(f"## {spec['table']}\n\n{len(held)} delegations, {len(values)} cells, printed totals {printed}")
         report.extend(f"- {failure}" for failure in failures)
         report.append("")
         if not failures:
-            frames.append(pl.DataFrame(first))
+            frames.append(pl.DataFrame(placed))
             for leaf in spec["leaves"]:
                 image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
                 with Image.open(image.path) as opened:
