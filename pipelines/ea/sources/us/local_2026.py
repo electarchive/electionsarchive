@@ -10229,6 +10229,37 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                nj_multi = False
+                if state == "NJ":
+                    joined = " ".join(tokens)
+                    nj_multi = bool(
+                        re.search(r"\bregional\b|^morris school district\b|^school district of the chathams\b", joined)
+                    )
+                    for pattern, repl in (
+                        (r"^clinton glen gardner\b", "clinton town glen gardner"),
+                        (r"^hamilton township greater egg harbor regional\b", "greater egg harbor regional"),
+                        (r"^school district of the chathams\b", "the chathams"),
+                        (r"^hunterdon central regional high school\b", "hunterdon central high"),
+                        (r"^hanover park regional\b", "hanover park high"),
+                        (r"^west morris regional\b", "west morris high"),
+                        (r"^manchester regional high school\b", "passaic manchester regional high school"),
+                        (r"^bridgewater raritan raritan\b", "bridgewater raritan"),
+                        (
+                            r"^scotch plains township board of education$",
+                            "scotch plains fanwood regional board of education scotch plains township",
+                        ),
+                        (
+                            r"^(carneys point township|penns grove borough) board of education$",
+                            r"penns grove carneys point regional board of education \1",
+                        ),
+                        (
+                            r"^(pilesgrove township|woodstown borough) board of education$",
+                            r"woodstown pilesgrove regional board of education \1",
+                        ),
+                    ):
+                        joined = re.sub(pattern, repl, joined)
+                    nj_multi = nj_multi or bool(re.search(r"\bregional\b", joined))
+                    tokens = joined.split()
                 if state == "IN":
                     tokens = re.sub(
                         r"^(elkhart (?=goshen|baugo|concord|middlebury|fairfield)|delaware (?=cowan|daleville))",
@@ -10341,6 +10372,23 @@ def parse() -> None:
                 if state == "IL" and re.search(r"(?i)\bregional (superintendent|office)\b", str(row["contest"])):
                     fits = []
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
+                if state == "NJ" and len({fit[4] for fit in fits}) > 1:
+                    plain = [
+                        word for word in tokens if word not in ("high", "school", "schools", "district", "sch", "dist")
+                    ]
+                    exact = [
+                        fit
+                        for fit in fits
+                        if (
+                            named := [
+                                "township" if word == "twp" else word
+                                for word in re.findall(r"[a-z0-9]+", fit[3].lower().replace("&", " and "))
+                                if word not in ("school", "schools", "district", "sch", "dist")
+                            ]
+                        )
+                        and plain[: len(named)] == named
+                    ]
+                    fits = exact or fits
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
@@ -10466,6 +10514,20 @@ def parse() -> None:
                         )
                         else " ".join(rest[rest.index("board") + 1 :]).title()
                         if state == "IN" and role == "board-of-education" and "board" in rest
+                        else nj_area
+                        if state == "NJ"
+                        and role == "board-of-education"
+                        and nj_multi
+                        and "education" in rest
+                        and (
+                            nj_area := " ".join(
+                                word
+                                for word in rest[rest.index("education") + 1 :]
+                                if word not in ("unexpired", "term", "partial", "full")
+                            )
+                            .removeprefix("district ")
+                            .title()
+                        )
                         else chair[1].title()
                         if state == "IL"
                         and role == "board-of-education"
