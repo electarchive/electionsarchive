@@ -104,6 +104,7 @@ const MODEL = {
   same: { center: 0.06, spread: 0.08 },
   drift: 0.06,
   quiet: 15,
+  pause: 2,
   moving: 0.1,
   shift: 0.028,
   surge: 0.14,
@@ -272,6 +273,7 @@ function units(race: LiveRace, at: string | null) {
   const byUnit = series(race, at);
   const latest = new Map<string, Array<number>>();
   const changed = new Map<string, string>();
+  const waits = new Map<string, number>();
   let now = at ?? "";
   for (const [id, list] of byUnit) {
     let pick = list[0]!;
@@ -289,6 +291,26 @@ function units(race: LiveRace, at: string | null) {
     }
     latest.set(id, pick.votes);
     changed.set(id, since);
+    const steps: Array<number> = [];
+    let last = -1;
+    for (const count of list.toSorted((x, y) => x.at.localeCompare(y.at))) {
+      const value = sum(count.votes);
+      if (value !== last) {
+        steps.push(Date.parse(count.at));
+        last = value;
+      }
+    }
+    const gaps = steps
+      .slice(1)
+      .map((time, index) => (time - steps[index]!) / 60_000)
+      .toSorted((x, y) => x - y);
+    waits.set(
+      id,
+      Math.max(
+        MODEL.quiet,
+        MODEL.pause * (gaps[Math.floor(gaps.length / 2)] ?? 0),
+      ),
+    );
     if (pick.at > now) {
       now = pick.at;
     }
@@ -345,7 +367,8 @@ function units(race: LiveRace, at: string | null) {
       features: [],
       traits: base?.traits ?? null,
       settled: changed.has(id)
-        ? (clock - Date.parse(changed.get(id)!)) / 60_000 >= MODEL.quiet
+        ? (clock - Date.parse(changed.get(id)!)) / 60_000 >=
+          (waits.get(id) ?? MODEL.quiet)
           ? 1
           : MODEL.moving
         : 1,
