@@ -1068,7 +1068,16 @@ def misread(option: str, name: str) -> bool:
 
 def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
     added = pl.read_csv(
-        Path(__file__).with_name("nh_manual_lines.tsv"), separator="\t", schema_overrides={"beside_y0": pl.Float64}
+        Path(__file__).with_name("nh_manual_lines.tsv"),
+        separator="\t",
+        schema_overrides={
+            "beside_y0": pl.Float64,
+            "office": pl.String,
+            "district": pl.String,
+            "party": pl.String,
+            "group": pl.Int64,
+            "printed": pl.Int64,
+        },
     )
     parts = []
     for row in added.iter_rows(named=True):
@@ -1090,7 +1099,12 @@ def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
                 y1=pl.lit(row["y1"]),
                 writein=pl.lit(False),
                 tail=pl.lit(None, dtype=pl.String),
-                party=pl.lit(None, dtype=pl.String),
+                party=pl.lit(row["party"], dtype=pl.String),
+            ).with_columns(
+                office=pl.lit(row["office"] or beside["office"][0]),
+                district=pl.lit(row["district"] if row["office"] else beside["district"][0], dtype=pl.String),
+                group=pl.lit(row["group"] if row["group"] is not None else beside["group"][0], dtype=pl.Int64),
+                printed=pl.lit(row["printed"] if row["group"] is not None else beside["printed"][0], dtype=pl.Int64),
             )
         )
     return pl.concat(parts)

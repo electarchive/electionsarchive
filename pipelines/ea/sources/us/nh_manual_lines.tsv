@@ -1,2 +1,8 @@
-year	page	beside_y0	name	town	votes	x0	y0	x1	y1
-2010	196	0.845407	William Cohen	Bow	2811	0.2141	0.83066	0.8724	0.84
+year	page	beside_y0	name	town	votes	x0	y0	x1	y1	office	district	party	group	printed
+2010	196	0.845407	William Cohen	Bow	2811	0.2141	0.83066	0.8724	0.84					
+1972	898	0.104618	Edith E. Holland	Exeter	41234	0.14133	0.176529	0.902806	0.188522	register of deeds		r	2000001	41237
+1972	898	0.104618	Scatter		3	0.14133	0.19034	0.902806	0.202333	register of deeds			2000001	41237
+1972	898	0.104618	Edward J. Howard	Exeter	39948	0.14133	0.248642	0.902806	0.260635	register of probate		r	2000002	39950
+1972	898	0.104618	Scatter		2	0.140902	0.263577	0.902806	0.27557	register of probate			2000002	39950
+2004	387	0.367613	Chester L. Jordan	Bow	39747	0.094241	0.314778	0.913613	0.323486	sheriff		r	2000003	70107
+2004	387	0.367613	Clark M. Karolian	Hooksett	30360	0.094241	0.32813	0.913613	0.336838	sheriff		d	2000003	70107
