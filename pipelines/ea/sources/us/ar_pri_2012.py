@@ -14,12 +14,11 @@ from ea.store import DATA, connect
 SOURCE = "us.ar_pri_2012"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-FILE = DATA / "inbox" / "manual" / "MF-025" / "2022_Primary_Federal.csv"
-URL = "https://results.enr.clarityelections.com/AR/"
+FILE = DATA / "inbox" / "manual" / "MF-330" / "2012_Preferential_Primary_Federal.csv"
+URL = "https://arkansas.tally-enr.com/"
 DAY = date(2012, 5, 22)
 PUBLISHER = "Arkansas Secretary of State"
-TITLE = "Election results: 2012 preferential primary, federal contests by county"
-WORDS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4}
+TITLE = "Election results: 2012 preferential primary, presidential contests by county"
 
 
 def fetch() -> None:
@@ -42,21 +41,14 @@ def parse() -> None:
     rows = []
     text = raw.cached(SOURCE, URL).path.read_text(encoding="utf-8-sig")
     for record in csv.DictReader(text.splitlines()):
-        if record["Location"] == "Statewide":
-            continue
         contest = record["Contest Name"].upper()
+        if record["Location"] == "Statewide" or not contest.startswith("U.S. PRESIDENT"):
+            continue
         party = "democratic" if "DEM" in contest else "republican"
-        if contest.startswith("U.S. PRESIDENT"):
-            chamber, district = "president", None
-        elif contest.startswith("U.S. SENATE"):
-            chamber, district = "senate", None
-        else:
-            found = re.search(r"(?:DISTRICT|DST) (\w+)", contest)
-            chamber, district = "house", WORDS.get(found[1]) or int(found[1])
         rows.append(
             (
-                f"{chamber}:{party}",
-                district,
+                f"president:{party}",
+                None,
                 counties[re.sub(r"[^a-z]", "", record["Location"].lower())],
                 record["Candidate Name"].upper(),
                 int(record["Candidate Votes"]),
@@ -92,7 +84,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Arkansas's May 22, 2012 presidential and U.S. House primaries by county from the Secretary of State's results export",
+            summary="Arkansas's May 22, 2012 presidential primaries by county from the Secretary of State's results export",
             polity="US-AR",
         )
         source = cs.source(PUBLISHER, TITLE)
