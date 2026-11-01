@@ -220,44 +220,48 @@
         .normalize("NFKD")
         .replaceAll(/\p{M}/gu, "");
     const needle = fold(query.trim());
+    const key = column;
+    const isDescending = descending;
+    const pick = only;
+    const shifts = moves;
+    const lead = owner ?? (shared == null ? null : `${shared}, `);
+    const cut = tail;
     const sorted = listed
       .map((row, index) => ({
         row,
-        move: moves[index],
+        move: shifts[index],
         value:
-          column === "leader"
+          key === "leader"
             ? row.leader == null
               ? -1
               : (row.shares[row.leader] ?? -1)
-            : column === "margin"
+            : key === "margin"
               ? (row.margin ?? -1)
-              : column === "valid"
+              : key === "valid"
                 ? row.valid
-                : column === "delegates"
+                : key === "delegates"
                   ? (row.delegates?.total ?? -1)
-                  : column === "final"
+                  : key === "final"
                     ? (row.delegates?.final?.[0]?.[1] ?? -1)
-                    : (moves[index]?.shift ?? -Infinity),
+                    : (shifts[index]?.shift ?? -Infinity),
         match:
           (needle === "" || fold(row.name).includes(needle)) &&
-          (only == null ||
-            (only === "flip" && moves[index]?.flip != null) ||
-            only === row.leader ||
-            only === `${moves[index]?.flip?.from}>${moves[index]?.flip?.to}`),
+          (pick == null ||
+            (pick === "flip" && shifts[index]?.flip != null) ||
+            pick === row.leader ||
+            pick === `${shifts[index]?.flip?.from}>${shifts[index]?.flip?.to}`),
       }))
       .filter((entry) => entry.match)
       .toSorted((a, b) => {
         const order =
-          column === "name"
-            ? natural(a.row.name, b.row.name)
-            : a.value - b.value;
+          key === "name" ? natural(a.row.name, b.row.name) : a.value - b.value;
         return (
           Number(a.row.isCounted === false) -
             Number(b.row.isCounted === false) ||
-          (column === "name"
+          (key === "name"
             ? 0
             : Number(a.row.valid === 0) - Number(b.row.valid === 0)) ||
-          (descending ? -order : order)
+          (isDescending ? -order : order)
         );
       });
     const parents = new Map(
@@ -279,14 +283,14 @@
           ? entry.row.name.startsWith(`${parent.name}'s `)
             ? `${parent.name}'s `
             : `${parent.name} `
-          : (owner ?? (shared == null ? null : `${shared}, `));
+          : lead;
         const short =
           prefix != null && entry.row.name.startsWith(prefix)
             ? entry.row.name
                 .slice(prefix.length)
                 .replace(" congressional district", " district")
-            : tail > 0
-              ? entry.row.name.slice(0, -tail)
+            : cut > 0
+              ? entry.row.name.slice(0, -cut)
               : entry.row.name;
         return {
           ...entry.row,

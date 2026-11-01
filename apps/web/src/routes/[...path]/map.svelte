@@ -789,8 +789,7 @@
   );
   const remote = $derived.by(() => {
     const codes = new Map((outlying ?? []).map((entry) => [entry.k, entry]));
-    const painted = new Map(fills((css) => css));
-    return [
+    const picked = [
       ...places.rows
         .filter(
           (row) =>
@@ -810,7 +809,12 @@
           leader: null,
           isBlank: true,
         })),
-    ]
+    ];
+    if (picked.length === 0) {
+      return [];
+    }
+    const painted = new Map(fills((css) => css));
+    return picked
       .map((entry) => ({
         ...entry,
         code: codes.get(entry.k)?.code,
@@ -1897,13 +1901,15 @@
     );
   }
 
-  let outline = $state<Array<Array<[number, number]>> | null>(
+  let outline = $state.raw<Array<Array<[number, number]>> | null>(
     untrack(() => (own == null ? [] : null)),
   );
+  const ownK = $derived(own?.k);
+  const ownTiles = $derived(own?.tiles);
 
   $effect(() => {
-    if (own != null) {
-      void orpc.contests.outline.call({ k: own.k, tiles: own.tiles }).then(
+    if (ownK != null && ownTiles != null) {
+      void orpc.contests.outline.call({ k: ownK, tiles: ownTiles }).then(
         (found) => {
           outline = found;
         },
