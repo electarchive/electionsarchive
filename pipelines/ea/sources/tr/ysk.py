@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "23"
+VERSION = "24"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -772,6 +772,33 @@ FOUNDING_SOURCES = (
     ),
 )
 MISPRINTED = {"Sabahat Akkiray": "Sabahat Akkiraz"}
+MISREAD = {
+    "1983-11-06:67-2:milliyetci-demokrasi-partisi:3": "Cemil Çakmaklı",
+    "1987-11-29:34-6:milliyetci-hareket-partisi:1": "Recep Yetim",
+    "1987-11-29:35-4:anavatan-partisi-1983:2": "Hülya (Koçyiğit) Soydan",
+    "1987-11-29:46-2:anavatan-partisi-1983:3": "Mehmet Kılıç (Halil Oğlu)",
+    "1991-10-20:06-2:anavatan-partisi-1983:11": "Aysel Yavuz (Şengüler)",
+    "1991-10-20:40:refah-partisi:5": "Halil İbrahim Özturk",
+    "1991-10-20:46-2:anavatan-partisi-1983:2": "Mehmet Kılıç (Mevlüt Oğlu)",
+    "1999-04-18:02:bagimsizlar:3": "Fatma Kocamer (Şahin)",
+    "1999-04-18:07:demokratik-sol-parti:12": "Ömer Faruk Akıskalıoğlu",
+    "1999-04-18:26:anavatan-partisi-1983:3": "Merih Beşoğul (Şenak)",
+    "1999-04-18:31:sol-parti:3": "Yıldız Oktay (Taş)",
+    "1999-04-18:33:demokrat-turkiye-partisi:3": "Muhammet Kurşat Haddat",
+    "1999-04-18:34-2:demokratik-sol-parti:9": "Hesna Mirgun Ersarı (Pars)",
+    "1999-04-18:34-2:emek-partisi:1": "Fatma (Fadime) Göktepe",
+    "1999-04-18:34-2:emek-partisi:6": "Adnan Çelik (Özyalçıner)",
+    "1999-04-18:34-2:sol-parti:6": "Aynur Aksoy (Hacıbaloğlu)",
+    "2002-11-03:01:millet-partisi:13": "Ümmügülsüm Nazik (Geçioğlu)",
+    "2002-11-03:06-1:cumhuriyet-halk-partisi:10": "H. Nazlı Eray (Bütün)",
+    "2002-11-03:09:yurt-partisi:2": "Özlem Kordoğlu (Savral)",
+    "2002-11-03:33:genc-parti:1": "Mehmet Ertuğrul Başar",
+    "2002-11-03:34-2:yeni-turkiye-partisi:14": "Hesna Mirgün Ersarı (Pars)",
+    "2002-11-03:34-3:isci-partisi:16": "Ümmühan Gökdere Evren",
+    "2002-11-03:55:buyuk-birlik-partisi:5": "Öznur Ural (Özdilek)",
+    "2002-11-03:69:demokrat-parti:2": "Ayşe Gencal (Şen)",
+    "2002-11-03:71:buyuk-birlik-partisi:4": "Hürriyet Akça (Körük)",
+}
 PRESIDENT_CAVEAT = (
     "Customs-gate ballot boxes serve voters registered abroad, so the gazette prints the abroad register again for "
     "customs gates. It is stored once, under abroad. Prison and mobile ballot boxes are included in the domestic "
@@ -6104,6 +6131,14 @@ def emit() -> Path:
             ),
             polity="TR",
         )
+        misread: dict[UUID, str] = {}
+        dropped = set(
+            conn.execute(
+                """select d.entity_id, d.text from name_drop d join changeset ch on ch.id = d.changeset_id
+                   where ch.status = 'published' and ch.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        )
 
         def name(
             entity: UUID,
@@ -6113,6 +6148,8 @@ def emit() -> Path:
             start: date | None = None,
             end: date | None = None,
         ) -> None:
+            if (entity, text) in dropped:
+                return
             cs.add(
                 "name",
                 entity_id=entity,
@@ -7649,7 +7686,9 @@ def emit() -> Path:
                     person = cs.key(f"{SOURCE}.person", member)
                     if person in cs.minted:
                         cs.add("person", id=person)
-                        name(person, title(row["name"]))
+                        name(person, MISREAD.get(member, title(row["name"])))
+                    elif member in MISREAD:
+                        misread[person] = MISREAD[member]
                     candidacy = cs.key("tr.candidacy", member)
                     cs.add(
                         "candidacy",
@@ -8131,4 +8170,18 @@ def emit() -> Path:
                 y1=pl.col("box").list.get(3),
             ),
         )
+        for name_id, entity, text in conn.execute(
+            """select n.id::text, n.entity_id, n.text from name n join changeset ch on ch.id = n.changeset_id
+               where ch.pipeline = %s and n.is_preferred and n.entity_id = any(%s::uuid[])""",
+            [SOURCE, list(misread)],
+        ).fetchall():
+            if text != misread[entity]:
+                name(entity, misread[entity])
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="Misread from the scanned candidate list.",
+                )
         return cs.write()
