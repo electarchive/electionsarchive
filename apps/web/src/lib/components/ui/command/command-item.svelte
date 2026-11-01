@@ -22,6 +22,6 @@
 >
   {@render children?.()}
   <CheckIcon
-    class="ms-auto size-3.5 stroke-[2.5] opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100"
+    class="ms-auto size-3.5 stroke-[2.5] opacity-0 group-data-[checked=true]/command-item:opacity-100 [[data-slot=command-shortcut]~&]:hidden"
   />
 </CommandPrimitive.Item>

@@ -18,6 +18,7 @@
   import Shahmaran from "#lib/components/shahmaran.svelte";
   import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import embedStyles from "#lib/embed.css?url";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { makeQueryClient } from "#lib/query-client.js";
@@ -156,6 +157,7 @@
   {#if embed != null}
     <base target="_blank" />
     <meta name="robots" content="noindex" />
+    <link rel="stylesheet" href={embedStyles} />
   {/if}
 </svelte:head>
 
