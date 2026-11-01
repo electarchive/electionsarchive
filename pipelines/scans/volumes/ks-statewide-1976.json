@@ -19,13 +19,6 @@
     "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
     "commissioner-of-insurance": "Commissioner of Insurance"
   },
-  "leaves": [
-    4,
-    20,
-    22,
-    71,
-    77,
-    79
-  ],
+  "leaves": [78, 80],
   "totals": true
 }
