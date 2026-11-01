@@ -10213,7 +10213,7 @@ def parse() -> None:
             )
         cousubs: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for geoid, full in (
-            cousubs_all.filter(pl.col("USPS").is_in(["KS", "NE"]) & (pl.col("FUNCSTAT") == "A"))
+            cousubs_all.filter(pl.col("USPS").is_in(["IN", "KS", "NE"]) & (pl.col("FUNCSTAT") == "A"))
             .select("GEOID", "NAME")
             .iter_rows()
         ):
@@ -10223,12 +10223,12 @@ def parse() -> None:
             for code, text in conn.execute(
                 """select u.code, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'official' and n.is_preferred
-                   where u.scheme_code = 'us.county' and (u.code like '20%%' or u.code like '31%%')"""
+                   where u.scheme_code = 'us.county' and (u.code like '18%%' or u.code like '20%%' or u.code like '31%%')"""
             ).fetchall()
         }
         for state_code, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'township' and g.polity_id is null and g.state in ('KS', 'NE') and g.county is not null"""
+               where g.kind = 'township' and g.polity_id is null and g.state in ('IN', 'KS', 'NE') and g.county is not null"""
         ).fetchall():
             hits = cousubs.get((county_code, coverage_tables.tokens(re.sub(r" Township$", "", label))), [])
             if len(hits) == 1 and county_code in counties_ks:
