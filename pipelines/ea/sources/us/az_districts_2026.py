@@ -1,5 +1,6 @@
 import csv
 import html
+import itertools
 import re
 import subprocess
 from datetime import UTC, datetime
@@ -23,11 +24,28 @@ YAVAPAI = "https://www.yavapaivotes.gov/"
 YAVAPAI_FILE = DATA / "inbox" / "manual" / "MF-500" / "yavapai" / "Special Districts.csv"
 COCHISE = "https://www.cochise.az.gov/"
 COCHISE_FILE = DATA / "inbox" / "manual" / "MF-500" / "cochise" / "az-2026-general-cochise-candidate-information.html"
+COCONINO = "https://www.coconino.az.gov/3531/Whats-on-the-Ballot"
+COCONINO_FILE = (
+    DATA
+    / "inbox"
+    / "manual"
+    / "MF-500"
+    / "coconino"
+    / "az-2026-general-coconino-special-district-candidate-filing.html"
+)
+COCONINO_BALLOT = {
+    "Blue Ridge Fire District": (
+        3,
+        {"Brian Alexander", "James Caffroy", "Pamela Higgins", "Linda McDermott", "Casey Samsill", "Donald Wetter"},
+    ),
+    "Highlands Fire District": (2, {"Jonathan Bruce", "Mark Maciha", "Carl Nelson"}),
+}
 SOURCES = {
     PIMA: ("Pima County Elections Department", "2026 General Election, Candidates Filed (updated 7/21/2026)"),
     MARICOPA: ("Maricopa County Elections Department", "Official County Candidates, 2026 General Election"),
     YAVAPAI: ("Yavapai County Elections Department", "2026 General Election, Special District Candidates"),
     COCHISE: ("Cochise County Elections Department", "2026 Candidate Information"),
+    COCONINO: ("Coconino County Elections Department", "November 3, 2026 General Election, What's on the Ballot"),
 }
 YAVAPAI_NAMES = {
     "Ash Fork Volunteer Fire": "Ash Fork Fire District",
@@ -250,8 +268,32 @@ def cochise() -> list[dict[str, object]]:
     return rows
 
 
+def coconino() -> list[dict[str, object]]:
+    text = re.sub(r"<[^>]+>", "\n", COCONINO_FILE.read_text(errors="replace"))
+    lines = [re.sub(r"\s+", " ", html.unescape(line)).strip() for line in text.splitlines()]
+    lines = [line for line in lines if line]
+    rows: list[dict[str, object]] = []
+    for office, name in itertools.pairwise(lines):
+        district = office.removesuffix(" Governing Board")
+        if district in COCONINO_BALLOT and name in COCONINO_BALLOT[district][1]:
+            seats = COCONINO_BALLOT[district][0]
+            rows.append(
+                {
+                    "district": district,
+                    "seat": "",
+                    "vote": seats,
+                    "name": name,
+                    "county": "Coconino",
+                    "url": COCONINO,
+                    "function": district_boards_function(district),
+                    "tacit": False,
+                }
+            )
+    return rows
+
+
 def parse() -> None:
-    frame = pl.DataFrame([*pima(), *maricopa(), *yavapai(), *cochise()])
+    frame = pl.DataFrame([*pima(), *maricopa(), *yavapai(), *cochise(), *coconino()])
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.height, frame["district"].n_unique())
@@ -265,7 +307,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="AZ",
-        summary="Arizona special district board races on the November 3, 2026 ballot: Pima County fire districts, the Maricopa County Special Health Care District, Yavapai County fire, sanitary, and hospital districts, and four Cochise County fire and water districts, from each county's candidate list",
+        summary="Arizona special district board races on the November 3, 2026 ballot: Pima County fire districts, the Maricopa County Special Health Care District, Yavapai County fire, sanitary, and hospital districts, four Cochise County fire and water districts, and two Coconino County fire districts, from each county's candidate list",
         sources=SOURCES,
         frame=frame,
     )
