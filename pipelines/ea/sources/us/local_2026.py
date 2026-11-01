@@ -10174,6 +10174,10 @@ def parse() -> None:
             gazetteer.filter(
                 pl.col("USPS").is_in(
                     ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY"]
+                "Colorado R Union High School District 2": "Colorado River Union High School District",
+                "Indian Oasis-Baboquivara Unified School District 40": "Indian Oasis-Baboquivari Unified District",
+                "Santa Cruz Valley School District 35": "Santa Cruz Valley Unified District",
+                "Fredonia-Moccasin Bi-County School District 6": "Fredonia-Moccasin Unified District",
                 )
                 & (pl.col("FUNCSTAT") == "A")
             )
@@ -10563,6 +10567,28 @@ def parse() -> None:
                             break
                     tokens = tokens.split()
                 if tokens[:3] == ["governing", "board", "member"]:
+                if state == "AZ":
+                    tokens = re.sub(
+                        r"^(?:(colorado|tuba) city|lake havasu city) unified\b",
+                        lambda m: f"{m[1] or 'lake havasu'} unified",
+                        re.sub(
+                            r"^(tonto) school district 33\b|^ft thomas school district 7\b|^parker school district 27\b"
+                            r"|^quartzsite elementary district\b|^safford school district 1\b|^ray school district 3\b"
+                            r"|^maricopa school district 20\b|^baboquivari unified\b|^santa cruz valley school district 35\b",
+                            lambda m: {
+                                "tonto": "tonto basin elementary school district",
+                                "ft": "fort thomas unified school district",
+                                "parker": "parker unified school district",
+                                "quartzsite": "quartzsite elementary school district",
+                                "safford": "safford unified school district",
+                                "ray": "ray unified school district",
+                                "maricopa": "maricopa unified school district",
+                                "baboquivari": "indian oasis baboquivari unified",
+                                "santa": "santa cruz valley unified school district",
+                            }[m[0].split()[0]],
+                            " ".join(tokens),
+                        ),
+                    ).split()
                     tokens = tokens[3:]
                 for formal in (
                     ["public", "schools", "of", "the", "city", "of"],
