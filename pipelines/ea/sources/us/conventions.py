@@ -685,7 +685,7 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
+LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1904:democratic": [
@@ -1317,6 +1317,13 @@ def candidate(label: str, table: str) -> str:
     return LABELS.get(label, label)
 
 
+def scattered(label: str) -> str:
+    label = label.strip().rstrip(".:- ")
+    if sum(ch.isupper() for ch in label) > sum(ch.islower() for ch in label):
+        label = label.title()
+    return LABELS.get(label, label)
+
+
 def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
     cells: list[dict[str, object]] = []
     totals: dict[str, float] = {}
@@ -1358,7 +1365,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         {
                             "table": spec["table"],
                             "state": code,
-                            "column": row["label"].strip(),
+                            "column": scattered(row["label"]),
                             "value": figure,
                             "leaf": leaf,
                             "sha256": image.sha256,
