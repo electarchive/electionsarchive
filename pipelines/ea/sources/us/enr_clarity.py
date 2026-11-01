@@ -804,6 +804,44 @@ def parse(
         .drop("same")
     )
     table = pl.DataFrame(contests, infer_schema_length=None)
+    if "legacy" in table.columns:
+        with connect() as conn:
+            existing = conn.execute(
+                """select c.code, n.text from area a
+                   join area_code c on c.area_id = a.id
+                   join polity_territory t on t.area_id = a.id
+                   join name n on n.entity_id = t.polity_id and n.is_preferred and n.lang = 'en'
+                   where a.scheme_code = 'us.special_district' and left(c.code, 2) = any(%s)
+                     and not exists (select from entity_merge m where m.entity_id = t.polity_id)
+                   order by c.code""",
+                [states],
+            ).fetchall()
+        codes = {code for code, _ in existing}
+        named: dict[tuple[str, str], str] = {}
+        for code, text in existing:
+            named.setdefault((code[:2], slug(text)), code)
+        canonical: dict[tuple[str, str], str] = {}
+        for code, legacy, display in sorted(
+            table.filter(pl.col("scheme") == "us.special_district")
+            .select("code", "legacy", "display")
+            .unique()
+            .iter_rows()
+        ):
+            canonical[(code, legacy)] = (
+                legacy
+                if legacy in codes
+                else code
+                if code in codes
+                else named.setdefault((code[:2], slug(display)), code)
+            )
+        table = table.with_columns(
+            code=pl.concat_str("code", "legacy", separator=" ").replace_strict(
+                {f"{code} {legacy}": into for (code, legacy), into in canonical.items()}, default=pl.col("code")
+            )
+        ).drop("legacy")
+        for (code, _), into in sorted(canonical.items()):
+            if into != code:
+                print(f"special district {code} resolved to {into}")
     totals = frame.filter(pl.col("place").is_null()).drop("place")
     counted = (
         frame.filter(pl.col("place").is_not_null())
@@ -939,6 +977,35 @@ def _precinct_key(name: str) -> tuple[str, str] | None:
     return None
 
 
+def _district(text: str, pattern: str, kind: str, noun: str, county_name: str, clean: bool) -> tuple[str, str | None]:
+    found = list(re.finditer(rf"\b(?:{pattern})", text))[-1]
+    head = SPECIAL_ROLES.sub(" ", text[: found.start()])
+    tail = text[found.end() :]
+    number = re.match(
+        r"^ ?(?:DIST(?:RICT)? )?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-[A-Z0-9]+)?)\b"
+        if clean
+        else r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-[A-Z0-9]+)?)\b",
+        tail,
+    )
+    if number:
+        tail = tail[number.end() :]
+    seat, head = _seat(head)
+    if seat is None:
+        seat, tail = _seat(tail)
+    if clean:
+        head = re.sub(r"^.*\b(?:FOR|TO)\b|\bTERM\b", " ", TERM.sub(" ", REMAINDER.sub(" ", head)))
+    head = re.sub(r"\b(?:PROPOSITION|PROP) [A-Z0-9]+\b|\b(?:CITY|TOWN|VILLAGE) OF [A-Z]+\b|^.*\bFOR\b", " ", head)
+    head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/")
+    if head in ("", "COUNTY") or head.startswith("COUNTY "):
+        head = f"{county_name} {head or 'COUNTY'}" if head.startswith("COUNTY") else f"{county_name} COUNTY"
+    if kind == "college" and re.search(r"\bACC\b|AUSTIN", text):
+        head, noun = "AUSTIN", "Community College District"
+    display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
+    if kind == "reclamation" and (not clean or re.search(r"METROPOLITAN|GREATER CHICAGO", text)):
+        display = "Metropolitan Water Reclamation District of Greater Chicago"
+    return display, seat
+
+
 def _classify(
     plain: str,
     st: str,
@@ -1035,29 +1102,27 @@ def _classify(
                 "label": re.sub(r"\s+", " ", plain).strip(),
             }
     for pattern, kind, noun in SPECIALS:
-        if found := next(reversed(list(re.finditer(rf"\b(?:{pattern})", plain))), None):
-            head = SPECIAL_ROLES.sub(" ", plain[: found.start()])
-            tail = plain[found.end() :]
-            number = re.match(r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-[A-Z0-9]+)?)\b", tail)
-            if number:
-                tail = tail[number.end() :]
-            seat, head = _seat(head)
-            if seat is None:
-                seat, tail = _seat(tail)
-            head = re.sub(
-                r"\b(?:PROPOSITION|PROP) [A-Z0-9]+\b|\b(?:CITY|TOWN|VILLAGE) OF [A-Z]+\b|^.*\bFOR\b", " ", head
+        if re.search(rf"\b(?:{pattern})", plain):
+            legacy, seat = _district(plain, pattern, kind, noun, county_name, False)
+            display, _ = _district(
+                next(
+                    (
+                        part
+                        for part in re.sub(r"\bDIST\b", "DISTRICT", plain).split(" - ")
+                        if re.search(rf"\b(?:{pattern})", part)
+                    ),
+                    plain,
+                ),
+                pattern,
+                kind,
+                noun,
+                county_name,
+                True,
             )
-            head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/")
-            if head in ("", "COUNTY") or head.startswith("COUNTY "):
-                head = f"{county_name} {head or 'COUNTY'}" if head.startswith("COUNTY") else f"{county_name} COUNTY"
-            if kind == "college" and re.search(r"\bACC\b|AUSTIN", plain):
-                head, noun = "AUSTIN", "Community College District"
-            display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
-            if kind == "reclamation":
-                display = "Metropolitan Water Reclamation District of Greater Chicago"
             return {
                 "scheme": "us.special_district",
                 "code": f"{county}:{kind}:{slug(display)}",
+                "legacy": f"{county}:{kind}:{slug(legacy)}",
                 "display": display,
                 "key": "special",
                 "office": {
@@ -1260,6 +1325,13 @@ def emit(
                 [states, source],
             ).fetchall()
         )
+        bodies = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.body' and split_part(value, ':', 1) = any(%s)",
+                [states],
+            ).fetchall()
+        }
         asked = set(
             conn.execute(
                 """select e.date_from, a.code from contest c
@@ -1561,14 +1633,14 @@ def emit(
                 continue
             polity, place, path = polities[f"{scheme}:{code}"]
             owner_key = f"{st}:{code}:{office_key}" + (f"-{party}" if office_key in PARTY_KEYS else "")
-            aliases = {
-                owner_key,
-                f"{st}:{code}:"
-                + {
-                    "commissioners-court": "commission",
-                    "council": "city-council",
-                    "board-of-trustees": "township-board",
-                }.get(office_key, office_key),
+            aliases = {owner_key} | {
+                f"{st}:{code}:{alias}"
+                for alias in {
+                    "commissioners-court": ("commission",),
+                    "council": ("city-council", "board-of-trustees"),
+                    "board-of-trustees": ("township-board",),
+                    "board-of-commissioners": ("county-board",),
+                }.get(office_key, (office_key,))
             }
             if not question and contest_key in keyed and "whole" in rows.columns and rows["whole"].all():
                 existing = cs.key("us.contest", contest_key)
@@ -1859,7 +1931,12 @@ def emit(
                 )
                 office_kind = "mayor" if office_key == "mayor" else "other"
                 owner = (
-                    cs.key("us.body", owner_key)
+                    cs.key(
+                        "us.body",
+                        owner_key
+                        if owner_key in bodies
+                        else next((alias for alias in sorted(aliases) if alias in bodies), owner_key),
+                    )
                     if first["body"]
                     else offices.key(cs, owner_key, polity, office_kind, office_title)
                 )
@@ -2289,8 +2366,9 @@ def emit(
         linked = {
             person
             for (person,) in conn.execute(
-                "select distinct entity_id from external_id where entity_id = any(%s) and scheme <> %s",
-                [list(person_keys), person_scheme],
+                """select entity_id from external_id where entity_id = any(%s) and scheme <> %s
+                   union select into_id from entity_merge where into_id = any(%s)""",
+                [list(person_keys), person_scheme, list(person_keys)],
             ).fetchall()
         }
         holders: dict[UUID, set[UUID]] = {}
