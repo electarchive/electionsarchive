@@ -5107,6 +5107,13 @@ for key, publisher, title, url, local in (
         "ar/saline_notice_general.pdf",
     ),
     (
+        "AR-05051-sb",
+        "Garland County Election Commission",
+        "2026 General Election Sample Ballots, all styles",
+        "https://www.garlandcountyvote.org/uploads/6/3/0/4/63045401/2026_general_sample_ballots_all.pdf",
+        "ar/garland_sample_ballots.pdf",
+    ),
+    (
         "AR-05051-garland",
         "Garland County Election Commission",
         "Notice of Election, November 3, 2026",
