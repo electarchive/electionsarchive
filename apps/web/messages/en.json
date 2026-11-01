@@ -4167,7 +4167,7 @@
   "method_order_title": "Votes counted late",
   "method_order_body": "Ballots counted late in the night, or after it, often lean differently from the ones counted first. Mail ballots, provisional ballots, and ballots from large cities can all come in late. Two parts of the model cover this.",
   "method_order_shift": "A shared late-count shift moves all the uncounted votes in a race together in each simulation, so the model never assumes that errors in different counties cancel out.",
-  "method_order_tail": "In states that keep counting for days or weeks, the model adds the votes expected after election night, with their own lean. The chart shows how many votes each state typically adds for every 100 counted on the night.",
+  "method_order_tail": "In states that keep counting for days or weeks, the model adds the votes expected after election night, with their own lean. From the second day on, it adds fewer each day, because many of those late votes are already in the count. The chart shows how many votes each state typically adds for every 100 counted on the night.",
   "method_order_chart": "Votes added after election night, for every 100 counted on the night",
   "method_order_other": "All other states",
   "method_ranges_title": "Ranges and chances",

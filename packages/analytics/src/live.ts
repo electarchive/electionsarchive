@@ -107,7 +107,14 @@ const MODEL = {
   moving: 0.1,
   shift: 0.028,
   surge: 0.14,
-  tail: { share: 0.035, spread: 0.5, lean: 0.06, local: 0.05 },
+  tail: {
+    share: 0.035,
+    spread: 0.5,
+    lean: 0.06,
+    local: 0.05,
+    grace: 1,
+    pace: 13,
+  },
 };
 
 const TAILS: Record<string, number> = {
@@ -656,6 +663,14 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   }
   const optionA = race.options[a]!;
   const optionB = race.options[b]!;
+  const opened = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
+  const days =
+    opened == null
+      ? 0
+      : Math.max(0, (Date.parse(stamp) - Date.parse(opened)) / 86_400_000);
+  const left =
+    tail *
+    Math.exp(-Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail));
   if (race.certified != null) {
     const totals = race.certified.totals;
     const all = sum(totals);
@@ -755,7 +770,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const surge = MODEL.surge * gaussian(random);
     const shift = MODEL.shift * gaussian(random);
     const late =
-      tail *
+      left *
       Math.exp(
         MODEL.tail.spread * gaussian(random) - MODEL.tail.spread ** 2 / 2,
       );
