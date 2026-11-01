@@ -10377,6 +10377,8 @@ def parse() -> None:
                         else f"KY:{owner.split(':')[1]}:board-of-education"
                         + (":remainder" if str(row["contest"]).endswith("(Unexpired Term)") else ""),
                     )
+                    if tail.endswith(":remainder"):
+                        title = f"{title} (Unexpired Term)"
                     minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
                 if state in TERRITORIES:
                     head, _, seat = str(row["contest"]).partition(", ")
@@ -11282,7 +11284,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         else ""
                     )
                     + ("-special" if "special" in tail.split(":")[3:] else "")
-                    + ("-unexpired" if tail.endswith(":unexpired") else ""),
+                    + ("-unexpired" if tail.endswith(":unexpired") else "")
+                    + ("-remainder" if tail.startswith("KY:") and tail.endswith(":remainder") else ""),
                     f"2026 {place} general election",
                     f"{home}/{DAY}-general",
                     f"{st}:{code}",
