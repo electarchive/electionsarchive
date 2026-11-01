@@ -2,24 +2,35 @@ import time
 
 from ea.store import connect
 
-BUILD_SQL = """
-with sizes as materialized (
-    select p.id, coalesce(
-        (select max(g.population) from coverage_government g where g.polity_id = p.id),
-        2.5 * (
-            select max(v.total) from (
-                select sum(r.value) as total
-                from polity_territory t join area a on a.id = t.area_id
-                join result_rollup_sum r on r.area_k = a.k and r.measure = 1 and r.channel = 0 and r.count_round = 0
-                where t.polity_id = p.id
-                group by r.result_set_k
-            ) v
-        )
-    ) as people
-    from polity p
-    where exists (select from slug s where s.entity_id = p.id and s.is_current)
+SIZES_SQL = """
+create temporary table search_size on commit drop as
+with totals as materialized (
+    select area_k, result_set_k, sum(value) as total
+    from result_rollup_sum
+    where measure = 1 and channel = 0 and count_round = 0
+    group by area_k, result_set_k
 ),
-prom as (
+votes as (
+    select polity_id, max(total) as total from (
+        select t.polity_id, sum(r.total) as total
+        from polity_territory t join area a on a.id = t.area_id
+        join totals r on r.area_k = a.k
+        where not exists (select from coverage_government g where g.polity_id = t.polity_id and g.population is not null)
+        group by t.polity_id, r.result_set_k
+    ) v
+    group by polity_id
+)
+select p.id, coalesce(pop.population, 2.5 * votes.total) as people
+from polity p
+left join (select polity_id, max(population) as population from coverage_government group by polity_id) pop
+    on pop.polity_id = p.id
+left join votes on votes.polity_id = p.id
+where exists (select from slug s where s.entity_id = p.id and s.is_current)
+"""
+
+BUILD_SQL = """
+create temporary table search_build on commit drop as
+with prom as (
     select person_id, max(prominence) as prominence from (
         select cy.person_id, case
             when o.kind in ('head_of_state', 'head_of_government') and p.kind in ('sovereign_state', 'supranational')
@@ -39,7 +50,7 @@ prom as (
         left join polity p on p.id = o.polity_id
         left join body b on b.id = c.body_id
         left join polity bp on bp.id = b.polity_id
-        left join sizes sz on sz.id = o.polity_id
+        left join search_size sz on sz.id = o.polity_id
         where cy.role = 'head'
         union all
         select t.person_id, case
@@ -48,7 +59,7 @@ prom as (
             when o.kind = 'mayor' then least(1.5, greatest(0, ln(1 + coalesce(sz.people, 0)) - 11) / 2)
             else 0 end
         from tenure t join office o on o.id = t.office_id join polity p on p.id = o.polity_id
-        left join sizes sz on sz.id = o.polity_id
+        left join search_size sz on sz.id = o.polity_id
     ) x
     group by person_id
 ),
@@ -80,15 +91,14 @@ docs as (
     from entity e
     join name n on n.entity_id = e.id
     left join prom pr on pr.person_id = e.id
-    left join sizes sz on sz.id = e.id
+    left join search_size sz on sz.id = e.id
     where e.type in ('polity', 'election', 'contest', 'party', 'person')
         and not exists (select from entity_merge m where m.entity_id = e.id)
         and e.retired_by is null
         and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current))
     group by e.id, e.type, pr.prominence, sz.people
 )
-insert into search_document (entity_id, type, polity_id, text, tsv, rank_boost)
-select entity_id, type, polity_id, text, to_tsvector('simple', text), rank_boost
+select entity_id, type, polity_id, text, to_tsvector('simple', text) as tsv, rank_boost
 from (
     select entity_id, type, polity_id, rank_boost,
         lower(unaccent(text))
@@ -103,12 +113,30 @@ from (
 ) d
 """
 
+SWAP_SQL = """
+insert into search_document (entity_id, type, polity_id, text, tsv, rank_boost)
+select b.entity_id, b.type, b.polity_id, b.text, b.tsv, b.rank_boost
+from search_build b join entity e on e.id = b.entity_id and e.retired_by is null
+where not exists (select from entity_merge m where m.entity_id = b.entity_id)
+    and (b.polity_id is null or exists (
+        select from polity p join entity pe on pe.id = p.id and pe.retired_by is null
+        where p.id = b.polity_id and not exists (select from entity_merge m where m.entity_id = p.id)
+    ))
+"""
+
 
 def build() -> str:
     started = time.monotonic()
     with connect() as conn:
+        for scan in ("indexscan", "indexonlyscan", "bitmapscan"):
+            conn.execute(f"set local enable_{scan} = off")
+        conn.execute(SIZES_SQL)
+        for scan in ("indexscan", "indexonlyscan", "bitmapscan"):
+            conn.execute(f"reset enable_{scan}")
+        conn.execute("analyze search_size")
+        conn.execute(BUILD_SQL)
         conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
         conn.execute("delete from search_document")
-        inserted = conn.execute(BUILD_SQL).rowcount
+        inserted = conn.execute(SWAP_SQL).rowcount
         conn.execute("analyze search_document")
     return f"{inserted} search documents in {time.monotonic() - started:.0f}s"
