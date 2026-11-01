@@ -10444,6 +10444,8 @@ def parse() -> None:
                                         "sch",
                                         "dist",
                                         "pub",
+                                        "schs",
+                                        "sd",
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -10590,6 +10592,16 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                    tokens = re.sub(
+                        r"^richardson county school district (1|23|29|70)\b",
+                        lambda m: {
+                            "1": "pawnee city public schools",
+                            "23": "johnson brock public schools",
+                            "29": "auburn public schools",
+                            "70": "humboldt table rock steinauer public schools",
+                        }[m[1]],
+                        " ".join(tokens),
+                    ).split()
                 if state == "MI":
                     tokens = re.sub(
                         r"^walkerville public schools\b",
