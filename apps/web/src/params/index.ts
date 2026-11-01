@@ -1,5 +1,5 @@
 import { defineParams } from "@sveltejs/kit/params";
-import { PROJECTS } from "#lib/projects.js";
+import { PROJECTS } from "../lib/projects.ts";
 
 const directions = ["indelible", "tally", "chamber"] as const;
 
