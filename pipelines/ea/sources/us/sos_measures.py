@@ -498,6 +498,12 @@ OK_HISTORY_FILES = (
     "1992-election-results/1992-results.pdf",
     "1996-election-results/1996-general-summary-results.pdf",
 )
+OK_PAGES = "https://oklahoma.gov/elections/elections-results/election-results/"
+OK_HISTORY_PAGES = {
+    "1996-election-results/1996-sq669-election-results.html": date(1996, 3, 12),
+    "1998-election-results/98sq672.html": date(1998, 2, 10),
+    "1998-election-results/98gensq.html": date(1998, 11, 3),
+}
 FL_DAYS = (
     date(2008, 1, 29),
     date(2000, 11, 7),
@@ -2698,6 +2704,9 @@ def fetch() -> None:
     for path in OK_HISTORY_FILES:
         raw.fetch(SOURCE, OK_HISTORY + path, suffix=".pdf")
         time.sleep(1)
+    for path in OK_HISTORY_PAGES:
+        raw.fetch(SOURCE, OK_PAGES + path, suffix=".html")
+        time.sleep(1)
     for url in dict.fromkeys([*(url for urls in OR_ABSTRACTS.values() for url in urls), OR_2022]):
         raw.fetch(SOURCE, url, suffix=".htm" if url.endswith(".htm") else ".pdf")
         time.sleep(1)
@@ -3859,6 +3868,44 @@ def oklahoma_history() -> list[dict[str, object]]:
                     "votes": int(found[1].replace(",", "")),
                 }
                 for answer, found in (("YES", yes), ("NO", no))
+            )
+    return rows
+
+
+def oklahoma_history_pages() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    seen: set[tuple[date, str]] = set()
+    for path, day in OK_HISTORY_PAGES.items():
+        url = OK_PAGES + path
+        text = html.unescape(raw.cached(SOURCE, url).path.read_text(errors="replace"))
+        text = re.sub(r"(?s)<(?:script|style).*?</(?:script|style)>", " ", text)
+        text = re.sub(r"<[^>]+>", " ", text.replace("\\r\\n", "\n"))
+        starts = list(re.finditer(r"STATE QUESTION (?:NO\. ?)?(\d+)\b", text, re.IGNORECASE))
+        for index, start in enumerate(starts):
+            end = starts[index + 1].start() if index + 1 < len(starts) else len(text)
+            total = re.search(r"STATE TOTAL:\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)", text[start.start() : end])
+            if total is None or (day, start[1]) in seen:
+                continue
+            seen.add((day, start[1]))
+            yes, no, whole = (int(value.replace(",", "")) for value in total.groups())
+            if yes + no != whole:
+                raise ValueError(f"{url} SQ {start[1]}: totals do not add up")
+            heading = text[start.start() : start.start() + 80]
+            kind = "Initiative" if "INITIATIVE" in heading.upper() else "Legislative Referendum"
+            rows.extend(
+                {
+                    "state": "OK",
+                    "day": day,
+                    "number": start[1],
+                    "label": f"State Question {start[1]}",
+                    "title": f"State Question {start[1]}",
+                    "kind": kind,
+                    "url": url,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": votes,
+                }
+                for answer, votes in (("YES", yes), ("NO", no))
             )
     return rows
 
@@ -7269,6 +7316,7 @@ def parse() -> None:
             *texas_2022(),
             *california_totals(),
             *oklahoma_history(),
+            *oklahoma_history_pages(),
             *wisconsin(),
             *wisconsin_manual(),
             *iowa(),
