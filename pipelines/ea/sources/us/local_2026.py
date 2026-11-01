@@ -1212,6 +1212,11 @@ FEEDS.update(
             "Delaware County Board of Elections",
             "Election Notice for the Federal Write-In Absentee Ballot, November 3, 2026 General Election (revised 10/2/2026)",
         ),
+        "OH-39173": (
+            "https://boe.woodcountyohio.gov/DocumentCenter/View/1006/Candidate-List",
+            "Wood County Board of Elections",
+            "Candidate List for November 3, 2026 General Election (certified 08/26/2026)",
+        ),
         "OH-39155": (
             "https://boe.co.trumbull.oh.gov/pdfs/100%20Day%20Notice.pdf",
             "Trumbull County Board of Elections",
@@ -1518,6 +1523,7 @@ DELIVERED = {
     "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
     "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
     "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
+    "OH-39173": DATA / "inbox" / "y26" / "oh" / "wood.pdf",
     "IL-17161": DATA / "inbox" / "y26" / "il" / "rock_island_cands.pdf",
     "DE-10003": DATA / "inbox" / "y26" / "de" / "state.html",
     "DE-10001": DATA / "inbox" / "y26" / "de" / "state.html",
