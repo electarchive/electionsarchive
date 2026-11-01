@@ -1722,6 +1722,28 @@
       ]
     },
     {
+      "key": "parish",
+      "goal": "local",
+      "label": "Parish, town, and community council elections",
+      "unit": "polity",
+      "match": [
+        {
+          "kinds": [
+            "local"
+          ],
+          "bodies": [
+            "council"
+          ],
+          "schemes": [
+            "gb.parish_ward"
+          ],
+          "iso": "*"
+        }
+      ],
+      "elections": [],
+      "note": "No source counts the parish, town, and community councils that voted each year, so this level lists no elections and holds only its gap rows. It sits ahead of the principal councils so a parish ward contest is never counted as one of them."
+    },
+    {
       "key": "councils",
       "goal": "local",
       "label": "Council elections",
