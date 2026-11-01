@@ -12,8 +12,6 @@ const Tiles = v.pipe(
 const Boxes = v.array(
   v.object({
     name: v.string(),
-    x: v.number(),
-    y: v.number(),
     width: v.number(),
     height: v.number(),
     units: v.array(v.object({ k: v.number(), d: v.string() })),
@@ -27,7 +25,7 @@ export const maps = {
         method: "GET",
         path: "/maps/{scheme}/insets",
         summary:
-          "Draw the places a national map sets apart in fixed boxes, such as Alaska and Hawaii on a map of the United States: each box's name, its frame in map coordinates, and a simplified SVG path for every place in it",
+          "Draw the places a national map sets apart in fixed boxes, such as Alaska and Hawaii on a map of the United States: each box's name and size, and a simplified SVG path for every place in it, drawn from the box's top-left corner",
       }),
     )
     .input(
@@ -45,7 +43,7 @@ export const maps = {
         method: "GET",
         path: "/maps/detached",
         summary:
-          "Draw the overseas places a national map lists apart, such as the constituencies of Guadeloupe and Guyane on a map of France, grouped by territory: each territory's name, its frame in map coordinates, and a simplified SVG path for every place in it",
+          "Draw the overseas places a national map lists apart, such as the constituencies of Guadeloupe and Guyane on a map of France, grouped by territory: each territory's name and size, and a simplified SVG path for every place in it, drawn from the territory's top-left corner",
       }),
     )
     .input(

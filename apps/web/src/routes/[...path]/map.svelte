@@ -896,6 +896,41 @@
       return entries.length === 0 ? [] : [{ group, entries }];
     }),
   );
+  const rosters = $derived(
+    new Map(
+      segments.map((segment) => [
+        segment.group,
+        Map.groupBy(segment.entries, (entry) => {
+          const cut = entry.name.lastIndexOf(", ");
+          const prefix = cut > 0 ? entry.name.slice(0, cut) : "";
+          return prefix !== "" &&
+            segment.entries.filter((other) =>
+              other.name.startsWith(`${prefix}, `),
+            ).length > 1
+            ? prefix
+            : "";
+        })
+          .entries()
+          .map(([header, entries]) => ({
+            header,
+            lines: entries.map((entry) => {
+              const cut = entry.name.lastIndexOf(", ");
+              const rest = entry.name.slice(cut + 2);
+              return {
+                entry,
+                label:
+                  header === ""
+                    ? cut > 0 && entry.name.slice(0, cut) === rest
+                      ? rest
+                      : entry.name
+                    : rest,
+              };
+            }),
+          }))
+          .toArray(),
+      ]),
+    ),
+  );
   $effect(() => {
     if (listing !== "overseas") {
       return;
@@ -903,12 +938,12 @@
     const key = `${tiles}:${listing}`;
     const ks = untrack(() =>
       territories[key] == null
-        ? remote
-            .filter((entry) => entry.group === "overseas")
-            .map((entry) => entry.k)
+        ? (rosters.get("overseas") ?? []).flatMap((block) =>
+            block.header === "" ? [] : block.lines.map((line) => line.entry.k),
+          )
         : [],
     );
-    if (ks.length > 1) {
+    if (ks.length > 0) {
       void orpc.maps.detached.call({ tiles, ks }).then(
         (found) => {
           territories = { ...territories, [key]: found };
@@ -958,7 +993,7 @@
         {
           ...box,
           units,
-          view: `${box.x - pad} ${box.y - pad} ${width} ${height}`,
+          view: `${-pad} ${-pad} ${width} ${height}`,
           ratio: width / height,
         },
       ];
@@ -3069,46 +3104,21 @@
               {/each}
             </div>
           {:else}
-            {const drawn = $derived(
+            {const sketched = $derived(
               territories[`${tiles}:${segment.group}`] ?? [],
             )}
             {const blocks = $derived(
-              Map.groupBy(segment.entries, (entry) => {
-                const cut = entry.name.lastIndexOf(", ");
-                const prefix = cut > 0 ? entry.name.slice(0, cut) : "";
-                return prefix !== "" &&
-                  segment.entries.filter((other) =>
-                    other.name.startsWith(`${prefix}, `),
-                  ).length > 1
-                  ? prefix
-                  : "";
-              })
-                .entries()
-                .map(([header, entries]) => ({
-                  header,
-                  box:
-                    header === ""
-                      ? null
-                      : (drawn.find((box) =>
-                          entries.every((entry) =>
-                            box.units.some((piece) => piece.k === entry.k),
-                          ),
-                        ) ?? null),
-                  lines: entries.map((entry) => {
-                    const cut = entry.name.lastIndexOf(", ");
-                    const rest = entry.name.slice(cut + 2);
-                    return {
-                      entry,
-                      label:
-                        header === ""
-                          ? cut > 0 && entry.name.slice(0, cut) === rest
-                            ? rest
-                            : entry.name
-                          : rest,
-                    };
-                  }),
-                }))
-                .toArray(),
+              (rosters.get(segment.group) ?? []).map((block) => ({
+                ...block,
+                box:
+                  block.header === ""
+                    ? null
+                    : (sketched.find((box) =>
+                        block.lines.every((line) =>
+                          box.units.some((piece) => piece.k === line.entry.k),
+                        ),
+                      ) ?? null),
+              })),
             )}
             {#if narrow}
               <Drawer.Root
@@ -4247,8 +4257,6 @@
   blocks: Array<{
     header: string;
     box: {
-      x: number;
-      y: number;
       width: number;
       height: number;
       units: Array<{ k: number; d: string }>;
@@ -4298,8 +4306,7 @@
               { "block-52": isSheet },
             )}
             style:inline-size="calc(100% - 1rem)"
-            viewBox="{box.x - pad} {box.y - pad} {box.width +
-              pad * 2} {box.height + pad * 2}"
+            viewBox="{-pad} {-pad} {box.width + pad * 2} {box.height + pad * 2}"
             aria-hidden="true"
             {@attach (node: SVGSVGElement) => {
               node.scrollIntoView({

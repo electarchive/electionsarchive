@@ -271,17 +271,15 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
     k: number;
     part: number;
     d: string;
-    x: number;
-    y: number;
     width: number;
     height: number;
   }>(sql`
     with picked as materialized (
-      select a.k, a.scheme_code as scheme, g.geom as raw, coalesce(
+      select a.k, a.scheme_code as scheme, g.geom as raw, ST_Simplify(coalesce(
         (select c.geom from display.clipped c
           join display.meta dm on dm.mask_version = c.mask_version
           where c.area_id = a.id and c.valid = g.valid and c.geom_hash = md5(ST_AsBinary(g.geom))),
-        g.geom) as geom
+        g.geom), greatest(ST_XMax(g.geom) - ST_XMin(g.geom), ST_YMax(g.geom) - ST_YMin(g.geom)) / 2000) as geom
       from area a
       cross join lateral (
         select geom, valid from area_geometry where area_id = a.id
@@ -299,11 +297,11 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
       from planed where part <> -1 and geom is not null
       window w as (partition by part)
     )
-    select k, part, ST_AsSVG(ST_Scale(coalesce((
+    select k, part, ST_AsSVG(ST_Scale(ST_Translate(coalesce((
         select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, span / 500)) d
         where ST_Area(d.geom) >= (span / 500) ^ 2
-      ), ST_SimplifyPreserveTopology(geom, span / 500)), 0.001, 0.001), 0, 1) as d,
-      west / 1000 as x, -north / 1000 as y, (east - west) / 1000 as width, (north - south) / 1000 as height
+      ), ST_SimplifyPreserveTopology(geom, span / 500)), -west, -north), 0.001, 0.001), 0, 1) as d,
+      (east - west) / 1000 as width, (north - south) / 1000 as height
     from (select *, greatest(east - west, north - south) as span from framed) f
     order by part, k
   `);
@@ -311,8 +309,6 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
     number,
     {
       name: string;
-      x: number;
-      y: number;
       width: number;
       height: number;
       units: Array<{ k: number; d: string }>;
@@ -323,8 +319,6 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
     if (seen == null) {
       parts.set(row.part, {
         name: insets[row.part]?.name ?? "",
-        x: row.x,
-        y: row.y,
         width: row.width,
         height: row.height,
         units: [{ k: row.k, d: row.d }],
