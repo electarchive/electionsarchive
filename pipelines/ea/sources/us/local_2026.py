@@ -2596,6 +2596,13 @@ for key, publisher, title, url, local in (
         "tx/travis_notices.html",
     ),
     (
+        "TX-48085-wsud",
+        "Collin County Elections",
+        "Certification of Unopposed Candidates, Wylie Northeast Special Utility District, November 3, 2026",
+        "https://www.collincountytx.gov/docs/default-source/elections/election-notices/wylie-ne-sud-certified-unopposed-candidates.pdf",
+        "tx/wylie_ne_sud.pdf",
+    ),
+    (
         "TX-48453-lv",
         "Lago Vista Independent School District",
         "Order of Cancellation of Trustee Election, November 3, 2026",
@@ -6878,7 +6885,7 @@ KY_CITY_SPELLINGS = {
     ("TODD", "Gurthrie"): "Guthrie",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
-TACIT_FEEDS = {"TX-48209-udc", "CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb"}
+TACIT_FEEDS = {"TX-48209-udc", "CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb", "TX-48085-wsud"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
