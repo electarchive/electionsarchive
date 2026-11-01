@@ -9945,7 +9945,7 @@ export const contests = {
         method: "GET",
         path: "/contests/{id}/cycle",
         summary:
-          "Trace a contest's cycle: the party primaries that chose the nominees for its general election, that general election, and the other races on the ballot the same day",
+          "Trace a contest's cycle: the primaries, partisan or nonpartisan, that chose the candidates for its general election, that general election, and the other races on the ballot the same day",
       }),
     )
     .input(
@@ -9993,7 +9993,8 @@ export const contests = {
       const focus =
         chain.at(-1) ?? (contest.id === contest.root ? null : contest.place);
       const same = (a: string, b: string) =>
-        sql.raw(`((${a}.office_id is not null and ${b}.office_id = ${a}.office_id)
+        sql.raw(`((${a}.office_id is not null and (${b}.office_id = ${a}.office_id
+            or (${b}.office_id in (select id from twin) and ${b}.district_area_id is not distinct from ${a}.district_area_id)))
           or (${a}.office_id is null and ${b}.office_id is null and ${b}.body_id = ${a}.body_id
             and ${b}.district_area_id is not distinct from ${a}.district_area_id))
           and (${a}.seat_id is null or ${b}.seat_id is null or ${b}.seat_id = ${a}.seat_id)
@@ -10019,6 +10020,13 @@ export const contests = {
           r as materialized (
             select c.*, e.kind as ekind, e.date_from as d
             from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
+          ),
+          twin as materialized (
+            select o.id from r join office x on x.id = r.office_id
+            join office o on o.polity_id = x.polity_id and o.kind = x.kind and o.body_id is not distinct from x.body_id
+            where o.id = x.id or exists (
+              select from name n join name m on lower(m.text) = lower(n.text) where n.entity_id = x.id and m.entity_id = o.id
+            )
           ),
           g as materialized (
             (select c.*, e.date_from as d
@@ -10048,7 +10056,7 @@ export const contests = {
               c.id = g.id as "isGeneral", c.district_area_id is not distinct from g.district_area_id as "isSame"
             from g cross join prev cross join contest c join election e on e.id = c.election_id
             where c.id = g.id or (
-              c.party_scope_id is not null and c.allocation_parent_id is null and c.previous_round_id is null
+              c.allocation_parent_id is null and c.previous_round_id is null
               and e.kind in ('primary', 'caucus') and e.date_from > prev.d and e.date_from <= g.d
               and (g.office_id is not null or g.body_id is not null) and ${same("g", "c")}
             )
@@ -10146,9 +10154,7 @@ export const contests = {
         `),
       ]);
       const general = stepped.rows.find((row) => row.isGeneral) ?? null;
-      const scoped = stepped.rows.filter(
-        (row) => !row.isGeneral && row.party != null,
-      );
+      const scoped = stepped.rows.filter((row) => !row.isGeneral);
       const ancestry =
         focus == null
           ? null
@@ -10185,7 +10191,9 @@ export const contests = {
           row.isUmbrella ||
           (row.district != null && anchored.has(row.district)),
       );
-      const others = scoped.filter((row) => !featured.includes(row));
+      const others = scoped.filter(
+        (row) => row.party != null && !featured.includes(row),
+      );
       const steps = [...(general == null ? [] : [general]), ...featured];
       const decided = [
         ...steps.map((row) => row.id),
@@ -10244,7 +10252,7 @@ export const contests = {
           join area a on a.id = coalesce(c.district_area_id, pt.area_id)
           where c.id = x.contest limit 1
         ) spot
-        join outcome oc on oc.result_set_id = rs.id and oc.candidacy_id is null and oc.kind in ('won', 'elected')
+        join outcome oc on oc.result_set_id = rs.id and oc.candidacy_id is null and oc.kind in ('won', 'elected', 'advanced')
           and not exists (select from outcome d where d.result_set_id = rs.id and d.option_id = oc.option_id and d.kind = 'declined')
         join contest_option o on o.id = oc.option_id
         left join lateral (
