@@ -8493,7 +8493,16 @@ def parse() -> None:
             feeds["CA-06037"].append(
                 {
                     "county": "Los Angeles",
-                    "contest": re.sub(r"\bGENERAL MUNICIPAL ELECTION\b|\bCITY OF\b", " ", heading),
+                    "contest": re.sub(
+                        r"\bGENERAL MUNICIPAL ELECTION\b|\bCITY OF\b"
+                        + (
+                            r"|(?<=COLLEGE DISTRICT) SPECIAL ELECTION\b|\s*\(Unexpired term[^)]*\)"
+                            if "COLLEGE DISTRICT" in heading
+                            else ""
+                        ),
+                        " ",
+                        heading,
+                    ),
                     "seats": seats,
                     "name": cased(found[1]),
                     "party": None,
@@ -10669,6 +10678,14 @@ def parse() -> None:
                 nj_multi = False
                 if state == "NJ":
                     joined = " ".join(tokens)
+                if state == "CA":
+                    tokens = re.sub(
+                        r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
+                        lambda hit: (
+                            f"district {hit[1] or ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].index(hit[2])}"
+                        ),
+                        " ".join(tokens),
+                    ).split()
                     nj_multi = bool(
                         re.search(r"\bregional\b|^morris school district\b|^school district of the chathams\b", joined)
                     )
