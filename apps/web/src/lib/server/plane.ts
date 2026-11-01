@@ -296,13 +296,33 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
         min(ST_YMin(geom)) over w as south, max(ST_YMax(geom)) over w as north
       from planed where part <> -1 and geom is not null
       window w as (partition by part)
+    ),
+    thin as materialized (
+      select k, part, west, east, south, north, span, d.geom,
+        greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) >= span / 40 as wide
+      from (select *, greatest(east - west, north - south) as span from framed) f,
+        ST_Dump(ST_SimplifyPreserveTopology(f.geom, f.span / 500)) d
+    ),
+    land as materialized (
+      select part, geom from thin where wide
+    ),
+    shaped as materialized (
+      select t.*, case
+        when t.wide then 'land'
+        when not exists (
+          select 1 from land l where l.part = t.part and ST_DWithin(l.geom, t.geom, t.span / 40)
+        ) then 'dot'
+        when ST_Area(t.geom) >= (t.span / 500) ^ 2 then 'land'
+      end as shape
+      from thin t
     )
-    select k, part, ST_AsSVG(ST_Scale(ST_Translate(coalesce((
-        select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, span / 500)) d
-        where ST_Area(d.geom) >= (span / 500) ^ 2
-      ), ST_SimplifyPreserveTopology(geom, span / 500)), -west, -north), 0.001, 0.001), 0, 1) as d,
+    select k, part, coalesce(ST_AsSVG(ST_Scale(ST_Translate(ST_Collect(array_remove(array[
+        ST_Collect(geom) filter (where shape = 'land'),
+        ST_Union(distinct ST_Buffer(ST_SnapToGrid(ST_Centroid(geom), span / 80), span / 80, 'quad_segs=2')) filter (where shape = 'dot')
+      ], null)), -west, -north), 0.001, 0.001), 0, 1), '') as d,
       (east - west) / 1000 as width, (north - south) / 1000 as height
-    from (select *, greatest(east - west, north - south) as span from framed) f
+    from shaped
+    group by k, part, west, east, south, north, span
     order by part, k
   `);
   const parts = new Map<
