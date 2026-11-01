@@ -94,18 +94,19 @@ const MODEL = {
   draws: 500,
   spread: 0.12,
   sizeRef: 20_000,
-  sizeExp: 0.1,
+  sizeExp: 0.25,
   sizeLow: 0.3,
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
-  priors: { swing: 0.1, slope: 0.15, size: 0.015, order: 0.06, trait: 0.015 },
+  priors: { swing: 0.1, slope: 0.15, size: 0.015, order: 0.15, trait: 0.015 },
   turnout: 0.12,
+  same: { center: 0.06, spread: 0.08 },
   drift: 0.06,
   quiet: 15,
   moving: 0.1,
   shift: 0.028,
-  surge: 0.07,
+  surge: 0.14,
   tail: { share: 0.035, spread: 0.5, lean: 0.06, local: 0.05 },
 };
 
@@ -115,6 +116,7 @@ const TAILS: Record<string, number> = {
   ca: 0.6,
   co: 0.1,
   dc: 0.1,
+  fl: 0.01,
   hi: 0.05,
   il: 0.08,
   md: 0.2,
@@ -128,6 +130,7 @@ const TAILS: Record<string, number> = {
 
 const TAUS = 41;
 const PIS = [0.05, 0.2, 0.4, 0.6, 0.8, 0.95];
+const SCALES = [0.4, 0.55, 0.75, 1, 1.35];
 
 type Unit = {
   id: string;
@@ -390,7 +393,11 @@ function units(race: LiveRace, at: string | null) {
       ];
       unit.sigma =
         MODEL.spread *
-        clamp((MODEL.sizeRef / unit.expected) ** MODEL.sizeExp, MODEL.sizeLow, 1);
+        clamp(
+          (MODEL.sizeRef / unit.expected) ** MODEL.sizeExp,
+          MODEL.sizeLow,
+          1,
+        );
     }
   }
   return { found, a, b };
@@ -411,8 +418,8 @@ function logcdf(x: number) {
   return Math.log(x < 0 ? tail / 2 : 1 - tail / 2);
 }
 
-function components(unit: Unit, tau: number, pi: number) {
-  const sigma = unit.sigma;
+function components(unit: Unit, tau: number, pi: number, scale: number) {
+  const sigma = unit.sigma * scale;
   const ell = Math.log(unit.total / unit.expected) - tau;
   const p = clamp(pi * unit.settled, 1e-6, 1 - 1e-6);
   const mu = -ell - sigma * sigma;
@@ -443,23 +450,25 @@ function truncated(mu: number, sigma: number, random: () => number) {
   }
 }
 
-function turnout(found: Array<Unit>, spread: number) {
+function turnout(found: Array<Unit>, center: number, spread: number) {
   const step = (8 * spread) / (TAUS - 1);
   const taus = Array.from(
     { length: TAUS },
-    (_, index) => -4 * spread + index * step,
+    (_, index) => center - 4 * spread + index * step,
   );
   const reported = found.filter((unit) => unit.hasBaseline && unit.total > 0);
   const logs: Array<number> = [];
   for (const tau of taus) {
-    for (const pi of PIS) {
-      let log = (-0.5 * tau * tau) / (spread * spread);
-      for (const unit of reported) {
-        const { done, open } = components(unit, tau, pi);
-        const top = Math.max(done, open);
-        log += top + Math.log(Math.exp(done - top) + Math.exp(open - top));
+    for (const scale of SCALES) {
+      for (const pi of PIS) {
+        let log = (-0.5 * (tau - center) ** 2) / (spread * spread);
+        for (const unit of reported) {
+          const { done, open } = components(unit, tau, pi, scale);
+          const top = Math.max(done, open);
+          log += top + Math.log(Math.exp(done - top) + Math.exp(open - top));
+        }
+        logs.push(log);
       }
-      logs.push(log);
     }
   }
   const top = Math.max(...logs);
@@ -479,7 +488,8 @@ function turnout(found: Array<Unit>, spread: number) {
         cell = cumulative.length - 1;
       }
       const tau =
-        taus[Math.floor(cell / PIS.length)]! + (random() - 0.5) * step;
+        taus[Math.floor(cell / (PIS.length * SCALES.length))]! +
+        (random() - 0.5) * step;
       return { cell, tau };
     },
     unit(
@@ -489,20 +499,26 @@ function turnout(found: Array<Unit>, spread: number) {
       surge: number,
       random: () => number,
     ) {
+      const scale = SCALES[Math.floor(cell / PIS.length) % SCALES.length]!;
       if (unit.total <= 0) {
         return (
           unit.expected *
-          Math.exp(tau + surge + unit.sigma * gaussian(random))
+          Math.exp(tau + surge + unit.sigma * scale * gaussian(random))
         );
       }
-      const { done, open, mu } = components(unit, tau, PIS[cell % PIS.length]!);
+      const { done, open, mu } = components(
+        unit,
+        tau,
+        PIS[cell % PIS.length]!,
+        scale,
+      );
       if (random() < 1 / (1 + Math.exp(open - done))) {
         return (
           unit.total *
           (1 + MODEL.spike * -Math.log(Math.max(random(), Number.EPSILON)))
         );
       }
-      return unit.total * Math.exp(truncated(mu, unit.sigma, random));
+      return unit.total * Math.exp(truncated(mu, unit.sigma * scale, random));
     },
   };
 }
@@ -688,7 +704,9 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const scale = found.map((unit) =>
     unit.hasBaseline ? clamp((median / unit.expected) ** 0.15, 0.6, 1.8) : 1,
   );
-  const model = turnout(found, MODEL.turnout);
+  const model = race.baseline.some((row) => row.expected != null)
+    ? turnout(found, 0, MODEL.turnout)
+    : turnout(found, MODEL.same.center, MODEL.same.spread);
   const random = seeded(`${race.id}@${stamp}`);
   const typical = found.map((unit) => {
     if (!unit.hasBaseline) {
