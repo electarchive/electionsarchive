@@ -4192,6 +4192,13 @@ for key, publisher, title, url, local in (
         "../manual/MF-523/EAA - Certification of Unopposed Candidates.pdf",
     ),
     (
+        "TX-48303-ud",
+        "Lubbock County Elections",
+        "November 3, 2026 General Election Sample Ballots, Lubbock County Water Control and Improvement District 1",
+        "https://votelubbock.gov/",
+        "../manual/MF-526/10_138-LCSD.pdf",
+    ),
+    (
         "TX-48491-jarrell",
         "Williamson County Elections",
         "Comprehensive Sample Ballot, City of Jarrell, November 3, 2026",
