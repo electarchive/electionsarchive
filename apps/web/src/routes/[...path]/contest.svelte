@@ -38,6 +38,7 @@
   import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
   import Count from "./count.svelte";
+  import Crowns from "./crowns.svelte";
   import Cycle from "./cycle.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
@@ -76,6 +77,7 @@
     surround,
     match,
     standing,
+    crowned,
   }: {
     id: string;
     unit: string;
@@ -92,6 +94,7 @@
     surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
     standing: Extract<PageData, { kind: "contest" }>["standing"];
+    crowned: Extract<PageData, { kind: "contest" }>["crowned"];
   } = $props();
 
   const DAY: Record<string, (place: string) => string> = {
@@ -1937,6 +1940,15 @@
       </p>
     </div>
   {/snippet}
+  {#snippet crowns()}
+    {#if crowned != null}
+      <Crowns
+        maps={crowned.maps}
+        since={crowned.since}
+        year={contest.election.date?.slice(0, 4) ?? ""}
+      />
+    {/if}
+  {/snippet}
   {#snippet hemicycle()}
     <Seats
       isLinked
@@ -1951,7 +1963,7 @@
   {/snippet}
   <Lead
     results={summary}
-    map={isMapped ? mapped : missing}
+    map={isMapped ? mapped : crowned == null ? missing : crowns}
     aside={chamber == null ? null : hemicycle}
   />
   {#if drawn != null && placed != null}

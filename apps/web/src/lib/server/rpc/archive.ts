@@ -16036,23 +16036,24 @@ export const elections = {
           "List who won the office in each of an election's child elections, grouped by region, with each party's wins by tier, its share of the vote, and who held each office after the previous election",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        contest: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+      }),
+    )
     .output(
       v.object({
         noun: v.nullable(v.string()),
+        before: v.nullable(v.object({ path: v.string(), date: v.string() })),
         groups: v.array(
           v.object({
             id: v.string(),
             k: v.nullable(v.number()),
-        before: v.nullable(v.object({ path: v.string(), date: v.string() })),
             name: v.string(),
           }),
         ),
         maps: v.array(v.object({ places: v.nonNullable(Places), map: Sketch })),
-        rows: v.array(
-          v.object({
-            path: v.string(),
-            at: v.nullable(v.number()),
         parties: v.array(
           v.object({
             key: v.string(),
@@ -16080,21 +16081,25 @@ export const elections = {
             valid: v.number(),
           }),
         ),
+        rows: v.array(
+          v.object({
+            path: v.string(),
+            at: v.nullable(v.number()),
             group: v.nullable(v.string()),
+            tier: v.picklist(TIERS),
             person: v.nullable(v.string()),
             party: v.nullable(v.string()),
             label: v.nullable(v.string()),
             short: v.nullable(v.string()),
-            tier: v.picklist(TIERS),
             color: v.nullable(v.string()),
             isLed: v.boolean(),
+            share: v.nullable(v.number()),
+            margin: v.nullable(v.number()),
+            prior: v.nullable(v.string()),
           }),
         ),
       }),
     )
-            share: v.nullable(v.number()),
-            margin: v.nullable(v.number()),
-            prior: v.nullable(v.string()),
     .handler(async ({ input }) => {
       const crown = async (election: string) => {
         const offices = await db.execute<{ id: string }>(sql`
@@ -16272,7 +16277,7 @@ export const elections = {
           };
         });
       };
-      const [rows, earlier, held] = await Promise.all([
+      const [crowned, earlier, held, aggregate] = await Promise.all([
         crown(input.id),
         db.execute<{ id: string; path: string; date: string }>(
           sql`
@@ -16287,37 +16292,80 @@ export const elections = {
             order by p.date_from desc limit 1
           `,
         ),
-      );
-      const current = new Set([
-        ...rows.flatMap((row) => row.party ?? []),
-        ...(measure?.totals.keys() ?? [])
-          .filter((entry) => entry.startsWith("party:"))
-          .map((entry) => entry.slice(6)),
-      ]);
-      const heirs = new Map<string, string>();
-      for (const party of current) {
-        if (root(party) === party || !heirs.has(root(party))) {
-          heirs.set(root(party), party);
-        }
-      }
         db.execute<{ kind: string }>(
           sql`select e.kind::text as kind from election e where e.id = ${input.id}::uuid`,
         ),
+        input.contest == null
+          ? null
+          : db.execute<{ office: string | null; seats: number | null }>(sql`
+            select (select f.kind::text from office f where f.id = c.office_id) as office,
+              (
+                select sum(x.seats)::int from result_set rs
+                join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won')
+                where rs.contest_id = c.id and rs.is_default
+              ) as seats
+            from contest c
+            where c.id = ${input.contest}::uuid and c.election_id = ${input.id}::uuid
+          `),
       ]);
-      if (rows.length < 40) {
-        return {
-          noun: null,
-          before: null,
-          groups: [],
-          maps: [],
-          parties: [],
-          tiers: [],
-          measure: null,
-          rows: [],
-        };
+      const empty = {
+        noun: null,
+        before: null,
+        groups: [],
+        maps: [],
+        parties: [],
+        tiers: [],
+        measure: null,
+        rows: [],
+      };
+      if (crowned.length < 40) {
+        return empty;
       }
+      let picked: Set<string> | null = null;
+      if (aggregate != null) {
+        const target = aggregate.rows[0];
+        const sizes = TIERS.map(
+          (tier) =>
+            crowned.filter(
+              (row) => row.tier === tier && row.office === target?.office,
+            ).length,
+        );
+        let gap = Math.max(2, (target?.seats ?? 0) * 0.05);
+        for (const mask of Array.from(
+          { length: (1 << TIERS.length) - 1 },
+          (_, index) => index + 1,
+        )) {
+          const tiers = TIERS.filter((_, index) => (mask >> index) & 1);
+          let size = 0;
+          for (const tier of tiers) {
+            size += sizes[TIERS.indexOf(tier)] ?? 0;
+          }
+          const off = Math.abs(size - (target?.seats ?? 0));
+          if (
+            size > 0 &&
+            (off < gap ||
+              (off === gap && picked != null && tiers.length < picked.size))
+          ) {
+            gap = off;
+            picked = new Set(tiers);
+          }
+        }
+        if (picked == null) {
+          return empty;
+        }
+      }
+      const covered = (row: {
+        tier: (typeof TIERS)[number];
+        office: string | null;
+      }) =>
+        picked == null ||
+        (picked.has(row.tier) && row.office === aggregate?.rows[0]?.office);
+      const rows = crowned.filter((row) => covered(row));
       const before = earlier.rows[0] ?? null;
-      const earliest = before == null ? [] : await crown(before.id);
+      const earliest =
+        before == null
+          ? []
+          : (await crown(before.id)).filter((row) => covered(row));
       const groups = [...new Set(rows.flatMap((row) => row.group ?? []))];
       const date = rows[0]?.date ?? "infinity";
       const isLayered =
@@ -16505,6 +16553,19 @@ export const elections = {
       const root = ancestry(
         relations.map((row) => ({ ...row, toLabel: "" })),
         "party",
+      );
+      const current = new Set([
+        ...rows.flatMap((row) => row.party ?? []),
+        ...(measure?.totals.keys() ?? [])
+          .filter((entry) => entry.startsWith("party:"))
+          .map((entry) => entry.slice(6)),
+      ]);
+      const heirs = new Map<string, string>();
+      for (const party of current) {
+        if (root(party) === party || !heirs.has(root(party))) {
+          heirs.set(root(party), party);
+        }
+      }
       const heir = (party: string) =>
         current.has(party) ? party : (heirs.get(root(party)) ?? party);
       const rekey = (entry: string) =>
@@ -16636,10 +16697,6 @@ export const elections = {
           party: members[0]?.party ?? null,
         }));
       const position = new Map(legend.map((item, index) => [item.key, index]));
-      const nation = territory.rows[0];
-      const maps =
-        nation == null
-          ? []
       const split = (tally: Map<string, number>, winner: string) => {
         let valid = 0;
         let rival = 0;
@@ -16654,6 +16711,10 @@ export const elections = {
           ? { valid, share: null, margin: null }
           : { valid, share: own / valid, margin: (own - rival) / valid };
       };
+      const nation = territory.rows[0];
+      const maps =
+        nation == null
+          ? []
           : await Promise.all(
               levels.map(async (level) => {
                 const first = area.get(level[0]?.at ?? "");
@@ -16679,10 +16740,6 @@ export const elections = {
                           sources: [],
                           rows: level.flatMap(({ row, at }) => {
                             const place = area.get(at);
-                            return place == null
-                              ? []
-                              : [
-                                  {
                             const old = then.get(row.place);
                             const { valid, margin } = split(
                               row.tally,
@@ -16692,6 +16749,10 @@ export const elections = {
                               old == null
                                 ? 0
                                 : split(old.tally, key(old)).valid;
+                            return place == null
+                              ? []
+                              : [
+                                  {
                                     k: place.k,
                                     at:
                                       place.x == null || place.y == null
@@ -16736,25 +16797,6 @@ export const elections = {
                     ];
               }),
             );
-      return {
-        noun: nouns.rows[0]?.noun ?? null,
-        maps: maps.flat(),
-        parties,
-        tiers: (isLayered ? TIERS : [])
-          .map((code) => ({
-            code,
-            total: rows.filter((row) => row.tier === code).length,
-            before: prior.filter((row) => row.tier === code).length,
-          }))
-          .filter((tier) => tier.total > 0),
-        measure:
-          measure == null
-            ? null
-            : {
-                mayors: measure.mayors,
-                councils: measure.councils,
-                valid: measure.valid,
-              },
       const counts = (crowned: typeof rows) => {
         const found = new Map<string, Array<number>>();
         for (const row of crowned) {
@@ -16845,10 +16887,29 @@ export const elections = {
             (b.share ?? 0) - (a.share ?? 0) ||
             all(b.won) - all(a.won),
         );
-        groups: groups
-          .map((id) => ({
+      return {
+        noun: nouns.rows[0]?.noun ?? null,
         before:
           before == null ? null : { path: before.path, date: before.date },
+        maps: maps.flat(),
+        parties,
+        tiers: (isLayered ? TIERS : [])
+          .map((code) => ({
+            code,
+            total: rows.filter((row) => row.tier === code).length,
+            before: prior.filter((row) => row.tier === code).length,
+          }))
+          .filter((tier) => tier.total > 0),
+        measure:
+          measure == null
+            ? null
+            : {
+                mayors: measure.mayors,
+                councils: measure.councils,
+                valid: measure.valid,
+              },
+        groups: groups
+          .map((id) => ({
             id,
             k: area.get(id)?.k ?? null,
             name: labels.full.get(id) ?? "",

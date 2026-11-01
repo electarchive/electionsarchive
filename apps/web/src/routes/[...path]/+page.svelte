@@ -244,6 +244,7 @@
         successors={data.successors}
         statutes={data.statutes}
         boundaries={data.boundaries}
+        crowned={data.crowned}
         surround={data.surround}
         match={data.match}
         standing={data.standing}

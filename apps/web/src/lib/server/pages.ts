@@ -1197,6 +1197,23 @@ export async function archive(path: string, search: URLSearchParams) {
     ahead(contest.count, input.round, async (round) =>
       call(router.contests.get, { ...input, round }),
     );
+    const crowned =
+      contest.kind === "body_seats" &&
+      unit === "" &&
+      (contest.places?.rows.length ?? 0) === 0
+        ? await db
+            .execute<{ id: string }>(
+              sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
+            )
+            .then(async ({ rows }) =>
+              rows[0] == null
+                ? null
+                : call(router.elections.winners, {
+                    id: rows[0].id,
+                    contest: slug.entity_id,
+                  }),
+            )
+        : null;
     return {
       kind: "contest" as const,
       id: slug.entity_id,
@@ -1218,6 +1235,13 @@ export async function archive(path: string, search: URLSearchParams) {
       match,
       within,
       standing: standing(),
+      crowned:
+        crowned == null || crowned.maps.length === 0
+          ? null
+          : {
+              maps: crowned.maps,
+              since: crowned.before?.date.slice(0, 4) ?? null,
+            },
     };
   }
   if (slug.type === "election") {

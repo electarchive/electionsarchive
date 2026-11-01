@@ -520,7 +520,9 @@ export async function twin({ request, url }: RequestEvent) {
       const plain =
         data.kind === "election"
           ? { ...data, sections: { ...data.sections, winners: undefined } }
-          : data;
+          : data.kind === "contest"
+            ? { ...data, crowned: undefined }
+            : data;
       return Response.json(
         ledger?.places != null
           ? { ...plain, ledger }
