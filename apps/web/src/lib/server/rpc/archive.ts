@@ -2942,10 +2942,17 @@ async function places(
     level.count += 1;
     counts.set(kid.scheme, level);
   }
-  const eligible = counts
+  const plural = counts
     .values()
     .filter((level) => level.count > 1)
     .toArray();
+  const eligible =
+    plural.length > 0
+      ? plural
+      : counts
+          .values()
+          .filter((level) => level.code === "world.country")
+          .toArray();
   if (eligible.length === 0) {
     const sets = await db.execute<{ k: number; isDefault: boolean }>(sql`
       with recursive grp(id) as (
