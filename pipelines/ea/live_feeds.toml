@@ -22,6 +22,7 @@ url = "https://results.elections.myflorida.com"
 [[feed]]
 id = "us.enr_2026.ga"
 adapter = "us.enr_2026"
+interval = 90
 params = { state = "GA" }
 publisher = "Georgia Secretary of State"
 url = "https://results.sos.ga.gov"
@@ -66,6 +67,7 @@ url = "https://sos.ks.gov/elections/election-results.html"
 [[feed]]
 id = "us.enr_2026.la"
 adapter = "us.enr_2026"
+interval = 60
 params = { state = "LA" }
 publisher = "Louisiana Secretary of State"
 url = "https://voterportal.sos.la.gov/graphical"
@@ -110,6 +112,7 @@ url = "https://www.electionreturns.pa.gov/"
 [[feed]]
 id = "us.enr_2026.ri"
 adapter = "us.enr_2026"
+interval = 90
 params = { state = "RI" }
 publisher = "Rhode Island Board of Elections"
 url = "https://elections.ri.gov/elections/previous-election-results"
