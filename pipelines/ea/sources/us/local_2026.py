@@ -6509,6 +6509,13 @@ for key, publisher, title, url, local in (
         "az/pima_canceled.html",
     ),
     (
+        "AZ-04027-cc",
+        "Yuma County Recorder and Elections",
+        "2026 General Election Candidate Listing",
+        "https://www.yumacountyaz.gov/government/recorder-elections/candidate-listing",
+        "../manual/MF-553/yuma/yuma-candidate-listing.html",
+    ),
+    (
         "AZ-04015-county",
         "Mohave County Elections Department",
         "2026 General Election County Candidates",
