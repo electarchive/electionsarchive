@@ -24,10 +24,11 @@ from ea import raw, scan
 from ea.changeset import Changeset, slug
 from ea.sources.tr.tuik_secim import ILCE_ALIASES, norm
 from ea.sources.tr.ysk import DIGITIZED, PROVINCES, REGISTERED, VALID, VOTERS, VOTES, title
+from ea.sources.tr.ysk_local import own_area, own_areas
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -1209,6 +1210,7 @@ def emit() -> Path:
         matched: list[str] = []
         minted_ilce: list[str] = []
         areas = {unit: area for area, unit in equals.items()}
+        spans = own_areas(conn)
         polities = {value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'")}
         settled = {
             value
@@ -1517,7 +1519,9 @@ def emit() -> Path:
                     election_id=election,
                     kind="office",
                     office_id=office,
-                    district_area_id=areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate),
+                    district_area_id=own_area(spans, polity, day)
+                    or areas.get(ilce(plate, district, None))
+                    or cs.area("tr.il", plate),
                     magnitude=1,
                     round_number=1,
                     electoral_system_id=mayoral,

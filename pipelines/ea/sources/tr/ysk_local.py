@@ -10,6 +10,7 @@ from urllib.parse import quote
 from uuid import UUID
 
 import polars as pl
+from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -29,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "9"
+VERSION = "10"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -1087,6 +1088,7 @@ DATED = {
     ("ANAVATAN PARTİSİ", 2024): "anavatan-partisi",
     ("YENİ TÜRKİYE PARTİSİ", 2024): "yeni-turkiye-partisi-2024",
     ("YTP", 2024): "yeni-turkiye-partisi-2024",
+    **{("Milliyetçi Hareket Partisi", year): "milliyetci-hareket-partisi" for year in (1984, 1989, 1994, 1999)},
 }
 MINTED = {
     "sosyalist-devrim-partisi": ("Sosyalist Devrim Partisi", None),
@@ -1250,6 +1252,27 @@ NAMED_2009 = (
 def party(label: str, year: int) -> str | None:
     canonical = label if label in LABELS else ANAGRAMS["".join(sorted(label.replace(" ", "")))]
     return DATED.get((canonical, year), LABELS[canonical])
+
+
+def own_areas(conn: Connection) -> dict[UUID, list[tuple[date | None, date | None, UUID]]]:
+    spans: dict[UUID, list[tuple[date | None, date | None, UUID]]] = {}
+    for polity, area, start, end in conn.execute(
+        """select pt.polity_id, pt.area_id, lower(pt.valid), upper(pt.valid) from polity_territory pt
+           join area a on a.id = pt.area_id where a.scheme_code in ('tr.belde', 'tr.buyuksehir')"""
+    ).fetchall():
+        spans.setdefault(polity, []).append((start, end, area))
+    return spans
+
+
+def own_area(spans: dict[UUID, list[tuple[date | None, date | None, UUID]]], polity: UUID, day: date) -> UUID | None:
+    return next(
+        (
+            area
+            for start, end, area in spans.get(polity, [])
+            if (start is None or start <= day) and (end is None or day < end)
+        ),
+        None,
+    )
 
 
 def emit() -> Path:
@@ -1658,6 +1681,8 @@ def emit() -> Path:
             )
             name(city_units[plate], f"{PROVINCES[int(plate) - 1]} Büyükşehir Belediyesi")
 
+        spans = own_areas(conn)
+
         def mayor_contest(
             key: str, polity: UUID, office: UUID, path: str, english: str, native: str, day: date, area: UUID | None
         ) -> tuple[UUID, UUID, str]:
@@ -1753,7 +1778,7 @@ def emit() -> Path:
                     PROVINCES[int(plate) - 1],
                     PROVINCES[int(plate) - 1] + " Büyükşehir",
                     day,
-                    provinces[plate],
+                    own_area(spans, metropolises[plate], day) or provinces[plate],
                 )
                 rows = grid_rows.filter(pl.col("unit") == plate)
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -1904,7 +1929,10 @@ def emit() -> Path:
                 polity = cs.key("tr.polity", key)
                 office = cs.key("tr.office", f"{key}-mayor")
                 english, native = label_text, label_text
-                area = districts[(plate, RENAMED_DISTRICTS.get((plate, district_text), district_text))]
+                area = (
+                    own_area(spans, polity, day)
+                    or districts[(plate, RENAMED_DISTRICTS.get((plate, district_text), district_text))]
+                )
                 if key not in seen:
                     seen.add(key)
                     cs.add("polity", id=polity, kind="municipality", iso_code=None)

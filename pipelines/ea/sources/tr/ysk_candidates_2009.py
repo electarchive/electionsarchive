@@ -9,13 +9,13 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.tr.ysk import LICENSE, PROVINCES, PUBLISHER, upper
-from ea.sources.tr.ysk_local import DATED, LABELS, title
+from ea.sources.tr.ysk_local import DATED, LABELS, own_area, own_areas, title
 from ea.sources.tr.ysk_mayors import CANDIDATES_2009
 from ea.sources.tr.ysk_mayors import SOURCE as MAYORS
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_candidates_2009"
-VERSION = "2"
+VERSION = "3"
 DAY = date(2009, 3, 29)
 PAGE = "https://www.ysk.gov.tr/doc/sayfa/29-mart-2009-mahalli-idareler-genel-secimleri/2819.html"
 SPELLINGS = {"KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN", "BAHŞİLİ": "BAHŞILI", "ONDOKUZMAYIS": "19-May"}
@@ -115,6 +115,7 @@ def emit() -> Path:
                 [DAY],
             ).fetchall()
         }
+        spans = own_areas(conn)
         existing = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'").fetchall()
         }
@@ -197,7 +198,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=office,
-                district_area_id=area,
+                district_area_id=own_area(spans, polity, DAY) or area,
                 magnitude=1,
                 round_number=1,
                 electoral_system_id=mayoral,

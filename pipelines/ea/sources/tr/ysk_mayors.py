@@ -20,6 +20,7 @@ from ea.sources.tr.ysk import (
     VOTES,
     upper,
 )
+from ea.sources.tr.ysk_local import own_area, own_areas
 from ea.sources.tr.ysk_local import party as local_party
 from ea.store import connect
 
@@ -186,7 +187,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "4"
+VERSION = "5"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
@@ -247,6 +248,7 @@ def emit() -> Path:
                 [DAY_2004],
             ).fetchall()
         }
+        spans = own_areas(conn)
         existing = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'").fetchall()
         }
@@ -371,7 +373,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=office,
-                district_area_id=area,
+                district_area_id=own_area(spans, polity, DAY_2004) or area,
                 magnitude=1,
                 round_number=1,
                 electoral_system_id=mayoral,

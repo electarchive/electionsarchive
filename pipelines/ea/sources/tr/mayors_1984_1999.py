@@ -6,21 +6,21 @@ from collections import defaultdict
 from datetime import date
 from pathlib import Path
 from urllib.parse import quote
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.tr.mayors_2004_2009 import LICENSE, LICENSE_URL, NUMBER, REF, cell, fold
 from ea.sources.tr.ysk import INVALID, REGISTERED, VALID, VOTES, upper
 from ea.sources.tr.ysk import PROVINCES as PLATES
-from ea.sources.tr.ysk_local import DAYS, party
+from ea.sources.tr.ysk_local import DAYS, own_area, own_areas, party
 from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "5"
+VERSION = "6"
 YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
@@ -165,12 +165,14 @@ def emit() -> Path:
         existing = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'").fetchall()
         }
-        areas = dict(
-            conn.execute(
-                """select distinct on (office_id) office_id, district_area_id from contest
-                   where district_area_id is not null and office_id is not null order by office_id, id"""
-            ).fetchall()
-        )
+        areas: dict[UUID, list[tuple[bool, date, UUID]]] = defaultdict(list)
+        for office_id, held_on, area_id, scheme in conn.execute(
+            """select c.office_id, e.date_from, c.district_area_id, a.scheme_code from contest c
+               join election e on e.id = c.election_id join area a on a.id = c.district_area_id
+               where c.office_id is not null and e.date_from is not null and a.scheme_code like 'tr.%'"""
+        ).fetchall():
+            areas[office_id].append((scheme in ("tr.il", "tr.buyuksehir"), held_on, area_id))
+        spans = own_areas(conn)
         units: dict[UUID | str, UUID] = dict(
             conn.execute(
                 """select area_id, id from reporting_unit
@@ -281,10 +283,17 @@ def emit() -> Path:
                 cs.add("office", id=office, polity_id=polity, kind="mayor")
                 cs.add("name", entity_id=office, text=f"Mayor of {name}", lang="en", kind="official", is_preferred=True)
                 cs.add("name", entity_id=office, text=f"{name} Belediye Başkanı", lang="tr", kind="native")
-            if contest_key in held and held[contest_key] not in own:
+            if (contest_key in held and held[contest_key] not in own) or uuid5(
+                NAMESPACE, f"external_id:tr.election\x1f{contest_key}"
+            ) in cs.retired:
                 skipped.append((str(year), label, "contest already held"))
                 continue
-            area = areas.get(office) or (cs.area("tr.il", plates[key.split("-")[0]]) if minted_place else None)
+            nearest = min(areas.get(office, []), key=lambda held: (held[0], abs((held[1] - day).days)), default=None)
+            area = (
+                own_area(spans, polity, day)
+                or (None if nearest is None else nearest[2])
+                or (cs.area("tr.il", plates[key.split("-")[0]]) if minted_place else None)
+            )
             if area is None or polity not in paths:
                 skipped.append((str(year), label, "no area"))
                 continue
@@ -502,5 +511,18 @@ def emit() -> Path:
             writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
             writer.writerow(("year", "race", "reason"))
             writer.writerows(sorted(skipped, key=lambda row: (row[2], row[0], row[1])))
+        options = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        reason = "A duplicate of a mayoral option, left behind when the archive re-read the candidate's party."
+        for option, candidacy in conn.execute(
+            """select o.id::text, ca.id::text from contest_option o join changeset c on c.id = o.changeset_id
+               join entity e on e.id = o.id and e.retired_by is null
+               left join candidacy ca on ca.option_id = o.id
+               where c.pipeline = %s and o.contest_id = any(%s::uuid[])""",
+            [SOURCE, [str(row["id"]) for row in cs.rows.get("contest", [])]],
+        ).fetchall():
+            if option not in options:
+                if candidacy is not None:
+                    cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                cs.add("entity_retirement", entity_id=option, reason=reason)
         print(f"{len(made)} contests ({complete} complete); {len(skipped)} unpublished")
         return cs.write()
