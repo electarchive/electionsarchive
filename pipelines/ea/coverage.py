@@ -655,6 +655,10 @@ def registry() -> list[dict]:
     with GAPS.open() as f:
         rows = list(csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"))
     for i, row in enumerate(rows):
+        if row["category"] not in CATEGORIES:
+            raise ValueError(
+                f"{GAPS.name} row {i + 1} ({row['polity']} {row['state']} {row['years']}): category {row['category']!r} is not one of {', '.join(CATEGORIES)}"
+            )
         first, dash, last = row["years"].partition("-")
         row |= {
             "i": i,
