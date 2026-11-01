@@ -1,6 +1,6 @@
 <script lang="ts" module>
-  import type { VariantProps } from "tailwind-variants";
-  import { tv } from "tailwind-variants";
+  import type { VariantProps } from "tailwind-variants/lite";
+  import { tv } from "tailwind-variants/lite";
   export const inputGroupAddonVariants = tv({
     base: "flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium text-muted-foreground select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)_-_5px)] [&>svg:not([class*='size-'])]:size-4",
     variants: {

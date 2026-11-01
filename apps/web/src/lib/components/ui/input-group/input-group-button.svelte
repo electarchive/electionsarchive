@@ -1,6 +1,6 @@
 <script lang="ts" module>
-  import type { VariantProps } from "tailwind-variants";
-  import { tv } from "tailwind-variants";
+  import type { VariantProps } from "tailwind-variants/lite";
+  import { tv } from "tailwind-variants/lite";
 
   const inputGroupButtonVariants = tv({
     base: "flex items-center gap-2 text-sm shadow-none",

@@ -3,8 +3,8 @@
     HTMLAnchorAttributes,
     HTMLButtonAttributes,
   } from "svelte/elements";
-  import type { VariantProps } from "tailwind-variants";
-  import { tv } from "tailwind-variants";
+  import type { VariantProps } from "tailwind-variants/lite";
+  import { tv } from "tailwind-variants/lite";
   import type { WithElementRef } from "#lib/utils.js";
   import { cn } from "#lib/utils.js";
 
