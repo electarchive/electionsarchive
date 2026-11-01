@@ -19,6 +19,11 @@ SPLITS = {
     ),
 }
 
+NAMES = {
+    "OR:41059:commissioner-position-1": "Umatilla County Commissioner, Position 1",
+    "OR:41059:commissioner-position-2": "Umatilla County Commissioner, Position 2",
+}
+
 
 def emit() -> Path:
     with connect() as conn:
@@ -28,8 +33,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "One office recorded twice, by two pipelines that key it differently or by one whose key changed, "
-                "merged into the record that carries the most contests, tenures, and governments; two seats merged "
-                "because they shared a name are split back apart"
+                "merged into the record that carries the most contests, tenures, and governments; seats merged, or "
+                "about to be merged, because they shared a name are kept apart under their full titles"
             ),
             polity=None,
             kind="correction",
@@ -73,15 +78,35 @@ def emit() -> Path:
                    where x.scheme = 'us.office' and x.value = %s""",
                 [value],
             ).fetchone() or (None, None, None, None)
-            if survivor is None or survivor == office:
+            if survivor is None:
                 continue
-            cs.add("office", id=office, polity_id=polity, kind=kind, body_id=body)
-            cs.add("external_id", entity_id=office, scheme="us.office", value=value)
-            name(office, split)
-            name(survivor, kept)
+            if survivor != office:
+                cs.add("office", id=office, polity_id=polity, kind=kind, body_id=body)
+                cs.add("external_id", entity_id=office, scheme="us.office", value=value)
+                name(office, split)
+                name(survivor, kept)
+            moved = conn.execute(
+                """select k.* from contest k join external_id x on x.entity_id = k.id and x.scheme = 'us.contest'
+                   where regexp_replace(x.value, '^[0-9-]+:', '') = %s and k.office_id is distinct from %s""",
+                [value, office],
+            )
+            columns = [column.name for column in moved.description or ()]
+            for row in moved.fetchall():
+                contest = dict(zip(columns, row, strict=True))
+                del contest["changeset_id"], contest["recorded_from"]
+                cs.add("contest", **contest | {"office_id": office})
+        renamed = set()
+        for value, text in NAMES.items():
+            entity = cs.key("us.office", value)
+            if entity not in cs.minted:
+                renamed.add(entity)
+                name(entity, text)
         groups = 0
         for ranked in conn.execute(TWINS).fetchall():
-            survivor, *duplicates = ranked[0]
+            members = [entity for entity in ranked[0] if entity not in renamed]
+            if len(members) < 2:
+                continue
+            survivor, *duplicates = members
             groups += 1
             for duplicate in duplicates:
                 cs.merge(duplicate, survivor)

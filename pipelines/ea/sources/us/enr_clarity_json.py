@@ -89,6 +89,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                         ],
                     }
                     for node in summary["Contests"]
+                    if node["V"]
                 ],
             }
 

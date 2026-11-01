@@ -567,7 +567,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "candidates.parquet")
+    frame = pl.read_parquet(PARSED / "candidates.parquet").filter(~pl.col("state").is_in(list(elstats.HELD)))
     places = pl.read_parquet(PARSED / "places.parquet")
     grouped = {keys: rows for keys, rows in pl.read_parquet(PARSED / "precincts.parquet").group_by("state", "contest")}
     with connect() as conn:
@@ -575,7 +575,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County, city, town, and school board elections and primaries from the archives of Virginia, New Hampshire, Idaho, New Mexico, Connecticut, and Vermont",
+            summary="County, city, town, and school board elections and primaries from the archives of Virginia, Idaho, New Mexico, Connecticut, and Vermont",
             polity="US",
         )
         zeroed = cs.zeroed()
@@ -584,9 +584,10 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        sources = {state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in STATES}
+        loaded = {state: entry for state, entry in STATES.items() if state not in elstats.HELD}
+        sources = {state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in loaded}
         stored: set[str] = set()
-        for state, (first, *_) in STATES.items():
+        for state, (first, *_) in loaded.items():
             for year in range(first, 2026):
                 if (artifact := raw.cached(SOURCE, url(state, year))).storage_key not in stored:
                     stored.add(artifact.storage_key)
