@@ -8189,6 +8189,7 @@ def parse() -> None:
                     (r"\bColl\b", "College"),
                     (r"\bRcho\b", "Rancho"),
                     (r"\bUSD\b", "Unified School District"),
+                    (r"\bSD\b", "School District"),
                     (r"\bHS\b", "High School"),
                     (r"\bOC\b", "Orange County"),
                     (r"\bDiv\.?", "Division"),
@@ -10275,6 +10276,11 @@ def parse() -> None:
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
+                    fits = (
+                        own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
+                    )
                 if (
                     state == "NJ"
                     and row.get("tail") is None
