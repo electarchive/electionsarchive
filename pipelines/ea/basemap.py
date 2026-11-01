@@ -43,7 +43,8 @@ COUNTRIES = {
 }
 BANDS = {6: (0, 7), 8: (8, 9), 10: (10, 12)}
 METRO = 500_000
-MARGIN = 8
+ASPECTS = (0.45, 2.5)
+BROAD = 6
 ROADS = {
     "motorway": ("highway", 4),
     "trunk": ("highway", 5),
@@ -95,6 +96,29 @@ def tiles(z: int, w: float, s: float, e: float, n: float) -> list[tuple[int, int
     y0 = int((1 - math.asinh(math.tan(math.radians(n))) / math.pi) / 2 * span)
     y1 = int((1 - math.asinh(math.tan(math.radians(s))) / math.pi) / 2 * span)
     return [(z, x, y) for x in range(x0, min(x1, span - 1) + 1) for y in range(y0, min(y1, span - 1) + 1)]
+
+
+def surround() -> list[BaseGeometry]:
+    within, _, project, _ = zones[-1]
+    back = Transformer.from_crs(project.target_crs, "EPSG:4326", always_xy=True)
+    bounds = [project.transform_bounds(*b, densify_pts=64) for b in within]
+    x0, y0 = min(b[0] for b in bounds), min(b[1] for b in bounds)
+    x1, y1 = max(b[2] for b in bounds), max(b[3] for b in bounds)
+    wide, tall = max(x1 - x0, (y1 - y0) * ASPECTS[1]) * 0.6, max(y1 - y0, (x1 - x0) / ASPECTS[0]) * 0.6
+    xs, ys = np.meshgrid((x0 + x1) / 2 + np.linspace(-wide, wide, 257), (y0 + y1) / 2 + np.linspace(-tall, tall, 257))
+    lons, lats = back.transform(xs.ravel(), ys.ravel())
+    keep = np.isfinite(lons) & np.isfinite(lats) & (np.abs(lons) <= 180) & (np.abs(lats) <= 90)
+    span = 2**BROAD
+    tx = np.clip(((lons[keep] + 180) / 360 * span).astype(int), 0, span - 1)
+    mercator = np.arcsinh(np.tan(np.radians(np.clip(lats[keep], -85.05, 85.05))))
+    ty = np.clip(((1 - mercator / np.pi) / 2 * span).astype(int), 0, span - 1)
+    hit = set(zip(tx.tolist(), ty.tolist(), strict=True))
+    near = {((x + dx) % span, y + dy) for x, y in hit for dx in (-1, 0, 1) for dy in (-1, 0, 1) if 0 <= y + dy < span}
+
+    def lat(row: int) -> float:
+        return math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * row / span))))
+
+    return [box(x / span * 360 - 180, lat(y + 1), (x + 1) / span * 360 - 180, lat(y)) for x, y in near]
 
 
 def walk(coords, fn):
@@ -305,12 +329,9 @@ def build(scheme: str) -> str:
     country = folder / f"{scheme}.pmtiles"
     core = [b for zone in zones for b in zone[0]]
     extract(key, country, unary_union([box(*b) for b in core]), 0, 10)
-    wide = unary_union(
-        [box(*b) for b in core]
-        + [box(w - MARGIN, max(s - MARGIN, -80), e + MARGIN, min(n + MARGIN, 80)) for w, s, e, n in zones[-1][0]]
-    )
+    wide = unary_union([box(*b) for b in core] + surround())
     broad = folder / f"{scheme}.wide.pmtiles"
-    extract(key, broad, wide, 0, 8)
+    extract(key, broad, wide, 0, BROAD)
     fine = {z: {t for b in core for t in tiles(z, *b)} for z in (8, 10)}
     jobs = []
     for z, path, area, finer in (
