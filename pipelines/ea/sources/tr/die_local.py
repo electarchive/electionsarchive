@@ -24,11 +24,11 @@ from ea import raw, scan
 from ea.changeset import Changeset, slug
 from ea.sources.tr.tuik_secim import ILCE_ALIASES, norm
 from ea.sources.tr.ysk import DIGITIZED, PROVINCES, REGISTERED, VALID, VOTERS, VOTES, title
-from ea.sources.tr.ysk_local import own_area, own_areas
+from ea.sources.tr.ysk_local import own_area, own_areas, successors
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -1078,6 +1078,7 @@ SPELLINGS_1973 = {
     "Içel": "Merkez",
     "İçel": "Merkez",
 }
+BELDES_1973 = {"Yakmsu": "Yakınsu", "Ahmanlar": "Akmanlar", "Sanyakup": "Sarıyakup"}
 LABELS_1963_1973 = {
     ("04", "Doğubeyazıt"): "Doğubayazıt",
     ("04", "Doğu Bayazit"): "Doğubayazıt",
@@ -1232,6 +1233,7 @@ def emit() -> Path:
         )
         printed_keys = {new: old for old, new in relabeled}
         relinked: set[str] = set()
+        relocated = successors()
         taken = dict(
             conn.execute(
                 "select path, entity_id from slug where path ~ '^tr/.*/(1963-11-17|1973-12-09)-local(/mayor)?$'"
@@ -1522,10 +1524,12 @@ def emit() -> Path:
                 row: dict, stored: dict, parts: list[str], english: str, plate: str, unit: UUID, district: str
             ) -> None:
                 key = "-".join(parts)
-                path = "tr/" + "/".join(parts)
-                polity = cs.key("tr.polity", key)
-                office = cs.key("tr.office", f"{key}-mayor")
-                if key not in polities:
+                own = "tr/" + "/".join(parts)
+                path = relocated.get(own, own)
+                home = path[3:].replace("/", "-")
+                polity = cs.key("tr.polity", home)
+                office = cs.key("tr.office", f"{home}-mayor")
+                if path == own and key not in polities:
                     polities.add(key)
                     relinked.add(key)
                     cs.add("polity", id=polity, kind="municipality", iso_code=None)
@@ -1533,7 +1537,7 @@ def emit() -> Path:
                     name(polity, f"{english} Belediyesi", kind="native")
                     cs.add("polity_parent", polity_id=polity, parent_id=turkey)
                     cs.add("slug", path=path, entity_id=polity)
-                elif f"{day}:{key}" in printed_keys and key not in relinked:
+                elif path == own and f"{day}:{key}" in printed_keys and key not in relinked:
                     relinked.add(key)
                     cs.add("slug", path=path, entity_id=polity)
                 if office in cs.minted and office not in offices:
@@ -1869,7 +1873,7 @@ def emit() -> Path:
                                 if len(moved) == 1
                                 else next((o for o in options if "-".join(o) in polities), options[0])
                             )
-                            english = row["name"]
+                            english = BELDES_1973.get(row["name"], row["name"])
                             scheme, code = (
                                 "tr.belde",
                                 "-".join(parts if len(parts) == 3 and parts in options else options[0]),
@@ -1951,6 +1955,11 @@ def emit() -> Path:
             if before != after and before in mine and mine[before] not in holders:
                 cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
                 cs.merge(cs.key("tr.office", f"{before}-mayor"), cs.key("tr.office", f"{after}-mayor"))
+        for before, after in relocated.items():
+            old, new = before[3:].replace("/", "-"), after[3:].replace("/", "-")
+            if old in mine:
+                cs.merge(cs.key("tr.polity", old), cs.key("tr.polity", new))
+                cs.merge(cs.key("tr.office", f"{old}-mayor"), cs.key("tr.office", f"{new}-mayor"))
         reason = "A duplicate of a 1963 or 1973 municipal race, left behind when the archive re-read the race's town."
         for contest, election in conn.execute(
             """select c.id::text, c.election_id::text from contest c join changeset ch on ch.id = c.changeset_id
