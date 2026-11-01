@@ -1,9 +1,15 @@
 <script lang="ts">
   import Versus from "#routes/compare/places.svelte";
+  import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
-  import { createQuery } from "@tanstack/svelte-query";
+  import {
+    createQuery,
+    queryOptions,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
+  import { untrack } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -29,6 +35,25 @@
     polity,
   }: { id: string; polity: Extract<PageData, { kind: "polity" }>["polity"] } =
     $props();
+
+  const client = useQueryClient();
+
+  untrack(() => {
+    const queryKey = orpc.polities.record.queryKey({ input: { id } });
+    if (polity.record instanceof Promise) {
+      if (browser) {
+        void client.prefetchQuery(
+          queryOptions({
+            queryKey,
+            queryFn: async () =>
+              (await polity.record) ?? orpc.polities.record.call({ id }),
+          }),
+        );
+      }
+    } else if (polity.record != null) {
+      client.setQueryData(queryKey, polity.record);
+    }
+  });
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,

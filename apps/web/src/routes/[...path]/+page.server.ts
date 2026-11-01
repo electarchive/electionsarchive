@@ -12,11 +12,7 @@ async function seed(path: string) {
   return { path, located, hub, hexes };
 }
 
-async function scrubbed(path: string | null | undefined) {
-  if (path == null) {
-    return { value: null };
-  }
-  const pending = seed(path).catch(() => null);
+async function soon<T>(pending: Promise<T | null>) {
   const streamed = Promise.race([
     pending,
     new Promise<null>((done) => setTimeout(done, 30_000, null)),
@@ -35,11 +31,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
     return data;
   }
   const { polities } = data.polity;
-  const scrubber = ["sovereign_state", "supranational"].includes(
-    data.polity.kind,
-  )
-    ? (await scrubbed(data.polity.latest?.path)).value
+  const path = ["sovereign_state", "supranational"].includes(data.polity.kind)
+    ? data.polity.latest?.path
     : null;
+  const [{ value: scrubber }, { value: record }] = await Promise.all([
+    path == null ? { value: null } : soon(seed(path).catch(() => null)),
+    soon(call(router.polities.record, { id: data.id }).catch(() => null)),
+  ]);
   const groups = Map.groupBy(polities, (child) => child.kind);
   const places = {
     total: polities.length,
@@ -49,7 +47,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
     isPartial: polities.length > 200,
   };
   if (!places.isPartial) {
-    return { ...data, polity: { ...data.polity, places, scrubber } };
+    return { ...data, polity: { ...data.polity, places, scrubber, record } };
   }
   const kept = new Set([
     ...groups.values().flatMap((rows) => rows.slice(0, 20)),
@@ -67,6 +65,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
       polities: polities.filter((child) => kept.has(child)),
       places,
       scrubber,
+      record,
     },
   };
 };

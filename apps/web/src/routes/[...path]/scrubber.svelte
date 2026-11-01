@@ -70,6 +70,7 @@
   let at = $state<number | null>(null);
   let isPlaying = $state(false);
   let isDragging = $state(false);
+  let isEngaged = $state(false);
   let settled = $state<string | null>(null);
   let swipe: { x: number; y: number } | null = null;
 
@@ -192,7 +193,7 @@
   }));
 
   $effect(() => {
-    if (isDragging || hub.isPending) {
+    if (!isEngaged || isDragging || hub.isPending) {
       return;
     }
     for (const near of [steps[index - 1], steps[index + 1]]) {
@@ -414,6 +415,8 @@
     class="relative col-span-12 grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
     aria-labelledby="{uid}-title"
     data-export
+    onpointerenter={() => (isEngaged = true)}
+    onfocusin={() => (isEngaged = true)}
   >
     <Export name="history" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
