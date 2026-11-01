@@ -3,13 +3,13 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
-  import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
+  import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
+  import EyeIcon from "@lucide/svelte/icons/eye";
+  import LayoutGridIcon from "@lucide/svelte/icons/layout-grid";
   import LinkIcon from "@lucide/svelte/icons/link";
-  import LockIcon from "@lucide/svelte/icons/lock";
-  import LockOpenIcon from "@lucide/svelte/icons/lock-open";
-  import MaximizeIcon from "@lucide/svelte/icons/maximize";
   import MinimizeIcon from "@lucide/svelte/icons/minimize";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import PresentationIcon from "@lucide/svelte/icons/presentation";
   import SettingsIcon from "@lucide/svelte/icons/settings-2";
   import { onMount } from "svelte";
   import { on } from "svelte/events";
@@ -19,7 +19,6 @@
   import * as Dialog from "#lib/components/ui/dialog/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
-  import { KIND_TEXT } from "#lib/live/board/labels.js";
   import {
     COLUMNS,
     forget,
@@ -36,11 +35,14 @@
     unpack,
     vacancy,
   } from "#lib/live/board/layout.js";
+  import { clock } from "#lib/live/format.js";
   import { closing } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getConfirmationContext } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
+  import Catalog from "./catalog.svelte";
   import Frame from "./frame.svelte";
+  import Standing from "./standing.svelte";
 
   const { desk }: { desk: Desk } = $props();
 
@@ -72,9 +74,11 @@
     cell: Cell;
     mode: "move" | "resize";
   } | null>(null);
-  let isLocked = $state(false);
+  let isArranging = $state(false);
   let isPresenting = $state(false);
   let isAdding = $state(false);
+  let target = $state<{ x: number; y: number } | null>(null);
+  let hover = $state<{ x: number; y: number } | null>(null);
   let isShortcuts = $state(false);
   let renaming = $state<{ index: number; draft: string } | null>(null);
   let isShared = $state(false);
@@ -83,7 +87,7 @@
   const current = $derived(board.pages[board.current] ?? board.pages[0]);
   const column = $derived(Math.max(1, (width - GAP * (COLUMNS - 1)) / COLUMNS));
   const isStacked = $derived(width > 0 && width < STACK_BELOW);
-  const isFrozen = $derived(isLocked || isPresenting);
+  const isFrozen = $derived(!isArranging || isPresenting || isStacked);
   const layout = $derived.by(() => {
     const panels = current?.panels ?? [];
     const found = preview;
@@ -104,8 +108,15 @@
     for (const cell of layout.values()) {
       found = Math.max(found, cell.y + cell.h);
     }
-    return found + (isFrozen ? 0 : 6);
+    return found;
   });
+  const isEmpty = $derived((current?.panels.length ?? 0) === 0);
+  const tail = $derived(isFrozen && !isEmpty ? 0 : 4);
+  const ghost = $derived(
+    hover == null
+      ? null
+      : { x: Math.min(hover.x, COLUMNS - 4), y: hover.y, w: 4, h: 3 },
+  );
   const stacked = $derived(
     (current?.panels ?? []).toSorted((a, b) => a.y - b.y || a.x - b.x),
   );
@@ -186,13 +197,40 @@
     current.panels = [...current.panels, { ...found, id: id(), ...spot }];
   }
 
+  function insert(at: { x: number; y: number } | null) {
+    target = at;
+    isArranging = true;
+    isAdding = true;
+  }
+
+  function cellAt(event: MouseEvent) {
+    const grid = event.currentTarget;
+    if (isFrozen || !(grid instanceof HTMLElement) || event.target !== grid) {
+      return null;
+    }
+    const box = grid.getBoundingClientRect();
+    return {
+      x: Math.max(
+        0,
+        Math.min(
+          COLUMNS - 1,
+          Math.floor((event.clientX - box.left) / (column + GAP)),
+        ),
+      ),
+      y: Math.max(0, Math.floor((event.clientY - box.top) / (ROW + GAP))),
+    };
+  }
+
   function add(kind: Kind) {
     if (current == null) {
       return;
     }
     const size = SIZES[kind];
     const w = Math.min(size.w, COLUMNS);
-    const spot = vacancy(current.panels, w, size.h);
+    const spot =
+      target == null
+        ? vacancy(current.panels, w, size.h)
+        : { x: Math.min(target.x, COLUMNS - w), y: target.y };
     const entry: Panel = { id: id(), kind, ...spot, w, h: size.h };
     if (RACE_KINDS.has(kind)) {
       entry.race = null;
@@ -206,8 +244,10 @@
     if (kind === "note") {
       entry.text = "";
     }
-    current.panels = [...current.panels, entry];
+    current.panels = settle([...current.panels, entry], entry.id);
     isAdding = false;
+    target = null;
+    hover = null;
     requestAnimationFrame(() => {
       root
         ?.querySelector(`[data-panel="${entry.id}"]`)
@@ -347,10 +387,10 @@
       go((board.current - 1 + board.pages.length) % board.pages.length);
     } else if (event.key === "p") {
       void present();
-    } else if (event.key === "l") {
-      isLocked = !isLocked;
-    } else if (event.key === "a" && !isFrozen) {
-      isAdding = true;
+    } else if (event.key === "e" && !isStacked && !isPresenting) {
+      isArranging = !isArranging;
+    } else if (event.key === "a" && !isStacked && !isPresenting) {
+      insert(null);
     } else if (event.key === "?") {
       isShortcuts = true;
     } else {
@@ -414,135 +454,105 @@
     "text-[0.9375rem]": board.density === "cozy",
   })}
 >
-  <div
-    class="sticky inset-bs-0 z-40 flex flex-wrap items-center gap-x-2 gap-y-1 border-be border-border bg-background px-3 py-1.5 text-[0.8125rem]"
+  <header
+    class="sticky inset-bs-0 z-40 flex flex-wrap items-center gap-x-3 gap-y-1 border-be border-border bg-background px-3 py-1.5 text-[0.8125rem]"
   >
     {#if !isPresenting}
       <a
         href={resolve("/live/[...path]", { path: feed.election.slug })}
-        class="inline-flex items-center gap-1 rounded-xs px-1.5 py-1 font-semibold hover:bg-muted"
+        class="-me-1 grid shrink-0 place-content-center rounded-xs text-muted-foreground block-7 inline-7 hover:bg-muted hover:text-foreground"
+        aria-label={m.board_results()}
+        title={m.board_results()}
       >
-        <ArrowLeftIcon class="block-3.5 inline-3.5" aria-hidden="true" />
-        {m.board_results()}
+        <ArrowLeftIcon class="block-4 inline-4" aria-hidden="true" />
       </a>
     {/if}
-    <h1 class="truncate font-semibold max-inline-[28ch]">
-      {feed.election.title}
-    </h1>
-    <span
-      class={cn("rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold", {
-        "bg-foreground text-background": status === "live",
-        "border border-border text-muted-foreground": status === "before",
-        "bg-(--no) text-background": status === "offline",
-        "border border-dashed border-foreground": status === "rehearsal",
-      })}
-      title={status === "rehearsal" ? m.board_rehearsal_note() : undefined}
-    >
-      {#if status === "rehearsal"}
-        {m.board_rehearsal()}
-      {:else if status === "offline"}
-        {m.night_status_offline()}
-      {:else if status === "before"}
-        {m.night_status_before()}
-      {:else}
-        {m.night_status_live()}
-      {/if}
-    </span>
-    <nav
-      class="order-last flex basis-full items-center gap-0.5 overflow-x-auto min-inline-0 lg:order-0 lg:flex-1 lg:basis-auto"
-      aria-label={m.board_pages()}
-    >
-      {#each board.pages as entry, index (entry.id)}
-        {const isCurrent = $derived(index === board.current)}
-        <button
-          type="button"
-          class={cn(
-            "shrink-0 rounded-xs px-2 py-1 whitespace-nowrap transition-colors",
-            {
-              "bg-foreground font-semibold text-background": isCurrent,
-              "text-muted-foreground hover:bg-muted hover:text-foreground":
-                !isCurrent,
-            },
-          )}
-          aria-current={isCurrent ? "page" : undefined}
-          onclick={() => go(index)}
-          ondblclick={() => {
-            if (!isFrozen) {
-              renaming = { index, draft: entry.name };
-            }
-          }}
+    <div class="grid leading-tight min-inline-0">
+      <h1 class="truncate font-semibold max-inline-[36ch]">
+        {feed.election.title}
+      </h1>
+      <p
+        class="flex items-center gap-2 text-[0.6875rem] text-muted-foreground"
+        title={status === "rehearsal" ? m.board_rehearsal_note() : undefined}
+      >
+        <span
+          class={cn("flex items-center gap-1 font-semibold", {
+            "text-foreground": status === "live" || status === "rehearsal",
+            "text-(--no)": status === "offline",
+          })}
         >
-          {#if index < 9}<span
-              class="me-1 font-figures text-[0.85em] tabular-nums opacity-60"
-              aria-hidden="true">{index + 1}</span
-            >{/if}{entry.name}
-        </button>
-      {/each}
-      {#if !isFrozen}
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger
-            class="grid shrink-0 place-content-center rounded-xs text-muted-foreground block-7 inline-7 hover:bg-muted hover:text-foreground"
-            aria-label={m.board_pages()}
+          <span
+            class={cn("rounded-full block-1.5 inline-1.5", {
+              "bg-(--yes)": status === "live",
+              "bg-(--no)": status === "offline",
+              "border border-muted-foreground": status === "before",
+              "border border-dashed border-foreground": status === "rehearsal",
+            })}
+            aria-hidden="true"
+          ></span>
+          {#if status === "rehearsal"}
+            {m.board_rehearsal()}
+          {:else if status === "offline"}
+            {m.night_status_offline()}
+          {:else if status === "before"}
+            {m.night_status_before()}
+          {:else}
+            {m.night_status_live()}
+          {/if}
+        </span>
+        {#if feed.election.newest != null}
+          <span class="font-figures tabular-nums"
+            >{m.night_updated({ time: clock(feed.election.newest) })}</span
           >
-            <EllipsisIcon class="block-4 inline-4" aria-hidden="true" />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content align="start" class="inline-52">
-            <DropdownMenu.Item onSelect={addPage}>
-              {m.board_page_add()}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() =>
-                (renaming = {
-                  index: board.current,
-                  draft: current?.name ?? "",
-                })}
-            >
-              {m.board_page_rename()}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item onSelect={() => duplicatePage(board.current)}>
-              {m.board_page_duplicate()}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              disabled={board.current === 0}
-              onSelect={() => movePage(board.current, -1)}
-            >
-              {m.board_page_left()}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              disabled={board.current === board.pages.length - 1}
-              onSelect={() => movePage(board.current, 1)}
-            >
-              {m.board_page_right()}
-            </DropdownMenu.Item>
-            <DropdownMenu.Separator />
-            <DropdownMenu.Item
-              variant="destructive"
-              disabled={board.pages.length === 1}
-              onSelect={async () => removePage(board.current)}
-            >
-              {m.board_page_remove()}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      {/if}
-    </nav>
+        {/if}
+      </p>
+    </div>
+    <div class="hidden border-s border-border ps-3 lg:block">
+      <Standing {desk} />
+    </div>
     <div class="ms-auto flex items-center gap-1">
-      {#if !isFrozen && !isStacked}
-        <Button size="sm" variant="outline" onclick={() => (isAdding = true)}>
-          <PlusIcon />{m.board_add()}
-        </Button>
+      {#if !isPresenting && !isStacked}
+        <div
+          class="me-1 flex rounded-sm bg-muted p-0.5"
+          role="group"
+          aria-label={m.board_mode()}
+        >
+          {#each [{ value: false, name: m.board_view(), Icon: EyeIcon }, { value: true, name: m.board_arrange(), Icon: LayoutGridIcon }] as option (option.value)}
+            {const isOn = $derived(isArranging === option.value)}
+            <button
+              type="button"
+              class={cn(
+                "flex items-center gap-1.5 rounded-xs px-2 py-1 font-semibold transition-colors",
+                {
+                  "bg-background text-foreground shadow-xs": isOn,
+                  "text-muted-foreground hover:text-foreground": !isOn,
+                },
+              )}
+              aria-pressed={isOn}
+              title="{option.name} (E)"
+              onclick={() => {
+                isArranging = option.value;
+                hover = null;
+              }}
+            >
+              <option.Icon class="block-3.5 inline-3.5" aria-hidden="true" />
+              {option.name}
+            </button>
+          {/each}
+        </div>
+        {#if isArranging}
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label={m.board_add_title()}
+            title="{m.board_add_title()} (A)"
+            onclick={() => insert(null)}
+          >
+            <PlusIcon />
+          </Button>
+        {/if}
       {/if}
       {#if !isPresenting}
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label={isLocked ? m.board_unlock() : m.board_lock()}
-          aria-pressed={isLocked}
-          title={isLocked ? m.board_unlock() : m.board_lock()}
-          onclick={() => (isLocked = !isLocked)}
-        >
-          {#if isLocked}<LockIcon />{:else}<LockOpenIcon />{/if}
-        </Button>
         <Button
           size="icon"
           variant="ghost"
@@ -555,11 +565,12 @@
       {/if}
       <Button
         size="sm"
-        variant={isPresenting ? "outline" : "default"}
+        variant="ghost"
+        title="{isPresenting ? m.board_present_exit() : m.board_present()} (P)"
         onclick={present}
       >
         {#if isPresenting}<MinimizeIcon
-          />{m.board_present_exit()}{:else}<MaximizeIcon
+          />{m.board_present_exit()}{:else}<PresentationIcon
           />{m.board_present()}{/if}
       </Button>
       {#if !isPresenting}
@@ -567,6 +578,7 @@
           <DropdownMenu.Trigger
             class="grid place-content-center rounded-sm text-muted-foreground block-8 inline-8 hover:bg-muted hover:text-foreground"
             aria-label={m.board_settings()}
+            title={m.board_settings()}
           >
             <SettingsIcon class="block-4 inline-4" aria-hidden="true" />
           </DropdownMenu.Trigger>
@@ -615,7 +627,7 @@
         </DropdownMenu.Root>
       {/if}
     </div>
-  </div>
+  </header>
   {#if status === "rehearsal"}
     <p
       class="border-be border-dashed border-border bg-background px-3 py-1 text-[0.75rem] text-muted-foreground"
@@ -631,8 +643,26 @@
   <main class="flex-1 p-1.5 sm:p-2">
     <div
       bind:clientWidth={width}
-      class={cn({ relative: !isStacked, "grid gap-1.5": isStacked })}
-      style:block-size={isStacked ? undefined : `${rows * (ROW + GAP)}px`}
+      class={cn({
+        relative: !isStacked,
+        "grid gap-1.5": isStacked,
+        "cursor-copy": !isFrozen,
+      })}
+      style:block-size={isStacked
+        ? undefined
+        : `${(rows + tail) * (ROW + GAP)}px`}
+      style:background-image={isFrozen
+        ? undefined
+        : `repeating-linear-gradient(to right, color-mix(in oklab, var(--foreground) 5%, transparent) 0 ${column}px, transparent ${column}px ${column + GAP}px)`}
+      role="presentation"
+      onpointermove={(event: PointerEvent) => (hover = cellAt(event))}
+      onpointerleave={() => (hover = null)}
+      onclick={(event: MouseEvent) => {
+        const spot = cellAt(event);
+        if (spot != null) {
+          insert({ x: Math.min(spot.x, COLUMNS - 4), y: spot.y });
+        }
+      }}
     >
       {#if width > 0 && current != null}
         {#if preview != null && !isStacked}
@@ -647,6 +677,17 @@
               aria-hidden="true"
             ></div>
           {/if}
+        {:else if ghost != null && !isFrozen}
+          <div
+            class="pointer-events-none absolute inset-s-0 inset-bs-0 grid place-content-center rounded-sm border border-dashed border-foreground/50 bg-background/70 text-muted-foreground"
+            style:transform="translate({ghost.x * (column + GAP)}px, {ghost.y *
+              (ROW + GAP)}px)"
+            style:inline-size="{ghost.w * column + (ghost.w - 1) * GAP}px"
+            style:block-size="{ghost.h * ROW + (ghost.h - 1) * GAP}px"
+            aria-hidden="true"
+          >
+            <PlusIcon class="block-4 inline-4" />
+          </div>
         {/if}
         {#each isStacked ? stacked : current.panels as entry (entry.id)}
           <Frame
@@ -666,35 +707,140 @@
             onChange={(patch: Partial<Panel>) => Object.assign(entry, patch)}
           />
         {/each}
+        {#if tail > 0 && !isPresenting && !isStacked}
+          <button
+            type="button"
+            class="absolute inset-s-0 flex items-center justify-center gap-1.5 rounded-sm border border-dashed border-foreground/25 text-muted-foreground inline-full hover:border-foreground/50 hover:bg-background/60 hover:text-foreground"
+            style:inset-block-start="{rows * (ROW + GAP)}px"
+            style:block-size="{3 * ROW + 2 * GAP}px"
+            onpointermove={() => (hover = null)}
+            onclick={() => insert({ x: 0, y: rows })}
+          >
+            <PlusIcon class="block-4 inline-4" aria-hidden="true" />
+            {m.board_add_title()}
+          </button>
+        {/if}
       {/if}
     </div>
   </main>
-</div>
-
-<Dialog.Root bind:open={isAdding}>
-  <Dialog.Content class="max-inline-2xl">
-    <Dialog.Header>
-      <Dialog.Title>{m.board_add_title()}</Dialog.Title>
-      <Dialog.Description>{m.board_add_hint()}</Dialog.Description>
-    </Dialog.Header>
-    <ul class="grid grid-cols-1 gap-1 sm:grid-cols-2">
-      {#each kinds as kind (kind)}
-        <li>
+  <footer
+    class="sticky inset-be-0 z-30 flex items-stretch gap-3 border-bs border-border bg-background pe-3 text-[0.75rem]"
+  >
+    <nav
+      class="flex items-stretch overflow-x-auto min-inline-0"
+      aria-label={m.board_pages()}
+    >
+      {#each board.pages as entry, index (entry.id)}
+        {const isCurrent = $derived(index === board.current)}
+        <div
+          class={cn("relative -mbs-px flex shrink-0 items-center border-e", {
+            "border-border bg-muted font-semibold text-foreground": isCurrent,
+            "border-border/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground":
+              !isCurrent,
+          })}
+        >
           <button
             type="button"
-            class="grid gap-0.5 rounded-sm border border-border px-3 py-2 text-start block-full inline-full hover:bg-muted focus-visible:bg-muted"
-            onclick={() => add(kind)}
+            class={cn("py-1.5 whitespace-nowrap", {
+              "ps-3 pe-1": isCurrent && !isPresenting,
+              "px-3": !isCurrent || isPresenting,
+            })}
+            aria-current={isCurrent ? "page" : undefined}
+            title={index < 9 ? `${entry.name} (${index + 1})` : entry.name}
+            onclick={() => go(index)}
+            ondblclick={() => {
+              if (!isPresenting) {
+                renaming = { index, draft: entry.name };
+              }
+            }}
           >
-            <span class="text-sm font-semibold">{KIND_TEXT[kind].name()}</span>
-            <span class="text-xs text-muted-foreground"
-              >{KIND_TEXT[kind].about()}</span
-            >
+            {entry.name}
           </button>
-        </li>
+          {#if isCurrent && !isPresenting}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger
+                class="me-1 grid place-content-center rounded-xs text-muted-foreground block-5 inline-5 hover:bg-background hover:text-foreground"
+                aria-label={m.board_page_actions()}
+                title={m.board_page_actions()}
+              >
+                <ChevronUpIcon
+                  class="block-3.5 inline-3.5"
+                  aria-hidden="true"
+                />
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content side="top" align="start" class="inline-52">
+                <DropdownMenu.Item
+                  onSelect={() =>
+                    (renaming = {
+                      index: board.current,
+                      draft: current?.name ?? "",
+                    })}
+                >
+                  {m.board_page_rename()}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  disabled={board.pages.length >= 12}
+                  onSelect={() => duplicatePage(board.current)}
+                >
+                  {m.board_page_duplicate()}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  disabled={board.current === 0}
+                  onSelect={() => movePage(board.current, -1)}
+                >
+                  {m.board_page_left()}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  disabled={board.current === board.pages.length - 1}
+                  onSelect={() => movePage(board.current, 1)}
+                >
+                  {m.board_page_right()}
+                </DropdownMenu.Item>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item
+                  variant="destructive"
+                  disabled={board.pages.length === 1}
+                  onSelect={async () => removePage(board.current)}
+                >
+                  {m.board_page_remove()}
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
+          {/if}
+          {#if isCurrent && isPresenting && (board.cycle ?? 0) > 0 && board.pages.length > 1}
+            {#key board.current}
+              <span
+                class="rotation absolute inset-x-0 inset-be-0 bg-foreground block-0.5 motion-reduce:hidden"
+                style:animation-duration="{board.cycle}s"
+                aria-hidden="true"
+              ></span>
+            {/key}
+          {/if}
+        </div>
       {/each}
-    </ul>
-  </Dialog.Content>
-</Dialog.Root>
+      {#if !isPresenting && board.pages.length < 12}
+        <button
+          type="button"
+          class="grid shrink-0 place-content-center text-muted-foreground inline-8 hover:bg-muted hover:text-foreground"
+          aria-label={m.board_page_add()}
+          title={m.board_page_add()}
+          onclick={addPage}
+        >
+          <PlusIcon class="block-3.5 inline-3.5" aria-hidden="true" />
+        </button>
+      {/if}
+    </nav>
+    {#if !isFrozen}
+      <p
+        class="ms-auto hidden items-center truncate text-muted-foreground min-inline-0 md:flex"
+      >
+        {m.board_arrange_hint()}
+      </p>
+    {/if}
+  </footer>
+</div>
+
+<Catalog bind:open={isAdding} {kinds} onPick={(kind: Kind) => add(kind)} />
 
 <Dialog.Root
   open={renaming != null}
@@ -735,7 +881,7 @@
       <Dialog.Title>{m.board_shortcuts()}</Dialog.Title>
     </Dialog.Header>
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-      {#each [["1–9", m.board_shortcut_pages()], ["[ ]", m.board_shortcut_next()], ["P", m.board_shortcut_present()], ["L", m.board_shortcut_lock()], ["A", m.board_shortcut_add()], ["← → ↑ ↓", m.board_shortcut_move()], ["Shift ← → ↑ ↓", m.board_shortcut_resize()]] as [keys, text] (keys)}
+      {#each [["1–9", m.board_shortcut_pages()], ["[ ]", m.board_shortcut_next()], ["E", m.board_shortcut_arrange()], ["A", m.board_shortcut_add()], ["P", m.board_shortcut_present()], ["← → ↑ ↓", m.board_shortcut_move()], ["Shift ← → ↑ ↓", m.board_shortcut_resize()]] as [keys, text] (keys)}
         <dt>
           <kbd
             class="rounded-xs border border-border bg-muted px-1.5 py-0.5 font-figures text-xs"
@@ -747,3 +893,20 @@
     </dl>
   </Dialog.Content>
 </Dialog.Root>
+
+<style>
+  .rotation {
+    transform-origin: left;
+    animation-name: rotation;
+    animation-timing-function: linear;
+  }
+
+  @keyframes rotation {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+</style>
