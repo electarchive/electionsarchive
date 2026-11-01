@@ -7,12 +7,14 @@ import type {
 } from "@ea/analytics/live";
 import type { SQL } from "drizzle-orm";
 import { dev } from "$app/env";
+import { getRequestEvent } from "$app/server";
 import { estimate } from "@ea/analytics/live";
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { os, strict } from "#lib/server/cache.js";
+import { os } from "#lib/server/cache.js";
+import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
@@ -420,6 +422,18 @@ const pending = new Map<
   { key: string; value: Promise<Awaited<ReturnType<typeof night>>> }
 >();
 
+async function switches() {
+  if ((await roles(getRequestEvent().locals.user?.id)).admin) {
+    return { results: true, forecasts: true };
+  }
+  const result = await db.execute<{ results: boolean; forecasts: boolean }>(sql`
+    select coalesce(bool_or(shown) filter (where name = 'results'), false) as results,
+      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts
+    from live.switch
+  `);
+  return result.rows[0] ?? { results: false, forecasts: false };
+}
+
 function office(seat: string): LiveOffice {
   if (seat.startsWith("senate")) {
     return "senate";
@@ -605,6 +619,7 @@ async function night(
   found: { id: string; path: string; date: string; rest: string },
   picked: Array<{ id: string; path: string; district: string | null }>,
   detail: "race" | "state" | "national",
+  shown: { results: boolean; forecasts: boolean },
 ) {
   const contests = picked.map((row) => row.id);
   const [frames, choices, incumbents, settled, prior, drawn] =
@@ -618,17 +633,17 @@ async function night(
         publisher: string;
         url: string | null;
       }>(sql`
-      select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
-        f.reporting, f.expected, d.publisher, d.url
-      from live.frame f join live.feed d on d.id = f.feed_id
-      where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active'
-      order by f.as_of
-    `),
+        select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
+          f.reporting, f.expected, d.publisher, d.url
+        from live.frame f join live.feed d on d.id = f.feed_id
+        where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
+        order by f.as_of
+      `),
       options(contests, found.date),
       db.execute<{ option: string }>(sql`
-      select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
-      where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
-    `),
+        select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
+        where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
+      `),
       certified(contests),
       baselines(picked, found.date),
       detail === "national" ? [] : geography(picked, found.date),
@@ -877,8 +892,9 @@ async function night(
   };
   return {
     election,
+    shown,
     estimates: Object.fromEntries(
-      built.map((race) => {
+      (shown.forecasts ? built : []).map((race) => {
         const value = estimate({ race, at: null });
         return [race.id, kept(race) ? value : { ...value, units: [] }];
       }),
@@ -898,288 +914,6 @@ const Input = v.objectAsync({
 });
 
 export const live = {
-  get: strict
-    .meta(
-      openapi({
-        method: "GET",
-        path: "/live",
-        summary:
-          "An election night as the count came in: every update the official source published, each race's running totals by option at each update, the share of scanners reported where the source prints it, and the certified result once there is one",
-      }),
-    )
-    .input(Input)
-    .handler(async ({ input }) => {
-      const found = await election(input.path);
-      const plan =
-        dev && input.rehearsal != null
-          ? {
-              ...input.rehearsal,
-              from:
-                input.rehearsal.started ??
-                Date.parse(`${found.date}T00:20:00Z`) + 86_400_000,
-              every: input.rehearsal.started == null ? 1_200_000 : 150_000,
-            }
-          : null;
-      const staged = new Map<
-        number,
-        Array<{ option: string; votes: number; full: number }>
-      >();
-      const stamped =
-        plan == null
-          ? await sets(found.id)
-          : await (async () => {
-              const frame = await rehearsal(found.id, found.date);
-              return Array.from(
-                { length: Math.min(plan.shown, NIGHT) },
-                (_, index) =>
-                  [...Map.groupBy(frame(index), (row) => row.contest)].flatMap(
-                    ([contest, rows]) => {
-                      if (rows.every((row) => row.votes === 0)) {
-                        return [];
-                      }
-                      const k = -1 - staged.size;
-                      staged.set(k, rows);
-                      let counted = 0;
-                      let full = 0;
-                      for (const row of rows) {
-                        counted += row.votes;
-                        full += row.full;
-                      }
-                      return [
-                        {
-                          k,
-                          contest,
-                          at: new Date(plan.from + index * plan.every)
-                            .toISOString()
-                            .replace(/\.\d+Z$/u, "Z"),
-                          outside: false,
-                          scheme: rows.some((row) => row.area != null)
-                            ? "us.county"
-                            : "us.state",
-                          note: null,
-                          publisher: "Rehearsal",
-                          url: null,
-                          reported: full > 0 ? counted / full : null,
-                        },
-                      ];
-                    },
-                  ),
-              ).flat();
-            })();
-      const children = await states(found, plan);
-      if (
-        stamped.length === 0 &&
-        children.every((row) => row.counting <= 0) &&
-        Date.parse(found.date) < Date.now() - 2 * 86_400_000
-      ) {
-        throw new ORPCError("NOT_FOUND");
-      }
-      const bucket = new Map<string, string>();
-      let end = "";
-      const stamps = [...new Set(stamped.map((row) => row.at))].toSorted(
-        (a, b) => b.localeCompare(a),
-      );
-      for (const at of stamps) {
-        if (end === "" || Date.parse(end) - Date.parse(at) > 120_000) {
-          end = at;
-        }
-        bucket.set(at, end);
-      }
-      const listed = stamped
-        .map((row) => ({
-          ...row,
-          stamp: row.at,
-          at: bucket.get(row.at) ?? row.at,
-        }))
-        .toSorted((a, b) => a.stamp.localeCompare(b.stamp));
-      const settledOnly = await db.execute<{ id: string }>(sql`
-        select c.id from contest c
-        where ${stamped.length > 0 && plan?.isFinal !== false}::boolean and c.election_id = ${found.id}::uuid
-          and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
-      `);
-      const contests = [
-        ...new Set([
-          ...listed.map((row) => row.contest),
-          ...settledOnly.rows.map((row) => row.id),
-        ]),
-      ];
-      const [summed, settled, choices, titles, slugs] = await Promise.all([
-        plan == null
-          ? totals(listed.map((row) => row.k))
-          : [...staged].flatMap(([set, rows]) =>
-              [...Map.groupBy(rows, (row) => row.option)].map(
-                ([option, lines]) => {
-                  let votes = 0;
-                  for (const line of lines) {
-                    votes += line.votes;
-                  }
-                  return { set, option, votes };
-                },
-              ),
-            ),
-        plan?.isFinal === false ? [] : certified(contests),
-        options(contests, found.date),
-        names(
-          [
-            found.id,
-            found.polity,
-            ...contests,
-            ...children.map((row) => row.polity),
-          ],
-          found.date,
-        ),
-        db.execute<{ id: string; path: string }>(sql`
-          select entity_id as id, path from slug where is_current and entity_id = any(${sql.param(contests)}::uuid[])
-        `),
-      ]);
-      const paths = new Map(slugs.rows.map((row) => [row.id, row.path]));
-      const bySet = Map.groupBy(summed, (row) => row.set);
-      const moments = [...new Set(listed.map((row) => row.at))].toSorted(
-        (a, b) => a.localeCompare(b),
-      );
-      const frames = moments.map((at) => ({
-        at,
-        scanners: [
-          ...new Map(
-            listed
-              .filter((row) => row.at === at)
-              .flatMap((row) => scanners(row.note))
-              .map((row) => [row.area, row.share]),
-          ),
-        ].map(([area, share]) => ({ area, share })),
-      }));
-      const races = contests.map((contest) => {
-        const own = choices.filter((choice) => choice.contest === contest);
-        const index = new Map(
-          own.map((choice, position) => [choice.id, position]),
-        );
-        const mine = listed.filter((row) => row.contest === contest);
-        const series = moments.flatMap((at) => {
-          const chosen = mine
-            .filter((row) => row.at === at && WHOLE.includes(row.scheme))
-            .toSorted(
-              (a, b) =>
-                WHOLE.indexOf(a.scheme) - WHOLE.indexOf(b.scheme) ||
-                b.stamp.localeCompare(a.stamp),
-            )[0];
-          if (chosen == null) {
-            return [];
-          }
-          const votes = own.map(() => 0);
-          const rows = bySet.get(chosen.k) ?? [];
-          for (const row of rows) {
-            const position = index.get(row.option);
-            if (position != null) {
-              votes[position] = row.votes;
-            }
-          }
-          return [
-            { at, level: chosen.scheme, votes, reported: chosen.reported },
-          ];
-        });
-        const final = settled.filter((row) => row.contest === contest);
-        const votes = own.map(() => 0);
-        for (const row of final) {
-          const position = index.get(row.option);
-          if (position != null) {
-            votes[position] = row.votes;
-          }
-        }
-        const path = paths.get(contest) ?? "";
-        const tally = final.length > 0 ? votes : (series.at(-1)?.votes ?? []);
-        const top = Math.max(0, ...tally);
-        return {
-          id: contest,
-          path,
-          name: (titles.full.get(contest) ?? path.split("/").at(-1) ?? "")
-            .replace(/^\d{4} /u, "")
-            .replace(/ election$/u, "")
-            .replace(/^\p{Ll}/u, (letter) => letter.toUpperCase()),
-          group: group(path),
-          options: own.map(({ id, name, party, key, color, kind }, at) => ({
-            id,
-            name,
-            party,
-            key,
-            color:
-              color ??
-              (key.startsWith("party:") && (tally[at] ?? 0) >= top * 0.05
-                ? (UNAFFILIATED[
-                    Number.parseInt(key.slice(-4), 16) % UNAFFILIATED.length
-                  ] ?? null)
-                : null),
-            kind,
-          })),
-          outside: mine.some((row) => row.outside),
-          series,
-          maps: mine
-            .filter(
-              (row) => row.scheme !== "us.place" && row.scheme !== "us.state",
-            )
-            .map((row) => ({ at: row.at, level: row.scheme }))
-            .toSorted((a, b) => a.at.localeCompare(b.at)),
-          certified:
-            final.length === 0 || mine.some((row) => row.outside)
-              ? null
-              : {
-                  votes,
-                  elected: own.map((choice) =>
-                    final.some(
-                      (row) => row.option === choice.id && row.elected,
-                    ),
-                  ),
-                },
-        };
-      });
-      const source = listed[0];
-      return {
-        election: {
-          id: found.id,
-          path: found.path,
-          name: titles.full.get(found.id) ?? found.path,
-          place: titles.full.get(found.polity) ?? "",
-          zone: ZONES[found.path.split("/", 2)[1] ?? ""] ?? "UTC",
-          date: found.date,
-        },
-        focus: found.rest === "" ? null : `${found.path}/${found.rest}`,
-        rehearsal: plan == null ? null : { from: plan.from, every: plan.every },
-        source: {
-          publisher: source?.publisher ?? "",
-          url: source?.url ?? null,
-        },
-        frames,
-        races: races.filter(
-          (race) => race.series.length > 0 || race.certified != null,
-        ),
-        states: children
-          .map((row) => {
-            const code = row.path.split("/", 2)[1] ?? "";
-            return {
-              code,
-              name: titles.full.get(row.polity) ?? code.toUpperCase(),
-              path: row.path,
-              zone: ZONES[code] ?? "UTC",
-              status:
-                row.certified > 0 &&
-                row.certified >= row.counting &&
-                Date.now() > Date.parse(found.date)
-                  ? ("certified" as const)
-                  : row.counting > 0
-                    ? ("counting" as const)
-                    : ("waiting" as const),
-              contests: row.contests,
-              counting: row.counting,
-              newest: row.newest,
-              reported: row.reported,
-            };
-          })
-          .toSorted(
-            (a, b) =>
-              Number(TERRITORIES.has(a.code)) -
-                Number(TERRITORIES.has(b.code)) || a.name.localeCompare(b.name),
-          ),
-      };
-    }),
   election: base
     .meta(
       openapi({
@@ -1196,16 +930,20 @@ export const live = {
       if (picked.length === 0) {
         throw new ORPCError("NOT_FOUND");
       }
-      const stamp = await db.execute<{ key: string }>(sql`
-        select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
-        from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
-      `);
-      const key = stamp.rows[0]?.key ?? "";
-      const ready = done.get(input.path);
+      const [stamp, shown] = await Promise.all([
+        db.execute<{ key: string }>(sql`
+          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+          from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
+        `),
+        switches(),
+      ]);
+      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${input.path}`;
+      const key = shown.results ? (stamp.rows[0]?.key ?? "") : "";
+      const ready = done.get(slot);
       if (ready?.key === key) {
         return ready.value;
       }
-      let running = pending.get(input.path);
+      let running = pending.get(slot);
       if (running?.key !== key) {
         const value = night(
           found,
@@ -1215,13 +953,14 @@ export const live = {
             : found.path.split("/").length === 2
               ? "national"
               : "state",
+          shown,
         );
         running = { key, value };
-        pending.set(input.path, running);
+        pending.set(slot, running);
         value
           .then((result) => {
-            done.delete(input.path);
-            done.set(input.path, { key, value: result });
+            done.delete(slot);
+            done.set(slot, { key, value: result });
             if (done.size > 64) {
               done.delete(done.keys().next().value ?? "");
             }
@@ -1230,8 +969,8 @@ export const live = {
             console.error(error);
           })
           .finally(() => {
-            if (pending.get(input.path)?.value === value) {
-              pending.delete(input.path);
+            if (pending.get(slot)?.value === value) {
+              pending.delete(slot);
             }
           });
       }
@@ -1243,7 +982,10 @@ export const live = {
       if (dev && input.isRehearsal === true) {
         return { newest: new Date().toISOString(), isCertified: false };
       }
-      const found = await election(input.path);
+      const [found, shown] = await Promise.all([
+        election(input.path),
+        switches(),
+      ]);
       const result = await db.execute<{
         newest: string | null;
         isCertified: boolean;
@@ -1255,7 +997,7 @@ export const live = {
         ),
         frames as (
           select max(f.as_of) as newest from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
-          where f.status = 'active'
+          where f.status = 'active' and ${shown.results}::boolean
         )
         select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
           coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"

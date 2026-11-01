@@ -4,6 +4,9 @@ import { sql } from "drizzle-orm";
 import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
+import { estimateAt } from "#lib/live/history.js";
+import { toward } from "#lib/live/standing.js";
+import { summarize } from "#lib/live/summary.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
@@ -1603,46 +1606,100 @@ export async function atlasPage(path: string, search: URLSearchParams) {
 }
 
 export async function livePage(path: string, at: string | null) {
-  const night = await found(call(router.live.get, { path }));
-  const hasFinal = night.races.some((race) => race.certified != null);
+  const { election, estimates, shown } = await found(
+    call(router.live.election, { path }),
+  );
+  const stamps = [
+    ...new Set(
+      election.races.flatMap((race) => race.frames.map((frame) => frame.at)),
+    ),
+  ].toSorted((a, b) => a.localeCompare(b));
+  const hasFinal = election.races.some((race) => race.certified != null);
   const wanted = Date.parse(at ?? "");
-  const position =
-    at === "final" && hasFinal
-      ? night.frames.length
-      : at == null || Number.isNaN(wanted)
-        ? night.frames.length - 1
-        : Math.max(
-            0,
-            night.frames.findLastIndex(
-              (frame) => Date.parse(frame.at) <= wanted,
-            ),
-          );
-  const isFinal = hasFinal && position === night.frames.length;
-  const time = isFinal ? null : (night.frames[position]?.at ?? null);
+  const isFinal = hasFinal && (at === "final" || at == null);
+  const time =
+    isFinal || Number.isNaN(wanted)
+      ? null
+      : (stamps.findLast((stamp) => Date.parse(stamp) <= wanted) ??
+        stamps[0] ??
+        null);
+  const isNow =
+    isFinal || time == null || (!hasFinal && time === stamps.at(-1));
   return {
     kind: "live" as const,
     path,
-    ...night,
+    election: {
+      slug: election.slug,
+      title: election.title,
+      date: election.date,
+      pollClose: election.pollClose,
+      newest: election.newest,
+      isCertified: election.isCertified,
+    },
     at: isFinal ? "final" : time,
-    scanners: Object.entries(
-      Object.fromEntries(
-        night.frames
-          .slice(0, position + 1)
-          .flatMap((frame) =>
-            frame.scanners.map((entry) => [entry.area, entry.share]),
-          ),
-      ) as Record<string, number>,
-    ).map(([area, share]) => ({ area, share })),
-    races: night.races.map((race) => {
-      const current =
-        race.series.findLast((point) => time == null || point.at <= time) ??
-        null;
+    stamps: [...stamps, ...(hasFinal ? ["final"] : [])],
+    forecasts: shown.forecasts,
+    races: election.races.map((race) => {
+      const view = isNow
+        ? race
+        : {
+            ...race,
+            frames: race.frames.filter(
+              (frame) => time == null || frame.at <= time,
+            ),
+            certified: null,
+          };
+      const summary = summarize(
+        view,
+        !shown.forecasts
+          ? null
+          : view === race
+            ? (estimates[race.id] ?? null)
+            : view.units.length === 0
+              ? null
+              : estimateAt(view, time),
+      );
+      const frame = view.frames.at(-1) ?? null;
+      const flip = toward(summary.estimate, summary.favorite ?? undefined);
+      const band = summary.estimate?.margin;
       return {
-        ...race,
-        standing:
-          isFinal && race.certified != null
-            ? { at: "final", level: null, votes: race.certified.votes }
-            : current,
+        slug: race.slug,
+        title: race.title,
+        office: race.office,
+        state: race.state,
+        district: race.district,
+        options: race.options.map((option) => ({
+          label: option.label,
+          party: option.party?.short ?? option.party?.name ?? null,
+          isWriteIn: option.isWriteIn,
+          isIncumbent: option.isIncumbent,
+          isWinner: summary.winner?.id === option.id,
+        })),
+        votes: summary.totals,
+        at: summary.at,
+        reporting: frame?.reporting ?? null,
+        expected: frame?.expected ?? null,
+        leader: summary.leader?.label ?? null,
+        margin: summary.margin,
+        winner: summary.winner?.label ?? null,
+        estimate:
+          summary.estimate == null || summary.estimate.status === "waiting"
+            ? null
+            : {
+                status: summary.estimate.status,
+                favorite: summary.favorite?.label ?? null,
+                chance: summary.chance,
+                margin:
+                  band == null || summary.favorite == null
+                    ? null
+                    : {
+                        low: Math.min(band.low * flip, band.high * flip),
+                        mid: band.mid * flip,
+                        high: Math.max(band.low * flip, band.high * flip),
+                      },
+                shareIn: summary.estimate.shareIn.mid,
+              },
+        source: race.source,
       };
     }),
   };

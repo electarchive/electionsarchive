@@ -36,6 +36,8 @@ import {
   plural,
   points,
 } from "#lib/format.js";
+import { stamp } from "#lib/live/format.js";
+import { sum } from "#lib/live/standing.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
@@ -3741,231 +3743,172 @@ function hexMarkdown(
   ];
 }
 
-function landingMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
-  const latest =
-    data.states
-      .flatMap((state) => (state.newest == null ? [] : [state.newest]))
-      .toSorted((a, b) => a.localeCompare(b))
-      .at(-1) ?? "";
-  const clocks = new Map(
-    [
-      ...new Set([
-        "America/New_York",
-        ...data.states.map((state) => state.zone),
-      ]),
-    ].map((zone) => [
-      zone,
-      new Intl.DateTimeFormat(getLocale(), {
-        hour: "numeric",
-        minute: "2-digit",
-        timeZone: zone,
-        timeZoneName: "short",
-      }),
-    ]),
-  );
-  return [
-    `# ${m.live_landing_title()}`,
-    byline(
-      [{ name: data.election.name, path: data.election.path }],
-      link,
-      data.election.date,
-    ),
-    m.live_landing_twin(),
-    `**${m.live_landing_summary({
-      counting: String(
-        data.states.filter((state) => state.status !== "waiting").length,
-      ),
-      total: String(data.states.length),
-    })}${latest === "" ? "" : `. ${m.live_landing_latest({ time: clocks.get("America/New_York")?.format(Date.parse(latest)) ?? "" })}`}**`,
-    table(
-      [
-        m.live_col_state(),
-        m.live_reporting(),
-        m.live_col_races(),
-        m.live_col_updated(),
-      ],
-      data.states.map((state) => [
-        link(state.name, `live/${state.path}`),
-        state.status === "certified"
-          ? m.live_landing_legend_certified()
-          : state.status === "waiting"
-            ? m.live_landing_legend_waiting()
-            : state.reported == null
-              ? m.live_landing_legend_counting()
-              : percent(state.reported),
-        m.live_races_of({
-          counting: String(state.counting),
-          total: String(state.contests),
-        }),
-        state.newest == null
-          ? ""
-          : (clocks.get(state.zone)?.format(Date.parse(state.newest)) ?? ""),
-      ]),
-    ),
-  ];
-}
-
 function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
-  const clock = new Intl.DateTimeFormat(getLocale(), {
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: data.election.zone,
-  });
-  if (data.states.length > 0) {
-    return landingMarkdown(data, link);
-  }
+  const { election } = data;
+  const isNation = election.slug.split("/").length === 2;
+  const isRace = data.path !== election.slug;
   const moment = (at: string) =>
     link(
-      at === "final" ? m.live_certified_count() : clock.format(Date.parse(at)),
+      at === "final" ? m.live_certified_count() : stamp(at),
       `live/${data.path}?at=${at}`,
     );
-  const groups = Map.groupBy(
-    data.races.toSorted((a, b) => natural(a.path, b.path)),
-    (race) => race.group,
-  );
-  const federal = groups.get("federal") ?? [];
-  const sections = [
-    [
-      data.election.path.split("/").length > 3
-        ? m.live_citywide()
-        : m.live_statewide(),
-      groups.get("executive") ?? [],
-    ],
-    [
-      m.live_senate(),
-      federal.filter((race) => /\/senate[^/]*$/u.test(race.path)),
-    ],
-    [
-      m.live_house(),
-      federal.filter((race) => /\/house[^/]*$/u.test(race.path)),
-    ],
-    [m.live_measures(), groups.get("measure") ?? []],
-    [
-      m.live_boroughs(),
-      [...(groups.get("borough") ?? []), ...(groups.get("prosecutor") ?? [])],
-    ],
-    [m.live_council(), groups.get("council") ?? []],
-    ...[
-      ...Map.groupBy(
-        groups.get("legislative") ?? [],
-        (race) =>
-          /\/(state-senate|state-house|assembly|house-of-delegates)-[^/]*$/u.exec(
-            race.path,
-          )?.[1] ?? "legislature",
+  const closes = [
+    ...Map.groupBy(
+      election.pollClose.filter(
+        (entry) =>
+          !isRace || data.races.some((race) => race.state === entry.state),
       ),
-    ]
-      .toSorted(
-        ([a], [b]) =>
-          Number(b === "state-senate") - Number(a === "state-senate"),
-      )
-      .map(
-        ([kind, races]) =>
-          [
-            {
-              "state-senate": m.live_state_senate(),
-              "state-house": m.live_state_house(),
-              assembly: m.live_state_assembly(),
-              "house-of-delegates": m.live_delegates(),
-            }[kind] ?? m.live_legislature(),
-            races,
-          ] as const,
-      ),
-    [m.live_other(), groups.get("other") ?? []],
-    [m.live_courts(), groups.get("judicial") ?? []],
-  ] as const;
-  const isFinal = data.at === "final";
-  return [
-    `# ${m.live_title({ place: data.election.place })}`,
-    byline(
-      [{ name: data.election.name, path: data.election.path }],
-      link,
-      data.election.date,
+      (entry) => entry.at,
     ),
-    ...(data.frames.length === 0
-      ? []
-      : [
-          m.live_twin_summary({
-            publisher:
-              data.source.url == null
-                ? data.source.publisher
-                : `[${data.source.publisher}](${data.source.url})`,
-          }),
-        ]),
-    `**${data.at == null ? m.live_waiting() : isFinal ? m.live_certified_count() : m.live_as_of({ time: clock.format(Date.parse(data.at)) })}**`,
-    ...(isFinal || data.scanners.length === 0
-      ? []
-      : [
-          `${m.live_scanners()}: ${data.scanners.map((entry) => `${entry.area} ${percent(entry.share / 100)}`).join(", ")}`,
-        ]),
-    ...sections.flatMap(([heading, races]) =>
-      races.length === 0
+  ].toSorted(([a], [b]) => a.localeCompare(b));
+  const brief = (race: (typeof data.races)[number]) => {
+    const total = sum(race.votes);
+    return [
+      link(race.title, `live/${race.slug}`),
+      race.winner == null
+        ? (race.leader ?? "")
+        : `${race.winner} (${m.live_elected()})`,
+      total === 0 ? "" : count(total),
+      total === 0 ? "" : points(race.margin, 1).replace(/^[+−]/u, ""),
+      ...(data.forecasts
+        ? [
+            race.estimate?.chance == null || race.estimate.favorite == null
+              ? ""
+              : `${race.estimate.favorite} ${percent(race.estimate.chance, 0)}`,
+          ]
+        : []),
+    ];
+  };
+  const full = (race: (typeof data.races)[number]) => {
+    const total = sum(race.votes);
+    const rows = race.options
+      .map((option, index) => ({ ...option, votes: race.votes[index] ?? 0 }))
+      .filter((row) => !row.isWriteIn || row.votes > 0)
+      .toSorted((a, b) => b.votes - a.votes);
+    const { estimate } = race;
+    return [
+      `### ${link(race.title, `live/${race.slug}`)}`,
+      total === 0
+        ? data.at == null
+          ? m.live_waiting()
+          : m.live_no_update()
+        : [
+            table(
+              [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],
+              rows.map((row) => [
+                row.isWinner ? `${row.label} (${m.live_elected()})` : row.label,
+                row.party,
+                count(row.votes),
+                percent(row.votes / total),
+              ]),
+            ),
+            [
+              data.at === "final"
+                ? m.live_certified_count()
+                : m.live_votes_counted({ count: count(total) }),
+              ...(race.reporting == null || race.expected == null
+                ? []
+                : [
+                    m.live_twin_precincts({
+                      reporting: count(race.reporting),
+                      expected: count(race.expected),
+                    }),
+                  ]),
+            ]
+              .map((line) => `${line}.`)
+              .join(" "),
+          ].join("\n\n"),
+      ...(estimate == null
         ? []
         : [
-            `## ${heading}`,
-            ...races.flatMap((race) => {
-              const votes = race.standing?.votes ?? null;
-              let total = 0;
-              const voteList = votes ?? [];
-              for (const value of voteList) {
-                total += value;
-              }
-              const rows = race.options
-                .map((option, index) => ({
-                  ...option,
-                  votes: votes?.[index] ?? 0,
-                  isElected: isFinal && race.certified?.elected[index] === true,
-                }))
-                .filter((row) => row.kind !== "write_in" || row.votes > 0)
-                .toSorted((a, b) => b.votes - a.votes);
-              return [
-                `### ${link(race.name, race.path)}`,
-                votes == null || total === 0
-                  ? m.live_no_update()
-                  : [
-                      race.group === "measure"
-                        ? table(
-                            [m.col_answer(), m.col_votes(), m.col_share()],
-                            rows.map((row) => [
-                              row.name,
-                              count(row.votes),
-                              percent(row.votes / total),
-                            ]),
-                          )
-                        : table(
-                            [
-                              m.col_candidate(),
-                              m.col_party(),
-                              m.col_votes(),
-                              m.col_share(),
-                            ],
-                            rows.map((row) => [
-                              row.isElected
-                                ? `${row.name} (${m.live_elected()})`
-                                : row.name,
-                              row.party,
-                              count(row.votes),
-                              percent(row.votes / total),
-                            ]),
-                          ),
-                      isFinal
-                        ? m.live_certified_count()
-                        : m.live_votes_counted({ count: count(total) }),
-                    ].join("\n\n"),
-              ];
-            }),
-          ],
+            estimate.status === "settled"
+              ? m.live_twin_settled({ name: race.winner ?? race.leader ?? "" })
+              : estimate.status === "unavailable"
+                ? m.live_twin_no_estimate()
+                : estimate.status === "too-early" ||
+                    estimate.favorite == null ||
+                    estimate.chance == null ||
+                    estimate.margin == null
+                  ? m.live_twin_too_early()
+                  : m.live_twin_estimate({
+                      name: estimate.favorite,
+                      chance: percent(estimate.chance, 0),
+                      low: points(estimate.margin.low, 1),
+                      high: points(estimate.margin.high, 1),
+                      share: percent(estimate.shareIn, 0),
+                    }),
+          ]),
+    ];
+  };
+  const sections = (
+    [
+      ["senate", m.live_senate()],
+      ["governor", m.live_governor()],
+      ["house", m.live_house()],
+      ["other", m.live_other()],
+    ] as const
+  ).map(
+    ([office, heading]) =>
+      [
+        office,
+        heading,
+        data.races
+          .filter((race) => race.office === office)
+          .toSorted((a, b) => natural(a.slug, b.slug)),
+      ] as const,
+  );
+  return [
+    `# ${m.live_twin_title({ name: isRace ? (data.races[0]?.title ?? election.title) : election.title })}`,
+    byline(
+      [{ name: election.title, path: election.slug }],
+      link,
+      election.date,
     ),
-    ...(data.frames.length === 0
+    m.live_twin_note(),
+    ...(data.forecasts ? [] : [m.live_twin_forecast_off()]),
+    `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: stamp(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: stamp(election.newest) })}**`,
+    ...(closes.length === 0
+      ? []
+      : [
+          closes
+            .map(
+              ([at, entries]) =>
+                `- ${m.live_twin_polls_close({ time: stamp(at) })}${isNation ? `: ${entries.map((entry) => entry.state.toUpperCase()).join(", ")}` : ""}`,
+            )
+            .join("\n"),
+        ]),
+    ...sections.flatMap(([office, heading, races]) =>
+      races.length === 0
+        ? []
+        : isRace
+          ? races.flatMap((race) => full(race))
+          : [
+              `## ${heading}`,
+              ...(!isNation && office !== "other"
+                ? races.flatMap((race) => full(race))
+                : [
+                    table(
+                      [
+                        m.col_contest(),
+                        m.col_leader(),
+                        m.col_votes(),
+                        m.col_margin(),
+                        ...(data.forecasts ? [m.live_col_chance()] : []),
+                      ],
+                      races.map((race) => brief(race)),
+                    ),
+                  ]),
+            ],
+    ),
+    ...(data.stamps.length === 0
       ? []
       : [
           `## ${m.live_twin_updates()}`,
-          [
-            ...data.frames.map((frame) => frame.at),
-            ...(data.races.some((race) => race.certified != null)
-              ? ["final"]
-              : []),
-          ]
-            .map((at) => `- ${moment(at)}${at === data.at ? " ←" : ""}`)
+          data.stamps
+            .map(
+              (at) =>
+                `- ${moment(at)}${at === (data.at ?? data.stamps.at(-1)) ? " ←" : ""}`,
+            )
             .join("\n"),
         ]),
   ];
