@@ -74,6 +74,23 @@ PLACES = {
     "Virgin Islands, U.S.": "VI",
     "Northern Marianas": "MP",
 }
+REPORTED = (
+    "The delegations of Alaska, the District of Columbia, and Utah announced votes for candidates who had left the "
+    "race (Alaska: 11 Trump, 12 Cruz, and 5 Rubio; the District of Columbia: 10 Rubio and 9 Kasich; Utah: 40 Cruz). "
+    "Under the party's rules those delegates were bound to the remaining candidate, and the secretary recorded every "
+    "one of them for Trump, as stored here."
+)
+ABROAD_NOTE = (
+    "Democrats Abroad is stored as an unlocated delegation, apart from the states and territories. Eight of its "
+    "superdelegates cast half votes, so its 21 delegates cast 17 votes, and its total here is the 17 votes. One "
+    "superdelegate position assigned to no state did not vote and is not counted in any delegation."
+)
+ABROAD_NOTE_2020 = (
+    "Democrats Abroad is stored as an unlocated delegation, apart from the states and territories. Eight of its "
+    "superdelegates cast half votes, so its 21 delegates cast 17 votes, and its total here is the 17 votes. Two "
+    "superdelegate positions assigned to no state did not vote and are not counted in any delegation. Delegates "
+    "voted remotely, and the convention's ceremonial roll call of the states announced the result."
+)
 CONVENTIONS = [
     {
         "key": "2016-02-01:president:republican",
@@ -85,6 +102,7 @@ CONVENTIONS = [
         "required": 1237,
         "nominee": "Trump",
         "city": "Cleveland",
+        "caveat": REPORTED,
     },
     {
         "key": "2016-02-01:president:democratic",
@@ -96,6 +114,19 @@ CONVENTIONS = [
         "required": 2383,
         "nominee": "Clinton",
         "city": "Philadelphia",
+        "caveat": ABROAD_NOTE,
+    },
+    {
+        "key": "2020-02-03:president:democratic",
+        "party": "democratic",
+        "title": "2020 Democratic National Convention",
+        "table": "Democratic presidential nomination ballot",
+        "days": (date(2020, 8, 17), date(2020, 8, 20)),
+        "ballots": [date(2020, 8, 18)],
+        "required": 1991,
+        "nominee": "Biden",
+        "city": "Milwaukee",
+        "caveat": ABROAD_NOTE_2020,
     },
 ]
 ABROAD = "DA"
@@ -106,17 +137,6 @@ METHOD = (
     "the convention, pinned to the revision current when it was fetched, until an official tally is found. Each "
     "delegation's total is the delegates it held, abstentions included; abstentions are that total less the votes "
     "recorded for candidates."
-)
-ABROAD_NOTE = (
-    "Democrats Abroad is stored as an unlocated delegation, apart from the states and territories. Eight of its "
-    "superdelegates cast half votes, so its 21 delegates cast 17 votes, and its total here is the 17 votes. One "
-    "superdelegate position assigned to no state did not vote and is not counted in any delegation."
-)
-REPORTED = (
-    "The delegations of Alaska, the District of Columbia, and Utah announced votes for candidates who had left the "
-    "race (Alaska: 11 Trump, 12 Cruz, and 5 Rubio; the District of Columbia: 10 Rubio and 9 Kasich; Utah: 40 Cruz). "
-    "Under the party's rules those delegates were bound to the remaining candidate, and the secretary recorded every "
-    "one of them for Trump, as stored here."
 )
 
 
@@ -312,7 +332,11 @@ def roll_call(text: str, caption: str) -> tuple[list[str], dict[str, list[int]]]
     start = text.index(caption)
     table = text[start : text.index("\n|}", start)]
     rows = table.split("\n|-\n")
-    candidates = [re.search(r"\[\[(?:[^]|]*\|)?([^]]*)\]\]\s*$", line) for line in rows[0].split("\n")[2:]]
+    candidates = [
+        re.search(r"\[\[(?:[^]|]*\|)?([^]]*)\]\]\s*$", line)
+        for line in rows[0].split("\n")[2:]
+        if line != "!Candidates"
+    ]
     labels = [match.group(1) if match else "Abstain" for match in candidates]
     votes: dict[str, list[int]] = {}
     for row in rows[1:]:
@@ -321,7 +345,10 @@ def roll_call(text: str, caption: str) -> tuple[list[str], dict[str, list[int]]]
             continue
         code = ABROAD if place.group(2) else PLACES[place.group(1)]
         cells = re.sub(
-            r"\{\{refn\|.*?\|group=[^}]*\}\}|<ref[^>]*/>|<ref[^>]*>.*?</ref>", "", row, flags=re.DOTALL
+            r"\{\{refn\|.*?\|group=[^}]*\}\}|\{\{efn\|[^}]*\}\}|<ref[^>]*/>|<ref[^>]*>.*?</ref>",
+            "",
+            row,
+            flags=re.DOTALL,
         ).split("\n|")[1:]
         if len(cells) != len(labels):
             raise ValueError(f"{code}: {len(cells)} cells for {len(labels)} columns")
@@ -339,7 +366,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 2016 national conventions",
+            summary="The roll call of the states at the 2016 and 2020 national conventions",
             polity="US",
         )
 
@@ -477,10 +504,7 @@ def emit() -> Path:
                     body_md=METHOD + f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}; "
                     f"{convention['required']:,} votes, a majority of the delegates, were needed to nominate.",
                 )
-                if key == "2016-02-01:president:republican":
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=REPORTED)
-                else:
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=ABROAD_NOTE)
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=convention["caveat"])
                 ballot_options = {}
                 for label in labels[:-1]:
                     surname = label.split()[-1]
