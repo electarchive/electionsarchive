@@ -972,6 +972,23 @@ def person(name: str) -> tuple[str, str]:
     return (re.sub(r"[^a-z]", "", words[-1].lower()), words[0][:1].lower()) if words else ("", "")
 
 
+def given_surname(name: str) -> frozenset[str]:
+    words = re.sub(r"[.,]", " ", name).split()
+    return frozenset(
+        re.sub(r"[^a-z-]", "", word.lower())
+        for word in words
+        if len(word) > 1 and not re.fullmatch(r"(?i)jr|sr|st|ii|iii|iv|2d|3d", word)
+    )
+
+
+def same_person(option: str, name: str) -> bool:
+    ours, theirs = given_surname(option), given_surname(name)
+    if ours and ours == theirs:
+        return True
+    last = re.sub(r"[^a-z-]", "", re.sub(r"[.,]", " ", name).split()[-1].lower()) if name.split() else ""
+    return len(ours) == 1 and len(next(iter(ours))) >= 6 and len(theirs) > 1 and distance(next(iter(ours)), last) <= 1
+
+
 def garbled(name: str) -> bool:
     return any(
         re.search(r"[a-z][A-Z]", word) and not re.match(r"(?:Mc|Mac|De|Di|Du|Le|La|O')[A-Z]", word)
@@ -1306,6 +1323,9 @@ def emit() -> Path:
                         or misread(option[1], name)
                     )
                 ]
+                exact = [option for option in options if option[2] == "candidate" and same_person(option[1], name)]
+                if len(exact) == 1:
+                    hits = exact
                 if len(hits) > 1:
                     hits = [hit for hit in hits if person(hit[1])[1] == mine[1]] or hits
                 if len(hits) > 1:
