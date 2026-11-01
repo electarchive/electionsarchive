@@ -89,4 +89,93 @@ const runs = {
     ),
 };
 
-export const transport = { sparse, runs } satisfies Transport;
+function isPlain(value: unknown): value is Record<string, unknown> {
+  return (
+    value != null &&
+    typeof value === "object" &&
+    Object.getPrototypeOf(value) === Object.prototype &&
+    Object.getOwnPropertySymbols(value).length === 0
+  );
+}
+
+function isFlat(value: unknown, seen: Set<unknown>): boolean {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return true;
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) && !Object.is(value, -0);
+  }
+  if (
+    !Array.isArray(value) ||
+    value.length >= LONG ||
+    seen.has(value) ||
+    Object.keys(value).length !== value.length
+  ) {
+    return false;
+  }
+  seen.add(value);
+  const items: Array<unknown> = value;
+  return items.every((item) => isFlat(item, seen));
+}
+
+const columns = {
+  encode: (value: unknown) => {
+    if (!Array.isArray(value) || value.length < LONG) {
+      return false;
+    }
+    const rows: Array<unknown> = value;
+    const first = rows[0];
+    if (!isPlain(first)) {
+      return false;
+    }
+    const keys = Object.keys(first);
+    if (keys.length === 0) {
+      return false;
+    }
+    const seen = new Set<unknown>();
+    const cells = keys.map((): Array<unknown> => []);
+    for (const row of rows) {
+      if (!isPlain(row) || seen.has(row)) {
+        return false;
+      }
+      seen.add(row);
+      const own = Object.keys(row);
+      if (
+        own.length !== keys.length ||
+        own.some((key, at) => key !== keys[at])
+      ) {
+        return false;
+      }
+      for (const [at, key] of keys.entries()) {
+        cells[at]?.push(row[key]);
+      }
+    }
+    const packed = new Set<unknown>();
+    return [
+      keys,
+      cells.map((cell) =>
+        cell.every((item) => isFlat(item, packed))
+          ? JSON.stringify(cell)
+          : cell,
+      ),
+    ];
+  },
+  decode: ([keys, cells]: [Array<string>, Array<string | Array<unknown>>]) => {
+    const lists = cells.map((cell): Array<unknown> => {
+      if (typeof cell !== "string") {
+        return cell;
+      }
+      const parsed: unknown = JSON.parse(cell);
+      return Array.isArray(parsed) ? parsed : [];
+    });
+    return Array.from({ length: lists[0]?.length ?? 0 }, (_, index) =>
+      Object.fromEntries(keys.map((key, at) => [key, lists[at]?.[index]])),
+    );
+  },
+};
+
+export const transport = { sparse, runs, columns } satisfies Transport;
