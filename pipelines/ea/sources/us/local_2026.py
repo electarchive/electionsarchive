@@ -6409,6 +6409,13 @@ for key, publisher, title, url, local in (
         "or/grantspass_council_nov2026_candidates.pdf",
     ),
     (
+        "OR-41051-wood-village",
+        "City of Wood Village",
+        "Elections: Current Candidate Filings, November 3, 2026 General Election",
+        "https://www.woodvillageor.gov/government/elections/",
+        "or/wood_village_elections.html",
+    ),
+    (
         "OR-41071-mcminnville",
         "City of McMinnville",
         "November 3, 2026 General Election",
