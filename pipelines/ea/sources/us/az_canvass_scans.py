@@ -72,7 +72,8 @@ def read() -> str:
             for variant in VARIANTS:
                 params = MessageCreateParamsNonStreaming(
                     model="claude-haiku-5-5",
-                    max_tokens=1500,
+                    max_tokens=4000,
+                    thinking={"type": "disabled"},
                     messages=[
                         {
                             "role": "user",
@@ -90,12 +91,12 @@ def read() -> str:
                         }
                     ],
                 )
-                wanted[f"read:{year}:{page}:{variant}"] = ((params), (3000 * price_in + 1000 * price_out) / 1e6)
-    return batch.ensure(SOURCE, "propositions", wanted)[1]
+                wanted[f"plain:{year}:{page}:{variant}"] = ((params), (6000 * price_in + 2500 * price_out) / 1e6)
+    return batch.ensure(SOURCE, "plain", wanted)[1]
 
 
 def seen(year: int, page: int, variant: str) -> list[dict[str, object]]:
-    text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}:{variant}").path.read_text())["content"]
+    text = json.loads(raw.cached(SOURCE, f"plain:{year}:{page}:{variant}").path.read_text())["content"]
     text = next(block["text"] for block in text if block.get("type") == "text")
     found = re.search(r"\[.*\]", text, re.DOTALL)
     return json.loads(found[0]) if found else []
