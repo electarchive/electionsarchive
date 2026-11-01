@@ -7170,7 +7170,7 @@ KY_BOARD_SEATS = {
     "Erlanger-Elsmere Independent School District Board of Education": 3,
     "Ludlow Independent School District Board of Education": 3,
     "Walton-Verona Independent School District Board of Education": 3,
-    "Anchorage Independent Schools Board of Education": 3,
+    "Anchorage Independent School District Board of Education": 3,
     "Campbellsville Independent School District Board of Education": 3,
 }
 NJ_SCHOOL_PINS = {
@@ -7189,6 +7189,23 @@ NJ_EXTRA_SCHOOLS = (
     ("34001", "3408671", "Longport Borough School District"),
     ("34007", "3407080", "Hi-Nella Borough School District"),
 )
+KY_SCHOOL_ALIASES = {
+    "OPS": ("", "OWENSBORO"),
+    "DAWSO": ("", "DAWSON"),
+    "CITY": ("BREATHITT", "JACKSON"),
+}
+KY_COMMISSION_CITIES = {
+    ("JEFFERSON", ky_ballots.city_letters(city))
+    for city in (
+        "Brownsboro Farm",
+        "Brownsboro Village",
+        "Glenview",
+        "Glenview Hills",
+        "Glenview Manor",
+        "Old Brownsboro Place",
+        "Ten Broeck",
+    )
+}
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -7965,9 +7982,9 @@ def parse() -> None:
         for n, w in enumerate(
             ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"]
         )
-    }
-    councils: dict[tuple[str, frozenset[str]], tuple[str, int]] = {}
-    warded: set[tuple[str, frozenset[str]]] = set()
+    } | {"feur": 4}
+    councils: dict[tuple[str, str], tuple[str, int]] = {}
+    warded: dict[tuple[str, str], bool] = {}
     ballot_text: dict[str, list[str]] = {}
     board_seats: dict[frozenset[str], int] = {}
     for county in filings["County"].unique():
@@ -7975,14 +7992,14 @@ def parse() -> None:
             ballot_pdf = raw.cached(SOURCE, BALLOTS.format(str(county).replace(" ", "%20"))).path
         except LookupError:
             continue
-        printed = (
+        printed = ky_ballots.unwrap(
             subprocess.run(["pdftotext", "-raw", str(ballot_pdf), "-"], capture_output=True, check=False)
             .stdout.decode()
             .splitlines()
         )
         ballot_text[str(county)] = printed
         for name, asks in re.findall(
-            r"(?i)BOARD OF EDUCATION,?\s+([A-Za-z0-9 .,'&()-]{3,90}?)\s*\(?Vote for (?:up to )?([A-Za-z0-9]+)\)?",
+            r"(?i)BOARD OF EDUCATION,?\s+([A-Za-z0-9 .,'&()/-]{3,90}?)\s*\(?Vote for (?:up to )?([A-Za-z0-9]+)\)?",
             " ".join(printed),
         ):
             if re.search(r"(?i)\bind", name) and not re.search(r"(?i)unexpired", name):
@@ -8001,7 +8018,9 @@ def parse() -> None:
                 r"(?i)county commission|fiscal|judge|urban county", above
             ):
                 continue
-            for earlier in [ahead] if ahead else printed[max(0, i - 8) : i][::-1]:
+            for earlier in ([ahead] if ahead else []) + ky_ballots.join_headings(printed[max(0, i - 8) : i + 1])[:-1][
+                ::-1
+            ]:
                 city_key = re.search(
                     r"(?i)City of\s+([A-Za-z'. -]+?)(?:,|\s+CITY\b|$|\s+(?:COUNCIL|COMMISSION))", earlier
                 ) or re.search(
@@ -8013,17 +8032,17 @@ def parse() -> None:
                 continue
             elect = spelled.get(asks[1].lower()) or (int(asks[1]) if asks[1].isdigit() else 0)
             if re.search(r"(?i)\bward\s+\w+", above) and elect == 1:
-                warded.add((str(county), coverage_tables.tokens(city_key[1])))
+                warded[(str(county), ky_ballots.city_letters(city_key[1]))] = True
             elif elect:
-                councils[(str(county), coverage_tables.tokens(city_key[1]))] = (
+                councils[(str(county), ky_ballots.city_letters(city_key[1]))] = (
                     "City Commission" if re.search(r"(?i)commission", above) else "City Council",
                     elect,
                 )
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
-    for county, post, district, description, last_name in filings.select(
-        "County", "Office", "District", "Office Description", "Last Name"
+    for county, post, district, description, last_name, unexpired in filings.select(
+        "County", "Office", "District", "Office Description", "Last Name", "Unexpired"
     ).iter_rows():
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
         city = " ".join(
@@ -8044,8 +8063,18 @@ def parse() -> None:
             )
         found = kentucky.get(coverage_tables.tokens(f"{place} County School District"))
         described = coverage_tables.tokens(str(description or ""))
-        if "OPS" in described:
-            described |= {"OWENSBORO"}
+        for word, alias in KY_SCHOOL_ALIASES.items():
+            if word in described and alias[0] in ("", str(county)):
+                described |= {alias[1]}
+        if (
+            post == "SCHOOL BOARD MEMBER"
+            and district is None
+            and found is not None
+            and "IND" not in described
+            and "INDEPENDENT" not in described
+            and str(county) in ballot_text
+        ):
+            district = ky_ballots.school_district_by_candidate(ballot_text[str(county)], str(last_name))
         own = (
             None
             if post != "SCHOOL BOARD MEMBER" or "COUNTY" in described
@@ -8056,9 +8085,10 @@ def parse() -> None:
             base = f"{label} Board of Education"
             seats = KY_BOARD_SEATS.get(base) or next((n for stem, n in board_seats.items() if own <= stem), 0)
             if seats:
-                contest = base + (" (Unexpired Term)" if "UNEXPIRED" in described else "")
+                lapsed = "UNEXPIRED" in described or unexpired is not None
+                contest = base + (" (Unexpired Term)" if lapsed else "")
                 schools[contest] = ("Board of Education", label, f"school:{code}")
-                magnitudes[(str(county), contest)] = seats if "UNEXPIRED" not in described else 1
+                magnitudes[(str(county), contest)] = 1 if lapsed else seats
                 contests.append(contest)
             else:
                 contests.append(None)
@@ -8078,17 +8108,19 @@ def parse() -> None:
         elif post == "MAYOR" and city:
             contests.append(f"City of {city} Mayor")
         elif post == "CITY LEGISLATIVE BODY" and city:
-            city_key = (str(county), coverage_tables.tokens(city))
-            chamber, elect = councils.get(
-                city_key,
-                ("City Commission", 4) if re.search(r"\bCOM", str(description).upper()) else ("City Council", 0),
+            city_key = (str(county), ky_ballots.city_letters(city))
+            is_warded = ky_ballots.near(warded, city_key) is not None
+            chamber, elect = ky_ballots.near(councils, city_key) or (
+                ("City Commission", 4)
+                if re.search(r"\bCOM", str(description).upper()) or city_key in KY_COMMISSION_CITIES
+                else ("City Council", 0)
             )
             contest = (
                 f"City of {city} City Council, Ward {district}"
-                if district and city_key in warded
+                if district and is_warded
                 else f"City of {city} {chamber}"
             )
-            magnitudes[(str(county), contest)] = 1 if city_key in warded else elect
+            magnitudes[(str(county), contest)] = 1 if is_warded else elect
             contests.append(contest)
         else:
             contests.append(None)
@@ -8098,7 +8130,23 @@ def parse() -> None:
         .group_by("County", "Contest")
     ):
         if group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))["Party"].is_duplicated().any():
-            continue
+            if not str(contest).startswith("City of") or str(county) not in ballot_text:
+                continue
+            printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
+            named_city = re.match(r"City of (.+?) (?:Mayor|City Council|City Commission)", str(contest))
+            if (
+                named_city is None
+                or len(ky_ballots.letters(named_city[1])) < 5
+                or ky_ballots.letters(named_city[1]) not in printed
+            ):
+                continue
+            group = group.filter(
+                pl.col("Last Name").map_elements(
+                    lambda name: ky_ballots.letters(name) in printed, return_dtype=pl.Boolean
+                )
+            )
+            if group.is_empty():
+                continue
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
         for row in group.iter_rows(named=True):
             suffix = str(row["Suffix"] or "").strip()
@@ -12002,9 +12050,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             ).fetchone()
             if holder is not None and holder[0] != contest:
                 cs.minted.discard(contest)
-                cs.rows["external_id"] = [
-                    row for row in cs.rows["external_id"] if row["entity_id"] != contest
-                ]
+                cs.rows["external_id"] = [row for row in cs.rows["external_id"] if row["entity_id"] != contest]
                 counts["held slug"] = counts.get("held slug", 0) + 1
                 continue
             if area is not None:
