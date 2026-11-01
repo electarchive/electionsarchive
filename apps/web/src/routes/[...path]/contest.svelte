@@ -3,6 +3,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
@@ -1677,7 +1678,7 @@
   {#if drawn != null}
     {@render caveat()}
   {/if}
-  {#if drawn == null && boundaries.some((entry) => entry.isPending)}
+  {#if isMapped && drawn == null && boundaries.some((entry) => entry.isPending)}
     <p class="col-span-12 bg-card px-3.5 py-3 text-sm text-muted-foreground">
       {m.map_rebuilding()}
     </p>
@@ -1771,6 +1772,30 @@
       {@render locator(locating)}
     {/if}
   {/snippet}
+  {#snippet missing()}
+    {const noun = $derived(
+      placed?.levels.find((entry) => entry.code === placed.level)?.noun,
+    )}
+    <div
+      class="grid aspect-4/3 place-content-center justify-items-center gap-2 rounded-sm bg-card bg-[repeating-linear-gradient(135deg,color-mix(in_oklab,var(--border)_60%,transparent)_0_1px,transparent_1px_9px)] px-6 text-center ring-1 ring-border inline-full max-block-[min(38rem,70svh)]"
+    >
+      <MapIcon class="text-muted-foreground block-5 inline-5" />
+      <p class="text-sm font-semibold">{m.map_missing_title()}</p>
+      <p class="text-sm text-pretty text-muted-foreground max-inline-sm">
+        {#if boundaries.some((entry) => entry.isPending)}
+          {m.map_rebuilding()}
+        {:else if noun != null && placed != null && placed.rows.length > 0}
+          {#if boundaries.some((entry) => entry.scheme === placed.level && entry.tiles != null)}
+            {m.map_missing_drawn()}
+          {:else}
+            {m.map_missing_places({ noun })}
+          {/if}
+        {:else}
+          {m.map_missing_whole()}
+        {/if}
+      </p>
+    </div>
+  {/snippet}
   {#snippet hemicycle()}
     <Seats
       isLinked
@@ -1785,7 +1810,7 @@
   {/snippet}
   <Lead
     results={summary}
-    map={isMapped ? mapped : null}
+    map={isMapped ? mapped : missing}
     aside={chamber == null ? null : hemicycle}
   />
   {#if drawn != null && placed != null}
