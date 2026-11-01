@@ -1,4 +1,5 @@
 import difflib
+import functools
 import hashlib
 import itertools
 import os
@@ -340,7 +341,9 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         last_page = row.page
         found = number(row.words)
         if found is None and len(row.words) > 2 and re.fullmatch(r"[Il|]{3}", row.words[-1].text):
-            if re.search(r"(?i)otal\W*vote\W*[rdl1]?\W*$", " ".join(word.text for word in row.words[:-1]).replace(".", "")):
+            if re.search(
+                r"(?i)otal\W*vote\W*[rdl1]?\W*$", " ".join(word.text for word in row.words[:-1]).replace(".", "")
+            ):
                 found = (111, False, row.words[-1:])
         left = (
             [word for word in row.words[: row.words.index(found[2][0])] if not LEADER.fullmatch(word.text)]
@@ -692,9 +695,57 @@ READ_PROMPT = (
 )
 
 
+@functools.cache
+def page_words(year: int, page: int) -> list[tuple[float, str]]:
+    out = subprocess.run(
+        ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(pdf(year)), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    height = float(re.search(r'<page width="[\d.]+" height="([\d.]+)"', out)[1])
+    return [(float(top) / height, text) for top, text in re.findall(r'yMin="([\d.]+)"[^>]*>([^<]*)<', out)]
+
+
+def cleared(frame: pl.DataFrame) -> pl.DataFrame:
+    sums = (
+        frame.filter(pl.col("group").is_not_null() & pl.col("printed").is_not_null())
+        .group_by("year", "stage", "group")
+        .agg(
+            pl.col("votes").sum().alias("added"),
+            pl.col("printed").first(),
+            pl.col("page").n_unique().alias("pages"),
+            pl.col("page").first(),
+            pl.col("y1").max().alias("bottom"),
+        )
+        .filter((pl.col("added") != pl.col("printed")) & (pl.col("pages") == 1))
+    )
+    loose = [
+        (row["year"], row["stage"], row["group"])
+        for row in sums.iter_rows(named=True)
+        if not any(
+            row["bottom"] - 0.002 <= top <= row["bottom"] + 0.04 and re.search(r"ota|Vote", text)
+            for top, text in page_words(int(row["year"]), int(row["page"]))
+        )
+    ]
+    if not loose:
+        return frame
+    marked = pl.DataFrame(loose, schema=["year", "stage", "group"], orient="row").with_columns(
+        pl.col("year").cast(frame.schema["year"]), pl.col("group").cast(frame.schema["group"]), loose=pl.lit(True)
+    )
+    return (
+        frame.join(marked, on=["year", "stage", "group"], how="left")
+        .with_columns(
+            printed=pl.when(pl.col("loose").is_not_null()).then(None).otherwise(pl.col("printed")),
+            total_party=pl.when(pl.col("loose").is_not_null()).then(None).otherwise(pl.col("total_party")),
+        )
+        .drop("loose")
+    )
+
+
 def held(frame: pl.DataFrame) -> pl.DataFrame:
     return (
-        blocks(frame.filter(pl.col("county").is_not_null()))
+        blocks(cleared(frame.filter(pl.col("county").is_not_null())))
         .filter(pl.col("agrees").is_null())
         .sort("year", "page", "y0", "x0")
         .with_columns(rid=pl.int_range(pl.len()).over("year", "page"))
@@ -1045,6 +1096,109 @@ def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
     return pl.concat(parts)
 
 
+def amended(lines: pl.DataFrame) -> pl.DataFrame:
+    fixes = pl.read_csv(
+        Path(__file__).with_name("nh_manual_fixes.tsv"),
+        separator="\t",
+        schema_overrides={"beside_y0": pl.Float64, "votes": pl.Int64, "name": pl.String, "town": pl.String},
+    )
+    lines = lines.with_row_index("ix")
+    lines = lines.filter(
+        ~pl.col("ix").is_in(
+            lines.filter(pl.col("district").is_null())
+            .join(
+                lines.filter(pl.col("district").is_not_null()).select(
+                    "year", "page", "county", "office", "stage", "votes", "side", pl.col("y0").alias("y0b")
+                ),
+                on=["year", "page", "county", "office", "stage", "votes", "side"],
+                nulls_equal=True,
+            )
+            .filter((pl.col("y0") - pl.col("y0b")).abs() < 0.01)["ix"]
+            .implode()
+        )
+    ).drop("ix")
+    touched: list[tuple[int, str, int]] = []
+
+    def find(frame: pl.DataFrame, year: int, page: int, y0: float) -> pl.DataFrame:
+        return frame.filter(
+            (pl.col("year") == year) & (pl.col("page") == page) & ((pl.col("y0") - y0).abs() < 6e-5)
+        ).head(1)
+
+    for fix in fixes.iter_rows(named=True):
+        year, page, y0 = fix["year"], fix["page"], fix["y0"]
+        if fix["op"] == "add":
+            beside = find(lines, year, page, fix["beside_y0"])
+            assert beside.height == 1, fix
+            row = beside.with_columns(
+                name=pl.lit(fix["name"]),
+                town=pl.lit(fix["town"]),
+                votes=pl.lit(fix["votes"], dtype=pl.Int64),
+                clean=pl.lit(True),
+                digits=pl.lit(f"{fix['votes']:,}"),
+                y0=pl.lit(y0),
+                y1=pl.col("y1") + (y0 - fix["beside_y0"]),
+                writein=pl.lit(False),
+                tail=pl.lit(None, dtype=pl.String),
+                party=pl.lit(None, dtype=pl.String),
+                twice=pl.lit(True),
+            )
+            lines = pl.concat([lines, row.select(lines.columns)])
+            hit = beside
+        else:
+            hit = find(lines, year, page, y0)
+            assert hit.height == 1, fix
+            if fix["op"] == "drop":
+                lines = lines.filter(
+                    ~((pl.col("year") == year) & (pl.col("page") == page) & ((pl.col("y0") - y0).abs() < 6e-5))
+                )
+            elif fix["op"] == "rename":
+                at = pl.col("page").eq(page) & pl.col("year").eq(year) & ((pl.col("y0") - y0).abs() < 6e-5)
+                lines = lines.with_columns(
+                    name=pl.when(at).then(pl.lit(fix["name"])).otherwise(pl.col("name")),
+                    town=pl.when(at).then(pl.lit(fix["town"])).otherwise(pl.col("town")),
+                )
+            elif fix["op"] == "votes":
+                lines = lines.with_columns(
+                    votes=pl.when(
+                        (pl.col("year") == year) & (pl.col("page") == page) & ((pl.col("y0") - y0).abs() < 6e-5)
+                    )
+                    .then(fix["votes"])
+                    .otherwise(pl.col("votes"))
+                )
+            else:
+                lines = lines.with_columns(
+                    printed=pl.when(
+                        (pl.col("year") == year)
+                        & (pl.col("stage") == hit["stage"][0])
+                        & (pl.col("group") == hit["group"][0])
+                    )
+                    .then(fix["votes"])
+                    .otherwise(pl.col("printed"))
+                )
+        touched.append((year, hit["stage"][0], hit["group"][0]))
+    if touched:
+        marked = (
+            pl.DataFrame(touched, schema=["year", "stage", "group"], orient="row")
+            .unique()
+            .with_columns(
+                pl.col("year").cast(lines.schema["year"]),
+                pl.col("group").cast(lines.schema["group"]),
+                touched=pl.lit(True),
+            )
+        )
+        lines = (
+            lines.join(marked, on=["year", "stage", "group"], how="left")
+            .with_columns(added=pl.col("votes").sum().over("year", "stage", "group"))
+            .with_columns(
+                agrees=pl.when(pl.col("touched").is_not_null())
+                .then(pl.col("added") == pl.col("printed"))
+                .otherwise(pl.col("agrees"))
+            )
+            .drop("touched")
+        )
+    return lines
+
+
 def emit() -> Path:
     from ea.changeset import Changeset
     from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, TEMPLATE, WRITE_IN
@@ -1110,6 +1264,7 @@ def emit() -> Path:
             .then(pl.lit("Scatter"))
             .otherwise(pl.col("name"))
         )
+        .pipe(cleared)
     )
     both = pl.concat([twice(raw_lines), reread_votes(raw_lines)], how="diagonal_relaxed").unique(
         ["year", "page", "y0", "x0"], keep="last"
@@ -1122,6 +1277,7 @@ def emit() -> Path:
             votes=pl.coalesce("read", "votes"),
         )
         .drop("read")
+        .pipe(amended)
         .with_columns(
             agrees=pl.when(
                 pl.col("agrees").is_null()

@@ -1,0 +1,157 @@
+year	page	y0	op	beside_y0	name	town	votes
+1970	343	0.1321	printed				1104
+1972	684	0.2080	add	0.1952	John N. Leighton	Conway	3096
+1972	684	0.2333	votes				2757
+1972	687	0.5635	add	0.5513	Antonio J. Roy, Jr.	Goffstown	1866
+1972	690	0.5440	add	0.5308	George A. Young	Rochester	3
+1972	691	0.4602	add	0.4477	Edward J. Bennett	Goshen	5
+1972	894	0.1259	add	0.1134	Scatter		1
+1972	894	0.2740	add	0.2605	Joan H. Foldeak	Keene	1885
+1972	894	0.4983	add	0.4853	John D. Morton, Sr.	Berlin	1
+1972	894	0.8054	add	0.7919	Sherwood L. Blodgett	Northumberland	1296
+1972	895	0.1134	add	0.1009	Scatter		4
+1972	896	0.3223	add	0.3086	Scatter		1
+1972	897	0.7205	add	0.7093	Scatter		1
+1972	899	0.1003	drop				
+1972	899	0.1111	drop				
+1972	899	0.1711	drop				
+1972	899	0.1843	drop				
+1972	899	0.1993	drop				
+1972	899	0.2583	drop				
+1972	899	0.1003	add	0.1095	Marjorie E. Holmes	Dover	18284
+1972	900	0.1080	add	0.1215	Remington B. Woodhull	Newport	7678
+1974	561	0.7256	printed				10305
+1974	561	0.7427	votes				1907
+1974	566	0.6982	add	0.6798	Scatter		5
+1976	619	0.0932	printed				11543
+1980	109	0.3248	add	0.3094	Denis J. Maltais	Manchester	7
+1980	112	0.6380	add	0.6229	Ernest P. Barka	Derry	11
+1980	269	0.1655	add	0.1520	Everett D. Wheeler	Laconia	2399
+1980	269	0.3630	add	0.3494	Michael Seymour	Laconia	5803
+1980	269	0.5418	add	0.5283	Joseph Clairmont	Gilmanton	5967
+1980	269	0.7590	add	0.7449	Donald Ekberg	Conway	2187
+1976	614	0.1002	votes				2686
+1982	70	0.5301	drop				
+1982	70	0.5425	drop				
+1982	70	0.1880	add	0.1756	Bradbury E. Sprague	Meredith	2449
+1982	74	0.7610	add	0.7477	Nicholas D. Vergas	Manchester	1
+1982	75	0.1743	printed				4040
+1982	75	0.2000	add	0.1876	Jerome B. Duval	Manchester	14
+1982	75	0.7897	printed				10325
+1982	77	0.7545	add	0.7417	Rolland W. Grondin	Dover	48
+1982	78	0.2385	add	0.2258	Roland R. Roberge	Rochester	111
+1982	219	0.8845	add	0.8741	Norman C. Marsh	Gilford	1618
+1982	221	0.1789	votes				11669
+1982	221	0.1663	add	0.1789	Whalen B. Dunn	Keene	3757
+1982	221	0.6428	drop				
+1982	221	0.6543	drop				
+1982	225	0.1878	add	0.1753	Edward J. Howard	Exeter	14363
+1982	226	0.2575	add	0.2696	Edward J. Tenney, II	Claremont	5484
+1982	226	0.3189	add	0.3314	Peter R. Lovely, Sr.	Newport	6712
+1982	220	0.2039	add	0.1914	Earl R. Fullerton	Moultonborough	1483
+1982	220	0.2674	add	0.2549	William D. Paine, II	Bartlett	1447
+1982	220	0.3705	add	0.3577	Lillian O. Brookes	Wolfeboro	1487
+1982	220	0.4342	add	0.4214	Ruth C. Eckhoff	Ossipee	1417
+1982	220	0.5740	add	0.5611	Brenda M. Presby	Freedom	1382
+1982	220	0.6385	add	0.6256	Gordon O. Thayer	Tuftonboro	1414
+1984	188	0.6955	add	0.6831	Leonard M. Drucker	Belmont	7
+1984	189	0.7405	add	0.7285	Kenneth C. Leavitt	Ossipee	1106
+1984	189	0.7922	votes				155
+1984	189	0.8047	add	0.7922	Luella Blake Gibbons	Ossipee	27
+1984	191	0.6838	printed				712
+1984	191	0.7600	add	0.7470	Norman S. Brungot	Colebrook	8
+1984	192	0.5530	add	0.5401	Richard L. Bradley	Thornton	7
+1984	192	0.7007	add	0.6885	Camille A. Cote	Manchester	7
+1984	192	0.7880	add	0.7758	Louis A. Durette	Manchester	52
+1984	195	0.2306	add	0.2435	Aubrey D. Robinson	Hampton	27
+1984	195	0.3457	add	0.3337	Laurence J. Gillis	Exeter	1
+1984	195	0.6255	add	0.6129	Francis L. Thibodeau	Seabrook	1
+1984	205	0.1500	add	0.1377	William A. Fielding	Rochester	7
+1984	205	0.8450	add	0.8320	Robert A. Hollis	Claremont	1
+1984	206	0.1017	add	0.1142	Robert A. Hollis	Claremont	1272
+1988	214	0.7789	drop				
+1988	214	0.8916	printed				1120
+1988	214	0.9040	add	0.8916	Everett D. Wheeler	Laconia	11
+1988	215	0.7967	add	0.8092	Raymond H. Abbott, Jr.	Jackson	1579
+1988	216	0.1252	votes				1648
+1988	216	0.1159	rename		Marjorie M. Webster	Tuftonboro	
+1988	216	0.2808	votes				1197
+1988	216	0.2808	rename		Joseph F. Doherty, Jr.	Rindge	
+1988	222	0.2662	add	0.2538	Philip Osgood, Sr.	Cornish	137
+1990	153	0.4087	printed				1120
+1990	153	0.8480	add	0.8356	Phil Davis	Laconia	18
+1990	155	0.3980	add	0.4108	Elizabeth B. Minkler	Keene	1825
+1990	157	0.9214	add	0.9097	John J. McDonough	Manchester	7
+1990	159	0.2840	add	0.2716	Peter J. Spaulding	Hopkinton	7
+1990	250	0.1127	rename		Elizabeth B. Minkler	Keene	
+1990	250	0.1252	add	0.1127	Shields (write-in)		1803
+1992	271	0.2271	add	0.2396	Roger W. Conway	Swanzey	142
+1992	406	0.4090	add	0.4211	Kenneth L. McDonnell	Concord	10696
+1994	282	0.7545	add	0.7418	Anne Warner	Londonderry	20510
+1994	282	0.7418	rename		Cathy Stacey	Salem	
+1996	316	0.9211	votes				1368
+1996	316	0.9211	rename		Lois A. Alger	Milan	
+1996	316	0.9242	drop				
+1996	319	0.4355	votes				1667
+1996	319	0.4496	votes				1340
+1996	319	0.4496	rename		Paul R. Bergeron	Hudson	
+1996	319	0.4527	drop				
+1996	319	0.5290	add	0.5160	Paul R. Bergeron	Hudson	1
+1996	322	0.7549	add	0.7422	Earle Goodwin	Dover	7
+1996	322	0.6083	add	0.6219	Margaret Kohut	Dover	3727
+1996	322	0.5947	add	0.6219	Amos R. Townsend	Lee	3810
+1996	322	0.5811	add	0.6219	Earle Goodwin	Dover	4236
+1998	199	0.8451	rename		Winnifred McLaughlin	Berlin	
+1998	199	0.8484	drop				
+1998	199	0.8298	printed				388
+1998	199	0.8706	add	0.8831	Winnifred McLaughlin	Berlin	365
+1998	203	0.3852	add	0.3723	Sandra B. Keans	Rochester	11
+1998	203	0.6764	add	0.6630	Ronald Chagnon	Farmington	1777
+2000	371	0.1282	printed				11164
+2000	371	0.3648	add	0.3778	David G. Fredette	Nashua	81403
+2002	215	0.6665	add	0.6538	Francis E. Lord	Ossipee	137
+2002	218	0.6320	add	0.6185	Lee Lombard	Nashua	22
+2004	288	0.7580	add	0.7446	Michael R. Clemons	Nashua	1
+2004	289	0.1900	printed				6711
+2004	291	0.3145	add	0.3012	Ralph W. Torr	Rochester	7
+2006	199	0.1490	add	0.1359	Anna Z. Tilton	Marlborough	11
+2008	311	0.2822	printed				15206
+2008	311	0.3871	add	0.4016	Pamela D. Coughlin	Mont Vernon	6251
+2008	311	0.6092	add	0.5943	Pamela D. Coughlin	Mont Vernon	11
+2008	313	0.1017	printed				1980
+2008	313	0.7385	add	0.7535	Katharin Pratt	Hampton	4071
+2010	191	0.4410	add	0.4280	Judy Stewart	Tilton	1
+2010	191	0.4700	add	0.4833	Judy Stewart	Tilton	1731
+2010	191	0.8008	printed				6193
+2010	191	0.7860	add	0.8008	Christopher E. Conley	Wolfeboro	4831
+2010	195	0.4865	printed				11610
+2010	195	0.5967	votes				11714
+2010	195	0.6016	votes				111
+2010	293	0.3500	add	0.3369	Kerstin Ahlgren	Sanbornton	7171
+2010	293	0.5200	add	0.5349	John Thomas	Belmont	4418
+2010	293	0.7779	votes				11178
+2010	294	0.5500	add	0.5645	Roger Zerba	Keene	4517
+2010	295	0.7210	add	0.7358	Dennis Hogan	Pelham	63115
+2012	282	0.8350	add	0.8494	Susan Ladmer	Peterborough	6651
+2012	284	0.2780	add	0.2914	Cathy Stacey	Salem	20018
+2012	390	0.3740	add	0.3590	Erik Corbett	Bartlett	10601
+2012	390	0.6170	add	0.6028	Fred S. Parker	Keene	14431
+2012	390	0.8750	add	0.8892	Stillman D. Rogers	Richmond	6948
+2012	394	0.2510	add	0.2364	Robert J. Watson	Rochester	27311
+2012	394	0.5860	add	0.6009	Jeffrey Barrette	Claremont	10431
+2014	215	0.6478	add	0.6265	Amanda Tuttle Bevard	Wolfeboro	1613
+2014	218	0.3930	add	0.4105	Stephen A. Whitney	Bath	1771
+2014	218	0.7520	add	0.7657	James A. Hardy	Pelham	25651
+2014	221	0.6480	add	0.6282	Michael F. DiCroce	Fremont	6251
+2014	220	0.2592	add	0.2882	Susan Ladmer	Peterborough	1717
+2014	220	0.2737	add	0.2882	Shannon Bernier Martin	Hillsborough	1414
+2014	223	0.7610	add	0.7761	John P. Simonds	Claremont	1615
+2014	367	0.7580	add	0.7431	Robin J. Gordon	Tamworth	9431
+2014	368	0.1960	add	0.1809	Chip Albee	Tuftonboro	9217
+2014	368	0.3030	add	0.2883	Earl D. Nelson	Marlborough	12911
+2014	369	0.5100	add	0.4926	Paul H. Simard	Bristol	4311
+2014	370	0.6485	add	0.6340	Chris Ryan Pannapacker	Concord	20013
+2014	371	0.1420	add	0.1248	Dante Mazzari	Portsmouth	38013
+2014	371	0.3300	add	0.3481	Cathy Stacey	Salem	67716
+2014	371	0.7980	add	0.8135	Catherine A. Berube	Dover	20431
+2010	195	0.5967	printed				11825
