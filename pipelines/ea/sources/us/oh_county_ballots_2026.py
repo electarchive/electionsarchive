@@ -64,7 +64,9 @@ MF_559_COUNTIES = [
     "Scioto",
     "Pike",
 ]
-MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES, *MF_559_COUNTIES]
+MF_561 = DATA / "inbox" / "manual" / "MF-561"
+MF_561_COUNTIES = ["Darke"]
+MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES, *MF_559_COUNTIES, *MF_561_COUNTIES]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
 MONTGOMERY_KEY = "https://lookup.boe.ohio.gov/vtrapp/montgomery/ballotlist.aspx#sample-ballots.zip"
@@ -186,6 +188,8 @@ def fetch() -> None:
 
 
 def mf_dir(county: str) -> Path:
+    if county in MF_561_COUNTIES:
+        return MF_561
     if county in MF_559_COUNTIES:
         return MF_559
     return MF_555 if county in MF_555_COUNTIES else MF
@@ -836,6 +840,6 @@ def emit() -> Path:
                 )
             pending = deferred
         for row in pending:
-            print("no match:", row["entity"], row["kind"])
+            print("no match:", row.get("county"), row["entity"], row["kind"])
         print(f"{kept} of {frame.height} issues")
         return cs.write()
