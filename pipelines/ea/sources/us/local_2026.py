@@ -1411,6 +1411,46 @@ IN_SKIP = {
     "STATE REPRESENTATIVE",
     "STATE SENATOR",
     "SECRETARY OF STATE",
+IN_ALIASES = (
+    (r"^centerpoint town\b", "center point town", None),
+    (r"^demotte town\b", "de motte town", None),
+    (r"^fairview town\b", "fairview park town", None),
+    (r"^uc cc joint\b", "union college corner joint", None),
+    (r"^st joseph (?=penn harris|mishawaka)", "", None),
+    (r"^greene wrv\b", "white river valley", None),
+    (r"^vanderburgh\b", "evansville vanderburgh", None),
+    (r"^shelby southwestern\b", "southwestern shelby", None),
+    (r"^borden henryville\b", "borden henryville corp", None),
+    (r"^carroll delphi\b", "delphi", None),
+    (r"^eastern (?=school board)", "eastern howard ", None),
+    (r"^floyd county school", "new albany floyd school", None),
+    (r"^hamilton noblesville\b", "noblesville", None),
+    (r"^highland school", "highland town school", None),
+    (r"^munster school", "munster town school", None),
+    (r"^jefferson southwestern\b", "southwestern jefferson", None),
+    (r"^johnson franklin\b", "franklin", "Franklin Community School Corporation"),
+    (r"^kokomo school", "kokomo center township school", None),
+    (r"^laporte community", "la porte community", None),
+    (r"^msd school", "warren school", None),
+    (r"^marion indianapolis public\b", "indianapolis public", None),
+    (r"^metropolitan school board of new durham\b", "new durham township school board", None),
+    (r"^morgan msd martinsville\b", "martinsville", None),
+    (r"^mount vernon community school corporation", "mount vernon school", "Mount Vernon Community School Corporation"),
+    (r"^posey mount vernon metropolitan", "mount vernon", "Mount Vernon Metropolitan School District"),
+    (r"^school board member (?=craig|jefferson|posey)", "switzerland county school board ", None),
+    (r"^shelby northwestern\b", "northwestern", "Northwestern Consolidated School Corporation"),
+    (r"^norwell\b", "northern wells", None),
+    (r"^new palestine community schools", "southern hancock", None),
+    (r"^ohio county community", "rising sun ohio", None),
+    (
+        r"^scott county school board (?=district 2 vienna)",
+        "scott county school board ",
+        "Scott County School District 1",
+    ),
+    (r"^tell city troy township", "tell troy township", None),
+    (r"^tipton tri central\b", "tri central", None),
+)
+
     "STATE COMPTROLLER (AUDITOR OF STATE)",
     "TREASURER OF STATE",
     "OTHER",
@@ -10019,7 +10059,12 @@ def parse() -> None:
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL')"""
         ).fetchall():
-            label = {"Rowan County Sch": "Rowan-Salisbury Schools"}.get(label, label)
+            label = {
+                "Rowan County Sch": "Rowan-Salisbury Schools",
+                "Southeastern Cass County School District": "Lewis Cass Schools",
+                "Northwestrn Consolidated School District": "Northwestern Consolidated School Corporation",
+                "Union County School Corporation": "Union County-College Corner Joint School District",
+            }.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
                 hit
@@ -10449,7 +10494,14 @@ def parse() -> None:
                             "kankakee valeey corporatn",
                             re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
                         ),
-                    ).split()
+                    )
+                    in_pin = None
+                    for pattern, repl, pinned in IN_ALIASES:
+                        if re.search(pattern, tokens):
+                            tokens = re.sub(pattern, repl, tokens)
+                            in_pin = pinned
+                            break
+                    tokens = tokens.split()
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
                 for formal in (
@@ -10571,6 +10623,8 @@ def parse() -> None:
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                if state == "IN" and in_pin is not None:
+                    fits = [fit for fit in fits if fit[3] == in_pin] or fits
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
                 if (
