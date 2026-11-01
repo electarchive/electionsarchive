@@ -161,6 +161,7 @@ IL_CITIES = {
     "CITY OF GALESBURG": "Knox",
     "CITY OF ROCKFORD": "Winnebago",
 }
+APPEALS = re.compile(r"\bcourt of appeals?\b", re.IGNORECASE)
 SEAT = re.compile(r"district\s+(\d+)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE)
 IL_STATEWIDE = ("190-ATTORNEY%20GENERAL", "200-SECRETARY%20OF%20STATE", "210-COMPTROLLER", "220-TREASURER")
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
@@ -211,7 +212,10 @@ def terms(label: str, joined: bool = True) -> list[str]:
     text = label.replace("’", "'")
     if joined:
         text = re.sub(r"(?<=[a-z])-(?=[a-z])", "", text, flags=re.IGNORECASE)
-    return [YESNO.get(w, w) for w in re.sub(r"[^a-z ]", " ", slug(text).replace("-", " ")).split() if w not in SUFFIXES]
+    words = [
+        YESNO.get(w, w) for w in re.sub(r"[^a-z ]", " ", slug(text).replace("-", " ")).split() if w not in SUFFIXES
+    ]
+    return words[:-1] if len(words) > 2 and words[-1] == "i" else words
 
 
 def person(label: str) -> str:
@@ -1155,7 +1159,7 @@ def plan(
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
-            wide = office == "state"
+            wide = office == "state" or bool(APPEALS.search(name))
             seat = (found[1], found[2] or "") if wide and (found := SEAT.search(name)) else None
             best, ok = choose(people, words, places, wide, seat)
             if ok:
