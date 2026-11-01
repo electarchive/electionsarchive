@@ -11621,6 +11621,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         }
         created: set[str] = set()
         made: set[object] = set()
+        seen_contests: set[UUID] = set()
         offices = Offices(conn)
         at_large: dict[object, tuple | None] = {}
         homes: dict[str, str] = {}
@@ -12070,8 +12071,20 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             if holder is not None and holder[0] != contest:
                 cs.minted.discard(contest)
                 cs.rows["external_id"] = [row for row in cs.rows["external_id"] if row["entity_id"] != contest]
+                if not cs.rows["external_id"]:
+                    del cs.rows["external_id"]
                 counts["held slug"] = counts.get("held slug", 0) + 1
                 continue
+            if contest in seen_contests:
+                cs.rows["external_id"] = [
+                    row for row in cs.rows["external_id"] if not (row["entity_id"] == contest and row["value"] == key)
+                ]
+                if not cs.rows["external_id"]:
+                    del cs.rows["external_id"]
+                counts["duplicate"] = counts.get("duplicate", 0) + 1
+                print(f"duplicate contest: {tail} {path}")
+                continue
+            seen_contests.add(contest)
             if area is not None:
                 if area not in at_large:
                     at_large[area] = conn.execute(
