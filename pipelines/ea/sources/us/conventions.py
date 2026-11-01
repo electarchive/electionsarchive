@@ -513,6 +513,13 @@ COLUMNS = {
 LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1904:democratic": [
+        (259, "CO", (0.443, 0.226, 0.862, 0.238), {"Wall": 0, "Towne": 0, "McClellan": 1}, "1, set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
+        (259, "MO", (0.443, 0.468, 0.862, 0.480), {"Cockrell": 36}, "36, all for Cockrell; one read drops a digit"),
+        (259, "OR", (0.443, 0.602, 0.862, 0.614), {"Wall": 0, "McClellan": 1}, "1, set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
+        (259, "WI", (0.443, 0.763, 0.862, 0.775), {"Olney": 0, "Wall": 26}, "26, set under Wall, whose printed total of 27 counts it"),
+        (259, "OK", (0.443, 0.870, 0.862, 0.882), {"Wall": 0, "Towne": 0, "Olney": 1, "McClellan": 1}, "1 under Olney and 1 set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
+    ],
     "1920:democratic:b1": [
         (293, "DE", (0.330, 0.507, 0.880, 0.527), {"votes": 6, "McAdoo": 4, "Marshall": 4, "Wood": 0}, "4, set between the Marshall and Wood columns; the printed totals (Marshall 37, Wood 4) count it for Marshall"),
         (293, "FL", (0.330, 0.531, 0.880, 0.551), {"votes": 12, "McAdoo": 1, "Palmer": 8, "Edwards": 1, "Davis": 1, "Marshall": 1, "Wood": 0}, "1, set between the Marshall and Wood columns; the printed totals (Marshall 37, Wood 4) count it for Marshall"),
@@ -860,6 +867,20 @@ CORRECTIONS = {
     ],
 }  # fmt: skip
 TOTALS = {
+    "1904:democratic": {
+        "Parker": 679,
+        "Hearst": 181,
+        "Gray": 12,
+        "Miles": 3,
+        "Cockrell": 42,
+        "Olney": 38,
+        "Wall": 27,
+        "McClellan": 3,
+        "Towne": 2,
+        "Pattison": 4,
+        "Williams": 8,
+        "Coler": 1,
+    },
     "1948:democratic": {"Russell": 263, "McNutt": 0.5, "Truman": 947.5},
     "1920:democratic:b1": {
         "votes": None,
