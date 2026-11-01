@@ -413,12 +413,12 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
-    {"party": "democratic", "tables": {2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
+    {"party": "democratic", "tables": {1: "1876:democratic:b1", 2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
     {"party": "democratic", "tables": {2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
     {"party": "democratic", "tables": {1: "1884:democratic:b1"}, "title": DNC + "in Chicago, Ill., July 8th, 9th, 10th and 11th, 1884", "publisher": "Nabu Press", "city": "Chicago", "days": (date(1884, 7, 8), date(1884, 7, 11)), "ballots": {1: date(1884, 7, 10), 2: date(1884, 7, 11)}, "deciding": 2},
     {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
     {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
-    {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47) if n != 2}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
+    {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47)}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
     {"party": "democratic", "tables": {1: "1924:democratic:b1"}, "title": "Official report of the proceedings of the Democratic National Convention held in Madison Square Garden, New York City, June 24, 25, 26, 27, 28, 30, July 1, 2, 3, 4, 5, 7, 8, and 9, 1924, resulting in the nomination of John W. Davis (of West Virginia) for president and Charles W. Bryan (of Nebraska) for vice-president", "publisher": "Bookwalter-Ball-Greathouse Printing Co.", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {1: date(1924, 6, 30)}, "deciding": 103},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
@@ -502,6 +502,7 @@ CANDIDATES = {
     "democratic:Allen": ("William Allen", "Q880659"),
     "democratic:Bayard": ("Thomas F. Bayard", "Q708034"),
     "democratic:Thurman": ("Allen G. Thurman", "Q1850376"),
+    "democratic:Broadhead": ("James O. Broadhead", "Q1680065"),
     "democratic:Cleveland": ("Grover Cleveland", "Q35171"),
     "democratic:Randall": ("Samuel J. Randall", "Q942678"),
     "democratic:McDonald": ("Joseph E. McDonald", "Q436858"),
@@ -775,6 +776,7 @@ CORRECTIONS = {
         (284, "MO", (0.21, 0.771, 0.58, 0.785), {"Hughes": 1}, "the footnote to the row: 'Missouri cast one vote for Charles E. Hughes'"),
     ],
     "1912:democratic:b2": [
+        (208, "WA", (0.11, 0.563, 0.9, 0.58), {"votes": 14, "Clark": 14}, "the table prints no Washington row between Virginia and West Virginia; the printed Clark total of 446\u00bd counts the delegation of 14, which cast them for Clark on the first and third ballots"),
         (207, "CT", (0.755, 0.617, 0.795, 0.631), {"Baldwin": 14}, "the row prints only the delegation of 14; the announced and printed Baldwin total of 14 has no other source"),
         (207, "IN", (0.803, 0.724, 0.843, 0.738), {"Marshall": 30}, "the row prints only the delegation of 30; the announced and printed Marshall total of 31 is Indiana's 30 and Michigan's 1"),
         (208, "OK", (0.487, 0.375, 0.643, 0.39), {"Clark": 10, "Wilson": 10, "Harmon": 0}, "10 and 10, printed one column to the right; the printed totals count them for Clark and Wilson"),
@@ -1111,6 +1113,14 @@ MISPRINTS = {
             "the 14, McLean's total would be 190. No totals are printed with the table."
         ),
         {},
+    ),
+    "1876:democratic:b1": (
+        (
+            "The printed Tilden total of 404\u00bd does not match the table's state rows, which add to 401\u00bd "
+            "(the figure the rows give is stored); the other columns match their printed totals. The Nevada row "
+            "prints three votes each for Tilden, Thurman, and Hendricks, nine from a delegation of six, and is stored as printed."
+        ),
+        {"NV": (6, 9, "three votes each for three candidates against a delegation of six"), "column Tilden": (404.5, 401.5, "the state figures add to 401\u00bd")},
     ),
     "1864:republican": (
         (
@@ -1848,7 +1858,7 @@ def emit() -> Path:
                         .agg(pl.col("value").sum())
                     )
                     for state, value in cast.iter_rows():
-                        if value > held.get(state, 0):
+                        if value > held.get(state, 0) and state not in MISPRINTS.get(ballot, ("", {}))[1]:
                             raise ValueError(f"{ballot}: {state} cast {value:g}, more than {held.get(state, 0):g}")
             loaded = rolls.filter(pl.col("table").is_in(list(convention["tables"].values())))
             seated = loaded.filter(pl.col("column") == "votes").group_by("table").agg(pl.col("value").sum())["value"]
