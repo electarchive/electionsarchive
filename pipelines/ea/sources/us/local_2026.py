@@ -5557,13 +5557,6 @@ for key, publisher, title, url, local in (
         "fl/volusia_candidates.html",
     ),
     (
-        "OR-41059-umatilla",
-        "Umatilla County Elections",
-        "Contest and Candidate Listing for the November 3, 2026 General Election",
-        "https://www.umatillacounty.gov/departments/elections/general-election/contest-and-candidate-listing-for-the-november-3-2026-general-election",
-        "or/umatilla_candidates.html",
-    ),
-    (
         "TX-48187-schertz",
         "City of Schertz",
         "November 3, 2026 General Election: candidate information",
@@ -7180,6 +7173,7 @@ KY_SHARED_CITIES = {
     "21161": "21023",
     "21187": "21077",
     "21211": "21103",
+    "05049": "05135 05065",
 }
 KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
@@ -10756,7 +10750,12 @@ def parse() -> None:
                         (variant, *rest)
                         for full, *rest in [
                             *towns.get(str(row["fips"]), []),
-                            *(towns.get(KY_SHARED_CITIES.get(str(row["fips"]), ""), []) if state == "KY" else []),
+                            *(
+                                town
+                                for shared in KY_SHARED_CITIES.get(str(row["fips"]), "").split()
+                                for town in towns.get(shared, [])
+                                if state in ("KY", "AR")
+                            ),
                         ]
                         for variant in ([full, [word for word in full if word != "and"]] if "and" in full else [full])
                         + (
@@ -10812,7 +10811,7 @@ def parse() -> None:
                                     sort
                                     and said != sort
                                     and ((said, sort) != ("town", "township") or state == "IN")
-                                    and (state not in ("KY", "OR") or (said, sort) != ("city", "village"))
+                                    and (state not in ("KY", "OR", "AR") or (said, sort) != ("city", "village"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
@@ -10905,6 +10904,8 @@ def parse() -> None:
                                 role
                                 for pattern, role in (
                                     (r"^(?:town |city )?clerk treasurer$", "clerk-treasurer"),
+                                    (r"^(?:town |city )?recorder treasurer$", "recorder-treasurer"),
+                                    (r"^(?:town |city )?clerk recorder$", "clerk-recorder"),
                                     (
                                         (
                                             r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator)$"
@@ -10933,7 +10934,14 @@ def parse() -> None:
                                 )
                                 if re.search(pattern, post)
                                 and (
-                                    role in ("office", "president", "clerk-treasurer")
+                                    role
+                                    in (
+                                        "office",
+                                        "president",
+                                        "clerk-treasurer",
+                                        "recorder-treasurer",
+                                        "clerk-recorder",
+                                    )
                                     or not re.search(r"president|clerk|tax|collector|fire|library", post)
                                 )
                             ),
@@ -11046,6 +11054,8 @@ def parse() -> None:
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
                                 "clerk-treasurer": "Clerk-Treasurer",
+                                "recorder-treasurer": "Recorder-Treasurer",
+                                "clerk-recorder": "Clerk-Recorder",
                                 "moderator": "Moderator",
                                 "administrator": "Administrator",
                                 "collector": "Tax Collector",
