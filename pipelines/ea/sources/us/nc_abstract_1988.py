@@ -13,14 +13,14 @@ from ea.sources.us import medsl_statewide
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_abstract_1988"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast for Council of State at the general election held on November 8, 1988"
 RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199398"
 RECORD_GOVERNOR = "https://digital.ncdcr.gov/Documents/Detail/4199437"
 DAY = date(1988, 11, 8)
-HELD = {"Commissioner of Agriculture"}
+HELD: set[str] = set()
 SHEETS = {
     (1, 2): [
         ("Secretary of State", [("Rufus L. Edmisten", "DEMOCRATIC"), ("John H. Carrington", "REPUBLICAN")]),
@@ -156,8 +156,9 @@ def emit() -> Path:
         version=VERSION,
         parsed=PARSED,
         summary="North Carolina's 1988 lieutenant governor, secretary of state, auditor, treasurer, superintendent of public instruction, "
-        "attorney general, and commissioners of insurance and labor by county from the State Board of "
+        "attorney general, and commissioners of agriculture, insurance, and labor by county from the State Board of "
         "Elections' abstract of votes cast",
         cite=cite,
         method=METHOD,
+        supersede=True,
     )
