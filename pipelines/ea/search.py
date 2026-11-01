@@ -63,43 +63,70 @@ with prom as (
     ) x
     group by person_id
 ),
-docs as (
-    select e.id as entity_id, e.type,
-        case e.type
-            when 'polity' then e.id
-            when 'election' then (select polity_id from election where id = e.id)
-            when 'contest' then (select el.polity_id from contest c join election el on el.id = c.election_id where c.id = e.id)
-            when 'party' then (select polity_id from party where id = e.id)
-            when 'body' then (select polity_id from body where id = e.id)
-        end as polity_id,
-        string_agg(distinct n.text, ' ') || case when e.type = 'polity' then coalesce(' ' || (
-            select string_agg(distinct substr(mn.text, 10), ' ') from office o
-            join name mn on mn.entity_id = o.id and mn.is_preferred and mn.text like 'Mayor of %'
-            where o.polity_id = e.id and o.kind = 'mayor'
-        ), '') else '' end as text,
-        case e.type
-            when 'polity' then 4 + ln(1 + (select count(*) from election el where el.polity_id = e.id)) / 10
-                + coalesce(ln(1 + sz.people) / 3, 0)
-            when 'election' then 2 + (select (kind = 'general')::int from election where id = e.id)
-            when 'contest' then (select 1 + 2 * (c.allocation_parent_id is null)::int + 0.5 * (el.kind = 'general')::int
-                + (exists (select from contest ch where ch.allocation_parent_id = c.id))::int
-                from contest c join election el on el.id = c.election_id where c.id = e.id)
-            when 'party' then 1 + ln(1 + (select count(*) from contest_option o where o.party_id = e.id)) / 3
-            when 'person' then ln(1 + (select count(*) from candidacy cy where cy.person_id = e.id)) / 2
-                + (select count(*) from external_id x where x.entity_id = e.id and x.scheme = 'wikidata')
-                + coalesce(pr.prominence, 0)
-            when 'body' then 2 + ln(1 + (select count(*) from tenure t where t.body_id = e.id)) / 3
-        end as rank_boost
+ents as (
+    select e.id, e.type
     from entity e
-    join name n on n.entity_id = e.id
-    left join prom pr on pr.person_id = e.id
-    left join search_size sz on sz.id = e.id
+    left join (select distinct entity_id from slug where is_current) sl on sl.entity_id = e.id
+    left join (select id from body where kind <> 'electoral_college') bd on bd.id = e.id
+    left join (select distinct entity_id from entity_merge) mg on mg.entity_id = e.id
     where e.type in ('polity', 'body', 'election', 'contest', 'party', 'person')
-        and not exists (select from entity_merge m where m.entity_id = e.id)
+        and mg.entity_id is null
         and e.retired_by is null
-        and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current)
-            or e.type = 'body' and exists (select from body b where b.id = e.id and b.kind <> 'electoral_college'))
-    group by e.id, e.type, pr.prominence, sz.people
+        and (e.type in ('party', 'person') or sl.entity_id is not null or e.type = 'body' and bd.id is not null)
+),
+names as (
+    select n.entity_id, string_agg(distinct n.text, ' ') as text
+    from name n join ents on ents.id = n.entity_id
+    group by n.entity_id
+),
+mayors as (
+    select o.polity_id, string_agg(distinct substr(mn.text, 10), ' ') as text
+    from office o
+    join name mn on mn.entity_id = o.id and mn.is_preferred and mn.text like 'Mayor of %'
+    where o.kind = 'mayor'
+    group by o.polity_id
+),
+election_counts as (select polity_id, count(*) as n from election group by polity_id),
+contest_parents as (select distinct allocation_parent_id as id from contest where allocation_parent_id is not null),
+party_counts as (select party_id, count(*) as n from contest_option where party_id is not null group by party_id),
+candidacy_counts as (select person_id, count(*) as n from candidacy group by person_id),
+wikidata_counts as (select entity_id, count(*) as n from external_id where scheme = 'wikidata' group by entity_id),
+tenure_counts as (select body_id, count(*) as n from tenure group by body_id),
+docs as (
+    select ents.id as entity_id, ents.type,
+        case ents.type
+            when 'polity' then ents.id
+            when 'election' then ee.polity_id
+            when 'contest' then ce.polity_id
+            when 'party' then pa.polity_id
+            when 'body' then bo.polity_id
+        end as polity_id,
+        nm.text || case when ents.type = 'polity' then coalesce(' ' || my.text, '') else '' end as text,
+        case ents.type
+            when 'polity' then 4 + ln(1 + coalesce(ec.n, 0)) / 10 + coalesce(ln(1 + sz.people) / 3, 0)
+            when 'election' then 2 + (ee.kind = 'general')::int
+            when 'contest' then 1 + 2 * (cc.allocation_parent_id is null)::int + 0.5 * (ce.kind = 'general')::int
+                + (cp.id is not null)::int
+            when 'party' then 1 + ln(1 + coalesce(pc.n, 0)) / 3
+            when 'person' then ln(1 + coalesce(cdc.n, 0)) / 2 + coalesce(wd.n, 0) + coalesce(pr.prominence, 0)
+            when 'body' then 2 + ln(1 + coalesce(tc.n, 0)) / 3
+        end as rank_boost
+    from ents
+    join names nm on nm.entity_id = ents.id
+    left join election ee on ents.type = 'election' and ee.id = ents.id
+    left join contest cc on ents.type = 'contest' and cc.id = ents.id
+    left join election ce on ents.type = 'contest' and ce.id = cc.election_id
+    left join contest_parents cp on ents.type = 'contest' and cp.id = ents.id
+    left join party pa on ents.type = 'party' and pa.id = ents.id
+    left join body bo on ents.type = 'body' and bo.id = ents.id
+    left join mayors my on ents.type = 'polity' and my.polity_id = ents.id
+    left join election_counts ec on ents.type = 'polity' and ec.polity_id = ents.id
+    left join party_counts pc on ents.type = 'party' and pc.party_id = ents.id
+    left join candidacy_counts cdc on ents.type = 'person' and cdc.person_id = ents.id
+    left join wikidata_counts wd on ents.type = 'person' and wd.entity_id = ents.id
+    left join tenure_counts tc on ents.type = 'body' and tc.body_id = ents.id
+    left join prom pr on pr.person_id = ents.id
+    left join search_size sz on sz.id = ents.id
 )
 select entity_id, type, polity_id, text, to_tsvector('simple', text) as tsv, rank_boost
 from (
@@ -147,7 +174,11 @@ def build() -> str:
         for scan in ("indexscan", "indexonlyscan", "bitmapscan"):
             conn.execute(f"reset enable_{scan}")
         conn.execute("analyze search_size")
+        for scan in ("indexscan", "indexonlyscan", "bitmapscan"):
+            conn.execute(f"set local enable_{scan} = off")
         conn.execute(BUILD_SQL)
+        for scan in ("indexscan", "indexonlyscan", "bitmapscan"):
+            conn.execute(f"reset enable_{scan}")
         conn.execute("analyze search_build")
         conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
         deleted = conn.execute(STALE_SQL).rowcount
