@@ -15326,6 +15326,17 @@
     "state": "CA",
     "county": "Stanislaus County",
     "county_fips": "06099",
+    "publisher": "City of Waterford",
+    "place": "City of Waterford",
+    "number": "Measure O",
+    "title": "Council Elected by Districts",
+    "text": "Shall the City Council of the City of Waterford be elected by districts in four districts with the Mayor elected at-large in accordance with the Green Map?",
+    "file": "MF-541/stanislaus/waterford-agenda-20260416.pdf"
+  },
+  {
+    "state": "CA",
+    "county": "Stanislaus County",
+    "county_fips": "06099",
     "publisher": "Stanislaus County Clerk-Recorder and Registrar of Voters",
     "place": "City of Ceres",
     "number": "Measure P",
