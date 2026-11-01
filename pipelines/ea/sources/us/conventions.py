@@ -391,6 +391,8 @@ TABLES += [
     {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
     {"table": "1924:democratic:b1", "htid": "mdp.39015030799251", "leaves": (356, 357, 358), "rotate": True},
     {"table": "1948:democratic", "htid": "mdp.39015030799574", "leaves": tuple(range(314, 325)), "narrated": True},
+    {"table": "1940:democratic", "htid": "uc1.$b619005", "leaves": (225, 226)},
+    {"table": "1944:democratic", "htid": "uc1.$b619006", "leaves": (125, 126, 127, 128, 129, 130), "narrated": True},
     {"table": "1956:democratic", "htid": "uc1.$b619008", "leaves": (463, 464)},
 ]
 PROCEEDINGS = [
@@ -564,6 +566,12 @@ CANDIDATES = {
     "1924:democratic:Harrison": ("Pat Harrison", "Q369437"),
     "1924:democratic:Thompson": ("Thompson", None),
     "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
+    "democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
+    "democratic:Farley": ("James A. Farley", "Q954859"),
+    "democratic:Tydings": ("Millard Tydings", "Q354099"),
+    "democratic:Garner": ("John Nance Garner", "Q298991"),
+    "democratic:Hull": ("Cordell Hull", "Q202979"),
+    "democratic:Byrd": ("Harry F. Byrd", "Q775382"),
     "1948:democratic:Truman": ("Harry S. Truman", "Q11613"),
     "1948:democratic:Russell": ("Richard B. Russell Jr.", "Q718415"),
     "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
@@ -661,6 +669,7 @@ COLUMNS = {
     ),
     "1920:republican:b5": ("votes", "Wood", "Lowden", None, "Johnson", "Harding", "Sproul"),
     "1900:democratic": ("votes", "Bryan"),
+    "1940:democratic": ("votes", "Roosevelt", "Farley", "Tydings", "Garner", "Hull"),
     "1928:republican": (
         "votes",
         "Hoover",
