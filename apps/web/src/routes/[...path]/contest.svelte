@@ -1636,6 +1636,16 @@
   </div>
 {/snippet}
 
+{#if contest.nomination != null}
+  <p class="col-span-12 bg-card px-3.5 py-3 text-[0.9375rem] font-semibold">
+    {m.nomination_ballot({
+      ballot: contest.nomination.ballot,
+      votes: contest.nomination.votes.toLocaleString(),
+      total: contest.nomination.total.toLocaleString(),
+    })}
+  </p>
+{/if}
+
 {#if contest.current == null && contest.delegates != null}
   {const held = $derived(contest.delegates)}
   <section class="col-span-12 grid gap-3 bg-card px-3.5 py-4">

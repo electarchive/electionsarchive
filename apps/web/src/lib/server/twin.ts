@@ -4488,6 +4488,16 @@ function contestMarkdown(
             ),
           }
         : contest,
+    ...(contest.nomination == null
+      ? []
+      : [
+          m.nomination_ballot({
+            ballot: contest.nomination.ballot,
+            votes: count(contest.nomination.votes),
+            total: count(contest.nomination.total),
+          }),
+          "",
+        ]),
     ...delegatesMarkdown(contest.delegates ?? null, link),
       then,
       link,

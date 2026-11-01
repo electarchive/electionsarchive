@@ -190,6 +190,7 @@
   "delegates_final_ballot": "How it voted on the final ballot",
   "delegates_pledged": "Delegates pledged at the national convention",
   "delegates_declared": "Delegates won, as declared",
+  "nomination_ballot": "Nominated on ballot {ballot} with {votes} of {total} delegate votes.",
   "delegates_of": "{votes} of {total}",
   "map_delegates": "{votes} of {total} delegates on the first ballot",
   "map_by_delegates": "Places without a popular vote are colored by how their delegates voted on the convention's first ballot.",

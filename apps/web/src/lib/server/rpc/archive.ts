@@ -3105,6 +3105,48 @@ async function delegations(root: string, ks: Array<number>) {
   };
 }
 
+async function nomination(contest: Found, isRoot: boolean) {
+  if (!isRoot || contest.kind !== "delegate_allocation" || contest.id !== contest.root) {
+    return null;
+  }
+  const ballots = (await convention(contest.root)).filter(
+    (row) => row.kind === "office",
+  );
+  const last = ballots.at(-1);
+  if (last == null) {
+    return null;
+  }
+  const found = await db.execute<{ votes: number; total: number }>(sql`
+    select w.votes::float8 as votes, t.total::float8 as total
+    from contest c
+    join area a on a.id = c.district_area_id
+    cross join lateral (
+      select y.option_k, y.value as votes,
+        exists (
+          select 1 from contest_option o join outcome x on x.option_id = o.id
+          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+          where o.k = y.option_k and x.kind in ('elected', 'won')
+        ) as won
+      from result_rollup y
+      where y.result_set_k = ${last.k} and y.area_k = a.k and y.measure = 1
+        and coalesce(y.count_round, 0) = 0 and y.option_k <> 0
+      order by won desc, y.value desc
+      limit 1
+    ) w
+    cross join lateral (
+      select y.value as total from result_rollup y
+      where y.result_set_k = ${last.k} and y.area_k = a.k and y.measure = 30
+        and coalesce(y.count_round, 0) = 0 and y.option_k = 0
+      limit 1
+    ) t
+    where c.id = ${last.id}::uuid
+  `);
+  const row = found.rows[0];
+  return row == null
+    ? null
+    : { ballot: ballots.length, votes: row.votes, total: row.total };
+}
+
 async function pledged(contest: Found, isRoot: boolean) {
   const place = contest.place;
   if (
@@ -6188,6 +6230,15 @@ export const contests = {
             isTally: v.boolean(),
           }),
         ),
+        nomination: v.optional(
+          v.nullable(
+            v.object({
+              ballot: v.number(),
+              votes: v.number(),
+              total: v.number(),
+            }),
+          ),
+        ),
         delegates: v.optional(
           v.nullable(
             v.object({
@@ -6687,6 +6738,7 @@ export const contests = {
         declaredColors.rows.map((row) => [row.party_id, row.color]),
       );
       const pledge = await pledged(contest, isRoot);
+      const nominee = await nomination(contest, isRoot);
       const listed =
         isRoot && sets.rows.every((row) => row.status !== "active")
           ? await db.execute<{
@@ -7016,6 +7068,7 @@ export const contests = {
                 })),
               },
         delegates: pledge,
+        nomination: nominee,
         turnout: roll.turnout,
         quorum: roll.quorum,
         explanations,
