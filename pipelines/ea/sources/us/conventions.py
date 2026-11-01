@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+import unicodedata
 from datetime import UTC, date, datetime
 from itertools import pairwise, product
 from pathlib import Path
@@ -229,8 +230,8 @@ TABLES += [
     *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
     *leaves("officialproceedi00repu", "1896", {"": (132,)}),
     *ballots("proceedingsoften00repu", "1892", {1: (144, 150)}),
-    *leaves("officialproceedi00repu_0", "1888", {"b1": (380,), "b2": (383, 384), "b5": (397,), "b7": (410,)}),
-    *ballots("officialproceedi00repu_0", "1888", {3: (386, 393), 4: (394, 396), 6: (406, 408), 8: (416, 418)}),
+    *leaves("officialproceedi00repu_0", "1888", {"b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)}),
+    *ballots("officialproceedi00repu_0", "1888", {4: (394, 396), 6: (406, 408), 8: (416, 418)}),
     *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
     *ballots("proceedingsofeig00repu", "1884", {1: (148, 152), 2: (153, 157), 4: (165, 176)}),
     *ballots(
@@ -369,9 +370,80 @@ ABBREVIATIONS = {
     "philippines": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
     "southsarolina": "SC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
 }  # fmt: skip
+COLUMNS = {
+    "1916:republican:b1": (
+        "votes",
+        "Hughes",
+        "Root",
+        "Weeks",
+        "Fairbanks",
+        "Sherman",
+        "Burton",
+        "Cummins",
+        "Roosevelt",
+    ),
+    "1920:republican:b5": ("votes", "Wood", "Lowden", None, "Johnson", "Harding", "Sproul"),
+}
+LABELS = {"Washbarne": "Washburne"}
+RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
+CORRECTIONS = {
+    "1876:republican:b2": [
+        (87, "SC", (0.573, 0.622, 0.618, 0.634), {"Bristow": 1, "Hayes": 0}, "the figure sits in the Bristow column, whose printed total counts it"),
+        (87, "TX", (0.573, 0.634, 0.618, 0.647), {"Bristow": 1, "Hayes": 0}, "the figure sits in the Bristow column, whose printed total counts it"),
+    ],
+    "1876:republican:b5": [
+        (103, "NJ", (0.615, 0.690, 0.662, 0.703), {"Hayes": 6, "Morton": 0}, "the figure sits in the Hayes column, whose printed total counts it"),
+    ],
+    "1884:republican:b3": [
+        (159, "IA", (0.43, 0.395, 0.66, 0.406), {"Blaine": 26, "Edmunds": 0}, "printed under Edmunds; the Blaine and Edmunds totals each differ from the rows by exactly these 26 votes"),
+        (159, "RI", (0.49, 0.643, 0.54, 0.654), {"Arthur": 0}, "the printed Arthur vote exceeds both the delegation's 8 and the Arthur total"),
+        (159, "LA", (0.43, 0.432, 0.48, 0.443), {"not voting": 1}, "16 held, 15 recorded; 819 of 820 votes cast"),
+    ],
+    "1888:republican:b2": [
+        (380, "GA", (0.423, 0.311, 0.459, 0.321), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
+        (380, "TX", (0.423, 0.578, 0.459, 0.588), {"not voting": 1}, "26 held, 25 recorded; 830 of 832 votes cast"),
+    ],
+    "1888:republican:b3": [
+        (384, "NJ", (0.42, 0.262, 0.90, 0.272), {"Alger": 0, "Allison": 4, "Depew": 1, "Gresham": 0, "Harrison": 4, "Phelps": 4, "Rusk": 0, "Sherman": 2, "Blaine": 0, "Lincoln": 0, "McKinley": 3, "Miller": 0}, "row read from the page"),
+        (384, "NY", (0.42, 0.272, 0.90, 0.282), {"Depew": 71, "Gresham": 0, "Blaine": 1, "Lincoln": 0}, "row read from the page"),
+        (384, "WV", (0.42, 0.382, 0.90, 0.392), {"Gresham": 2, "Harrison": 1, "Phelps": 0}, "row read from the page"),
+        (383, "VA", (0.13, 0.292, 0.55, 0.306), {"Gresham": 2}, "left out of the table; the poll of Virginia printed above it and the Gresham total count them"),
+        (383, "GA", (0.464, 0.786, 0.495, 0.796), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
+        (384, "TX", (0.42, 0.354, 0.46, 0.364), {"not voting": 1}, "26 held, 25 recorded; 830 of 832 votes cast"),
+    ],
+    "1888:republican:b5": [
+        (397, "GA", (0.641, 0.455, 0.677, 0.465), {"not voting": 1}, "24 held, 23 recorded; 827 of 832 votes cast"),
+        (397, "MO", (0.641, 0.588, 0.677, 0.598), {"not voting": 1}, "32 held, 31 recorded; 827 of 832 votes cast"),
+        (397, "NY", (0.641, 0.638, 0.677, 0.648), {"not voting": 1}, "72 held, 71 recorded; 827 of 832 votes cast"),
+        (397, "TN", (0.641, 0.711, 0.677, 0.721), {"not voting": 2}, "24 held, 22 recorded; 827 of 832 votes cast"),
+    ],
+    "1888:republican:b7": [
+        (410, "GA", (0.573, 0.309, 0.609, 0.319), {"Allison": 0}, "row read from the page"),
+        (410, "GA", (0.509, 0.309, 0.545, 0.319), {"not voting": 1}, "24 held, 23 recorded; 831 of 832 votes cast"),
+    ],
+    "1916:republican:b1": [
+        (212, "AL", (0.568, 0.175, 0.600, 0.186), {"Weeks": 3}, "a faint 3, which the Weeks total counts"),
+    ],
+    "1920:republican:b10": [
+        (269, "IL", (0.56, 0.395, 0.88, 0.405), {"Harding": 38.2, "Johnson": 18.8}, "printed in fifths: 38 1/5 and 18 4/5"),
+    ],
+    "1920:republican:b3": [
+        (235, "OK", (0.375, 0.621, 0.41, 0.631), {"votes": 20}, "printed 28; the row's votes and the delegates total of 984 count 20"),
+    ],
+    "1920:republican:b4": [
+        (240, "AR", (0.38, 0.702, 0.41, 0.712), {"votes": 13}, "a broken 13; the row's votes and the delegates total of 984 count 13"),
+    ],
+    "1920:republican:b7": [
+        (253, "PA", (0.455, 0.630, 0.49, 0.640), {"votes": 76}, "the row is left out of the table; the delegates total of 984 counts its 76, all listed under the scattering votes"),
+    ],
+    "1920:republican:b5": [
+        (247, "MA", (0.636, 0.438, 0.677, 0.448), {"Johnson": 0}, "printed under Johnson but left out of the Johnson total; the rest of the delegation went to Coolidge"),
+    ],
+}  # fmt: skip
+TOTALS = {"1920:republican:b10": {"Harding": 692.2, "Johnson": 80.8}}
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
 PAGES = DATA / "pages" / SOURCE
-HALF = re.compile(r"\s*(?:½|1/2|'/2|\.5)$")
+FRACTION = re.compile(r"\s*(?:([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])|1/2|'/2|\.5)$")
 
 
 def fetch() -> None:
@@ -447,11 +519,10 @@ def place(label: str) -> str | None:
 
 def number(cell: str) -> float:
     text = cell.strip().replace(",", "")
-    half = HALF.search(text)
-    text = text[: half.start()] if half else text
-    if re.fullmatch(r"[\s.\-—–·*…]*", text) and not half:
-        return 0.0
-    return (float(text) if text else 0.0) + (0.5 if half else 0.0)
+    fraction = FRACTION.search(text)
+    text = re.sub(r"^[\s.\-—–·*…]+", "", text[: fraction.start()] if fraction else text)
+    part = (unicodedata.numeric(fraction[1]) if fraction[1] else 0.5) if fraction else 0.0
+    return (float(text) if text else 0.0) + part
 
 
 def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
@@ -501,23 +572,32 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         }
                     )
             continue
-        roles = spec.get("columns") or tuple(
-            "votes" if re.search(r"vote|delegate", column["label"], re.IGNORECASE) else column["label"].strip()
-            for column in header
+        roles = (
+            spec.get("columns")
+            or COLUMNS.get(spec["table"])
+            or tuple(
+                "votes"
+                if re.search(r"vote|delegate", column["label"], re.IGNORECASE)
+                else LABELS.get(label := column["label"].strip().rstrip("."), label)
+                for column in header
+            )
         )
         if len(roles) != len(header):
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
+        seen: dict[str | None, int] = {}
         for row in read["rows"]:
             if len(row["values"]) != len(header):
                 problems.append(f"leaf {leaf}: {row['label']} has {len(row['values'])} cells")
                 continue
             code = place(row["label"])
+            seen[code] = seen.get(code, 0) + 1
+            code = RELABEL.get((spec["table"], leaf, code, seen[code]), code)
             if code is None and not re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE):
                 problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
                 continue
             for role, column, value in zip(roles, header, row["values"], strict=True):
-                if role is None:
+                if role is None or (not value.strip() and roles.count(role) > 1):
                     continue
                 try:
                     figure = number(value)
@@ -538,6 +618,22 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         "box": [column["x0"] / 1000, row["y0"] / 1000, column["x1"] / 1000, row["y1"] / 1000],
                     }
                 )
+    totals |= TOTALS.get(spec["table"], {})
+    for leaf, code, box, figures, _ in CORRECTIONS.get(spec["table"], ()):
+        image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+        cells = [cell for cell in cells if cell["state"] != code or cell["column"] not in figures]
+        cells += [
+            {
+                "table": spec["table"],
+                "state": code,
+                "column": column,
+                "value": float(figure),
+                "leaf": leaf,
+                "sha256": image.sha256,
+                "box": list(box),
+            }
+            for column, figure in figures.items()
+        ]
     return cells, totals, problems
 
 
@@ -563,11 +659,11 @@ def parse() -> None:
                 continue
             votes = values.get((state, "votes"), 0)
             cast = sum(value for (code, column), value in values.items() if code == state and column != "votes")
-            if votes != cast:
+            if abs(votes - cast) > 1e-6:
                 failures.append(f"{state}: {cast:g} cast of {votes:g} held")
         for column, total in printed.items():
             summed = sum(value for (_, name), value in values.items() if name == column)
-            if summed != total:
+            if abs(summed - total) > 1e-6:
                 failures.append(f"column {column}: states sum to {summed:g}, printed total {total:g}")
         report.append(f"## {spec['table']}\n\n{len(held)} delegations, {len(values)} cells, printed totals {printed}")
         report.extend(f"- {failure}" for failure in failures)
