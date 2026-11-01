@@ -687,18 +687,10 @@ def st_johns(url: str) -> list[dict[str, str | int | None]]:
                 district = "St Augustine Port"
         elif not line.strip() or " / " in line:
             district = ""
-        elif district:
+        elif district and "No One Qualified" not in line:
             name = re.split(r"\s{2,}", line.strip())[0]
             rows.append({"district": district, "seat": seat, "vote": 1, "name": name, "url": url})
-    counts: dict[tuple[str, str], int] = {}
-    for row in rows:
-        key = (str(row["district"]), str(row["seat"]))
-        counts[key] = counts.get(key, 0) + 1
-    return [
-        row
-        for row in rows
-        if counts[(str(row["district"]), str(row["seat"]))] > 1 or "Community Development" not in str(row["district"])
-    ]
+    return rows
 
 
 def parse() -> None:
@@ -843,12 +835,16 @@ def canonical(frame: pl.DataFrame) -> pl.DataFrame:
             governments.setdefault(county, []).append(name)
     names = [census_name(county, district, governments) for district, county in zip(frame["district"], frame["county"])]
     return frame.with_columns(
-        district=pl.Series(names), county=pl.Series([f"{county} County" for county in frame["county"]])
+        district=pl.Series(names),
+        county=pl.Series([f"{county} County" for county in frame["county"]]),
+        name=pl.col("name").str.replace(r"\.$", ""),
     )
 
 
 def emit() -> Path:
-    frame = canonical(pl.read_parquet(PARSED / "candidates.parquet"))
+    frame = canonical(pl.read_parquet(PARSED / "candidates.parquet")).unique(
+        subset=["district", "seat", "name"], keep="first", maintain_order=True
+    )
     roles = []
     for district in frame["district"]:
         if re.search(r"(?i)community development|soil and water|water control|improvement", district):
