@@ -12,7 +12,7 @@ from ea.sources.us import medsl_statewide
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_abstract_1996"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of Votes Cast in the General Election held on November 5, 1996"
@@ -29,7 +29,14 @@ PAGES = {
     "insuran": "Commissioner of Insurance",
     "labor": "Commissioner of Labor",
 }
-PARTIES = {"D": "DEMOCRATIC", "R": "REPUBLICAN", "L": "LIBERTARIAN", "NL": "NATURAL LAW", "WI": None, "I": "INDEPENDENT"}
+PARTIES = {
+    "D": "DEMOCRATIC",
+    "R": "REPUBLICAN",
+    "L": "LIBERTARIAN",
+    "NL": "NATURAL LAW",
+    "WI": None,
+    "I": "INDEPENDENT",
+}
 
 
 def fetch() -> None:
@@ -148,4 +155,5 @@ def emit() -> Path:
             "the board's former site), and every candidate's 100 county values add up to the Grand Total row printed "
             "under the column."
         ),
+        supersede=True,
     )

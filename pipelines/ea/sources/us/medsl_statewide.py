@@ -365,6 +365,7 @@ def emit(
     pages: Callable[[Changeset], dict[int, tuple[UUID, int, int]]] | None = None,
     season: str | None = None,
     renamed: dict[str, str] | None = None,
+    supersede: bool = False,
 ) -> Path:
     renamed = renamed or {}
     returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
@@ -637,11 +638,33 @@ def emit(
                 ).items()
             }
             revised = None
+            adopted: dict[str, tuple[UUID, UUID, UUID]] = {}
             seen.update([contest_key, *matches[:1]])
             if matches:
                 mapping.append((year, state, office, post, special, matches[0]))
                 published = own.get(matches[0])
-                changed = published is not None and published[5] != int(lines["votes"].sum())
+                if published is None and supersede and matches[0] == contest_key:
+                    published = conn.execute(
+                        """select r.id, r.election_id, r.contest_id, r.source_id, r.supersedes_id,
+                                  (select coalesce(sum(v.value), 0)::int from result_value v
+                                   where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0)
+                           from external_id x join result_set r on r.contest_id = x.entity_id and r.is_default
+                           where x.scheme = 'us.contest' and x.value = %s""",
+                        [contest_key],
+                    ).fetchone()
+                    for label, option, candidacy, person in conn.execute(
+                        """select o.ballot_label, o.id, cy.id, cy.person_id from external_id x
+                           join contest_option o on o.contest_id = x.entity_id and o.parent_option_id is null
+                           join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                           where x.scheme = 'us.contest' and x.value = %s and o.kind = 'candidate'""",
+                        [contest_key],
+                    ).fetchall():
+                        adopted[re.sub(r"-(jr|sr|ii|iii|iv)$", "", slug(label)).split("-")[-1]] = (
+                            option,
+                            candidacy,
+                            person,
+                        )
+                changed = published is not None and (bool(adopted) or published[5] != int(lines["votes"].sum()))
                 if matches[0] != contest_key or published is None or not (changed or (folded and published[4] is None)):
                     if published is not None and declared and matches[0] in declared:
                         label, caveat = declared[matches[0]]
@@ -738,44 +761,45 @@ def emit(
                     else f"{office} of {'the ' if state == 'DC' else ''}{states[state]}",
                 )
             contest = cs.key("us.contest", contest_key)
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="office",
-                office_id=office_id,
-                district_area_id=state_units[state][1],
-                term="remainder" if special else "full",
-                magnitude=magnitude,
-                round_number=2 if first else 1,
-                previous_round_id=previous,
-                electoral_system_id=systems["two_round"]
-                if state in MAJORITY
-                else systems["fptp"]
-                if magnitude == 1
-                else systems["block"],
-                default_result_kind="counted",
-            )
-            if begins is None:
-                name(contest, display)
-            else:
-                retitle(contest, display)
-            if begins is not None and starts[(day, state, office, special)] == 1:
+            if not adopted:
                 cs.add(
-                    "note",
-                    id=uuid5(contest, "term"),
-                    entity_id=contest,
-                    kind="methodology",
-                    body_md=f"The term begins {begins}.",
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=office_id,
+                    district_area_id=state_units[state][1],
+                    term="remainder" if special else "full",
+                    magnitude=magnitude,
+                    round_number=2 if first else 1,
+                    previous_round_id=previous,
+                    electoral_system_id=systems["two_round"]
+                    if state in MAJORITY
+                    else systems["fptp"]
+                    if magnitude == 1
+                    else systems["block"],
+                    default_result_kind="counted",
                 )
-            path = (
-                f"{election_path or f'us/{state.lower()}/{day}-' + (slug(season) if season else 'general')}/{slug(office)}"
-                + (f"-{slug(shown)}" if shown else "")
-                + ("-special" if special else "")
-            )
-            if slugs.setdefault(path, contest) != contest:
-                raise ValueError(f"slug {path} is taken")
-            cs.add("slug", path=path, entity_id=contest)
+                if begins is None:
+                    name(contest, display)
+                else:
+                    retitle(contest, display)
+                if begins is not None and starts[(day, state, office, special)] == 1:
+                    cs.add(
+                        "note",
+                        id=uuid5(contest, "term"),
+                        entity_id=contest,
+                        kind="methodology",
+                        body_md=f"The term begins {begins}.",
+                    )
+                path = (
+                    f"{election_path or f'us/{state.lower()}/{day}-' + (slug(season) if season else 'general')}/{slug(office)}"
+                    + (f"-{slug(shown)}" if shown else "")
+                    + ("-special" if special else "")
+                )
+                if slugs.setdefault(path, contest) != contest:
+                    raise ValueError(f"slug {path} is taken")
+                cs.add("slug", path=path, entity_id=contest)
             total = int(lines["votes"].sum())
             result_set = cs.key(
                 f"{pipeline}.result_set",
@@ -843,7 +867,16 @@ def emit(
                     if nota
                     else f"{contest_key}:{slug(str(candidate))}"
                 )
-                root = cs.key("us.option", option_key)
+                reused = (
+                    None
+                    if pooled or nota
+                    else adopted.get(re.sub(r"-(jr|sr|ii|iii|iv)$", "", slug(str(candidate))).split("-")[-1])
+                )
+                if reused is not None:
+                    root = reused[0]
+                    cs.add("external_id", entity_id=root, scheme="us.option", value=option_key)
+                else:
+                    root = cs.key("us.option", option_key)
                 labels = rows["party"].to_list()
                 printed = rows["printed"].to_list()
                 resolved = [party(state, label) for label in labels] if not (pooled or nota) else [(None, False)]
@@ -859,8 +892,18 @@ def emit(
                 )
                 if not (pooled or nota):
                     person_key = f"{state}:{slug(str(candidate))}"
-                    person = None
-                    if first:
+                    person = None if reused is None else reused[2]
+                    if person is not None:
+                        if (
+                            conn.execute(
+                                "select from external_id where scheme = %s and value = %s",
+                                [f"{pipeline}.person", person_key],
+                            ).fetchone()
+                            is None
+                        ):
+                            cs.add("external_id", entity_id=person, scheme=f"{pipeline}.person", value=person_key)
+                        cs.add("external_id", entity_id=reused[1], scheme="us.candidacy", value=f"{option_key}:head")
+                    elif first:
                         found = [
                             entity
                             for text, entity in runners[first].items()
@@ -882,7 +925,7 @@ def emit(
                         name(person, ballot)
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{option_key}:head"),
+                        id=cs.key("us.candidacy", f"{option_key}:head") if reused is None else reused[1],
                         person_id=person,
                         option_id=root,
                         role="head",
