@@ -403,6 +403,16 @@ TABLES += [
         "only": True,
     },
 ]
+CAPTIONS_1852 = {1: 29, 2: 30, 3: 30, 4: 31, 5: 31, 6: 32, 7: 32, 8: 32, 9: 35, 10: 36, 11: 36, 12: 37, 13: 37, 14: 37, 15: 38, 16: 38, 17: 39, 18: 40, 19: 41, 20: 42, 21: 42, 22: 43, 23: 43, 24: 43, 25: 44, 26: 44, 27: 45, 28: 45, 29: 46, 30: 46, 31: 47, 32: 47, 33: 47, 34: 49, 35: 52, 36: 52, 37: 53, 38: 53, 39: 54, 40: 54, 41: 54, 42: 55, 43: 55, 44: 56, 45: 56, 46: 56, 47: 57, 48: 57}  # fmt: skip
+TABLES += [
+    spec | {"scatter": True, "bycandidate": True}
+    for spec in ballots(
+        "proceedingsofde00demo",
+        "1852",
+        {n: (leaf, leaf + 1) for n, leaf in CAPTIONS_1852.items()},
+        party="democratic",
+    )
+]
 TABLES += [
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
     {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295), "rotate": True},
@@ -790,6 +800,22 @@ SCATTER = (
     "after any whole number), empty where the state cast none for that candidate. Where an entry gives the votes of "
     "a state without a number ('the 6 votes of Delaware'), use that number. Leave out totals and the "
     "delegations not voting. If the page holds no such paragraph, return an empty header and no rows."
+)
+BYCANDIDATE = (
+    "This page is from the official report of the proceedings of a national party convention, which prints each "
+    "ballot for president as one paragraph per candidate, naming the states that voted for that candidate and "
+    "ending with the candidate's total (for example 'For Lewis Cass—Maine, 4; New Hampshire, 4; ...—96'). Read "
+    "only the paragraphs of the {} ballot, under its caption. The page may hold only the beginning or the end of "
+    "that ballot, or none of it; paragraphs at the top of the page that continue from the previous page belong to "
+    "the ballot before the first one captioned on this page. Leave out every other ballot, any narration of how a "
+    "delegation voted, and any announced result. Return one row per candidate paragraph, labeled with the "
+    "candidate's surname as printed, without 'For', with the vertical extent of that paragraph's lines on the page "
+    "as y0 and y1. The header lists the states named in any paragraph, in the order first named, each with x0 0 "
+    "and x1 1000, then a last column labeled 'Total'. Each row's values hold one string per header column, in the "
+    "same order: the votes that candidate had from that state as digits (a fraction such as 1/2 after any whole "
+    "number), empty where the state cast none for that candidate, and under 'Total' the total printed at the end "
+    "of the paragraph, empty where none is printed. If no part of that ballot is on this page, return an empty "
+    "header and no rows."
 )
 ABBREVIATIONS = {
     "ala": "AL", "ariz": "AZ", "ark": "AR", "calif": "CA", "cal": "CA", "colo": "CO", "conn": "CT", "del": "DE",
@@ -1560,7 +1586,9 @@ def fetch() -> None:
                 if skipped(spec, leaf, scatter):
                     continue
                 ask = (
-                    SCATTER
+                    BYCANDIDATE.format(ordinal(spec["ballot"]))
+                    if spec.get("bycandidate")
+                    else SCATTER
                     if scatter
                     else NARRATED
                     if spec.get("narrated")
@@ -1652,12 +1680,12 @@ def region(spec: dict[str, object], leaf: int) -> str | None:
 
 def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
     only = spec.get("reads", {}).get(leaf)
-    return (scatter and not spec.get("scatter")) or (only is not None and only != ("scatter" if scatter else "table"))
+    return (scatter and not spec.get("scatter")) or (not scatter and bool(spec.get("bycandidate"))) or (only is not None and only != ("scatter" if scatter else "table"))
 
 
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
-        return "s"
+        return f"c{spec['ballot']}" if spec.get("bycandidate") else "s"
     if spec.get("crop"):
         return f"b{spec['ballot']}{spec['crop']}"
     if spec.get("parts", {}).get(leaf, "head") != "head":
@@ -1742,7 +1770,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             header = header[1:]
         if scatter:
             for column in header:
-                if place(column["label"]) is None:
+                if place(column["label"]) is None and not re.fullmatch(r"\s*totals?\.?\s*", column["label"], re.IGNORECASE):
                     problems.append(f"leaf {leaf}: unknown state {column['label']!r}")
             for row in read["rows"]:
                 if len(row["values"]) != len(header):
@@ -1750,6 +1778,12 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                     continue
                 for column, value in zip(header, row["values"], strict=True):
                     code = place(column["label"])
+                    if code is None and value.strip() and re.fullmatch(r"\s*totals?\.?\s*", column["label"], re.IGNORECASE):
+                        try:
+                            totals[scattered(row["label"])] = totals.get(scattered(row["label"]), 0) + number(value)
+                        except ValueError:
+                            problems.append(f"leaf {leaf}: {row['label']} total reads {value!r}")
+                        continue
                     if code is None or not value.strip():
                         continue
                     try:
