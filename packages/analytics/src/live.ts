@@ -92,7 +92,7 @@ export type EstimateInput = { race: LiveRace; at: string | null };
 
 const MODEL = {
   draws: 500,
-  spread: 0.14,
+  spread: 0.12,
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
@@ -101,7 +101,7 @@ const MODEL = {
   drift: 0.06,
   quiet: 15,
   moving: 0.1,
-  shift: 0.022,
+  shift: 0.028,
   surge: 0.07,
   tail: { share: 0.035, spread: 0.5, lean: 0.06, local: 0.05 },
 };
