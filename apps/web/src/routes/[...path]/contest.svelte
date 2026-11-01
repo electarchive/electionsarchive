@@ -144,6 +144,17 @@
     annulled: m.status_annulled,
     withdrawn: m.status_withdrawn,
   };
+  const METHODS = {
+    primary: m.delegates_primary,
+    caucus: m.delegates_caucus,
+    convention: m.delegates_convention,
+    unbound: m.delegates_unbound,
+  };
+  const SOURCES = {
+    ballot: m.delegates_first_ballot,
+    pledged: m.delegates_pledged,
+    declared: m.delegates_declared,
+  };
   const SEATS: Record<string, () => string> = {
     office: m.col_electors,
     elector_slate: m.col_electors,
@@ -377,6 +388,21 @@
                 : item,
             ),
           },
+  );
+  const charted = $derived(
+    placed == null ||
+      placed.rows.every(
+        (row) => row.valid > 0 || row.delegates?.first[0] == null,
+      )
+      ? placed
+      : {
+          ...placed,
+          rows: placed.rows.map((row) =>
+            row.valid > 0
+              ? row
+              : { ...row, leader: row.delegates?.first[0]?.[0] ?? row.leader },
+          ),
+        },
   );
   const drawn = $derived.by(() => {
     const places = placed;
@@ -1563,6 +1589,68 @@
   {/if}
 {/snippet}
 
+{#snippet delegation(
+  title: string,
+  ballot: NonNullable<typeof contest.delegates>["first"],
+  total: number,
+)}
+  <div class="grid gap-1.5">
+    <p class="text-[0.8125rem] text-muted-foreground">
+      {#if ballot.path == null}
+        {title}
+      {:else}
+        <a
+          href={resolve("/[...path]", { path: ballot.path })}
+          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+          >{title}</a
+        >
+      {/if}
+    </p>
+    <ul class="grid gap-1.5 text-sm/tight max-inline-sm">
+      {#each ballot.picks as pick (`${pick.person ?? pick.party}:${pick.label}`)}
+        {const tone = $derived(
+          swatch(pick.color, `person:${pick.person ?? pick.label}`),
+        )}
+        <li class="flex items-baseline gap-2" style:--party={tone}>
+          <span
+            class="shrink-0 self-center rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+          ></span>
+          <Name
+            class="font-semibold"
+            label={pick.label}
+            color={tone}
+            hasSwatch={false}
+            person={pick.person}
+            party={pick.party}
+          />
+          <span
+            class="ms-auto font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+            >{m.delegates_of({
+              votes: count(pick.votes),
+              total: count(total),
+            })}</span
+          >
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/snippet}
+
+{#if contest.current == null && contest.delegates != null}
+  {const held = $derived(contest.delegates)}
+  <section class="col-span-12 grid gap-3 bg-card px-3.5 py-4">
+    <p class="text-[0.9375rem] font-semibold">
+      {METHODS[held.method]({ count: held.total })}
+    </p>
+    {#if held.source !== "declared"}
+      {@render delegation(SOURCES[held.source](), held.first, held.total)}
+    {/if}
+    {#if held.final != null}
+      {@render delegation(m.delegates_final_ballot(), held.final, held.total)}
+    {/if}
+  </section>
+{/if}
+
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
     <p class="text-[0.9375rem] text-muted-foreground">
@@ -1702,7 +1790,7 @@
     {#if drawn != null && placed != null}
       {#key `${here}:${drawn.tiles}`}
         <PlaceMap
-          places={placed}
+          places={charted ?? placed}
           colors={tones}
           shade={titles.length === 1 ? "bubbles" : "winner"}
           tiles={drawn.tiles}
@@ -1738,6 +1826,11 @@
       {#if grouped != null && placed.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.places_others_note({ name: grouped.label })}
+        </p>
+      {/if}
+      {#if charted !== placed}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.map_by_delegates()}
         </p>
       {/if}
       {#if placed.level === "world.country" && unmapped >= 0.01}

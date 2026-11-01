@@ -3787,7 +3787,14 @@
             : (places.legend[current.leader]?.label ??
               names[current.leader])}</span
         >
-        {#if !isDeclared}
+        {#if current.delegates?.first[0] != null}
+          <span class="font-figures text-muted-foreground tabular-nums"
+            >{m.map_delegates({
+              votes: count(current.delegates.first[0][1]),
+              total: count(current.delegates.total),
+            })}</span
+          >
+        {:else if !isDeclared}
           <span class="text-muted-foreground"
             >{current.declared?.isTacit === false
               ? current.declared.kind === "elected"

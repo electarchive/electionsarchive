@@ -4488,6 +4488,7 @@ function contestMarkdown(
             ),
           }
         : contest,
+    ...delegatesMarkdown(contest.delegates ?? null, link),
       then,
       link,
     ),
@@ -5139,6 +5140,54 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
             ]),
       ],
     ),
+function delegatesMarkdown(
+  delegates: Extract<Data, { kind: "contest" }>["contest"]["delegates"],
+  link: Link,
+) {
+  if (delegates == null) {
+    return [];
+  }
+  const listed = (
+    title: string,
+    ballot: NonNullable<typeof delegates>["first"],
+  ) => [
+    link(title, ballot.path),
+    "",
+    ...ballot.picks.map(
+      (pick) =>
+        `- ${pick.label}: ${m.delegates_of({ votes: count(pick.votes), total: count(delegates.total) })}`,
+    ),
+  ];
+  return [
+    [
+      `## ${m.col_delegates()}`,
+      "",
+      {
+        primary: m.delegates_primary,
+        caucus: m.delegates_caucus,
+        convention: m.delegates_convention,
+        unbound: m.delegates_unbound,
+      }[delegates.method]({ count: delegates.total }),
+      ...(delegates.first.picks.length === 0
+        ? []
+        : [
+            "",
+            ...listed(
+              {
+                ballot: m.delegates_first_ballot,
+                pledged: m.delegates_pledged,
+                declared: m.delegates_declared,
+              }[delegates.source](),
+              delegates.first,
+            ),
+          ]),
+      ...(delegates.final == null
+        ? []
+        : ["", ...listed(m.delegates_final_ballot(), delegates.final)]),
+    ].join("\n"),
+  ];
+}
+
   ];
 }
 
@@ -5453,6 +5502,15 @@ function placesMarkdown(
   const isCompared =
     !isTally && then != null && places.rows.some((row) => row.earlier != null);
   const noun =
+  const hasDelegates = places.rows.some((row) => row.delegates != null);
+  const hasFinal = (places.ballots ?? 0) > 1;
+  const voted = (
+    ballot: Array<[number, number]> | null | undefined,
+    total: number,
+  ) =>
+    ballot?.[0] == null
+      ? null
+      : `${places.legend[ballot[0][0]]?.label ?? ""} ${m.delegates_of({ votes: count(ballot[0][1]), total: count(total) })}`;
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
   const hasMargin = places.rows.some((row) => row.margin != null);
@@ -5522,6 +5580,8 @@ function placesMarkdown(
         m.col_name(),
         m.col_leader(),
         isTally ? m.col_votes() : m.col_share(),
+        ...(hasDelegates ? [m.col_delegates()] : []),
+        ...(hasFinal ? [m.col_final_ballot()] : []),
         ...(hasMargin ? [m.col_margin()] : []),
         ...(isCompared ? [m.col_share_in({ year: then }), m.col_change()] : []),
         m.stat_valid(),
@@ -5566,6 +5626,21 @@ function placesMarkdown(
                 before == null || row.leader == null
                   ? null
                   : points((row.shares[row.leader] ?? 0) - before),
+          ...(hasDelegates
+            ? [
+                row.delegates == null
+                  ? null
+                  : (voted(row.delegates.first, row.delegates.total) ??
+                    count(row.delegates.total)),
+              ]
+            : []),
+          ...(hasFinal
+            ? [
+                row.delegates == null
+                  ? null
+                  : voted(row.delegates.final, row.delegates.total),
+              ]
+            : []),
               ]
             : []),
           row.valid === 0 && row.declared != null ? null : count(row.valid),

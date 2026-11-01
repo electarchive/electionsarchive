@@ -87,7 +87,14 @@
 
   let query = $state("");
   let picked = $state<{
-    column: "name" | "leader" | "margin" | "valid" | "shift";
+    column:
+      | "name"
+      | "leader"
+      | "margin"
+      | "valid"
+      | "delegates"
+      | "final"
+      | "shift";
     descending: boolean;
   } | null>(null);
   let all = $state(false);
@@ -124,6 +131,7 @@
     span != null && places.rows.some((row) => row.earlier != null),
   );
   const listed = $derived([...places.rows, ...(places.districts ?? [])]);
+  const isDelegated = $derived(listed.some((row) => row.delegates != null));
   const column = $derived(
     picked?.column ?? (listed.length > limit ? "valid" : "name"),
   );
@@ -220,7 +228,11 @@
               ? (row.margin ?? -1)
               : column === "valid"
                 ? row.valid
-                : (moves[index]?.shift ?? -Infinity),
+                : column === "delegates"
+                  ? (row.delegates?.total ?? -1)
+                  : column === "final"
+                    ? (row.delegates?.final?.[0]?.[1] ?? -1)
+                    : (moves[index]?.shift ?? -Infinity),
         match:
           (names[index] ?? "").includes(needle) &&
           (only == null ||
@@ -324,6 +336,12 @@
               ]),
         ]),
     { key: "valid" as const, label: votes, numeric: true },
+    ...(isDelegated
+      ? [{ key: "delegates" as const, label: m.col_delegates(), numeric: true }]
+      : []),
+    ...((places.ballots ?? 0) > 1
+      ? [{ key: "final" as const, label: m.col_final_ballot(), numeric: true }]
+      : []),
     ...(comparing && span != null
       ? [
           {
@@ -584,6 +602,7 @@
         `${m.col_margin()} (%)`,
         ...titles.map((title) => `${title} (%)`),
         ...(comparing ? [`${m.col_shift()} (%)`] : []),
+        ...(isDelegated ? [m.col_delegates()] : []),
         "URL",
       ]}
       rows={() =>
@@ -602,6 +621,7 @@
                 value == null ? null : Math.round(value * 1e6) / 1e4,
               )
             : []),
+          ...(isDelegated ? [row.delegates?.total ?? null] : []),
           row.path == null ? null : `${page.url.origin}/${row.path}`,
         ])}
     />
@@ -1018,6 +1038,30 @@
                 )}
               {/if}
             </td>
+            {#if isDelegated}
+              {#each [row.delegates?.first, row.delegates?.final].slice(0, (places.ballots ?? 0) > 1 ? 2 : 1) as ballot, at (at)}
+                <td
+                  class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
+                >
+                  {#if ballot?.[0] != null && row.delegates != null}
+                    {const lead = $derived(ballot[0][0])}
+                    <span class="inline-flex items-center gap-1.5">
+                      <span
+                        class="shrink-0 rounded-xs bg-(--party) chip block-2 inline-2"
+                        style:--party={colors[lead]}
+                      ></span>
+                      <span class="sr-only">{titles[lead]}</span>
+                      {m.delegates_of({
+                        votes: count(ballot[0][1]),
+                        total: count(row.delegates.total),
+                      })}
+                    </span>
+                  {:else if at === 0 && row.delegates != null}
+                    {count(row.delegates.total)}
+                  {/if}
+                </td>
+              {/each}
+            {/if}
             {#if comparing}
               <td class="px-2 py-1.5">
                 {#if row.move?.shift != null}

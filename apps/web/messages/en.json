@@ -145,6 +145,54 @@
   "col_seats": "Seats",
   "col_electors": "Electors won",
   "col_delegates": "Delegates",
+  "col_final_ballot": "Final ballot",
+  "delegates_primary": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} delegate, chosen in the primary",
+        "countPlural=*": "{count} delegates, chosen in the primary"
+      }
+    }
+  ],
+  "delegates_caucus": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} delegate, chosen by the caucuses",
+        "countPlural=*": "{count} delegates, chosen by the caucuses"
+      }
+    }
+  ],
+  "delegates_convention": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} delegate, chosen by the state convention",
+        "countPlural=*": "{count} delegates, chosen by the state convention"
+      }
+    }
+  ],
+  "delegates_unbound": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} delegate, unbound",
+        "countPlural=*": "{count} delegates, all unbound"
+      }
+    }
+  ],
+  "delegates_first_ballot": "How the delegation voted on the first ballot at the national convention",
+  "delegates_final_ballot": "How it voted on the final ballot",
+  "delegates_pledged": "Delegates pledged at the national convention",
+  "delegates_declared": "Delegates won, as declared",
+  "delegates_of": "{votes} of {total}",
+  "map_delegates": "{votes} of {total} delegates on the first ballot",
+  "map_by_delegates": "Places without a popular vote are colored by how their delegates voted on the convention's first ballot.",
   "col_change": "Change",
   "backed": "Backed {name}",
   "nominated_by": "Nominated by {parties}",

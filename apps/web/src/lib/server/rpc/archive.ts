@@ -569,6 +569,13 @@ const PlaceRow = v.pipe(
     redrawn: v.optional(v.number()),
     within: v.optional(v.number()),
     seats: v.optional(v.nullable(v.number())),
+    delegates: v.optional(
+      v.object({
+        total: v.number(),
+        first: v.array(v.tuple([v.number(), v.number()])),
+        final: v.nullable(v.array(v.tuple([v.number(), v.number()]))),
+      }),
+    ),
     isCounted: v.optional(v.boolean()),
     isTally: v.optional(v.boolean()),
     declared: v.optional(
@@ -627,6 +634,7 @@ const Places = v.nullable(
       v.array(v.object({ ...Unreconciled.entries, publisher: v.string() })),
     ),
     estimated: v.optional(v.boolean()),
+    ballots: v.optional(v.number()),
     context: v.optional(
       v.object({ date: v.string(), path: v.nullable(v.string()) }),
     ),
@@ -999,7 +1007,13 @@ async function gather(
     )
     select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
   `);
-  const ks = sets.rows.map((row) => row.k);
+  const held = await Promise.all(
+    [contest].flat().map(async (id) => convention(id)),
+  );
+  const ks = [
+    ...sets.rows.map((row) => row.k),
+    ...held.flat().map((row) => row.k),
+  ];
   if (ks.length === 0) {
     return [];
   }
@@ -2899,6 +2913,300 @@ async function tally(
   };
 }
 
+async function convention(root: string) {
+  return remember(`convention:${root}`, async () =>
+    rowsOf(
+      await db.execute<{
+        id: string;
+        kind: string;
+        round: number;
+        k: number;
+        path: string | null;
+      }>(sql`
+        select c.id, c.kind::text as kind, c.round_number as round, rs.k, s.path
+        from contest r
+        join election e on e.parent_id = r.election_id and e.kind = 'indirect'
+        join contest c on c.election_id = e.id and c.party_scope_id = r.party_scope_id
+          and c.kind in ('office', 'delegate_allocation')
+        cross join lateral (
+          select x.k from result_set x
+          where x.contest_id = c.id and x.status = 'active' and x.is_default and ${served("x")}
+          limit 1
+        ) rs
+        left join slug s on s.entity_id = c.id and s.is_current
+        where r.id = ${root}::uuid and r.kind = 'delegate_allocation'
+          and r.district_area_id is null and r.allocation_parent_id is null
+        order by c.kind = 'delegate_allocation', c.round_number
+      `),
+    ),
+  );
+}
+
+type Pick = {
+  kind: string;
+  label: string | null;
+  person: string | null;
+  party: string | null;
+  votes: number;
+};
+
+async function delegations(root: string, ks: Array<number>) {
+  const held = await convention(root);
+  const ballots = held.filter((row) => row.kind === "office");
+  const pledged = held.find((row) => row.kind === "delegate_allocation");
+  const [opening, closing] = [ballots[0], ballots.at(-1)];
+  const sets = [
+    ...new Set(
+      [opening, closing, pledged].flatMap((row) =>
+        row == null ? [] : [row.k],
+      ),
+    ),
+  ];
+  const [rolled, seated] = await Promise.all([
+    sets.length === 0 || ks.length === 0
+      ? { rows: [] }
+      : db.execute<{
+          set: number;
+          area: number;
+          measure: number;
+          option: number;
+          value: number;
+          kind: string | null;
+          label: string | null;
+          person: string | null;
+          party: string | null;
+        }>(sql`
+          select r.set, r.area, r.measure, r.option, r.value, o.kind::text as kind, o.ballot_label as label, o.party_id as party,
+            (select cy.person_id from candidacy cy where cy.option_id = o.id order by cy.role = 'head' desc limit 1) as person
+          from (
+            select x.result_set_k as set, x.area_k as area, x.measure, x.option_k as option, sum(x.value)::float8 as value
+            from unnest(${sql.param(sets)}::int[]) as s(k)
+            cross join lateral (
+              select y.result_set_k, y.area_k, y.measure, y.option_k, y.value from result_rollup y
+              where y.result_set_k = s.k and y.area_k = any(${sql.param(ks)}::int[])
+                and y.measure in (1, 28, 29, 30) and coalesce(y.count_round, 0) = 0
+              offset 0
+            ) x
+            group by 1, 2, 3, 4
+          ) r
+          left join contest_option o on o.k = r.option and r.option <> 0
+        `),
+    ks.length === 0
+      ? { rows: [] }
+      : db.execute<{
+          area: number;
+          kind: string;
+          label: string | null;
+          person: string | null;
+          party: string | null;
+          votes: number;
+        }>(sql`
+          select a.k as area, o.kind::text as kind, o.ballot_label as label, o.party_id as party, x.seats as votes,
+            (select cy.person_id from candidacy cy where cy.option_id = o.id order by cy.role = 'head' desc limit 1) as person
+          from contest c
+          join area a on a.id = c.district_area_id
+          join contest_option o on o.contest_id = c.id
+          cross join lateral (
+            select max(x.seats)::int as seats from outcome x
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+            where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null and x.seats > 0
+            having count(*) > 0
+          ) x
+          where c.allocation_parent_id = ${root}::uuid and a.k = any(${sql.param(ks)}::int[])
+        `),
+  ]);
+  const ranked = (picks: Array<Pick>) =>
+    picks
+      .filter((pick) => pick.votes > 0)
+      .toSorted((a, b) => b.votes - a.votes);
+  const read = (
+    set: number | undefined,
+    area: number,
+    measures: Array<number>,
+  ) => {
+    const rows = rolled.rows.filter(
+      (row) => row.set === set && row.area === area,
+    );
+    let total = 0;
+    for (const row of rows) {
+      if (row.option === 0 && row.measure === 30) {
+        total = row.value;
+      }
+    }
+    const picks = new Map<number, Pick>();
+    for (const row of rows) {
+      if (
+        row.option === 0 ||
+        !measures.includes(row.measure) ||
+        row.kind == null
+      ) {
+        continue;
+      }
+      const pick = picks.get(row.option) ?? {
+        kind: row.kind,
+        label: row.label,
+        person: row.person,
+        party: row.party,
+        votes: 0,
+      };
+      pick.votes += row.value;
+      picks.set(row.option, pick);
+    }
+    const listed = ranked([...picks.values()]);
+    let sum = 0;
+    for (const pick of listed) {
+      sum += pick.votes;
+    }
+    return listed.length === 0 && total === 0
+      ? null
+      : { total: Math.max(total, sum), picks: listed };
+  };
+  const found = new Map<
+    number,
+    {
+      total: number;
+      source: "ballot" | "pledged" | "declared";
+      first: Array<Pick>;
+      final: Array<Pick> | null;
+      ballots: number;
+    }
+  >();
+  for (const k of ks) {
+    const first = read(opening?.k, k, [1]);
+    const last =
+      closing == null || closing === opening ? null : read(closing.k, k, [1]);
+    const pledges = read(pledged?.k, k, [28, 29]);
+    const declared = ranked(seated.rows.filter((row) => row.area === k));
+    let won = 0;
+    for (const row of declared) {
+      won += row.votes;
+    }
+    const entry =
+      first != null
+        ? { ...first, source: "ballot" as const }
+        : pledges != null
+          ? { ...pledges, source: "pledged" as const }
+          : declared.length > 0
+            ? { total: won, picks: declared, source: "declared" as const }
+            : null;
+    if (entry != null) {
+      found.set(k, {
+        total: entry.total,
+        source: entry.source,
+        first: entry.picks,
+        final: entry.source === "ballot" ? (last?.picks ?? null) : null,
+        ballots: ballots.length,
+      });
+    }
+  }
+  return {
+    found,
+    ballots: ballots.map((row) => ({ round: row.round, path: row.path })),
+  };
+}
+
+async function pledged(contest: Found, isRoot: boolean) {
+  const place = contest.place;
+  if (
+    !isRoot ||
+    place == null ||
+    contest.kind !== "delegate_allocation" ||
+    contest.id === contest.root
+  ) {
+    return null;
+  }
+  const [{ found, ballots }, held] = await Promise.all([
+    delegations(contest.root, [place.k]),
+    db.execute<{ kind: string }>(sql`
+      select e.kind::text as kind from contest c join election e on e.id = c.election_id
+      where c.id = ${contest.id}::uuid
+    `),
+  ]);
+  const entry = found.get(place.k);
+  if (entry == null) {
+    return null;
+  }
+  const picks = [...entry.first, ...(entry.final ?? [])];
+  const parties = [...new Set(picks.flatMap((pick) => pick.party ?? []))];
+  const [labels, painted] = await Promise.all([
+    names(
+      [...new Set(picks.flatMap((pick) => pick.person ?? pick.party ?? []))],
+      contest.date,
+    ),
+    db.execute<{ id: string; color: string }>(sql`
+      select p.id, c.color from unnest(${sql.param(parties)}::uuid[]) p(id),
+        lateral (select ${paint(sql`p.id`, sql`${contest.election}::uuid`, sql`${contest.date ?? "infinity"}::date`)} as color) c
+      where c.color is not null
+    `),
+  ]);
+  const colors = new Map(painted.rows.map((row) => [row.id, row.color]));
+  const opening = (await convention(contest.root)).find(
+    (row) => row.kind === "office",
+  );
+  const nation =
+    opening == null
+      ? { rows: [] }
+      : await db.execute<{ person: string; party: string }>(sql`
+        select cy.person, o.party_id as party
+        from contest c
+        join area a on a.id = c.district_area_id
+        join result_rollup y on y.result_set_k = ${opening.k} and y.area_k = a.k and y.measure = 1 and coalesce(y.count_round, 0) = 0
+        join contest_option o on o.k = y.option_k and o.party_id is not null
+        cross join lateral (
+          select x.person_id as person from candidacy x where x.option_id = o.id order by x.role = 'head' desc limit 1
+        ) cy
+        where c.id = ${opening.id}::uuid
+        group by 1, 2
+        order by sum(y.value) desc
+      `);
+  const ranks = new Map<string, number>();
+  const seen = new Map<string, number>();
+  for (const row of nation.rows) {
+    const rank = seen.get(row.party) ?? 0;
+    ranks.set(row.person, rank);
+    seen.set(row.party, rank + 1);
+  }
+  const tint = (pick: Pick) => {
+    const base = colors.get(pick.party ?? "");
+    const rank = ranks.get(pick.person ?? "") ?? 0;
+    return base == null || rank === 0
+      ? (base ?? null)
+      : `oklch(from ${base} l max(c, 0.1) calc(h + ${rank * 137.5}))`;
+  };
+  const shown = (list: Array<Pick>) =>
+    list.map((pick) => ({
+      label:
+        labels.full.get(pick.person ?? pick.party ?? "") ??
+        pick.label ??
+        pick.kind,
+      person: pick.person,
+      party: pick.party,
+      color: tint(pick),
+      votes: pick.votes,
+    }));
+  const kind = held.rows[0]?.kind;
+  return {
+    total: entry.total,
+    method: entry.first.every((pick) => pick.kind === "uncommitted")
+      ? ("unbound" as const)
+      : kind === "primary"
+        ? ("primary" as const)
+        : kind === "caucus"
+          ? ("caucus" as const)
+          : ("convention" as const),
+    source: entry.source,
+    ballots: entry.ballots,
+    first: {
+      path: entry.source === "ballot" ? (ballots[0]?.path ?? null) : null,
+      picks: shown(entry.first),
+    },
+    final:
+      entry.final == null
+        ? null
+        : { path: ballots.at(-1)?.path ?? null, picks: shown(entry.final) },
+  };
+}
+
 async function places(
   contest: Found,
   area: { id: string; k: number },
@@ -3415,6 +3723,38 @@ async function places(
     ),
   ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
+  const nominated =
+    isRoot &&
+    contest.kind === "delegate_allocation" &&
+    contest.id === contest.root
+      ? await delegations(
+          contest.root,
+          listed.map((row) => row.k),
+        )
+      : null;
+  const indexed = (picks: Array<Pick>) =>
+    picks.flatMap((pick) => {
+      const index = tabulated.legend.findIndex((item) =>
+        pick.person != null
+          ? item.person === pick.person
+          : pick.kind === "candidate"
+            ? item.key === `party:${pick.party ?? ""}`
+            : item.key.startsWith(`kind:${pick.kind}`),
+      );
+      return index === -1 ? [] : [[index, pick.votes] as [number, number]];
+    });
+  const delegated = (k: number) => {
+    const entry = nominated?.found.get(k);
+    return entry == null
+      ? null
+      : {
+          delegates: {
+            total: entry.total,
+            first: indexed(entry.first),
+            final: entry.final == null ? null : indexed(entry.final),
+          },
+        };
+  };
   const contexts =
     level.code === "world.country"
       ? rowsOf(
@@ -3480,6 +3820,8 @@ async function places(
     ...tabulated,
     total: whole.get(area.k)?.side.valid,
     estimated: spread.size > 0,
+    ...(nominated != null &&
+      nominated.ballots.length > 0 && { ballots: nominated.ballots.length }),
     ...(waited != null && {
       pending: waiting
         .map((row) => waited.full.get(row.id) ?? "")
@@ -3499,6 +3841,7 @@ async function places(
         ...turnouts(row),
         at: at.get(row.k) ?? null,
         seats: seats.get(row.k) ?? null,
+        ...delegated(row.k),
         ...(row.k < 0 && { isPool: true }),
         ...(statuses.has(row.k) && { status: statuses.get(row.k) }),
       })),
@@ -5845,6 +6188,47 @@ export const contests = {
             isTally: v.boolean(),
           }),
         ),
+        delegates: v.optional(
+          v.nullable(
+            v.object({
+              total: v.number(),
+              method: v.picklist([
+                "primary",
+                "caucus",
+                "convention",
+                "unbound",
+              ]),
+              source: v.picklist(["ballot", "pledged", "declared"]),
+              ballots: v.number(),
+              first: v.object({
+                path: v.nullable(v.string()),
+                picks: v.array(
+                  v.object({
+                    label: v.string(),
+                    person: v.nullable(v.string()),
+                    party: v.nullable(v.string()),
+                    color: v.nullable(v.string()),
+                    votes: v.number(),
+                  }),
+                ),
+              }),
+              final: v.nullable(
+                v.object({
+                  path: v.nullable(v.string()),
+                  picks: v.array(
+                    v.object({
+                      label: v.string(),
+                      person: v.nullable(v.string()),
+                      party: v.nullable(v.string()),
+                      color: v.nullable(v.string()),
+                      votes: v.number(),
+                    }),
+                  ),
+                }),
+              ),
+            }),
+          ),
+        ),
         electors: v.nullable(
           v.object({
             rows: v.array(
@@ -6302,6 +6686,7 @@ export const contests = {
       const declaredColor = new Map(
         declaredColors.rows.map((row) => [row.party_id, row.color]),
       );
+      const pledge = await pledged(contest, isRoot);
       const listed =
         isRoot && sets.rows.every((row) => row.status !== "active")
           ? await db.execute<{
@@ -6630,6 +7015,7 @@ export const contests = {
                   seats: row.seats,
                 })),
               },
+        delegates: pledge,
         turnout: roll.turnout,
         quorum: roll.quorum,
         explanations,
