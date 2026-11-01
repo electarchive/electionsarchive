@@ -262,10 +262,6 @@ describe("golden elections", () => {
     });
   }
 
-  const italyDeltas: Record<string, Record<string, number>> = {
-    "1948-04-18": { "BLOCCO NAZIONALE": -1, DC: 1 },
-    "1953-06-07": { DC: -1, PLI: 1 },
-  };
   for (const { date, seats, districts } of italyCamera) {
     it(`reproduces Italy's ${date} Chamber national college`, () => {
       const distribution = distribute(
@@ -285,7 +281,7 @@ describe("golden elections", () => {
         },
         districts,
       );
-      const declared: Record<string, number> = { ...italyDeltas[date] };
+      const declared: Record<string, number> = {};
       for (const [id, won] of Object.entries(seats))
         declared[id] = (declared[id] ?? 0) + won;
       expect(distribution.tie).toBeUndefined();
