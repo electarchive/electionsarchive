@@ -5,7 +5,7 @@
   import SearchIcon from "@lucide/svelte/icons/search";
   import { on } from "svelte/events";
   import { m } from "#lib/paraglide/messages.js";
-  import { finder } from "#lib/search.svelte.js";
+  import { finder, summon } from "#lib/search.svelte.js";
   import { cn } from "#lib/utils.js";
 
   const { class: className }: { class?: string } = $props();
@@ -86,7 +86,7 @@
   aria-haspopup="dialog"
   onpointerenter={load}
   onfocus={load}
-  onclick={() => (finder.isOpen = true)}
+  onclick={() => summon()}
 >
   <SearchIcon class="shrink-0 text-foreground block-4 inline-4" />
   <span class="flex-1 truncate min-inline-0 sm:hidden">{m.search_open()}</span>

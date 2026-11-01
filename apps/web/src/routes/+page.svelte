@@ -5,7 +5,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { finder } from "#lib/search.svelte.js";
+  import { finder, summon } from "#lib/search.svelte.js";
   import type { PageData } from "./$types";
   import Lead from "./lead.svelte";
   import Strata from "./strata.svelte";
@@ -196,6 +196,15 @@
             type="search"
             name="q"
             autocomplete="off"
+            aria-haspopup="dialog"
+            onclick={(event) => {
+              summon(event.currentTarget.value);
+              event.currentTarget.value = "";
+            }}
+            oninput={(event) => {
+              summon(event.currentTarget.value);
+              event.currentTarget.value = "";
+            }}
             placeholder={isNarrow.current
               ? m.home_search_cta_short()
               : m.home_search_cta()}

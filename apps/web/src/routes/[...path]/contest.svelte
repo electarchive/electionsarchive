@@ -13,7 +13,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { gapNote } from "#lib/coverage.js";
-  import { count, date, definite, percent, points } from "#lib/format.js";
+  import { count, date, percent, points } from "#lib/format.js";
   import {
     explain,
     isDerived,
@@ -39,7 +39,6 @@
   import Changes from "./changes.svelte";
   import Count from "./count.svelte";
   import Crowns from "./crowns.svelte";
-  import Cycle from "./cycle.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import Lead from "./lead.svelte";
@@ -100,15 +99,15 @@
     sameDay: Extract<PageData, { kind: "contest" }>["sameDay"];
   } = $props();
 
-  const DAY: Record<string, (place: string) => string> = {
+  const DAY: Record<string, () => string> = {
     owner: () => "",
     governor: m.cycle_governor,
     legislature: m.cycle_legislature,
     regional_office: m.cycle_regional_office,
     national_measure: m.cycle_national_measure,
     regional_measure: m.cycle_regional_measure,
-    local: (place) => m.cycle_local({ place }),
-    local_measure: (place) => m.cycle_local_measure({ place }),
+    local: m.same_day_local,
+    local_measure: m.same_day_local_measure,
   };
   const STAGES: Record<string, () => string> = {
     live: m.stage_live,
@@ -1536,9 +1535,26 @@
       </ol>
     </nav>
   {/if}
-  {#if sameDay != null && sameDay.races.length > 1}
-    <SameDay place={sameDay.place} races={sameDay.races} />
-  {/if}
+  <SameDay
+    place={sameDay?.place ?? cycle.day.place}
+    races={sameDay?.races ?? []}
+    day={{
+      place: cycle.day.place,
+      part: cycle.day.part,
+      groups: cycle.day.groups.flatMap((group, index) =>
+        group.path == null
+          ? []
+          : [
+              {
+                ...group,
+                path: group.path,
+                key: `${group.kind}:${index}`,
+                label: group.label ?? DAY[group.kind]?.() ?? "",
+              },
+            ],
+      ),
+    }}
+  />
 </header>
 
 {#snippet road(isBelow: boolean)}
@@ -2356,27 +2372,6 @@
     <Ballot ballot={entries} place={contest.scope.name} />
   {/if}
 {/await}
-
-<Cycle
-  day={{
-    ...cycle.day,
-    groups: cycle.day.groups.flatMap((group, index) =>
-      group.path == null
-        ? []
-        : [
-            {
-              ...group,
-              path: group.path,
-              key: `${group.kind}:${index}`,
-              label:
-                group.label ??
-                DAY[group.kind]?.(definite(cycle.day.place)) ??
-                "",
-            },
-          ],
-    ),
-  }}
-/>
 
 {#snippet caveat()}
   {#if unreconciled.length > 0}
