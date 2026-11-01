@@ -2448,6 +2448,21 @@
   "polity_known_races": "Races affected: {count}",
   "polity_known_more": "and {count} more",
   "polity_known_all": "All offices",
+  "polity_known_show": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Show {countText} known gap",
+        "countPlural=*": "Show all {countText} known gaps"
+      }
+    }
+  ],
+  "polity_known_hide": "Hide known gaps",
   "polity_known_record": "Known gaps in this record",
   "coverage_country_reason_partial": "Short of the official total",
   "coverage_country_reason_partial_def": "The archive has votes for the race, but they add up to less than 98% of the declared total, or some of the race's units are missing.",

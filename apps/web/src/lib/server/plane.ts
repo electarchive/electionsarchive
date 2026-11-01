@@ -449,17 +449,21 @@ const reach = (box: ReturnType<typeof extent>) => {
   return (east - west) * (north - south) * 10;
 };
 
-export const zooms = async (tiles: string, ks: Array<number>) => {
-  const none = { day: null, ids: [], zones: [] };
-  if (ks.length < 24 || ks.length > 5000) {
-    return none;
-  }
+export const vintage = async (tiles: string) => {
   const set = await db.execute<{ scheme: string; day: string }>(sql`
     select scheme_code as scheme, as_of::text as day from boundary_set
     where coalesce(tiles_key, scheme_code || '/' || vintage) = ${tiles}
     order by as_of desc limit 1
   `);
-  const held = set.rows[0];
+  return set.rows[0];
+};
+
+export const zooms = async (tiles: string, ks: Array<number>) => {
+  const none = { day: null, ids: [], zones: [] };
+  if (ks.length < 24 || ks.length > 5000) {
+    return none;
+  }
+  const held = await vintage(tiles);
   if (held == null) {
     return none;
   }

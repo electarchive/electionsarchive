@@ -1,8 +1,24 @@
 import { openapi } from "@orpc/openapi";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
-import { boxes, zooms } from "#lib/server/plane.js";
+import { boxes, vintage, zooms } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
+
+const Tiles = v.pipe(
+  v.string(),
+  v.regex(/^[a-z]{2,5}\.[a-z0-9_]+\/[\w:.-]+$/u),
+);
+
+const Boxes = v.array(
+  v.object({
+    name: v.string(),
+    x: v.number(),
+    y: v.number(),
+    width: v.number(),
+    height: v.number(),
+    units: v.array(v.object({ k: v.number(), d: v.string() })),
+  }),
+);
 
 export const maps = {
   insets: os
@@ -21,19 +37,28 @@ export const maps = {
         ks: v.pipe(v.array(v.pipe(v.number(), v.integer())), v.maxLength(5000)),
       }),
     )
-    .output(
-      v.array(
-        v.object({
-          name: v.string(),
-          x: v.number(),
-          y: v.number(),
-          width: v.number(),
-          height: v.number(),
-          units: v.array(v.object({ k: v.number(), d: v.string() })),
-        }),
-      ),
-    )
+    .output(Boxes)
     .handler(async ({ input }) => boxes(input.scheme, input.day, input.ks)),
+  detached: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/maps/detached",
+        summary:
+          "Draw the overseas places a national map lists apart, such as the constituencies of Guadeloupe and Guyane on a map of France, grouped by territory: each territory's name, its frame in map coordinates, and a simplified SVG path for every place in it",
+      }),
+    )
+    .input(
+      v.object({
+        tiles: Tiles,
+        ks: v.pipe(v.array(v.pipe(v.number(), v.integer())), v.maxLength(500)),
+      }),
+    )
+    .output(Boxes)
+    .handler(async ({ input }) => {
+      const held = await vintage(input.tiles);
+      return held == null ? [] : boxes(held.scheme, held.day, input.ks);
+    }),
   zooms: os
     .meta(
       openapi({
@@ -45,10 +70,7 @@ export const maps = {
     )
     .input(
       v.object({
-        tiles: v.pipe(
-          v.string(),
-          v.regex(/^[a-z]{2,5}\.[a-z0-9_]+\/[\w:.-]+$/u),
-        ),
+        tiles: Tiles,
         ks: v.pipe(v.array(v.pipe(v.number(), v.integer())), v.maxLength(5000)),
       }),
     )

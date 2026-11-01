@@ -179,6 +179,11 @@
   let opening = $state<number | null>(null);
   let going = $state<string | null>(null);
   let listing = $state<string | null>(null);
+  let territories = $state.raw<
+    Record<string, Awaited<ReturnType<typeof orpc.maps.detached.call>>>
+  >({});
+  let shown = $state<string | null>(null);
+  let traced = $state<number | null>(null);
   const globe = $derived(
     levels.length > 1
       ? levels.find((level) => level.code === "world.country")
@@ -891,6 +896,27 @@
       return entries.length === 0 ? [] : [{ group, entries }];
     }),
   );
+  $effect(() => {
+    if (listing !== "overseas") {
+      return;
+    }
+    const key = `${tiles}:${listing}`;
+    const ks = untrack(() =>
+      territories[key] == null
+        ? remote
+            .filter((entry) => entry.group === "overseas")
+            .map((entry) => entry.k)
+        : [],
+    );
+    if (ks.length > 1) {
+      void orpc.maps.detached.call({ tiles, ks }).then(
+        (found) => {
+          territories = { ...territories, [key]: found };
+        },
+        () => {},
+      );
+    }
+  });
   const wanted = $derived(
     parted?.inset == null ? null : JSON.stringify(parted.inset),
   );
@@ -3043,6 +3069,9 @@
               {/each}
             </div>
           {:else}
+            {const drawn = $derived(
+              territories[`${tiles}:${segment.group}`] ?? [],
+            )}
             {const blocks = $derived(
               Map.groupBy(segment.entries, (entry) => {
                 const cut = entry.name.lastIndexOf(", ");
@@ -3057,6 +3086,14 @@
                 .entries()
                 .map(([header, entries]) => ({
                   header,
+                  box:
+                    header === ""
+                      ? null
+                      : (drawn.find((box) =>
+                          entries.every((entry) =>
+                            box.units.some((piece) => piece.k === entry.k),
+                          ),
+                        ) ?? null),
                   lines: entries.map((entry) => {
                     const cut = entry.name.lastIndexOf(", ");
                     const rest = entry.name.slice(cut + 2);
@@ -3079,6 +3116,8 @@
                   () => listing === segment.group,
                   (value: boolean) => {
                     listing = value ? segment.group : null;
+                    shown = null;
+                    traced = null;
                   }
                 }
               >
@@ -3108,6 +3147,8 @@
                   () => listing === segment.group,
                   (value: boolean) => {
                     listing = value ? segment.group : null;
+                    shown = null;
+                    traced = null;
                   }
                 }
               >
@@ -4205,18 +4246,116 @@
 {#snippet roster(
   blocks: Array<{
     header: string;
+    box: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      units: Array<{ k: number; d: string }>;
+    } | null;
     lines: Array<{ entry: (typeof remote)[number]; label: string }>;
   }>,
   isSheet: boolean,
 )}
-  {#each blocks as block (block.header)}
+  {#each blocks as block, index (block.header)}
     <div
       class={cn({
         "not-first:mbs-1 not-first:border-bs not-first:border-border":
           block.header !== "",
       })}
     >
-      {#if block.header !== ""}
+      {#if block.box != null}
+        {const box = $derived(block.box)}
+        {const isShown = $derived(shown === block.header)}
+        {const pad = $derived(Math.max(box.width, box.height) * 0.05)}
+        <button
+          type="button"
+          class={cn(
+            "flex items-center justify-between gap-2 rounded-xs px-2 pbs-2 pbe-1 text-start text-xs text-muted-foreground inline-full hover:bg-secondary hover:text-foreground focus-visible:bg-secondary focus-visible:text-foreground",
+            { "text-[0.8125rem]": isSheet },
+            { "text-foreground": isShown },
+          )}
+          aria-expanded={isShown}
+          aria-controls="{uid}-territory-{index}"
+          onclick={() => {
+            shown = isShown ? null : block.header;
+            traced = null;
+          }}
+        >
+          {block.header}
+          <MapIcon
+            class={cn("shrink-0 block-3.5 inline-3.5", {
+              "text-foreground": isShown,
+            })}
+            aria-hidden="true"
+          />
+        </button>
+        {#if isShown}
+          <svg
+            id="{uid}-territory-{index}"
+            class={cn(
+              "mx-2 my-1 block rounded-sm bg-card ring-1 ring-border block-40",
+              { "block-52": isSheet },
+            )}
+            style:inline-size="calc(100% - 1rem)"
+            viewBox="{box.x - pad} {box.y - pad} {box.width +
+              pad * 2} {box.height + pad * 2}"
+            aria-hidden="true"
+            {@attach (node: SVGSVGElement) => {
+              node.scrollIntoView({
+                block: "nearest",
+                behavior: calm ? "auto" : "smooth",
+              });
+            }}
+          >
+            {#each box.units as piece (piece.k)}
+              {const entry = $derived(
+                block.lines.find((line) => line.entry.k === piece.k)?.entry,
+              )}
+              {const isOpen = $derived(rows.get(piece.k)?.path != null)}
+              <path
+                class={cn({ "cursor-pointer": isOpen })}
+                role="presentation"
+                d={piece.d}
+                fill={entry?.fill ??
+                  "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))"}
+                stroke="var(--card)"
+                stroke-width="0.75"
+                stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"
+                onpointerenter={() => (traced = piece.k)}
+                onpointerleave={() => {
+                  if (traced === piece.k) {
+                    traced = null;
+                  }
+                }}
+                onclick={() => {
+                  if (isOpen) {
+                    listing = null;
+                    open(piece.k);
+                  }
+                }}
+              />
+            {/each}
+            {#if traced != null}
+              {const lit = $derived(
+                box.units.find((piece) => piece.k === traced),
+              )}
+              {#if lit != null}
+                <path
+                  d={lit.d}
+                  fill="none"
+                  stroke="var(--foreground)"
+                  stroke-width="1.5"
+                  stroke-linejoin="round"
+                  vector-effect="non-scaling-stroke"
+                  pointer-events="none"
+                />
+              {/if}
+            {/if}
+          </svg>
+        {/if}
+      {:else if block.header !== ""}
         <p
           class={cn("px-2 pbs-2 pbe-0.5 text-xs text-muted-foreground", {
             "text-[0.8125rem]": isSheet,
@@ -4241,7 +4380,14 @@
             class={cn(
               "flex items-center gap-2.5 rounded-xs px-2 py-1.5 text-start inline-full hover:bg-secondary focus-visible:bg-secondary",
               { "py-2.5": isSheet },
+              { "bg-secondary": traced === line.entry.k },
             )}
+            onpointerenter={() => (traced = line.entry.k)}
+            onpointerleave={() => {
+              if (traced === line.entry.k) {
+                traced = null;
+              }
+            }}
             onclick={() => {
               listing = null;
               open(line.entry.k);

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Tone from "#routes/coverage/tone.svelte";
   import { resolve } from "$app/paths";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { createQuery } from "@tanstack/svelte-query";
   import {
     CATEGORY_LABELS,
@@ -12,10 +13,12 @@
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
 
   const { id }: { id: string } = $props();
 
   const uid = $props.id();
+  let isOpen = $state(false);
   const known = createQuery(() =>
     orpc.coverage.known.queryOptions({ input: { id } }),
   );
@@ -66,7 +69,24 @@
     <p class="text-[0.8125rem] text-muted-foreground max-inline-[70ch]">
       {m.polity_known_lede()}
     </p>
-    <div class="grid">
+    <button
+      type="button"
+      class="flex items-center gap-1.5 justify-self-start text-[0.8125rem] font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground focus-visible:outline-2 focus-visible:outline-ring"
+      aria-expanded={isOpen}
+      aria-controls="{uid}-gaps"
+      onclick={() => (isOpen = !isOpen)}
+    >
+      {isOpen
+        ? m.polity_known_hide()
+        : m.polity_known_show({ count: known.data?.length ?? 0 })}
+      <ChevronDownIcon
+        class={cn("block-3.5 inline-3.5 motion-safe:transition-transform", {
+          "rotate-180": isOpen,
+        })}
+        aria-hidden="true"
+      />
+    </button>
+    <div id="{uid}-gaps" class="grid" hidden={!isOpen}>
       {#each groups as group (group.key)}
         <div
           class="grid gap-x-6 gap-y-1.5 border-bs border-border py-2.5 lg:grid-cols-[12rem_minmax(0,1fr)]"
