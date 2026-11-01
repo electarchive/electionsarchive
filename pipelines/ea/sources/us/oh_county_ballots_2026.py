@@ -478,12 +478,32 @@ def stark() -> list[dict[str, str]]:
 
 
 def columns(path: Path) -> list[str]:
-    pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, check=True).stdout)[1])
+    pages = int(
+        re.search(
+            r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, check=True).stdout
+        )[1]
+    )
     lines: list[str] = []
     for page in range(1, pages + 1):
         for left in (0, 204, 408):
             lines += subprocess.run(
-                ["pdftotext", "-f", str(page), "-l", str(page), "-x", str(left), "-y", "0", "-W", "204", "-H", "1116", str(path), "-"],
+                [
+                    "pdftotext",
+                    "-f",
+                    str(page),
+                    "-l",
+                    str(page),
+                    "-x",
+                    str(left),
+                    "-y",
+                    "0",
+                    "-W",
+                    "204",
+                    "-H",
+                    "1116",
+                    str(path),
+                    "-",
+                ],
                 capture_output=True,
                 text=True,
                 check=True,
@@ -696,6 +716,7 @@ def emit() -> Path:
                left join note t on t.entity_id = c.id and t.kind = 'context'""",
             [f"{DAY}:OH:%:question:%"],
         ).fetchall():
+            code = code.removesuffix("-sd")
             if len(code) == 7 and code in leas and name.split()[0].lower() not in leas[code]:
                 home.pop(code, None)
             if len(code) == 10:

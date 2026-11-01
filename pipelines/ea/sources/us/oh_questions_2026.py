@@ -337,6 +337,8 @@ ADDED.append(
 )
 
 
+GEOIDS = {("Montgomery", "City", "Oakwood"): "3957764"}
+
 WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
 
 
@@ -403,7 +405,7 @@ def parse() -> None:
                 "name": name,
                 "text": WORDING.get(f"{name}|{label}") or describe(row),
                 "label": label,
-                "geoid": "",
+                "geoid": GEOIDS.get((clean(row["County"]), kind, name), ""),
             }
         )
     rows += [{"geoid": "", **row} for row in ADDED]
@@ -421,6 +423,7 @@ def emit() -> Path:
         places: dict[str, list[str]] = {}
         schools: dict[str, list[str]] = {}
         found: dict[str, tuple[UUID, UUID, str, str, str]] = {}
+        place_geoids = set(gazetteer(PLACES)["GEOID"])
         for scheme, code, polity, area, text, path in conn.execute(
             """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
                join area_code c on c.area_id = a.id
@@ -432,7 +435,13 @@ def emit() -> Path:
                  and left(c.code, 2) = '39'"""
         ).fetchall():
             key = f"{scheme}:{code}"
-            found[key] = (polity, area, text, path, code)
+            found[key] = (
+                polity,
+                area,
+                text,
+                path,
+                f"{code}-sd" if scheme == "us.school_district" and code in place_geoids else code,
+            )
             if scheme == "us.county":
                 counties[ceda._core(text)] = code
             elif scheme == "us.town":
@@ -495,6 +504,8 @@ def emit() -> Path:
                 spec = candidates.get(("school", ceda._core(name)), [])
                 if len(spec) > 1:
                     spec = [s for s in spec if school_county.get(s[1]) == county]
+                if len(spec) > 1:
+                    spec = [s for s in spec if s[2].lower() == name.lower().removesuffix(" school district")] or spec
                 scheme = "us.school_district"
             else:
                 options = places.get(ceda._city(name), [])
@@ -551,7 +562,8 @@ def emit() -> Path:
                             kind="standard",
                             valid_from=None,
                         )
-                    found[key] = (polity_id, area_id, text, path, geoid)
+                    keycode = f"{geoid}-sd" if scheme == "us.school_district" and geoid in place_geoids else geoid
+                    found[key] = (polity_id, area_id, text, path, keycode)
             if key is None or key not in found:
                 print("no polity:", row["kind"], row["county"], name)
                 continue
