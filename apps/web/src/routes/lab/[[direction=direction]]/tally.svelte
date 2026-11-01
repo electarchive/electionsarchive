@@ -546,12 +546,6 @@
     border-block-end: 2px solid var(--marker);
   }
 
-  .tly :global(.cmap-mode.active) {
-    background: var(--marker);
-    color: #191816;
-    box-shadow: none;
-  }
-
   @media (width < 1200px) {
     .tly-sheet {
       grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -278,22 +278,11 @@
     justify-content: end;
   }
 
-  .chm-map :global(.cmap-modes),
   .chm-map :global(.cmap-select) {
     border-color: var(--glass-edge);
     border-radius: var(--radius);
     background: var(--glass);
     backdrop-filter: blur(16px) saturate(1.4);
-  }
-
-  .chm-map :global(.cmap-mode) {
-    border-radius: calc(var(--radius) - 2px);
-  }
-
-  .chm-map :global(.cmap-mode.active) {
-    background: var(--accent);
-    color: var(--accent-ink);
-    box-shadow: none;
   }
 
   .chm-map :global(.cmap-legend) {
