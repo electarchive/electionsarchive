@@ -415,7 +415,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
                     store("PA", url, detail, ".json")
 
 
-def rows(state: str, url: str, path: Path):
+def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
@@ -577,10 +577,9 @@ def rows(state: str, url: str, path: Path):
     if state == "CT":
         if not url.endswith("townVotes_Electiondata.json"):
             return
-        pages = json.loads((PARSED / "pages.json").read_text())["CT"]
         base = url.rsplit("/", 1)[0]
-        lookup = json.loads(raw.cached(SOURCE, pages[f"{base}/Lookupdata.json"]).path.read_bytes())
-        status = json.loads(raw.cached(SOURCE, pages[f"{base}/election_Electiondata.json"]).path.read_bytes())
+        lookup = json.loads(urls[f"{base}/Lookupdata.json"].read_bytes())
+        status = json.loads(urls[f"{base}/election_Electiondata.json"].read_bytes())
         counted = re.match(r"(\d+) of (\d+)", status["PR"])
         regions = ct_regions()
         region = {
@@ -859,7 +858,7 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
         for url, path in urls.items():
             if url.endswith(LISTINGS):
                 continue
-            for row in rows(state, url, path):
+            for row in rows(state, url, path, urls):
                 found.append({"state": state, "page": url, "scope": "", "contest": "", **row})
     return pl.DataFrame(
         found,
