@@ -1411,10 +1411,20 @@ LOCAL_BODY = re.compile(
     r"|conservation|cemetery|\bparks?\b|airport|\bport\b|utility|levee|drainage|college|recreation"
     r"|public service|house of delegates|state senat|congress"
 )
+IN_TOWNSHIP_SPELLINGS = (
+    (r"\bst joe township\b", "st joseph township"),
+    (r"^(flat|haw|rock|sand|fall)(rock|creek)\b", r"\1 \2"),
+    (r"^stamperscreek\b", "stampers creek"),
+    (r"^vanburen\b", "van buren"),
+    (r"^greene township\b", "green township"),
+    (r"^(owen|clay)township\b", r"\1 township"),
+    (r"\btownshiptrustee\b", "township trustee"),
+    (r"^mayor of (attica|covington)$", r"\1 mayor"),
+)
 IN_ALIASES = (
     (r"^centerpoint town\b", "center point town", None),
     (r"^monroe city\b", "monroe city", "Monroe City"),
-    (r"^(zanesville town clerk treasurer) wells allen$", r"\1", None),
+    (r"^(zanesville town clerk treasurer) wells and allen$", r"\1", None),
     (r"^anderson school board\b", "anderson community school corporation school board", None),
     (r"^lewis cass school board\b", "lewis cass schools school board", None),
     (r"^msd of shakamak\b", "shakamak schools metropolitan school district school board", None),
@@ -10352,6 +10362,9 @@ def parse() -> None:
                             code
                             for name, code in sorted(counties.items(), key=lambda item: -len(item[0]))
                             if name in inside
+                            or state == "IN"
+                            and re.search(r"(?i)township (trustee|board member), ", str(row["contest"]))
+                            and inside.endswith(name.removesuffix("COUNTY"))
                         ),
                         "",
                     )
@@ -10696,6 +10709,18 @@ def parse() -> None:
                         "eastern hancock county school board",
                         re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
                     )
+                    for pattern, repl in IN_TOWNSHIP_SPELLINGS:
+                        tokens = re.sub(pattern, repl, tokens)
+                    if not row["county"] and (
+                        county_name := re.sub(
+                            r"[^a-z0-9]+", " ", places.get(str(row["fips"]), "").rsplit(",", 1)[0].lower()
+                        )
+                        .replace(" county", "")
+                        .strip()
+                    ):
+                        tokens = re.sub(rf" {county_name}$", "", tokens)
+                    if row["county"] == "Hamilton":
+                        tokens = re.sub(r"^washington township\b", "westfield washington township", tokens)
                     in_pin = None
                     for pattern, repl, alias_pin in IN_ALIASES:
                         if re.search(pattern, tokens):
@@ -11127,6 +11152,17 @@ def parse() -> None:
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
                     minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
+                if (
+                    state == "IN"
+                    and tail is not None
+                    and ":board-of-education:" in tail
+                    and used.get(tail, row["contest"]) != row["contest"]
+                    and tail in minted
+                    and (extra := re.sub(r"(?i)^.*?\bschool board\b,?\s*", "", str(row["contest"])))
+                ):
+                    tail = f"{tail}:{slug(extra)}"
+                    minted[tail] = (f"{minted[tail.rsplit(':', 1)[0]][0]}, {extra}", *minted[tail.rsplit(':', 1)[0]][1:])
+                    pinned.add(tail)
                 if (
                     template is None
                     or tail is None
