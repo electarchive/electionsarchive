@@ -4,12 +4,12 @@ from pathlib import Path
 from uuid import UUID
 
 from ea.changeset import Changeset
+from ea.sources.us import enr_clarity
 from ea.sources.us.enr_clarity_twins import LIVE, _person
 from ea.store import connect
 
 SOURCE = "us.special_district_merge"
-VERSION = "2"
-PIPELINES = ["us.enr_clarity", "us.enr_clarity_json", "us.enr_static", "us.kane_il", "us.tx_collin", "us.stl_boe"]
+VERSION = "5"
 GENERIC = re.compile(
     r"\b(?:no|number|ward|wd|district|dist|subdistrict|subdivision|protection|fire|water|sewer|sewerage|drainage|drain|"
     r"gravity|grav|road|rd|lighting|light|recreation|recreational|hospital|hosp|service|services|ser|serv|svc|area|"
@@ -21,13 +21,28 @@ GENERIC = re.compile(
     r"facilities|one|two|three|four|five|six|seven|eight|nine|ten|first|second|third|fourth|fifth|sixth|seventh|"
     r"eighth|ninth|tenth|fifteen|gdd|fpd|sd|mud|wcid|esd|fwsd|sud|cdd|pud|par|sch|\d+[a-z]?|[a-z])\b"
 )
-ALIASES = {("17", "foxmetrowaterdistrict4"): "foxmetrowaterreclamationdistrict"}
+ALIASES = {
+    ("17", "foxmetrowaterdistrict4"): "foxmetrowaterreclamationdistrict",
+    ("48", "trophyclubmunicipalutilitydistrict"): "trophyclubmunicipalutilitydistrict1",
+    ("48", "ftbendwatercontrolandimprovementdistrict2"): "fortbendwatercontrolandimprovementdistrict2",
+    ("48", "bastoptraviscoemergencyservicesdistrict1"): "bastroptravisemergencyservicesdistrict1",
+    ("06", "sjdeltacommunitycollegedistrict"): "sanjoaquindeltacommunitycollegedistrict",
+    ("20", "wyandottecountywaterdistrict1"): "jocowaterdistrict1",
+    ("26", "gratiotcountycommunitycollegedistrict"): "montcalmcommunitycollegedistrict",
+    ("29", "saintlouiscommunitycollegedistrict"): "stlouiscommunitycollegedistrict",
+}
 UNRELATED = {"increasesfundingsourcespublicschoolscommunitycollegedistrict"}
 MISREAD = {
     "special:17043:fire:bloomingdale-emergency-services-district-13": "Bloomingdale's ESD 13 is Bloomingdale School "
     "District 13, an elementary school district, not an emergency services district",
     "special:48085:college:austin-community-college-district": "Collin County's 1999 line on casualty and accident "
     "insurance (Acc Ins) is a state constitutional amendment, not an Austin Community College District question",
+    "special:06059:college:increases-funding-sources-public-schools-community-college-district": "Orange County's "
+    "2020 line for Proposition 15 (funding for public schools, community colleges, and local services) is a statewide "
+    "measure, not a community college district question",
+    "special:06067:college:increases-funding-sources-public-schools-community-college-district": "Sacramento "
+    "County's 2020 line for Proposition 15 (funding for public schools, community colleges, and local services) is a "
+    "statewide measure, not a community college district question",
 }
 PREFERRED = "(select text from name n where n.entity_id = {0} and n.is_preferred and n.lang = 'en' limit 1)"
 
@@ -37,6 +52,7 @@ def _folded(text: str | None) -> str:
 
 
 def emit() -> Path:
+    family = enr_clarity.family(SOURCE)
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -63,8 +79,8 @@ def emit() -> Path:
                        (select array_agg(y.ballot_name) from contest_option p join candidacy y on y.option_id = p.id
                         where p.contest_id = o.id and y.ballot_name is not null)
                 from stale s
-                join election f on f.date_from = s.date_from and f.polity_id <> s.polity_id
-                join contest o on o.election_id = f.id and o.kind = s.kind
+                join election f on f.date_from = s.date_from
+                join contest o on o.election_id = f.id and o.id <> s.id and o.kind = s.kind
                   and o.round_number is not distinct from s.round_number
                   and o.party_scope_id is not distinct from s.party_scope_id and {LIVE.format("o")}
                 join changeset h on h.id = o.changeset_id and h.pipeline = any(%s)
@@ -72,7 +88,7 @@ def emit() -> Path:
                 join external_id b on b.entity_id = f.polity_id and b.scheme = 'us.polity'
                   and left(split_part(a.value, ':', 2), 2) = left(split_part(b.value, ':', 2), 2)
                 where exists (select from result_set r where r.contest_id = o.id and r.status = 'active')""",
-            [PIPELINES, PIPELINES],
+            [family] * 2,
         ).fetchall()
         matches: dict[UUID, set[tuple[UUID, ...]]] = defaultdict(set)
         for (
@@ -96,7 +112,7 @@ def emit() -> Path:
             if (
                 shared * 2 > len(mine) and shared * 2 > len(held)
                 if mine or held
-                else (title or "").partition(": ")[2] == (other_title or "").partition(": ")[2] != ""
+                else _folded((title or "").partition(": ")[2]) == _folded((other_title or "").partition(": ")[2]) != ""
             ):
                 matches[stale].add((other, polity, survivor, body, other_body, office, other_office, local))
         rekeyed: dict[UUID, set[UUID]] = defaultdict(set)
@@ -107,7 +123,8 @@ def emit() -> Path:
                 continue
             other, polity, survivor, body, other_body, office, other_office, _ = next(iter(found))
             cs.merge(stale, other)
-            rekeyed[polity].add(survivor)
+            if polity != survivor:
+                rekeyed[polity].add(survivor)
             for owner, target in ((body, other_body), (office, other_office)):
                 if owner is not None and target is not None and owner != target:
                     rekeyed[owner].add(target)
@@ -156,14 +173,14 @@ def emit() -> Path:
                 for member in members
             ):
                 continue
-            survivor = max(members, key=lambda member: (member[2], str(member[0])))[0]
+            survivor = max(members, key=lambda member: (_folded(member[3]) == folded, member[2], str(member[0])))[0]
             groups += 1
             for member in members:
                 cs.merge(member[0], survivor)
                 involved.add(member[0])
 
-        def fold(rows: list[tuple[UUID, tuple[object, ...], int]]) -> None:
-            grouped: dict[tuple[object, ...], list[tuple[UUID, int]]] = defaultdict(list)
+        def fold(rows: list[tuple[UUID, tuple[object, ...], tuple[bool, int]]]) -> None:
+            grouped: dict[tuple[object, ...], list[tuple[UUID, tuple[bool, int]]]] = defaultdict(list)
             for entity, key, weight in rows:
                 if entity not in cs.survivors:
                     grouped[key].append((entity, weight))
@@ -175,7 +192,7 @@ def emit() -> Path:
         ids = [list(involved)]
         fold(
             [
-                (election, (cs.survivors.get(polity, polity), day, kind), contests)
+                (election, (cs.survivors.get(polity, polity), day, kind), (polity not in cs.survivors, contests))
                 for election, polity, day, kind, contests in conn.execute(
                     f"""select e.id, e.polity_id, e.date_from, e.kind::text,
                                (select count(*) from contest k where k.election_id = e.id)
@@ -186,7 +203,11 @@ def emit() -> Path:
         )
         fold(
             [
-                (owner, (table, cs.survivors.get(polity, polity), kind, _folded(text)), contests)
+                (
+                    owner,
+                    (table, cs.survivors.get(polity, polity), kind, _folded(text)),
+                    (polity not in cs.survivors, contests),
+                )
                 for owner, table, polity, kind, text, contests in conn.execute(
                     f"""select b.id, 'body', b.polity_id, b.kind::text, {PREFERRED.format("b.id")},
                                (select count(*) from contest k where k.body_id = b.id)
@@ -211,5 +232,39 @@ def emit() -> Path:
                 [value] * 4,
             ).fetchall():
                 cs.add("entity_retirement", entity_id=entity, reason=reason)
-        print(f"{len(rekeyed)} re-keyed owners, {groups} special districts written once per county")
+        elections = conn.execute(
+            f"""select distinct on (e.id) e.id, e.polity_id, n.id, n.text from election e
+                join external_id x on x.entity_id = e.polity_id and x.scheme = 'us.polity' and x.value like 'special:%%'
+                  and not (x.value = any(%s))
+                join name n on n.entity_id = e.id and n.is_preferred and n.lang = 'en'
+                join changeset g on g.id = e.changeset_id
+                where g.pipeline = any(%s) and {LIVE.format("e")}""",
+            [list(MISREAD), family],
+        ).fetchall()
+        polities = dict(
+            conn.execute(
+                "select entity_id, text from name where entity_id = any(%s) and is_preferred and lang = 'en'",
+                [list({cs.survivors.get(polity, polity) for _, polity, _, _ in elections})],
+            ).fetchall()
+        )
+        renamed = 0
+        for election, polity, name, text in elections:
+            styled = re.fullmatch(r"(\d{4}) (.+) (\w+ elections?)", text)
+            place = polities.get(cs.survivors.get(polity, polity))
+            if election in cs.survivors or styled is None or place is None or _folded(styled[2]) == _folded(place):
+                continue
+            renamed += 1
+            reason = f"{styled[2]} is a misread of the district's name, {place}"
+            cs.add("name_drop", name_id=name, entity_id=election, text=text, reason=reason)
+            cs.add(
+                "name",
+                entity_id=election,
+                text=f"{styled[1]} {place} {styled[3]}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+        print(
+            f"{len(rekeyed)} re-keyed owners, {groups} special districts written once per county, {renamed} elections renamed"
+        )
         return cs.write()

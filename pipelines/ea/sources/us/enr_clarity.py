@@ -1,4 +1,5 @@
 import csv
+import importlib.util
 import io
 import json
 import re
@@ -297,6 +298,7 @@ SPECIALS = (
     ),
     (r"FRESH WATER SUPPLY DISTRICT|\bF ?W ?S ?D\b", "water", "Fresh Water Supply District"),
     (r"EMERGENCY SERVICES? DISTRICT|\bE ?S ?D\b", "fire", "Emergency Services District"),
+    (r"EDUCATIONAL SERVICE DISTRICT", "school", "Educational Service District"),
     (r"FIRE PROTECTION DISTRICT|FIRE DISTRICT", "fire-protection", "Fire Protection District"),
     (r"HOSPITAL DISTRICT", "hospital", "Hospital District"),
     (r"GROUNDWATER CONSERVATION DISTRICT", "conservation", "Groundwater Conservation District"),
@@ -307,12 +309,17 @@ SPECIALS = (
     (r"(?:PUBLIC |MUNICIPAL )?IMPROVEMENT DISTRICT|\bPID\b", "improvement", "Improvement District"),
     (r"LIBRARY DISTRICT", "library", "Library District"),
     (
-        r"COMMUNITY COLLEGE(?: DISTRICT)?|JUNIOR COLLEGE(?: DISTRICT)?|COLLEGE DISTRICT|\bACC\b(?! INS)",
+        r"COMMUNITY COLLEGE(?!S)(?: DISTRICT)?|JUNIOR COLLEGE(?: DISTRICT)?|COLLEGE DISTRICT|\bACC\b(?! INS)",
         "college",
         "Community College District",
     ),
     (r"WATER RECLAMATION DIST(?:RICT)?", "reclamation", "Water Reclamation District"),
     (r"WATER (?:SUPPLY |IMPROVEMENT )?DISTRICT|WATER AUTHORITY|RIVER AUTHORITY", "water", "Water District"),
+)
+SPECIAL_LEAD = re.compile(
+    r"^(?:#?\d+|ISSUE \d+[A-Z]?|MEASURE [A-Z]{1,2}\d?|(?:ESD )?(?:PROPOSITION|PROP)(?: NO)?(?: (?:[IVX]+|[A-Z]|\d+[A-Z]?)(?![A-Z0-9]))?|QUESTION|(?:TO )?CREAT(?:E|ION OF)(?: AN?)?|"
+    r"ANNEXATION(?: ELECTION)?(?: TO)?|PROPOSED(?: (?:ADDITIONAL )?TAX LEVY(?: (?:RENEWAL|ADDITIONAL|REPLACEMENT|INCREASE|AND|&))*)?)"
+    r"(?![A-Z0-9])[ -]*"
 )
 SPECIAL_ROLES = re.compile(
     r"\b(?:BOARD OF (?:DIRECTORS|TRUSTEES|SUPERVISORS|COMMISSIONERS)|DIRECTORS? ELECTION|DIRECTORS?|TRUSTEES?|"
@@ -326,7 +333,7 @@ SEATS = (
     (r"(?:PRECINCT|PCT|PREC)", "Precinct"),
     (r"(?:PLACE|PL)", "Place"),
     (r"(?:POSITION|POS|SEAT)", "Position"),
-    (r"(?:SINGLE MEMBER DISTRICT|DISTRICT|DIST|SMD)", "District"),
+    (r"(?:SINGLE MEMBER DISTRICT|SUB-?DIST(?:RICT)?(?! ?\d+ ?(?:YR|YEAR))|DISTRICT|DIST|SMD)", "District"),
     (r"(?:WARD|WD)", "Ward"),
     (r"REGION", "Region"),
     (r"ZONE", "Zone"),
@@ -1027,14 +1034,28 @@ def _precinct_key(name: str) -> tuple[str, str] | None:
     return None
 
 
-def _district(text: str, pattern: str, kind: str, noun: str, county_name: str, clean: bool) -> tuple[str, str | None]:
+def _district(
+    text: str, pattern: str, kind: str, noun: str, county_name: str, names: list[str], clean: bool
+) -> tuple[str, str | None]:
     found = list(re.finditer(rf"\b(?:{pattern})", text))[-1]
-    head = SPECIAL_ROLES.sub(" ", text[: found.start()])
+    head = re.sub(r"\s+", " ", REMAINDER.sub(" ", TERM.sub(" ", SPECIAL_ROLES.sub(" ", text[: found.start()])))).strip(
+        " ,-/"
+    )
+    while lead := SPECIAL_LEAD.match(head):
+        head = head[lead.end() :]
+    head = re.sub(
+        r"^.*\b(?:PROPOS\w*|PROP|MILLAGE|SALES AND USE TAX)\b(?: (?:NO\.? |NUMBER )?(?:[IVX]+|[A-Z]|\d+[A-Z]?|ONE|TWO|THREE|FOUR|FIVE)\b)?|\b(?:19|20)\d\d\b",
+        " ",
+        head,
+    ).strip(" ,-/:")
+    head = re.sub(r"\s*\bREQ \d+/\d+\b", "", head)
+    if kind == "fire-protection":
+        head = re.sub(r"(?: FIRE| PROT)+$", "", head)
     tail = text[found.end() :]
     number = re.match(
-        r"^ ?(?:DIST(?:RICT)? )?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-[A-Z0-9]+)?)\b"
+        r"^ ?(?:DIST(?:RICT)? )?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b)"
         if clean
-        else r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-[A-Z0-9]+)?)\b",
+        else r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b)",
         tail,
     )
     if number:
@@ -1043,7 +1064,9 @@ def _district(text: str, pattern: str, kind: str, noun: str, county_name: str, c
     if seat is None:
         seat, tail = _seat(tail)
     if clean:
-        head = re.sub(r"^.*\b(?:FOR|TO)\b|\bTERM\b", " ", TERM.sub(" ", REMAINDER.sub(" ", head)))
+        head = re.sub(r"^.*\b(?:FOR|TO)\b|\bTERM\b", " ", head)
+    if names and (city := re.search(rf"\b(?:CITY|TOWN|VILLAGE) OF ({'|'.join(map(re.escape, names))})\b", head)):
+        head = (head[: city.start()] + " " + head[city.end() :]).strip() or city[1]
     head = re.sub(r"\b(?:PROPOSITION|PROP) [A-Z0-9]+\b|\b(?:CITY|TOWN|VILLAGE) OF [A-Z]+\b|^.*\bFOR\b", " ", head)
     head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/")
     if head in ("", "COUNTY") or head.startswith("COUNTY "):
@@ -1070,8 +1093,11 @@ def _classify(
     plain = re.sub(r"\bAT- LARGE\b", "AT-LARGE", plain)
     if st in ("IL", "MI"):
         plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
-    if st != "TX" and re.search(r"\bESD\b", plain):
-        return None
+    elementary = st not in ("TX", "MI", "WA", "OR") and re.search(r"\bESD\b", plain) is not None
+    if st != "TX":
+        plain = re.sub(r"\bESD\b", "SCHOOL DISTRICT" if elementary else "EDUCATIONAL SERVICE DISTRICT", plain)
+    if elementary:
+        plain = re.sub(r"#(?=\d)", "", plain)
     if st == "NY":
         plain = re.sub(r"\s+", " ", TERM.sub(" ", plain))
         plain = re.sub(r"\b(\d+) (WARD|DISTRICT|DIST)\b", r"\2 \1", plain)
@@ -1107,6 +1133,8 @@ def _classify(
     if (SCHOOL.search(plain) or st == "NY" and "EDUCATION" in plain) and school_names:
         bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", plain)).strip()
         for name, code in school_names:
+            if elementary:
+                name = re.sub(r"\s+", " ", re.sub(r"\bELEMENTARY\b", " ", name)).strip()
             if name and re.search(
                 rf"\b{re.escape(name)}\b", bare if " " in name or not name.endswith("ISD") else plain
             ):
@@ -1155,12 +1183,14 @@ def _classify(
             }
     for pattern, kind, noun in SPECIALS:
         if re.search(rf"\b(?:{pattern})", plain):
-            legacy, seat = _district(plain, pattern, kind, noun, county_name, False)
+            legacy, seat = _district(plain, pattern, kind, noun, county_name, names, False)
             display, _ = _district(
                 next(
                     (
                         part
-                        for part in re.sub(r"\bDIST\b", "DISTRICT", plain).split(" - ")
+                        for part in re.sub(
+                            r"(?<![A-Z0-9] )\b([A-Z]+) - (?=[A-Z]+ )", r"\1-", re.sub(r"\bDIST\b", "DISTRICT", plain)
+                        ).split(" - ")
                         if re.search(rf"\b(?:{pattern})", part)
                     ),
                     plain,
@@ -1169,6 +1199,7 @@ def _classify(
                 kind,
                 noun,
                 county_name,
+                names,
                 True,
             )
             return {
@@ -1315,6 +1346,199 @@ def _county(st: str, county: str, key: str, office: str, body: bool, seat: str |
     }
 
 
+def family(source: str) -> list[str]:
+    found = []
+    for folder in sorted((DATA / "parsed").glob("us.*")):
+        module = folder.name[3:]
+        if (
+            folder.name == source
+            or "." in module
+            or importlib.util.find_spec(f"ea.sources.us.{module}") is None
+            or not all((folder / f"{table}.parquet").exists() for table in ("contests", "lines", "polities"))
+        ):
+            continue
+        if {"contest_key", "tenant", "balanced", "scheme", "code"} <= set(
+            pl.read_parquet_schema(folder / "contests.parquet")
+        ):
+            found.append(folder.name)
+    return found
+
+
+def _pieces(
+    source: str, family: list[str], contests: pl.DataFrame, lines: pl.DataFrame, alias_codes: Mapping[str, list[str]]
+) -> tuple[
+    pl.DataFrame, pl.DataFrame, set[str], dict[str, dict[str, set[str]]], dict[tuple[object, str, str], str | None]
+]:
+    def canonical(code: str) -> str:
+        return min([code, *alias_codes[code]])
+
+    def choices(table: pl.DataFrame) -> dict[tuple[str, str, str], frozenset[str]]:
+        found: dict[tuple[str, str, str], set[str]] = {}
+        for county, election, contest, choice in (
+            table.filter(pl.col("choice") != "Write-ins").select("county", "election", "contest", "choice").iter_rows()
+        ):
+            found.setdefault((county, election, contest), set()).add(re.sub(r"[^a-z0-9]+", "", choice.lower()))
+        return {keys: frozenset(names) for keys, names in found.items()}
+
+    tables: dict[str, tuple[pl.DataFrame, pl.DataFrame]] = {}
+    for name in [source, *family]:
+        rows = contests if name == source else pl.read_parquet(DATA / "parsed" / name / "contests.parquet")
+        rows = rows.filter((pl.col("scheme") == "us.special_district") & pl.col("code").is_in(list(alias_codes)))
+        if rows.is_empty():
+            continue
+        counted = (lines if name == source else pl.read_parquet(DATA / "parsed" / name / "lines.parquet")).join(
+            rows.select("county", "election", "contest").unique(), on=["county", "election", "contest"]
+        )
+        tables[name] = (rows, counted)
+    groups: dict[tuple[object, str, str], dict[str, list[dict[str, Any]]]] = {}
+    fitted: dict[tuple[object, str, str], str | None] = {}
+    for name, (rows, counted) in tables.items():
+        sizes = dict(
+            counted.filter(pl.col("place").is_null())
+            .group_by("county", "election", "contest")
+            .agg(pl.col("votes").sum())
+            .select(pl.concat_str("county", "election", "contest", separator="\x1f"), "votes")
+            .iter_rows()
+        )
+        named = choices(counted)
+        for row in rows.iter_rows(named=True):
+            keys = (row["county"], row["election"], row["contest"])
+            if keys not in named:
+                continue
+            group = (row["day"], canonical(row["code"]), ":".join(row["contest_key"].split(":")[5:]))
+            piece = row | {"_size": sizes.get("\x1f".join(keys), 0), "_choices": named[keys]}
+            pieces = groups.setdefault(group, {}).setdefault(name, [])
+            same = next((other for other in pieces if other["county"] == row["county"]), None)
+            if same is None:
+                pieces.append(piece)
+            elif piece["_size"] > same["_size"]:
+                pieces[pieces.index(same)] = piece
+    for (day, code, tail), by_source in sorted(groups.items(), key=lambda item: (str(item[0][0]), *item[0][1:])):
+        for name, pieces in list(by_source.items()):
+            twins = [
+                group
+                for group in groups
+                if group[:2] == (day, code)
+                and any(
+                    row["_choices"] == piece["_choices"]
+                    for rows in groups[group].values()
+                    for row in rows
+                    for piece in pieces
+                )
+            ]
+            fits = [
+                group
+                for group in groups
+                if group[:2] == (day, code)
+                and group[2] != tail
+                and name not in groups[group]
+                and (
+                    group[2].startswith(f"{tail}:")
+                    or len(twins) == 2
+                    and group in twins
+                    and len(by_source) == 1
+                    and len(groups[group]) == 1
+                )
+                and any(
+                    all(
+                        piece["_choices"] <= row["_choices"]
+                        if group[2].startswith(f"{tail}:")
+                        else piece["_choices"] == row["_choices"]
+                        for piece in pieces
+                    )
+                    and not {piece["county"] for piece in pieces} & {row["county"] for row in rows}
+                    for rows in groups[group].values()
+                    for row in rows
+                )
+            ]
+            if len(fits) == 1:
+                seat = next(row["seat"] for rows in groups[fits[0]].values() for row in rows)
+                for piece in pieces:
+                    fitted[(day, code, piece["county"])] = seat
+                groups[fits[0]][name] = [piece | {"_fit": True} for piece in by_source.pop(name)]
+    added: list[dict[str, Any]] = []
+    added_lines: list[pl.DataFrame] = []
+    yielded: set[str] = set()
+    absorbed: dict[str, dict[str, set[str]]] = {}
+    for by_source in groups.values():
+        if source not in by_source or len(by_source) < 2:
+            continue
+        ranked = sorted(
+            by_source,
+            key=lambda name: (
+                any(row.get("_fit") for row in by_source[name]),
+                -sum(row["_size"] for row in by_source[name]),
+                name,
+            ),
+        )
+        base = by_source[ranked[0]]
+        reference = base[0]["_choices"]
+
+        def matches(row: dict[str, Any], reference: frozenset[str] = reference) -> bool:
+            return row["_choices"] <= reference or not row.get("_fit") and reference <= row["_choices"]
+
+        counties = {row["county"] for row in base}
+        chosen = [ranked[0]]
+        for name in ranked[1:]:
+            pieces = by_source[name]
+            if all(matches(row) for row in pieces) and not counties & {row["county"] for row in pieces}:
+                chosen.append(name)
+                counties |= {row["county"] for row in pieces}
+        own = by_source[source]
+        if source not in chosen:
+            if len(chosen) > 1 and all(matches(row) and row["county"] in counties for row in own):
+                yielded.update(row["contest_key"] for row in own)
+            continue
+        if len(chosen) < 2:
+            continue
+        if chosen[0] != source:
+            yielded.update(row["contest_key"] for row in own)
+            continue
+        contest_key, code = own[0]["contest_key"], own[0]["code"]
+        for name in chosen[1:]:
+            rows, counted = tables[name]
+            for row in by_source[name]:
+                added.append(row | {"contest_key": contest_key, "code": code})
+                parts = row["contest_key"].split(":")
+                district = ":".join(parts[2:5])
+                absorbed.setdefault(contest_key, {}).setdefault(name, set()).update(
+                    row["contest_key"].replace(f":{district}:", f":{other}:", 1)
+                    for other in [district, *alias_codes.get(district, [])]
+                )
+                added_lines.append(
+                    counted.filter(
+                        (pl.col("county") == row["county"])
+                        & (pl.col("election") == row["election"])
+                        & (pl.col("contest") == row["contest"])
+                    )
+                )
+    if not added:
+        return contests, lines, yielded, absorbed, fitted
+    extra = pl.DataFrame(
+        [{column: row.get(column) for column in contests.columns} for row in added],
+        schema=contests.schema,
+        orient="row",
+    ).with_columns([pl.col(column).fill_null(False) for column, kind in contests.schema.items() if kind == pl.Boolean])
+    return (
+        pl.concat([contests, extra]).sort("day", "contest_key", "county"),
+        pl.concat(
+            [
+                lines,
+                *(
+                    table.select(
+                        pl.col(column).cast(kind) if column in table.columns else pl.lit(None, kind).alias(column)
+                        for column, kind in lines.schema.items()
+                    )
+                    for table in added_lines
+                ),
+            ]
+        ),
+        yielded,
+        absorbed,
+        fitted,
+    )
+
+
 def emit(
     source: str = SOURCE,
     platform: str = "clarity",
@@ -1402,6 +1626,68 @@ def emit(
                 f"{sum(key != into for key, into in reused.items())} contests keep the key of a merged district's code"
             )
         contests = contests.with_columns(contest_key=pl.col("contest_key").replace(reused))
+        siblings = [
+            name
+            for (name,) in conn.execute(
+                "select distinct pipeline from changeset where status = 'published' and pipeline = any(%s)",
+                [family(source)],
+            ).fetchall()
+        ]
+        contests, lines, yielded, absorbed, fitted = _pieces(source, siblings, contests, lines, alias_codes)
+        if absorbed or yielded:
+            print(
+                f"{len(absorbed)} contests join pieces from {', '.join(sorted({name for names in absorbed.values() for name in names}))}; "
+                f"{len(yielded)} pieces join another pipeline's contest"
+            )
+        balloted: dict[object, dict[str, set[str | None]]] = {}
+        for name in [source, *siblings]:
+            rows = contests if name == source else pl.read_parquet(DATA / "parsed" / name / "contests.parquet")
+            for day, code, county, seat in (
+                rows.filter(pl.col("scheme") == "us.special_district")
+                .select("day", "code", "county", "seat")
+                .iter_rows()
+            ):
+                for each in [code, *alias_codes.get(code, [])]:
+                    for scope in (each, (day, each)):
+                        balloted.setdefault(scope, {}).setdefault(county, set()).add(
+                            fitted.get((day, min([code, *alias_codes.get(code, [])]), county)) if seat is None else seat
+                        )
+        existing = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value = any(%s)",
+                [[*absorbed, *(key for names in absorbed.values() for keys in names.values() for key in keys)]],
+            ).fetchall()
+        }
+        backed = set(
+            conn.execute(
+                """select x.value, g.pipeline from external_id x
+                   join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
+                   join changeset g on g.id = r.changeset_id
+                   where x.scheme = 'us.contest' and x.value = any(%s)""",
+                [list(existing)],
+            ).fetchall()
+        )
+        adopted = {
+            contest_key: min(found, key=lambda key: (not any((key, name) in backed for name in names), key))
+            for contest_key, names in absorbed.items()
+            if contest_key not in existing
+            and (found := {key for keys in names.values() for key in keys if key in existing})
+        }
+        if adopted:
+            contests = contests.with_columns(contest_key=pl.col("contest_key").replace(adopted))
+            absorbed = {adopted.get(key, key): names for key, names in absorbed.items()}
+        added_counties = set(contests["county"].to_list()) - set(counties_listed)
+        if added_counties:
+            grouped = {keys: rows for keys, rows in lines.group_by("county", "election", "contest")}
+            tenants_of = set(contests.filter(pl.col("county").is_in(list(added_counties)))["tenant"].to_list())
+            with portals.REGISTRY.open() as file:
+                listed = [
+                    *listed,
+                    *(row for row in csv.DictReader(file) if row["tenant"] in tenants_of),
+                ]
+            county_names = {row["county_fips"]: row["county"].upper() for row in listed}
+            counties_listed = sorted(set(contests["county"].to_list()))
         polities: dict[str, tuple[UUID, str, str]] = {}
         for scheme, code, polity, text, path in conn.execute(
             """select a.scheme_code, c.code, t.polity_id, n.text, s.path from area a
@@ -1420,19 +1706,21 @@ def emit(
                 "select path, entity_id from slug where path like any(%s)", [[f"us/{st.lower()}/%" for st in states]]
             ).fetchall()
         )
-        taken: dict[tuple[object, str], set[str]] = {}
-        for held_on, value, key in conn.execute(
-            """select e.date_from, x.value, k.value from contest c
+        taken: dict[tuple[object, str], set[tuple[str, str]]] = {}
+        for held_on, value, key, pipeline in conn.execute(
+            """select e.date_from, x.value, k.value, g.pipeline from contest c
                join election e on e.id = c.election_id
                join result_set r on r.contest_id = c.id
                join changeset g on g.id = r.changeset_id
                join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                  and x.scheme in ('us.office', 'us.body')
                left join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
-               where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s""",
+               where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s and r.status <> 'withdrawn'""",
             [states, source],
         ).fetchall():
-            taken.setdefault((held_on, value), set()).add("*" if key is None else ":".join(key.split(":")[2:5]))
+            taken.setdefault((held_on, value), set()).add(
+                ("*" if key is None else ":".join(key.split(":")[2:5]), pipeline)
+            )
         bodies = {
             value
             for (value,) in conn.execute(
@@ -1440,28 +1728,30 @@ def emit(
                 [states],
             ).fetchall()
         }
-        asked: dict[tuple[object, str], set[str]] = {}
-        for held_on, area, key in conn.execute(
-            """select e.date_from, a.code, k.value from contest c
+        asked: dict[tuple[object, str], set[tuple[str, str]]] = {}
+        for held_on, area, key, pipeline in conn.execute(
+            """select e.date_from, a.code, k.value, g.pipeline from contest c
                join election e on e.id = c.election_id
                join result_set r on r.contest_id = c.id
                join changeset g on g.id = r.changeset_id
                join area_code a on a.area_id = c.district_area_id
                left join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
-               where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)""",
+               where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)
+                 and r.status <> 'withdrawn'""",
             [source, fips],
         ).fetchall():
-            asked.setdefault((held_on, area), set()).add("*" if key is None else ":".join(key.split(":")[2:5]))
-        held = {
-            value
-            for (value,) in conn.execute(
-                """select x.value from external_id x
-                   join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
-                   join changeset g on g.id = r.changeset_id
-                   where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
-                [source, states],
-            ).fetchall()
-        }
+            asked.setdefault((held_on, area), set()).add(
+                ("*" if key is None else ":".join(key.split(":")[2:5]), pipeline)
+            )
+        held: dict[str, set[str]] = {}
+        for value, pipeline in conn.execute(
+            """select x.value, g.pipeline from external_id x
+               join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
+               join changeset g on g.id = r.changeset_id
+               where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
+            [source, states],
+        ).fetchall():
+            held.setdefault(value, set()).add(pipeline)
         keyed = {
             value
             for (value,) in conn.execute(
@@ -1480,6 +1770,14 @@ def emit(
                 [source],
             ).fetchall()
         }
+        set_keys: dict[UUID, set[str]] = {}
+        for contest_id, value in conn.execute(
+            """select r.contest_id, x.value from result_set r join changeset g on g.id = r.changeset_id
+               join external_id x on x.entity_id = r.id and x.scheme = %s
+               where g.pipeline = %s and r.is_default""",
+            [f"{source}.result_set", source],
+        ).fetchall():
+            set_keys.setdefault(contest_id, set()).add(value)
         runoff_schools = {
             value
             for (value,) in conn.execute(
@@ -1554,6 +1852,7 @@ def emit(
         chosen: set[UUID] = set()
         assigned: dict[UUID, UUID] = {}
         seated: dict[tuple[UUID, str], UUID] = {}
+        ours = {cs.survivors.get(person, person) for person in person_keys}
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "referendum")}
         parties = {key: cs.key("us.party", f"{key}-party") for key in ("republican", "democratic")}
         if cs.minted & {*systems.values(), *parties.values()}:
@@ -1738,11 +2037,15 @@ def emit(
         memberships: set[tuple[UUID, UUID, date]] = set()
         values: list[tuple[str, str, str, int]] = []
         emitted: list[UUID] = []
+        emitted_sets: list[UUID] = []
         done: dict[str, UUID] = {}
         skipped: Counter[str] = Counter()
         primary_winners: dict[tuple[int, str, str, str, str | None, bool], dict[str, set[str]]] = {}
         for key, rows in contests.group_by("contest_key", maintain_order=True):
             contest_key = str(key[0])
+            if contest_key in yielded:
+                skipped["joined into another pipeline's contest"] += 1
+                continue
             first = rows.row(0, named=True)
             scheme, code, office_key, seat, day, st = (
                 first[k] for k in ("scheme", "code", "key", "seat", "day", "state")
@@ -1888,16 +2191,15 @@ def emit(
                 skipped["retired"] += 1
                 continue
             piece = {"*", ":".join(contest_key.split(":")[2:5])} if scheme == "us.special_district" else None
+            joined = set(absorbed.get(contest_key, {}))
+
+            def clash(entries: set[tuple[str, str]]) -> bool:
+                return any((piece is None or part in piece) and pipeline not in joined for part, pipeline in entries)
+
             if (
-                contest_key in held
-                or (
-                    not question
-                    and any(
-                        (day, alias) in taken and (piece is None or bool(piece & taken[(day, alias)]))
-                        for alias in aliases
-                    )
-                )
-                or (question and (day, code) in asked and (piece is None or bool(piece & asked[(day, code)])))
+                held.get(contest_key, set()) - joined
+                or (not question and any(clash(taken.get((day, alias), set())) for alias in aliases))
+                or (question and clash(asked.get((day, code), set())))
             ):
                 skipped["held by another pipeline"] += 1
                 continue
@@ -1912,7 +2214,19 @@ def emit(
             missing = (
                 []
                 if "whole" in rows.columns and rows["whole"].all()
-                else sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
+                else sorted(
+                    county
+                    for county, share in shares.items()
+                    if share >= 0.01
+                    and county not in carried
+                    and not (
+                        scheme == "us.special_district"
+                        and seat is not None
+                        and (seen := balloted.get((day, code), {}).get(county) or balloted.get(code, {}).get(county))
+                        and None not in seen
+                        and seat not in seen
+                    )
+                )
             )
             completeness = 1.0 if not missing else round(sum(shares.get(county, 0.0) for county in carried) / whole, 3)
             if completeness < floor and scheme != "us.special_district":
@@ -2035,6 +2349,30 @@ def emit(
                 [stale_keys.get(contest_key, []), contest],
             ).fetchall():
                 cs.merge(stale, contest)
+            pieces = [contest]
+            for pipeline, keys in absorbed.get(contest_key, {}).items():
+                for (stale,) in conn.execute(
+                    """select distinct coalesce(m.into_id, x.entity_id) from external_id x
+                       left join entity_merge m on m.entity_id = x.entity_id
+                       join result_set r on r.contest_id = coalesce(m.into_id, x.entity_id)
+                       join changeset g on g.id = r.changeset_id
+                       where x.scheme = 'us.contest' and x.value = any(%s) and g.pipeline = %s
+                         and coalesce(m.into_id, x.entity_id) <> %s""",
+                    [sorted(keys), pipeline, contest],
+                ).fetchall():
+                    cs.merge(stale, contest)
+                    pieces.append(stale)
+            owned: dict[UUID, UUID] = (
+                dict(
+                    conn.execute(
+                        """select y.id, y.person_id from candidacy y join contest_option o on o.id = y.option_id
+                           join changeset c on c.id = y.changeset_id where o.contest_id = any(%s) and c.pipeline <> %s""",
+                        [pieces, source],
+                    ).fetchall()
+                )
+                if contest_key in absorbed
+                else {}
+            )
             contest_path = next(
                 (
                     candidate
@@ -2171,7 +2509,11 @@ def emit(
             cs.add("slug", path=contest_path, entity_id=contest)
             emitted.append(contest)
             done[contest_key] = contest
-            result_set = cs.key(f"{source}.result_set", contest_key)
+            held_keys = set_keys.get(contest, set())
+            result_set = cs.key(
+                f"{source}.result_set", contest_key if contest_key in held_keys or not held_keys else min(held_keys)
+            )
+            emitted_sets.append(result_set)
             main = max(carried, key=lambda county: shares.get(county, 0.0))
             cs.add(
                 "result_set",
@@ -2311,12 +2653,13 @@ def emit(
                     key = f"{st}:{code}:{slug(ballot)}"
                     if (holder := people.get(candidacy)) is not None and holder in person_keys:
                         cs.renamed[key] = person_keys[holder]
-                    person = cs.key(person_scheme, key)
+                    keeper = owned.get(candidacy) or (holder if holder is not None and holder not in ours else None)
+                    person = keeper or cs.key(person_scheme, key)
                     cs.renamed.pop(key, None)
                     chosen.add(person)
                     assigned[candidacy] = person
                     seated[(contest, slug(ballot))] = person
-                    if person not in persons:
+                    if person not in persons and keeper is None:
                         persons.add(person)
                         if person in cs.minted:
                             cs.add("person", id=person)
@@ -2422,11 +2765,11 @@ def emit(
             f"""select distinct {", ".join(f"r.{column}" for column in columns)} from result_set r
                 join changeset g on g.id = r.changeset_id
                 join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)
+                where g.pipeline = %s and r.status = 'active' and (r.contest_id <> all(%s) or r.id <> all(%s))
                   and split_part(x.value, ':', 2) = any(%s)""",
-            [source, emitted, states],
+            [source, emitted, emitted_sets, states],
         ).fetchall():
-            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
+            cs.add("result_set", **dict(zip(columns, row, strict=True)) | {"is_default": False}, status="withdrawn")
             cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
         states_of = {row["county_fips"]: row["state"] for row in listed}
         for place_code, (county, day) in minted.items():

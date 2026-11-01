@@ -11,7 +11,7 @@ from ea import raw
 from ea.sources.us import enr_clarity
 
 SOURCE = "us.stlco"
-VERSION = "2"
+VERSION = "3"
 PLATFORM = "mo_stlco"
 ROOT = "https://extcontent.stlouisco.com/BOE/eResults/"
 PARTIES = {"REP": "Republican", "DEM": "Democratic", "LIB": "Libertarian", "CON": "Constitution", "GRN": "Green"}
@@ -45,7 +45,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             title = row["Contest Title"].strip()
             choice = re.sub(r"(?i)\s*\(disqualified[^)]*\)", "", row["Choice Name"]).strip()
             votes = row["Total Votes"].strip()
-            if not votes.lstrip("-").isdigit():
+            if not votes.lstrip("-").isdigit() or choice.upper() == "NO ONE":
                 continue
             entry = contests[title].setdefault(
                 choice,
