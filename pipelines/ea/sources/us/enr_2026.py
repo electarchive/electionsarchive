@@ -74,7 +74,7 @@ TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives)
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
-YESNO = {"for": "yes", "against": "no"}
+YESNO = {"for": "yes", "against": "no", "approve": "yes", "reject": "no"}
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
 GENERIC = {
     "an",
@@ -124,6 +124,8 @@ GENERIC = {
     "appeals",
     "supreme",
     "associate",
+    "township",
+    "village",
 }
 NOBODY = r"(?i)^no candidat"
 ORDINALS = {
@@ -1204,9 +1206,9 @@ def plan(
         titles: dict[UUID, set[str]] = {}
         held: dict[UUID, tuple[UUID | None, datetime]] = {}
         statewide: set[UUID] = set()
-        for key, id, area, recorded, level in conn.execute(
-            """select x.value, x.entity_id, c.district_area_id, c.recorded_from,
-                      p.kind in ('federal_unit', 'judicial_district')
+        judicial: set[UUID] = set()
+        for key, id, area, recorded, kind in conn.execute(
+            """select x.value, x.entity_id, c.district_area_id, c.recorded_from, p.kind
                from external_id x
                join contest c on c.id = x.entity_id
                join election e on e.id = c.election_id
@@ -1219,13 +1221,17 @@ def plan(
             if not re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
                 published.setdefault(id, ([], set()))[0].append(key)
                 held[id] = (area, recorded)
-                if level:
+                if kind in ("federal_unit", "judicial_district"):
                     statewide.add(id)
+                if kind == "judicial_district":
+                    judicial.add(id)
         for contest, label in conn.execute(
             """select o.contest_id, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
                from contest_option o
                left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
-               where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)""",
+               where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)
+                 and (o.kind = 'answer' or not exists (
+                   select from contest_option a where a.contest_id = o.contest_id and a.kind = 'answer' and a.parent_option_id is null))""",
             [list(published)],
         ).fetchall():
             if not WRITE_IN.search(label):
@@ -1284,12 +1290,21 @@ def plan(
                     and (len(places) != 1 or codes.get((FIPS[state], plain(places[0]))) != segment[:5])
                     or len(places) == 1
                     and not re.match(r"\d|sd|house$|senate$", segment)
+                    and contest not in judicial
                     or people <= {"yes", "no"}
                     and segment in towns
                     and not towns[segment] & words
                 ):
                     continue
                 overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
+                if (
+                    overlap < 0.6
+                    and people
+                    and people <= wanted
+                    and not people <= {"yes", "no"}
+                    and (re.match(r"\d|sd", segment) or contest in judicial)
+                ):
+                    overlap = 0.6
                 if overlap >= 0.6:
                     tokens = titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:])
                     found = words & tokens
@@ -1306,6 +1321,21 @@ def plan(
                     )
             scored.sort(key=lambda hit: (-hit[0], -hit[1], -hit[2]))
             best = [hit for hit in scored if hit[:3] == scored[0][:3]] if scored else []
+            if (
+                len(best) > 1
+                and len({frozenset(published[hit[3]][1]) for hit in best}) == 1
+                and len(published[best[0][3]][1]) > 1
+                and not published[best[0][3]][1] <= {"yes", "no"}
+                and len({hit[4].split(":")[2] for hit in best}) == 1
+            ):
+                best = [max(best, key=lambda hit: held[hit[3]][1])]
+            numbers = {w for w in words if w.isdigit()}
+            if len(best) > 1 and numbers:
+                kept = [
+                    hit for hit in best if numbers & (titles.get(hit[3], set()) | set(re.split(r"[:-]", hit[4])[2:]))
+                ]
+                if len(kept) == 1:
+                    best = kept
             if len(best) == 1 and not ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
                 return best, True
             return best, False
@@ -1372,6 +1402,11 @@ def plan(
                        order by u.scheme_code = 'us.place' and u.code = %s, u.scheme_code limit 1""",
                     [contest, segment, segment],
                 ).fetchone()
+                if found is None:
+                    found = conn.execute(
+                        "select id from reporting_unit where scheme_code = 'us.school_district' and code = %s",
+                        [segment.removeprefix("sd")],
+                    ).fetchone()
                 if found is None:
                     unmatched.append(f"local {state}: {name}: no unit for {key}")
                     continue
