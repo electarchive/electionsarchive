@@ -1127,7 +1127,7 @@ export async function archive(path: string, search: URLSearchParams) {
     };
   }
   if (slug.type === "contest") {
-    const merged = season(slug.entity_id);
+    const merged = season(slug.entity_id).catch(() => null);
     const input = {
       id: slug.entity_id,
       unit,

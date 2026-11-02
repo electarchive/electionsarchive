@@ -103,6 +103,9 @@ const edgeHandle: Handle = async ({ event, resolve }) =>
   mark(event, await resolve(event));
 
 export const init: ServerInit = () => {
+  process.on("unhandledRejection", (error) => {
+    console.error("An unhandled rejection:", error);
+  });
   setTimeout(() => void purge(), 5000);
 };
 
