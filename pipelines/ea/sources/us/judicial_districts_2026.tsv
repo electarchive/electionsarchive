@@ -1,0 +1,10 @@
+state	district	label	parent	office	candidate	source
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Adam Giganti	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	John M. Madonia	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Gail L. Noll	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Zachary A. Schmidt	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Allison Lorton	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Christopher Reif	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Raylene Grischow	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-3	Third Judicial Circuit		Circuit Judge	Dennis R. Ruth	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
+IL	IL:circuit-3-subcircuit-2	Third Judicial Circuit, 2nd Subcircuit	IL:circuit-3	Subcircuit Judge	Amy Maher	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
