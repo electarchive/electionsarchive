@@ -20,7 +20,8 @@ function isShareable(
 ) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
-    response.status !== 200 ||
+    (response.status !== 200 &&
+      !(url.pathname.startsWith("/id/") && [307, 308].includes(response.status))) ||
     (response.headers.has("cache-control") && !isDataRequest) ||
     response.headers.has("set-cookie") ||
     locals.user != null ||
@@ -38,11 +39,14 @@ function isShareable(
   );
 }
 
-async function settled(response: Response) {
+async function settled(response: Response, isMoved: boolean) {
   if (response.headers.get("content-type") !== "application/json") {
     return null;
   }
   const text = await response.clone().text();
+  if (isMoved && text.startsWith('{"type":"redirect",')) {
+    return text;
+  }
   return text.startsWith('{"type":"data","nodes":[') &&
     !text.includes('{"type":"error"')
     ? text
@@ -54,7 +58,7 @@ export async function mark(event: RequestEvent, response: Response) {
   const isOpen = isShareable(event, response);
   const data =
     isOpen && event.isDataRequest && !isLive
-      ? await settled(response)
+      ? await settled(response, event.url.pathname.startsWith("/id/"))
       : undefined;
   if (!isOpen || data === null) {
     if (isLive) {
