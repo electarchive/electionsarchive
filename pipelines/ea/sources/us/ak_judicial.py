@@ -55,7 +55,7 @@ JUDGES = {
 }
 OFFICES = {"Supreme Court": "Justice of the Supreme Court", "Court of Appeals": "Judge of the Court of Appeals"}
 BLOCK = re.compile(
-    r"^\s*(Supreme Court|Supreme Crt|Supreme CT|Court of Appeals|Appeals)(?:\s*-\s*(?:Justice|Judge)\s+(\S+)|\s+(\S+))?\s*$",
+    r"^\s*(Supreme Court|Supreme Crt|Supreme CT|Court of Appeals|Appeals)(?:\s*-\s*(?:(?:Justice|Judge)\s+)?(\S+)|\s+(\S+))?\s*$",
     re.IGNORECASE,
 )
 VOTES = re.compile(r"^(YES|NO)\s+([\d,]+)\s+[\d.]+%$")
@@ -289,7 +289,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result,
                     option_id=options["yes"],
-                    candidacy_id=candidacy,
+                    candidacy_id=None,
                     kind="elected" if retained else "lost",
                     seats=1 if retained else None,
                 )

@@ -294,7 +294,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result,
                     option_id=options[choice],
-                    candidacy_id=candidacies[choice],
+                    candidacy_id=None,
                     kind="elected",
                     seats=1,
                 )

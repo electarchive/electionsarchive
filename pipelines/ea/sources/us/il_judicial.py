@@ -312,7 +312,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result,
                     option_id=options["yes"],
-                    candidacy_id=candidacies["yes"],
+                    candidacy_id=None,
                     kind="elected" if retained else "lost",
                     seats=1 if retained else None,
                 )
@@ -322,7 +322,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result,
                     option_id=options[winner],
-                    candidacy_id=candidacies[winner],
+                    candidacy_id=None,
                     kind="elected",
                     seats=1,
                 )

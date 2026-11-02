@@ -268,7 +268,14 @@ def emit():
             """select u.area_id, u.id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state' where p.iso_code = 'US-OH'"""
         ).fetchone()
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/oh/%%'").fetchall()}
+        taken = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s join changeset c on c.id = s.changeset_id
+                   where s.path like 'us/oh/%%' and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         fptp = cs.key("us.electoral_system", "fptp")
         known: dict[tuple[str, str], UUID] = {}
         for person, text in conn.execute(
@@ -386,7 +393,7 @@ def emit():
                 "outcome",
                 result_set_id=result,
                 option_id=options[winner],
-                candidacy_id=candidacies[winner],
+                candidacy_id=None,
                 kind="elected",
                 seats=1,
             )

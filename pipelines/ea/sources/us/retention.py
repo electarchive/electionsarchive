@@ -1572,6 +1572,15 @@ def emit() -> Path:
         persons: set[str] = set()
         memberships: set[tuple[UUID, UUID, str]] = set()
         values: list[tuple[str, str, str, int, int]] = []
+        stray = {
+            id
+            for (id,) in conn.execute(
+                """select t.result_set_id from outcome t join changeset c on c.id = t.changeset_id
+                   join contest_option o on o.id = t.option_id and o.kind = 'answer'
+                   where c.pipeline = %s and t.candidacy_id is not null""",
+                [SOURCE],
+            ).fetchall()
+        }
         units: dict[str, tuple[str, str, str]] = {}
         compared: list[tuple[str, int, int]] = []
         for row in races.iter_rows(named=True):
@@ -1632,6 +1641,7 @@ def emit() -> Path:
             )
             if minted or (state == "OK" and year == 2010 and seat):
                 name(contest, f"{year} {states[state]} {title} retention: {judge}" + (f" ({seat})" if seat else ""))
+            if minted:
                 base = f"us/{state.lower()}/{day}-general/{slug(title)}-{suffix}"
                 path, count = base, 1
                 while path in taken:
@@ -1838,11 +1848,11 @@ def emit() -> Path:
                         unit = cs.unit("us.precinct", code, date.fromisoformat(day))
                         if area in districts.values():
                             memberships.add((unit, area, day))
-                        if fine not in cs.minted:
+                        if fine not in cs.minted and fine not in stray:
                             continue
                         if code not in existing:
                             units[code] = (state, county, day)
-                    elif fine not in cs.minted:
+                    elif fine not in cs.minted and fine not in stray:
                         continue
                     elif unit_kind in ("county", "place"):
                         unit = counties[code][0]
@@ -1873,7 +1883,7 @@ def emit() -> Path:
                 "outcome",
                 result_set_id=default,
                 option_id=options["yes"],
-                candidacy_id=candidacy,
+                candidacy_id=None,
                 kind="elected" if retained else "lost",
                 seats=1 if retained else None,
             )
@@ -1937,4 +1947,6 @@ def emit() -> Path:
         drift = [item for item in compared if item[1] or item[2]]
         print(f"{len(compared)} questions with both MEDSL and official totals, {len(drift)} differ: {drift[:20]}")
         print(f"{len(values)} values, {len(units)} new precincts, {len(persons)} judges")
+        scope = cs.manifest.get("scope")
+        cs.manifest["scope"] = {**(scope if isinstance(scope, dict) else {}), "clears": [str(id) for id in stray]}
         return cs.write()

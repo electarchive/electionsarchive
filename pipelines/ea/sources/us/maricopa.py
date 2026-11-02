@@ -563,8 +563,13 @@ def emit() -> Path:
                 """select s.path from slug s where s.is_current and s.entity_id in (
                        select o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
                        where c.pipeline = %s and o.kind = 'candidate'
-                         and o.ballot_label ~* 'print name of write|not qualified')""",
-                [SOURCE],
+                         and o.ballot_label ~* 'print name of write|not qualified'
+                       union
+                       select r.contest_id from outcome t join changeset c on c.id = t.changeset_id
+                       join result_set r on r.id = t.result_set_id
+                       join contest_option o on o.id = t.option_id and o.kind = 'answer'
+                       where c.pipeline = %s and t.candidacy_id is not null)""",
+                [SOURCE, SOURCE],
             ).fetchall()
         }
         taken -= replaced
@@ -990,7 +995,7 @@ def emit() -> Path:
                         "outcome",
                         result_set_id=result_set,
                         option_id=options["Yes"],
-                        candidacy_id=candidacies["Yes"],
+                        candidacy_id=None,
                         kind="elected" if yes > no else "lost",
                         seats=1 if yes > no else None,
                     )

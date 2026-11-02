@@ -310,7 +310,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result,
                     option_id=options[str(top["candidate"])],
-                    candidacy_id=candidacies[str(top["candidate"])],
+                    candidacy_id=None,
                     kind="elected",
                     seats=1,
                 )

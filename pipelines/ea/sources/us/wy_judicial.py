@@ -258,7 +258,7 @@ def emit():
                 "outcome",
                 result_set_id=result,
                 option_id=options["yes"],
-                candidacy_id=candidacy,
+                candidacy_id=None,
                 kind="elected" if retained else "lost",
                 seats=1 if retained else None,
             )

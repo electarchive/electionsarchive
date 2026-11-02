@@ -315,8 +315,6 @@ def emit() -> Path:
             tallies = dict(lines.group_by("answer").agg(pl.col("votes").sum()).iter_rows())
             yes, no = tallies.get("yes", 0), tallies.get("no", 0)
             retained = yes >= share * (yes + no) if share is not None else yes > no
-            if result_set not in cs.minted:
-                continue
             cs.add(
                 "note",
                 entity_id=result_set,
@@ -330,7 +328,7 @@ def emit() -> Path:
                 "outcome",
                 result_set_id=result_set,
                 option_id=options["yes"],
-                candidacy_id=candidacy,
+                candidacy_id=None,
                 kind="elected" if retained else "lost",
                 seats=1 if retained else None,
             )

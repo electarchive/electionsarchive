@@ -1,6 +1,5 @@
 import html
 import re
-from collections import defaultdict
 from datetime import date
 from uuid import UUID
 
@@ -53,13 +52,18 @@ def cells(year: int) -> list[str]:
     text = raw.cached(SOURCE, url(year)).path.read_text(errors="ignore")
     text = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<!--.*?-->", "", text)
     text = re.sub(r"(?i)</t[dr]>|<br\s*/?>|</p>|</h\d>", "\n", text)
-    lines = [re.sub(r"\s+", " ", line.replace("\xa0", " ")).strip() for line in html.unescape(re.sub(r"<[^>]+>", " ", text)).split("\n")]
+    lines = [
+        re.sub(r"\s+", " ", line.replace("\xa0", " ")).strip()
+        for line in html.unescape(re.sub(r"<[^>]+>", " ", text)).split("\n")
+    ]
     return [line for line in lines if line]
 
 
 def judges(year: int) -> list[dict[str, object]]:
     lines = cells(year)
-    start = next(i for i, x in enumerate(lines) if re.match(r"(FOR )?COURT OF (SPECIAL )?APPEALS", x) and x.upper() == x)
+    start = next(
+        i for i, x in enumerate(lines) if re.match(r"(FOR )?COURT OF (SPECIAL )?APPEALS", x) and x.upper() == x
+    )
     end = next(
         (i for i, x in enumerate(lines) if i > start and re.match(r"(FOR )?CIRCUIT COURT", x) and x.upper() == x),
         len(lines),
@@ -140,7 +144,15 @@ def emit() -> object:
             polity="US-MD",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=PAGE.format(year=2010, name="2010jud"), license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE.format(year=2010, name="2010jud"),
+            license="Public record",
+        )
         for year in DAYS:
             cs.artifact(raw.cached(SOURCE, url(year)), source)
         retention_system = cs.key("us.electoral_system", "retention")
@@ -171,7 +183,11 @@ def emit() -> object:
                 for wrong, right in SPELLING.items():
                     raw_name = raw_name.replace(wrong, right)
                 shown = display(raw_name)
-                tokens = [t for t in re.sub(r"[.,]", " ", raw_name).split() if len(t) > 1 and t.lower() not in {"jr", "sr", "ii", "iii"}]
+                tokens = [
+                    t
+                    for t in re.sub(r"[.,]", " ", raw_name).split()
+                    if len(t) > 1 and t.lower() not in {"jr", "sr", "ii", "iii"}
+                ]
                 person_key = f"MD:{slug(tokens[0] + ' ' + tokens[-1])}"
                 office_key = f"{slug(title)}:MD"
                 office = cs.key("us.office", office_key)
@@ -242,6 +258,7 @@ def emit() -> object:
                     completeness=1,
                 )
                 cs.add("note", entity_id=result, kind="methodology", body_md=f"{METHOD} {NOTE}")
+                yes, no = row["nums"]
                 if row.get("printed") is not None:
                     cs.add(
                         "note",
@@ -277,13 +294,12 @@ def emit() -> object:
                     ballot_name=shown,
                     is_independent=False,
                 )
-                yes, no = row["nums"]
                 retained = yes > no
                 cs.add(
                     "outcome",
                     result_set_id=result,
                     option_id=options["yes"],
-                    candidacy_id=candidacy,
+                    candidacy_id=None,
                     kind="elected" if retained else "lost",
                     seats=1 if retained else None,
                 )
