@@ -32,6 +32,7 @@ export class View {
   level = $state<string | null>(null);
   vs = $state<string | null>(null);
   group = $state<string | null>(null);
+  round = $state<"first" | "second" | null>(null);
   range = $state<[number, number] | null>(null);
   only = $state<string | null>(null);
   isFlippedOnly = $state(false);
@@ -51,6 +52,8 @@ export class View {
     this.level = query.get("level");
     this.vs = query.get("vs");
     this.group = query.get("group") === "alliance" ? "alliance" : null;
+    const round = query.get("round");
+    this.round = round === "first" || round === "second" ? round : null;
     this.range = range(query.get("range"));
     this.only = query.get("only");
     this.isFlippedOnly = query.get("flipped") === "1";
@@ -70,6 +73,7 @@ export class View {
       who: this.mode === "share" ? this.who : null,
       vs: this.vs,
       group: this.group,
+      round: this.round,
       range:
         this.range == null
           ? null

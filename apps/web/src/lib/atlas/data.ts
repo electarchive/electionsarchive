@@ -12,6 +12,7 @@ export type Ask = {
   vs?: string | null;
   group?: string | null;
   whole?: string | null;
+  round?: string | null;
 };
 export type Mosaic = {
   key: string;
@@ -21,7 +22,7 @@ export type Mosaic = {
   set: Sheet;
 };
 
-const KEYS = ["unit", "level", "vs", "group", "whole"] as const;
+const KEYS = ["unit", "level", "vs", "group", "whole", "round"] as const;
 const sheets = new Map<string, Promise<Sheet>>();
 const mosaics = new Map<string, Promise<Mosaic | null>>();
 const splits = new WeakMap<Mosaic, Array<Sheet>>();

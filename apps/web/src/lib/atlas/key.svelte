@@ -30,6 +30,7 @@
     year,
     isProportional,
     isAllied,
+    isRunoff,
     isEstimated,
     noun,
     scope,
@@ -43,6 +44,7 @@
     year: string | null;
     isProportional: boolean;
     isAllied: boolean;
+    isRunoff: boolean;
     isEstimated: boolean;
     noun: string;
     scope: string;
@@ -174,6 +176,29 @@
 </script>
 
 <div class="grid grid-cols-[minmax(0,1fr)] gap-4">
+  {#if isRunoff}
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-1.5">
+      <span class="text-xs font-semibold text-muted-foreground"
+        >{m.map_round_label()}</span
+      >
+      <Segmented
+        label={m.map_round_label()}
+        size="sm"
+        fill
+        options={[
+          { value: "seats", label: m.map_round_seats() },
+          { value: "first", label: m.round_first() },
+          { value: "second", label: m.round_second() },
+        ]}
+        value={view.round ?? "seats"}
+        onValueChange={(value) => {
+          view.round = value === "first" || value === "second" ? value : null;
+          view.only = null;
+        }}
+      />
+    </div>
+  {/if}
+
   <div class="grid grid-cols-[minmax(0,1fr)] gap-1.5">
     <span class="text-xs font-semibold text-muted-foreground"
       >{m.map_color_by()}</span

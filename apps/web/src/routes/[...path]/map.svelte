@@ -126,6 +126,7 @@
     }> | null;
     parted?: {
       isOnly: boolean;
+      isApart?: boolean;
       ks: Array<number>;
       inset: { scheme: string; day: string; ks: Array<number> } | null;
     } | null;
@@ -2465,7 +2466,7 @@
     const shown = isSummary ? null : outline;
     const isDetailed = isBasemap;
     const polity = scheme;
-    const isHidden = isBoxed;
+    const isHidden = isBoxed || parted?.isApart === true;
     untrack(() => basemap(engine, polity, isDetailed, shown, isHidden));
   });
 
@@ -2521,7 +2522,8 @@
                   {
                     at: row.at,
                     swing,
-                    color: colors[swing >= 0 ? 0 : 1] ?? "var(--muted-foreground)",
+                    color:
+                      colors[swing >= 0 ? 0 : 1] ?? "var(--muted-foreground)",
                     weight: row.valid,
                   },
                 ];

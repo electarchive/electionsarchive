@@ -81,7 +81,7 @@ export const maps = {
       }),
     )
     .output(Boxes)
-    .handler(async ({ input }) => boxes(input.scheme, input.day, input.ks)),
+    .handler(async ({ input }) => boxes([input])),
   detached: os
     .meta(
       openapi({
@@ -100,7 +100,46 @@ export const maps = {
     .output(Boxes)
     .handler(async ({ input }) => {
       const held = await vintage(input.tiles);
-      return held == null ? [] : boxes(held.scheme, held.day, input.ks);
+      return held == null
+        ? []
+        : boxes([{ scheme: held.scheme, day: held.day, ks: input.ks }]);
+    }),
+  apart: os
+    .meta(
+      openapi({
+        method: "POST",
+        path: "/maps/apart",
+        summary:
+          "Draw the places a national map sets apart, such as the counties and precincts of Alaska and Hawaii on a map of the United States, from up to four tile sets at once: each box's name and size, and a simplified SVG path for every place in it, drawn from the box's top-left corner",
+      }),
+    )
+    .input(
+      v.object({
+        sets: v.pipe(
+          v.array(
+            v.object({
+              tiles: Tiles,
+              ks: v.pipe(
+                v.array(v.pipe(v.number(), v.integer())),
+                v.maxLength(2500),
+              ),
+            }),
+          ),
+          v.maxLength(4),
+        ),
+      }),
+    )
+    .output(Boxes)
+    .handler(async ({ input }) => {
+      const asks = await Promise.all(
+        input.sets.map(async (set) => {
+          const held = await vintage(set.tiles);
+          return held == null
+            ? []
+            : [{ scheme: held.scheme, day: held.day, ks: set.ks }];
+        }),
+      );
+      return boxes(asks.flat());
     }),
   zooms: os
     .meta(

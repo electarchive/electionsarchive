@@ -676,6 +676,7 @@ const Places = v.nullable(
 
 const Parted = v.object({
   isOnly: v.boolean(),
+  isApart: v.boolean(),
   ks: v.array(v.number()),
   inset: v.nullable(
     v.object({ scheme: v.string(), day: v.string(), ks: v.array(v.number()) }),
@@ -5070,6 +5071,7 @@ async function tabulate(
               ),
               winner: position.get(chain.winner ?? "") ?? null,
               margin: chain.margin,
+              total: chain.total,
             },
           }),
           ...(isTally && { isTally }),
@@ -5253,6 +5255,7 @@ async function atlas(input: {
   group: Grouping;
   isLean?: boolean;
   whole?: string;
+  round?: "seats" | "first" | "second";
 }) {
   const picked = await find(input.id);
   const group =
@@ -5564,6 +5567,24 @@ async function atlas(input: {
       ? undefined
       : parted(own.rows[0]?.scheme ?? "", area.id, day),
   ]);
+  const [boxed, boxedParts] = await Promise.all([
+    level?.tiles == null ? undefined : parted(level.code, area.id, day),
+    federal == null || federal === level?.code || parts.length === 0
+      ? undefined
+      : parted(federal, area.id, day),
+  ]);
+  const apart =
+    boxed == null || boxed.isOnly
+      ? undefined
+      : {
+          isApart: boxed.isApart,
+          inset: boxed.inset,
+          parts: parts.flatMap((part, index) =>
+            ((boxedParts ?? boxed).inset?.ks ?? []).includes(part.k)
+              ? [index]
+              : [],
+          ),
+        };
   const wanted =
     input.vs == null || input.vs === "" || input.vs === "none"
       ? null
@@ -5761,26 +5782,47 @@ async function atlas(input: {
     }
     return summed;
   };
-  const rows = tabulated.rows.map((row) => ({
-    ...row,
-    shares: merge(row.shares),
-    earlier: row.earlier == null ? null : merge(row.earlier),
-    absent: row.absent?.flatMap((index) =>
-      fold.every(
-        (at, other) => at !== fold[index] || row.absent?.includes(other),
-      )
-        ? [fold[index] ?? index]
-        : [],
-    ),
-    leader: row.leader == null ? null : (fold[row.leader] ?? row.leader),
-    held:
-      row.held?.map(([at, seats]): [number, number] => [
-        fold[at] ?? at,
-        seats,
-      ]) ?? null,
-    prior: row.prior == null ? null : (fold[row.prior] ?? row.prior),
-    ...(moved.has(row.k) && { earlier: null, previous: null, prior: null }),
-  }));
+  const isRunoff = tabulated.rows.some((row) => row.runoff != null);
+  const round = isRunoff ? (input.round ?? "seats") : "first";
+  const rows = tabulated.rows
+    .flatMap((row) => {
+      if (round === "first") {
+        return [row];
+      }
+      if (row.runoff == null) {
+        return round === "second" ? [] : [row];
+      }
+      return [
+        {
+          ...row,
+          valid: row.runoff.total,
+          shares: row.runoff.shares,
+          leader: row.runoff.winner,
+          held: null,
+          absent: undefined,
+        },
+      ];
+    })
+    .map((row) => ({
+      ...row,
+      shares: merge(row.shares),
+      earlier: row.earlier == null ? null : merge(row.earlier),
+      absent: row.absent?.flatMap((index) =>
+        fold.every(
+          (at, other) => at !== fold[index] || row.absent?.includes(other),
+        )
+          ? [fold[index] ?? index]
+          : [],
+      ),
+      leader: row.leader == null ? null : (fold[row.leader] ?? row.leader),
+      held:
+        row.held?.map(([at, seats]): [number, number] => [
+          fold[at] ?? at,
+          seats,
+        ]) ?? null,
+      prior: row.prior == null ? null : (fold[row.prior] ?? row.prior),
+      ...(moved.has(row.k) && { earlier: null, previous: null, prior: null }),
+    }));
   const tail = /, [^,]+$/u.exec(rows[0]?.name ?? "")?.[0];
   const isShared =
     tail != null &&
@@ -5798,6 +5840,32 @@ async function atlas(input: {
           ).map((row) => [row.k, row.body]),
         )
       : null;
+  const away =
+    level?.tiles == null || boxed == null || boxed.isOnly
+      ? []
+      : (
+          await outside(
+            level.code,
+            area.id,
+            rows.map((row) => row.k),
+            day,
+          )
+        ).flatMap((entry) =>
+          entry.group === "over" ? [] : [{ ...entry, group: entry.group }],
+        );
+  const territories =
+    level?.code === "us.state" && away.length > 0
+      ? await db.execute<{ k: number; code: string }>(sql`
+        select a.k, (array['AS', 'GU', 'MP', 'PR', 'VI'])[array_position(array['60', '66', '69', '72', '78'], c.code)] as code
+        from area a join area_code c on c.area_id = a.id
+        where a.k = any(${sql.param(away.map((entry) => entry.k))}::int[])
+          and c.code in ('60', '66', '69', '72', '78')
+      `)
+      : null;
+  const outlying = away.map((entry) => {
+    const code = territories?.rows.find((row) => row.k === entry.k)?.code;
+    return code == null ? entry : { ...entry, code };
+  });
   return {
     title:
       group == null
@@ -5821,6 +5889,8 @@ async function atlas(input: {
     outline: stored(known.get(own.rows[0]?.scheme ?? "")?.tiles),
     frame,
     parted: split,
+    apart,
+    ...(outlying.length > 0 && { outlying }),
     levels: levels.map(({ rank: _rank, ...entry }) => entry),
     level: level?.code ?? null,
     parts,
@@ -5835,6 +5905,7 @@ async function atlas(input: {
       (entry) => entry.tiles == null && known.get(entry.code)?.tiles != null,
     ),
     isLed: group?.isLed ?? false,
+    isRunoff,
     isAllied: tabulated.isAllied,
     legend: legend.map((item) => ({
       key: item.key,
@@ -10572,6 +10643,7 @@ export const contests = {
         vs: v.optional(v.string()),
         group: Input.entries.group,
         whole: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+        round: v.optional(v.picklist(["seats", "first", "second"])),
       }),
     )
     .output(
@@ -10595,6 +10667,22 @@ export const contests = {
           }),
         ),
         parted: v.optional(Parted),
+        apart: v.optional(
+          v.object({
+            isApart: v.boolean(),
+            inset: Parted.entries.inset,
+            parts: v.array(v.number()),
+          }),
+        ),
+        outlying: v.optional(
+          v.array(
+            v.object({
+              k: v.number(),
+              group: v.picklist(["territory", "overseas", "abroad"]),
+              code: v.optional(v.string()),
+            }),
+          ),
+        ),
         levels: v.array(
           v.object({
             code: v.string(),
@@ -10614,6 +10702,7 @@ export const contests = {
         estimated: v.boolean(),
         isPending: v.boolean(),
         isLed: v.boolean(),
+        isRunoff: v.boolean(),
         isAllied: v.boolean(),
         legend: v.array(
           v.object({

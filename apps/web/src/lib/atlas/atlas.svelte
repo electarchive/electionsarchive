@@ -25,7 +25,9 @@
   import { layered, load, loadMosaic } from "#lib/atlas/data.js";
   import Drawer from "#lib/atlas/drawer.svelte";
   import Hover from "#lib/atlas/hover.svelte";
+  import Insets from "#lib/atlas/insets.svelte";
   import Key from "#lib/atlas/key.svelte";
+  import Outlying from "#lib/atlas/outlying.svelte";
   import Places from "#lib/atlas/places.svelte";
   import Rail from "#lib/atlas/rail.svelte";
   import Result from "#lib/atlas/result.svelte";
@@ -89,6 +91,7 @@
     vs: view.vs,
     group: view.group,
     whole,
+    round: view.round,
   });
 
   const SHARP = 8;
@@ -102,6 +105,7 @@
   let isFailed = $state(false);
   let begins = $state.raw<Array<number>>([]);
   let zoom = $state(0);
+  let fit = $state(0);
   let tier = $state(0);
   let moved = $state(0);
   let isAnalyzing = $state(false);
@@ -140,6 +144,19 @@
   const asked = new Set<string>();
 
   const head = $derived<Shell | Sheet>(base ?? shell);
+  const isNational = $derived(base?.apart != null && zoom < fit + 1.5);
+  const aside = $derived.by(() => {
+    void stage.version;
+    void drawn;
+    void tier;
+    return isNational ? stage.aside(tier) : [];
+  });
+  const outlying = $derived.by(() => {
+    void stage.version;
+    void drawn;
+    void tier;
+    return base?.apart != null ? stage.outlying(tier) : [];
+  });
   const levels = $derived(chain(head));
   const sample = $derived(Object.values(parts)[0] ?? null);
   const finest = $derived(isSettled ? fine(head, mosaic, sample) : null);
@@ -309,25 +326,10 @@
           engine.cursor(hit != null);
           return;
         }
-        const k = hit == null ? null : (hit.set.places.k[hit.i] ?? null);
         if (isTouch) {
           hover(null);
         }
-        if (isAdding || isShift) {
-          if (k != null) {
-            view.picked = view.picked.includes(k)
-              ? view.picked.filter((other) => other !== k)
-              : [...view.picked, k];
-          }
-          return;
-        }
-        view.picked =
-          k == null || (view.picked.length === 1 && view.picked[0] === k)
-            ? []
-            : [k];
-        if (k != null && !wide.current && detent === "peek") {
-          detent = "peek";
-        }
+        choose(hit, isShift);
       },
     },
   );
@@ -340,7 +342,7 @@
     if (gl == null || frame == null) {
       return;
     }
-    const fit = engine.fitZoom(frame);
+    fit = engine.fitZoom(frame);
     const world = 512 * 2 ** fit;
     const mercator = (lat: number) =>
       Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / (2 * Math.PI);
@@ -357,6 +359,22 @@
     ) {
       begins = next;
     }
+  }
+
+  function choose(hit: Hit | null, isMany: boolean) {
+    const k = hit == null ? null : (hit.set.places.k[hit.i] ?? null);
+    if (isAdding || isMany) {
+      if (k != null) {
+        view.picked = view.picked.includes(k)
+          ? view.picked.filter((other) => other !== k)
+          : [...view.picked, k];
+      }
+      return;
+    }
+    view.picked =
+      k == null || (view.picked.length === 1 && view.picked[0] === k)
+        ? []
+        : [k];
   }
 
   function hover(hit: Hit | null) {
@@ -397,6 +415,7 @@
       level: layer.code,
       vs: view.vs,
       group: view.group,
+      round: view.round,
     }).then((set) => {
       for (const [j, k] of set.places.k.entries()) {
         const found = stage.hit(index, k);
@@ -462,8 +481,13 @@
     }
     const middle = gl.getCenter();
     const box = gl.getBounds();
+    const apart = new Set(from.apart?.parts ?? []);
+    const away = new Set((from.outlying ?? []).map((entry) => entry.k));
     const near = from.parts
-      .flatMap((part) => {
+      .flatMap((part, index) => {
+        if (apart.has(index) || away.has(part.k)) {
+          return [];
+        }
         const i = from.places.k.indexOf(part.k);
         const x = from.places.x[i];
         const y = from.places.y[i];
@@ -489,7 +513,12 @@
     fetch(
       `${scope}|part|${part.unit}`,
       async () =>
-        load(contest, { unit: part.unit, vs: view.vs, group: view.group }),
+        load(contest, {
+          unit: part.unit,
+          vs: view.vs,
+          group: view.group,
+          round: view.round,
+        }),
       (set) => {
         if (JSON.stringify(ask) === scope) {
           parts = { ...parts, [part.unit]: set };
@@ -549,6 +578,10 @@
   }
 
   function focus(hit: Hit) {
+    if (stage.isApart(hit.set.places.k[hit.i] ?? 0)) {
+      engine.reset();
+      return;
+    }
     const box = stage.shape(hit);
     if (box != null) {
       engine.fit(box);
@@ -1180,7 +1213,7 @@
     void drawn;
     void room.width;
     void room.height;
-    const { hits, isBounded } = stage.within(tier);
+    const { hits, isBounded } = stage.within(tier, isNational);
     const rows: Array<{
       k: number;
       name: string;
@@ -1445,6 +1478,19 @@
             isNested: from.trail.length > 1,
           },
           from.parted,
+          {
+            apart: new Set(
+              (from.apart?.parts ?? []).flatMap((index) => {
+                const part = from.parts[index];
+                return part == null ? [] : [part.k];
+              }),
+            ),
+            off: new Set(
+              (from.outlying ?? []).flatMap((entry) =>
+                from.parts.some((part) => part.k === entry.k) ? [entry.k] : [],
+              ),
+            ),
+          },
         );
       }
       built = `${scope}|codes:${codes.join(",")}|${starts.map((value) => value.toFixed(2)).join(",")}`;
@@ -1593,8 +1639,9 @@
 
   $effect(() => {
     const isDetailed = view.isBasemap;
+    const isSplit = base?.apart != null;
     if (engine.gl != null) {
-      untrack(() => basemap(engine, scheme, isDetailed, []));
+      untrack(() => basemap(engine, scheme, isDetailed, [], isSplit));
     }
   });
 
@@ -1867,6 +1914,7 @@
     {year}
     {isProportional}
     isAllied={base?.isAllied ?? false}
+    isRunoff={base?.isRunoff ?? false}
     {isEstimated}
     noun={now?.noun ?? ""}
     scope={head.scope.name}
@@ -2181,6 +2229,62 @@
           >
         {/if}
       </div>
+
+      {#if aside.length > 0 && analysis == null && lasso == null}
+        <div
+          class={cn("absolute z-10", {
+            "inset-s-15 inset-be-3": wide.current,
+            "inset-s-3": !wide.current,
+          })}
+          style:inset-block-end={wide.current ? undefined : `${sheet + 12}px`}
+        >
+          <Insets
+            groups={aside}
+            {lens}
+            picked={view.picked}
+            {hovered}
+            {room}
+            isWide={wide.current}
+            isCalm={calm.current}
+            onhover={(
+              hit: Hit | null,
+              point: { x: number; y: number } | null,
+            ) => {
+              hover(hit);
+              pointer = point;
+            }}
+            onpick={choose}
+          />
+        </div>
+      {/if}
+
+      {#if outlying.length > 0 && analysis == null && lasso == null}
+        <div
+          class={cn("absolute z-10", {
+            "inset-e-3 inset-be-3 max-inline-[50%]": wide.current,
+            "inset-s-3 inset-e-16": !wide.current,
+          })}
+          style:inset-block-end={wide.current
+            ? undefined
+            : `${sheet + 12 + (aside.length > 0 ? 92 : 0)}px`}
+        >
+          <Outlying
+            entries={outlying}
+            {lens}
+            {labels}
+            picked={view.picked}
+            isWide={wide.current}
+            onhover={(
+              hit: Hit | null,
+              point: { x: number; y: number } | null,
+            ) => {
+              hover(hit);
+              pointer = point;
+            }}
+            onpick={choose}
+          />
+        </div>
+      {/if}
 
       {#if analysis != null}
         <div

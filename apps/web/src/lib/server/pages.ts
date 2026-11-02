@@ -1787,6 +1787,9 @@ export async function atlasPage(path: string, search: URLSearchParams) {
         vs: search.get("vs") ?? undefined,
         group: search.get("group") ?? undefined,
         whole: whole ?? undefined,
+        round: (["first", "second"] as const).find(
+          (round) => round === search.get("round"),
+        ),
       }).catch((error_: unknown) => {
         if (
           unit !== "" &&

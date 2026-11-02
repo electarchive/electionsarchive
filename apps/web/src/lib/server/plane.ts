@@ -215,13 +215,21 @@ export const parted = async (
     `),
     contest == null ? null : live(scheme, contest.id, day),
   ]);
-  if (rows.length === 0 || own.rows.length === 0) {
+  if (own.rows.length === 0) {
     return;
   }
   const mine = own.rows[0]?.mine ?? -1;
+  const isApart =
+    mine === -1 && insets.some((inset) => inset.detached !== true);
+  if (rows.length === 0) {
+    return isApart
+      ? { isOnly: false, isApart, ks: [], inset: null }
+      : undefined;
+  }
   if (mine !== -1) {
     return {
       isOnly: true,
+      isApart,
       ks: rows.filter((row) => row.part === mine).map((row) => row.k),
       inset: null,
     };
@@ -270,17 +278,25 @@ export const parted = async (
         insets[row.part]?.detached !== true,
     )
     .map((row) => row.k);
-  return ks.length === 0 && boxed.length === 0
+  return ks.length === 0 && boxed.length === 0 && !isApart
     ? undefined
     : {
         isOnly: false,
+        isApart,
         ks,
         inset: boxed.length === 0 ? null : { scheme, day, ks: boxed },
       };
 };
 
-export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
+export const boxes = async (
+  asks: Array<{ scheme: string; day: string; ks: Array<number> }>,
+) => {
+  const scheme = asks[0]?.scheme ?? "";
   const insets = insetsOf(scheme);
+  const kept = asks.filter(
+    (ask) => projectionOf(ask.scheme) === projectionOf(scheme),
+  );
+  const ks = kept.flatMap((ask) => ask.ks);
   if (insets.length === 0 || ks.length === 0) {
     return [];
   }
@@ -297,12 +313,16 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
           join display.meta dm on dm.mask_version = c.mask_version
           where c.area_id = a.id and c.valid = g.valid and c.geom_hash = md5(ST_AsBinary(g.geom))),
         g.geom), greatest(ST_XMax(g.geom) - ST_XMin(g.geom), ST_YMax(g.geom) - ST_YMin(g.geom)) / 2000) as geom
-      from area a
+      from unnest(
+        ${sql.param(ks)}::int[],
+        ${sql.param(kept.flatMap((ask) => ask.ks.map(() => ask.day)))}::date[],
+        ${sql.param(kept.flatMap((ask) => ask.ks.map(() => ask.scheme)))}::text[]
+      ) w(k, day, scheme)
+      join area a on a.k = w.k and a.scheme_code = w.scheme
       cross join lateral (
         select geom, valid from area_geometry where area_id = a.id
-        order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+        order by valid @> w.day desc, upper(valid) desc nulls first limit 1
       ) g
-      where a.k = any(${sql.param(ks)}::int[]) and a.scheme_code = ${scheme}
     ),
     planed as materialized (
       select k, ${part(scheme, "raw")} as part, ${plane("geom", "scheme")} as geom from picked

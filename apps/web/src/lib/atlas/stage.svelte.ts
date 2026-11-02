@@ -25,6 +25,9 @@ export class Stage {
   #tinted = "";
   #painted = new Map<string, string>();
   #hovered: { k: number; source: string } | null = null;
+  #apart = new Set<number>();
+  #off = new Set<number>();
+  #scopes = { apart: new Set<number>(), off: new Set<number>() };
 
   constructor(engine: Engine) {
     this.#engine = engine;
@@ -40,6 +43,7 @@ export class Stage {
     locked: number | null,
     scope: { outline: string | null; k: number; isNested: boolean },
     parted: Sheet["parted"],
+    scopes: { apart: Set<number>; off: Set<number> },
   ) {
     const engine = this.#engine;
     engine.drop(GROUP);
@@ -53,6 +57,9 @@ export class Stage {
     this.#mosaic = null;
     this.#tinted = "";
     this.#hovered = null;
+    this.#apart = new Set();
+    this.#off = new Set();
+    this.#scopes = scopes;
     engine.tint(new Map());
     engine.spot(null);
     if (scope.outline != null) {
@@ -280,7 +287,7 @@ export class Stage {
       set.places.k.flatMap((k, i) => {
         const x = set.places.x[i];
         const y = set.places.y[i];
-        return x == null || y == null
+        return x == null || y == null || this.isApart(k)
           ? []
           : [
               {
@@ -362,8 +369,19 @@ export class Stage {
     if (hits == null) {
       return false;
     }
+    const boxed = new Set(
+      set.apart?.inset?.scheme === set.level ? set.apart.inset.ks : [],
+    );
+    const away = new Set((set.outlying ?? []).map((entry) => entry.k));
+    const isApart = this.#scopes.apart.has(set.scope.k);
+    const isOff = this.#scopes.off.has(set.scope.k);
     for (const [i, k] of set.places.k.entries()) {
       hits.set(k, { set, i, tier, source });
+      if (isOff || away.has(k)) {
+        this.#off.add(k);
+      } else if (isApart || boxed.has(k)) {
+        this.#apart.add(k);
+      }
     }
     this.#drawn.set(key, {
       set,
@@ -385,8 +403,16 @@ export class Stage {
     }
     this.#mosaic = { mosaic, tier };
     this.#tinted = "";
+    const parts = new Set(mosaic.set.apart?.parts);
+    const away = new Set((mosaic.set.outlying ?? []).map((entry) => entry.k));
     for (const [i, k] of mosaic.set.places.k.entries()) {
       hits.set(k, { set: mosaic.set, i, tier, source: "ids" });
+      const part = mosaic.part[i] ?? -1;
+      if (away.has(mosaic.set.parts[part]?.k ?? -1)) {
+        this.#off.add(k);
+      } else if (parts.has(part)) {
+        this.#apart.add(k);
+      }
     }
     const keys = mosaic.layers.map((layer) => layer.tiles);
     this.#engine.drape(keys, GROUP);
@@ -401,7 +427,7 @@ export class Stage {
     return this.#hits[tier]?.get(k) ?? null;
   }
 
-  within(tier: number) {
+  within(tier: number, isBoxed: boolean) {
     const box = this.#engine.gl?.getBounds() ?? null;
     for (let at = tier; at >= 0; at -= 1) {
       const hits: Array<Hit> = [];
@@ -409,6 +435,12 @@ export class Stage {
       for (const hit of this.#hits[at]?.values() ?? []) {
         const { set, i } = hit;
         if (set.places.leader[i] == null) {
+          continue;
+        }
+        if (this.isApart(set.places.k[i] ?? 0)) {
+          if (isBoxed) {
+            hits.push(hit);
+          }
           continue;
         }
         const x = set.places.x[i];
@@ -433,7 +465,7 @@ export class Stage {
       for (const { set, i } of this.#hits[at]?.values() ?? []) {
         const x = set.places.x[i];
         const y = set.places.y[i];
-        if (x == null || y == null) {
+        if (x == null || y == null || this.isApart(set.places.k[i] ?? 0)) {
           continue;
         }
         const reading = read(set, i, lens);
@@ -474,7 +506,7 @@ export class Stage {
       }
       if (this.#mosaic?.tier === at) {
         const k = engine.sample(point);
-        const hit = k == null ? null : hits.get(k);
+        const hit = k == null || this.isApart(k) ? null : hits.get(k);
         if (hit != null) {
           return hit;
         }
@@ -488,7 +520,7 @@ export class Stage {
         ),
       ];
       const k = layers.length === 0 ? null : engine.pick(point, layers);
-      const hit = k == null ? null : hits.get(k);
+      const hit = k == null || this.isApart(k) ? null : hits.get(k);
       if (hit != null) {
         return hit;
       }
@@ -498,15 +530,38 @@ export class Stage {
 
   hover(hit: Hit | null) {
     const engine = this.#engine;
+    const k = hit == null ? null : (hit.set.places.k[hit.i] ?? null);
+    const shown = k == null || this.isApart(k) ? null : hit;
     const next =
-      hit == null || hit.source === "ids"
+      shown == null || shown.source === "ids"
         ? null
-        : { k: hit.set.places.k[hit.i] ?? 0, source: hit.source };
+        : { k: k ?? 0, source: shown.source };
     engine.mark("hover", next?.source ?? null, next?.k ?? null);
     this.#hovered = next;
-    engine.spot(
-      hit?.source === "ids" ? (hit.set.places.k[hit.i] ?? null) : null,
-    );
+    engine.spot(shown?.source === "ids" ? k : null);
+  }
+
+  isApart(k: number) {
+    return this.#apart.has(k) || this.#off.has(k);
+  }
+
+  outlying(tier: number) {
+    for (let at = tier; at >= 0; at -= 1) {
+      const found: Array<{ hit: Hit; group: string; code: string | null }> = [];
+      for (const hit of this.#hits[at]?.values() ?? []) {
+        const k = hit.set.places.k[hit.i] ?? 0;
+        const entry = this.#off.has(k)
+          ? hit.set.outlying?.find((other) => other.k === k)
+          : null;
+        if (entry != null) {
+          found.push({ hit, group: entry.group, code: entry.code ?? null });
+        }
+      }
+      if (found.length > 0) {
+        return found;
+      }
+    }
+    return [];
   }
 
   paint(
@@ -531,6 +586,9 @@ export class Stage {
       const dots = new Map<number, Record<string, string | number | boolean>>();
       const splits: Array<{ k: number; image: string }> = [];
       for (const [i, k] of set.places.k.entries()) {
+        if (this.isApart(k)) {
+          continue;
+        }
         const reading = read(set, i, lens);
         const color = tone(set, i, lens, reading);
         fills.set(k, {
@@ -589,7 +647,7 @@ export class Stage {
       const colors = new Map<number, string>();
       const { set } = held.mosaic;
       for (const [i, k] of set.places.k.entries()) {
-        if (set.places.leader[i] != null) {
+        if (set.places.leader[i] != null && !this.isApart(k)) {
           colors.set(k, isDotted ? QUIET : tone(set, i, lens));
         }
       }
@@ -624,6 +682,7 @@ export class Stage {
         if (
           x == null ||
           y == null ||
+          this.isApart(drawn.set.places.k[i] ?? 0) ||
           x < west - padX ||
           x > east + padX ||
           y < south - padY ||
@@ -683,6 +742,37 @@ export class Stage {
       "labels",
       { group: GROUP },
     );
+  }
+
+  aside(tier: number) {
+    const found: Array<{ tier: number; tiles: string; hits: Array<Hit> }> = [];
+    const held = this.#mosaic?.mosaic;
+    for (let at = tier; at >= 0; at -= 1) {
+      const groups = new Map<string, Array<Hit>>();
+      for (const hit of this.#hits[at]?.values() ?? []) {
+        const { set, i } = hit;
+        if (!this.#apart.has(set.places.k[i] ?? 0)) {
+          continue;
+        }
+        const tiles =
+          hit.source === "ids"
+            ? held?.layers[held.layer[i] ?? 0]?.tiles.replace(/\.ids$/u, "")
+            : set.levels.find((level) => level.code === set.level)?.tiles;
+        if (tiles == null) {
+          continue;
+        }
+        const group = groups.get(tiles);
+        if (group == null) {
+          groups.set(tiles, [hit]);
+        } else {
+          group.push(hit);
+        }
+      }
+      for (const [tiles, hits] of groups) {
+        found.push({ tier: at, tiles, hits });
+      }
+    }
+    return found;
   }
 
   shape(hit: Hit) {
