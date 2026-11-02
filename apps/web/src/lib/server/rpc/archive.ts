@@ -3553,7 +3553,7 @@ async function places(
   grouping: Grouping = "option",
   round: number | null = null,
 ): Promise<v.InferOutput<typeof Places>> {
-  const kids = await children(
+  const found = await children(
     contest.id,
     area,
     isRoot,
@@ -3561,6 +3561,24 @@ async function places(
     undefined,
     true,
   );
+  const electoral = found.filter((kid) => kid.kind === "electoral_district");
+  const loose =
+    electoral.length === 0
+      ? new Set<number>()
+      : new Set(
+          (
+            await db.execute<{ k: number }>(sql`
+              select a.k from area a
+              where a.k = any(${sql.param(electoral.map((kid) => kid.k))}::int[])
+                and not exists (select from area_geometry g where g.area_id = a.id)
+                and not exists (
+                  select from contest c
+                  where c.district_area_id = a.id and c.allocation_parent_id = ${contest.id}::uuid
+                )
+            `)
+          ).rows.map((row) => row.k),
+        );
+  const kids = found.filter((kid) => !loose.has(kid.k));
   const counts = new Map<
     string,
     {
@@ -4715,7 +4733,9 @@ async function tabulate(
   const bareKs = [
     ...new Set(
       rows.flatMap((row, index) =>
-        row.owner == null && row.k > 0 && now[tier[index] ?? 0]?.has(row.k) !== true
+        row.owner == null &&
+        row.k > 0 &&
+        now[tier[index] ?? 0]?.has(row.k) !== true
           ? [row.k]
           : [],
       ),
