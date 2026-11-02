@@ -6,6 +6,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.tr.mayors_2004_2009 import fold
+from ea.sources.tr.names import province_name
 from ea.sources.tr.tbmm_album import TITLE as ALBUM_TITLE
 from ea.sources.tr.ysk import PROVINCES
 from ea.sources.tr.ysk_local import party
@@ -94,7 +95,7 @@ def emit() -> Path:
         for province in sorted({province for province, _ in members}):
             plate = plates[province]
             winners = {key: value for key, value in members.items() if key[0] == province}
-            place = PROVINCES[int(plate) - 1]
+            place = province_name(int(plate), DAY)
             contest = cs.key("tr.contest", f"{DAY}:by-election:{plate}")
             cs.add(
                 "contest",
