@@ -36,6 +36,7 @@ EV = {
     "RI": ("electionresults.ri.gov", "RhodeIsland"),
     "WA": ("results.votewa.gov", "washington"),
     "VA": ("app.enhancedvoting.com", "virginia"),
+    "AZ": ("app.enhancedvoting.com", "Arizona"),
 }
 CLARITY = {
     "IA": "https://electionresults.iowa.gov/IA/",
@@ -44,7 +45,7 @@ CLARITY = {
 }
 EV_OFFICES = re.compile(
     r"^(?:(?P<party0>REP|DEM) )?(?:(?P<senate>(?:U\.? ?S\.? |United States )Senat(?:e|or)|Senator in Congress)"
-    r"|(?P<governor>Governor)"
+    r"|(?P<governor>Governor(?: and Lieutenant Governor)?)"
     r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*"
     r"|Congressional District (?=\d+ - U\.? ?S\.? Representative$))"
     r"(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?(?: - U\.? ?S\.? Representative)?)"
@@ -515,9 +516,18 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
                 detail = get(client, url)
                 if detail:
                     store("PA", url, detail, ".json")
+    if not only or "TX" in only:
+        from ea.sources.us import enr_tx
+
+        enr_tx.collect(client, store)
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
+    if state == "TX":
+        from ea.sources.us import enr_tx
+
+        yield from enr_tx.rows(url, path, urls)
+        return
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))

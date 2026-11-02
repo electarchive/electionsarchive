@@ -6,6 +6,14 @@ publisher = "Arkansas Secretary of State"
 url = "https://arkansas.tally-enr.com/"
 
 [[feed]]
+id = "us.enr_2026.az"
+adapter = "us.enr_2026"
+interval = 90
+params = { state = "AZ" }
+publisher = "Arizona Secretary of State"
+url = "https://app.enhancedvoting.com/results/public/Arizona/110326GeneralElection"
+
+[[feed]]
 id = "us.enr_2026.ct"
 adapter = "us.enr_2026"
 params = { state = "CT" }
@@ -124,6 +132,14 @@ params = { state = "SC" }
 poller = "muktedir"
 publisher = "South Carolina State Election Commission"
 url = "https://scvotes.gov/"
+
+[[feed]]
+id = "us.enr_2026.tx"
+adapter = "us.enr_2026"
+interval = 120
+params = { state = "TX" }
+publisher = "Texas Secretary of State"
+url = "https://goelect.txelections.civixapps.com/ivis-enr-ui/races"
 
 [[feed]]
 id = "us.enr_2026.ut"
