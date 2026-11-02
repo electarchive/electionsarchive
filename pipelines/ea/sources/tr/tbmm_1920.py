@@ -464,7 +464,8 @@ def party_note(term: int, outside: int) -> str:
 
 COUNT_CAVEAT = (
     "The province's magnitude is TÜİK's seat count; the Albüm lists every person who held a seat in the term, "
-    "including replacements, so its per-province counts can differ by one or two."
+    "including replacements, so its per-province counts can differ by one or two. For the one-party terms the party's "
+    "seats in a province are the magnitude minus the independents the Albüm lists there, the same split as the national row."
 )
 
 
@@ -776,6 +777,20 @@ def emit() -> Path:
                                 ballot_label=label,
                             )
                             cs.add("outcome", result_set_id=result, option_id=option, kind="won", seats=seats_won)
+                if term < 8:
+                    remainder = magnitude - independents.get((term, key), 0)
+                    if remainder > 0:
+                        label = "Müdâfaa-i Hukuk Grubu" if term == 2 else "Cumhuriyet Halk Partisi"
+                        option = cs.key("tr.option", f"{contest_key}:{slug(label)}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="list",
+                            party_id=mhg if term == 2 else chp,
+                            ballot_label=label,
+                        )
+                        cs.add("outcome", result_set_id=result, option_id=option, kind="won", seats=remainder)
                 if independents.get((term, key)):
                     option = cs.key("tr.option", f"{contest_key}:bagimsiz")
                     cs.add(
