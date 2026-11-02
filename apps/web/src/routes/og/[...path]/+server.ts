@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import satori from "satori";
+import { render as markup } from "svelte/server";
+import AgentsScene from "#lib/components/agents-scene.svelte";
 import { date, percent } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { remember } from "#lib/server/cache.js";
@@ -175,6 +177,9 @@ export const GET: RequestHandler = async ({ params, url }) => {
   if (!params.path.endsWith(".png")) {
     error(404);
   }
+  if (params.path === "agents.png") {
+    return image(await remember("og:agents:v2", agents));
+  }
   const segments = params.path
     .slice(0, -4)
     .split("/")
@@ -194,18 +199,112 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
     throw error_;
   }
-  const png = await remember(
-    `og:v2:${createHash("sha256").update(JSON.stringify(found)).digest("base64url")}`,
-    async () => render(found),
+  return image(
+    await remember(
+      `og:v2:${createHash("sha256").update(JSON.stringify(found)).digest("base64url")}`,
+      async () => render(found),
+    ),
   );
-  return new Response(png, {
+};
+
+const image = (png: Uint8Array<ArrayBuffer>) =>
+  new Response(png, {
     headers: {
       "content-type": "image/png",
       "cache-control":
         "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800",
     },
   });
-};
+
+const rasterize = (svg: string) =>
+  new Uint8Array(
+    new Resvg(svg, {
+      fitTo: { mode: "width", value: 2400 },
+      font: { loadSystemFonts: false },
+    })
+      .render()
+      .asPng(),
+  );
+
+const brand = () =>
+  h(
+    "div",
+    {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      fontSize: 26,
+      fontWeight: 800,
+      letterSpacing: "-0.01em",
+    },
+    [
+      { type: "img", props: { src: MONOGRAM, width: 34, height: 34 } },
+      m.wordmark(),
+    ],
+  );
+
+async function agents() {
+  const width = 1100;
+  const svg = await satori(
+    h(
+      "div",
+      {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: 1200,
+        height: 630,
+        backgroundColor: PAPER,
+        fontFamily: "Sofia latin, Sofia latin-ext",
+        color: INK,
+      },
+      [
+        h(
+          "div",
+          {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            width: 1088,
+            paddingTop: 40,
+          },
+          [
+            h("div", { display: "flex", flexDirection: "column" }, [
+              h(
+                "div",
+                {
+                  display: "flex",
+                  fontWeight: 800,
+                  fontSize: 68,
+                  lineHeight: 1,
+                  letterSpacing: "-0.022em",
+                },
+                m.agents_title(),
+              ),
+              h(
+                "div",
+                { display: "flex", marginTop: 12, fontSize: 30, color: MUTED },
+                "electionsarchive.com/mcp",
+              ),
+            ]),
+            brand(),
+          ],
+        ),
+        {
+          type: "img",
+          props: {
+            src: `data:image/svg+xml;utf8,${encodeURIComponent(markup(AgentsScene).body)}`,
+            width,
+            height: Math.round((width * 520) / 1200),
+            style: { marginTop: 4 },
+          },
+        },
+      ],
+    ) as Parameters<typeof satori>[0],
+    { width: 1200, height: 630, fonts: await fonts },
+  );
+  return rasterize(svg);
+}
 
 async function render(found: Awaited<ReturnType<typeof card>>) {
   const bars = found.bars.slice(0, 3);
@@ -368,12 +467,5 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
     ) as Parameters<typeof satori>[0],
     { width: 1200, height: 630, fonts: await fonts },
   );
-  return new Uint8Array(
-    new Resvg(svg, {
-      fitTo: { mode: "width", value: 2400 },
-      font: { loadSystemFonts: false },
-    })
-      .render()
-      .asPng(),
-  );
+  return rasterize(svg);
 }

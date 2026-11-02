@@ -23,7 +23,7 @@ Pages follow the place, then the election, then the contest, then the reporting 
 - [REST API](${origin}/api/v1/openapi.json): OpenAPI description of the REST API, for reading${READ_ONLY ? " and searching" : ", searching, and proposing changes"}.
 - [MCP server](${origin}/mcp): the same tools over MCP. ${READ_ONLY ? "Reading needs no key. Contributions open after launch." : "Reading needs no key; proposing changes needs an API key, sent in the x-api-key header."}
 - [Skill](${origin}/agents/skill.md): ${READ_ONLY ? "how to connect, and the data model in one page." : "how to propose a change: the data model, the evidence rule, the workflow, and every operation, with worked examples."}
-- [For agents](${origin}/agents): setup, tools, and rules for people connecting an agent.
+- [Connect your agent](${origin}/agents): the skill, MCP setup for each client, example questions, and every tool; also as [Markdown](${origin}/agents.md) and [JSON](${origin}/agents.json).
 
 ## About
 

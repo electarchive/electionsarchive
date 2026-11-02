@@ -31,7 +31,7 @@
           label: m.license_title(),
         },
         { href: "/api/v1/openapi.json", label: m.footer_api() },
-        { href: resolve("/agents"), label: m.agents_nav() },
+        { href: resolve("/agents"), label: m.agents_title() },
       ],
     },
     {

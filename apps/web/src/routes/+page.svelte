@@ -277,6 +277,27 @@
                 href={resolve("/[...path]", { path: next.path })}
                 >{m.home_next_open()}</a
               >
+              <a
+                class="inline-flex items-center gap-2 rounded-sm border border-input px-3 font-semibold block-9 hover:bg-accent"
+                href={resolve("/agents")}
+                ><svg
+                  class="block-4 inline-4"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                  ><path d="M8 1.5v2.5" /><circle
+                    cx="8"
+                    cy="1.5"
+                    r="0.75"
+                    class="fill-marker stroke-none"
+                  /><rect x="2.5" y="4" width="11" height="9" rx="2.5" /><path
+                    d="M6 8v1M10 8v1"
+                  /></svg
+                >{m.home_agents()}</a
+              >
             </p>
           </div>
         {/if}
