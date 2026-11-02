@@ -4521,6 +4521,13 @@ async function tabulate(
       result.length === 0
         ? new Map(seated)
         : new Map(
+  const named = new Map(
+    results.flatMap((entries) =>
+      entries
+        .filter((entry) => entry.key.startsWith("person:"))
+        .map((entry) => [entry.key, entry] as const),
+    ),
+  );
             result.map((entry, at) => [
               entry.key,
               seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
@@ -4572,6 +4579,20 @@ async function tabulate(
       isMulti: elects[index]?.isMulti === true,
     };
   });
+      const known =
+        entry.key.startsWith("party:") && entry.current?.person != null
+          ? named.get(`person:${entry.current.person}`)
+          : null;
+      if (known != null && known.current?.party === entry.current?.party) {
+        return {
+          ...entry,
+          key: known.key,
+          label: known.label,
+          short: known.short,
+          color: known.color,
+          lean: known.lean,
+        };
+      }
   const silent = rows.flatMap((row, index) =>
     row.owner == null || now[tier[index] ?? 0]?.has(row.k) === true
       ? []
