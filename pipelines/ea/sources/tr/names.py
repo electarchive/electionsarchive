@@ -1,4 +1,5 @@
 import csv
+from collections.abc import Callable
 from datetime import date
 from functools import cache
 from pathlib import Path
@@ -8,8 +9,9 @@ from ea.changeset import NAMESPACE, Changeset, slug
 from ea.store import connect
 
 SOURCE = "tr.names"
-VERSION = "1"
+VERSION = "2"
 RENAMES = Path(__file__).with_name("names.tsv")
+DISTRICTS = Path(__file__).with_name("names_ilce.tsv")
 LICENSE = "Laws and official texts may be freely reproduced (Law 5846 art. 31)."
 
 Segment = tuple[date | None, date | None, str]
@@ -19,15 +21,19 @@ def instant(text: str, precision: str) -> date:
     return date.fromisoformat(f"{text}-01-01" if precision == "year" else text)
 
 
+def grouped[K](path: Path, key: Callable[[dict[str, str]], K]) -> dict[K, list[dict[str, str]]]:
+    groups: dict[K, list[dict[str, str]]] = {}
+    with path.open(encoding="utf-8", newline="") as file:
+        for row in csv.DictReader(file, delimiter="\t"):
+            groups.setdefault(key(row), []).append(row)
+    for changes in groups.values():
+        changes.sort(key=lambda row: instant(row["date"], row["precision"]))
+    return groups
+
+
 @cache
 def rows() -> dict[int, list[dict[str, str]]]:
-    by_plate: dict[int, list[dict[str, str]]] = {}
-    with RENAMES.open(encoding="utf-8", newline="") as file:
-        for row in csv.DictReader(file, delimiter="\t"):
-            by_plate.setdefault(int(row["plate"]), []).append(row)
-    for changes in by_plate.values():
-        changes.sort(key=lambda row: instant(row["date"], row["precision"]))
-    return by_plate
+    return grouped(RENAMES, lambda row: int(row["plate"]))
 
 
 def current(plate: int) -> str:
@@ -66,20 +72,28 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "The names Turkey's provinces carried before their current ones, with the law or decree that renamed "
-                "each: dated name versions on the province areas and their municipality pages, and a renamed event "
-                "for each change"
+                "The names Turkey's provinces and ilçeler carried before their current ones, with the law or decree "
+                "that renamed each: dated name versions on the province areas, their municipality pages, and the "
+                "ilçe areas, and a renamed event for each change"
             ),
             polity="TR",
         )
         hubs = dict(conn.execute("select value, entity_id from external_id where scheme = 'tr.polity'").fetchall())
+        districts = {
+            (plate, text): id
+            for plate, text, id in conn.execute(
+                """select pc.code, n.text, a.id from area a
+                   join area_parent ap on ap.area_id = a.id and ap.valid_to is null
+                   join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
+                   join area_code pc on pc.area_id = p.id
+                   join name n on n.entity_id = a.id and n.is_preferred
+                   where a.scheme_code = 'tr.ilce'"""
+            ).fetchall()
+        }
         added: set[UUID] = set()
         wanted: set[tuple[UUID, str, date | None, date | None]] = set()
-        for plate, changes in sorted(rows().items()):
-            present = current(plate)
-            area = cs.area("tr.il", f"{plate:02}")
-            hub = hubs.get(slug(present))
-            targets = [area] if hub is None else [area, hub]
+
+        def write(area: UUID, targets: list[UUID], present: str, changes: list[dict[str, str]]) -> None:
             sources: list[UUID] = []
             for row in changes:
                 source = cs.source(row["publisher"], row["law"])
@@ -137,6 +151,17 @@ def emit() -> Path:
                         valid_to_precision="day" if bound is None else bound["precision"],
                         source_id=source,
                     )
+
+        for plate, changes in sorted(rows().items()):
+            present = current(plate)
+            area = cs.area("tr.il", f"{plate:02}")
+            hub = hubs.get(slug(present))
+            write(area, [area] if hub is None else [area, hub], present, changes)
+        for (plate, present), changes in sorted(grouped(DISTRICTS, lambda row: (row["plate"], row["ilce"])).items()):
+            district = districts.get((plate, present))
+            if district is None:
+                raise SystemExit(f"no single ilçe {plate} {present}")
+            write(district, [district], present, changes)
         for id, entity, text, begins, ends in conn.execute(
             """select n.id, n.entity_id, n.text, n.valid_from, n.valid_to from name n
                join changeset c on c.id = n.changeset_id where c.pipeline = %s""",
