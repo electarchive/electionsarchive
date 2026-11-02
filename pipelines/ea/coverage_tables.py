@@ -1114,6 +1114,18 @@ cross join lateral (select case
 group by 1, 2, 3
 """
 
+TOWN_SCHOOL_STATES = frozenset(("09", "25", "33", "44", "50"))
+TOWN_SCHOOL_WORDS = re.compile(
+    r"\b(?:TWN|TOWN|CITY|SCHS|SCH|SCHOOLS|SCHOOL|DEPT|DEPARTMENT|PUBLIC|DISTRICT|DIST|SYSTEM)\b"
+)
+TOWN_SCHOOL_REGIONAL = {
+    "BRISTOL-WARREN REGIONAL SCHOOL DISTRICT": "BRISTOL",
+    "FOSTER-GLOCESTER REGIONAL SCHOOL DISTRICT": "FOSTER",
+    "FOSTER ELEMENTARY SCHOOL DISTRICT": "FOSTER",
+    "EXETER-WEST GREENWICH REGIONAL SCHOOL DISTRICT": "EXETER",
+}
+
+
 POLITIES_SQL = """
 select p.id, p.kind::text, e.value, n.text, ps.st
 from polity p
@@ -1816,6 +1828,18 @@ def build(full: bool = False) -> str:
         if ranked and ranked[0][0] >= 0.85 and (len(ranked) == 1 or ranked[1][0] < ranked[0][0] - 0.05):
             link[ranked[0][1]] = pid
             taken.add(pid)
+    town_names: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for code, pid in codes.items():
+        prefix, _, rest = code.partition(":")
+        if prefix in ("town", "place") and rest[:2] in TOWN_SCHOOL_STATES and pid in polities:
+            town_names[(rest[:2], " ".join(sorted(tokens(polities[pid][2]))))].append(pid)
+    for gid, kind, name, st in cog.select("id", "kind", "name", "state_fips").iter_rows():
+        if gid in link or kind not in ("school", "dependent_school") or st not in TOWN_SCHOOL_STATES:
+            continue
+        stripped = tokens(TOWN_SCHOOL_WORDS.sub(" ", TOWN_SCHOOL_REGIONAL.get(name.upper(), name.upper())))
+        found = town_names.get((st, " ".join(sorted(stripped))), [])
+        if len(found) == 1:
+            link[gid] = found[0]
     link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
     link["05504300800000"] = "5f1810f8-9163-5a5e-aed2-ccd9fc4b1532"
 

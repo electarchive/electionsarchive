@@ -403,6 +403,13 @@ def measure(conn, day: str) -> dict:
             if level in ("county", "municipal", "school", "special_district")
             else []
         )
+        if level in ("county", "municipal", "school", "special_district") and len(targets) > 1:
+            same = [
+                i
+                for i in targets
+                if places[i][0] == {"county": "county_office", "school": "school_board"}.get(level, level)
+            ]
+            targets = same or targets
         if level == "school" and (polity or "") in counties:
             county, short = counties[polity or ""]
             system = [i for i, name in schools[county] if short in name]
