@@ -24,8 +24,9 @@
     setConfirmationContext,
   } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
+  import type { LayoutData } from "./$types";
 
-  const { children }: { children: Snippet } = $props();
+  const { children, data }: { children: Snippet; data: LayoutData } = $props();
 
   const queryClient = makeQueryClient();
 
@@ -206,7 +207,7 @@
         >
           {@render children()}
         </div>
-        <Footer />
+        <Footer site={data.site} />
       </div>
     {:else}
       <div class="p-3.5" data-embed>

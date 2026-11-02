@@ -12,6 +12,7 @@ FROM base AS build
 RUN pnpm install --frozen-lockfile --filter "@ea/web..."
 COPY packages packages
 COPY apps/web apps/web
+RUN test -f apps/web/changelog.json || echo '[]' > apps/web/changelog.json
 RUN DATABASE_URL=postgres://build@localhost/build BETTER_AUTH_SECRET=build BETTER_AUTH_URL=http://localhost \
   REDIS_URL=redis://localhost BASE_URL=http://localhost NODE_OPTIONS=--max-old-space-size=5000 pnpm --filter @ea/web build
 
@@ -20,6 +21,10 @@ ENV NODE_ENV=production
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter "@ea/web..."
 COPY packages packages
 COPY --from=build /app/apps/web/build apps/web/build
+COPY --from=build /app/apps/web/changelog.json apps/web/changelog.json
+ARG EA_VERSION
+ARG EA_COMMIT
+ENV EA_VERSION=$EA_VERSION EA_COMMIT=$EA_COMMIT
 WORKDIR /app/apps/web
 USER node
 ENV PORT=3000 BODY_SIZE_LIMIT=200M

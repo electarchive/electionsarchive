@@ -480,7 +480,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
 export async function twin({ request, url }: RequestEvent) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
-    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history)(?:\/|\.|$)/.test(
+    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog)(?:\/|\.|$)/.test(
       url.pathname,
     )
   ) {

@@ -1,13 +1,17 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { ArrowUpRightIcon } from "@lucide/svelte";
+  import type { Site } from "#lib/server/site.js";
+  import Cite from "#lib/components/cite.svelte";
   import Monogram from "#lib/components/monogram.svelte";
+  import SystemStatus from "#lib/components/system-status.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { moment, REPOSITORY } from "#lib/site.js";
   import { cn } from "#lib/utils.js";
 
-  const GITHUB = "https://github.com/electarchive/electionsarchive";
+  const { site }: { site: Site } = $props();
 
   const groups = [
     {
@@ -44,7 +48,7 @@
           href: resolve("/[slug=project]", { slug: "contribute" }),
           label: m.contribute_title(),
         },
-        { href: GITHUB, label: m.footer_github() },
+        { href: REPOSITORY, label: m.footer_github() },
       ],
     },
   ];
@@ -113,9 +117,9 @@
               <li>
                 <a
                   href={link.href}
-                  rel={link.href === GITHUB ? "external" : undefined}
+                  rel={link.href === REPOSITORY ? "external" : undefined}
                   class="inline-flex items-center gap-0.5 underline decoration-transparent underline-offset-4 hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
-                  >{link.label}{#if link.href === GITHUB}<ArrowUpRightIcon
+                  >{link.label}{#if link.href === REPOSITORY}<ArrowUpRightIcon
                       class="text-muted-foreground block-3.5 inline-3.5"
                       aria-hidden="true"
                     />{/if}</a
@@ -175,6 +179,61 @@
         {/if}
       </p>
     </form>
+  </div>
+
+  <div class="border-bs">
+    <div
+      class="mx-auto flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5 font-figures text-[0.8125rem] text-muted-foreground tabular-nums max-inline-7xl max-sm:px-3"
+    >
+      <span class="flex items-center gap-2.5">
+        <SystemStatus live={site.live} published={site.published} />
+        {#if site.published != null}
+          <a
+            href={resolve("/recent")}
+            class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+            >{m.footer_data_as_of({ time: moment(site.published) })}</a
+          >
+        {/if}
+      </span>
+      {#if site.release != null}
+        <span class="flex items-center gap-2">
+          {m.footer_release({ version: site.release.calver })}
+          {#if site.release.doi != null}
+            <a
+              href="https://doi.org/{site.release.doi}"
+              rel="external"
+              class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+              aria-label={m.footer_release_download({
+                version: site.release.calver,
+              })}>{site.release.doi}</a
+            >
+          {/if}
+        </span>
+      {/if}
+      <span class="flex items-center gap-2">
+        <a
+          href="{resolve('/changelog')}{site.build.version === 'dev'
+            ? ''
+            : `#v${site.build.version}`}"
+          class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+          aria-label={m.footer_version_label({ version: site.build.version })}
+          >{m.footer_version({ version: site.build.version })}</a
+        >
+        {#if site.build.commit != null}
+          <a
+            href="{REPOSITORY}/commit/{site.build.commit}"
+            rel="external"
+            class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+            aria-label={m.footer_commit({ sha: site.build.commit.slice(0, 7) })}
+            >{site.build.commit.slice(0, 7)}</a
+          >
+        {/if}
+        {#if site.build.isDirty}
+          <span title={m.footer_dirty_label()}>{m.footer_dirty()}</span>
+        {/if}
+      </span>
+      <Cite published={site.published} release={site.release} />
+    </div>
   </div>
 
   <div class="border-bs">
