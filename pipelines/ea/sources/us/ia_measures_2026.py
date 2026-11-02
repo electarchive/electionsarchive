@@ -101,6 +101,27 @@ SOURCES = {
         ".pdf",
     ),
     "dallas": ("https://www.dallascountyiowa.gov/DocumentCenter/View/7620", "Dallas County Auditor", ".pdf"),
+    "greene_churdan": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50371", "Greene County Auditor", ".pdf"),
+    "greene_dana": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50364", "Greene County Auditor", ".pdf"),
+    "greene_grandjunction": (
+        "https://www.greenecounty.iowa.gov/docview.aspx?docid=50365",
+        "Greene County Auditor",
+        ".pdf",
+    ),
+    "greene_jefferson": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50369", "Greene County Auditor", ".pdf"),
+    "greene_paton": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50372", "Greene County Auditor", ".pdf"),
+    "greene_rippey": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50366", "Greene County Auditor", ".pdf"),
+    "greene_scranton": ("https://www.greenecounty.iowa.gov/docview.aspx?docid=50376", "Greene County Auditor", ".pdf"),
+    "grundy": (
+        "https://www.grundycountyiowa.gov/images/documents/announcements/NOTICE%20OF%20ELECTION--General%202026.pdf",
+        "Grundy County Auditor",
+        ".pdf",
+    ),
+    "woodbury": (
+        "https://elections.woodburycountyiowa.gov/files/sample_ballots/20261103_precinct_30_sgt_bluff_west_24965.pdf",
+        "Woodbury County Auditor",
+        ".pdf",
+    ),
     "feed": (
         "https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip",
         "Iowa Secretary of State",
@@ -113,6 +134,11 @@ PAGES = ("johnson", "desmoines")
 TOWNSHIP = (
     "Should the Palo Alto County Board of Supervisors fill the offices of Trustee and Clerk of {} Township by "
     "appointment as the terms of the office of the incumbent township officers expires?"
+)
+LOST = (
+    "Shall the following Public Measure be adopted? A local option sales and services tax shall be imposed in the City "
+    "of {} at the Rate of 1% to be effective July 1, 2027, with no sunset. Revenues from the local option sales and "
+    "services tax shall be allocated as follows: {}"
 )
 SCANNED = (
     (
@@ -305,6 +331,97 @@ SCANNED = (
             "and site improvements?"
         ),
     ),
+    (
+        "greene_churdan",
+        "IM",
+        "City of Churdan",
+        LOST.format(
+            "Churdan",
+            "25% for property tax relief and 75% for any lawful corporate purpose of the city as determined by the City Council.",
+        ),
+    ),
+    ("greene_dana", "IN", "City of Dana", LOST.format("Dana", "100% for property tax relief.")),
+    (
+        "greene_grandjunction",
+        "II",
+        "City of Grand Junction",
+        LOST.format(
+            "Grand Junction",
+            "100% of said local option sales and service tax to be allocated for any costs associated with property tax relief.",
+        ),
+    ),
+    (
+        "greene_jefferson",
+        "IJ",
+        "City of Jefferson",
+        LOST.format(
+            "Jefferson", "100% for the repair, maintenance, replacement and improvement of Jefferson’s infrastructure."
+        ),
+    ),
+    (
+        "greene_paton",
+        "IK",
+        "City of Paton",
+        LOST.format(
+            "Paton", "100% for the repair, maintenance, replacement and improvement of Paton's infrastructure."
+        ),
+    ),
+    (
+        "greene_rippey",
+        "IL",
+        "City of Rippey",
+        LOST.format(
+            "Rippey",
+            "100% of said local options sales services tax to be allocated for any costs associated with property tax relief.",
+        ),
+    ),
+    (
+        "greene_scranton",
+        "GY",
+        "City of Scranton",
+        LOST.format(
+            "Scranton",
+            "20% of said local option sales and services tax shall be allocated for any costs associated with operating "
+            "expenses of the Scranton Public Library. 30% of said local option sales and services tax shall be allocated "
+            "for any costs associated with the general expenses of the City of Scranton. 30% of said local option sales "
+            "and services tax shall be allocated for any costs associated with the public works department of the City "
+            "of Scranton. 20% said local option sales and services tax shall be allocated for any costs associated with "
+            "the water and sewer expenses of the City of Scranton.",
+        ),
+    ),
+    (
+        "grundy",
+        "IO",
+        "City of Dike",
+        (
+            "Shall the City of Dike, State of Iowa, issue its General Obligation Bonds or Capital Loan Notes in an amount "
+            "not exceeding the amount of $1,500,000 for the purpose of paying costs of the acquisition, construction, "
+            "demolition, reconstruction, enlargement, improvement, and equipping of swimming pool and pool facilities, "
+            "including parking lot and related site improvements?"
+        ),
+    ),
+    (
+        "grundy",
+        "IP",
+        "City of Reinbeck",
+        (
+            "Shall the City of Reinbeck, in Grundy County, State of Iowa, enter into a loan agreement and issue general "
+            "obligation bonds in an amount not exceeding $4,000,000 for the purpose of paying the cost, to that extent, of "
+            "constructing, furnishing and equipping a new municipal fire station?"
+        ),
+    ),
+    (
+        "woodbury",
+        "WD",
+        "Sergeant Bluff-Luton Community School District",
+        (
+            "Shall the Board of Directors of the Sergeant Bluff-Luton Community School District in the County of "
+            "Woodbury, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an "
+            "amount not to exceed $38,000,000 to provide funds to build, furnish, and equip a new Primary School building "
+            "as an addition to the Elementary building (including demolition of the existing Primary building) and "
+            "improve the site?"
+        ),
+    ),
 )
 SHALL = re.compile(r"Public Measure ([A-Z]{1,3})\b[^?]{0,140}?(Shall\b[^?]+\?)")
 BREMER = re.compile(r"District - ([A-Z]{1,3})\s+(Shall\b[^?]+\?)")
@@ -324,7 +441,17 @@ def fetch() -> None:
                 retrieved = datetime.fromtimestamp(LOCAL[key].stat().st_mtime, UTC)
             else:
                 content = subprocess.run(
-                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                    [
+                        "curl",
+                        "-sSfL",
+                        "-m",
+                        "120",
+                        "-A",
+                        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130 Safari/537.36",
+                        url,
+                    ],
+                    capture_output=True,
+                    check=True,
                 ).stdout
                 retrieved = datetime.now(UTC)
             raw.store(
@@ -385,6 +512,8 @@ def entity_of(wording: str) -> str:
 def topic(entity: str, wording: str) -> str:
     if "Township" in entity:
         return "Appoint Township Trustee and Clerk"
+    if "local option sales and services tax" in wording.lower():
+        return "Local Option Sales and Services Tax"
     if "revenue" in wording.lower() and "bonds" in wording.lower() and "School Infrastructure" in wording:
         return "School Infrastructure Revenue Bonds"
     return "General Obligation Bonds" if "bonds" in wording.lower() else "Question"
