@@ -1783,6 +1783,7 @@ DELIVERED = {
     "MI-26075": DATA / "inbox" / "y26" / "mi" / "jackson_school.pdf",
     "MI-26075-v": DATA / "inbox" / "y26" / "mi" / "jackson_village.pdf",
 }
+FOLDED = {"RI-summary": "RI", "IA-19087-county": "IA"}
 TERRITORIES = {"GU": "Guam", "VI": "U.S. Virgin Islands", "AS": "American Samoa", "MP": "Northern Mariana Islands"}
 PUBLISHERS = {
     "0644000": (
@@ -1852,6 +1853,18 @@ NE_SOURCES = {
         "2026 General Election Candidates by city or town, candidate search summaries as of October 31, 2026",
         "https://vote.sos.ri.gov/Candidates/CandidateSearchSummary?Election=18144",
         "ne/ri_summaries.zip",
+    ),
+    "IA-19087": (
+        "Henry County Auditor",
+        "Official sample ballots, General Election November 3, 2026",
+        "https://cap.gmdsolutions.com/viewfile.aspx?id=3669F870D52E468B857E7B006B2DE581&dir=Objects",
+        "ia/counties/henry.pdf",
+    ),
+    "IA-19087-county": (
+        "Henry County Auditor",
+        "Official sample ballots, General Election November 3, 2026",
+        "https://cap.gmdsolutions.com/viewfile.aspx?id=3669F870D52E468B857E7B006B2DE581&dir=Objects",
+        "ia/counties/henry.pdf",
     ),
     "NJ-34011-s": (
         "Cumberland County Clerk",
@@ -10071,12 +10084,10 @@ def parse() -> None:
             if row["key"] == "NY"
             else row["key"] + "-s"
             if row["key"] + "-s" in NE_SOURCES and "Board of Education" in row["contest"]
-            else "RI"
-            if row["key"] == "RI-summary"
-            else row["key"]
+            else FOLDED.get(row["key"], row["key"])
         ].append(
             {
-                **({"feed": row["key"]} if row["key"] == "RI-summary" else {}),
+                **({"feed": row["key"]} if row["key"] in FOLDED else {}),
                 "county": row.get("county") or row["contest"].split(" County")[0],
                 "contest": row["contest"],
                 "seats": int(row.get("seats") or 1),
@@ -10584,7 +10595,7 @@ def parse() -> None:
             if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI", "NC", "IN"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
-                        """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
+                        """select distinct on (g.id) coalesce(g.county, case when g.state = 'IA' and x.value ~ '^town:' then substr(x.value, 6, 5) end), g.name, x.value, s.path, g.kind from coverage_government g
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
