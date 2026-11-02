@@ -161,6 +161,71 @@ const LAYOUTS = import.meta.glob<{
   labels: Record<string, [number, number, string, number?]>;
 }>("./hex/us-cd-[0-9]*.json", { import: "default" });
 
+export async function hexes(date: string) {
+  const load =
+    LAYOUTS[`./hex/us-cd-${america[date as keyof typeof america] ?? ""}.json`];
+  return load == null ? null : load();
+}
+
+export async function shapes(
+  areaIds: Array<string>,
+  date: string,
+  clip: string | null,
+) {
+  if (areaIds.length === 0) {
+    return null;
+  }
+  const found = await db.execute<{
+    id: string;
+    d: string;
+    width: number;
+    height: number;
+  }>(sql`
+    with picked as materialized (
+      select distinct on (a.id) a.id, a.scheme_code as scheme, g.geom
+      from area a join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
+      where a.id = any(${sql.param(areaIds)}::uuid[])
+      order by a.id, g.valid_from desc nulls last
+    ),
+    edge as materialized (
+      select g.geom from area_geometry g
+      where g.area_id = ${clip}::uuid and g.valid @> ${date}::date
+      order by g.valid_from desc nulls last limit 1
+    ),
+    cut as materialized (
+      select p.id, p.scheme, coalesce(ST_CollectionExtract(ST_Intersection(ST_MakeValid(p.geom), ST_MakeValid(e.geom)), 3), p.geom) as geom
+      from picked p left join edge e on true
+    ),
+    planed as materialized (
+      select id, ${plane("geom", "scheme")} as geom from cut where not ST_IsEmpty(geom)
+    ),
+    framed as materialized (
+      select id, geom, west, north, east - west as wide, north - south as tall, greatest(east - west, north - south) as side
+      from (
+        select id, geom, min(ST_XMin(geom)) over () as west, max(ST_XMax(geom)) over () as east,
+          min(ST_YMin(geom)) over () as south, max(ST_YMax(geom)) over () as north
+        from planed where geom is not null and not ST_IsEmpty(geom)
+      ) f
+    ),
+    thin as (
+      select id, wide * 1000 / side as width, tall * 1000 / side as height,
+        ST_SnapToGrid(ST_Scale(ST_Translate(
+          ST_CoverageSimplify(geom, side / 400) over (),
+        -west, -north), 1000 / side, 1000 / side), 1) as geom
+      from framed
+    )
+    select id, ST_AsSVG(geom, 1, 0) as d, width, height from thin where not ST_IsEmpty(geom)
+  `);
+  const first = found.rows[0];
+  return first == null
+    ? null
+    : {
+        width: Math.ceil(first.width),
+        height: Math.ceil(first.height),
+        paths: found.rows.map((row) => ({ areaId: row.id, d: row.d })),
+      };
+}
+
 export async function house(electionId: string, date: string) {
   const found = await db.execute<{ id: string; code: string }>(sql`
     with recursive tree(id) as (
@@ -174,11 +239,9 @@ export async function house(electionId: string, date: string) {
     order by a.id, ac.code
   `);
   const ids = found.rows.map((row) => row.id);
-  const load =
-    LAYOUTS[`./hex/us-cd-${america[date as keyof typeof america] ?? ""}.json`];
   const [map, layout] = await Promise.all([
     geography(ids, date, ids, false),
-    load == null ? null : load(),
+    hexes(date),
   ]);
   const postal = new Map(
     Object.entries(layout?.labels ?? {}).map(([fips, label]) => [
