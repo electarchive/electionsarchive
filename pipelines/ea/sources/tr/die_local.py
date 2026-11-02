@@ -1700,7 +1700,7 @@ def emit() -> Path:
                         "outcome",
                         result_set_id=declared,
                         option_id=option(label),
-                        candidacy_id=candidacy,
+                        candidacy_id=None,
                         kind="elected",
                         seats=None,
                     )
