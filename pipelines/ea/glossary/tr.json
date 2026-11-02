@@ -136,8 +136,8 @@
   "note": "Also 'ezici çoğunluk'."
  },
  "seat": {
-  "term": "sandalye",
-  "note": "The official term is 'milletvekilliği' or 'üyelik'."
+  "term": "koltuk",
+  "note": "Never 'sandalye'. Mind k→ğ before vowels: koltuğu, koltuğa, koltuğun."
  },
  "constituency": {
   "term": "seçim çevresi",
@@ -344,7 +344,7 @@
   "note": "Also 'Sainte-Laguë sistemi'."
  },
  "seat allocation": {
-  "term": "sandalye dağılımı",
+  "term": "koltuk dağılımı",
   "note": "Law: 'milletvekilliklerinin dağıtımı'."
  },
  "transfer": {
@@ -502,5 +502,9 @@
  "secretary of state": {
   "term": "eyalet sekreteri",
   "note": "A US state's Secretary of State. The office is 'Eyalet Sekreterliği'. Never 'Dışişleri Bakanı', which is a foreign minister."
+ },
+ "party slot": {
+  "term": "(no suffix)",
+  "note": "Never attach 'partisi', 'partisine', or 'partisinden' to a party name slot: names often end in 'Partisi' or are abbreviations. Use a label and colon, as in 'Katıldı: {party}'."
  }
 }
