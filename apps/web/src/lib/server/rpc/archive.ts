@@ -805,10 +805,12 @@ export async function names(
   ids: Array<string>,
   on: string | null = null,
   common: Array<string> = [],
+  historical = false,
 ) {
   const found = await dated(
     ids.map((id) => ({ id, on })),
     common,
+    historical,
   );
   const full = new Map<string, string>();
   const short = new Map<string, string>();
@@ -827,6 +829,7 @@ export async function names(
 export async function dated(
   pairs: Array<{ id: string; on: string | null }>,
   common: Array<string> = [],
+  historical = false,
 ) {
   const unique = new Map(
     pairs.map((pair) => [`${pair.id}|${pair.on ?? ""}`, pair]),
@@ -847,7 +850,9 @@ export async function dated(
     cross join lateral (
       select kind::text, text
       from name
-      where entity_id = p.entity_id and kind in ('official', 'english')
+      where entity_id = p.entity_id
+        and (kind in ('official', 'english')
+          or (${historical} and kind = 'historical' and p.on_date is not null and valid @> p.on_date and not (lower_inf(valid) and upper_inf(valid))))
       order by coalesce(valid @> coalesce(p.on_date, current_date), false) desc,
         coalesce(valid @> coalesce(p.on_date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
         ${nearest(sql`name`, sql`p.on_date`)} nulls first,
@@ -1285,7 +1290,7 @@ async function gather(
     .filter((rows) => rows.length > tops.length && rows.length <= 10_000)
     .toArray()
     .flat();
-  const [labels, schemes] = await Promise.all([
+  const [labels, schemes, dating] = await Promise.all([
     names(
       [...found.rows, ...deep].map((row) => row.id),
       date,
@@ -1294,6 +1299,12 @@ async function gather(
       select code, noun, kind::text, rank from scheme
       where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
     `),
+    names(
+      [...found.rows, ...deep].map((row) => row.id),
+      date,
+      [],
+      true,
+    ),
   ]);
   const scheme = new Map(schemes.rows.map((row) => [row.code, row]));
   const taken = new Map<string, number>();
@@ -1301,8 +1312,9 @@ async function gather(
     row: { id: string; k: number; scheme: string },
     prefix: string,
   ) => {
-    const name = labels.full.get(row.id) ?? "";
-    const base = `${prefix}${segment(name)}`;
+    const slug = labels.full.get(row.id) ?? "";
+    const name = dating.full.get(row.id) ?? slug;
+    const base = `${prefix}${segment(slug)}`;
     const seen = (taken.get(base) ?? 0) + 1;
     taken.set(base, seen);
     return {
@@ -4000,6 +4012,8 @@ async function places(
   const nestedNames = await names(
     nested.map((row) => row.area),
     contest.date,
+    [],
+    true,
   );
   const listed = [
     ...rows,
@@ -4160,6 +4174,8 @@ async function places(
       : await names(
           unplaced.map((row) => row.id),
           contest.date,
+          [],
+          true,
         );
   const turnouts = (row: (typeof tabulated.rows)[number]) => {
     const entry = turned.get(row.k);
@@ -4196,6 +4212,8 @@ async function places(
       : await names(
           waiting.map((row) => row.id),
           contest.date,
+          [],
+          true,
         );
   return {
     levels: levels.map((entry) => ({
