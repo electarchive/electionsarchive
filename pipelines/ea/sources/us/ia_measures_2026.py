@@ -142,6 +142,33 @@ SOURCES = {
         "Jasper County Auditor",
         ".pdf",
     ),
+    "polk_saydel": (
+        "https://www.polkcountyiowa.gov/media/zhhnne3w/des_moines_1_say-sample.pdf",
+        "Polk County Auditor",
+        ".pdf",
+    ),
+    "carroll": ("https://www.carrollcountyiowa.gov/docview.aspx?docid=32022", "Carroll County Auditor", ".pdf"),
+    "decatur": ("https://www.decaturcountyiowa.gov/document/50465", "Decatur County Auditor", ".pdf"),
+    "marion_knoxville": (
+        "https://www.marioncountyiowa.gov/files/sample_ballots/20261103_2026_general_election_kx1_ksd_65449.pdf",
+        "Marion County Auditor",
+        ".pdf",
+    ),
+    "jackson_bellevue": (
+        "https://jacksoncounty.iowa.gov/files/sample_ballots/1240_pct_1_bellevue_city_35310.pdf",
+        "Jackson County Auditor",
+        ".pdf",
+    ),
+    "jackson_easton": (
+        "https://jacksoncounty.iowa.gov/files/sample_ballots/1240_pct_5_jackson_township_easton_valley_87908.pdf",
+        "Jackson County Auditor",
+        ".pdf",
+    ),
+    "dickinson": (
+        "https://dickinsoncountyiowa.gov/wp-content/uploads/2026/10/2026-General-Election-Ballot-Styles.pdf",
+        "Dickinson County Auditor",
+        ".pdf",
+    ),
     "feed": (
         "https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip",
         "Iowa Secretary of State",
@@ -504,6 +531,109 @@ SCANNED = (
             "campus, including classroom and career and technical education spaces; to build, furnish, and equip an "
             "addition to the Monroe campus, including a multipurpose performance gymnasium, support spaces, and site "
             "improvements; and to improve the Prairie City campus site, including playgrounds and parking?"
+        ),
+    ),
+    (
+        "polk_saydel",
+        "S",
+        "Saydel Community School District",
+        (
+            "Shall the Board of Directors of the Saydel Community School District in the County of Polk, State of "
+            "Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an amount not to exceed "
+            "$26,900,000 to provide funds to build, furnish, and equip an addition to Cornell Elementary for "
+            "kindergarten and early childhood education, including a playground and site improvements; to remodel, "
+            "repair, furnish, and equip Cornell Elementary, Woodside Middle School, and the High School, including "
+            "HVAC, electrical, and building improvements; for improvements to the High School emergency generator "
+            "system and sewer line; and to remodel, repair, furnish, and equip athletic facilities, including "
+            "improvements to the softball concession and restrooms facility, football field turf replacement, and "
+            "softball and baseball field turf installation?"
+        ),
+    ),
+    (
+        "carroll",
+        "DA",
+        "Carroll Community School District",
+        (
+            "Shall the Board of Directors of the Carroll Community School District in the County of Carroll, State of "
+            "Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an amount not to exceed "
+            "$51,000,000 to provide funds to build, furnish, and equip additions to the high school and to remodel, "
+            "repair, improve, furnish, and equip the high school and middle school, including site improvements, to "
+            "facilitate the closure of Adams Elementary School?"
+        ),
+    ),
+    (
+        "decatur",
+        "GA",
+        "Central Decatur Community School District",
+        (
+            "Shall the Board of Directors of the Central Community School District of Decatur County in the County of "
+            "Decatur, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an "
+            "amount not to exceed $11,955,000 to provide funds to build, furnish and equip an elementary addition to "
+            "its North Elementary School, with related remodeling and improvements and site improvements; to remodel, "
+            "repair, improve, furnish, and equip the North Elementary school for consolidated elementary programming; "
+            "to demolish the existing South Elementary School; and to remodel, repair, improve, and equip the "
+            "Junior-Senior High School, including replacement of its exterior doors, secure entry vestibule upgrades, "
+            "and HVAC improvements?"
+        ),
+    ),
+    (
+        "marion_knoxville",
+        "ON",
+        "Knoxville Community School District",
+        (
+            "Shall the Board of Directors of the Knoxville Community School District in the County of Marion, State of "
+            "Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an amount not to exceed "
+            "$15,300,000 to provide funds to build, furnish, and equip a new elementary building on the Veterans "
+            "District Site, including related site improvements?"
+        ),
+    ),
+    (
+        "jackson_bellevue",
+        "LI",
+        "City of Bellevue",
+        (
+            "Shall the City of Bellevue, in Jackson County, State of Iowa, enter into a loan agreement and issue general "
+            "obligation bonds in an amount not exceeding $3,000,000 for the purpose of paying the cost, to that "
+            "extent, of undertaking the construction, furnishing & equipping a new municipal swimming pool, including "
+            "a splash pad?"
+        ),
+    ),
+    (
+        "jackson_easton",
+        "LJ",
+        "Easton Valley Community School District",
+        (
+            "Shall the Board of Directors of the Easton Valley Community School District, in the Counties of Clinton "
+            "and Jackson, State of Iowa, be authorized to contract indebtedness and issue general obligation bonds in "
+            "an amount not exceeding $7,500,000 for the purposes of acquiring, furnishing, equipping, constructing, "
+            "and improving the School District's school buildings to include a new gymnasium and new locker room "
+            "facilities that include a FEMA-rated storm shelter, performing arts upgrades to the existing gym, ADA "
+            "updates, and other related building, site and land improvements?"
+        ),
+    ),
+    (
+        "dickinson",
+        "GX",
+        "City of Lake Park",
+        (
+            "Shall the City of Lake Park, State of Iowa, issue its General Obligation Bonds or Capital Loan Notes in an "
+            "amount not exceeding the amount of $4,600,000 for the purpose of paying costs of designing, constructing, "
+            "equipping, and furnishing a new Emergency Services Facility, with related site improvements and "
+            "acquisition of real estate therefor?"
+        ),
+    ),
+    (
+        "dickinson",
+        "GW",
+        "Spirit Lake Community School District",
+        (
+            "Shall the Board of Directors of the Spirit Lake Community School District in the County of Dickinson, "
+            "State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an amount not "
+            "to exceed $69,990,000 to provide funds to remodel, repair, improve, and equip existing school buildings, "
+            "including academic, common, and extracurricular spaces at the high school, middle school, and elementary "
+            "school; to build, furnish, and equip additions to the high school, middle school, and elementary school; "
+            "to build a new bus barn; and to improve the sites, including improvements to existing athletic "
+            "facilities and the elementary playground?"
         ),
     ),
 )
