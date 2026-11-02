@@ -1473,34 +1473,51 @@
   const isBanded = $derived(
     view === "split" || (view === "winner" && !isProportional),
   );
-  const pips = $derived(
-    grid == null && view === "winner" && !isProportional
-      ? places.rows.flatMap((row) => {
-          const held =
-            row.held ??
-            (row.leader == null || row.seats == null
-              ? []
-              : [[row.leader, row.seats] as const]);
-          let total = 0;
-          for (const [, count] of held) {
-            total += count;
-          }
-          if (row.at == null || away.has(row.k) || total < 2 || total > 12) {
-            return [];
-          }
-          const tones: Array<string> = [];
-          for (const [index, count] of held.toSorted(
-            (a, b) =>
-              b[1] - a[1] || (row.shares[b[0]] ?? 0) - (row.shares[a[0]] ?? 0),
-          )) {
-            for (let at = 0; at < count; at += 1) {
-              tones.push(colors[index] ?? "var(--muted-foreground)");
-            }
-          }
-          return [{ at: row.at, tones, order: -(rows.get(row.k)?.valid ?? 0) }];
-        })
-      : [],
-  );
+  const pips = $derived.by(() => {
+    if (grid != null || view !== "winner" || isProportional) {
+      return [];
+    }
+    const seated = places.rows.map((row) => {
+      const held =
+        row.held ??
+        (row.leader == null ? [] : [[row.leader, row.seats ?? 1] as const]);
+      let total = 0;
+      for (const [, count] of held) {
+        total += count;
+      }
+      return { row, held, total };
+    });
+    let single = 0;
+    let multiple = 0;
+    for (const { total } of seated) {
+      if (total === 1) {
+        single += 1;
+      } else if (total > 1) {
+        multiple += 1;
+      }
+    }
+    return seated.flatMap(({ row, held, total }) => {
+      if (
+        row.at == null ||
+        away.has(row.k) ||
+        total < 2 ||
+        total > 12 ||
+        (single <= multiple && held.filter(([, count]) => count > 0).length < 2)
+      ) {
+        return [];
+      }
+      const tones: Array<string> = [];
+      for (const [index, count] of held.toSorted(
+        (a, b) =>
+          b[1] - a[1] || (row.shares[b[0]] ?? 0) - (row.shares[a[0]] ?? 0),
+      )) {
+        for (let at = 0; at < count; at += 1) {
+          tones.push(colors[index] ?? "var(--muted-foreground)");
+        }
+      }
+      return [{ at: row.at, tones, order: -(rows.get(row.k)?.valid ?? 0) }];
+    });
+  });
   const leading = (row: (typeof places.rows)[number]) =>
     view === "winner" && isProportional && row.held != null
       ? largest(row.held, (index) => row.shares[index] ?? 0)
