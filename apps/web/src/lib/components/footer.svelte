@@ -94,6 +94,12 @@
       >
         {m.footer_tagline()}
       </p>
+      <p class="text-sm text-pretty text-muted-foreground">
+        <span
+          class="-my-1.25 me-1.5 inline-block -rotate-3 rounded-[2px/7px] border-y-[5px] border-transparent bg-marker bg-clip-padding px-1 align-[0.0625rem] text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a]"
+          >{m.beta_label()}</span
+        >{m.footer_beta()}
+      </p>
       <p class="text-sm text-muted-foreground">
         <a
           href={resolve("/[slug=project]", { slug: "license" })}
