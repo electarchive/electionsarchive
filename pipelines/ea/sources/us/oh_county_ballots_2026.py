@@ -148,7 +148,14 @@ DROPPED_PATTERN = re.compile(
     % "|".join(DROPPED)
 )
 LEAD = re.compile(r"^(?:Sample\s*)*\d+\s+")
+BUTLER = "https://elections.bcohio.gov/2026/November/20261103%20LegalAds.pdf"
 SOURCES = {
+    BUTLER: (
+        "Butler",
+        None,
+        "Butler County Board of Elections",
+        "Notices of election, November 3, 2026 General Election",
+    ),
     HAMILTON: (
         "Hamilton",
         HAMILTON_FILE,
@@ -272,15 +279,13 @@ def mf_files() -> list[tuple[str, Path]]:
         if folder.name == "franklin":
             continue
         county = MF_575_NAMES.get(folder.name, folder.name.capitalize())
-        files.extend(
-            (county, path) for path in sorted(folder.glob("*.pdf")) if (county, path.name) not in seen
-        )
+        files.extend((county, path) for path in sorted(folder.glob("*.pdf")) if (county, path.name) not in seen)
     return files
 
 
 def mf_page(county: str) -> str:
     if county in MF_LOOKUP:
-        return f"https://lookup.boe.ohio.gov/vtrapp/{county.lower().replace(" ", "")}/ballotlist.aspx"
+        return f"https://lookup.boe.ohio.gov/vtrapp/{county.lower().replace(' ', '')}/ballotlist.aspx"
     return f"https://www.boe.ohio.gov/{county.lower()}"
 
 
@@ -534,7 +539,9 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
 
 
 NOTICE_KIND = re.compile(r"^(?:A|An) (renewal|additional|replacement)\b", re.IGNORECASE)
-LISTED_HEAD = re.compile(r"^(PROPOSED (?:TAX LEVY|INCOME TAX|BOND ISSUE|COMBINATION)\b.*|LOCAL OPTION.*|SPECIAL ELECTION.*)$")
+LISTED_HEAD = re.compile(
+    r"^(PROPOSED (?:TAX LEVY|INCOME TAX|BOND ISSUE|COMBINATION)\b.*|LOCAL OPTION.*|SPECIAL ELECTION.*)$"
+)
 
 
 def notice_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
@@ -569,7 +576,13 @@ def listed_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
         text = re.sub(r"\s+", " ", " ".join(block[:-1])).strip()
         named = re.search(r"(?:benefit of|imposed by) (?:the )?(.+?)(?:,| for\b| excluding\b)", text)
         rows.append(
-            {"url": url, "county": county, "kind": lines[start], "entity": named[1] if named else block[-1], "text": text}
+            {
+                "url": url,
+                "county": county,
+                "kind": lines[start],
+                "entity": named[1] if named else block[-1],
+                "text": text,
+            }
         )
     return rows
 
@@ -612,7 +625,10 @@ def mf_samples() -> list[dict[str, str]]:
         found = []
         for flags in (["-raw"], []):
             text = subprocess.run(
-                ["pdftotext", *flags, str(raw.cached(SOURCE, key).path), "-"], capture_output=True, text=True, check=True
+                ["pdftotext", *flags, str(raw.cached(SOURCE, key).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
             ).stdout
             found = ballot_issues(text.split("\n"), key, county)
             if found:
@@ -624,6 +640,40 @@ def mf_samples() -> list[dict[str, str]]:
         for row in found:
             rows.setdefault((county, row["kind"], row["entity"], row["text"]), {**row, **mf_meta(county, path)})
     return list(rows.values())
+
+
+def butler() -> list[dict[str, str]]:
+    text = subprocess.run(
+        ["pdftotext", "-raw", str(raw.cached(SOURCE, BUTLER).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    rows = []
+    for block in re.split(r"(?=Notice of Election on )", re.sub(r"\s+", " ", text)):
+        body = re.search(r"the question of:?\s*(.*?)\s*The polls for the election", block)
+        if body is None:
+            continue
+        question = body[1].strip()
+        if question.startswith("levying a tax"):
+            kind = "PROPOSED TAX LEVY"
+            for word in ("additional", "renewal"):
+                if re.search(rf"which shall be an? {word}\b", question):
+                    kind += f" ({word.upper()})"
+            who = re.search(r"for the benefit of (.+?) for the purpose", question)
+        else:
+            who = re.search(r"vote of the people of (.+?) at the General", block) or re.search(
+                r"Board of Education of (.+?) of [A-Z]", block
+            )
+            if question.startswith("Shall an annual income tax"):
+                kind = "PROPOSED INCOME TAX"
+            elif "bonds" in question[:120]:
+                kind = "PROPOSED BOND ISSUE"
+            else:
+                kind = "PROPOSED CHARTER AMENDMENT" if "Charter" in question[:60] else "PROPOSED ISSUE"
+        if who is None:
+            print("no entity:", question[:80])
+            continue
+        question = question[0].upper() + question[1:]
+        rows.append({"url": BUTLER, "county": "Butler", "kind": kind, "entity": who[1], "text": question})
+    return rows
 
 
 def stark() -> list[dict[str, str]]:
@@ -744,7 +794,16 @@ def montgomery() -> list[dict[str, str]]:
 
 def parse() -> None:
     frame = pl.DataFrame(
-        hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin() + mf_samples() + montgomery() + stark(),
+        hamilton()
+        + summit()
+        + cuyahoga()
+        + wayne()
+        + lorain()
+        + franklin()
+        + mf_samples()
+        + montgomery()
+        + stark()
+        + butler(),
         infer_schema_length=None,
     )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -813,7 +872,9 @@ def token(note: str) -> re.Pattern[str]:
 def plausible(name: str, wanted: str, row: dict[str, str]) -> bool:
     if wanted == "miscellaneous" and re.match(r"(?:A|An) (?:renewal|additional|replacement)\b", row["text"]):
         return False
-    place = re.sub(r"\b(?:city|village|township|local|exempted|school|district|county|joint|vocational|oh)\b|,", "", name.lower())
+    place = re.sub(
+        r"\b(?:city|village|township|local|exempted|school|district|county|joint|vocational|oh)\b|,", "", name.lower()
+    )
     first = place.split()[:1]
     return not first or len(first[0]) < 3 or first[0] in f"{row['entity']} {row['text']}".lower().replace("|", " ")
 
@@ -845,7 +906,7 @@ def pick(
         wanted = "miscellaneous"
     elif "COMBINATION" in kind:
         wanted = "combination"
-    elif "INCOME" in kind:
+    elif "INCOME" in kind or (kind.endswith("MUNICIPAL") and "INCOME TAX" in row["entity"].upper()):
         wanted = "income tax"
     elif "BOND" in kind:
         wanted = "bond"
@@ -857,7 +918,11 @@ def pick(
     for word in ("additional", "renewal", "replacement", "decrease", "increase"):
         if len(narrowed) > 1 and word in kind.lower():
             narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
-    text = re.sub(r"(\d+)\.0+\b", r"\1", re.sub(r"(?<![\d.])\.(\d)", r"0.\1", row["text"].lower()))
+    text = re.sub(
+        r"(\d\.\d*?[1-9])0+\b",
+        r"\1",
+        re.sub(r"(\d+)\.0+\b", r"\1", re.sub(r"(?<![\d.])\.(\d)", r"0.\1", row["text"].lower())),
+    )
     if len(narrowed) > 1 and "liquor" in kind.lower():
         sunday = "sunday" in kind.lower()
         narrowed = [c for c in narrowed if ("sunday" in c[2].lower().split("purpose:")[0]) == sunday] or narrowed
@@ -872,14 +937,18 @@ def pick(
         ] or narrowed
     if len(narrowed) > 1:
         narrowed = [c for c in narrowed if token(c[2]).search(references(row["text"]))] or narrowed
-    if len(narrowed) > 1:
-        words = set(re.findall(r"[a-z]{5,}", f"{row['entity']} {row['text']}".lower()))
-        scores = sorted(
-            ((len(words & set(re.findall(r"[a-z]{5,}", c[2].split("Purpose:")[-1].lower()))), c) for c in narrowed),
-            key=lambda pair: -pair[0],
-        )
-        if scores[0][0] > scores[1][0]:
-            narrowed = [scores[0][1]]
+    for width in (5, 4) if "LEVY" in kind else (5,):
+        if len(narrowed) > 1:
+            words = set(re.findall(rf"[a-z]{{{width},}}", f"{row['entity']} {row['text']}".lower()))
+            scores = sorted(
+                (
+                    (len(words & set(re.findall(rf"[a-z]{{{width},}}", c[2].split("Purpose:")[-1].lower()))), c)
+                    for c in narrowed
+                ),
+                key=lambda pair: -pair[0],
+            )
+            if scores[0][0] > scores[1][0]:
+                narrowed = [scores[0][1]]
     if (
         len({c[0] for c in narrowed}) > 1
         and len({(c[1], c[2]) for c in narrowed}) == 1
