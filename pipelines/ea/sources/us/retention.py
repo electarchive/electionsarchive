@@ -1265,6 +1265,10 @@ def emit() -> Path:
     medsl_rows = pl.concat([pl.read_parquet(PARSED / "medsl.parquet"), pl.read_parquet(PARSED / "kansas.parquet")])
     official = pl.read_parquet(PARSED / "official.parquet")
     names = dict(pl.read_parquet(PARSED / "names.parquet").iter_rows())
+    wanted = selected_states()
+    if wanted is not None:
+        medsl_rows = medsl_rows.filter(pl.col("state").is_in(wanted))
+        official = official.filter(pl.col("state").is_in(wanted))
     race = ["day", "state", "court", "person"]
     races = (
         pl.concat(
