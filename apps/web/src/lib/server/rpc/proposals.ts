@@ -5,6 +5,13 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
+import {
+  AnchorSchema,
+  Body,
+  commentOnProposal,
+  proposalThread,
+  threadComments,
+} from "#lib/server/discussion.js";
 import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
 
 const Uuid = v.pipe(v.string(), v.uuid());
@@ -157,7 +164,7 @@ export async function view(number: number, owner: Owner | null) {
   if (found == null || (found.submitted_at == null && !found.mine)) {
     error(404, "No proposal has that number.");
   }
-  const [revisions, jobs] = await Promise.all([
+  const [revisions, jobs, comments] = await Promise.all([
     db.execute<{
       n: number;
       created_at: string;
@@ -190,6 +197,9 @@ export async function view(number: number, owner: Owner | null) {
       order by created_at desc
       limit 10
     `),
+    proposalThread(found.id).then(async (thread) =>
+      threadComments(thread, owner?.userId ?? null),
+    ),
   ]);
   const { id: _, draft, ...proposal } = found;
   return {
@@ -201,6 +211,7 @@ export async function view(number: number, owner: Owner | null) {
       : jobs.rows.map(
           ({ error: _error, checks: _checks, diff: _diff, ...job }) => job,
         ),
+    comments: comments.map(({ mine: _mine, ...comment }) => comment),
   };
 }
 
@@ -437,6 +448,49 @@ export const proposals = {
         await queueJob(found.id, "submit", owner.userId, n);
         return view(Number(number), owner);
       }),
+    ),
+  comments: reader
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/proposals/{number}/comments",
+        summary:
+          "The proposal's discussion, oldest first: each comment's author, agent, revision, anchor, Markdown body, and replies by parent_id; hidden comments keep their reason and lose their body",
+      }),
+    )
+    .input(v.object({ number: Number_ }))
+    .handler(async ({ input, context }) =>
+      run(
+        async () => (await view(Number(input.number), context.owner)).comments,
+      ),
+    ),
+  comment: writer
+    .meta(
+      openapi({
+        method: "POST",
+        path: "/proposals/{number}/comments",
+        summary:
+          "Comment on a proposal in Markdown (10,000 characters), optionally replying to a comment (parent) or anchored to a diff row or evidence item of a revision; @handle mentions notify, up to ten",
+      }),
+    )
+    .input(
+      v.object({
+        number: Number_,
+        body_md: Body,
+        parent: v.optional(Uuid),
+        anchor: v.optional(AnchorSchema),
+      }),
+    )
+    .handler(async ({ input, context: { owner } }) =>
+      run(async () => ({
+        id: await commentOnProposal({
+          author: owner,
+          number: Number(input.number),
+          body: input.body_md,
+          parentId: input.parent ?? null,
+          anchor: input.anchor ?? null,
+        }),
+      })),
     ),
   withdraw: writer
     .meta(

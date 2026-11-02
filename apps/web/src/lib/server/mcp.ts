@@ -90,6 +90,7 @@ const TOOLS: Array<{
     procedure: router.proposals.withdraw,
     access: "key",
   },
+  { name: "comment", procedure: router.proposals.comment, access: "key" },
   { name: "upload_document", procedure: router.uploads.create, access: "key" },
   { name: "get_upload", procedure: router.uploads.get, access: "key" },
   {

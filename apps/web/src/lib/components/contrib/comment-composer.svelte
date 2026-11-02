@@ -83,6 +83,7 @@
   {/if}
   <Tabs
     id={tabsId}
+    panel="{tabsId}-panel"
     label={m.discussion_body_label()}
     size="sm"
     options={[
@@ -92,40 +93,48 @@
     value={previewing ? "preview" : "write"}
     onValueChange={(next: string) => (previewing = next === "preview")}
   />
-  <Textarea
-    bind:ref={field}
-    bind:value={body}
-    name="body"
-    rows={parent == null && id == null ? 4 : 3}
-    maxlength={commentLimit}
-    aria-label={m.discussion_body_label()}
-    {placeholder}
-    class={cn({ "sr-only": previewing })}
-    onkeydown={(event) => {
-      if (
-        event.key === "Enter" &&
-        (event.metaKey || event.ctrlKey) &&
-        body.trim() !== ""
-      ) {
-        event.currentTarget.form?.requestSubmit();
-      }
-      if (event.key === "Escape" && onclose != null) {
-        onclose();
-      }
-    }}
-  />
-  {#if previewing}
-    <div
-      class="border-y border-dashed border-border py-2 text-sm min-block-24"
-      role="tabpanel"
-    >
-      {#if body.trim() === ""}
-        <p class="text-muted-foreground">{m.discussion_preview_empty()}</p>
-      {:else}
-        <Markdown {body} />
-      {/if}
-    </div>
-  {/if}
+  <div
+    id="{tabsId}-panel"
+    role="tabpanel"
+    aria-labelledby="{tabsId}-{previewing ? 'preview' : 'write'}"
+    class="grid"
+  >
+    <Textarea
+      bind:ref={field}
+      bind:value={body}
+      name="body"
+      rows={parent == null && id == null ? 4 : 3}
+      maxlength={commentLimit}
+      aria-label={m.discussion_body_label()}
+      {placeholder}
+      class={cn({ "sr-only": previewing })}
+      onkeydown={(
+        event: KeyboardEvent & { currentTarget: HTMLTextAreaElement },
+      ) => {
+        if (
+          event.key === "Enter" &&
+          (event.metaKey || event.ctrlKey) &&
+          body.trim() !== ""
+        ) {
+          event.currentTarget.form?.requestSubmit();
+        }
+        if (event.key === "Escape" && onclose != null) {
+          onclose();
+        }
+      }}
+    />
+    {#if previewing}
+      <div
+        class="border-y border-dashed border-border py-2 text-sm min-block-24"
+      >
+        {#if body.trim() === ""}
+          <p class="text-muted-foreground">{m.discussion_preview_empty()}</p>
+        {:else}
+          <Markdown {body} />
+        {/if}
+      </div>
+    {/if}
+  </div>
   {#if message != null}
     <p class="text-sm text-destructive" role="alert">{message}</p>
   {/if}

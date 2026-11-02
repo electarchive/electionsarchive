@@ -58,7 +58,7 @@
       ><time datetime={comment.created_at}
         >{date(comment.created_at.slice(0, 10))}</time
       >{#if comment.edited_at != null}
-        <span> ({m.discussion_edited()})</span>{/if}</a
+        <span class="ms-1">({m.discussion_edited()})</span>{/if}</a
     >
   </header>
   {#if (showAnchor && comment.anchor != null) || (comment.revision_n != null && head != null && comment.revision_n !== head)}
@@ -104,14 +104,14 @@
       {#if canReply && !hidden}
         <button
           type="button"
-          class="hover:text-foreground"
+          class="min-block-6 hover:text-foreground"
           onclick={() => (mode = "reply")}>{m.discussion_reply()}</button
         >
       {/if}
       {#if comment.mine && !hidden}
         <button
           type="button"
-          class="hover:text-foreground"
+          class="min-block-6 hover:text-foreground"
           onclick={() => (mode = "edit")}>{m.discussion_edit()}</button
         >
       {/if}
@@ -120,14 +120,14 @@
           <form method="POST" action="?/hide_comment" use:enhance>
             <input type="hidden" name="id" value={comment.id} />
             <input type="hidden" name="restore" value="1" />
-            <button type="submit" class="hover:text-foreground"
+            <button type="submit" class="min-block-6 hover:text-foreground"
               >{m.discussion_restore()}</button
             >
           </form>
         {:else}
           <button
             type="button"
-            class="hover:text-foreground"
+            class="min-block-6 hover:text-foreground"
             onclick={() => (mode = "hide")}>{m.discussion_hide()}</button
           >
         {/if}

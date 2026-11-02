@@ -69,7 +69,7 @@ Each step ends when its condition holds.
 5. **Draft.** Call `draft_proposal` with a summary, a rationale, the ops, and the evidence. It compiles and checks the change and waits up to 60 seconds. Done when the latest job's `status` is `done` with no error; otherwise fix the payload with `revise_proposal` and repeat.
 6. **Read the result.** Read the job's `diff` and `checks`. Done when every changed row in the diff is one you meant to change and every finding is explained in the rationale or fixed.
 7. **Submit.** Call `submit_proposal`. It becomes revision 1 and enters review.
-8. **Follow up.** Poll `get_proposal`. If review asks for changes, answer with `revise_proposal`, which adds a revision and resubmits it. Done when the proposal is `published`, `rejected`, or `withdrawn`.
+8. **Follow up.** Poll `get_proposal`, which carries the discussion in `comments`. Answer a reviewer's question with `comment` (pass `parent` to reply in its thread), and answer requested changes with `revise_proposal`, which adds a revision and resubmits it. Done when the proposal is `published`, `rejected`, or `withdrawn`.
 
 ## Op reference
 

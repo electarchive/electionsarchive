@@ -196,7 +196,7 @@ export async function commentOnProposal({
              array(
                select distinct x from unnest(
                  array_remove(array[p.author_user_id], null)
-                 || array(select f.user_id from profile f where f.handle = any(${mentionsOf(body)}::text[]))
+                 || array(select f.user_id from profile f where f.handle = any(${sql.param(mentionsOf(body))}::text[]))
                ) x
                where x <> ${author.userId}::uuid
              ),
