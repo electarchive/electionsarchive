@@ -194,7 +194,7 @@ HEADINGS = {
     "zonguldak",
 }
 HEADING = re.compile(r"^ {0,3}([A-ZÇĞİÖŞÜÂÎÛ][A-ZÇĞİÖŞÜÂÎÛ.' -]+)$")
-PARTY_LINE = re.compile(r"^[A-ZÇĞİÖŞÜ/ –-]+$")
+PARTY_LINE = re.compile(r"^(?:[A-ZÇĞİÖŞÜ/ –-]+|[^\d,.;:]*(?:Bağımsız|\(Müstakil\))[^\d,.;:]*)$")
 RUNNING = re.compile(r"YASAMA DÖNEMİ /|^\d{3,4}$|^TBMM Albümü$")
 DEATH = re.compile(r"Ölüm Tarihi: (\d\d)\.(\d\d)\.(\d{4})")
 BIRTH = re.compile(r"^(.+?) [–-] (\d{4}),")
@@ -426,6 +426,39 @@ TUIK_NOTE = (
     "by the CHP, the DP, and independents per province in 1946. The PDF's text layer garbles Turkish letters, which "
     "the parser repairs."
 )
+ALBUM_LISTINGS = {4: "181", 5: "235", 6: "301", 7: "371-440"}
+KEPT_OUT = {
+    4: "the Albüm's Müstakiller Listesi (Cilt 1, p. 181)",
+    5: "the Albüm's Müstakiller Listesi (Cilt 1, p. 235)",
+    6: "the Albüm's Müstakiller Listesi (Cilt 1, p. 301), whose second part is the Cumhuriyet Halk Fırkası Müstakil Grubu of 22",
+    7: "the members whose printed party is Bağımsız alone in the Albüm's roster (Cilt 1, pp. 371-440), since the Albüm prints no list for this term",
+}
+
+
+def party_note(term: int, outside: int) -> str:
+    size = SIZES[term]
+    base = (
+        f"Seats at the term's opening: TÜİK's declared size of the Assembly ({size}, Table 5) split by party. The Albüm "
+        "and TÜİK print no national party totals. "
+    )
+    if term not in KEPT_OUT:
+        return (
+            base
+            + "The Albüm lists no independent members for this term, so the "
+            + ("Müdâfaa-i Hukuk Grubu" if term == 2 else "Halk Fırkası")
+            + f" holds all {size}."
+        )
+    extra = (
+        " English Wikipedia gives 287 and 30 for 1931; the Albüm's list is the source used here." if term == 4 else ""
+    )
+    return (
+        base
+        + f"The party figure is the declared size minus the {outside} independents counted from {KEPT_OUT[term]}; "
+        + "members who entered at by-elections are not counted."
+        + extra
+    )
+
+
 COUNT_CAVEAT = (
     "The province's magnitude is TÜİK's seat count; the Albüm lists every person who held a seat in the term, "
     "including replacements, so its per-province counts can differ by one or two."
@@ -535,6 +568,10 @@ def emit() -> Path:
             (row["term"], canon(row["province"], row["term"]))
             for row in listed.filter(pl.col("kind") == "IND").iter_rows(named=True)
         )
+        for row in entries.filter(
+            (pl.col("term") == 7) & ~pl.col("by_election") & (pl.col("party") == "Bağımsız")
+        ).iter_rows(named=True):
+            independents[7, canon(row["province"], 7)] += 1
         groups = {
             "TCF": (
                 "terakkiperver-cumhuriyet-firkasi",
@@ -618,6 +655,70 @@ def emit() -> Path:
                     (pl.col("term") == term) & ~pl.col("by_election") & ~pl.col("never_joined")
                 ).iter_rows(named=True)
             )
+            national = None
+            if term < 8:
+                if sum(table.values()) != SIZES[term]:
+                    raise ValueError(f"TÜİK table for {year} does not sum to {SIZES[term]}")
+                national_key = f"{day}:parliament"
+                national = cs.key("tr.contest", national_key)
+                cs.add(
+                    "contest",
+                    id=national,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=assembly,
+                    district_area_id=nation,
+                    magnitude=SIZES[term],
+                    round_number=1,
+                    electoral_system_id=system_23,
+                    default_result_kind="counted",
+                )
+                name(national, f"Grand National Assembly, {year} seats by party", "en")
+                cs.add("slug", path=f"{path}/parliament", entity_id=national)
+                national_result = cs.key(f"{SOURCE}.result_set", national_key)
+                cs.add(
+                    "result_set",
+                    id=national_result,
+                    election_id=election,
+                    contest_id=national,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=album,
+                    is_default=True,
+                    completeness=0,
+                )
+                outside = sum(count for (held, _), count in independents.items() if held == term)
+                if any(held == term and place not in table for held, place in independents):
+                    raise ValueError(f"independents outside the {year} table")
+                cs.add("note", entity_id=national_result, kind="caveat", body_md=party_note(term, outside))
+                cs.add(
+                    "citation",
+                    entity_id=national_result,
+                    source_id=album,
+                    locator={"volume": 1, "pages": ALBUM_LISTINGS.get(term, "none")},
+                )
+                cs.add("citation", entity_id=national_result, source_id=tuik_source, locator={"table": 5, "year": year})
+                for label, party, seats_won, kind in (
+                    (
+                        "Müdâfaa-i Hukuk Grubu" if term == 2 else "Cumhuriyet Halk Partisi",
+                        mhg if term == 2 else chp,
+                        SIZES[term] - outside,
+                        "list",
+                    ),
+                    ("Bağımsız", None, outside, "independents"),
+                ):
+                    if seats_won > 0:
+                        option = cs.key("tr.option", f"{national_key}:{slug(label)}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=national,
+                            kind=kind,
+                            party_id=party,
+                            ballot_label=label,
+                        )
+                        cs.add("outcome", result_set_id=national_result, option_id=option, kind="won", seats=seats_won)
             for key, magnitude in sorted(table.items()):
                 if key not in areas:
                     raise ValueError(f"no area for {key}")
@@ -632,6 +733,7 @@ def emit() -> Path:
                     body_id=assembly,
                     district_area_id=areas[key],
                     magnitude=magnitude,
+                    allocation_parent_id=national,
                     round_number=1,
                     electoral_system_id=system_46 if term == 8 else system_23,
                     default_result_kind="counted",
@@ -869,7 +971,7 @@ def lists() -> pl.DataFrame:
                 place is None
                 or not re.search(r"[a-zçğıöşü]", name)
                 or "ADI SOYADI" in name
-                or fold(place.group(1)) not in HEADINGS
+                or (fold(place.group(1)) not in HEADINGS and canon(place.group(1)) not in HEADINGS)
             ):
                 continue
             rows.append(
