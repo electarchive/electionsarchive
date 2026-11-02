@@ -13753,6 +13753,16 @@ async function races(
                     party: string | null;
                     isIncumbent: boolean | null;
                   }> | null;
+                  declared: Array<{
+                    party: string | null;
+                    seats: number;
+                    color: string | null;
+                  }> | null;
+                  members: Array<{
+                    person: string;
+                    party: string | null;
+                    color: string | null;
+                  }> | null;
                 }>(sql`
                   select g.id, c.district_area_id as area, (select st.label from seat st where st.id = c.seat_id) as seat,
                     f.person, f.share, f.won as "isWon", g.runoff,
@@ -13763,6 +13773,43 @@ async function races(
                       left join entity_merge fm on fm.entity_id = fc.person_id
                       where fo.contest_id = c.id and fo.kind = 'candidate'
                     ) end as field,
+                    case when f.person is null and g.runoff is null then (
+                      select json_agg(json_build_object('party', d.party, 'seats', d.seats, 'color', ${paint(sql`d.party`, sql`${election}::uuid`, sql`${day}::date`)}) order by d.seats desc)
+                      from (
+                        select coalesce(dm.into_id, dop.party_id) as party, sum(dx.seats)::int as seats
+                        from result_set ds
+                        join outcome dx on dx.result_set_id = ds.id and dx.kind in ('won', 'elected') and dx.candidacy_id is null and dx.seats > 0
+                        join contest_option dop on dop.id = dx.option_id
+                        left join entity_merge dm on dm.entity_id = dop.party_id
+                        where ds.contest_id = c.id and ${latest("ds")}
+                        group by 1
+                      ) d
+                    ) end as declared,
+                    case when f.person is null and g.runoff is null then (
+                      select json_agg(json_build_object('person', w.person, 'party', w.party, 'color', ${paint(sql`w.party`, sql`${election}::uuid`, sql`${day}::date`)}))
+                      from (
+                        select distinct on (v.person) v.person, v.party from (
+                          select coalesce(tm.into_id, t.person_id) as person, (
+                            select coalesce(am.into_id, ta.party_id) from tenure_affiliation ta
+                            left join entity_merge am on am.entity_id = ta.party_id
+                            where ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
+                            order by lower(ta.valid) nulls first limit 1
+                          ) as party
+                          from tenure t
+                          left join entity_merge tm on tm.entity_id = t.person_id
+                          where t.contest_id = c.id
+                          union all
+                          select coalesce(cm.into_id, cy.person_id), coalesce(cy.member_of_party_id, xo.party_id)
+                          from result_set xs
+                          join outcome x on x.result_set_id = xs.id and x.kind in ('elected', 'won') and x.candidacy_id is not null
+                          join candidacy cy on cy.id = x.candidacy_id
+                          join contest_option xo on xo.id = x.option_id
+                          left join entity_merge cm on cm.entity_id = cy.person_id
+                          where xs.contest_id = c.id and ${latest("xs")}
+                        ) v
+                        order by v.person, v.party nulls last
+                      ) w
+                    ) end as members,
                     (select e.date_from::text from contest n join election e on e.id = n.election_id where n.id = g.runoff) as date,
                     (select e.kind = 'general' from contest n join election e on e.id = n.election_id where n.id = g.runoff) as "isGeneral",
                     r.person as winner, r.share as won, r.won as "isDone"
@@ -13838,6 +13885,11 @@ async function races(
                           entry.person,
                           entry.party,
                         ]),
+                        ...(row.declared ?? []).map((entry) => entry.party),
+                        ...(row.members ?? []).flatMap((entry) => [
+                          entry.person,
+                          entry.party,
+                        ]),
                       ].filter((id) => id != null),
                     ),
                     date,
@@ -13872,6 +13924,53 @@ async function races(
                             people.full.get(entry.party) ??
                             null),
                     })),
+                    declared:
+                      (row.declared ?? row.members ?? []).length === 0
+                        ? []
+                        : (
+                            row.declared ??
+                            Map.groupBy(
+                              row.members ?? [],
+                              (entry) => entry.party,
+                            )
+                              .entries()
+                              .map(([party, entries]) => ({
+                                party,
+                                seats: entries.length,
+                                color: entries[0]?.color ?? null,
+                              }))
+                              .toArray()
+                              .toSorted((a, b) => b.seats - a.seats)
+                          ).map((entry) => ({
+                            key:
+                              entry.party == null
+                                ? row.declared == null
+                                  ? "unrecorded"
+                                  : "independent"
+                                : `party:${entry.party}`,
+                            label:
+                              entry.party == null
+                                ? row.declared == null
+                                  ? m.record_none()
+                                  : m.seats_independents()
+                                : (people.short.get(entry.party) ??
+                                  people.full.get(entry.party) ??
+                                  ""),
+                            color: entry.color,
+                            seats: entry.seats,
+                          })),
+                    members: (row.members ?? [])
+                      .map((entry) => ({
+                        person: entry.person,
+                        name: people.full.get(entry.person) ?? "",
+                        party:
+                          entry.party == null
+                            ? null
+                            : (people.short.get(entry.party) ??
+                              people.full.get(entry.party) ??
+                              null),
+                      }))
+                      .toSorted((a, b) => natural(a.name, b.name)),
                     runoff:
                       row.runoff == null
                         ? null
@@ -14627,6 +14726,21 @@ export const elections = {
                       party: v.nullable(v.string()),
                     }),
                   ),
+                  declared: v.array(
+                    v.object({
+                      key: v.string(),
+                      label: v.string(),
+                      color: v.nullable(v.string()),
+                      seats: v.number(),
+                    }),
+                  ),
+                  members: v.array(
+                    v.object({
+                      person: v.string(),
+                      name: v.string(),
+                      party: v.nullable(v.string()),
+                    }),
+                  ),
                   runoff: v.nullable(
                     v.object({
                       path: v.nullable(v.string()),
@@ -14907,6 +15021,9 @@ export const elections = {
           where ${within}::uuid is null and exists (select from districts)
             and not exists (select from districts where area is null or area in (select area_id from home))
             and not exists (select from election x where x.id = ${input.id}::uuid and x.kind = 'by_election')
+          group by kids.scheme_code
+          order by held desc
+          limit 1
         `),
       ]);
       const anchored = anchor.rows[0];

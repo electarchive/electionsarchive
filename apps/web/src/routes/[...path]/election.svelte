@@ -1040,31 +1040,88 @@
       const isPending = wards.every(
         (row) => row.share == null && !row.isWon && row.runoff == null,
       );
+      const isPast =
+        election.date == null
+          ? election.status !== "scheduled"
+          : election.date < new Date().toISOString().slice(0, 10);
+      const parties = isPending
+        ? Map.groupBy(
+            wards.flatMap((row) => row.declared),
+            (entry) => entry.key,
+          )
+            .values()
+            .flatMap(([lead, ...rest]) => {
+              if (lead == null) {
+                return [];
+              }
+              let seats = lead.seats;
+              for (const entry of rest) {
+                seats += entry.seats;
+              }
+              return [{ ...lead, seats }];
+            })
+            .toArray()
+            .toSorted((a, b) => b.seats - a.seats)
+        : [];
+      const missing = {
+        key: "ward:missing",
+        label: m.map_pending(),
+        color: "#5f6b7a",
+      };
       const kinds = (
-        isPending
+        parties.length > 0
           ? [
-              {
-                key: "ward:scheduled",
-                label: m.map_ward_scheduled(),
-                color: "#5f6b7a",
-              },
+              ...parties.map(({ key, label, color }) => ({
+                key,
+                label,
+                color,
+              })),
+              ...(wards.some((row) => row.declared.length === 0)
+                ? [missing]
+                : []),
             ]
-          : [
-              {
-                key: "ward:outright",
-                label: m.map_ward_outright(),
-                color: "#0e7c86",
-              },
-              {
-                key: "ward:runoff",
-                label:
-                  first?.isGeneral === true
-                    ? m.map_ward_general()
-                    : m.map_ward_runoff(),
-                color: "#d08a00",
-              },
-            ]
+          : isPending
+            ? [
+                isPast
+                  ? missing
+                  : {
+                      key: "ward:scheduled",
+                      label: m.map_ward_scheduled(),
+                      color: "#5f6b7a",
+                    },
+              ]
+            : [
+                {
+                  key: "ward:outright",
+                  label: m.map_ward_outright(),
+                  color: "#0e7c86",
+                },
+                {
+                  key: "ward:runoff",
+                  label:
+                    first?.isGeneral === true
+                      ? m.map_ward_general()
+                      : m.map_ward_runoff(),
+                  color: "#d08a00",
+                },
+              ]
       ).map((kind) => ({ ...kind, short: null, person: null, party: null }));
+      const roster = (members: (typeof wards)[number]["members"]) => {
+        if (members.length === 0) {
+          return undefined;
+        }
+        const listed = new Intl.ListFormat(getLocale(), {
+          type: "unit",
+          style: "short",
+        }).format(members.slice(0, 6).map((entry) => entry.name));
+        return m.outcome_note({
+          names: m.outcome_elected(),
+          note:
+            members.length > 6
+              ? `${listed} ${m.wards_field_more({ count: count(members.length - 6) })}`
+              : listed,
+        });
+      };
       const outcomes =
         wards.length === 0 || race.places == null
           ? null
@@ -1075,8 +1132,49 @@
                 districts: undefined,
                 rows: race.places.rows.map((row) => {
                   const ward = wards.find((entry) => entry.path === row.path);
+                  if (
+                    parties.length > 0 &&
+                    ward != null &&
+                    ward.declared.length > 0
+                  ) {
+                    let total = 0;
+                    for (const entry of ward.declared) {
+                      total += entry.seats;
+                    }
+                    const held = ward.declared.map(
+                      (entry) =>
+                        [
+                          kinds.findIndex((kind) => kind.key === entry.key),
+                          entry.seats,
+                        ] as [number, number],
+                    );
+                    return {
+                      ...row,
+                      valid: total,
+                      seats: total,
+                      isTally: true,
+                      shares: kinds.map(
+                        (kind) =>
+                          (ward.declared.find((entry) => entry.key === kind.key)
+                            ?.seats ?? 0) / total,
+                      ),
+                      leader: held[0]?.[0] ?? null,
+                      held,
+                      margin: null,
+                      earlier: null,
+                      prior: null,
+                      declared: null,
+                      status: roster(ward.members),
+                    };
+                  }
                   const spot =
-                    ward == null ? null : ward.runoff == null ? 0 : 1;
+                    ward == null
+                      ? null
+                      : isPending
+                        ? kinds.length - 1
+                        : ward.runoff == null
+                          ? 0
+                          : 1;
                   return {
                     ...row,
                     shares: kinds.map((_, at) =>
@@ -1088,11 +1186,13 @@
                     earlier: null,
                     prior: null,
                     declared: null,
+                    status: ward == null ? undefined : roster(ward.members),
                   };
                 }),
               },
               tones: kinds.map((kind) => swatch(kind.color, kind.key)),
               titles: kinds.map((kind) => kind.label),
+              votes: parties.length > 0 ? m.col_seats() : null,
             };
       let decided: {
         places: NonNullable<typeof race.places>;
@@ -2224,7 +2324,7 @@
                     approximate={race.map.approximate}
                     sources={race.map.credits}
                     noun={race.places?.levels[0]?.noun ?? ""}
-                    votes={race.votes}
+                    votes={race.outcomes.votes ?? race.votes}
                     names={race.outcomes.titles}
                     levels={[]}
                     span={null}
@@ -3040,7 +3140,39 @@
             >
           {/if}
           <span class="grid gap-0.5 min-inline-0">
-            {#if row.share == null && row.field.length > 0}
+            {#if row.share == null && row.members.length > 0}
+              <span
+                class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 min-inline-0"
+              >
+                {#each row.members as entry (entry.person)}
+                  <span class="flex items-baseline gap-1 min-inline-0">
+                    <Name
+                      class="font-semibold"
+                      label={entry.name}
+                      person={entry.person}
+                    />
+                    {#if entry.party != null}
+                      <span class="text-xs text-muted-foreground"
+                        >{entry.party}</span
+                      >
+                    {/if}
+                  </span>
+                {/each}
+              </span>
+            {:else if row.share == null && row.declared.length > 0}
+              <span
+                class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 font-figures tabular-nums"
+              >
+                {#each row.declared as entry (entry.key)}
+                  <span class="flex items-baseline gap-1"
+                    ><span class="font-semibold">{entry.label}</span><span
+                      class="text-xs text-muted-foreground"
+                      >{count(entry.seats)}</span
+                    ></span
+                  >
+                {/each}
+              </span>
+            {:else if row.share == null && row.field.length > 0}
               <span class="grid gap-0.5">
                 {const shown = $derived(
                   row.field.filter(
@@ -3092,7 +3224,11 @@
             {/if}
             <span
               class={cn("text-xs text-muted-foreground", {
-                hidden: row.share == null && row.field.length > 0,
+                hidden:
+                  row.share == null &&
+                  (row.field.length > 0 ||
+                    row.members.length > 0 ||
+                    row.declared.length > 0),
               })}
             >
               {#if row.share == null}

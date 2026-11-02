@@ -3365,21 +3365,34 @@ function electionMarkdown(
                 row.field.every((entry) => entry.isIncumbent === false);
               return [
                 `${link(row.label, row.path)}${isOpen ? ` (${m.incumbency_open()})` : ""}`,
-                row.share == null && row.field.length > 0
-                  ? row.field
-                      .map((entry) => {
-                        const tags = [
-                          entry.party,
-                          entry.isIncumbent === true
-                            ? m.slate_incumbent()
-                            : null,
-                        ].filter((tag) => tag != null);
-                        return `${entry.name}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
-                      })
+                row.share == null && row.members.length > 0
+                  ? row.members
+                      .map(
+                        (entry) =>
+                          `${entry.name}${entry.party == null ? "" : ` (${entry.party})`}`,
+                      )
                       .join(", ")
-                  : (final ?? row).name,
+                  : row.share == null && row.field.length > 0
+                    ? row.field
+                        .map((entry) => {
+                          const tags = [
+                            entry.party,
+                            entry.isIncumbent === true
+                              ? m.slate_incumbent()
+                              : null,
+                          ].filter((tag) => tag != null);
+                          return `${entry.name}${tags.length === 0 ? "" : ` (${tags.join(", ")})`}`;
+                        })
+                        .join(", ")
+                    : (final ?? row).name,
                 row.share == null
-                  ? m.wards_none()
+                  ? row.declared.length > 0
+                    ? row.declared
+                        .map((entry) => `${entry.label} ${count(entry.seats)}`)
+                        .join(", ")
+                    : row.members.length > 0
+                      ? m.outcome_elected()
+                      : m.wards_none()
                   : row.runoff == null
                     ? (row.isWon ? m.wards_won : m.wards_led)({
                         share: percent(row.share),
