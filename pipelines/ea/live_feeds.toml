@@ -14,6 +14,14 @@ publisher = "Arizona Secretary of State"
 url = "https://app.enhancedvoting.com/results/public/Arizona/110326GeneralElection"
 
 [[feed]]
+id = "us.enr_2026.ca"
+adapter = "us.enr_2026"
+interval = 120
+params = { state = "CA" }
+publisher = "California Secretary of State"
+url = "https://electionresults.sos.ca.gov/"
+
+[[feed]]
 id = "us.enr_2026.ct"
 adapter = "us.enr_2026"
 params = { state = "CT" }

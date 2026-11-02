@@ -356,6 +356,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         else:
             store("AR", url, listing, ".json")
             store("AR", f"https://results.tally-enr.com/results/arkansas/{ids[0]}/FullDataFile.json", content, ".json")
+    if not only or "CA" in only:
+        from ea.sources.us import enr_ca
+
+        enr_ca.collect(client, get, lambda url, content: store("CA", url, content, ".json"))
     missing: list[str] = []
     for fips, (tenant, *_) in COUNTIES.items():
         state = STATES[fips[:2]]
@@ -571,6 +575,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                             "total": int(contest.get("precinctsParticipating") or 0),
                             "scope": (found["party0"] or found["party1"] or "") if found else "",
                         }
+        return
+    if state == "CA":
+        from ea.sources.us import enr_ca
+
+        yield from enr_ca.rows(url, path, urls)
         return
     if state == "FL":
         seen = set()
