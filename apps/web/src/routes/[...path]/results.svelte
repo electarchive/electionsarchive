@@ -561,7 +561,7 @@
           <span class="flex flex-wrap items-baseline gap-x-1.5 *:shrink-0">
             <span class="shrink! min-inline-0 [@media(width>=48rem)]:truncate"
               ><Name
-                class="font-semibold text-foreground"
+                class="font-semibold text-foreground [@media(width>=48rem)]:inline-block [@media(width>=48rem)]:truncate [@media(width>=48rem)]:align-bottom [@media(width>=48rem)]:max-inline-full"
                 label={row.label}
                 color={swatch(row.color, row.key)}
                 hasSwatch={false}
@@ -633,7 +633,7 @@
             </span>
           </span>
           {#if line.subtitle != null && !line.isAbbreviated}
-            <span class="block text-[0.8125rem] text-pretty">
+            <span class="mbs-2 block text-[0.8125rem] text-pretty">
               <Name
                 class="text-muted-foreground"
                 label={line.subtitle}
@@ -1072,7 +1072,7 @@
   </table>
 </div>
 {#if facts != null && facts.length > 0}
-  <dl class="grid gap-1 px-2 pbs-2.5 text-[0.8125rem]">
+  <dl class="grid gap-1.5 px-2 pbs-2.5 text-[0.8125rem]">
     {#each facts as fact (fact.key)}
       <div class="flex flex-wrap items-baseline gap-x-2">
         <dt

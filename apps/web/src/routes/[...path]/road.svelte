@@ -293,7 +293,7 @@
     {/if}
     {#if entry.leaders.length > 0 || (entry.local != null && entry.local.place !== "")}
       <span
-        class="col-start-3 flex flex-wrap items-baseline gap-x-3.5 gap-y-0.5 sm:col-start-4"
+        class="col-start-3 flex flex-wrap items-baseline gap-x-3.5 gap-y-1 sm:col-start-4 max-sm:mbs-1.5"
       >
         {#each entry.leaders as leader (leader.key)}
           <span class="inline-flex items-baseline gap-x-1.5">

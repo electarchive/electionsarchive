@@ -222,7 +222,7 @@
     {/if}
     {#if tallies.length > 0 || day?.part?.path != null}
       <ul
-        class={cn("flex flex-wrap items-baseline gap-x-4 gap-y-1", {
+        class={cn("flex flex-wrap items-baseline gap-x-4 gap-y-2", {
           "border-bs border-border pbs-1.5": entries.length > 0,
         })}
       >

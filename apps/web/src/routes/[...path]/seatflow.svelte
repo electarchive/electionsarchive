@@ -270,7 +270,7 @@
       </h2>
       {#if ledger.kind === "rounds"}
         <nav
-          class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[0.8125rem]"
+          class="flex flex-wrap items-baseline gap-x-4 gap-y-1.5 text-[0.8125rem]"
           aria-label={m.rounds_title()}
         >
           {#if ledger.path != null && !isHere(ledger.path) && ledger.rounds.every((round) => round.path !== ledger.path)}

@@ -1110,7 +1110,7 @@
         ></span>
         <span class="flex-1 truncate font-semibold min-inline-0">
           <Name
-            class="relative z-1 truncate align-bottom max-inline-full"
+            class="relative z-1 -my-1 inline-block truncate py-1 align-bottom max-inline-full min-inline-6"
             label={party.short ?? party.label}
             hasSwatch={false}
             party={id}

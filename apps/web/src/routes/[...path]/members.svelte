@@ -126,7 +126,7 @@
     >
       {#each isOpen || query !== "" ? shown : shown.slice(0, 48) as member, index (index)}
         <li
-          class="grid border-s-3 bg-card px-2.5 py-1.5 text-[0.8125rem]/snug shadow-[0_0_0_0.5px_var(--border)]"
+          class="grid gap-2 border-s-3 bg-card px-2.5 py-1.5 text-[0.8125rem]/snug shadow-[0_0_0_0.5px_var(--border)]"
           style:border-inline-start-color={colors.get(member.party)}
         >
           <Name

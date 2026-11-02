@@ -122,7 +122,7 @@
     </div>
     {#if sheet.net.length > 0}
       <dl
-        class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[0.8125rem]"
+        class="flex flex-wrap items-baseline gap-x-4 gap-y-1.5 text-[0.8125rem]"
       >
         <dt class="text-xs font-semibold text-muted-foreground">
           {m.byes_net()}
