@@ -1389,6 +1389,43 @@ export const UNAFFILIATED = [
   "#3f6fd1",
 ];
 
+export const unaffiliated = (id: string) =>
+  UNAFFILIATED[Number.parseInt(id.slice(-4), 16) % UNAFFILIATED.length] ?? "";
+
+export function spare(id: string) {
+  const seed = Number.parseInt(id.replaceAll("-", "").slice(-10), 16) || 0;
+  const lightness = [0.58, 0.68, 0.78][Math.floor(seed / 3600) % 3] ?? 0.68;
+  const hue = ((seed % 3600) / 10) * (Math.PI / 180);
+  const [l, m, s] = [
+    lightness +
+      0.3963377774 * 0.11 * Math.cos(hue) +
+      0.2158037573 * 0.11 * Math.sin(hue),
+    lightness -
+      0.1055613458 * 0.11 * Math.cos(hue) -
+      0.0638541728 * 0.11 * Math.sin(hue),
+    lightness -
+      0.0894841775 * 0.11 * Math.cos(hue) -
+      1.291485548 * 0.11 * Math.sin(hue),
+  ].map((value) => value ** 3) as [number, number, number];
+  return `#${[
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ]
+    .map((value) => {
+      const clipped = Math.min(1, Math.max(0, value));
+      return Math.round(
+        255 *
+          (clipped <= 0.0031308
+            ? 12.92 * clipped
+            : 1.055 * clipped ** (1 / 2.4) - 0.055),
+      )
+        .toString(16)
+        .padStart(2, "0");
+    })
+    .join("")}`;
+}
+
 const VARIANTS = [
   [0, 0],
   [0.1, 0],
@@ -1404,11 +1441,41 @@ const VARIANTS = [
   [0.2, -0.45],
 ] as const;
 
+export function kindred(
+  roots: Array<{ id: string; label: string; years: Array<number> }>,
+  rest: Array<{ id: string; label: string; years: Array<number> }>,
+) {
+  const key = (label: string) => label.trim().toLocaleLowerCase();
+  const named = Map.groupBy(roots, (party) => key(party.label));
+  const kin = new Map<string, string>();
+  for (const party of rest) {
+    const found = named.get(key(party.label));
+    if (found == null || key(party.label) === "") {
+      continue;
+    }
+    const overlap = (root: { years: Array<number> }) => {
+      const low = Math.min(...root.years) - 1;
+      const high = Math.max(...root.years) + 1;
+      return party.years.filter((year) => year >= low && year <= high).length;
+    };
+    const latest = (root: { years: Array<number> }) =>
+      Math.max(0, ...root.years);
+    const root = found.toSorted(
+      (a, b) => overlap(b) - overlap(a) || latest(b) - latest(a),
+    )[0];
+    if (root != null && root.id !== party.id) {
+      kin.set(party.id, root.id);
+    }
+  }
+  return kin;
+}
+
 export function separate(
   colors: Map<string, string>,
   votes: Array<readonly [string | null, number]>,
   branch: Map<string, string> = new Map(),
   isHued = false,
+  fixed: Set<string> = new Set(),
 ) {
   const weight = new Map<string, number>();
   for (const [party, count] of votes) {
@@ -1419,7 +1486,11 @@ export function separate(
   const order = weight
     .keys()
     .toArray()
-    .toSorted((a, b) => (weight.get(b) ?? 0) - (weight.get(a) ?? 0));
+    .toSorted(
+      (a, b) =>
+        Number(fixed.has(b)) - Number(fixed.has(a)) ||
+        (weight.get(b) ?? 0) - (weight.get(a) ?? 0),
+    );
   const placed = new Map<number, Array<Array<number>>>();
   const scale = isHued ? 0.5 : 1;
   const cell = (at: Array<number>) =>
@@ -1520,9 +1591,12 @@ export function separate(
         }
         return { ...fitted, kept: step === 0 && turn === 0 };
       });
-    let best = candidates.find(
-      (candidate) => nearest(candidate.at, (distance) => distance < 0.1) >= 0.1,
-    );
+    let best = fixed.has(party)
+      ? candidates.find((candidate) => candidate.kept)
+      : candidates.find(
+          (candidate) =>
+            nearest(candidate.at, (distance) => distance < 0.1) >= 0.1,
+        );
     let far = -Infinity;
     for (const candidate of best == null ? candidates : []) {
       const distance = nearest(candidate.at, (value) => value <= far);
@@ -2208,11 +2282,7 @@ async function load(
     )
     .map((row) => stand(row) ?? row.person ?? "");
   for (const id of independents) {
-    color.set(
-      id,
-      UNAFFILIATED[Number.parseInt(id.slice(-4), 16) % UNAFFILIATED.length] ??
-        "",
-    );
+    color.set(id, unaffiliated(id));
   }
   const side = new Map(
     options.rows.map((row) => {
@@ -8619,10 +8689,7 @@ export const contests = {
                 person == null
                   ? base
                   : base == null
-                    ? (UNAFFILIATED[
-                        Number.parseInt(person.slice(-4), 16) %
-                          UNAFFILIATED.length
-                      ] ?? null)
+                    ? unaffiliated(person)
                     : at === 0
                       ? base
                       : `oklch(from ${base} l max(c, 0.1) calc(h + ${at * 137.5}))`,
@@ -19351,6 +19418,7 @@ export async function record(input: { id: string; body?: string }) {
     winner: string | null;
     decider: string | null;
     isRunoff: boolean;
+    size: number | null;
   }>(sql`
     with recursive later as materialized (
       select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
@@ -19577,7 +19645,7 @@ export async function record(input: { id: string; body?: string }) {
     select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share, winner,
       decider, coalesce(runoff, false) as "isRunoff",
       party is null and independent as "isIndependent",
-      case when "isMixed" then listed else seats end as seats
+      case when "isMixed" then listed else seats end as seats, size::int as size
     from flagged
     where not ("isMixed" and listed = 0)
       and not exists (
@@ -19739,6 +19807,50 @@ export async function record(input: { id: string; body?: string }) {
       }
     }
   }
+  const filled = new Map<string, number>();
+  for (const row of found.rows) {
+    const key = `${row.seat}/${row.bucket}`;
+    filled.set(key, (filled.get(key) ?? 0) + row.seats);
+  }
+  const held = Map.groupBy(
+    found.rows.flatMap((row) =>
+      row.party == null ? [] : [{ id: row.party, year: row.year }],
+    ),
+    (row) => row.id,
+  );
+  const kin = kindred(
+    held
+      .entries()
+      .map(([id, rows]) => ({
+        id,
+        label: colors.get(id)?.label ?? "",
+        years: rows.map((row) => row.year),
+      }))
+      .toArray(),
+    parties
+      .filter((id) => !held.has(id))
+      .map((id) => ({
+        id,
+        label: colors.get(id)?.label ?? "",
+        years: cabinets.rows
+          .filter((row) => row.party === id)
+          .map((row) => Number(row.from.slice(0, 4))),
+      })),
+  );
+  const shown = parties.filter((id) => !kin.has(id));
+  const palette = new Map(
+    shown.map((id) => [id, colors.get(id)?.color ?? spare(id)]),
+  );
+  separate(palette, [
+    ...found.rows.map(
+      (row) =>
+        [
+          row.party,
+          row.seats / Math.max(filled.get(`${row.seat}/${row.bucket}`) ?? 1, 1),
+        ] as const,
+    ),
+    ...shown.map((id) => [id, 0] as const),
+  ]);
   return {
     scope: own.rows[0]?.path ?? null,
     series: seats
@@ -19768,6 +19880,7 @@ export async function record(input: { id: string; body?: string }) {
                 year: first?.year ?? 0,
                 races: Math.max(...group.map((row) => row.races)),
                 filled,
+                size: first?.size ?? null,
                 share:
                   group.length === 1 &&
                   first?.isOffice === true &&
@@ -19900,12 +20013,12 @@ export async function record(input: { id: string; body?: string }) {
         row.head == null
           ? null
           : { id: row.head, name: labels.full.get(row.head) ?? "" },
-      party: row.party,
+      party: row.party == null ? null : (kin.get(row.party) ?? row.party),
       from: row.from,
       to: row.to,
       isCaretaker: row.isCaretaker,
     })),
-    parties: parties.map((id) => {
+    parties: shown.map((id) => {
       const ref = colors.get(id) ?? { id, label: "", short: null, color: null };
       const text = ref.short ?? ref.label;
       const place = region.get(id);
@@ -19916,6 +20029,7 @@ export async function record(input: { id: string; body?: string }) {
       const last = Math.max(...years);
       return {
         ...ref,
+        color: palette.get(id) ?? null,
         short: !clashes.has(id)
           ? ref.short
           : place != null && place !== ""
@@ -20956,6 +21070,7 @@ export const polities = {
                 year: v.number(),
                 races: v.number(),
                 filled: v.number(),
+                size: v.optional(v.nullable(v.number())),
                 share: v.nullable(v.number()),
                 winner: v.nullable(v.string()),
                 contest: v.nullable(v.string()),

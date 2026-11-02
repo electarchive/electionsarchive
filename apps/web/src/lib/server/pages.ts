@@ -15,9 +15,11 @@ import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
 import {
   eras,
+  kindred,
   latest,
   representative,
   separate,
+  spare,
 } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import { canonicalPath } from "#lib/server/territory.js";
@@ -654,41 +656,67 @@ export async function chamber(path: string) {
         ...later,
       ]
     : results;
-  const groups = Map.groupBy(
-    [
-      ...record.parties,
-      ...body.parties.filter((party) =>
-        record.parties.every((entry) => entry.id !== party.id),
-      ),
-    ],
-    (party) => party.label.trim().toLocaleLowerCase(),
-  )
-    .values()
-    .toArray();
-  const shared = groups.flatMap((group) =>
-    group.length > 1 ? group.map((party) => party.id) : [],
+  const listed = new Set(record.parties.map((party) => party.id));
+  const extra = body.parties.filter((party) => !listed.has(party.id));
+  const labels = new Set(
+    record.parties.map((party) => party.label.trim().toLocaleLowerCase()),
+  );
+  const shared = extra.flatMap((party) =>
+    labels.has(party.label.trim().toLocaleLowerCase()) &&
+    /^[\da-f-]{36}$/u.test(party.id)
+      ? [party.id]
+      : [],
   );
   const naming =
     shared.length === 0
       ? null
       : await db.execute<{ id: string }>(sql`
         select distinct entity_id::text as id from name
-        where entity_id = any(${sql.param(shared.filter((key) => /^[\da-f-]{36}$/u.test(key)))}::uuid[])
+        where entity_id = any(${sql.param(shared)}::uuid[])
           and kind in ('official', 'english') and not (lower_inf(valid) and upper_inf(valid))
       `);
   const renamed = new Set((naming?.rows ?? []).map((row) => row.id));
-  const kin = new Map(
-    groups.flatMap((group) => {
-      const root = group.find((party) => !renamed.has(party.id))?.id;
-      return group.map(
-        (party) =>
-          [
-            party.id,
-            renamed.has(party.id) ? party.id : (root ?? party.id),
-          ] as const,
-      );
-    }),
+  const won = Map.groupBy(
+    record.series.flatMap((series) =>
+      series.points.flatMap((point) =>
+        point.parties.flatMap((entry) =>
+          entry.party == null
+            ? []
+            : [{ id: entry.party, year: Number(point.date.slice(0, 4)) }],
+        ),
+      ),
+    ),
+    (entry) => entry.id,
   );
+  const sat = Map.groupBy(
+    body.makeup.flatMap((term) =>
+      term.parties.flatMap((entry) =>
+        [entry.party, entry.caucus].flatMap((id) =>
+          id == null ? [] : [{ id, year: Number(term.start.slice(0, 4)) }],
+        ),
+      ),
+    ),
+    (entry) => entry.id,
+  );
+  const kin = new Map([
+    ...[...record.parties, ...extra].map(
+      (party) => [party.id, party.id] as const,
+    ),
+    ...kindred(
+      record.parties.map((party) => ({
+        id: party.id,
+        label: party.label,
+        years: (won.get(party.id) ?? []).map((entry) => entry.year),
+      })),
+      extra
+        .filter((party) => !renamed.has(party.id))
+        .map((party) => ({
+          id: party.id,
+          label: party.label,
+          years: (sat.get(party.id) ?? []).map((entry) => entry.year),
+        })),
+    ),
+  ]);
   const rekey = (key: string | null) =>
     key == null || key === "independent" || key.startsWith("category:")
       ? key
@@ -862,14 +890,17 @@ export async function chamber(path: string) {
       }
     }
   }
-  const relit = new Map(
-    groups.flatMap((group) =>
-      group.flatMap((party) =>
-        party.color == null ? [] : [[party.id, party.color] as const],
-      ),
+  const relit = new Map([
+    ...record.parties.flatMap((party) =>
+      party.color == null ? [] : [[party.id, party.color] as const],
     ),
-  );
-  separate(relit, [...recent]);
+    ...extra.flatMap((party) =>
+      kin.get(party.id) === party.id
+        ? [[party.id, party.color ?? spare(party.id)] as const]
+        : [],
+    ),
+  ]);
+  separate(relit, [...recent], new Map(), false, listed);
   const spans = await db.execute<{
     start: string;
     id: string;
@@ -989,16 +1020,10 @@ export async function chamber(path: string) {
           ]),
         ].map((entry) => entry.party),
       ),
-      groups.flatMap((group) =>
-        group.map((party) => ({
-          ...party,
-          color: relit.get(kin.get(party.id) ?? party.id) ?? party.color,
-          short:
-            new Set(group.map((entry) => entry.short)).size > 1
-              ? null
-              : party.short,
-        })),
-      ),
+      [...record.parties, ...extra].map((party) => ({
+        ...party,
+        color: relit.get(kin.get(party.id) ?? party.id) ?? party.color,
+      })),
     ),
     members,
     kin: Object.fromEntries([...kin].filter(([id, root]) => id !== root)),

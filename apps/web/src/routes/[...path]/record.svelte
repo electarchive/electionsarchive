@@ -97,7 +97,7 @@
           ? point.ended
           : (all[index + 1]?.date ?? null),
       total: point.filled,
-      size: null,
+      size: point.size ?? null,
       apportioned: null,
       seceded: 0,
       isSeated: false,
