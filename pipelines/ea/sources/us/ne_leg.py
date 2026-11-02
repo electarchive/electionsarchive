@@ -10,6 +10,7 @@ from ea.changeset import Changeset
 from ea.sources.us import medsl
 from ea.sources.us.ne_house_generals import BASE, BOOKS, LANDING, PUBLISHER
 from ea.store import DATA, connect
+from ea.typed import search
 
 SOURCE = "us.ne_leg"
 VERSION = "2"
@@ -39,9 +40,9 @@ def pages(path: str, first: int | None) -> list[str]:
     if first is None:
         return text().splitlines()
     count = int(
-        re.search(
-            r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", path], capture_output=True, check=True, text=True).stdout
-        )[1]
+        search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", path], capture_output=True, check=True, text=True).stdout)[
+            1
+        ]
     )
     lines = text("-l", str(first - 1)).splitlines()
     for page in range(first, count + 1):

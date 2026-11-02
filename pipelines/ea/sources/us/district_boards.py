@@ -200,14 +200,14 @@ def emit(
                     cs.add("entity_retirement", entity_id=option, reason=reason)
                 cs.add("entity_retirement", entity_id=contest, reason=reason)
             print(f"{len(stale)} stale contests retired")
-            elections = {str(row["id"]) for row in cs.rows.get("election", [])} | {
+            election_ids = {str(row["id"]) for row in cs.rows.get("election", [])} | {
                 str(row["election_id"]) for row in cs.rows.get("contest", [])
             }
             kept_polities = {str(row["polity_id"]) for row in cs.rows.get("election", [])}
             kept_polities.update(
                 str(polity)
                 for (polity,) in conn.execute(
-                    "select polity_id from election where id = any(%s::uuid[])", [list(elections)]
+                    "select polity_id from election where id = any(%s::uuid[])", [list(election_ids)]
                 ).fetchall()
             )
             orphans = conn.execute(

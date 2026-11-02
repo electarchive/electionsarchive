@@ -142,8 +142,10 @@ def parse() -> None:
                         office = line
                         contest = f"{kind}:{party}"
     for day, contests in TABLES.items():
-        for contest, district in contests.items():
-            table = pl.read_csv(raw.cached(SOURCE, TABLE.format(id=contest)).path, has_header=False, infer_schema=False)
+        for table_id, district in contests.items():
+            table = pl.read_csv(
+                raw.cached(SOURCE, TABLE.format(id=table_id)).path, has_header=False, infer_schema=False
+            )
             names = table.row(0)
             counties = table.filter(pl.col("column_0") == "County")
             if counties.height != len(COUNTIES):

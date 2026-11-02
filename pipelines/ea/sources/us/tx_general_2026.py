@@ -9,6 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.sources.us.tx_primaries_2026 import ordinal
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.tx_general_2026"
 VERSION = "1"
@@ -80,9 +81,11 @@ def emit() -> Path:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         state_polity = cs.polity("US-TX")
-        (state_area,) = conn.execute(
-            "select area_id from reporting_unit where scheme_code = 'us.state' and polity_id = %s", [state_polity]
-        ).fetchone()
+        (state_area,) = one(
+            conn.execute(
+                "select area_id from reporting_unit where scheme_code = 'us.state' and polity_id = %s", [state_polity]
+            )
+        )
         title_text = "2026 general election ballot certification"
         source = cs.source("Texas Secretary of State", title_text)
         if source in cs.minted:

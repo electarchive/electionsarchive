@@ -137,8 +137,8 @@ def emit() -> Path:
                        order by value limit 1""",
                     [polity],
                 ).fetchone()
-            if legacy[polity] is not None:
-                code = legacy[polity][0]
+            if (legacy_code := legacy[polity]) is not None:
+                code = legacy_code[0]
             election = cs.key("us.election", f"{DAY}:WA:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)

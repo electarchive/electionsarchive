@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from ea.sources.us.enr_2026 import DAY, EV_OFFICES
+from ea.typed import search
 
 FOLDERS = {"St. Louis": "https://extcontent.stlouisco.com/BOE/eResults/"}
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
@@ -51,7 +52,7 @@ def jackson_rows(path: Path):
         else None
     )
     for item in re.split(r'<div id="listid_\d+"', page)[1:]:
-        title = " ".join(html.unescape(re.search(r'class="race-title">([^<]*)', item)[1]).split())
+        title = " ".join(html.unescape(search(r'class="race-title">([^<]*)', item)[1]).split())
         if "COMMITTEE" in title or "COMMITEE" in title:
             continue
         counts = re.search(r"Precincts? Reported: (\d+) of (\d+)", item)

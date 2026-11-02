@@ -15,6 +15,7 @@ from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import ceda
 from ea.store import DATA, connect
+from ea.typed import search
 
 SOURCE = "us.oh_county_ballots_2026"
 VERSION = "1"
@@ -915,7 +916,7 @@ def stark() -> list[dict[str, str]]:
 
 def columns(path: Path) -> list[str]:
     pages = int(
-        re.search(
+        search(
             r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, check=True).stdout
         )[1]
     )

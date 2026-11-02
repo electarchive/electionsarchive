@@ -128,7 +128,7 @@ def parse() -> None:
         if len(counties) != 56:
             raise ValueError(f"{year} {title} {post}: {len(counties)} counties")
         for index, name in enumerate(names):
-            if sum(county[1 + index] for county in counties) != totals[index]:
+            if sum(county[1:][index] for county in counties) != totals[index]:
                 raise ValueError(f"{year} {name}: the counties do not add up to the printed total")
             for county in counties:
                 rows.append((year, FILES[year][0], title, post, fips[key(county[0])], name.upper(), county[1 + index]))

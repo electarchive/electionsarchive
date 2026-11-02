@@ -243,7 +243,7 @@ def scanned(
     pdf: Path, sha: str
 ) -> tuple[dict[tuple[str, str], dict[str, Cell]], dict[tuple[str, str], tuple[int, int]]]:
     fips = counties()
-    options: dict[tuple[str, str], dict[str, dict[tuple[int, int, int], list[object]]]] = {}
+    options: dict[tuple[str, str], dict[str, dict[tuple[int, int, int], list[int | scan.Box]]]] = {}
     totals: dict[tuple[str, str], tuple[int, int]] = {}
     for page, (turn, court, judges) in SCAN_PAGES.items():
         rows: dict[str, list[list[tuple[str, scan.Box]]]] = {}
@@ -312,7 +312,9 @@ def scanned(
                     print(f"Iowa 2000 {key[1]}: no combination of readings reaches {want}")
         for label, found in ranked.items():
             triple, (_, yes_box, no_box, page) = found[pick[label]]
-            cells.setdefault(key, {})[label] = (triple[0], triple[1], yes_box, no_box, int(str(page)))  # type: ignore[arg-type]
+            if not (isinstance(yes_box, tuple) and isinstance(no_box, tuple)):
+                raise TypeError(f"{key} {label}: boxes {yes_box!r} and {no_box!r} are not tuples")
+            cells.setdefault(key, {})[label] = (triple[0], triple[1], yes_box, no_box, int(str(page)))
     return cells, totals
 
 

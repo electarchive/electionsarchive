@@ -12,6 +12,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us.ak_judicial import COLUMNS, INBOX, PUBLISHER, TITLE, URL
 from ea.sources.us.retention import display
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ak_trial"
 VERSION = "1"
@@ -158,11 +159,13 @@ def emit() -> Path:
         )
         for day in FILES:
             cs.artifact(raw.cached(SOURCE, f"{URL}#{day}"), source)
-        state_unit, state_area, polity = conn.execute(
-            """select u.id, u.area_id, p.id from polity p
+        state_unit, state_area, polity = one(
+            conn.execute(
+                """select u.id, u.area_id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-AK'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ak/%%'").fetchall()}
         retention_system = cs.key("us.electoral_system", "retention")
 

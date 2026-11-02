@@ -25,7 +25,7 @@ ROW = re.compile(
 def collect(client: httpx.Client, get: Callable, store: Callable[[str, bytes, str], None]) -> None:
     listing = get(client, LIST)
     ids = [e["ElectionId"] for e in json.loads(listing or "[]") if e["ElectionDate"][:10] == DAY.isoformat()]
-    content = ids and get(client, f"{PAGE}{ids[0]}")
+    content = get(client, f"{PAGE}{ids[0]}") if ids else None
     if not content:
         print("WI: no Dane County page")
         return

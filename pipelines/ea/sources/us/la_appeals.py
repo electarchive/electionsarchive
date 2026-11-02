@@ -5,6 +5,7 @@ import re
 import time
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -21,7 +22,7 @@ OFFICE = "Judge of a Court of Appeal"
 FIRST, LAST = date(2000, 1, 1), date(2025, 12, 31)
 
 
-def races(day: date) -> list[dict[str, object]]:
+def races(day: date) -> list[dict[str, Any]]:
     listed = json.loads(raw.cached(la_sos.SOURCE, la_sos.blob(day, "RacesCandidates_Multiparish.htm")).path.read_text())
     return [
         race

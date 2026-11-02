@@ -6,6 +6,7 @@ from uuid import UUID
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.judicial_districts_2026"
 VERSION = "1"
@@ -62,12 +63,14 @@ def emit() -> Path:
 
         states: dict[str, tuple[UUID, UUID, UUID]] = {}
         for state in sorted({row["state"] for row in rows}):
-            area, polity = conn.execute(
-                """select u.area_id, p.id from polity p
+            area, polity = one(
+                conn.execute(
+                    """select u.area_id, p.id from polity p
                    join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                    where p.iso_code = %s""",
-                [f"US-{state}"],
-            ).fetchone()
+                    [f"US-{state}"],
+                )
+            )
             election = cs.key("us.election", f"2026-11-03:{state}")
             if election in cs.minted:
                 raise LookupError(f"no 2026-11-03 election for {state}")

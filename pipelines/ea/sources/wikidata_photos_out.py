@@ -12,7 +12,7 @@ ALLOWED = r"^(Public domain|CC0|CC BY(-SA)? [0-9.]+|OGL|Licence Ouverte)"
 
 def emit() -> Path | None:
     with connect() as conn:
-        names = [d.name for d in conn.execute("select * from person_image limit 0").description]
+        names = [d.name for d in conn.execute("select * from person_image limit 0").description or []]
         columns = [c for c in names if c not in ("changeset_id", "recorded_from")]
         rows = conn.execute("select * from person_image where license !~ %s order by id", [ALLOWED]).fetchall()
         if not rows:
