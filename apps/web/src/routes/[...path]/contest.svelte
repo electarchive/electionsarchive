@@ -42,6 +42,7 @@
   import Crowns from "./crowns.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
+  import FiguresSkeleton from "./figures-skeleton.svelte";
   import Lead from "./lead.svelte";
   import Ledger from "./ledger.svelte";
   import Lists from "./lists.svelte";
@@ -1987,7 +1988,9 @@
       {change}
     />
     {#if contest.kind === "list_allocation"}
-      {#await import("./figures.svelte") then figures}
+      {#await import("./figures.svelte")}
+        <FiguresSkeleton />
+      {:then figures}
         <figures.default {id} body={null} />
       {/await}
     {/if}

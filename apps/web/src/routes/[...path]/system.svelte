@@ -186,6 +186,13 @@
     hovered == null ? null : (chart.columns[hovered] ?? null),
   );
   const recent = $derived(points.toReversed());
+  const reading = $derived(
+    {
+      effective: m.indices_series_read_effective,
+      gallagher: m.indices_series_read_gallagher,
+      volatility: m.indices_series_read_volatility,
+    }[view](),
+  );
 </script>
 
 <section
@@ -453,5 +460,10 @@
         </tbody>
       </table>
     </div>
+    <p
+      class="text-xs/relaxed text-pretty text-muted-foreground max-inline-[70ch]"
+    >
+      {reading}
+    </p>
   {/if}
 </section>

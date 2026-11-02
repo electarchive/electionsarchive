@@ -7,6 +7,8 @@
   import { figure } from "#lib/indices.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
+  import Skeleton from "./figures-skeleton.svelte";
 
   const { id, body }: { id: string; body: string | null } = $props();
 
@@ -91,13 +93,15 @@
   });
 </script>
 
-{#if chamber != null && items.length > 0}
+{#if (body == null ? contest : election).isPending}
+  <Skeleton />
+{:else if chamber != null && items.length > 0}
   <dl
-    class="mbs-3 flex flex-wrap gap-x-5 gap-y-1 border-bs border-border px-3.5 pbs-2.5 text-[0.8125rem]"
+    class="mbs-3 flex flex-wrap gap-x-6 gap-y-1.5 border-bs border-border px-3.5 pbs-2.5 pbe-2.5 text-[0.8125rem]/5"
     aria-label={m.indices_row({ chamber: chamber.name })}
   >
     {#each items as item (item.figure)}
-      <div class="flex items-baseline gap-x-1.5">
+      <div class="flex flex-wrap items-baseline gap-x-2">
         <dt>
           <button
             type="button"
@@ -116,10 +120,11 @@
               })}>{item.label}</button
           >
         </dt>
-        {#each item.values as value (value.unit)}
-          <dd class="font-medium tabular-nums">
-            {value.text}{#if value.unit != null}{" "}<span
-                class="font-normal text-muted-foreground">{value.unit}</span
+        {#each item.values as value, index (value.unit)}
+          <dd class={cn("font-medium tabular-nums", { "ms-1.5": index > 0 })}>
+            {value.text}{#if value.unit != null}<span
+                class="ms-[0.3em] font-normal text-muted-foreground"
+                >{value.unit}</span
               >{/if}
           </dd>
         {/each}

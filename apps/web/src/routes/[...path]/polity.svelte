@@ -29,6 +29,7 @@
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
   import Scrubber from "./scrubber.svelte";
+  import SystemSkeleton from "./system-skeleton.svelte";
 
   const {
     id,
@@ -898,7 +899,9 @@
 />
 
 {#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
-  {#await import("./system.svelte") then system}
+  {#await import("./system.svelte")}
+    <SystemSkeleton />
+  {:then system}
     <system.default {id} />
   {/await}
 {/if}

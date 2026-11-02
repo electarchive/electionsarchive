@@ -39,6 +39,7 @@
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
   import Electors from "./electors.svelte";
+  import FiguresSkeleton from "./figures-skeleton.svelte";
   import Gains from "./gains.svelte";
   import Governments from "./governments.svelte";
   import Lead from "./lead.svelte";
@@ -2605,7 +2606,9 @@
             unelected={race.unelected ?? []}
           />
           {#if index === head && scope == null && race.body != null && !race.isTier}
-            {#await import("./figures.svelte") then figures}
+            {#await import("./figures.svelte")}
+              <FiguresSkeleton />
+            {:then figures}
               <figures.default {id} body={race.body} />
             {/await}
           {/if}

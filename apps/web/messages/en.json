@@ -4853,5 +4853,8 @@
   "versus_system_lede": "Each figure comes from the latest general election for the main chamber. The line beside it shows every general election since {year}, on the same scale for both sides.",
   "versus_system_column": "{chamber}, {year}",
   "versus_system_both": "{a} and {b}",
-  "versus_system_from": "{name}: {election}"
+  "versus_system_from": "{name}: {election}",
+  "indices_series_read_effective": "Roughly how many parties really count. Two big parties make about 2, and more parties of similar size push it higher.",
+  "indices_series_read_gallagher": "How far each party's seats strayed from its votes. Near 0, seats closely match votes; higher means the voting system rewarded some parties well beyond their vote.",
+  "indices_series_read_volatility": "How much support moved between parties since the previous election. Low means voters mostly stayed put; high means a big shake-up."
 }
