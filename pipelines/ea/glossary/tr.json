@@ -136,8 +136,8 @@
   "note": "Also 'ezici çoğunluk'."
  },
  "seat": {
-  "term": "koltuk",
-  "note": "Never 'sandalye'. Mind k→ğ before vowels: koltuğu, koltuğa, koltuğun."
+  "term": "sandalye",
+  "note": "An assembly's seats: 'sandalye sayısı', '{total} sandalyeden {seats}', 'sandalye oranı'. A single office held by one person is 'koltuk' ('belediye başkanlığı koltuğu', 'koltuğunu kaybetti'); never 'koltuk' for seat counts. Mind the suffixes: sandalyesi, sandalyeye, sandalyeden."
  },
  "constituency": {
   "term": "seçim çevresi",
@@ -344,7 +344,7 @@
   "note": "Also 'Sainte-Laguë sistemi'."
  },
  "seat allocation": {
-  "term": "koltuk dağılımı",
+  "term": "sandalye dağılımı",
   "note": "Law: 'milletvekilliklerinin dağıtımı'."
  },
  "transfer": {
