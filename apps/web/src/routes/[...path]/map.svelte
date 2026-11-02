@@ -22,6 +22,7 @@
   import XIcon from "@lucide/svelte/icons/x";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
+  import { MediaQuery } from "svelte/reactivity";
   import { fade, fly } from "svelte/transition";
   import type { Box } from "#lib/map/engine.svelte.js";
   import Export from "#lib/components/export.svelte";
@@ -191,7 +192,10 @@
   );
   const tiers = $derived(levels.filter((level) => level !== globe));
   const narrow = $derived(isNarrowLayout());
+  const phone = new MediaQuery("(width < 40rem)", false);
   let stripHeight = $state(0);
+  let toolWidth = $state(0);
+  let toolHeight = $state(0);
   let ladder = $state<Awaited<ReturnType<typeof orpc.contests.context.call>>>(
     [],
   );
@@ -278,11 +282,18 @@
   const engine = new Engine(
     untrack(() => frame),
     (width, height) => {
-      const edge = Math.max(24, Math.round(Math.min(width, height) * 0.06));
+      const edge = phone.current
+        ? 12
+        : Math.max(24, Math.round(Math.min(width, height) * 0.06));
       return {
         top: edge + (up == null ? 0 : 20),
-        right: edge + 36,
-        bottom: Math.max(edge, stripHeight + 16, band),
+        right: phone.current ? edge : edge + 36,
+        bottom: Math.max(
+          edge,
+          stripHeight + 16,
+          band,
+          phone.current ? toolHeight + 16 : 0,
+        ),
         left: edge,
       };
     },
@@ -898,6 +909,20 @@
       return entries.length === 0 ? [] : [{ group, entries }];
     }),
   );
+  const shared = (names: Array<string>) => {
+    let tail = names[0] ?? "";
+    for (const name of names) {
+      while (!name.endsWith(tail)) {
+        tail = tail.slice(1);
+      }
+    }
+    const at = tail.includes("'s ")
+      ? tail.indexOf("'s ")
+      : names.length > 1
+        ? tail.indexOf(" ")
+        : -1;
+    return at === -1 ? "" : tail.slice(at);
+  };
   const rosters = $derived(
     new Map(
       segments.map((segment) => [
@@ -913,34 +938,39 @@
             : "";
         })
           .entries()
-          .map(([header, entries]) => ({
-            header,
-            lines: entries.map((entry) => {
-              const cut = entry.name.lastIndexOf(", ");
-              const rest = entry.name.slice(cut + 2);
-              return {
-                entry,
-                label:
-                  header === ""
-                    ? cut > 0 && entry.name.slice(0, cut) === rest
+          .map(([header, entries]) => {
+            const tail =
+              header === "" ? shared(entries.map((entry) => entry.name)) : "";
+            return {
+              header,
+              lines: entries.map((entry) => {
+                const cut = entry.name.lastIndexOf(", ");
+                const rest = entry.name.slice(cut + 2);
+                return {
+                  entry,
+                  label:
+                    header !== ""
                       ? rest
-                      : entry.name
-                    : rest,
-              };
-            }),
-          }))
+                      : cut > 0 && entry.name.slice(0, cut) === rest
+                        ? rest
+                        : entry.name.slice(0, entry.name.length - tail.length),
+                };
+              }),
+            };
+          })
           .toArray(),
       ]),
     ),
   );
   $effect(() => {
-    if (listing !== "overseas") {
+    const group = listing;
+    if (group !== "overseas" && group !== "territory") {
       return;
     }
-    const key = `${tiles}:${listing}`;
+    const key = `${tiles}:${group}`;
     const ks = untrack(() =>
       territories[key] == null
-        ? (rosters.get("overseas") ?? []).flatMap((block) =>
+        ? (rosters.get(group) ?? []).flatMap((block) =>
             block.header === "" ? [] : block.lines.map((line) => line.entry.k),
           )
         : [],
@@ -973,7 +1003,9 @@
     );
   });
   const isBoxed = $derived(kept.size > 0);
-  const stature = $derived(Math.min(96, Math.max(44, boxHeight * 0.17)));
+  const stature = $derived(
+    Math.min(96, Math.max(44, (phone.current ? boxWidth : boxHeight) * 0.15)),
+  );
   const band = $derived(
     isBoxed
       ? stature + 32 + (narrow && segments.length > 0 ? stripHeight + 6 : 0)
@@ -1004,7 +1036,11 @@
     for (const box of shaped) {
       total += stature * box.ratio + 6;
     }
-    const tallest = stature * Math.min(1, (boxWidth * 0.55) / total);
+    const room =
+      phone.current && segments.length === 0
+        ? boxWidth - toolWidth - 28
+        : boxWidth * (phone.current ? 1 : 0.55) - 16;
+    const tallest = stature * Math.min(1, room / total);
     return shaped.map((box) => ({
       ...box,
       inline: tallest * box.ratio,
@@ -1395,9 +1431,17 @@
       Math.log(Math.tan(Math.PI / 4 + (latitude * Math.PI) / 360));
     const wide = ((frame.east - frame.west) * Math.PI) / 180;
     const tall = y(frame.north) - y(frame.south);
-    return (
-      Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04)) *
-      (isBoxed ? 0.84 : 1)
+    const shape = Math.min(
+      2,
+      Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04),
+    );
+    if (!phone.current || boxWidth === 0) {
+      return shape * (isBoxed ? 0.84 : 1);
+    }
+    const below = Math.max(12, stripHeight + 16, band, toolHeight + 16);
+    return Math.max(
+      0.8,
+      boxWidth / ((boxWidth - 24) / shape + 12 + (up == null ? 0 : 20) + below),
     );
   });
   let isKeyed = $state(false);
@@ -2915,9 +2959,11 @@
     {/if}
     <div
       class={cn(
-        "absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2",
+        "absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border sm:divide-y sm:divide-border max-sm:inset-bs-auto max-sm:inset-be-2 max-sm:flex-row max-sm:divide-x max-sm:divide-border",
         { hidden: isSummary },
       )}
+      bind:clientWidth={toolWidth}
+      bind:clientHeight={toolHeight}
       data-export-skip
     >
       <button
@@ -2931,7 +2977,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
+        class="grid place-items-center block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
         onclick={() => engine.zoomOut()}
@@ -2940,7 +2986,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
+        class="grid place-items-center block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_reset()}
         title={m.map_reset()}
         onclick={() => engine.reset()}
@@ -2951,7 +2997,7 @@
         <button
           type="button"
           class={cn(
-            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10",
+            "grid place-items-center block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10",
             { "text-muted-foreground": !isBasemap },
           )}
           aria-label={m.map_basemap()}
@@ -3006,7 +3052,10 @@
     {/if}
     {#if segments.length > 0 || (globe != null && !isSummary)}
       <div
-        class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2 max-sm:inset-e-14"
+        class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2"
+        style:inset-inline-end={phone.current
+          ? `${toolWidth + 14}px`
+          : undefined}
         bind:clientHeight={stripHeight}
       >
         {#each segments as segment (segment.group)}
@@ -3018,7 +3067,7 @@
               pool: m.map_offmap(),
             }[segment.group],
           )}
-          {#if segment.entries.length === 1 || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= (narrow ? 6 : 12))}
+          {#if (segment.entries.length === 1 && segment.group !== "territory") || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= (narrow ? 6 : 12))}
             <div
               class="pointer-events-auto flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
               role="group"

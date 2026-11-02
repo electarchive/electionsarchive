@@ -24,31 +24,36 @@
           "name": "U.S. Virgin Islands",
           "within": [[-65.15, 17.6, -64.4, 18.5]],
           "srid": 32161,
-          "affine": [1.1169, 1605389, -24432]
+          "affine": [1.1169, 1605389, -24432],
+          "detached": true
         },
         {
           "name": "Puerto Rico",
           "within": [[-68, 17.5, -64.4, 18.7]],
           "srid": 32161,
-          "affine": [1.1169, 1605389, -24432]
+          "affine": [1.1169, 1605389, -24432],
+          "detached": true
         },
         {
           "name": "Northern Mariana Islands",
           "within": [[144, 13.9, 146.5, 21]],
           "srid": 32655,
-          "affine": [0.49389, 1961454, -566390]
+          "affine": [0.49389, 1961454, -566390],
+          "detached": true
         },
         {
           "name": "Guam",
           "within": [[144, 13, 146.5, 21]],
           "srid": 32655,
-          "affine": [0.49389, 1961454, -566390]
+          "affine": [0.49389, 1961454, -566390],
+          "detached": true
         },
         {
           "name": "American Samoa",
           "within": [[-172, -15, -168, -10.9]],
           "srid": 32702,
-          "affine": [0.50365, 1943120, -4066658]
+          "affine": [0.50365, 1943120, -4066658],
+          "detached": true
         }
       ]
     },

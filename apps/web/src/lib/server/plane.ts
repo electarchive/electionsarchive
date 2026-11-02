@@ -120,9 +120,11 @@ export const outside = async (
       )})
   `);
   return found.rows.flatMap((row) => {
-    const group: "overseas" | "abroad" | null =
+    const group: "territory" | "overseas" | "abroad" | null =
       insets[row.part]?.detached === true
-        ? "overseas"
+        ? scheme.startsWith("us.")
+          ? "territory"
+          : "overseas"
         : row.part === -1 && row.isAbroad
           ? "abroad"
           : null;

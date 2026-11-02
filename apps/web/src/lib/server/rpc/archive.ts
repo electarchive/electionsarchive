@@ -10215,7 +10215,10 @@ export const contests = {
               ...entry,
               group: "territory" as const,
             })),
-            ...(isLevel ? offside : []),
+            ...(isLevel ? offside : []).filter(
+              (entry) =>
+                outlying?.rows.some((row) => row.k === entry.k) !== true,
+            ),
           ];
           return [
             {
@@ -12657,7 +12660,9 @@ async function sketch(
       ...entry,
       group: "territory" as const,
     })),
-    ...offside,
+    ...offside.filter(
+      (entry) => outlying?.rows.some((row) => row.k === entry.k) !== true,
+    ),
   ];
   return tiled == null || frame == null
     ? null
