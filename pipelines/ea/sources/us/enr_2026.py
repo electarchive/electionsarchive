@@ -39,6 +39,7 @@ EV = {
     "WA": ("results.votewa.gov", "washington"),
     "VA": ("app.enhancedvoting.com", "virginia"),
     "AZ": ("app.enhancedvoting.com", "Arizona"),
+    "TN": ("app.enhancedvoting.com", "shelby-county-tn"),
 }
 CLARITY = {
     "CO": "https://results.enr.clarityelections.com/CO/",
@@ -69,6 +70,7 @@ LISTINGS = (
     "Elections.json",
     "Version.json",
 )
+TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -374,6 +376,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         enr_nv.collect(client, get, lambda url, content: store("NV", url, content, ".html"))
     if not only or "MO" in only:
         from ea.sources.us import enr_mo
+    if not only or "TN" in only:
+        from ea.sources.us import enr_tn
+
+        enr_tn.collect(client, get, lambda url, content, suffix: store("TN", url, content, suffix))
 
         enr_mo.collect(client, get, lambda url, content, suffix: store("MO", url, content, suffix))
     if not only or "WI" in only:
@@ -596,6 +602,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         return
     if state == "TX":
         from ea.sources.us import enr_tx
+    if state == "TN" and url.endswith("/data.js"):
+        from ea.sources.us import enr_tn
+
+        yield from enr_tn.rows(url, path)
+        return
 
         yield from enr_tx.rows(url, path, urls)
         return
@@ -1070,9 +1081,15 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
     found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
     if "breakdownResults" not in detail:
         return
+    seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
     status = detail.get("reportingStatus") or {}
     as_of = status.get("asOf")
-    for locality in detail["breakdownResults"]:
+    localities = (
+        [{"locality": {"name": [{"text": "Shelby"}]}, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
+        if state == "TN"
+        else detail["breakdownResults"]
+    )
+    for locality in localities:
         place = locality["locality"]["name"][0]["text"]
         county = (
             town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
@@ -1083,15 +1100,17 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for option in locality["ballotOptions"]:
             yield {
-                "office": "other"
+                "office": ("senate" if seat[1] == "Senate" else "house")
+                if seat
+                else "other"
                 if found is None
                 else "senate"
                 if found["senate"]
                 else "governor"
                 if found["governor"]
                 else "house",
-                "contest": detail["name"][0]["text"].strip() if found is None else "",
-                "district": (found["district"] if found else None) or "",
+                "contest": detail["name"][0]["text"].strip() if found is None and seat is None else "",
+                "district": f"{seat[2]}:g" if seat else (found["district"] if found else None) or "",
                 "party": (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()"),
                 "county": county,
                 "candidate": TAGS.sub("", option["name"][0]["text"]).strip(),

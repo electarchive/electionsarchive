@@ -165,6 +165,15 @@ publisher = "South Carolina State Election Commission"
 url = "https://scvotes.gov/"
 
 [[feed]]
+id = "us.enr_2026.tn"
+adapter = "us.enr_2026"
+interval = 120
+params = { state = "TN" }
+publisher = "Shelby County Election Commission and Hamilton County Election Commission"
+url = "https://app.enhancedvoting.com/results/public/shelby-county-tn"
+note = "Shelby and Hamilton counties only; the statewide results site blocks scripted requests"
+
+[[feed]]
 id = "us.enr_2026.tx"
 adapter = "us.enr_2026"
 interval = 120
