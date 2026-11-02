@@ -837,6 +837,7 @@ export async function dated(
   )
     .values()
     .toArray();
+  const ids = [...new Set(unique.map((pair) => pair.id))];
   const result = await db.execute<{
     entity_id: string;
     on: string | null;
@@ -845,42 +846,57 @@ export async function dated(
   }>(sql`
     with p as (
       select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[]) p(entity_id, on_date)
-    )
-    (select p.entity_id, p.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
-    from p
-    cross join lateral (
-      select kind::text, text
+    ),
+    c as materialized (
+      select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from, ctid as tid
       from name
-      where entity_id = p.entity_id
-        and (kind in ('official', 'english')
-          or (${historical} and kind = 'historical' and p.on_date is not null and valid @> p.on_date and not (lower_inf(valid) and upper_inf(valid))))
-      order by coalesce(valid @> coalesce(p.on_date, current_date), false) desc,
-        coalesce(valid @> coalesce(p.on_date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
-        ${nearest(sql`name`, sql`p.on_date`)} nulls first,
-        coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
-        lang = (select o.lang from name o where o.entity_id = p.entity_id and o.is_preferred and o.kind in ('official', 'english') limit 1) desc nulls last,
-        (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id
-      limit 1
-    ) n
+      where entity_id = any(${sql.param(ids)}::uuid[])
+        and (kind in ('official', 'english') or (${historical} and kind = 'historical'))
+    ),
+    e as materialized (
+      select id, date_from, polity_id from election
+      where id = any(${sql.param(ids)}::uuid[]) and date_precision = 'day'
+    ),
+    l as (
+      select distinct on (entity_id) entity_id, lang from c
+      where is_preferred and kind in ('official', 'english')
+      order by entity_id, tid
+    ),
+    n as (
+      select distinct on (p.entity_id, p.on_date) p.entity_id, p.on_date, c.kind::text as kind, c.text
+      from p
+      join c on c.entity_id = p.entity_id
+        and (c.kind in ('official', 'english')
+          or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
+      left join l on l.entity_id = p.entity_id
+      order by p.entity_id, p.on_date, coalesce(c.valid @> coalesce(p.on_date, current_date), false) desc,
+        coalesce(c.valid @> coalesce(p.on_date, current_date) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
+        ${nearest(sql`c`, sql`p.on_date`)} nulls first,
+        coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
+        c.lang = l.lang desc nulls last,
+        (c.lang = 'en') desc, (c.kind = 'official') desc, c.recorded_from desc, c.id
+    )
+    (select n.entity_id, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+    from n
+    left join e on e.id = n.entity_id and n.text like extract(year from e.date_from)::int || ' %'
     left join lateral (
-      select e.date_from as date from election e
-      where e.id = p.entity_id and e.date_precision = 'day'
-        and n.text like extract(year from e.date_from)::int || ' %'
-        and exists (
-          select from election o
-          join name m on m.entity_id = o.id and m.is_preferred and m.lang = 'en'
-          where o.polity_id = e.polity_id and o.id <> e.id and o.status::text <> 'annulled'
-            and o.date_from >= date_trunc('year', e.date_from)::date
-            and o.date_from < (date_trunc('year', e.date_from) + interval '1 year')::date
-            and o.date_from <> e.date_from
-            and regexp_replace(m.text, '^[A-Z][a-z]+ [0-9]{1,2}, ', '') = n.text
-        )
+      select e.date_from as date
+      where e.id is not null and exists (
+        select from election o
+        join name m on m.entity_id = o.id and m.is_preferred and m.lang = 'en'
+        where o.polity_id = e.polity_id and o.id <> e.id and o.status::text <> 'annulled'
+          and o.date_from >= date_trunc('year', e.date_from)::date
+          and o.date_from < (date_trunc('year', e.date_from) + interval '1 year')::date
+          and o.date_from <> e.date_from
+          and regexp_replace(m.text, '^[A-Z][a-z]+ [0-9]{1,2}, ', '') = n.text
+      )
     ) d on true)
     union all
     select p.entity_id, p.on_date::text, 'abbreviation', short.text
     from p
     cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
-    where short.text is not null
+    where p.entity_id = any(array(select entity_id from name where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('short', 'abbreviation')))
+      and short.text is not null
   `);
   const found = new Map<string, { label: string; short: string | null }>();
   for (const row of result.rows) {
@@ -2120,7 +2136,7 @@ async function load(
         limit 1
       )) as party, o.ballot_label as label, o.candidate_count as candidates,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
-      exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
+      exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent offset 0) as independent,
       case when o.contest_id in (select id from covered) then exists (
           select from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
           where cy.option_id = o.id and cy.role = 'head' and ${tenured(sql`coalesce(m.into_id, cy.person_id)`, sql`o.contest_id`)}
@@ -2134,7 +2150,7 @@ async function load(
                 and coalesce(ws.district_area_id, wc.district_area_id) = wk.district_area_id
             ))
         )
-        else exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent)
+        else exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_incumbent offset 0)
       end as incumbent,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
