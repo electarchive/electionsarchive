@@ -12567,11 +12567,24 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
 async function sketch(
   area: { id: string; k: number },
   level: string,
-  day: string,
+  held: string,
   ks: Array<number> = [],
   inner: Array<number> = [],
   contest: string | null = null,
 ) {
+  const drawn =
+    contest == null
+      ? null
+      : await db.execute<{ day: string }>(sql`
+        select case when bs.valid @> ${held}::date then ${held} else bs.as_of::text end as day
+        from contest b join election eb on eb.id = b.election_id
+        join election er on er.date_from between eb.date_from and coalesce(eb.date_to, eb.date_from)
+        join contest r on r.election_id = er.id and r.body_id = b.body_id
+        join boundary_set bs on bs.id = r.boundary_set_id and bs.scheme_code = ${level}
+        where b.id = ${contest}::uuid
+        group by bs.id order by count(*) desc, bs.valid_from desc nulls last limit 1
+      `);
+  const day = drawn?.rows[0]?.day ?? held;
   const whole =
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
