@@ -25,6 +25,7 @@ url = "https://electionresults.sos.ca.gov/"
 id = "us.enr_2026.co"
 adapter = "us.enr_2026"
 params = { state = "CO" }
+poller = "muktedir"
 publisher = "Colorado Secretary of State"
 url = "https://results.enr.clarityelections.com/CO/"
 
@@ -46,6 +47,7 @@ url = "https://ctemspublic.pcctg.net/"
 id = "us.enr_2026.mo"
 adapter = "us.enr_2026"
 params = { state = "MO" }
+poller = "muktedir"
 publisher = "St. Louis County Board of Elections"
 url = "https://extcontent.stlouisco.com/BOE/eResults/"
 
@@ -203,6 +205,7 @@ url = "https://sos.wv.gov/elections/election-data/historical-election-results-an
 id = "us.enr_2026.wi"
 adapter = "us.enr_2026"
 params = { state = "WI" }
+poller = "muktedir"
 publisher = "Dane County Clerk"
 url = "https://elections.countyofdane.com/"
 
