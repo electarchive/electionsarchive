@@ -408,6 +408,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_de
 
         enr_de.collect(client, get, lambda url, content, suffix: store("DE", url, content, suffix))
+    if not only or "MA" in only:
+        from ea.sources.us import enr_ma
+
+        enr_ma.collect(client, get, lambda url, content, suffix: store("MA", url, content, suffix))
     if not only or "AK" in only:
         from ea.sources.us import enr_ak
 
@@ -645,6 +649,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_de
 
         yield from enr_de.rows(url, path, urls)
+        return
+    if state == "MA":
+        from ea.sources.us import enr_ma
+
+        yield from enr_ma.rows(url, path, urls)
         return
     if state == "AK":
         from ea.sources.us import enr_ak

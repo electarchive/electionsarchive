@@ -340,3 +340,10 @@ adapter = "us.nyc_enr"
 publisher = "Board of Elections in the City of New York"
 url = "https://enr.boenyc.gov/"
 note = "city contests and districts inside the city; statewide races and districts that cross the city line wait for a statewide feed"
+
+[[feed]]
+id = "us.enr_2026.ma"
+adapter = "us.enr_2026"
+params = { state = "MA" }
+publisher = "Massachusetts Secretary of the Commonwealth"
+url = "https://electionstats.state.ma.us/"
