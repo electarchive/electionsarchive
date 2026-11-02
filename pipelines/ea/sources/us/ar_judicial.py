@@ -15,6 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import ar_cert, ar_pri_cert
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one, required
 
 SOURCE = "us.ar_judicial"
 VERSION = "1"
@@ -195,7 +196,9 @@ def workbook(url: str, sheets: dict[str, str]) -> dict[tuple[str, str], dict[str
         frame = frames["Sup. Court"].slice(1)
         grouped: dict[tuple[str, str], dict[str | None, dict[str, int]]] = {}
         for county, _, race, _, candidate, votes in frame.iter_rows():
-            match = re.match(r"^State Supreme Court (Chief|Associate) Justice (Position \d+)$", " ".join(race.split()))
+            match = required(
+                re.match(r"^State Supreme Court (Chief|Associate) Justice (Position \d+)$", " ".join(race.split()))
+            )
             place = grouped.setdefault((match[1], match[2]), defaultdict(lambda: defaultdict(int)))
             place[county.removesuffix(" County")][clean(candidate)] += int(votes)
         for key, places in grouped.items():
@@ -217,7 +220,7 @@ def check(day: date, court: str, seat: str, places: dict[str | None, dict[str, i
             summed[name] += votes
     if dict(summed) != totals or len(places) != 75:
         raise ValueError(f"{day} {court} {seat}: counties {len(places)} {dict(summed)} differ from {totals}")
-    return places
+    return {place: votes for place, votes in places.items() if place is not None}
 
 
 def emit() -> Path:
@@ -298,10 +301,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '05%%' and u.valid @> '2004-06-01'::date and u.valid @> '2024-06-01'::date"""
             ).fetchall()
         }
-        state_area = conn.execute(
-            """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area = one(
+            conn.execute(
+                """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-AR'"""
-        ).fetchone()[0]
+            )
+        )[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ar/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
         persons: set[str] = set()

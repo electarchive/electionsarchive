@@ -11,6 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import ok_pri_pdf, ok_pri_state
 from ea.sources.us.oe_primaries_2026 import plain, title
 from ea.store import connect
+from ea.typed import one, present
 
 SOURCE = "us.ok_pri_judicial"
 VERSION = "1"
@@ -148,25 +149,31 @@ def emit() -> Path:
             ).fetchall()
         }
         state_polity = cs.polity("US-OK")
-        state_area = conn.execute(
-            """select u.area_id from reporting_unit u join polity p on p.id = u.polity_id
+        state_area = one(
+            conn.execute(
+                """select u.area_id from reporting_unit u join polity p on p.id = u.polity_id
                where p.iso_code = 'US-OK' and u.scheme_code = 'us.state'"""
-        ).fetchone()[0]
+            )
+        )[0]
         scope: dict[str, tuple] = {}
         for party, key in (
             ("democratic", "2018-06-26:OK:house:1:democratic"),
             ("republican", "2018-06-26:OK:house:1:republican"),
         ):
-            scope[party] = conn.execute(
-                """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
+            scope[party] = one(
+                conn.execute(
+                    """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
                    from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
                    where x.value = %s""",
-                [key],
-            ).fetchone()
-        runoff_system = conn.execute(
-            """select c.electoral_system_id from contest c join external_id x on x.entity_id = c.id
+                    [key],
+                )
+            )
+        runoff_system = one(
+            conn.execute(
+                """select c.electoral_system_id from contest c join external_id x on x.entity_id = c.id
                where x.scheme = 'us.contest' and x.value = '2014-06-24:OK:house:1:rpfsettled'"""
-        ).fetchone()[0]
+            )
+        )[0]
         fptp = cs.key("us.electoral_system", "fptp")
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ok/%%'").fetchall()}
 
@@ -226,7 +233,7 @@ def emit() -> Path:
             runoff = day != first
             partisan = party in PARTIES
             if office == "DISTRICT ATTORNEY":
-                polity, area = district("da", number)
+                polity, area = district("da", present(number, "the district attorney district"))
                 office_name, where = "District Attorney", f"District {number}"
                 contest_key = f"{day}:OK:district-attorney:{number}:{PARTIES[party][1]}" + ("runoff" if runoff else "")
                 previous = f"{first}:OK:district-attorney:{number}:{PARTIES[party][1]}"
@@ -234,7 +241,7 @@ def emit() -> Path:
                 office_key = f"district-attorney:OK:{number}"
                 heading = f"Oklahoma District Attorney, District {number}"
             elif office == "DISTRICT JUDGE":
-                polity, area = district("dj", number)
+                polity, area = district("dj", present(number, "the district judge district"))
                 office_name, where = "District Judge", f"District {number}, {seat}"
                 contest_key = f"{day}:OK:district-judge:{number}:{slug(seat)}"
                 previous = None
@@ -284,7 +291,9 @@ def emit() -> Path:
                 term="full",
                 magnitude=1,
                 round_number=2 if runoff else 1,
-                previous_round_id=cs.key("us.contest", previous) if runoff else None,
+                previous_round_id=cs.key("us.contest", present(previous, f"the first round of {contest_key}"))
+                if runoff
+                else None,
                 electoral_system_id=runoff_system if partisan else fptp,
                 default_result_kind="counted",
             )
@@ -350,7 +359,7 @@ def emit() -> Path:
                         continue
                     cs.add("outcome", result_set_id=result, option_id=options[candidate], kind=kind)
             by_place: dict[str, int] = defaultdict(int)
-            rows = []
+            rows: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for candidate, by_county in by_candidate.items():
                 for county, votes in by_county.items():
                     fips, _ = counties[plain(county)]

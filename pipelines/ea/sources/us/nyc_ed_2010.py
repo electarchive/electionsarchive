@@ -11,6 +11,7 @@ import shapefile
 from ea import raw
 from ea.changeset import Changeset
 from ea.store import DATA, connect
+from ea.typed import present
 
 SOURCE = "us.nyc_ed_2010"
 VERSION = "1"
@@ -43,7 +44,9 @@ def parse() -> None:
                 shx=io.BytesIO(archive.read(f"{stem}.shx")),
                 dbf=io.BytesIO(archive.read(f"{stem}.dbf")),
             )
-            for record, shape in zip(reader.records(), reader.shapes(), strict=True):
+            for stored, outline in zip(reader.records(), reader.shapes(), strict=True):
+                record = present(stored, "a shapefile record")
+                shape = present(outline, f"the shape of election district {record['ELECTDIST']}")
                 rings = [
                     [list(point) for point in shape.points[first:last]]
                     for first, last in zip(shape.parts, [*shape.parts[1:], len(shape.points)], strict=True)

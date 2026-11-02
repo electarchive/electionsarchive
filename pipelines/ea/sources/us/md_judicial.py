@@ -1,6 +1,7 @@
 import html
 import re
 from datetime import date
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -9,6 +10,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.md_judicial"
 VERSION = "1"
@@ -59,7 +61,7 @@ def cells(year: int) -> list[str]:
     return [line for line in lines if line]
 
 
-def judges(year: int) -> list[dict[str, object]]:
+def judges(year: int) -> list[dict[str, Any]]:
     lines = cells(year)
     start = next(
         i for i, x in enumerate(lines) if re.match(r"(FOR )?COURT OF (SPECIAL )?APPEALS", x) and x.upper() == x
@@ -69,8 +71,8 @@ def judges(year: int) -> list[dict[str, object]]:
         len(lines),
     )
     court = circuit = None
-    found: list[dict[str, object]] = []
-    current: dict[str, object] | None = None
+    found: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
     pending: list[int] | None = None
     for x in lines[start:end]:
         up = x.upper()
@@ -129,11 +131,13 @@ def emit() -> object:
         }
         fips["baltimore"] = "24005"
         fips["baltimorecity"] = "24510"
-        state_unit, state_area, polity = conn.execute(
-            """select u.id, u.area_id, p.id from polity p
+        state_unit, state_area, polity = one(
+            conn.execute(
+                """select u.id, u.area_id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-MD'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/md/%%'").fetchall()}
         cs = Changeset(
             conn,

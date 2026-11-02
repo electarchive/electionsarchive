@@ -10,6 +10,7 @@ from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us.nh_sos_primaries import ALIASES, PUBLISHER, WAYBACK, key, sheets
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.nh_sos_pres_primaries"
 VERSION = "1"
@@ -171,7 +172,7 @@ def parse() -> None:
         }
     rows = []
     unplaced: set[str] = set()
-    summaries: dict[tuple[int, str], dict[str, dict[str, int]]] = {}
+    summaries: dict[tuple[int, str, str], dict[str, dict[str, int]]] = {}
     for entry in files():
         year, party, county = int(entry["year"]), entry["party"], entry["county"]
         path = raw.cached(SOURCE, WAYBACK + entry["file"]).path
@@ -323,11 +324,13 @@ def emit() -> Path:
         values = []
         for (year, party), lines in frame.group_by("year", "party", maintain_order=True):
             contest_key = f"{DAYS[year]}:NH:president:{party}"
-            contest, election = conn.execute(
-                """select c.id, c.election_id from external_id x join contest c on c.id = x.entity_id
+            contest, election = one(
+                conn.execute(
+                    """select c.id, c.election_id from external_id x join contest c on c.id = x.entity_id
                    where x.scheme = 'us.contest' and x.value = %s""",
-                [contest_key],
-            ).fetchone()
+                    [contest_key],
+                )
+            )
             found = [
                 (str(option), label, kind)
                 for option, label, kind in conn.execute(
@@ -389,7 +392,7 @@ def emit() -> Path:
                 "supersedes_id",
             )
             for (prior_id,) in prior:
-                row = conn.execute(f"select {', '.join(columns)} from result_set where id = %s", [prior_id]).fetchone()
+                row = one(conn.execute(f"select {', '.join(columns)} from result_set where id = %s", [prior_id]))
                 cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(

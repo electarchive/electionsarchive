@@ -14,6 +14,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import ok_county
 from ea.sources.us.oe_primaries_2026 import plain, title
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ok_leg_primaries"
 VERSION = "1"
@@ -105,16 +106,20 @@ def emit() -> Path:
 
         scope: dict[str, tuple] = {}
         for party, (word, _, _) in PARTIES.items():
-            scope[party] = conn.execute(
-                """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
+            scope[party] = one(
+                conn.execute(
+                    """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
                    from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
                    where x.value = %s""",
-                [f"2018-06-26:OK:house:1:{word}"],
-            ).fetchone()
-        system = conn.execute(
-            """select c.electoral_system_id from contest c join external_id x on x.entity_id = c.id
+                    [f"2018-06-26:OK:house:1:{word}"],
+                )
+            )
+        system = one(
+            conn.execute(
+                """select c.electoral_system_id from contest c join external_id x on x.entity_id = c.id
                where x.scheme = 'us.contest' and x.value = '2014-06-24:OK:house:1:rpfsettled'"""
-        ).fetchone()[0]
+            )
+        )[0]
         pool: dict[str, set[UUID]] = defaultdict(set)
         for person, text in conn.execute(
             """select cy.person_id, n.text from candidacy cy join contest_option o on o.id = cy.option_id
@@ -204,7 +209,7 @@ def emit() -> Path:
                     party_scope_id=scope[party][0],
                     term="remainder" if remainder else shaped[6],
                     round_number=2 if runoff else 1,
-                    previous_round_id=cs.key("us.contest", previous) if runoff else None,
+                    previous_round_id=cs.key("us.contest", previous) if previous is not None else None,
                     electoral_system_id=system,
                     default_result_kind="counted",
                 )
@@ -269,7 +274,7 @@ def emit() -> Path:
                         continue
                     cs.add("outcome", result_set_id=result, option_id=options[name], kind=kind)
                 by_place: dict[str, int] = defaultdict(int)
-                rows = []
+                rows: list[tuple[str, str, str | None, int, int, int, int, int]] = []
                 for name, by_county in by_candidate.items():
                     for county, votes in by_county.items():
                         fips = counties[plain(county)]

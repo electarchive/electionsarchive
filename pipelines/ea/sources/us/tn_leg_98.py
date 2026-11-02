@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import medsl, openelections, tn_gen_98
 from ea.store import DATA, connect
+from ea.typed import required
 
 SOURCE = "us.tn_leg_98"
 VERSION = "1"
@@ -62,7 +64,7 @@ MANUAL: dict[tuple[str, int], list[tuple[int, dict[int, str], list[Row]]]] = {
         (97, {2: "Tre Hargett"}, [("shelby", (0, 9581, 0, 1))]),
     ],
 }
-LAYOUT = {
+LAYOUT: dict[tuple[str, int], tuple[list[int], int, list[float]]] = {
     ("house", 5): ([871, 1478, 2123, 2724, 3332], 3886, [667, 948, 1230, 1500]),
     ("house", 18): ([915, 1521, 2123, 2726, 3325], 3870, [660, 942, 1223, 1500]),
 }
@@ -194,7 +196,7 @@ class Cursor:
         self.names: dict[int, str] = {}
         self.centers: list[float] = []
         self.last: list[float] = []
-        self.block: list[dict[str, object]] = []
+        self.block: list[dict[str, Any]] = []
 
     def copy(self) -> Cursor:
         other = Cursor()
@@ -205,9 +207,9 @@ class Cursor:
 
 def read_page(
     chamber: str, page: int, image: Path, size: tuple[int, int], cursor: Cursor, fips: dict[str, str]
-) -> tuple[list[dict[str, object]], list[str]]:
+) -> tuple[list[dict[str, Any]], list[str]]:
     width, height = size
-    done: list[dict[str, object]] = []
+    done: list[dict[str, Any]] = []
     problems: list[str] = []
     if (chamber, page) in MANUAL:
         rules, last_row, centers = LAYOUT[(chamber, page)]
@@ -245,7 +247,7 @@ def read_page(
         text = " ".join(w[4] for w in line)
         district = cursor.district
         if (chamber, page, text) in HEADINGS or HEADING.match(text):
-            cursor.district = HEADINGS.get((chamber, page, text)) or int(HEADING.match(text)[1])
+            cursor.district = HEADINGS.get((chamber, page, text)) or int(required(HEADING.match(text))[1])
             cursor.centers, cursor.block = [], []
             if chamber == "house" and cursor.district != district + 1:
                 problems.append(f"house page {page}: district {cursor.district} follows {district} ({text})")
@@ -333,7 +335,7 @@ def read_page(
 def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["TN"]
-    rows: list[dict[str, object]] = []
+    rows: list[dict[str, Any]] = []
     failed = False
     for chamber, (url, _) in FILES.items():
         artifact = raw.cached(SOURCE, url)

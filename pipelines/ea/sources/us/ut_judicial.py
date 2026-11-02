@@ -4,6 +4,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import fastexcel
@@ -13,6 +14,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ut_judicial"
 VERSION = "1"
@@ -81,8 +83,8 @@ def number(text: object) -> int:
     return int(str(text).replace(",", ""))
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for day, (source, url, judges) in PDFS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(source, url).path), "-"], check=True, capture_output=True, text=True
@@ -166,10 +168,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '49%%'"""
             ).fetchall()
         }
-        state_area = conn.execute(
-            """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area = one(
+            conn.execute(
+                """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-UT'"""
-        ).fetchone()[0]
+            )
+        )[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ut/%%'").fetchall()}
         retention_system = cs.key("us.electoral_system", "retention")
 
@@ -197,7 +201,7 @@ def emit() -> Path:
                 kind="official",
                 is_preferred=True,
             )
-        groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, str], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["judge"]))].append(row)
         persons: set[str] = set()

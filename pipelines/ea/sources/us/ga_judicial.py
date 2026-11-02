@@ -3,6 +3,7 @@ import re
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us.pa_judicial import number, sheet
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.ga_judicial"
 VERSION = "1"
@@ -71,8 +73,8 @@ def clean(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().rstrip(",")
 
 
-def early() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def early() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for day, url in EARLY.items():
         text = html.unescape(re.sub(r"<[^>]+>", "\n", raw.cached(SOURCE, url).path.read_text(errors="replace")))
         cells = [line.strip() for line in text.splitlines() if line.strip()]
@@ -103,8 +105,8 @@ def early() -> list[dict[str, object]]:
     return found
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = early()
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = early()
     for day in FILES:
         for cells in sheet(raw.cached(SOURCE, f"{URL}#{day}").path)[1:]:
             office = cells.get("A", "")
@@ -148,11 +150,13 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, f"{URL}#{day}"), source)
         for url in EARLY.values():
             cs.artifact(raw.cached(SOURCE, url), source)
-        state_unit, state_area, polity = conn.execute(
-            """select u.id, u.area_id, p.id from polity p
+        state_unit, state_area, polity = one(
+            conn.execute(
+                """select u.id, u.area_id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-GA'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ga/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
 
@@ -171,7 +175,7 @@ def emit() -> Path:
         offices: set[UUID] = set()
         persons: set[str] = set()
         elections: set[UUID] = set()
-        groups: dict[tuple[date, str, str], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, str, str], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["court"]), str(row["office"]))].append(row)
         later = {

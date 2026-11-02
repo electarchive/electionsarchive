@@ -4,6 +4,7 @@ import re
 import subprocess
 import time
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -13,6 +14,7 @@ from psycopg import Connection
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.nh_sos_county"
 VERSION = "1"
@@ -206,8 +208,8 @@ def pdf_grids(path: Path) -> list[tuple[str, list[list[str]]]]:
     return grids
 
 
-def blocks(path: Path, name: str) -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def blocks(path: Path, name: str) -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     sheets = (
         pdf_grids(path)
         if path.suffix == ".pdf"
@@ -244,7 +246,7 @@ def blocks(path: Path, name: str) -> list[dict[str, object]]:
                 if line[0].upper().startswith("TOTAL"):
                     break
             total = body.pop() if body and body[-1][0].upper().startswith("TOTAL") else None
-            last: dict[str, object] | None = None
+            last: dict[str, Any] | None = None
             for col, candidate in names.items():
                 group = max((label for label in labels if label <= col), default=min(labels))
                 if not any(col < len(line) and NUMBER.fullmatch(line[col]) for line in body):
@@ -415,8 +417,8 @@ def create(
     report: dict[str, list[str]],
 ) -> list[tuple[UUID, pl.DataFrame, dict[str, UUID]]]:
     columns = ", ".join(f"c.{column}" for column in TEMPLATE)
-    templates: dict[tuple[str, str, str | None], dict[str, object]] = {}
-    scopes: dict[str, object] = {}
+    templates: dict[tuple[str, str, str | None], dict[str, Any]] = {}
+    scopes: dict[str, Any] = {}
     elections: dict[tuple[int, bool], object] = {}
     people: dict[tuple[str, str, str], set[object]] = {}
     labels: dict[object, str] = {}
@@ -661,9 +663,7 @@ def emit() -> Path:
                 [contest],
             ).fetchone() or (None, None, None)
             first = first or 1
-            election = (
-                election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
-            )
+            election = election or one(conn.execute("select election_id from contest where id = %s", [contest]))[0]
             options = conn.execute(
                 """select o.id::text, o.ballot_label, o.kind,
                           coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
@@ -794,9 +794,7 @@ def emit() -> Path:
                 old = dict(
                     zip(
                         COLUMNS,
-                        conn.execute(
-                            f"select {', '.join(COLUMNS)} from result_set where id = %s", [default]
-                        ).fetchone(),
+                        one(conn.execute(f"select {', '.join(COLUMNS)} from result_set where id = %s", [default])),
                         strict=True,
                     )
                 )

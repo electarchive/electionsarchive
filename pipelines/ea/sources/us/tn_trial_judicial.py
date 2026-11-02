@@ -4,6 +4,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.tn_trial_judicial"
 VERSION = "1"
@@ -114,12 +116,12 @@ def candidate(text: str, day: date) -> tuple[str, str | None, bool, bool]:
     return mark[1], PARTIES.get(value), value == "independent", value == "i"
 
 
-def blocks(path: Path, day: date) -> list[dict[str, object]]:
+def blocks(path: Path, day: date) -> list[dict[str, Any]]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
     text = re.sub(r"Judicial District\s*\n\s*(\d+)", r"District \1", text)
     text = re.sub(r"(District Attorney General)\s*\n\s*(\d+)\s*\n", r"\1 District \2\n", text)
-    found: list[dict[str, object]] = []
-    current: dict[str, object] | None = None
+    found: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
     for line in text.splitlines():
         stripped = line.strip()
         if not stripped or SKIP.search(stripped):
@@ -156,7 +158,7 @@ def blocks(path: Path, day: date) -> list[dict[str, object]]:
         for number, name in CANDIDATE.findall(line):
             current["numbered"].append((int(number), candidate(name, day)))
             current["candidates"] = [value for _, value in sorted(current["numbered"])]
-    merged: dict[tuple[object, ...], dict[str, object]] = {}
+    merged: dict[tuple[object, ...], dict[str, Any]] = {}
     for block in found:
         key = (block["office"], block["seat"], block["district"], block["unexpired"], tuple(block["candidates"]))
         if key not in merged:
@@ -178,8 +180,8 @@ def blocks(path: Path, day: date) -> list[dict[str, object]]:
     return clean
 
 
-def contests() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def contests() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for name, day in FILES.items():
         found.extend(blocks(raw.cached(SOURCE, f"{URL}#{name}").path, day))
     return found
@@ -235,10 +237,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '47%%'"""
             ).fetchall()
         }
-        state_area, state_polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, state_polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-TN'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/tn/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
 

@@ -3,6 +3,7 @@ import re
 import time
 import unicodedata
 from datetime import date
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -11,6 +12,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.oh_supreme"
 VERSION = "1"
@@ -34,7 +36,7 @@ CANVASS_2008 = NEW.format("2023", "2008/gen/08-1104officialcanvass.pdf")
 SUPREME = "Justice of the Supreme Court"
 CHIEF = "Chief Justice of the Supreme Court"
 
-HTML = {
+HTML: dict[date, list[tuple[str, list[tuple[str | None, int]]]]] = {
     date(2000, 11, 7): [
         ("2000ElectionsResults/OHSupCt0101_11072000.aspx", [("Term Commencing 01/01/2001", 2)]),
         ("2000ElectionsResults/OHSupCt0102_11072000.aspx", [("Term Commencing 01/02/2001", 2)]),
@@ -184,8 +186,8 @@ def book_table(
     return found
 
 
-def contests() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def contests() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for day, pages in HTML.items():
         for path, shape in pages:
             for label, places, printed in web_table(OLD + path, shape):
@@ -264,10 +266,12 @@ def emit():
                    where u.scheme_code = 'us.county' and u.code like '39%%' and length(u.code) = 5"""
             ).fetchall()
         }
-        state_area, state_unit, polity = conn.execute(
-            """select u.area_id, u.id, p.id from polity p
+        state_area, state_unit, polity = one(
+            conn.execute(
+                """select u.area_id, u.id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state' where p.iso_code = 'US-OH'"""
-        ).fetchone()
+            )
+        )
         taken = {
             path
             for (path,) in conn.execute(

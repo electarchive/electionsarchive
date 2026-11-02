@@ -15,6 +15,7 @@ from ea.sources.us import medsl, ok_county
 from ea.sources.us.oe_primaries_2026 import plain, title
 from ea.sources.us.ok_leg_primaries import NOTE, PARTIES, PUBLISHER, TITLE
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ok_leg_specials"
 VERSION = "1"
@@ -124,23 +125,29 @@ def emit() -> Path:
 
         scope: dict[str, tuple] = {}
         for party, (word, _, _) in PARTIES.items():
-            scope[party] = conn.execute(
-                """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
+            scope[party] = one(
+                conn.execute(
+                    """select c.party_scope_id, (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
                    from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
                    where x.value = %s""",
-                [f"2018-06-26:OK:house:1:{word}"],
-            ).fetchone()
+                    [f"2018-06-26:OK:house:1:{word}"],
+                )
+            )
         parties = {"REP": scope["REP"][1], "DEM": scope["DEM"][1]}
-        parties["LIB"] = conn.execute(
-            """select o.party_id from contest_option o where o.contest_id = %s and o.ballot_label = 'Richard Prawdzienski'""",
-            [contests[LIBERTARIAN]],
-        ).fetchone()[0]
-        primary_system = conn.execute(
-            "select electoral_system_id from contest where id = %s", [contests["2014-06-24:OK:house:1:rpfsettled"]]
-        ).fetchone()[0]
-        special_system = conn.execute(
-            "select electoral_system_id from contest where id = %s", [contests[LIBERTARIAN]]
-        ).fetchone()[0]
+        parties["LIB"] = one(
+            conn.execute(
+                """select o.party_id from contest_option o where o.contest_id = %s and o.ballot_label = 'Richard Prawdzienski'""",
+                [contests[LIBERTARIAN]],
+            )
+        )[0]
+        primary_system = one(
+            conn.execute(
+                "select electoral_system_id from contest where id = %s", [contests["2014-06-24:OK:house:1:rpfsettled"]]
+            )
+        )[0]
+        special_system = one(
+            conn.execute("select electoral_system_id from contest where id = %s", [contests[LIBERTARIAN]])
+        )[0]
         pool: dict[str, set[UUID]] = defaultdict(set)
         for person, text in conn.execute(
             """select cy.person_id, n.text from candidacy cy join contest_option o on o.id = cy.option_id
@@ -340,7 +347,7 @@ def emit() -> Path:
                     continue
                 cs.add("outcome", result_set_id=result, option_id=options[name], kind=kind)
             by_place: dict[str, int] = defaultdict(int)
-            rows = []
+            rows: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for name, (_, by_county) in by_candidate.items():
                 for county, votes in by_county.items():
                     fips = counties[plain(county)]

@@ -3,6 +3,7 @@ import subprocess
 import unicodedata
 from collections import defaultdict
 from datetime import date
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -11,6 +12,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.wy_judicial"
 VERSION = "1"
@@ -79,8 +81,8 @@ def table(lines: list[str], start: int) -> tuple[dict[str, list[int]], list[int]
     return counties, []
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for day, path in FILES.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, SITE + path).path), "-"],
@@ -160,10 +162,12 @@ def emit():
                    where u.scheme_code = 'us.county' and u.code like '56%%'"""
             ).fetchall()
         }
-        state_area, polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-WY'"""
-        ).fetchone()
+            )
+        )
         retention_system = cs.key("us.electoral_system", "retention")
         office = cs.key("us.office", f"{slug(TITLE_OFFICE)}:WY")
         if office in cs.minted:
@@ -177,7 +181,7 @@ def emit():
                 is_preferred=True,
             )
         persons: set[str] = set()
-        groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, str], list[dict[str, Any]]] = defaultdict(list)
         for found in rows:
             groups[(found["day"], str(found["judge"]))].append(found)
         for (day, judge), group in sorted(groups.items()):

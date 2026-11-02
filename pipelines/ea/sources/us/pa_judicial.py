@@ -5,6 +5,7 @@ import zipfile
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 from xml.etree import ElementTree
 
@@ -14,6 +15,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one, present, required
 
 SOURCE = "us.pa_judicial"
 VERSION = "1"
@@ -120,8 +122,9 @@ def sheet(path: Path) -> list[dict[str, str]]:
         for cell in row.iter(NS + "c"):
             value = cell.find(NS + "v")
             if value is not None:
-                column = re.match(r"[A-Z]+", cell.get("r"))[0]
-                cells[column] = strings[int(value.text)] if cell.get("t") == "s" else value.text
+                column = required(re.match(r"[A-Z]+", cell.get("r") or ""))[0]
+                text = present(value.text, f"the value of cell {column}")
+                cells[column] = strings[int(text)] if cell.get("t") == "s" else text
         table.append(cells)
     return table
 
@@ -146,7 +149,7 @@ def fetch() -> None:
             )
 
 
-def attributed(year: int, table: list[dict[str, str]]) -> list[dict[str, object]]:
+def attributed(year: int, table: list[dict[str, str]]) -> list[dict[str, Any]]:
     slots: dict[tuple[str, str, str], int] = defaultdict(int)
     rows: list[tuple[tuple[str, str, int], dict[str, str]]] = []
     for cells in table[1:]:
@@ -196,7 +199,7 @@ def attributed(year: int, table: list[dict[str, str]]) -> list[dict[str, object]
             slot in chosen for other, other_party in groups if other == office for slot in groups[(other, other_party)]
         )
     }
-    found: list[dict[str, object]] = []
+    found: list[dict[str, Any]] = []
     for slot, cells in rows:
         if slot not in chosen or (not slot[0].endswith("(Retention)") and slot[0] not in whole):
             continue
@@ -216,8 +219,8 @@ def attributed(year: int, table: list[dict[str, str]]) -> list[dict[str, object]
     return found
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for year, day in YEARS.items():
         table = sheet(raw.cached(SOURCE, f"{URL}#{year}").path)
         if year < 2017:
@@ -272,10 +275,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '42%%'"""
             ).fetchall()
         }
-        state_area = conn.execute(
-            """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area = one(
+            conn.execute(
+                """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-PA'"""
-        ).fetchone()[0]
+            )
+        )[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/pa/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
         block = cs.key("us.electoral_system", "block")
@@ -386,13 +391,13 @@ def emit() -> Path:
                 ),
             )
 
-        groups: dict[tuple[date, str, bool], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, str, bool], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["office"]), bool(row["retention"]))].append(row)
         made = 0
         for (day, title, retention), group in sorted(groups.items()):
             if retention:
-                by_judge: dict[str, list[dict[str, object]]] = defaultdict(list)
+                by_judge: dict[str, list[dict[str, Any]]] = defaultdict(list)
                 for row in group:
                     by_judge[str(row["candidate"])].append(row)
                 for judge, judge_rows in by_judge.items():
@@ -493,7 +498,7 @@ def emit() -> Path:
                     seats=1,
                 )
             by_place: dict[str, int] = defaultdict(int)
-            values = []
+            values: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for choice, by_unit in by_choice.items():
                 for place, votes in by_unit.items():
                     unit = str(counties[flat(place)])

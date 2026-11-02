@@ -2,6 +2,7 @@ import re
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea.sources.us import mi_cenr_judicial as base
 from ea.sources.us import mi_cenr_statewide
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one, required
 
 SOURCE = "us.mi_cenr_appeals"
 VERSION = "1"
@@ -31,8 +33,8 @@ def era(day: date) -> int:
     return 0 if day.year < 2002 else 1 if day.year < 2012 else 2
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for year in [*base.CACHED, *base.FETCHED, *base.APPEALS_ONLY]:
         for row in base.read(year, "47" if year in base.APPEALS_ONLY else "14").iter_rows(named=True):
             if (row["WriteIn(W)/Uncommitted(Z)"] or "").strip() == "W":
@@ -95,10 +97,12 @@ def emit() -> Path:
         ).fetchall():
             county_units[base.flat(text)] = unit
             county_areas[base.flat(text)] = code
-        state_area, state_polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, state_polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-MI'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/mi/%%'").fetchall()}
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block")}
 
@@ -148,15 +152,17 @@ def emit() -> Path:
                 )
                 for index, (start, end) in enumerate(ERAS):
                     codes = [county_areas[flat] for flat in sorted(members[(number, index)])]
-                    geom, point = conn.execute(
-                        """with latest as (
+                    geom, point = one(
+                        conn.execute(
+                            """with latest as (
                                select distinct on (ac.code) ac.code, g.geom from area_geometry g
                                join area_code ac on ac.area_id = g.area_id
                                where ac.code = any(%s) order by ac.code, g.valid_from desc nulls last)
                            select encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(st_union(geom)), 3))), 'hex'),
                                   encode(st_asewkb(st_pointonsurface(st_makevalid(st_union(geom)))), 'hex') from latest""",
-                        [codes],
-                    ).fetchone()
+                            [codes],
+                        )
+                    )
                     cs.add(
                         "area_geometry",
                         area_id=area,
@@ -170,7 +176,7 @@ def emit() -> Path:
                         source_id=census,
                     )
 
-        groups: dict[tuple[date, int, int | None], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, int, int | None], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], row["district"], row["ends"])].append(row)
         office = cs.key("us.office", f"{slug(TITLE)}:MI")
@@ -183,7 +189,7 @@ def emit() -> Path:
             groups.items(), key=lambda item: (item[0][0], item[0][1], item[0][2] or 0)
         ):
             descriptions = {str(row["description"]) for row in group}
-            magnitude = sum(int(SEATS.search(text)[1]) for text in descriptions)
+            magnitude = sum(int(required(SEATS.search(text))[1]) for text in descriptions)
             ordinal = ORDINALS[district]
             suffix = f"{district}" + (f"-partial-term-ending-{ends}" if ends else "")
             contest_key = f"{day}:MI:{slug(TITLE)}:{suffix}"
@@ -276,7 +282,7 @@ def emit() -> Path:
                     seats=1,
                 )
             by_place: dict[str, int] = defaultdict(int)
-            values = []
+            values: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for choice, by_unit in by_choice.items():
                 for place, votes in by_unit.items():
                     unit = county_units[base.flat(place)]

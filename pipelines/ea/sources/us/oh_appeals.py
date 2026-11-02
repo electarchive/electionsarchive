@@ -3,6 +3,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -11,6 +12,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.oh_appeals"
 VERSION = "1"
@@ -47,7 +49,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".xlsx")
 
 
-def races() -> list[dict[str, object]]:
+def races() -> list[dict[str, Any]]:
     found = []
     for day, url in BOOKS.items():
         rows = pl.read_excel(
@@ -125,10 +127,12 @@ def emit() -> Path:
         ).fetchall():
             county_units[flat(text)] = unit
             county_codes[flat(text)] = code
-        state_area, state_polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, state_polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-OH'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/oh/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
 
@@ -182,15 +186,17 @@ def emit() -> Path:
                 valid_from=None,
             )
             codes = [county_codes[flat(place)] for place in sorted(members[number])]
-            geom, point = conn.execute(
-                """with latest as (
+            geom, point = one(
+                conn.execute(
+                    """with latest as (
                        select distinct on (ac.code) ac.code, g.geom from area_geometry g
                        join area_code ac on ac.area_id = g.area_id
                        where ac.code = any(%s) order by ac.code, g.valid_from desc nulls last)
                    select encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(st_union(geom)), 3))), 'hex'),
                           encode(st_asewkb(st_pointonsurface(st_makevalid(st_union(geom)))), 'hex') from latest""",
-                [codes],
-            ).fetchone()
+                    [codes],
+                )
+            )
             cs.add(
                 "area_geometry",
                 area_id=area,
@@ -261,7 +267,7 @@ def emit() -> Path:
             options: dict[str, UUID] = {}
             candidacies: dict[str, UUID] = {}
             totals: dict[str, int] = {}
-            values = []
+            values: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             by_place: dict[str, int] = defaultdict(int)
             for position, (choice, code, places) in enumerate(race["candidates"]):
                 first, last = identity(choice)

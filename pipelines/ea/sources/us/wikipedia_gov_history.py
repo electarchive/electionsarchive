@@ -4,6 +4,7 @@ import time
 import unicodedata
 from datetime import date
 from pathlib import Path
+from typing import Any
 from urllib.parse import quote, urlencode
 from uuid import UUID
 
@@ -160,7 +161,7 @@ def cells(row: str) -> list[str]:
     return found
 
 
-def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | None]]:
+def tables(text: str) -> list[tuple[str, int, list[dict[str, Any]], str | None]]:
     boxes = []
     for begin in re.finditer(r"^\{\|", text, re.MULTILINE):
         end = text.find("\n|}", begin.start())
@@ -171,7 +172,7 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
         if re.search(r"lieutenant|ticket", body[:1500], re.IGNORECASE):
             continue
         mated = re.search(r"running mate", body[:1500], re.IGNORECASE) is not None
-        rows: list[dict[str, object]] = []
+        rows: list[dict[str, Any]] = []
         listed, total = 0, None
         for row in body.split("\n|-")[1:]:
             row_cells = cells(row)
@@ -224,7 +225,7 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
     return boxes
 
 
-def tickets(text: str) -> tuple[list[dict[str, object]], str | None]:
+def tickets(text: str) -> tuple[list[dict[str, Any]], str | None]:
     for begin in re.finditer(r"^\{\|", text, re.MULTILINE):
         end = text.find("\n|}", begin.start())
         body = text[begin.start() : end if end != -1 else len(text)]
@@ -251,7 +252,7 @@ def tickets(text: str) -> tuple[list[dict[str, object]], str | None]:
                     re.sub(r"^(?:\s*align=\"?\w+\"?\s*\|)?", "", re.sub(r"^\|(?:[^|]*\{\{[^}]*\}\}\s*\|)?", "", line))
                 )
         pairs = list(zip(found[1::2], found[2::2], strict=False))
-        merged: dict[str, dict[str, object]] = {}
+        merged: dict[str, dict[str, Any]] = {}
         for label, (name, votes) in zip(labels, pairs, strict=False):
             digits = re.sub(r"\D", "", re.sub(r"\{\{efn.*", "", votes))
             person = clean(re.sub(r"\{\{efn.*", "", name).replace("'''", ""))
@@ -280,8 +281,8 @@ def tickets(text: str) -> tuple[list[dict[str, object]], str | None]:
     return [], None
 
 
-def fuse(rows: list[dict[str, object]]) -> list[dict[str, object]]:
-    folded: dict[tuple[str, ...], dict[str, object]] = {}
+def fuse(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    folded: dict[tuple[str, ...], dict[str, Any]] = {}
     for row in rows:
         key = tuple(words(str(row["name"])))
         if key not in folded:
@@ -299,12 +300,12 @@ def fuse(rows: list[dict[str, object]]) -> list[dict[str, object]]:
     return list(folded.values())
 
 
-def results_template(text: str) -> list[dict[str, object]]:
+def results_template(text: str) -> list[dict[str, Any]]:
     begin = re.search(r"\{\{\s*Election results\s*\n", text, re.IGNORECASE)
     if begin is None:
         return []
     body = text[begin.end() : text.find("\n}}", begin.end())]
-    rows: list[dict[str, object]] = []
+    rows: list[dict[str, Any]] = []
     for number in range(1, 30):
         found = re.search(rf"cand{number}=(.*?)\|party{number}=(.*?)\|votes{number}=(\d+)", body)
         if found is None:
@@ -321,8 +322,8 @@ def results_template(text: str) -> list[dict[str, object]]:
     return rows
 
 
-def infobox(text: str) -> tuple[list[dict[str, object]], str | None]:
-    rows: list[dict[str, object]] = []
+def infobox(text: str) -> tuple[list[dict[str, Any]], str | None]:
+    rows: list[dict[str, Any]] = []
     for number in range(1, 10):
         votes = re.search(rf"popular_vote{number}\s*=\s*'*([\d,]+)", text)
         name = re.search(rf"nominee{number}\s*=\s*(.+)", text)
@@ -348,8 +349,8 @@ def infobox(text: str) -> tuple[list[dict[str, object]], str | None]:
     return rows, None
 
 
-def read(text: str, skip: bool = True, infobox_only: bool = False) -> tuple[list[dict[str, object]], str | None]:
-    boxes: list[tuple[str, int, list[dict[str, object]], str | None]] = []
+def read(text: str, skip: bool = True, infobox_only: bool = False) -> tuple[list[dict[str, Any]], str | None]:
+    boxes: list[tuple[str, int, list[dict[str, Any]], str | None]] = []
     for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
         end = re.search(r"\{\{\s*election box end\s*\}\}", text[begin.start() :], re.IGNORECASE)
         body = text[begin.start() : begin.start() + end.end()] if end else text[begin.start() :]
@@ -357,7 +358,7 @@ def read(text: str, skip: bool = True, infobox_only: bool = False) -> tuple[list
         label = label_of(text, begin.start(), members[0][1] if members else {})
         if skip and SKIP.search(label):
             continue
-        rows: list[dict[str, object]] = []
+        rows: list[dict[str, Any]] = []
         listed, total, turnout = 0, None, None
         for name, params in members[1:]:
             digits = re.sub(r"\D", "", clean(params.get("votes", "")))
@@ -429,7 +430,7 @@ def parse() -> None:
             [[contest for _, _, contest in targets]],
         ):
             options.setdefault(contest, []).append((option, kind, person or label, party, summed, None))
-    lines: list[dict[str, object]] = []
+    lines: list[dict[str, Any]] = []
     held: list[tuple[str, str]] = []
     disagree: list[tuple[str, str]] = []
     for state, year, contest in targets:

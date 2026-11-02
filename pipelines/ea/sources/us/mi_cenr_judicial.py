@@ -3,6 +3,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import mi_cenr_statewide
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one, required
 
 SOURCE = "us.mi_cenr_judicial"
 VERSION = "1"
@@ -70,8 +72,8 @@ def read(year: int, office: str) -> pl.DataFrame:
     return frame.filter((pl.col("OfficeCode(Text)") == office) & pl.col("CandidateVotes").is_not_null())
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for year in [*CACHED, *FETCHED]:
         for row in read(year, "13").iter_rows(named=True):
             if (row["WriteIn(W)/Uncommitted(Z)"] or "").strip() == "W":
@@ -87,7 +89,7 @@ def lines() -> list[dict[str, object]]:
                 {
                     "day": date.fromisoformat(row["ElectionDate"][:10]),
                     "ends": int(partial[3]) if partial else None,
-                    "magnitude": int(SEATS.search(description)[1]),
+                    "magnitude": int(required(SEATS.search(description))[1]),
                     "candidate": re.sub(r"\s+", " ", name).upper(),
                     "county": row["CountyName"],
                     "votes": int(row["CandidateVotes"]),
@@ -128,10 +130,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '26%%'"""
             ).fetchall()
         }
-        state_area = conn.execute(
-            """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area = one(
+            conn.execute(
+                """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-MI'"""
-        ).fetchone()[0]
+            )
+        )[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/mi/%%'").fetchall()}
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block")}
 
@@ -147,7 +151,7 @@ def emit() -> Path:
                 cs.add("name_drop", name_id=found[0], entity_id=entity, text=found[1], reason="Name restyled")
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        groups: dict[tuple[date, int | None], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, int | None], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], row["ends"])].append(row)
         office = cs.key("us.office", f"{slug(TITLE)}:MI")
@@ -243,7 +247,7 @@ def emit() -> Path:
                     seats=1,
                 )
             by_place: dict[str, int] = defaultdict(int)
-            values = []
+            values: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for choice, by_unit in by_choice.items():
                 for place, votes in by_unit.items():
                     unit = counties[flat(place)]

@@ -4,6 +4,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.tn_judicial"
 VERSION = "1"
@@ -102,12 +104,12 @@ def header(buffer: list[str]) -> tuple[str, str, list[tuple[int, str]]] | None:
     return court, division, judges
 
 
-def blocks(path: Path) -> list[dict[str, object]]:
+def blocks(path: Path) -> list[dict[str, Any]]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
-    found: dict[tuple[str, str, tuple[str, ...]], dict[str, object]] = {}
+    found: dict[tuple[str, str, tuple[str, ...]], dict[str, Any]] = {}
     buffer: list[str] = []
     state = "rows"
-    current: dict[str, object] | None = None
+    current: dict[str, Any] | None = None
     for line in text.splitlines():
         if not line.strip() or FOOTER.search(line) or MONTH.match(line):
             continue
@@ -141,8 +143,8 @@ def blocks(path: Path) -> list[dict[str, object]]:
     return list(found.values())
 
 
-def lines() -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+def lines() -> list[dict[str, Any]]:
+    found: list[dict[str, Any]] = []
     for name, day in FILES.items():
         for block in blocks(raw.cached(SOURCE, f"{URL}#{name}").path):
             if not block["rows"]:
@@ -197,10 +199,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '47%%'"""
             ).fetchall()
         }
-        state_area, polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-TN'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/tn/%%'").fetchall()}
         retention_system = cs.key("us.electoral_system", "retention")
 
@@ -218,7 +222,7 @@ def emit() -> Path:
 
         offices: set[UUID] = set()
         persons: set[str] = set()
-        groups: dict[tuple[date, str, str], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[tuple[date, str, str], list[dict[str, Any]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["court"]), str(row["judge"]))].append(row)
         for (day, court, judge), group in sorted(groups.items()):

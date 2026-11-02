@@ -7,9 +7,11 @@ import subprocess
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
@@ -17,6 +19,7 @@ from ea import batch, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.statewide_totals import PARTIES
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.gov_official_totals"
 VERSION = "1"
@@ -29,7 +32,7 @@ VERIFIED = Path(__file__).with_name("gov_official_totals_verified.tsv")
 DPI = 100
 PUBLISHER = "Commonwealth of Massachusetts, Secretary of the Commonwealth"
 TITLE = "Manual for the Use of the General Court"
-SCHEMA: dict[str, object] = {
+SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
         "candidates": {
@@ -110,7 +113,7 @@ def requests() -> dict[str, tuple[MessageCreateParamsNonStreaming, float]]:
     ):
         stored = find(origin, needle)
         for reader, dpi in READS.items():
-            blocks: list[dict[str, object]] = []
+            blocks: list[ImageBlockParam | TextBlockParam] = []
             digest = hashlib.sha256(f"{PROMPT}{reader}{stored.sha256}{numbers}{rotate or ''}".encode()).hexdigest()
             for number in str(numbers).split(","):
                 data = image(stored.path, int(number), dpi, rotate)
@@ -136,8 +139,8 @@ def requests() -> dict[str, tuple[MessageCreateParamsNonStreaming, float]]:
     return out
 
 
-def reads() -> dict[tuple[str, int, str], dict[str, object]]:
-    found: dict[tuple[str, int, str], dict[str, object]] = {}
+def reads() -> dict[tuple[str, int, str], dict[str, Any]]:
+    found: dict[tuple[str, int, str], dict[str, Any]] = {}
     wanted = requests()
     ready, note = batch.ensure(SOURCE, "reads", wanted)
     print(note)
@@ -235,15 +238,17 @@ def emit() -> Path:
             state = str(state)
             year = int(year)
             row = book.filter((pl.col("state") == state) & (pl.col("year") == year)).row(0, named=True)
-            contest, election, ckey = conn.execute(
-                """select c.id, c.election_id, min(k.value) from contest c
+            contest, election, ckey = one(
+                conn.execute(
+                    """select c.id, c.election_id, min(k.value) from contest c
                    join election e on e.id = c.election_id join polity p on p.id = e.polity_id
                    join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
                      and o.value like 'governor:%%'
                    join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
                    where p.iso_code = %s and extract(year from e.date_from) = %s group by 1, 2""",
-                [f"US-{state}", year],
-            ).fetchone()
+                    [f"US-{state}", year],
+                )
+            )
             prior = conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchall()

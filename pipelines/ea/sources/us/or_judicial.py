@@ -4,6 +4,7 @@ import unicodedata
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -12,6 +13,7 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.or_judicial"
 VERSION = "2"
@@ -79,7 +81,7 @@ def split(text: str) -> list[str]:
     return [part for part in re.split(r"\s{2,}", text.strip()) if part]
 
 
-def contests(path: Path, swapped: bool) -> list[dict[str, object]]:
+def contests(path: Path, swapped: bool) -> list[dict[str, Any]]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
     lines = text.splitlines()
     found = []
@@ -129,7 +131,7 @@ def contests(path: Path, swapped: bool) -> list[dict[str, object]]:
     return found
 
 
-def early(path: Path, stage: str, year: int) -> list[dict[str, object]]:
+def early(path: Path, stage: str, year: int) -> list[dict[str, Any]]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
     lines = text.splitlines()
     found = []
@@ -230,10 +232,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '41%%'"""
             ).fetchall()
         }
-        state_area, polity = conn.execute(
-            """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
+        state_area, polity = one(
+            conn.execute(
+                """select u.area_id, p.id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-OR'"""
-        ).fetchone()
+            )
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/or/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
 
@@ -311,7 +315,7 @@ def emit() -> Path:
                 )
                 cs.add("note", entity_id=result, kind="methodology", body_md=NOTE)
                 options: list[UUID] = []
-                values = []
+                values: list[tuple[str, str, str | None, int, int, int, int, int]] = []
                 by_place: dict[str, int] = defaultdict(int)
                 rows = block["rows"]
                 for column, candidate in enumerate(block["candidates"]):

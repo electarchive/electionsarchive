@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import polars as pl
@@ -7,6 +8,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.ny_redbook_gov"
 VERSION = "1"
@@ -27,7 +29,7 @@ VOLUMES = {
     1914: ("1915", "nyp.33433084510993", "NY-RedBook-1915-nyp.33433084510993.txt", 820, 686),
     1926: ("1927", "uc1.b4046285", "NY-RedBook-1927-uc1.b4046285.txt", 469, 371),
 }
-READINGS: dict[int, dict[str, object]] = {
+READINGS: dict[int, dict[str, Any]] = {
     1908: {
         "lines": (
             ("Charles Evans Hughes", "Hughes", 804651),
@@ -135,11 +137,13 @@ def emit() -> Path:
                 license="Public domain",
             )
             cs.artifact(raw.cached(SOURCE, ITEM.format(item=item)), source)
-            contest, election = conn.execute(
-                """select c.id, c.election_id from contest c join external_id k on k.entity_id = c.id
+            contest, election = one(
+                conn.execute(
+                    """select c.id, c.election_id from contest c join external_id k on k.entity_id = c.id
                    and k.scheme = 'us.contest' and k.value ~ %s""",
-                [f"^{year}(-[0-9-]+)?:NY:governor$"],
-            ).fetchone()
+                    [f"^{year}(-[0-9-]+)?:NY:governor$"],
+                )
+            )
             options: dict[str, list[tuple[UUID, str, bool]]] = {}
             for option, label, carries in conn.execute(
                 """select o.id, o.ballot_label, exists (
@@ -186,10 +190,12 @@ def emit() -> Path:
             for label, votes in lines.select("label", "votes").iter_rows():
                 leaders[label.split(" (")[0]] = leaders.get(label.split(" (")[0], 0) + votes
             top = max(leaders, key=leaders.__getitem__)
-            elected = conn.execute(
-                """select o.id from contest_option o where o.contest_id = %s and o.kind = 'candidate'
+            elected = one(
+                conn.execute(
+                    """select o.id from contest_option o where o.contest_id = %s and o.kind = 'candidate'
                    and o.ballot_label like %s order by o.id limit 1""",
-                [contest, f"%{top.split()[-1]}"],
-            ).fetchone()
+                    [contest, f"%{top.split()[-1]}"],
+                )
+            )
             cs.add("outcome", result_set_id=result_set, option_id=elected[0], kind="elected", seats=1)
         return cs.write()
