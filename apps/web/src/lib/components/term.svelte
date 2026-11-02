@@ -1,5 +1,6 @@
 <script lang="ts">
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import Words from "#lib/components/words.svelte";
   import { isTouch, show } from "#lib/explain.svelte.js";
   import { cn } from "#lib/utils.js";
 
@@ -28,7 +29,7 @@
       if (isTouch(event)) {
         show(event, { kind: "term", label, definition });
       }
-    }}>{label}</Tooltip.Trigger
+    }}><Words text={label} /></Tooltip.Trigger
   >
   <Tooltip.Content
     {side}

@@ -5,6 +5,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import Words from "#lib/components/words.svelte";
   import { fits } from "#lib/fits.js";
   import {
     count,
@@ -949,9 +950,11 @@
     <thead
       class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
     >
-      <tr class="border-be text-[0.8125rem] text-muted-foreground">
+      <tr
+        class="border-be text-[0.8125rem] text-balance text-muted-foreground [&>th]:align-bottom"
+      >
         <th class="px-2 py-1.5 text-start font-medium" scope="col"
-          >{isQuestion ? m.col_answer() : m.col_option()}</th
+          ><Words text={isQuestion ? m.col_answer() : m.col_option()} /></th
         >
         {#if isReach}
           <th
@@ -967,11 +970,11 @@
           class={cn("px-2 py-1.5 text-end font-medium", {
             "max-sm:hidden": span != null,
           })}
-          scope="col">{votes}</th
+          scope="col"><Words text={votes} /></th
         >
         {#if span == null && isTally}{:else if span == null}
           <th class="px-2 py-1.5 text-end font-medium" scope="col"
-            >{m.col_share()}</th
+            ><Words text={m.col_share()} /></th
           >
         {:else}
           {#each [span.from, span.to] as label (label)}
@@ -998,7 +1001,7 @@
             })}
             scope="col"
           >
-            {seats}
+            <Words text={seats} />
           </th>
         {/if}
         {#if span != null && paired && !isTally}

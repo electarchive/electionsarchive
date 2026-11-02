@@ -11,6 +11,7 @@
   import { Input } from "#lib/components/ui/input/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import Words from "#lib/components/words.svelte";
   import { fits } from "#lib/fits.js";
   import { count, natural, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -764,7 +765,9 @@
       <thead
         class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
       >
-        <tr class="border-be text-[0.8125rem] text-muted-foreground">
+        <tr
+          class="border-be text-[0.8125rem] text-balance text-muted-foreground [&>th]:align-bottom"
+        >
           {#each columns as entry (entry.key)}
             <th
               class={cn("px-2 py-1.5 font-medium", {
@@ -807,7 +810,7 @@
                         };
                       }}
                     >
-                      {entry.label}
+                      <span><Words text={entry.label} /></span>
                       {#if entry.key === "shift" && span != null}
                         <span
                           class="flex items-center gap-1 font-figures text-[0.6875rem] font-normal"
