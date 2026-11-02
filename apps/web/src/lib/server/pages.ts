@@ -1538,22 +1538,19 @@ export async function comparison(ids: Array<string>) {
           }>;
         }>(sql`
           with pairs(at, a, b, kind) as (
-            values (1, 'Donald J. Trump', 'Kamala D. Harris', 'person'),
+            values (1, '01a13aad-ae96-71e9-a032-8533c04566fd', '01a13aad-ae98-7161-a6b6-a87bc86afe5a', 'person'),
               (2, 'us/ga', 'us/nc', 'polity'),
-              (3, 'Recep Tayyip Erdoğan', 'Kemal Kılıçdaroğlu', 'person'),
+              (3, '01a13c0c-c7c5-74b3-a52f-5411a6aaa052', '01a13c0c-c7c5-74b3-a52f-5413263c04a9', 'person'),
               (4, 'us/pa', 'us/wi', 'polity'),
-              (5, 'Ekrem İmamoğlu', 'Binali Yıldırım', 'person'),
-              (6, 'Cumhuriyet Halk Partisi', 'Adalet ve Kalkınma Partisi', 'party')
+              (5, '01a13c0c-c7c5-74b3-a52f-541544855da4', '01a13c0c-c7c5-74b3-a52f-5416cc1f0e11', 'person'),
+              (6, '01a13c0c-c7c5-74b3-a52f-540b0464c07c', '01a13c0c-c7c5-74b3-a52f-53ffda623a16', 'party')
           ),
           picked as (
-            select p.at, p.kind, x.side, coalesce(
-              (select s.entity_id from slug s where p.kind = 'polity' and s.is_current and s.path = x.key limit 1),
-              (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'person'
-                where p.kind = 'person' and n.text = x.key
-                order by (select count(*) from candidacy cy where cy.person_id = n.entity_id) desc limit 1),
-              (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'party'
-                where p.kind = 'party' and n.text = x.key limit 1)
-            ) as id
+            select p.at, p.kind, x.side, case when p.kind = 'polity'
+              then (select s.entity_id from slug s where s.is_current and s.path = x.key limit 1)
+              else (select coalesce((select m.into_id from entity_merge m where m.entity_id = e.id), e.id)
+                from entity e where e.id = x.key::uuid)
+            end as id
             from pairs p cross join lateral (values (1, p.a), (2, p.b)) x(side, key)
           ),
           sided as (
