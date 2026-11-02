@@ -651,7 +651,7 @@
         "rankOrdinal"
       ],
       "match": {
-        "rankOrdinal=*": "Yurt dışındaki {count} {nouns} arasında {name} için {rank}. en iyi sonuç"
+        "rankOrdinal=*": "Yurt dışındaki {nouns} arasında {name} için {rank}. en iyi sonuç ({count} içinden)"
       }
     }
   ],
@@ -696,14 +696,14 @@
       ],
       "match": {
         "countPlural=one": "{countText} {groups} için yukarıda gösterilenlerin dışında sonuç yok; bu yüzden burada listelenmedi.",
-        "countPlural=*": "{countText} {groups} için yukarıda gösterilenlerin dışında sonuç yok; bu yüzden burada listelenmedi."
+        "countPlural=*": "Yukarıda gösterilenlerin dışında sonucu olmayan {groups} burada listelenmedi ({countText})."
       }
     }
   ],
   "ledger_open": "{name} sayfasını aç",
   "ledger_unplaced": "{place} içinde {group} bilinmiyor",
   "places_leads": "{label}, {count} yerde önde",
-  "places_reconcile": "{nouns}, {total} geçerli oyun {sum} kadarını oluşturuyor. Sonraki satırlar, hiçbir tek yere dahil olmayan kalan oyları içeriyor.",
+  "places_reconcile": "Bu {nouns}, {total} geçerli oyun {sum} kadarını oluşturuyor. Sonraki satırlar, hiçbir tek yere dahil olmayan kalan oyları içeriyor.",
   "places_reconcile_short": "Bu satırlar, {total} geçerli oyun {sum} kadarını oluşturuyor. Kalanı yer belirtilmeden bildirildi.",
   "channels_title": "Oyların kullanılış biçimi",
   "channels_method": "Yöntem",
@@ -744,7 +744,7 @@
       ],
       "match": {
         "countPlural=one": "{count} {noun}",
-        "countPlural=*": "{count} {nouns}"
+        "countPlural=*": "{count} {noun}"
       }
     }
   ],
@@ -763,7 +763,7 @@
       }
     }
   ],
-  "places_top_votes": "En çok oy alan {count} {nouns} gösteriliyor",
+  "places_top_votes": "En çok oy alan {nouns} gösteriliyor (ilk {count})",
   "places_flipped": "El değiştirenler",
   "places_show_all": "Tümünü göster ({count})",
   "places_show_more": "{count} tane daha göster",
@@ -936,7 +936,7 @@
       ],
       "match": {
         "countPlural=one": "1 {noun} birden fazla üye seçti. Seçmenler birden fazla oy kullanabildiğinden toplamlar seçmeni değil, oyu gösterir.",
-        "countPlural=*": "{count} {nouns} birden fazla üye seçti. Seçmenler birden fazla oy kullanabildiğinden toplamlar seçmeni değil, oyu gösterir."
+        "countPlural=*": "{count} {noun} birden fazla üye seçti. Seçmenler birden fazla oy kullanabildiğinden toplamlar seçmeni değil, oyu gösterir."
       }
     }
   ],
@@ -1735,7 +1735,7 @@
   "atlas_page_title": "{title} haritası, {place}",
   "atlas_page_title_plain": "{title} haritası",
   "col_place": "Yer",
-  "twin_map_summary": "{count} {nouns}; her biri için önde olan, onun oy oranı ve ikinciyle arasındaki oy farkı.",
+  "twin_map_summary": "{nouns} ({count}); her biri için önde olan, onun oy oranı ve ikinciyle arasındaki oy farkı.",
   "twin_map_compared": "{name} ile karşılaştırıldı.",
   "twin_map_then": "{year} yılında önde olan",
   "twin_map_levels": "Ayrıca şu düzeylerde haritalandı: {levels}.",
@@ -1765,7 +1765,7 @@
   "atlas_shown": "{total} içinden {shown} gösteriliyor",
   "atlas_flipped_only": "Yalnızca el değiştirenler",
   "atlas_clear": "Filtreleri temizle",
-  "atlas_zoom_hint": "{places} için yakınlaştırın.",
+  "atlas_zoom_hint": "Yakınlaştırınca {places} görünür.",
   "atlas_pin_hint": "Bir yeri sabitlemek için tıklayın",
   "atlas_unpin": "Sabitlemeyi kaldır",
   "atlas_votes": "{votes} oy",
@@ -1787,7 +1787,7 @@
         "rankOrdinal"
       ],
       "match": {
-        "rankOrdinal=*": "{place} içindeki {count} {nouns} arasında {name} için {rank}. en iyi"
+        "rankOrdinal=*": "{place} içindeki {nouns} arasında {name} için {rank}. en iyi sonuç ({count} içinden)"
       }
     }
   ],
@@ -1798,7 +1798,7 @@
   "standing_key": "Her nokta bir {noun} gösterir. Hangisi olduğunu görmek için noktanın üzerine gelin.",
   "standing_all": "Tümünü göster ({count})",
   "standing_fewer": "Daha az göster",
-  "standing_partial": "{total} {nouns} içinden yalnızca {count} tanesinde hem {first} hem {second} oy pusulasında yer aldı; kalanlar dışarıda bırakıldı.",
+  "standing_partial": "{nouns} içinden yalnızca {count} tanesinde (toplam {total}) hem {first} hem {second} oy pusulasında yer aldı; kalanlar dışarıda bırakıldı.",
   "standing_allied": "İttifaka göre karşılaştırıldı: her ittifaktaki partiler dönüşümlü aday çıkardı; parti bazında karşılaştırma, birinin oy pusulasında olmadığı {nouns} dışarıda bırakırdı.",
   "atlas_zoom_to": "Yakınlaştır:",
   "atlas_alone": "Yalnızca {place} haritası",
@@ -1834,6 +1834,27 @@
   "atlas_up": "{place} düzeyine çık",
   "atlas_select_hint": "Seçmek için yerlere tıklayın veya etraflarını sürükleyerek çevreleyin.",
   "atlas_select_hint_touch": "Seçmek için yerlere dokunun veya parmağınızla etraflarını çizin.",
+  "map_mode_lean": "Eğilim",
+  "atlas_lean_even": "{name} ile aynı",
+  "atlas_lean_key": "Her yerin oy farkı, {name} genelindeki farkla karşılaştırılır",
+  "atlas_analysis": "Tablo ve grafik",
+  "atlas_analysis_close": "Tablo ve grafiği kapat",
+  "atlas_table": "Tablo",
+  "atlas_scatter": "Dün ve bugün",
+  "atlas_in_view": "Görünümdeki {places}: {count}",
+  "atlas_listed": "Listelenen {places}: {count}",
+  "atlas_showing": "Toplam {total} yerden ilk {shown} tanesi gösteriliyor. CSV dosyasında hepsi var.",
+  "atlas_column_place": "Yer",
+  "atlas_column_votes": "Oy",
+  "atlas_column_margin": "Oy farkı",
+  "atlas_column_swing": "Oy kayması",
+  "atlas_column_within": "Bağlı olduğu yer",
+  "atlas_image": "Görseli kaydet",
+  "atlas_link": "Bağlantıyı kopyala",
+  "atlas_copied": "Kopyalandı",
+  "atlas_margin_in": "{year} oy farkı",
+  "atlas_scatter_hint": "Çizginin üstündeki yerler {name} lehine kaydı. Yer seçmek için grafiğin üzerinde sürükleyin.",
+  "atlas_none_match": "Filtrelere uyan yer yok.",
   "map_gesture_windows": "Yakınlaştırmak için Ctrl tuşuna basılı tutup kaydırın",
   "map_gesture_mac": "Yakınlaştırmak için ⌘ tuşuna basılı tutup kaydırın",
   "map_gesture_mobile": "Haritayı hareket ettirmek için iki parmağınızı kullanın",
@@ -2452,8 +2473,8 @@
   "winners_none": "Kazanan kaydedilmedi",
   "winners_led": "Önde",
   "winners_led_note": "Kaynaklarımız bu yarışların {count} tanesinde kazanan bildirmiyor; bu yüzden en çok oy alan aday gösteriliyor ve Önde olarak işaretleniyor.",
-  "sweep_verdict_both": "{party} en çok oyu ve en çok {nouns} kazandı",
-  "sweep_verdict_split": "{party} en çok oyu, {rival} en çok {nouns} kazandı",
+  "sweep_verdict_both": "{party} en çok oyu aldı ve {nouns} arasında en fazla kazanımı da elde etti",
+  "sweep_verdict_split": "{party} en çok oyu aldı, ancak {nouns} arasında en fazla kazanımı {rival} elde etti",
   "sweep_summary": "{party}, {total} {nouns} içinden {won} tanesini ve oyların {share} oranını kazandı.",
   "sweep_summary_since": "{party}, {total} {nouns} içinden {won} tanesini ve oyların {share} oranını kazandı; {year} yılında ise {before} {nouns} ve {earlier} kazanmıştı.",
   "sweep_tier_metro": "Büyükşehir",
