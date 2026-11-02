@@ -1146,7 +1146,7 @@ def attach(
                     raise ValueError(f"{key}: no county {code}")
                 members[code] = str(counties[code][0])
             elif kind == "precinct":
-                members[code] = str(cs.unit("us.precinct", code))
+                members[code] = str(cs.unit("us.precinct", code, day))
             elif kind == "town":
                 members[code] = str(cs.unit("us.town", code))
             else:

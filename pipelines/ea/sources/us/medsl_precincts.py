@@ -136,19 +136,22 @@ def emit() -> Path:
         missing = set(units["county"]) - set(counties)
         if missing:
             raise ValueError(f"no county units for {sorted(missing)}")
-        existing = {
-            code
-            for (code,) in conn.execute(
-                """select u.code from reporting_unit u join changeset c on c.id = u.changeset_id
+        existing = pl.DataFrame(
+            conn.execute(
+                """select u.code, u.valid_from from reporting_unit u join changeset c on c.id = u.changeset_id
                    where u.scheme_code = 'us.precinct' and u.code ~ '^20(16|18|20|22|24):' and c.pipeline <> %s""",
                 [SOURCE],
-            ).fetchall()
-        }
-        units = units.filter(~pl.col("code").is_in(list(existing)))
+            ).fetchall(),
+            schema={"code": pl.String, "day": pl.Date},
+            orient="row",
+        )
+        units = units.join(existing, on=["code", "day"], how="anti")
         cs.frame(
             "reporting_unit",
             units.select(
-                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String),
+                id=pl.struct("code", "day").map_elements(
+                    lambda row: str(cs.unit("us.precinct", row["code"], row["day"])), return_dtype=pl.String
+                ),
                 polity_id=pl.col("state").map_elements(
                     lambda state: str(cs.polity(f"US-{state}")), return_dtype=pl.String
                 ),
