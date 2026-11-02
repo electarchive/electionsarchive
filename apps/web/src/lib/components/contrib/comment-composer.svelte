@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { untrack } from "svelte";
   import type { Anchor } from "#lib/contrib.js";
+  import type { parseMarkdown } from "#lib/markdown-tree.js";
   import Markdown from "#lib/components/markdown.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -49,6 +50,7 @@
   let body = $state(untrack(() => initial));
   let title = $state("");
   let previewing = $state(false);
+  let parse = $state<typeof parseMarkdown | null>(null);
   let busy = $state(false);
   let message = $state<string | null>(null);
   let field = $state<HTMLTextAreaElement | null>(null);
@@ -58,6 +60,14 @@
   );
 
   const left = $derived(commentLimit - body.length);
+
+  $effect(() => {
+    if (previewing && parse == null) {
+      void import("#lib/markdown-tree.js").then((module) => {
+        parse = module.parseMarkdown;
+      });
+    }
+  });
   const changed = $derived.by(() => {
     if (!suggesting || suggestable == null) {
       return null;
@@ -180,8 +190,8 @@
       >
         {#if body.trim() === ""}
           <p class="text-muted-foreground">{m.discussion_preview_empty()}</p>
-        {:else}
-          <Markdown {body} />
+        {:else if parse != null}
+          <Markdown tree={parse(body)} />
         {/if}
       </div>
     {/if}

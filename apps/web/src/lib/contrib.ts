@@ -1,3 +1,4 @@
+import type { Root } from "mdast";
 import type { Box } from "#lib/map/engine.svelte.js";
 import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -705,7 +706,7 @@ export const anchorId = (anchor: Anchor) =>
 
 export const commentLimit = 10_000;
 
-export type CommentView = {
+export type CommentRow = {
   id: string;
   parent_id: string | null;
   author: string | null;
@@ -727,6 +728,8 @@ export type CommentView = {
   accepted_revision: number | null;
   mine: boolean;
 };
+
+export type CommentView = CommentRow & { tree: Root | null };
 
 export function threaded(comments: Array<CommentView>) {
   const roots: Array<CommentView> = [];

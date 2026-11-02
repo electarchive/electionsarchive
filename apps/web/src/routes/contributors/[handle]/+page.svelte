@@ -82,11 +82,11 @@
     {/each}
   </dl>
 
-  {#if data.profile.bio_md != null || data.profile.links.length > 0}
+  {#if data.bio != null || data.profile.links.length > 0}
     <section class="mbs-8 grid gap-3" aria-label={m.contributor_about()}>
-      {#if data.profile.bio_md != null}
+      {#if data.bio != null}
         <div class="max-inline-prose text-[0.9375rem]">
-          <Markdown body={data.profile.bio_md} />
+          <Markdown tree={data.bio} />
         </div>
       {/if}
       {#if data.profile.links.length > 0}

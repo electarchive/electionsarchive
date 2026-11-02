@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { TalkProposal, TopicView } from "#lib/contrib.js";
 import type { Author } from "#lib/server/discussion.js";
-import { mentionsOf } from "#lib/markdown.js";
+import { mentionsOf } from "#lib/markdown-tree.js";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { allowed } from "#lib/server/discussion.js";

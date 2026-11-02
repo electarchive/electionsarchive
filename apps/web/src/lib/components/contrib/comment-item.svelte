@@ -115,9 +115,9 @@
       autofocus
       onclose={() => (mode = "read")}
     />
-  {:else if comment.body != null}
+  {:else if comment.tree != null}
     <div class={cn("text-sm", { "text-muted-foreground": hidden })}>
-      <Markdown body={comment.body} />
+      <Markdown tree={comment.tree} />
     </div>
   {/if}
   {#if comment.suggestion != null && !hidden}

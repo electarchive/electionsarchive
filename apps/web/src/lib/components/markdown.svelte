@@ -1,10 +1,8 @@
 <script lang="ts">
-  import type { RootContent } from "mdast";
-  import { parseMarkdown, piecesOf, safeHref } from "#lib/markdown.js";
+  import type { Root, RootContent } from "mdast";
+  import { piecesOf, safeHref } from "#lib/markdown.js";
 
-  const { body }: { body: string } = $props();
-
-  const tree = $derived(parseMarkdown(body));
+  const { tree }: { tree: Root } = $props();
 </script>
 
 {#snippet nodes(list: Array<RootContent>)}

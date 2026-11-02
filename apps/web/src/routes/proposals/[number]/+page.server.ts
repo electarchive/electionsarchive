@@ -17,6 +17,7 @@ import {
   suggestableRows,
   SuggestionSchema,
   threadComments,
+  withTrees,
 } from "#lib/server/discussion.js";
 import { watching } from "#lib/server/feeds.js";
 import type { Action, Actions, PageServerLoad } from "./$types";
@@ -90,7 +91,7 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
         })),
       })),
     },
-    comments,
+    comments: withTrees(comments),
     isAuthor,
     suggestable:
       latest == null ||

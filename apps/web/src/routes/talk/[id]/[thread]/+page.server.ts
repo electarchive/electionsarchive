@@ -9,7 +9,7 @@ import {
   hideAction,
   Id,
 } from "#lib/server/discussion-actions.js";
-import { Body, threadComments } from "#lib/server/discussion.js";
+import { Body, threadComments, withTrees } from "#lib/server/discussion.js";
 import {
   commentOnTopic,
   PublicId,
@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   return {
     entity,
     topic: rest,
-    comments,
+    comments: withTrees(comments),
     commenter: commenterOf(locals.user),
     canModerate,
     canResolve: viewer != null && (viewer === author || canModerate),

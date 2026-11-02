@@ -1,10 +1,10 @@
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import type { Anchor, CommentView, DiffRow } from "#lib/contrib.js";
+import type { Anchor, CommentRow, CommentView, DiffRow } from "#lib/contrib.js";
 import { PROJECT } from "#lib/constants.js";
 import { anchorId, commentLimit } from "#lib/contrib.js";
-import { mentionsOf } from "#lib/markdown.js";
+import { mentionsOf, parseMarkdown } from "#lib/markdown-tree.js";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
@@ -155,13 +155,13 @@ export async function allowed(userId: string) {
 export async function threadComments(
   threadId: string | null,
   viewer: string | null,
-): Promise<Array<CommentView>> {
+): Promise<Array<CommentRow>> {
   if (threadId == null) {
     return [];
   }
   const allowedRoles = await roles(viewer ?? undefined);
   const isModerator = allowedRoles.admin || allowedRoles.reviewer;
-  const { rows } = await db.execute<CommentView>(sql`
+  const { rows } = await db.execute<CommentRow>(sql`
     select c.id, c.parent_id, u.name as author, p.handle, c.agent_name, c.agent_model, c.revision_n,
            case when c.hidden_at is null or ${isModerator} or c.author_user_id = ${viewer}::uuid
                 then c.body_md end as body,
@@ -179,6 +179,12 @@ export async function threadComments(
   `);
   return rows;
 }
+
+export const withTrees = (comments: Array<CommentRow>): Array<CommentView> =>
+  comments.map((comment) => ({
+    ...comment,
+    tree: comment.body == null ? null : parseMarkdown(comment.body),
+  }));
 
 export async function proposalThread(proposalId: string) {
   const { rows } = await db.execute<{ id: string }>(sql`

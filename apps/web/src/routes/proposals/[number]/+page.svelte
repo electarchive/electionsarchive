@@ -1,8 +1,8 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
+  import type BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
   import type { Anchor, CommentView, DiffRow } from "#lib/contrib.js";
-  import BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import CommentItem from "#lib/components/contrib/comment-item.svelte";
   import Discussion from "#lib/components/contrib/discussion.svelte";
@@ -48,6 +48,18 @@
   const head = $derived(proposal.revisions.at(0));
   const several = $derived(new Set(head?.diff?.entities).size > 1);
   const job = $derived(proposal.jobs.at(0));
+
+  let Boundaries = $state<typeof BoundaryMap | null>(null);
+
+  $effect(() => {
+    if (head?.diff?.map != null && Boundaries == null) {
+      void import("#lib/components/contrib/boundary-map.svelte").then(
+        (module) => {
+          Boundaries = module.default;
+        },
+      );
+    }
+  });
   const pending = $derived(
     job?.status === "queued" || job?.status === "running",
   );
@@ -505,7 +517,13 @@
     <section class="mbs-8" aria-labelledby="boundaries">
       <h2 id="boundaries" class="heading">{m.proposal_boundaries()}</h2>
       <div class="mbs-2">
-        <BoundaryMap drawn={head.diff.map} rows={shapes} />
+        {#if Boundaries == null}
+          <div
+            class="rounded-sm bg-card ring-1 ring-border block-[min(28rem,55svh)]"
+          ></div>
+        {:else}
+          <Boundaries drawn={head.diff.map} rows={shapes} />
+        {/if}
       </div>
     </section>
   {/if}

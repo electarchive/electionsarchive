@@ -1,4 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
+import { parseMarkdown } from "#lib/markdown-tree.js";
 import { credits } from "#lib/server/bounties.js";
 import { contributor, HANDLE } from "#lib/server/contributors.js";
 import { watching } from "#lib/server/feeds.js";
@@ -17,6 +18,8 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   const mine = locals.user?.id === userId;
   return {
     ...found,
+    bio:
+      found.profile.bio_md == null ? null : parseMarkdown(found.profile.bio_md),
     bounties: await credits(userId),
     mine,
     watch:
