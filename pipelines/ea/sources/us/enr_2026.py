@@ -1387,7 +1387,7 @@ def plan(
                     )
                     continue
             unmatched.append(
-                f"{'state' if wide else 'local'} {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if len(best) > 1 and best[0][1] else 'no contest'}"
+                f"{'state' if wide else 'local'} {state}: {name} ({', '.join(sorted(places)[:2])}): {'ambiguous' if len(best) > 1 and best[0][1] else 'no contest'}"
             )
         for (_, _, _, contest, key), name, places, office, *only in sorted(
             picks, key=lambda pick: (-pick[0][0], -pick[0][1], -pick[0][2])
@@ -1435,7 +1435,7 @@ def plan(
                     matched[office] += 1
                     continue
                 unmatched.append(
-                    f"{'state' if office == 'state' else 'local'} {state}: {name} ({', '.join(places[:2])}): duplicate of {key}"
+                    f"{'state' if office == 'state' else 'local'} {state}: {name} ({', '.join(sorted(places)[:2])}): duplicate of {key}"
                 )
                 continue
             matched[office] += 1
