@@ -1477,9 +1477,9 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 seat = f"{match[1]}{match[2]} District" if match[1] else f"{match[3]} County, Position {match[4]}"
             elif name is None:
                 name = line.rstrip("*")
-                for split in re.finditer(r"(?<=[a-z]{2})(?=[A-Z])", name):
+                for split in re.finditer(r"(?<=[a-z]{2})(?=[A-Z])|(?<= [A-Z])(?=[A-Z][a-z])", name):
                     candidate = f"{name[: split.start()]} {name[split.start() :]}"
-                    if candidate in spaced and name not in spaced:
+                    if candidate in spaced and not re.search(rf"(?<![A-Za-z]){re.escape(name)}(?![A-Za-z])", spaced):
                         name = candidate
                         break
             else:
