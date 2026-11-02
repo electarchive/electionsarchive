@@ -241,47 +241,74 @@ def parse() -> None:
             for number, geom in zip(numbers, shapes, strict=True)
         )
 
+    at_large = {
+        district: {
+            n for run in str(congresses).split(",") for n in range(int(run.split("-")[0]), int(run.split("-")[-1]) + 1)
+        }
+        for district, congresses in pl.read_csv(
+            Path(__file__).with_name("census_at_large.tsv"), separator="\t", infer_schema=False
+        ).iter_rows()
+    }
+    files: list[tuple[str, list[tuple[int, int, int, str, object]]]] = []
+    with tarfile.open(raw.cached(SOURCE, LEWIS).path, "r|gz") as archive:
+        for member in archive:
+            match = re.search(r"/GeoJson/(.+)_(\d{3})_to_(\d{3})\.geojson$", member.name)
+            file = archive.extractfile(member)
+            if match is None or file is None or match[1] == "District Of Columbia" or int(match[2]) > 117:
+                continue
+            files.append(
+                (
+                    match[1],
+                    [
+                        (
+                            *(int(feature["properties"][key]) for key in ("startcong", "endcong", "district")),
+                            str(feature["properties"]["id"])[1:3],
+                            feature["geometry"],
+                        )
+                        for feature in json.load(file)["features"]
+                    ],
+                )
+            )
+    districted = {
+        (state, n)
+        for _, listed in files
+        for first, last, number, state, _ in listed
+        if number > 0
+        for n in range(first, last + 1)
+    }
     historical: list[dict[str, object]] = []
     with connect() as conn:
-        with tarfile.open(raw.cached(SOURCE, LEWIS).path, "r|gz") as archive:
-            for member in archive:
-                match = re.search(r"/GeoJson/(.+)_(\d{3})_to_(\d{3})\.geojson$", member.name)
-                file = archive.extractfile(member)
-                if match is None or file is None or match[1] == "District Of Columbia" or int(match[2]) > 117:
-                    continue
-                features: list[tuple[str, int, int, int, int, bool, str]] = []
-                for feature in json.load(file)["features"]:
-                    properties = feature["properties"]
-                    first, last, number = (int(properties[key]) for key in ("startcong", "endcong", "district"))
-                    for low, high in (
-                        (first, min(last, 107)),
-                        *([(117, 117)] if match[1] == "North Carolina" and first <= 117 <= last else []),
-                    ):
-                        if number >= 0 and low <= high:
-                            features.append(
-                                (
-                                    f"{properties['id'][1:3]}{number:02d}",
-                                    first,
-                                    last,
-                                    low,
-                                    high,
-                                    number == 0,
-                                    json.dumps(feature["geometry"]),
-                                )
-                            )
-                if not features:
-                    continue
-                historical.extend(
-                    {
-                        "code": code,
-                        "valid_from": CONGRESSES[low],
-                        "valid_to": CONGRESSES[high + 1],
-                        "quality": "academic",
-                        "geom": geom,
-                        "label_point": point,
+        for name, listed in files:
+            features: list[tuple[str, int, int, int, int, bool, str]] = []
+            for first, last, number, state, geometry in listed:
+                code = f"{state}{number:02d}"
+                for low, high in (
+                    (first, min(last, 107)),
+                    *([(117, 117)] if name == "North Carolina" and first <= 117 <= last else []),
+                ):
+                    if number < 0 or low > high:
+                        continue
+                    held = {
+                        n
+                        for n in range(low, high + 1)
+                        if number > 0 or n in at_large.get(code, set()) or (state, n) not in districted
                     }
-                    for code, low, high, geom, point in conn.execute(
-                        """select code, low, high, encode(st_asewkb(geom), 'hex'),
+                    for start in sorted(n for n in held if n - 1 not in held):
+                        end = next(n for n in range(start, high + 2) if n not in held) - 1
+                        features.append((code, first, last, start, end, number == 0, json.dumps(geometry)))
+            if not features:
+                continue
+            historical.extend(
+                {
+                    "code": code,
+                    "valid_from": CONGRESSES[low],
+                    "valid_to": CONGRESSES[high + 1],
+                    "quality": "academic",
+                    "geom": geom,
+                    "label_point": point,
+                }
+                for code, low, high, geom, point in conn.execute(
+                    """select code, low, high, encode(st_asewkb(geom), 'hex'),
                                   encode(st_asewkb(st_pointonsurface(geom)), 'hex')
                            from (
                              select code, low, high,
@@ -300,9 +327,9 @@ def parse() -> None:
                              ) simplified
                              group by code, low, high
                            ) districts""",
-                        [TOLERANCE, *(list(column) for column in zip(*features, strict=True))],
-                    ).fetchall()
-                )
+                    [TOLERANCE, *(list(column) for column in zip(*features, strict=True))],
+                ).fetchall()
+            )
 
         conn.execute(
             """create temp table shape on commit drop as
