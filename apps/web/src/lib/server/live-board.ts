@@ -10,6 +10,7 @@ export async function geography(
   date: string,
   framed: Array<string> = areaIds,
   isOutlined = true,
+  isGrounded = false,
 ): Promise<Geography | null> {
   if (areaIds.length === 0) {
     return null;
@@ -50,7 +51,21 @@ export async function geography(
     `);
     return box.rows[0];
   };
-  let region = framed;
+  const ground = isGrounded
+    ? (
+        await db.execute<{ id: string; k: number }>(sql`
+          select distinct a.id, a.k from area a
+          join area_code c on c.area_id = a.id and c.valid @> ${date}::date
+          where a.scheme_code = ${scheme}
+            and split_part(c.code, ':', 1) in (
+              select split_part(o.code, ':', 1) from area_code o
+              where o.area_id = any(${sql.param(areaIds)}::uuid[]) and o.valid @> ${date}::date and position(':' in o.code) > 0
+            )
+            and exists (select 1 from area_geometry g where g.area_id = a.id and g.valid @> ${date}::date)
+        `)
+      ).rows
+    : [];
+  let region = ground.length > 0 ? ground.map((area) => area.id) : framed;
   let row = await extent(region);
   if (row?.west == null && framed !== areaIds) {
     region = areaIds;
@@ -89,6 +104,7 @@ export async function geography(
     scheme: scheme.split(".", 1)[0] ?? scheme,
     outline: drawn?.rows[0]?.rings ?? [],
     isEdged: region.some((id) => !areaIds.includes(id)),
+    ground: ground.map((area) => area.k),
     frame: {
       west: row.west,
       south: row.south,

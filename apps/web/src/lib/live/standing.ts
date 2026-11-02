@@ -13,6 +13,7 @@ export type Geography = {
   scheme: string;
   outline: Array<Array<[number, number]>>;
   isEdged?: boolean;
+  ground?: Array<number>;
   frame: { west: number; south: number; east: number; north: number };
   places: Array<{ areaId: string; k: number; at: [number, number] }>;
 };

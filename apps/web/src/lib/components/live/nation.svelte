@@ -90,6 +90,40 @@
     const source = engine.tiles(geography.tiles, "nation");
     if (!painted) {
       const ks = [...byK.keys()];
+      const ground = (geography.ground ?? []).filter((k) => !byK.has(k));
+      if (ground.length > 0) {
+        engine.add(
+          {
+            id: "nation-ground",
+            type: "fill",
+            source,
+            "source-layer": "areas",
+            filter: ["in", ["id"], ["literal", ground]],
+            paint: {
+              "fill-color":
+                "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))",
+            },
+          },
+          "fills",
+          { group: "nation-layers", rank: 0 },
+        );
+        engine.add(
+          {
+            id: "nation-ground-seam",
+            type: "line",
+            source,
+            "source-layer": "areas",
+            filter: ["in", ["id"], ["literal", ground]],
+            paint: {
+              "line-color":
+                "color-mix(in oklab, var(--muted-foreground) 22%, var(--background))",
+              "line-width": 0.6,
+            },
+          },
+          "lines",
+          { group: "nation-layers" },
+        );
+      }
       engine.add(
         {
           id: "nation-fill",

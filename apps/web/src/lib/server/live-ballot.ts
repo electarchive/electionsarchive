@@ -489,7 +489,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v6:${election.slug}`, async () => {
+  return remember(`live:ballot:v7:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");
@@ -506,7 +506,10 @@ export async function liveBallot(path: string) {
         const ids = [
           ...new Set(list.flatMap((entry) => entry.contest.area ?? [])),
         ];
-        return [key, await geography(ids, election.date, ids, false)] as const;
+        return [
+          key,
+          await geography(ids, election.date, ids, false, true),
+        ] as const;
       }),
     );
     const maps: Record<string, Geography | null> = Object.fromEntries(drawn);
