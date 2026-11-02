@@ -26,6 +26,7 @@ import {
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale, locales } from "#lib/paraglide/runtime.js";
 import { authDb } from "#lib/server/db/index.js";
+import { renderEmail } from "#lib/server/email.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
 
 const authErrorMessages = {
@@ -61,18 +62,39 @@ for (const locale of locales) {
   translations[locale] = dictionary;
 }
 
+const message = (
+  to: string,
+  url: string,
+  parts: {
+    subject: string;
+    preheader: string;
+    heading: string;
+    body: string;
+    action: string;
+    reason: string;
+  },
+) => ({
+  to,
+  ...renderEmail({
+    ...parts,
+    url,
+    note: m.email_link_expiry(),
+    fallback: m.email_link_fallback(),
+    replies: m.email_footer_replies(),
+    wordmark: m.wordmark(),
+  }),
+});
+
 async function sendEmail({
   to,
   subject,
-  body,
-  action,
-  url,
+  html,
+  text,
 }: {
   to: string;
   subject: string;
-  body: string;
-  action: string;
-  url: string;
+  html: string;
+  text: string;
 }) {
   if (CLOUDFLARE_ACCOUNT_ID == null || CLOUDFLARE_EMAIL_TOKEN == null) {
     throw new Error(
@@ -91,8 +113,8 @@ async function sendEmail({
         from: { address: EMAIL_FROM_ADDRESS, name: EMAIL_FROM_NAME },
         to,
         subject,
-        html: `<p>${body}</p><p><a href="${url}">${action}</a></p>`,
-        text: `${body}\n\n${url}`,
+        html,
+        text,
       }),
     },
   );
@@ -186,37 +208,48 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      await sendEmail({
-        to: user.email,
-        subject: m.reset_password_subject(),
-        body: m.reset_password_body(),
-        action: m.reset_password_action(),
-        url,
-      });
+      await sendEmail(
+        message(user.email, url, {
+          subject: m.reset_password_subject(),
+          preheader: m.reset_password_preheader(),
+          heading: m.reset_password_heading(),
+          body: m.reset_password_body({ email: user.email }),
+          action: m.reset_password_action(),
+          reason: m.reset_password_reason(),
+        }),
+      );
     },
   },
   emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail({
-        to: user.email,
-        subject: m.verify_email_subject(),
-        body: m.verify_email_body(),
-        action: m.verify_email_action(),
-        url,
-      });
+      await sendEmail(
+        message(user.email, url, {
+          subject: m.verify_email_subject(),
+          preheader: m.verify_email_preheader(),
+          heading: m.verify_email_heading(),
+          body: m.verify_email_body({ email: user.email }),
+          action: m.verify_email_action(),
+          reason: m.verify_email_reason({ email: user.email }),
+        }),
+      );
     },
   },
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailConfirmation: async ({ newEmail, url }) => {
-        await sendEmail({
-          to: newEmail,
-          subject: m.change_email_subject(),
-          body: m.change_email_body(),
-          action: m.change_email_action(),
-          url,
-        });
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        await sendEmail(
+          message(user.email, url, {
+            subject: m.change_email_subject(),
+            preheader: m.change_email_preheader({ newEmail }),
+            heading: m.change_email_heading(),
+            body: m.change_email_body({ email: user.email, newEmail }),
+            action: m.change_email_action(),
+            reason: m.change_email_reason({ email: user.email }),
+          }),
+        );
       },
     },
   },

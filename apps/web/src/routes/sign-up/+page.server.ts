@@ -23,7 +23,7 @@ export const actions: Actions = {
     const password = String(form.get("password") ?? "");
     try {
       await auth.api.signUpEmail({
-        body: { name, email, password },
+        body: { name, email, password, callbackURL: target(url) },
         headers: request.headers,
       });
     } catch (error) {
