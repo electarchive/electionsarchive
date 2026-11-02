@@ -24,13 +24,14 @@ LEGISLATURE = re.compile(
     re.IGNORECASE,
 )
 STATEWIDE = re.compile(r"(?:State )?Comptroller|Attorney General", re.IGNORECASE)
+MONROE_DISTRICT = 25
 TOTALS = {"ballots cast", "over votes", "under votes", "total votes cast", "total ballots cast", "blank"}
 CODE = re.compile(r"^[A-Z]{3} (?=\S+ )")
 NASSAU_LINE = re.compile(r"^\s+(\S.*?)(?:\s*\.)(?:\s+\.)+\s+([\d,]+)\b")
 NASSAU_PRECINCTS = re.compile(r"WITH ([\d,]+) OF ([\d,]+) PRECINCTS")
 NASSAU_PARTY = re.compile(r"\*{4,} \((.+)\) \*{4,}")
 PDF_LINE = re.compile(
-    r"^(?:(?P<code>[A-Z]{3}) )?(?P<name>\S.*?)\s{2,}(?:(?P<party>[A-Za-z][A-Za-z ]*?)\s{2,})?(?P<votes>[\d,]+)$"
+    r"^(?:(?P<code>[A-Z]{3}) )?(?P<name>\S.*?)(?:\s{2,}(?P<party>[A-Za-z][A-Za-z ]*?)\s+|\s{2,})(?P<votes>[\d,]+)$"
 )
 
 
@@ -261,6 +262,8 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
         elif lowered.startswith("write-in"):
             candidates[(title, "Write-in")] = ["", count]
     for (title, candidate), (party, count) in candidates.items():
+        if title == "Representative in Congress":
+            title = f"{title} {MONROE_DISTRICT}"
         yield row("Monroe", title, candidate, party, count, as_of, seen)
 
 

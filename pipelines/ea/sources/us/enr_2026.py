@@ -1392,7 +1392,11 @@ def plan(
                 continue
             tokens = {*terms(name), *terms(name, joined=False)}
             hits = sorted(
-                ((len(tokens & set(words)), option) for option, words in named if words and words[-1] in tokens),
+                (
+                    (len(tokens & set(words)), option)
+                    for option, words in named
+                    if words and (words[-1] in tokens or "".join(words[-2:]) in tokens)
+                ),
                 key=lambda hit: -hit[0],
             )
             answer = person(name)
