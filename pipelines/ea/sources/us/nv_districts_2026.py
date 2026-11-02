@@ -203,4 +203,5 @@ def emit() -> Path:
         summary="Nevada water, fire protection, general improvement, hospital, and television district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's certified list",
         sources={URL: (PUBLISHER, TITLE), FILING_URL: (PUBLISHER, FILING_TITLE)},
         frame=frame,
+        retire_stale=True,
     )

@@ -200,4 +200,35 @@ def emit(
                     cs.add("entity_retirement", entity_id=option, reason=reason)
                 cs.add("entity_retirement", entity_id=contest, reason=reason)
             print(f"{len(stale)} stale contests retired")
+            elections = {str(row["id"]) for row in cs.rows.get("election", [])} | {
+                str(row["election_id"]) for row in cs.rows.get("contest", [])
+            }
+            kept_polities = {str(row["polity_id"]) for row in cs.rows.get("election", [])}
+            kept_polities.update(
+                str(polity)
+                for (polity,) in conn.execute(
+                    "select polity_id from election where id = any(%s::uuid[])", [list(elections)]
+                ).fetchall()
+            )
+            orphans = conn.execute(
+                """select distinct el.polity_id from election el
+                   where el.id in (select election_id from contest where id = any(%s::uuid[]))
+                   and not exists (
+                       select 1 from contest c2 join election e2 on e2.id = c2.election_id
+                       join entity en on en.id = c2.id and en.retired_by is null
+                       where e2.polity_id = el.polity_id and c2.id <> all(%s::uuid[]))""",
+                [[str(c) for (c,) in stale], [str(c) for (c,) in stale]],
+            ).fetchall()
+            dropped = 0
+            for (polity,) in orphans:
+                if str(polity) in kept_polities:
+                    continue
+                for (election,) in conn.execute("select id from election where polity_id = %s", [polity]).fetchall():
+                    cs.add("entity_retirement", entity_id=election, reason=reason)
+                for table in ("office", "reporting_unit"):
+                    for (held,) in conn.execute(f"select id from {table} where polity_id = %s", [polity]).fetchall():
+                        cs.add("entity_retirement", entity_id=held, reason=reason)
+                cs.add("entity_retirement", entity_id=polity, reason=reason)
+                dropped += 1
+            print(f"{dropped} stale districts retired")
         return cs.write()
