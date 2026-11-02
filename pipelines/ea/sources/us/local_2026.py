@@ -7260,6 +7260,10 @@ KY_CITY_SPELLINGS = {
     ("PIKE", "Coal Run"): "Coal Run Village",
     ("PULASKI", "Feruson"): "Ferguson",
     ("TODD", "Gurthrie"): "Guthrie",
+    ("TODD", "Cit"): "",
+    ("TODD", "Couoncil"): "",
+    ("TODD", "Mayro"): "",
+    ("OWSLEY", "Owsley"): "Booneville",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
 TACIT_FEEDS = {
