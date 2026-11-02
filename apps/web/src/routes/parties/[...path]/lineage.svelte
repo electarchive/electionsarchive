@@ -59,18 +59,48 @@
 
   const year = (value: string) =>
     Number(value.slice(0, 4)) + (Number(value.slice(5, 7) || "7") - 1) / 12;
-  const measure = $derived.by(() => {
-    const context =
-      chart == null ? null : document.createElement("canvas").getContext("2d");
-    const family = chart == null ? "" : getComputedStyle(chart).fontFamily;
-    return (text: string, size: number, weight: number) => {
+  const now = year(new Date().toISOString());
+  const after = (at: number) => Math.max(at, Math.min(at + 4, now));
+  const survives = (
+    events: Array<{ at: number | null; isInto: boolean }>,
+    isReceiving: (isInto: boolean) => boolean,
+  ) => {
+    let last: { at: number; isInto: boolean } | null = null;
+    for (const event of events) {
+      if (event.at != null && (last == null || event.at >= last.at)) {
+        last = { at: event.at, isInto: event.isInto };
+      }
+    }
+    return last != null && isReceiving(last.isInto)
+      ? after(last.at)
+      : -Infinity;
+  };
+  const family = $derived(
+    chart == null
+      ? ""
+      : (chart.ownerDocument.defaultView?.getComputedStyle(chart).fontFamily ??
+          ""),
+  );
+  const widths = new Map<string, number>();
+  let context: CanvasRenderingContext2D | null = null;
+  const measure = (text: string, size: number, weight: number) => {
+    if (family === "") {
+      return text.length * size * 0.56;
+    }
+    const font = `${weight} ${size}px ${family}`;
+    const key = `${font}|${text}`;
+    let found = widths.get(key);
+    if (found == null) {
+      context ??= document.createElement("canvas").getContext("2d");
       if (context == null) {
         return text.length * size * 0.56;
       }
-      context.font = `${weight} ${size}px ${family}`;
-      return context.measureText(text).width;
-    };
-  });
+      context.font = font;
+      found = context.measureText(text).width;
+      widths.set(key, found);
+    }
+    return found;
+  };
 
   const title = $derived(party.short ?? party.name);
   const names = $derived(party.names ?? []);
@@ -139,6 +169,19 @@
         to = Math.max(to, year(event.date));
       }
     }
+    if (
+      !(party.events ?? []).some(
+        (event) => event.date != null && year(event.date) >= to,
+      )
+    ) {
+      to = Math.max(
+        to,
+        survives(
+          others.flatMap((other) => other.events),
+          (isInto) => isInto,
+        ),
+      );
+    }
     if (isRenamed) {
       for (const entry of names) {
         for (const at of [entry.from, entry.to]) {
@@ -168,10 +211,12 @@
         other.span == null
           ? Math.min(...dates, other.isAbove ? anchor - 4 : anchor)
           : Math.min(year(other.span.from), ...dates);
-      const to =
+      const to = Math.max(
         other.span == null
-          ? Math.max(...dates, other.isAbove ? anchor : anchor + 4)
-          : Math.max(year(other.span.to), ...dates);
+          ? Math.max(...dates, other.isAbove ? anchor : after(anchor))
+          : Math.max(year(other.span.to), ...dates),
+        survives(other.events, (isInto) => !isInto),
+      );
       return { ...other, anchor, from, to };
     });
     const above = spans
@@ -453,8 +498,11 @@
                 if (isInto && to <= x + 1) {
                   to = Math.max(from, x - turn);
                 }
-                if (!isInto && from >= x - 1) {
-                  from = Math.min(to, x + turn);
+                if (!isInto) {
+                  to = Math.max(to, x + turn);
+                  if (from >= x - 1) {
+                    from = x + turn;
+                  }
                 }
               }
               return { from, to };
