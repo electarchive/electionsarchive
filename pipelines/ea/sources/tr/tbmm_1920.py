@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.tr.names import province_name
 from ea.sources.tr.tbmm import capitalize, fold, title
 from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
@@ -740,7 +741,8 @@ def emit() -> Path:
                     electoral_system_id=system_46 if term == 8 else system_23,
                     default_result_kind="counted",
                 )
-                name(contest, f"Grand National Assembly, {labels[key]}", "en")
+                place = province_name(PLATES[key], day) if key in PLATES else labels[key]
+                name(contest, f"Grand National Assembly, {place}", "en")
                 cs.add("slug", path=f"{path}/parliament/{slug(labels[key])}", entity_id=contest)
                 result = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
@@ -938,7 +940,9 @@ def emit() -> Path:
                     valid_to=group_end,
                 )
             parties_here = {
-                token.replace("(Müstakil)", "").strip() for token in re.split(r"\s*[/–-]\s*", row["party"]) if token.strip()
+                token.replace("(Müstakil)", "").strip()
+                for token in re.split(r"\s*[/–-]\s*", row["party"])
+                if token.strip()
             }
             if len(parties_here) == 1 and term >= 7 and next(iter(parties_here)) in ("CHP", "DP"):
                 cs.add(

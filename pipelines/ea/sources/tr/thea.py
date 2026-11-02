@@ -7,6 +7,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources import thea
+from ea.sources.tr.names import province_name
 from ea.sources.tr.ysk import FORMER, INDEPENDENTS, PROVINCES, REGISTERED, RENAMED, VALID, VOTERS, VOTES
 from ea.store import connect
 
@@ -55,14 +56,12 @@ FIXED = {(1987, 11, 37): 0.0, (1987, 11, 43): 1.0, (1987, 24, 43): 1.0}
 SIZE_RAISED = date(1995, 7, 1)
 COUP_1960 = date(1960, 5, 27)
 COUP_1980 = date(1980, 9, 12)
-MARAS_RENAMED = date(1973, 2, 7)
 PLATES = {slug(name): plate for plate, name in enumerate(PROVINCES, 1)} | {
     "afyon": 3,
     "k-maras": 46,
     "icel": 33,
     "mersin-icel": 33,
 }
-FORMER_NAMES = {3: "Afyon", 33: "İçel", 63: "Urfa"}
 CKMP_RENAMED = date(1969, 2, 8)
 BP_RENAMED = date(1971, 11, 27)
 MGP_RENAMED = date(1971, 1, 29)
@@ -701,9 +700,7 @@ def emit() -> Path:
 
             for plate in sorted(set(held["plate"])):
                 province = held.filter(pl.col("plate") == plate)
-                place = (
-                    "Maraş" if plate == 46 and day < MARAS_RENAMED else FORMER_NAMES.get(plate, PROVINCES[plate - 1])
-                )
+                place = province_name(plate, day)
                 contest_key = f"{day}:parliament:{plate:02}"
                 contest = cs.key("tr.contest", contest_key)
                 cs.add(

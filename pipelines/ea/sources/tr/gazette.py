@@ -11,7 +11,8 @@ import polars as pl
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
-from ea.sources.tr.thea import FORMER_NAMES, MARAS_RENAMED, PARTIES, REMAINDER_METHODOLOGY
+from ea.sources.tr.names import province_name
+from ea.sources.tr.thea import PARTIES, REMAINDER_METHODOLOGY
 from ea.sources.tr.ysk import (
     ANSWERS_2017,
     DERIVED,
@@ -20,7 +21,6 @@ from ea.sources.tr.ysk import (
     INVALID,
     LICENSE,
     MONTHS_TR,
-    PROVINCES,
     PUBLISHER,
     REGISTERED,
     VALID,
@@ -2165,11 +2165,7 @@ def emit() -> Path:
             for unit in counted["unit"].unique(maintain_order=True):
                 by = unit.startswith("by")
                 plate, _, part = unit.removeprefix("by").partition("-")
-                place = (
-                    "Maraş"
-                    if plate == "46" and day < MARAS_RENAMED
-                    else FORMER_NAMES.get(int(plate), PROVINCES[int(plate) - 1])
-                )
+                place = province_name(int(plate), day)
                 label = f"{place} {'I' * int(part)}" if part else place
                 if part:
                     district = cs.unit("tr.senato_cevresi", f"{day.year}:{unit}")
