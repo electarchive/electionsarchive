@@ -143,7 +143,7 @@ class Stage:
         return sql.SQL(
             """c.id = {owner} and c.pipeline = {pipeline}
                and p.{parent} in (select {parent} from {staged}{cleared})
-               and not exists (select from {staged} x where {same})"""
+               and not exists (select from {staged} x where x.{parent} = p.{parent} and {same})"""
         ).format(
             cleared=sql.SQL(
                 """ union all select r.id from public.result_set r join public.changeset w on w.id = r.changeset_id
