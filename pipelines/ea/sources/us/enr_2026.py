@@ -1,6 +1,7 @@
 import csv
 import html
 import io
+import itertools
 import json
 import os
 import re
@@ -1350,7 +1351,8 @@ def plan(
                 ):
                     overlap = 0.6
                 if overlap >= 0.6:
-                    tokens = titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:])
+                    parts = re.split(r"[:-]", key)[2:]
+                    tokens = titles.get(contest, set()) | set(parts) | {a + b for a, b in itertools.pairwise(parts)}
                     found = words & tokens
                     if not found - GENERIC:
                         found |= {w for w in words if stem(w) in {stem(t) for t in tokens}}
