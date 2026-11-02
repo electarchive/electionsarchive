@@ -4694,6 +4694,25 @@ async function tabulate(
       ? []
       : [row.owner],
   );
+  const bareKs = [
+    ...new Set(
+      rows.flatMap((row, index) =>
+        row.owner == null && row.k > 0 && now[tier[index] ?? 0]?.has(row.k) !== true
+          ? [row.k]
+          : [],
+      ),
+    ),
+  ];
+  const bare = new Map(
+    bareKs.length === 0
+      ? []
+      : rowsOf(
+          await db.execute<{ id: string; k: number }>(sql`
+            select c.id, a.k from contest c join area a on a.id = c.district_area_id
+            where c.allocation_parent_id = any(${sql.param(roots)}::uuid[]) and a.k = any(${sql.param(bareKs)}::int[])
+          `),
+        ).map((row) => [row.k, row.id] as const),
+  );
   const root = ancestry(lineage, "party");
   const declared = await db.execute<{
     contest: string;
@@ -4705,8 +4724,8 @@ async function tabulate(
     color: string | null;
   }>(sql`
     select c.id as contest, rs.id is not null as "isRecorded", rs.kind is not distinct from 'tacit' as "isTacit",
-      w.kind, w.party, w.person,
-      (select pc.color from party_color pc where pc.party_id = w.party
+      w.kind, coalesce(w.party, h.party) as party, w.person,
+      (select pc.color from party_color pc where pc.party_id = coalesce(w.party, h.party)
         order by pc.valid @> e.date_from desc, upper(pc.valid) desc nulls first limit 1) as color
     from contest c
     join election e on e.id = c.election_id
@@ -4724,7 +4743,15 @@ async function tabulate(
       where x.result_set_id = rs.id and x.kind in ('elected', 'won')
       order by x.seats desc nulls last, o.k limit 1
     ) w on true
-    where c.id = any(${sql.param(silent)}::uuid[])
+    left join lateral (
+      select coalesce(pm.into_id, ta.party_id) as party
+      from tenure t
+      join tenure_affiliation ta on ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
+      left join entity_merge pm on pm.entity_id = ta.party_id
+      where t.contest_id = c.id and w.party is null and w.person is null
+      group by 1 order by count(*) desc, 1 limit 1
+    ) h on true
+    where c.id = any(${sql.param([...silent, ...bare.values()])}::uuid[])
   `);
   const winners = await names(
     declared.rows.flatMap((row) =>
@@ -4732,8 +4759,27 @@ async function tabulate(
     ),
     date,
   );
+  const isSeatsOnly = legend.size === 0;
   const unopposed = new Map(
     declared.rows.map((row) => {
+      const seated =
+        row.party != null && isSeatsOnly ? `party:${root(row.party)}` : null;
+      if (seated != null && !legend.has(seated)) {
+        legend.set(seated, {
+          key: seated,
+          label:
+            winners.full.get(row.party ?? "") ??
+            winners.short.get(row.party ?? "") ??
+            "",
+          short: winners.short.get(row.party ?? "") ?? null,
+          color: row.color,
+          person: null,
+          party: row.party,
+          votes: 0,
+          lead: true,
+          people: new Set<string>(),
+        });
+      }
       const key = [
         row.party == null ? null : `party:${root(row.party)}`,
         row.person == null ? null : `person:${row.person}`,
@@ -4966,6 +5012,7 @@ async function tabulate(
               )
             : [];
         const chain = row.isContest ? runoffs.get(row.owner ?? "") : undefined;
+        const at = row.owner ?? bare.get(row.k) ?? "";
         return {
           k: row.k,
           name: row.name,
@@ -4998,12 +5045,10 @@ async function tabulate(
           tags: tags.some((tag) => tag != null) ? tags : undefined,
           absent: absent.length > 0 ? absent : undefined,
           leader:
-            position.get(
-              leader?.key ?? unopposed.get(row.owner ?? "")?.key ?? "",
-            ) ?? null,
+            position.get(leader?.key ?? unopposed.get(at)?.key ?? "") ?? null,
           held: holdings(seats, position),
-          declared: unopposed.get(row.owner ?? "")?.declared ?? null,
-          isRecorded: unopposed.get(row.owner ?? "")?.isRecorded ?? true,
+          declared: unopposed.get(at)?.declared ?? null,
+          isRecorded: unopposed.get(at)?.isRecorded ?? true,
           margin:
             leader?.current == null || transferred.has(row.owner ?? "")
               ? null
