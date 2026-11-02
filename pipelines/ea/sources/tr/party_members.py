@@ -9,7 +9,10 @@ from ea.store import connect
 SOURCE = "tr.party_members"
 VERSION = "1"
 ROWS = Path(__file__).with_name("party_members.tsv")
-MERGES = [(("tr.ysk_local.person", "2014-03-30:istanbul-beylikduzu-mayor"), ("wikidata", "Q59313241"))]
+MERGES = [
+    (("tr.ysk_local.person", "2014-03-30:istanbul-beylikduzu-mayor"), ("wikidata", "Q59313241")),
+    (("tr.ysk.person", "1995-12-24:77:cumhuriyet-halk-partisi:2"), ("wikidata", "Q6080205")),
+]
 
 
 def _rows() -> list[dict[str, str]]:
@@ -41,7 +44,7 @@ def emit() -> Path:
             f"{scheme}:{value}": person
             for scheme, value, person in conn.execute(
                 """select x.scheme, x.value, x.entity_id from external_id x join person p on p.id = x.entity_id
-                   where x.scheme in ('wikidata', 'tr.ysk_local.person', 'tr.person')"""
+                   where x.scheme in ('wikidata', 'tr.ysk_local.person', 'tr.ysk.person', 'tr.person')"""
             ).fetchall()
         }
         people |= {
