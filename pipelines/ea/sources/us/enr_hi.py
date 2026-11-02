@@ -23,7 +23,7 @@ PARTIES = {
     "SL": "Socialism and Liberation",
 }
 STATE = re.compile(
-    r"U\.S\. Senator|Governor|Lieutenant Governor|At-Large Trustee|(?:Molokai|Kauai|Maui|Hawaii|Oahu) Resident Trustee|Question #\d+"
+    r"U\.S\. Senator|Governor(?: and Lieutenant Governor)?|Lieutenant Governor|At-Large Trustee|(?:Molokai|Kauai|Maui|Hawaii|Oahu) Resident Trustee|Question #\d+"
 )
 HOUSE = re.compile(r"U\.S\. Representative, Dist (I+)")
 SEAT = re.compile(r"State (Representative|Senator), Dist (\d+)")
@@ -87,7 +87,7 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             done[key].add(row[0])
     for key, votes in totals.items():
         place, _, title, party, name = key
-        name = " ".join(name.replace("\n", " ").split())
+        name = " ".join(re.split(r"\s+For GOVERNOR", name)[0].split())
         prefix = re.match(r"\((\w+)\) ", name)
         name = name[prefix.end() :] if prefix else name
         last, _, first = name.partition(", ")
@@ -100,7 +100,7 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             ("senate", "")
             if title == "U.S. Senator"
             else ("governor", "")
-            if title == "Governor"
+            if title in ("Governor", "Governor and Lieutenant Governor")
             else ("house", str(len(house[1])))
             if house
             else (("senate" if seat[1] == "Senator" else "house"), f"{int(seat[2])}:g")
