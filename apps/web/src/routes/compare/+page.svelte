@@ -4,43 +4,35 @@
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
-  import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
-  import * as Command from "#lib/components/ui/command/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
+  import { idle } from "#lib/idle.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import Parties from "./parties.svelte";
-  import People from "./people.svelte";
-  import Places from "./places.svelte";
+  import type SearchPanel from "./search.svelte";
 
   const { data }: { data: PageData } = $props();
 
-  const values = $state(["", ""]);
-  const terms = $state(["", ""]);
   const opened = $state([false, false]);
+  let Search = $state<typeof SearchPanel | null>(null);
 
-  $effect(() => {
-    const next = values.map((value) => value.trim());
-    const timer = setTimeout(() => {
-      terms[0] = next[0] ?? "";
-      terms[1] = next[1] ?? "";
-    }, 140);
-    return () => clearTimeout(timer);
-  });
+  function load() {
+    void import("./search.svelte").then((module) => {
+      Search = module.default;
+    });
+  }
 
-  const finds = [0, 1].map((index) =>
-    createQuery(() => ({
-      ...orpc.search.query.queryOptions({
-        input: { q: terms[index] ?? "", limit: 30 },
-      }),
-      enabled: opened[index] === true && terms[index] !== "",
-      placeholderData: keepPreviousData,
-      meta: { quiet: true },
-    })),
-  );
+  $effect(() => idle(load));
+
+  const preload = async (type: string | undefined) =>
+    type === "person"
+      ? import("./people.svelte")
+      : type === "polity"
+        ? import("./places.svelte")
+        : type === "party"
+          ? import("./parties.svelte")
+          : null;
 
   const sides = $derived(data.sides);
   const isMismatch = $derived(
@@ -56,7 +48,6 @@
       )
       .join("&");
     opened[index] = false;
-    values[index] = "";
     void goto(resolve(`/compare?${text}`));
   };
 </script>
@@ -75,17 +66,14 @@
   {const other = $derived(sides[1 - index] ?? null)}
   {const side = $derived(sides[index] ?? null)}
   {const kind = $derived(other?.type ?? side?.type ?? null)}
-  {const hits = $derived(
-    (values[index]?.trim() === "" ? [] : (finds[index]?.data ?? [])).filter(
-      (hit) =>
-        (kind == null
-          ? hit.type === "person" ||
-            hit.type === "polity" ||
-            hit.type === "party"
-          : hit.type === kind) && hit.id !== other?.id,
-    ),
-  )}
-  <Popover.Root bind:open={opened[index]}>
+  <Popover.Root
+    bind:open={opened[index]}
+    onOpenChange={(isOpen: boolean) => {
+      if (isOpen) {
+        load();
+      }
+    }}
+  >
     <Popover.Trigger>
       {#snippet child({ props })}
         <button
@@ -127,39 +115,13 @@
       class="p-0 inline-(--bits-popover-anchor-width) min-inline-72"
       align="start"
     >
-      <Command.Root shouldFilter={false}>
-        <Command.Input
-          placeholder={kind === "person"
-            ? m.versus_search_person()
-            : kind === "polity"
-              ? m.versus_search_place()
-              : kind === "party"
-                ? m.versus_search_party()
-                : m.versus_search()}
-          bind:value={values[index]}
+      {#if Search != null}
+        <Search
+          {kind}
+          other={other?.id ?? null}
+          onpick={(id: string) => pick(index, id)}
         />
-        <Command.List class="max-block-80">
-          {#if values[index]?.trim() !== "" && hits.length === 0 && !finds[index]?.isFetching}
-            <p class="p-3 text-sm text-muted-foreground">
-              {m.versus_empty()}
-            </p>
-          {/if}
-          {#each hits as hit (hit.id)}
-            <Command.Item
-              value={hit.id}
-              class="grid gap-0 py-1"
-              onSelect={() => pick(index, hit.id)}
-            >
-              <span class="truncate font-semibold">{hit.name}</span>
-              {#if hit.context != null}
-                <span class="truncate text-xs text-muted-foreground"
-                  >{hit.context}</span
-                >
-              {/if}
-            </Command.Item>
-          {/each}
-        </Command.List>
-      </Command.Root>
+      {/if}
     </Popover.Content>
   </Popover.Root>
 {/snippet}
@@ -289,7 +251,7 @@
         {m.versus_mismatch()}
       </p>
     {:else if sides.length === 2}
-      {#await data.body}
+      {#await Promise.all([data.body, preload(sides[0]?.type)])}
         <div
           class="col-span-12 grid gap-px"
           role="status"
@@ -299,18 +261,24 @@
           <div class="bg-card block-56 motion-safe:animate-pulse"></div>
           <div class="bg-card block-80 motion-safe:animate-pulse"></div>
         </div>
-      {:then body}
+      {:then [body]}
         {#if body.people != null}
-          <People people={body.people} />
+          {#await import("./people.svelte") then view}
+            <view.default people={body.people} />
+          {/await}
         {:else if body.places != null}
-          <Places data={body.places} />
+          {#await import("./places.svelte") then view}
+            <view.default data={body.places} />
+          {/await}
           {#await import("./system.svelte") then system}
             <system.default
               sides={sides.map(({ id, name }) => ({ id, name }))}
             />
           {/await}
         {:else if body.parties != null}
-          <Parties data={body.parties} first={sides[0]} />
+          {#await import("./parties.svelte") then view}
+            <view.default data={body.parties} first={sides[0]} />
+          {/await}
         {/if}
       {/await}
     {/if}

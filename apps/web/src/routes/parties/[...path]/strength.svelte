@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-  import { createQuery } from "@tanstack/svelte-query";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -27,15 +27,42 @@
     });
   });
 
+  const queryClient = useQueryClient();
   const chosen = $derived(elections[index] ?? elections[0]);
-  const hub = createQuery(() =>
-    orpc.elections.get.queryOptions({
-      input: { id: chosen?.id ?? "" },
-      enabled: chosen != null,
-    }),
-  );
+  let loaded = $state<{
+    id: string;
+    data: Awaited<ReturnType<typeof orpc.elections.get.call>> | null;
+  } | null>(null);
+
+  $effect(() => {
+    const id = chosen?.id;
+    if (id == null) {
+      return;
+    }
+    let isCurrent = true;
+    queryClient
+      .fetchQuery(orpc.elections.get.queryOptions({ input: { id } }))
+      .then(
+        (data) => {
+          if (isCurrent) {
+            loaded = { id, data };
+          }
+        },
+        () => {
+          if (isCurrent) {
+            loaded = { id, data: null };
+          }
+        },
+      );
+    return () => {
+      isCurrent = false;
+    };
+  });
+
+  const isPending = $derived(loaded?.id !== chosen?.id);
+  const hub = $derived(isPending ? null : (loaded?.data ?? null));
   const found = $derived.by(() => {
-    for (const race of hub.data?.races ?? []) {
+    for (const race of hub?.races ?? []) {
       const shade =
         race.places?.legend.findIndex(
           (item) => item.party === party || item.key === `party:${party}`,
@@ -70,7 +97,7 @@
   <section
     class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3.5 min-inline-0"
     aria-labelledby="strength-title"
-    aria-busy={hub.isPending}
+    aria-busy={isPending}
   >
     <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
       <div class="grid gap-0.5 min-inline-0">
@@ -80,13 +107,13 @@
         <p
           class="block-lh-2 text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
         >
-          {#if found != null && hub.data != null}
+          {#if found != null && hub != null}
             {m.party_strength_lede({
               noun,
               race: found.race.name,
-              election: hub.data.name,
+              election: hub.name,
             })}
-          {:else if !hub.isPending}
+          {:else if !isPending}
             {m.party_strength_missing()}
           {/if}
         </p>
@@ -148,7 +175,7 @@
           {m.map_rebuilding()}
         </p>
       {/if}
-    {:else if hub.isPending}
+    {:else if isPending}
       <div
         class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
       ></div>
