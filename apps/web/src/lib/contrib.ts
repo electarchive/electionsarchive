@@ -773,6 +773,7 @@ export type FeedEntry = {
   title: string | null;
   tier: number | null;
   state: ProposalState | null;
+  bounty: number | null;
   thread: string | null;
   comment: string | null;
   entity: { name: string; public_id: string } | null;
@@ -802,11 +803,25 @@ const topicEvents: Record<
   topic_resolved: m.feed_topic_resolved,
 };
 
+const bountyEvents: Record<string, (inputs: { bounty: string }) => string> = {
+  bounty_claimed: m.feed_bounty_claimed,
+  bounty_fulfilled: m.feed_bounty_fulfilled,
+  bounty_closed: m.feed_bounty_closed,
+};
+
 export function describe(entry: FeedEntry) {
   if (entry.kind === "imported") {
     return {
       text: entry.title ?? "",
       href: entry.polity_path == null ? null : `/${entry.polity_path}`,
+    };
+  }
+  if (entry.bounty != null) {
+    const event = bountyEvents[entry.kind];
+    const bounty = entry.title ?? `#${entry.bounty}`;
+    return {
+      text: event == null ? bounty : event({ bounty }),
+      href: `/bounties/${entry.bounty}`,
     };
   }
   const anchor = entry.comment == null ? "" : `#comment-${entry.comment}`;

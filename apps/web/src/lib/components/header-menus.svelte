@@ -7,6 +7,7 @@
   import { page } from "$app/state";
   import {
     AtSignIcon,
+    BellIcon,
     ChevronRightIcon,
     EyeIcon,
     KeyRoundIcon,
@@ -132,6 +133,14 @@
         {#if !READ_ONLY}
           <DropdownMenu.Item>
             {#snippet child({ props })}
+              <a {...props} href={resolve("/settings/notifications")}>
+                <BellIcon class="text-muted-foreground" />
+                {m.notify_settings_title()}
+              </a>
+            {/snippet}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item>
+            {#snippet child({ props })}
               <a {...props} href={resolve("/watchlist")}>
                 <EyeIcon class="text-muted-foreground" />
                 {m.watchlist_title()}
@@ -246,6 +255,10 @@
               {m.profile_nav()}
             </Button>
             {#if !READ_ONLY}
+              <Button href={resolve("/settings/notifications")} size="sm">
+                <BellIcon />
+                {m.notify_settings_nav()}
+              </Button>
               <Button href={resolve("/watchlist")} size="sm">
                 <EyeIcon />
                 {m.watchlist_title()}

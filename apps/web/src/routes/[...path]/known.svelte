@@ -131,6 +131,17 @@
                     >
                   </p>
                   <p class="max-inline-[75ch]">{entry.note}</p>
+                  {#if entry.bounty != null}
+                    <p class="text-xs">
+                      <a
+                        href={resolve("/bounties/[number]", {
+                          number: String(entry.bounty),
+                        })}
+                        class="underline underline-offset-2 hover:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring"
+                        >{m.polity_known_bounty({ number: entry.bounty })}</a
+                      >
+                    </p>
+                  {/if}
                   {#if entry.category !== "not_applicable" && entry.count > 0}
                     <p class="text-xs tabular-nums">
                       {m.polity_known_races({ count: count(entry.count) })}

@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import os
 import time
 from collections import defaultdict
@@ -669,6 +670,11 @@ def registry() -> list[dict]:
     return rows
 
 
+def gap_key(row: dict) -> str:
+    parts = [row[field] for field in ("polity", "state", "level", "stage", "years", "grain", "label")]
+    return hashlib.sha256("\t".join([*parts, " ".join(sorted(row["ids"]))]).encode()).hexdigest()[:32]
+
+
 def gap(
     rows: list[dict],
     grains: tuple[str, ...],
@@ -716,6 +722,7 @@ def note(row: dict, hits: set[tuple[str, str]], count: int) -> dict:
         "sources": row["sources"],
         "checked": row["checked"] or None,
         "ref": row["ref"] or None,
+        "gap": gap_key(row),
         "count": count,
         "contests": sorted({contest for contest, _ in hits}),
         "elections": sorted({election for _, election in hits}),

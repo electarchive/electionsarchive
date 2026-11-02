@@ -10,7 +10,7 @@
     id,
     watching,
   }: {
-    kind: "entity" | "polity" | "proposal" | "user";
+    kind: "entity" | "polity" | "proposal" | "user" | "bounty";
     id: string;
     watching: boolean;
   } = $props();

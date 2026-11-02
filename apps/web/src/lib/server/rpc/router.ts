@@ -12,6 +12,7 @@ import {
   polities,
   search,
 } from "#lib/server/rpc/archive.js";
+import { bounties, claims } from "#lib/server/rpc/bounties.js";
 import { contributors } from "#lib/server/rpc/contributors.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
 import { admin } from "#lib/server/rpc/desk.js";
@@ -31,6 +32,7 @@ export const READ_ONLY_MESSAGE =
 export const contributions = {
   admin,
   agents,
+  claims,
   contributors,
   proposals,
   talk,
@@ -40,6 +42,7 @@ export const contributions = {
 
 export const reads = {
   bodies,
+  bounties,
   contests,
   coverage,
   elections,
@@ -71,6 +74,7 @@ export const served = READ_ONLY
       ...reads,
       admin: closed.router(admin),
       agents: closed.router(agents),
+      claims: closed.router(claims),
       contributors: closed.router(contributors),
       proposals: closed.router(proposals),
       talk: closed.router(talk),

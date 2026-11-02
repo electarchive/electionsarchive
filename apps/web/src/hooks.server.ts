@@ -1,5 +1,5 @@
 import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
-import { building } from "$app/env";
+import { building, dev } from "$app/env";
 import { READ_ONLY } from "$app/env/public";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
@@ -12,13 +12,44 @@ import { twin } from "#lib/server/twin.js";
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
 
 const WRITABLE =
-  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile)(?:\/|$)/u;
+  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile|unsubscribe)(?:\/|$)/u;
+
+const FORM_TYPES = new Set([
+  "application/x-www-form-urlencoded",
+  "multipart/form-data",
+  "text/plain",
+  "application/x-sveltekit-formdata",
+]);
+
+const ONE_CLICK = /^\/unsubscribe\/[0-9a-f]{64}$/u;
 
 const PRELOADED =
   /\/sofia-sans-semi-condensed-latin-wght-normal\.[\w-]+\.woff2$/u;
 
 const SHUT =
   /^\/api\/auth\/(?:api-key|admin|update-user|change-email|delete-user)(?:\/|$)/u;
+
+const csrfHandle: Handle = async ({ event, resolve }) => {
+  const { request, url } = event;
+  const type = request.headers
+    .get("content-type")
+    ?.split(";", 1)[0]
+    ?.trim()
+    .toLowerCase();
+  if (
+    !dev &&
+    !SAFE.has(request.method) &&
+    (type == null || FORM_TYPES.has(type)) &&
+    request.headers.get("origin") !== url.origin &&
+    !(request.method === "POST" && ONE_CLICK.test(url.pathname))
+  ) {
+    return new Response(
+      `Cross-site ${request.method} form submissions are forbidden`,
+      { status: 403 },
+    );
+  }
+  return resolve(event);
+};
 
 const readOnlyHandle: Handle = async ({ event, resolve }) => {
   const { pathname } = event.url;
@@ -76,6 +107,7 @@ export const init: ServerInit = () => {
 };
 
 export const handle: Handle = sequence(
+  csrfHandle,
   edgeHandle,
   readOnlyHandle,
   paraglideHandle,

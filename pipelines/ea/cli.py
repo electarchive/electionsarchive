@@ -92,6 +92,7 @@ def main() -> None:
         help="build the US House, UK, French, and Turkish cartogram and tile layouts, then the other hex tile maps",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser("bounties", help="sync the bounties from the known coverage gaps")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
     commands.add_parser("records", help="rebuild the precomputed election records of the largest polities")
@@ -247,6 +248,10 @@ def main() -> None:
             print(hexes.build_tiles())
         case "search":
             print(search.build())
+        case "bounties":
+            from ea import bounties
+
+            print(bounties.sync())
         case "parties":
             subprocess.run(
                 ["node", "scripts/party-pages.js"], cwd=Path(__file__).resolve().parents[2] / "apps" / "web", check=True

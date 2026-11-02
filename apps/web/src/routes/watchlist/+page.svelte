@@ -12,11 +12,15 @@
     polity: m.watchlist_kind_polity,
     proposal: m.watchlist_kind_proposal,
     user: m.watchlist_kind_user,
+    bounty: m.watchlist_kind_bounty,
   };
 
   const hrefOf = (target: (typeof data.targets)[number]) => {
     if (target.kind === "proposal") {
       return target.number == null ? null : `/proposals/${target.number}`;
+    }
+    if (target.kind === "bounty") {
+      return target.number == null ? null : `/bounties/${target.number}`;
     }
     if (target.kind === "user") {
       return target.handle == null ? null : `/contributors/${target.handle}`;

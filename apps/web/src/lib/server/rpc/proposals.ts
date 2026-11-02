@@ -349,10 +349,10 @@ export const proposals = {
         method: "POST",
         path: "/proposals",
         summary:
-          "Draft a proposal from ops and evidence and check it: waits up to 60 s for the compile and checks, then returns the proposal with the check job's tier, findings, diff, or error",
+          "Draft a proposal from ops and evidence and check it: waits up to 60 s for the compile and checks, then returns the proposal with the check job's tier, findings, diff, or error; pass bounty with an open bounty's number to credit the fill when the proposal is published",
       }),
     )
-    .input(v.object({ ...Payload, ...Agent }))
+    .input(v.object({ ...Payload, ...Agent, bounty: v.optional(Number_) }))
     .handler(async ({ input, context: { owner } }) =>
       run(async () => {
         const agentName = input.agent_name ?? owner.agentName;
@@ -365,9 +365,10 @@ export const proposals = {
         }
         const payload = payloadOf(input);
         const { rows } = await db.execute<{ id: string; number: number }>(sql`
-          insert into proposal (author_user_id, agent_key_id, agent_name, agent_model, title, polity_id, draft)
+          insert into proposal (author_user_id, agent_key_id, agent_name, agent_model, title, polity_id, draft, bounty_id)
           select ${owner.userId}, ${owner.keyId}, ${agentName}, ${agentModel}, ${input.summary},
-                 ${input.polity ?? null}::uuid, ${JSON.stringify(payload)}::jsonb
+                 ${input.polity ?? null}::uuid, ${JSON.stringify(payload)}::jsonb,
+                 (select id from bounty where number = ${input.bounty ?? null}::int and status = 'open')
           where ${input.polity ?? null}::uuid is null or exists (select from polity where id = ${input.polity ?? null}::uuid)
           returning id, number
         `);

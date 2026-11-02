@@ -660,7 +660,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/known",
         summary:
-          "One country's known gaps (polity, or id for the country's own polity), or those touching one contest or election (id): what the archive cannot fill yet and why, each with its category (known_gap: every source tried is exhausted; blocked: a source exists but cannot be reached yet; not_applicable: the grain does not exist), the period, office level, state, and grain it covers, the reason, the date checked, how many races it touches, and the affected elections",
+          "One country's known gaps (polity, or id for the country's own polity), or those touching one contest or election (id): what the archive cannot fill yet and why, each with its category (known_gap: every source tried is exhausted; blocked: a source exists but cannot be reached yet; not_applicable: the grain does not exist), the period, office level, state, and grain it covers, the reason, the date checked, how many races it touches, the affected elections, and the number of the open bounty for it, if any",
       }),
     )
     .input(
@@ -684,6 +684,7 @@ export const coverage = {
           note: v.string(),
           checked: v.nullable(v.string()),
           count: v.number(),
+          bounty: v.nullable(v.number()),
           elections: v.array(
             v.object({
               path: v.string(),
@@ -714,6 +715,7 @@ export const coverage = {
         note: string;
         checked: string | null;
         count: number;
+        bounty: number | null;
         elections: Array<{
           path: string;
           date: string | null;
@@ -725,6 +727,7 @@ export const coverage = {
           (n ->> 'from')::int as "from", (n ->> 'to')::int as "to", n ->> 'label' as label, n ->> 'category' as category,
           n ->> 'note' as note, n ->> 'checked' as checked,
           coalesce((n ->> 'count')::int, 0) as count,
+          (select b.number from bounty b where b.gap_key = n ->> 'gap' and b.status = 'open') as bounty,
           coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'date', x.date, 'place', x.place) order by x.date, x.path)
             from (select s.path, e.date_from::text as date,
                 (select pn.text from name pn where pn.entity_id = e.polity_id and pn.is_preferred limit 1) as place

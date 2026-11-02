@@ -480,7 +480,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
 export async function twin({ request, url }: RequestEvent) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
-    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents|proposals|recent|watchlist|history)(?:\/|\.|$)/.test(
+    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history)(?:\/|\.|$)/.test(
       url.pathname,
     )
   ) {
@@ -1086,6 +1086,12 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
                   )
                   .map((part) => `, ${part}`)
                   .join("")}): ${entry.note}`,
+                entry.bounty == null
+                  ? ""
+                  : link(
+                      m.polity_known_bounty({ number: entry.bounty }),
+                      `bounties/${entry.bounty}`,
+                    ),
                 entry.category === "not_applicable" || entry.count === 0
                   ? ""
                   : m.polity_known_races({ count: count(entry.count) }),

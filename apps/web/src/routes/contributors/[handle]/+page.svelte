@@ -153,6 +153,39 @@
     {/if}
   </section>
 
+  {#if data.bounties.length > 0}
+    <section class="mbs-10" aria-labelledby="contributor-bounties">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 id="contributor-bounties" class="heading">
+          {m.contributor_bounties()}
+        </h2>
+        <span class="font-figures text-xs text-muted-foreground"
+          >{count(data.bounties.length)}</span
+        >
+      </div>
+      <ul class="mbs-2 grid border-bs">
+        {#each data.bounties as item (item.number)}
+          <li
+            class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3 border-be py-2.5 text-sm"
+          >
+            <span class="font-figures text-muted-foreground"
+              >#{item.number}</span
+            >
+            <a
+              class="truncate underline-offset-4 hover:underline"
+              href="/bounties/{item.number}">{item.label}</a
+            >
+            <a
+              class="font-figures text-xs text-muted-foreground underline-offset-4 hover:underline"
+              href="/proposals/{item.proposal}"
+              >{m.contributor_bounty_proposal({ number: item.proposal })}</a
+            >
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
   {#if data.agents.length > 0}
     <section class="mbs-10" aria-labelledby="contributor-agents">
       <h2 id="contributor-agents" class="heading">

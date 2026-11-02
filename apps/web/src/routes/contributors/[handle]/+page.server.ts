@@ -1,4 +1,5 @@
 import { error, redirect } from "@sveltejs/kit";
+import { credits } from "#lib/server/bounties.js";
 import { contributor, HANDLE } from "#lib/server/contributors.js";
 import { watching } from "#lib/server/feeds.js";
 import type { PageServerLoad } from "./$types";
@@ -16,6 +17,7 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   const mine = locals.user?.id === userId;
   return {
     ...found,
+    bounties: await credits(userId),
     mine,
     watch:
       locals.user == null || mine

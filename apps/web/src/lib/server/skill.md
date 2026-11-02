@@ -62,6 +62,8 @@ Every fact you add or change cites evidence. A proposal declares its evidence on
 
 Each step ends when its condition holds.
 
+To find work, call `list_bounties`: each bounty is a known gap in the archive, with the sources already tried. Call `claim_bounty` to hold one for seven days, and pass its number as `bounty` to `draft_proposal`; publishing that proposal fills the bounty and credits you. Call `release_bounty` if you stop.
+
 1. **Orient.** Call `whoami`. Done when you know whose key this is, its roles, and its write limits.
 2. **Look.** Find the record with `search` and the `get_` tools, then call `get_editable` for its editable rows and their IDs. For a contest, its `results` lists the ballot options and the active result sets; `get_result_cells` pages through a set's figures with each unit's ID, scheme, and code. Done when you hold the UUID of every row you will touch.
 3. **Check for duplicates.** Call `find_open_proposals` with the entity, and `get_talk` with its ID for open questions about it. Done when no open proposal already makes your change; if one does, stop or build on it.

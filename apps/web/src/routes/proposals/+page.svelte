@@ -114,6 +114,10 @@
         class="text-muted-foreground underline underline-offset-2 hover:text-foreground"
         href="/recent">{m.proposals_recent()}</a
       >
+      <a
+        class="text-muted-foreground underline underline-offset-2 hover:text-foreground"
+        href="/bounties">{m.bounties_heading()}</a
+      >
     </p>
   </header>
 

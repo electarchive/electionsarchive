@@ -5201,5 +5201,203 @@
   "history_revert_queued": "Revert queued. The proposal page shows its progress.",
   "history_feed_title": "Changes to {name}",
   "history_fields": "Fields",
-  "history_table_entity": "Record"
+  "history_table_entity": "Record",
+  "notifications_title": "Notifications",
+  "notifications_lede": "Replies, mentions, and reviews of your proposals, plus activity on what you watch. Opening this page marks what it shows as read.",
+  "notifications_show": "Show",
+  "notifications_show_all": "All",
+  "notifications_show_direct": "For you",
+  "notifications_show_watched": "Watching",
+  "notifications_mark_all": "Mark all as read",
+  "notifications_marked": "Marked everything as read.",
+  "notifications_empty_all": "Nothing yet. You'll hear here when someone replies to you, mentions you, or reviews your proposals, and when something you watch changes.",
+  "notifications_empty_direct": "Nothing for you yet. Replies, mentions, and reviews of your proposals show up here.",
+  "notifications_empty_watched": "Nothing from your watchlist yet. Watch a record, place, proposal, or contributor to follow it here.",
+  "notifications_unread": "Unread",
+  "notifications_reason_direct": "For you",
+  "notifications_reason_watched": "Watching",
+  "notifications_settings": "Email settings",
+  "notifications_watchlist": "Watchlist",
+  "notifications_bell": "Notifications",
+  "notifications_bell_unread": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Notifications, {countText} unread",
+        "countPlural=*": "Notifications, {countText} unread"
+      }
+    }
+  ],
+  "notify_settings_title": "Notification email",
+  "notify_settings_lede": "Choose which notifications also reach your inbox. Everything always appears on your notifications page.",
+  "notify_settings_direct": "Email me about replies, mentions, and reviews of my proposals",
+  "notify_settings_direct_hint": "Sent a few minutes after the first notification. Anything else that arrives in the meantime is added to the same email.",
+  "notify_settings_digest": "Watchlist digest",
+  "notify_settings_digest_hint": "A summary of activity on everything you watch. Skipped when nothing happened.",
+  "notify_settings_digest_off": "Off",
+  "notify_settings_digest_daily": "Daily",
+  "notify_settings_digest_weekly": "Weekly",
+  "notify_settings_save": "Save settings",
+  "notify_settings_saved": "Settings saved.",
+  "notify_settings_unverified": "Verify your email address to get notification email. Until then, notifications only appear on your notifications page.",
+  "notify_settings_verify": "Verify your email",
+  "notify_settings_nav": "Notifications",
+  "unsubscribe_title": "Unsubscribe",
+  "unsubscribe_heading_direct": "Stop notification email?",
+  "unsubscribe_heading_digest": "Stop the watchlist digest?",
+  "unsubscribe_body_direct": "You won't get email about replies, mentions, or reviews of your proposals. They'll still appear on your notifications page.",
+  "unsubscribe_body_digest": "You won't get the watchlist digest anymore. Your watchlist stays as it is.",
+  "unsubscribe_confirm": "Unsubscribe",
+  "unsubscribe_done_direct": "You're unsubscribed from notification email.",
+  "unsubscribe_done_digest": "You're unsubscribed from the watchlist digest.",
+  "unsubscribe_already": "You're already unsubscribed from these emails.",
+  "unsubscribe_invalid": "This unsubscribe link doesn't work. It may be from an old email. Sign in to change your email settings.",
+  "unsubscribe_settings": "Change email settings",
+  "notify_direct_subject": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} new notification",
+        "countPlural=*": "{countText} new notifications"
+      }
+    }
+  ],
+  "notify_direct_preheader": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Something on Elections Archive needs your attention.",
+        "countPlural=*": "{countText} things on Elections Archive need your attention."
+      }
+    }
+  ],
+  "notify_direct_heading": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "You have a new notification",
+        "countPlural=*": "You have {countText} new notifications"
+      }
+    }
+  ],
+  "notify_open": "Open notifications",
+  "notify_direct_reason": "You're getting this because someone replied to you, mentioned you, or reviewed one of your proposals on Elections Archive.",
+  "notify_digest_subject_daily": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Your watchlist today: {countText} update",
+        "countPlural=*": "Your watchlist today: {countText} updates"
+      }
+    }
+  ],
+  "notify_digest_subject_weekly": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Your watchlist this week: {countText} update",
+        "countPlural=*": "Your watchlist this week: {countText} updates"
+      }
+    }
+  ],
+  "notify_digest_preheader": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} update on what you watch.",
+        "countPlural=*": "{countText} updates on what you watch."
+      }
+    }
+  ],
+  "notify_digest_heading_daily": "Your watchlist today",
+  "notify_digest_heading_weekly": "Your watchlist this week",
+  "notify_digest_more": "Here are the latest {count}. Your watchlist has the rest.",
+  "notify_digest_open": "Open your watchlist",
+  "notify_digest_reason_daily": "You're getting this because you turned on the daily watchlist digest.",
+  "notify_digest_reason_weekly": "You're getting this because you turned on the weekly watchlist digest.",
+  "bounties_title": "Bounties",
+  "bounties_heading": "Bounties",
+  "bounties_lede": "Each bounty is a gap the archive knows about: results it doesn't hold yet, with the sources already tried. Claim one, find the records, and propose them. Publishing the proposal fills the bounty and credits you.",
+  "bounties_blocked_lede": "Blocked bounties have a source that a script can't reach, because it sits behind a login, a form, or a request by mail. A person can often get it in a few minutes.",
+  "bounties_filter_status": "Status",
+  "bounties_filter_category": "Kind",
+  "bounties_filter_place": "Place",
+  "bounties_filter_grain": "Missing",
+  "bounties_filter_year": "Year",
+  "bounties_filter_apply": "Apply",
+  "bounties_filter_all": "All",
+  "bounties_status_open": "Open",
+  "bounties_status_fulfilled": "Filled",
+  "bounties_empty": "No bounties match these filters.",
+  "bounties_more": "More bounties",
+  "bounties_footer": "The list comes from the archive's register of known gaps and updates when that register changes.",
+  "bounties_coverage_link": "See coverage",
+  "bounty_title": "Bounty #{number}: {label}",
+  "bounty_place": "Place",
+  "bounty_missing": "Missing",
+  "bounty_years": "Years",
+  "bounty_level": "Office level",
+  "bounty_stage": "Stage",
+  "bounty_category": "Kind",
+  "bounty_checked": "Last checked",
+  "bounty_state": "Status",
+  "bounty_facts": "Details",
+  "bounty_sources": "Sources already tried",
+  "bounty_sign_in": "Sign in to claim this bounty",
+  "bounty_verify": "Verify your email to claim this bounty",
+  "bounty_claim": "Claim for 7 days",
+  "bounty_renew": "Renew claim",
+  "bounty_release": "Release",
+  "bounty_propose": "Start a proposal",
+  "bounty_claim_hint": "A claim tells others you're working on this. It lasts seven days, and you can renew it. You can propose without claiming.",
+  "bounty_held_hint": "Someone else is working on this. Watch it to hear when the claim ends or the bounty is filled.",
+  "bounty_blocked_hint": "A script can't reach this source. If you can get the records by hand, upload them with your proposal as evidence.",
+  "bounty_filled": "Filled by {name} in proposal {proposal} on {date}.",
+  "bounty_closed": "Closed on {date}: the gap no longer appears in the register.",
+  "bounty_claimed": "Claimed by {name} until {date}.",
+  "bounty_unclaimed": "Open and unclaimed.",
+  "feed_bounty_claimed": "Claimed bounty: {bounty}",
+  "feed_bounty_fulfilled": "Filled bounty: {bounty}",
+  "feed_bounty_closed": "Closed bounty: {bounty}",
+  "watchlist_kind_bounty": "Bounty",
+  "ws_index_bounty": "This draft fills bounty #{number}: {label}.",
+  "ws_index_bounty_link": "View the bounty",
+  "contributor_bounties": "Bounties filled",
+  "contributor_bounty_proposal": "Proposal #{number}",
+  "polity_known_bounty": "Bounty #{number}: help fill this gap"
 }

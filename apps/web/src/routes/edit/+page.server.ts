@@ -1,6 +1,7 @@
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import type { Template } from "#lib/workspace.js";
+import { open } from "#lib/server/bounties.js";
 import { db } from "#lib/server/db/index.js";
 import { blank, templates, templateTitle } from "#lib/workspace.js";
 import type { Actions, PageServerLoad } from "./$types";
@@ -33,7 +34,12 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
     order by p.updated_at desc
     limit 50
   `);
-  return { drafts: rows, record: url.searchParams.get("record") ?? "" };
+  const asked = Number(url.searchParams.get("bounty"));
+  return {
+    drafts: rows,
+    record: url.searchParams.get("record") ?? "",
+    bounty: Number.isSafeInteger(asked) && asked > 0 ? await open(asked) : null,
+  };
 };
 
 export const actions: Actions = {
@@ -48,11 +54,14 @@ export const actions: Actions = {
     }
     const given = form.get("record");
     const record = typeof given === "string" ? given.trim().slice(0, 2048) : "";
+    const asked = Number(form.get("bounty"));
+    const bounty = Number.isSafeInteger(asked) && asked > 0 ? asked : null;
     const summary = templateTitle[template]();
     const draft = { summary, ops: [], workspace: fresh(template, record) };
     const { rows } = await db.execute<{ number: number }>(sql`
-      insert into proposal (author_user_id, title, draft)
-      values (${locals.user.id}, ${summary}, ${JSON.stringify(draft)}::jsonb)
+      insert into proposal (author_user_id, title, draft, bounty_id)
+      values (${locals.user.id}, ${summary}, ${JSON.stringify(draft)}::jsonb,
+              (select id from bounty where number = ${bounty}::int and status = 'open'))
       returning number
     `);
     redirect(303, `/edit/${rows[0]?.number}`);

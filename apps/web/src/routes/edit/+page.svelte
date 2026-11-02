@@ -26,6 +26,20 @@
     >
       {m.ws_index_intro()}
     </p>
+    {#if data.bounty != null}
+      <p
+        class="border-s-[3px] border-foreground ps-3 text-sm text-pretty max-inline-[60ch]"
+      >
+        {m.ws_index_bounty({
+          number: data.bounty.number,
+          label: data.bounty.label,
+        })}
+        <a
+          class="underline underline-offset-2"
+          href="/bounties/{data.bounty.number}">{m.ws_index_bounty_link()}</a
+        >
+      </p>
+    {/if}
   </header>
 
   <section
@@ -51,6 +65,9 @@
             <input type="hidden" name="template" value={template} />
             {#if data.record !== ""}
               <input type="hidden" name="record" value={data.record} />
+            {/if}
+            {#if data.bounty != null}
+              <input type="hidden" name="bounty" value={data.bounty.number} />
             {/if}
             <div class="grid gap-1">
               <h3 class="font-semibold">{templateTitle[template]()}</h3>

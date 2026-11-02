@@ -3,9 +3,25 @@
   import { byline, describe } from "#lib/contrib.js";
   import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { cn } from "#lib/utils.js";
 
-  const { entries, label }: { entries: Array<FeedEntry>; label: string } =
-    $props();
+  const {
+    entries,
+    label,
+    marks,
+  }: {
+    entries: Array<FeedEntry>;
+    label: string;
+    marks?: Record<
+      string,
+      { reason: "direct" | "watched"; unread: boolean } | undefined
+    >;
+  } = $props();
+
+  const reasonLabel = {
+    direct: m.notifications_reason_direct,
+    watched: m.notifications_reason_watched,
+  };
 
   const clock = dates({ hour: "numeric", minute: "2-digit", timeZone: "UTC" });
 
@@ -33,9 +49,20 @@
       <ol class="grid">
         {#each group.entries as entry (entry.id)}
           {const described = $derived(describe(entry))}
+          {const mark = $derived(marks?.[entry.id])}
           <li
-            class="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 border-be py-2 text-sm max-sm:grid-cols-1"
+            class={cn(
+              "relative grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 border-be py-2 text-sm max-sm:grid-cols-1",
+              { "font-medium": mark?.unread === true },
+            )}
           >
+            {#if mark?.unread === true}
+              <span
+                class="absolute -inset-s-3 inset-bs-3.5 rounded-full bg-foreground block-1.5 inline-1.5 max-sm:-inset-s-2.5"
+                aria-hidden="true"
+              ></span>
+              <span class="sr-only">{m.notifications_unread()}</span>
+            {/if}
             <time
               class="pbs-0.5 font-figures text-xs text-muted-foreground"
               datetime={entry.at}>{clock.format(new Date(entry.at))} UTC</time
@@ -69,6 +96,9 @@
                       href="/{entry.polity_path}">{entry.polity}</a
                     >
                   {/if}
+                {/if}
+                {#if mark != null}
+                  <span>{reasonLabel[mark.reason]()}</span>
                 {/if}
                 {#if entry.batches > 1}
                   <span class="font-figures"

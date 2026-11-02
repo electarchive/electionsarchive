@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import {
     ArrowLeftRightIcon,
+    BellIcon,
     GaugeIcon,
     LayoutDashboardIcon,
     MenuIcon,
@@ -182,6 +183,27 @@
         </Button>
       {/each}
     </nav>
+    {#if page.data.user != null && !READ_ONLY}
+      <Button
+        href={resolve("/notifications")}
+        variant="ghost"
+        size="icon"
+        class="relative max-lg:ms-auto"
+        aria-current={current(resolve("/notifications"))}
+        aria-label={page.data.unread > 0
+          ? m.notifications_bell_unread({ count: page.data.unread })
+          : m.notifications_bell()}
+      >
+        <BellIcon />
+        {#if page.data.unread > 0}
+          <span
+            class="absolute -inset-e-0.5 inset-bs-0.5 grid place-items-center rounded-full bg-marker px-1 font-figures text-[0.625rem]/4 font-bold text-[#15171a] min-inline-4"
+            aria-hidden="true"
+            >{page.data.unread > 99 ? "99+" : page.data.unread}</span
+          >
+        {/if}
+      </Button>
+    {/if}
     {#if Menus != null}
       <Menus
         links={LINKS}

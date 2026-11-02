@@ -141,15 +141,23 @@ export const RecentFilters = v.object({
 
 export type RecentQuery = v.InferOutput<typeof RecentFilters>;
 
-async function stream({
+export const visible = sql`
+  (a.proposal_id is null or (p.submitted_at is not null and ${shown(sql`p`)}))
+  and (a.comment_id is null or c.hidden_at is null)
+  and a.kind <> 'changeset_published'
+`;
+
+export async function stream({
   activity,
   imports,
   before,
+  after = null,
   limit = PAGE,
 }: {
   activity: SQL | null;
   imports: SQL | null;
   before: string | null;
+  after?: string | null;
   limit?: number;
 }) {
   const parts = [
@@ -159,7 +167,8 @@ async function stream({
         select a.id::text, a.at, a.kind::text as kind,
                coalesce(f.display_name, f.handle) as author, f.handle,
                case when a.agent_key_id is not null then coalesce(c.agent_name, p.agent_name) end as agent,
-               p.number, coalesce(p.title, t.title) as title, p.tier, p.state::text as state,
+               p.number, coalesce(b.label, p.title, t.title) as title, p.tier, p.state::text as state,
+               b.number as bounty,
                t.id::text as thread, t.entity_id::text as entity, a.comment_id::text as comment,
                a.polity_ids[1]::text as polity, null::text as pipeline, 1 as batches
         from activity a
@@ -167,10 +176,10 @@ async function stream({
         left join thread t on t.id = a.thread_id
         left join comment c on c.id = a.comment_id
         left join profile f on f.user_id = a.actor_user_id
-        where (a.proposal_id is null or (p.submitted_at is not null and ${shown(sql`p`)}))
-          and (a.comment_id is null or c.hidden_at is null)
-          and a.kind <> 'changeset_published'
+        left join bounty b on b.id = a.bounty_id
+        where ${visible}
           and (${before}::timestamptz is null or a.at < ${before}::timestamptz)
+          and (${after}::timestamptz is null or a.at >= ${after}::timestamptz)
           and (${activity})
       `,
     imports == null
@@ -180,13 +189,14 @@ async function stream({
                          left(md5(c.summary), 12)) as id,
                max(c.published_at) as at,
                'imported' as kind, null as author, null as handle, null as agent, null::int as number,
-               c.summary as title, null::int as tier, null as state, null as thread, null as entity, null as comment,
+               c.summary as title, null::int as tier, null as state, null::int as bounty, null as thread, null as entity, null as comment,
                (select p.id::text from polity p where p.iso_code = k.iso limit 1) as polity,
                c.pipeline, count(*)::int as batches
         from changeset c
         cross join lateral (select c.scope ->> 'polity' as iso) k
         where c.status = 'published' and c.author_kind in ('pipeline', 'system')
           and (${before}::timestamptz is null or c.published_at < ${before}::timestamptz)
+          and (${after}::timestamptz is null or c.published_at >= ${after}::timestamptz)
           and (${imports})
         group by c.pipeline, c.summary, k.iso, (c.published_at at time zone 'UTC')::date
       `,
@@ -202,7 +212,7 @@ async function stream({
     }
   >(sql`
     select id, to_char(at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as at, kind, author,
-           handle, agent, number, title, tier, state, thread, entity, comment, polity, pipeline, batches
+           handle, agent, number, title, tier, state, bounty, thread, entity, comment, polity, pipeline, batches
     from (${sql.join(parts, sql` union all `)}) s
     order by s.at desc
     limit ${limit + 1}
@@ -300,7 +310,13 @@ export async function contributorStream(userId: string) {
   return entries;
 }
 
-export const WATCH_KINDS = ["entity", "polity", "proposal", "user"] as const;
+export const WATCH_KINDS = [
+  "entity",
+  "polity",
+  "proposal",
+  "user",
+  "bounty",
+] as const;
 
 export type WatchKind = (typeof WATCH_KINDS)[number];
 
@@ -308,29 +324,33 @@ const watched = (userId: string, kind: WatchKind) => sql`
   select target_id from watch where user_id = ${userId}::uuid and target_kind = ${kind}::watch_target
 `;
 
-export async function watchlist(userId: string, before: string | null) {
+export const watchedStream = (userId: string) => {
   const polities = tree(sql`
     select target_id from watch
     where user_id = ${userId}::uuid and target_kind = 'polity' and descendants
   `);
+  return {
+    activity: sql`
+      a.proposal_id in (${watched(userId, "proposal")})
+      or a.bounty_id in (${watched(userId, "bounty")})
+      or a.actor_user_id in (${watched(userId, "user")})
+      or a.entity_ids && array(${watched(userId, "entity")})
+      or t.entity_id in (${watched(userId, "entity")})
+      or a.polity_ids && array(${watched(userId, "polity")})
+      or a.polity_ids && ${polities}
+    `,
+    imports: sql`
+      exists (
+              select from polity x where x.iso_code = k.iso
+              and (x.id in (${watched(userId, "polity")}) or x.id = any(${polities}))
+            )
+    `,
+  };
+};
+
+export async function watchlist(userId: string, before: string | null) {
   const [stream_, mine, targets] = await Promise.all([
-    stream({
-      activity: sql`
-        a.proposal_id in (${watched(userId, "proposal")})
-        or a.actor_user_id in (${watched(userId, "user")})
-        or a.entity_ids && array(${watched(userId, "entity")})
-        or t.entity_id in (${watched(userId, "entity")})
-        or a.polity_ids && array(${watched(userId, "polity")})
-        or a.polity_ids && ${polities}
-      `,
-      imports: sql`
-        exists (
-                select from polity x where x.iso_code = k.iso
-                and (x.id in (${watched(userId, "polity")}) or x.id = any(${polities}))
-              )
-      `,
-      before,
-    }),
+    stream({ ...watchedStream(userId), before }),
     before == null
       ? stream({
           activity: sql`
@@ -361,14 +381,15 @@ export async function watches(userId: string) {
     path: string | null;
   }>(sql`
     select w.target_kind::text as kind, w.target_id::text as id, w.descendants, w.created_at::text,
-           p.number, p.title, f.handle, coalesce(f.display_name, f.handle) as person,
+           coalesce(p.number, b.number) as number, coalesce(p.title, b.label) as title, f.handle, coalesce(f.display_name, f.handle) as person,
            case when e.id is not null then ea_public_id(e.type, e.id) end as public_id,
            (select s.path from slug s where s.entity_id = e.id and s.is_current limit 1) as path
     from watch w
     left join proposal p on w.target_kind = 'proposal' and p.id = w.target_id
     left join profile f on w.target_kind = 'user' and f.user_id = w.target_id
     left join entity e on w.target_kind in ('entity', 'polity') and e.id = w.target_id
-    where w.user_id = ${userId}::uuid and w.target_kind <> 'bounty'
+    left join bounty b on w.target_kind = 'bounty' and b.id = w.target_id
+    where w.user_id = ${userId}::uuid
     order by w.created_at desc
   `);
   const { full } = await names(
@@ -379,7 +400,7 @@ export async function watches(userId: string) {
   return rows.map((row) => ({
     ...row,
     name:
-      row.kind === "proposal"
+      row.kind === "proposal" || row.kind === "bounty"
         ? row.title
         : row.kind === "user"
           ? row.person
@@ -420,6 +441,7 @@ export async function setWatch(
       when 'proposal' then exists (select from proposal where id = ${id}::uuid and submitted_at is not null)
       when 'user' then exists (select from profile where user_id = ${id}::uuid)
       when 'polity' then exists (select from polity where id = ${id}::uuid)
+      when 'bounty' then exists (select from bounty where id = ${id}::uuid)
       else exists (select from entity where id = ${id}::uuid and retired_by is null)
     end as ok
   `);
@@ -434,13 +456,13 @@ export async function setWatch(
 }
 
 export async function feedToken(userId: string, rotate = false) {
-  const { rows } = await db.execute<{ token: string | null; digest: boolean }>(
+  const { rows } = await db.execute<{ token: string | null }>(
     sql`
       update profile set feed_token = case
         when ${rotate} or feed_token is null then ${randomBytes(24).toString("hex")}
         else feed_token end
       where user_id = ${userId}::uuid
-      returning feed_token as token, digest
+      returning feed_token as token
     `,
   );
   return rows[0] ?? null;

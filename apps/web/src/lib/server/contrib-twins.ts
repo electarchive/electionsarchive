@@ -1,6 +1,7 @@
 import { error } from "@sveltejs/kit";
 import type { FeedEntry, HistoryEntry, ProposalState } from "#lib/contrib.js";
 import type { Entry } from "#lib/server/atom.js";
+import type { Bounty } from "#lib/server/bounties.js";
 import type { change } from "#lib/server/history.js";
 import type { view } from "#lib/server/rpc/proposals.js";
 import {
@@ -11,6 +12,8 @@ import {
   stateLabel,
   tierLabel,
 } from "#lib/contrib.js";
+import { CATEGORY_LABELS, GRAIN_LABELS, levelLabel } from "#lib/coverage.js";
+import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { atom } from "#lib/server/atom.js";
 
@@ -329,4 +332,82 @@ export function changeMarkdown(
     }
   }
   return `${lines.join("\n")}\n`;
+}
+
+const bountyStatus = (bounty: Bounty) =>
+  bounty.status === "fulfilled" && bounty.proposal != null
+    ? m.bounty_filled({
+        name: bounty.filler ?? m.feed_someone(),
+        proposal: `#${bounty.proposal}`,
+        date: date(bounty.closed_at),
+      })
+    : bounty.status === "closed"
+      ? m.bounty_closed({ date: date(bounty.closed_at) })
+      : bounty.claimer == null
+        ? m.bounty_unclaimed()
+        : m.bounty_claimed({
+            name: bounty.claimer,
+            date: date(bounty.claimed_until),
+          });
+
+export function bountiesMarkdown(
+  origin: string,
+  bounties: Array<Bounty>,
+  next: number | null,
+) {
+  const lines = [
+    `# ${inline(m.bounties_heading())}`,
+    "",
+    m.bounties_lede(),
+    "",
+    "| # | Bounty | Place | Years | Missing | Category | Status |",
+    "| ---: | --- | --- | --- | --- | --- | --- |",
+    ...bounties.map((bounty) =>
+      [
+        "",
+        bounty.number,
+        `[${inline(bounty.label)}](${origin}/bounties/${bounty.number})`,
+        inline(bounty.place ?? bounty.polity.toUpperCase()),
+        bounty.years,
+        GRAIN_LABELS[bounty.grain]?.() ?? bounty.grain,
+        CATEGORY_LABELS[bounty.category](),
+        inline(bountyStatus(bounty)),
+        "",
+      ]
+        .join(" | ")
+        .trim(),
+    ),
+  ];
+  if (next != null) {
+    lines.push("", `More bounties: \`after=${next}\``);
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+export function bountyMarkdown(origin: string, bounty: Bounty) {
+  const facts = [
+    [m.bounty_place(), bounty.place ?? bounty.polity.toUpperCase()],
+    [m.bounty_missing(), GRAIN_LABELS[bounty.grain]?.() ?? bounty.grain],
+    [m.bounty_years(), bounty.years],
+    [
+      m.bounty_level(),
+      bounty.level === "" ? "" : levelLabel(bounty.polity, bounty.level),
+    ],
+    [m.bounty_stage(), bounty.stage],
+    [m.bounty_category(), CATEGORY_LABELS[bounty.category]()],
+    [m.bounty_checked(), bounty.checked ?? ""],
+    [m.bounty_state(), bountyStatus(bounty)],
+  ].filter(([, value]) => value !== "");
+  return `${[
+    `# ${inline(bounty.label)}`,
+    "",
+    `${origin}/bounties/${bounty.number}`,
+    "",
+    bounty.reason,
+    "",
+    ...facts.map(([term, value]) => `- ${term}: ${inline(value ?? "")}`),
+    ...(bounty.sources === ""
+      ? []
+      : ["", `## ${m.bounty_sources()}`, "", bounty.sources]),
+  ].join("\n")}\n`;
 }

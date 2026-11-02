@@ -1,0 +1,7 @@
+[Unit]
+Description=Send electionsarchive notification email and watchlist digests (POST /internal/notifications)
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/electionsarchive/.env
+ExecStart=/bin/sh -c 'printf "authorization: Bearer %%s\\n" "$$NOTIFY_TOKEN" | curl -fsS --max-time 300 -X POST -H "content-type: application/json" -H @- "$$BASE_URL/internal/notifications"'

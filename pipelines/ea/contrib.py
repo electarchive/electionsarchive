@@ -2653,6 +2653,22 @@ def _activity(
     )
 
 
+def _fulfill(conn: Connection, proposal: UUID) -> None:
+    conn.execute(
+        """with done as (
+             update bounty b set status = 'fulfilled', fulfilled_by_proposal = p.id, closed_at = now()
+             from proposal p
+             where p.id = %s and b.id = p.bounty_id and b.status <> 'fulfilled'
+             returning b.id, b.number, b.label, p.id as proposal_id, p.author_user_id, p.agent_key_id, p.polity_id
+           )
+           insert into activity (actor_user_id, agent_key_id, kind, proposal_id, bounty_id, polity_ids, summary)
+           select author_user_id, agent_key_id, 'bounty_fulfilled', proposal_id, id,
+                  array_remove(array[polity_id], null), format('Bounty %%s fulfilled: %%s', number, label)
+           from done""",
+        [proposal],
+    )
+
+
 def _compiled(conn: Connection, proposal: UUID, payload: object, undefaulted: bool) -> Path:
     row = conn.execute(
         "select author_user_id, agent_key_id is not null from proposal where id = %s", [proposal]
@@ -2862,6 +2878,7 @@ def _publish(proposal: UUID, n: int | None, requested: UUID | None, output: dict
             publish(conn, head, str(requested))
         _close(conn, proposal, "published", cast(UUID, requested), output.get("reason"))
         _activity(conn, proposal, "proposal_published", requested, head, "Proposal %s published")
+        _fulfill(conn, proposal)
         sets = conn.execute(
             """select distinct bs.scheme_code || '/' || bs.vintage
                from area_geometry g join area a on a.id = g.area_id
@@ -3022,6 +3039,7 @@ def _folds() -> None:
             publish(conn, head, str(reviewer))
             conn.execute("update proposal set state = 'published', updated_at = now() where id = %s", [proposal])
             _activity(conn, proposal, "proposal_published", reviewer, head, "Proposal %s published")
+            _fulfill(conn, proposal)
             conn.commit()
             print(f"fold {proposal}: published by {carried}", flush=True)
 

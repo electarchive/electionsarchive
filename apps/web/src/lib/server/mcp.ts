@@ -72,6 +72,8 @@ const TOOLS: Array<{
     procedure: router.coverage.gaps,
     access: "read",
   },
+  { name: "list_bounties", procedure: router.bounties.list, access: "read" },
+  { name: "get_bounty", procedure: router.bounties.get, access: "read" },
   { name: "get_editable", procedure: router.agents.editable, access: "read" },
   { name: "get_result_cells", procedure: router.agents.cells, access: "read" },
   { name: "describe_ops", procedure: router.agents.ops, access: "read" },
@@ -104,6 +106,8 @@ const TOOLS: Array<{
   { name: "get_watchlist", procedure: router.watches.list, access: "key" },
   { name: "watch", procedure: router.watches.add, access: "key" },
   { name: "unwatch", procedure: router.watches.remove, access: "key" },
+  { name: "claim_bounty", procedure: router.claims.claim, access: "key" },
+  { name: "release_bounty", procedure: router.claims.release, access: "key" },
   {
     name: "draft_proposal",
     procedure: router.proposals.create,
