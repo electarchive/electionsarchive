@@ -81,7 +81,12 @@
 
   const uid = $props.id();
   const S = 100;
-  const BENCHED = new Set(["01a13b8d-56e9-747a-a0a6-f9741f70db7e"]);
+  const BENCHED = new Set([
+    "01a13b8d-56e9-747a-a0a6-f9741f70db7e",
+    "01a13fb6-eab8-71a8-b3f0-ca174fba58db",
+    "fc04f6de-b056-5266-86b1-6ddf28de75d8",
+    "3a07465a-46f6-5fd4-b193-7da4b137e058",
+  ]);
 
   const folded = $derived.by(() => {
     const groups = Map.groupBy(
