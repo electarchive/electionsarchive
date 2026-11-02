@@ -123,7 +123,7 @@
     options={leadingLinks}
     value={current}
     label={m.record_tabs()}
-    class="min-inline-0 max-sm:flex-1"
+    class="min-inline-0 max-sm:flex-1 max-sm:[&>a]:flex-auto max-sm:[&>a]:min-inline-0"
   />
   {#if former.length > 0}
     <DropdownMenu.Root>

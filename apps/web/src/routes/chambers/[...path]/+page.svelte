@@ -383,7 +383,9 @@
           {/each}
         </ol>
       </nav>
-      <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+      <div
+        class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 min-inline-0"
+      >
         <div class="grid gap-1">
           <h1 class="title">
             {body.name}
