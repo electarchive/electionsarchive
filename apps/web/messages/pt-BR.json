@@ -1854,6 +1854,8 @@
   "atlas_select_many": "Selecionar vários locais",
   "atlas_versus": "{name} +{points} contra {place}",
   "atlas_explore": "Abrir mapa completo",
+  "atlas_expand": "Expandir mapa",
+  "atlas_back": "Voltar aos resultados",
   "atlas_estimated_note": "Os limites mudaram desde {year}. Os resultados de {year} exibidos aqui são estimativas para as áreas atuais, calculadas a partir das áreas de {year} que se sobrepõem a elas.",
   "atlas_estimated": "Estimado",
   "map_gesture_windows": "Segure Ctrl e role para ampliar",
@@ -2556,6 +2558,26 @@
   "coverage_nav": "Cobertura",
   "header_menu": "Menu",
   "header_compare_about": "Coloque dois locais ou eleições lado a lado",
+  "map_nav": "Mapa",
+  "header_map_about": "Explore qualquer eleição em um mapa em tela cheia",
+  "map_landing_title": "Mapas eleitorais",
+  "map_landing_lede": "Abra a eleição mais recente de qualquer país em um mapa em tela cheia, aproxime dos resultados nacionais até a menor unidade de apuração, compare com eleições anteriores e alterne entre as disputas.",
+  "map_landing_elections": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} eleição",
+        "countPlural=many": "{count} de eleições",
+        "countPlural=*": "{count} eleições"
+      }
+    }
+  ],
   "header_workbench_about": "Monte um painel de mapas e gráficos para qualquer disputa",
   "header_coverage_about": "Veja o que o arquivo tem e o que ainda falta",
   "header_sign_in_about": "Entre para salvar visualizações da Bancada de trabalho e criar chaves de API",

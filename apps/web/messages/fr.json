@@ -1856,6 +1856,8 @@
   "atlas_select_many": "Sélectionner plusieurs lieux",
   "atlas_versus": "{name} +{points} contre {place}",
   "atlas_explore": "Ouvrir la carte complète",
+  "atlas_expand": "Agrandir la carte",
+  "atlas_back": "Retour aux résultats",
   "atlas_estimated_note": "Les limites ont changé depuis {year}. Les résultats de {year} affichés ici sont des estimations pour les territoires actuels, établies à partir des territoires de {year} qui les recoupent.",
   "atlas_estimated": "Estimé",
   "map_gesture_windows": "Maintenez Ctrl et faites défiler pour zoomer",
@@ -2558,6 +2560,26 @@
   "coverage_nav": "Couverture",
   "header_menu": "Menu",
   "header_compare_about": "Comparez deux territoires ou deux élections côte à côte",
+  "map_nav": "Carte",
+  "header_map_about": "Explorez n'importe quelle élection sur une carte en plein écran",
+  "map_landing_title": "Cartes électorales",
+  "map_landing_lede": "Ouvrez la dernière élection de n'importe quel pays sur une carte en plein écran, puis zoomez des résultats nationaux jusqu'à la plus petite unité de résultats, comparez avec les élections précédentes et passez d'un scrutin à l'autre.",
+  "map_landing_elections": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} élection",
+        "countPlural=many": "{count} d'élections",
+        "countPlural=*": "{count} élections"
+      }
+    }
+  ],
   "header_workbench_about": "Composez un tableau de cartes et de graphiques pour n’importe quel scrutin",
   "header_coverage_about": "Découvrez ce que contiennent les archives et ce qui leur manque",
   "header_sign_in_about": "Connectez-vous pour enregistrer vos vues de l’atelier et créer des clés d’API",

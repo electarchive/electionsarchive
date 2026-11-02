@@ -1818,6 +1818,8 @@
   "atlas_select_many": "Birden fazla yer seç",
   "atlas_versus": "{name} +{points}, karşılaştırma: {place}",
   "atlas_explore": "Tam haritayı aç",
+  "atlas_expand": "Haritayı büyüt",
+  "atlas_back": "Sonuçlara dön",
   "atlas_estimated_note": "Sınırlar {year} yılından bu yana değişti. Burada gösterilen {year} sonuçları, bugünkü alanlar için yapılmış tahminlerdir; bu alanlarla çakışan {year} yılı alanlarından türetilmiştir.",
   "atlas_estimated": "Tahmini",
   "map_gesture_windows": "Yakınlaştırmak için Ctrl tuşuna basılı tutup kaydırın",
@@ -2511,6 +2513,25 @@
   "coverage_nav": "Kapsam",
   "header_menu": "Menü",
   "header_compare_about": "İki yeri veya seçimi yan yana koyun",
+  "map_nav": "Harita",
+  "header_map_about": "Herhangi bir seçimi tam ekran haritada inceleyin",
+  "map_landing_title": "Seçim haritaları",
+  "map_landing_lede": "Herhangi bir ülkenin son seçimini tam ekran haritada açın; ulusal sonuçlardan en küçük sonuç birimine kadar yakınlaşın, önceki seçimlerle karşılaştırın ve yarışlar arasında geçiş yapın.",
+  "map_landing_elections": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} seçim",
+        "countPlural=*": "{count} seçim"
+      }
+    }
+  ],
   "header_workbench_about": "Herhangi bir seçim yarışı için harita ve grafik panosu oluşturun",
   "header_coverage_about": "Arşivde neler olduğunu ve neyin eksik olduğunu görün",
   "header_sign_in_about": "Çalışma alanı görünümlerini kaydetmek ve API anahtarları oluşturmak için giriş yapın",

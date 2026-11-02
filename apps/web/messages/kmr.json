@@ -1819,6 +1819,8 @@
   "atlas_select_many": "Çend cihan hilbijêre",
   "atlas_versus": "{name} +{points} li hember {place}",
   "atlas_explore": "Nexşeya tam veke",
+  "atlas_expand": "Nexşeyê mezin bike",
+  "atlas_back": "Vegere encaman",
   "atlas_estimated_note": "Sînor ji {year} ve hatine guhertin. Encamên {year} yên ku li vir têne nîşandan texmînên ji bo herêmên îroyîn in û ji herêmên {year} yên ku bi wan re hev dikevin hatine avakirin.",
   "atlas_estimated": "Texmînî",
   "map_gesture_windows": "Ji bo nêzîkkirinê Ctrl bigire û bizivirîne",
@@ -2513,6 +2515,25 @@
   "coverage_nav": "Vegirtin",
   "header_menu": "Menû",
   "header_compare_about": "Du cih an hilbijartinan li kêleka hev deynin",
+  "map_nav": "Nexşe",
+  "header_map_about": "Her hilbijartinê li ser nexşeyeke tevahiya ekranê vekolin",
+  "map_landing_title": "Nexşeyên hilbijartinê",
+  "map_landing_lede": "Hilbijartina herî dawî ya her welatî li ser nexşeyeke tevahiya ekranê vekin, ji encamên neteweyî heta yekeya raporkirinê ya herî biçûk nêzîk bibin, bi hilbijartinên berê re bidin ber hev û di navbera pêşbaziyan de derbas bibin.",
+  "map_landing_elections": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} hilbijartin",
+        "countPlural=*": "{count} hilbijartin"
+      }
+    }
+  ],
   "header_workbench_about": "Ji bo her pêşbaziyekê tabloyek nexşe û grafîkan ava bike",
   "header_coverage_about": "Bibîne ka arşîv çi heye û çi kêm e",
   "header_sign_in_about": "Têkeve da ku dîmenên Maseya xebatê hilînî û mifteyên API biafirînî",

@@ -1819,6 +1819,8 @@
   "atlas_select_many": "Mehrere Orte auswählen",
   "atlas_versus": "{name} +{points} gegenüber {place}",
   "atlas_explore": "Vollständige Karte öffnen",
+  "atlas_expand": "Karte vergrößern",
+  "atlas_back": "Zurück zu den Ergebnissen",
   "atlas_estimated_note": "Die Grenzen haben sich seit {year} geändert. Die hier gezeigten Ergebnisse von {year} sind Schätzungen für die heutigen Gebiete, berechnet aus den Gebieten von {year}, die sich mit ihnen überschneiden.",
   "atlas_estimated": "Geschätzt",
   "map_gesture_windows": "Strg gedrückt halten und scrollen, um zu zoomen",
@@ -2513,6 +2515,25 @@
   "coverage_nav": "Abdeckung",
   "header_menu": "Menü",
   "header_compare_about": "Zwei Orte oder Wahlen nebeneinanderstellen",
+  "map_nav": "Karte",
+  "header_map_about": "Jede Wahl auf einer Vollbildkarte erkunden",
+  "map_landing_title": "Wahlkarten",
+  "map_landing_lede": "Öffnen Sie die jüngste Wahl eines beliebigen Landes auf einer Vollbildkarte, zoomen Sie von den landesweiten Ergebnissen bis zur kleinsten Meldeeinheit, vergleichen Sie mit früheren Wahlen und wechseln Sie zwischen den Rennen.",
+  "map_landing_elections": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{count} Wahl",
+        "countPlural=*": "{count} Wahlen"
+      }
+    }
+  ],
   "header_workbench_about": "Eine Tafel aus Karten und Diagrammen für jede Wahl erstellen",
   "header_coverage_about": "Sehen, was das Archiv enthält und was ihm fehlt",
   "header_sign_in_about": "Anmelden, um Ansichten der Werkbank zu speichern und API-Schlüssel zu erstellen",
