@@ -1,6 +1,7 @@
 import html
 import re
 import subprocess
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -17,7 +18,10 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Public measures, November 3, 2026 general election"
-HENRY = DATA / "inbox" / "y26" / "ia" / "counties" / "henry.pdf"
+LOCAL = {
+    "henry": DATA / "inbox" / "y26" / "ia" / "counties" / "henry.pdf",
+    "feed": DATA / "inbox" / "y26" / "ia" / "feed_127077.zip",
+}
 LINN = "19113"
 SOURCES = {
     "linn": (
@@ -65,7 +69,45 @@ SOURCES = {
         "Henry County Auditor",
         ".pdf",
     ),
+    "warren": (
+        "https://www.warrencountyia.gov/wp-content/uploads/2026/09/Federal-State-County-Candidates-Public-Measures-General-110326.pdf",
+        "Warren County Auditor",
+        ".pdf",
+    ),
+    "cedar": (
+        "https://cedarcounty.iowa.gov/files/auditor/2026_candidate_list_89671.pdf",
+        "Cedar County Auditor",
+        ".pdf",
+    ),
+    "osceola": (
+        "https://osceolacountyia.gov/wp-content/uploads/2026/10/2026-General-Election-Notice.pdf",
+        "Osceola County Auditor",
+        ".pdf",
+    ),
+    "pocahontas": (
+        "https://pocahontascounty.iowa.gov/wp-content/uploads/2026-General-Election-Sample-Ballots.pdf",
+        "Pocahontas County Auditor",
+        ".pdf",
+    ),
+    "allamakee": (
+        "https://allamakeecountyelections.iowa.gov/files/candidate_list/2026_general_election_76436.pdf",
+        "Allamakee County Auditor",
+        ".pdf",
+    ),
+    "plymouth": ("https://plymouthcountyiowa.gov/elections", "Plymouth County Auditor", ".pdf"),
+    "ringgold": (
+        "https://ringgoldcountyelections.iowa.gov/files/candidate_list/november_3_2026_50330.pdf",
+        "Ringgold County Auditor",
+        ".pdf",
+    ),
+    "dallas": ("https://www.dallascountyiowa.gov/DocumentCenter/View/7620", "Dallas County Auditor", ".pdf"),
+    "feed": (
+        "https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip",
+        "Iowa Secretary of State",
+        ".zip",
+    ),
 }
+BORROWED = ("warren", "cedar", "osceola", "pocahontas", "allamakee", "plymouth", "ringgold", "dallas")
 LAYOUT = ("linn", "jefferson", "keokuk", "butler")
 PAGES = ("johnson", "desmoines")
 TOWNSHIP = (
@@ -116,6 +158,153 @@ SCANNED = (
             "school infrastructure projects as authorized by the School District's Revenue Purpose Statement?"
         ),
     ),
+    (
+        "warren",
+        "Z",
+        "Interstate 35 Community School District",
+        (
+            "Shall the Board of Directors of the Interstate 35 Community School District in the Counties of Clarke, "
+            "Madison, and Warren, State of Iowa, be authorized to contract indebtedness and issue General Obligation "
+            "Bonds in an amount not to exceed $12,300,000 to provide funds to remodel, repair, improve, and equip the "
+            "school building, including reconfiguration of academic spaces, HVAC, mechanical and exterior improvements; "
+            "to build, furnish, and equip athletic facilities, including a new stadium and track, parking, and site "
+            "improvements, and for related improvements to repurpose the existing track and field, bleachers, and press "
+            "box; and for site and access improvements to the school campus?"
+        ),
+    ),
+    (
+        "warren",
+        "A",
+        "Norwalk Community School District",
+        (
+            "Shall the Board of Directors of the Norwalk Community School District, in Warren County, State of Iowa, be "
+            "authorized to contract indebtedness and issue general obligation bonds in an amount not exceeding "
+            "$65,000,000 for the purpose of acquiring, furnishing, equipping, constructing, improving, repairing, and "
+            "renovating school buildings and improving the sites of the School District's school buildings and athletic "
+            "facilities located in Norwalk, Iowa, including without limitation: (a) a new elementary school building and "
+            "site/land improvements; (b) HVAC system replacement and improvements, kitchen ventilation system "
+            "improvements, and other mechanical or electrical upgrades to Oviatt Elementary School, Lakewood Elementary "
+            "School, and Secondary Campus; (c) building improvements and upgrades to enhance security at all existing "
+            "school buildings, including security systems and enhanced building safety measures; (d) a new "
+            "transportation building, including maintenance bays, a wash bay, a custodial room, offices, common areas, "
+            "and site/land improvements; and (e) improving athletic facilities and related parking areas, including "
+            "construction of a new practice field and building improvements and expansions for additional practice "
+            "areas, offices, storage space, common areas, and related site improvements?"
+        ),
+    ),
+    (
+        "cedar",
+        "A",
+        "Tipton Community School District",
+        (
+            "Shall the Board of Directors of the Tipton Community School District in the County of Cedar, State of Iowa, "
+            "be authorized to contract indebtedness and issue General Obligation Bonds in an amount not to exceed "
+            "$16,100,000 to provide funds to build, furnish, and equip additions to the high school, including a secure "
+            "entrance, gymnasium, and commons area; to remodel, repair, improve, and equip the high school, including "
+            "educational and administrative spaces; and to improve the site, including parking?"
+        ),
+    ),
+    (
+        "osceola",
+        "NV",
+        "George-Little Rock Community School District",
+        (
+            "Shall the Board of Directors of the George-Little Rock Community School District in the Counties of Lyon, "
+            "Osceola and Sioux, State of Iowa, be authorized to contract indebtedness and issue General Obligation "
+            "Bonds in an amount not to exceed $14,950,000 to provide funds to build, furnish and equip additions to its "
+            "Elementary School and Middle School/ High School facilities, including related remodeling and improvements; "
+            "to remodel, repair, and improve the Elementary School and Middle School/ High School facilities, including "
+            "HVAC and bathroom improvements, and site improvements, exterior improvements to the Middle School / High "
+            "School; to build, furnish, and equip a new bus barn; and to remodel, repair, and improve the Middle School "
+            "/ High School track?"
+        ),
+    ),
+    (
+        "pocahontas",
+        "RQ",
+        "Pocahontas Area Community School District",
+        (
+            "Shall the Board of Directors of the Pocahontas Area Community School District in the Counties of "
+            "Pocahontas, Calhoun and Palo Alto, State of Iowa, be authorized to contract indebtedness and issue "
+            "General Obligation Bonds in an amount not to exceed $20,000,000 to provide funds to remodel, repair, "
+            "improve, and equip the middle/high school and elementary school, including career and technical education "
+            "and classroom spaces; to build, furnish, and equip additions to the middle/high school and elementary "
+            "school, including site improvements; for playground improvements at the elementary school; and to build, "
+            "furnish, and equip a central office and regional learning center building and a transportation facility, "
+            "including site improvements?"
+        ),
+    ),
+    (
+        "allamakee",
+        "AM",
+        "City of Waukon",
+        (
+            "Shall Chapter 22 Library Board of Trustees of the City of Waukon Code of Ordinances be amended as "
+            "follows: Amending the residency requirements of Trustees, which is currently eight resident members and "
+            "one nonresident member, to seven resident members, one nonresident member, and one member that could "
+            "either be a resident or nonresident member, where resident members would continue to be appointed by the "
+            "City Council with any nonresident members continuing to be appointed by the Allamakee County Board of "
+            "Supervisors, with Library Trustee terms to be reduced from six (6) years to three (3) years?"
+        ),
+    ),
+    (
+        "plymouth",
+        "RC",
+        "City of Le Mars",
+        (
+            "Shall the City of Le Mars, in Plymouth County, State of Iowa, enter into a loan agreement and issue "
+            "general obligation bonds in an amount not exceeding $8,000,000 for the purpose of paying the cost, to "
+            "that extent, of constructing, furnishing and equipping a municipal emergency services building?"
+        ),
+    ),
+    (
+        "plymouth",
+        "RD",
+        "Hinton Community School District",
+        (
+            "Shall the Board of Directors of the Hinton Community School District in the County of Plymouth, State of "
+            "Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an amount not to "
+            "exceed $8,600,000 to provide funds to remodel, repair, improve, furnish and equip its middle / high "
+            "school facility, including site improvements?"
+        ),
+    ),
+    (
+        "ringgold",
+        "GB",
+        "Lamoni Community School District",
+        (
+            "Shall the Board of Directors of the Lamoni Community School District in the Counties of Decatur and "
+            "Ringgold, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an "
+            "amount not to exceed $5,750,000 to be used together with sales tax revenue bonds to provide funds to "
+            "build, furnish and equip an addition to its Elementary School, with related remodeling and improvements "
+            "and related site improvements; to remodel, repair, improve, furnish, and equip the Elementary School, "
+            "including HVAC, mechanical, electrical, and plumbing improvements; to remodel, repair, and improve the "
+            "Middle School, including exterior façade restoration; and to remodel, repair, improve, and equip the High "
+            "School, including fire suppression, HVAC improvements and a new secured entry?"
+        ),
+    ),
+    (
+        "dallas",
+        "U",
+        "City of Urbandale",
+        (
+            "Shall the City of Urbandale, State of Iowa, issue its General Obligation Bonds or Capital Loan Notes in "
+            "an amount not exceeding the amount of $25,000,000 for the purpose of paying costs of designing, "
+            "constructing, equipping, and furnishing a new police station, with related site improvements?"
+        ),
+    ),
+    (
+        "dallas",
+        "BQ",
+        "Madrid Community School District",
+        (
+            "Shall the Board of Directors of the Madrid Community School District in the counties of Boone, Dallas, "
+            "and Polk, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an "
+            "amount not to exceed $4,300,000 to provide funds to build, furnish and equip additions to its existing "
+            "Junior-Senior High School, including a Career Academy addition, with related remodeling and improvements "
+            "and site improvements?"
+        ),
+    ),
 )
 SHALL = re.compile(r"Public Measure ([A-Z]{1,3})\b[^?]{0,140}?(Shall\b[^?]+\?)")
 BREMER = re.compile(r"District - ([A-Z]{1,3})\s+(Shall\b[^?]+\?)")
@@ -126,9 +315,13 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            if key == "henry":
-                content = HENRY.read_bytes()
-                retrieved = datetime.fromtimestamp(HENRY.stat().st_mtime, UTC)
+            if key in BORROWED:
+                artifact = raw.cached("us.ia_districts_2026", url)
+                content = artifact.path.read_bytes()
+                retrieved = artifact.retrieved_at
+            elif key in LOCAL:
+                content = LOCAL[key].read_bytes()
+                retrieved = datetime.fromtimestamp(LOCAL[key].stat().st_mtime, UTC)
             else:
                 content = subprocess.run(
                     ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
@@ -154,6 +347,25 @@ def source_text(key: str) -> str:
         text = re.sub(r"(?s)<script.*?</script>|<style.*?</style>", "", path.read_text())
         text = html.unescape(re.sub(r"<[^>]+>", "\n", text))
     return re.sub(r"\s+", " ", text)
+
+
+def feed_measures() -> list[tuple[str, str]]:
+    with zipfile.ZipFile(raw.cached(SOURCE, SOURCES["feed"][0]).path) as archive:
+        text = archive.read("detail.xml").decode()
+    found = []
+    for title in re.findall(r'<Contest key="\d+" text="([^"]+)"', text):
+        match = re.fullmatch(r"(.+?) - Public Measure ([A-Z]{1,3})", html.unescape(title))
+        if match is None:
+            continue
+        name = match[1]
+        if name.startswith("City of "):
+            entity = name
+        elif name.endswith(" School"):
+            entity = f"{name.removesuffix(' School')} Community School District"
+        else:
+            continue
+        found.append((match[2], entity))
+    return found
 
 
 def entity_of(wording: str) -> str:
@@ -206,6 +418,10 @@ def parse() -> None:
         add("bremer", match[1], match[2])
     for key, code, entity, wording in SCANNED:
         add(key, code, wording, entity)
+    for code, entity in feed_measures():
+        lead = entity.removeprefix("City of ").split()[0]
+        if not any(held == code and lead in name for held, name in rows):
+            add("feed", code, "", entity)
     frame = [{**row, "sources": ",".join(dict.fromkeys(cited[key]))} for key, row in rows.items()]
     PARSED.mkdir(parents=True, exist_ok=True)
     result = pl.DataFrame(frame)
@@ -330,14 +546,15 @@ def emit() -> Path:
                 )
             for key in row["sources"].split(","):
                 cs.add("citation", entity_id=contest, source_id=source_ids[key])
-            cs.add(
-                "ballot_question_text",
-                contest_id=contest,
-                kind="text",
-                lang="en",
-                body=row["wording"],
-                url=row["url"],
-                source_id=source_ids[row["source"]],
-            )
+            if row["wording"]:
+                cs.add(
+                    "ballot_question_text",
+                    contest_id=contest,
+                    kind="text",
+                    lang="en",
+                    body=row["wording"],
+                    url=row["url"],
+                    source_id=source_ids[row["source"]],
+                )
         print(f"{kept} of {frame.height} measures")
         return cs.write()
