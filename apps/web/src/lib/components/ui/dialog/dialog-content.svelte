@@ -28,7 +28,7 @@
     bind:ref
     data-slot="dialog-content"
     class={cn(
-      "fixed top-1/2 left-1/2 menu z-50 grid max-h-[calc(100dvh-0.5rem)] w-full max-w-[calc(100%_-_2rem)] -translate-x-1/2 -translate-y-1/2 gap-5 overflow-y-auto rounded-lg p-5 text-sm sm:max-w-md",
+      "modal grid max-h-[calc(100dvh-0.5rem)] w-full max-w-[calc(100%_-_2rem)] gap-5 overflow-y-auto rounded-lg p-5 text-sm sm:max-w-md",
       className,
     )}
     {...restProps}
