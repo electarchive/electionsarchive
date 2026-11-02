@@ -13904,7 +13904,7 @@ async function races(
                         )
                         select party, seats from held
                         union all
-                        select dt.party, count(*)::int from (
+                        select dt.party, least(count(*), c.magnitude - (select sum(seats) from held))::int from (
                           select distinct on (coalesce(tm.into_id, t.person_id)) (
                             select coalesce(am.into_id, ta.party_id) from tenure_affiliation ta
                             left join entity_merge am on am.entity_id = ta.party_id
