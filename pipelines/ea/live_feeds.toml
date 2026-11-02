@@ -43,6 +43,13 @@ publisher = "Connecticut Secretary of the State"
 url = "https://ctemspublic.pcctg.net/"
 
 [[feed]]
+id = "us.enr_2026.mo"
+adapter = "us.enr_2026"
+params = { state = "MO" }
+publisher = "St. Louis County Board of Elections"
+url = "https://extcontent.stlouisco.com/BOE/eResults/"
+
+[[feed]]
 id = "us.enr_2026.fl"
 adapter = "us.enr_2026"
 params = { state = "FL" }
