@@ -13260,12 +13260,60 @@ export function inside(polity: string, area: SQL, day: SQL) {
   `;
 }
 
+export async function alliances(election: string) {
+  return db.execute<{ id: string; parties: Array<string> }>(sql`
+    with recursive tree(id) as (
+      select ${election}::uuid
+      union all
+      select e.id from election e join tree on e.parent_id = tree.id
+    )
+    select a.alliance_id as id, array_agg(distinct x.id::text) as parties
+    from (
+      select distinct o.alliance_id from contest c
+      join contest_option o on o.contest_id = c.id
+      where c.election_id in (select id from tree) and o.alliance_id is not null
+    ) a
+    join alliance_member m on m.alliance_id = a.alliance_id
+    left join entity_merge pm on pm.entity_id = m.party_id
+    cross join lateral (values (m.party_id), (pm.into_id)) x(id)
+    where x.id is not null
+    group by a.alliance_id
+  `);
+}
+
+export function anchorsOf(
+  raced: Array<{
+    anchor: string;
+    round: number | null;
+    kind: string;
+    count: number;
+    noun: string;
+    isRemainder: boolean;
+  }>,
+) {
+  const anchors: Array<string> = [];
+  for (const [index, race] of raced.entries()) {
+    const tiers = [
+      race.round != null && race.round > 1 && `round-${race.round}`,
+      race.kind === "list_allocation" && "by-party-list",
+      race.count > 1 && race.noun !== "" && `by-${segment(race.noun)}`,
+      race.isRemainder && "special-election",
+    ].flatMap((tier) => (tier === false ? [] : `${race.anchor}-${tier}`));
+    anchors.push(
+      [race.anchor, ...tiers].find((anchor) => !anchors.includes(anchor)) ??
+        `${race.anchor}-${index + 1}`,
+    );
+  }
+  return anchors;
+}
+
 export async function races(
   election: string,
   polity: string,
   date: string | null,
   isBrief = false,
   isInside = false,
+  isSeated = false,
 ) {
   const day = date ?? "infinity";
   const [found, territory] = await Promise.all([
@@ -13504,115 +13552,262 @@ export async function races(
           .map((row) => row.id),
       ];
       const voting = group.filter((row) => row.isCounted).map((row) => row.id);
-      const [totals, grid, table, spread] = await Promise.all([
+      const isDeferred =
+        isBrief &&
+        isSeated &&
+        head?.body != null &&
+        (head.kind === "body_seats" || head.kind === "list_allocation");
+      const lay = async (isLaid: boolean) =>
+        Promise.all([
+          single == null || !isLaid
+            ? null
+            : places(
+                single,
+                place,
+                true,
+                slugs.get(single.id) ?? null,
+                undefined,
+                null,
+                lineage,
+                "party",
+              ),
+          single != null || !isLaid || first == null || districts.length < 2
+            ? null
+            : (async () => {
+                const prior = await db.execute<{
+                  root: string;
+                  id: string;
+                  date: string;
+                }>(
+                  sql`
+                    select distinct on (h.id) h.id::text as root, c.id, e.date_from::text as date
+                    from contest h
+                    join contest c on (h.seat_id is not null and c.seat_id = h.seat_id)
+                      or (h.seat_id is null and c.district_area_id = h.district_area_id)
+                    join election e on e.id = c.election_id
+                    where h.id = any(${sql.param(districts.map((row) => row.id))}::uuid[])
+                      and c.id <> all(${sql.param(roots)}::uuid[])
+                      and c.kind = h.kind
+                      and c.body_id is not distinct from h.body_id
+                      and c.office_id is not distinct from h.office_id
+                      and c.round_number is not distinct from h.round_number
+                      and c.party_scope_id is not distinct from h.party_scope_id
+                      and e.date_from < ${day}::date and e.status::text <> 'annulled'
+                    order by h.id, e.date_from desc, c.notional desc
+                  `,
+                );
+                const years = Map.groupBy(prior.rows, (row) =>
+                  row.date.slice(0, 4),
+                );
+                const since =
+                  years
+                    .entries()
+                    .toArray()
+                    .toSorted((a, b) => b[1].length - a[1].length)[0]?.[0] ??
+                  null;
+                const latest =
+                  prior.rows
+                    .map((row) => row.date)
+                    .toSorted((a, b) => a.localeCompare(b))
+                    .at(-1) ?? null;
+                const [tabled, at] = await Promise.all([
+                  tabulate(
+                    roots,
+                    districts.map((row) => ({
+                      k: row.k ?? 0,
+                      name: labels.full.get(row.area ?? "") ?? "",
+                      path: slugs.get(row.id) ?? null,
+                      isContest: true,
+                      isRemainder: row.isRemainder,
+                      isCounted: row.isCounted,
+                      owner: row.id,
+                    })),
+                    date,
+                    prior.rows.length === 0
+                      ? null
+                      : {
+                          ids: prior.rows.map((row) => row.id),
+                          date: latest,
+                          pairs: districts.flatMap((row) => {
+                            const match = prior.rows.find(
+                              (entry) => entry.root === row.id,
+                            );
+                            return match == null
+                              ? []
+                              : [{ k: row.k ?? 0, id: match.id }];
+                          }),
+                        },
+                    lineage,
+                    isPrimaries ? "person" : "party",
+                    isPrimaries ? "option" : grouping,
+                  ),
+                  anchors(
+                    districts.map((row) => row.k ?? 0),
+                    day,
+                  ),
+                ]);
+                return {
+                  since,
+                  sample: first.id,
+                  ...tabled,
+                  rows: tabled.rows.map((row, index) => {
+                    const seats = districts[index]?.magnitude ?? null;
+                    return {
+                      ...row,
+                      at: at.get(row.k) ?? null,
+                      seats: seats != null && seats > 1 ? seats : null,
+                    };
+                  }),
+                };
+              })(),
+        ]);
+      const [
+        totals,
+        [grid, table],
+        spread,
+        won,
+        [credited, creditNames],
+        returned,
+        repeated,
+      ] = await Promise.all([
         load(
           voting.length > 0 ? voting : roots,
           [place.k],
           day,
           counted.length > 0 ? counted : roots,
         ),
-        single == null || isBrief
-          ? null
-          : places(
-              single,
-              place,
-              true,
-              slugs.get(single.id) ?? null,
-              undefined,
-              null,
-              lineage,
-              "party",
-            ),
-        single != null || isBrief || first == null || districts.length < 2
-          ? null
-          : (async () => {
-              const prior = await db.execute<{
-                root: string;
-                id: string;
-                date: string;
-              }>(
-                sql`
-                  select distinct on (h.id) h.id::text as root, c.id, e.date_from::text as date
-                  from contest h
-                  join contest c on (h.seat_id is not null and c.seat_id = h.seat_id)
-                    or (h.seat_id is null and c.district_area_id = h.district_area_id)
-                  join election e on e.id = c.election_id
-                  where h.id = any(${sql.param(districts.map((row) => row.id))}::uuid[])
-                    and c.id <> all(${sql.param(roots)}::uuid[])
-                    and c.kind = h.kind
-                    and c.body_id is not distinct from h.body_id
-                    and c.office_id is not distinct from h.office_id
-                    and c.round_number is not distinct from h.round_number
-                    and c.party_scope_id is not distinct from h.party_scope_id
-                    and e.date_from < ${day}::date and e.status::text <> 'annulled'
-                  order by h.id, e.date_from desc, c.notional desc
-                `,
-              );
-              const years = Map.groupBy(prior.rows, (row) =>
-                row.date.slice(0, 4),
-              );
-              const since =
-                years
-                  .entries()
-                  .toArray()
-                  .toSorted((a, b) => b[1].length - a[1].length)[0]?.[0] ??
-                null;
-              const latest =
-                prior.rows
-                  .map((row) => row.date)
-                  .toSorted((a, b) => a.localeCompare(b))
-                  .at(-1) ?? null;
-              const [tabled, at] = await Promise.all([
-                tabulate(
-                  roots,
-                  districts.map((row) => ({
-                    k: row.k ?? 0,
-                    name: labels.full.get(row.area ?? "") ?? "",
-                    path: slugs.get(row.id) ?? null,
-                    isContest: true,
-                    isRemainder: row.isRemainder,
-                    isCounted: row.isCounted,
-                    owner: row.id,
-                  })),
-                  date,
-                  prior.rows.length === 0
-                    ? null
-                    : {
-                        ids: prior.rows.map((row) => row.id),
-                        date: latest,
-                        pairs: districts.flatMap((row) => {
-                          const match = prior.rows.find(
-                            (entry) => entry.root === row.id,
-                          );
-                          return match == null
-                            ? []
-                            : [{ k: row.k ?? 0, id: match.id }];
-                        }),
-                      },
-                  lineage,
-                  isPrimaries ? "person" : "party",
-                  isPrimaries ? "option" : grouping,
-                ),
-                anchors(
-                  districts.map((row) => row.k ?? 0),
-                  day,
-                ),
-              ]);
-              return {
-                since,
-                sample: first.id,
-                ...tabled,
-                rows: tabled.rows.map((row, index) => {
-                  const seats = districts[index]?.magnitude ?? null;
-                  return {
-                    ...row,
-                    at: at.get(row.k) ?? null,
-                    seats: seats != null && seats > 1 ? seats : null,
-                  };
-                }),
-              };
-            })(),
+        lay(!isBrief),
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
+        (async () =>
+          single == null && head?.isOffice === true && roots.length > 1
+            ? new Map(
+                rowsOf(
+                  await db.execute<{ party: string | null; seats: number }>(sql`
+                    select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party, count(distinct x.option_id)::int as seats
+                    from contest c
+                    join election e on e.id = c.election_id
+                    join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                    join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                    join contest_option o on o.id = x.option_id
+                    left join entity_merge pm on pm.entity_id = o.party_id
+                    left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                      and br.kind = 'regional_branch' and br.valid @> e.date_from
+                    left join entity_merge bm on bm.entity_id = br.parent_party_id
+                    where c.id = any(${sql.param(roots)}::uuid[])
+                    group by 1
+                  `),
+                ).map((row) => [
+                  row.party == null
+                    ? null
+                    : `party:${parentOf.get(row.party) ?? row.party}`,
+                  row.seats,
+                ]),
+              )
+            : null)(),
+        (async () => {
+          const credited =
+            grouping === "alliance" && single == null && head?.isOffice !== true
+              ? rowsOf(
+                  await db.execute<{
+                    from: string;
+                    party: string;
+                    seats: number;
+                  }>(sql`
+                    select r.from, r.party, count(*)::int as seats
+                    from (
+                      select distinct on (o.id, x.candidacy_id) coalesce(lm.into_id, o.alliance_id) as from,
+                        coalesce(bm.into_id, br.parent_party_id, pm.into_id, n.party_id) as party
+                      from contest c
+                      join election e on e.id = c.election_id
+                      join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                      join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won')
+                      join contest_option o on o.id = x.option_id and o.alliance_id is not null
+                      join candidacy cy on cy.option_id = o.id and (x.candidacy_id is null or cy.id = x.candidacy_id)
+                      cross join lateral (
+                        select coalesce(
+                          (select min(cn.party_id::text)::uuid from candidacy_nomination cn
+                            where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
+                          cy.member_of_party_id
+                        ) as party_id
+                      ) n
+                      left join entity_merge lm on lm.entity_id = o.alliance_id
+                      left join entity_merge pm on pm.entity_id = n.party_id
+                      left join party_affiliation br on br.party_id = coalesce(pm.into_id, n.party_id)
+                        and br.kind = 'regional_branch' and br.valid @> e.date_from
+                      left join entity_merge bm on bm.entity_id = br.parent_party_id
+                      where c.id = any(${sql.param(roots)}::uuid[]) and n.party_id is not null
+                        and (o.party_id is null or (x.candidacy_id is not null and n.party_id <> o.party_id and exists (
+                          select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id = n.party_id)))
+                      order by o.id, x.candidacy_id, cy.id
+                    ) r
+                    group by 1, 2
+                  `),
+                )
+              : [];
+          const creditNames =
+            credited.length === 0
+              ? null
+              : await names(
+                  credited.flatMap((row) => [
+                    row.from,
+                    parentOf.get(row.party) ?? row.party,
+                  ]),
+                  date,
+                );
+          return [credited, creditNames] as const;
+        })(),
+        single != null || head?.isOffice === true
+          ? null
+          : db.execute<{
+              party: string | null;
+              seats: number;
+              multiple: number;
+            }>(sql`
+              with tacit as (
+                select distinct o.id, coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
+                from contest c
+                join election e on e.id = c.election_id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")} and rs.kind = 'tacit'
+                join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join contest_option o on o.id = x.option_id
+                left join entity_merge pm on pm.entity_id = o.party_id
+                left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                  and br.kind = 'regional_branch' and br.valid @> e.date_from
+                left join entity_merge bm on bm.entity_id = br.parent_party_id
+                where c.id = any(${sql.param(roots)}::uuid[])
+              )
+              select party, count(*)::int as seats,
+                (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate')) as multiple
+              from tacit group by party
+              union all
+              select null, 0, (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
+              where not exists (select from tacit)
+            `),
+        single != null || head?.isOffice === true
+          ? null
+          : db.execute<{
+              party: string | null;
+              name: string;
+              returns: number;
+            }>(sql`
+              select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party,
+                coalesce(min(n.text), '') as name, count(distinct c.id)::int as returns
+              from contest c
+              join election e on e.id = c.election_id
+              join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+              join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+              join contest_option o on o.id = x.option_id and o.kind = 'candidate'
+              join candidacy cy on cy.option_id = o.id
+              left join name n on n.entity_id = cy.person_id and n.is_preferred
+              left join entity_merge pm on pm.entity_id = o.party_id
+              left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                and br.kind = 'regional_branch' and br.valid @> e.date_from
+              left join entity_merge bm on bm.entity_id = br.parent_party_id
+              where c.id = any(${sql.param(roots)}::uuid[])
+              group by cy.person_id, 1
+              having count(distinct c.id) > 1
+              order by 2
+            `),
       ]);
       const direct = totals.get(place.k);
       const pooled =
@@ -13656,81 +13851,6 @@ export async function races(
         ],
         date,
       );
-      const won =
-        single == null && head?.isOffice === true && roots.length > 1
-          ? new Map(
-              rowsOf(
-                await db.execute<{ party: string | null; seats: number }>(sql`
-                  select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party, count(distinct x.option_id)::int as seats
-                  from contest c
-                  join election e on e.id = c.election_id
-                  join result_set rs on rs.contest_id = c.id and ${latest("rs")}
-                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                  join contest_option o on o.id = x.option_id
-                  left join entity_merge pm on pm.entity_id = o.party_id
-                  left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
-                    and br.kind = 'regional_branch' and br.valid @> e.date_from
-                  left join entity_merge bm on bm.entity_id = br.parent_party_id
-                  where c.id = any(${sql.param(roots)}::uuid[])
-                  group by 1
-                `),
-              ).map((row) => [
-                row.party == null
-                  ? null
-                  : `party:${parentOf.get(row.party) ?? row.party}`,
-                row.seats,
-              ]),
-            )
-          : null;
-      const credited =
-        grouping === "alliance" && single == null && head?.isOffice !== true
-          ? rowsOf(
-              await db.execute<{
-                from: string;
-                party: string;
-                seats: number;
-              }>(sql`
-                select r.from, r.party, count(*)::int as seats
-                from (
-                  select distinct on (o.id, x.candidacy_id) coalesce(lm.into_id, o.alliance_id) as from,
-                    coalesce(bm.into_id, br.parent_party_id, pm.into_id, n.party_id) as party
-                  from contest c
-                  join election e on e.id = c.election_id
-                  join result_set rs on rs.contest_id = c.id and ${latest("rs")}
-                  join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won')
-                  join contest_option o on o.id = x.option_id and o.alliance_id is not null
-                  join candidacy cy on cy.option_id = o.id and (x.candidacy_id is null or cy.id = x.candidacy_id)
-                  cross join lateral (
-                    select coalesce(
-                      (select min(cn.party_id::text)::uuid from candidacy_nomination cn
-                        where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
-                      cy.member_of_party_id
-                    ) as party_id
-                  ) n
-                  left join entity_merge lm on lm.entity_id = o.alliance_id
-                  left join entity_merge pm on pm.entity_id = n.party_id
-                  left join party_affiliation br on br.party_id = coalesce(pm.into_id, n.party_id)
-                    and br.kind = 'regional_branch' and br.valid @> e.date_from
-                  left join entity_merge bm on bm.entity_id = br.parent_party_id
-                  where c.id = any(${sql.param(roots)}::uuid[]) and n.party_id is not null
-                    and (o.party_id is null or (x.candidacy_id is not null and n.party_id <> o.party_id and exists (
-                      select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id = n.party_id)))
-                  order by o.id, x.candidacy_id, cy.id
-                ) r
-                group by 1, 2
-              `),
-            )
-          : [];
-      const creditNames =
-        credited.length === 0
-          ? null
-          : await names(
-              credited.flatMap((row) => [
-                row.from,
-                parentOf.get(row.party) ?? row.party,
-              ]),
-              date,
-            );
       const reckoned = folded
         .entries()
         .map(([key, members]) => {
@@ -13850,60 +13970,6 @@ export async function races(
                 ballots: 0,
               };
             });
-      const returned =
-        single != null || head?.isOffice === true
-          ? null
-          : await db.execute<{
-              party: string | null;
-              seats: number;
-              multiple: number;
-            }>(sql`
-              with tacit as (
-                select distinct o.id, coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party
-                from contest c
-                join election e on e.id = c.election_id
-                join result_set rs on rs.contest_id = c.id and ${latest("rs")} and rs.kind = 'tacit'
-                join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                join contest_option o on o.id = x.option_id
-                left join entity_merge pm on pm.entity_id = o.party_id
-                left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
-                  and br.kind = 'regional_branch' and br.valid @> e.date_from
-                left join entity_merge bm on bm.entity_id = br.parent_party_id
-                where c.id = any(${sql.param(roots)}::uuid[])
-              )
-              select party, count(*)::int as seats,
-                (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate')) as multiple
-              from tacit group by party
-              union all
-              select null, 0, (select count(*)::int from contest c left join electoral_system es on es.id = c.electoral_system_id where c.id = any(${sql.param(roots)}::uuid[]) and c.magnitude > 1 and c.kind <> 'list_allocation' and coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') not in ('dhondt', 'hare', 'sainte_lague_schepers', 'stv', 'imperiali_quota', 'hagenbach_bischoff', 'irv') and exists (select from contest_option co where co.contest_id = c.id and co.kind = 'candidate'))
-              where not exists (select from tacit)
-            `);
-      const repeated =
-        single != null || head?.isOffice === true
-          ? null
-          : await db.execute<{
-              party: string | null;
-              name: string;
-              returns: number;
-            }>(sql`
-              select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party,
-                coalesce(min(n.text), '') as name, count(distinct c.id)::int as returns
-              from contest c
-              join election e on e.id = c.election_id
-              join result_set rs on rs.contest_id = c.id and ${latest("rs")}
-              join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-              join contest_option o on o.id = x.option_id and o.kind = 'candidate'
-              join candidacy cy on cy.option_id = o.id
-              left join name n on n.entity_id = cy.person_id and n.is_preferred
-              left join entity_merge pm on pm.entity_id = o.party_id
-              left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
-                and br.kind = 'regional_branch' and br.valid @> e.date_from
-              left join entity_merge bm on bm.entity_id = br.parent_party_id
-              where c.id = any(${sql.param(roots)}::uuid[])
-              group by cy.person_id, 1
-              having count(distinct c.id) > 1
-              order by 2
-            `);
       const unopposed = (returned?.rows ?? []).filter((row) => row.seats > 0);
       let tacit = 0;
       for (const row of unopposed) {
@@ -14487,6 +14553,33 @@ export async function races(
           : carried(previous?.rows ?? null, filled, parentOf);
       const { titled, named } = naming(head, single, groups);
       const chain = group.length === 1 ? chains.get(head?.id ?? "") : undefined;
+      const shape = (
+        laid: typeof grid,
+        tabled: typeof table,
+        named: typeof parties,
+      ) =>
+        tabled == null
+          ? laid
+          : {
+              levels: [
+                {
+                  code: first?.scheme ?? "",
+                  noun: first?.noun ?? "",
+                  count: districts.length,
+                },
+              ],
+              level: first?.scheme ?? "",
+              ...tabled,
+              legend: tabled.legend.map((item) =>
+                item.key.startsWith("party:")
+                  ? {
+                      ...item,
+                      label: named.full.get(item.key.slice(6)) ?? item.label,
+                      short: named.short.get(item.key.slice(6)) ?? null,
+                    }
+                  : item,
+              ),
+            };
       const sources = new Set(
         group.map((row) => {
           const link = chains.get(row.id);
@@ -14549,7 +14642,11 @@ export async function races(
         count: group.length,
         noun: first?.noun ?? "",
         nonvoting: group.filter((row) => !row.isVoting).length,
-        sample: table?.sample ?? null,
+        sample:
+          table?.sample ??
+          (isDeferred && single == null && first != null && districts.length > 1
+            ? first.id
+            : null),
         since:
           table?.since ??
           (before == null && !(isTier && straddled === 0)
@@ -14628,30 +14725,22 @@ export async function races(
                 })),
                 seats: Object.fromEntries(seated.seats),
               },
-        places:
-          table == null
-            ? grid
-            : {
-                levels: [
-                  {
-                    code: first?.scheme ?? "",
-                    noun: first?.noun ?? "",
-                    count: districts.length,
-                  },
-                ],
-                level: first?.scheme ?? "",
-                ...table,
-                legend: table.legend.map((item) =>
-                  item.key.startsWith("party:")
-                    ? {
-                        ...item,
-                        label:
-                          parties.full.get(item.key.slice(6)) ?? item.label,
-                        short: parties.short.get(item.key.slice(6)) ?? null,
-                      }
-                    : item,
+        places: shape(grid, table, parties),
+        layout: isDeferred
+          ? async () => {
+              const [laid, tabled] = await lay(true);
+              return shape(
+                laid,
+                tabled,
+                await names(
+                  (tabled?.legend ?? []).flatMap((item) =>
+                    item.key.startsWith("party:") ? [item.key.slice(6)] : [],
+                  ),
+                  date,
                 ),
-              },
+              );
+            }
+          : null,
       };
     }),
   );
@@ -15402,24 +15491,7 @@ export const elections = {
           where e.id = ${input.id}::uuid and ${within}::uuid is null
           limit 1
         `),
-        db.execute<{ id: string; parties: Array<string> }>(sql`
-          with recursive tree(id) as (
-            select ${input.id}::uuid
-            union all
-            select e.id from election e join tree on e.parent_id = tree.id
-          )
-          select a.alliance_id as id, array_agg(distinct x.id::text) as parties
-          from (
-            select distinct o.alliance_id from contest c
-            join contest_option o on o.contest_id = c.id
-            where c.election_id in (select id from tree) and o.alliance_id is not null
-          ) a
-          join alliance_member m on m.alliance_id = a.alliance_id
-          left join entity_merge pm on pm.entity_id = m.party_id
-          cross join lateral (values (m.party_id), (pm.into_id)) x(id)
-          where x.id is not null
-          group by a.alliance_id
-        `),
+        alliances(input.id),
         db.execute<{ held: number; of: number; noun: string | null }>(sql`
           with recursive tree(id) as (
             select ${input.id}::uuid
@@ -15466,19 +15538,7 @@ export const elections = {
         turnout(anchored?.now ?? null, anchored == null ? [] : [anchored.k]),
         turnout(anchored?.before ?? null, anchored == null ? [] : [anchored.k]),
       ]);
-      const anchors: Array<string> = [];
-      for (const [index, race] of raced.entries()) {
-        const tiers = [
-          race.round != null && race.round > 1 && `round-${race.round}`,
-          race.kind === "list_allocation" && "by-party-list",
-          race.count > 1 && race.noun !== "" && `by-${segment(race.noun)}`,
-          race.isRemainder && "special-election",
-        ].flatMap((tier) => (tier === false ? [] : `${race.anchor}-${tier}`));
-        anchors.push(
-          [race.anchor, ...tiers].find((anchor) => !anchors.includes(anchor)) ??
-            `${race.anchor}-${index + 1}`,
-        );
-      }
+      const anchors = anchorsOf(raced);
       const valid = Math.max(0, ...raced.map((race) => race.valid));
       const totaled = anchored == null ? undefined : turned.get(anchored.k);
       const earlier = anchored == null ? undefined : prior.get(anchored.k);

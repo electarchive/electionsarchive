@@ -10,12 +10,18 @@ import {
   pedersen,
 } from "@ea/analytics/indices";
 import { openapi } from "@orpc/openapi";
-import { call } from "@orpc/server";
+import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import { elections, polities } from "#lib/server/rpc/archive.js";
+import {
+  alliances,
+  anchorsOf,
+  names,
+  polities,
+  races,
+} from "#lib/server/rpc/archive.js";
 
 type Election = Awaited<ReturnType<typeof load>>;
 type Race = Election["races"][number];
@@ -34,10 +40,52 @@ type Chamber = {
   caveats: Array<Caveat>;
 };
 
-const load = async (id: string) => call(elections.get, { id });
+async function load(id: string) {
+  const found = await db.execute<{ polity: string; date: string | null }>(sql`
+    select polity_id::text as polity, date_from::text as date from election where id = ${id}::uuid
+  `);
+  const head = found.rows[0];
+  if (head == null) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const [raced, allied] = await Promise.all([
+    races(id, head.polity, head.date, true, false, true),
+    alliances(id),
+  ]);
+  const samples = raced.flatMap((race) =>
+    race.body != null && race.kind === "body_seats" && (race.round ?? 1) === 1
+      ? [race.sample ?? race.contest ?? []]
+      : [],
+  );
+  const isUmbrella =
+    raced.length >= 5 &&
+    samples.length === raced.length &&
+    new Set(raced.map((race) => race.body)).size === raced.length &&
+    (await (async () => {
+      const whole = await db.execute<{ election: string }>(sql`
+        select c.election_id::text as election from contest c where c.id = any(${sql.param(samples.flat())}::uuid[])
+      `);
+      const held = new Set(whole.rows.map((row) => row.election));
+      return held.size === raced.length && !held.has(id);
+    })());
+  const labels = await names(allied.rows.map((row) => row.id));
+  const anchors = anchorsOf(raced);
+  return {
+    races: isUmbrella
+      ? []
+      : raced.map((race, index) => ({
+          ...race,
+          anchor: anchors[index] ?? race.anchor,
+        })),
+    coalitions: allied.rows.map((row) => ({
+      name: labels.full.get(row.id) ?? "",
+      parties: row.parties,
+    })),
+  };
+}
 
 const isPooled = (row: Row) =>
-  row.isIndependent === true ||
+  row.isIndependent ||
   row.key === "independent" ||
   row.key.startsWith("other") ||
   (row.party == null && row.person == null);
@@ -53,7 +101,10 @@ const seatsOf = (race: Race) => {
   return seats;
 };
 
-function assemble(election: Election, body: string): Chamber | null {
+async function assemble(
+  election: Election,
+  body: string,
+): Promise<Chamber | null> {
   const races = election.races.filter(
     (race) =>
       race.body === body &&
@@ -117,7 +168,8 @@ function assemble(election: Election, body: string): Chamber | null {
     }
   }
   const merge = new Map<string, { key: string; label: string }>();
-  const places = counted.places;
+  const places =
+    counted.layout == null ? counted.places : await counted.layout();
   for (const coalition of election.coalitions) {
     const keys = coalition.parties.map((party) => `party:${party}`);
     const present = keys.filter((key) => votes.has(key) || seats.has(key));
@@ -253,13 +305,10 @@ const chambers = async (id: string) =>
         race.body != null && race.scope == null ? [race.body] : [],
       ),
     );
-    return bodies
-      .values()
-      .flatMap((body) => {
-        const found = assemble(election, body);
-        return found == null ? [] : [found];
-      })
-      .toArray();
+    const found = await Promise.all(
+      bodies.values().map(async (body) => assemble(election, body)),
+    );
+    return found.filter((chamber) => chamber != null);
   });
 
 async function lineage(day: string, keys: Array<string>) {
