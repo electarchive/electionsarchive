@@ -2,8 +2,6 @@ import type { LiveOption, LiveRace } from "@ea/analytics/live";
 import { getContext, setContext } from "svelte";
 import { surname } from "#lib/live/format.js";
 import { sum } from "#lib/live/standing.js";
-import { m } from "#lib/paraglide/messages.js";
-import { getLocale } from "#lib/paraglide/runtime.js";
 
 export type Line = { option: LiveOption; votes: number; share: number | null };
 
@@ -84,15 +82,5 @@ export function lineup(
 }
 
 export function others(rest: Array<Line>) {
-  const names = rest.map((line) => surname(line.option));
-  const listed =
-    names.length <= 3
-      ? names
-      : [
-          ...names.slice(0, 2),
-          m.night_state_card_more({ count: names.length - 2 }),
-        ];
-  return new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
-    listed,
-  );
+  return rest.map((line) => surname(line.option)).join(", ");
 }

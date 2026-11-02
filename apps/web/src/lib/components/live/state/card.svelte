@@ -2,25 +2,34 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
-  import { count, percent } from "#lib/format.js";
-  import { tone } from "#lib/live/format.js";
+  import { percent } from "#lib/format.js";
+  import {
+    compact,
+    initial,
+    lead,
+    stamp,
+    surname,
+    tone,
+  } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
+  import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Also from "./also.svelte";
-  import Seat from "./seat.svelte";
 
   const {
     summary,
     heading,
     held,
     isFlip,
+    closes = null,
     limit = 3,
   }: {
     summary: Summary;
     heading?: string;
     held: { short: string; color: string } | null;
     isFlip: boolean;
+    closes?: number | null;
     limit?: number;
   } = $props();
 
@@ -45,32 +54,103 @@
       race.options.filter((option) => !option.isWriteIn).length <=
         (race.seats ?? 1),
   );
-  const pick = $derived(summary.winner ?? summary.leader);
+  const pick = $derived(summary.winner ?? summary.projected ?? summary.leader);
+  const status = $derived.by(() => {
+    if (summary.winner != null && (race.seats ?? 1) === 1) {
+      return m.night_head_won({
+        name: surname(summary.winner),
+        margin: lead(summary.margin),
+      });
+    }
+    if (summary.projected != null) {
+      return m.night_card_projected({ time: stamp(summary.projectedAt) });
+    }
+    if (summary.total > 0) {
+      return summary.counted == null
+        ? null
+        : m.night_tip_counted({ share: percent(summary.counted, 0) });
+    }
+    if (isUnopposed) {
+      return m.night_state_unopposed();
+    }
+    if (closes == null) {
+      return null;
+    }
+    return Date.now() < closes
+      ? m.night_head_before({ time: stamp(closes) })
+      : m.night_head_waiting();
+  });
+  const context = $derived.by(() => {
+    if (summary.projected != null) {
+      return summary.counted == null
+        ? null
+        : m.night_tip_counted({ share: percent(summary.counted, 0) });
+    }
+    if (summary.winner != null || isUnopposed) {
+      return null;
+    }
+    if (summary.favorite != null && summary.chance != null) {
+      return m.night_nation_chance({
+        name: surname(summary.favorite),
+        chance: percent(summary.chance, 0),
+      });
+    }
+    const prior = race.options.map((_, index) =>
+      sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
+    );
+    const total = sum(prior);
+    const order = prior
+      .map((votes, index) => ({ votes, option: race.options[index] }))
+      .toSorted((a, b) => b.votes - a.votes);
+    const first = order[0];
+    if (total <= 0 || first?.option?.party == null) {
+      return null;
+    }
+    return m.night_tip_baseline({
+      margin: `${initial(first.option)}+${lead((first.votes - (order[1]?.votes ?? 0)) / total)}`,
+    });
+  });
 </script>
 
-<div class="grid gap-2.5">
-  {#if heading != null}
-    <span class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-      <span class="text-sm/snug font-semibold text-pretty">{heading}</span>
-      <span class="flex items-center gap-1.5">
-        {#if isFlip}
-          <Flip
-            party={pick?.party?.short ?? ""}
-            color={tone(pick ?? undefined)}
-          />
+<div class="grid gap-2">
+  <span class="flex items-baseline justify-between gap-3">
+    <span class="text-[0.8125rem]/snug font-semibold text-pretty"
+      >{heading ?? ""}</span
+    >
+    <span class="flex shrink-0 items-center gap-1.5 self-center">
+      {#if isFlip}
+        <Flip
+          party={pick?.party?.short ?? ""}
+          color={tone(pick ?? undefined)}
+        />
+      {/if}
+      <span
+        class="flex items-center gap-1 text-xs whitespace-nowrap text-muted-foreground"
+      >
+        {#if held == null}
+          <span
+            class="rounded-full border border-dashed border-muted-foreground block-2 inline-2"
+          ></span>
+          {m.night_state_open_seat()}
+        {:else}
+          <span
+            class="rounded-full block-2 inline-2"
+            style:background-color={held.color}
+          ></span>
+          {m.night_state_held_seat({ party: held.short })}
         {/if}
-        <Seat {held} />
       </span>
     </span>
-  {/if}
+  </span>
   {#if split.main.length > 0}
     <ol class="grid gap-1.5">
       {#each split.main as line (line.option.id)}
         {const share = $derived(line.share)}
         {const isWinner = $derived(winners.has(line.option.id))}
+        {const isProjected = $derived(summary.projected?.id === line.option.id)}
         <li class="grid gap-0.5">
           <span
-            class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 text-[0.8125rem]"
+            class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 text-[0.8125rem]/snug"
           >
             <span class="flex items-baseline gap-1.5 min-inline-0">
               <span
@@ -79,13 +159,13 @@
               ></span>
               <span
                 class={cn("truncate", {
-                  "font-bold": isWinner,
-                  "font-medium": !isWinner,
+                  "font-semibold": isWinner || isProjected,
                 })}>{line.option.label}</span
               >
               {#if line.option.party != null}
-                <span class="shrink-0 text-xs text-muted-foreground"
-                  >{line.option.party.short}</span
+                <abbr
+                  class="shrink-0 text-xs text-muted-foreground no-underline"
+                  title={line.option.party.name}>{initial(line.option)}</abbr
                 >
               {/if}
               {#if isWinner}
@@ -93,13 +173,19 @@
                   class="shrink-0 self-center block-3.5 inline-3.5"
                   aria-label={m.night_state_won()}
                 />
+              {:else if isProjected}
+                <span
+                  class="shrink-0 self-center rounded-full bg-foreground block-1.5 inline-1.5"
+                  role="img"
+                  aria-label={m.night_rating_projected()}
+                ></span>
               {/if}
             </span>
-            <span class="font-figures tabular-nums">
+            <span class="font-figures whitespace-nowrap tabular-nums">
               {#if share != null}
                 <span class="font-semibold">{percent(share)}</span>
                 <span class="ms-1 text-xs text-muted-foreground"
-                  >{count(line.votes)}</span
+                  >{compact(line.votes)}</span
                 >
               {:else if line.option.isIncumbent}
                 <span class="text-xs text-muted-foreground"
@@ -110,7 +196,7 @@
           </span>
           {#if summary.total > 0}
             <span
-              class="relative overflow-hidden rounded-xs bg-muted block-1"
+              class="relative overflow-hidden rounded-full bg-muted block-0.75"
               aria-hidden="true"
             >
               <span
@@ -125,26 +211,22 @@
     </ol>
   {/if}
   <Also rest={split.rest} total={summary.total} />
-  <span
-    class="flex items-center justify-between gap-3 text-xs text-muted-foreground"
-  >
-    <span class="font-figures tabular-nums"
-      >{summary.counted == null
-        ? isUnopposed
-          ? m.night_state_unopposed()
-          : m.night_nation_waiting()
-        : m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
+  {#if status != null || context != null}
+    <span
+      class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs text-muted-foreground"
     >
-    {#if heading == null}
-      <span class="flex items-center gap-1.5">
-        {#if isFlip}
-          <Flip
-            party={pick?.party?.short ?? ""}
-            color={tone(pick ?? undefined)}
-          />
+      <span class="flex items-center gap-1.5 text-pretty">
+        {#if summary.projected != null}
+          <span
+            class="shrink-0 rounded-full bg-foreground block-1.5 inline-1.5"
+            aria-hidden="true"
+          ></span>
         {/if}
-        <Seat {held} />
+        <span class="font-figures tabular-nums">{status ?? ""}</span>
       </span>
-    {/if}
-  </span>
+      {#if context != null}
+        <span class="font-figures tabular-nums">{context}</span>
+      {/if}
+    </span>
+  {/if}
 </div>

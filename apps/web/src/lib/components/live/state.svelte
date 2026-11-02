@@ -495,6 +495,7 @@
                       heading={seatLabel(entry)}
                       held={entry.held}
                       isFlip={entry.isFlip}
+                      closes={closes == null ? null : Date.parse(closes)}
                     />
                   {/snippet}
                   {entry.contest.seat === "at-large"
@@ -601,6 +602,11 @@
     href={href(entry)}
     action={m.night_state_results()}
   >
-    <Card summary={entry.summary} held={entry.held} isFlip={entry.isFlip} />
+    <Card
+      summary={entry.summary}
+      held={entry.held}
+      isFlip={entry.isFlip}
+      closes={closes == null ? null : Date.parse(closes)}
+    />
   </Sheet>
 {/if}

@@ -4283,6 +4283,7 @@
   "night_tip_baseline": "Last time: {margin}",
   "night_tip_counted": "{share} counted",
   "night_tip_projected": "Our projection at {time}, not an official result",
+  "night_card_projected": "Projected at {time}, unofficial",
   "night_tip_waiting": "No votes yet",
   "night_tool_back": "Previous update",
   "night_tool_clear": "Clear all",
@@ -4869,7 +4870,6 @@
       }
     }
   ],
-  "night_state_card_more": "{count} more",
   "night_pick_senate_title": "U.S. Senate",
   "night_pick_governor_title": "Governor",
   "night_pick_quiet": "No Senate or governor race here. The state's page lists the rest of its ballot.",
@@ -4880,7 +4880,6 @@
   "night_dial_history_empty": "No estimates yet",
   "night_left_empty": "The places with the most votes left to count show up here once the estimate starts.",
   "night_nation_map_missing": "This election has no national map.",
-  "night_state_also": "Also running: {names}",
   "night_state_held_seat": "{party} seat",
   "indices_title": "Party system indices",
   "indices_effective": "Effective parties",

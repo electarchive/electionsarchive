@@ -36,7 +36,7 @@
     sides as sidesOf,
     STATES,
   } from "#lib/live/nation.js";
-  import { party, summarize, tally } from "#lib/live/summary.js";
+  import { closing, party, summarize, tally } from "#lib/live/summary.js";
   import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -821,6 +821,7 @@
       senate={(code: string) => of(code, "senate")}
       governor={(code: string) => of(code, "governor")}
       counted={reported}
+      closes={(summary: Summary) => closing(election, summary.race)}
       describe={(summary: Summary) => {
         const entry = seatById.get(summary.race.id);
         return {

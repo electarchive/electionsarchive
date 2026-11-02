@@ -19,7 +19,16 @@
   <p
     class="flex items-baseline justify-between gap-3 text-xs text-muted-foreground"
   >
-    <span class="truncate">{m.night_state_also({ names: others(rest) })}</span>
+    <span class="flex items-baseline gap-1.5 min-inline-0">
+      {#if rest.length === 1}
+        <span class="truncate">{rest[0]?.option.label}</span>
+      {:else}
+        <span class="shrink-0 text-foreground"
+          >{m.night_others({ count: rest.length })}</span
+        >
+        <span class="truncate">{others(rest)}</span>
+      {/if}
+    </span>
     {#if total > 0}
       <span class="shrink-0 font-figures tabular-nums"
         >{percent(votes / total)}</span

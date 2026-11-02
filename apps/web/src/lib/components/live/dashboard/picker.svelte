@@ -4,7 +4,7 @@
   import Peek from "#lib/components/live/state/peek.svelte";
   import Sheet from "#lib/components/live/state/sheet.svelte";
   import { percent } from "#lib/format.js";
-  import { tone } from "#lib/live/format.js";
+  import { stamp, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -14,6 +14,7 @@
     senate,
     governor,
     counted,
+    closes,
     describe,
     href,
   }: {
@@ -22,6 +23,7 @@
     senate: (code: string) => Array<Summary>;
     governor: (code: string) => Array<Summary>;
     counted: (code: string) => number | null;
+    closes: (summary: Summary) => number;
     describe: (summary: Summary) => {
       held: { short: string; color: string } | null;
       isFlip: boolean;
@@ -89,6 +91,18 @@
   const known = $derived(new Set(codes));
   const name = (code: string) => labels[code] ?? code.toUpperCase();
 
+  function note(code: string) {
+    const all = [...senate(code), ...governor(code)];
+    const first = all[0];
+    if (first == null || all.some((summary) => summary.total > 0)) {
+      return null;
+    }
+    const at = closes(first);
+    return Date.now() < at
+      ? m.night_head_before({ time: stamp(at) })
+      : m.night_head_waiting();
+  }
+
   function look(summary: Summary) {
     const called = summary.winner ?? summary.projected;
     const ahead = called ?? (summary.total > 0 ? summary.leader : null);
@@ -138,10 +152,10 @@
       {m.night_pick_quiet()}
     </p>
   {:else}
-    <div class="grid gap-3 divide-y divide-border">
+    <div class="grid gap-2.5 divide-y divide-border">
       {#each found as item (item.summary.race.id)}
         {const described = $derived(describe(item.summary))}
-        <div class="pbe-3 last:pbe-0">
+        <div class="pbe-2.5 last:pbe-0">
           <Card
             summary={item.summary}
             heading={item.heading}
@@ -197,7 +211,16 @@
           }}
         >
           {#snippet card()}
-            <span class="text-sm font-semibold">{name(code)}</span>
+            {const status = $derived(note(code))}
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="text-sm font-semibold">{name(code)}</span>
+              {#if status != null}
+                <span
+                  class="font-figures text-xs text-muted-foreground tabular-nums"
+                  >{status}</span
+                >
+              {/if}
+            </span>
             {@render races(code)}
           {/snippet}
           <span
@@ -242,6 +265,12 @@
     href={href(code)}
     action={m.night_pick_open({ state: name(code) })}
   >
+    {const status = $derived(note(code))}
+    {#if status != null}
+      <p class="font-figures text-xs text-muted-foreground tabular-nums">
+        {status}
+      </p>
+    {/if}
     {@render races(code)}
   </Sheet>
 {/if}
