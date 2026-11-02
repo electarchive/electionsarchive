@@ -68,6 +68,7 @@
   let {
     places,
     isTally = false,
+    isFinal = false,
     colors,
     tiles,
     own,
@@ -100,6 +101,7 @@
   }: {
     places: Places;
     isTally?: boolean;
+    isFinal?: boolean;
     colors: Array<string>;
     tiles: string;
     own: {
@@ -1795,7 +1797,7 @@
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
   );
   const runoffs = $derived(
-    view === "winner" || view === "flips"
+    !isFinal && (view === "winner" || view === "flips")
       ? places.rows.filter((row) => row.runoff != null)
       : [],
   );

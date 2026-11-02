@@ -624,6 +624,7 @@
             {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
               <PlaceMap
                 {places}
+                isFinal
                 colors={places.legend.map((item) =>
                   swatch(item.color, item.key),
                 )}
