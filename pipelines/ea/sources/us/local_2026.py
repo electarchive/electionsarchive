@@ -11057,7 +11057,22 @@ def parse() -> None:
                                 or (
                                     sort == "school"
                                     or state
-                                    in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL", "NE", "TN")
+                                    in (
+                                        "MI",
+                                        "CA",
+                                        "NJ",
+                                        "TX",
+                                        "UT",
+                                        "AZ",
+                                        "MD",
+                                        "VA",
+                                        "RI",
+                                        "NC",
+                                        "IN",
+                                        "IL",
+                                        "NE",
+                                        "TN",
+                                    )
                                 )
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
@@ -11115,7 +11130,8 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY", "TN")
+                        state
+                        in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY", "TN")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
@@ -11497,7 +11513,9 @@ def parse() -> None:
                     base = minted.get(tail)
                     if base is None and place:
                         base = (
-                            re.sub(rf"(?i)^{re.escape(place.removesuffix(' County'))}(?: county)?\s+", "", used[tail]).title(),
+                            re.sub(
+                                rf"(?i)^{re.escape(place.removesuffix(' County'))}(?: county)?\s+", "", used[tail]
+                            ).title(),
                             place,
                             "",
                             "",

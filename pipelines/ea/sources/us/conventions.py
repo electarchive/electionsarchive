@@ -417,7 +417,14 @@ TABLES += [
     )
 ]
 TABLES += [
-    {"table": "1852:democratic:b49", "item": "proceedingsofde00demo", "leaves": (65,), "ballot": 49, "scatter": True, "bycandidate": True}
+    {
+        "table": "1852:democratic:b49",
+        "item": "proceedingsofde00demo",
+        "leaves": (65,),
+        "ballot": 49,
+        "scatter": True,
+        "bycandidate": True,
+    }
 ]
 TABLES += [
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
@@ -791,7 +798,16 @@ CANDIDATES = {
     "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
 }
 UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands", "CZ": "Canal Zone"}
-ABSTAINED = {"votes", "Present and Not Voting", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
+ABSTAINED = {
+    "votes",
+    "Present and Not Voting",
+    "Abstention",
+    "not voting",
+    "Not voting",
+    "Not Voting",
+    "Not Voting or Absent",
+    "Absent",
+}
 OFFICIAL = (
     "The roll call of the states on the presidential nomination, as tabulated in {}, read from the scanned volume "
     "page by page."
@@ -917,7 +933,20 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Poinddexter": "Poindexter", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer", "Owens": "Owen"}
+LABELS = {
+    "Washbarne": "Washburne",
+    "Poinddexter": "Poindexter",
+    "Elaine": "Blaine",
+    "Mcclellan": "McClellan",
+    "Macgregor": "MacGregor",
+    "Du Pont": "du Pont",
+    "La Follette": "La Follette",
+    "T.H.Seymour": "T. H. Seymour",
+    "Mcdonald": "McDonald",
+    "Pennroyer": "Pennoyer",
+    "Pennrover": "Pennoyer",
+    "Owens": "Owen",
+}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1852:democratic:b49": [
@@ -1794,7 +1823,10 @@ MISPRINTS = {
             "(the figure the rows give is stored); the other columns match their printed totals. The Nevada row "
             "prints three votes each for Tilden, Thurman, and Hendricks, nine from a delegation of six, and is stored as printed."
         ),
-        {"NV": (6, 9, "three votes each for three candidates against a delegation of six"), "column Tilden": (404.5, 401.5, "the state figures add to 401\u00bd")},
+        {
+            "NV": (6, 9, "three votes each for three candidates against a delegation of six"),
+            "column Tilden": (404.5, 401.5, "the state figures add to 401\u00bd"),
+        },
     ),
     "1864:republican": (
         (
@@ -1957,7 +1989,12 @@ def region(spec: dict[str, object], leaf: int) -> str | None:
 
 def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
     only = spec.get("reads", {}).get(leaf)
-    return "transcribed" in spec or (scatter and not spec.get("scatter")) or (not scatter and bool(spec.get("bycandidate"))) or (only is not None and only != ("scatter" if scatter else "table"))
+    return (
+        "transcribed" in spec
+        or (scatter and not spec.get("scatter"))
+        or (not scatter and bool(spec.get("bycandidate")))
+        or (only is not None and only != ("scatter" if scatter else "table"))
+    )
 
 
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
@@ -2074,7 +2111,9 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             header = header[1:]
         if scatter:
             for column in header:
-                if place(column["label"]) is None and not re.fullmatch(r"\s*totals?\.?\s*", column["label"], re.IGNORECASE):
+                if place(column["label"]) is None and not re.fullmatch(
+                    r"\s*totals?\.?\s*", column["label"], re.IGNORECASE
+                ):
                     problems.append(f"leaf {leaf}: unknown state {column['label']!r}")
             for row in read["rows"]:
                 if len(row["values"]) != len(header):
@@ -2082,7 +2121,11 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                     continue
                 for column, value in zip(header, row["values"], strict=True):
                     code = place(column["label"])
-                    if code is None and value.strip() and re.fullmatch(r"\s*totals?\.?\s*", column["label"], re.IGNORECASE):
+                    if (
+                        code is None
+                        and value.strip()
+                        and re.fullmatch(r"\s*totals?\.?\s*", column["label"], re.IGNORECASE)
+                    ):
                         try:
                             totals[scattered(row["label"])] = totals.get(scattered(row["label"]), 0) + number(value)
                         except ValueError:
@@ -2679,10 +2722,13 @@ def emit() -> Path:
                         else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[convention['held'] - 1]} ballot"
                     )
                     method += HELD.format(deciding)
-                method += f" The convention met in {convention.get('cities', {}).get(number, convention['city'])} and " + (
-                    f"took this ballot in its session of {day:%B %-d, %Y}"
-                    if party == "democratic"
-                    else f"voted on {day:%B %-d, %Y}"
+                method += (
+                    f" The convention met in {convention.get('cities', {}).get(number, convention['city'])} and "
+                    + (
+                        f"took this ballot in its session of {day:%B %-d, %Y}"
+                        if party == "democratic"
+                        else f"voted on {day:%B %-d, %Y}"
+                    )
                 )
                 share = "two-thirds" if rule == "two-thirds" else "a majority"
                 method += (
@@ -2787,7 +2833,12 @@ def emit() -> Path:
                     )
                 if number == convention["deciding"]:
                     winner = max(totals, key=lambda column: totals[column])
-                    if rule == "two-thirds" and required is not None and totals[winner] < required and not (convention.get("acclamation") or convention.get("shifted")):
+                    if (
+                        rule == "two-thirds"
+                        and required is not None
+                        and totals[winner] < required
+                        and not (convention.get("acclamation") or convention.get("shifted"))
+                    ):
                         raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
                     cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(

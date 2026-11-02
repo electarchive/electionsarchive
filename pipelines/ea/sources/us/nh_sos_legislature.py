@@ -365,8 +365,11 @@ def emit() -> Path:
                 [default, contest],
             ).fetchall()
             rows = rows.with_columns(unit=pl.col("town").map_elements(town, return_dtype=pl.String))
-            repeats = rows.filter(~pl.col("label").is_in(["RECOUNT", "Overvotes", "Undervotes"])).group_by("label", "unit").agg(pl.col("votes").n_unique().alias("distinct")).filter(
-                pl.col("distinct") > 1
+            repeats = (
+                rows.filter(~pl.col("label").is_in(["RECOUNT", "Overvotes", "Undervotes"]))
+                .group_by("label", "unit")
+                .agg(pl.col("votes").n_unique().alias("distinct"))
+                .filter(pl.col("distinct") > 1)
             )
             if repeats.height:
                 skipped.setdefault("repeated town rows disagree", []).append(key)
@@ -379,10 +382,17 @@ def emit() -> Path:
                     continue
                 name = re.sub(r"\s*\(recount\)$", "", label)
                 name = re.sub(r"^write-in\s+", "", name, flags=re.IGNORECASE)
-                name = re.sub(r"\s*\(?\bw(?:rite)?[-/]?in\.?\)?$|(?:,\s*[a-z]{1,3}|\s+[dr])(?:[/&][a-z]{1,3})*$", "", name, flags=re.IGNORECASE)
+                name = re.sub(
+                    r"\s*\(?\bw(?:rite)?[-/]?in\.?\)?$|(?:,\s*[a-z]{1,3}|\s+[dr])(?:[/&][a-z]{1,3})*$",
+                    "",
+                    name,
+                    flags=re.IGNORECASE,
+                )
                 name = re.sub(r",?\s*\b(?:jr|sr|ii|iii|iv)\.?$", "", name, flags=re.IGNORECASE).strip()
                 if re.fullmatch(r"scat\w*", name, flags=re.IGNORECASE):
-                    hits = [o for o in options if o[2] == "write_in" and re.search(r"scatter|write", o[1], re.IGNORECASE)]
+                    hits = [
+                        o for o in options if o[2] == "write_in" and re.search(r"scatter|write", o[1], re.IGNORECASE)
+                    ]
                     if not hits:
                         continue
                 else:

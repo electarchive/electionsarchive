@@ -490,7 +490,14 @@ LINE_FIXES = {
     2624: {"votes": 13194, "digits": "13,194"},
     2626: {"name": "Arthur C. Godjikian, Jr.", "town": "Mason"},
     3506: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
-    3507: {"name": "David K. Wheeler", "town": "Milford", "party": "d", "total_party": "d", "group": 69, "printed": 3445},
+    3507: {
+        "name": "David K. Wheeler",
+        "town": "Milford",
+        "party": "d",
+        "total_party": "d",
+        "group": 69,
+        "printed": 3445,
+    },
     3508: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
     3509: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
     91104: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
@@ -700,7 +707,13 @@ LINE_FIXES = {
 }
 LINE_DROPS = {3594, 1456, 2912, 335, 1781, 1828, 2185, 3513, 3964, 5172}
 LINE_ADDS = {
-    92101: {"template": 1718, "name": "Robert B. Monier", "town": "Goffstown", "votes": 4245, "y": (167.5, 177.7, 1000)},
+    92101: {
+        "template": 1718,
+        "name": "Robert B. Monier",
+        "town": "Goffstown",
+        "votes": 4245,
+        "y": (167.5, 177.7, 1000),
+    },
     92102: {"template": 1726, "name": "Carleton Eldredge", "town": "Stratham", "votes": 9, "y": (305.9, 316.0, 1000)},
     92103: {"template": 1726, "name": "Robert B. Monier", "town": "Goffstown", "votes": 9, "y": (330.2, 341.0, 1000)},
     92104: {"template": 1726, "name": "Robert C. Smith", "town": "Tuftonboro", "votes": 36, "y": (342.3, 353.0, 1000)},

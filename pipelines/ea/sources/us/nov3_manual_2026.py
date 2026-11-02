@@ -305,12 +305,36 @@ COUNTIES = {
     ),
     "44007-jo": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/1601.pdf"),
     "44007-sc": ("RI", "https://vote.sos.ri.gov/Home/PollingPlaces?ActiveFlag=2", "MF-542/3001.pdf"),
-    "44007-fo": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/1201.pdf", "MF-542/1201.pdf"),
-    "44007-gl": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/1301.pdf", "MF-542/1301.pdf"),
-    "44009-na": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/2001.pdf", "MF-542/2001.pdf"),
-    "44007-ns": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/2501.pdf", "MF-542/2501.pdf"),
-    "44009-sk": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/3201.pdf", "MF-542/3201.pdf"),
-    "44005-tv": ("RI", "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/3301.pdf", "MF-542/3301.pdf"),
+    "44007-fo": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/1201.pdf",
+        "MF-542/1201.pdf",
+    ),
+    "44007-gl": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/1301.pdf",
+        "MF-542/1301.pdf",
+    ),
+    "44009-na": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/2001.pdf",
+        "MF-542/2001.pdf",
+    ),
+    "44007-ns": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/2501.pdf",
+        "MF-542/2501.pdf",
+    ),
+    "44009-sk": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/3201.pdf",
+        "MF-542/3201.pdf",
+    ),
+    "44005-tv": (
+        "RI",
+        "https://risos-legacy-files-public.s3.amazonaws.com/documents/elections/ballots/2026/11/03/3301.pdf",
+        "MF-542/3301.pdf",
+    ),
     "44009": (
         "RI",
         "https://www.richmondri.gov/DocumentCenter/View/4674/Chariho-Public-Notice-1022026",

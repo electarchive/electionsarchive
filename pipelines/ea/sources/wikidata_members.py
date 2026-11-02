@@ -197,8 +197,10 @@ def emit() -> Path:
                     withheld.add((people[item][0], parties[party][0]))
                     continue
                 dated = any(other == party and (s or e) for other, s, _, e, _ in rows)
-                if start is None and end is None and (
-                    len(named) > 1 or dated or (people[item][0], parties[party][0]) in elsewhere
+                if (
+                    start is None
+                    and end is None
+                    and (len(named) > 1 or dated or (people[item][0], parties[party][0]) in elsewhere)
                 ):
                     undated += 1
                     continue

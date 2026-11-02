@@ -609,9 +609,7 @@ def emit() -> Path:
             cs.add("area_code", area_id=province_areas[code], code=code, valid_from=None)
             cs.add("area_parent", area_id=province_areas[code], parent_id=nation)
             name(province_areas[code], label)
-            cs.add(
-                "polity_territory", polity_id=province, area_id=province_areas[code], valid_from=ENTRY[abbreviation]
-            )
+            cs.add("polity_territory", polity_id=province, area_id=province_areas[code], valid_from=ENTRY[abbreviation])
             cs.add(
                 "area_geometry",
                 area_id=province_areas[code],

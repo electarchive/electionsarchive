@@ -345,11 +345,15 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             state.update(office=None, district=None, opening=False)
         last_page = row.page
         found = number(row.words)
-        if found is None and len(row.words) > 2 and re.fullmatch(r"[Il|]{3}", row.words[-1].text):
-            if re.search(
+        if (
+            found is None
+            and len(row.words) > 2
+            and re.fullmatch(r"[Il|]{3}", row.words[-1].text)
+            and re.search(
                 r"(?i)otal\W*vote\W*[rdl1]?\W*$", " ".join(word.text for word in row.words[:-1]).replace(".", "")
-            ):
-                found = (111, False, row.words[-1:])
+            )
+        ):
+            found = (111, False, row.words[-1:])
         left = (
             [word for word in row.words[: row.words.index(found[2][0])] if not LEADER.fullmatch(word.text)]
             if found

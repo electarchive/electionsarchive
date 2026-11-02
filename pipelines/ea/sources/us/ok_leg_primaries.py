@@ -68,9 +68,9 @@ def races(day: date) -> dict[tuple[str, int, str, bool], dict[str, dict[str, int
         if match is None or row["race_party"] not in PARTIES:
             continue
         chamber = "senate" if match[1] == "SENATOR" else "house"
-        found[(chamber, int(match[2]), row["race_party"], match[3] is not None)][row["cand_name"].upper().strip()][row["county"]] += int(
-            row["cand_tot_votes"]
-        )
+        found[(chamber, int(match[2]), row["race_party"], match[3] is not None)][row["cand_name"].upper().strip()][
+            row["county"]
+        ] += int(row["cand_tot_votes"])
     return found
 
 

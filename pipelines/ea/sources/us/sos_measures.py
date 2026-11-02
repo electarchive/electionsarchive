@@ -7348,7 +7348,9 @@ def district_2014() -> list[dict[str, object]]:
     section = text[text.index("INITIATIVE #71 LEGALIZATION MARIJUANA") :]
     rows: list[dict[str, object]] = []
     for answer, heading in (("YES", "FOR INITIATIVE 71"), ("NO", "AGAINST INITIATIVE 71")):
-        figures = [int(cell.replace(",", "")) for cell in re.search(rf"^{heading}\s+(.+)$", section, re.M)[1].split()]
+        figures = [
+            int(cell.replace(",", "")) for cell in re.search(rf"^{heading}\s+(.+)$", section, re.MULTILINE)[1].split()
+        ]
         if len(figures) != 9 or sum(figures[:8]) != figures[8]:
             raise ValueError(f"DC 2014 Initiative 71 {answer}: wards do not add up to the printed total")
         rows.append(

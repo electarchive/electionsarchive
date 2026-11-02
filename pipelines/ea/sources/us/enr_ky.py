@@ -20,7 +20,7 @@ VOTE_FOR = re.compile(r"\s*-\s*\(Vote for[^)]*\)\s*$", re.IGNORECASE)
 
 def cells(content: bytes) -> list[str]:
     text = content.decode(errors="replace")
-    body = re.sub(r"<style.*?</style>", "", text[text.find("<body") :], flags=re.S)
+    body = re.sub(r"<style.*?</style>", "", text[text.find("<body") :], flags=re.DOTALL)
     return [x.strip() for x in html.unescape(re.sub(r"<[^>]+>", "|", body)).split("|") if x.strip()]
 
 

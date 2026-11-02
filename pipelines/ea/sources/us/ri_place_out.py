@@ -5,7 +5,9 @@ from ea.store import connect
 
 SOURCE = "us.ri_place_out"
 VERSION = "1"
-REASON = "Duplicate of the town's own contest: Rhode Island towns are recorded under the town polity, not a place polity"
+REASON = (
+    "Duplicate of the town's own contest: Rhode Island towns are recorded under the town polity, not a place polity"
+)
 SLUGS = ("us/ri/charlestown-place", "us/ri/hopkinton-place")
 
 
@@ -34,6 +36,8 @@ def emit() -> Path | None:
             summary="Retire duplicate Charlestown and Hopkinton ballot measure contests recorded under place polities",
             polity="US",
         )
-        for entity, kind in sorted(rows, key=lambda row: ("contest", "election", "reporting_unit", "polity").index(row[1])):
+        for entity, kind in sorted(
+            rows, key=lambda row: ("contest", "election", "reporting_unit", "polity").index(row[1])
+        ):
             cs.add("entity_retirement", entity_id=entity, reason=REASON)
         return cs.write()

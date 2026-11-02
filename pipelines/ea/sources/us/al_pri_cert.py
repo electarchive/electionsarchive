@@ -130,7 +130,7 @@ def parse_2006(text: str, fips: dict[str, str]) -> list[tuple]:
         candidates = [m.group().upper().replace(", JR.", " JR.") for m in names]
         districts = [2, 2, 7, 7]
         for row in lines[number + 3 :]:
-            if row.startswith("TOTAL") or row.startswith("Prepared"):
+            if row.startswith(("TOTAL", "Prepared")):
                 break
             county = row[:20].strip()
             if not county or county.startswith("County"):

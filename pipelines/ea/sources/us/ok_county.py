@@ -16,7 +16,9 @@ SOURCE = "us.ok_county"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://results.okelections.gov/OKER/?elecDate="
-DAYS = [date(year, 11, day) for year, day in ((2012, 6), (2014, 4), (2016, 8), (2018, 6), (2020, 3), (2022, 8), (2024, 5))]
+DAYS = [
+    date(year, 11, day) for year, day in ((2012, 6), (2014, 4), (2016, 8), (2018, 6), (2020, 3), (2022, 8), (2024, 5))
+]
 PUBLISHER = "Oklahoma State Election Board"
 TITLE = "Election results: county level results"
 DOWNLOADS = DATA / "inbox" / "manual" / "MF-334"
@@ -62,9 +64,7 @@ def parse() -> None:
             .filter(description.str.contains(RACE))
             .select(
                 year=pl.lit(day.year, pl.Int32),
-                chamber=pl.when(description.str.contains("SENATOR"))
-                .then(pl.lit("senate:"))
-                .otherwise(pl.lit("house:"))
+                chamber=pl.when(description.str.contains("SENATOR")).then(pl.lit("senate:")).otherwise(pl.lit("house:"))
                 + description.str.extract(RACE, 2)
                 + pl.when(description.str.contains("UNEXPIRED")).then(pl.lit(":gs")).otherwise(pl.lit(":g")),
                 day=pl.lit(day),
