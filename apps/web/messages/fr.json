@@ -1888,8 +1888,6 @@
   "atlas_column_swing": "Variation",
   "atlas_column_within": "Rattachement",
   "atlas_image": "Enregistrer l’image",
-  "atlas_link": "Copier le lien",
-  "atlas_copied": "Copié",
   "atlas_margin_in": "Écart en {year}",
   "atlas_scatter_hint": "Les lieux au-dessus de la ligne ont penché vers {name}. Faites glisser sur le graphique pour sélectionner des lieux.",
   "atlas_none_match": "Aucun lieu ne correspond aux filtres.",

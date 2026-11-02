@@ -283,8 +283,6 @@ export function basemap(
       inside,
       "var(--foreground)",
       [
-        [3, 12, REGULAR, 9, 0],
-        [2, 12.5, REGULAR, 6, 0],
         [1, 13, STRONG, 0, 0],
         [0, 14, STRONG, 0, 0],
       ],
@@ -323,8 +321,14 @@ export function basemap(
             "text-font": font,
             "text-size": size,
             "text-max-width": 8,
-            "text-variable-anchor": ["top", "bottom", "left", "right"],
-            "text-radial-offset": 0.5,
+            "text-anchor": ["step", ["zoom"], "top", 8, "center"],
+            "text-offset": [
+              "step",
+              ["zoom"],
+              ["literal", [0, 0.5]],
+              8,
+              ["literal", [0, 0]],
+            ],
             "symbol-sort-key": ["-", ["get", "mz"], ["/", ["get", "pop"], 1e8]],
           },
           paint: {

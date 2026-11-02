@@ -1851,8 +1851,6 @@
   "atlas_column_swing": "Swing",
   "atlas_column_within": "Gehört zu",
   "atlas_image": "Bild speichern",
-  "atlas_link": "Link kopieren",
-  "atlas_copied": "Kopiert",
   "atlas_margin_in": "Vorsprung {year}",
   "atlas_scatter_hint": "Orte oberhalb der Linie haben sich in Richtung {name} bewegt. Zum Auswählen von Orten über das Diagramm ziehen.",
   "atlas_none_match": "Keine Orte entsprechen den Filtern.",

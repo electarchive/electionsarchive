@@ -1790,19 +1790,6 @@
       {/if}
       <p id="{uid}-hint" class="sr-only">{m.atlas_hint()}</p>
 
-      <div
-        class="pointer-events-none absolute inset-0 overflow-hidden"
-        aria-hidden="true"
-      >
-        {#each stage.labels as label (label.k)}
-          <span
-            class="absolute inset-s-0 inset-bs-0 text-[0.75rem] font-semibold whitespace-nowrap text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill]"
-            style:transform="translate({label.x}px, {label.y}px) translate(-50%,
-            -50%)">{label.name}</span
-          >
-        {/each}
-      </div>
-
       {#if glance != null && pointer != null}
         <Hover summary={glance} point={pointer} {room} />
       {/if}

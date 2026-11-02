@@ -1850,8 +1850,6 @@
   "atlas_column_swing": "Oy kayması",
   "atlas_column_within": "Bağlı olduğu yer",
   "atlas_image": "Görseli kaydet",
-  "atlas_link": "Bağlantıyı kopyala",
-  "atlas_copied": "Kopyalandı",
   "atlas_margin_in": "{year} oy farkı",
   "atlas_scatter_hint": "Çizginin üstündeki yerler {name} lehine kaydı. Yer seçmek için grafiğin üzerinde sürükleyin.",
   "atlas_none_match": "Filtrelere uyan yer yok.",

@@ -1886,8 +1886,6 @@
   "atlas_column_swing": "Oscilação",
   "atlas_column_within": "Pertence a",
   "atlas_image": "Salvar imagem",
-  "atlas_link": "Copiar link",
-  "atlas_copied": "Copiado",
   "atlas_margin_in": "Margem em {year}",
   "atlas_scatter_hint": "Os locais acima da linha se moveram em direção a {name}. Arraste sobre o gráfico para selecionar locais.",
   "atlas_none_match": "Nenhum local corresponde aos filtros.",

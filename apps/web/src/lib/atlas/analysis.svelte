@@ -2,9 +2,7 @@
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import ArrowUpDownIcon from "@lucide/svelte/icons/arrow-up-down";
-  import CopyCheckIcon from "@lucide/svelte/icons/copy-check";
   import ImageDownIcon from "@lucide/svelte/icons/image-down";
-  import LinkIcon from "@lucide/svelte/icons/link";
   import XIcon from "@lucide/svelte/icons/x";
   import Download from "#lib/components/download.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -62,7 +60,6 @@
   let tab = $state<"table" | "scatter">("table");
   let column = $state<Column>("valid");
   let isDescending = $state(true);
-  let isCopied = $state(false);
   let width = $state(0);
   let height = $state(0);
   let near = $state<Row | null>(null);
@@ -145,14 +142,6 @@
     }
     column = next;
     isDescending = next !== "name";
-  }
-
-  async function copy() {
-    await navigator.clipboard.writeText(location.href);
-    isCopied = true;
-    setTimeout(() => {
-      isCopied = false;
-    }, 1600);
   }
 
   function locate(event: PointerEvent) {
@@ -272,7 +261,7 @@
     class="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-be px-3 py-2"
   >
     {#if year != null}
-      <div class="order-last basis-full @2xl:order-none @2xl:basis-auto">
+      <div class="order-last basis-full @2xl:order-0 @2xl:basis-auto">
         <Segmented
           label={m.atlas_analysis()}
           size="sm"
@@ -301,19 +290,6 @@
       onclick={onimage}
     >
       <ImageDownIcon class="block-4 inline-4" />
-    </button>
-    <button
-      type="button"
-      class="flex items-center justify-center rounded-sm text-muted-foreground block-7 inline-7 hover:bg-secondary hover:text-foreground pointer-coarse:block-10 pointer-coarse:inline-10"
-      aria-label={isCopied ? m.atlas_copied() : m.atlas_link()}
-      title={isCopied ? m.atlas_copied() : m.atlas_link()}
-      onclick={copy}
-    >
-      {#if isCopied}
-        <CopyCheckIcon class="text-foreground block-4 inline-4" />
-      {:else}
-        <LinkIcon class="block-4 inline-4" />
-      {/if}
     </button>
     <button
       type="button"

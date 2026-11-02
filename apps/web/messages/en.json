@@ -1739,8 +1739,6 @@
   "atlas_column_swing": "Swing",
   "atlas_column_within": "Within",
   "atlas_image": "Save image",
-  "atlas_link": "Copy link",
-  "atlas_copied": "Copied",
   "atlas_margin_in": "Margin in {year}",
   "atlas_scatter_hint": "Places above the line moved toward {name}. Drag across the chart to select places.",
   "atlas_none_match": "No places match the filters.",

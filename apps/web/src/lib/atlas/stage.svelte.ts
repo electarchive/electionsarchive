@@ -13,9 +13,6 @@ type Drawn = { set: Sheet; source: string; tier: number; dots: string | null };
 const GROUP = "sheet";
 
 export class Stage {
-  labels = $state.raw<Array<{ k: number; name: string; x: number; y: number }>>(
-    [],
-  );
   version = $state(0);
 
   #engine: Engine;
@@ -603,67 +600,88 @@ export class Stage {
   }
 
   letter(tier: number) {
-    const gl = this.#engine.gl;
+    const engine = this.#engine;
+    const gl = engine.gl;
     if (gl == null) {
       return;
     }
-    const sets = [...this.#drawn.values()]
-      .filter((drawn) => drawn.tier === tier)
-      .map((drawn) => drawn.set);
     const box = gl.getBounds();
-    const width = gl.getCanvas().clientWidth;
-    const height = gl.getCanvas().clientHeight;
-    const order: Array<{ set: Sheet; i: number }> = [];
-    for (const set of sets) {
-      for (const [i, x] of set.places.x.entries()) {
-        const y = set.places.y[i];
-        if (x != null && y != null && box.contains([x, y])) {
-          order.push({ set, i });
+    const west = box.getWest();
+    const east = box.getEast();
+    const south = box.getSouth();
+    const north = box.getNorth();
+    const padX = (east - west) / 2;
+    const padY = (north - south) / 2;
+    let inside = 0;
+    const near: Array<{ set: Sheet; i: number }> = [];
+    for (const drawn of this.#drawn.values()) {
+      if (drawn.tier !== tier) {
+        continue;
+      }
+      for (const [i, x] of drawn.set.places.x.entries()) {
+        const y = drawn.set.places.y[i];
+        if (
+          x == null ||
+          y == null ||
+          x < west - padX ||
+          x > east + padX ||
+          y < south - padY ||
+          y > north + padY
+        ) {
+          continue;
+        }
+        near.push({ set: drawn.set, i });
+        if (x >= west && x <= east && y >= south && y <= north) {
+          inside += 1;
         }
       }
     }
-    if (order.length > 600) {
-      this.labels = [];
-      return;
-    }
-    order.sort(
-      (a, b) => (b.set.places.valid[b.i] ?? 0) - (a.set.places.valid[a.i] ?? 0),
+    const id = engine.points(
+      "names",
+      inside > 600
+        ? []
+        : near
+            .filter(({ set, i }) => (set.places.name[i] ?? "") !== "")
+            .toSorted(
+              (a, b) =>
+                (b.set.places.valid[b.i] ?? 0) - (a.set.places.valid[a.i] ?? 0),
+            )
+            .slice(0, 400)
+            .map(({ set, i }) => ({
+              k: set.places.k[i] ?? 0,
+              at: [set.places.x[i] ?? 0, set.places.y[i] ?? 0] as [
+                number,
+                number,
+              ],
+              properties: {
+                name: set.places.name[i] ?? "",
+                votes: set.places.valid[i] ?? 0,
+              },
+            })),
+      GROUP,
     );
-    const taken: Array<[number, number, number, number]> = [];
-    const next: Array<{ k: number; name: string; x: number; y: number }> = [];
-    for (const { set, i } of order) {
-      const name = set.places.name[i] ?? "";
-      const at = gl.project([set.places.x[i] ?? 0, set.places.y[i] ?? 0]);
-      const half = name.length * 3.4 + 4;
-      const edge: [number, number, number, number] = [
-        at.x - half,
-        at.y - 9,
-        at.x + half,
-        at.y + 9,
-      ];
-      if (
-        name === "" ||
-        edge[0] < 4 ||
-        edge[1] < 4 ||
-        edge[2] > width - 4 ||
-        edge[3] > height - 4 ||
-        taken.some(
-          (other) =>
-            other[0] < edge[2] &&
-            edge[0] < other[2] &&
-            other[1] < edge[3] &&
-            edge[1] < other[3],
-        )
-      ) {
-        continue;
-      }
-      taken.push(edge);
-      next.push({ k: set.places.k[i] ?? 0, name, x: at.x, y: at.y });
-      if (next.length >= 36) {
-        break;
-      }
-    }
-    this.labels = next;
+    engine.add(
+      {
+        id,
+        type: "symbol",
+        source: id,
+        layout: {
+          "text-field": ["get", "name"],
+          "text-font": ["Sofia Sans Semi Condensed SemiBold"],
+          "text-size": 12,
+          "text-max-width": 9,
+          "text-padding": 4,
+          "symbol-sort-key": ["-", 0, ["get", "votes"]],
+        },
+        paint: {
+          "text-color": "var(--foreground)",
+          "text-halo-color": "var(--card)",
+          "text-halo-width": 1.6,
+        },
+      },
+      "labels",
+      { group: GROUP },
+    );
   }
 
   shape(hit: Hit) {
