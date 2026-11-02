@@ -6,7 +6,7 @@ import type {
   LiveRace,
 } from "@ea/analytics/live";
 import { count, percent } from "#lib/format.js";
-import { lead, stamp } from "#lib/live/format.js";
+import { lead, stamp, surname, tone } from "#lib/live/format.js";
 import { ranked, sum } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
 
@@ -138,6 +138,29 @@ export function describe(summary: Summary, closes: number, time: number) {
     margin: lead(margin),
     count: count(total),
   });
+}
+
+export function verdict(summary: Summary) {
+  const option = summary.winner ?? summary.leader;
+  if (option == null) {
+    return m.night_nation_waiting();
+  }
+  return summary.winner == null
+    ? m.night_races_leads({
+        name: surname(option),
+        margin: lead(summary.margin),
+      })
+    : m.night_races_won({ name: surname(option) });
+}
+
+export function shade(summary: Summary) {
+  const option = summary.winner ?? summary.leader;
+  if (option == null) {
+    return null;
+  }
+  return summary.winner == null
+    ? `color-mix(in oklab, ${tone(option)} ${Math.round(22 + 48 * Math.min(summary.margin / 0.3, 1))}%, var(--background))`
+    : tone(option);
 }
 
 export function party(option: LiveOption | null) {

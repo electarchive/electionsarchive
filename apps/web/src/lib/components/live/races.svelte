@@ -5,9 +5,10 @@
   import { percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { tally } from "#lib/live/summary.js";
+  import { shade, tally, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import RaceIndex from "./race-index.svelte";
 
   const {
     summaries,
@@ -38,6 +39,7 @@
       : summaries,
   );
   const seats = $derived(tally(houses, "house"));
+  const isMany = $derived(cards.length > 6);
 
   let probed = $state<string | null>(null);
 
@@ -60,29 +62,6 @@
         : m.night_rail_house({ district: race.district });
     }
     return race.title;
-  }
-
-  function status(entry: Summary) {
-    const option = entry.winner ?? entry.leader;
-    if (option == null) {
-      return m.night_nation_waiting();
-    }
-    return entry.winner == null
-      ? m.night_races_leads({
-          name: surname(option),
-          margin: lead(entry.margin),
-        })
-      : m.night_races_won({ name: surname(option) });
-  }
-
-  function fill(entry: Summary) {
-    const option = entry.winner ?? entry.leader;
-    if (option == null) {
-      return null;
-    }
-    return entry.winner == null
-      ? `color-mix(in oklab, ${tone(option)} ${Math.round(22 + 48 * Math.min(entry.margin / 0.3, 1))}%, var(--background))`
-      : tone(option);
   }
 </script>
 
@@ -115,9 +94,14 @@
 
 <nav
   aria-label={m.night_rail_label()}
-  class="grid gap-x-8 gap-y-4 border-be border-border bg-background px-4 py-3.5 sm:px-8 lg:grid-cols-[minmax(0,auto)_minmax(0,1fr)]"
+  class={cn(
+    "grid gap-x-8 gap-y-4 border-be border-border bg-background px-4 py-3.5 sm:px-8",
+    { "lg:grid-cols-[minmax(0,auto)_minmax(0,1fr)]": !isMany },
+  )}
 >
-  {#if cards.length > 0}
+  {#if isMany}
+    <RaceIndex summaries={cards} {current} />
+  {:else if cards.length > 0}
     <ul
       class="grid grid-cols-2 content-start gap-2 sm:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] lg:flex lg:flex-wrap"
     >
@@ -181,7 +165,7 @@
             <span class="font-semibold">{title(shown.race)}</span>
             {@render chip(
               shown.winner ?? shown.leader,
-              status(shown),
+              verdict(shown),
               shown.winner != null,
             )}
             {#if shown.counted != null}
@@ -200,12 +184,12 @@
       >
         {#each houses as entry (entry.race.id)}
           {const isCurrent = $derived(entry.race.slug === current)}
-          {const color = $derived(fill(entry))}
+          {const color = $derived(shade(entry))}
           <li>
             <a
               href={toLive(entry.race.slug)}
               aria-current={isCurrent ? "page" : undefined}
-              aria-label="{title(entry.race)}: {status(entry)}"
+              aria-label="{title(entry.race)}: {verdict(entry)}"
               class={cn(
                 "grid place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums transition-[background-color,box-shadow] duration-500 block-8 motion-reduce:transition-none",
                 {
