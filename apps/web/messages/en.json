@@ -4849,5 +4849,9 @@
   "indices_access_body": "Every figure comes with its inputs and notes from the API: `/api/v1/elections/{id}/indices` for each chamber an election filled, `/api/v1/contests/{id}/indices` for a list contest, and `/api/v1/polities/{id}/indices` for a country's whole series. The same data is in the MCP tools `get_election_indices`, `get_contest_indices`, and `get_polity_indices`, and in the Markdown and JSON versions of election and country pages.",
   "workbench_scatter_axis": "Horizontal axis",
   "workbench_shift_trend_split": "Gains were largest where the vote was most split",
-  "workbench_shift_trend_settled": "Gains were largest where the vote was least split"
+  "workbench_shift_trend_settled": "Gains were largest where the vote was least split",
+  "versus_system_lede": "Each figure comes from the latest general election for the main chamber. The line beside it shows every general election since {year}, on the same scale for both sides.",
+  "versus_system_column": "{chamber}, {year}",
+  "versus_system_both": "{a} and {b}",
+  "versus_system_from": "{name}: {election}"
 }

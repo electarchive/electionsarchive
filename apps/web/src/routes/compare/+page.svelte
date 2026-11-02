@@ -304,6 +304,11 @@
           <People people={body.people} />
         {:else if body.places != null}
           <Places data={body.places} />
+          {#await import("./system.svelte") then system}
+            <system.default
+              sides={sides.map(({ id, name }) => ({ id, name }))}
+            />
+          {/await}
         {:else if body.parties != null}
           <Parties data={body.parties} first={sides[0]} />
         {/if}
