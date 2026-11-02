@@ -67,6 +67,74 @@ HEADS = [
         "Council",
     ),
 ]
+ABBREVIATIONS = (
+    (r"\s*#\s*", " No. "),
+    (r"(?<=[a-z])\.(?=[a-z])", ". "),
+    (r"(?i),?\s*-?\s*prop(?:osition)?\.?\s*(?:no\.?\s*)?\d+(?:\s*of\s*\d+)?\s*$", ""),
+    (r"\bF\.?\s?P\.?\s?D\b\.?", "Fire Protection District"),
+    (r"\bG\.?\s?D\.?\s?D\b\.?", "Gravity Drainage District"),
+    (r"\bFire\s?Prot(?:ect)?\b\.?\s?", "Fire Protection "),
+    (r"(?<=School)(?=Dist)", " "),
+    (r"\bDist(?:\b\.?|(?=\d))", "District"),
+    (r"(?<=District)(?=No\b|\d)", " "),
+    (r"\bDistrict(?: District)+\b", "District"),
+    (r"\b(?:Serv|Svc|Ser|Srv)\b\.?", "Service"),
+    (r"\bHosp\b\.?", "Hospital"),
+    (r"\bAmbu?\b\.?", "Ambulance"),
+    (r"\bCamn\b\.?", "Cameron"),
+    (r"\bLafx\b\.?", "Lafourche"),
+    (r"\bAscn\b\.?", "Ascension"),
+    (r"\bRd\b\.?", "Road"),
+    (r"\bLight\b(?= District)", "Lighting"),
+    (r"\bGrav(?:it)?\b\.?", "Gravity"),
+    (r"(?<=Gravity )Drain\b\.?|\bDrn\b\.?", "Drainage"),
+    (r"\bW(?:ard|d)[- ]?w(?:ide)?\b\.?", "Wardwide"),
+    (r"\bWds\b\.?", "Wards"),
+    (r"\bWd\b\.?", "Ward"),
+    (r"\b(Wards?)(?=\d)", r"\1 "),
+    (r"\bCom(?:m|nty)?\b\.? ?C(?:tr|nt)\b\.?", "Community Center"),
+    (r"\bPla?y(?:g(?:rou)?r?n?d?|d)?\b\.?", "Playground"),
+    (r"\bComm\b\.?(?=\s*(?:$|No\b|#|\d))", "Commission"),
+    (r"\bCon(?:sv)?\b\.?(?= ?Lev)|\bConsv\b\.?", "Conservation"),
+    (r"\bLev\b\.?", "Levee"),
+    (r"\bCons?\b\.?", "Consolidated"),
+    (r"\bSD\b\.?", "School District"),
+    (r"\b(?:Wtr|Water)\s?wks\b\.?|\bWater Works\b", "Waterworks"),
+    (r"\bWtr\b\.?", "Water"),
+    (r"\bRec\b\.?", "Recreation"),
+    (r"\bSpe?c\b\.?", "Special"),
+    (r"\bEduc\b\.?", "Education"),
+    (r"\bImpv\b\.?", "Improvement"),
+    (r"\bMem\b\.?", "Memorial"),
+    (r"\bPar\b\.?", "Parish"),
+    (r"^N(?:\.\s?| )(?=\w)", "North "),
+    (r"^S(?:\.\s?| )(?=\w)", "South "),
+    (r"^E(?:\.\s?| )(?=\w)", "East "),
+    (r"^W(?:\.\s?| )(?=\w)", "West "),
+    (r"\bPro\.", "Protection"),
+    (r"\bPrev\b\.?", "Prevention"),
+    (r"\bImprov?\b\.?", "Improvement"),
+    (r"\bImp\b\.?", "Improvement"),
+    (r"\bNeigh?\b\.?|\bNbrhd\b\.?|\bNeighbor\b", "Neighborhood"),
+    (r"\bSec\b\.?", "Security"),
+    (r"\bSubrd\b\.?", "Subdivision Road"),
+    (r"\bSubdiv\b\.?|\bSubd\b\.?|\bSub\b\.?", "Subdivision"),
+    (r"\bSch\b\.?", "School"),
+    (r"\bSys\b\.?|\bSystm\b", "System"),
+    (r"\bComm\b\.?(?= School| Sch)", "Community"),
+    (r"\bCrime Prev\w*\b(?!.*\bDistrict\b)", "Crime Prevention District"),
+    (r"\bEnf\b\.?", "Enforcement"),
+    (r"\bEd\b\.?(?= Fac)", "Educational"),
+    (r"\bFac\b\.?", "Facilities"),
+    (r"\b(?:No\.?|Number)(?=\d)", "No. "),
+    (r"\bNo\b(?!\.)", "No."),
+    (r"\bNumber\b", "No."),
+    (r"\s{2,}", " "),
+)
+TWIN = (
+    "Withdrawn: an earlier reading of the Secretary of State's file listed this race under a misspelled district name. "
+    "The corrected copy, with the same totals, replaces it."
+)
 METHOD = (
     "Totals are from the Louisiana Secretary of State's election results portal. Where the portal lists "
     "precinct results that add up to the parish total they are shown by precinct, and otherwise by parish."
@@ -312,32 +380,9 @@ def parse() -> None:
                             label = title
                         else:
                             name = head
-                            for pattern, full in (
-                                (r"\bDist\.?(?=\s|$|,)", "District"),
-                                (r"\bPro\.", "Protection"),
-                                (r"\bRec\.", "Recreation"),
-                                (r"\bCons\.", "Consolidated"),
-                                (r"\bPrev\b\.?", "Prevention"),
-                                (r"\bImprov?\b\.?", "Improvement"),
-                                (r"\bImp\b\.?", "Improvement"),
-                                (r"\bNeigh?\b\.?|\bNbrhd\b\.?|\bNeighbor\b", "Neighborhood"),
-                                (r"\bSec\b\.?", "Security"),
-                                (r"\bSubdiv\b\.?|\bSubd\b\.?|\bSub\b\.?", "Subdivision"),
-                                (r"\bF\.?P\.?D\.?(?=\s|$)", "Fire Protection District"),
-                                (r"\bFire Prot\b\.?|\bFire Protection Dist\b\.?", "Fire Protection District"),
-                                (r"\bSch\b\.?", "School"),
-                                (r"\bSys\b\.?|\bSystm\b", "System"),
-                                (r"\bComm\b\.?(?= School| Sch)", "Community"),
-                                (r"\bCrime Prev\w*\b", "Crime Prevention"),
-                                (r"\bEnf\b\.?", "Enforcement"),
-                                (r"\bEd\b\.?(?= Fac)", "Educational"),
-                                (r"\bFac\b\.?", "Facilities"),
-                                (r"\bNo\b(?!\.)", "No."),
-                                (r"\bNumber\b", "No."),
-                                (r"(?i),?\s*-?\s*prop(?:osition)?\.?\s*(?:no\.?\s*)?\d+(?:\s*of\s*\d+)?\s*$", ""),
-                            ):
+                            for pattern, full in ABBREVIATIONS:
                                 name = re.sub(pattern, full, name, flags=re.IGNORECASE)
-                            name = re.sub(r"\s*#\s*", " No. ", name).strip()
+                            name = name.strip()
                             code, kind, label = f"{fips}:{slug(name)}", "special", title
                             office = name
                         office = office or "question"
@@ -621,6 +666,26 @@ def emit() -> Path:
             )
             for table in ("election", "contest")
         }
+        own_elections = dict(
+            conn.execute(
+                """select s.path, array(select x.value from external_id x
+                                        where x.entity_id = t.id and x.scheme = 'us.election') from slug s
+                   join election t on t.id = s.entity_id
+                   join changeset c on c.id = t.changeset_id
+                   where s.path like 'us/la/%%' and s.is_current and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
+        own_contests = dict(
+            conn.execute(
+                """select s.path, array(select x.value from external_id x
+                                        where x.entity_id = t.id and x.scheme = 'us.contest') from slug s
+                   join contest t on t.id = s.entity_id
+                   join changeset c on c.id = t.changeset_id
+                   where s.path like 'us/la/%%' and s.is_current and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/la/%'").fetchall()}
         used = set(contests.filter(pl.col("kind") == "place")["code"])
         kinds = {}
@@ -681,6 +746,28 @@ def emit() -> Path:
         cs.add(
             "scheme", code="us.special_district", polity_id=us, kind="administrative", rank=3, noun="special district"
         )
+        known = {
+            value.removeprefix("special:")
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.polity' and value like 'special:22%%'"
+            ).fetchall()
+        }
+        foreign_specials = dict(
+            conn.execute(
+                """select s.path, substr(x.value, 9) from slug s
+                   join polity p on p.id = s.entity_id and p.kind = 'special_district'
+                   join changeset g on g.id = p.changeset_id and g.pipeline <> %s
+                   join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value like 'special:22%%'
+                   where s.path like 'us/la/%%' and s.is_current""",
+                [SOURCE],
+            ).fetchall()
+        )
+        adopted = {
+            code: foreign_specials[path]
+            for code in contests.filter(pl.col("kind") == "special")["code"].unique()
+            if code not in known and (path := f"{polities[code[:5]][2]}/{code[6:]}") in foreign_specials
+        }
+        contests = contests.with_columns(pl.col("code").replace(adopted))
         special_names = dict(
             contests.filter(pl.col("kind") == "special")
             .sort("day", "office")
@@ -790,6 +877,9 @@ def emit() -> Path:
             if (day, code) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, code)] = foreign["election"][f"{path}/{day}-{election_kind}"]
             if (day, code) not in elections:
+                held = own_elections.get(f"{path}/{day}-{election_kind}", [])
+                if held and f"{day}:LA:{code}" not in held and (old := held[0]):
+                    cs.renamed[f"{day}:LA:{code}"] = old
                 election = elections[(day, code)] = cs.key("us.election", f"{day}:LA:{code}")
                 cs.add(
                     "election",
@@ -847,6 +937,20 @@ def emit() -> Path:
             paths.add(contest_path)
             if contest_path in foreign["contest"]:
                 continue
+            if question and (
+                old := next(
+                    (
+                        value
+                        for value in own_contests.get(contest_path, ())
+                        if value != contest_key
+                        and contest_key not in own_contests[contest_path]
+                        and value[:10] == contest_key[:10]
+                        and value.rsplit(":", 1)[1] == contest_key.rsplit(":", 1)[1]
+                    ),
+                    None,
+                )
+            ):
+                cs.renamed[contest_key] = old
             contest = cs.key("us.contest", contest_key)
             magnitude = row["magnitude"]
             cs.add(
@@ -1003,6 +1107,47 @@ def emit() -> Path:
                     flags=0,
                     value=votes,
                 )
+        emitted = {row["id"] for row in cs.rows.get("contest", [])}
+        questions = {
+            (key[:10], found[1]): contest
+            for key in map(keys.get, contests["ckey"])
+            if key and (found := re.search(r":q(\d+)$", key)) and (contest := cs.key("us.contest", key)) in emitted
+        }
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
+        unmatched = set()
+        folded = set()
+        for contest, values, *row in conn.execute(
+            f"""select c.id, array(select x.value from external_id x where x.entity_id = c.id and x.scheme = 'us.contest'
+                                   order by x.value),
+                       {", ".join(f"r.{column}" for column in columns)} from contest c
+                join election e on e.id = c.election_id
+                join result_set r on r.contest_id = c.id and r.status <> 'withdrawn'
+                join changeset g on g.id = r.changeset_id and g.pipeline = %s
+                where extract(year from e.date_from)::int / 10 * 10 = %s
+                  and not exists (select from entity_merge m where m.entity_id = c.id)
+                  and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+            [SOURCE, decade],
+        ).fetchall():
+            if contest in emitted:
+                continue
+            twin = next(
+                (
+                    questions[(value[:10], found[1])]
+                    for value in values
+                    if (found := re.search(r":q(\d+)$", value)) and (value[:10], found[1]) in questions
+                ),
+                None,
+            )
+            if twin is None:
+                unmatched.update(values)
+                continue
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+            cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=TWIN)
+            cs.merge(contest, twin)
+            folded.add(contest)
+        print(f"{len(folded)} re-keyed contests folded into their corrected copies; {len(unmatched)} unmatched")
+        for value in sorted(unmatched):
+            print(f"  no corrected copy: {value}")
         precinct_code.units(cs, conn, pl.Series(sorted(codes)))
         old = pl.DataFrame(
             conn.execute(

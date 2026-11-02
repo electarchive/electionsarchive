@@ -10,7 +10,7 @@ from ea.sources.us.enr_clarity_twins import LIVE, _person
 from ea.store import connect
 
 SOURCE = "us.special_district_merge"
-VERSION = "9"
+VERSION = "12"
 GENERIC = re.compile(
     r"\b(?:no|number|ward|wd|district|dist|subdistrict|subdivision|protection|fire|water|sewer|sewerage|drainage|drain|"
     r"gravity|grav|road|rd|lighting|light|recreation|recreational|hospital|hosp|service|services|ser|serv|svc|area|"
@@ -32,6 +32,14 @@ ALIASES = {
     ("26", "gratiotcountycommunitycollegedistrict"): "montcalmcommunitycollegedistrict",
     ("29", "saintlouiscommunitycollegedistrict"): "stlouiscommunitycollegedistrict",
 }
+PARISH_ABBREVIATIONS = (
+    (r"\b(?:serv|svc|ser)\b", "service"),
+    (r"\bambu\b", "ambulance"),
+    (r"\blafx\b", "lafourche"),
+    (r"\bdist\b", "district"),
+    (r"\bprot\b", "protection"),
+    (r"\bimp\b", "improvement"),
+)
 RETIRED = "A misread district that lumped several districts together; each district now has its own polity"
 UNRELATED = {"increasesfundingsourcespublicschoolscommunitycollegedistrict"}
 MISREAD = {
@@ -47,6 +55,13 @@ MISREAD = {
     "statewide measure, not a community college district question",
 }
 PREFERRED = "(select text from name n where n.entity_id = {0} and n.is_preferred and n.lang = 'en' limit 1)"
+
+
+def _parish_code(code: str) -> tuple[str, str]:
+    text = code.split(":")[-1].removeprefix("pw-")
+    for pattern, full in PARISH_ABBREVIATIONS:
+        text = re.sub(pattern, full, text)
+    return code.split(":")[0], text.removesuffix("-district")
 
 
 def _folded(text: str | None) -> str:
@@ -216,6 +231,70 @@ def emit() -> Path:
         ).fetchall():
             cs.add("unit_area_drop", unit_id=unit, area_id=area, reason=RETIRED)
 
+        for polity, targets in conn.execute(
+            f"""select p.id, array_agg(distinct f.polity_id) from polity p
+                join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value like 'special:%%'
+                join election e on e.polity_id = p.id join contest k on k.election_id = e.id
+                join entity_merge m on m.entity_id = k.id join contest t on t.id = m.into_id
+                join election f on f.id = t.election_id join polity q on q.id = f.polity_id
+                where {LIVE.format("p")} and {LIVE.format("t")} and {LIVE.format("q")}
+                  and not exists (select from election d join contest c on c.election_id = d.id
+                                  where d.polity_id = p.id and {LIVE.format("c")})
+                group by p.id"""
+        ).fetchall():
+            if len(targets) == 1 and targets[0] != polity and polity not in cs.survivors and polity not in retired:
+                cs.merge(polity, targets[0])
+                involved |= {polity, targets[0]}
+        holders: dict[str, set[UUID]] = defaultdict(set)
+        for value, polity in conn.execute(
+            f"""select y.value, e.polity_id from external_id y join contest k on k.id = y.entity_id
+                join election e on e.id = k.election_id
+                where y.scheme = 'us.contest' and y.value like '%%:LA:22%%' and {LIVE.format("k")}"""
+        ).fetchall():
+            parts = value.split(":")
+            holders[f"{parts[2]}:{parts[3]}"].add(cs.survivors.get(polity, polity))
+        parish: dict[UUID, tuple[list[str], int]] = {
+            polity: (codes, contests)
+            for polity, codes, contests in conn.execute(
+                f"""select p.id, array_agg(distinct substr(x.value, 9)),
+                           (select count(*) from election d join contest c on c.election_id = d.id
+                            where d.polity_id = p.id and {LIVE.format("c")})
+                    from polity p
+                    join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value like 'special:22%%'
+                    where {LIVE.format("p")} group by p.id"""
+            ).fetchall()
+            if polity not in cs.survivors and polity not in retired
+        }
+        folds: dict[UUID, UUID] = {}
+        for polity, (codes, contests) in parish.items():
+            targets = set().union(*(holders.get(code, set()) for code in codes)) - {polity}
+            if not contests and len(targets) == 1:
+                folds[polity] = targets.pop()
+        spelled: dict[tuple[str, str], set[UUID]] = defaultdict(set)
+        for polity, (codes, contests) in parish.items():
+            if contests:
+                for code in codes:
+                    spelled[_parish_code(code)].add(polity)
+        for members in spelled.values():
+            survivor = max(members, key=lambda member: (parish[member][1], str(member)))
+            for member in members - {survivor}:
+                folds.setdefault(member, survivor)
+        for polity, into in folds.items():
+            while into in folds and folds[into] != polity:
+                into = folds[into]
+            folds[polity] = into
+            cs.merge(polity, into)
+            involved |= {polity, into}
+        days: dict[tuple[UUID, object], list[UUID]] = defaultdict(list)
+        for election, polity, day in conn.execute(
+            f"select e.id, e.polity_id, e.date_from from election e where e.polity_id = any(%s) and {LIVE.format('e')}",
+            [list({*folds, *folds.values()})],
+        ).fetchall():
+            days[(polity, day)].append(election)
+        for (polity, day), elections in days.items():
+            if polity in folds and len(twins := days.get((folds[polity], day), [])) == 1:
+                for election in elections:
+                    cs.merge(election, twins[0])
         named: dict[tuple[str, str], list[tuple[UUID, str, int, str]]] = defaultdict(list)
         for polity, value, text, contests in conn.execute(
             f"""select distinct on (p.id) p.id, x.value, {PREFERRED.format("p.id")},
@@ -339,6 +418,6 @@ def emit() -> Path:
                 is_preferred=True,
             )
         print(
-            f"{len(rekeyed)} re-keyed owners, {len(orphans)} lumped districts retired, {groups} special districts written once per county, {renamed} elections renamed"
+            f"{len(rekeyed)} re-keyed owners, {len(orphans)} lumped districts retired, {groups} special districts written once per county, {renamed} elections renamed, {len(folds)} Louisiana spelling twins folded"
         )
         return cs.write()

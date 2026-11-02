@@ -1098,16 +1098,19 @@ def _district(
         head = re.sub(r"(?: FIRE| PROT)+$", "", head)
     tail = text[found.end() :]
     number = re.match(
-        r"^ ?(?:DIST(?:RICT)? )?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b)"
+        r"^ ?(?:DIST(?:RICT)? )?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b| ?-?(?:YRS?|YEARS?)\b)"
         if clean
-        else r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b)",
+        else r"^ ?(?:NO\.?|NUMBER|#)? ?#? ?(\d+[A-Z]?(?:-(?!PROP)[A-Z0-9]+)?)\b(?!(?: \d+)? MILLS?\b| ?-?(?:YRS?|YEARS?)\b)",
         tail,
     )
     if number:
         tail = tail[number.end() :]
+    head = re.sub(r"\bGOVERNING(?: BOARD)?(?: MEMBER)? AREA\b", "TRUSTEE AREA", head)
     seat, head = _seat(head)
     if seat is None:
         seat, tail = _seat(tail)
+    if seat is None and (member := re.search(r"\bBOARD MEMBER (\d)\b(?! ?(?:YR|YEAR))", tail)):
+        seat = f"Position {member[1]}"
     if kind == "ambulance":
         head = re.sub(
             rf"^((?:NORTH|SOUTH|EAST|WEST) {re.escape(county_name)})$", r"\1 COUNTY", head.replace("TWP", "TOWNSHIP")
@@ -1128,12 +1131,15 @@ def _district(
         )
     ):
         head = "COUNTY"
+    head = re.sub(r"^JO CO$", "JOHNSON COUNTY", head)
     if head in ("", "COUNTY") or head.startswith("COUNTY "):
         head = f"{county_name} {head or 'COUNTY'}" if head.startswith("COUNTY") else f"{county_name} COUNTY"
     if kind == "college" and re.search(r"\bACC\b(?! INS)|AUSTIN", text):
         head, noun = "AUSTIN", "Community College District"
     display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
-    if kind == "reclamation" and re.search(r"METROPOLITAN|GREATER CHICAGO", text):
+    if kind == "reclamation" and (
+        re.search(r"METROPOLITAN|GREATER CHICAGO", text) or display == "Cook County Water Reclamation District"
+    ):
         display = "Metropolitan Water Reclamation District of Greater Chicago"
     return display, seat
 
@@ -1195,7 +1201,18 @@ def _classify(
     plain = re.sub(rf"\b((?:NORTH|SOUTH|EAST|WEST) {re.escape(county_name)}) CO\b", r"\1 COUNTY", plain)
     label = re.sub(r"\s+", " ", plain).strip()
     if (SCHOOL.search(plain) or st == "NY" and "EDUCATION" in plain) and school_names:
-        bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", re.sub(r"\bTRUSTEE AREA\b", "TRUSTEEAREA", plain))).strip()
+        bare = re.sub(
+            r"\s+",
+            " ",
+            SCHOOL_WORDS.sub(
+                " ",
+                re.sub(
+                    rf"\bSUB(?:-?DISTRICT)?\b(?= ?{NUMBER})",
+                    "SUBDISTRICT",
+                    re.sub(r"\bTRUSTEE AREA\b", "TRUSTEEAREA", plain),
+                ),
+            ),
+        ).strip()
         for name, code in school_names:
             if elementary:
                 name = re.sub(r"\s+", " ", re.sub(r"\bELEMENTARY\b", " ", name)).strip()
@@ -1206,7 +1223,7 @@ def _classify(
                     bare = re.sub(rf"\b{name}\b", " ", plain)
                 rest = re.sub(rf"\b{re.escape(name)}\b", " ", bare)
                 seat, rest = _seat(rest)
-                if seat is None and (region := re.search(r"\b(\d+[A-Z]?)\b(?! ?(?:YR|YEAR))", rest)):
+                if seat is None and (region := re.search(r"\b(\d+[A-Z]?)\b(?! ?(?:YR|YEAR|FOR\b))", rest)):
                     seat = f"Region {region[1]}"
                 if seat is None and st == "NY":
                     seat = _title(_residue(rest, "EDUCATION|ED|SCHOOLS?")) or None
@@ -1253,7 +1270,9 @@ def _classify(
                     (
                         part
                         for part in re.sub(
-                            r"(?<![A-Z0-9] )\b([A-Z]+) - (?=[A-Z]+ )", r"\1-", re.sub(r"\bDIST\b", "DISTRICT", plain)
+                            r"(?<![A-Z0-9] )\b([A-Z]+) - (?=[A-Z]+ )",
+                            r"\1-",
+                            re.sub(r" - (?=COMMUNITY COLLEGE\b)", " ", re.sub(r"\bDIST\b", "DISTRICT", plain)),
                         ).split(" - ")
                         if re.search(rf"\b(?:{pattern})", part)
                     ),
@@ -1280,6 +1299,16 @@ def _classify(
                     display = legacy = f"{ILLINOIS_COLLEGES[number]} Community College District {number}"
                     if seat is not None and re.fullmatch(rf"\D*{number}", seat):
                         seat = None
+            if (
+                st == "MO"
+                and kind == "college"
+                and re.fullmatch(r"St Louis (?:County )?Community College District(?: \d)?", display)
+            ):
+                found = re.search(r"#\s?(\d)\b", plain)
+                display = legacy = "St Louis Community College District"
+                seat = seat or (f"District {found[1]}" if found else None)
+            if st == "KS" and display == "Wyandotte County Water District 1":
+                display = legacy = "Johnson County Water District 1"
             return {
                 "scheme": "us.special_district",
                 "code": f"{county}:{kind}:{slug(display)}",
