@@ -35,6 +35,9 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     proposal(parse(params.number)),
     roles(locals.user?.id),
   ]);
+  if (found.submitted_at == null && locals.user?.id !== found.author_user_id) {
+    error(404);
+  }
   const isWatching =
     found.submitted_at != null &&
     (await watching(locals.user?.id, "proposal", found.id));
