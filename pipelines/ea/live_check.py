@@ -170,7 +170,7 @@ def run() -> int:
                 ok = False
                 notes.append("never polled")
             else:
-                age = (now - fetched).total_seconds()
+                age = max(0, (now - fetched).total_seconds())
                 limit = max(300, 5 * interval)
                 if age > limit:
                     ok = False
