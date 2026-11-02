@@ -6,8 +6,11 @@
     shouldScaleBackground = true,
     open = $bindable(false),
     activeSnapPoint = $bindable(null),
+    autoFocus,
     ...restProps
   }: DrawerPrimitive.RootProps = $props();
+
+  let keyboard = $state(false);
 
   closeOnLeave(
     () => open,
@@ -15,8 +18,14 @@
   );
 </script>
 
+<svelte:document
+  onpointerdown={() => (keyboard = false)}
+  onkeydown={() => (keyboard = true)}
+/>
+
 <DrawerPrimitive.Root
   {shouldScaleBackground}
+  autoFocus={autoFocus ?? keyboard}
   bind:open
   bind:activeSnapPoint
   {...restProps}
