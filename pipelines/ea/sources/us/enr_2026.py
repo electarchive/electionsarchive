@@ -386,6 +386,19 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_nj
 
         enr_nj.collect(client, get, lambda url, content, suffix: store("NJ", url, content, suffix))
+    if not only or "VT" in only:
+        from ea.sources.us import enr_vt
+
+        enr_vt.collect(client, get, lambda url, content, suffix: store("VT", url, content, suffix))
+    if not only or "DE" in only:
+        from ea.sources.us import enr_de
+
+        enr_de.collect(client, get, lambda url, content, suffix: store("DE", url, content, suffix))
+    for state in ("NM", "SD", "ND"):
+        if not only or state in only:
+            from ea.sources.us import enr_ajax
+
+            enr_ajax.collect(state, client, get, lambda url, content, suffix: store(state, url, content, suffix))
     if not only or "OH" in only:
         from ea.sources.us import enr_oh
 
@@ -591,6 +604,26 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_wi.rows(url, path, urls)
         return
+    if state == "VT":
+        from ea.sources.us import enr_vt
+
+        yield from enr_vt.rows(url, path, urls)
+        return
+    if state == "DE":
+        from ea.sources.us import enr_de
+
+        yield from enr_de.rows(url, path, urls)
+        return
+    if state in ("NM", "SD", "ND"):
+        from ea.sources.us import enr_ajax
+
+        yield from enr_ajax.rows(url, path)
+        return
+    if state == "NJ":
+        from ea.sources.us import enr_nj
+
+        yield from enr_nj.rows(url, path)
+        return
     if state == "NY":
         from ea.sources.us import enr_ny
 
@@ -612,7 +645,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for contest in root.iter("Contest"):
             found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
-            if tenant and found and state != "NJ":
+            if tenant and found:
                 continue
             for choice in contest.iter("Choice"):
                 for kind in choice.iter("VoteType"):
@@ -1379,7 +1412,7 @@ def plan(
             .agg(pl.col("reporting").max(), pl.col("total").max())
             .select(pl.col("reporting").sum(), pl.col("total").sum())
             .row(0)
-            if state in ("FL", "NJ")
+            if state in ("FL", "NJ", "NM", "SD", "ND")
             else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
         )
         sums: dict[tuple[UUID, UUID], int] = {}

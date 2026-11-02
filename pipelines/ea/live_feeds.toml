@@ -257,6 +257,51 @@ publisher = "Oregon Secretary of State"
 url = "https://results.oregonvotes.gov/"
 
 [[feed]]
+id = "us.enr_2026.nj"
+adapter = "us.enr_2026"
+params = { state = "NJ" }
+poller = "muktedir"
+publisher = "Cumberland, Essex, Passaic, and Somerset County Clerks"
+url = "https://results.enr.clarityelections.com/NJ/"
+note = "the four counties that post a results file; the other seventeen post PDFs or nothing"
+
+[[feed]]
+id = "us.enr_2026.nm"
+adapter = "us.enr_2026"
+params = { state = "NM" }
+poller = "muktedir"
+publisher = "New Mexico Secretary of State"
+url = "https://electionresults.sos.nm.gov/"
+
+[[feed]]
+id = "us.enr_2026.sd"
+adapter = "us.enr_2026"
+params = { state = "SD" }
+publisher = "South Dakota Secretary of State"
+url = "https://electionresults.sd.gov/"
+
+[[feed]]
+id = "us.enr_2026.nd"
+adapter = "us.enr_2026"
+params = { state = "ND" }
+publisher = "North Dakota Secretary of State"
+url = "https://results.sos.nd.gov/"
+
+[[feed]]
+id = "us.enr_2026.de"
+adapter = "us.enr_2026"
+params = { state = "DE" }
+publisher = "Delaware Department of Elections"
+url = "https://elections.delaware.gov/results/enr/GE2026.html"
+
+[[feed]]
+id = "us.enr_2026.vt"
+adapter = "us.enr_2026"
+params = { state = "VT" }
+publisher = "Vermont Secretary of State"
+url = "https://electionresults.vermont.gov/"
+
+[[feed]]
 id = "us.nyc_enr"
 adapter = "us.nyc_enr"
 publisher = "Board of Elections in the City of New York"
