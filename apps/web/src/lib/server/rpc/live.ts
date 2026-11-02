@@ -24,6 +24,11 @@ import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
 
 const TRAITS: Record<string, Array<number>> = counties;
+const STAMP_MS = 5000;
+const stamps = new Map<
+  string,
+  { at: number; value: Promise<{ newest: string; isCertified: boolean }> }
+>();
 
 const LEVELS = new Set([
   "us.place",
@@ -173,6 +178,31 @@ async function election(path: string) {
     throw new ORPCError("NOT_FOUND");
   }
   return { ...row, rest: segments.slice(row.path.split("/").length).join("/") };
+}
+
+async function newest(id: string, isShown: boolean) {
+  const result = await db.execute<{
+    newest: string | null;
+    isCertified: boolean;
+  }>(sql`
+    with recursive tree as (
+      select id, 0 as depth from election where id = ${id}::uuid
+      union all
+      select e.id, t.depth + 1 from election e join tree t on e.parent_id = t.id where t.depth < 3
+    ),
+    frames as (
+      select max(f.as_of) as newest from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
+      where f.status = 'active' and ${isShown}::boolean
+    )
+    select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
+      coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"
+    from contest c left join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+    where c.election_id = ${id}::uuid
+  `);
+  return {
+    newest: result.rows[0]?.newest ?? "",
+    isCertified: result.rows[0]?.isCertified ?? false,
+  };
 }
 
 async function sets(id: string) {
@@ -1316,32 +1346,21 @@ export const live = {
       if (dev && input.isRehearsal === true) {
         return { newest: new Date().toISOString(), isCertified: false };
       }
-      const [found, shown] = await Promise.all([
-        election(input.path),
-        switches(),
-      ]);
-      const result = await db.execute<{
-        newest: string | null;
-        isCertified: boolean;
-      }>(sql`
-        with recursive tree as (
-          select id, 0 as depth from election where id = ${found.id}::uuid
-          union all
-          select e.id, t.depth + 1 from election e join tree t on e.parent_id = t.id where t.depth < 3
-        ),
-        frames as (
-          select max(f.as_of) as newest from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
-          where f.status = 'active' and ${shown.results}::boolean
-        )
-        select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
-          coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"
-        from contest c left join result_set rs on rs.contest_id = c.id and rs.status = 'active'
-        where c.election_id = ${found.id}::uuid
-      `);
-      return {
-        newest: result.rows[0]?.newest ?? "",
-        isCertified: result.rows[0]?.isCertified ?? false,
-      };
+      const userId = getRequestEvent().locals.user?.id;
+      const slot = `${input.path}|${userId ?? ""}`;
+      const recent = stamps.get(slot);
+      if (recent != null && Date.now() - recent.at < STAMP_MS) {
+        return recent.value;
+      }
+      const value = Promise.all([election(input.path), switches()]).then(
+        async ([found, shown]) => newest(found.id, shown.results),
+      );
+      stamps.set(slot, { at: Date.now(), value });
+      if (stamps.size > 256) {
+        stamps.delete(stamps.keys().next().value ?? "");
+      }
+      value.catch(() => stamps.delete(slot));
+      return value;
     }),
   map: os
     .input(
