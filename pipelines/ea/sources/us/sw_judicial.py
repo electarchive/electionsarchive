@@ -230,7 +230,14 @@ def emit() -> Path:
                    where p.iso_code like 'US-%%'"""
             ).fetchall()
         )
-        taken = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(ca|in)/'").fetchall()}
+        taken = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s join changeset c on c.id = s.changeset_id
+                   where s.path ~ '^us/(ca|in)/' and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         sources: dict[str, UUID] = {}
         for state, (publisher, title, page) in PAGES.items():
             sources[state] = cs.source(publisher, title)
