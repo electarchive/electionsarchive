@@ -353,11 +353,12 @@
       isWhole: false,
     };
   });
+  const standing = $derived(
+    chamber?.points.findLast((entry) => entry.date <= (step?.date ?? "")) ??
+      null,
+  );
   const sitting = $derived(
-    (
-      chamber?.points.findLast((entry) => entry.date <= (step?.date ?? "")) ??
-      null
-    )?.parties
+    standing?.parties
       .filter((row) => row.seats > 0)
       .map((row) => {
         const party = parties.get(row.party ?? "");
@@ -729,7 +730,12 @@
             link={null}
             size={null}
             chamber={chamber.id}
-            title={m.scrubber_chamber({ chamber: chamber.name })}
+            title={standing?.path === step?.path
+              ? m.scrubber_chamber({ chamber: chamber.name })
+              : m.scrubber_chamber_standing({
+                  chamber: chamber.name,
+                  year: String(standing?.year ?? ""),
+                })}
             isCompact
           />
         {/if}
