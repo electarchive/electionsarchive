@@ -28,7 +28,7 @@ from ea.sources.tr.ysk_local import own_area, own_areas, successors
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -1955,6 +1955,9 @@ def emit() -> Path:
             if before != after and before in mine and mine[before] not in holders:
                 cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
                 cs.merge(cs.key("tr.office", f"{before}-mayor"), cs.key("tr.office", f"{after}-mayor"))
+        for old, new in relabeled:
+            if old[11:] in mine:
+                mine.setdefault(new[11:], mine[old[11:]])
         for before, after in relocated.items():
             old, new = before[3:].replace("/", "-"), after[3:].replace("/", "-")
             if old in mine:
