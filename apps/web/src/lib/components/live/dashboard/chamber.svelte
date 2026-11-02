@@ -67,6 +67,26 @@
       view.tallies.right.holdover,
   );
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
+  const legend = $derived([
+    { family: left, tally: view.tallies.left },
+    { family: right, tally: view.tallies.right },
+    ...(view.tallies.other.won +
+      view.tallies.other.ahead +
+      view.tallies.other.holdover >
+    0
+      ? [
+          {
+            family: {
+              id: "other",
+              name: m.night_chamber_others(),
+              short: "",
+              color: OTHER,
+            },
+            tally: view.tallies.other,
+          },
+        ]
+      : []),
+  ]);
 
   const span = $derived.by(() => {
     let low = view.pmf.length - 1;
@@ -125,16 +145,6 @@
           >{m.night_nation_waiting()}</span
         >
       {/if}
-      {#if view.tallies.other.won + view.tallies.other.ahead + view.tallies.other.holdover > 0}
-        <span class="text-xs text-muted-foreground"
-          >{m.night_chamber_other({
-            count:
-              view.tallies.other.won +
-              view.tallies.other.ahead +
-              view.tallies.other.holdover,
-          })}</span
-        >
-      {/if}
     </p>
     <p class="grid justify-items-end">
       <span class="text-xs font-semibold" style:color={right.color}
@@ -175,22 +185,13 @@
       {/each}
     </div>
     <span
-      class="pointer-events-none absolute -inset-y-1 border-s-2 border-foreground"
-      style:inset-inline-start="{(view.majority / Math.max(1, cells.length)) *
-        100}%"
-      aria-hidden="true"
-    ></span>
-    <span
-      class="pointer-events-none absolute -inset-y-1 border-s-2 border-foreground"
-      style:inset-inline-start="{((cells.length - view.majority) /
-        Math.max(1, cells.length)) *
-        100}%"
+      class="pointer-events-none absolute -inset-y-1 inset-s-1/2 border-s-2 border-foreground"
       aria-hidden="true"
     ></span>
   </div>
 
   <dl class="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-0.5 text-xs">
-    {#each [{ family: left, tally: view.tallies.left }, { family: right, tally: view.tallies.right }] as row (row.family.id)}
+    {#each legend as row (row.family.id)}
       <dt class="flex items-center gap-1.5">
         <span
           class="rounded-full block-2 inline-2"

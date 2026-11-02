@@ -4643,7 +4643,6 @@
   "night_kpi_flips": "Seats changing hands",
   "night_kpi_next": "Next polls close",
   "night_chamber_majority": "{count} for a majority",
-  "night_chamber_other": "{count} other",
   "night_chamber_breakdown": "{won} won, {ahead} ahead, {holdover} not up",
   "night_chamber_odds": "Chance of a majority",
   "night_chamber_split": "{share} no majority",
@@ -4652,6 +4651,19 @@
   "night_chamber_net": "Net gain of {count} for {party}",
   "night_chamber_net_none": "No net change in seats so far",
   "night_chamber_note": "Striped seats aren't up this year. Until a race reports votes, the odds give the party that holds the seat a {prior} chance of keeping it.",
+  "night_chamber_others": "Independents and others",
+  "night_governors_races": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} race",
+        "countPlural=*": "{count} races"
+      }
+    }
+  ],
+  "night_governors_net_none": "No net change in governorships so far",
+  "night_governors_label": "Governor races by state, from most {left} to most {right}",
   "night_state_back": "All states",
   "night_state_ballot": "On the ballot",
   "night_state_polls": "Polls close",

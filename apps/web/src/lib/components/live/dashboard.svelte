@@ -44,6 +44,7 @@
   import Chambers from "./dashboard/chamber.svelte";
   import Explorer from "./dashboard/explorer.svelte";
   import Flip from "./dashboard/flip.svelte";
+  import Governors from "./dashboard/governors.svelte";
   import Ladder from "./dashboard/ladder.svelte";
   import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
@@ -776,11 +777,10 @@
         href={seatHref}
         shade={seatShade}
       />
-      <Chambers
+      <Governors
         view={chambers.governor}
         sides={pair}
         title={m.night_nation_governors()}
-        {forecasts}
         label={fullLabel}
         href={seatHref}
         shade={seatShade}
