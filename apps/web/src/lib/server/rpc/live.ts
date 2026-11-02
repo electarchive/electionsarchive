@@ -554,6 +554,20 @@ async function races(found: {
   date: string;
   rest: string;
 }) {
+  if (found.rest === "" && found.path.split("/").length === 2) {
+    return remember(`live:races:v1:${found.path}`, async () =>
+      listRaces(found),
+    );
+  }
+  return listRaces(found);
+}
+
+async function listRaces(found: {
+  id: string;
+  path: string;
+  date: string;
+  rest: string;
+}) {
   const isNational = found.path.split("/").length === 2;
   const isLocal = found.path.split("/").length > 3;
   const result =
