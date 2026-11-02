@@ -87,6 +87,130 @@ const ABOUT: Record<
   },
 };
 
+const EFFECTIVE = [
+  m.indices_band_effective_1,
+  m.indices_band_effective_2,
+  m.indices_band_effective_3,
+  m.indices_band_effective_4,
+  m.indices_band_effective_5,
+];
+const PROPORTION = [
+  m.indices_band_gallagher_1,
+  m.indices_band_gallagher_2,
+  m.indices_band_gallagher_3,
+  m.indices_band_gallagher_4,
+  m.indices_band_gallagher_5,
+];
+const EFFECTIVE_CUTS = [1.8, 2.6, 4, 6];
+
+const SCALES: Record<
+  Family,
+  {
+    from: number;
+    to: number;
+    cuts: Array<number>;
+    names: Array<() => string>;
+    low: () => string;
+    high: () => string;
+  }
+> = {
+  effective: {
+    from: 1,
+    to: 8,
+    cuts: EFFECTIVE_CUTS,
+    names: EFFECTIVE,
+    low: m.indices_end_effective_low,
+    high: m.indices_end_effective_high,
+  },
+  fragmentation: {
+    from: 0,
+    to: 0.9,
+    cuts: EFFECTIVE_CUTS.map((cut) => 1 - 1 / cut),
+    names: EFFECTIVE,
+    low: m.indices_end_effective_low,
+    high: m.indices_end_effective_high,
+  },
+  gallagher: {
+    from: 0,
+    to: 30,
+    cuts: [2, 5, 10, 17],
+    names: PROPORTION,
+    low: m.indices_end_gallagher_low,
+    high: m.indices_end_gallagher_high,
+  },
+  loosemore: {
+    from: 0,
+    to: 45,
+    cuts: [4, 8, 15, 25],
+    names: PROPORTION,
+    low: m.indices_end_gallagher_low,
+    high: m.indices_end_gallagher_high,
+  },
+  volatility: {
+    from: 0,
+    to: 50,
+    cuts: [5, 10, 17, 30],
+    names: [
+      m.indices_band_volatility_1,
+      m.indices_band_volatility_2,
+      m.indices_band_volatility_3,
+      m.indices_band_volatility_4,
+      m.indices_band_volatility_5,
+    ],
+    low: m.indices_end_volatility_low,
+    high: m.indices_end_volatility_high,
+  },
+  nationalization: {
+    from: 0.4,
+    to: 1,
+    cuts: [0.6, 0.75, 0.85],
+    names: [
+      m.indices_band_nationalization_1,
+      m.indices_band_nationalization_2,
+      m.indices_band_nationalization_3,
+      m.indices_band_nationalization_4,
+    ],
+    low: m.indices_end_nationalization_low,
+    high: m.indices_end_nationalization_high,
+  },
+};
+
+export const scale = (figure: Figure) => {
+  const { from, to, cuts, names, low, high } = SCALES[FAMILIES[figure]];
+  const span = to - from;
+  const at = (value: number) => Math.min(1, Math.max(0, (value - from) / span));
+  const edges = [from, ...cuts, to];
+  const bands = names.map((name, index) => ({
+    name: name(),
+    start: at(edges[index] ?? from),
+    end: at(edges[index + 1] ?? to),
+    tone: names.length === 1 ? 1 : index / (names.length - 1),
+  }));
+  const band = (value: number) => {
+    let index = 0;
+    for (const cut of cuts) {
+      if (value >= cut) {
+        index += 1;
+      }
+    }
+    return index;
+  };
+  return {
+    bands,
+    ticks: cuts.map((cut) => ({
+      at: at(cut),
+      text: numbers({ maximumFractionDigits: 2 }).format(cut),
+    })),
+    low: low(),
+    high: high(),
+    at,
+    band,
+  };
+};
+
+export const pairReading = (votes: number, seats: number) =>
+  seats < votes * 0.8 ? m.indices_pair_concentrated() : m.indices_pair_even();
+
 export const figureLabel = (figure: Figure) =>
   ({
     effectiveVotes: m.indices_effective_votes,

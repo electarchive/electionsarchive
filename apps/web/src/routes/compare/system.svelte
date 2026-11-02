@@ -111,7 +111,9 @@
       values: row.cells.map((cell, index) => ({
         text: cell.text ?? "–",
         unit: sides[index]?.name ?? null,
+        value: cell.value,
       })),
+      reading: null,
       notes: row.cells.flatMap((cell, index) =>
         cell.latest == null
           ? []
@@ -153,9 +155,7 @@
         {m.versus_system_lede({ year: String(span.first) })}
       </p>
     </div>
-    <table
-      class="border-collapse text-[0.8125rem] inline-full max-inline-176"
-    >
+    <table class="border-collapse text-[0.8125rem] inline-full max-inline-176">
       <thead>
         <tr class="border-be border-border">
           <td></td>

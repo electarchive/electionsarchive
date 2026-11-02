@@ -4,7 +4,7 @@
   import type { Figure } from "#lib/indices.js";
   import { show } from "#lib/explain.svelte.js";
   import { count } from "#lib/format.js";
-  import { figure } from "#lib/indices.js";
+  import { figure, pairReading } from "#lib/indices.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
@@ -45,7 +45,8 @@
       figure: Figure;
       label: string;
       title: string;
-      values: Array<{ text: string; unit: string | null }>;
+      values: Array<{ text: string; unit: string | null; value: number }>;
+      reading: string | null;
       notes: Array<string>;
       caveats: Array<Caveat>;
     }> = [];
@@ -59,12 +60,15 @@
           {
             text: figure("effectiveVotes", effectiveVotes.value),
             unit: m.indices_by_votes(),
+            value: effectiveVotes.value,
           },
           {
             text: figure("effectiveSeats", effectiveSeats.value),
             unit: m.indices_by_seats(),
+            value: effectiveSeats.value,
           },
         ],
+        reading: pairReading(effectiveVotes.value, effectiveSeats.value),
         notes: [basis],
         caveats: caveats(effectiveVotes, effectiveSeats),
       });
@@ -74,7 +78,14 @@
         figure: "gallagher",
         label: m.indices_gallagher(),
         title: m.indices_gallagher_name(),
-        values: [{ text: figure("gallagher", gallagher.value), unit: null }],
+        values: [
+          {
+            text: figure("gallagher", gallagher.value),
+            unit: null,
+            value: gallagher.value,
+          },
+        ],
+        reading: null,
         notes: [basis],
         caveats: caveats(gallagher),
       });
@@ -84,7 +95,14 @@
         figure: "volatility",
         label: m.indices_volatility_since({ year: volatility.previous.year }),
         title: m.indices_volatility(),
-        values: [{ text: figure("volatility", volatility.value), unit: null }],
+        values: [
+          {
+            text: figure("volatility", volatility.value),
+            unit: null,
+            value: volatility.value,
+          },
+        ],
+        reading: null,
         notes: [m.indices_compared({ election: volatility.previous.name })],
         caveats: caveats(volatility),
       });
@@ -115,6 +133,7 @@
                 title: item.title,
                 context: chamber.name,
                 values: item.values,
+                reading: item.reading,
                 notes: item.notes,
                 caveats: item.caveats,
               })}>{item.label}</button

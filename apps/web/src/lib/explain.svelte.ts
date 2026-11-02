@@ -14,7 +14,12 @@ export const explain = $state<{
         figure: Figure;
         title: string;
         context: string;
-        values: Array<{ text: string; unit: string | null }>;
+        values: Array<{
+          text: string;
+          unit: string | null;
+          value: number | null;
+        }>;
+        reading: string | null;
         notes: Array<string>;
         caveats: Array<Caveat>;
       }
