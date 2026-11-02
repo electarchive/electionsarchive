@@ -8506,7 +8506,12 @@ export const contests = {
                     where o.election_id = c.election_id and o.id <> c.id and o.kind = c.kind and o.round_number = c.round_number
                       and o.body_id is not distinct from c.body_id and o.office_id is not distinct from c.office_id
                       and o.party_scope_id is not distinct from c.party_scope_id and o.allocation_parent_id is null and not o.notional
-                  ) then array(select s.id from election s where s.parent_id = e.parent_id and s.id <> e.id) else '{}' end as wide
+                  ) then array(select s.id from election s where s.parent_id = e.parent_id and s.id <> e.id) else '{}' end as wide,
+                  (
+                    select ST_Expand(g.geom::box2d, (ST_XMax(g.geom) - ST_XMin(g.geom)) / 2, (ST_YMax(g.geom) - ST_YMin(g.geom)) / 2)::geometry
+                    from area_geometry g where g.area_id = c.district_area_id
+                    order by g.valid @> e.date_from desc, upper(g.valid) desc nulls first limit 1
+                  ) as reach
                 from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
                 where c.id = ${contest.root}::uuid
                   and not exists (
@@ -8525,6 +8530,9 @@ export const contests = {
                   and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
                   and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null and not c.notional
                 join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
+                  and (c.election_id <> all(me.wide) or exists (
+                    select from area_geometry g where g.area_id = a.id and g.valid @> me.day and g.geom && ST_SetSRID(me.reach, ST_SRID(g.geom))
+                  ))
                 left join electoral_system es on es.id = c.electoral_system_id
               )
               select p.id, p.area, p.k, p.scheme, p.general,
