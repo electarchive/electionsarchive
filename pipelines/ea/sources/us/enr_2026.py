@@ -1234,7 +1234,7 @@ def plan(
                 held[id] = (area, recorded)
                 if kind in ("federal_unit", "judicial_district"):
                     statewide.add(id)
-                if kind == "judicial_district":
+                if kind == "judicial_district" or ":judicial-district-" in key:
                     judicial.add(id)
         for contest, label in conn.execute(
             """select o.contest_id, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
