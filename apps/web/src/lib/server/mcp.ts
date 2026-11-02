@@ -34,6 +34,16 @@ const TOOLS: Array<{
   { name: "get_election", procedure: router.elections.get, access: "read" },
   { name: "get_contest", procedure: router.contests.get, access: "read" },
   {
+    name: "get_election_indices",
+    procedure: router.indices.election,
+    access: "read",
+  },
+  {
+    name: "get_polity_indices",
+    procedure: router.indices.polity,
+    access: "read",
+  },
+  {
     name: "get_contest_ledger",
     procedure: router.contests.ledger,
     access: "read",

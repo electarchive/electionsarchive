@@ -14,6 +14,7 @@ import {
 } from "#lib/server/rpc/archive.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
 import { admin } from "#lib/server/rpc/desk.js";
+import { indices } from "#lib/server/rpc/indices.js";
 import { live } from "#lib/server/rpc/live.js";
 import { maps } from "#lib/server/rpc/maps.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
@@ -31,6 +32,7 @@ export const reads = {
   coverage,
   elections,
   entities,
+  indices,
   live,
   maps,
   parties,
