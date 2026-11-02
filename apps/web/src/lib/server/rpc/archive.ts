@@ -718,6 +718,7 @@ type Found = {
   indirect: boolean;
   isElectoral: boolean;
   series: string;
+  isScoped: boolean;
   root: string;
   election: string;
   polity: string;
@@ -981,8 +982,8 @@ async function find(id: string) {
       union all
       select c.id, c.allocation_parent_id from contest c join up on c.id = up.parent
     )
-    select c.id, c.kind::text as kind, ${serial("r", "e")} as series,
-      r.id as root, e.id as election, e.kind = 'indirect' as indirect,
+    select c.id, c.kind::text as kind, ${serial("r", "re")} as series,
+      r.party_scope_id is not null as "isScoped", r.id as root, e.id as election, e.kind = 'indirect' as indirect,
       exists (select from body b where b.id = r.body_id and b.kind = 'electoral_college') as "isElectoral",
       e.polity_id as polity, e.date_from::text as date,
       ${CYCLE} as year, e.status::text as status, r.term is not distinct from 'remainder' as "isRemainder",
@@ -990,6 +991,7 @@ async function find(id: string) {
     from contest c
     join up on up.parent is null
     join contest r on r.id = up.id
+    join election re on re.id = r.election_id
     join election e on e.id = c.election_id
     left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
     left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
@@ -6329,6 +6331,7 @@ export const contests = {
             }),
           ),
         }),
+        isScoped: v.boolean(),
         series: v.array(
           v.object({
             date: v.nullable(v.string()),
@@ -7573,6 +7576,7 @@ export const contests = {
           abroad,
           trail,
         },
+        isScoped: contest.isScoped,
         series: [],
         notes: notes.rows.map(({ kind, body }) => ({ kind, body })),
         wording: wording.rows.filter(
@@ -8464,7 +8468,7 @@ export const contests = {
         const kind = shape.rows[0];
         const cached = await remember(
           kind?.isBy === false
-            ? `locatorx:${contest.election}:${contest.series}:${kind.scheme}:${grid?.level ?? ""}`
+            ? `locator:${contest.election}:${contest.series}:${kind.scheme}:${grid?.level ?? ""}`
             : `locator:${contest.root}:${grid?.level ?? ""}`,
           async () => {
             const found = await db.execute<{
@@ -16894,10 +16898,19 @@ export const elections = {
         annulled: boolean;
         root: string | null;
       }>(sql`
+        with sided as (
+          select e.id, e.date_from, e.status, e.rerun_of_id, e.parent_id, e.polity_id, e.kind, (
+            select min(c.party_scope_id::text) from contest c where c.election_id = e.id
+            having count(distinct c.party_scope_id) = 1 and count(c.party_scope_id) = count(*)
+          ) as side
+          from election x
+          join election e on e.polity_id = x.polity_id and e.kind = x.kind
+          where x.id = ${input.id}::uuid
+        )
         select e.id, e.date_from::text as date, extract(year from e.date_from)::int as year,
           e.status::text = 'annulled' as annulled, coalesce(e.rerun_of_id, ${umbrella("e")}) as root
-        from election x
-        join election e on e.polity_id = x.polity_id and e.kind = x.kind
+        from sided x
+        join sided e on e.side is not distinct from x.side
         left join election p on p.id = e.parent_id
         where x.id = ${input.id}::uuid
           and (e.id = x.id or ((p.id is null or p.polity_id <> e.polity_id)

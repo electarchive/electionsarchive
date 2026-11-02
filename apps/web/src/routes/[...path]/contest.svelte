@@ -1418,7 +1418,7 @@
     </div>
   {/if}
   {#if contest.series.length > 1}
-    <Series series={contest.series} />
+    <Series series={contest.series} isScoped={contest.isScoped} />
   {/if}
   {#if origins.length > 0}
     <p

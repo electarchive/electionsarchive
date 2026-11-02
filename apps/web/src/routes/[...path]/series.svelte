@@ -22,10 +22,12 @@
     series,
     label = m.series_label(),
     all = m.series_all_label,
+    isScoped = false,
   }: {
     series: Extract<PageData, { kind: "contest" }>["contest"]["series"];
     label?: string;
     all?: (input: { count: number }) => string;
+    isScoped?: boolean;
   } = $props();
 
   const carried = $derived.by(() => {
@@ -74,11 +76,13 @@
                 ? month.format(new Date(`${entry.date}T00:00:00Z`))
                 : year,
         color:
-          entry.winner == null
+          entry.winner == null || isScoped
             ? null
             : swatch(entry.winner.color, entry.winner.key),
         paint:
-          entry.winner?.seats == null || entry.winner.seats.length < 2
+          entry.winner?.seats == null ||
+          entry.winner.seats.length < 2 ||
+          isScoped
             ? null
             : `linear-gradient(to right, ${entry.winner.seats
                 .map((seat, index, all) => {
@@ -171,10 +175,12 @@
   {#if entry.winner?.seats != null && entry.winner.seats.length > 1}
     {#each entry.winner.seats as seat, index (index)}
       <span class="flex items-baseline gap-1.5">
-        <span
-          class="shrink-0 self-center rounded-xs block-2 inline-2"
-          style:background-color={swatch(seat.color, seat.key)}
-        ></span>
+        {#if !isScoped}
+          <span
+            class="shrink-0 self-center rounded-xs block-2 inline-2"
+            style:background-color={swatch(seat.color, seat.key)}
+          ></span>
+        {/if}
         <span class="flex-1">{seat.label}</span>
       </span>
     {/each}
@@ -188,10 +194,12 @@
             "font-semibold": option.won,
           })}
         >
-          <span
-            class="shrink-0 self-center rounded-xs block-2 inline-2"
-            style:background-color={swatch(option.color, option.key)}
-          ></span>
+          {#if !isScoped}
+            <span
+              class="shrink-0 self-center rounded-xs block-2 inline-2"
+              style:background-color={swatch(option.color, option.key)}
+            ></span>
+          {/if}
           <span class="truncate min-inline-0">{option.label}</span>
           {#if option.won}
             <CheckIcon
@@ -424,6 +432,7 @@
         phrase={item.label}
         when={item.when}
         annulled={item.annulled}
+        {isScoped}
       />
     {/snippet}
   </Combobox>

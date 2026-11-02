@@ -11,6 +11,7 @@
     phrase,
     when,
     annulled,
+    isScoped = false,
   }: {
     year: string;
     winner: Extract<
@@ -20,6 +21,7 @@
     phrase: string;
     when: string;
     annulled: boolean;
+    isScoped?: boolean;
   } = $props();
 </script>
 
@@ -34,10 +36,12 @@
     <span class="text-pretty">{phrase}</span>
   {:else}
     <span class="flex items-baseline gap-1.5">
-      <span
-        class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-        style:background-color={swatch(winner.color, winner.key)}
-      ></span>
+      {#if !isScoped}
+        <span
+          class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+          style:background-color={swatch(winner.color, winner.key)}
+        ></span>
+      {/if}
       <span class="text-pretty">{winner.label}</span>
     </span>
     {#if winner.total > 0}
