@@ -530,7 +530,12 @@
 
   <section class="mbs-8" aria-labelledby="changes">
     <h2 id="changes" class="heading">{m.proposal_changes()}</h2>
-    <ul class="mbs-2 grid border-bs text-sm">
+    {#if rows.length === 0 && cells.length === 0}
+      <p class="mbs-2 border-bs pbs-2 text-sm text-muted-foreground">
+        {m.proposal_changes_empty()}
+      </p>
+    {/if}
+    <ul class="mbs-2 grid border-bs text-sm empty:hidden">
       {#each rows as row, i (i)}
         {const anchor = $derived(rowAnchor(row))}
         {const record = $derived(
