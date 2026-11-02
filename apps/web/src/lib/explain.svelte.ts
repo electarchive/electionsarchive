@@ -1,4 +1,6 @@
+import type { Caveat } from "@ea/analytics/indices";
 import { on } from "svelte/events";
+import type { Figure } from "#lib/indices.js";
 
 export const explain = $state<{
   isOpen: boolean;
@@ -7,6 +9,15 @@ export const explain = $state<{
     | { kind: "term"; label: string; definition: string }
     | { kind: "person"; id: string }
     | { kind: "party"; id: string; color: string | null; within: string | null }
+    | {
+        kind: "index";
+        figure: Figure;
+        title: string;
+        context: string;
+        values: Array<{ text: string; unit: string | null }>;
+        notes: Array<string>;
+        caveats: Array<Caveat>;
+      }
     | null;
 }>({ isOpen: false, anchor: null, value: null });
 

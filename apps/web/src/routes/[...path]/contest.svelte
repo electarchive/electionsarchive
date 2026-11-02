@@ -1982,6 +1982,11 @@
       size={chamber?.size ?? null}
       {change}
     />
+    {#if contest.kind === "list_allocation"}
+      {#await import("./figures.svelte") then figures}
+        <figures.default {id} body={null} />
+      {/await}
+    {/if}
   {/snippet}
   <Lead
     results={summary}

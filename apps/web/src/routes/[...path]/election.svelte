@@ -2604,6 +2604,11 @@
             isStaggered={race.isStaggered}
             unelected={race.unelected ?? []}
           />
+          {#if index === head && scope == null && race.body != null && !race.isTier}
+            {#await import("./figures.svelte") then figures}
+              <figures.default {id} body={race.body} />
+            {/await}
+          {/if}
         {/snippet}
         <Lead
           results={race.isPrimaries ? null : summary}

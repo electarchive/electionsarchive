@@ -36,6 +36,10 @@
             >{value.definition}</Drawer.Description
           >
         </div>
+      {:else if value?.kind === "index"}
+        {#await import("#lib/components/index-card.svelte") then card}
+          <card.default {value} />
+        {/await}
       {:else if value != null}
         <Drawer.Title class="sr-only">{m.explain_preview()}</Drawer.Title>
         <div class="pbs-5 pbe-2">
