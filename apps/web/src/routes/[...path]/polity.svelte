@@ -18,6 +18,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
@@ -908,11 +909,15 @@
 
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
-    class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
-      "lg:col-span-8": polity.places.total > 0 && !isState,
-      "max-lg:order-1": isLocal && polity.places.total > 0,
-    })}
+    class={cn(
+      "col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]",
+      {
+        "lg:col-span-8": polity.places.total > 0 && !isState,
+        "max-lg:order-1": isLocal && polity.places.total > 0,
+      },
+    )}
     aria-labelledby="{uid}-elections"
+    {@attach settle}
   >
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <h2 id="{uid}-elections" class="text-[0.8125rem] font-bold">

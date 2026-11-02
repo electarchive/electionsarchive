@@ -145,7 +145,7 @@
           scale: 2,
           backgroundColor: background(root),
           height: root.offsetHeight - skipped + CREDIT,
-          style: { gridTemplateRows: "none" },
+          style: { gridTemplateRows: "none", contentVisibility: "visible" },
           filter: (child) =>
             !(
               child instanceof Element && child.hasAttribute("data-export-skip")

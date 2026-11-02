@@ -7,6 +7,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
 
   const { id, within }: { id: string; within?: string } = $props();
@@ -106,8 +107,9 @@
 
 {#if sheet != null && sheet.changed > 0}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
     aria-labelledby="{uid}-title"
+    {@attach settle}
   >
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">{m.gains_title()}</h2>

@@ -14,6 +14,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { settle } from "#lib/settle.js";
   import Makeup from "./makeup.svelte";
 
   const { id, isExpected = false }: { id: string; isExpected?: boolean } =
@@ -354,9 +355,10 @@
   </section>
 {:else if current != null || cabinets.length > 0}
   <section
-    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
     aria-labelledby="{uid}-title"
     data-export
+    {@attach settle}
   >
     <Export name="record" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
