@@ -74,7 +74,6 @@ catalog:
   pg: ^8.23.1
   playwright-core: 1.64.1
   pmtiles: ^4.5.0
-  resend: ^6.34.1
   satori: 0.63.2
   shadcn-svelte: ^1.7.1
   svelte: ^5.57.3

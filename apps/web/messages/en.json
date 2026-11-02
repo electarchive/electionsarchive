@@ -115,7 +115,7 @@
   "privacy_network_title": "Cloudflare and rate limits",
   "privacy_network_body": "All traffic passes through Cloudflare, which caches pages and protects the site from attacks. Cloudflare processes your IP address and request details under its [privacy policy](https://www.cloudflare.com/privacypolicy/).\n\nTo limit abuse, the server counts requests per IP address. These counts expire on their own, within a day at most, and are used for nothing else.",
   "privacy_accounts_title": "Accounts",
-  "privacy_accounts_body": "If you create an account, the archive stores your email address, your username, and anything you add to your profile, such as a display name and bio. Your username, display name, and bio are public. A session cookie keeps you signed in.\n\nIf you sign in with GitHub or Google, that service shares your name and email address with the archive. Sign-in and verification emails are sent through [Resend](https://resend.com/legal/privacy-policy).",
+  "privacy_accounts_body": "If you create an account, the archive stores your email address, your username, and anything you add to your profile, such as a display name and bio. Your username, display name, and bio are public. A session cookie keeps you signed in.\n\nIf you sign in with GitHub or Google, that service shares your name and email address with the archive. Sign-in and verification emails are sent through [Cloudflare](https://www.cloudflare.com/privacypolicy/).",
   "privacy_contributions_title": "Contributions",
   "privacy_contributions_body": "When contributions open, your proposals, the evidence you attach, and the decisions on them will be public and credited to your username.",
   "privacy_newsletter_title": "Updates by email",

@@ -37,7 +37,7 @@ docs/                These guides
 - **oRPC** for every procedure, with TanStack Query on the client. Procedures live in `apps/web/src/lib/server/rpc/router.ts`. oRPC is pinned to exact versions and upgraded deliberately.
 - **Paraglide** for interface text, with English as the only locale so far. Messages live in `apps/web/messages/`.
 - **Better Auth** with email and password, GitHub and Google (each enabled only when its client ID and secret are set), the admin plugin, and API keys with the `ea_` prefix. Roles beyond Better Auth's own live in `user_role`.
-- **Redis** for rate limits and short-lived caches, and **Resend** for sign-in email.
+- **Redis** for rate limits and short-lived caches, and **Cloudflare Email Service** for sign-in email, sent through its REST API with a token that can only send.
 - **MapLibre** and **PMTiles** for maps.
 - Every dependency version lives in the `catalog:` section of `pnpm-workspace.yaml`, and packages reference `catalog:`.
 

@@ -40,9 +40,14 @@ export const variables = defineEnvVars({
     schema: optional,
     description: "Google OAuth client secret",
   },
-  RESEND_API_KEY: {
-    schema: v.pipe(v.string(), v.nonEmpty()),
-    description: "Resend API key",
+  CLOUDFLARE_ACCOUNT_ID: {
+    schema: optional,
+    description: "Cloudflare account that sends sign-in email",
+  },
+  CLOUDFLARE_EMAIL_TOKEN: {
+    schema: optional,
+    description:
+      "Cloudflare API token with Email Sending Write permission on that account",
   },
   REDIS_URL: {
     schema: v.pipe(

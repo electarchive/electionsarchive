@@ -2,11 +2,12 @@ import { dev } from "$app/env";
 import {
   BETTER_AUTH_SECRET,
   BETTER_AUTH_URL,
+  CLOUDFLARE_ACCOUNT_ID,
+  CLOUDFLARE_EMAIL_TOKEN,
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  RESEND_API_KEY,
 } from "$app/env/private";
 import { getRequestEvent } from "$app/server";
 import { apiKey } from "@better-auth/api-key";
@@ -17,8 +18,11 @@ import { betterAuth } from "better-auth/minimal";
 import { admin } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { randomUUID } from "node:crypto";
-import { Resend } from "resend";
-import { EMAIL_FROM, PROJECT } from "#lib/constants.js";
+import {
+  EMAIL_FROM_ADDRESS,
+  EMAIL_FROM_NAME,
+  PROJECT,
+} from "#lib/constants.js";
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale, locales } from "#lib/paraglide/runtime.js";
 import { authDb } from "#lib/server/db/index.js";
@@ -57,34 +61,52 @@ for (const locale of locales) {
   translations[locale] = dictionary;
 }
 
-const resend = new Resend(RESEND_API_KEY);
-
 async function sendEmail({
   to,
   subject,
   body,
   action,
   url,
-  category,
 }: {
   to: string;
   subject: string;
   body: string;
   action: string;
   url: string;
-  category: string;
 }) {
-  const { error } = await resend.emails.send({
-    from: EMAIL_FROM,
-    to: [to],
-    subject,
-    html: `<p>${body}</p><p><a href="${url}">${action}</a></p>`,
-    text: `${body}\n\n${url}`,
-    tags: [{ name: "category", value: category }],
-  });
-
-  if (error != null) {
-    throw new Error(error.message);
+  if (CLOUDFLARE_ACCOUNT_ID == null || CLOUDFLARE_EMAIL_TOKEN == null) {
+    throw new Error(
+      "Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_EMAIL_TOKEN to send email",
+    );
+  }
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/email/sending/send`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${CLOUDFLARE_EMAIL_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: { address: EMAIL_FROM_ADDRESS, name: EMAIL_FROM_NAME },
+        to,
+        subject,
+        html: `<p>${body}</p><p><a href="${url}">${action}</a></p>`,
+        text: `${body}\n\n${url}`,
+      }),
+    },
+  );
+  const result: unknown = await response.json().catch(() => null);
+  const sent =
+    response.ok &&
+    typeof result === "object" &&
+    result != null &&
+    "success" in result &&
+    result.success === true;
+  if (!sent) {
+    throw new Error(
+      `Email to ${to} failed with ${response.status}: ${JSON.stringify(result)}`,
+    );
   }
 }
 
@@ -170,7 +192,6 @@ export const auth = betterAuth({
         body: m.reset_password_body(),
         action: m.reset_password_action(),
         url,
-        category: "password_reset",
       });
     },
   },
@@ -182,7 +203,6 @@ export const auth = betterAuth({
         body: m.verify_email_body(),
         action: m.verify_email_action(),
         url,
-        category: "confirm_email",
       });
     },
   },
@@ -196,7 +216,6 @@ export const auth = betterAuth({
           body: m.change_email_body(),
           action: m.change_email_action(),
           url,
-          category: "change_email",
         });
       },
     },

@@ -104,7 +104,7 @@ pnpm --filter @ea/db migrate
 pnpm dev
 ```
 
-The app runs at http://localhost:5173. Fill in `BETTER_AUTH_SECRET` and `RESEND_API_KEY` in `.env` first. Then load real data, for example Canada's federal elections since 1867:
+The app runs at http://localhost:5173. Fill in `BETTER_AUTH_SECRET` in `.env` first, and `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_EMAIL_TOKEN` if you want sign-in emails. Then load real data, for example Canada's federal elections since 1867:
 
 ```bash
 cd pipelines
