@@ -458,6 +458,11 @@ def opens_issue(lines: list[str], cursor: int) -> bool:
     )
 
 
+JUNK = re.compile(
+    r"\s*(?=Page\s*\d+\s*of\s*\d+|CHECK BOTH SIDES|Board Signatures|Review Both Sides|Members\s*of\s*the Board|This proposed amendment would|RECALL OF [A-Z])"
+)
+
+
 def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
     lines = [line.strip() for line in lines if line.strip() and not NOISE.match(line.strip())]
     rows = []
@@ -471,6 +476,10 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
             head.append(lines[cursor])
             cursor -= 1
         head.reverse()
+        for offset, text in enumerate(head):
+            if MAJORITY.match(text) or text.startswith("necessary for"):
+                head = head[:offset]
+                break
         for offset, text in enumerate(head):
             if START.match(text):
                 head = head[offset:]
@@ -501,6 +510,10 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
         text = re.split(r"\s*(?:For the (?:Tax )?\w+ Against|S a m p l e|This sample ballot was produced)", text)[
             0
         ].strip()
+        text = re.split(JUNK, text)[0].strip()
+        text = re.sub(r"^(?:TO REQUIRE VOTERS TO PRESENT )?PHOTO IDENTIFICATION IN ORDER TO VOTE\s*", "", text)
+        if re.match(JUNK, text) or len(text) < 60 or re.search(r"\b(?:Republican|Democratic)\b", text[:300]):
+            text = ""
         kind = head[0] + (" " + head[1] if len(head) > 1 and head[1].startswith("(") else "")
         key = (tuple(head), text)
         if text and key not in seen:
@@ -730,10 +743,13 @@ def parse() -> None:
 
 def keys(name: str) -> set[str]:
     name = re.sub(r"\b(of|the)(?=[A-Z])", r"\1 ", name.replace("\u2010", "-").replace("\u2011", "-"))
-    name = re.sub(r"\s*\((?:excluding|exclusive|unincorporated)[^)]*\)", "", name, flags=re.IGNORECASE)
+    name = re.sub(r"\s*\([^)]*(?:\)|$)", "", name).strip()
     bare = re.sub(r"\s*village$", "", name, flags=re.IGNORECASE)
     name = re.sub(
-        r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name
+        r"^(City|Village|Township) of (.+)$",
+        lambda m: f"{m[2]} {m[1]}" if m[1].lower() == "township" else m[2],
+        name,
+        flags=re.IGNORECASE,
     )
     return {ceda._core(name), ceda._city(name), ceda._core(bare), ceda._city(bare)}
 
@@ -781,6 +797,14 @@ def token(note: str) -> re.Pattern[str]:
         return re.compile(rf"Articles? {roman[1]}\b")
     numbers = re.findall(r"\d+(?:\.\d+)?[a-z]?", purpose)
     return re.compile(rf"(?<![\d.]){re.escape(numbers[-1])}" if numbers else "(?!)")
+
+
+def plausible(name: str, wanted: str, row: dict[str, str]) -> bool:
+    if wanted == "miscellaneous" and re.match(r"(?:A|An) (?:renewal|additional|replacement)\b", row["text"]):
+        return False
+    place = re.sub(r"\b(?:city|village|township|local|exempted|school|district|county|joint|vocational|oh)\b|,", "", name.lower())
+    first = place.split()[:1]
+    return not first or len(first[0]) < 3 or first[0] in f"{row['entity']} {row['text']}".lower().replace("|", " ")
 
 
 def pick(
@@ -853,6 +877,8 @@ def pick(
         narrowed = sorted(narrowed, key=lambda c: str(c[0]))[:1]
     if len({c[0] for c in narrowed}) != 1:
         return None
+    if not plausible(narrowed[0][1], wanted, row):
+        return None
     note = narrowed[0][2].lower()
     for word in ("additional", "renewal", "replacement"):
         if word in kind.lower() and word not in note:
@@ -865,6 +891,13 @@ def pick(
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "issues.parquet")
+    frame = frame.filter(
+        ~pl.col("text").str.contains(
+            r"(?i)Joint Resolution of the General Assembly|Require voters to present|"
+            r"\b(?:Republican|Democratic)\b|Review Both Sides|CHECK BOTH SIDES|Board Signatures|Page\s*\d+\s*of\s*\d+"
+        )
+        & (pl.col("text").str.len_chars() >= 60)
+    )
     counties = {ceda._core(f"{county} County") for county in [*frame["county"], *COUNTY_OF.values()]}
     with connect() as conn:
         fips = {
