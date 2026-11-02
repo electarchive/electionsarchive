@@ -7233,6 +7233,7 @@ KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
     ("BELL", "Middlesboro City Coumcil"): "Middlesborough",
     ("BELL", "Middlesboro"): "Middlesborough",
+    ("ADAIR", "North Columbia Hurt"): "Columbia",
     ("BALLARD", "District"): "La Center",
     ("BALLARD", "Lacenter"): "La Center",
     ("LARUE", "Hadgenville"): "Hodgenville",
@@ -8064,6 +8065,8 @@ def parse() -> None:
         "County", "Office", "District", "Office Description", "Last Name", "Unexpired"
     ).iter_rows():
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
+        if post == "CITY LEGISLATIVE BODY" and str(description) == "SCHOOL BOARD MEMBER":
+            post = "SCHOOL BOARD MEMBER"
         city = " ".join(
             re.sub(
                 r"\bCITY (?=COUN|COM|LEGISLATIVE|MAYOR|OF)|^CITY\b|\bCITY$|-\s*\w+ CO$|\b(COUN\w*|MEMBERS?|COM\w*|MAYOR|OF|LEGISLATIVE|BODY)\b|[^A-Z ]",
@@ -10438,6 +10441,8 @@ def parse() -> None:
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
+            if st == "KY" and label == "Brownsboro Village":
+                label = "Brownsboro"
             if st == "NE" and label == "De Witt":
                 label = "DeWitt"
             if st == "MI" and full == "Minden City village":
