@@ -122,6 +122,26 @@ SOURCES = {
         "Woodbury County Auditor",
         ".pdf",
     ),
+    "winneshiek_decorah": (
+        "https://winneshiekcounty.iowa.gov/wp-content/uploads/2026/09/PCT-3-Decorah-Ward-1.pdf",
+        "Winneshiek County Auditor",
+        ".pdf",
+    ),
+    "winneshiek_spillville": (
+        "https://winneshiekcounty.iowa.gov/wp-content/uploads/2026/09/PCT-11-City-of-Spillville.pdf",
+        "Winneshiek County Auditor",
+        ".pdf",
+    ),
+    "buchanan": (
+        "https://www.buchanancounty.iowa.gov/2026%20General%20Ballot%20Notice%20for%20Papers.pdf",
+        "Buchanan County Auditor",
+        ".pdf",
+    ),
+    "jasper_pcm": (
+        "https://jaspercountyelections.iowa.gov/files/sample_ballots/1201_pcm_des_moines_township_33654.pdf",
+        "Jasper County Auditor",
+        ".pdf",
+    ),
     "feed": (
         "https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip",
         "Iowa Secretary of State",
@@ -422,6 +442,70 @@ SCANNED = (
             "improve the site?"
         ),
     ),
+    (
+        "winneshiek_decorah",
+        "WD",
+        "City of Decorah",
+        (
+            "Shall the following Public Measure be adopted? Shall the City of Decorah, State of Iowa, issue its General "
+            "Obligation Bonds or Capital Loan Notes in an amount not exceeding the amount of $20,900,000, in one or "
+            "more series, for the purpose of paying costs of designing, constructing, reconstructing, enlarging, "
+            "improving, equipping and furnishing municipal facilities including a new fire station and renovation of "
+            "city hall, with related site improvements?"
+        ),
+    ),
+    (
+        "winneshiek_spillville",
+        "WE",
+        "City of Spillville",
+        (
+            "Shall the following Public Measure be adopted? Summary: To authorize a change in the use of the one "
+            "percent (1%) local sales and services tax in the City of Spillville effective July 1, 2027. The use of the "
+            "one percent (1%) local option sales and services tax shall be changed in the City of Spillville, "
+            "effective July 1, 2027. Revenues from the local option sales and services tax (LOSST) shall be allocated "
+            "as follows: Zero percent (0%) for property tax relief, One Hundred percent (100%) will be allocated "
+            "annually by the City Council, for any lawful purpose, including but not limited to the following "
+            "purposes: Capital equipment purchases and repairs, street, water, sewer and other capital improvement and "
+            "maintenance projects, and/or for assistance to the Bily Clocks Museum and Antonin Dvorak Exhibit."
+        ),
+    ),
+    (
+        "buchanan",
+        "CD",
+        "City of Independence",
+        (
+            "Shall the City of Independence, in Buchanan County, State of Iowa, enter into a loan agreement and issue "
+            "general obligation bonds in an amount not exceeding $14,500,000 for the purpose of paying the cost, to "
+            "that extent, of undertaking fire protection facilities improvements, including the expansion, "
+            "renovation, furnishing and equipping of existing facilities and the acquisition and improvement of real "
+            "estate for the development of additional facilities?"
+        ),
+    ),
+    (
+        "buchanan",
+        "CE",
+        "Independence Community School District",
+        (
+            "Shall the Board of Directors of the Independence Community School District in the Counties of Buchanan "
+            "and Benton, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in "
+            "an amount not to exceed $24,990,000 to provide funds to build, furnish, and equip additions to East and "
+            "West Elementary Schools; and to remodel, repair, improve, and equip East and West Elementary Schools and "
+            "to improve the sites, including related demolition at West Elementary?"
+        ),
+    ),
+    (
+        "jasper_pcm",
+        "LL",
+        "PCM Community School District",
+        (
+            "Shall the Board of Directors of the PCM Community School District in the Counties of Jasper, Polk, and "
+            "Marion, State of Iowa, be authorized to contract indebtedness and issue General Obligation Bonds in an "
+            "amount not to exceed $14,195,000 to provide funds to remodel, repair, improve, and equip the Monroe "
+            "campus, including classroom and career and technical education spaces; to build, furnish, and equip an "
+            "addition to the Monroe campus, including a multipurpose performance gymnasium, support spaces, and site "
+            "improvements; and to improve the Prairie City campus site, including playgrounds and parking?"
+        ),
+    ),
 )
 SHALL = re.compile(r"Public Measure ([A-Z]{1,3})\b[^?]{0,140}?(Shall\b[^?]+\?)")
 BREMER = re.compile(r"District - ([A-Z]{1,3})\s+(Shall\b[^?]+\?)")
@@ -572,9 +656,12 @@ def emit() -> Path:
         found = civil.found
         system = cs.key("us.electoral_system", "referendum")
         source_ids: dict[str, UUID] = {}
+        added: set[UUID] = set()
         for key, (url, publisher, _) in SOURCES.items():
             source_ids[key] = cs.source(publisher, TITLE)
-            cs.add("source", id=source_ids[key], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            if source_ids[key] not in added:
+                added.add(source_ids[key])
+                cs.add("source", id=source_ids[key], kind="official_body", publisher=publisher, title=TITLE, url=url)
             cs.artifact(raw.cached(SOURCE, url), source_ids[key])
         parent = cs.key("us.election", f"{DAY}:IA")
         elections: set[UUID] = set()
