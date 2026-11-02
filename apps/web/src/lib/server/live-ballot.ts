@@ -2,7 +2,7 @@ import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
 import { remember } from "#lib/server/cache.js";
 import { liveDb as db } from "#lib/server/db/index.js";
-import { geography } from "#lib/server/live-board.js";
+import { geography, portraits } from "#lib/server/live-board.js";
 import { night } from "#lib/server/live-page.js";
 import { names } from "#lib/server/rpc/archive.js";
 
@@ -27,6 +27,8 @@ export type BallotLocalKind =
 export type BallotOption = {
   id: string;
   name: string;
+  person: string | null;
+  photo: string | null;
   party: string | null;
   isIncumbent: boolean;
   isWriteIn: boolean;
@@ -132,10 +134,15 @@ async function choices(contests: Array<string>, date: string) {
   const people = found.rows.flatMap((row) =>
     row.person == null ? [] : [row.person],
   );
-  const named = await names(people, date);
+  const [named, faces] = await Promise.all([
+    names(people, date),
+    portraits(people),
+  ]);
   return found.rows.map((row) => ({
     id: row.id,
     contest: row.contest,
+    person: row.person,
+    photo: row.person == null ? null : (faces.get(row.person) ?? null),
     name:
       (row.person == null ? null : named.full.get(row.person)) ??
       row.ballot ??
@@ -314,6 +321,8 @@ async function statewide(id: string, date: string, stateName: string) {
         options: own.map((option) => ({
           id: option.id,
           name: option.name,
+          person: option.person,
+          photo: option.photo,
           party: option.party,
           isIncumbent: option.isIncumbent,
           isWriteIn: option.isWriteIn,
@@ -452,6 +461,8 @@ export async function ballotLocals(path: string) {
                 options: (byContest.get(row.id) ?? []).map((option) => ({
                   id: option.id,
                   name: option.name,
+                  person: option.person,
+                  photo: option.photo,
                   party: option.party,
                   isIncumbent: option.isIncumbent,
                   isWriteIn: option.isWriteIn,

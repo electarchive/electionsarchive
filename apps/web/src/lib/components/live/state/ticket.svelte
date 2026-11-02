@@ -2,6 +2,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import type { Entry } from "#lib/live/ballot.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
   import { tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
@@ -67,16 +68,25 @@
               class="shrink-0 translate-y-[-0.05em] self-center rounded-full block-2.5 inline-2.5"
               style:background-color={tone(line.option)}
             ></span>
-            <span
+            <Name
+              label={line.option.label}
+              person={line.option.person}
+              hasSwatch={false}
+              hasLink={false}
               class={cn("truncate", {
                 "font-bold": isWinner,
                 "font-semibold": !isWinner,
-              })}>{line.option.label}</span
-            >
+              })}
+            />
             {#if line.option.party != null}
-              <span class="shrink-0 text-xs text-muted-foreground"
-                >{line.option.party.short}</span
-              >
+              <Name
+                label={line.option.party.short}
+                party={line.option.party.id}
+                color={line.option.party.color}
+                hasSwatch={false}
+                hasLink={false}
+                class="shrink-0 text-xs text-muted-foreground"
+              />
             {/if}
             {#if line.option.isIncumbent}
               <span

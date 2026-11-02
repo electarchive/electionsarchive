@@ -341,3 +341,15 @@ export async function control(
 
 export type Control = Awaited<ReturnType<typeof control>>;
 export type House = Awaited<ReturnType<typeof house>>;
+
+export async function portraits(people: Array<string>) {
+  if (people.length === 0) {
+    return new Map<string, string>();
+  }
+  const found = await db.execute<{ person: string; path: string }>(sql`
+    select distinct on (person_id) person_id as person, path
+    from person_image where person_id = any(${sql.param([...new Set(people)])}::uuid[])
+    order by person_id, recorded_from desc
+  `);
+  return new Map(found.rows.map((row) => [row.person, `/${row.path}`]));
+}

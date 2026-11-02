@@ -3,11 +3,13 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import type { Standing } from "#lib/live/standing.js";
+  import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Counter from "./counter.svelte";
+  import Face from "./face.svelte";
 
   const {
     options,
@@ -84,28 +86,53 @@
           style:border-color={color}
         >
           <span
-            class={cn("flex items-center gap-2 max-inline-full", {
+            class={cn("flex items-center gap-3 max-inline-full", {
               "flex-row-reverse": isEnd,
             })}
           >
-            <span class="truncate text-base/tight font-[720] tracking-tight"
-              >{option?.label}</span
+            <Face
+              {option}
+              class="block-10 inline-10 sm:block-11 sm:inline-11"
+            />
+            <span
+              class={cn("grid gap-1 min-inline-0", {
+                "justify-items-end": isEnd,
+              })}
             >
-            {#if isWinner}
               <span
-                class="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[0.6875rem] font-semibold knockout"
-                style:background-color={color}
-                style:--party={color}
-                ><CheckIcon
-                  class="block-3 inline-3"
-                  aria-hidden="true"
-                />{m.night_winner()}</span
+                class={cn("flex items-center gap-2 max-inline-full", {
+                  "flex-row-reverse": isEnd,
+                })}
               >
-            {/if}
+                <Name
+                  label={option?.label ?? ""}
+                  person={option?.person ?? null}
+                  hasSwatch={false}
+                  class="truncate text-base/tight font-[720] tracking-tight"
+                />
+                {#if isWinner}
+                  <span
+                    class="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[0.6875rem] font-semibold knockout"
+                    style:background-color={color}
+                    style:--party={color}
+                    ><CheckIcon
+                      class="block-3 inline-3"
+                      aria-hidden="true"
+                    />{m.night_winner()}</span
+                  >
+                {/if}
+              </span>
+              <span
+                class="truncate text-xs text-muted-foreground max-inline-full"
+                >{#if option?.party == null}{m.night_no_party()}{:else}<Name
+                    label={option.party.name}
+                    party={option.party.id}
+                    color={option.party.color}
+                    hasSwatch={false}
+                  />{/if}</span
+              >
+            </span>
           </span>
-          <span class="truncate text-xs text-muted-foreground max-inline-full"
-            >{option?.party?.name ?? m.night_no_party()}</span
-          >
           <span
             class={cn(
               "flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 pbs-1",
@@ -263,8 +290,17 @@
             style:background-color={tone(option)}
           ></span>
           <span class="grow truncate"
-            >{option?.label}<span class="text-muted-foreground">
-              · {option?.party?.short ?? m.night_no_party()}</span
+            ><Name
+              label={option?.label ?? ""}
+              person={option?.person ?? null}
+              hasSwatch={false}
+            /><span class="text-muted-foreground">
+              · {#if option?.party == null}{m.night_no_party()}{:else}<Name
+                  label={option.party.short}
+                  party={option.party.id}
+                  color={option.party.color}
+                  hasSwatch={false}
+                />{/if}</span
             ></span
           >
           <span class="font-figures text-muted-foreground tabular-nums"

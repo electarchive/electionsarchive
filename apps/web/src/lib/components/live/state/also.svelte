@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Line } from "#lib/live/lineup.js";
+  import Name from "#lib/components/name.svelte";
   import { percent } from "#lib/format.js";
   import { others } from "#lib/live/lineup.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -21,7 +22,12 @@
   >
     <span class="flex items-baseline gap-1.5 min-inline-0">
       {#if rest.length === 1}
-        <span class="truncate">{rest[0]?.option.label}</span>
+        <Name
+          label={rest[0]?.option.label ?? ""}
+          person={rest[0]?.option.person ?? null}
+          hasSwatch={false}
+          class="truncate"
+        />
       {:else}
         <span class="shrink-0 text-foreground"
           >{m.night_others({ count: rest.length })}</span

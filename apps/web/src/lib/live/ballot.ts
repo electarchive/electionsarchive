@@ -68,6 +68,8 @@ export function stub(
       return {
         id: option.id,
         label: option.name,
+        person: option.person,
+        photo: option.photo,
         party:
           option.party == null || party == null
             ? null

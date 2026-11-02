@@ -3,6 +3,8 @@ export type LiveOffice = "senate" | "governor" | "house" | "other";
 export type LiveOption = {
   id: string;
   label: string;
+  person: string | null;
+  photo: string | null;
   party: { id: string; name: string; short: string; color: string } | null;
   isWriteIn: boolean;
   isIncumbent: boolean;

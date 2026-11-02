@@ -2,6 +2,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
+  import Name from "#lib/components/name.svelte";
   import { percent } from "#lib/format.js";
   import {
     compact,
@@ -157,16 +158,22 @@
                 class="shrink-0 self-center rounded-full block-2 inline-2"
                 style:background-color={tone(line.option)}
               ></span>
-              <span
+              <Name
+                label={line.option.label}
+                person={line.option.person}
+                hasSwatch={false}
                 class={cn("truncate", {
                   "font-semibold": isWinner || isProjected,
-                })}>{line.option.label}</span
-              >
+                })}
+              />
               {#if line.option.party != null}
-                <abbr
-                  class="shrink-0 text-xs text-muted-foreground no-underline"
-                  title={line.option.party.name}>{initial(line.option)}</abbr
-                >
+                <Name
+                  label={initial(line.option)}
+                  party={line.option.party.id}
+                  color={line.option.party.color}
+                  hasSwatch={false}
+                  class="shrink-0 text-xs text-muted-foreground"
+                />
               {/if}
               {#if isWinner}
                 <CheckIcon

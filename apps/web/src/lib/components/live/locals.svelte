@@ -3,6 +3,7 @@
   import XIcon from "@lucide/svelte/icons/x";
   import type { Local, LocalKind, LocalSort } from "#lib/live/local.js";
   import type { Summary } from "#lib/live/summary.js";
+  import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { percent } from "#lib/format.js";
   import { tone } from "#lib/live/format.js";
@@ -389,18 +390,27 @@
                               class="shrink-0 rounded-full block-2 inline-2"
                               style:background-color={tone(entry.option)}
                             ></span>
-                            <span
+                            <Name
+                              label={entry.option.label}
+                              person={entry.option.person}
+                              hasSwatch={false}
+                              hasLink={false}
                               class={cn("truncate font-sans", {
                                 "font-semibold":
                                   entry.isWinner || entry.isInside,
                                 "text-muted-foreground":
                                   !entry.isWinner && !entry.isInside,
-                              })}>{@render marked(entry.option.label)}</span
+                              })}>{@render marked(entry.option.label)}</Name
                             >
                             {#if entry.option.party != null}
-                              <span class="shrink-0 text-muted-foreground"
-                                >{entry.option.party.short}</span
-                              >
+                              <Name
+                                label={entry.option.party.short}
+                                party={entry.option.party.id}
+                                color={entry.option.party.color}
+                                hasSwatch={false}
+                                hasLink={false}
+                                class="shrink-0 text-muted-foreground"
+                              />
                             {/if}
                             <span
                               class="relative ms-auto hidden overflow-hidden rounded-xs bg-muted block-1 inline-16 sm:block"

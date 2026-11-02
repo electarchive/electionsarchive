@@ -2,6 +2,7 @@
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
   import CheckIcon from "@lucide/svelte/icons/check";
   import type { Standing } from "#lib/live/standing.js";
+  import Name from "#lib/components/name.svelte";
   import { percent } from "#lib/format.js";
   import { tone } from "#lib/live/format.js";
   import { toward } from "#lib/live/standing.js";
@@ -147,7 +148,11 @@
                   "font-semibold text-foreground": isPair,
                 })}
               >
-                {option?.label}
+                <Name
+                  label={option?.label ?? ""}
+                  person={option?.person ?? null}
+                  hasSwatch={false}
+                />
                 {#if isWinner}
                   <CheckIcon
                     class="block-4 inline-4"
@@ -157,7 +162,12 @@
                 {/if}
               </span>
               <span class="text-xs text-muted-foreground"
-                >{option?.party?.name ?? m.night_no_party()}</span
+                >{#if option?.party == null}{m.night_no_party()}{:else}<Name
+                    label={option.party.name}
+                    party={option.party.id}
+                    color={option.party.color}
+                    hasSwatch={false}
+                  />{/if}</span
               >
             </span>
           </th>

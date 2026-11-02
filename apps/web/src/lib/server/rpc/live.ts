@@ -18,6 +18,7 @@ import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
+import { portraits } from "#lib/server/live-board.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
@@ -311,14 +312,17 @@ async function options(contests: Array<string>, date: string) {
   const parties = found.rows.flatMap((row) =>
     row.party == null ? [] : [row.party],
   );
-  const [named, partyNames] = await Promise.all([
+  const [named, partyNames, faces] = await Promise.all([
     names(people, date),
     names(parties, date),
+    portraits(people),
   ]);
   return found.rows.map((row) => ({
     id: row.id,
     contest: row.contest,
     kind: row.kind,
+    person: row.person,
+    photo: row.person == null ? null : (faces.get(row.person) ?? null),
     name:
       (row.person == null ? null : named.full.get(row.person)) ??
       row.ballot ??
@@ -1200,6 +1204,8 @@ async function night(
           return {
             id: choice.id,
             label: choice.name,
+            person: choice.person,
+            photo: choice.photo,
             party: null,
             isWriteIn: choice.kind === "write_in",
             isIncumbent: sitting.has(choice.id),
@@ -1225,6 +1231,8 @@ async function night(
         return {
           id: choice.id,
           label: choice.name,
+          person: choice.person,
+          photo: choice.photo,
           party: entry,
           isWriteIn: choice.kind === "write_in",
           isIncumbent: sitting.has(choice.id),
