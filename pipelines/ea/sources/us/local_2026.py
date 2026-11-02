@@ -10788,6 +10788,9 @@ def parse() -> None:
                         ),
                         " ".join(tokens),
                     ).split()
+                    tokens = re.sub(
+                        r"^member city council (city of .+?) (district \d+)$", r"\1 city council \2", " ".join(tokens)
+                    ).split()
                 if state == "NY":
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
