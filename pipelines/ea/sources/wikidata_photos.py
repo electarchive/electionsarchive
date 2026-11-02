@@ -6,9 +6,9 @@ import json
 import re
 import time
 from collections import Counter
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from urllib.parse import unquote, urlencode
+from urllib.parse import urlencode
 from uuid import uuid5
 
 import httpx
@@ -24,11 +24,9 @@ VERSION = "4"
 TITLE = "Photos of people"
 PHOTOS = DATA / "photos"
 ITEMS = DATA / "parsed" / SOURCE / "items.json"
-IMAGES = (
-    """SELECT ?item (MIN(?image) AS ?file) WHERE {{ VALUES ?item {{ {items} }} ?item wdt:P18 ?image }} GROUP BY ?item"""
-)
 SCOPE = "select x.value from external_id x join person p on p.id = x.entity_id where x.scheme = 'wikidata'"
-CHUNK = 400
+BUCKETS = 1000
+IDS = 50
 TITLES = 50
 WIDTH = 256
 FETCHED = 330
@@ -73,16 +71,23 @@ def _items() -> list[str]:
     return json.loads(ITEMS.read_text(encoding="utf-8"))
 
 
-def _sparql(items: list[str]) -> list[str]:
+def _entities(items: list[str]) -> list[str]:
+    buckets: dict[int, list[str]] = {}
+    for item in items:
+        buckets.setdefault(int(item[1:]) % BUCKETS, []).append(item)
     return [
-        "https://query.wikidata.org/sparql?"
+        "https://www.wikidata.org/w/api.php?"
         + urlencode(
             {
-                "query": IMAGES.format(items=" ".join(f"wd:{item}" for item in items[start : start + CHUNK])),
+                "action": "wbgetentities",
+                "ids": "|".join(bucket[start : start + IDS]),
+                "props": "claims",
                 "format": "json",
-            }
+            },
+            safe="|",
         )
-        for start in range(0, len(items), CHUNK)
+        for _, bucket in sorted(buckets.items())
+        for start in range(0, len(bucket), IDS)
     ]
 
 
@@ -133,13 +138,75 @@ def _get(url: str, suffix: str, pause: float) -> Artifact | None:
     return None
 
 
+def _api(url: str, pause: float, lag: dict[str, str]) -> Artifact | None:
+    try:
+        return raw.cached(SOURCE, url)
+    except LookupError:
+        pass
+    for _ in range(8):
+        try:
+            response = httpx.get(
+                str(httpx.URL(url).copy_merge_params(lag)),
+                headers={"User-Agent": raw.USER_AGENT},
+                timeout=120,
+            )
+        except httpx.TransportError as error:
+            print(f"{error!r}, waiting 60s")
+            time.sleep(60)
+            continue
+        if response.status_code == 429:
+            raise SystemExit(f"429 from {response.url.host}; stop and retry later")
+        if response.status_code >= 500:
+            wait = int(response.headers.get("retry-after", "30"))
+            print(f"{response.status_code} from {response.url.host}, waiting {wait}s")
+            time.sleep(wait)
+            continue
+        response.raise_for_status()
+        error = response.json().get("error")
+        if error is not None:
+            if error.get("code") != "maxlag":
+                raise RuntimeError(f"{url}: {error}")
+            if error.get("type") == "wikibase-queryservice":
+                lag.clear()
+                print("query service lag does not affect entity reads; continuing without maxlag")
+                continue
+            wait = int(response.headers.get("retry-after", "5"))
+            print(f"maxlag, waiting {wait}s")
+            time.sleep(wait)
+            continue
+        artifact = raw.store(
+            SOURCE,
+            url,
+            response.content,
+            suffix=".json",
+            retrieved_at=datetime.now(UTC),
+            media_type=response.headers.get("content-type", "application/json"),
+        )
+        time.sleep(pause)
+        return artifact
+    print(f"skipped {url}")
+    return None
+
+
 def _files(items: list[str]) -> dict[str, str]:
     files: dict[str, str] = {}
-    for url in _sparql(items):
-        for binding in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]:
-            files[binding["item"]["value"].rsplit("/", 1)[1]] = unquote(
-                binding["file"]["value"].rsplit("/", 1)[1]
-            ).replace("_", " ")
+    for url in _entities(items):
+        wanted = set(dict(httpx.URL(url).params)["ids"].split("|"))
+        for item, entity in (
+            json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8")).get("entities", {}).items()
+        ):
+            if item not in wanted:
+                continue
+            claims = [
+                claim
+                for claim in entity.get("claims", {}).get("P18", [])
+                if claim["rank"] != "deprecated"
+                and claim.get("mainsnak", {}).get("snaktype") == "value"
+                and isinstance(claim["mainsnak"]["datavalue"]["value"], str)
+            ]
+            best = [claim for claim in claims if claim["rank"] == "preferred"] or claims
+            if best:
+                files[item] = min(claim["mainsnak"]["datavalue"]["value"] for claim in best).replace("_", " ")
     return files
 
 
@@ -294,8 +361,11 @@ def fetch() -> None:
     ITEMS.parent.mkdir(parents=True, exist_ok=True)
     ITEMS.write_text(json.dumps(items), encoding="utf-8")
     print(f"{len(items)} people with Wikidata items in scope")
-    for url in _sparql(items):
-        _get(url, ".json", 2)
+    lag = {"maxlag": "5"}
+    for count, url in enumerate(_entities(items), 1):
+        _api(url, 1, lag)
+        if count % 100 == 0:
+            print(f"entities {count}")
     files = _files(items)
     print(f"{len(files)} with an image")
     for url in _commons(sorted(set(files.values()))):
@@ -351,7 +421,7 @@ def emit() -> Path:
             license_url="https://commons.wikimedia.org/wiki/Commons:Licensing",
             attribution="Each photo credits its author and license as its Wikimedia Commons file page gives them",
         )
-        for url in _sparql(items) + _commons(sorted(set(files.values()))):
+        for url in _entities(items) + _commons(sorted(set(files.values()))):
             cs.artifact(raw.cached(SOURCE, url), source)
         PHOTOS.mkdir(parents=True, exist_ok=True)
         added = 0
