@@ -18,7 +18,7 @@ from ea.changeset import Changeset, slug
 from ea.coverage_tables import tokens
 from ea.offices import Offices
 from ea.sources.licenses import UNLICENSED
-from ea.sources.us import cog
+from ea.sources.us import cog, enr_clarity
 from ea.sources.us.electionsfl import FIPS as FLORIDA
 from ea.sources.us.electionsfl import JACKSONVILLE, REPORTS, export
 from ea.sources.us.medsl import RECODED
@@ -133,6 +133,11 @@ SPLIT = {"2024-11-05:AZ:04013:constable"}
 WITHDRAWN = (
     "Withdrawn: MEDSL's file lists Maricopa County's 2024 constable races under one countywide title. The archive now "
     "holds them as ten separate races, one for each justice precinct, as the county's official canvass names them."
+)
+PARTIAL = (
+    "Withdrawn: MEDSL's file holds this special district's race for one county only, though the district spans "
+    "several counties. The archive now holds the race from the counties' official returns, which cover the whole "
+    "district."
 )
 RETIRED = (
     "Maricopa County's 2024 constable races, filed under one countywide title in MEDSL's file; the archive holds "
@@ -1686,6 +1691,19 @@ def emit() -> Path:
                 [[*sources.values(), *contributed.values(), *florida.values()]],
             ).fetchall()
         )
+        covered: dict[tuple[date, str, str], set[str]] = defaultdict(set)
+        for pipeline in enr_clarity.family(SOURCE):
+            for day, county, code in (
+                pl.read_parquet(
+                    DATA / "parsed" / pipeline / "contests.parquet", columns=["day", "county", "scheme", "code"]
+                )
+                .filter(pl.col("scheme") == "us.special_district")
+                .select("day", "county", "code")
+                .unique()
+                .iter_rows()
+            ):
+                covered[(day, code[:2], code.split(":", 1)[1])].add(county)
+        yielded: set[str] = set()
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         municipalities = pl.read_parquet(PARSED / "municipalities.parquet")
         for state in sorted(set(municipalities["state"])):
@@ -2039,6 +2057,9 @@ def emit() -> Path:
                     )
             official = row["origin"].startswith("electionsfl")
             if official and (f"{day:%Y-%m}", f"{state}:{code}:{key}") in held_fl:
+                continue
+            if scheme == "us.special_district" and {code[:5]} < covered[(day, code[:2], code.split(":", 1)[1])]:
+                yielded.add(f"{day}:{state}:{code}:")
                 continue
             parent = cs.key("us.election", f"{day}:{state}")
             majority = state in ("GA", "LA") or official and day.month == 8
@@ -2453,7 +2474,7 @@ def emit() -> Path:
                     """select c.* from contest c join election e on e.id = c.election_id
                    join entity n on n.id = c.id and n.retired_by is null
                    where (c.office_id = %(owner)s or c.body_id = %(owner)s)
-                     and c.district_area_id is not distinct from %(area)s
+                     and c.district_area_id is not distinct from %(area)s and c.magnitude = 1
                      and e.date_from > %(day)s and e.date_from <= %(day)s::date + 150 and c.id <> %(first)s
                    order by e.date_from limit 1""",
                     {"owner": owner, "area": area, "day": day, "first": first},
@@ -2468,6 +2489,7 @@ def emit() -> Path:
                         for row in cs.rows.get("contest", [])
                         if owner in (row.get("office_id"), row.get("body_id"))
                         and row.get("district_area_id") == area
+                        and row.get("magnitude") == 1
                         and row["id"] != first
                         and day < dates.get(row["election_id"], day) <= day + timedelta(days=150)
                     ),
@@ -2592,6 +2614,16 @@ def emit() -> Path:
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
             cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
+        for value, *row in conn.execute(
+            f"""select x.value, {", ".join(f"r.{column}" for column in columns)} from result_set r
+                join changeset g on g.id = r.changeset_id
+                join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                where g.pipeline = %s and r.status <> 'withdrawn'""",
+            [SOURCE],
+        ).fetchall():
+            if any(value.startswith(prefix) for prefix in yielded):
+                cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+                cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=PARTIAL)
         for (contest,) in conn.execute(
             """select x.entity_id from external_id x where x.scheme = 'us.contest' and x.value = any(%s)
                and exists (select from result_set r where r.contest_id = x.entity_id)

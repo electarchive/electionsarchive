@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from decimal import Decimal
 from pathlib import Path
 from uuid import UUID
 
@@ -9,7 +10,7 @@ from ea.sources.us.enr_clarity_twins import LIVE, _person
 from ea.store import connect
 
 SOURCE = "us.special_district_merge"
-VERSION = "5"
+VERSION = "9"
 GENERIC = re.compile(
     r"\b(?:no|number|ward|wd|district|dist|subdistrict|subdivision|protection|fire|water|sewer|sewerage|drainage|drain|"
     r"gravity|grav|road|rd|lighting|light|recreation|recreational|hospital|hosp|service|services|ser|serv|svc|area|"
@@ -31,6 +32,7 @@ ALIASES = {
     ("26", "gratiotcountycommunitycollegedistrict"): "montcalmcommunitycollegedistrict",
     ("29", "saintlouiscommunitycollegedistrict"): "stlouiscommunitycollegedistrict",
 }
+RETIRED = "A misread district that lumped several districts together; each district now has its own polity"
 UNRELATED = {"increasesfundingsourcespublicschoolscommunitycollegedistrict"}
 MISREAD = {
     "special:17043:fire:bloomingdale-emergency-services-district-13": "Bloomingdale's ESD 13 is Bloomingdale School "
@@ -49,6 +51,10 @@ PREFERRED = "(select text from name n where n.entity_id = {0} and n.is_preferred
 
 def _folded(text: str | None) -> str:
     return re.sub(r"[^a-z0-9]", "", (text or "").lower())
+
+
+def _question(title: str | None) -> str:
+    return _folded(re.sub(r"\bno\b", "", (title or "").partition(": ")[2].lower()))
 
 
 def emit() -> Path:
@@ -88,9 +94,31 @@ def emit() -> Path:
                 join external_id b on b.entity_id = f.polity_id and b.scheme = 'us.polity'
                   and left(split_part(a.value, ':', 2), 2) = left(split_part(b.value, ':', 2), 2)
                 where exists (select from result_set r where r.contest_id = o.id and r.status = 'active')""",
-            [family] * 2,
+            [[*family, "us.medsl_local"], family],
         ).fetchall()
-        matches: dict[UUID, set[tuple[UUID, ...]]] = defaultdict(set)
+        matches: dict[
+            UUID, set[tuple[UUID, UUID, UUID, UUID | None, UUID | None, UUID | None, UUID | None, bool, int]]
+        ] = defaultdict(set)
+        counted: dict[UUID, list[tuple[int, int, int, Decimal]]] = {}
+
+        def votes(contest: UUID) -> list[tuple[int, int, int, Decimal]]:
+            if contest not in counted:
+                counted[contest] = conn.execute(
+                    """select r.k, v.unit_k, v.measure, v.value from result_value v join result_set r on r.k = v.result_set_k
+                       where r.contest_id = %s and r.status in ('active', 'withdrawn')""",
+                    [contest],
+                ).fetchall()
+            return counted[contest]
+
+        def tally(contest: UUID) -> set[tuple[int, int, Decimal]]:
+            return {(unit, measure, value) for _, unit, measure, value in votes(contest)}
+
+        def fingerprint(contest: UUID) -> set[tuple[int, tuple[Decimal, ...]]]:
+            units: dict[tuple[int, int, int], list[Decimal]] = defaultdict(list)
+            for result, unit, measure, value in votes(contest):
+                units[(result, unit, measure)].append(value)
+            return {(measure, tuple(sorted(values))) for (_, _, measure), values in units.items()}
+
         for (
             stale,
             polity,
@@ -109,20 +137,28 @@ def emit() -> Path:
             mine = {person for person in map(_person, ours or []) if person}
             held = {person for person in map(_person, theirs or []) if person}
             shared = len(mine & held)
-            if (
-                shared * 2 > len(mine) and shared * 2 > len(held)
-                if mine or held
-                else _folded((title or "").partition(": ")[2]) == _folded((other_title or "").partition(": ")[2]) != ""
-            ):
-                matches[stale].add((other, polity, survivor, body, other_body, office, other_office, local))
-        rekeyed: dict[UUID, set[UUID]] = defaultdict(set)
+            if mine or held:
+                tier = 3 if shared * 2 > len(mine) and shared * 2 > len(held) else 0
+            elif _question(title) == _question(other_title) != "":
+                tier = 3
+            elif tally(stale) and tally(stale) <= tally(other):
+                tier = 2
+            elif local and fingerprint(stale) and fingerprint(stale) <= fingerprint(other):
+                tier = 1
+            else:
+                tier = 0
+            if tier:
+                matches[stale].add((other, polity, survivor, body, other_body, office, other_office, local, tier))
+        chosen: dict[UUID, tuple[UUID, UUID, UUID, UUID | None, UUID | None, UUID | None, UUID | None, bool, int]] = {}
         for stale, found in sorted(matches.items()):
+            best = max(match[8] for match in found)
+            found = {match for match in found if match[8] == best}
             if len({match[0] for match in found}) > 1:
                 found = {match for match in found if match[7]}
-            if len({match[0] for match in found}) != 1:
-                continue
-            other, polity, survivor, body, other_body, office, other_office, _ = next(iter(found))
-            cs.merge(stale, other)
+            if len({match[0] for match in found}) == 1:
+                chosen[stale] = next(iter(found))
+        rekeyed: dict[UUID, set[UUID]] = defaultdict(set)
+        for other, polity, survivor, body, other_body, office, other_office, *_ in chosen.values():
             if polity != survivor:
                 rekeyed[polity].add(survivor)
             for owner, target in ((body, other_body), (office, other_office)):
@@ -139,14 +175,46 @@ def emit() -> Path:
                        or exists (select from polity p where p.id = o.id)
                           and not exists (select from external_id x where x.entity_id = o.id and x.scheme = 'us.polity'
                                             and x.value like 'special:%%')""",
-                [owners, [entity for entity in cs.survivors if entity in matches]],
+                [owners, list(chosen)],
             ).fetchall()
         }
+        orphans = {
+            polity
+            for (polity,) in conn.execute(
+                "select x.entity_id from external_id x where x.entity_id = any(%s) and x.scheme = 'us.polity' and not (x.value = any(%s))",
+                [[entity for entity in owners if len(rekeyed[entity]) > 1 and entity not in kept], list(MISREAD)],
+            ).fetchall()
+        }
+        retired: set[UUID] = set()
+        for stale, (other, polity, *_) in chosen.items():
+            if polity in orphans:
+                retired.add(stale)
+                cs.add("entity_retirement", entity_id=stale, reason=RETIRED)
+            else:
+                cs.merge(stale, other)
         involved: set[UUID] = set()
         for entity, targets in sorted(rekeyed.items()):
-            if len(targets) == 1 and entity not in kept:
+            if len(targets) == 1 and entity not in kept and entity not in orphans:
                 cs.merge(entity, next(iter(targets)))
                 involved |= {entity, *targets}
+        for query in (
+            f"select e.id from election e where e.polity_id = any(%s) and {LIVE.format('e')}",
+            f"select o.id from office o where o.polity_id = any(%s) and {LIVE.format('o')}",
+            f"select b.id from body b where b.polity_id = any(%s) and {LIVE.format('b')}",
+            f"select u.id from reporting_unit u where u.polity_id = any(%s) and {LIVE.format('u')}",
+            "select p.id from polity p where p.id = any(%s)",
+        ):
+            for (entity,) in conn.execute(query, [list(orphans)]).fetchall():
+                if entity not in cs.survivors and entity not in retired:
+                    retired.add(entity)
+                    cs.add("entity_retirement", entity_id=entity, reason=RETIRED)
+        for unit, area in conn.execute(
+            """select x.unit_id, x.area_id from reporting_unit_area x
+               where x.area_id in (select area_id from polity_territory where polity_id = any(%s)
+                                   union select area_id from reporting_unit where polity_id = any(%s))""",
+            [list(orphans)] * 2,
+        ).fetchall():
+            cs.add("unit_area_drop", unit_id=unit, area_id=area, reason=RETIRED)
 
         named: dict[tuple[str, str], list[tuple[UUID, str, int, str]]] = defaultdict(list)
         for polity, value, text, contests in conn.execute(
@@ -156,7 +224,7 @@ def emit() -> Path:
                 where x.value like 'special:%%' and {LIVE.format("p")}
                 order by p.id, x.value"""
         ).fetchall():
-            if polity not in cs.survivors and value not in MISREAD:
+            if polity not in cs.survivors and polity not in retired and value not in MISREAD:
                 county = value.split(":")[1]
                 folded = _folded(text)
                 named[(county[:2], ALIASES.get((county[:2], folded), folded))].append(
@@ -251,7 +319,13 @@ def emit() -> Path:
         for election, polity, name, text in elections:
             styled = re.fullmatch(r"(\d{4}) (.+) (\w+ elections?)", text)
             place = polities.get(cs.survivors.get(polity, polity))
-            if election in cs.survivors or styled is None or place is None or _folded(styled[2]) == _folded(place):
+            if (
+                election in cs.survivors
+                or election in retired
+                or styled is None
+                or place is None
+                or _folded(styled[2]) == _folded(place)
+            ):
                 continue
             renamed += 1
             reason = f"{styled[2]} is a misread of the district's name, {place}"
@@ -265,6 +339,6 @@ def emit() -> Path:
                 is_preferred=True,
             )
         print(
-            f"{len(rekeyed)} re-keyed owners, {groups} special districts written once per county, {renamed} elections renamed"
+            f"{len(rekeyed)} re-keyed owners, {len(orphans)} lumped districts retired, {groups} special districts written once per county, {renamed} elections renamed"
         )
         return cs.write()
