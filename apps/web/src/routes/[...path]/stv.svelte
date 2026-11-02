@@ -131,7 +131,6 @@
                 href={href(round)}
                 aria-current={round === count.round ? "step" : undefined}
                 data-sveltekit-reset="false"
-                data-sveltekit-preload-data="hover"
               >
                 <span class="font-figures font-semibold tabular-nums"
                   >{m.stv_count({ count: round })}</span
