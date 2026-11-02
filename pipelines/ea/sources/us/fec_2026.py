@@ -2981,4 +2981,8 @@ def emit() -> Path:
                     reason="The contest is no longer on the ballot as scheduled; its seats are now held as other contests",
                 )
         print(counts)
+        cs.merge(
+            cs.key(f"{SOURCE}.person", "OH:kelly-kalagidis"),
+            cs.key("us.oh_legislature_2026.person", "OH:kelly-hunter-kalagidis"),
+        )
         return cs.write()
