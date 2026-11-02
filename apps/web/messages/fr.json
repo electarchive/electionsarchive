@@ -1781,7 +1781,6 @@
   "twin_hexes_lede": "Cette grille correspond à la vue Hexagones de la page, avec une cellule par {noun}. Chaque cellule indique la lettre du parti ou du candidat qui l’a remportée, après le code de son État, de sa province ou de son département lorsque la disposition regroupe ainsi les cellules. Un tiret signale une cellule sans résultat, par exemple un État sans scrutin pour ce poste.",
   "atlas_trail": "Zone de la carte",
   "atlas_search": "Rechercher un lieu",
-  "atlas_search_empty": "Aucun lieu chargé ne correspond à ce nom",
   "atlas_compare": "Comparer à une élection antérieure",
   "atlas_compare_none": "Aucune comparaison",
   "atlas_compare_with": "Comparaison avec {year}",

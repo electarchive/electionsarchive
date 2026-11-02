@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import BoxSelectIcon from "@lucide/svelte/icons/box-select";
+  import KeyboardIcon from "@lucide/svelte/icons/keyboard";
   import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -11,6 +12,7 @@
   import SearchIcon from "@lucide/svelte/icons/search";
   import SheetIcon from "@lucide/svelte/icons/sheet";
   import XIcon from "@lucide/svelte/icons/x";
+  import { createQuery } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
   import { fade } from "svelte/transition";
@@ -29,6 +31,7 @@
   import Result from "#lib/atlas/result.svelte";
   import { Stage } from "#lib/atlas/stage.svelte.js";
   import { View } from "#lib/atlas/state.svelte.js";
+  import Switcher from "#lib/atlas/switcher.svelte";
   import {
     active,
     chain,
@@ -40,6 +43,7 @@
   import Monogram from "#lib/components/monogram.svelte";
   import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
+  import * as Dialog from "#lib/components/ui/dialog/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date, plural } from "#lib/format.js";
   import { basemap } from "#lib/map/basemap.js";
@@ -47,6 +51,7 @@
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
 
   type Point = { x: number; y: number };
@@ -120,6 +125,11 @@
   let term = $state("");
   let isSearching = $state(false);
   let search = $state<HTMLInputElement | null>(null);
+  let wanted = $state("");
+  let chase = $state<number | null>(null);
+  let isSwitching = $state(false);
+  let isHelping = $state(false);
+  let switcher = $state<{ move: (delta: -1 | 1) => void } | null>(null);
   let built = "";
   let isQueued = false;
   const asked = new Set<string>();
@@ -465,16 +475,49 @@
       .toSorted((a, b) => Number(b.isIn) - Number(a.isIn) || a.gap - b.gap)
       .slice(0, isClose ? 8 : 1);
     for (const { part } of near) {
-      fetch(
-        `${scope}|part|${part.unit}`,
-        async () =>
-          load(contest, { unit: part.unit, vs: view.vs, group: view.group }),
-        (set) => {
-          if (JSON.stringify(ask) === scope) {
-            parts = { ...parts, [part.unit]: set };
-          }
-        },
-      );
+      grab(part);
+    }
+  }
+
+  function grab(part: { unit: string }) {
+    const scope = JSON.stringify(ask);
+    fetch(
+      `${scope}|part|${part.unit}`,
+      async () =>
+        load(contest, { unit: part.unit, vs: view.vs, group: view.group }),
+      (set) => {
+        if (JSON.stringify(ask) === scope) {
+          parts = { ...parts, [part.unit]: set };
+        }
+      },
+    );
+  }
+
+  function done() {
+    term = "";
+    isSearching = false;
+    search?.blur();
+  }
+
+  function seek(row: { k: number; above: Array<number> }) {
+    view.picked = [row.k];
+    const hit = stage.find(row.k);
+    if (hit != null) {
+      name(hit);
+      focus(hit);
+      return;
+    }
+    chase = row.k;
+    const part = base?.parts.find((entry) => row.above.includes(entry.k));
+    if (part != null) {
+      grab(part);
+    }
+    for (const k of row.above) {
+      const near = stage.find(k);
+      if (near != null) {
+        focus(near);
+        break;
+      }
     }
   }
 
@@ -1047,13 +1090,23 @@
     for (const [index] of tiers.entries()) {
       for (const set of index === 0 && base != null
         ? [base]
-        : [extras[tiers[index]?.code ?? ""], ...Object.values(parts)]) {
+        : [
+            extras[tiers[index]?.code ?? ""],
+            ...(tiers[index]?.kind === "mosaic" && mosaic != null
+              ? [mosaic.set]
+              : []),
+            ...Object.values(parts),
+          ]) {
         if (set == null) {
           continue;
         }
         for (const [i, label] of set.places.name.entries()) {
           const k = set.places.k[i] ?? 0;
-          if (seen.has(k) || !label.toLocaleLowerCase().includes(query)) {
+          if (
+            seen.has(k) ||
+            label === "" ||
+            !label.toLocaleLowerCase().includes(query)
+          ) {
             continue;
           }
           const hit = stage.find(k);
@@ -1078,6 +1131,41 @@
       )
       .slice(0, 8);
   });
+  const remote = createQuery(() => ({
+    ...orpc.maps.places.queryOptions({ input: { id: contest, q: wanted } }),
+    enabled: [...wanted].length >= 3,
+    staleTime: 10 * 60_000,
+    meta: { quiet: true },
+  }));
+  const elsewhere = createQuery(() => ({
+    ...orpc.search.query.queryOptions({
+      input: { q: wanted, limit: 5, types: ["election", "contest", "polity"] },
+    }),
+    enabled: [...wanted].length >= 3,
+    staleTime: 5 * 60_000,
+    meta: { quiet: true },
+  }));
+  const isLong = $derived([...term.trim()].length >= 3);
+  const more = $derived.by(() => {
+    if (!isLong || found.length >= 8) {
+      return [];
+    }
+    const seen = new Set(found.map((row) => row.hit.set.places.k[row.hit.i]));
+    return (remote.data ?? [])
+      .filter((row) => !seen.has(row.k))
+      .slice(0, 8 - found.length);
+  });
+  const archived = $derived(
+    isLong
+      ? (elsewhere.data ?? []).flatMap((row) =>
+          row.path == null ? [] : [{ ...row, path: row.path }],
+        )
+      : [],
+  );
+  const isLooking = $derived(
+    isLong &&
+      (wanted !== term.trim() || remote.isFetching || elsewhere.isFetching),
+  );
   const analysis = $derived.by(() => {
     if (!isAnalyzing || base == null) {
       return null;
@@ -1184,6 +1272,11 @@
       base.places.k.length === 0 &&
       base.date != null &&
       base.date >= new Date().toISOString().slice(0, 10),
+  );
+  const isUnmapped = $derived(
+    base != null &&
+      !isScheduled &&
+      base.places.leader.every((leader) => leader == null),
   );
 
   $effect(() => {
@@ -1439,6 +1532,31 @@
   });
 
   $effect(() => {
+    const next = term.trim();
+    const timer = setTimeout(() => (wanted = next), 250);
+    return () => clearTimeout(timer);
+  });
+
+  $effect(() => {
+    void drawn;
+    void parts;
+    void extras;
+    void stage.version;
+    const k = chase;
+    if (k == null) {
+      return;
+    }
+    untrack(() => {
+      const hit = stage.find(k);
+      if (hit != null) {
+        chase = null;
+        name(hit);
+        focus(hit);
+      }
+    });
+  });
+
+  $effect(() => {
     void stage.version;
     void drawn;
     const level = tier;
@@ -1497,7 +1615,29 @@
       }
       return;
     }
-    if (event.key === "/") {
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.altKey ||
+      target?.closest("[role='dialog'], [data-vaul-drawer]") != null
+    ) {
+      return;
+    }
+    const toggles: Record<string, () => void> = {
+      "?": () => (isHelping = true),
+      "[": () => switcher?.move(-1),
+      "]": () => switcher?.move(1),
+      g: () => (isSwitching = true),
+      t: () => (isAnalyzing = !isAnalyzing),
+      s: () => (isAdding = !isAdding),
+      b: () => (view.isBasemap = !view.isBasemap),
+      "0": () => engine.reset(),
+    };
+    const toggle = toggles[event.key];
+    if (toggle != null) {
+      event.preventDefault();
+      toggle();
+    } else if (event.key === "/") {
       event.preventDefault();
       isSearching = true;
       requestAnimationFrame(() => search?.focus());
@@ -1537,8 +1677,8 @@
     <Command.Input
       bind:ref={search}
       bind:value={term}
-      placeholder={m.atlas_search()}
-      aria-label={m.atlas_search()}
+      placeholder={m.atlas_search_full()}
+      aria-label={m.atlas_search_full()}
       onblur={() => {
         if (term === "") {
           isSearching = false;
@@ -1549,28 +1689,98 @@
       <Command.List
         class="absolute inset-x-0 inset-bs-full z-40 mbs-1 rounded-sm bg-popover p-1 shadow-menu ring-1 ring-border"
       >
-        <Command.Empty>{m.atlas_search_empty()}</Command.Empty>
-        {#each found as row (row.hit.set.places.k[row.hit.i])}
-          <Command.Item
-            value={String(row.hit.set.places.k[row.hit.i])}
-            onSelect={() => {
-              term = "";
-              isSearching = false;
-              search?.blur();
-              view.picked = [row.hit.set.places.k[row.hit.i] ?? 0];
-              focus(row.hit);
-            }}
-          >
-            <span class="flex-1 truncate">{row.name}</span>
-            <span class="shrink-0 text-xs text-muted-foreground"
-              >{row.where}</span
-            >
-          </Command.Item>
-        {/each}
+        {#if isLooking && found.length === 0}
+          <Command.Loading>{m.atlas_search_busy()}</Command.Loading>
+        {:else}
+          <Command.Empty>{m.atlas_search_none()}</Command.Empty>
+        {/if}
+        {#if found.length > 0 || more.length > 0}
+          <Command.Group heading={m.atlas_search_places()}>
+            {#each found as row (row.hit.set.places.k[row.hit.i])}
+              <Command.Item
+                value="here|{row.hit.set.places.k[row.hit.i]}"
+                keywords={[row.name]}
+                onSelect={() => {
+                  done();
+                  view.picked = [row.hit.set.places.k[row.hit.i] ?? 0];
+                  focus(row.hit);
+                }}
+              >
+                <span class="flex-1 truncate">{row.name}</span>
+                <span class="shrink-0 text-xs text-muted-foreground"
+                  >{row.where}</span
+                >
+              </Command.Item>
+            {/each}
+            {#each more as row (row.k)}
+              <Command.Item
+                value="there|{row.k}"
+                keywords={[row.name]}
+                onSelect={() => {
+                  done();
+                  seek(row);
+                }}
+              >
+                <span class="flex-1 truncate">{row.name}</span>
+                {#if row.within != null}
+                  <span class="shrink-0 text-xs text-muted-foreground"
+                    >{row.within}</span
+                  >
+                {/if}
+              </Command.Item>
+            {/each}
+          </Command.Group>
+        {/if}
+        {#if archived.length > 0}
+          <Command.Group heading={m.atlas_search_archive()}>
+            {#each archived as row (row.id)}
+              <Command.LinkItem
+                href="/map/{row.path}"
+                value="archive|{row.id}"
+                keywords={[row.name]}
+                onSelect={done}
+              >
+                <span class="flex-1 truncate">{row.name}</span>
+                {#if row.context != null || row.date != null}
+                  <span class="shrink-0 text-xs text-muted-foreground"
+                    >{row.context ?? date(row.date ?? "")}</span
+                  >
+                {/if}
+              </Command.LinkItem>
+            {/each}
+          </Command.Group>
+        {/if}
       </Command.List>
     {/if}
   </Command.Root>
 {/snippet}
+
+{#snippet keys(list: Array<string>)}
+  <span class="flex shrink-0 items-center gap-1">
+    {#each list as key (key)}
+      <kbd
+        class="grid place-items-center rounded-xs bg-secondary px-1.5 font-figures text-xs font-semibold ring-1 ring-border block-6 min-inline-6"
+        >{key}</kbd
+      >
+    {/each}
+  </span>
+{/snippet}
+
+<Dialog.Root bind:open={isHelping}>
+  <Dialog.Content class="sm:max-inline-sm">
+    <Dialog.Title class="text-base font-semibold"
+      >{m.atlas_shortcuts()}</Dialog.Title
+    >
+    <dl class="grid gap-2.5 text-[0.8125rem]">
+      {#each [{ keys: ["/"], label: m.atlas_shortcut_search() }, { keys: ["G"], label: m.atlas_shortcut_switch() }, { keys: ["[", "]"], label: m.atlas_shortcut_step() }, { keys: ["+", "−"], label: m.atlas_shortcut_zoom() }, { keys: ["0"], label: m.map_reset() }, { keys: ["Esc"], label: m.atlas_shortcut_up() }, { keys: [m.atlas_shortcut_click()], label: m.atlas_shortcut_add() }, { keys: ["S"], label: m.atlas_select_many() }, { keys: ["T"], label: m.atlas_analysis() }, { keys: ["B"], label: m.map_basemap() }, { keys: ["?"], label: m.atlas_shortcut_help() }] as row (row.label)}
+        <div class="flex items-center justify-between gap-4">
+          <dt>{row.label}</dt>
+          <dd>{@render keys(row.keys)}</dd>
+        </div>
+      {/each}
+    </dl>
+  </Dialog.Content>
+</Dialog.Root>
 
 {#snippet credits()}
   {#if engine.credits.length > 0 || view.isBasemap}
@@ -1669,7 +1879,17 @@
       title={m.wordmark()}><Monogram size={26} /></a
     >
     <div class="grid flex-1 min-inline-0">
-      <h1 class="truncate text-[0.9375rem]/5 font-[720]">{head.title}</h1>
+      <Switcher
+        bind:this={switcher}
+        bind:isOpen={isSwitching}
+        {contest}
+        {whole}
+        {path}
+        {unit}
+        title={head.title}
+        params={{ ...view.params(), at: camera }}
+        isWide={wide.current}
+      />
       <nav aria-label={m.atlas_trail()}>
         <ol
           class="flex items-center gap-1 text-[0.8125rem]/5 text-muted-foreground"
@@ -1828,27 +2048,43 @@
         >
           {m.slate_scheduled({ date: date(base.date) })}
         </p>
+      {:else if isUnmapped}
+        <div
+          class="absolute inset-x-0 inset-bs-3 z-10 mx-auto grid justify-items-center gap-2 rounded-sm bg-card/95 px-3.5 py-3 text-center shadow-menu ring-1 ring-border inline-fit max-inline-[min(24rem,calc(100%-1.5rem))]"
+          role="status"
+        >
+          <p class="text-[0.8125rem] font-semibold text-pretty">
+            {m.atlas_unmapped()}
+          </p>
+          <a
+            href={exit}
+            class="flex items-center rounded-sm px-2.5 text-[0.8125rem] font-semibold ring-1 ring-input block-8 hover:bg-secondary"
+            >{m.atlas_unmapped_link()}</a
+          >
+        </div>
       {/if}
 
-      <div
-        class={cn("absolute z-20", {
-          "inset-e-3 inset-bs-3": wide.current,
-          "inset-e-3 inset-bs-3 max-md:inset-bs-3": !wide.current,
-        })}
-      >
-        <Rail
-          chain={locked == null ? tiers : levels}
-          choices={all}
-          {begins}
-          {zoom}
-          active={tier}
-          locked={locked?.code ?? null}
-          isCompact={!wide.current || !tall.current}
-          onlock={(code) => {
-            view.level = code;
-          }}
-        />
-      </div>
+      {#if !isUnmapped}
+        <div
+          class={cn("absolute z-20", {
+            "inset-e-3 inset-bs-3": wide.current,
+            "inset-e-3 inset-bs-3 max-md:inset-bs-3": !wide.current,
+          })}
+        >
+          <Rail
+            chain={locked == null ? tiers : levels}
+            choices={all}
+            {begins}
+            {zoom}
+            active={tier}
+            locked={locked?.code ?? null}
+            isCompact={!wide.current || !tall.current}
+            onlock={(code) => {
+              view.level = code;
+            }}
+          />
+        </div>
+      {/if}
 
       <div
         class={cn("absolute z-20 grid gap-1.5", {
@@ -1925,6 +2161,17 @@
             ><SheetIcon class="block-4 inline-4" /></button
           >
         </div>
+        {#if wide.current}
+          <button
+            type="button"
+            class="grid place-items-center rounded-sm bg-card/95 shadow-menu ring-1 ring-border block-9 inline-9 hover:bg-secondary"
+            aria-label={m.atlas_shortcuts()}
+            title={m.atlas_shortcuts()}
+            aria-keyshortcuts="Shift+?"
+            onclick={() => (isHelping = true)}
+            ><KeyboardIcon class="block-4 inline-4" /></button
+          >
+        {/if}
       </div>
 
       {#if analysis != null}
@@ -1981,7 +2228,9 @@
             {#if detent !== "peek"}
               {@render details("body")}
             {/if}
-            {@render controls()}
+            {#if !isUnmapped}
+              {@render controls()}
+            {/if}
             {@render credits()}
           </div>
         </Drawer>
@@ -1994,7 +2243,9 @@
         aria-label={m.atlas_key()}
       >
         {@render details("full")}
-        <div class="border-bs pbs-4">{@render controls()}</div>
+        {#if !isUnmapped}
+          <div class="border-bs pbs-4">{@render controls()}</div>
+        {/if}
         {@render credits()}
       </aside>
     {/if}

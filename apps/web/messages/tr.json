@@ -1744,7 +1744,6 @@
   "twin_hexes_lede": "Bu ızgara, sayfadaki Altıgenler görünümüdür; her {noun} için bir hücre vardır. Her hücre, o hücreyi kazanan partinin veya adayın harfini gösterir; düzen hücreleri eyalet, il veya departmana göre gruplandırıyorsa harften önce bunların kodu gelir. Tire, sonucu olmayan hücreyi gösterir; örneğin bu görev için seçim yapılmamış bir eyalet.",
   "atlas_trail": "Harita alanı",
   "atlas_search": "Yer ara",
-  "atlas_search_empty": "Yüklenen yerler arasında bu adla eşleşen yok",
   "atlas_compare": "Önceki seçimle karşılaştır",
   "atlas_compare_none": "Karşılaştırma yok",
   "atlas_compare_with": "{year} ile karşılaştırıldı",

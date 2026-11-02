@@ -1780,7 +1780,6 @@
   "twin_hexes_lede": "Esta grade é a visualização Hexágonos da página, com uma célula para cada {noun}. Cada célula mostra a letra do partido ou candidato que venceu ali, depois do código do estado, província ou departamento, quando o layout agrupa as células assim. Um traço indica célula sem resultado, como um estado que não teve disputa para este cargo.",
   "atlas_trail": "Área do mapa",
   "atlas_search": "Buscar locais",
-  "atlas_search_empty": "Nenhum local carregado corresponde a esse nome",
   "atlas_compare": "Comparar com eleição anterior",
   "atlas_compare_none": "Sem comparação",
   "atlas_compare_with": "Comparado com {year}",

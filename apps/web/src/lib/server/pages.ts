@@ -1787,6 +1787,18 @@ export async function atlasPage(path: string, search: URLSearchParams) {
         vs: search.get("vs") ?? undefined,
         group: search.get("group") ?? undefined,
         whole: whole ?? undefined,
+      }).catch((error_: unknown) => {
+        if (
+          unit !== "" &&
+          error_ instanceof ORPCError &&
+          error_.code === "NOT_FOUND"
+        ) {
+          redirect(
+            307,
+            `/map/${slug.path}${search.size > 0 ? `?${search}` : ""}`,
+          );
+        }
+        throw error_;
       }),
     ),
   };

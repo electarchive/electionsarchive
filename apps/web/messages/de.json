@@ -1745,7 +1745,6 @@
   "twin_hexes_lede": "Dieses Raster ist die Hexagon-Ansicht der Seite, mit einer Zelle je {noun}. Jede Zelle zeigt den Buchstaben der Partei oder des Kandidaten, die oder der sie gewonnen hat, davor das Kürzel des Bundesstaats, der Provinz oder des Départements, sofern das Layout die Zellen so gruppiert. Ein Strich kennzeichnet eine Zelle ohne Ergebnis, etwa einen Bundesstaat, in dem es für dieses Amt keine Wahl gab.",
   "atlas_trail": "Kartenbereich",
   "atlas_search": "Orte suchen",
-  "atlas_search_empty": "Kein geladener Ort passt zu diesem Namen",
   "atlas_compare": "Mit früherer Wahl vergleichen",
   "atlas_compare_none": "Kein Vergleich",
   "atlas_compare_with": "Vergleich mit {year}",

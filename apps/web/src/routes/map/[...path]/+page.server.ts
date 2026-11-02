@@ -1,9 +1,11 @@
+import { call } from "@orpc/server";
 import { redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { shell } from "#lib/atlas/data.js";
 import { db } from "#lib/server/db/index.js";
 import { atlasPage } from "#lib/server/pages.js";
 import { races } from "#lib/server/rpc/archive.js";
+import { router } from "#lib/server/rpc/router.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, url }) => {
@@ -43,6 +45,16 @@ export const load: PageServerLoad = async ({ params, url }) => {
       307,
       lead == null ? `/${params.path}` : `/map/${lead}${url.search}`,
     );
+  }
+  if (!params.path.includes("/")) {
+    const found = await call(router.polities.list, {
+      kinds: ["sovereign_state", "supranational"],
+    });
+    const latest = found.find((polity) => polity.path === params.path)?.latest
+      ?.path;
+    if (latest != null) {
+      redirect(307, `/map/${latest}${url.search}`);
+    }
   }
   const search = new URLSearchParams(url.searchParams);
   search.delete("level");

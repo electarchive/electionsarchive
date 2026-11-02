@@ -1,13 +1,58 @@
+import type { SQL } from "drizzle-orm";
 import { openapi } from "@orpc/openapi";
+import { call, ORPCError } from "@orpc/server";
+import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
+import { db } from "#lib/server/db/index.js";
 import { boxes, vintage, zooms } from "#lib/server/plane.js";
-import { names } from "#lib/server/rpc/archive.js";
+import {
+  contests,
+  names,
+  paths,
+  polities,
+  races,
+  served,
+} from "#lib/server/rpc/archive.js";
 
 const Tiles = v.pipe(
   v.string(),
   v.regex(/^[a-z]{2,5}\.[a-z0-9_]+\/[\w:.-]+$/u),
 );
+
+const Id = v.pipe(v.string(), v.uuid(), v.toLowerCase());
+
+const Stop = v.object({
+  name: v.string(),
+  date: v.nullable(v.string()),
+  path: v.string(),
+});
+
+const mapped = (contest: SQL) => sql`
+  (
+    exists (
+      select from contest c
+      join result_set rs on rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
+      where c.allocation_parent_id = ${contest}
+    )
+    or exists (
+      select from contest c
+      join result_set rs on rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
+      left join area da on da.id = c.district_area_id
+      where c.id = ${contest}
+        and case
+          when da.id is null then (
+            select count(distinct z.area_k) from (select x.area_k from result_rollup x where x.result_set_k = rs.k limit 500) z
+          ) > 1
+          else exists (
+            select from area_parent ap join area a on a.id = ap.area_id
+            where ap.parent_id = da.id
+              and exists (select from result_rollup x where x.result_set_k = rs.k and x.area_k = a.k)
+          )
+        end
+    )
+  )
+`;
 
 const Boxes = v.array(
   v.object({
@@ -141,5 +186,257 @@ export const maps = {
               : word,
         };
       });
+    }),
+  nav: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/maps/nav/{id}",
+        summary:
+          "Find where a contest's map can go next: the other races with a map in the same election, the same race in every election of the polity, the polity's other elections, and the latest national map of every country",
+      }),
+    )
+    .input(
+      v.object({
+        id: Id,
+        whole: v.optional(Id),
+        anchor: v.optional(v.pipe(v.string(), v.regex(/^[a-z0-9-]+$/u))),
+      }),
+    )
+    .output(
+      v.object({
+        polity: v.object({ name: v.string(), path: v.nullable(v.string()) }),
+        election: v.object({
+          name: v.string(),
+          date: v.nullable(v.string()),
+          path: v.nullable(v.string()),
+        }),
+        races: v.array(v.object({ name: v.string(), path: v.string() })),
+        series: v.array(
+          v.object({
+            ...Stop.entries,
+            color: v.nullable(v.string()),
+            winner: v.nullable(v.string()),
+          }),
+        ),
+        elections: v.array(Stop),
+        polities: v.array(v.object({ name: v.string(), path: v.string() })),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const whole = input.anchor == null ? null : (input.whole ?? null);
+      const held = await db.execute<{
+        id: string;
+        polity: string;
+        date: string | null;
+      }>(sql`
+        select e.id, e.polity_id as polity, e.date_from::text as date from election e
+        where e.id = coalesce(${whole}::uuid, (select election_id from contest where id = ${input.id}::uuid))
+      `);
+      const election = held.rows[0];
+      if (election == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const [lineup, timeline, tops, countries] = await Promise.all([
+        races(election.id, election.polity, election.date, true),
+        whole == null
+          ? call(contests.get, { id: input.id })
+              .then(async (page) => {
+                const listed = page.series.flatMap((entry) =>
+                  entry.path == null ? [] : [entry.path],
+                );
+                const shown = await db.execute<{ path: string }>(sql`
+                  select s.path from slug s
+                  where s.path = any(${sql.param(listed)}::text[]) and s.is_current
+                    and ${mapped(sql`s.entity_id`)}
+                `);
+                const kept = new Set(shown.rows.map((row) => row.path));
+                return page.series.flatMap((entry) =>
+                  entry.path == null ||
+                  entry.annulled ||
+                  entry.notional ||
+                  !kept.has(entry.path)
+                    ? []
+                    : [
+                        {
+                          name: entry.name,
+                          date: entry.date,
+                          path: entry.path,
+                          color: entry.winner?.color ?? null,
+                          winner:
+                            entry.winner?.short ?? entry.winner?.label ?? null,
+                        },
+                      ],
+                );
+              })
+              .catch(() => [])
+          : db
+              .execute<{ id: string; date: string }>(
+                sql`
+                  with recursive tops(top, id, date) as (
+                    select e.id, e.id, e.date_from from election e
+                    where e.polity_id = ${election.polity}::uuid
+                      and e.parent_id is not distinct from (select parent_id from election where id = ${whole}::uuid)
+                      and e.status not in ('annulled', 'canceled')
+                    union all
+                    select tops.top, k.id, tops.date from election k join tops on k.parent_id = tops.id
+                  )
+                  select tops.top as id, tops.date::text as date
+                  from tops
+                  join contest c on c.election_id = tops.id
+                  join contest me on me.id = ${input.id}::uuid
+                  where coalesce(c.body_id, c.office_id) = coalesce(me.body_id, me.office_id) and c.kind = me.kind
+                    and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
+                  group by tops.top, tops.date
+                  having count(*) >= 3
+                  order by tops.date
+                `,
+              )
+              .then(async (found) => {
+                const ids = found.rows.map((row) => row.id);
+                const [labels, slugs] = await Promise.all([
+                  names(ids),
+                  paths(ids),
+                ]);
+                return found.rows.flatMap((row) => {
+                  const at = slugs.get(row.id);
+                  return at == null
+                    ? []
+                    : [
+                        {
+                          name: labels.full.get(row.id) ?? "",
+                          date: row.date,
+                          path: `${at}/${input.anchor ?? ""}`,
+                          color: null,
+                          winner: null,
+                        },
+                      ];
+                });
+              }),
+        db.execute<{ id: string; date: string }>(sql`
+          select e.id, e.date_from::text as date from election e
+          where e.polity_id = ${election.polity}::uuid and e.status = 'held' and e.date_from <= current_date
+            and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
+            and not exists (select from entity_merge m where m.entity_id = e.id)
+          order by e.date_from desc
+          limit 200
+        `),
+        call(polities.list, { kinds: ["sovereign_state", "supranational"] }),
+      ]);
+      const ids = [
+        election.id,
+        election.polity,
+        ...tops.rows.map((row) => row.id),
+      ];
+      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      const home = slugs.get(election.id) ?? null;
+      return {
+        polity: {
+          name: labels.full.get(election.polity) ?? "",
+          path: slugs.get(election.polity) ?? null,
+        },
+        election: {
+          name: labels.full.get(election.id) ?? "",
+          date: election.date,
+          path: home,
+        },
+        races: lineup.flatMap((race) => {
+          const at =
+            race.path ??
+            (race.count >= 3 && home != null ? `${home}/${race.anchor}` : null);
+          return at == null ? [] : [{ name: race.name, path: at }];
+        }),
+        series: timeline,
+        elections: tops.rows.flatMap((row) => {
+          const at = slugs.get(row.id);
+          return at == null
+            ? []
+            : [
+                {
+                  name: labels.full.get(row.id) ?? "",
+                  date: row.date,
+                  path: at,
+                },
+              ];
+        }),
+        polities: countries
+          .flatMap((country) =>
+            country.latest?.path == null
+              ? []
+              : [{ name: country.name, path: country.latest.path }],
+          )
+          .toSorted((a, b) => a.name.localeCompare(b.name)),
+      };
+    }),
+  places: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/maps/places/{id}",
+        summary:
+          "Find the places a contest reports by name, accents and case ignored, with the places each one sits inside, for searching a map before its finest places have loaded",
+      }),
+    )
+    .input(
+      v.object({
+        id: Id,
+        q: v.pipe(v.string(), v.trim(), v.minLength(2), v.maxLength(80)),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          k: v.number(),
+          name: v.string(),
+          within: v.nullable(v.string()),
+          above: v.array(v.number()),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const pattern = `%${input.q.replaceAll(/[\\%_]/gu, (found) => `\\${found}`)}%`;
+      const found = await db.execute<{
+        k: number;
+        name: string;
+        within: string | null;
+        above: Array<number>;
+      }>(sql`
+        with recursive grp(id) as (
+          select ${input.id}::uuid
+          union all
+          select c.id from contest c join grp on c.allocation_parent_id = grp.id
+        ),
+        sets as (
+          select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active' and ${served("rs")}
+        ),
+        held as (
+          select distinct r.area_k as k from sets
+          cross join lateral (select x.area_k from result_rollup x where x.result_set_k = sets.k offset 0) r
+        ),
+        matched as (
+          select distinct on (a.k) a.id, a.k, n.text as name from held h
+          join area a on a.k = h.k
+          join name n on n.entity_id = a.id
+          where unaccent(n.text) ilike unaccent(${pattern})
+          order by a.k, n.is_preferred desc, n.recorded_from desc
+        ),
+        hits as (
+          select * from matched
+          order by lower(name) = lower(${input.q}) desc, length(name), name
+          limit 12
+        )
+        select h.k, h.name,
+          (select n.text from area_parent ap join name n on n.entity_id = ap.parent_id where ap.area_id = h.id order by n.is_preferred desc, n.recorded_from desc limit 1) as within,
+          coalesce((
+            with recursive up(id, depth) as (
+              select h.id, 0
+              union all
+              select ap.parent_id, up.depth + 1 from area_parent ap join up on ap.area_id = up.id where up.depth < 6
+            )
+            select array_agg(a.k order by up.depth) from up join area a on a.id = up.id where up.depth > 0
+          ), '{}') as above
+        from hits h
+      `);
+      return found.rows;
     }),
 };
