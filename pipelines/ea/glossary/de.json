@@ -32,8 +32,8 @@
   "note": "Also 'Abwahl' (removal). For Switzerland 'Abberufung'. US: 'Recall-Wahl' is common in press. Germany has 'Abwahl' of mayors via 'Bürgerentscheid'."
  },
  "contest": {
-  "term": "Wahlkampf um ein Mandat",
-  "note": "No neat single word. Use 'Wahlkreisrennen' or 'Rennen' for a single race; 'Wahl' with the office named (e.g. 'Senatswahl in Texas'). Consider 'Wettbewerb' in tables."
+  "term": "Rennen",
+  "note": "Pl. 'Rennen'. Never 'Wahlkampf', which means a campaign. Use 'Wahl' with the office named when it reads better (e.g. 'Senatswahl in Texas')."
  },
  "race": {
   "term": "Rennen",
