@@ -21,7 +21,9 @@ function isShareable(
   if (
     !["GET", "HEAD"].includes(request.method) ||
     (response.status !== 200 &&
-      !(url.pathname.startsWith("/id/") && [307, 308].includes(response.status))) ||
+      !(
+        url.pathname.startsWith("/id/") && [307, 308].includes(response.status)
+      )) ||
     (response.headers.has("cache-control") && !isDataRequest) ||
     response.headers.has("set-cookie") ||
     locals.user != null ||
