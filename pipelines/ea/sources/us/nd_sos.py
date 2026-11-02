@@ -1139,7 +1139,9 @@ def emit() -> Path:
             for candidate, code, votes in (
                 lines.group_by("candidate", "code", maintain_order=True).agg(pl.col("votes").sum()).iter_rows()
             ):
-                matches = [option for option, _, text in options if surname(text or "") == surname(candidate)]
+                matches = [option for option, _, text in options if (text or "") == candidate] or [
+                    option for option, _, text in options if surname(text or "") == surname(candidate)
+                ]
                 if len(matches) > 1:
                     raise ValueError(f"{key}: {len(matches)} options for {candidate}")
                 if matches:
