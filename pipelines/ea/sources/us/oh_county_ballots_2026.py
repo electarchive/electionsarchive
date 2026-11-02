@@ -111,6 +111,8 @@ MF_568_COUNTIES = [
     "Champaign",
     "Coshocton",
 ]
+MF_575 = DATA / "inbox" / "manual" / "MF-575"
+MF_575_NAMES = {"vanwert": "Van Wert"}
 MF_LOOKUP = [
     *MF_LOOKUP,
     *MF_555_COUNTIES,
@@ -259,12 +261,21 @@ def mf_dir(county: str) -> Path:
 
 
 def mf_files() -> list[tuple[str, Path]]:
-    return [
+    files = [
         (county, path)
         for county in [*MF_SAMPLES, "Stark"]
         for path in sorted((mf_dir(county) / county.lower().replace(" ", "")).glob("*.pdf"))
         if county != "Stark" or "legal ad" in path.name
     ]
+    seen = {(county, path.name) for county, path in files}
+    for folder in sorted(MF_575.glob("*/")):
+        if folder.name == "franklin":
+            continue
+        county = MF_575_NAMES.get(folder.name, folder.name.capitalize())
+        files.extend(
+            (county, path) for path in sorted(folder.glob("*.pdf")) if (county, path.name) not in seen
+        )
+    return files
 
 
 def mf_page(county: str) -> str:
