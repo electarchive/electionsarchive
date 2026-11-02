@@ -1,5 +1,8 @@
 import { defineRelations } from "drizzle-orm";
-import * as schema from "./core.ts";
+import * as core from "./core.ts";
+import { apikeys, users } from "./schema.ts";
+
+const schema = { ...core, apikeys, users };
 
 export const relations = defineRelations(schema, (r) => ({
 	activity: {

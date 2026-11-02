@@ -1,5 +1,5 @@
 import { daterange } from "./range.ts";
-import { users } from "./schema.ts";
+import { activityKind, apikeys, archiveCaptureStatus, proposalJobKind, proposalJobStatus, proposalState, threadKind, threadStatus, uploadStatus, users, watchTarget } from "./schema.ts";
 import { pgTable, pgEnum, uuid, text, smallint, integer, boolean, timestamp, date, jsonb, customType, numeric, real, json, char, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
