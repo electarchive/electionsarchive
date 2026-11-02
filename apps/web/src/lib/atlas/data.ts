@@ -24,6 +24,7 @@ export type Mosaic = {
 const KEYS = ["unit", "level", "vs", "group", "whole"] as const;
 const sheets = new Map<string, Promise<Sheet>>();
 const mosaics = new Map<string, Promise<Mosaic | null>>();
+const splits = new WeakMap<Mosaic, Array<Sheet>>();
 
 function query(ask: Ask) {
   const params = new URLSearchParams();
@@ -143,4 +144,57 @@ function decode(key: string, raw: Raw, base: Sheet): Mosaic | null {
       },
     },
   };
+}
+
+function pick<T>(column: ReadonlyArray<T>, rows: Array<number>) {
+  const found: Array<T> = [];
+  for (const i of rows) {
+    const value = column[i];
+    if (value !== undefined) {
+      found.push(value);
+    }
+  }
+  return found;
+}
+
+export function layered(mosaic: Mosaic) {
+  let found = splits.get(mosaic);
+  if (found != null) {
+    return found;
+  }
+  const { set } = mosaic;
+  const { places } = set;
+  found = mosaic.layers.map((layer, j) => {
+    const rows = [...mosaic.layer.keys()].filter((i) => mosaic.layer[i] === j);
+    const at = <T>(column: ReadonlyArray<T>) => pick(column, rows);
+    return {
+      ...set,
+      level: layer.code,
+      levels: [
+        ...set.levels.filter((entry) => entry.code !== layer.code),
+        {
+          code: layer.code,
+          noun: layer.noun,
+          count: rows.length,
+          tiles: layer.tiles.replace(/\.ids$/u, ""),
+        },
+      ],
+      places: {
+        k: at(places.k),
+        name: at(places.name),
+        valid: at(places.valid),
+        x: at(places.x),
+        y: at(places.y),
+        leader: at(places.leader),
+        ...(places.held != null && { held: at(places.held) }),
+        prior: at(places.prior),
+        shares: places.shares.map((column) => at(column)),
+        before: places.before.map((column) => at(column)),
+        previous: at(places.previous),
+        redrawn: at(places.redrawn),
+      },
+    };
+  });
+  splits.set(mosaic, found);
+  return found;
 }

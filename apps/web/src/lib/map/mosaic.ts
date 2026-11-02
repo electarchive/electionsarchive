@@ -50,17 +50,9 @@ int at(ivec2 texel) {
 const FILL = `${HEAD}
 uniform sampler2D u_palette;
 uniform float u_opacity;
-vec4 tone(ivec2 texel) {
-  int i = at(texel);
-  return texelFetch(u_palette, ivec2(i % ${ROW}, i / ${ROW}), 0);
-}
 void main() {
-  vec2 p = v_uv * ${SIZE}.0 - 0.5;
-  vec2 f = fract(p);
-  ivec2 b = ivec2(floor(p));
-  vec4 top = mix(tone(b), tone(b + ivec2(1, 0)), f.x);
-  vec4 low = mix(tone(b + ivec2(0, 1)), tone(b + ivec2(1, 1)), f.x);
-  color = mix(top, low, f.y) * u_opacity;
+  int i = at(ivec2(floor(v_uv * ${SIZE}.0)));
+  color = texelFetch(u_palette, ivec2(i % ${ROW}, i / ${ROW}), 0) * u_opacity;
 }`;
 
 const EDGE = `${HEAD}

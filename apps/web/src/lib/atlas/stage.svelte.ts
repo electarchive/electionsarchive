@@ -135,7 +135,7 @@ export class Stage {
     };
   }
 
-  #layers(tiles: string, tier: number, isDense: boolean) {
+  #layers(tiles: string, tier: number, isDense: boolean, from: number | null) {
     const engine = this.#engine;
     const id = engine.tiles(tiles, GROUP);
     const range = this.#window(tier);
@@ -148,7 +148,11 @@ export class Stage {
       1,
       0,
     ];
-    const appear = this.#locked == null ? fade(range.start) : 1;
+    const start =
+      from == null ? range.start : from - Math.log2(devicePixelRatio);
+    const rim = from ?? range.start;
+    const isFading = from != null || this.#locked == null;
+    const appear = isFading ? fade(start) : 1;
     const layer = { source: id, "source-layer": "areas" } as const;
     const rank = tier + 1;
     const options = { group: GROUP, rank };
@@ -211,9 +215,9 @@ export class Stage {
             "interpolate",
             ["linear"],
             ["zoom"],
-            Math.max(0, Number.isFinite(range.start) ? range.start : 2),
+            Math.max(0, Number.isFinite(rim) ? rim : 2),
             isDense ? 0.15 : 0.5,
-            Math.max(1, (Number.isFinite(range.start) ? range.start : 2) + 3),
+            Math.max(1, (Number.isFinite(rim) ? rim : 2) + 3),
             isDense ? 0.7 : 1.1,
           ];
     engine.add(
@@ -225,16 +229,8 @@ export class Stage {
           "line-color": "var(--card)",
           "line-width": width,
           "line-opacity":
-            this.#locked == null && Number.isFinite(range.start)
-              ? [
-                  "interpolate",
-                  ["linear"],
-                  ["zoom"],
-                  range.start,
-                  0,
-                  range.start + 0.4,
-                  on,
-                ]
+            isFading && Number.isFinite(rim)
+              ? ["interpolate", ["linear"], ["zoom"], rim, 0, rim + 0.4, on]
               : on,
         },
       },
@@ -347,12 +343,17 @@ export class Stage {
     return id;
   }
 
-  show(set: Sheet, tier: number) {
+  show(set: Sheet, tier: number, from: number | null = null) {
     const level = set.levels.find((entry) => entry.code === set.level);
     if (level?.tiles == null || this.#window(tier) == null) {
       return false;
     }
-    const source = this.#layers(level.tiles, tier, set.places.k.length > 400);
+    const source = this.#layers(
+      level.tiles,
+      tier,
+      set.places.k.length > 400,
+      from,
+    );
     const key = `${source}|${set.scope.k}|${set.level}`;
     if (this.#drawn.has(key)) {
       return true;

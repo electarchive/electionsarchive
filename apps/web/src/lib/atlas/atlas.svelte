@@ -22,7 +22,7 @@
   import type { Tier } from "#lib/atlas/tiers.js";
   import Analysis from "#lib/atlas/analysis.svelte";
   import { admits, hue, read, share, was } from "#lib/atlas/color.js";
-  import { load, loadMosaic } from "#lib/atlas/data.js";
+  import { layered, load, loadMosaic } from "#lib/atlas/data.js";
   import Drawer from "#lib/atlas/drawer.svelte";
   import Hover from "#lib/atlas/hover.svelte";
   import Key from "#lib/atlas/key.svelte";
@@ -90,6 +90,8 @@
     group: view.group,
     whole,
   });
+
+  const SHARP = 8;
 
   let base = $state.raw<Sheet | null>(null);
   let mosaic = $state.raw<Mosaic | null>(null);
@@ -1466,6 +1468,9 @@
       for (const [index, entry] of list.entries()) {
         if (entry.kind === "mosaic" && held != null) {
           stage.drape(held, index);
+          for (const set of layered(held)) {
+            stage.show(set, index, SHARP);
+          }
         } else if (entry.kind === "parts") {
           for (const set of Object.values(pieces)) {
             const tiles = set.levels.find(
