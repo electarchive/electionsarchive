@@ -451,6 +451,12 @@ def emit() -> Path:
             else:
                 schools.setdefault(ceda._core(text), []).append(key)
         slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/oh/%%'").fetchall())
+        keyed = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value like %s",
+                [f"{DAY}:OH:%"],
+            ).fetchall()
+        )
         candidates: dict[tuple[str, str], list[tuple[str, str, str]]] = {}
         for geoid, full in gazetteer(PLACES).select("GEOID", "NAME").iter_rows():
             label = re.sub(r" (city|village|CDP)$", "", full)
@@ -596,11 +602,12 @@ def emit() -> Path:
             counts[key] = counts.get(key, 0) + 1
             stem = slug(label)
             contest_key = f"{DAY}:OH:{code}:question:{stem}-{counts[key]}"
-            contest = cs.key("us.contest", contest_key)
             contest_path = f"{path}/{DAY}-general/{stem}-{counts[key]}"
-            if slugs.get(contest_path, contest) != contest:
+            owner = slugs.get(contest_path)
+            if owner is not None and owner != keyed.get(contest_key):
                 print("slug taken:", contest_path)
                 continue
+            contest = cs.key("us.contest", contest_key)
             slugs[contest_path] = contest
             cs.add(
                 "contest",
