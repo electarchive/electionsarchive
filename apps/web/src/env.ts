@@ -54,6 +54,11 @@ export const variables = defineEnvVars({
     description:
       "Bearer token the notification timer sends to POST /internal/notifications",
   },
+  PROJECTION_TOKEN: {
+    schema: optional,
+    description:
+      "Bearer token the ops board sends to GET /internal/projections",
+  },
   REDIS_URL: {
     schema: v.pipe(
       v.string(),

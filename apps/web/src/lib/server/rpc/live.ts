@@ -193,8 +193,12 @@ async function newest(id: string, isShown: boolean) {
     frames as (
       select max(f.as_of) as newest from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
       where f.status = 'active' and ${isShown}::boolean
+    ),
+    called as (
+      select max(l.called_at) as newest from live.call l join contest c on c.id = l.contest_id join contest_option o on o.id = l.option_id and o.contest_id = l.contest_id join tree t on t.id = c.election_id
+      where ${isShown}::boolean
     )
-    select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
+    select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames), (select newest from called)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
       coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"
     from contest c left join result_set rs on rs.contest_id = c.id and rs.status = 'active'
     where c.election_id = ${id}::uuid
@@ -838,11 +842,27 @@ async function geography(
   return result.rows;
 }
 
+async function calls(contests: Array<string>) {
+  const result = await db.execute<{
+    contest: string;
+    option: string;
+    at: string;
+  }>(sql`
+    select l.contest_id as contest, l.option_id as option, to_char(l.called_at at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at
+    from live.call l
+    join contest c on c.id = l.contest_id
+    join contest_option o on o.id = l.option_id and o.contest_id = l.contest_id
+    where l.contest_id = any(${sql.param(contests)}::uuid[])
+  `);
+  return result.rows;
+}
+
 async function night(
   found: { id: string; path: string; date: string; rest: string },
   picked: Array<{ id: string; path: string; district: string | null }>,
   detail: "race" | "state" | "national",
   shown: { results: boolean; forecasts: boolean },
+  called: Awaited<ReturnType<typeof calls>>,
 ) {
   const contests = picked.map((row) => row.id);
   const [frames, { choices, incumbents, settled, prior, drawn, placed }] =
@@ -959,6 +979,7 @@ async function night(
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
   const badges = new Map<string, NonNullable<LiveOption["party"]>>();
+  const calledBy = new Map(called.map((row) => [row.contest, row]));
   const built = picked.map((row): LiveRace => {
     const own = choices.filter((choice) => choice.contest === row.id);
     const index = new Map(own.map((choice, position) => [choice.id, position]));
@@ -1227,6 +1248,12 @@ async function night(
                   : [],
               ),
             },
+      projected: shown.results
+        ? (() => {
+            const call = calledBy.get(row.id);
+            return call == null ? null : { option: call.option, at: call.at };
+          })()
+        : null,
       source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
     };
   });
@@ -1281,6 +1308,19 @@ const Input = v.objectAsync({
   ),
 });
 
+export async function projections(path: string) {
+  const found = await election(path);
+  const picked = await races(found);
+  const contests = picked.map((row) => row.id);
+  return night(
+    found,
+    picked,
+    found.path.split("/").length === 2 ? "national" : "state",
+    { results: true, forecasts: true },
+    await calls(contests),
+  );
+}
+
 export const live = {
   election: base
     .meta(
@@ -1298,15 +1338,18 @@ export const live = {
       if (picked.length === 0) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [stamp, shown] = await Promise.all([
+      const [stamp, shown, called] = await Promise.all([
         db.execute<{ key: string }>(sql`
           select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
           from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
         `),
         switches(),
+        calls(picked.map((row) => row.id)),
       ]);
       const slot = `${String(shown.results)}|${String(shown.forecasts)}|${found.path}|${found.rest}`;
-      const key = shown.results ? (stamp.rows[0]?.key ?? "") : "";
+      const key = shown.results
+        ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
+        : "";
       const kept =
         found.rest === "" && found.path.split("/").length <= 3 ? held : done;
       const ready = kept.get(slot);
@@ -1324,6 +1367,7 @@ export const live = {
               ? "national"
               : "state",
           shown,
+          called,
         );
         running = { key, value };
         pending.set(slot, running);

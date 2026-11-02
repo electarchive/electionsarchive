@@ -53,6 +53,7 @@ export type LiveRace = {
   counts: Array<LiveUnitCount>;
   baseline: Array<LiveBaseline>;
   certified: { totals: Array<number>; winners: Array<string> } | null;
+  projected?: { option: string; at: string } | null;
   source: { publisher: string; url: string | null };
   jurisdiction?: {
     name: string;

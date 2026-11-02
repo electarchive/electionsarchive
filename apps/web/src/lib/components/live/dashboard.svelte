@@ -301,7 +301,8 @@
   }
 
   function strength(summary: Summary) {
-    const option = summary.winner ?? summary.leader;
+    const called = summary.winner ?? summary.projected;
+    const option = called ?? summary.leader;
     if (option == null) {
       const held = seatById.get(summary.race.id)?.held ?? null;
       return held == null
@@ -309,7 +310,7 @@
         : `color-mix(in oklab, ${tint(held)} 24%, var(--background))`;
     }
     const share =
-      summary.winner == null
+      called == null
         ? Math.round(30 + 60 * Math.min(summary.margin / 0.3, 1))
         : 100;
     return `color-mix(in oklab, ${tone(option)} ${share}%, var(--background))`;
@@ -333,7 +334,7 @@
       if (!entry.isFlip) {
         return summary.total > 0 ? MUTED : WAITING;
       }
-      return `color-mix(in oklab, ${tint(entry.side)} ${entry.rating === "won" ? 100 : 70}%, var(--background))`;
+      return `color-mix(in oklab, ${tint(entry.side)} ${entry.rating === "won" || entry.rating === "projected" ? 100 : 70}%, var(--background))`;
     }
     if (entry.rating === "waiting" || entry.rating === "counting") {
       return summary.total > 0
@@ -347,7 +348,7 @@
   }
 
   function seatShade(entry: Seat) {
-    if (entry.rating === "won") {
+    if (entry.rating === "won" || entry.rating === "projected") {
       return tint(entry.side);
     }
     if (entry.rating === "waiting" || entry.side == null) {
@@ -483,7 +484,8 @@
   }
 
   function fullLabel(entry: Seat) {
-    const ahead = entry.summary.winner ?? entry.summary.leader;
+    const ahead =
+      entry.summary.winner ?? entry.summary.projected ?? entry.summary.leader;
     return ahead == null
       ? `${entry.summary.race.title}: ${m.night_nation_waiting()}`
       : `${entry.summary.race.title}: ${surname(ahead)} +${lead(entry.summary.margin)}`;
@@ -500,7 +502,9 @@
   {:else if summary.leader == null}
     <span class="text-muted-foreground">{m.night_nation_waiting()}</span>
   {:else}
-    {const option = $derived(summary.winner ?? summary.leader)}
+    {const option = $derived(
+      summary.winner ?? summary.projected ?? summary.leader,
+    )}
     {const entry = $derived(seatById.get(summary.race.id))}
     <span class="flex items-center gap-1.5 whitespace-nowrap min-inline-0">
       <span
@@ -509,7 +513,7 @@
       ></span>
       <span
         class={cn("truncate min-inline-0", {
-          "font-semibold": summary.winner != null,
+          "font-semibold": summary.winner != null || summary.projected != null,
         })}>{surname(option)}</span
       >
       <span class="shrink-0 font-figures text-muted-foreground tabular-nums"
@@ -561,7 +565,7 @@
                 name: entry.holder,
               })}</span
             >
-            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && pair != null}
+            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
               <span class="font-figures tabular-nums"
                 >{entry.left >= entry.right ? pair[0].short : pair[1].short}
                 {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -599,7 +603,7 @@
         name: entry.holder,
       })}</span
     >
-    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && pair != null}
+    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
       <span class="font-figures tabular-nums"
         >{entry.left >= entry.right ? pair[0].short : pair[1].short}
         {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -609,6 +613,11 @@
   {#if summary.counted != null}
     <span class="text-muted-foreground"
       >{m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
+    >
+  {/if}
+  {#if summary.projectedAt != null}
+    <span class="text-muted-foreground"
+      >{m.night_tip_projected({ time: stamp(summary.projectedAt) })}</span
     >
   {/if}
 {/snippet}

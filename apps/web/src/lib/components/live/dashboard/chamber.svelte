@@ -5,10 +5,11 @@
   import type { Summary } from "#lib/live/summary.js";
   import { numbers, percent } from "#lib/format.js";
   import { pointAt } from "#lib/live/hover.js";
-  import { odds } from "#lib/live/nation.js";
+  import { breakdown, odds } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Called from "./called.svelte";
   import Card from "./card.svelte";
   import Sheet from "./sheet.svelte";
 
@@ -82,11 +83,13 @@
 
   const leftSeats = $derived(
     view.tallies.left.won +
+      view.tallies.left.projected +
       view.tallies.left.ahead +
       view.tallies.left.holdover,
   );
   const rightSeats = $derived(
     view.tallies.right.won +
+      view.tallies.right.projected +
       view.tallies.right.ahead +
       view.tallies.right.holdover,
   );
@@ -95,6 +98,7 @@
     { family: left, tally: view.tallies.left },
     { family: right, tally: view.tallies.right },
     ...(view.tallies.other.won +
+      view.tallies.other.projected +
       view.tallies.other.ahead +
       view.tallies.other.holdover >
     0
@@ -123,7 +127,10 @@
   const isInformed = $derived(
     view.order.some(
       (seat) => seat.rating !== "counting" && seat.rating !== "waiting",
-    ) && !view.order.every((seat) => seat.rating === "won"),
+    ) &&
+      !view.order.every(
+        (seat) => seat.rating === "won" || seat.rating === "projected",
+      ),
   );
 
   function signed(value: number) {
@@ -153,15 +160,16 @@
         <a
           href={href(cell.seat)}
           data-cell={index}
-          class="rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
+          class="grid place-items-center rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
           style:background-color={shade(cell.seat)}
-          aria-label={label(cell.seat)}
-        ></a>
+          aria-label={label(cell.seat)}>{@render pip(cell.seat)}</a
+        >
       {:else}
         <span
-          class="rounded-[1px] block-3.5"
+          class="grid place-items-center rounded-[1px] block-3.5"
           style:background-color={shade(cell.seat)}
-        ></span>
+          >{@render pip(cell.seat)}</span
+        >
       {/if}
     {/each}
   </div>
@@ -169,6 +177,12 @@
     class="pointer-events-none absolute -inset-y-1 inset-s-1/2 border-s-2 border-foreground"
     aria-hidden="true"
   ></span>
+{/snippet}
+
+{#snippet pip(seat: Seat)}
+  {#if seat.rating === "projected"}
+    <span class="rounded-full bg-background block-1 inline-1"></span>
+  {/if}
 {/snippet}
 
 {#snippet legend()}
@@ -181,11 +195,7 @@
         ></span>{row.family.name}
       </dt>
       <dd class="font-figures text-muted-foreground tabular-nums">
-        {m.night_chamber_breakdown({
-          won: row.tally.won,
-          ahead: row.tally.ahead,
-          holdover: row.tally.holdover,
-        })}
+        {breakdown(row.tally)}
       </dd>
       <dd
         class={cn("text-end font-figures font-semibold tabular-nums", {
@@ -281,6 +291,7 @@
   {/if}
 
   {@render legend()}
+  <Called seats={view.order} />
 
   {#if forecasts && isInformed}
     <div class="grid gap-1.5 border-bs border-border pbs-3">

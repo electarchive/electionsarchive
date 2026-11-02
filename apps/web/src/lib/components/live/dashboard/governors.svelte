@@ -4,9 +4,11 @@
   import type { ChamberView, Family, Seat } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
   import { pointAt } from "#lib/live/hover.js";
+  import { breakdown } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Called from "./called.svelte";
   import Card from "./card.svelte";
   import Sheet from "./sheet.svelte";
 
@@ -52,7 +54,8 @@
   >
     {#each view.order as seat, index (seat.summary.race.id)}
       {const isStrong = $derived(
-        ["won", "solid", "likely"].includes(seat.rating) && seat.side != null,
+        ["won", "projected", "solid", "likely"].includes(seat.rating) &&
+          seat.side != null,
       )}
       <li class="grid">
         <svelte:element
@@ -60,7 +63,7 @@
           href={isLinked ? href(seat) : undefined}
           data-cell={index}
           class={cn(
-            "grid place-items-center rounded-xs font-figures text-[0.6875rem] font-semibold tracking-wide uppercase block-8",
+            "relative grid place-items-center rounded-xs font-figures text-[0.6875rem] font-semibold tracking-wide uppercase block-8",
             {
               "hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground":
                 isLinked,
@@ -70,7 +73,9 @@
           )}
           style:background-color={shade(seat)}
           aria-label={isLinked ? label(seat) : undefined}
-          >{seat.summary.race.state}</svelte:element
+          >{seat.summary.race.state}{#if seat.rating === "projected"}<span
+              class="absolute inset-e-1 inset-bs-1 rounded-full bg-background block-1 inline-1"
+            ></span>{/if}</svelte:element
         >
       </li>
     {/each}
@@ -87,11 +92,7 @@
         ></span>{row.family.name}
       </dt>
       <dd class="font-figures text-muted-foreground tabular-nums">
-        {m.night_chamber_breakdown({
-          won: row.tally.won,
-          ahead: row.tally.ahead,
-          holdover: row.tally.holdover,
-        })}
+        {breakdown(row.tally)}
       </dd>
       <dd
         class={cn("text-end font-figures font-semibold tabular-nums", {
@@ -146,6 +147,7 @@
   {/if}
 
   {@render legend()}
+  <Called seats={view.order} />
 
   <p class="text-xs text-muted-foreground">
     {net === 0

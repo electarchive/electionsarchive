@@ -2,6 +2,7 @@ import type { LiveOption } from "@ea/analytics/live";
 import type { Summary } from "#lib/live/summary.js";
 import type { LivePage } from "#lib/server/live-page.js";
 import { percent } from "#lib/format.js";
+import { m } from "#lib/paraglide/messages.js";
 import { swatch } from "#lib/party.js";
 
 export type Control = NonNullable<LivePage["control"]>;
@@ -10,6 +11,7 @@ export type Chamber = "senate" | "house" | "governor";
 
 export type Rating =
   | "won"
+  | "projected"
   | "solid"
   | "likely"
   | "lean"
@@ -127,8 +129,9 @@ export function seat(
   let pLeft = held === left.id ? PRIOR : held === right.id ? 1 - PRIOR : 0.5;
   let pRight = 1 - pLeft;
   let band: Seat["band"] = null;
-  if (summary.winner != null) {
-    const id = family(control, summary.winner);
+  const called = summary.winner ?? summary.projected;
+  if (called != null) {
+    const id = family(control, called);
     pLeft = id === left.id ? 1 : 0;
     pRight = id === right.id ? 1 : 0;
   } else if (isEstimating) {
@@ -157,11 +160,13 @@ export function seat(
           : { low: -estimate.margin.high, high: -estimate.margin.low };
     }
   }
-  const pick = summary.winner ?? summary.favorite ?? summary.leader;
+  const pick = called ?? summary.favorite ?? summary.leader;
   const side = family(control, pick);
   let rating: Rating = total > 0 ? "counting" : "waiting";
   if (summary.winner != null) {
     rating = "won";
+  } else if (summary.projected != null) {
+    rating = "projected";
   } else if (isEstimating) {
     const top = Math.max(pLeft, pRight);
     rating = RATINGS.find(([, floor]) => top >= floor)?.[0] ?? "tossup";
@@ -174,8 +179,9 @@ export function seat(
       total > 0,
   );
   let lean = pLeft - pRight;
-  if (rating === "won") {
-    lean = side === left.id ? 2 : side === right.id ? -2 : 0;
+  if (rating === "won" || rating === "projected") {
+    const sure = rating === "won" ? 2 : 1.5;
+    lean = side === left.id ? sure : side === right.id ? -sure : 0;
   } else if (rating === "counting" && signed != null) {
     lean = Math.max(-0.98, Math.min(0.98, signed / 0.2));
   }
@@ -229,11 +235,36 @@ function quantile(pmf: Array<number>, wanted: number) {
 
 export type Tally = {
   won: number;
+  projected: number;
   ahead: number;
   holdover: number;
   gains: number;
   losses: number;
 };
+
+export function breakdown(tally: Tally) {
+  return [
+    tally.won > 0 ? m.night_tally_won({ count: tally.won }) : null,
+    tally.projected > 0
+      ? m.night_tally_projected({ count: tally.projected })
+      : null,
+    m.night_tally_ahead({ count: tally.ahead }),
+    m.night_tally_not_up({ count: tally.holdover }),
+  ]
+    .filter((part) => part != null)
+    .join(", ");
+}
+
+export function latestCall(seats: Array<Seat>) {
+  let latest: string | null = null;
+  for (const seat of seats) {
+    const at = seat.summary.projectedAt;
+    if (at != null && (latest == null || at > latest)) {
+      latest = at;
+    }
+  }
+  return latest;
+}
 
 export function chamber(
   seats: Array<Seat>,
@@ -244,6 +275,7 @@ export function chamber(
   const { seats: size, majority } = CHAMBERS[name];
   const blank = (): Tally => ({
     won: 0,
+    projected: 0,
     ahead: 0,
     holdover: 0,
     gains: 0,
@@ -261,6 +293,8 @@ export function chamber(
       waiting += 1;
     } else if (entry.rating === "won") {
       tallies[key(entry.side)].won += 1;
+    } else if (entry.rating === "projected") {
+      tallies[key(entry.side)].projected += 1;
     } else {
       tallies[key(entry.side)].ahead += 1;
     }

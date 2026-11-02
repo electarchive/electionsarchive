@@ -90,7 +90,8 @@
   const name = (code: string) => labels[code] ?? code.toUpperCase();
 
   function look(summary: Summary) {
-    const ahead = summary.winner ?? (summary.total > 0 ? summary.leader : null);
+    const called = summary.winner ?? summary.projected;
+    const ahead = called ?? (summary.total > 0 ? summary.leader : null);
     if (ahead == null) {
       const hue = describe(summary).held?.color ?? "var(--muted-foreground)";
       return {
@@ -101,7 +102,7 @@
       };
     }
     const hue = tone(ahead);
-    if (summary.winner == null) {
+    if (called == null) {
       return {
         isDashed: false,
         border: hue,
@@ -158,13 +159,17 @@
     {const style = $derived(look(summary))}
     <span
       class={cn(
-        "grid place-items-center rounded-[3px] border text-[0.5625rem]/none font-bold block-3.5 inline-3.5 sm:text-[0.6875rem]/none sm:block-4.5 sm:inline-4.5",
+        "relative grid place-items-center rounded-[3px] border text-[0.5625rem]/none font-bold block-3.5 inline-3.5 sm:text-[0.6875rem]/none sm:block-4.5 sm:inline-4.5",
         { "border-dashed": style.isDashed },
       )}
       style:border-color={style.border}
       style:background-color={style.fill}
       style:color={style.ink}
-      aria-hidden="true">{letter}</span
+      aria-hidden="true"
+      >{letter}{#if summary.projected != null}<span
+          class="absolute inset-e-px inset-bs-px rounded-full block-0.75 inline-0.75 sm:inset-e-0.5 sm:inset-bs-0.5 sm:block-1 sm:inline-1"
+          style:background-color={style.ink}
+        ></span>{/if}</span
     >
   {/if}
 {/snippet}

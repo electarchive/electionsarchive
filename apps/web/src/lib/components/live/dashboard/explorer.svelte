@@ -50,6 +50,7 @@
 
   const RATINGS: Record<Rating, () => string> = {
     won: m.night_rating_won,
+    projected: m.night_rating_projected,
     solid: m.night_rating_solid,
     likely: m.night_rating_likely,
     lean: m.night_rating_lean,
@@ -63,7 +64,8 @@
     close: (seat) =>
       seat.summary.total > 0 &&
       seat.summary.margin < 0.02 &&
-      seat.rating !== "won",
+      seat.rating !== "won" &&
+      seat.rating !== "projected",
     flips: (seat) => seat.isFlip,
     upsets: (seat) => seat.isUpset,
     left: (seat) => (seat.remaining ?? 0) > 0,
@@ -312,7 +314,9 @@
         {/if}
         {#each windowed.entries as { value: seat, index, key: id } (id)}
           {const summary = $derived(seat.summary)}
-          {const ahead = $derived(summary.winner ?? summary.leader)}
+          {const ahead = $derived(
+            summary.winner ?? summary.projected ?? summary.leader,
+          )}
           {const isLeft = $derived((seat.signed ?? 0) >= 0)}
           <tr
             class="border-be border-border hover:highlighter"
@@ -363,8 +367,10 @@
                       style:background-color={tone(ahead)}
                     ></span>
                     <span
-                      class={cn({ "font-semibold": summary.winner != null })}
-                      >{surname(ahead)}</span
+                      class={cn({
+                        "font-semibold":
+                          summary.winner != null || summary.projected != null,
+                      })}>{surname(ahead)}</span
                     >
                     {#if ahead.isIncumbent}
                       <span class="text-xs text-muted-foreground"
@@ -452,7 +458,14 @@
             </td>
             {#if forecasts}
               <td class="py-1.5 pe-3 text-end whitespace-nowrap">
-                {#if seat.rating === "counting" || seat.rating === "waiting"}
+                {#if seat.rating === "projected"}
+                  <span
+                    class="text-xs font-semibold"
+                    style:color={seat.left >= seat.right
+                      ? left.color
+                      : right.color}>{RATINGS.projected()}</span
+                  >
+                {:else if seat.rating === "counting" || seat.rating === "waiting"}
                   <span class="text-muted-foreground"
                     >{RATINGS[seat.rating]()}</span
                   >

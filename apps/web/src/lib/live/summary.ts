@@ -20,6 +20,8 @@ export type Summary = {
   margin: number;
   counted: number | null;
   winner: LiveOption | null;
+  projected: LiveOption | null;
+  projectedAt: string | null;
   favorite: LiveOption | null;
   chance: number | null;
   at: string | null;
@@ -42,6 +44,11 @@ export function summarize(
     race.options.find((option) =>
       race.certified?.winners.includes(option.id),
     ) ?? null;
+  const projected =
+    winner == null
+      ? (race.options.find((option) => option.id === race.projected?.option) ??
+        null)
+      : null;
   let counted: number | null = null;
   if (race.certified != null) {
     counted = 1;
@@ -84,6 +91,8 @@ export function summarize(
         : 0,
     counted,
     winner,
+    projected,
+    projectedAt: projected == null ? null : (race.projected?.at ?? null),
     favorite,
     chance:
       favorite == null ? null : (estimate?.winProbability[favorite.id] ?? null),
@@ -102,6 +111,12 @@ export function describe(summary: Summary, closes: number, time: number) {
   const { leader, winner, margin, total, estimate } = summary;
   if (winner != null) {
     return m.night_head_won({ name: winner.label, margin: lead(margin) });
+  }
+  if (summary.projected != null) {
+    return m.night_head_projected({
+      name: summary.projected.label,
+      time: stamp(summary.projectedAt),
+    });
   }
   if (total === 0 || leader == null) {
     return time < closes
