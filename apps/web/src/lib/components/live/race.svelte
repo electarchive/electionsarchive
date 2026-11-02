@@ -560,7 +560,9 @@
   <footer
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"
   >
-    <p class="max-inline-[80ch]">{m.night_method()}</p>
+    {#if later == null}
+      <p class="max-inline-[80ch]">{m.night_method()}</p>
+    {/if}
     {#if race.source.publisher !== ""}
       <p>
         {m.night_source()}

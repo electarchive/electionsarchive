@@ -140,7 +140,9 @@
       return m.night_nation_governor();
     }
     if (race.office === "house" && race.district != null) {
-      return m.night_rail_house({ district: race.district });
+      return race.district === "0"
+        ? m.night_nation_house()
+        : m.night_rail_house({ district: race.district });
     }
     return race.title;
   }
