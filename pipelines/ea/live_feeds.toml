@@ -302,6 +302,13 @@ publisher = "Vermont Secretary of State"
 url = "https://electionresults.vermont.gov/"
 
 [[feed]]
+id = "us.enr_2026.hi"
+adapter = "us.enr_2026"
+params = { state = "HI" }
+publisher = "Hawaii Office of Elections"
+url = "https://elections.hawaii.gov/election-results/"
+
+[[feed]]
 id = "us.nyc_enr"
 adapter = "us.nyc_enr"
 publisher = "Board of Elections in the City of New York"
