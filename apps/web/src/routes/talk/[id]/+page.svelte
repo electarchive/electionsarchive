@@ -3,9 +3,10 @@
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import RecordTabs from "#lib/components/contrib/record-tabs.svelte";
   import WatchButton from "#lib/components/contrib/watch-button.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { stateLabel } from "#lib/contrib.js";
-  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { localDay, moment } from "#lib/zone.svelte.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -14,7 +15,6 @@
   const resolved = $derived(
     data.topics.filter((item) => item.status === "resolved"),
   );
-  const day = (value: string) => date(value.slice(0, 10));
 </script>
 
 <svelte:head>
@@ -37,17 +37,23 @@
           <span
             class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground"
           >
-            <span
-              >{m.talk_started({
+            <Moment
+              at={item.created_at}
+              label={m.talk_started({
                 author: item.author ?? m.proposal_unknown_author(),
-                date: day(item.created_at),
-              })}</span
-            >
+                date: moment(item.created_at, "date"),
+              })}
+            />
             <span class="font-figures"
               >{m.discussion_count({ count: item.comments })}</span
             >
-            {#if item.updated_at.slice(0, 10) !== item.created_at.slice(0, 10)}
-              <span>{m.talk_updated({ date: day(item.updated_at) })}</span>
+            {#if localDay(item.updated_at) !== localDay(item.created_at)}
+              <Moment
+                at={item.updated_at}
+                label={m.talk_updated({
+                  date: moment(item.updated_at, "date"),
+                })}
+              />
             {/if}
           </span>
         </a>

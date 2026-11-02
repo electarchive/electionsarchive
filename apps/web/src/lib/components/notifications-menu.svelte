@@ -6,14 +6,15 @@
   import { CheckIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
   import type { Latest } from "#lib/server/notifications.js";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
-  import { date } from "#lib/format.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
+  import { instant, moment } from "#lib/zone.svelte.js";
 
   const {
     trigger,
@@ -43,12 +44,12 @@
   );
 
   function ago(at: string) {
-    const seconds = (Date.now() - Date.parse(at)) / 1000;
+    const seconds = (Date.now() - instant(at).getTime()) / 1000;
     if (seconds < 60) {
       return m.notifications_menu_now();
     }
     if (seconds >= 7 * 86_400) {
-      return date(at);
+      return moment(at, "date");
     }
     const found = UNITS.findLast((step) => seconds >= step.seconds) ?? UNITS[0];
     return relative.format(-Math.floor(seconds / found.seconds), found.unit);
@@ -148,7 +149,7 @@
     >{entry.text}</span
   >
   <span class="flex flex-wrap gap-x-2.5 text-xs text-muted-foreground">
-    <time class="font-figures" datetime={entry.at}>{ago(entry.at)}</time>
+    <Moment at={entry.at} label={ago(entry.at)} class="font-figures" />
     <span>{entry.byline}</span>
     {#if entry.polity != null}
       <span>{entry.polity}</span>

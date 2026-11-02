@@ -1,16 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import RecordTabs from "#lib/components/contrib/record-tabs.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { historyByline, roleLabel, stateLabel } from "#lib/contrib.js";
-  import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { moment } from "#lib/zone.svelte.js";
   import type { ActionData, PageData } from "./$types";
 
   const { data, form }: { data: PageData; form: ActionData } = $props();
-
-  const clock = dates({ hour: "numeric", minute: "2-digit", timeZone: "UTC" });
 
   const tables: Record<string, () => string> = {
     entity: m.history_table_entity,
@@ -70,12 +69,13 @@
       <span class="font-semibold text-foreground"
         >{roleLabel[data.entry.role]()}</span
       >
-      <time datetime={data.entry.at}
-        >{m.history_published({
-          date: date(data.entry.at.slice(0, 10)),
-          time: clock.format(new Date(data.entry.at)),
-        })}</time
-      >
+      <Moment
+        at={data.entry.at}
+        label={m.history_published({
+          date: moment(data.entry.at, "date"),
+          time: moment(data.entry.at, "time"),
+        })}
+      />
       {#if data.entry.handle == null}
         <span>{historyByline(data.entry)}</span>
       {:else}

@@ -2,10 +2,11 @@
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import type { Template } from "#lib/workspace.js";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
-  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { templateBody, templates, templateTitle } from "#lib/workspace.js";
+  import { moment } from "#lib/zone.svelte.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -107,9 +108,12 @@
               <span class="truncate font-semibold">{draft.title}</span>
               <span
                 class="font-figures text-sm text-muted-foreground max-sm:col-start-2"
-                >{m.ws_draft_rows({ count: draft.rows })} · {m.ws_draft_saved_on(
-                  { date: date(draft.updated_at.slice(0, 10)) },
-                )}</span
+                >{m.ws_draft_rows({ count: draft.rows })} · <Moment
+                  at={draft.updated_at}
+                  label={m.ws_draft_saved_on({
+                    date: moment(draft.updated_at, "date"),
+                  })}
+                /></span
               >
             </a>
           </li>

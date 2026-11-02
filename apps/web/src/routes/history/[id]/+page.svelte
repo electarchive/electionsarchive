@@ -1,19 +1,19 @@
 <script lang="ts">
   import type { HistoryEntry } from "#lib/contrib.js";
   import RecordTabs from "#lib/components/contrib/record-tabs.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { historyByline, roleLabel, stateLabel } from "#lib/contrib.js";
-  import { date, dates } from "#lib/format.js";
+  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { localDay } from "#lib/zone.svelte.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
 
-  const clock = dates({ hour: "numeric", minute: "2-digit", timeZone: "UTC" });
-
   const days = $derived.by(() => {
     const grouped: Array<{ day: string; entries: Array<HistoryEntry> }> = [];
     for (const entry of data.entries) {
-      const day = entry.at.slice(0, 10);
+      const day = localDay(entry.at);
       const last = grouped.at(-1);
       if (last?.day === day) {
         last.entries.push(entry);
@@ -64,11 +64,11 @@
               <li
                 class="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 border-be py-2 text-sm max-sm:grid-cols-1"
               >
-                <time
+                <Moment
+                  at={entry.at}
+                  style="time"
                   class="pbs-0.5 font-figures text-xs text-muted-foreground"
-                  datetime={entry.at}
-                  >{clock.format(new Date(entry.at))} UTC</time
-                >
+                />
                 <div class="grid gap-0.5 min-inline-0">
                   <a
                     class="text-pretty underline-offset-4 hover:underline"

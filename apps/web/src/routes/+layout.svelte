@@ -24,6 +24,7 @@
     setConfirmationContext,
   } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
+  import { localizeZone } from "#lib/zone.svelte.js";
   import type { LayoutData } from "./$types";
 
   const { children, data }: { children: Snippet; data: LayoutData } = $props();
@@ -32,6 +33,8 @@
 
   setConfirmationContext(new ConfirmationStore());
   setContext("figures", new Set<string>());
+
+  $effect(localizeZone);
 
   let Overlays = $state<Component | null>(null);
   let isInteractive = $state(false);

@@ -5,10 +5,10 @@
   import CommentItem from "#lib/components/contrib/comment-item.svelte";
   import Proof from "#lib/components/contrib/proof.svelte";
   import Markdown from "#lib/components/markdown.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { anchorId } from "#lib/contrib.js";
-  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -69,9 +69,10 @@
     <a
       class="ms-auto font-figures text-xs text-muted-foreground underline-offset-2 hover:underline"
       href="#comment-{comment.id}"
-      ><time datetime={comment.created_at}
-        >{date(comment.created_at.slice(0, 10))}</time
-      >{#if comment.edited_at != null}
+      ><Moment
+        at={comment.created_at}
+        style="date"
+      />{#if comment.edited_at != null}
         <span class="ms-1">({m.discussion_edited()})</span>{/if}</a
     >
   </header>

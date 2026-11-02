@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from "$app/state";
   import FilterNav from "#lib/components/contrib/filter-nav.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { stateLabel, tierLabel } from "#lib/contrib.js";
-  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -151,7 +151,7 @@
                 {#if item.polity != null}
                   <span>{item.polity}</span>
                 {/if}
-                <span>{date(item.submitted_at.slice(0, 10))}</span>
+                <Moment at={item.submitted_at} style="date" />
                 <span class="font-figures"
                   >{m.proposals_changes({ count: item.changes })}</span
                 >

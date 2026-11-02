@@ -9,6 +9,7 @@
   import Proof from "#lib/components/contrib/proof.svelte";
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import WatchButton from "#lib/components/contrib/watch-button.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import {
@@ -34,10 +35,11 @@
     tierLabel,
     verdictLabel,
   } from "#lib/contrib.js";
-  import { count, date } from "#lib/format.js";
+  import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
+  import { moment } from "#lib/zone.svelte.js";
   import type { ActionData, PageData } from "./$types";
 
   const { data, form }: { data: PageData; form: ActionData } = $props();
@@ -224,7 +226,8 @@
     return found == null ? String(value) : schemeLabel[found]();
   };
   const found = $derived(findingsOf(head?.checks));
-  const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
+  const day = (value: string | null) =>
+    value == null ? "" : moment(value, "date");
   const figure = (value: unknown) =>
     typeof value === "number" ? count(value) : null;
   const precision = (value: unknown) =>
@@ -382,10 +385,13 @@
     <h1 class="title text-balance">{proposal.title}</h1>
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <p class="text-sm text-muted-foreground">
-        {m.proposal_by({
-          author: proposal.author ?? m.proposal_unknown_author(),
-          date: day(proposal.created_at),
-        })}
+        <Moment
+          at={proposal.created_at}
+          label={m.proposal_by({
+            author: proposal.author ?? m.proposal_unknown_author(),
+            date: day(proposal.created_at),
+          })}
+        />
       </p>
       {#if data.watch != null}
         <WatchButton

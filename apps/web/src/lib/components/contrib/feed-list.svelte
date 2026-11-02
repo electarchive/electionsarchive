@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { FeedEntry } from "#lib/contrib.js";
+  import Moment from "#lib/components/moment.svelte";
   import { byline, describe } from "#lib/contrib.js";
-  import { date, dates } from "#lib/format.js";
+  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import { localDay } from "#lib/zone.svelte.js";
 
   const {
     entries,
@@ -23,12 +25,10 @@
     watched: m.notifications_reason_watched,
   };
 
-  const clock = dates({ hour: "numeric", minute: "2-digit", timeZone: "UTC" });
-
   const days = $derived.by(() => {
     const grouped: Array<{ day: string; entries: Array<FeedEntry> }> = [];
     for (const entry of entries) {
-      const day = entry.at.slice(0, 10);
+      const day = localDay(entry.at);
       const last = grouped.at(-1);
       if (last?.day === day) {
         last.entries.push(entry);
@@ -63,10 +63,11 @@
               ></span>
               <span class="sr-only">{m.notifications_unread()}</span>
             {/if}
-            <time
+            <Moment
+              at={entry.at}
+              style="time"
               class="pbs-0.5 font-figures text-xs text-muted-foreground"
-              datetime={entry.at}>{clock.format(new Date(entry.at))} UTC</time
-            >
+            />
             <div class="grid gap-0.5 min-inline-0">
               {#if described.href == null}
                 <span class="text-pretty">{described.text}</span>

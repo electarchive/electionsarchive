@@ -2,9 +2,10 @@
   import { enhance } from "$app/forms";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import Discussion from "#lib/components/contrib/discussion.svelte";
+  import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
-  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { moment } from "#lib/zone.svelte.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -60,10 +61,13 @@
     </div>
     <h1 class="title text-balance">{data.topic.title}</h1>
     <p class="text-sm text-muted-foreground">
-      {m.talk_started({
-        author: data.topic.author ?? m.proposal_unknown_author(),
-        date: date(data.topic.created_at.slice(0, 10)),
-      })}
+      <Moment
+        at={data.topic.created_at}
+        label={m.talk_started({
+          author: data.topic.author ?? m.proposal_unknown_author(),
+          date: moment(data.topic.created_at, "date"),
+        })}
+      />
     </p>
   </header>
 
