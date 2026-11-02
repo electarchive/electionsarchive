@@ -145,6 +145,21 @@ PROVINCES = {
     "61": ("NT", "Northwest Territories"),
     "62": ("NU", "Nunavut"),
 }
+ENTRY = {
+    "ON": date(1867, 7, 1),
+    "QC": date(1867, 7, 1),
+    "NS": date(1867, 7, 1),
+    "NB": date(1867, 7, 1),
+    "MB": date(1870, 7, 15),
+    "NT": date(1870, 7, 15),
+    "BC": date(1871, 7, 20),
+    "PE": date(1873, 7, 1),
+    "YT": date(1898, 6, 13),
+    "AB": date(1905, 9, 1),
+    "SK": date(1905, 9, 1),
+    "NL": date(1949, 3, 31),
+    "NU": date(1999, 4, 1),
+}
 PARTIES = {
     "LIBERAL": ("Liberal Party of Canada", "LPC", "#d71920"),
     "CONSERVATIVE": ("Conservative Party of Canada", "CPC", "#1a4782"),
@@ -590,11 +605,13 @@ def emit() -> Path:
             cs.add("polity", id=province, kind="federal_unit", iso_code=f"CA-{abbreviation}")
             cs.add("slug", path=f"ca/{abbreviation.lower()}", entity_id=province)
             name(province, label)
-            cs.add("polity_parent", polity_id=province, parent_id=ca)
+            cs.add("polity_parent", polity_id=province, parent_id=ca, valid_from=ENTRY[abbreviation])
             cs.add("area_code", area_id=province_areas[code], code=code, valid_from=None)
             cs.add("area_parent", area_id=province_areas[code], parent_id=nation)
             name(province_areas[code], label)
-            cs.add("polity_territory", polity_id=province, area_id=province_areas[code])
+            cs.add(
+                "polity_territory", polity_id=province, area_id=province_areas[code], valid_from=ENTRY[abbreviation]
+            )
             cs.add(
                 "area_geometry",
                 area_id=province_areas[code],
