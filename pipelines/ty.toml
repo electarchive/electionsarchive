@@ -257,6 +257,7 @@ unsupported-operator = "ignore"
 include = [
   "ea/sources/us/il_judicial_shapes.py",
   "ea/sources/us/il_legislature.py",
+  "ea/sources/us/ia_measures_2026.py",
   "ea/sources/us/il_measures_2026.py",
   "ea/sources/us/il_primaries.py",
   "ea/sources/us/il_specials.py",
