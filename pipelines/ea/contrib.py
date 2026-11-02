@@ -26,7 +26,7 @@ from ea.capture import capture, resume
 from ea.changeset import UUID_TEXT, Changeset, bcp47, slug
 from ea.checks import FACTS, KEYS, Stage
 from ea.sources import party_logos, wikidata_photos
-from ea.store import DATA, ROOT, Connection, connect
+from ea.store import DATA, LAUNCHED_AT, ROOT, Connection, connect
 from ea.uploads import process, sweep
 
 VERSION = "1"
@@ -1214,14 +1214,7 @@ def _corrected(conn: Connection, op: Op, where: str) -> Corrected:
     return {"result_set": result_set, "contest": contest, "pipeline": pipeline, "cells": corrected}
 
 
-def _restage(
-    conn: Connection,
-    cs: Changeset,
-    corrected: Corrected,
-    source: UUID,
-    evidence: Evidence,
-    proof: dict[str, str],
-) -> None:
+def _copy(conn: Connection, cs: Changeset, corrected: Corrected, into: UUID) -> None:
     result_set = corrected["result_set"]
     changes = {address: value for address, _, value in corrected["cells"]}
     held = conn.execute(
@@ -1234,7 +1227,7 @@ def _restage(
         address = (unit, option, channel, measure, count_round)
         cs.add(
             "result_value",
-            result_set_id=result_set,
+            result_set_id=into,
             unit_id=unit,
             option_id=option,
             channel=channel,
@@ -1246,7 +1239,7 @@ def _restage(
     for (unit, option, channel, measure, count_round), value in changes.items():
         cs.add(
             "result_value",
-            result_set_id=result_set,
+            result_set_id=into,
             unit_id=unit,
             option_id=option,
             channel=channel,
@@ -1263,7 +1256,7 @@ def _restage(
     ).fetchall():
         cs.add(
             "value_locator",
-            result_set_id=result_set,
+            result_set_id=into,
             unit_id=unit,
             option_id=option,
             channel=channel,
@@ -1276,14 +1269,67 @@ def _restage(
             x1=x1,
             y1=y1,
         )
-    _cite(
-        cs,
-        corrected["contest"],
-        source,
-        evidence,
-        proof,
-        {"table": "result_set", "row": str(result_set), "op": "correct"},
-    )
+
+
+def _restage(
+    conn: Connection,
+    cs: Changeset,
+    corrected: Corrected,
+    source: UUID,
+    evidence: Evidence,
+    proof: dict[str, str],
+) -> UUID:
+    into = corrected["result_set"]
+    if LAUNCHED_AT is not None:
+        found = conn.execute(
+            """select election_id, stage::text, kind::text, source_id, as_of, is_default, supersedes_id, completeness
+               from result_set where id = %s""",
+            [corrected["result_set"]],
+        ).fetchone()
+        assert found is not None
+        election, stage, kind, held, as_of, default, supersedes, completeness = found
+        shared = held == source
+        into = uuid7()
+        common = {"election_id": election, "contest_id": corrected["contest"], "stage": stage, "kind": kind}
+        cs.add(
+            "result_set",
+            id=into,
+            **common,
+            source_id=source,
+            as_of=as_of,
+            status="active",
+            is_default=shared and default,
+            supersedes_id=corrected["result_set"] if shared else None,
+            completeness=completeness,
+        )
+        if shared:
+            cs.add(
+                "result_set",
+                id=corrected["result_set"],
+                **common,
+                source_id=held,
+                as_of=as_of,
+                status="superseded",
+                is_default=False,
+                supersedes_id=supersedes,
+                completeness=completeness,
+            )
+        for option, outcome, seats, notes, candidacy in conn.execute(
+            "select option_id, kind::text, seats, notes, candidacy_id from outcome where result_set_id = %s and %s",
+            [corrected["result_set"], shared],
+        ).fetchall():
+            cs.add(
+                "outcome",
+                result_set_id=into,
+                option_id=option,
+                kind=outcome,
+                seats=seats,
+                notes=notes,
+                candidacy_id=candidacy,
+            )
+    _copy(conn, cs, corrected, into)
+    _cite(cs, corrected["contest"], source, evidence, proof, {"table": "result_set", "row": str(into), "op": "correct"})
+    return into
 
 
 def _cell_rows(conn: Connection, corrected: Corrected) -> list[dict[str, object]]:
@@ -1323,7 +1369,7 @@ def _cell_rows(conn: Connection, corrected: Corrected) -> list[dict[str, object]
 def _fold(conn: Connection, payload: Payload) -> dict[str, object] | None:
     ops = payload.get("ops") or []
     corrections = [(n, op) for n, op in enumerate(ops) if op.get("op") == "correct"]
-    if not corrections:
+    if not corrections or LAUNCHED_AT is not None:
         return None
     folded = [(n, _corrected(conn, op, f"ops[{n}]")) for n, op in corrections]
     foreign = [corrected for _, corrected in folded if corrected["pipeline"] != "contrib"]
@@ -2314,8 +2360,8 @@ def compile(
                 if ("result_set", str(result_set)) in targets:
                     raise ValueError(f"{where}: result set {result_set} is corrected twice")
                 targets.add(("result_set", str(result_set)))
-                if corrected["pipeline"] == "contrib":
-                    _restage(conn, cs, corrected, sources[first], evidence[first], proofs.get(first, {}))
+                if corrected["pipeline"] == "contrib" or LAUNCHED_AT is not None:
+                    result_set = _restage(conn, cs, corrected, sources[first], evidence[first], proofs.get(first, {}))
                 else:
                     cited = [first, *cited]
             for key in cited[1:]:

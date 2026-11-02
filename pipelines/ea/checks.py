@@ -8,7 +8,7 @@ from jsonschema.exceptions import best_match
 from psycopg import sql
 
 from ea.names import ACRONYMS, ROMAN
-from ea.store import ROOT, Connection
+from ea.store import LAUNCHED_AT, ROOT, Connection
 
 FACTS = ("result_value", "result_flow", "value_locator")
 KEYS = {
@@ -414,8 +414,13 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                         """select distinct null::uuid, s.result_set_id, jsonb_build_object('table', {table})
                            from {facts} s join public.result_set p on p.id = s.result_set_id
                            join public.changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline}"""
-                    ).format(table=sql.Literal(table), facts=stage.staged(table), pipeline=sql.Literal(stage.pipeline)),
+                           where c.pipeline is distinct from {pipeline} or {launched}"""
+                    ).format(
+                        table=sql.Literal(table),
+                        facts=stage.staged(table),
+                        pipeline=sql.Literal(stage.pipeline),
+                        launched=sql.Literal(LAUNCHED_AT is not None),
+                    ),
                 )
             )
     if "result_set" in stage.tables:

@@ -12,6 +12,8 @@ if (ROOT / ".env").exists():
         if separator and not key.startswith("#"):
             os.environ.setdefault(key.strip(), value.strip())
 
+LAUNCHED_AT = os.environ.get("EA_LAUNCHED_AT") or None
+
 type Connection = psycopg.Connection[tuple]
 
 
