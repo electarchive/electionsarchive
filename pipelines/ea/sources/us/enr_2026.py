@@ -1362,12 +1362,10 @@ def plan(
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
-            wide = (
-                office == "state"
-                or bool(APPEALS.search(name))
-                or state == "IL"
-                and bool(re.search(r"^retain\b|\bjudge retention\b", name, re.IGNORECASE))
-            )
+            retention = state == "IL" and bool(re.search(r"^retain\b|\bjudge retention\b", name, re.IGNORECASE))
+            if retention:
+                words = set(terms(name)[-1:])
+            wide = office == "state" or bool(APPEALS.search(name)) or retention
             seat = (found[1] or found[2], found[3] or "") if wide and (found := SEAT.search(name)) else None
             best, ok = choose(people, words, places, wide, seat)
             if ok:
@@ -1381,7 +1379,7 @@ def plan(
             if split and all(found[1] for _, found in split):
                 picks.extend((found[0][0], name, place, office) for place, found in split)
                 continue
-            if wide and len(people) > 1:
+            if wide and len(people) > 1 and not people <= {"yes", "no"}:
                 parts = [
                     (contest, keys[0], wanted)
                     for contest, (keys, wanted) in published.items()
