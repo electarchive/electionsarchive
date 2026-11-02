@@ -12,10 +12,10 @@ export function keep(params: Record<string, string | null>) {
     }
   }
   if (url.search !== location.search) {
-    void goto(url, {
+    goto(url, {
       state: untrack(() => page.state),
       shallow: true,
       replace: true,
-    });
+    }).catch(() => {});
   }
 }

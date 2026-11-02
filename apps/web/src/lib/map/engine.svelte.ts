@@ -1335,6 +1335,14 @@ export class Engine {
     if (layers != null || (found[0]?.rank ?? 0) > 0) {
       return found[0]?.k ?? null;
     }
+    return this.sample(point) ?? found[0]?.k ?? null;
+  }
+
+  sample(point: { x: number; y: number }) {
+    const gl = this.gl;
+    if (gl == null) {
+      return null;
+    }
     const at = gl.unproject([point.x, point.y]);
     const sin = Math.sin((at.lat * Math.PI) / 180);
     const top = Math.min(8, Math.max(0, Math.round(gl.getZoom() + 1)));
@@ -1362,6 +1370,11 @@ export class Engine {
         break;
       }
     }
-    return found[0]?.k ?? null;
+    return null;
+  }
+
+  jump(center: [number, number], zoom: number) {
+    this.#isFramed = false;
+    this.gl?.jumpTo({ center, zoom });
   }
 }

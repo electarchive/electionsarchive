@@ -1,0 +1,1309 @@
+<script lang="ts">
+  import { afterNavigate, goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
+  import BoxSelectIcon from "@lucide/svelte/icons/box-select";
+  import MapIcon from "@lucide/svelte/icons/map";
+  import MinusIcon from "@lucide/svelte/icons/minus";
+  import PlusIcon from "@lucide/svelte/icons/plus";
+  import ScanIcon from "@lucide/svelte/icons/scan";
+  import SearchIcon from "@lucide/svelte/icons/search";
+  import XIcon from "@lucide/svelte/icons/x";
+  import { untrack } from "svelte";
+  import { MediaQuery } from "svelte/reactivity";
+  import { fade } from "svelte/transition";
+  import type { Lens } from "#lib/atlas/color.js";
+  import type { Mosaic, Sheet, Shell } from "#lib/atlas/data.js";
+  import type { Hit } from "#lib/atlas/stage.svelte.js";
+  import type { Tier } from "#lib/atlas/tiers.js";
+  import { load, loadMosaic } from "#lib/atlas/data.js";
+  import Drawer from "#lib/atlas/drawer.svelte";
+  import Hover from "#lib/atlas/hover.svelte";
+  import Key from "#lib/atlas/key.svelte";
+  import Rail from "#lib/atlas/rail.svelte";
+  import Result from "#lib/atlas/result.svelte";
+  import { Stage } from "#lib/atlas/stage.svelte.js";
+  import { View } from "#lib/atlas/state.svelte.js";
+  import {
+    active,
+    chain,
+    choices,
+    fine,
+    isParted,
+    starts,
+  } from "#lib/atlas/tiers.js";
+  import Monogram from "#lib/components/monogram.svelte";
+  import * as Command from "#lib/components/ui/command/index.js";
+  import { date } from "#lib/format.js";
+  import { basemap } from "#lib/map/basemap.js";
+  import { Engine, proportional } from "#lib/map/engine.svelte.js";
+  import { palette } from "#lib/palette.svelte.js";
+  import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
+
+  const {
+    contest,
+    path,
+    whole,
+    shell,
+    scheme,
+  }: {
+    contest: string;
+    path: string;
+    whole: string | null;
+    shell: Shell;
+    scheme: string;
+  } = $props();
+
+  const uid = $props.id();
+  const wide = new MediaQuery("min-width: 48rem", false);
+  const tall = new MediaQuery("min-height: 40rem", true);
+  const calm = new MediaQuery("prefers-reduced-motion: reduce", false);
+  const view = new View();
+
+  const unit = $derived(
+    decodeURI((page.shallow?.url ?? page.url).pathname).slice(
+      `/map/${path}`.length + 1,
+    ),
+  );
+  const ask = $derived({
+    unit: unit === "" ? null : unit,
+    vs: view.vs,
+    group: view.group,
+    whole,
+  });
+
+  let base = $state.raw<Sheet | null>(null);
+  let mosaic = $state.raw<Mosaic | null>(null);
+  let isSettled = $state(false);
+  let extras = $state.raw<Record<string, Sheet>>({});
+  let parts = $state.raw<Record<string, Sheet>>({});
+  let pending = $state(0);
+  let isFailed = $state(false);
+  let begins = $state.raw<Array<number>>([]);
+  let zoom = $state(0);
+  let tier = $state(0);
+  let hovered = $state.raw<Hit | null>(null);
+  let pointer = $state<{ x: number; y: number } | null>(null);
+  const room = $state({ width: 0, height: 0 });
+  let drawn = $state(0);
+  let detent = $state<"peek" | "half" | "full">("peek");
+  let named = $state(0);
+  let camera = $state<string | null>(
+    untrack(() => page.url.searchParams.get("at")),
+  );
+  let isAdding = $state(false);
+  let isShift = false;
+  let term = $state("");
+  let isSearching = $state(false);
+  let search = $state<HTMLInputElement | null>(null);
+  let built = "";
+  let isQueued = false;
+  const asked = new Set<string>();
+
+  const head = $derived<Shell | Sheet>(base ?? shell);
+  const levels = $derived(chain(head));
+  const sample = $derived(Object.values(parts)[0] ?? null);
+  const finest = $derived(isSettled ? fine(head, mosaic, sample) : null);
+  const all = $derived(choices(head, mosaic, sample));
+  const locked = $derived(
+    view.level == null
+      ? null
+      : (all.find((choice) => choice.code === view.level) ?? null),
+  );
+  const tiers = $derived<Array<Tier>>(
+    locked != null ? [locked] : finest == null ? levels : [...levels, finest],
+  );
+  const now = $derived(tiers[tier] ?? tiers[0] ?? null);
+
+  const tones = $derived.by(() => {
+    void $state.snapshot(palette);
+    const found = new Map<string, string>();
+    for (const set of [base, mosaic?.set]) {
+      for (const item of set?.legend ?? []) {
+        found.set(item.key, swatch(item.color, item.key));
+      }
+    }
+    return found;
+  });
+  const isCompared = $derived(
+    base != null &&
+      base.target != null &&
+      (base.places.redrawn.some((value) => value != null) ||
+        base.places.before.some((column) =>
+          column.some((value) => value != null),
+        )),
+  );
+  const isProportional = $derived(
+    base != null &&
+      proportional(
+        base.places.leader.flatMap((leader, i) =>
+          leader == null ? [] : [base?.places.held?.[i] ?? null],
+        ),
+      ),
+  );
+  const legend = $derived(
+    (base?.legend ?? []).map((item) =>
+      whole == null ? item : { ...item, label: item.short ?? item.label },
+    ),
+  );
+  const labels = $derived(
+    new Map(legend.map((item) => [item.key, item.label])),
+  );
+  const lens = $derived.by<Lens>(() => {
+    const mode =
+      (!isCompared && (view.mode === "swing" || view.mode === "flips")) ||
+      (view.mode === "split" && !isProportional)
+        ? "winner"
+        : view.mode;
+    const first = legend[0]?.key ?? null;
+    return {
+      mode,
+      first,
+      second: legend[1]?.key ?? null,
+      whom:
+        mode === "share"
+          ? (legend.find((item) => item.key === view.who)?.key ?? first)
+          : null,
+      isBanded: mode === "split" || (mode === "winner" && !isProportional),
+      isCompared,
+      range: view.range,
+      only: view.only,
+      isFlippedOnly: view.isFlippedOnly,
+      tone: (key) =>
+        (key == null ? null : tones.get(key)) ?? "var(--muted-foreground)",
+    };
+  });
+  const year = $derived(
+    base?.targets
+      .find((target) => target.id === base?.target)
+      ?.date.slice(0, 4) ?? null,
+  );
+
+  const engine = new Engine(
+    untrack(() => shell.frame) ?? {
+      west: -20,
+      south: -20,
+      east: 20,
+      north: 20,
+    },
+    (width) =>
+      width >= 768
+        ? { top: 32, right: Math.max(48, width * 0.08), bottom: 32, left: 48 }
+        : {
+            top: 64,
+            right: 60,
+            bottom: Math.max(24, untrack(() => sheet) + 16),
+            left: 16,
+          },
+    {
+      onReady: () => {
+        measure();
+        const at = view.at;
+        if (at != null) {
+          engine.jump([at[0], at[1]], at[2]);
+        }
+        zoom = engine.gl?.getZoom() ?? 0;
+      },
+      onMove: () => {
+        if (!isQueued) {
+          isQueued = true;
+          requestAnimationFrame(() => {
+            isQueued = false;
+            zoom = engine.gl?.getZoom() ?? zoom;
+            tier = locked != null ? 0 : active(begins, zoom, tier);
+          });
+        }
+      },
+      onMoveEnd: () => {
+        const gl = engine.gl;
+        if (gl == null) {
+          return;
+        }
+        const middle = gl.getCenter();
+        camera = engine.isFramed
+          ? null
+          : `${middle.lng.toFixed(4)},${middle.lat.toFixed(4)},${gl.getZoom().toFixed(2)}`;
+        stage.letter(tier);
+        deepen();
+      },
+      onPointer: ({ kind, point, isTouch }) => {
+        if (kind === "leave") {
+          hover(null);
+          pointer = null;
+          return;
+        }
+        const hit = stage.pick(point, tier);
+        if (kind === "move") {
+          hover(hit);
+          pointer = point;
+          engine.cursor(hit != null);
+          return;
+        }
+        const k = hit == null ? null : (hit.set.places.k[hit.i] ?? null);
+        if (isTouch) {
+          hover(null);
+        }
+        if (isAdding || isShift) {
+          if (k != null) {
+            view.picked = view.picked.includes(k)
+              ? view.picked.filter((other) => other !== k)
+              : [...view.picked, k];
+          }
+          return;
+        }
+        view.picked =
+          k == null || (view.picked.length === 1 && view.picked[0] === k)
+            ? []
+            : [k];
+        if (k != null && !wide.current && detent === "peek") {
+          detent = "peek";
+        }
+      },
+    },
+  );
+  const stage = new Stage(engine);
+  let sheet = $state(0);
+
+  function measure() {
+    const gl = engine.gl;
+    const frame = head.frame;
+    if (gl == null || frame == null) {
+      return;
+    }
+    const fit = engine.fitZoom(frame);
+    const world = 512 * 2 ** fit;
+    const mercator = (lat: number) =>
+      Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / (2 * Math.PI);
+    const area =
+      ((frame.east - frame.west) / 360) *
+      world *
+      (mercator(frame.north) - mercator(frame.south)) *
+      world *
+      0.5;
+    const next = starts(tiers, fit, area);
+    if (
+      next.length !== begins.length ||
+      next.some((value, index) => Math.abs(value - (begins[index] ?? 0)) > 0.2)
+    ) {
+      begins = next;
+    }
+  }
+
+  function hover(hit: Hit | null) {
+    if (hit === hovered) {
+      return;
+    }
+    hovered = hit;
+    stage.hover(hit);
+    if (hit != null) {
+      name(hit);
+    }
+  }
+
+  function name(hit: Hit) {
+    const held = mosaic;
+    const from = base;
+    if (
+      held == null ||
+      from == null ||
+      hit.set !== held.set ||
+      held.set.places.name[hit.i] !== ""
+    ) {
+      return;
+    }
+    const part = from.parts[held.part[hit.i] ?? -1];
+    const layer = held.layers[held.layer[hit.i] ?? 0];
+    if (part == null || layer == null) {
+      return;
+    }
+    const key = `${held.key}|${part.unit}|${layer.code}`;
+    if (asked.has(key)) {
+      return;
+    }
+    asked.add(key);
+    const index = hit.tier;
+    void load(contest, {
+      unit: part.unit,
+      level: layer.code,
+      vs: view.vs,
+      group: view.group,
+    }).then((set) => {
+      for (const [j, k] of set.places.k.entries()) {
+        const found = stage.hit(index, k);
+        if (found?.set === held.set) {
+          held.set.places.name[found.i] = set.places.name[j] ?? "";
+        }
+      }
+      named += 1;
+    });
+  }
+
+  function fetch(
+    key: string,
+    run: () => Promise<Sheet>,
+    done: (set: Sheet) => void,
+  ) {
+    if (asked.has(key)) {
+      return;
+    }
+    asked.add(key);
+    pending += 1;
+    void run()
+      .then(done)
+      .catch(() => asked.delete(key))
+      .finally(() => {
+        pending -= 1;
+      });
+  }
+
+  function deepen() {
+    const from = base;
+    const gl = engine.gl;
+    if (from == null || gl == null) {
+      return;
+    }
+    const scope = JSON.stringify(ask);
+    for (const [index, entry] of tiers.entries()) {
+      const start = begins[index] ?? -Infinity;
+      const isNear = locked != null || zoom >= start - 1.2;
+      if (!isNear || entry.kind !== "level" || entry.code === from.level) {
+        continue;
+      }
+      fetch(
+        `${scope}|${entry.code}`,
+        async () => load(contest, { ...ask, level: entry.code }),
+        (set) => {
+          if (JSON.stringify(ask) === scope) {
+            extras = { ...extras, [entry.code]: set };
+          }
+        },
+      );
+    }
+    const isClose =
+      tiers.at(-1)?.kind === "parts" &&
+      zoom >= (begins.at(-1) ?? Infinity) - 0.8;
+    const isPriming =
+      isSettled &&
+      mosaic == null &&
+      isParted(from) &&
+      Object.keys(parts).length === 0;
+    if (!isClose && !isPriming) {
+      return;
+    }
+    const middle = gl.getCenter();
+    const box = gl.getBounds();
+    const near = from.parts
+      .flatMap((part) => {
+        const i = from.places.k.indexOf(part.k);
+        const x = from.places.x[i];
+        const y = from.places.y[i];
+        return x == null || y == null
+          ? []
+          : [
+              {
+                part,
+                gap: Math.hypot(x - middle.lng, y - middle.lat),
+                isIn: box.contains([x, y]),
+              },
+            ];
+      })
+      .toSorted((a, b) => Number(b.isIn) - Number(a.isIn) || a.gap - b.gap)
+      .slice(0, isClose ? 8 : 1);
+    for (const { part } of near) {
+      fetch(
+        `${scope}|part|${part.unit}`,
+        async () =>
+          load(contest, { unit: part.unit, vs: view.vs, group: view.group }),
+        (set) => {
+          if (JSON.stringify(ask) === scope) {
+            parts = { ...parts, [part.unit]: set };
+          }
+        },
+      );
+    }
+  }
+
+  afterNavigate(({ type }) => {
+    if (type === "popstate") {
+      const query = (page.shallow?.url ?? page.url).searchParams;
+      view.read(query);
+      camera = query.get("at");
+    }
+  });
+
+  async function go(next: string) {
+    const url = new URL(location.href);
+    url.pathname = `/map/${[path, next].filter((part) => part !== "").join("/")}`;
+    for (const key of ["at", "pick", "level"]) {
+      url.searchParams.delete(key);
+    }
+    hover(null);
+    await goto(url, { state: page.state, shallow: true }).catch(() => {});
+    view.picked = [];
+    view.level = null;
+    camera = null;
+  }
+
+  function focus(hit: Hit) {
+    const box = stage.shape(hit);
+    if (box != null) {
+      engine.fit(box);
+      return;
+    }
+    const x = hit.set.places.x[hit.i];
+    const y = hit.set.places.y[hit.i];
+    if (x != null && y != null) {
+      engine.fly([x, y], Math.max(zoom, (begins[hit.tier] ?? zoom) + 1.5));
+    }
+  }
+
+  function summarize(hits: Array<Hit>) {
+    const totals = new Map<
+      string,
+      { label: string; votes: number; then: number; isThen: boolean }
+    >();
+    let valid = 0;
+    let before = 0;
+    for (const hit of hits) {
+      const { set, i } = hit;
+      const votes = set.places.valid[i] ?? 0;
+      const weight = hits.length === 1 ? 1 : votes;
+      valid += votes;
+      let isBefore = false;
+      for (const [index, item] of set.legend.entries()) {
+        const share = set.places.shares[index]?.[i];
+        const was = set.places.before[index]?.[i];
+        if (share == null && was == null) {
+          continue;
+        }
+        const entry = totals.get(item.key) ?? {
+          label: labels.get(item.key) ?? item.label,
+          votes: 0,
+          then: 0,
+          isThen: false,
+        };
+        entry.votes += ((share ?? 0) / 10_000) * weight;
+        if (was != null) {
+          entry.then += (was / 10_000) * weight;
+          entry.isThen = true;
+          isBefore = true;
+        }
+        totals.set(item.key, entry);
+      }
+      if (isBefore) {
+        before += weight;
+      }
+    }
+    const total = hits.length === 1 ? 1 : valid;
+    const rows = [...totals]
+      .map(([key, entry]) => ({
+        key,
+        label: entry.label,
+        tone: lens.tone(key),
+        share: total === 0 ? 0 : entry.votes / total,
+        change:
+          isCompared && entry.isThen && before > 0
+            ? entry.votes / total - entry.then / before
+            : null,
+        isLeader: false,
+      }))
+      .filter((row) => row.share > 0 || row.change != null)
+      .toSorted((a, b) => b.share - a.share);
+    if (rows[0] != null) {
+      rows[0].isLeader = true;
+    }
+    return { valid, rows };
+  }
+
+  function title(hit: Hit) {
+    const found = hit.set.places.name[hit.i] ?? "";
+    return found === "" ? "…" : found;
+  }
+
+  function noun(hit: Hit) {
+    const held = mosaic;
+    if (held != null && hit.set === held.set) {
+      return held.layers[held.layer[hit.i] ?? 0]?.noun ?? "";
+    }
+    return (
+      hit.set.levels.find((level) => level.code === hit.set.level)?.noun ??
+      tiers[hit.tier]?.noun ??
+      ""
+    );
+  }
+
+  function where(hit: Hit) {
+    const held = mosaic;
+    const label = noun(hit);
+    const upper = label.charAt(0).toUpperCase() + label.slice(1);
+    const part =
+      held != null && hit.set === held.set
+        ? base?.parts[held.part[hit.i] ?? -1]
+        : hit.set.scope.k !== base?.scope.k
+          ? { name: hit.set.scope.name }
+          : null;
+    return part == null || part.name === ""
+      ? upper
+      : m.atlas_place_in({ noun: upper, place: part.name });
+  }
+
+  const picked = $derived.by(() => {
+    void drawn;
+    return view.picked.flatMap((k) => {
+      const hit = stage.find(k);
+      return hit == null ? [] : [hit];
+    });
+  });
+  const summary = $derived.by(() => {
+    void named;
+    if (picked.length === 0) {
+      const from = base;
+      const hits =
+        from == null
+          ? []
+          : from.places.k.map((_, i) => ({
+              set: from,
+              i,
+              tier: 0,
+              source: "",
+            }));
+      const { valid, rows } = summarize(hits);
+      return {
+        name: head.scope.name,
+        kind: [head.title, head.date == null ? "" : date(head.date)]
+          .filter((part) => part !== "")
+          .join(", "),
+        valid,
+        rows,
+        isCombined: false,
+      };
+    }
+    const { valid, rows } = summarize(picked);
+    const one = picked[0];
+    return {
+      name:
+        picked.length === 1 && one != null
+          ? title(one)
+          : m.atlas_picked({ count: picked.length }),
+      kind: picked.length === 1 && one != null ? where(one) : head.scope.name,
+      valid,
+      rows,
+      isCombined: picked.length > 1,
+    };
+  });
+  const glance = $derived.by(() => {
+    void named;
+    const hit = hovered;
+    if (hit == null || pointer == null || !wide.current) {
+      return null;
+    }
+    const { valid, rows } = summarize([hit]);
+    return { name: title(hit), kind: where(hit), valid, rows };
+  });
+  const actions = $derived.by(() => {
+    const one = picked.length === 1 ? picked[0] : null;
+    if (one == null) {
+      return [];
+    }
+    const k = one.set.places.k[one.i];
+    const part = base?.parts.find((entry) => entry.k === k) ?? null;
+    return [
+      { label: m.atlas_zoom_to(), onclick: () => focus(one) },
+      ...(part == null
+        ? []
+        : [
+            {
+              label: m.atlas_alone({ place: part.name }),
+              onclick: () => void go(part.unit),
+            },
+          ]),
+    ];
+  });
+  const shown = $derived.by(() => {
+    void drawn;
+    const code = now?.code;
+    const found: Array<Sheet> = [];
+    if (now?.kind === "mosaic" && mosaic != null) {
+      found.push(mosaic.set);
+    } else if (now?.kind === "parts") {
+      found.push(...Object.values(parts));
+    } else if (base != null && code === base.level) {
+      found.push(base);
+    } else if (code != null && extras[code] != null) {
+      found.push(extras[code]);
+    }
+    return found.length === 0 && base != null ? [base] : found;
+  });
+  const found = $derived.by(() => {
+    const query = term.trim().toLocaleLowerCase();
+    if (query.length < 2) {
+      return [];
+    }
+    void drawn;
+    const rows: Array<{
+      hit: Hit;
+      name: string;
+      where: string;
+      votes: number;
+    }> = [];
+    const seen = new Set<number>();
+    for (const [index] of tiers.entries()) {
+      for (const set of index === 0 && base != null
+        ? [base]
+        : [extras[tiers[index]?.code ?? ""], ...Object.values(parts)]) {
+        if (set == null) {
+          continue;
+        }
+        for (const [i, label] of set.places.name.entries()) {
+          const k = set.places.k[i] ?? 0;
+          if (seen.has(k) || !label.toLocaleLowerCase().includes(query)) {
+            continue;
+          }
+          const hit = stage.find(k);
+          if (hit != null) {
+            seen.add(k);
+            rows.push({
+              hit,
+              name: label,
+              where: where(hit),
+              votes: set.places.valid[i] ?? 0,
+            });
+          }
+        }
+      }
+    }
+    return rows
+      .toSorted(
+        (a, b) =>
+          Number(b.name.toLocaleLowerCase().startsWith(query)) -
+            Number(a.name.toLocaleLowerCase().startsWith(query)) ||
+          b.votes - a.votes,
+      )
+      .slice(0, 8);
+  });
+  const isEstimated = $derived(
+    isCompared &&
+      (base?.estimated === true ||
+        Object.values(extras).some((set) => set.estimated)),
+  );
+  const isScheduled = $derived(
+    base != null &&
+      base.places.k.length === 0 &&
+      base.date != null &&
+      base.date >= new Date().toISOString().slice(0, 10),
+  );
+
+  $effect(() => {
+    const wanted = ask;
+    let isStale = false;
+    untrack(() => (pending += 1));
+    isFailed = false;
+    void load(contest, wanted)
+      .then((set) => {
+        if (!isStale) {
+          base = set;
+          extras = {};
+          parts = {};
+        }
+      })
+      .catch(() => {
+        if (!isStale) {
+          isFailed = true;
+        }
+      })
+      .finally(() => {
+        pending -= 1;
+      });
+    return () => {
+      isStale = true;
+    };
+  });
+
+  $effect(() => {
+    const from = base;
+    if (from == null) {
+      return;
+    }
+    const wanted = from.parts.length > 0 && unit === "" && whole == null;
+    let isStale = false;
+    isSettled = !wanted;
+    mosaic = null;
+    if (!wanted) {
+      return;
+    }
+    const start = async () =>
+      loadMosaic(contest, { vs: view.vs, group: view.group }, from)
+        .then((found) => {
+          if (!isStale) {
+            mosaic = found;
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!isStale) {
+            isSettled = true;
+            deepen();
+          }
+        });
+    const timer = setTimeout(() => void start(), 50);
+    return () => {
+      isStale = true;
+      clearTimeout(timer);
+    };
+  });
+
+  $effect(() => {
+    const frame = base?.frame;
+    const k = base?.scope.k;
+    if (engine.gl == null || frame == null) {
+      return;
+    }
+    untrack(() => {
+      if (built !== "" && !built.startsWith(`${k}|`)) {
+        engine.frame(frame, true);
+      }
+    });
+  });
+
+  $effect(() => {
+    void tiers;
+    void room;
+    if (engine.gl != null) {
+      untrack(measure);
+    }
+  });
+
+  $effect(() => {
+    const from = base;
+    const list = tiers;
+    const starts = begins;
+    const gl = engine.gl;
+    if (from == null || gl == null || starts.length !== list.length) {
+      return;
+    }
+    untrack(() => {
+      const scope = `${from.scope.k}|${JSON.stringify(ask)}|${locked?.code ?? ""}`;
+      const codes = list.map((entry) => entry.code);
+      const signature = `${scope}|${codes.join(",")}|${starts.map((value) => value.toFixed(2)).join(",")}`;
+      if (signature === built) {
+        return;
+      }
+      const [previous = ""] = built.split("|codes:");
+      const old = built.split("|codes:")[1] ?? "";
+      const isGrown =
+        previous === scope &&
+        old !== "" &&
+        `${codes.join(",")}|${starts.map((value) => value.toFixed(2)).join(",")}`.startsWith(
+          old.split("|")[0] ?? "",
+        ) &&
+        codes.length === (old.split("|")[0] ?? "").split(",").length + 1;
+      const last = list.at(-1);
+      if (isGrown && last != null) {
+        stage.extend(last, starts.at(-1) ?? Infinity);
+      } else {
+        stage.reset(
+          list,
+          starts,
+          locked == null ? null : 0,
+          {
+            outline: from.outline,
+            k: from.scope.k,
+            isNested: from.trail.length > 1,
+          },
+          from.parted,
+        );
+      }
+      built = `${scope}|codes:${codes.join(",")}|${starts.map((value) => value.toFixed(2)).join(",")}`;
+      tier = locked != null ? 0 : active(starts, gl.getZoom(), null);
+      drawn += 1;
+      deepen();
+    });
+  });
+
+  $effect(() => {
+    void drawn;
+    const from = base;
+    const list = tiers;
+    const loaded = extras;
+    const pieces = parts;
+    const held = mosaic;
+    if (from == null || engine.gl == null) {
+      return;
+    }
+    untrack(() => {
+      const tiled = new Set(
+        list.flatMap((entry) => (entry.kind === "level" ? [entry.tiles] : [])),
+      );
+      for (const [index, entry] of list.entries()) {
+        if (entry.kind === "mosaic" && held != null) {
+          stage.drape(held, index);
+        } else if (entry.kind === "parts") {
+          for (const set of Object.values(pieces)) {
+            const tiles = set.levels.find(
+              (level) => level.code === set.level,
+            )?.tiles;
+            if (tiles != null && !tiled.has(tiles)) {
+              stage.show(set, index);
+            }
+          }
+        } else if (entry.code === from.level) {
+          stage.show(from, index);
+        } else {
+          const set = loaded[entry.code];
+          if (set != null) {
+            stage.show(set, index);
+          }
+        }
+      }
+      stage.letter(tier);
+    });
+  });
+
+  $effect(() => {
+    const mark = JSON.stringify([
+      lens.mode,
+      lens.whom,
+      lens.first,
+      lens.second,
+      lens.range,
+      lens.only,
+      lens.isFlippedOnly,
+      lens.isBanded,
+      view.picked,
+      [...tones],
+      stage.version,
+      drawn,
+    ]);
+    if (engine.gl == null) {
+      return;
+    }
+    untrack(() => stage.paint(lens, new Set(view.picked), mark));
+  });
+
+  $effect(() => {
+    void tier;
+    if (engine.gl != null) {
+      untrack(() => {
+        stage.letter(tier);
+        deepen();
+      });
+    }
+  });
+
+  $effect(() => {
+    const isDetailed = view.isBasemap;
+    if (engine.gl != null) {
+      untrack(() => basemap(engine, scheme, isDetailed, []));
+    }
+  });
+
+  $effect(() => {
+    void view.params();
+    const at = camera;
+    untrack(() => view.sync({ at }));
+  });
+
+  $effect(() => {
+    void sheet;
+    untrack(() => engine.hold());
+  });
+</script>
+
+<svelte:window
+  onkeydown={(event: KeyboardEvent) => {
+    isShift = event.shiftKey || event.metaKey || event.ctrlKey;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest("input, textarea, [contenteditable]") != null) {
+      if (event.key === "Escape") {
+        term = "";
+        search?.blur();
+      }
+      return;
+    }
+    if (event.key === "/") {
+      event.preventDefault();
+      isSearching = true;
+      requestAnimationFrame(() => search?.focus());
+    } else if (event.key === "Escape") {
+      if (view.picked.length > 0) {
+        view.picked = [];
+      } else if (head.trail.length > 1) {
+        void go(head.trail.at(-2)?.unit ?? "");
+      }
+    } else if (event.key === "+" || event.key === "=") {
+      engine.zoomIn();
+    } else if (event.key === "-") {
+      engine.zoomOut();
+    }
+  }}
+  onkeyup={(event: KeyboardEvent) => {
+    isShift = event.shiftKey || event.metaKey || event.ctrlKey;
+  }}
+/>
+
+<svelte:head>
+  <title
+    >{head.title.includes(head.scope.name)
+      ? m.atlas_page_title_plain({ title: head.title })
+      : m.atlas_page_title({
+          title: head.title,
+          place: head.scope.name,
+        })}</title
+  >
+</svelte:head>
+
+{#snippet finder()}
+  <Command.Root
+    shouldFilter={false}
+    class="relative overflow-visible bg-transparent"
+  >
+    <Command.Input
+      bind:ref={search}
+      bind:value={term}
+      placeholder={m.atlas_search()}
+      aria-label={m.atlas_search()}
+      onblur={() => {
+        if (term === "") {
+          isSearching = false;
+        }
+      }}
+    />
+    {#if term.trim().length >= 2}
+      <Command.List
+        class="absolute inset-x-0 inset-bs-full z-40 mbs-1 rounded-sm bg-popover p-1 shadow-menu ring-1 ring-border"
+      >
+        <Command.Empty>{m.atlas_search_empty()}</Command.Empty>
+        {#each found as row (row.hit.set.places.k[row.hit.i])}
+          <Command.Item
+            value={String(row.hit.set.places.k[row.hit.i])}
+            onSelect={() => {
+              term = "";
+              isSearching = false;
+              search?.blur();
+              view.picked = [row.hit.set.places.k[row.hit.i] ?? 0];
+              focus(row.hit);
+            }}
+          >
+            <span class="flex-1 truncate">{row.name}</span>
+            <span class="shrink-0 text-xs text-muted-foreground"
+              >{row.where}</span
+            >
+          </Command.Item>
+        {/each}
+      </Command.List>
+    {/if}
+  </Command.Root>
+{/snippet}
+
+{#snippet credits()}
+  {#if engine.credits.length > 0 || view.isBasemap}
+    <p class="text-[0.6875rem] text-pretty text-muted-foreground">
+      {[
+        ...engine.credits,
+        ...(view.isBasemap ? [m.map_basemap_credit()] : []),
+      ].join("; ")}
+    </p>
+  {/if}
+{/snippet}
+
+{#snippet details(layout: "full" | "peek" | "head" | "body")}
+  <Result
+    {summary}
+    {year}
+    {actions}
+    {layout}
+    onclear={view.picked.length > 0 ? () => (view.picked = []) : null}
+  />
+{/snippet}
+
+{#snippet controls()}
+  <Key
+    {view}
+    {lens}
+    sets={shown}
+    {legend}
+    targets={base?.targets ?? []}
+    {year}
+    {isProportional}
+    isAllied={base?.isAllied ?? false}
+    {isEstimated}
+    noun={now?.noun ?? ""}
+  />
+{/snippet}
+
+<div
+  class="fixed inset-0 z-40 grid grid-rows-[auto_minmax(0,1fr)] bg-card text-foreground"
+>
+  <header
+    class="relative z-30 flex items-center gap-x-3 border-be bg-card px-3 block-14 md:gap-x-4 md:px-4"
+  >
+    <a
+      href={resolve("/")}
+      class="shrink-0"
+      aria-label={m.wordmark()}
+      title={m.wordmark()}><Monogram size={26} /></a
+    >
+    <div class="grid flex-1 min-inline-0">
+      <h1 class="truncate text-[0.9375rem]/5 font-[720]">{head.title}</h1>
+      <nav aria-label={m.atlas_trail()}>
+        <ol
+          class="flex items-center gap-1 text-[0.8125rem]/5 text-muted-foreground"
+        >
+          {#each head.trail as crumb, index (crumb.unit)}
+            <li class="flex items-center gap-1 min-inline-0">
+              {#if index > 0}
+                <span aria-hidden="true">/</span>
+              {/if}
+              {#if index === head.trail.length - 1}
+                <span
+                  class="truncate font-semibold text-foreground"
+                  aria-current="page">{crumb.name}</span
+                >
+              {:else}
+                <a
+                  href={resolve("/map/[...path]", {
+                    path: [path, crumb.unit]
+                      .filter((part) => part !== "")
+                      .join("/"),
+                  })}
+                  class="truncate underline decoration-border underline-offset-3 hover:text-foreground hover:decoration-foreground"
+                  onclick={(event) => {
+                    event.preventDefault();
+                    void go(crumb.unit);
+                  }}>{crumb.name}</a
+                >
+              {/if}
+            </li>
+          {/each}
+        </ol>
+      </nav>
+    </div>
+    {#if wide.current}
+      <div class="inline-[min(18rem,28vw)]">{@render finder()}</div>
+    {:else}
+      <button
+        type="button"
+        class="grid shrink-0 place-items-center rounded-sm block-9 inline-9 hover:bg-secondary"
+        aria-label={m.atlas_search()}
+        onclick={() => {
+          isSearching = true;
+          requestAnimationFrame(() => search?.focus());
+        }}><SearchIcon class="block-4.5 inline-4.5" /></button
+      >
+    {/if}
+    <a
+      href={resolve("/[...path]", { path: head.scope.path ?? path })}
+      class="flex shrink-0 items-center rounded-sm px-2.5 text-[0.8125rem] font-semibold ring-1 ring-input block-8 hover:bg-secondary max-md:hidden"
+      >{m.atlas_results()}</a
+    >
+    <a
+      href={resolve("/[...path]", { path: head.scope.path ?? path })}
+      class="grid shrink-0 place-items-center rounded-sm block-9 inline-9 hover:bg-secondary"
+      aria-label={m.atlas_close()}
+      title={m.atlas_close()}><XIcon class="block-4.5 inline-4.5" /></a
+    >
+    {#if isSearching && !wide.current}
+      <div
+        class="absolute inset-0 z-40 flex items-center gap-2 bg-card px-3"
+        transition:fade={{ duration: calm.current ? 0 : 100 }}
+      >
+        <div class="flex-1">{@render finder()}</div>
+        <button
+          type="button"
+          class="grid shrink-0 place-items-center rounded-sm block-9 inline-9 hover:bg-secondary"
+          aria-label={m.atlas_close_search()}
+          onclick={() => {
+            term = "";
+            isSearching = false;
+          }}><XIcon class="block-4.5 inline-4.5" /></button
+        >
+      </div>
+    {/if}
+  </header>
+
+  <div
+    class={cn("grid min-block-0", {
+      "grid-cols-[minmax(0,1fr)_clamp(17rem,30vw,24rem)]": wide.current,
+    })}
+  >
+    <main class="relative overflow-hidden min-block-0">
+      <div
+        class="absolute inset-0"
+        role="application"
+        aria-roledescription="map"
+        aria-label={m.map_label({ noun: now?.noun ?? "" })}
+        aria-describedby="{uid}-hint"
+        bind:clientWidth={room.width}
+        bind:clientHeight={room.height}
+      >
+        <div class="block-full inline-full" {@attach engine.mount}></div>
+      </div>
+      <p id="{uid}-hint" class="sr-only">{m.atlas_hint()}</p>
+
+      <div
+        class="pointer-events-none absolute inset-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        {#each stage.labels as label (label.k)}
+          <span
+            class="absolute inset-s-0 inset-bs-0 text-[0.75rem] font-semibold whitespace-nowrap text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill]"
+            style:transform="translate({label.x}px, {label.y}px) translate(-50%,
+            -50%)">{label.name}</span
+          >
+        {/each}
+      </div>
+
+      {#if glance != null && pointer != null}
+        <Hover summary={glance} point={pointer} {room} />
+      {/if}
+
+      {#if pending > 0 || base == null}
+        <p
+          class="pointer-events-none absolute inset-x-0 inset-bs-3 z-10 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit"
+          role="status"
+          transition:fade={{ duration: calm.current ? 0 : 120 }}
+        >
+          <span
+            class="animate-spin rounded-full border-2 border-border border-bs-foreground block-3.5 inline-3.5 motion-reduce:animate-none"
+            aria-hidden="true"
+          ></span>
+          {m.atlas_loading()}
+        </p>
+      {:else if isFailed}
+        <p
+          class="absolute inset-x-0 inset-bs-3 z-10 mx-auto rounded-sm bg-card/95 px-3 py-2 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border inline-fit"
+          role="alert"
+        >
+          {m.atlas_failed()}
+        </p>
+      {:else if isScheduled && base?.date != null}
+        <p
+          class="pointer-events-none absolute inset-x-0 inset-bs-3 z-10 mx-auto rounded-sm bg-card/95 px-3 py-2 text-center text-[0.8125rem] font-semibold text-pretty shadow-menu ring-1 ring-border inline-fit max-inline-[min(26rem,calc(100%-1.5rem))]"
+          role="status"
+        >
+          {m.slate_scheduled({ date: date(base.date) })}
+        </p>
+      {/if}
+
+      <div
+        class={cn("absolute z-20", {
+          "inset-e-3 inset-bs-3": wide.current,
+          "inset-e-3 inset-bs-3 max-md:inset-bs-3": !wide.current,
+        })}
+      >
+        <Rail
+          chain={locked == null ? tiers : levels}
+          choices={all}
+          {begins}
+          {zoom}
+          active={tier}
+          locked={locked?.code ?? null}
+          isCompact={!wide.current || !tall.current}
+          onlock={(code) => {
+            view.level = code;
+          }}
+        />
+      </div>
+
+      <div
+        class={cn("absolute z-20 grid gap-1.5", {
+          "inset-s-3 inset-be-3": wide.current,
+          "inset-e-3": !wide.current,
+        })}
+        style:inset-block-end={wide.current ? undefined : `${sheet + 12}px`}
+      >
+        <div
+          class="grid overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
+        >
+          <button
+            type="button"
+            class="grid place-items-center block-9 inline-9 hover:bg-secondary"
+            aria-label={m.map_zoom_in()}
+            title={m.map_zoom_in()}
+            onclick={() => engine.zoomIn()}
+            ><PlusIcon class="block-4 inline-4" /></button
+          >
+          <button
+            type="button"
+            class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
+            aria-label={m.map_zoom_out()}
+            title={m.map_zoom_out()}
+            onclick={() => engine.zoomOut()}
+            ><MinusIcon class="block-4 inline-4" /></button
+          >
+          <button
+            type="button"
+            class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
+            aria-label={m.map_reset()}
+            title={m.map_reset()}
+            onclick={() => engine.reset()}
+            ><ScanIcon class="block-4 inline-4" /></button
+          >
+        </div>
+        <div
+          class="grid overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
+        >
+          <button
+            type="button"
+            class={cn("grid place-items-center block-9 inline-9", {
+              "bg-foreground text-card": isAdding,
+              "hover:bg-secondary": !isAdding,
+            })}
+            aria-label={m.atlas_select_many()}
+            title={m.atlas_select_many()}
+            aria-pressed={isAdding}
+            onclick={() => (isAdding = !isAdding)}
+            ><BoxSelectIcon class="block-4 inline-4" /></button
+          >
+          <button
+            type="button"
+            class={cn("grid place-items-center border-bs block-9 inline-9", {
+              "bg-foreground text-card": view.isBasemap,
+              "hover:bg-secondary": !view.isBasemap,
+            })}
+            aria-label={m.map_basemap()}
+            title={m.map_basemap()}
+            aria-pressed={view.isBasemap}
+            onclick={() => (view.isBasemap = !view.isBasemap)}
+            ><MapIcon class="block-4 inline-4" /></button
+          >
+        </div>
+      </div>
+
+      {#if !wide.current}
+        <Drawer
+          room={room.height}
+          bind:detent
+          bind:height={sheet}
+          label={m.atlas_key()}
+        >
+          {#snippet head()}
+            <div class="px-4 pbs-2 pbe-3">
+              {@render details(detent === "peek" ? "peek" : "head")}
+            </div>
+          {/snippet}
+          <div class="grid gap-5 px-4 pbe-6">
+            {#if detent !== "peek"}
+              {@render details("body")}
+            {/if}
+            {@render controls()}
+            {@render credits()}
+          </div>
+        </Drawer>
+      {/if}
+    </main>
+
+    {#if wide.current}
+      <aside
+        class="grid content-start gap-5 overflow-y-auto border-s bg-card p-4 min-block-0"
+        aria-label={m.atlas_key()}
+      >
+        {@render details("full")}
+        <div class="border-bs pbs-4">{@render controls()}</div>
+        {@render credits()}
+      </aside>
+    {/if}
+  </div>
+</div>
