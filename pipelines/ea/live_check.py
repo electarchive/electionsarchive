@@ -126,6 +126,9 @@ def readable(content: bytes) -> str:
 
 
 def host(feed: dict[str, object]) -> tuple[bool, str, list[tuple[str, bytes]]]:
+    poller = feed.get("poller", "fsn1")
+    if poller != "fsn1":
+        return True, f"host: polled from {poller}", []
     requests = 0
 
     def count(_: httpx.Request) -> None:
