@@ -232,6 +232,8 @@ def person(label: str) -> str:
     words = terms(label)
     if words and words[0] in ("yes", "no"):
         return words[0]
+    if words[-2:-1] == ["retained"] and words[-1] in ("yes", "no"):
+        return words[-1]
     return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
 
 
