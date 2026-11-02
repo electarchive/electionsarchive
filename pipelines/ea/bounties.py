@@ -1,5 +1,3 @@
-import re
-
 from psycopg.types.json import Jsonb
 
 from ea import coverage
@@ -48,7 +46,7 @@ def sync() -> dict[str, int]:
                 "category": row["category"],
                 "reason": row["reason"],
                 "sources": row["sources"],
-                "checked": row["checked"] if re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["checked"] or "") else "",
+                "checked": row["checked"],
             }
             for row in coverage.registry()
             if row["category"] in ("known_gap", "blocked")
