@@ -113,6 +113,8 @@ MF_568_COUNTIES = [
 ]
 MF_575 = DATA / "inbox" / "manual" / "MF-575"
 MF_575_NAMES = {"vanwert": "Van Wert"}
+MF_577 = DATA / "inbox" / "manual" / "MF-577"
+MF_577_PDFS = {"wyandot": "Wyandot", "sandusky": "Sandusky"}
 MF_LOOKUP = [
     *MF_LOOKUP,
     *MF_555_COUNTIES,
@@ -236,6 +238,18 @@ def fetch() -> None:
             media_type="application/zip",
         )
     fetch_franklin()
+    issues = sandusky_issues_file()
+    try:
+        raw.cached(SOURCE, mf_key("Sandusky", issues))
+    except LookupError:
+        raw.store(
+            SOURCE,
+            mf_key("Sandusky", issues),
+            issues.read_bytes(),
+            suffix=".txt",
+            retrieved_at=datetime.fromtimestamp(issues.stat().st_mtime, UTC),
+            media_type="text/plain",
+        )
     for county, path in mf_files():
         key = mf_key(county, path)
         try:
@@ -280,7 +294,15 @@ def mf_files() -> list[tuple[str, Path]]:
             continue
         county = MF_575_NAMES.get(folder.name, folder.name.capitalize())
         files.extend((county, path) for path in sorted(folder.glob("*.pdf")) if (county, path.name) not in seen)
+    for folder, county in MF_577_PDFS.items():
+        files.extend(
+            (county, path) for path in sorted((MF_577 / folder).glob("*.pdf")) if (county, path.name) not in seen
+        )
     return files
+
+
+def sandusky_issues_file() -> Path:
+    return next((MF_577 / "sandusky").glob("*Issues*.txt"))
 
 
 def mf_page(county: str) -> str:
@@ -709,6 +731,32 @@ def mf_samples() -> list[dict[str, str]]:
     return list(rows.values())
 
 
+def sandusky_issues() -> list[dict[str, str]]:
+    path = sandusky_issues_file()
+    key = mf_key("Sandusky", path)
+    rows = []
+    for block in re.split(r"\n\*{5,}\s*\n", raw.cached(SOURCE, key).path.read_text()):
+        lines = [line.strip() for line in block.split("\n") if line.strip()]
+        majority = next((index for index, line in enumerate(lines) if line.startswith("A majority")), None)
+        if majority is None or len(lines) < majority + 2:
+            continue
+        head = lines[:majority]
+        kind = head[0].upper()
+        entity = head[-1] if kind.startswith("LOCAL LIQUOR") else head[1]
+        rows.append(
+            {
+                "url": key,
+                "county": "Sandusky",
+                "kind": kind,
+                "entity": entity,
+                "text": lines[majority + 1],
+                "publisher": "Sandusky County Board of Elections",
+                "title": "Issues list, November 3, 2026 General Election",
+            }
+        )
+    return rows
+
+
 def butler() -> list[dict[str, str]]:
     text = subprocess.run(
         ["pdftotext", "-raw", str(raw.cached(SOURCE, BUTLER).path), "-"], capture_output=True, text=True, check=True
@@ -870,7 +918,8 @@ def parse() -> None:
         + mf_samples()
         + montgomery()
         + stark()
-        + butler(),
+        + butler()
+        + sandusky_issues(),
         infer_schema_length=None,
     )
     PARSED.mkdir(parents=True, exist_ok=True)
