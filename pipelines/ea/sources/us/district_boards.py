@@ -80,7 +80,7 @@ def emit(
                     home = top
                     if first["county"] is not None:
                         home = None
-                        for guess in (slug(first["county"]), slug(f"{first['county']} County")):
+                        for guess in (slug(f"{first['county']} County"), slug(first["county"])):
                             home = parent_for(conn, f"us/{lower}/{guess}")
                             if home is not None:
                                 break

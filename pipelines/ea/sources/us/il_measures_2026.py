@@ -200,10 +200,10 @@ def pdf_text(url: str, mode: str = "-layout") -> str:
 
 
 def listed_rows(county: str, listed: tuple[tuple[str, str, str], ...]) -> list[dict[str, str]]:
-    text = re.sub(r"\W+", " ", pdf_text(COUNTIES[county][0], "-raw")).lower()
+    text = re.sub(r"\W+", "", pdf_text(COUNTIES[county][0], "-raw")).lower()
     rows = []
     for entity, label, wording in listed:
-        assert re.sub(r"\W+", " ", wording).lower() in text, (county, label)
+        assert re.sub(r"\W+", "", wording).lower() in text, (county, label)
         rows.append({"entity": entity, "label": label, "wording": wording})
     return rows
 
