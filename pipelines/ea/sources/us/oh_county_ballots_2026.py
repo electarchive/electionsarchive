@@ -544,6 +544,51 @@ SALVAGE = {
         "Pike County for the purpose of the developmental",
     ),
 }
+EXCERPTS = {
+    "us/oh/urbana/2026-11-03-general/charter-amendment-article-vii-section-8-07-1": (
+        "Champaign",
+        "0007  2x.pdf",
+        r"Shall Article VIII of the Charter of the City",
+        r"this Section is self-executing\.",
+    ),
+    "us/oh/piqua/2026-11-03-general/charter-amendment-article-138-1": (
+        "Miami",
+        "013   1x.pdf",
+        r"Be it Resolved by the People of the City of Piqua",
+        r"\(D\) This Section is self-executing\.",
+    ),
+    "us/oh/toledo/2026-11-03-general/charter-amendment-chapter-1-06-4-33-8-171-2": (
+        "Lucas",
+        "001a  1x.pdf",
+        r"Chapter I, Section 6 to be amended",
+        r"Ordinance 302-26, be adopted\?",
+    ),
+    "us/oh/toledo/2026-11-03-general/charter-amendment-chapter-3-14-3-17-6-83-6-92-3": (
+        "Lucas",
+        "001a  1x.pdf",
+        r"Chapter III, Section 14 to be amended",
+        r"Ordinance 304-26, be adopted\?",
+    ),
+    "us/oh/murray-city/2026-11-03-general/police-protection-4": (
+        "Hocking",
+        "19    2x.pdf",
+        r"A renewal of a tax for the benefit of the Village of Murray City for the purpose of policing",
+        r"calendar year 2028\.",
+    ),
+    "us/oh/murray-city/2026-11-03-general/streets-5": (
+        "Hocking",
+        "19    2x.pdf",
+        r"A renewal of a tax for the benefit of Village of Murray City for the purpose of street",
+        r"calendar year 2028\.",
+    ),
+}
+for _number, _slug in (("4", "o-26-04-2"), ("5", "o-26-05-3"), ("6", "o-26-06-4"), ("7", "0-26-07-1")):
+    EXCERPTS[f"us/oh/wilmington/2026-11-03-general/zoning-ordinance-{_slug}"] = (
+        "Clinton",
+        "01    1x.pdf",
+        rf"Ordinance O-26-0{_number}: Changing",
+        r"A NO vote rejects the ordinance\.",
+    )
 NEXT_HEAD = re.compile(r"^(?:PROPOSED\b|Proposed (?:Tax|Income|Municipal|Charter)\b)")
 CHOICE = re.compile(r"^(?:(?:FOR|AGAINST)\b[A-Z ]*|YES|NO)$")
 SPILL = re.compile(r"This proposed amendment would|Require voters to present|PHOTO IDENTIFICATION|SHALL THE AMENDMENT")
@@ -1155,6 +1200,15 @@ def salvage(url: str, anchor: str) -> str | None:
     return None if body is None or SPILLED.search(body) else body
 
 
+def excerpt(county: str, name: str, start: str, end: str) -> tuple[str, str] | None:
+    path = next((path for owner, path in mf_files() if owner == county and path.name == name), None)
+    if path is None:
+        return None
+    text = subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    found = re.search(rf"{start}.*?{end}", re.sub(r"\s+", " ", text))
+    return None if found is None else (mf_key(county, path), found.group(0))
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "issues.parquet")
     frame = frame.filter(
@@ -1213,6 +1267,14 @@ def emit() -> Path:
             for contest, url, body in conn.execute(
                 """select b.contest_id, b.url, b.body from ballot_question_text b
                    join changeset c on c.id = b.changeset_id where c.pipeline = %s and b.kind = 'text'""",
+                [SOURCE],
+            )
+        }
+        written = {
+            (contest, body)
+            for contest, body in conn.execute(
+                "select b.contest_id, b.body from ballot_question_text b join changeset c on c.id = b.changeset_id"
+                " where c.pipeline = %s and b.kind = 'text'",
                 [SOURCE],
             )
         }
@@ -1304,8 +1366,14 @@ def emit() -> Path:
                 and body is not None
                 and (found[0], url) in existing
                 and SPILLED.search(existing[(found[0], url)])
+                and (found[0], body) not in written
             ):
                 load(found[0], {"url": url, "text": body})
+        for path, (county, name, start, end) in EXCERPTS.items():
+            found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
+            picked = excerpt(county, name, start, end)
+            if found is not None and picked is not None and found[0] not in covered:
+                load(found[0], {"url": picked[0], "text": picked[1]})
         for row in pending:
             print("no match:", row.get("county"), row["entity"], row["kind"])
         print(f"{kept[0]} of {frame.height} issues")
