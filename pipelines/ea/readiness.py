@@ -66,7 +66,7 @@ COG = {
 }
 JUDGES = """oe.value ~ '(justice|judge|court|chancellor|magistrate)' and oe.value !~ '(clerk|county-judge)'"""
 TERRITORIES = {"GU", "VI", "AS", "MP"}
-APPELLATE = "(op.kind in ('federal_unit', 'region') or oe.value ~ '(supreme|appeal)')"
+APPELLATE = "(oe.value ~ '(supreme|appeal)' or (op.kind in ('federal_unit', 'region') and oe.value !~ '^((sub)?circuit|district|associate)-'))"
 ZONES = {
     "US": "Pacific/Honolulu",
     "US-HI": "Pacific/Honolulu",
@@ -129,7 +129,8 @@ OPTIONS_SQL = f"""
 select rc.id, rc.st,
     case when {JUDGES} then case when {APPELLATE} then 'judicial' else 'local_judicial' end else rc.level end,
     coalesce(c.magnitude, 1),
-    count(o.k) filter (where o.kind in ('candidate', 'ticket', 'list')),
+    count(o.k) filter (where o.kind in ('candidate', 'ticket', 'list')
+        or o.kind = 'answer' and exists (select from candidacy y where y.option_id = o.id)),
     count(o.k) filter (where o.kind = 'answer'),
     exists (select from label l where l.entity_id = rc.id and l.kind = 'ballot' and l.value = 'no_candidate_qualified'),
     op.id::text
@@ -217,7 +218,8 @@ k as (
         count(o.id) filter (where o.kind in ('candidate', 'ticket') and o.labeled) as labeled,
         count(o.id) filter (where o.kind = 'list') as lists,
         count(o.id) filter (where o.kind = 'list' and not o.members) as empty,
-        count(o.id) filter (where o.kind = 'answer') as answers
+        count(o.id) filter (where o.kind = 'answer') as answers,
+        count(o.id) filter (where o.kind = 'answer' and exists (select from candidacy y where y.option_id = o.id)) as judged
     from x left join o on o.contest_id = x.id
     group by x.id
 ),
@@ -250,6 +252,7 @@ select x.id, x.framed and (x.previous_round_id is not null or not x.later) and c
     when x.kind = 'ballot_question' then k.answers >= 2 and exists (select from ballot_question_text t where t.contest_id = x.id)
     when x.later and x.previous_round_id in (select id from upc) then true
     when x.unqualified then k.people = 0
+    when k.judged > 0 then k.answers >= 2
     when k.lists > 0 then k.empty = 0 and k.unlabeled = 0
     else (k.people > x.seats or k.people >= x.seats and (x.tacit or k.official >= x.seats)
             or k.people > 0 and k.official = k.people)
