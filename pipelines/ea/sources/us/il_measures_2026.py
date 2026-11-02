@@ -199,6 +199,12 @@ def pdf_text(url: str, mode: str = "-layout") -> str:
     ).stdout
 
 
+KEY_CODES = {
+    "17043:library:bartlett-public-library-district": "17031:district:bartlett-public-library-district",
+    "17089:fire-protection:east-dundee-countryside-fire-protection-district": "17031:fire-protection:east-dundee-countryside-fire-protection-district",
+}
+
+
 def listed_rows(county: str, listed: tuple[tuple[str, str, str], ...]) -> list[dict[str, str]]:
     text = re.sub(r"\W+", "", pdf_text(COUNTIES[county][0], "-raw")).lower()
     rows = []
@@ -356,6 +362,7 @@ def emit() -> Path:
                 continue
             kept += 1
             polity, area, place, path, code = found[option]
+            code = KEY_CODES.get(code, code)
             election = cs.key("us.election", f"{DAY}:IL:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
