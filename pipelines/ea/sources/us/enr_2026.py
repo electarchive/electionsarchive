@@ -39,14 +39,15 @@ EV = {
     "AZ": ("app.enhancedvoting.com", "Arizona"),
 }
 CLARITY = {
+    "CO": "https://results.enr.clarityelections.com/CO/",
     "IA": "https://electionresults.iowa.gov/IA/",
     "SC": "https://www.enr-scvotes.org/SC/",
     "WV": "https://results.enr.clarityelections.com/WV/",
 }
 EV_OFFICES = re.compile(
     r"^(?:(?P<party0>REP|DEM) )?(?:(?P<senate>(?:U\.? ?S\.? |United States )Senat(?:e|or)|Senator in Congress)"
-    r"|(?P<governor>Governor(?: and Lieutenant Governor)?)"
-    r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*"
+    r"|(?P<governor>Governor(?:(?: and |\s*/\s*)Lieutenant Governor)?)"
+    r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress|Representative to the \d+(?:st|nd|rd|th) United States Congress)\b[^\d]*"
     r"|Congressional District (?=\d+ - U\.? ?S\.? Representative$))"
     r"(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?(?: - U\.? ?S\.? Representative)?)"
     r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$",
@@ -255,7 +256,7 @@ def fetch() -> None:
             content,
             suffix=suffix,
             retrieved_at=datetime.now(UTC),
-            media_type="application/json" if suffix == ".json" else "text/tab-separated-values",
+            media_type={".json": "application/json", ".html": "text/html"}.get(suffix, "text/tab-separated-values"),
         )
         pages.setdefault(state, {})[url] = key
 
@@ -360,6 +361,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_ca
 
         enr_ca.collect(client, get, lambda url, content: store("CA", url, content, ".json"))
+    if not only or "NV" in only:
+        from ea.sources.us import enr_nv
+
+        enr_nv.collect(client, get, lambda url, content: store("NV", url, content, ".html"))
     missing: list[str] = []
     for fips, (tenant, *_) in COUNTIES.items():
         state = STATES[fips[:2]]
@@ -531,6 +536,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_tx
 
         yield from enr_tx.rows(url, path, urls)
+        return
+    if state == "NV":
+        from ea.sources.us import enr_nv
+
+        yield from enr_nv.rows(url, path, urls)
         return
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
