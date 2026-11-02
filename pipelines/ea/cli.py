@@ -30,6 +30,7 @@ from ea import (
     search,
     statewide,
     tiles,
+    touched,
 )
 from ea.apply import apply, publish, revert, rollup
 from ea.store import DATA, connect
@@ -51,6 +52,9 @@ def main() -> None:
     for command in (publishing, reverting):
         command.add_argument("--reviewer", type=lambda value: str(UUID(value)), help="user id of the person deciding")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
+    commands.add_parser(
+        "touched", help="backfill changeset_entity, the records each published changeset touched, from the core tables"
+    ).add_argument("table", nargs="?", help="one core table, or entity for creations; all of them by default")
     contributing = commands.add_parser(
         "contrib",
         help="compile a contribution payload into a changeset folder, serve the proposal_job queue, "
@@ -209,6 +213,9 @@ def main() -> None:
             )
         case "fixtures":
             print(fixtures.export())
+        case "touched":
+            with connect() as conn:
+                touched.backfill(conn, args.table)
         case "contrib" if args.action == "serve":
             contrib.serve()
         case "contrib" if args.action == "prescreen":

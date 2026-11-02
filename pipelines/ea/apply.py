@@ -10,7 +10,7 @@ import polars as pl
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ea import checks, coverage_tables
+from ea import checks, coverage_tables, touched
 from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
@@ -1712,6 +1712,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                             json.dumps(finding.details, default=str),
                         )
                     )
+        touched.recorded(conn, changeset_id)
         conn.execute(
             f"update changeset set status = 'published', published_at = now(), {REVIEWED} where id = %s",
             [reviewer, reviewer, changeset_id],
