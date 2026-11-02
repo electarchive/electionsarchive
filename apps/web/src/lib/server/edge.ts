@@ -8,6 +8,8 @@ import { redis } from "#lib/server/redis.js";
 
 const LOCALE = "x-locale";
 
+const DATA = "data";
+
 const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
 const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/stamp$))(?:\/|$)/u;
@@ -85,6 +87,9 @@ export async function mark(event: RequestEvent, response: Response) {
       `"${createHash("sha1").update(data).digest("base64url")}"`,
     );
   }
+  if (event.isDataRequest) {
+    response.headers.set("cache-tag", DATA);
+  }
   response.headers.set(
     "cloudflare-cdn-cache-control",
     isLive
@@ -116,7 +121,7 @@ export async function purge() {
           authorization: `Bearer ${CLOUDFLARE_PURGE_TOKEN}`,
           "content-type": "application/json",
         },
-        body: JSON.stringify({ hosts: [host] }),
+        body: JSON.stringify({ tags: [DATA] }),
       },
     );
     if (!response.ok) {

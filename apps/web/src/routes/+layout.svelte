@@ -2,9 +2,9 @@
   // eslint-disable-next-line no-restricted-imports
   import "../app.css";
   import type { Component, Snippet } from "svelte";
-  import { onNavigate } from "$app/navigation";
+  import { beforeNavigate, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { navigating, page } from "$app/state";
+  import { navigating, page, updated } from "$app/state";
   import { ProgressBar } from "@prgm/sveltekit-progress-bar";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -135,6 +135,12 @@
     try {
       localStorage.setItem("palette", value);
     } catch {}
+  });
+
+  beforeNavigate(({ willUnload, to }) => {
+    if (updated.current && !willUnload && to?.url != null) {
+      location.href = to.url.href;
+    }
   });
 
   onNavigate(async (navigation) => {
