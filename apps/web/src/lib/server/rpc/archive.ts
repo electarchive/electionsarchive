@@ -8987,6 +8987,7 @@ export const contests = {
                 join contest_option o on o.k = t.top
                 left join entity_merge pm on pm.entity_id = o.party_id
               ) w on true
+              order by p.k, p.id
             `);
             if (found.rows.length < 2) {
               return null;
@@ -9054,26 +9055,42 @@ export const contests = {
           keyed,
         )
           .entries()
-          .map(([key, rows]) => ({ key, rows }))
-          .toArray()
-          .toSorted(
-            (a, b) =>
-              Number(b.key === (own == null ? "" : keyed(own))) -
-                Number(a.key === (own == null ? "" : keyed(own))) ||
-              b.rows.length - a.rows.length,
-          )
-          .map(({ key, rows }, at) => {
+          .map(([key, rows]) => {
             const party = rows[0]?.party ?? null;
             const person = key.startsWith("person:") ? key.slice(7) : null;
-            const base = rows[0]?.color ?? null;
+            let seats = 0;
+            for (const row of rows) {
+              seats += "seats" in row ? row.seats : 0;
+            }
             return {
               key,
+              rows,
+              party,
+              person,
+              seats,
               label:
                 (key === "independent" ? m.seats_independents() : null) ??
                 (person == null ? null : labels.full.get(person)) ??
                 labels.full.get(party ?? "") ??
                 rows[0]?.label ??
                 "",
+            };
+          })
+          .toArray()
+          .toSorted(
+            (a, b) =>
+              Number(b.key === (own == null ? "" : keyed(own))) -
+                Number(a.key === (own == null ? "" : keyed(own))) ||
+              b.rows.length - a.rows.length ||
+              b.seats - a.seats ||
+              a.label.localeCompare(b.label) ||
+              a.key.localeCompare(b.key),
+          )
+          .map(({ key, rows, party, person, label }, at) => {
+            const base = rows[0]?.color ?? null;
+            return {
+              key,
+              label,
               short:
                 person == null ? (labels.short.get(party ?? "") ?? null) : null,
               color:
