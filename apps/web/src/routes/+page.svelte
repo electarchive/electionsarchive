@@ -428,7 +428,9 @@
       <h2 id="places-title" class="heading">{m.home_places()}</h2>
       <ul class="columns-2 gap-x-6 text-sm sm:columns-3 lg:columns-5">
         {#each places as polity (polity.id)}
-          <li class="flex flex-wrap break-inside-avoid items-baseline gap-x-2 py-0.5">
+          <li
+            class="flex break-inside-avoid flex-wrap items-baseline gap-x-2 py-0.5"
+          >
             <a
               class="truncate font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground"
               href={resolve("/[...path]", { path: polity.path })}

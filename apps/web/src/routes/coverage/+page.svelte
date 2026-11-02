@@ -8,7 +8,12 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import type { PageData } from "./$types";
   import type { CountryTier, Tier } from "#lib/coverage.js";
-  import { COUNTRY_TIERS, headline, STRICT, TIER_LABELS } from "#lib/coverage.js";
+  import {
+    COUNTRY_TIERS,
+    headline,
+    STRICT,
+    TIER_LABELS,
+  } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Share from "./share.svelte";
 

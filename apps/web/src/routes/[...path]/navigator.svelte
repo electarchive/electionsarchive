@@ -318,7 +318,7 @@
                   {/if}
                   <span
                     class={cn(
-                      "col-start-2 row-start-1 line-clamp-2 self-end mbs-1.5 text-[0.9375rem]/tight text-pretty @lg:my-1.5 @lg:self-center",
+                      "col-start-2 row-start-1 mbs-1.5 line-clamp-2 self-end text-[0.9375rem]/tight text-pretty @lg:my-1.5 @lg:self-center",
                       {
                         "font-semibold": !row.isNested || isCurrent,
                         "ps-3": row.isNested,

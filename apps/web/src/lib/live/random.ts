@@ -10,7 +10,7 @@ export function hash(text: string) {
 export function stream(seed: number) {
   let state = seed >>> 0;
   const next = () => {
-    state = (state + 0x6D_2B_79_F5) >>> 0;
+    state = (state + 0x6d_2b_79_f5) >>> 0;
     let value = state;
     value = Math.imul(value ^ (value >>> 15), value | 1);
     value ^= value + Math.imul(value ^ (value >>> 7), value | 61);

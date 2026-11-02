@@ -167,9 +167,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sandalye dolu, parti kaydı yok",
         "countPlural=*": "{countText} sandalye dolu, parti kaydı yok"
@@ -183,9 +181,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sandalye dolduruldu",
         "countPlural=*": "{countText} sandalye dolduruldu"
@@ -258,9 +254,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} seçim",
         "countPlural=*": "{countText} seçim"
@@ -294,13 +288,8 @@
   "col_final_ballot": "Son oylama",
   "delegates_primary": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Ön seçimde belirlenen {count} delege",
         "countPlural=*": "Ön seçimde belirlenen {count} delege"
@@ -309,13 +298,8 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Caucus toplantılarında belirlenen {count} delege",
         "countPlural=*": "Caucus toplantılarında belirlenen {count} delege"
@@ -324,13 +308,8 @@
   ],
   "delegates_convention": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Eyalet kongresinde belirlenen {count} delege",
         "countPlural=*": "Eyalet kongresinde belirlenen {count} delege"
@@ -339,13 +318,8 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} delege, bağlı değil",
         "countPlural=*": "{count} delegenin tümü bağlı değil"
@@ -429,9 +403,7 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Bu parlamentoda, {year} genel seçiminden önce 1 ara seçim yapıldı.",
         "countPlural=*": "Bu parlamentoda, {year} genel seçiminden önce {count} ara seçim yapıldı."
@@ -440,13 +412,8 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Bu parlamentoda şu ana kadar 1 ara seçim yapıldı.",
         "countPlural=*": "Bu parlamentoda şu ana kadar {count} ara seçim yapıldı."
@@ -455,13 +422,8 @@
   ],
   "byes_changed": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 sandalye el değiştirdi.",
         "countPlural=*": "{count} sandalye el değiştirdi."
@@ -647,9 +609,7 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "Yurt dışındaki {nouns} arasında {name} için {rank}. en iyi sonuç ({count} içinden)"
       }
@@ -691,9 +651,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} {groups} için yukarıda gösterilenlerin dışında sonuç yok; bu yüzden burada listelenmedi.",
         "countPlural=*": "Yukarıda gösterilenlerin dışında sonucu olmayan {groups} burada listelenmedi ({countText})."
@@ -739,9 +697,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {noun}"
@@ -750,13 +706,8 @@
   ],
   "map_electoral": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Seçiciler Kurulu oyu",
         "countPlural=*": "{count} Seçiciler Kurulu oyu"
@@ -799,9 +750,7 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{party}, {where} genelinde {count} sandalye kazandı",
         "countPlural=*": "{party}, {where} genelinde {count} sandalye kazandı"
@@ -842,13 +791,8 @@
   "check_votes_valid_unit": "{name}: oyların toplamı {votes}, ancak {valid} geçerli oy bildirilmiş",
   "checks_turnout": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} birim, kayıtlı seçmenden fazla oy pusulası bildiriyor",
         "countPlural=*": "{count} birim, kayıtlı seçmenden fazla oy pusulası bildiriyor"
@@ -857,13 +801,8 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} birimde oyların toplamı geçerli oy sayısıyla tutmuyor",
         "countPlural=*": "{count} birimde oyların toplamı geçerli oy sayısıyla tutmuyor"
@@ -875,13 +814,8 @@
   "election_unplaced_detail": "Üniversite sandalyeleri gibi bu yarışların coğrafi bir alanı yoktur; tablo ve haritaya dahil edilmemiştir.",
   "election_parts": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} parça",
         "countPlural=*": "{count} parça"
@@ -914,9 +848,7 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "1 sandalye rakipsiz belirlendi, bu nedenle bu sandalyede oy kullanılmadı: {parties}.",
         "seatsPlural=*": "{seats} sandalye rakipsiz belirlendi, bu nedenle bu sandalyelerde oy kullanılmadı: {parties}."
@@ -931,9 +863,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 {noun} birden fazla üye seçti. Seçmenler birden fazla oy kullanabildiğinden toplamlar seçmeni değil, oyu gösterir.",
         "countPlural=*": "{count} {noun} birden fazla üye seçti. Seçmenler birden fazla oy kullanabildiğinden toplamlar seçmeni değil, oyu gösterir."
@@ -978,13 +908,8 @@
   "race_contests_nonvoting": "{count} seçim yarışı, bunların {nonvoting} tanesi oy hakkı olmayan delege yarışı",
   "race_contests": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} seçim yarışı",
         "countPlural=*": "{count} seçim yarışı"
@@ -1054,9 +979,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yerel yönetim",
         "countPlural=*": "{countText} yerel yönetim"
@@ -1070,12 +993,8 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
-      "match": {
-        "countPlural=*": "{countText} ilçe"
-      }
+      "selectors": ["countPlural"],
+      "match": { "countPlural=*": "{countText} ilçe" }
     }
   ],
   "alongside_title": "Oy pusulasındaki diğer seçimler",
@@ -1256,13 +1175,8 @@
   "lists_title": "Aday listeleri",
   "lists_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} sandalye sıralı parti listelerinden dolduruldu",
         "seatsPlural=*": "{seats} sandalye sıralı parti listelerinden dolduruldu"
@@ -1273,13 +1187,8 @@
   "lists_unranked_title": "Seçilen üyeler",
   "lists_unranked_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} sandalye parti listelerinden dolduruldu. Kaynak yalnızca seçilen üyeleri belirtir, sıralı listelerin tamamını vermez.",
         "seatsPlural=*": "{seats} sandalye parti listelerinden dolduruldu. Kaynak yalnızca seçilen üyeleri belirtir, sıralı listelerin tamamını vermez."
@@ -1289,13 +1198,8 @@
   "lists_open_title": "Listelere göre adaylar",
   "lists_open_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} sandalye açık parti listelerinden dolduruldu; her listedeki adaylar tercih oylarına göre sıralanır",
         "seatsPlural=*": "{seats} sandalye açık parti listelerinden dolduruldu; her listedeki adaylar tercih oylarına göre sıralanır"
@@ -1305,13 +1209,8 @@
   "col_members": "Seçilen üyeler",
   "lists_all": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} listenin tümü",
         "countPlural=*": "{count} listenin tümü"
@@ -1322,13 +1221,8 @@
   "lists_collapse": "Listelerin başını göster",
   "lists_more": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} aday daha",
         "countPlural=*": "{count} aday daha"
@@ -1337,13 +1231,8 @@
   ],
   "lists_seats": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} sandalye",
         "countPlural=*": "{count} sandalye"
@@ -1437,9 +1326,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Oy pusulasında {countText} seçim yarışı",
         "countPlural=*": "Oy pusulasında {countText} seçim yarışı"
@@ -1518,9 +1405,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sandalye kazandı",
         "countPlural=*": "{countText} sandalye kazandı"
@@ -1537,10 +1422,7 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": [
-        "seatsPlural",
-        "officesPlural"
-      ],
+      "selectors": ["seatsPlural", "officesPlural"],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} sandalye, {officesText} görev kazanıldı",
         "seatsPlural=one, officesPlural=*": "{seatsText} sandalye, {officesText} görev kazanıldı",
@@ -1782,9 +1664,7 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "{place} içindeki {nouns} arasında {name} için {rank}. en iyi sonuç ({count} içinden)"
       }
@@ -1978,13 +1858,8 @@
   "tiers_tile_tacit": "{place}: {party}, {total} sandalyenin {seats} tanesini kazandı; bunların {tacit} tanesi rakipsiz ilan edildi",
   "tiers_tacit": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} sandalye, oylama yapılmadan rakipsiz ilan edildi.",
         "countPlural=*": "{count} sandalye, oylama yapılmadan rakipsiz ilan edildi."
@@ -2066,9 +1941,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sandalye seçilecek",
         "countPlural=*": "{countText} sandalye seçilecek"
@@ -2121,9 +1994,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} üye",
         "countPlural=*": "{countText} üye"
@@ -2263,13 +2134,8 @@
   "changelog_first": "İlk etiketli sürüm. Daha önceki değişiklikler işleme geçmişinde.",
   "changelog_commits": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} değişiklik",
         "countPlural=*": "{count} değişiklik"
@@ -2286,13 +2152,8 @@
   "person_majority": "Oy farkı {count}",
   "person_scattered": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=*": "{count} seçim yarışında, oy pusulasında adı olmadığı hâlde seçmenlerin yazdığı oyları da aldı"
       }
@@ -2305,9 +2166,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{states} içinde sadakatsiz bir seçiciden {count} seçiciler kurulu oyu aldı",
         "countPlural=*": "{states} içinde sadakatsiz seçicilerden {count} seçiciler kurulu oyu aldı"
@@ -2321,9 +2180,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{states} içinde {count} seçiciler kurulu oyu aldı",
         "countPlural=*": "{states} içinde {count} seçiciler kurulu oyu aldı"
@@ -2437,9 +2294,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sonuç",
         "countPlural=*": "{countText} sonuç"
@@ -2577,13 +2432,8 @@
   "map_landing_lede": "Herhangi bir ülkenin son seçimini tam ekran haritada açın; ulusal sonuçlardan en küçük sonuç birimine kadar yakınlaşın, önceki seçimlerle karşılaştırın ve yarışlar arasında geçiş yapın.",
   "map_landing_elections": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} seçim",
         "countPlural=*": "{count} seçim"
@@ -2776,9 +2626,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} bilinen eksiği göster",
         "countPlural=*": "{countText} bilinen eksiğin tümünü göster"
@@ -3037,9 +2885,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} seçim zaferi",
         "countPlural=*": "{countText} seçim zaferi"
@@ -3201,9 +3047,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Oylama yöntemine veya sayım turuna göre ayrılmış {countText} rakam burada gösterilmiyor.",
         "countPlural=*": "Oylama yöntemine veya sayım turuna göre ayrılmış {countText} rakam burada gösterilmiyor."
@@ -3217,9 +3061,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Adayların toplamı geçerli oyla tutmayan {countText} yer",
         "countPlural=*": "Adayların toplamı geçerli oyla tutmayan {countText} yer"
@@ -3233,9 +3075,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rakam değişti",
         "countPlural=*": "{countText} rakam değişti"
@@ -3261,9 +3101,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} değişiklik, yayın masası tarafından incelenir",
         "countPlural=*": "{countText} değişiklik, yayın masası tarafından incelenir"
@@ -3463,9 +3301,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "İncelenecek {countText} bulgu",
         "countPlural=*": "İncelenecek {countText} bulgu"
@@ -3507,9 +3343,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{pipeline} yeniden çalıştırıldığında {countText} rakam bu düzeltmeden farklı çıktı. Yükleyici düzeltilip yeniden çalıştırılana kadar öneri onaylı kalır.",
         "countPlural=*": "{pipeline} yeniden çalıştırıldığında {countText} rakam bu düzeltmeden farklı çıktı. Yükleyici düzeltilip yeniden çalıştırılana kadar öneri onaylı kalır."
@@ -3523,9 +3357,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rakam",
         "countPlural=*": "{countText} rakam"
@@ -3565,9 +3397,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} değişiklik",
         "countPlural=*": "{countText} değişiklik"
@@ -3787,9 +3617,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} satır",
         "countPlural=*": "{countText} satır"
@@ -4030,9 +3858,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rakam",
         "countPlural=*": "{countText} rakam"
@@ -4046,9 +3872,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kutu",
         "countPlural=*": "{countText} kutu"
@@ -4062,9 +3886,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yer",
         "countPlural=*": "{countText} yer"
@@ -4078,9 +3900,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} satır yapıştırıldı.",
         "countPlural=*": "{countText} satır yapıştırıldı."
@@ -4094,9 +3914,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} bulunamadı ve yeni yer olarak eklendi; kodunu kontrol edin.",
         "countPlural=*": "{countText} bulunamadı ve yeni yer olarak eklendi; kodlarını kontrol edin."
@@ -4110,9 +3928,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} tabloya sığmadı ve dışarıda bırakıldı.",
         "countPlural=*": "{countText} tabloya sığmadı ve dışarıda bırakıldı."
@@ -4126,9 +3942,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Başka bir dosya kullanırsanız bunun üzerine çizilen kutu kaldırılır.",
         "countPlural=*": "Başka bir dosya kullanırsanız bunun üzerine çizilen {countText} kutu kaldırılır."
@@ -4206,9 +4020,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sınır değişiyor.",
         "countPlural=*": "{countText} sınır değişiyor."
@@ -4222,9 +4034,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yeni alan.",
         "countPlural=*": "{countText} yeni alan."
@@ -4238,9 +4048,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kod hiçbir alanla eşleşmiyor. Yeni alan olarak eklemek için bir ad alanı seçin veya dışarıda bırakın.",
         "countPlural=*": "{countText} kod hiçbir alanla eşleşmiyor. Bunları yeni alan olarak eklemek için bir ad alanı seçin veya dışarıda bırakın."
@@ -4254,9 +4062,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yeni alanın ad alanında bir ad yok.",
         "countPlural=*": "{countText} yeni alanın ad alanında bir ad yok."
@@ -4270,9 +4076,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sınır geometrisi",
         "countPlural=*": "{countText} sınır geometrisi"
@@ -4289,9 +4093,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yorum",
         "countPlural=*": "{countText} yorum"
@@ -4360,9 +4162,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Tartışma, {countText} açık konu",
         "countPlural=*": "Tartışma, {countText} açık konu"
@@ -4379,9 +4179,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} karakter kaldı",
         "countPlural=*": "{countText} karakter kaldı"
@@ -4395,9 +4193,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yanıt",
         "countPlural=*": "{countText} yanıt"
@@ -4982,13 +4778,8 @@
   "night_chamber_others": "Bağımsızlar ve diğerleri",
   "night_chamber_not_up": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} sandalye bu yıl seçimde değil",
         "countPlural=*": "{count} sandalye bu yıl seçimde değil"
@@ -4999,13 +4790,8 @@
   "night_chamber_open": "{title} grafiğindeki tüm yarışları gör",
   "night_governors_races": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} yarış",
         "countPlural=*": "{count} yarış"
@@ -5156,9 +4942,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} ikinci turda birinci turun lideri kaybetti.",
         "countPlural=*": "{countText} ikinci turda birinci turun lideri kaybetti."
@@ -5172,9 +4956,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} seçim bölgesi kazananı, partisinin liste oyu yetmediği için sandalye alamadı.",
         "countPlural=*": "{countText} seçim bölgesi kazananı, partilerinin liste oyu yetmediği için sandalye alamadı."
@@ -5188,9 +4970,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Yeterli oyu alan {countText} aday ikinci turdan önce çekildi.",
         "countPlural=*": "Yeterli oyu alan {countText} aday ikinci turdan önce çekildi."
@@ -5206,9 +4986,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} ikinci turda aday sayısı {from} iken {to} oldu",
         "countPlural=*": "{countText} ikinci turda aday sayısı {from} iken {to} oldu"
@@ -5355,9 +5133,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} değişiklik önerisi",
         "countPlural=*": "{countText} değişiklik önerisi"
@@ -5371,9 +5147,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kabul edildi",
         "countPlural=*": "{countText} kabul edildi"
@@ -5440,9 +5214,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Günde {countText} değişiklik önerisi",
         "countPlural=*": "Günde {countText} değişiklik önerisi"
@@ -5489,9 +5261,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} geri alma sıraya alındı.",
         "countPlural=*": "{countText} geri alma sıraya alındı."
@@ -5519,9 +5289,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} toplu işlem",
         "countPlural=*": "{countText} toplu işlem"
@@ -5564,9 +5332,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} değişiklik",
         "countPlural=*": "{countText} değişiklik"
@@ -5649,9 +5415,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Bildirimler, {countText} okunmamış",
         "countPlural=*": "Bildirimler, {countText} okunmamış"
@@ -5690,9 +5454,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} yeni bildirim",
         "countPlural=*": "{countText} yeni bildirim"
@@ -5706,9 +5468,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Elections Archive'da dikkatinizi bekleyen bir şey var.",
         "countPlural=*": "Elections Archive'da dikkatinizi bekleyen {countText} şey var."
@@ -5722,9 +5482,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Yeni bir bildiriminiz var",
         "countPlural=*": "{countText} yeni bildiriminiz var"
@@ -5740,9 +5498,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Bugün izleme listenizde: {countText} güncelleme",
         "countPlural=*": "Bugün izleme listenizde: {countText} güncelleme"
@@ -5756,9 +5512,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Bu hafta izleme listenizde: {countText} güncelleme",
         "countPlural=*": "Bu hafta izleme listenizde: {countText} güncelleme"
@@ -5772,9 +5526,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "İzlediklerinizde {countText} güncelleme var.",
         "countPlural=*": "İzlediklerinizde {countText} güncelleme var."
