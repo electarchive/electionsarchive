@@ -106,6 +106,7 @@ LAYERS = {
     "HI:2024": "https://geodata.hawaii.gov/arcgis/rest/services/AdminBnd/MapServer/13/",
 }
 LAYERS |= {f"{state}:2024": LAYERS[state] for state in ("DC", "OK", "RI", "AZ", "IA")} | {
+    "UT:2024": LAYERS["UT:snapshot"],
     "IN:2023": "https://gisdata.in.gov/server/rest/services/Hosted/Voting_District_Boundaries_2023/FeatureServer/1/",
     "RI:2016": "https://services2.arcgis.com/S8zZg9pg23JUEexQ/arcgis/rest/services/Voting_Precincts/FeatureServer/0/",
     "IN:marion-1990": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/1/",
@@ -949,6 +950,15 @@ SNAPSHOTS |= {
         lambda p: ("12086", str(p["ID"]), f"Precinct {p['ID']}"),
     ),
 }
+DATED["UT:2024"] = (
+    GENERAL,
+    GENERAL + timedelta(days=1),
+    "Utah Geospatial Resource Center",
+    "Utah Vista Ballot Areas (layer as retrieved after the 2024 general election)",
+    "CC BY 4.0",
+    "Utah AGRC, Utah Counties, Lt. Governor's Elections Office",
+    SNAPSHOTS["UT:snapshot"][6],
+)
 WORDS = {"SAINT": "ST", "TOWNSHIP": "TWP", "HEIGHTS": "HTS", "MOUNT": "MT", "FORT": "FT"}
 FILLER = {"CITY", "OF", "CHARTER", "PRECINCT", "PCT", "PREC", "P", "WARD", "W", "TOWN", "VILLAGE"}
 
