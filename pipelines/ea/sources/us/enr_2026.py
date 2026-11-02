@@ -49,10 +49,11 @@ CLARITY = {
 }
 EV_OFFICES = re.compile(
     r"^(?:(?P<party0>REP|DEM) )?(?:(?P<senate>(?:U\.? ?S\.? |United States )Senat(?:e|or)|Senator in Congress)"
-    r"|(?P<governor>Governor(?:(?: and |\s*/\s*)Lieutenant Governor)?)"
-    r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress|Representative to the \d+(?:st|nd|rd|th) United States Congress)\b[^\d]*"
-    r"|Congressional District (?=\d+ - U\.? ?S\.? Representative$))"
-    r"(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?(?: - U\.? ?S\.? Representative)?)"
+    r"|(?P<governor>(?:(?:For|State|KS)\s+)?Gov(?:ernor|\.)?(?:(?:\s+(?:and|&)\s+|\s*/\s*)(?:Lieutenant|Lt\.?)\s+Gov(?:ernor|\.)?(?:\s+State)?)?)"
+    r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress|Representative to the \d+(?:st|nd|rd|th) United States Congress"
+    r"|Rep\. in Congress|Congress Dist|(?:For )?Representative to Congress)\b[^\d]*"
+    r"|Congressional District (?=\d+ - U\.? ?S\.? Representative$)|Congressional (?=\d+(?:st|nd|rd|th) District Representative$))"
+    r"(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?(?: - U\.? ?S\.? Representative| Representative)?\)?)"
     r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$",
     re.IGNORECASE,
 )
@@ -75,6 +76,8 @@ EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
 YESNO = {"for": "yes", "against": "no", "approve": "yes", "reject": "no"}
+SYNONYMS = {"id": "identification", "sell": "sale"}
+TENANT = re.compile(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports")
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
 GENERIC = {
     "an",
@@ -169,7 +172,7 @@ IL_CITIES = {
     "CITY OF GALESBURG": "Knox",
     "CITY OF ROCKFORD": "Winnebago",
 }
-APPEALS = re.compile(r"\bcourt of appeals?\b|\bsupreme court\b.*\bretain", re.IGNORECASE)
+APPEALS = re.compile(r"\bcourt of appeals?\b|\bappellate\b|\bsupreme court\b.*\bretain", re.IGNORECASE)
 SEAT = re.compile(
     r"(?:(?:district|seat)\s+0*(\d+)|\b0*(\d+)(?:st|nd|rd|th)\s+district)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE
 )
@@ -228,12 +231,22 @@ def terms(label: str, joined: bool = True) -> list[str]:
     return words[:-1] if len(words) > 2 and words[-1] == "i" else words
 
 
+def district_words(key: str) -> set[str]:
+    parts = key.split(":")
+    if len(parts) < 6 or not re.fullmatch(r"\d{5}", parts[2]):
+        return set()
+    return set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
+
+
 def person(label: str) -> str:
     words = terms(label)
     if words and words[0] in ("yes", "no"):
         return words[0]
     if words[-2:-1] == ["retained"] and words[-1] in ("yes", "no"):
         return words[-1]
+    head, comma, rest = label.partition(",")
+    if comma and terms(rest):
+        words = terms(f"{rest} {head}")
     return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
 
 
@@ -677,7 +690,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
         stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
-        tenant = re.search(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports", url)
+        tenant = TENANT.search(url)
         as_of = (
             datetime.strptime(stamped[1], "%m/%d/%Y %I:%M:%S %p")
             .replace(
@@ -1183,6 +1196,11 @@ def plan(
         .then(pl.col("candidate").str.slice(pl.col("party").str.len_chars() + 1))
         .otherwise(pl.col("candidate"))
     )
+    tenant = pl.col("page").str.contains(TENANT.pattern)
+    race = pl.concat_str(
+        [pl.col(name).fill_null("") for name in ("state", "office", "contest", "district", "county")], separator="|"
+    )
+    frame = frame.filter(~tenant | ~race.is_in(frame.filter(~tenant).select(race).to_series()))
     local = frame.filter(pl.col("office").is_in(["other", "state"]))
     frame = frame.filter(~pl.col("office").is_in(["other", "state"]))
     counties: dict[tuple[str, str], UUID] = {}
@@ -1293,12 +1311,18 @@ def plan(
                 (contest, key, wanted) for contest, (keys, wanted) in published.items() for key in keys
             ):
                 segment = key.split(":")[2]
+                named = district_words(key)
                 if wide:
                     if contest not in statewide or (seat and seats.get(contest, seat) != seat):
                         continue
                 elif (
                     re.fullmatch(r"\d{5}|\d{10}", segment)
                     and (len(places) != 1 or codes.get((FIPS[state], plain(places[0])), places[0]) != segment[:5])
+                    and not (named and named <= words)
+                    or people <= {"yes", "no"}
+                    and ":measure:" in key
+                    and named
+                    and not named & words
                     or len(places) == 1
                     and not re.match(r"\d|sd|house$|senate$", segment)
                     and contest not in judicial
@@ -1353,6 +1377,11 @@ def plan(
                 ]
                 if len(kept) == 1:
                     best = kept
+            if len(best) > 1:
+                homes = {codes.get((FIPS[state], plain(place)), place) for place in places}
+                kept = [hit for hit in best if hit[4].split(":")[2][:5] in homes]
+                if kept:
+                    best = kept
             if len(best) == 1 and not ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
                 return best, True
             return best, False
@@ -1366,7 +1395,7 @@ def plan(
             )
             spelled = re.sub(rf"\b({'|'.join(ORDINALS)})\b", lambda found: ORDINALS[found[1]], spelled)
             words = {
-                re.sub(r"^(?:p|pos|d|0+)(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w)
+                SYNONYMS.get(w, re.sub(r"^(?:p|pos|d|0+)(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w))
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
@@ -1406,6 +1435,17 @@ def plan(
                         ((1.0, 0, 0, contest, key), name, places, office, wanted) for contest, key, wanted in parts
                     )
                     continue
+            if (
+                not wide
+                and people - {"yes", "no"}
+                and any(
+                    contest in statewide
+                    and not re.search(r"judge|justice|court", keys[0])
+                    and len(people & wanted) >= 0.6 * len(people | wanted)
+                    for contest, (keys, wanted) in published.items()
+                )
+            ):
+                continue
             unmatched.append(
                 f"{'state' if wide else 'local'} {state}: {name} ({', '.join(sorted(places)[:2])}): {'ambiguous' if len(best) > 1 and best[0][1] else 'no contest'}"
             )
