@@ -111,6 +111,7 @@ PERSON = re.compile(r"^([A-Z][^,]*?), (.+?)(?: - ([A-Z]{2,4}))?\s{3,}\S.*\s(YES|
 
 
 ALIASES: dict[str, str] = {}
+SEPARATE = {"North County Fire Protection District"}
 
 
 def usable(label: str) -> bool:
@@ -2380,7 +2381,12 @@ def single_county(conn: Connection, frame: pl.DataFrame) -> pl.DataFrame:
     homes = govcand.counties(conn, "06")
     order = list(COUNTIES.values())
     pairs = frame.select("county", "district").unique()
-    shared = pairs.group_by("district").agg(pl.col("county")).filter(pl.col("county").list.len() > 1)
+    shared = (
+        pairs.filter(~pl.col("district").is_in(SEPARATE))
+        .group_by("district")
+        .agg(pl.col("county"))
+        .filter(pl.col("county").list.len() > 1)
+    )
     keep = set()
     for district, found in shared.iter_rows():
         existing = [
