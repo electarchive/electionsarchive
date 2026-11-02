@@ -7,6 +7,7 @@
     BellIcon,
     GaugeIcon,
     LayoutDashboardIcon,
+    MapIcon,
     MenuIcon,
     MonitorIcon,
     MoonIcon,
@@ -26,6 +27,12 @@
   import { cn } from "#lib/utils.js";
 
   const LINKS = [
+    {
+      href: resolve("/map"),
+      label: m.map_nav(),
+      about: m.header_map_about(),
+      icon: MapIcon,
+    },
     {
       href: resolve("/compare"),
       label: m.versus_action(),

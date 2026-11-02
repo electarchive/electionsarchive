@@ -1,5 +1,3 @@
-import { page } from "$app/state";
-import { untrack } from "svelte";
 import type { Mode } from "#lib/atlas/color.js";
 import { MODES } from "#lib/atlas/color.js";
 import { keep } from "#lib/linked.js";
@@ -41,8 +39,8 @@ export class View {
   picked = $state.raw<Array<number>>([]);
   at: [number, number, number] | null = null;
 
-  constructor() {
-    this.read(untrack(() => page.url.searchParams));
+  constructor(query: URLSearchParams) {
+    this.read(query);
   }
 
   read(query: { get: (key: string) => string | null }) {

@@ -1707,6 +1707,8 @@
   "atlas_select_many": "Select several places",
   "atlas_versus": "{name} +{points} vs. {place}",
   "atlas_explore": "Open full map",
+  "atlas_expand": "Expand map",
+  "atlas_back": "Back to results",
   "atlas_estimated_note": "Boundaries changed since {year}. The {year} results shown here are estimates for today's areas, built from the {year} areas that overlap them.",
   "atlas_estimated": "Estimated",
   "map_gesture_windows": "Hold Ctrl and scroll to zoom",
@@ -2376,6 +2378,20 @@
   "coverage_nav": "Coverage",
   "header_menu": "Menu",
   "header_compare_about": "Put two places or elections side by side",
+  "map_nav": "Map",
+  "header_map_about": "Explore any election on a full-screen map",
+  "map_landing_title": "Election maps",
+  "map_landing_lede": "Open any country's latest election on a full-screen map, then zoom from national results down to the smallest reporting unit, compare with earlier elections, and switch between races.",
+  "map_landing_elections": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} election",
+        "countPlural=*": "{count} elections"
+      }
+    }
+  ],
   "header_workbench_about": "Build a board of maps and charts for any contest",
   "header_coverage_about": "See what the archive holds and what it’s missing",
   "header_sign_in_about": "Sign in to save Workbench views and create API keys",

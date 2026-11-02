@@ -447,6 +447,13 @@
           ],
         };
   });
+  const explore = $derived.by(() => {
+    const steps = source?.unit?.split("/") ?? [];
+    const unit = loaded?.around == null ? steps : steps.slice(0, -1);
+    return loaded?.contest.path == null
+      ? null
+      : [loaded.contest.path, ...unit].join("/");
+  });
   const upward = $derived.by(() => {
     const parent = polity.breadcrumbs.at(-1);
     return parent?.path == null
@@ -531,6 +538,7 @@
       </h2>
       <PlaceMap
         places={drawn.places}
+        {explore}
         colors={drawn.colors}
         tiles={drawn.tiles}
         own={drawn.own}

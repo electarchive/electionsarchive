@@ -2,6 +2,7 @@
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import BoxSelectIcon from "@lucide/svelte/icons/box-select";
   import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
@@ -48,19 +49,22 @@
     whole,
     shell,
     scheme,
+    query,
   }: {
     contest: string;
     path: string;
     whole: string | null;
     shell: Shell;
     scheme: string;
+    query: string;
   } = $props();
 
   const uid = $props.id();
   const wide = new MediaQuery("min-width: 48rem", false);
   const tall = new MediaQuery("min-height: 40rem", true);
   const calm = new MediaQuery("prefers-reduced-motion: reduce", false);
-  const view = new View();
+  const initial = new URLSearchParams(untrack(() => query));
+  const view = new View(initial);
 
   const unit = $derived(
     decodeURI((page.shallow?.url ?? page.url).pathname).slice(
@@ -90,10 +94,9 @@
   let drawn = $state(0);
   let detent = $state<"peek" | "half" | "full">("peek");
   let named = $state(0);
-  let camera = $state<string | null>(
-    untrack(() => page.url.searchParams.get("at")),
-  );
+  let camera = $state<string | null>(initial.get("at"));
   let isAdding = $state(false);
+  let isArrived = $state(false);
   let isShift = false;
   let term = $state("");
   let isSearching = $state(false);
@@ -426,6 +429,7 @@
   }
 
   afterNavigate(({ type }) => {
+    isArrived = true;
     if (type === "popstate") {
       const query = (page.shallow?.url ?? page.url).searchParams;
       view.read(query);
@@ -688,6 +692,14 @@
       (base?.estimated === true ||
         Object.values(extras).some((set) => set.estimated)),
   );
+  const origin = initial.get("from");
+  const back =
+    origin != null && origin.startsWith("/") && !origin.startsWith("//")
+      ? origin
+      : null;
+  const exit = $derived(
+    back ?? resolve("/[...path]", { path: head.scope.path ?? path }),
+  );
   const isScheduled = $derived(
     base != null &&
       base.places.k.length === 0 &&
@@ -902,7 +914,9 @@
   $effect(() => {
     void view.params();
     const at = camera;
-    untrack(() => view.sync({ at }));
+    if (isArrived) {
+      untrack(() => view.sync({ at }));
+    }
   });
 
   $effect(() => {
@@ -1094,15 +1108,19 @@
       >
     {/if}
     <a
-      href={resolve("/[...path]", { path: head.scope.path ?? path })}
-      class="flex shrink-0 items-center rounded-sm px-2.5 text-[0.8125rem] font-semibold ring-1 ring-input block-8 hover:bg-secondary max-md:hidden"
-      >{m.atlas_results()}</a
+      href={exit}
+      class="flex shrink-0 items-center gap-1.5 rounded-sm px-2.5 text-[0.8125rem] font-semibold ring-1 ring-input block-8 hover:bg-secondary max-md:hidden"
+      >{#if back != null}<ArrowLeftIcon
+          class="block-3.5 inline-3.5"
+          aria-hidden="true"
+        />{m.atlas_back()}{:else}{m.atlas_results()}{/if}</a
     >
     <a
-      href={resolve("/[...path]", { path: head.scope.path ?? path })}
+      href={exit}
       class="grid shrink-0 place-items-center rounded-sm block-9 inline-9 hover:bg-secondary"
-      aria-label={m.atlas_close()}
-      title={m.atlas_close()}><XIcon class="block-4.5 inline-4.5" /></a
+      aria-label={back != null ? m.atlas_back() : m.atlas_close()}
+      title={back != null ? m.atlas_back() : m.atlas_close()}
+      ><XIcon class="block-4.5 inline-4.5" /></a
     >
     {#if isSearching && !wide.current}
       <div

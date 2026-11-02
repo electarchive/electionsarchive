@@ -15,6 +15,7 @@
   import GlobeIcon from "@lucide/svelte/icons/globe";
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
+  import Maximize2Icon from "@lucide/svelte/icons/maximize-2";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -287,6 +288,37 @@
     onshade?.(shading);
   });
   let isBasemap = $state(page.url.searchParams.get("basemap") !== "off");
+
+  let aim = $state<string | null>(null);
+
+  function expanded(path: string) {
+    const url = new URL(resolve("/map/[...path]", { path }), page.url.origin);
+    const color =
+      typeof shading === "number"
+        ? "share"
+        : ["split", "swing", "flips"].includes(shading)
+          ? shading
+          : null;
+    const gl = engine.gl;
+    const middle = gl?.getCenter();
+    const extra = {
+      color,
+      vs: page.url.searchParams.get("vs"),
+      group: page.url.searchParams.get("group"),
+      basemap: isBasemap ? null : "off",
+      at:
+        engine.isFramed || gl == null || middle == null
+          ? null
+          : `${middle.lng.toFixed(4)},${middle.lat.toFixed(4)},${gl.getZoom().toFixed(2)}`,
+      from: `${page.url.pathname}${page.url.search}`,
+    };
+    for (const [key, value] of Object.entries(extra)) {
+      if (value != null) {
+        url.searchParams.set(key, value);
+      }
+    }
+    return `${url.pathname}${url.search}`;
+  }
   const scheme = $derived(tiles.split(/[./]/u)[0] ?? "");
   const engine = new Engine(
     untrack(() => frame),
@@ -2872,11 +2904,15 @@
       <div class="flex items-center gap-2">
         {#if explore != null}
           <a
-            href={page.url.searchParams.get("group") === "alliance"
-              ? resolve("/map/[...path]?group=alliance", { path: explore })
-              : resolve("/map/[...path]", { path: explore })}
-            class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
-            >{m.atlas_explore()}</a
+            href={aim ?? expanded(explore)}
+            class="flex items-center gap-1.5 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+            onpointerenter={() => (aim = expanded(explore))}
+            onpointerdown={() => (aim = expanded(explore))}
+            onfocus={() => (aim = expanded(explore))}
+            ><Maximize2Icon
+              class="block-3.5 inline-3.5"
+              aria-hidden="true"
+            />{m.atlas_expand()}</a
           >
         {/if}
         <Export name="map" />

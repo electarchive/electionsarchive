@@ -13231,7 +13231,7 @@ export function inside(polity: string, area: SQL, day: SQL) {
   `;
 }
 
-async function races(
+export async function races(
   election: string,
   polity: string,
   date: string | null,

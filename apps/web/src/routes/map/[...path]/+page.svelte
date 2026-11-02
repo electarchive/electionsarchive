@@ -6,11 +6,12 @@
 
   const { data }: { data: PageData } = $props();
 
+  const asked = $derived(new URLSearchParams(data.query));
   const preload = $derived(
     sheetUrl(data.contest, {
       unit: decodeURI(page.url.pathname).slice(`/map/${data.path}`.length + 1),
-      vs: page.url.searchParams.get("vs"),
-      group: page.url.searchParams.get("group"),
+      vs: asked.get("vs"),
+      group: asked.get("group"),
       whole: data.whole,
     }),
   );
@@ -27,5 +28,6 @@
     whole={data.whole}
     shell={data.shell}
     scheme={data.path.split("/")[0] ?? ""}
+    query={data.query}
   />
 {/key}
