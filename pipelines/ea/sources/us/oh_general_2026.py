@@ -22,7 +22,6 @@ PUBLISHER = "Ohio Secretary of State"
 TITLE = "Election night reporting: candidates on the November 3, 2026 general election ballot"
 PARTIES = {"DEM": "democratic-party", "REP": "republican-party", "LIB": "libertarian-party"}
 INDEPENDENT = {"Indep", "Nonprtycan"}
-NOTE = "Besides the nominees recorded in the archive's 2026 primary result sets, the candidates are those on the Ohio Secretary of State's election night reporting ballot for the 2026-11-03 general election, which includes independent and Libertarian candidates. Declared write-in candidates are not listed."
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 
@@ -131,13 +130,12 @@ def emit() -> Path:
         ).fetchall():
             if label:
                 earlier.setdefault(slug(" ".join(words(label)[-1:])), set()).add(person)
-        noted = {
-            entity
-            for (entity,) in conn.execute(
-                """select n.entity_id from note n join changeset c on c.id = n.changeset_id and c.pipeline = 'us.fec_2026'
-                   where n.kind = 'methodology' and n.body_md like 'Candidates are the Ohio nominees%%'"""
-            ).fetchall()
-        }
+        own_notes = conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'methodology'""",
+            [SOURCE],
+        ).fetchall()
+        dropped = {entity: (note, text) for note, entity, text in own_notes}
         names = dict(
             conn.execute(
                 "select entity_id, text from name where is_preferred and lang = 'en' and entity_id = any(%s)",
@@ -223,7 +221,14 @@ def emit() -> Path:
                         cs.add("entity_retirement", entity_id=candidacy, reason=reason)
                     cs.add("entity_retirement", entity_id=option, reason=reason)
                     counts["retired"] += 1
-            if contest in noted:
-                cs.add("note", entity_id=contest, kind="methodology", body_md=NOTE)
+            if contest in dropped:
+                note, text = dropped[contest]
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=contest,
+                    body_md=text,
+                    reason="The election night ballot note now sits on the contest from the federal pipeline",
+                )
         print(counts)
         return cs.write()
