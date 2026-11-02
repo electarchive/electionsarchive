@@ -4,6 +4,7 @@
   import type { Anchor } from "#lib/contrib.js";
   import Markdown from "#lib/components/markdown.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
+  import { Input } from "#lib/components/ui/input/index.js";
   import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { commentLimit } from "#lib/contrib.js";
@@ -19,6 +20,7 @@
     placeholder = m.discussion_placeholder(),
     submit = m.discussion_comment(),
     autofocus = false,
+    suggestable = null,
     onclose,
   }: {
     action: string;
@@ -29,8 +31,16 @@
     placeholder?: string;
     submit?: string;
     autofocus?: boolean;
+    suggestable?: Record<string, string> | null;
     onclose?: () => void;
   } = $props();
+
+  const labels: Record<string, () => string> = {
+    text: m.discussion_field_text,
+    body_md: m.discussion_field_text,
+    value: m.discussion_field_value,
+    color: m.proposal_field_color,
+  };
 
   const tabsId = $props.id();
 
@@ -39,8 +49,24 @@
   let busy = $state(false);
   let message = $state<string | null>(null);
   let field = $state<HTMLTextAreaElement | null>(null);
+  let suggesting = $state(false);
+  let suggested = $state<Record<string, string>>(
+    untrack(() => ({ ...suggestable })),
+  );
 
   const left = $derived(commentLimit - body.length);
+  const changed = $derived.by(() => {
+    if (!suggesting || suggestable == null) {
+      return null;
+    }
+    const values: Record<string, string> = {};
+    for (const [name, value] of Object.entries(suggested)) {
+      if (value !== suggestable[name]) {
+        values[name] = value;
+      }
+    }
+    return Object.keys(values).length > 0 ? values : null;
+  });
 
   $effect(() => {
     if (autofocus) {
@@ -67,6 +93,7 @@
       if (result.type === "success") {
         body = "";
         previewing = false;
+        suggesting = false;
         onclose?.();
       }
     };
@@ -77,6 +104,13 @@
   {/if}
   {#if parent != null}
     <input type="hidden" name="parent" value={parent} />
+  {/if}
+  {#if changed != null}
+    <input
+      type="hidden"
+      name="suggestion"
+      value={JSON.stringify({ values: changed })}
+    />
   {/if}
   {#if id != null}
     <input type="hidden" name="id" value={id} />
@@ -135,6 +169,32 @@
       </div>
     {/if}
   </div>
+  {#if suggesting && suggestable != null}
+    <fieldset class="grid gap-2 border-s-2 border-marker ps-3">
+      <legend class="text-xs text-pretty text-muted-foreground"
+        >{m.discussion_suggest_hint()}</legend
+      >
+      {#each Object.keys(suggestable) as name (name)}
+        <label class="grid gap-1 text-xs text-muted-foreground">
+          {labels[name]?.() ?? name}
+          {#if name === "body_md"}
+            <Textarea
+              bind:value={suggested[name]}
+              rows={3}
+              maxlength={commentLimit}
+              class="text-foreground"
+            />
+          {:else}
+            <Input
+              bind:value={suggested[name]}
+              maxlength={name === "color" ? 7 : 500}
+              class="text-foreground"
+            />
+          {/if}
+        </label>
+      {/each}
+    </fieldset>
+  {/if}
   {#if message != null}
     <p class="text-sm text-destructive" role="alert">{message}</p>
   {/if}
@@ -149,6 +209,21 @@
       {/if}
     </p>
     <div class="ms-auto flex gap-2">
+      {#if suggestable != null}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-pressed={suggesting}
+          onclick={() => {
+            suggesting = !suggesting;
+            suggested = { ...suggestable };
+          }}
+          >{suggesting
+            ? m.discussion_suggest_remove()
+            : m.discussion_suggest()}</Button
+        >
+      {/if}
       {#if onclose != null}
         <Button type="button" variant="ghost" size="sm" onclick={onclose}
           >{m.discussion_cancel()}</Button

@@ -6,10 +6,12 @@ import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import {
+  acceptSuggestion,
   AnchorSchema,
   Body,
   commentOnProposal,
   proposalThread,
+  SuggestionSchema,
   threadComments,
 } from "#lib/server/discussion.js";
 import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
@@ -470,7 +472,7 @@ export const proposals = {
         method: "POST",
         path: "/proposals/{number}/comments",
         summary:
-          "Comment on a proposal in Markdown (10,000 characters), optionally replying to a comment (parent) or anchored to a diff row or evidence item of a revision; @handle mentions notify, up to ten",
+          "Comment on a proposal in Markdown (10,000 characters), optionally replying to a comment (parent) or anchored to a diff row or evidence item of a revision; @handle mentions notify, up to ten. On a row anchor of the latest revision, suggestion.values proposes new text for the op behind that row (text, body_md, value, or color), which the author can accept in one call",
       }),
     )
     .input(
@@ -479,6 +481,7 @@ export const proposals = {
         body_md: Body,
         parent: v.optional(Uuid),
         anchor: v.optional(AnchorSchema),
+        suggestion: v.optional(SuggestionSchema),
       }),
     )
     .handler(async ({ input, context: { owner } }) =>
@@ -489,8 +492,29 @@ export const proposals = {
           body: input.body_md,
           parentId: input.parent ?? null,
           anchor: input.anchor ?? null,
+          suggestion: input.suggestion ?? null,
         }),
       })),
+    ),
+  accept: writer
+    .meta(
+      openapi({
+        method: "POST",
+        path: "/proposals/{number}/suggestions/{id}/accept",
+        summary:
+          "Accept a suggested change on your proposal: it becomes the next revision and is checked and resubmitted",
+      }),
+    )
+    .input(v.object({ number: Number_, id: Uuid }))
+    .handler(async ({ input, context: { owner } }) =>
+      run(async () => {
+        await acceptSuggestion({
+          userId: owner.userId,
+          number: Number(input.number),
+          id: input.id,
+        });
+        return view(Number(input.number), owner);
+      }),
     ),
   withdraw: writer
     .meta(

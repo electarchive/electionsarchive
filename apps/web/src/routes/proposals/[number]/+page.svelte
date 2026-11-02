@@ -348,6 +348,7 @@
           head={head?.n ?? null}
           canReply={canComment}
           canModerate={data.canModerate}
+          canAccept={data.canAccept}
           showAnchor={false}
         />
       {/each}
@@ -358,6 +359,7 @@
       <CommentComposer
         action="?/comment"
         {anchor}
+        suggestable={data.suggestable[key] ?? null}
         autofocus
         onclose={() => (drafting = null)}
       />
@@ -913,6 +915,7 @@
                 head={head?.n ?? null}
                 canReply={canComment}
                 canModerate={data.canModerate}
+                canAccept={data.canAccept}
               />
             </li>
           {/each}

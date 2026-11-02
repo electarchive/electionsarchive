@@ -2,12 +2,15 @@ import { error, fail, isHttpError } from "@sveltejs/kit";
 import * as v from "valibot";
 import { decide, proposal, roles } from "#lib/server/contrib.js";
 import {
+  acceptSuggestion,
   AnchorSchema,
   Body,
   commentOnProposal,
   editComment,
   hideComment,
   proposalThread,
+  suggestableRows,
+  SuggestionSchema,
   threadComments,
 } from "#lib/server/discussion.js";
 import type { Action, Actions, PageServerLoad } from "./$types";
@@ -32,8 +35,16 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     viewer ?? null,
   );
   const isReviewer = allowed.admin || allowed.reviewer;
-  const head = found.revisions.at(0)?.n;
-  const { prescreen, prereview, escalations, ...rest } = found;
+  const latest = found.revisions.at(0);
+  const head = latest?.n;
+  const isAuthor = viewer != null && viewer === found.author_user_id;
+  const {
+    prescreen,
+    prereview,
+    escalations,
+    author_user_id: _author,
+    ...rest
+  } = found;
   const isCurrent = prescreen != null && prescreen.revision === head;
   return {
     proposal: {
@@ -68,6 +79,18 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
       })),
     },
     comments,
+    isAuthor,
+    suggestable:
+      latest == null ||
+      isAuthor ||
+      !["open", "changes_requested"].includes(found.state)
+        ? {}
+        : suggestableRows(
+            latest.payload.ops ?? [],
+            latest.diff?.rows ?? [],
+            latest.n,
+          ),
+    canAccept: isAuthor && ["open", "changes_requested"].includes(found.state),
     commenter:
       locals.user == null
         ? ("signed_out" as const)
@@ -155,6 +178,19 @@ export const actions: Actions = {
     if (parent != null && !v.is(Id, parent)) {
       return fail(400, { message: "That reply target isn't valid." });
     }
+    const suggestionText = field(form, "suggestion");
+    let suggestion = null;
+    if (suggestionText != null) {
+      let decoded: unknown = null;
+      try {
+        decoded = JSON.parse(suggestionText);
+      } catch {}
+      const parsed = v.safeParse(SuggestionSchema, decoded);
+      if (!parsed.success) {
+        return fail(400, { message: parsed.issues[0].message });
+      }
+      suggestion = parsed.output;
+    }
     return (
       (await attempt(async () =>
         commentOnProposal({
@@ -163,6 +199,7 @@ export const actions: Actions = {
           body: body.output,
           parentId: parent,
           anchor,
+          suggestion,
         }),
       )) ?? { commented: true }
     );
@@ -207,6 +244,22 @@ export const actions: Actions = {
       (await attempt(async () => hideComment({ userId, id, reason }))) ?? {
         hidden: id,
       }
+    );
+  },
+  accept_suggestion: async ({ params, locals, request }) => {
+    if (locals.user == null) {
+      return fail(401, { message: "Sign in to accept suggestions." });
+    }
+    const userId = locals.user.id;
+    const form = await request.formData();
+    const id = field(form, "id");
+    if (id == null || !v.is(Id, id)) {
+      return fail(400, { message: "That suggestion isn't valid." });
+    }
+    return (
+      (await attempt(async () =>
+        acceptSuggestion({ userId, number: parse(params.number), id }),
+      )) ?? { accepted: id }
     );
   },
   approve: decision("approve"),

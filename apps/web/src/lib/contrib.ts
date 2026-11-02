@@ -714,5 +714,11 @@ export type CommentView = {
   edited_at: string | null;
   hidden_reason: string | null;
   hidden_by: string | null;
+  suggestion: {
+    op: number;
+    values: Record<string, string>;
+    before: Record<string, string>;
+  } | null;
+  accepted_revision: number | null;
   mine: boolean;
 };

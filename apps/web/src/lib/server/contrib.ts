@@ -717,6 +717,7 @@ export async function proposal(number: number) {
     state: ProposalState;
     tier: number | null;
     author: string | null;
+    author_user_id: string | null;
     created_at: string;
     submitted_at: string | null;
     decided_at: string | null;
@@ -728,7 +729,7 @@ export async function proposal(number: number) {
     prereviewer: string | null;
     escalations: Array<Escalation>;
   }>(sql`
-    select p.id, p.number, p.title, p.state::text as state, p.tier, a.name as author,
+    select p.id, p.number, p.title, p.state::text as state, p.tier, a.name as author, p.author_user_id,
            p.created_at::text, p.submitted_at::text, p.decided_at::text, d.name as decider,
            p.decision_reason, p.head_changeset_id, p.prescreen, p.prereview, w.name as prereviewer,
            ${escalations(sql`p.id`)} as escalations
@@ -748,6 +749,7 @@ export async function proposal(number: number) {
       payload: {
         summary: string;
         rationale?: string;
+        ops?: Array<Record<string, unknown>>;
         evidence?: Record<
           string,
           {

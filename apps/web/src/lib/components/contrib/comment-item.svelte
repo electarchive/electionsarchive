@@ -3,6 +3,7 @@
   import type { CommentView } from "#lib/contrib.js";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import CommentItem from "#lib/components/contrib/comment-item.svelte";
+  import Proof from "#lib/components/contrib/proof.svelte";
   import Markdown from "#lib/components/markdown.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -17,6 +18,7 @@
     head,
     canReply,
     canModerate,
+    canAccept = false,
     showAnchor = true,
   }: {
     comment: CommentView;
@@ -24,14 +26,26 @@
     head: number | null;
     canReply: boolean;
     canModerate: boolean;
+    canAccept?: boolean;
     showAnchor?: boolean;
   } = $props();
+
+  const labels: Record<string, () => string> = {
+    text: m.discussion_field_text,
+    body_md: m.discussion_field_text,
+    value: m.discussion_field_value,
+    color: m.proposal_field_color,
+  };
 
   let mode = $state<"read" | "edit" | "reply" | "hide">("read");
   let reason = $state("");
 
   const author = $derived(comment.author ?? m.proposal_unknown_author());
   const hidden = $derived(comment.hidden_reason != null);
+  const outdated = $derived(
+    comment.revision_n != null && head != null && comment.revision_n !== head,
+  );
+  let accepting = $state(false);
 </script>
 
 <article class="grid gap-1.5" id="comment-{comment.id}">
@@ -61,16 +75,22 @@
         <span class="ms-1">({m.discussion_edited()})</span>{/if}</a
     >
   </header>
-  {#if (showAnchor && comment.anchor != null) || (comment.revision_n != null && head != null && comment.revision_n !== head)}
+  {#if (showAnchor && comment.anchor != null) || outdated}
     <p class="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
       {#if showAnchor && comment.anchor != null}
-        <a
-          class="border-s-2 border-foreground ps-1.5 text-foreground underline-offset-2 hover:underline"
-          href="#{anchorId(comment.anchor)}"
-          >{m.discussion_on({ label: comment.anchor.label })}</a
-        >
+        {#if outdated}
+          <span class="border-s-2 border-border ps-1.5"
+            >{m.discussion_on({ label: comment.anchor.label })}</span
+          >
+        {:else}
+          <a
+            class="border-s-2 border-foreground ps-1.5 text-foreground underline-offset-2 hover:underline"
+            href="#{anchorId(comment.anchor)}"
+            >{m.discussion_on({ label: comment.anchor.label })}</a
+          >
+        {/if}
       {/if}
-      {#if comment.revision_n != null && head != null && comment.revision_n !== head}
+      {#if outdated && comment.revision_n != null}
         <span class="font-figures"
           >{m.discussion_on_revision({ n: comment.revision_n })}</span
         >
@@ -97,6 +117,57 @@
   {:else if comment.body != null}
     <div class={cn("text-sm", { "text-muted-foreground": hidden })}>
       <Markdown body={comment.body} />
+    </div>
+  {/if}
+  {#if comment.suggestion != null && !hidden}
+    {const suggestion = $derived(comment.suggestion)}
+    <div
+      class="grid gap-1.5 border-s-2 border-marker py-1 ps-3 text-sm"
+      aria-label={m.discussion_suggested()}
+      role="group"
+    >
+      <p class="text-xs text-muted-foreground">{m.discussion_suggested()}</p>
+      {#each Object.entries(suggestion.values) as [name, value] (name)}
+        <div class="grid gap-0.5">
+          <span class="text-xs text-muted-foreground"
+            >{labels[name]?.() ?? name}</span
+          >
+          <Proof
+            class={cn("flex-wrap", {
+              "whitespace-pre-line": name === "body_md",
+            })}
+            before={suggestion.before[name] ?? null}
+            after={value}
+          />
+        </div>
+      {/each}
+      {#if comment.accepted_revision != null}
+        <p class="text-xs font-semibold">
+          {m.discussion_accepted({ n: comment.accepted_revision })}
+        </p>
+      {:else if outdated}
+        <p class="text-xs text-muted-foreground">
+          {m.discussion_suggestion_outdated()}
+        </p>
+      {:else if canAccept}
+        <form
+          method="POST"
+          action="?/accept_suggestion"
+          class="mbs-1"
+          use:enhance={() => {
+            accepting = true;
+            return async ({ update }) => {
+              await update();
+              accepting = false;
+            };
+          }}
+        >
+          <input type="hidden" name="id" value={comment.id} />
+          <Button type="submit" size="sm" disabled={accepting}
+            >{m.discussion_accept()}</Button
+          >
+        </form>
+      {/if}
     </div>
   {/if}
   {#if mode === "read" && (canReply || comment.mine || canModerate)}

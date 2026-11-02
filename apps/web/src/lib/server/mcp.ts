@@ -101,6 +101,11 @@ const TOOLS: Array<{
     access: "key",
   },
   { name: "comment", procedure: router.proposals.comment, access: "key" },
+  {
+    name: "accept_suggestion",
+    procedure: router.proposals.accept,
+    access: "key",
+  },
   { name: "upload_document", procedure: router.uploads.create, access: "key" },
   { name: "get_upload", procedure: router.uploads.get, access: "key" },
   {
