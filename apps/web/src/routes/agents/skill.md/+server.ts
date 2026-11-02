@@ -1,5 +1,6 @@
 import { READ_ONLY } from "$app/env/public";
 import { GUIDE } from "#lib/server/rpc/agents.js";
+import { shapeSkill } from "#lib/server/skill.js";
 import skill from "#lib/server/skill.md?raw";
 import type { RequestHandler } from "./$types";
 
@@ -42,16 +43,7 @@ function reference() {
   return lines.join("\n");
 }
 
-const [dropped, kept] = READ_ONLY ? ["write", "read"] : ["read", "write"];
-const shaped = skill
-  .replaceAll(
-    new RegExp(
-      String.raw`<!-- ${dropped} -->\n?[\s\S]*?<!-- /${dropped} -->\n?`,
-      "gu",
-    ),
-    "",
-  )
-  .replaceAll(new RegExp(String.raw`<!-- /?${kept} -->\n?`, "gu"), "");
+const shaped = shapeSkill(skill, READ_ONLY ? "read" : "write");
 
 export const GET: RequestHandler = ({ url }) =>
   new Response(

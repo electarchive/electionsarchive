@@ -24,6 +24,7 @@ Read the matching file before working in its area:
 
 - JavaScript: `pnpm install`, `pnpm dev` (app on http://localhost:5173), `pnpm run check`, `pnpm run test` (engine golden tests), `pnpm run lint`, and `pnpm run format`. The `:fix` variants of lint and format apply fixes.
 - Interface text: edit `apps/web/messages/<locale>.json`, then run `pnpm run compile-paraglide`. Never edit `apps/web/src/lib/paraglide/`.
+- Agent skill: edit `apps/web/src/lib/server/skill.md`, then run `pnpm run skill` to regenerate `skills/electionsarchive/SKILL.md`, the read-only copy that `npx skills add electarchive/electionsarchive` installs. CI fails when the two drift.
 - Database: `docker compose -f infra/compose.yaml up -d`, then `pnpm --filter @ea/db migrate`. The migrations in `packages/db/migrations` are the source of truth for the DDL.
 - Python, from `pipelines/`: `uv sync`, `uv run ea --help`, `uv run ruff check`, `uv run ruff format`, and `uv run ty check`.
 

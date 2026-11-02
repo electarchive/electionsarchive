@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter @ea/web dev",
     "build": "pnpm --filter @ea/web build",
+    "skill": "pnpm --filter @ea/web skill",
     "compile-paraglide": "pnpm --filter @ea/web compile-paraglide",
     "check": "pnpm --recursive --workspace-concurrency=1 run check",
     "test": "pnpm --filter @ea/engine test",

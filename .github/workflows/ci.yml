@@ -24,6 +24,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run compile-paraglide
+      - run: pnpm run skill && git diff --exit-code skills
       - run: pnpm run check
       - run: pnpm run test
       - run: pnpm run format
