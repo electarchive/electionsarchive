@@ -80,7 +80,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                     {
                         "key": node["K"],
                         "text": node["C"],
-                        "vote_for": int(node["VF"] or 1),
+                        "vote_for": int(node["VF"]) if 0 < int(node["VF"] or 0) < 100 else 1,
                         "choices": [
                             {"text": choice, "party": party or None, "total": str(votes), "places": []}
                             for choice, party, votes in zip(node["CH"], node["P"], node["V"], strict=True)

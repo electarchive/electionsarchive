@@ -308,6 +308,7 @@ SPECIALS = (
     (r"LEVEE IMPROVEMENT DISTRICT|\bLID\b", "levee", "Levee Improvement District"),
     (r"(?:PUBLIC |MUNICIPAL )?IMPROVEMENT DISTRICT|\bPID\b", "improvement", "Improvement District"),
     (r"LIBRARY DISTRICT", "library", "Library District"),
+    (r"(?<!\bSUB )AMBULANCE DIST(?:RICT)?\b", "ambulance", "Ambulance District"),
     (
         r"COMMUNITY COLLEGE(?!S)(?: DISTRICT)?|JUNIOR COLLEGE(?: DISTRICT)?|COLLEGE DISTRICT|\bACC\b(?! INS)",
         "college",
@@ -316,8 +317,49 @@ SPECIALS = (
     (r"WATER RECLAMATION DIST(?:RICT)?", "reclamation", "Water Reclamation District"),
     (r"WATER (?:SUPPLY |IMPROVEMENT )?DISTRICT|WATER AUTHORITY|RIVER AUTHORITY", "water", "Water District"),
 )
+ILLINOIS_COLLEGES = {
+    "501": "Kaskaskia",
+    "502": "College of DuPage",
+    "503": "Black Hawk",
+    "504": "Triton",
+    "505": "Parkland",
+    "506": "Sauk Valley",
+    "507": "Danville Area",
+    "508": "City Colleges of Chicago",
+    "509": "Elgin",
+    "510": "South Suburban",
+    "511": "Rock Valley",
+    "512": "William Rainey Harper",
+    "513": "Illinois Valley",
+    "514": "Illinois Central",
+    "515": "Prairie State",
+    "516": "Waubonsee",
+    "517": "Lake Land",
+    "518": "Carl Sandburg",
+    "519": "Highland",
+    "520": "Kankakee",
+    "521": "Rend Lake",
+    "522": "Southwestern Illinois",
+    "523": "Kishwaukee",
+    "524": "Moraine Valley",
+    "525": "Joliet Junior",
+    "526": "Lincoln Land",
+    "527": "Morton",
+    "528": "McHenry County",
+    "529": "Illinois Eastern",
+    "530": "John A. Logan",
+    "531": "Shawnee",
+    "532": "College of Lake County",
+    "533": "Southeastern Illinois",
+    "534": "Spoon River",
+    "535": "Oakton",
+    "536": "Lewis and Clark",
+    "537": "Richland",
+    "539": "John Wood",
+    "540": "Heartland",
+}
 SPECIAL_LEAD = re.compile(
-    r"^(?:#?\d+|ISSUE \d+[A-Z]?|MEASURE [A-Z]{1,2}\d?|(?:ESD )?(?:PROPOSITION|PROP)(?: NO)?(?: (?:[IVX]+|[A-Z]|\d+[A-Z]?)(?![A-Z0-9]))?|QUESTION|(?:TO )?CREAT(?:E|ION OF)(?: AN?)?|"
+    r"^(?:#?\d+|ISSUE \d+[A-Z]?|MEASURE [A-Z]{1,2}\d?|(?:ESD )?(?:PROPOSITION|PROP)(?: NO\.?)?(?: (?:[IVX]+|[A-Z]|\d+[A-Z]?)(?![A-Z0-9]))?|QUESTION|(?:TO )?CREAT(?:E|ION OF)(?: AN?)?|"
     r"ANNEXATION(?: ELECTION)?(?: TO)?|PROPOSED(?: (?:ADDITIONAL )?TAX LEVY(?: (?:RENEWAL|ADDITIONAL|REPLACEMENT|INCREASE|AND|&))*)?)"
     r"(?![A-Z0-9])[ -]*"
 )
@@ -332,6 +374,7 @@ SCHOOL_WORDS = re.compile(
 SEATS = (
     (r"(?:PRECINCT|PCT|PREC)", "Precinct"),
     (r"(?:PLACE|PL)", "Place"),
+    (r"TRUSTEE ?AREA", "Trustee Area"),
     (r"(?:POSITION|POS|SEAT)", "Position"),
     (r"(?:SINGLE MEMBER DISTRICT|SUB-?DIST(?:RICT)?(?! ?\d+ ?(?:YR|YEAR))|DISTRICT|DIST|SMD)", "District"),
     (r"(?:WARD|WD)", "Ward"),
@@ -508,7 +551,7 @@ def _seat(text: str) -> tuple[str | None, str]:
         text = text.replace(court[0], " COURT ")
     for pattern, label in SEATS:
         found = re.search(rf"\b{pattern}\b ?(?:NO\b|NUMBER\b|NUM\b|#)? ?#? ?{NUMBER}", text)
-        if found is None or found[1] in ("A", "I") and label not in ("Place", "Position", "District"):
+        if found is None or found[1] in ("A", "I") and label not in ("Place", "Position", "District", "Trustee Area"):
             continue
         number = NUMBERS.get(found[1], found[1])
         parts.append(f"{label} {number.lstrip('0') or '0'}")
@@ -816,7 +859,9 @@ def parse(
                     "party": party,
                     "remainder": remainder,
                     "term": f"{NUMBERS.get(term[1], term[1])}-year term" if term else None,
-                    "magnitude": node["vote_for"],
+                    "magnitude": int(printed[1])
+                    if (printed := re.search(r"\(VOTE FOR (\d+)\)", text.upper()))
+                    else node["vote_for"],
                     "whole": bool(node.get("whole")),
                     "summed": bool(node.get("summed")),
                     **found,
@@ -1063,12 +1108,26 @@ def _district(
     seat, head = _seat(head)
     if seat is None:
         seat, tail = _seat(tail)
+    if kind == "ambulance":
+        head = re.sub(
+            rf"^((?:NORTH|SOUTH|EAST|WEST) {re.escape(county_name)})$", r"\1 COUNTY", head.replace("TWP", "TOWNSHIP")
+        )
+        if number:
+            seat, number = seat or f"District {number[1].lstrip('0')}", None
     if clean:
         head = re.sub(r"^.*\b(?:FOR|TO)\b|\bTERM\b", " ", head)
     if names and (city := re.search(rf"\b(?:CITY|TOWN|VILLAGE) OF ({'|'.join(map(re.escape, names))})\b", head)):
         head = (head[: city.start()] + " " + head[city.end() :]).strip() or city[1]
     head = re.sub(r"\b(?:PROPOSITION|PROP) [A-Z0-9]+\b|\b(?:CITY|TOWN|VILLAGE) OF [A-Z]+\b|^.*\bFOR\b", " ", head)
-    head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/")
+    head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/.")
+    if (
+        kind == "fire"
+        and number
+        and re.fullmatch(
+            "|".join([re.escape(county_name), r"(?:.+ )?ETJ", "UNINCORPORATED", *map(re.escape, names)]), head
+        )
+    ):
+        head = "COUNTY"
     if head in ("", "COUNTY") or head.startswith("COUNTY "):
         head = f"{county_name} {head or 'COUNTY'}" if head.startswith("COUNTY") else f"{county_name} COUNTY"
     if kind == "college" and re.search(r"\bACC\b(?! INS)|AUSTIN", text):
@@ -1128,10 +1187,15 @@ def _classify(
                     "seat": seat,
                     "label": None,
                 }
-    plain = re.sub(rf"\b{re.escape(county_name)} (?:COUNTY|CO)\b", "COUNTY", plain)
+    plain = re.sub(
+        rf"(?<!\bNORTH )(?<!\bSOUTH )(?<!\bEAST )(?<!\bWEST )\b{re.escape(county_name)} (?:COUNTY|CO)\b",
+        "COUNTY",
+        plain,
+    )
+    plain = re.sub(rf"\b((?:NORTH|SOUTH|EAST|WEST) {re.escape(county_name)}) CO\b", r"\1 COUNTY", plain)
     label = re.sub(r"\s+", " ", plain).strip()
     if (SCHOOL.search(plain) or st == "NY" and "EDUCATION" in plain) and school_names:
-        bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", plain)).strip()
+        bare = re.sub(r"\s+", " ", SCHOOL_WORDS.sub(" ", re.sub(r"\bTRUSTEE AREA\b", "TRUSTEEAREA", plain))).strip()
         for name, code in school_names:
             if elementary:
                 name = re.sub(r"\s+", " ", re.sub(r"\bELEMENTARY\b", " ", name)).strip()
@@ -1202,6 +1266,20 @@ def _classify(
                 names,
                 True,
             )
+            if st == "IL" and kind == "college":
+                found = re.search(r"(?:COLLEGE|DIST\w*|NO\.?|#) ?#? ?(5[0-4]\d)\b", plain)
+                number = (
+                    found[1]
+                    if found and found[1] in ILLINOIS_COLLEGES
+                    else next(
+                        (code for code, name in ILLINOIS_COLLEGES.items() if re.search(rf"\b{name.upper()}\b", plain)),
+                        None,
+                    )
+                )
+                if number is not None:
+                    display = legacy = f"{ILLINOIS_COLLEGES[number]} Community College District {number}"
+                    if seat is not None and re.fullmatch(rf"\D*{number}", seat):
+                        seat = None
             return {
                 "scheme": "us.special_district",
                 "code": f"{county}:{kind}:{slug(display)}",
@@ -1516,11 +1594,19 @@ def _pieces(
         return contests, lines, yielded, absorbed, fitted
     extra = pl.DataFrame(
         [{column: row.get(column) for column in contests.columns} for row in added],
-        schema=contests.schema,
-        orient="row",
+        schema_overrides={column: kind for column, kind in contests.schema.items() if kind != pl.Null},
+        infer_schema_length=None,
     ).with_columns([pl.col(column).fill_null(False) for column, kind in contests.schema.items() if kind == pl.Boolean])
+    joined = pl.col("contest_key").is_in(list(absorbed))
     return (
-        pl.concat([contests, extra]).sort("day", "contest_key", "county"),
+        pl.concat([contests, extra], how="vertical_relaxed")
+        .with_columns(
+            pl.when(joined)
+            .then(pl.col("magnitude").max().over("contest_key"))
+            .otherwise(pl.col("magnitude"))
+            .alias("magnitude")
+        )
+        .sort("day", "contest_key", "county"),
         pl.concat(
             [
                 lines,
