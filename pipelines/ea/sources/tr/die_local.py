@@ -22,6 +22,7 @@ from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
+from ea.sources.tr.names import province_name
 from ea.sources.tr.tuik_secim import ILCE_ALIASES, norm
 from ea.sources.tr.ysk import DIGITIZED, PROVINCES, REGISTERED, VALID, VOTERS, VOTES, title
 from ea.sources.tr.ysk_local import own_area, own_areas, successors
@@ -1792,6 +1793,7 @@ def emit() -> Path:
                     plate = f"{row['plate']:02}"
                     province = PROVINCES[row["plate"] - 1]
                     province_slug = slug(province)
+                    shown = province_name(row["plate"], day)
                     frame = grouped.get((table, row["seq"]))
                     if frame is None:
                         if row["level"] == "district" and table != "il_genel":
@@ -1800,7 +1802,7 @@ def emit() -> Path:
                         continue
                     if row["level"] == "province":
                         level, unit = "province", cs.unit("tr.il", plate)
-                        place = province
+                        place = shown
                     elif table == "il_genel":
                         level, unit, place = "district", ilce(plate, row["name"], row["alias"]), row["name"]
                     else:
@@ -1811,7 +1813,7 @@ def emit() -> Path:
                             current[plate] = label
                             central = label == "Merkez"
                             parts = [province_slug] if central else [province_slug, slug(label)]
-                            english = province if central else label
+                            english = shown if central else label
                             scheme, code = "tr.ilce", "-".join(parts)
                             district = label
                         else:
