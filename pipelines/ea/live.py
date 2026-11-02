@@ -60,8 +60,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
         if not any(not url.endswith(enr_2026.LISTINGS) for url in pages):
-            record(conn, feed, fetched_at, None, None, None, "error", "no result pages")
-            return "no result pages"
+            record(conn, feed, fetched_at, None, None, None, "unchanged", "waiting: no result pages yet")
+            return "waiting: no result pages yet"
         digest = hashlib.sha256()
         for url in sorted(pages):
             if not url.endswith(enr_2026.LISTINGS):
