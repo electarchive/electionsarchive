@@ -1307,6 +1307,12 @@ def plan(
                     and not towns[segment] & words
                 ):
                     continue
+                if ":measure:public-measure-" in key:
+                    code = key.rsplit("public-measure-", 1)[1]
+                    if code not in words or not (
+                        titles.get(contest, set()) & words - GENERIC - {code, "public", "school", "community"}
+                    ):
+                        continue
                 overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
                 if (
                     overlap < 0.6
