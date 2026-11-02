@@ -479,10 +479,51 @@ JUNK = re.compile(
 )
 
 
-def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
+SPILLED = re.compile(
+    r"Board Signatures|CHECK BOTH SIDES|Page ?2 ?of|Require voters to present|Review Both Sides|Joint Resolution of the General|\b(?:Republican|Democratic)\b"
+)
+NEXT_HEAD = re.compile(r"^(?:PROPOSED\b|Proposed (?:Tax|Income|Municipal|Charter)\b)")
+CHOICE = re.compile(r"^(?:(?:FOR|AGAINST)\b[A-Z ]*|YES|NO)$")
+SPILL = re.compile(r"This proposed amendment would|Require voters to present|PHOTO IDENTIFICATION|SHALL THE AMENDMENT")
+
+
+def stacked_bodies(lines: list[str], start: int, wanted: int) -> list[str]:
+    bodies: list[str] = []
+    current: list[str] = []
+    for line in lines[start:]:
+        if line.startswith("This sample ballot was produced"):
+            break
+        if CHOICE.match(line):
+            text = re.sub(r"\s+", " ", " ".join(current)).strip()
+            current = []
+            if text and not SPILL.search(text):
+                bodies.append(text)
+                if len(bodies) == wanted:
+                    break
+        elif not re.match(r"^(?:CHECK BOTH SIDES|Page\s*\d+\s*of\s*\d+)$", line):
+            current.append(line)
+    return bodies
+
+
+def ballot_issues(lines: list[str], url: str, county: str, stacked: bool = False) -> list[dict[str, str]]:
     lines = [line.strip() for line in lines if line.strip() and not NOISE.match(line.strip())]
     rows = []
     seen = set()
+    stack: list[tuple[list[str], str, int]] = []
+
+    def flush() -> None:
+        if stacked and len(stack) > 0:
+            bodies = stacked_bodies(lines, stack[-1][2] + 1, len(stack))
+            if len(bodies) == len(stack):
+                for (head, kind, _), text in zip(stack, bodies, strict=True):
+                    key = (tuple(head), text)
+                    if key not in seen:
+                        seen.add(key)
+                        rows.append(
+                            {"url": url, "county": county, "kind": kind, "entity": "|".join(head[1:]), "text": text}
+                        )
+            stack.clear()
+
     for index, line in enumerate(lines):
         if not MAJORITY.match(line):
             continue
@@ -494,7 +535,8 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
         head.reverse()
         for offset, text in enumerate(head):
             if MAJORITY.match(text) or text.startswith("necessary for"):
-                head = head[:offset]
+                after = head[offset + 1 :]
+                head = after if any(START.match(entry) for entry in after) else head[:offset]
                 break
         for offset, text in enumerate(head):
             if START.match(text):
@@ -528,13 +570,21 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
         ].strip()
         text = re.split(JUNK, text)[0].strip()
         text = re.sub(r"^(?:TO REQUIRE VOTERS TO PRESENT )?PHOTO IDENTIFICATION IN ORDER TO VOTE\s*", "", text)
+        text = re.sub(r"^(?:A majority (?:affirmative )?vote is necessary for passage\.\s*|passage\.\s*)+", "", text)
+        if any(NEXT_HEAD.match(line) for line in body):
+            text = ""
         if re.match(JUNK, text) or len(text) < 60 or re.search(r"\b(?:Republican|Democratic)\b", text[:300]):
             text = ""
         kind = head[0] + (" " + head[1] if len(head) > 1 and head[1].startswith("(") else "")
         key = (tuple(head), text)
-        if text and key not in seen:
+        if not text:
+            stack.append((head, kind, index))
+            continue
+        flush()
+        if key not in seen:
             seen.add(key)
             rows.append({"url": url, "county": county, "kind": kind, "entity": "|".join(head[1:]), "text": text})
+    flush()
     return rows
 
 
@@ -633,6 +683,23 @@ def mf_samples() -> list[dict[str, str]]:
             found = ballot_issues(text.split("\n"), key, county)
             if found:
                 break
+        if text.strip():
+            heads = {re.sub(r"\W", "", row["kind"] + row["entity"] + row["text"]).lower() for row in found}
+            texts = {re.sub(r"\W", "", row["text"]).lower() for row in found}
+            for flags in ([], ["-raw"]):
+                layout = subprocess.run(
+                    ["pdftotext", *flags, str(raw.cached(SOURCE, key).path), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
+                for row in ballot_issues(layout.split("\n"), key, county, stacked=True):
+                    head = re.sub(r"\W", "", row["kind"] + row["entity"] + row["text"]).lower()
+                    body = re.sub(r"\W", "", row["text"]).lower()
+                    if head not in heads and body not in texts:
+                        heads.add(head)
+                        texts.add(body)
+                        found.append(row)
         if not text.strip():
             found = ballot_issues(ocr(key, re.sub(r"\W+", "-", f"{county}-{path.stem}").lower()), key, county)
         if not found:
@@ -974,7 +1041,7 @@ def emit() -> Path:
     frame = frame.filter(
         ~pl.col("text").str.contains(
             r"(?i)Joint Resolution of the General Assembly|Require voters to present|"
-            r"\b(?:Republican|Democratic)\b|Review Both Sides|CHECK BOTH SIDES|Board Signatures|Page\s*\d+\s*of\s*\d+"
+            r"\b(?:Republican|Democratic)\b|Review Both Sides|CHECK BOTH SIDES|Board Signatures|Page\s*\d+\s*of\s*\d+|Vote for not more than|\S{40,}"
         )
         & (pl.col("text").str.len_chars() >= 60)
     )
@@ -1038,7 +1105,41 @@ def emit() -> Path:
             table = folder / "ballot_question_text.parquet"
             if table.exists() and json.loads((folder / "manifest.json").read_text())["pipeline"] == SOURCE:
                 covered |= {UUID(str(contest)) for contest in pl.read_parquet(table)["contest_id"]}
-        kept = 0
+        kept = [0]
+        loaded: set[UUID] = set()
+
+        def load(contest: UUID, row: dict[str, str]) -> None:
+            kept[0] += 1
+            loaded.add(contest)
+            if row["url"] not in sources:
+                _, _, publisher, title = SOURCES.get(row["url"]) or (
+                    "",
+                    None,
+                    row.get("publisher") or "Franklin County Board of Elections",
+                    row.get("title")
+                    or f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
+                )
+                sources[row["url"]] = cs.source(publisher, title)
+                cs.add(
+                    "source",
+                    id=sources[row["url"]],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=row["url"],
+                )
+                cs.artifact(raw.cached(SOURCE, row["url"]), sources[row["url"]])
+            cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
+            cs.add(
+                "ballot_question_text",
+                contest_id=contest,
+                kind="text",
+                lang="en",
+                body=row["text"],
+                url=row["url"],
+                source_id=sources[row["url"]],
+            )
+
         used: set[UUID] = set()
         pending = list(frame.iter_rows(named=True))
         progress = True
@@ -1053,39 +1154,27 @@ def emit() -> Path:
                     continue
                 progress = True
                 used.add(contest)
-                if contest in covered and existing.get((contest, row["url"]), row["text"]) == row["text"]:
+                previous = existing.get((contest, row["url"]))
+                if contest in covered and (previous is None or previous == row["text"] or not SPILLED.search(previous)):
                     continue
-                kept += 1
-                if row["url"] not in sources:
-                    _, _, publisher, title = SOURCES.get(row["url"]) or (
-                        "",
-                        None,
-                        row.get("publisher") or "Franklin County Board of Elections",
-                        row.get("title")
-                        or f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
-                    )
-                    sources[row["url"]] = cs.source(publisher, title)
-                    cs.add(
-                        "source",
-                        id=sources[row["url"]],
-                        kind="official_body",
-                        publisher=publisher,
-                        title=title,
-                        url=row["url"],
-                    )
-                    cs.artifact(raw.cached(SOURCE, row["url"]), sources[row["url"]])
-                cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
-                cs.add(
-                    "ballot_question_text",
-                    contest_id=contest,
-                    kind="text",
-                    lang="en",
-                    body=row["text"],
-                    url=row["url"],
-                    source_id=sources[row["url"]],
-                )
+                load(contest, row)
             pending = deferred
+
+        broken: dict[str, set[UUID]] = {}
+        for (contest, url), body in existing.items():
+            if SPILLED.search(body):
+                broken.setdefault(url, set()).add(contest)
+        everyone = {entry[0] for entries in contests.values() for entry in entries}
+        for url, bad in broken.items():
+            taken = everyone - bad
+            for row in frame.filter(pl.col("url") == url).iter_rows(named=True):
+                county = COUNTY_OF.get(row["entity"], row["county"])
+                contest = pick(row, contests, taken, fips[ceda._core(f"{county} County")])
+                if contest is not None:
+                    taken.add(contest)
+                    if contest not in loaded and SPILLED.search(existing[(contest, url)]):
+                        load(contest, row)
         for row in pending:
             print("no match:", row.get("county"), row["entity"], row["kind"])
-        print(f"{kept} of {frame.height} issues")
+        print(f"{kept[0]} of {frame.height} issues")
         return cs.write()
