@@ -931,13 +931,15 @@ def emit() -> Path:
                     valid_from_precision="day",
                     valid_to=group_end,
                 )
-            parties_here = [token.strip() for token in re.split(r"\s*[/–-]\s*", row["party"]) if token.strip()]
-            if len(parties_here) == 1 and term >= 7 and parties_here[0] in ("CHP", "DP"):
+            parties_here = {
+                token.replace("(Müstakil)", "").strip() for token in re.split(r"\s*[/–-]\s*", row["party"]) if token.strip()
+            }
+            if len(parties_here) == 1 and term >= 7 and next(iter(parties_here)) in ("CHP", "DP"):
                 cs.add(
                     "tenure_affiliation",
                     tenure_id=tenure,
                     kind="party",
-                    party_id=chp if parties_here[0] == "CHP" else dp,
+                    party_id=chp if "CHP" in parties_here else dp,
                     valid_from=start,
                     valid_from_precision="day" if exact else "unknown",
                     valid_to=ended,
