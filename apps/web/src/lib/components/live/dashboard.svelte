@@ -580,6 +580,39 @@
   {/if}
 {/snippet}
 
+{#snippet seatTip(entry: Seat)}
+  {const summary = $derived(entry.summary)}
+  <span class="text-sm font-semibold"
+    >{summary.race.office === "house"
+      ? `${name(summary.race.state)}, ${
+          summary.race.district == null || summary.race.district === "0"
+            ? m.night_nation_house()
+            : m.night_rail_house({ district: summary.race.district })
+        }`
+      : name(summary.race.state)}</span
+  >
+  {@render chip(summary)}
+  <span class="flex justify-between gap-3 text-muted-foreground">
+    <span
+      >{m.night_tip_held({
+        party: short(entry.held),
+        name: entry.holder,
+      })}</span
+    >
+    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && pair != null}
+      <span class="font-figures tabular-nums"
+        >{entry.left >= entry.right ? pair[0].short : pair[1].short}
+        {percent(Math.max(entry.left, entry.right), 0)}</span
+      >
+    {/if}
+  </span>
+  {#if summary.counted != null}
+    <span class="text-muted-foreground"
+      >{m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
+    >
+  {/if}
+{/snippet}
+
 {#snippet district(key: string)}
   {const summary = $derived(districts.get(key))}
   {#if summary == null}
@@ -801,8 +834,11 @@
         title={NAMES.senate()}
         {forecasts}
         label={fullLabel}
+        name={label}
         href={seatHref}
         shade={seatShade}
+        detail={seatTip}
+        line={chip}
       />
       <Chambers
         view={chambers.house}
@@ -810,16 +846,22 @@
         title={NAMES.house()}
         {forecasts}
         label={fullLabel}
+        name={label}
         href={seatHref}
         shade={seatShade}
+        detail={seatTip}
+        line={chip}
       />
       <Governors
         view={chambers.governor}
         sides={pair}
         title={m.night_nation_governors()}
         label={fullLabel}
+        name={label}
         href={seatHref}
         shade={seatShade}
+        detail={seatTip}
+        line={chip}
       />
     </div>
     {#if forecasts}

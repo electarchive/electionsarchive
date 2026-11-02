@@ -1,9 +1,16 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
+  import type { Point } from "#lib/live/hover.js";
   import type { ChamberView, Family, Seat } from "#lib/live/nation.js";
+  import type { Summary } from "#lib/live/summary.js";
   import { numbers, percent } from "#lib/format.js";
+  import { pointAt } from "#lib/live/hover.js";
   import { odds } from "#lib/live/nation.js";
+  import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Card from "./card.svelte";
+  import Sheet from "./sheet.svelte";
 
   const {
     view,
@@ -11,45 +18,62 @@
     title,
     forecasts,
     label,
+    name,
     href,
     shade,
+    detail,
+    line,
   }: {
     view: ChamberView;
     sides: [Family, Family];
     title: string;
     forecasts: boolean;
     label: (seat: Seat) => string;
+    name: (seat: Seat) => string;
     href: (seat: Seat) => string;
     shade: (seat: Seat) => string;
+    detail: Snippet<[Seat]>;
+    line: Snippet<[Summary | undefined]>;
   } = $props();
+
+  let point = $state<Point | null>(null);
+  let isOpen = $state(false);
+  const narrow = $derived(isNarrowLayout());
 
   const left = $derived(sides[0]);
   const right = $derived(sides[1]);
   const OTHER =
     "color-mix(in oklab, var(--muted-foreground) 55%, var(--background))";
 
+  const others = $derived({
+    id: "other",
+    name: m.night_chamber_others(),
+    short: "",
+    color: OTHER,
+  });
+
   type Cell =
-    | { kind: "hold"; color: string; key: string }
+    | { kind: "hold"; family: Family; count: number; key: string }
     | { kind: "race"; seat: Seat; key: string };
 
   const cells = $derived.by(() => {
     const found: Array<Cell> = [];
-    const hold = (count: number, color: string, prefix: string) => {
+    const hold = (count: number, family: Family, prefix: string) => {
       for (let index = 0; index < count; index += 1) {
-        found.push({ kind: "hold", color, key: `${prefix}${index}` });
+        found.push({ kind: "hold", family, count, key: `${prefix}${index}` });
       }
     };
-    hold(view.tallies.left.holdover, left.color, "l");
+    hold(view.tallies.left.holdover, left, "l");
     const leaning = view.order.filter((seat) => seat.lean >= 0);
     const trailing = view.order.filter((seat) => seat.lean < 0);
     for (const seat of leaning) {
       found.push({ kind: "race", seat, key: seat.summary.race.id });
     }
-    hold(view.tallies.other.holdover, OTHER, "o");
+    hold(view.tallies.other.holdover, others, "o");
     for (const seat of trailing) {
       found.push({ kind: "race", seat, key: seat.summary.race.id });
     }
-    hold(view.tallies.right.holdover, right.color, "r");
+    hold(view.tallies.right.holdover, right, "r");
     return found;
   });
 
@@ -67,24 +91,14 @@
       view.tallies.right.holdover,
   );
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
-  const legend = $derived([
+  const families = $derived([
     { family: left, tally: view.tallies.left },
     { family: right, tally: view.tallies.right },
     ...(view.tallies.other.won +
       view.tallies.other.ahead +
       view.tallies.other.holdover >
     0
-      ? [
-          {
-            family: {
-              id: "other",
-              name: m.night_chamber_others(),
-              short: "",
-              color: OTHER,
-            },
-            tally: view.tallies.other,
-          },
-        ]
+      ? [{ family: others, tally: view.tallies.other }]
       : []),
   ]);
 
@@ -116,6 +130,73 @@
     return value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : "0";
   }
 </script>
+
+{#snippet grid(isLinked: boolean)}
+  <div
+    class="grid gap-px"
+    style:grid-template-rows="repeat({rows}, minmax(0, 1fr))"
+    style:grid-template-columns="repeat({columns}, minmax(0, 1fr))"
+    style:grid-auto-flow="column"
+  >
+    {#each cells as cell, index (cell.key)}
+      {#if cell.kind === "hold"}
+        <span
+          data-cell={index}
+          class="rounded-[1px] block-3.5"
+          style:background-image="repeating-linear-gradient(135deg, {cell.family
+            .color}
+          0 1.5px, color-mix(in oklab, {cell.family.color} 30%, var(--background))
+          1.5px 3px)"
+          aria-hidden="true"
+        ></span>
+      {:else if isLinked}
+        <a
+          href={href(cell.seat)}
+          data-cell={index}
+          class="rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
+          style:background-color={shade(cell.seat)}
+          aria-label={label(cell.seat)}
+        ></a>
+      {:else}
+        <span
+          class="rounded-[1px] block-3.5"
+          style:background-color={shade(cell.seat)}
+        ></span>
+      {/if}
+    {/each}
+  </div>
+  <span
+    class="pointer-events-none absolute -inset-y-1 inset-s-1/2 border-s-2 border-foreground"
+    aria-hidden="true"
+  ></span>
+{/snippet}
+
+{#snippet legend()}
+  <dl class="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-0.5 text-xs">
+    {#each families as row (row.family.id)}
+      <dt class="flex items-center gap-1.5">
+        <span
+          class="rounded-full block-2 inline-2"
+          style:background-color={row.family.color}
+        ></span>{row.family.name}
+      </dt>
+      <dd class="font-figures text-muted-foreground tabular-nums">
+        {m.night_chamber_breakdown({
+          won: row.tally.won,
+          ahead: row.tally.ahead,
+          holdover: row.tally.holdover,
+        })}
+      </dd>
+      <dd
+        class={cn("text-end font-figures font-semibold tabular-nums", {
+          "text-muted-foreground": row.tally.gains === row.tally.losses,
+        })}
+      >
+        {signed(row.tally.gains - row.tally.losses)}
+      </dd>
+    {/each}
+  </dl>
+{/snippet}
 
 <section class="grid content-start gap-3 bg-background px-4 py-5 sm:px-6">
   <header class="flex items-baseline justify-between gap-3">
@@ -157,63 +238,49 @@
     </p>
   </div>
 
-  <div class="relative">
-    <div
-      class="grid gap-px"
-      style:grid-template-rows="repeat({rows}, minmax(0, 1fr))"
-      style:grid-template-columns="repeat({columns}, minmax(0, 1fr))"
-      style:grid-auto-flow="column"
+  {#if narrow}
+    <button
+      type="button"
+      class="relative grid gap-2 text-start"
+      aria-label={m.night_chamber_open({ title })}
+      onclick={() => {
+        isOpen = true;
+      }}
     >
-      {#each cells as cell (cell.key)}
-        {#if cell.kind === "hold"}
-          <span
-            class="rounded-[1px] block-3.5"
-            style:background-image="repeating-linear-gradient(135deg, {cell.color}
-            0 1.5px, color-mix(in oklab, {cell.color} 30%, var(--background)) 1.5px
-            3px)"
-            aria-hidden="true"
-          ></span>
-        {:else}
-          <a
-            href={href(cell.seat)}
-            class="rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
-            style:background-color={shade(cell.seat)}
-            title={label(cell.seat)}
-            aria-label={label(cell.seat)}
-          ></a>
+      <span class="relative grid">{@render grid(false)}</span>
+      <span class="text-xs text-muted-foreground">{m.night_chamber_tap()}</span>
+    </button>
+  {:else}
+    <div
+      class="relative"
+      role="presentation"
+      onpointermove={(event) => {
+        point = pointAt(event);
+      }}
+      onpointerleave={() => {
+        point = null;
+      }}
+    >
+      {@render grid(true)}
+      {#if point != null}
+        {const cell = $derived(cells[point.index])}
+        {#if cell != null}
+          <Card {point}>
+            {#if cell.kind === "race"}
+              {@render detail(cell.seat)}
+            {:else}
+              <span class="text-sm font-semibold">{cell.family.name}</span>
+              <span class="text-muted-foreground"
+                >{m.night_chamber_not_up({ count: cell.count })}</span
+              >
+            {/if}
+          </Card>
         {/if}
-      {/each}
+      {/if}
     </div>
-    <span
-      class="pointer-events-none absolute -inset-y-1 inset-s-1/2 border-s-2 border-foreground"
-      aria-hidden="true"
-    ></span>
-  </div>
+  {/if}
 
-  <dl class="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-0.5 text-xs">
-    {#each legend as row (row.family.id)}
-      <dt class="flex items-center gap-1.5">
-        <span
-          class="rounded-full block-2 inline-2"
-          style:background-color={row.family.color}
-        ></span>{row.family.name}
-      </dt>
-      <dd class="font-figures text-muted-foreground tabular-nums">
-        {m.night_chamber_breakdown({
-          won: row.tally.won,
-          ahead: row.tally.ahead,
-          holdover: row.tally.holdover,
-        })}
-      </dd>
-      <dd
-        class={cn("text-end font-figures font-semibold tabular-nums", {
-          "text-muted-foreground": row.tally.gains === row.tally.losses,
-        })}
-      >
-        {signed(row.tally.gains - row.tally.losses)}
-      </dd>
-    {/each}
-  </dl>
+  {@render legend()}
 
   {#if forecasts && isInformed}
     <div class="grid gap-1.5 border-bs border-border pbs-3">
@@ -297,3 +364,17 @@
         })}
   </p>
 </section>
+
+{#if narrow}
+  <Sheet
+    bind:isOpen
+    {title}
+    note={m.night_chamber_majority({ count: view.majority })}
+    seats={view.order}
+    {name}
+    {href}
+    {shade}
+    {line}
+    summary={legend}
+  />
+{/if}
