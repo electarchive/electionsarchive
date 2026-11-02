@@ -133,7 +133,7 @@
             <p class="text-xs text-muted-foreground">
               {[
                 bounty.place ?? bounty.polity.toUpperCase(),
-                bounty.years === "" ? null : bounty.years,
+                bounty.years === "" ? null : bounty.years.replace("-", "–"),
                 GRAIN_LABELS[bounty.grain]?.() ?? bounty.grain,
                 bounty.category === "blocked"
                   ? CATEGORY_LABELS.blocked()

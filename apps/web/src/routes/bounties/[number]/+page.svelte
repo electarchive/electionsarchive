@@ -25,7 +25,7 @@
       },
       {
         term: m.bounty_years(),
-        value: bounty.years === "" ? null : bounty.years,
+        value: bounty.years === "" ? null : bounty.years.replace("-", "–"),
       },
       {
         term: m.bounty_level(),
