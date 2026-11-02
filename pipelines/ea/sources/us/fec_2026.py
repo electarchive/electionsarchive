@@ -17,6 +17,7 @@ import polars as pl
 from ea import raw, readiness, statewide_table
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.names import initials
+from ea.sources.us import oh_general_2026
 from ea.sources.us.oe_primaries_2026 import FIPS
 from ea.store import DATA, connect
 
@@ -443,6 +444,10 @@ SPECIAL_2026 = {
     ("WV", "senate:17:1"): "senate:17",
 }
 TX_SPECIAL = "https://goelect.txelections.civixapps.com/api-ivis-cbp/api/cbp/findQualifiedCandidates#{}"
+BALLOT_LISTS = {
+    "OH": (oh_general_2026.SOURCE, oh_general_2026.PUBLISHER, oh_general_2026.TITLE, oh_general_2026.FEED),
+}
+BALLOT_PARTIES = {"DEM": "Democratic Party", "REP": "Republican Party", "LIB": "Libertarian Party"}
 SPECIAL_LISTS = {
     "FL": (
         "Florida Department of State, Division of Elections",
@@ -1965,6 +1970,23 @@ def parse() -> None:
                 for office, district, text in TRANSCRIBED.get(url.rsplit("/", 1)[-1], [])
             ),
         ]
+    ] + [
+        {
+            "state": state,
+            "office": "house"
+            if len(parts) == 4
+            else "state senator"
+            if parts[2] == "senate"
+            else "state representative",
+            "district": int(parts[3]),
+            "name": name,
+            "party": BALLOT_PARTIES.get(party, "Independent"),
+            "url": feed,
+        }
+        for state, (source, _, _, feed) in BALLOT_LISTS.items()
+        for line in (DATA / "parsed" / source / "candidates.tsv").read_text().splitlines()
+        for key, name, party in [line.split("\t")]
+        for parts in [key.split(":")]
     ]
     frame = pl.DataFrame(
         rows,
@@ -2458,6 +2480,17 @@ def emit() -> Path:
             [SOURCE, f"{DAY}:%"],
         ).fetchall():
             held.setdefault(value, {})[person] = (option, candidacy)
+        labels: dict[str, list[str]] = {}
+        for value, label in conn.execute(
+            """select x.value, op.ballot_label
+               from external_id x
+               join contest_option op on op.contest_id = x.entity_id and op.ballot_label is not null
+               join changeset c on c.id = op.changeset_id and c.pipeline = %s
+               where x.scheme = 'us.contest' and x.value like %s
+                 and not exists (select from entity_retirement r where r.entity_id = op.id)""",
+            [SOURCE, f"{DAY}:%"],
+        ).fetchall():
+            labels.setdefault(value, []).append(re.sub(r"\s*\(write-in\)", "", label, flags=re.IGNORECASE))
         option_keys = dict(
             conn.execute(
                 "select entity_id, value from external_id where scheme = 'us.option' and value like %s", [f"{DAY}:%"]
@@ -2707,9 +2740,20 @@ def emit() -> Path:
             listing = None
             if state in OFFICIAL and key in listed:
                 listing = (
-                    f"special:{state}" if listed[key][0]["url"] in SPECIAL_LISTS.get(state, ("", "", []))[2] else state
+                    f"special:{state}"
+                    if listed[key][0]["url"] in SPECIAL_LISTS.get(state, ("", "", []))[2]
+                    else f"ballot:{state}"
+                    if state in BALLOT_LISTS and listed[key][0]["url"] == BALLOT_LISTS[state][3]
+                    else state
                 )
-                publisher, title, urls = SPECIAL_LISTS[state] if listing != state else OFFICIAL[state]
+                cache = BALLOT_LISTS[state][0] if listing.startswith("ballot:") else SOURCE
+                publisher, title, urls = (
+                    SPECIAL_LISTS[state]
+                    if listing.startswith("special:")
+                    else (*BALLOT_LISTS[state][1:3], [BALLOT_LISTS[state][3]])
+                    if listing.startswith("ballot:")
+                    else OFFICIAL[state]
+                )
                 if listing not in sources:
                     sources[listing] = cs.source(publisher, title)
                     if sources[listing] in cs.minted:
@@ -2723,7 +2767,7 @@ def emit() -> Path:
                             license=None,
                         )
                     for url in urls:
-                        cs.artifact(raw.cached(SOURCE, url), sources[listing])
+                        cs.artifact(raw.cached(cache, url), sources[listing])
                 if all(row["name"] == "No Candidate Qualified" for row in listed[key]):
                     cs.add(
                         "label",
@@ -2737,7 +2781,11 @@ def emit() -> Path:
                     text, label = str(row["name"]), str(row["party"])
                     if text == "No Candidate Qualified":
                         continue
-                    person = person_of(state, key, chamber, int(rest[0]) if chamber == "house" else None, text)
+                    lookup = text
+                    if listing.startswith("ballot:"):
+                        lookup = next((held for held in labels.get(key, []) if oh_general_2026.same(text, held)), text)
+                        text = lookup if oh_general_2026.matches(text, lookup) else text
+                    person = person_of(state, key, chamber, int(rest[0]) if chamber == "house" else None, lookup)
                     if " " not in text:
                         text = next((held for held_person, held in known.get(key, []) if held_person == person), text)
                     entries.append(
@@ -2871,6 +2919,8 @@ def emit() -> Path:
                     counts["dropped"] += 1
             if state in SUPPLEMENTED and listing is not None and not key.endswith(":gs"):
                 body = f"Candidates are the {state_name} nominees recorded in the archive's own 2026 primary result sets, the unopposed primary candidates, and the independent candidates qualified for the general election ballot on the {publisher}'s {title}. Declared write-in candidates are not listed."
+            elif listing is not None and listing.startswith("ballot:"):
+                body = f"Candidates are those on the {publisher}'s election night reporting ballot for the 2026-11-03 general election, including independent and third-party candidates. Declared write-in candidates are not listed."
             elif listing is not None:
                 body = f"Candidates are those on the {publisher}'s {title}, as certified for the 2026-11-03 ballot. Declared write-in candidates are not listed."
             elif key in nominees:
