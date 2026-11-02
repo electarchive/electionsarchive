@@ -247,6 +247,11 @@ def emit() -> Path:
                 option = civil.town(entity, "19147")
             elif "School District" in entity:
                 option = civil.school(entity)
+                if option is None:
+                    lea = entity.replace(" Community ", " Comm ")
+                    leaids = [leaid for leaid, name in civil.school_specs if name == lea]
+                    if len(leaids) == 1:
+                        option = civil.mint("us.school_district", leaids[0], entity)
             elif entity == "Kirkwood Community College":
                 county_key = f"us.county:{LINN}"
                 if county_key in found:
