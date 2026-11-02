@@ -2,8 +2,7 @@
   import type { Snippet } from "svelte";
   import { resolve } from "$app/paths";
   import { getContext } from "svelte";
-  import PartyCard from "#lib/components/party-card.svelte";
-  import PersonCard from "#lib/components/person-card.svelte";
+  import { cards, loadCards } from "#lib/cards.svelte.js";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { isTouch, show } from "#lib/explain.svelte.js";
   import { WITHIN } from "#lib/party.js";
@@ -50,7 +49,15 @@
 {#if person == null && party == null}
   <span class={className}>{@render (children ?? face)()}</span>
 {:else}
-  <HoverCard.Root openDelay={280} closeDelay={120}>
+  <HoverCard.Root
+    openDelay={280}
+    closeDelay={120}
+    onOpenChange={(open: boolean) => {
+      if (open) {
+        loadCards();
+      }
+    }}
+  >
     <HoverCard.Trigger>
       {#snippet child({ props })}
         {#if !hasLink}
@@ -87,16 +94,16 @@
           >
         {/if}
       {/snippet}
-    </HoverCard.Trigger><HoverCard.Content
-      collisionPadding={8}
-      align="start"
-      class="p-0 text-start font-sans text-sm font-normal tracking-normal text-foreground normal-case inline-[min(21rem,calc(100vw-2rem))]"
-    >
-      {#if person == null}
-        <PartyCard id={party ?? ""} {color} within={scope?.() ?? null} />
-      {:else}
-        <PersonCard id={person} />
-      {/if}
-    </HoverCard.Content>
+    </HoverCard.Trigger>{#if cards.party != null && cards.person != null}<HoverCard.Content
+        collisionPadding={8}
+        align="start"
+        class="p-0 text-start font-sans text-sm font-normal tracking-normal text-foreground normal-case inline-[min(21rem,calc(100vw-2rem))]"
+      >
+        {#if person == null}
+          <cards.party id={party ?? ""} {color} within={scope?.() ?? null} />
+        {:else}
+          <cards.person id={person} />
+        {/if}
+      </HoverCard.Content>{/if}
   </HoverCard.Root>
 {/if}

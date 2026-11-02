@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PlaceMap from "#routes/[...path]/map.svelte";
+  import type PlaceMap from "#routes/[...path]/map.svelte";
   import { resolve } from "$app/paths";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
@@ -19,6 +19,13 @@
   } = $props();
 
   let index = $state(0);
+  let Places = $state<typeof PlaceMap | null>(null);
+
+  $effect(() => {
+    void import("#routes/[...path]/map.svelte").then((module) => {
+      Places = module.default;
+    });
+  });
 
   const chosen = $derived(elections[index] ?? elections[0]);
   const hub = createQuery(() =>
@@ -106,9 +113,13 @@
       {/if}
     </div>
     {#if found != null}
-      {#if found.map.tiles != null}
+      {#if found.map.tiles != null && Places == null}
+        <div
+          class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
+        ></div>
+      {:else if found.map.tiles != null && Places != null}
         {#key chosen.id}
-          <PlaceMap
+          <Places
             places={found.places}
             colors={found.places.legend.map((item) =>
               swatch(item.color, item.key),
