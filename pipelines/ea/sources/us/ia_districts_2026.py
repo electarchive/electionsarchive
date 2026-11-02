@@ -13,7 +13,19 @@ SOURCE = "us.ia_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "y26" / "ia" / "counties"
-IMAGE_ONLY = {"Jasper", "Pottawattamie", "Audubon", "Emmet", "Fremont", "Lucas", "Lyon", "Palo Alto", "Taylor", "Union"}
+IMAGE_ONLY = {
+    "Henry",
+    "Jasper",
+    "Pottawattamie",
+    "Audubon",
+    "Emmet",
+    "Fremont",
+    "Lucas",
+    "Lyon",
+    "Palo Alto",
+    "Taylor",
+    "Union",
+}
 SWCD = "Soil and Water Conservation District"
 
 COUNTIES = {
@@ -41,6 +53,11 @@ COUNTIES = {
         "buena-vista",
         "https://buenavistacounty.iowa.gov/elections",
         "Buena Vista County Auditor",
+    ),
+    "Henry": (
+        "henry",
+        "https://cap.gmdsolutions.com/viewfile.aspx?id=58CC9BF357494FD2B2B91C512294B2D4&dir=Objects",
+        "Henry County Auditor",
     ),
     "Guthrie": (
         "guthrie",
@@ -628,6 +645,31 @@ BOARDS = (
         ("Ann McBride", "Kayla Scheuers", "Michael William Thomas", "Quenton Dodson"),
     ),
     ("Van Buren", f"Van Buren County {SWCD}", "Commissioner", 2, False, ("Dennis Gratz", "Rodney Peck")),
+    (
+        "Henry",
+        f"Henry County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Ricky M. Mallams", "Harlan Miller", "Andrew John Woline"),
+    ),
+    (
+        "Henry",
+        "Henry County Health Center",
+        "Trustee",
+        4,
+        False,
+        ("Rebecca Bender", "Mary Liechty", "Amy J. McLaughlin", "Joel D. Prottsman"),
+    ),
+    (
+        "Henry",
+        "Henry County Agricultural Extension Council",
+        "Member",
+        5,
+        False,
+        ("Marc Benson", "Amanda McArtor-Morin", "Brooke Kelley-McArtor", "Theresa Rose"),
+    ),
+    ("Henry", "Henry County Agricultural Extension Council", "Member", 1, True, ("Jason Liechty",)),
     ("Hardin", f"Hardin County {SWCD}", "Commissioner", 2, False, ("Jo Duncan", "John Everly")),
     ("Kossuth", f"Kossuth County {SWCD}", "Commissioner", 2, False, ("Luke Snyder", "Nancy Bohl Bormann")),
     (
@@ -717,8 +759,10 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet").with_columns(
-        function=pl.when(pl.col("district").str.contains("Hospital"))
+        function=pl.when(pl.col("district").str.contains("Hospital|Health Center"))
         .then(pl.lit("hospital"))
+        .when(pl.col("district").str.contains("Extension"))
+        .then(pl.lit("extension"))
         .otherwise(pl.lit("soil-and-water"))
     )
     return district_boards.emit(

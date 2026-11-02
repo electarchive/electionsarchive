@@ -25,6 +25,18 @@ COUNTIES = {
         "Winnebago County Clerk",
         ".pdf",
     ),
+    "17119": (
+        "https://www.madisoncountyil.gov/document_center/CountyClerk/2026%20Election/REFERENDA%20QUESTIONS.pdf",
+        None,
+        "Madison County Clerk",
+        ".pdf",
+    ),
+    "17117": (
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/macoupin-il.connect.clarityelections.com/2026%20Election/26nov3ilmacoupin-Publication.pdf",
+        None,
+        "Macoupin County Clerk",
+        ".pdf",
+    ),
     "17031": (
         "https://www.cookcountyclerkil.gov/elections/current-election-referenda",
         "IL-Cook/il-cook-2026-11-03-referenda.html",
@@ -50,6 +62,97 @@ MCHENRY_LABELS = (
     ("Limitation Law", "Increase Limiting Rate"),
     ("Pension", "New Tax Rate for Pension Fund"),
     ("Bonds", "Issue Bonds"),
+)
+BUNKER_HILL = (
+    "Shall the limiting rate under the Property Tax Extension Limitation Law for the Bunker Hill Fire Protection "
+    "District, in Macoupin County, Illinois and Madison County, Illinois be increased by an additional amount equal "
+    "to .18% above the limiting rate for the purpose of fire department operations for levy year 2026 and be equal "
+    "to .43097% of the equalized assessed value of the taxable property therein for levy year 2026?"
+)
+DATA_CENTERS = "Shall the construction and operation of new data centers be permitted in {} Township?"
+SEWER = "Shall Madison County sell Special Service Area No. 1, a sewer {}, to a private company?"
+MADISON = (
+    (
+        "City of Madison",
+        "Home Rule",
+        "Shall the City of Madison, Madison County, Illinois, become a home rule unit?",
+    ),
+    (
+        "Cottage Hills Fire Protection District",
+        "Special Tax for Emergency and Rescue",
+        (
+            "Shall the Cottage Hills Fire Protection District levy a special tax at a rate of not more than .10% of the "
+            "value of all taxable property within the district as equalized or assessed by the Department of Revenue for "
+            "the purpose of providing funds to pay for the costs of emergency and rescue crews and equipment?"
+        ),
+    ),
+    (
+        "Madison County",
+        "Advisory Question: Government-Issued Identification to Vote",
+        "Shall the Illinois General Assembly pass legislation to require government-issued identification to vote?",
+    ),
+    (
+        "Madison County",
+        "Advisory Question: Local Zoning Control of Wind and Solar Farms",
+        (
+            "Shall the Illinois General Assembly restore zoning control of wind and solar farm developments to local "
+            "governments instead of mandating them from the state level?"
+        ),
+    ),
+    (
+        "Madison County",
+        "Advisory Question: Property Tax Reform",
+        (
+            "Shall the Illinois General Assembly pass new legislation to enact comprehensive property tax reform and "
+            "dramatically reduce property taxes, such as using a different source to fund public schools, and putting a "
+            "cap on property taxes at 1% of the assessed value of a property?"
+        ),
+    ),
+    (
+        "Village of Worden",
+        "Backyard Chickens",
+        "Shall the Village of Worden enact an ordinance allowing and regulating the keeping of backyard chickens?",
+    ),
+    *(
+        (f"{town} Township", "Data Centers", DATA_CENTERS.format(town))
+        for town in ("Chouteau", "Granite City", "Nameoki", "Venice")
+    ),
+    *(
+        (
+            f"{town} Township",
+            "Sale of Special Service Area No. 1",
+            SEWER.format("district" if town != "Granite City" else "system"),
+        )
+        for town in ("Chouteau", "Granite City", "Nameoki", "Venice")
+    ),
+)
+MACOUPIN = (
+    (
+        "Macoupin County",
+        "Advisory Question: Separation From Cook County",
+        (
+            "Shall the board of Macoupin County correspond with the boards of the other counties of Illinois outside of "
+            "Cook County about the possibility of separating from Cook County to form a new state, and to seek admission "
+            "to the Union as such, subject to the approval of the people?"
+        ),
+    ),
+    (
+        "Macoupin County",
+        "Proposition to Create Special Ambulance Service",
+        (
+            "Should a Special Service Area to provide ambulance service be created in the same area as Medora Ambulance "
+            "Service so those residents pay property taxes for the service at a rate of .103%?"
+        ),
+    ),
+    (
+        "City of Staunton",
+        "Proposition to Arrange for Supply of Electricity",
+        (
+            "Shall the municipality have the authority to arrange for the supply of electricity for its residential and "
+            "small commercial retail customers who have not opted out of such a program?"
+        ),
+    ),
+    ("Bunker Hill Fire Protection District", "Increase Limiting Rate", BUNKER_HILL),
 )
 SKIPPED = {("17111", "Community Unit School District #300")}
 
@@ -90,10 +193,19 @@ def full_name(entity: str, wording: str) -> str:
     return re.sub(r"^(Shall|The) ", "", match[1]) if match is not None else entity
 
 
-def pdf_text(url: str) -> str:
+def pdf_text(url: str, mode: str = "-layout") -> str:
     return subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", mode, str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
     ).stdout
+
+
+def listed_rows(county: str, listed: tuple[tuple[str, str, str], ...]) -> list[dict[str, str]]:
+    text = re.sub(r"\W+", " ", pdf_text(COUNTIES[county][0], "-raw")).lower()
+    rows = []
+    for entity, label, wording in listed:
+        assert re.sub(r"\W+", " ", wording).lower() in text, (county, label)
+        rows.append({"entity": entity, "label": label, "wording": wording})
+    return rows
 
 
 def page_text(url: str) -> str:
@@ -178,7 +290,13 @@ def parse() -> None:
         wording = re.sub(r"\s+", " ", re.sub(r"(?<=\s)(YES|NO)(?=\s)", " ", wording)).strip()
         rows.append({"entity": entity, "label": label, "wording": wording})
     tagged = [{**row, "county": "17201"} for row in rows]
-    for county, extra in (("17031", cook_rows()), ("17113", mclean_rows()), ("17111", mchenry_rows())):
+    for county, extra in (
+        ("17031", cook_rows()),
+        ("17113", mclean_rows()),
+        ("17111", mchenry_rows()),
+        ("17119", listed_rows("17119", MADISON)),
+        ("17117", listed_rows("17117", MACOUPIN)),
+    ):
         tagged.extend({**row, "county": county} for row in extra if (county, row["entity"]) not in SKIPPED)
     for row in tagged:
         row["entity"] = full_name(row["entity"], row["wording"])
@@ -196,7 +314,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Illinois county, municipal, school, and special district referenda (Winnebago, Cook, McLean, McHenry) on the November 3, 2026 ballot, with official wording",
+            summary="Illinois county, municipal, school, and special district referenda (Winnebago, Cook, McLean, McHenry, Madison, Macoupin) on the November 3, 2026 ballot, with official wording",
             polity="US-IL",
         )
         civil = civmint.Civil(conn, cs, "17", "IL")

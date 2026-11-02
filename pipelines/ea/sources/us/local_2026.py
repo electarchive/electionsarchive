@@ -11038,6 +11038,7 @@ def parse() -> None:
                                     sort
                                     and said != sort
                                     and ((said, sort) != ("town", "township") or state == "IN")
+                                    and (state != "NC" or (said, sort) != ("town", "city"))
                                     and (state not in ("KY", "OR", "AR") or (said, sort) != ("city", "village"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
@@ -11363,7 +11364,7 @@ def parse() -> None:
                     and (
                         int(str(row["seats"]) or 0) <= 1
                         or re.search(
-                            r"(?i)\bcounty (council|commission|board district|coroner|board of supervisors(?: at large)?)\b",
+                            r"(?i)\bcounty (council|commission|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
                             str(row["contest"]),
                         )
                         is not None
@@ -11468,6 +11469,32 @@ def parse() -> None:
                         *minted[tail.rsplit(":", 1)[0]][1:],
                     )
                     pinned.add(tail)
+                if (
+                    state == "NC"
+                    and tail is not None
+                    and not row["unexpired"]
+                    and used.get(tail, row["contest"]) != row["contest"]
+                    and tail not in taken
+                    and (
+                        extra := " ".join(
+                            str(row["contest"]).split()[
+                                len(os.path.commonprefix([str(row["contest"]).split(), used[tail].split()])) :
+                            ]
+                        )
+                    )
+                ):
+                    base = minted.get(tail)
+                    if base is None and place:
+                        base = (
+                            re.sub(rf"(?i)^{re.escape(place.removesuffix(' County'))}(?: county)?\s+", "", used[tail]).title(),
+                            place,
+                            "",
+                            "",
+                        )
+                    if base is not None:
+                        tail = f"{tail}:{slug(extra)}"
+                        template = ""
+                        minted[tail] = (f"{base[0]}, {extra.title()}", *base[1:])
                 if (
                     template is None
                     or tail is None
