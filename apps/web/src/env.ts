@@ -22,6 +22,11 @@ export const variables = defineEnvVars({
     description:
       "PostgreSQL connection string for accounts and sessions, when they live apart from the archive",
   },
+  PAGES_DATABASE_URL: {
+    schema: optional,
+    description:
+      "PostgreSQL connection string for the persistent procedure cache, a database the nightly restore never replaces",
+  },
   BETTER_AUTH_SECRET: {
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Better Auth secret key",

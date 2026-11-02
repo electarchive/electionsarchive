@@ -35,10 +35,11 @@ Cloudflare keeps the origin's ETag only when no zone feature rewrites the HTML, 
 
 ## The procedure cache
 
-Every read procedure goes through `remember()` in `apps/web/src/lib/server/cache.ts`. A result is keyed by the procedure's name and its JSON input, and it lives in two tiers:
+Every read procedure goes through `remember()` in `apps/web/src/lib/server/cache.ts`. A result is keyed by the procedure's name and its JSON input, and it lives in three tiers:
 
 - **In-process.** A `Map` used as an LRU, capped at 20,000 entries or 1 GiB of serialized size, whichever comes first.
 - **Shared.** Redis, keyed by `c:<code version>:<procedure>:<input>`. Values are serialized with `node:v8`, compressed with zstd, and kept for 30 days. Values larger than 64 MiB are not stored.
+- **Persistent.** A separate Postgres database, named by `PAGES_DATABASE_URL`, keeps the same compressed payload under the same key in one table, `entry`. It never evicts, so a result computed once survives Redis evictions, server restarts, and the nightly restore of the archive database, which replaces only that database. A Redis miss reads this table and puts the value back into Redis. The server creates the table on first use and skips this tier when `PAGES_DATABASE_URL` is unset.
 
 The code version is a fingerprint of the server code that can change a cached result. The `codeVersion()` Vite plugin in `apps/web/code-version.ts` computes it during the server build. It starts from the modules that import `cache.ts` and the modules that import those, follows every static and dynamic import from there, and hashes each module's transformed code. It also hashes `pnpm-lock.yaml` and every file in `packages/db/migrations`, so a dependency upgrade or a schema change counts as new code. The plugin writes the list it hashed to `build/server/code-version.txt`, one line per module. Diffing that file between two builds shows why their versions differ. A deploy that changes only components, styles, or client code keeps the version, so it reads every result the previous build wrote. A deploy that changes a query, a procedure, a dependency, or a migration starts with an empty shared cache, as every deploy did before. In the dev server the plugin returns no version, and the key falls back to the SvelteKit build id.
 
