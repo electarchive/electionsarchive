@@ -897,6 +897,12 @@
     ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
 />
 
+{#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
+  {#await import("./system.svelte") then system}
+    <system.default {id} />
+  {/await}
+{/if}
+
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
     class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
