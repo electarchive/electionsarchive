@@ -674,7 +674,6 @@ unsupported-operator = "ignore"
 
 [[overrides]]
 include = [
-  "ea/sources/us/conventions.py",
   "ea/sources/us/nh_manual.py",
   "ea/sources/us/nh_manual_questions.py",
   "ea/sources/us/nh_manual_state.py",

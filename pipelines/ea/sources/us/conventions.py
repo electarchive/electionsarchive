@@ -6,6 +6,7 @@ import unicodedata
 from datetime import UTC, date, datetime
 from itertools import product
 from pathlib import Path
+from typing import Any, Literal
 from urllib.parse import urlencode
 from uuid import UUID
 
@@ -94,7 +95,7 @@ ABROAD_NOTE_2020 = (
     "superdelegate positions assigned to no state did not vote and are not counted in any delegation. Delegates "
     "voted remotely, and the convention's ceremonial roll call of the states announced the result."
 )
-CONVENTIONS = [
+CONVENTIONS: list[dict[str, Any]] = [
     {
         "key": "2016-02-01:president:republican",
         "party": "republican",
@@ -153,7 +154,7 @@ LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
 EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
 RNC = "sim_republican-national-convention-proceedings_{}"
-TABLES = [
+TABLES: list[dict[str, Any]] = [
     {"table": "1968:republican:first", "item": RNC.format("august-5-8-1968"), "leaves": (409, 410)},
     {"table": "1968:republican:final", "item": RNC.format("august-5-8-1968"), "leaves": (419, 420)},
     {"table": "1972:republican", "item": RNC.format("august-21-23-1972_30"), "leaves": (361, 362)},
@@ -170,7 +171,7 @@ TABLES = [
 
 def volume(
     item: str, year: str, offset: int, back: int, pages: dict[str, int | list[int]], party: str = "republican"
-) -> list[dict[str, object]]:
+) -> list[dict[str, Any]]:
     specs = []
     for name, found in pages.items():
         found = [found] if isinstance(found, int) else found
@@ -180,8 +181,8 @@ def volume(
 
 
 def ballots(
-    item: str, year: str, windows: dict[int, tuple[int, int]], scatter: bool = False, party: str = "republican"
-) -> list[dict[str, object]]:
+    item: str, year: str, windows: dict[int, tuple[int, ...]], scatter: bool = False, party: str = "republican"
+) -> list[dict[str, Any]]:
     return [
         {
             **({"scatter": True} if scatter else {}),
@@ -196,7 +197,7 @@ def ballots(
 
 def leaves(
     item: str, year: str, found: dict[str, tuple[int, ...]], scatter: bool = False, party: str = "republican"
-) -> list[dict[str, object]]:
+) -> list[dict[str, Any]]:
     return [
         {
             **({"scatter": True} if scatter else {}),
@@ -459,7 +460,7 @@ BALTIMORE_1852 = (
     "delegations held 288 votes, so the needed figure stored here is 192. No candidate reached it before the "
     "forty-ninth ballot, on which Franklin Pierce was nominated."
 )
-PROCEEDINGS = [
+PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
     {"tables": {n: f"1876:republican:b{n}" for n in range(1, 8)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
@@ -825,7 +826,7 @@ FIRST_1968 = (
     "changed their votes before the chair announced the result, and the final tabulation, stored here, is the one "
     "the convention declared."
 )
-READS = {"a": "low", "b": "medium"}
+READS: dict[str, Literal["low", "medium"]] = {"a": "low", "b": "medium"}
 QUADRANTS = {
     "tl": (0.0, 0.04, 0.5, 0.525),
     "tr": (0.5, 0.04, 1.0, 0.525),
@@ -1929,7 +1930,7 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
-def scan(spec: dict[str, object], leaf: int, fetch: bool = False) -> raw.Artifact:
+def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
     if "uky" in spec:
         url = EXPLOREUK.format(item=spec["uky"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
@@ -1944,7 +1945,7 @@ def scan(spec: dict[str, object], leaf: int, fetch: bool = False) -> raw.Artifac
     return render(spec, leaf)
 
 
-def render(spec: dict[str, object], leaf: int) -> raw.Artifact:
+def render(spec: dict[str, Any], leaf: int) -> raw.Artifact:
     import subprocess
     import tempfile
 
@@ -1982,12 +1983,12 @@ def cropped(path: Path, crop: str | None) -> bytes:
         return out.getvalue()
 
 
-def region(spec: dict[str, object], leaf: int) -> str | None:
+def region(spec: dict[str, Any], leaf: int) -> str | None:
     part = spec.get("parts", {}).get(leaf)
     return part if part in QUADRANTS else spec.get("crop")
 
 
-def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
+def skipped(spec: dict[str, Any], leaf: int, scatter: bool) -> bool:
     only = spec.get("reads", {}).get(leaf)
     return (
         "transcribed" in spec
@@ -1997,7 +1998,7 @@ def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
     )
 
 
-def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
+def variant(spec: dict[str, Any], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
         return f"c{spec['ballot']}" if spec.get("bycandidate") else "s"
     if spec.get("crop"):
@@ -2009,7 +2010,7 @@ def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = N
     return None if spec.get("ballot") is None else f"b{spec['ballot']}"
 
 
-def read_key(effort: str, digest: str, kind: str | None = None) -> str:
+def read_key(effort: Literal["low", "medium"], digest: str, kind: str | None = None) -> str:
     prompt = PROMPT if kind is None else f"{PROMPT}{kind}"
     return f"anthropic-batch:claude-haiku-5-5/{prompt}/{effort}/{digest}"
 
@@ -2054,7 +2055,7 @@ def scattered(label: str) -> str:
     return LABELS.get(label, label)
 
 
-def transcribed(spec: dict[str, object]) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
+def transcribed(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, float], list[str]]:
     rows = pl.read_csv(Path(__file__).with_name(str(spec["transcribed"])), separator="\t").filter(
         pl.col("ballot") == spec["ballot"]
     )
@@ -2079,10 +2080,10 @@ def transcribed(spec: dict[str, object]) -> tuple[list[dict[str, object]], dict[
     return cells, totals, problems
 
 
-def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
+def table(spec: dict[str, Any], effort: Literal["low", "medium"]) -> tuple[list[dict[str, Any]], dict[str, float], list[str]]:
     if "transcribed" in spec:
         return transcribed(spec)
-    cells: list[dict[str, object]] = []
+    cells: list[dict[str, Any]] = []
     totals: dict[str, float] = {}
     shifted: dict[str, float] = {}
     problems: list[str] = []
@@ -2670,6 +2671,8 @@ def emit() -> Path:
                     total = cells.filter(pl.col("column") == "votes")["value"].sum()
                 else:
                     total = None
+                if total is not None and not isinstance(total, int | float):
+                    raise TypeError(f"the total {total!r} of {key} is not a number")
                 if "required" in convention:
                     required = convention["required"]
                     if isinstance(required, dict):
