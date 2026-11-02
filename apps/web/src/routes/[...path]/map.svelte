@@ -1509,7 +1509,7 @@
         away.has(row.k) ||
         total < 2 ||
         total > 12 ||
-        (single <= multiple && held.filter(([, count]) => count > 0).length < 2)
+        single <= multiple
       ) {
         return [];
       }
