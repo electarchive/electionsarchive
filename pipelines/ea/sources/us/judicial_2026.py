@@ -123,7 +123,10 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 label = f"{title}{f', {seat}' if seat else ''}"
-                name(contest, f"2026 {state} {label}{' retention election' if retention else ' election'}")
+                name(
+                    contest,
+                    f"2026 {state} {label} retention: {row['candidate']}" if retention else f"2026 {state} {label} election",
+                )
                 cs.add(
                     "slug",
                     path=f"us/{state.lower()}/2026-11-03-general/{slug(label)}"
@@ -143,15 +146,26 @@ def emit() -> Path:
                     cs.add("person", id=person)
                     name(person, text)
             party = PARTIES[row["party"]] if row["party"] else None
-            option = cs.key("us.option", f"{key}:{slug(text)}")
-            cs.add(
-                "contest_option",
-                id=option,
-                contest_id=contest,
-                kind="candidate",
-                party_id=cs.key("us.party", party) if party else None,
-                ballot_label=text,
-            )
+            option = cs.key("us.option", f"{key}:{'yes' if retention else slug(text)}")
+            if retention:
+                cs.add("contest_option", id=option, contest_id=contest, kind="answer", party_id=None, ballot_label="Yes")
+                cs.add(
+                    "contest_option",
+                    id=cs.key("us.option", f"{key}:no"),
+                    contest_id=contest,
+                    kind="answer",
+                    party_id=None,
+                    ballot_label="No",
+                )
+            else:
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=cs.key("us.party", party) if party else None,
+                    ballot_label=text,
+                )
             candidacy = cs.key("us.candidacy", f"{key}:{slug(text)}")
             cs.add(
                 "candidacy",

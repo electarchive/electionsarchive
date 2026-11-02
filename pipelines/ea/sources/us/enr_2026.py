@@ -163,7 +163,7 @@ IL_CITIES = {
     "CITY OF GALESBURG": "Knox",
     "CITY OF ROCKFORD": "Winnebago",
 }
-APPEALS = re.compile(r"\bcourt of appeals?\b", re.IGNORECASE)
+APPEALS = re.compile(r"\bcourt of appeals?\b|\bsupreme court\b.*\bretain", re.IGNORECASE)
 SEAT = re.compile(
     r"(?:(?:district|seat)\s+0*(\d+)|\b0*(\d+)(?:st|nd|rd|th)\s+district)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE
 )
