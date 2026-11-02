@@ -2,6 +2,8 @@ import hashlib
 import json
 import re
 import subprocess
+import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import NotRequired, TypedDict, cast
 
@@ -16,10 +18,16 @@ WEB = Path(__file__).resolve().parents[2] / "apps" / "web"
 MESSAGES = WEB / "messages"
 GLOSSARY = Path(__file__).resolve().parent / "glossary"
 WORK = DATA / "i18n"
+LOCK = MESSAGES / ".source.json"
+SETTINGS = WEB / "project.inlang" / "settings.json"
+EFFORT = "medium"
+AUTO = 3.0
+ATTEMPTS = 3
+POLL = 30
 CHUNK_CHARS = 20_000
 SITES = 3
 
-LOCALES = {
+LANGUAGES = {
     "bg": ("Bulgarian", "Bulgaria"),
     "cs": ("Czech", "Czechia"),
     "cy": ("Welsh", "Wales (Senedd Cymru, UK Parliament, local councils)"),
@@ -215,14 +223,14 @@ def digest(value: object) -> str:
     return hashlib.md5(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
 
 
-def categories() -> dict[str, dict[str, list[str]]]:
+def categories(targets: list[str]) -> dict[str, dict[str, list[str]]]:
     script = (
         "const out={};for(const l of process.argv.slice(1)){out[l]={plural:new Intl.PluralRules(l)"
         ".resolvedOptions().pluralCategories,ordinal:new Intl.PluralRules(l,{type:'ordinal'})"
         ".resolvedOptions().pluralCategories}}console.log(JSON.stringify(out))"
     )
     found: dict[str, dict[str, list[str]]] = json.loads(
-        subprocess.run(["node", "-e", script, *LOCALES], capture_output=True, text=True, check=True).stdout
+        subprocess.run(["node", "-e", script, *targets], capture_output=True, text=True, check=True).stdout
     )
     return found
 
@@ -296,12 +304,19 @@ def estimate(prompt: str, output_chars: float) -> float:
 def reply(key: str) -> dict[str, object] | None:
     message = json.loads(raw.cached(SOURCE, key).path.read_text())
     text = "".join(block["text"] for block in message["content"] if block["type"] == "text").strip()
-    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        return None
-    return parsed if isinstance(parsed, dict) else None
+    decoder = json.JSONDecoder()
+    merged: dict[str, object] | None = None
+    start = text.find("{")
+    while start != -1:
+        try:
+            parsed, end = decoder.raw_decode(text, start)
+        except json.JSONDecodeError:
+            start = text.find("{", start + 1)
+            continue
+        if isinstance(parsed, dict):
+            merged = (merged or {}) | cast(dict[str, object], parsed)
+        start = text.find("{", end)
+    return merged
 
 
 def glossary(locale: str) -> dict[str, dict[str, str]]:
@@ -309,9 +324,10 @@ def glossary(locale: str) -> dict[str, dict[str, str]]:
     return json.loads(file.read_text()) if file.exists() else {}
 
 
-def glossary_wants() -> dict[str, batch.Want]:
+def glossary_wants(targets: list[str]) -> dict[str, batch.Want]:
     wanted: dict[str, batch.Want] = {}
-    for locale, (language, place) in LOCALES.items():
+    for locale in targets:
+        language, place = LANGUAGES[locale]
         prompt = (
             f"You are a professional election-terminology translator for {language}, writing for readers in {place}.\n"
             "Build a glossary for electionsarchive.com, a world election archive (results, maps, parties, people, "
@@ -324,8 +340,14 @@ def glossary_wants() -> dict[str, batch.Want]:
             '{"term": "<target term>", "note": "<short English note on usage, inflection, or alternatives; '
             'empty if none>"}.\n\n' + "\n".join(f"- {term}: {meaning}" for term, meaning in TERMS.items())
         )
-        wanted[f"glossary/{locale}/{digest(TERMS)}"] = (
-            {"model": MODEL, "max_tokens": 16_000, "messages": [{"role": "user", "content": prompt}]},
+        params: dict[str, object] = {
+            "model": MODEL,
+            "max_tokens": 32_000,
+            "output_config": {"effort": EFFORT},
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        wanted[f"glossary/{locale}/{digest(params)}"] = (
+            cast(MessageCreateParamsNonStreaming, params),
             estimate(prompt, 12_000),
         )
     return wanted
@@ -363,7 +385,7 @@ Glossary (English: {language}, with notes):
 
 
 def system(template: str, locale: str) -> list[dict[str, object]]:
-    language, place = LOCALES[locale]
+    language, place = LANGUAGES[locale]
     terms = "\n".join(
         f"- {term}: {entry['term']}" + (f" ({entry['note']})" if entry.get("note") else "")
         for term, entry in glossary(locale).items()
@@ -389,6 +411,7 @@ def wants(stage: str, locale: str, rows: list[Item]) -> dict[str, tuple[batch.Wa
         params: dict[str, object] = {
             "model": MODEL,
             "max_tokens": 32_000,
+            "output_config": {"effort": EFFORT},
             "system": head,
             "messages": [{"role": "user", "content": prompt}],
         }
@@ -423,7 +446,11 @@ def problem(source: Text, text: object, required: list[str] | None) -> str | Non
     for before, after in pairs:
         if isinstance(source, str) and sorted(holes(after)) != sorted(holes(before)):
             return f"placeholders must be exactly {sorted(holes(before))}"
-        for pattern, label in ((r"<[^>]+>", "markup"), (r"https?://[^\s)]+", "URLs"), (r"`[^`]+`", "code spans")):
+        for pattern, label in (
+            (r"<[^>]+>", "markup"),
+            (r"https?://[\w-][^\s)]*[\w/]", "URLs"),
+            (r"`[^`]+`", "code spans"),
+        ):
             if sorted(re.findall(pattern, before)) != sorted(re.findall(pattern, after)):
                 return f"{label} must match the English: {re.findall(pattern, before)}"
         if after == before and len(re.findall(r"\b[a-z]{2,}\b", before)) >= 4:
@@ -431,9 +458,35 @@ def problem(source: Text, text: object, required: list[str] | None) -> str | Non
     return None
 
 
+def fingerprint(value: Message) -> str:
+    text = value if isinstance(value, str) else json.dumps(value, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.md5(text.encode()).hexdigest()
+
+
+def lock() -> dict[str, dict[str, str]]:
+    return json.loads(LOCK.read_text()) if LOCK.exists() else {}
+
+
 def state(locale: str) -> dict[str, Entry]:
     file = WORK / f"{locale}.json"
     return json.loads(file.read_text()) if file.exists() else {}
+
+
+def seeded(locale: str, source: dict[str, Message], sources: dict[str, str]) -> dict[str, Entry]:
+    entries = state(locale)
+    file = MESSAGES / f"{locale}.json"
+    shipped: dict[str, Message] = json.loads(file.read_text()) if file.exists() else {}
+    for key, value in source.items():
+        current = fingerprint(value)
+        entry = entries.get(key)
+        if key in shipped and sources.get(key) == current and (entry is None or entry["en"] != current):
+            text = shipped[key]
+            entries[key] = {
+                "en": current,
+                "text": text if isinstance(text, str) else text[0]["match"],
+                "reviewed": True,
+            }
+    return entries
 
 
 def save(locale: str, entries: dict[str, Entry]) -> None:
@@ -443,11 +496,12 @@ def save(locale: str, entries: dict[str, Entry]) -> None:
     partial.replace(WORK / f"{locale}.json")
 
 
-def write(locale: str, entries: dict[str, Entry], source: dict[str, Message]) -> None:
+def write(locale: str, entries: dict[str, Entry], source: dict[str, Message], sources: dict[str, str]) -> None:
     out: dict[str, object] = {"$schema": "https://inlang.com/schema/inlang-message-format"}
+    sources.clear()
     for key, value in source.items():
-        entry = entries[key]
-        text = entry["text"]
+        text = entries[key]["text"]
+        sources[key] = entries[key]["en"]
         if isinstance(value, str) or isinstance(text, str):
             out[key] = text
         else:
@@ -456,24 +510,50 @@ def write(locale: str, entries: dict[str, Entry], source: dict[str, Message]) ->
     (MESSAGES / f"{locale}.json").write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n")
 
 
-def advance(stage: str, plans: dict[str, dict[str, tuple[batch.Want, list[Item]]]]) -> tuple[bool, str]:
-    wanted = {key: want for plan in plans.values() for key, (want, _) in plan.items()}
-    if not wanted:
-        return True, f"{stage}: nothing to send"
-    return batch.ensure(SOURCE, stage, wanted)
+type Plan = dict[str, tuple[str, batch.Want, list[Item]]]
 
 
-def run() -> str:
+def planned(stage: str, build: Callable[[], Plan]) -> Plan:
+    file = WORK / f"{stage}.plan.json"
+    if file.exists():
+        stored: dict[str, list[object]] = json.loads(file.read_text())
+        return {
+            request: (
+                str(locale),
+                (cast(MessageCreateParamsNonStreaming, params), float(cast(float, cost))),
+                cast(list[Item], group),
+            )
+            for request, (locale, params, cost, group) in stored.items()
+        }
+    plan = build()
+    if plan:
+        file.write_text(
+            json.dumps(
+                {request: [locale, want[0], want[1], group] for request, (locale, want, group) in plan.items()},
+                ensure_ascii=False,
+            )
+        )
+    return plan
+
+
+def tries(locale: str) -> dict[str, list[object]]:
+    file = WORK / f"{locale}.rejected.json"
+    return json.loads(file.read_text()) if file.exists() else {}
+
+
+def step(targets: list[str]) -> tuple[bool, str]:
     WORK.mkdir(parents=True, exist_ok=True)
     GLOSSARY.mkdir(parents=True, exist_ok=True)
     notes: list[str] = []
     missing = {
-        key: want for key, want in glossary_wants().items() if not (GLOSSARY / f"{key.split('/')[1]}.json").exists()
+        key: want
+        for key, want in glossary_wants(targets).items()
+        if not (GLOSSARY / f"{key.split('/')[1]}.json").exists()
     }
     if missing:
         done, note = batch.ensure(SOURCE, "glossary", missing)
         if not done:
-            return note
+            return False, note
         for key in missing:
             locale = key.split("/")[1]
             parsed = reply(key) if key in raw.keys(SOURCE) else None
@@ -484,91 +564,127 @@ def run() -> str:
             else:
                 notes.append(f"glossary for {locale} came back unusable")
         if notes:
-            return "; ".join(notes)
+            raise SystemExit("; ".join(notes))
     source = english()
-    kinds = categories()
-    where = sites()
+    sources = lock()
+    entries = {locale: seeded(locale, source, sources.get(locale, {})) for locale in targets}
     for stage in ("translate", "review"):
-        plans: dict[str, dict[str, tuple[batch.Want, list[Item]]]] = {}
-        entries = {locale: state(locale) for locale in LOCALES}
-        for locale in LOCALES:
-            rows: list[Item] = []
-            for key, value in source.items():
-                entry = entries[locale].get(key)
-                fresh = entry is not None and entry["en"] == digest(value)
-                if stage == "translate" and not fresh:
-                    row = item(key, value, kinds[locale], where)
-                    note = rejected(locale).get(key)
-                    if note is not None:
-                        row["rejected"] = note
-                    rows.append(row)
-                if stage == "review" and fresh and entry is not None and not entry["reviewed"]:
-                    row = item(key, value, kinds[locale], where)
-                    row["translation"] = entry["text"]
-                    rows.append(row)
-            if rows:
-                plans[locale] = wants(stage, locale, rows)
-        done, note = advance(stage, plans)
-        notes.append(note)
-        if not done:
-            return "; ".join(notes)
+
+        def build(stage: str = stage) -> Plan:
+            kinds = categories(targets)
+            where = sites()
+            plan: Plan = {}
+            for locale in targets:
+                rows: list[Item] = []
+                failed = tries(locale)
+                for key, value in source.items():
+                    entry = entries[locale].get(key)
+                    fresh = entry is not None and entry["en"] == fingerprint(value)
+                    if stage == "translate" and not fresh:
+                        row = item(key, value, kinds[locale], where)
+                        if key in failed:
+                            row["rejected"] = str(failed[key][0])
+                        rows.append(row)
+                    if stage == "review" and fresh and entry is not None and not entry["reviewed"]:
+                        row = item(key, value, kinds[locale], where)
+                        row["translation"] = entry["text"]
+                        rows.append(row)
+                for request, (want, group) in wants(stage, locale, rows).items():
+                    plan[request] = (locale, want, group)
+            return plan
+
+        plan = planned(stage, build)
+        if plan:
+            wanted = {request: want for request, (_, want, _) in plan.items()}
+            projected = sum(want[1] for want in wanted.values())
+            done, note = batch.ensure(SOURCE, stage, wanted, approved=AUTO if projected < AUTO else None)
+            notes.append(note)
+            if not done:
+                return False, "; ".join(notes)
         held = raw.keys(SOURCE)
-        for locale, plan in plans.items():
-            bad = rejected(locale)
-            for request, (_, group) in plan.items():
-                parsed = reply(request) if request in held else None
-                for row in group:
-                    key = row["key"]
-                    if stage == "translate":
-                        text = parsed.get(key) if parsed is not None else None
-                        issue = "no reply" if parsed is None else problem(row["english"], text, row.get("forms"))
-                        if issue is None and isinstance(text, (str, dict)):
-                            entries[locale][key] = {
-                                "en": digest(source[key]),
-                                "text": cast(Text, text),
-                                "reviewed": False,
-                            }
-                            bad.pop(key, None)
-                        else:
-                            bad[key] = issue or "invalid"
-                        continue
-                    if parsed is None:
-                        continue
-                    found = parsed.get(key)
-                    fix = found.get("fix") if isinstance(found, dict) else None
-                    if fix is not None and problem(row["english"], fix, row.get("forms")) is None:
-                        entries[locale][key]["text"] = cast(Text, fix)
-                    entries[locale][key]["reviewed"] = True
+        failed = {locale: tries(locale) for locale in targets}
+        for request, (locale, _, group) in plan.items():
+            parsed = reply(request) if request in held else None
+            for row in group:
+                key = row["key"]
+                current = fingerprint(source[key]) if key in source else None
+                if stage == "translate":
+                    text = parsed.get(key) if parsed is not None else None
+                    issue = "no reply" if parsed is None else problem(row["english"], text, row.get("forms"))
+                    if issue is None and isinstance(text, (str, dict)) and current is not None:
+                        entries[locale][key] = {"en": current, "text": cast(Text, text), "reviewed": False}
+                        failed[locale].pop(key, None)
+                    else:
+                        count = int(cast(int, failed[locale].get(key, ["", 0])[1]))
+                        failed[locale][key] = [issue or "invalid", count + 1]
+                    continue
+                entry = entries[locale].get(key)
+                if entry is None or parsed is None:
+                    continue
+                found = parsed.get(key)
+                fix = found.get("fix") if isinstance(found, dict) else None
+                if fix is not None and problem(row["english"], fix, row.get("forms")) is None:
+                    entry["text"] = cast(Text, fix)
+                entry["reviewed"] = True
+        for locale in targets:
             save(locale, entries[locale])
-            (WORK / f"{locale}.rejected.json").write_text(json.dumps(bad, ensure_ascii=False, indent=1))
-        if stage == "translate" and any(rejected(locale) for locale in LOCALES):
-            failed = sum(len(rejected(locale)) for locale in LOCALES)
-            return f"{failed} strings failed checks; run `ea i18n` again to retranslate them"
+            (WORK / f"{locale}.rejected.json").write_text(json.dumps(failed[locale], ensure_ascii=False, indent=1))
+        (WORK / f"{stage}.plan.json").unlink(missing_ok=True)
+        stuck = [
+            f"{locale}/{key}: {note[0]}"
+            for locale in targets
+            for key, note in failed[locale].items()
+            if int(cast(int, note[1])) >= ATTEMPTS
+        ]
+        if stuck:
+            raise SystemExit(f"BLOCKED: {len(stuck)} strings failed checks {ATTEMPTS} times: {'; '.join(stuck[:10])}")
+        if stage == "translate" and any(failed.values()):
+            return False, f"{sum(len(found) for found in failed.values())} strings failed checks; retranslating them"
     written: list[str] = []
-    for locale in LOCALES:
-        entries = state(locale)
+    for locale in targets:
         if all(
-            key in entries and entries[key]["en"] == digest(value) and entries[key]["reviewed"]
+            key in entries[locale]
+            and entries[locale][key]["en"] == fingerprint(value)
+            and entries[locale][key]["reviewed"]
             for key, value in source.items()
         ):
-            write(locale, entries, source)
+            write(locale, entries[locale], source, sources.setdefault(locale, {}))
             written.append(locale)
-    notes.append(f"wrote {len(written)} of {len(LOCALES)} locales: {', '.join(written)}")
-    return "; ".join(notes)
+    LOCK.write_text(json.dumps(dict(sorted(sources.items())), ensure_ascii=False, indent=2) + "\n")
+    notes.append(f"wrote {len(written)} of {len(targets)} locales")
+    return True, "; ".join(notes)
 
 
-def rejected(locale: str) -> dict[str, str]:
-    file = WORK / f"{locale}.rejected.json"
-    return json.loads(file.read_text()) if file.exists() else {}
+def locales(chosen: list[str]) -> list[str]:
+    settings = json.loads(SETTINGS.read_text())
+    targets = chosen or [locale for locale in settings["locales"] if locale != settings["baseLocale"]]
+    unknown = [locale for locale in targets if locale not in LANGUAGES]
+    if unknown:
+        raise SystemExit(f"add {', '.join(unknown)} to LANGUAGES in pipelines/ea/i18n.py first")
+    return targets
 
 
-def quote() -> str:
+def run(chosen: list[str], *, wait: bool = True) -> str:
+    targets = locales(chosen)
+    shown = ""
+    while True:
+        done, note = step(targets)
+        if done or not wait:
+            return note
+        if note != shown:
+            print(note, flush=True)
+            shown = note
+        time.sleep(POLL)
+
+
+def quote(chosen: list[str]) -> str:
+    targets = locales(chosen)
     source = english()
-    kinds = categories()
+    kinds = categories(targets)
     where = sites()
     translate = review = 0.0
     requests = 0
-    for locale in LOCALES:
+    for locale in targets:
         rows = [item(key, value, kinds[locale], where) for key, value in source.items()]
         for want, group in wants("translate", locale, rows).values():
             translate += want[1]
@@ -576,9 +692,9 @@ def quote() -> str:
             for row in group:
                 row["translation"] = row["english"]
         review += sum(want[1] for want, _ in wants("review", locale, rows).values())
-    glossary_cost = sum(want[1] for want in glossary_wants().values())
+    glossary_cost = sum(want[1] for want in glossary_wants(targets).values())
     return (
-        f"{len(LOCALES)} locales, {len(source)} strings, {requests} translate requests; "
+        f"{len(targets)} locales, {len(source)} strings, {requests} translate requests; "
         f"glossary ${glossary_cost:.2f}, translate ${translate:.2f}, review ${review:.2f} "
         "(list price at batch rates, before cache reads)"
     )

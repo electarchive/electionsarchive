@@ -1,0 +1,498 @@
+{
+ "election": {
+  "term": "seçim",
+  "note": ""
+ },
+ "general election": {
+  "term": "genel seçim",
+  "note": "For the Turkish parliament the full form is 'milletvekilliği genel seçimi'."
+ },
+ "primary": {
+  "term": "ön seçim",
+  "note": "TDK spelling is 'önseçim'. Press and the Political Parties Law usually write it as two words."
+ },
+ "runoff": {
+  "term": "ikinci tur",
+  "note": "Often 'ikinci tur seçimi'. Turkish presidential elections use this term."
+ },
+ "first round": {
+  "term": "birinci tur",
+  "note": "Also 'ilk tur'."
+ },
+ "by-election": {
+  "term": "ara seçim",
+  "note": "This is the term in electoral law. 'Ara seçim' also means US midterms ('ABD ara seçimleri'), so context decides."
+ },
+ "special election": {
+  "term": "özel seçim",
+  "note": "Used in the press for US special elections. 'Ara seçim' is sometimes used when a vacancy is filled."
+ },
+ "recall election": {
+  "term": "geri çağırma seçimi",
+  "note": "Turkey has no equivalent mechanism. This is the press rendering."
+ },
+ "contest": {
+  "term": "seçim yarışı",
+  "note": "Descriptive rendering. For one seat, 'yarış' is also fine."
+ },
+ "race": {
+  "term": "yarış",
+  "note": "Informal, as in 'başkanlık yarışı'."
+ },
+ "ballot measure": {
+  "term": "halkoylaması önerisi",
+  "note": "Descriptive. The press also says 'oylama önergesi' or 'referandum maddesi'."
+ },
+ "referendum": {
+  "term": "halkoylaması",
+  "note": "Used in the Constitution and in law. The press often uses 'referandum'."
+ },
+ "initiative": {
+  "term": "halk girişimi",
+  "note": "Citizen-initiated measure. 'Halk inisiyatifi' also occurs."
+ },
+ "proposition": {
+  "term": "öneri",
+  "note": "'Proposition 8' is rendered '8 numaralı öneri'. The press often keeps 'Proposition 8'."
+ },
+ "retention election": {
+  "term": "yargıç görev onayı oylaması",
+  "note": "No established Turkish equivalent. This is a descriptive rendering, usually explained at first mention."
+ },
+ "candidate": {
+  "term": "aday",
+  "note": ""
+ },
+ "incumbent": {
+  "term": "görevdeki aday",
+  "note": "The shorter 'görevdeki' is also common, as in 'görevdeki başkan'."
+ },
+ "nominee": {
+  "term": "parti adayı",
+  "note": "Also 'resmi aday' or 'aday gösterilen kişi'."
+ },
+ "write-in": {
+  "term": "yazılı oy",
+  "note": "Descriptive. Turkish law has no write-in voting, so the press explains it as a name written onto the ballot."
+ },
+ "unopposed": {
+  "term": "rakipsiz",
+  "note": "Used as 'rakipsiz seçilen aday'."
+ },
+ "ballot": {
+  "term": "oy pusulası",
+  "note": "The term in electoral law. 'Oy kâğıdı' is an older variant."
+ },
+ "votes cast": {
+  "term": "kullanılan oy",
+  "note": "Also 'oy kullanan seçmen sayısı' when counting voters."
+ },
+ "valid votes": {
+  "term": "geçerli oy",
+  "note": ""
+ },
+ "invalid votes": {
+  "term": "geçersiz oy",
+  "note": "The YSK term."
+ },
+ "blank votes": {
+  "term": "boş oy",
+  "note": "Under Turkish law, blank ballots are counted as invalid."
+ },
+ "turnout": {
+  "term": "katılım oranı",
+  "note": "The YSK also uses 'oy kullanma oranı'."
+ },
+ "registered voters": {
+  "term": "kayıtlı seçmen",
+  "note": "Formally 'seçmen kütüğüne kayıtlı seçmen'."
+ },
+ "electorate": {
+  "term": "seçmen kitlesi",
+  "note": "Also 'seçmenler'."
+ },
+ "vote share": {
+  "term": "oy oranı",
+  "note": "Percentage. Also 'oy yüzdesi'."
+ },
+ "margin": {
+  "term": "oy farkı",
+  "note": "Difference between winner and runner-up."
+ },
+ "swing": {
+  "term": "oy kayması",
+  "note": "Change in vote share between elections."
+ },
+ "majority": {
+  "term": "salt çoğunluk",
+  "note": "More than half. 'Çoğunluk' alone is also common."
+ },
+ "plurality": {
+  "term": "göreli çoğunluk",
+  "note": "Also 'nispi çoğunluk' or 'basit çoğunluk'."
+ },
+ "landslide": {
+  "term": "ezici zafer",
+  "note": "Also 'ezici çoğunluk'."
+ },
+ "seat": {
+  "term": "sandalye",
+  "note": "The official term is 'milletvekilliği' or 'üyelik'."
+ },
+ "constituency": {
+  "term": "seçim çevresi",
+  "note": "The legal term. In Turkey it usually corresponds to an il."
+ },
+ "electoral district": {
+  "term": "seçim bölgesi",
+  "note": "Used for single-member areas abroad. Turkish law prefers 'seçim çevresi'."
+ },
+ "district": {
+  "term": "bölge",
+  "note": "US congressional district: 'kongre bölgesi'."
+ },
+ "ward": {
+  "term": "mahalle",
+  "note": "Used for UK-style wards. Sometimes explained as 'belediye seçim bölgesi'."
+ },
+ "precinct": {
+  "term": "sandık bölgesi",
+  "note": "The Turkish legal analogue is 'sandık alanı'. The press often keeps 'precinct'."
+ },
+ "polling station": {
+  "term": "oy verme yeri",
+  "note": "The term in law. 'Sandık' is colloquial. The ballot box board is 'sandık kurulu'."
+ },
+ "reporting unit": {
+  "term": "sonuç birimi",
+  "note": "No standard term. Descriptive rendering."
+ },
+ "county": {
+  "term": "kontluk",
+  "note": "Used for UK/Irish counties. US counties often appear as 'ilçe' in the press, which can be confused with Turkish ilçe."
+ },
+ "municipality": {
+  "term": "belediye",
+  "note": "Local government unit."
+ },
+ "state": {
+  "term": "eyalet",
+  "note": "Used for US, Brazilian and German states. German Land is 'federal eyalet'."
+ },
+ "province": {
+  "term": "il",
+  "note": "The Turkish administrative province."
+ },
+ "region": {
+  "term": "bölge",
+  "note": "Same word as 'district'. Context or a qualifier such as 'idari bölge' clarifies."
+ },
+ "polity": {
+  "term": "siyasi birim",
+  "note": "Descriptive. No single standard term."
+ },
+ "jurisdiction": {
+  "term": "yetki alanı",
+  "note": "'Yargı çevresi' for courts."
+ },
+ "boundaries": {
+  "term": "sınır",
+  "note": "Usually plural in use: 'seçim çevresi sınırları'."
+ },
+ "redistricting": {
+  "term": "seçim bölgelerinin yeniden çizilmesi",
+  "note": "Descriptive. The press also says 'yeniden bölgelendirme'."
+ },
+ "chamber": {
+  "term": "kamara",
+  "note": "Also 'meclis'."
+ },
+ "legislature": {
+  "term": "yasama organı",
+  "note": "Also 'yasama meclisi'."
+ },
+ "parliament": {
+  "term": "parlamento",
+  "note": "The Turkish parliament is TBMM, or 'Meclis'."
+ },
+ "lower house": {
+  "term": "alt meclis",
+  "note": "Also 'alt kamara' or 'alt kanat'."
+ },
+ "upper house": {
+  "term": "üst meclis",
+  "note": "Also 'üst kamara'."
+ },
+ "senate": {
+  "term": "senato",
+  "note": ""
+ },
+ "house of representatives": {
+  "term": "Temsilciler Meclisi",
+  "note": "The US House is 'ABD Temsilciler Meclisi'."
+ },
+ "council": {
+  "term": "meclis",
+  "note": "Local: 'belediye meclisi', 'il genel meclisi'."
+ },
+ "mayor": {
+  "term": "belediye başkanı",
+  "note": ""
+ },
+ "governor": {
+  "term": "vali",
+  "note": "In Turkey valis are appointed. For the US, 'eyalet valisi' or 'Teksas Valisi'."
+ },
+ "officeholder": {
+  "term": "görev sahibi",
+  "note": "Also 'görevdeki kişi'."
+ },
+ "term": {
+  "term": "görev süresi",
+  "note": ""
+ },
+ "term limit": {
+  "term": "görev süresi sınırı",
+  "note": "Also 'görev süresi sınırlaması'."
+ },
+ "party": {
+  "term": "siyasi parti",
+  "note": "Often just 'parti'."
+ },
+ "independent": {
+  "term": "bağımsız aday",
+  "note": "The term in law."
+ },
+ "coalition": {
+  "term": "koalisyon",
+  "note": "Usually a governing coalition: 'koalisyon hükümeti'."
+ },
+ "alliance": {
+  "term": "ittifak",
+  "note": "Established in Turkish electoral law, as in 'Cumhur İttifakı'."
+ },
+ "party list": {
+  "term": "parti listesi",
+  "note": "Also 'aday listesi'."
+ },
+ "closed list": {
+  "term": "kapalı liste",
+  "note": ""
+ },
+ "open list": {
+  "term": "açık liste",
+  "note": ""
+ },
+ "preference vote": {
+  "term": "tercih oyu",
+  "note": "Also 'tercihli oy'."
+ },
+ "list seat": {
+  "term": "liste sandalyesi",
+  "note": "Also 'listeden gelen sandalye'."
+ },
+ "constituency seat": {
+  "term": "seçim bölgesi sandalyesi",
+  "note": "Also 'doğrudan seçilen sandalye'."
+ },
+ "overhang seat": {
+  "term": "fazladan sandalye",
+  "note": "German 'Überhangmandat'. The press also says 'fazla mandat'."
+ },
+ "leveling seat": {
+  "term": "denkleştirme sandalyesi",
+  "note": "German 'Ausgleichsmandat'. Also 'denkleştirme mandası'."
+ },
+ "threshold": {
+  "term": "seçim barajı",
+  "note": "Also 'baraj'. Turkey's national threshold is 7%."
+ },
+ "quota": {
+  "term": "kota",
+  "note": "Also 'seçim katsayısı' or 'Droop kotası' in the STV context."
+ },
+ "proportional representation": {
+  "term": "nispi temsil",
+  "note": "The Constitution and law use 'nispi temsil'. The press also uses 'orantılı temsil'."
+ },
+ "first past the post": {
+  "term": "basit çoğunluk sistemi",
+  "note": "Full form: 'tek turlu basit çoğunluk sistemi'. The press may add 'first-past-the-post' in brackets."
+ },
+ "two-round system": {
+  "term": "iki turlu sistem",
+  "note": "Also 'iki turlu seçim sistemi'."
+ },
+ "ranked-choice voting": {
+  "term": "sıralı tercihli oylama",
+  "note": "The press often explains it as 'sıralı tercih sistemi'."
+ },
+ "single transferable vote": {
+  "term": "tek devredilebilir oy",
+  "note": "Full form 'tek devredilebilir oy sistemi'. Sometimes written 'STV'."
+ },
+ "mixed-member proportional": {
+  "term": "karma üyeli nispi temsil",
+  "note": "Also 'karma seçim sistemi'. German 'personalisierte Verhältniswahl' is rendered as 'kişiselleştirilmiş nispi temsil'."
+ },
+ "D'Hondt method": {
+  "term": "d'Hondt yöntemi",
+  "note": "Turkish law says 'd'Hondt sistemi'."
+ },
+ "Sainte-Laguë method": {
+  "term": "Sainte-Laguë yöntemi",
+  "note": "Also 'Sainte-Laguë sistemi'."
+ },
+ "seat allocation": {
+  "term": "sandalye dağılımı",
+  "note": "Law: 'milletvekilliklerinin dağıtımı'."
+ },
+ "transfer": {
+  "term": "oy devri",
+  "note": "STV transfer. Also 'oyların aktarılması'."
+ },
+ "elimination": {
+  "term": "eleme",
+  "note": ""
+ },
+ "count": {
+  "term": "sayım turu",
+  "note": "A round of counting in STV or instant runoff."
+ },
+ "results": {
+  "term": "sonuç",
+  "note": "The plural 'seçim sonuçları' is the more common form."
+ },
+ "official results": {
+  "term": "kesin sonuç",
+  "note": "The YSK announces 'kesin sonuçlar'."
+ },
+ "certified": {
+  "term": "onaylanmış",
+  "note": "YSK usage: 'kesinleşmiş'."
+ },
+ "preliminary results": {
+  "term": "geçici sonuç",
+  "note": "The YSK's 'geçici sonuçlar'."
+ },
+ "election night": {
+  "term": "seçim gecesi",
+  "note": ""
+ },
+ "called": {
+  "term": "kazananı ilan edilmiş",
+  "note": "Used for a race whose winner is declared. Short form: 'kazananı belli oldu'."
+ },
+ "projection": {
+  "term": "projeksiyon",
+  "note": "Also 'sonuç tahmini'."
+ },
+ "too close to call": {
+  "term": "tahmin edilemeyecek kadar yakın",
+  "note": "Also 'başa baş'."
+ },
+ "reporting": {
+  "term": "açılan sandık oranı",
+  "note": "Typical Turkish election-night expression."
+ },
+ "votes counted": {
+  "term": "sayılan oy",
+  "note": ""
+ },
+ "absentee ballot": {
+  "term": "mektupla oy",
+  "note": "Descriptive. Turkey has no domestic absentee voting, only abroad and at border gates."
+ },
+ "mail-in ballot": {
+  "term": "posta oyu",
+  "note": "Also 'posta yoluyla oy'."
+ },
+ "early voting": {
+  "term": "erken oylama",
+  "note": "Also 'erken oy kullanma'."
+ },
+ "flip": {
+  "term": "el değiştiren sandalye",
+  "note": "Also verb: 'el değiştirmek'."
+ },
+ "gain": {
+  "term": "sandalye kazanımı",
+  "note": "Short form: 'kazanım'."
+ },
+ "hold": {
+  "term": "korunan sandalye",
+  "note": "Also 'sandalyeyi koruma'."
+ },
+ "gerrymander": {
+  "term": "gerrymandering",
+  "note": "Usually kept in English. Descriptive Turkish: 'seçim bölgesi manipülasyonu'."
+ },
+ "electoral college": {
+  "term": "Seçiciler Kurulu",
+  "note": "The standard press rendering for the US body."
+ },
+ "elector": {
+  "term": "seçici",
+  "note": "Member of the Seçiciler Kurulu."
+ },
+ "delegate": {
+  "term": "delege",
+  "note": ""
+ },
+ "convention": {
+  "term": "parti kongresi",
+  "note": "US: 'ulusal kongre'. Not to be confused with the US Congress ('Kongre')."
+ },
+ "roll call": {
+  "term": "isim okuyarak oylama",
+  "note": "Press often explains it as a state-by-state delegate vote."
+ },
+ "turnover": {
+  "term": "sandalye değişimi",
+  "note": "Also 'sandalye el değiştirme oranı'."
+ },
+ "source": {
+  "term": "kaynak",
+  "note": ""
+ },
+ "changeset": {
+  "term": "değişiklik paketi",
+  "note": "Technical term for a batch of edits."
+ },
+ "provenance": {
+  "term": "köken bilgisi",
+  "note": "Also 'veri kökeni'."
+ },
+ "archive": {
+  "term": "arşiv",
+  "note": ""
+ },
+ "coverage": {
+  "term": "kapsam",
+  "note": ""
+ },
+ "map": {
+  "term": "harita",
+  "note": ""
+ },
+ "shapes": {
+  "term": "sınır geometrisi",
+  "note": "Technical. 'Şekil' is too generic."
+ },
+ "watchlist": {
+  "term": "izleme listesi",
+  "note": ""
+ },
+ "proposal": {
+  "term": "değişiklik önerisi",
+  "note": ""
+ },
+ "bounty": {
+  "term": "ödüllü görev",
+  "note": "Descriptive. No standard term."
+ },
+ "workbench": {
+  "term": "çalışma alanı",
+  "note": "Alternative: 'çalışma tezgâhı'."
+ }
+}

@@ -1,0 +1,498 @@
+{
+ "election": {
+  "term": "eleição",
+  "note": "Plural: eleições."
+ },
+ "general election": {
+  "term": "eleição geral",
+  "note": "Usually plural, 'eleições gerais'. In Brazilian law it means federal and state elections held together, but the press uses it for the UK and other countries."
+ },
+ "primary": {
+  "term": "eleição primária",
+  "note": "Usually 'primárias' in the plural. In Brazil, party-internal selection is called 'prévias'; avoid that for US primaries."
+ },
+ "runoff": {
+  "term": "segundo turno",
+  "note": "Official Brazilian term. Plural: segundos turnos."
+ },
+ "first round": {
+  "term": "primeiro turno",
+  "note": "'Primeira volta' is the European Portuguese form; avoid it."
+ },
+ "by-election": {
+  "term": "eleição suplementar",
+  "note": "Brazilian electoral term for an election to fill a vacancy. The press sometimes uses 'eleição parcial' for UK by-elections."
+ },
+ "special election": {
+  "term": "eleição especial",
+  "note": "Standard rendering for the US. 'Eleição extraordinária' or 'eleição suplementar' are alternatives."
+ },
+ "recall election": {
+  "term": "referendo revogatório",
+  "note": "Also 'eleição de revogação de mandato'. The press often keeps 'recall' in italics."
+ },
+ "contest": {
+  "term": "disputa",
+  "note": "Can be 'disputa eleitoral'. Use 'pleito' for a formal election."
+ },
+ "race": {
+  "term": "corrida eleitoral",
+  "note": "Informal. 'Disputa' also works."
+ },
+ "ballot measure": {
+  "term": "consulta popular",
+  "note": "Umbrella term. For US measures the press also says 'medida submetida a voto popular'."
+ },
+ "referendum": {
+  "term": "referendo",
+  "note": "Brazilian law distinguishes referendo (vote after a law is passed) from plebiscito (vote before). For foreign votes the press uses both loosely."
+ },
+ "initiative": {
+  "term": "iniciativa popular",
+  "note": "Plural: iniciativas populares."
+ },
+ "proposition": {
+  "term": "proposição",
+  "note": "Used as in 'Proposição 8' for California-style numbered measures."
+ },
+ "retention election": {
+  "term": "eleição de retenção",
+  "note": "No Brazilian equivalent; the press explains it as a vote on keeping a judge, often 'eleição de retenção de juízes'."
+ },
+ "candidate": {
+  "term": "candidato",
+  "note": "Feminine: candidata."
+ },
+ "incumbent": {
+  "term": "titular",
+  "note": "Also 'ocupante do cargo'. A candidate seeking another term is 'candidato à reeleição'."
+ },
+ "nominee": {
+  "term": "candidato indicado",
+  "note": "In Brazil, a party's candidate is chosen at a 'convenção partidária'. For the US, 'candidato do partido' is also common."
+ },
+ "write-in": {
+  "term": "voto manuscrito",
+  "note": "Voto in a name not on the ballot. The press often glosses it as 'write-in'. There is no Brazilian equivalent, since the electronic ballot box allows only registered candidates."
+ },
+ "unopposed": {
+  "term": "candidatura única",
+  "note": "As an adjective phrase, 'sem oposição' or 'eleito sem adversário'."
+ },
+ "ballot": {
+  "term": "cédula",
+  "note": "The paper ballot. The Brazilian electronic voting machine is the 'urna eletrônica'. 'Boletim' refers to the results sheet, not the ballot."
+ },
+ "votes cast": {
+  "term": "total de votos",
+  "note": "TSE also uses 'comparecimento' for the number of voters who showed up."
+ },
+ "valid votes": {
+  "term": "votos válidos",
+  "note": "In Brazil these are votes for candidates and party labels, excluding blank and null votes."
+ },
+ "invalid votes": {
+  "term": "votos nulos",
+  "note": "Brazilian term for spoiled or annulled votes. 'Votos inválidos' is understood but less used."
+ },
+ "blank votes": {
+  "term": "votos em branco",
+  "note": "Counted separately from null votes in Brazil."
+ },
+ "turnout": {
+  "term": "comparecimento",
+  "note": "Its complement is 'abstenção'. Press also says 'taxa de comparecimento'."
+ },
+ "registered voters": {
+  "term": "eleitores aptos",
+  "note": "TSE term for people on the electoral roll. 'Eleitores registrados' is also acceptable for foreign contexts."
+ },
+ "electorate": {
+  "term": "eleitorado",
+  "note": ""
+ },
+ "vote share": {
+  "term": "percentual de votos",
+  "note": "Also 'participação nos votos' or 'proporção de votos'."
+ },
+ "margin": {
+  "term": "margem",
+  "note": "Full form: 'margem de votos' or 'margem de vitória'; also 'diferença de votos'."
+ },
+ "swing": {
+  "term": "oscilação",
+  "note": "The press may keep 'swing' for UK elections. Full form: 'oscilação eleitoral'."
+ },
+ "majority": {
+  "term": "maioria absoluta",
+  "note": "More than half. 'Maioria' alone is often enough in context."
+ },
+ "plurality": {
+  "term": "maioria relativa",
+  "note": "Also 'maioria simples' in some press usage. 'Pluralidade' is a rarer calque."
+ },
+ "landslide": {
+  "term": "vitória esmagadora",
+  "note": "Also 'vitória avassaladora' or 'vitória por larga margem'."
+ },
+ "seat": {
+  "term": "cadeira",
+  "note": "In legal contexts, 'vaga' or 'assento'."
+ },
+ "constituency": {
+  "term": "circunscrição eleitoral",
+  "note": "For UK and EU usage. The press also uses 'distrito eleitoral'. 'Círculo eleitoral' is European Portuguese."
+ },
+ "electoral district": {
+  "term": "distrito eleitoral",
+  "note": "General term. Brazil's own units are 'circunscrição', 'zona eleitoral' and 'seção eleitoral'."
+ },
+ "district": {
+  "term": "distrito",
+  "note": "Used as in 'distrito congressional' for the US."
+ },
+ "ward": {
+  "term": "distrito municipal",
+  "note": "No exact Brazilian equivalent. The press sometimes keeps 'ward' and glosses it as a municipal subdivision."
+ },
+ "precinct": {
+  "term": "precinto",
+  "note": "US usage; the press may add 'distrito eleitoral'. The closest Brazilian unit is 'seção eleitoral', but avoid it for foreign precincts."
+ },
+ "polling station": {
+  "term": "local de votação",
+  "note": "In Brazil, a 'seção eleitoral' is the voting unit within a 'local de votação'."
+ },
+ "reporting unit": {
+  "term": "unidade de apuração",
+  "note": "Descriptive rendering for any area that publishes results."
+ },
+ "county": {
+  "term": "condado",
+  "note": "Used for US, UK and Irish counties."
+ },
+ "municipality": {
+  "term": "município",
+  "note": "Brazilian official term for the local government unit."
+ },
+ "state": {
+  "term": "estado",
+  "note": "German Länder are usually rendered 'estado federado' or kept as 'Land' (plural 'Länder')."
+ },
+ "province": {
+  "term": "província",
+  "note": "Turkish 'il' is also rendered 'província'."
+ },
+ "region": {
+  "term": "região",
+  "note": ""
+ },
+ "polity": {
+  "term": "entidade política",
+  "note": "Descriptive term for a country, state or territory that holds its own elections."
+ },
+ "jurisdiction": {
+  "term": "jurisdição",
+  "note": "In electoral contexts, 'circunscrição' is also used."
+ },
+ "boundaries": {
+  "term": "limites",
+  "note": "Full form: 'limites territoriais' or 'limites eleitorais'."
+ },
+ "redistricting": {
+  "term": "redistritamento",
+  "note": "Also 'redesenho dos distritos eleitorais' in the press."
+ },
+ "chamber": {
+  "term": "câmara",
+  "note": "Plural: câmaras."
+ },
+ "legislature": {
+  "term": "legislativo",
+  "note": "'Poder Legislativo' for the institution. In Brazil, 'legislatura' means the four-year term of a legislature, not the body."
+ },
+ "parliament": {
+  "term": "parlamento",
+  "note": ""
+ },
+ "lower house": {
+  "term": "câmara baixa",
+  "note": "In Brazil the lower house is the Câmara dos Deputados."
+ },
+ "upper house": {
+  "term": "câmara alta",
+  "note": ""
+ },
+ "senate": {
+  "term": "senado",
+  "note": "Capitalize in names, as in 'Senado Federal'."
+ },
+ "house of representatives": {
+  "term": "Câmara dos Representantes",
+  "note": "For the US. Brazil's equivalent is the 'Câmara dos Deputados'."
+ },
+ "council": {
+  "term": "conselho",
+  "note": "For Brazilian municipal bodies: 'câmara municipal' (members are 'vereadores')."
+ },
+ "mayor": {
+  "term": "prefeito",
+  "note": "Feminine: prefeita."
+ },
+ "governor": {
+  "term": "governador",
+  "note": "Feminine: governadora."
+ },
+ "officeholder": {
+  "term": "ocupante do cargo",
+  "note": "Also 'titular de cargo eletivo' for elected office."
+ },
+ "term": {
+  "term": "mandato",
+  "note": "Plural: mandatos."
+ },
+ "term limit": {
+  "term": "limite de mandatos",
+  "note": ""
+ },
+ "party": {
+  "term": "partido",
+  "note": "Full form: 'partido político'."
+ },
+ "independent": {
+  "term": "independente",
+  "note": "Brazilian law does not allow candidates without a party, so this applies to foreign contexts. 'Candidato avulso' is the Brazilian term in debates on independent candidacy."
+ },
+ "coalition": {
+  "term": "coalizão",
+  "note": "For a governing coalition. In Brazilian electoral law, a joint electoral ticket is 'coligação'."
+ },
+ "alliance": {
+  "term": "coligação",
+  "note": "The Brazilian term for a joint ticket. 'Aliança' is also used."
+ },
+ "party list": {
+  "term": "lista partidária",
+  "note": ""
+ },
+ "closed list": {
+  "term": "lista fechada",
+  "note": ""
+ },
+ "open list": {
+  "term": "lista aberta",
+  "note": "Used in Brazil for deputados and vereadores."
+ },
+ "preference vote": {
+  "term": "voto preferencial",
+  "note": "In Brazil, 'voto nominal' is the vote for a candidate, as opposed to 'voto de legenda' (for the party)."
+ },
+ "list seat": {
+  "term": "cadeira de lista",
+  "note": "Descriptive; also 'vaga da lista partidária'."
+ },
+ "constituency seat": {
+  "term": "cadeira distrital",
+  "note": "Seat won in a single-member district."
+ },
+ "overhang seat": {
+  "term": "mandato excedente",
+  "note": "German 'Überhangmandat'; the press often keeps the German term in parentheses."
+ },
+ "leveling seat": {
+  "term": "mandato de compensação",
+  "note": "German 'Ausgleichsmandat'."
+ },
+ "threshold": {
+  "term": "cláusula de barreira",
+  "note": "Brazilian law also uses 'cláusula de desempenho'. Also called 'limiar eleitoral' for foreign systems."
+ },
+ "quota": {
+  "term": "quociente eleitoral",
+  "note": "Brazilian legal term for the votes needed per seat. For STV, 'quota de Droop' is used."
+ },
+ "proportional representation": {
+  "term": "representação proporcional",
+  "note": "Also 'sistema proporcional'. Abbreviation: RP."
+ },
+ "first past the post": {
+  "term": "sistema majoritário de turno único",
+  "note": "The press often glosses 'first past the post' in parentheses."
+ },
+ "two-round system": {
+  "term": "sistema de dois turnos",
+  "note": "Also 'sistema de segundo turno'."
+ },
+ "ranked-choice voting": {
+  "term": "voto ranqueado",
+  "note": "Also 'votação por ordem de preferência'. Full form for US: 'votação por escolha ranqueada'."
+ },
+ "single transferable vote": {
+  "term": "voto único transferível",
+  "note": "Abbreviation STV is also used."
+ },
+ "mixed-member proportional": {
+  "term": "sistema proporcional misto",
+  "note": "Also 'representação proporcional mista'; abbreviation MMP is used."
+ },
+ "D'Hondt method": {
+  "term": "método D'Hondt",
+  "note": "Brazil uses a similar highest-averages step ('sobras') after the quociente eleitoral."
+ },
+ "Sainte-Laguë method": {
+  "term": "método Sainte-Laguë",
+  "note": "Spelled as in French, with the diaeresis."
+ },
+ "seat allocation": {
+  "term": "distribuição de cadeiras",
+  "note": "In Brazilian law, 'distribuição das vagas'."
+ },
+ "transfer": {
+  "term": "transferência de votos",
+  "note": ""
+ },
+ "elimination": {
+  "term": "eliminação",
+  "note": ""
+ },
+ "count": {
+  "term": "rodada de contagem",
+  "note": "The general word for counting is 'contagem' or 'apuração'."
+ },
+ "results": {
+  "term": "resultados",
+  "note": ""
+ },
+ "official results": {
+  "term": "resultados oficiais",
+  "note": ""
+ },
+ "certified": {
+  "term": "homologado",
+  "note": "In Brazil, the electoral court 'homologa' the result, and the winner is 'diplomado'. US 'certified' is also rendered 'certificado'."
+ },
+ "preliminary results": {
+  "term": "resultados preliminares",
+  "note": "'Resultados parciais' is also common in Brazilian press for partial counts."
+ },
+ "election night": {
+  "term": "noite da eleição",
+  "note": "Also 'noite eleitoral'."
+ },
+ "called": {
+  "term": "vitória projetada",
+  "note": "Used when a race is declared won; the verb is 'projetar'."
+ },
+ "projection": {
+  "term": "projeção",
+  "note": ""
+ },
+ "too close to call": {
+  "term": "disputa indefinida",
+  "note": "Press phrase: 'disputa apertada demais para projetar vencedor'."
+ },
+ "reporting": {
+  "term": "apuração",
+  "note": "Share counted: 'percentual apurado'. In Brazil, urnas report quickly, so this is mainly for foreign contexts."
+ },
+ "votes counted": {
+  "term": "votos apurados",
+  "note": ""
+ },
+ "absentee ballot": {
+  "term": "voto ausente",
+  "note": "No Brazilian equivalent. Brazilian voters away from home vote at special points or abroad."
+ },
+ "mail-in ballot": {
+  "term": "voto por correspondência",
+  "note": "Also 'voto pelo correio'. Not used in Brazil."
+ },
+ "early voting": {
+  "term": "votação antecipada",
+  "note": ""
+ },
+ "flip": {
+  "term": "virada",
+  "note": "A seat that changes party; the verb is 'virar'."
+ },
+ "gain": {
+  "term": "ganho",
+  "note": "A seat won from another party. Press also says 'conquista'."
+ },
+ "hold": {
+  "term": "manutenção",
+  "note": "Press also says 'cadeira mantida'."
+ },
+ "gerrymander": {
+  "term": "gerrymandering",
+  "note": "The English term is normally kept in Brazilian press and treated as a masculine noun, often glossed as 'manipulação de distritos eleitorais'."
+ },
+ "electoral college": {
+  "term": "Colégio Eleitoral",
+  "note": "Capitalized when it refers to the US body."
+ },
+ "elector": {
+  "term": "grande eleitor",
+  "note": "Plural: grandes eleitores."
+ },
+ "delegate": {
+  "term": "delegado",
+  "note": "Brazilian party conventions also have delegados."
+ },
+ "convention": {
+  "term": "convenção partidária",
+  "note": "In Brazil, the formal party meeting that selects candidates."
+ },
+ "roll call": {
+  "term": "chamada nominal",
+  "note": "At US conventions, the 'chamada nominal dos estados'."
+ },
+ "turnover": {
+  "term": "renovação",
+  "note": "In parliament: 'renovação parlamentar'."
+ },
+ "source": {
+  "term": "fonte",
+  "note": ""
+ },
+ "changeset": {
+  "term": "conjunto de alterações",
+  "note": "Technical term for a reviewed batch of edits."
+ },
+ "provenance": {
+  "term": "procedência",
+  "note": "Also 'origem e tratamento dos dados'."
+ },
+ "archive": {
+  "term": "arquivo",
+  "note": ""
+ },
+ "coverage": {
+  "term": "cobertura",
+  "note": ""
+ },
+ "map": {
+  "term": "mapa",
+  "note": ""
+ },
+ "shapes": {
+  "term": "geometrias",
+  "note": "Full form: 'geometrias de limites'."
+ },
+ "watchlist": {
+  "term": "lista de acompanhamento",
+  "note": ""
+ },
+ "proposal": {
+  "term": "proposta",
+  "note": ""
+ },
+ "bounty": {
+  "term": "recompensa",
+  "note": ""
+ },
+ "workbench": {
+  "term": "bancada de trabalho",
+  "note": "Software term; 'ambiente de trabalho' is an alternative."
+ }
+}

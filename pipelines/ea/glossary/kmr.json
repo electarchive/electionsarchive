@@ -1,0 +1,502 @@
+{
+ "election": {
+  "term": "hilbijartin",
+  "note": "Plural: hilbijartin(ên). Verbal noun of hilbijartin (to choose)."
+ },
+ "general election": {
+  "term": "hilbijartina giştî",
+  "note": "Plural 'hilbijartinên giştî' is the usual press form. In Turkey, 'hilbijartinên giştî' often means parliamentary elections."
+ },
+ "primary": {
+  "term": "hilbijartina pêşîn",
+  "note": "Also 'pêşhilbijartin'. US usage; often glossed as 'hilbijartina berendamtiya partiyê'."
+ },
+ "runoff": {
+  "term": "hilbijartina dora duyem",
+  "note": "Short form: 'dora duyem'."
+ },
+ "first round": {
+  "term": "dora yekem",
+  "note": "Full form: 'dora yekem a hilbijartinê'."
+ },
+ "by-election": {
+  "term": "hilbijartina navberê",
+  "note": "Also 'hilbijartina tijîkirina kursiya valayî'. Turkish 'ara seçim' is the model."
+ },
+ "special election": {
+  "term": "hilbijartina taybet",
+  "note": "Press often explains it as 'hilbijartina li derveyî demsala asayî'."
+ },
+ "recall election": {
+  "term": "dengdana vekişandinê",
+  "note": "Descriptive rendering of the US recall. Alternative: 'dengdana ji wezîfeyê rakirinê'."
+ },
+ "contest": {
+  "term": "pêşbazî",
+  "note": "Also 'pêşbirka hilbijartinê'. One race for one office."
+ },
+ "race": {
+  "term": "pêşbazî",
+  "note": "Same word as 'contest'. Informal register, 'pêşbaziya kursiyê'."
+ },
+ "ballot measure": {
+  "term": "pirsa dengdanê",
+  "note": "Descriptive. Press may also say 'pêşniyara li ber dengdanê'."
+ },
+ "referendum": {
+  "term": "referandum",
+  "note": "Also spelled 'referandûm'. 'Raya giştî' is a rarer alternative."
+ },
+ "initiative": {
+  "term": "pêşniyara gelêrî",
+  "note": "A citizen-petition measure. Press also uses 'înîsiyatîf'."
+ },
+ "proposition": {
+  "term": "pêşniyar",
+  "note": "For numbered US measures, 'Pêşniyara 8' or 'Proposition 8'. Often left as 'Proposition' with a gloss."
+ },
+ "retention election": {
+  "term": "dengdana domandina dadger",
+  "note": "No established equivalent; descriptive rendering ('vote on keeping the judge'). Press often keeps 'retention election' in parentheses."
+ },
+ "candidate": {
+  "term": "berendam",
+  "note": "Also 'namzed' in some press. 'Berendam' is the standard form."
+ },
+ "incumbent": {
+  "term": "wezîfedarê heyî",
+  "note": "Also 'serokê heyî' for presidents or mayors. 'Yê ku li ser kar e' is a descriptive alternative."
+ },
+ "nominee": {
+  "term": "berendamê partiyê",
+  "note": "Short for the candidate officially chosen by the party."
+ },
+ "write-in": {
+  "term": "dengê bi nivîsandina nav",
+  "note": "Descriptive. Refers to a name written onto the ballot, a US practice."
+ },
+ "unopposed": {
+  "term": "bê hevrik",
+  "note": "Used as in 'bê hevrik hate hilbijartin'. 'Hevrik' means rival."
+ },
+ "ballot": {
+  "term": "pusula",
+  "note": "'Pusula dengdanê' in full. Alternative: 'kaxeza dengdanê'. The word comes via Turkish 'pusula'."
+ },
+ "votes cast": {
+  "term": "dengên hatine dayîn",
+  "note": "Plural. Also 'dengên hatine bikaranîn'."
+ },
+ "valid votes": {
+  "term": "dengên derbasdar",
+  "note": "Plural. Turkish 'geçerli oy' is the model."
+ },
+ "invalid votes": {
+  "term": "dengên nederbasdar",
+  "note": "Plural. Turkish 'geçersiz oy' is the model."
+ },
+ "blank votes": {
+  "term": "dengên vala",
+  "note": "Plural. Turkish 'boş oy' is the model."
+ },
+ "turnout": {
+  "term": "rêjeya beşdariyê",
+  "note": "Full: 'rêjeya beşdariya dengdanê'. Short: 'beşdarî'."
+ },
+ "registered voters": {
+  "term": "hilbijêrên tomarkirî",
+  "note": "Plural. 'Dengdêr' is a variant of 'hilbijêr'. The electoral roll is 'lîsteya hilbijêran'."
+ },
+ "electorate": {
+  "term": "hilbijêr",
+  "note": "Collective noun, 'tevahiya hilbijêran'. Also 'korpusa dengdêran'."
+ },
+ "vote share": {
+  "term": "rêjeya dengan",
+  "note": "Full: 'rêjeya dengên ku stendine'. Ezafe: 'rêjeya dengên partiyê'."
+ },
+ "margin": {
+  "term": "cudahiya dengan",
+  "note": "The gap between winner and runner-up. Also 'ferqa dengan'."
+ },
+ "swing": {
+  "term": "guhertina rêjeya dengan",
+  "note": "Descriptive. 'Swing' is sometimes kept in press analysis."
+ },
+ "majority": {
+  "term": "piraniya mutleq",
+  "note": "For more than half. Plain 'piranî' means 'most/majority' in general."
+ },
+ "plurality": {
+  "term": "piraniya nisbî",
+  "note": "Most votes without a majority."
+ },
+ "landslide": {
+  "term": "serkeftina berfireh",
+  "note": "Descriptive. Also 'serkeftina ji ber cudahiyeke mezin'."
+ },
+ "seat": {
+  "term": "kursî",
+  "note": "Also 'kursiya parlamentoyê'. Ezafe form: 'kursiya'."
+ },
+ "constituency": {
+  "term": "çemberê hilbijartinê",
+  "note": "Modeled on Turkish 'seçim çevresi'. Alternative: 'herêma hilbijartinê'."
+ },
+ "electoral district": {
+  "term": "çemberê hilbijartinê",
+  "note": "Same as 'constituency'. Avoid 'navçe', which means Turkish ilçe."
+ },
+ "district": {
+  "term": "çember",
+  "note": "For US congressional districts: 'çemberê kongreyê'. 'Navçe' means ilçe in Turkey, so use it only for that."
+ },
+ "ward": {
+  "term": "taxa",
+  "note": "Ward as a city subdivision. Equivalent to Turkish 'mahalle'. Alternative: 'dorpêç'."
+ },
+ "precinct": {
+  "term": "herêma dengdanê",
+  "note": "Descriptive for the US voting precinct. Press may keep 'precinct' in parentheses."
+ },
+ "polling station": {
+  "term": "navenda dengdanê",
+  "note": "Also 'cihê dengdanê'. 'Sindoq' means the ballot box."
+ },
+ "reporting unit": {
+  "term": "yekeya raporkirinê",
+  "note": "Technical term. Means any area whose results are published."
+ },
+ "county": {
+  "term": "kontî",
+  "note": "Used for US and UK/Irish counties. Plural 'kontî'. Alternative gloss: 'wîlayet' (rare)."
+ },
+ "municipality": {
+  "term": "şaredarî",
+  "note": "Means both the municipality and its administration."
+ },
+ "state": {
+  "term": "eyalet",
+  "note": "For US states and Brazilian states. German Land: 'eyalet' or 'Land'. 'Wîlayet' is also used."
+ },
+ "province": {
+  "term": "parêzgeh",
+  "note": "Used for provinces and for Turkish il. Ezafe: 'parêzgeha'."
+ },
+ "region": {
+  "term": "herêm",
+  "note": "Ezafe: 'herêma'."
+ },
+ "polity": {
+  "term": "yekeya siyasî",
+  "note": "Descriptive. Means a country, state or territory with its own elections. Alternative: 'dewlet an herêma xwedî hilbijartin'."
+ },
+ "jurisdiction": {
+  "term": "qada desthilatdariyê",
+  "note": "Also 'desthilatdarî'. Legal sense: 'dadwerî'."
+ },
+ "boundaries": {
+  "term": "sînor",
+  "note": "Plural 'sînorên'. Full: 'sînorên çemberan'."
+ },
+ "redistricting": {
+  "term": "nûxêzkirina çemberan",
+  "note": "Descriptive: 'ji nû ve xêzkirina sînorên çemberên hilbijartinê'."
+ },
+ "chamber": {
+  "term": "meclîs",
+  "note": "Also 'ode'. Plural 'meclîsan'."
+ },
+ "legislature": {
+  "term": "meclîsa yasadanînê",
+  "note": "Descriptive. Also 'desthilatiya yasadanînê'."
+ },
+ "parliament": {
+  "term": "parlamento",
+  "note": "Turkey's national parliament: 'Meclîsa Tirkiyeyê ya Mezin'."
+ },
+ "lower house": {
+  "term": "meclîsa jêrîn",
+  "note": "Also 'ola jêrîn' in some press."
+ },
+ "upper house": {
+  "term": "meclîsa jorîn",
+  "note": "Also 'meclîsa duyem'."
+ },
+ "senate": {
+  "term": "senato",
+  "note": "Loan form used in Kurdish press."
+ },
+ "house of representatives": {
+  "term": "Meclîsa Nûneran",
+  "note": "For the US House: 'Meclîsa Nûneran a Amerîkayê'."
+ },
+ "council": {
+  "term": "encûmen",
+  "note": "Local councils: 'meclîsa şaredariyê' is also used. 'Konsey' is a variant."
+ },
+ "mayor": {
+  "term": "şaredar",
+  "note": "Co-mayors (DEM Parti) are 'hevşaredar'."
+ },
+ "governor": {
+  "term": "parêzgar",
+  "note": "Used for US governors. 'Walî' is used for the Turkish appointed vali."
+ },
+ "officeholder": {
+  "term": "wezîfedar",
+  "note": "Also 'xwedîwezîfe'."
+ },
+ "term": {
+  "term": "heyama wezîfeyê",
+  "note": "Also 'dem' or 'serdem'. Full: 'heyama wezîfeya şaredarî'."
+ },
+ "term limit": {
+  "term": "sînorê heyamên wezîfeyê",
+  "note": "Descriptive."
+ },
+ "party": {
+  "term": "partî",
+  "note": "Plural: 'partî'. Ezafe: 'partiya'."
+ },
+ "independent": {
+  "term": "serbixwe",
+  "note": "As in 'berendamê serbixwe'."
+ },
+ "coalition": {
+  "term": "koalîsyon",
+  "note": "Governing coalition. Alternative: 'hevpeyman'."
+ },
+ "alliance": {
+  "term": "hevpeymanî",
+  "note": "Electoral alliances, as with the Turkish 'ittifak'. Also 'ittifaq'."
+ },
+ "party list": {
+  "term": "lîsteya partiyê",
+  "note": "Plural: 'lîsteyên partiyê'."
+ },
+ "closed list": {
+  "term": "lîsteya girtî",
+  "note": "Voters cannot reorder."
+ },
+ "open list": {
+  "term": "lîsteya vekirî",
+  "note": "Voters can reorder via preference votes."
+ },
+ "preference vote": {
+  "term": "dengê tercîhê",
+  "note": "Descriptive."
+ },
+ "list seat": {
+  "term": "kursiya lîsteyê",
+  "note": "Ezafe 'kursiya'."
+ },
+ "constituency seat": {
+  "term": "kursiya çemberê",
+  "note": "For single-member district seats."
+ },
+ "overhang seat": {
+  "term": "kursiya zêdeyî",
+  "note": "German 'Überhangmandat'. Usually glossed in press."
+ },
+ "leveling seat": {
+  "term": "kursiya hevsengkirinê",
+  "note": "Descriptive. For adjustment or compensatory seats."
+ },
+ "threshold": {
+  "term": "bendav",
+  "note": "Short for 'bendava hilbijartinê', the electoral threshold. Turkish 'seçim barajı' is the model."
+ },
+ "quota": {
+  "term": "kota",
+  "note": "Loan word. 'Kotaya Droop' for the Droop quota."
+ },
+ "proportional representation": {
+  "term": "nûnertiya nisbî",
+  "note": "Also 'nûnertiya rêjeyî'."
+ },
+ "first past the post": {
+  "term": "pergala piraniya sade",
+  "note": "Descriptive. Press may cite 'first past the post' in parentheses."
+ },
+ "two-round system": {
+  "term": "pergala du dorî",
+  "note": "Also 'pergala du-dorî'."
+ },
+ "ranked-choice voting": {
+  "term": "dengdana bi rêzkirina tercîhan",
+  "note": "Descriptive. The US 'ranked-choice voting' is often kept in parentheses."
+ },
+ "single transferable vote": {
+  "term": "dengê veguhezbar ê yekane",
+  "note": "Descriptive. Often kept as 'STV'."
+ },
+ "mixed-member proportional": {
+  "term": "nûnertiya nisbî ya têkel",
+  "note": "Descriptive. Often kept as 'MMP'."
+ },
+ "D'Hondt method": {
+  "term": "rêbaza d'Hondt",
+  "note": "Name is kept in the original form."
+ },
+ "Sainte-Laguë method": {
+  "term": "rêbaza Sainte-Laguë",
+  "note": "Name is kept in the original form."
+ },
+ "seat allocation": {
+  "term": "dabeşkirina kursiyan",
+  "note": "Descriptive."
+ },
+ "transfer": {
+  "term": "veguhastin",
+  "note": "In STV: 'veguhastina dengan'."
+ },
+ "elimination": {
+  "term": "derxistin",
+  "note": "In STV: 'derxistina berendamê herî kêmdeng'."
+ },
+ "count": {
+  "term": "dora jimartinê",
+  "note": "A round in STV/IRV. The general act of counting is 'jimartin'."
+ },
+ "results": {
+  "term": "encam",
+  "note": "Usually plural: 'encamên hilbijartinê'."
+ },
+ "official results": {
+  "term": "encamên fermî",
+  "note": "Plural."
+ },
+ "certified": {
+  "term": "pejirandî",
+  "note": "Also 'bi fermî pejirandî'. Verb: 'pejirandin'."
+ },
+ "preliminary results": {
+  "term": "encamên pêşîn",
+  "note": "Also 'encamên nefermî'."
+ },
+ "election night": {
+  "term": "şeva hilbijartinê",
+  "note": "Ezafe 'şeva'."
+ },
+ "called": {
+  "term": "hatiye ragihandin",
+  "note": "Predicate form: 'serkeftî hat ragihandin'. Means a race declared for a winner."
+ },
+ "projection": {
+  "term": "pêşbînî",
+  "note": "Also 'texmîn'."
+ },
+ "too close to call": {
+  "term": "pir nêzîk e, nayê pêşbînîkirin",
+  "note": "Descriptive phrase. Short label: 'pir nêzîk'."
+ },
+ "reporting": {
+  "term": "rêjeya sindoqên vekirî",
+  "note": "Modeled on Turkish 'açılan sandık oranı'. Share of units counted."
+ },
+ "votes counted": {
+  "term": "dengên hatine jimartin",
+  "note": "Plural."
+ },
+ "absentee ballot": {
+  "term": "dengdana ji dûr ve",
+  "note": "Descriptive. Also 'dengê nehazir'."
+ },
+ "mail-in ballot": {
+  "term": "dengdana bi postê",
+  "note": "Descriptive."
+ },
+ "early voting": {
+  "term": "dengdana pêşwext",
+  "note": "Also 'dengdana zû'."
+ },
+ "flip": {
+  "term": "guhertina partiya kursiyê",
+  "note": "Descriptive. Seat that changes party."
+ },
+ "gain": {
+  "term": "kursiya bidestxistî",
+  "note": "Descriptive. A seat won from another party."
+ },
+ "hold": {
+  "term": "parastina kursiyê",
+  "note": "Descriptive. A party keeping its seat."
+ },
+ "gerrymander": {
+  "term": "gerrymander",
+  "note": "Usually kept as a loan word and glossed: 'dabeşkirina çemberan a alîgir'."
+ },
+ "electoral college": {
+  "term": "Koleja Hilbijartinê",
+  "note": "Press rendering for the US body. Sometimes 'Koleja Hilbijêran'."
+ },
+ "elector": {
+  "term": "hilbijêrê kolejê",
+  "note": "Also 'elektor'. Descriptive."
+ },
+ "delegate": {
+  "term": "delege",
+  "note": "Plural 'delegeyên'. Also 'şandevan'."
+ },
+ "convention": {
+  "term": "kongre",
+  "note": "Party convention: 'kongreya partiyê'."
+ },
+ "roll call": {
+  "term": "dengdana bi gazîkirina navan",
+  "note": "Descriptive. Also 'dengdana bi nav'."
+ },
+ "turnover": {
+  "term": "guhertina kursiyan",
+  "note": "Descriptive."
+ },
+ "source": {
+  "term": "çavkanî",
+  "note": "Ezafe 'çavkaniya'."
+ },
+ "changeset": {
+  "term": "komeya guhertinan",
+  "note": "Technical. A reviewed batch of edits."
+ },
+ "provenance": {
+  "term": "eslê daneyê",
+  "note": "Descriptive. Means where data came from and how it was processed."
+ },
+ "archive": {
+  "term": "arşîv",
+  "note": "Also 'arşîva hilbijartinan'."
+ },
+ "coverage": {
+  "term": "vegirtin",
+  "note": "Technical. Means how much of the elections the archive holds. Alternative: 'berfirehiya daneyan'."
+ },
+ "map": {
+  "term": "nexşe",
+  "note": "Plural 'nexşe'. Ezafe 'nexşeya'."
+ },
+ "shapes": {
+  "term": "şeklên sînoran",
+  "note": "Technical. Boundary geometry data."
+ },
+ "watchlist": {
+  "term": "lîsteya şopandinê",
+  "note": "Descriptive."
+ },
+ "proposal": {
+  "term": "pêşniyar",
+  "note": "Suggested edit. Plural 'pêşniyarên'."
+ },
+ "bounty": {
+  "term": "xelata peywirê",
+  "note": "Descriptive. A requested data task with a reward."
+ },
+ "workbench": {
+  "term": "maseya xebatê",
+  "note": "Descriptive for the site's tool for tables and charts."
+ },
+ "Elections Archive": {
+  "term": "Elections Archive",
+  "note": "The product name; never translate it."
+ }
+}

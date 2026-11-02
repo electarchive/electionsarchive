@@ -129,11 +129,14 @@ def main() -> None:
         "or emit the tables that passed",
     )
     scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
-    commands.add_parser(
+    translating = commands.add_parser(
         "i18n",
-        help="translate apps/web/messages/en.json into every locale with Sonnet batches: glossary, translation, "
-        "review, and checks; quote prints the estimated cost (set ANTHROPIC_API_KEY)",
-    ).add_argument("action", nargs="?", choices=("run", "quote"), default="run")
+        help="translate new and changed keys of apps/web/messages/en.json into the locales in "
+        "project.inlang/settings.json (or the ones given) with Sonnet batches: glossary, translation, review, and "
+        "checks; quote prints the estimated cost of a full run (set ANTHROPIC_API_KEY)",
+    )
+    translating.add_argument("action", nargs="?", choices=("run", "quote"), default="run")
+    translating.add_argument("locales", nargs="*")
     batching = commands.add_parser(
         "batch", help="Message Batches jobs, accounts, and approvals (set ANTHROPIC_API_KEY)"
     )
@@ -205,7 +208,7 @@ def main() -> None:
         case "i18n":
             from ea import i18n
 
-            print(i18n.quote() if args.action == "quote" else i18n.run())
+            print(i18n.quote(args.locales) if args.action == "quote" else i18n.run(args.locales))
         case "batch":
             from ea import batch
 

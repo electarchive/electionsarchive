@@ -1,0 +1,498 @@
+{
+ "election": {
+  "term": "élection",
+  "note": "Also scrutin for the act of voting."
+ },
+ "general election": {
+  "term": "élection générale",
+  "note": "Used for the UK, Canada, etc. (plural élections générales in headings). France has no exact equivalent; for France use élections législatives, présidentielle, etc."
+ },
+ "primary": {
+  "term": "primaire",
+  "note": "Full form élection primaire. In French press, primaire is also used for party-run selections outside the US."
+ },
+ "runoff": {
+  "term": "second tour",
+  "note": "Used in France, Switzerland and Canada. Scrutin de ballottage is the formal variant in Belgium and Canada."
+ },
+ "first round": {
+  "term": "premier tour",
+  "note": ""
+ },
+ "by-election": {
+  "term": "élection partielle",
+  "note": "Standard in France and Canada. Plural élections partielles."
+ },
+ "special election": {
+  "term": "élection spéciale",
+  "note": "Used for the US. In France it is also called élection partielle. Use élection extraordinaire only for Canadian or other legal contexts that specify it."
+ },
+ "recall election": {
+  "term": "référendum révocatoire",
+  "note": "Alternatives: scrutin révocatoire, vote de révocation. Press often explains the US recall (e.g. California) on first mention."
+ },
+ "contest": {
+  "term": "scrutin",
+  "note": "No exact single word in French. For a specific seat, use élection pour le poste de / le siège de…. For a ballot question, use question."
+ },
+ "race": {
+  "term": "course",
+  "note": "Informal: course à la mairie, course au Sénat. Not for formal tables, where scrutin or élection is used."
+ },
+ "ballot measure": {
+  "term": "question référendaire",
+  "note": "Canadian usage. Switzerland uses objet soumis au vote or objet de votation. For US measures, press often uses référendum d'initiative populaire or consultation."
+ },
+ "referendum": {
+  "term": "référendum",
+  "note": "Plural référendums. In Switzerland a popular vote is called votation, and in Belgium consultation populaire."
+ },
+ "initiative": {
+  "term": "initiative populaire",
+  "note": "Swiss and general usage. In France, référendum d'initiative partagée is a distinct mechanism."
+ },
+ "proposition": {
+  "term": "proposition",
+  "note": "US numbered measure, e.g. la proposition 8 (Californie). Keep lowercase in running text."
+ },
+ "retention election": {
+  "term": "scrutin de maintien en fonction",
+  "note": "Descriptive rendering for US judges. Press also uses vote de confirmation des juges. No French equivalent institution."
+ },
+ "candidate": {
+  "term": "candidat",
+  "note": "Feminine: candidate."
+ },
+ "incumbent": {
+  "term": "sortant",
+  "note": "Feminine: sortante. Usually with a noun, e.g. député sortant. Titulaire du siège is also used."
+ },
+ "nominee": {
+  "term": "candidat investi",
+  "note": "Feminine: candidate investie. Also candidat désigné for US nominees."
+ },
+ "write-in": {
+  "term": "vote par inscription manuscrite",
+  "note": "Descriptive. There is no fixed term. Switzerland uses voix éparses for scattered votes for non-candidates."
+ },
+ "unopposed": {
+  "term": "élu sans opposition",
+  "note": "Canada: also élu par acclamation. Switzerland: élection tacite."
+ },
+ "ballot": {
+  "term": "bulletin de vote",
+  "note": "Short form bulletin. Distinguish from scrutin, which is the vote itself."
+ },
+ "votes cast": {
+  "term": "votant",
+  "note": "The count is labelled votants (France). Bulletins déposés is a descriptive alternative. Do not equate with suffrages exprimés, which excludes blank and invalid ballots in France."
+ },
+ "valid votes": {
+  "term": "suffrage exprimé",
+  "note": "Plural suffrages exprimés in tables. In France it excludes blank and null ballots. Belgium and Switzerland: votes valables or bulletins valables. Canada: votes valides or bulletins valides."
+ },
+ "invalid votes": {
+  "term": "bulletin nul",
+  "note": "Plural bulletins nuls in tables. Canada: bulletins rejetés."
+ },
+ "blank votes": {
+  "term": "vote blanc",
+  "note": "Plural votes blancs or bulletins blancs. In France, blank votes are counted separately from suffrages exprimés."
+ },
+ "turnout": {
+  "term": "taux de participation",
+  "note": "Also participation. The abstention rate is the complement (taux d'abstention)."
+ },
+ "registered voters": {
+  "term": "électeur inscrit",
+  "note": "In tables, the plural label inscrits or électeurs inscrits is used."
+ },
+ "electorate": {
+  "term": "corps électoral",
+  "note": "The legal term. Électorat is the general or sociological sense."
+ },
+ "vote share": {
+  "term": "pourcentage de voix",
+  "note": "Also pourcentage des suffrages exprimés. Swiss usage: part des suffrages."
+ },
+ "margin": {
+  "term": "écart de voix",
+  "note": "Écart en points for the percentage difference. Canada: also marge."
+ },
+ "swing": {
+  "term": "variation",
+  "note": "Written variation (en points). Swing is used as an anglicism in some press."
+ },
+ "majority": {
+  "term": "majorité absolue",
+  "note": "More than half. Majorité simple is a distinct term, with a meaning that varies by country."
+ },
+ "plurality": {
+  "term": "majorité relative",
+  "note": "Canada also uses pluralité."
+ },
+ "landslide": {
+  "term": "raz-de-marée électoral",
+  "note": "Also victoire écrasante."
+ },
+ "seat": {
+  "term": "siège",
+  "note": "Also mandat in some contexts, especially for Germany and Belgium."
+ },
+ "constituency": {
+  "term": "circonscription",
+  "note": "Same word for UK constituencies and French or Canadian ridings."
+ },
+ "electoral district": {
+  "term": "circonscription électorale",
+  "note": "Switzerland: also arrondissement électoral."
+ },
+ "district": {
+  "term": "district",
+  "note": "Used for US districts: district congressionnel. Use circonscription for French or Canadian equivalents."
+ },
+ "ward": {
+  "term": "district électoral",
+  "note": "Quebec municipal usage. Quartier is also used. For UK wards, press often keeps ward in italics."
+ },
+ "precinct": {
+  "term": "bureau de vote",
+  "note": "For the US precinct, the smallest reporting unit; plural: bureaux de vote."
+ },
+ "polling station": {
+  "term": "bureau de vote",
+  "note": "Canada: bureau de scrutin. Switzerland: local de vote."
+ },
+ "reporting unit": {
+  "term": "unité de résultats",
+  "note": "Working term. No official French equivalent."
+ },
+ "county": {
+  "term": "comté",
+  "note": "Used for the US, UK and Ireland. Not a French département."
+ },
+ "municipality": {
+  "term": "commune",
+  "note": "France, Belgium, Switzerland. Canada: municipalité."
+ },
+ "state": {
+  "term": "État",
+  "note": "Capitalised for federated states. German Länder are called Land (plural Länder) in French."
+ },
+ "province": {
+  "term": "province",
+  "note": "Also used for Turkish il."
+ },
+ "region": {
+  "term": "région",
+  "note": "Belgium: Région also denotes a federated entity."
+ },
+ "polity": {
+  "term": "entité politique",
+  "note": "Descriptive. Also territoire for non-sovereign cases."
+ },
+ "jurisdiction": {
+  "term": "juridiction",
+  "note": "In an administrative sense, territoire de compétence or ressort is also used."
+ },
+ "boundaries": {
+  "term": "limite",
+  "note": "Plural limites, e.g. limites des circonscriptions. Also découpage for the whole delineation."
+ },
+ "redistricting": {
+  "term": "redécoupage électoral",
+  "note": "Redécoupage des circonscriptions in France."
+ },
+ "chamber": {
+  "term": "chambre",
+  "note": ""
+ },
+ "legislature": {
+  "term": "assemblée législative",
+  "note": "Législature also means the period of a mandate, or a US state legislature in press."
+ },
+ "parliament": {
+  "term": "parlement",
+  "note": "Capitalised when naming a specific body."
+ },
+ "lower house": {
+  "term": "chambre basse",
+  "note": ""
+ },
+ "upper house": {
+  "term": "chambre haute",
+  "note": ""
+ },
+ "senate": {
+  "term": "sénat",
+  "note": "Capitalised for specific bodies: le Sénat."
+ },
+ "house of representatives": {
+  "term": "Chambre des représentants",
+  "note": "US House. Canada's equivalent is Chambre des communes."
+ },
+ "council": {
+  "term": "conseil",
+  "note": "Conseil municipal, conseil régional, etc."
+ },
+ "mayor": {
+  "term": "maire",
+  "note": "Belgium: bourgmestre. Switzerland: syndic in some cantons. Feminine: la maire."
+ },
+ "governor": {
+  "term": "gouverneur",
+  "note": "Feminine: gouverneure (Canada) or la gouverneur (France)."
+ },
+ "officeholder": {
+  "term": "titulaire d'une fonction",
+  "note": "For elected officials, élu is common. Titulaire d'un mandat for mandates."
+ },
+ "term": {
+  "term": "mandat",
+  "note": "Also durée du mandat."
+ },
+ "term limit": {
+  "term": "limitation des mandats",
+  "note": "Also limitation du nombre de mandats."
+ },
+ "party": {
+  "term": "parti politique",
+  "note": "Parti in short."
+ },
+ "independent": {
+  "term": "indépendant",
+  "note": "Feminine: indépendante. France: sans étiquette in election listings."
+ },
+ "coalition": {
+  "term": "coalition",
+  "note": ""
+ },
+ "alliance": {
+  "term": "alliance électorale",
+  "note": "France: union, e.g. Nouveau Front populaire. Belgium: cartel for joint lists."
+ },
+ "party list": {
+  "term": "liste de candidats",
+  "note": "Also liste de parti. Do not confuse with liste électorale (the electoral roll)."
+ },
+ "closed list": {
+  "term": "liste bloquée",
+  "note": ""
+ },
+ "open list": {
+  "term": "liste ouverte",
+  "note": ""
+ },
+ "preference vote": {
+  "term": "vote préférentiel",
+  "note": "Belgium: also vote de préférence. Switzerland: panachage and cumul relate to similar options."
+ },
+ "list seat": {
+  "term": "siège de liste",
+  "note": "For Germany: mandat de liste."
+ },
+ "constituency seat": {
+  "term": "siège de circonscription",
+  "note": "For Germany: mandat direct."
+ },
+ "overhang seat": {
+  "term": "mandat excédentaire",
+  "note": "Translation of Überhangmandat."
+ },
+ "leveling seat": {
+  "term": "mandat de compensation",
+  "note": "Translation of Ausgleichsmandat. Also siège de compensation."
+ },
+ "threshold": {
+  "term": "seuil électoral",
+  "note": "Seuil de représentation. Colloquial: barre or clause barrière."
+ },
+ "quota": {
+  "term": "quotient électoral",
+  "note": "For STV in Ireland, quota is also commonly used. Droop quota: quotient de Droop."
+ },
+ "proportional representation": {
+  "term": "représentation proportionnelle",
+  "note": "Short form: la proportionnelle."
+ },
+ "first past the post": {
+  "term": "scrutin majoritaire uninominal à un tour",
+  "note": "Often glossed in press as scrutin à un tour."
+ },
+ "two-round system": {
+  "term": "scrutin majoritaire à deux tours",
+  "note": ""
+ },
+ "ranked-choice voting": {
+  "term": "vote alternatif",
+  "note": "Also scrutin à second tour instantané. Québec press uses vote préférentiel; US press often glosses vote par classement."
+ },
+ "single transferable vote": {
+  "term": "vote unique transférable",
+  "note": "Abbreviated VUT; STV also seen."
+ },
+ "mixed-member proportional": {
+  "term": "représentation proportionnelle mixte",
+  "note": "Canadian term. For Germany: scrutin proportionnel personnalisé or système mixte compensatoire."
+ },
+ "D'Hondt method": {
+  "term": "méthode d'Hondt",
+  "note": "Also méthode de la plus forte moyenne."
+ },
+ "Sainte-Laguë method": {
+  "term": "méthode Sainte-Laguë",
+  "note": "Modified version: méthode Sainte-Laguë modifiée."
+ },
+ "seat allocation": {
+  "term": "répartition des sièges",
+  "note": "Attribution des sièges is also used."
+ },
+ "transfer": {
+  "term": "transfert",
+  "note": "Transfert de voix. Report de voix is used for second-round vote movements."
+ },
+ "elimination": {
+  "term": "élimination",
+  "note": ""
+ },
+ "count": {
+  "term": "tour de dépouillement",
+  "note": "For STV, décompte also occurs. Dépouillement means counting generally."
+ },
+ "results": {
+  "term": "résultat",
+  "note": "Usually plural résultats in headings."
+ },
+ "official results": {
+  "term": "résultat officiel",
+  "note": "France: résultats proclamés. Plural in headings."
+ },
+ "certified": {
+  "term": "certifié",
+  "note": "Used for US certification. France: proclamé. Canada: validé."
+ },
+ "preliminary results": {
+  "term": "résultat provisoire",
+  "note": "Canada: résultats préliminaires or non officiels. Plural in headings."
+ },
+ "election night": {
+  "term": "soirée électorale",
+  "note": "Nuit électorale is used for long US counts."
+ },
+ "called": {
+  "term": "vainqueur déclaré",
+  "note": "Press: X est donné gagnant / victoire annoncée."
+ },
+ "projection": {
+  "term": "projection",
+  "note": "France: estimation, from polling institutes."
+ },
+ "too close to call": {
+  "term": "trop serré pour être projeté",
+  "note": "Also trop serré pour trancher."
+ },
+ "reporting": {
+  "term": "taux de dépouillement",
+  "note": "Or part des bureaux dépouillés."
+ },
+ "votes counted": {
+  "term": "bulletin dépouillé",
+  "note": "Plural bulletins dépouillés or suffrages dépouillés."
+ },
+ "absentee ballot": {
+  "term": "bulletin de vote des absents",
+  "note": "No fixed single term. US press often says vote par correspondance. Canada: vote par bulletin spécial."
+ },
+ "mail-in ballot": {
+  "term": "vote par correspondance",
+  "note": "Switzerland uses the same term."
+ },
+ "early voting": {
+  "term": "vote anticipé",
+  "note": "Canada: vote par anticipation."
+ },
+ "flip": {
+  "term": "basculement",
+  "note": "Siège basculé: seat that changes party."
+ },
+ "gain": {
+  "term": "gain",
+  "note": "Siège gagné: seat won from another party."
+ },
+ "hold": {
+  "term": "maintien",
+  "note": "Siège conservé: seat kept."
+ },
+ "gerrymander": {
+  "term": "gerrymandering",
+  "note": "Also charcutage électoral (colloquial). Used as a loanword."
+ },
+ "electoral college": {
+  "term": "collège électoral",
+  "note": "US body. In France, grands électeurs refers to different electors (senatorial). The electors are called grands électeurs in US coverage."
+ },
+ "elector": {
+  "term": "grand électeur",
+  "note": "For US electors. In France the term also covers senatorial electors."
+ },
+ "delegate": {
+  "term": "délégué",
+  "note": "Feminine: déléguée."
+ },
+ "convention": {
+  "term": "convention",
+  "note": "Convention d'investiture or convention nationale of a party."
+ },
+ "roll call": {
+  "term": "appel nominal",
+  "note": "At US conventions, appel nominal des États."
+ },
+ "turnover": {
+  "term": "renouvellement",
+  "note": "Renouvellement des sièges."
+ },
+ "source": {
+  "term": "source",
+  "note": ""
+ },
+ "changeset": {
+  "term": "lot de modifications",
+  "note": ""
+ },
+ "provenance": {
+  "term": "provenance",
+  "note": "Also traçabilité des données."
+ },
+ "archive": {
+  "term": "archives",
+  "note": "Normally plural in French."
+ },
+ "coverage": {
+  "term": "couverture",
+  "note": ""
+ },
+ "map": {
+  "term": "carte",
+  "note": ""
+ },
+ "shapes": {
+  "term": "contour",
+  "note": "Plural contours. Fond de carte or tracé also used."
+ },
+ "watchlist": {
+  "term": "liste de suivi",
+  "note": ""
+ },
+ "proposal": {
+  "term": "proposition de modification",
+  "note": "Avoids confusion with US proposition."
+ },
+ "bounty": {
+  "term": "prime",
+  "note": "Descriptive. No standard term."
+ },
+ "workbench": {
+  "term": "atelier",
+  "note": "Atelier de données or atelier d'analyse."
+ }
+}

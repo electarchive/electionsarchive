@@ -1,0 +1,498 @@
+{
+ "election": {
+  "term": "Wahl",
+  "note": ""
+ },
+ "general election": {
+  "term": "Hauptwahl",
+  "note": "No single standard term. For national parliaments use 'Parlamentswahl' or 'Bundestagswahl'/'Nationalratswahl'. For the US, 'allgemeine Wahl' or 'Hauptwahl' (as opposed to 'Vorwahl'). UK: 'Unterhauswahl'."
+ },
+ "primary": {
+  "term": "Vorwahl",
+  "note": "Press also uses 'Primary' (pl. 'Primaries'); 'Vorwahl' is the established German term. Not to be confused with a telephone area code."
+ },
+ "runoff": {
+  "term": "Stichwahl",
+  "note": "Used in Germany, Austria and Switzerland (e.g. Bundespräsidentenwahl in Austria; cantonal executive elections in Switzerland)."
+ },
+ "first round": {
+  "term": "erster Wahlgang",
+  "note": "Swiss usage: 'erster Wahlgang'. Also 'erste Runde' in press for foreign elections."
+ },
+ "by-election": {
+  "term": "Nachwahl",
+  "note": "UK 'by-election' often rendered 'Nachwahl' or 'Nachwahl zum Unterhaus'. Swiss: 'Ersatzwahl' (for filling a vacancy). Germany: 'Nachwahl' or 'Ersatzwahl'."
+ },
+ "special election": {
+  "term": "Sonderwahl",
+  "note": "Also 'außerplanmäßige Wahl' or 'Nachwahl' where it fills a vacancy. 'Sonderwahl' is the common rendering for US usage."
+ },
+ "recall election": {
+  "term": "Abberufungswahl",
+  "note": "Also 'Abwahl' (removal). For Switzerland 'Abberufung'. US: 'Recall-Wahl' is common in press. Germany has 'Abwahl' of mayors via 'Bürgerentscheid'."
+ },
+ "contest": {
+  "term": "Wahlkampf um ein Mandat",
+  "note": "No neat single word. Use 'Wahlkreisrennen' or 'Rennen' for a single race; 'Wahl' with the office named (e.g. 'Senatswahl in Texas'). Consider 'Wettbewerb' in tables."
+ },
+ "race": {
+  "term": "Rennen",
+  "note": "Informal, as in 'Kopf-an-Kopf-Rennen'. In tables use 'Wahl' with the office named."
+ },
+ "ballot measure": {
+  "term": "Abstimmungsvorlage",
+  "note": "Swiss usage 'Abstimmungsvorlage' / 'Vorlage'. For US ballot measures, press says 'Volksabstimmung' or 'Abstimmung über ...'. Generic: 'Sachfrage' or 'Sachabstimmung'."
+ },
+ "referendum": {
+  "term": "Referendum",
+  "note": "Pl. 'Referenden' (also 'Referenda'). Germany: 'Volksentscheid' for binding votes; Switzerland: 'Referendum' (optional/mandatory) and 'Volksabstimmung'; Austria: 'Volksabstimmung'."
+ },
+ "initiative": {
+  "term": "Volksinitiative",
+  "note": "Swiss: 'Volksinitiative'. Germany: 'Volksbegehren' (petition stage) leading to 'Volksentscheid'; Austria: 'Volksbegehren'."
+ },
+ "proposition": {
+  "term": "Proposition",
+  "note": "US usage: 'Proposition 8' etc.; rendered as 'Proposition' (pl. 'Propositionen') in press, sometimes explained as 'Abstimmungsvorlage'."
+ },
+ "retention election": {
+  "term": "Bestätigungswahl",
+  "note": "For US judges: 'Bestätigungswahl für Richter'. Press often explains: 'Wahl über den Verbleib im Amt'."
+ },
+ "candidate": {
+  "term": "Kandidat",
+  "note": "Feminine 'Kandidatin'; plural 'Kandidaten'. Official language also 'Bewerber' (Bundeswahlgesetz uses 'Bewerber'). Gender-neutral 'Kandidierende' is used in Switzerland."
+ },
+ "incumbent": {
+  "term": "Amtsinhaber",
+  "note": "Feminine 'Amtsinhaberin'. Also 'Titelverteidiger' informally; for MPs 'bisheriger Abgeordneter'. Swiss: 'bisher' (e.g. 'Bisherige')."
+ },
+ "nominee": {
+  "term": "nominierter Kandidat",
+  "note": "Feminine 'nominierte Kandidatin'. US: 'Kandidat der Partei' / 'Präsidentschaftskandidat'. Official: 'aufgestellter Bewerber'."
+ },
+ "write-in": {
+  "term": "handschriftlich eingetragener Name",
+  "note": "US concept; no equivalent in German law. Press: 'Write-in-Stimme'. Abbreviated 'Write-in'."
+ },
+ "unopposed": {
+  "term": "ohne Gegenkandidat",
+  "note": "Phrase: 'ohne Gegenkandidaten gewählt'. Swiss: 'in stiller Wahl gewählt' (tacit election when candidates equal seats), also 'stille Wahl'."
+ },
+ "ballot": {
+  "term": "Stimmzettel",
+  "note": "Swiss: 'Wahlzettel' / 'Stimmzettel'. Screen: 'Wahlcomputer' / 'Wahlgerät' for voting machine."
+ },
+ "votes cast": {
+  "term": "abgegebene Stimmen",
+  "note": "Plural only; in the nominative: 'die abgegebenen Stimmen'. Inflects as adjective."
+ },
+ "valid votes": {
+  "term": "gültige Stimmen",
+  "note": "Plural; official term in Bundeswahlgesetz."
+ },
+ "invalid votes": {
+  "term": "ungültige Stimmen",
+  "note": "Plural; official term."
+ },
+ "blank votes": {
+  "term": "leere Stimmzettel",
+  "note": "Swiss: 'leere Stimmen' / 'leere Stimmzettel'. In Germany blank ballots count as invalid; in Switzerland they are counted separately."
+ },
+ "turnout": {
+  "term": "Wahlbeteiligung",
+  "note": "Swiss: 'Stimmbeteiligung' for referendums and votes."
+ },
+ "registered voters": {
+  "term": "Wahlberechtigte",
+  "note": "Plural; adjectival noun ('die Wahlberechtigten'). Swiss: 'Stimmberechtigte'. Also 'eingetragene Wähler' for US registration."
+ },
+ "electorate": {
+  "term": "Wählerschaft",
+  "note": "Also 'Wahlvolk'; 'Wahlberechtigte' for those entitled to vote. Swiss: 'Stimmberechtigte'."
+ },
+ "vote share": {
+  "term": "Stimmenanteil",
+  "note": "Also 'Stimmanteil'; Swiss: 'Wähleranteil' for parties. Press: 'Prozent der Stimmen'."
+ },
+ "margin": {
+  "term": "Vorsprung",
+  "note": "Also 'Abstand' or 'Stimmenabstand'. US 'margin of victory': 'Vorsprung'."
+ },
+ "swing": {
+  "term": "Swing",
+  "note": "Press also uses 'Stimmenverschiebung' or 'Verschiebung der Stimmenanteile'; Swiss: 'Wählerverschiebung'."
+ },
+ "majority": {
+  "term": "Mehrheit",
+  "note": "'absolute Mehrheit' for more than half; 'einfache Mehrheit' for plurality."
+ },
+ "plurality": {
+  "term": "relative Mehrheit",
+  "note": "Also 'einfache Mehrheit'. Swiss: 'relatives Mehr' ('absolutes Mehr' for majority)."
+ },
+ "landslide": {
+  "term": "Erdrutschsieg",
+  "note": "Also 'Erdrutsch' alone or 'überwältigender Sieg'. Press: 'Erdrutschsieg'."
+ },
+ "seat": {
+  "term": "Sitz",
+  "note": "Pl. 'Sitze'. Also 'Mandat' (pl. 'Mandate'), the official term in electoral law."
+ },
+ "constituency": {
+  "term": "Wahlkreis",
+  "note": "Pl. 'Wahlkreise'. Used for UK constituencies and for Germany's Wahlkreise."
+ },
+ "electoral district": {
+  "term": "Wahlkreis",
+  "note": "Also 'Wahlbezirk' (in Germany a smaller unit for polling, 'Stimmbezirk'). Swiss: 'Wahlkreis'."
+ },
+ "district": {
+  "term": "Distrikt",
+  "note": "US: 'Kongresswahlbezirk' / 'Wahlbezirk' ('Kongressdistrikt' in press). Swiss 'Bezirk' is an administrative unit."
+ },
+ "ward": {
+  "term": "Wahlbezirk",
+  "note": "UK ward: 'Ward' also appears in press. Alternative: 'Stadtbezirk' or 'Stadtteil'."
+ },
+ "precinct": {
+  "term": "Wahlbezirk",
+  "note": "US precinct, in press 'Wahlbezirk' or 'Stimmbezirk'. In Germany 'Stimmbezirk' is the smallest unit (Urnenwahlbezirk)."
+ },
+ "polling station": {
+  "term": "Wahllokal",
+  "note": "Pl. 'Wahllokale'. Swiss: 'Wahllokal' / 'Stimmlokal'. Austria: 'Wahllokal'."
+ },
+ "reporting unit": {
+  "term": "Meldeeinheit",
+  "note": "Coined term, no standard equivalent. Official: 'Auszählungsbezirk' or 'Gebietseinheit'."
+ },
+ "county": {
+  "term": "County",
+  "note": "US: 'County' (pl. 'Countys' or 'Counties'), established in press. UK: 'Grafschaft' (pl. 'Grafschaften'). Germany's 'Landkreis' is not an equivalent."
+ },
+ "municipality": {
+  "term": "Gemeinde",
+  "note": "Pl. 'Gemeinden'. Cities: 'Stadt'. Swiss and Austrian: 'Gemeinde'."
+ },
+ "state": {
+  "term": "Bundesstaat",
+  "note": "US/Brazil: 'Bundesstaat'. German Land: 'Land' (pl. 'Länder'); Austria: 'Bundesland'; Swiss: 'Kanton'."
+ },
+ "province": {
+  "term": "Provinz",
+  "note": "Pl. 'Provinzen'. Turkish 'il': 'Provinz'. Swiss/Austria: not used for subnational units."
+ },
+ "region": {
+  "term": "Region",
+  "note": "Pl. 'Regionen'. Italian 'regione', French 'région': 'Region'."
+ },
+ "polity": {
+  "term": "Gebietskörperschaft",
+  "note": "No exact equivalent. For countries or territories use 'Staat oder Gebiet', 'Land' or 'Hoheitsgebiet'."
+ },
+ "jurisdiction": {
+  "term": "Zuständigkeitsbereich",
+  "note": "Also 'Gerichtsbarkeit' (judicial), 'Hoheitsgebiet' (territory)."
+ },
+ "boundaries": {
+  "term": "Grenzen",
+  "note": "Electoral: 'Wahlkreisgrenzen'. Administrative: 'Verwaltungsgrenzen'."
+ },
+ "redistricting": {
+  "term": "Neuzuschnitt der Wahlkreise",
+  "note": "Also 'Wahlkreiseinteilung' / 'Wahlkreisneueinteilung'. US: 'Redistricting' in press."
+ },
+ "chamber": {
+  "term": "Kammer",
+  "note": "Pl. 'Kammern'. Also 'Haus' for US House; Swiss: 'Rat' (Nationalrat, Ständerat)."
+ },
+ "legislature": {
+  "term": "Legislative",
+  "note": "Also 'gesetzgebende Körperschaft' or 'Parlament'. US state: 'Parlament' or 'Legislative'."
+ },
+ "parliament": {
+  "term": "Parlament",
+  "note": "Pl. 'Parlamente'. Germany: 'Bundestag'; Austria: 'Nationalrat'; Swiss: 'Bundesversammlung'."
+ },
+ "lower house": {
+  "term": "Unterhaus",
+  "note": "Pl. 'Unterhäuser'. Also 'Erste Kammer' or 'Volkskammer' in other contexts. UK: 'Unterhaus'."
+ },
+ "upper house": {
+  "term": "Oberhaus",
+  "note": "Also 'Zweite Kammer'. Germany's Bundesrat, Swiss Ständerat as examples."
+ },
+ "senate": {
+  "term": "Senat",
+  "note": "Pl. 'Senate'. Swiss: 'Ständerat'."
+ },
+ "house of representatives": {
+  "term": "Repräsentantenhaus",
+  "note": "US: 'Repräsentantenhaus'. Other: 'Abgeordnetenhaus' (Berlin state parliament)."
+ },
+ "council": {
+  "term": "Rat",
+  "note": "Local: 'Gemeinderat', 'Stadtrat', 'Kreistag' (district), 'Regionalrat'. Swiss: 'Gemeinderat', 'Grosser Rat' (cantonal)."
+ },
+ "mayor": {
+  "term": "Bürgermeister",
+  "note": "Feminine 'Bürgermeisterin'. Large cities: 'Oberbürgermeister'. Swiss: 'Stadtpräsident' / 'Gemeindepräsident'. Berlin, Hamburg: 'Regierender Bürgermeister' / 'Erster Bürgermeister'."
+ },
+ "governor": {
+  "term": "Gouverneur",
+  "note": "Feminine 'Gouverneurin'. Pl. 'Gouverneure'. Swiss: 'Regierungsrat' for cantonal executives."
+ },
+ "officeholder": {
+  "term": "Amtsträger",
+  "note": "Feminine 'Amtsträgerin'. Also 'Mandatsträger' for elected representatives."
+ },
+ "term": {
+  "term": "Amtszeit",
+  "note": "Pl. 'Amtszeiten'. For legislatures: 'Legislaturperiode' (Germany), 'Wahlperiode'."
+ },
+ "term limit": {
+  "term": "Amtszeitbegrenzung",
+  "note": "Pl. 'Amtszeitbegrenzungen'. Also 'Begrenzung der Amtszeit'."
+ },
+ "party": {
+  "term": "Partei",
+  "note": "Pl. 'Parteien'."
+ },
+ "independent": {
+  "term": "Parteiloser",
+  "note": "Feminine 'Parteilose'; adjectival noun. Also 'unabhängiger Kandidat'; Germany: 'Einzelbewerber' in electoral law."
+ },
+ "coalition": {
+  "term": "Koalition",
+  "note": "Pl. 'Koalitionen'. Electoral alliances: 'Wahlbündnis'."
+ },
+ "alliance": {
+  "term": "Wahlbündnis",
+  "note": "Also 'Bündnis' or 'Listenverbindung' (Swiss). Austria: 'Wahlallianz'."
+ },
+ "party list": {
+  "term": "Parteiliste",
+  "note": "Germany: 'Landesliste' (state list), 'Liste'. Swiss: 'Liste'."
+ },
+ "closed list": {
+  "term": "starre Liste",
+  "note": "Also 'geschlossene Liste'. 'Starre Liste' is the established term in Germany's electoral law debates."
+ },
+ "open list": {
+  "term": "offene Liste",
+  "note": "Also 'flexible Liste'. Swiss: 'Panaschieren' and 'Kumulieren' are specific vote options."
+ },
+ "preference vote": {
+  "term": "Vorzugsstimme",
+  "note": "Austria: 'Vorzugsstimme'. Swiss: 'Kumulieren' (giving two votes). Germany (state elections): 'Personenstimme'."
+ },
+ "list seat": {
+  "term": "Listenmandat",
+  "note": "Pl. 'Listenmandate'. Also 'Listensitz'."
+ },
+ "constituency seat": {
+  "term": "Direktmandat",
+  "note": "Pl. 'Direktmandate'. Official German term for directly elected seats."
+ },
+ "overhang seat": {
+  "term": "Überhangmandat",
+  "note": "Pl. 'Überhangmandate'. Abolished effect at federal level since 2023 reform (no overhang seats awarded)."
+ },
+ "leveling seat": {
+  "term": "Ausgleichsmandat",
+  "note": "Pl. 'Ausgleichsmandate'."
+ },
+ "threshold": {
+  "term": "Sperrklausel",
+  "note": "Also 'Prozenthürde' (colloquial), 'Fünf-Prozent-Hürde'. Official term 'Sperrklausel'."
+ },
+ "quota": {
+  "term": "Quote",
+  "note": "Also 'Wahlzahl', 'Hare-Quote', 'Droop-Quote'. Swiss: 'Wahlzahl' / 'Quorum'. Hare quota: 'Hare-Quote'."
+ },
+ "proportional representation": {
+  "term": "Verhältniswahl",
+  "note": "Also 'Verhältniswahlrecht', 'Proporzwahl' (Swiss and Austrian: 'Proporz')."
+ },
+ "first past the post": {
+  "term": "Mehrheitswahl",
+  "note": "More exact: 'relative Mehrheitswahl'. British system: 'Mehrheitswahlrecht'. Also 'First-past-the-post' in press."
+ },
+ "two-round system": {
+  "term": "Zwei-Runden-System",
+  "note": "Also 'Mehrheitswahl mit Stichwahl'. Press: 'Zweirundenwahl'."
+ },
+ "ranked-choice voting": {
+  "term": "Rangfolgewahl",
+  "note": "Press also 'Ranked-Choice-Voting' and 'Präferenzwahl'. Also 'Sofort-Stichwahl' / 'Instant-Runoff-Verfahren'."
+ },
+ "single transferable vote": {
+  "term": "übertragbare Einzelstimmgebung",
+  "note": "Also 'Single Transferable Vote' / 'STV' in press. Official German: 'Einzelstimmübertragung'."
+ },
+ "mixed-member proportional": {
+  "term": "personalisierte Verhältniswahl",
+  "note": "Germany's official description of its system. Generic: 'Grabensystem' is mixed non-compensatory (parallel)."
+ },
+ "D'Hondt method": {
+  "term": "D'Hondt-Verfahren",
+  "note": "Also 'Divisorverfahren mit Abrundung'. Used in Austria and Switzerland ('Proporz nach D'Hondt')."
+ },
+ "Sainte-Laguë method": {
+  "term": "Sainte-Laguë-Verfahren",
+  "note": "Also 'Sainte-Laguë/Schepers' in Germany (current federal method), 'Divisorverfahren mit Standardrundung'."
+ },
+ "seat allocation": {
+  "term": "Sitzverteilung",
+  "note": "Also 'Mandatsverteilung' or 'Sitzzuteilung'."
+ },
+ "transfer": {
+  "term": "Stimmenübertragung",
+  "note": "STV usage; also 'Übertragung'."
+ },
+ "elimination": {
+  "term": "Ausscheiden",
+  "note": "Noun: 'Ausscheiden des Kandidaten'; or 'Eliminierung'. Rare outside STV."
+ },
+ "count": {
+  "term": "Zählgang",
+  "note": "Also 'Auszählungsrunde'. 'Auszählung' is the general counting."
+ },
+ "results": {
+  "term": "Ergebnisse",
+  "note": "Singular 'Ergebnis'; 'Wahlergebnis' (pl. 'Wahlergebnisse')."
+ },
+ "official results": {
+  "term": "amtliches Endergebnis",
+  "note": "Germany: 'amtliches Endergebnis' (declared by Bundeswahlleiter). Pl. 'amtliche Endergebnisse'. Also 'amtliches Ergebnis'."
+ },
+ "certified": {
+  "term": "amtlich festgestellt",
+  "note": "Adjective/participle. Also 'beglaubigt'. US: 'zertifiziert' in press."
+ },
+ "preliminary results": {
+  "term": "vorläufiges Ergebnis",
+  "note": "Germany: 'vorläufiges amtliches Ergebnis'. Pl. 'vorläufige Ergebnisse'."
+ },
+ "election night": {
+  "term": "Wahlabend",
+  "note": "Also 'Wahlnacht' in press. Coverage: 'Wahlabend-Berichterstattung'."
+ },
+ "called": {
+  "term": "Prognose",
+  "note": "As status: 'Sieger ausgerufen' / 'Wahlsieg verkündet'. Press: 'zum Sieger erklärt'."
+ },
+ "projection": {
+  "term": "Hochrechnung",
+  "note": "Hochrechnung is the standard projection based on counted votes; 'Prognose' is the exit-poll forecast at poll closing."
+ },
+ "too close to call": {
+  "term": "zu knapp für eine Prognose",
+  "note": "Press: 'Kopf-an-Kopf-Rennen', 'noch offen'. Not a fixed term."
+ },
+ "reporting": {
+  "term": "Auszählungsstand",
+  "note": "Also 'ausgezählte Stimmbezirke'. Percent counted: 'Anteil der ausgezählten Wahlbezirke'."
+ },
+ "votes counted": {
+  "term": "ausgezählte Stimmen",
+  "note": "Plural."
+ },
+ "absentee ballot": {
+  "term": "Briefwahl",
+  "note": "In Germany 'Briefwahl' covers postal and absentee voting. Swiss: 'briefliche Stimmabgabe'. Austria: 'Wahlkarte'."
+ },
+ "mail-in ballot": {
+  "term": "Briefwahlunterlagen",
+  "note": "The vote itself: 'Briefwahl'. Individual: 'Briefwahlstimme'. Swiss: 'briefliche Stimmabgabe'."
+ },
+ "early voting": {
+  "term": "vorzeitige Stimmabgabe",
+  "note": "Austria: 'vorgezogene Stimmabgabe'; Swiss: 'vorzeitige Stimmabgabe'. Press for US: 'Early Voting'."
+ },
+ "flip": {
+  "term": "Mandatswechsel",
+  "note": "Press: 'Sitzwechsel' or 'Wechsel der Partei'. Verb: 'kippen' ('der Sitz kippt')."
+ },
+ "gain": {
+  "term": "Mandatsgewinn",
+  "note": "Pl. 'Mandatsgewinne'. Also 'Sitzgewinn'."
+ },
+ "hold": {
+  "term": "Mandatsverteidigung",
+  "note": "Also 'Sitz gehalten'. 'Verteidigung des Sitzes'."
+ },
+ "gerrymander": {
+  "term": "Gerrymandering",
+  "note": "Neuter noun, used as in English ('das Gerrymandering'). Also 'manipulativer Zuschnitt von Wahlkreisen'."
+ },
+ "electoral college": {
+  "term": "Wahlmännergremium",
+  "note": "Press: 'Electoral College' and 'Wahlleute' (members). Established: 'Electoral College'."
+ },
+ "elector": {
+  "term": "Wahlmann",
+  "note": "Plural 'Wahlleute' or 'Wahlmänner'. Feminine 'Wahlfrau'. Press: 'Wahlmänner und -frauen'."
+ },
+ "delegate": {
+  "term": "Delegierter",
+  "note": "Feminine 'Delegierte'; adjectival noun. Pl. 'Delegierte'."
+ },
+ "convention": {
+  "term": "Parteitag",
+  "note": "US: 'Nominierungsparteitag' or 'Convention' in press ('Nominierungsparteitag der Demokraten')."
+ },
+ "roll call": {
+  "term": "namentliche Abstimmung",
+  "note": "For US conventions: 'Delegiertenabstimmung nach Bundesstaaten'. Press: 'Roll Call'."
+ },
+ "turnover": {
+  "term": "Mandatsverschiebung",
+  "note": "Also 'Wechsel' or 'Fluktuation' (e.g. 'Fluktuation im Parlament'). No standard term."
+ },
+ "source": {
+  "term": "Quelle",
+  "note": "Pl. 'Quellen'."
+ },
+ "changeset": {
+  "term": "Änderungssatz",
+  "note": "Technical term; 'Changeset' is often retained in software contexts."
+ },
+ "provenance": {
+  "term": "Herkunftsnachweis",
+  "note": "Also 'Datenherkunft'. 'Provenienz' for scholarly usage."
+ },
+ "archive": {
+  "term": "Archiv",
+  "note": "Pl. 'Archive'."
+ },
+ "coverage": {
+  "term": "Abdeckung",
+  "note": "Also 'Erfassungsgrad' or 'Umfang'. Media coverage would be 'Berichterstattung'."
+ },
+ "map": {
+  "term": "Karte",
+  "note": "Pl. 'Karten'."
+ },
+ "shapes": {
+  "term": "Geometrien",
+  "note": "Also 'Gebietsgrenzen' or 'Shapes' in GIS contexts. Singular 'Geometrie'."
+ },
+ "watchlist": {
+  "term": "Beobachtungsliste",
+  "note": "Also 'Merkliste'."
+ },
+ "proposal": {
+  "term": "Änderungsvorschlag",
+  "note": "Pl. 'Änderungsvorschläge'. General 'Vorschlag'."
+ },
+ "bounty": {
+  "term": "Prämienaufgabe",
+  "note": "Coined; alternatives 'Kopfgeld' (unsuitable) or 'Bounty'. Describe as 'Aufgabe mit Prämie'."
+ },
+ "workbench": {
+  "term": "Werkbank",
+  "note": "Common UI translation; alternative 'Arbeitsbereich'."
+ }
+}
