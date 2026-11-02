@@ -25,22 +25,6 @@ PROVINCES = {
     "61": "NT",
     "62": "NU",
 }
-REGIONS = {
-    "IDF": "75 77 78 91 92 93 94 95",
-    "HDF": "02 59 60 62 80",
-    "GES": "08 10 51 52 54 55 57 67 68 88",
-    "NOR": "14 27 50 61 76",
-    "BRE": "22 29 35 56",
-    "PDL": "44 49 53 72 85",
-    "CVL": "18 28 36 37 41 45",
-    "BFC": "21 25 39 58 70 71 89 90",
-    "ARA": "01 03 07 15 26 38 42 43 63 69 73 74",
-    "NAQ": "16 17 19 23 24 33 40 47 64 79 86 87",
-    "OCC": "09 11 12 30 31 32 34 46 48 65 66 81 82",
-    "PAC": "04 05 06 13 83 84",
-    "COR": "2A 2B",
-}
-DEPARTEMENTS = {code: code for codes in REGIONS.values() for code in codes.split()}
 LANDER = {
     "01": "SH",
     "02": "HH",
@@ -91,14 +75,6 @@ TILES = {
                 date(2025, 4, 28),
             ]
         },
-    ),
-    "fr-circ": Tiles(
-        "fr.circonscription",
-        2154,
-        2,
-        DEPARTEMENTS,
-        {day.year: day for day in [date(2012, 6, 10), date(2017, 6, 11), date(2022, 6, 12), date(2024, 6, 30)]},
-        {code: region for region, codes in REGIONS.items() for code in codes.split()},
     ),
     "de-wk": Tiles("de.wahlkreis", 25832, 0, LANDER, {2025: date(2025, 2, 23)}, parent="de.land"),
 }

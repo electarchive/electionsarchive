@@ -52,6 +52,7 @@ class Map:
     corner: dict[str, tuple[bool, float, float]] = field(default_factory=dict)
     links: tuple[tuple[str, str], ...] = ()
     isles: frozenset[str] = frozenset()
+    groups: dict[str, str] | None = None
 
 
 type Run = tuple[date, date, dict[str, BaseGeometry], dict[str, int], Map, list[str]]
@@ -84,6 +85,40 @@ UNIVERSITIES = {
     "sct-aberdeen-and-glasgow-universities": (-4.2886, 55.8721),
     "sct-edinburgh-and-st-andrew-s-universities": (-3.1883, 55.9445),
     "wls-university-of-wales": (-3.1791, 51.4866),
+}
+FR_REGIONS = {
+    "IDF": "75 77 78 91 92 93 94 95",
+    "HDF": "02 59 60 62 80",
+    "GES": "08 10 51 52 54 55 57 67 68 88",
+    "NOR": "14 27 50 61 76",
+    "BRE": "22 29 35 56",
+    "PDL": "44 49 53 72 85",
+    "CVL": "18 28 36 37 41 45",
+    "BFC": "21 25 39 58 70 71 89 90",
+    "ARA": "01 03 07 15 26 38 42 43 63 69 73 74",
+    "NAQ": "16 17 19 23 24 33 40 47 64 79 86 87",
+    "OCC": "09 11 12 30 31 32 34 46 48 65 66 81 82",
+    "PAC": "04 05 06 13 83 84",
+    "COR": "2A 2B",
+}
+FR_NAMES = (
+    {code: code for codes in FR_REGIONS.values() for code in codes.split()}
+    | {code: code for code in ("971", "972", "973", "974", "975", "976", "986", "987", "988")}
+    | {"ZX": "977", "ZZ": "Abroad"}
+    | {region: region for region in FR_REGIONS}
+)
+FR_CORNER: dict[str, tuple[bool, float, float]] = {
+    "ZZ": (False, 8, 2),
+    "974": (False, 30, 0),
+    "971": (False, 44, 0),
+    "972": (False, 56, 0),
+    "987": (False, 28, 13),
+    "973": (False, 38, 13),
+    "976": (False, 46, 13),
+    "988": (False, 54, 13),
+    "975": (False, 30, 21),
+    "ZX": (False, 37, 21),
+    "986": (False, 44, 21),
 }
 US_CORNER: dict[str, tuple[bool, float, float]] = {
     "02": (False, 10, -2),
@@ -730,6 +765,54 @@ def fix(taken: dict[Cell, str], names: list[str], need: dict[str, int]) -> list[
     return [c for c in names if len(parts(c)) > 1 or len(owned(c)) != need[c]]
 
 
+def share(
+    cells: list[Cell],
+    members: list[str],
+    polys: dict[str, BaseGeometry],
+    anchors: dict[str, tuple[float, float]],
+    need: dict[str, int],
+) -> tuple[dict[Cell, str], list[str]]:
+    if len(members) == 1:
+        return dict.fromkeys(cells, members[0]), []
+    names = [c for c in members if c in polys]
+    pinned = [c for c in members if c in anchors]
+    shaped = [polys[c] for c in names]
+    warp = diffuse(shaped, [1 / p.area for p in shaped], 128)
+    seeds = np.array(
+        [[p.representative_point().x, p.representative_point().y] for p in shaped] + [anchors[c] for c in pinned]
+    )
+    moved = warp(np.vstack([seeds, shapely.get_coordinates(shaped)]))
+    warped = [make_valid(p) for p in shapely.set_coordinates(np.array(shaped, dtype=object), moved[len(seeds) :])]
+    union = shapely.union_all(warped)
+    uc = np.array(union.centroid.coords[0])
+    mc = centroid(cells)
+    fit = math.sqrt(len(cells) * HEX / union.area)
+    warped = [affinity.affine_transform(p, [fit, 0, 0, fit, mc[0] - uc[0] * fit, mc[1] - uc[1] * fit]) for p in warped]
+    home = {c: (np.array(moved[i]) - uc) * fit + mc for i, c in enumerate([*names, *pinned])} | {
+        c: mc for c in members if c not in polys and c not in anchors
+    }
+    points = np.array([axial(*cell) for cell in cells])
+    reach = {c: shapely.distance(warped[i], shapely.points(points)) for i, c in enumerate(names)}
+    reach |= {c: np.zeros(len(points)) for c in members if c not in polys}
+    owners = [c for c in members for _ in range(need[c])]
+    split = members
+    taken: dict[Cell, str] = {}
+    for weight in (0.25, 0.5, 1.0, 2.0, 4.0):
+        spots = dict(home)
+        for _ in range(10):
+            rows = [reach[c] ** 2 * REACH + ((points - spots[c]) ** 2).sum(axis=1) * weight for c in owners]
+            picked, columns = linear_sum_assignment(np.array(rows))
+            taken = {cells[j]: owners[i] for i, j in zip(picked, columns, strict=True)}
+            spread: dict[str, list[tuple[float, float]]] = defaultdict(list)
+            for cell, c in taken.items():
+                spread[c].append(axial(*cell))
+            spots = {c: 0.25 * home[c] + 0.75 * np.mean(spread[c], axis=0) for c in members}
+        split = fix(taken, members, need)
+        if not split:
+            break
+    return taken, split
+
+
 def districts(
     shapes: dict[str, BaseGeometry],
     seats: dict[str, int],
@@ -742,57 +825,45 @@ def districts(
     problems = []
     for s, members in membership(m).items():
         cells = [(x + placed[s][0], z + placed[s][1]) for x, z in masks[s]]
-        if len(members) == 1:
-            district.update(dict.fromkeys(cells, members[0]))
-            continue
-        names = [c for c in members if c not in m.wide]
-        wide = [c for c in members if c in m.wide]
-        anchors = {c: point for c in wide if (point := m.wide[c]) is not None}
-        pinned = list(anchors)
-        need = {c: K * seats.get(c, 1) for c in members}
         scale, ox, oy, dx, dy = frames[s]
         off = axial(*placed[s])
         matrix = [scale, 0, 0, -scale, -ox * scale + dx + off[0], oy * scale + dy + off[1]]
-        polys = [make_valid(affinity.affine_transform(shapes[c], matrix).simplify(0.05)) for c in names]
-        warp = diffuse(polys, [1 / p.area for p in polys], 128)
-        seeds = np.array(
-            [[p.representative_point().x, p.representative_point().y] for p in polys]
-            + [[matrix[0] * x + matrix[4], matrix[3] * y + matrix[5]] for x, y in anchors.values()]
-        )
-        moved = warp(np.vstack([seeds, shapely.get_coordinates(polys)]))
-        warped = [make_valid(p) for p in shapely.set_coordinates(np.array(polys, dtype=object), moved[len(seeds) :])]
-        union = shapely.union_all(warped)
-        uc = np.array(union.centroid.coords[0])
-        mc = centroid(cells)
-        fit = math.sqrt(len(cells) * HEX / union.area)
-        warped = [
-            affinity.affine_transform(p, [fit, 0, 0, fit, mc[0] - uc[0] * fit, mc[1] - uc[1] * fit]) for p in warped
-        ]
-        home = {c: (np.array(moved[i]) - uc) * fit + mc for i, c in enumerate([*names, *pinned])} | dict.fromkeys(
-            [c for c in wide if c not in pinned], mc
-        )
-        points = np.array([axial(*cell) for cell in cells])
-        reach = {c: shapely.distance(warped[i], shapely.points(points)) for i, c in enumerate(names)}
-        reach |= {c: np.zeros(len(points)) for c in wide}
-        owners = [c for c in members for _ in range(need[c])]
-        split = members
-        taken: dict[Cell, str] = {}
-        for weight in (0.25, 0.5, 1.0, 2.0, 4.0):
-            spots = dict(home)
-            for _ in range(10):
-                rows = [reach[c] ** 2 * REACH + ((points - spots[c]) ** 2).sum(axis=1) * weight for c in owners]
-                picked, columns = linear_sum_assignment(np.array(rows))
-                taken = {cells[j]: owners[i] for i, j in zip(picked, columns, strict=True)}
-                spread: dict[str, list[tuple[float, float]]] = defaultdict(list)
-                for cell, c in taken.items():
-                    spread[c].append(axial(*cell))
-                spots = {c: 0.25 * home[c] + 0.75 * np.mean(spread[c], axis=0) for c in members}
-            split = fix(taken, members, need)
-            if not split:
-                break
-        if split:
-            problems.append(f"{m.names[s]} split {', '.join(split)}")
-        district.update(taken)
+        polys = {
+            c: make_valid(affinity.affine_transform(shapes[c], matrix).simplify(0.05))
+            for c in members
+            if c not in m.wide
+        }
+        anchors = {
+            c: (matrix[0] * x + matrix[4], matrix[3] * y + matrix[5])
+            for c in members
+            if c in m.wide and (point := m.wide[c]) is not None
+            for x, y in [point]
+        }
+        need = {c: K * seats.get(c, 1) for c in members}
+        units: dict[str, list[str]] = defaultdict(list)
+        for c in members:
+            units[m.unit[c]].append(c)
+        if len(units) > 1 and all(any(c in polys for c in codes) for codes in units.values()):
+            outer, split = share(
+                cells,
+                list(units),
+                {
+                    u: make_valid(shapely.union_all([polys[c] for c in codes if c in polys]))
+                    for u, codes in units.items()
+                },
+                {},
+                {u: sum(need[c] for c in codes) for u, codes in units.items()},
+            )
+            if split:
+                problems.append(f"{m.names[s]} split {', '.join(m.names[u] for u in split)}")
+            parts = [([cell for cell, u in outer.items() if u == unit], codes) for unit, codes in units.items()]
+        else:
+            parts = [(cells, members)]
+        for part, codes in parts:
+            taken, split = share(part, codes, polys, anchors, need)
+            if split:
+                problems.append(f"{m.names[s]} split {', '.join(split)}")
+            district.update(taken)
     return district, problems
 
 
@@ -910,7 +981,9 @@ def tiles(district: dict[Cell, str], seats: dict[str, int], m: Map, scheme: str)
         total_of[m.unit[code]] += count
     inland = [s for s in sorted(fine) if s not in m.corner]
     lands: list[Polygon] = []
-    for part in [[s for s in inland if s not in m.isles]] + [[s] for s in inland if s in m.isles]:
+    for part in [[s for s in inland if s not in m.isles], [s for s in inland if s in m.isles]]:
+        if not part:
+            continue
         closed = union(cell for s in part for cell in fine[s]).buffer(CLOSE).buffer(-CLOSE)
         lands.extend(Polygon(piece.exterior) for piece in getattr(closed, "geoms", [closed]))
     lands.sort(key=lambda land: -land.area)
@@ -961,9 +1034,20 @@ def tiles(district: dict[Cell, str], seats: dict[str, int], m: Map, scheme: str)
             continue
         middle = centroid(fine[s]) / f
         z = round(middle[1] / 1.5)
-        mine = [(round(middle[0] / S3 - z / 2), z)]
+        start = (round(middle[0] / S3 - z / 2), z)
+        busy = set(taken) | {o for c in taken for o in near(*c)}
+
+        def gap(o: Cell, at: np.ndarray = middle) -> tuple[float, Cell]:
+            return float(np.hypot(*(np.array(axial(*o)) - at))), o
+
+        if start in busy:
+            ring = {start}
+            while not ring - busy:
+                ring |= {o for c in ring for o in near(*c)}
+            start = min(ring - busy, key=gap)
+        mine = [start]
         while len(mine) < total_of[s]:
-            mine.append(min({o for c in mine for o in near(*c)} - set(mine), key=lambda o: (o[1], o[0])))
+            mine.append(min({o for c in mine for o in near(*c)} - set(mine) - busy, key=gap))
         taken.update(dict.fromkeys(mine, s))
     placed: dict[Cell, str] = {}
     for s in sorted(fine):
@@ -985,7 +1069,9 @@ def tiles(district: dict[Cell, str], seats: dict[str, int], m: Map, scheme: str)
     hexes: dict[str, list[int]] = defaultdict(list)
     for (q, r), code in sorted(grid.items()):
         hexes[code].extend([q, -r])
-    shape = outline(Tiles(scheme, 0, 2, m.names, {}), {cell: m.names[m.unit[code]] for cell, code in grid.items()})
+    shape = outline(
+        Tiles(scheme, 0, 2, m.names, {}, m.groups), {cell: m.names[m.unit[code]] for cell, code in grid.items()}
+    )
     regions = {code: m.unit[code] for code in sorted(hexes) if m.unit[code] != code[:-2]}
     return {"hexes": dict(sorted(hexes.items())), **({"regions": regions} if regions else {}), **shape}, problems
 
@@ -1085,6 +1171,66 @@ def gb_runs() -> Iterator[Run]:
         )
 
 
+def fr_runs() -> Iterator[Run]:
+    with connect() as db:
+        db.execute("set statement_timeout = '600s'")
+        rows = db.execute(
+            """
+            select r.date_from, a.id, ac.code
+            from contest c join election e on e.id = c.election_id and e.kind = 'general'
+            join election r on r.id = e.parent_id and r.parent_id is null
+            join body b on b.id = c.body_id and b.kind = 'lower_house'
+            join area a on a.id = c.district_area_id and a.scheme_code = 'fr.circonscription'
+            join area_code ac on ac.area_id = a.id and (ac.valid @> r.date_from or ac.valid is null)
+            where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
+            group by 1, 2, 3
+            """
+        ).fetchall()
+    found: dict[date, dict[str, str]] = defaultdict(dict)
+    for day, area, code in rows:
+        found[day][code] = area
+    for day, contests in sorted(found.items()):
+        with connect() as db:
+            texts = dict(
+                db.execute(
+                    """
+                    select g.area_id, st_astext(st_buffer(st_simplify(st_transform(g.geom, case
+                      when g.area_id = any(%(overseas)s) then 3857 else 2154 end),
+                      case when g.area_id = any(%(abroad)s) then 20000 else 100 end), 0))
+                    from area_geometry g where g.area_id = any(%(areas)s) and g.valid @> %(day)s
+                    """,
+                    {
+                        "areas": list(contests.values()),
+                        "overseas": [area for code, area in contests.items() if code[:2] in ("97", "98", "ZX", "ZZ")],
+                        "abroad": [area for code, area in contests.items() if code.startswith("ZZ")],
+                        "day": day,
+                    },
+                ).fetchall()
+            )
+        if len(texts) < len(contests) / 2:
+            continue
+        shapes = {code: make_valid(wkt.loads(texts[area])) for code, area in sorted(contests.items()) if area in texts}
+        unit = {code: code[:-2] for code in shapes}
+        regions = {code: region for region, codes in FR_REGIONS.items() for code in codes.split()}
+        yield (
+            day,
+            day,
+            shapes,
+            dict.fromkeys(shapes, 1),
+            Map(
+                unit,
+                FR_NAMES,
+                blob=frozenset(FR_CORNER),
+                corner={s: spot for s, spot in FR_CORNER.items() if s in unit.values()},
+                merge=regions,
+                links=(("COR", "PAC"),),
+                isles=frozenset({"2A", "2B"}),
+                groups=regions,
+            ),
+            sorted(set(contests) - set(shapes)),
+        )
+
+
 def layouts(prefix: str, scheme: str, runs: Iterable[Run], out: Path = OUT) -> list[str]:
     report = []
     index: dict[str, str] = {}
@@ -1118,4 +1264,10 @@ def layouts(prefix: str, scheme: str, runs: Iterable[Run], out: Path = OUT) -> l
 
 
 def build() -> str:
-    return "\n".join([*layouts("us-cd", "us.cd", us_runs()), *layouts("gb-pcon", "gb.pcon", gb_runs())])
+    return "\n".join(
+        [
+            *layouts("us-cd", "us.cd", us_runs()),
+            *layouts("gb-pcon", "gb.pcon", gb_runs()),
+            *layouts("fr-circ", "fr.circonscription", fr_runs()),
+        ]
+    )

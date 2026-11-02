@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import france from "#lib/server/hex/fr-circ.json";
 import britain from "#lib/server/hex/gb-pcon.json";
 import america from "#lib/server/hex/us-cd.json";
 import {
@@ -34,9 +35,14 @@ const CARTOGRAMS = Object.fromEntries(
         };
         labels: Record<string, [number, number, string]>;
       };
-    }>(["../hex/us-cd-[0-9]*.json", "../hex/gb-pcon-[0-9]*.json"], {
-      import: "default",
-    }),
+    }>(
+      [
+        "../hex/us-cd-[0-9]*.json",
+        "../hex/gb-pcon-[0-9]*.json",
+        "../hex/fr-circ-[0-9]*.json",
+      ],
+      { import: "default" },
+    ),
   ).map(([file, load]) => [file.slice(7, -5), load]),
 );
 const CARTOGRAM_SETS: Record<
@@ -45,6 +51,7 @@ const CARTOGRAM_SETS: Record<
 > = {
   "us.cd": { prefix: "us-cd", roots: america },
   "gb.pcon": { prefix: "gb-pcon", roots: britain },
+  "fr.circonscription": { prefix: "fr-circ", roots: france },
 };
 const cartogram = async (scheme: string, root: string) => {
   const set = CARTOGRAM_SETS[scheme];
@@ -74,7 +81,6 @@ const TILES = import.meta.glob<{
 }>("../hex/*-tiles.json", { eager: true, import: "default" });
 const TILE_SETS: Record<string, { file: string; cut: number }> = {
   "ca.fed": { file: "../hex/ca-fed-tiles.json", cut: 3 },
-  "fr.circonscription": { file: "../hex/fr-circ-tiles.json", cut: 2 },
   "de.wahlkreis": { file: "../hex/de-wk-tiles.json", cut: 0 },
 };
 const STATES =

@@ -892,7 +892,9 @@
   });
   const segments = $derived(
     (["territory", "overseas", "abroad", "pool"] as const).flatMap((group) => {
-      const entries = remote.filter((entry) => entry.group === group);
+      const entries = remote.filter(
+        (entry) => entry.group === group && grid?.at.has(entry.k) !== true,
+      );
       return entries.length === 0 ? [] : [{ group, entries }];
     }),
   );
@@ -3002,7 +3004,7 @@
         {/each}
       </div>
     {/if}
-    {#if segments.length > 0 || globe != null}
+    {#if segments.length > 0 || (globe != null && !isSummary)}
       <div
         class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2 max-sm:inset-e-14"
         bind:clientHeight={stripHeight}
@@ -3178,7 +3180,7 @@
             {/if}
           {/if}
         {/each}
-        {#if globe != null}
+        {#if globe != null && !isSummary}
           {const target = $derived(globe.isCurrent ? tiers[0] : globe)}
           {#if target != null && pick == null}
             <a
