@@ -1,3 +1,4 @@
+import type { RequestEvent } from "@sveltejs/kit";
 import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
 import { building, dev } from "$app/env";
 import { READ_ONLY } from "$app/env/public";
@@ -5,13 +6,18 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
-import { mark, purge } from "#lib/server/edge.js";
+import { refreshing } from "#lib/server/cache.js";
+import { kept, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
 import { twin } from "#lib/server/twin.js";
 
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
+
+const REFRESH = "x-ea-refresh";
+
+const LOOPBACK = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 const WRITABLE =
   /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile|unsubscribe)(?:\/|$)/u;
@@ -101,8 +107,24 @@ const twinHandle: Handle = async ({ event, resolve }) => {
   return response;
 };
 
+const keptHandle: Handle = async ({ event, resolve }) =>
+  (await kept(event)) ?? resolve(event);
+
 const edgeHandle: Handle = async ({ event, resolve }) =>
-  mark(event, await resolve(event));
+  skewed(event) ?? mark(event, await resolve(event));
+
+function isLocal(event: RequestEvent) {
+  try {
+    return LOOPBACK.has(event.getClientAddress());
+  } catch {
+    return false;
+  }
+}
+
+const refreshHandle: Handle = async ({ event, resolve }) =>
+  event.request.headers.get(REFRESH) === "1" && isLocal(event)
+    ? refreshing.run(true, async () => resolve(event))
+    : resolve(event);
 
 const timingHandle: Handle = async ({ event, resolve }) => {
   const response = await resolve(event);
@@ -117,13 +139,14 @@ export const init: ServerInit = () => {
   process.on("unhandledRejection", (error) => {
     console.error("An unhandled rejection:", error);
   });
-  setTimeout(() => void purge(), 5000);
 };
 
 export const handle: Handle = sequence(
+  keptHandle,
   guardHandle,
   csrfHandle,
   edgeHandle,
+  refreshHandle,
   timingHandle,
   readOnlyHandle,
   paraglideHandle,

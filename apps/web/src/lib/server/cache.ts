@@ -3,6 +3,7 @@ import { PAGES_DATABASE_URL } from "$app/env/private";
 import { os as base, Procedure } from "@orpc/server";
 import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
+import { AsyncLocalStorage } from "node:async_hooks";
 import { Buffer } from "node:buffer";
 import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
@@ -41,6 +42,8 @@ type Entry = {
   isSettled: boolean;
   isRenewing: boolean;
 };
+
+export const refreshing = new AsyncLocalStorage<boolean>();
 
 const entries = new Map<string, Entry>();
 const names = new WeakMap<object, string>();
@@ -323,6 +326,7 @@ export async function remember<T>(
   isStrict = false,
   generation = GENERATION,
 ) {
+  const isRefresh = isStrict || refreshing.getStore() === true;
   const locale = getLocale();
   const isBase = locale === baseLocale;
   const key = isBase ? shared : `${locale}|${shared}`;
@@ -338,7 +342,7 @@ export async function remember<T>(
   if (hit != null) {
     entries.delete(key);
     entries.set(key, hit);
-    if (isStrict && hit.version !== state.version) {
+    if (isRefresh && hit.version !== state.version) {
       const next = store(key, slot, run, true);
       put(key, next);
       return next.value as Promise<T>;
@@ -348,7 +352,7 @@ export async function remember<T>(
     }
     return hit.value as Promise<T>;
   }
-  const entry = store(key, slot, run, isStrict);
+  const entry = store(key, slot, run, isRefresh);
   put(key, entry);
   return entry.value as Promise<T>;
 }

@@ -1,12 +1,33 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import { version as build, building } from "$app/env";
-import { CLOUDFLARE_PURGE_TOKEN, CLOUDFLARE_ZONE_ID } from "$app/env/private";
-import { BASE_URL } from "$app/env/public";
+import { version as build, dev } from "$app/env";
 import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { cookieName, isLocale } from "#lib/paraglide/runtime.js";
-import { redis } from "#lib/server/redis.js";
 
 const LOCALE = "x-locale";
+
+const BUILD = "build";
+
+const KEPT = path.resolve("../../data/immutable");
+
+const IMMUTABLE = /^\/_app\/immutable\/((?:[\w-]+\/)*[\w.-]+\.(\w+))$/u;
+
+const TYPES: Record<string, string> = {
+  js: "text/javascript",
+  css: "text/css",
+  json: "application/json",
+  map: "application/json",
+  wasm: "application/wasm",
+  svg: "image/svg+xml",
+  png: "image/png",
+  jpg: "image/jpeg",
+  webp: "image/webp",
+  avif: "image/avif",
+  woff: "font/woff",
+  woff2: "font/woff2",
+  ttf: "font/ttf",
+};
 
 const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
@@ -79,6 +100,10 @@ export async function mark(event: RequestEvent, response: Response) {
   varies.add(LOCALE);
   response.headers.set("vary", [...varies].join(", "));
   response.headers.set("cache-control", "no-cache");
+  const tag = page(event.url.pathname);
+  if (tag != null) {
+    response.headers.set("cache-tag", tag);
+  }
   if (data != null) {
     response.headers.set(
       "etag",
@@ -94,41 +119,51 @@ export async function mark(event: RequestEvent, response: Response) {
   return response;
 }
 
-export async function purge() {
-  if (
-    building ||
-    CLOUDFLARE_ZONE_ID == null ||
-    CLOUDFLARE_PURGE_TOKEN == null
-  ) {
-    return;
+function page(pathname: string) {
+  const tag =
+    pathname.replace(/\.(?:md|json)$/u, "").replace(/^\/index$/u, "") || "/";
+  return tag.length <= 1024 && /^[\u{21}-\u{2B}\u{2D}-\u{7E}]+$/u.test(tag)
+    ? tag
+    : null;
+}
+
+export function skewed({ isDataRequest, url }: RequestEvent) {
+  if (!isDataRequest) {
+    return null;
   }
-  const host = new URL(BASE_URL).host;
-  const key = `edge:purged:${host}`;
+  const sent = url.searchParams.get(BUILD);
+  url.searchParams.delete(BUILD);
+  if (dev || sent === build) {
+    return null;
+  }
+  return Response.json(
+    { message: "This page was built by an earlier version of the site" },
+    {
+      status: 409,
+      headers: { "cache-control": "no-store", "x-sveltekit-version": build },
+    },
+  );
+}
+
+export async function kept({ request, url }: RequestEvent) {
+  const found = IMMUTABLE.exec(url.pathname);
+  if (found == null || !["GET", "HEAD"].includes(request.method)) {
+    return null;
+  }
+  const [, file = "", extension = ""] = found;
   try {
-    if ((await redis().get(key)) === build) {
-      return;
-    }
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache`,
-      {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${CLOUDFLARE_PURGE_TOKEN}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ hosts: [host] }),
+    const body = await readFile(path.join(KEPT, file));
+    return new Response(request.method === "HEAD" ? null : body, {
+      headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+        "content-type": TYPES[extension] ?? "application/octet-stream",
+        "content-length": String(body.length),
       },
-    );
-    if (!response.ok) {
-      console.error(
-        "Edge purge failed:",
-        response.status,
-        await response.text(),
-      );
-      return;
-    }
-    await redis().set(key, build);
-  } catch (error) {
-    console.error("Edge purge failed:", error);
+    });
+  } catch {
+    return new Response("Not found", {
+      status: 404,
+      headers: { "cache-control": "no-store" },
+    });
   }
 }
