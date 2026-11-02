@@ -808,7 +808,11 @@ def emit() -> Path:
         for members in by_place.values():
             for index, (tenure_id, person_id, written_by, tokens) in enumerate(members):
                 for kept_tenure, kept_person, kept_by, kept_tokens in members[:index]:
-                    if person_id == kept_person or written_by == kept_by or len(tokens & kept_tokens) < 2:
+                    if person_id == kept_person or written_by == kept_by or not tokens & kept_tokens:
+                        continue
+                    if len(tokens & kept_tokens) < 2 and (
+                        tokens != kept_tokens or sum(1 for member in members if member[3] == tokens) != 2
+                    ):
                         continue
                     if tokens <= kept_tokens or kept_tokens <= tokens:
                         cs.merge(person_id, kept_person)
