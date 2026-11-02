@@ -69,20 +69,37 @@ ELECTION = "2026-11-03-general"
 WEB = os.environ.get("EA_LIVE_WEB", "http://localhost:5173")
 
 
+class Enough(BaseException):
+    pass
+
+
 def host(feed: dict[str, object]) -> tuple[bool, str]:
-    client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS)
+    requests = 0
+
+    def count(_: httpx.Request) -> None:
+        nonlocal requests
+        requests += 1
+        if requests > 4:
+            raise Enough
+
+    client = httpx.Client(follow_redirects=True, timeout=20, headers=enr_2026.HEADERS, event_hooks={"request": [count]})
+    seen: list[str] = []
+
+    def store(_: str, url: str, content: bytes, suffix: str) -> None:
+        seen.append(url)
+        raise Enough
+
     try:
         if feed["adapter"] == "us.nyc_enr":
-            pages = len(nyc_enr_live.collect(client))
+            seen.extend(nyc_enr_live.collect(client))
         else:
-            seen: list[str] = []
             params = feed.get("params")
-            state = params["state"] if isinstance(params, dict) else ""
-            enr_2026.collect(client, {state}, lambda _, url, content, suffix: seen.append(url))
-            pages = len(seen)
+            enr_2026.collect(client, {params["state"] if isinstance(params, dict) else ""}, store)
+    except Enough:
+        pass
     except Exception as error:
         return False, f"host: {type(error).__name__}: {str(error)[:80]}"
-    return (pages > 0, f"host: {pages} pages" if pages else "host: no result pages")
+    return (bool(seen), "host: answers" if seen else "host: no result pages")
 
 
 def page(client: httpx.Client, url: str) -> tuple[bool, str]:
