@@ -380,6 +380,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_tn
 
         enr_tn.collect(client, get, lambda url, content, suffix: store("TN", url, content, suffix))
+    if not only or "KY" in only:
+        from ea.sources.us import enr_ky
+
+        enr_ky.collect(client, get, lambda url, content, suffix: store("KY", url, content, suffix))
     if not only or "MO" in only:
         from ea.sources.us import enr_mo
 
@@ -606,6 +610,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_tn
 
         yield from enr_tn.rows(url, path)
+        return
+    if state == "KY":
+        from ea.sources.us import enr_ky
+
+        yield from enr_ky.rows(url, path)
         return
     if state == "TX":
         from ea.sources.us import enr_tx
@@ -1353,7 +1362,12 @@ def plan(
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
-            wide = office == "state" or bool(APPEALS.search(name))
+            wide = (
+                office == "state"
+                or bool(APPEALS.search(name))
+                or state == "IL"
+                and bool(re.search(r"^retain\b|\bjudge retention\b", name, re.IGNORECASE))
+            )
             seat = (found[1] or found[2], found[3] or "") if wide and (found := SEAT.search(name)) else None
             best, ok = choose(people, words, places, wide, seat)
             if ok:

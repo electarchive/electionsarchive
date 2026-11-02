@@ -104,6 +104,15 @@ publisher = "Kansas Secretary of State"
 url = "https://sos.ks.gov/elections/election-results.html"
 
 [[feed]]
+id = "us.enr_2026.ky"
+adapter = "us.enr_2026"
+interval = 120
+params = { state = "KY" }
+publisher = "Hardin County Clerk"
+url = "https://hccoky.org/26GResults/display.html"
+note = "Hardin County only; the State Board of Elections live results service blocks scripted requests"
+
+[[feed]]
 id = "us.enr_2026.la"
 adapter = "us.enr_2026"
 interval = 60
