@@ -16,23 +16,26 @@ from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "tr.tkgm"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 COUNTIES = Path.home() / "Downloads" / "counties"
 URL = "https://parselsorgu.tkgm.gov.tr/"
 PARENTS = Path(__file__).with_name("tkgm_parents.tsv")
 COMPOSITIONS = Path(__file__).with_name("tkgm_districts.tsv")
+TRANSFERS = Path(__file__).with_name("tkgm_transfers.tsv")
 GAZETTE = "https://www.resmigazete.gov.tr/arsiv"
 DECISIONS = ("19510", "19519", "19525")
 RENAMED = {"19 Mayıs": "19-May"}
 TOLERANCE = 10
 GAP = 50
 ELECTION = date(2023, 5, 14)
+EARLIEST = date(1923, 1, 1)
+REORGANIZED = date(1926, 6, 26)
 CREATIONS = (
     (date(1953, 7, 15), "day", "64", "43", {"Eşme": "45"}),
     (date(1954, 6, 22), "day", "02", "44", {}),
     (date(1954, 6, 22), "day", "54", "41", {}),
-    (date(1954, 6, 30), "month", "50", "51", {"Avanos": "40", "Hacıbektaş": "40", "Kozaklı": "40"}),
+    (date(1954, 7, 20), "day", "50", "51", {"Avanos": "40", "Hacıbektaş": "40", "Kozaklı": "40", "Ürgüp": "38"}),
     (date(1989, 6, 21), "day", "68", "51", {"Ağaçören": "06", "Sarıyahşi": "06"}),
     (date(1989, 6, 21), "day", "69", "29", {}),
     (date(1989, 6, 21), "day", "70", "42", {}),
@@ -54,18 +57,18 @@ CREATIONS = (
     (date(1996, 10, 28), "day", "80", "01", {}),
     (date(1999, 12, 9), "day", "81", "14", {}),
 )
-ABOLITION = (date(1954, 6, 30), "month", date(1957, 6, 19), "day", ("40", "50"))
+ABOLITION = (date(1954, 7, 20), "day", date(1957, 6, 19), "day", ("40", "50"))
 NOTES = (
     "TKGM's boundaries as retrieved in July 2024, with Şişli's and İskenderun's in October 2026; no license stated. Provinces "
     "before each province's creation are unions of today's ilçeler, dated by the creation laws: Uşak 1953-07-15 "
     "(Law 6129, RG 8458); Adıyaman and Sakarya 1954-06-22 (Laws 6418 and 6419); Nevşehir, with Kırşehir made one "
-    "of its ilçeler, mid-1954 (Law 6429, adopted 1954-06-30 per TÜBA, 1954-07-20 per other sources); Kırşehir "
+    "of its ilçeler, 1954-07-20 (Law 6429, RG 8748); Kırşehir "
     "restored 1957-06-19 (Law 7001, RG 9637); Aksaray, Bayburt, Karaman, and Kırıkkale 1989-06-21 (Law 3578, "
     "RG 20202); Batman and Şırnak 1990-05-18 (Law 3647, RG 20522); Bartın 1991-09-07 (Law 3760, RG 20984); "
     "Ardahan and Iğdır 1992-06-03 (Law 3806, RG 21247); Yalova, Karabük, and Kilis 1995-06-06 (KHK 550, RG "
     "22305); Osmaniye 1996-10-28 (Law 4200, RG 22801); Düzce 1999-12-09 (KHK 584, RG 23091). Each new province's "
     "ilçeler are assigned to the province named in its law, except those listed from another province; transfers "
-    "between existing provinces are not modeled. Each ilçe's outline before its first election with its own results "
+    "between existing provinces are dated in tkgm_transfers.tsv from the laws that ordered them. Each ilçe's outline before its first election with its own results "
     "is drawn inside the ilçe it was carved from, so an ilçe's outline at an election is the union of today's "
     "ilçeler that reported under it; ilçeler that existed in 1961 keep today's outline back to then, and villages "
     "moved between existing ilçeler are not modeled. The parent of each of the 360 ilçeler that first reported "
@@ -83,8 +86,19 @@ NOTES = (
     "is drawn inside one of them until its first election, so the outlines of all of them before then are marked "
     "synthetic. Ankara Merkez before 1987 is drawn as today's Gölbaşı, Keçiören, Mamak, and Sincan and the ilçeler later "
     "carved from them, in three pieces, "
-    "because the parts of its ring now in Altındağ, Çankaya, and Yenimahalle are not modeled."
+    "because the parts of its ring now in Altındağ, Çankaya, and Yenimahalle are not modeled. Provinces from "
+    "1926-06-26 (Law 877) are unions of the ilçeler each law left in them, with the provinces Law 2197 abolished on "
+    "1933-06-01 (Aksaray, Cebelibereket, Mersin, and Şebinkarahisar) drawn as the h- provinces until then; an ilçe "
+    "that was then a nahiye goes with the kaza it was attached to, which is an assumption for Adaklı, Yayladere, "
+    "Yedisu, Karlıova, Erzin, Payas, Sumbas, Yumurtalık, Erdemli, Çamlıyayla, Derecik, Uludere, Doğanşar, Akıncılar, "
+    "Çamoluk, Ağaçören, and Sarıyahşi. Villages moved between provinces are not modeled. Before 1926-06-26 the same "
+    "outlines are drawn and marked synthetic."
 )
+
+
+def load_transfers() -> list[dict[str, str | date]]:
+    with TRANSFERS.open() as handle:
+        return [{**row, "day": date.fromisoformat(row["date"])} for row in csv.DictReader(handle, delimiter="\t")]
 
 
 def key(text: str) -> str:
@@ -96,6 +110,8 @@ def key(text: str) -> str:
 def fetch() -> None:
     for issue in DECISIONS:
         raw.fetch(SOURCE, f"{GAZETTE}/{issue}.pdf", suffix=".pdf")
+    for url in sorted({row["url"] for row in load_transfers()}):
+        raw.fetch(SOURCE, url, suffix=".pdf")
     try:
         raw.cached(SOURCE, URL)
         return
@@ -179,7 +195,7 @@ def parse() -> None:
         territories: dict[tuple[str, date], set[str]] = {}
 
         def whole(start: date | None, members: frozenset[str]) -> bool:
-            day = start or date(1950, 1, 1)
+            day = start or EARLIEST
             for child, others in also.items():
                 for other in others if day < starts[child] else []:
                     if (other, day) not in territories:
@@ -260,19 +276,34 @@ def parse() -> None:
         if missing := sorted(names[area] for area in names.keys() - found):
             raise ValueError(f"ilçeler without a file: {missing}")
 
-        breaks = sorted({day for day, *_ in CREATIONS} | {ABOLITION[0], ABOLITION[2]})
+        timeline: list[tuple[date, str, str, str, dict[str, str]]] = [
+            (day, child, "", parent, moved) for day, _, child, parent, moved in CREATIONS
+        ]
+        for row in load_transfers():
+            for ilce in row["ilce"].split(";"):
+                if (row["plate"], ilce) not in names.values() or {row["from"], row["to"]} - {*provinces, "none"}:
+                    raise ValueError(f"unknown ilçe or province in {row}")
+                timeline.append((row["day"], row["plate"], ilce, row["from"], {"to": row["to"]}))
+        timeline.sort(key=lambda event: event[0], reverse=True)
+        breaks = sorted({event[0] for event in timeline} | {ABOLITION[0], ABOLITION[2], REORGANIZED})
         precisions = {day: precision for day, precision, *_ in CREATIONS} | {
             ABOLITION[0]: ABOLITION[1],
             ABOLITION[2]: ABOLITION[3],
         }
-        created = {child: (day, parent, moved) for day, _, child, parent, moved in CREATIONS}
 
         def province(plate: str, name: str, day: date) -> str | None:
-            while plate in created and day < created[plate][0]:
-                plate = created[plate][2].get(name, created[plate][1])
+            home = plate
+            for when, owner_plate, ilce, parent, moved in timeline:
+                if when <= day:
+                    break
+                if ilce:
+                    if (home, name) == (owner_plate, ilce) and plate == moved["to"]:
+                        plate = parent
+                elif plate == owner_plate:
+                    plate = moved.get(name, parent)
             if plate in ABOLITION[4] and ABOLITION[0] <= day < ABOLITION[2]:
                 return None
-            return plate
+            return None if plate == "none" else plate
 
         periods = list(zip([None, *breaks], [*breaks, None], strict=True))
         marks = sorted({*breaks, *(starts[child] for child in also)})
@@ -281,11 +312,9 @@ def parse() -> None:
             history: list[tuple[date | None, date | None, frozenset[str], bool]] = []
             for start, end in zip([None, *marks], [*marks, None], strict=True):
                 members = frozenset(
-                    area
-                    for area, (home, name) in names.items()
-                    if province(home, name, start or date(1950, 1, 1)) == plate
+                    area for area, (home, name) in names.items() if province(home, name, start or EARLIEST) == plate
                 )
-                exact = whole(start, members)
+                exact = start is not None and whole(start, members)
                 if members and history and history[-1][1] == start and history[-1][2:] == (members, exact):
                     history[-1] = (history[-1][0], end, members, exact)
                 elif members:
@@ -297,7 +326,7 @@ def parse() -> None:
         for start, _ in spans:
             owned: dict[str, set[str]] = defaultdict(set)
             for area in names:
-                if (holder := owner(area, start or date(1950, 1, 1))) is not None:
+                if (holder := owner(area, start or EARLIEST)) is not None:
                     owned[holder].add(area)
             held_by[start] = {holder: frozenset(members) for holder, members in owned.items()}
         for area in [*names, *historical]:
@@ -328,7 +357,7 @@ def parse() -> None:
         for area, (home, name) in names.items():
             history = []
             for start, end in periods:
-                plate = province(home, name, start or date(1950, 1, 1))
+                plate = province(home, name, start or EARLIEST)
                 if plate is not None and history and history[-1][1] == start and history[-1][2] == plate:
                     history[-1] = (history[-1][0], end, plate)
                 elif plate is not None:
@@ -488,7 +517,7 @@ def emit() -> Path:
                 "Ankara's, İzmir's, and Bursa's electoral districts, and the nation as their unions, each "
                 "province's outline before the provinces created since 1953, each ilçe's outline before the ilçeler "
                 "carved from it since 1961, the electoral districts of every general election since 1983, the "
-                "province each ilçe belonged to on each date, and a boundary set for each era"
+                "province each ilçe belonged to on each date, including the transfers between provinces ordered by law since 1929, and a boundary set for each era"
             ),
             polity="TR",
         )
@@ -528,6 +557,26 @@ def emit() -> Path:
         )
         for issue in DECISIONS:
             cs.artifact(raw.cached(SOURCE, f"{GAZETTE}/{issue}.pdf"), decisions)
+        title = "Laws moving ilçeler between Turkey's provinces, 1929 to 1957"
+        laws = cs.source("Türkiye Büyük Millet Meclisi", title)
+        cs.add(
+            "source",
+            id=laws,
+            kind="official_body",
+            publisher="Türkiye Büyük Millet Meclisi",
+            title=title,
+            url="https://www5.tbmm.gov.tr/tutanaklar/KANUNLAR_KARARLAR/",
+            license=UNLICENSED,
+            license_url=None,
+            attribution="Türkiye Büyük Millet Meclisi, Kanunlar Dergisi",
+            notes=(
+                "Laws 1509, 2197, 2347, 2500, 2885, 3383, 3711, 4529, 6166, 6190, and 7033, as printed in the "
+                "assembly's law series; the transfers they order, with their effective dates, are transcribed in "
+                "tkgm_transfers.tsv."
+            ),
+        )
+        for url in sorted({row["url"] for row in load_transfers()}):
+            cs.artifact(raw.cached(SOURCE, url), laws)
         nation = cs.area("tr.nation", "TR")
         cs.manifest["scope"] = {
             "polity": "TR",
