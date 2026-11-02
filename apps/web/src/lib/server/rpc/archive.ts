@@ -1069,6 +1069,10 @@ async function gather(
           ) v
           where u.area_k = a.k and u.result_set_k = any(${sql.param(ks)}::int[])
         )
+        or exists (
+          select from result_set s join contest c on c.id = s.contest_id
+          where s.k = any(${sql.param(ks)}::int[]) and c.district_area_id = a.id
+        )
       )
   `;
   let found = await db.execute<{ id: string; k: number; scheme: string }>(sql`
