@@ -241,7 +241,7 @@
     }
     return { rows, thick, radii, counts };
   });
-  const dot = $derived(0.84 * layout.thick * S);
+  const dot = $derived(Math.round(0.84 * layout.thick * S * 1000) / 1000);
   const ring = $derived(Math.max(0.6, 0.22 * dot));
   const striped = $derived(
     new Set(
@@ -268,8 +268,9 @@
     }
     positions.sort((a, b) => b.angle - a.angle || a.radius - b.radius);
     const placed = positions.map((position, index) => ({
-      x: position.radius * S * Math.cos(position.angle),
-      y: -position.radius * S * Math.sin(position.angle),
+      x: Math.round(position.radius * S * Math.cos(position.angle) * 100) / 100,
+      y:
+        Math.round(-position.radius * S * Math.sin(position.angle) * 100) / 100,
       angle: position.angle,
       party: "",
       local: false,
@@ -590,7 +591,7 @@
             }
           })}
         class={cn(
-          "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
+          "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&>circle]:animate-seat [&>circle]:transition-[fill] [&>circle]:duration-150 motion-reduce:[&>circle]:animate-none motion-reduce:[&>circle]:transition-none",
           { "cursor-pointer": tip?.path != null },
           { "pointer-events-none": isCompact },
         )}
@@ -662,10 +663,7 @@
           )}
           <circle
             id="{uid}-seat-{seat.index}"
-            class={cn(
-              "animate-seat transition-[fill] duration-150 motion-reduce:animate-none motion-reduce:transition-none",
-              { "stroke-foreground": link != null && seat.local },
-            )}
+            class={{ "stroke-foreground": link != null && seat.local }}
             style:animation-delay="{Math.round(
               (seat.index / seats.length) * 640,
             )}ms"
