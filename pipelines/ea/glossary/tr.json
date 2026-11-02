@@ -72,8 +72,8 @@
   "note": "Also 'resmi aday' or 'aday gösterilen kişi'."
  },
  "write-in": {
-  "term": "yazılı oy",
-  "note": "Descriptive. Turkish law has no write-in voting, so the press explains it as a name written onto the ballot."
+  "term": "listede olmayan aday",
+  "note": "A name the voter writes in by hand. Descriptive; Turkey has no write-in voting."
  },
  "unopposed": {
   "term": "rakipsiz",
@@ -168,8 +168,8 @@
   "note": "No standard term. Descriptive rendering."
  },
  "county": {
-  "term": "kontluk",
-  "note": "Used for UK/Irish counties. US counties often appear as 'ilçe' in the press, which can be confused with Turkish ilçe."
+  "term": "ilçe",
+  "note": "Used for US, UK, and Irish counties. Never 'kontluk'."
  },
  "municipality": {
   "term": "belediye",
@@ -204,8 +204,8 @@
   "note": "Descriptive. The press also says 'yeniden bölgelendirme'."
  },
  "chamber": {
-  "term": "kamara",
-  "note": "Also 'meclis'."
+  "term": "meclis",
+  "note": "A legislative chamber. Use 'kamara' only inside established names such as 'Avam Kamarası' and 'Lordlar Kamarası'."
  },
  "legislature": {
   "term": "yasama organı",
@@ -217,11 +217,11 @@
  },
  "lower house": {
   "term": "alt meclis",
-  "note": "Also 'alt kamara' or 'alt kanat'."
+  "note": ""
  },
  "upper house": {
   "term": "üst meclis",
-  "note": "Also 'üst kamara'."
+  "note": ""
  },
  "senate": {
   "term": "senato",

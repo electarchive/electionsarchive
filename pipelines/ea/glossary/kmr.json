@@ -140,16 +140,16 @@
   "note": "Also 'kursiya parlamentoyê'. Ezafe form: 'kursiya'."
  },
  "constituency": {
-  "term": "çemberê hilbijartinê",
-  "note": "Modeled on Turkish 'seçim çevresi'. Alternative: 'herêma hilbijartinê'."
+  "term": "herêma hilbijartinê",
+  "note": "Never 'çemberê hilbijartinê'."
  },
  "electoral district": {
-  "term": "çemberê hilbijartinê",
-  "note": "Same as 'constituency'. Avoid 'navçe', which means Turkish ilçe."
+  "term": "herêma hilbijartinê",
+  "note": "Never 'çemberê hilbijartinê'."
  },
  "district": {
-  "term": "çember",
-  "note": "For US congressional districts: 'çemberê kongreyê'. 'Navçe' means ilçe in Turkey, so use it only for that."
+  "term": "herêm",
+  "note": "An electoral or administrative district. US congressional district: 'herêma kongreyê'. Never 'çember'."
  },
  "ward": {
   "term": "taxa",
@@ -168,8 +168,8 @@
   "note": "Technical term. Means any area whose results are published."
  },
  "county": {
-  "term": "kontî",
-  "note": "Used for US and UK/Irish counties. Plural 'kontî'. Alternative gloss: 'wîlayet' (rare)."
+  "term": "navçe",
+  "note": "Used for US, UK, and Irish counties, like Turkish 'ilçe'. Never 'kontî'."
  },
  "municipality": {
   "term": "şaredarî",
