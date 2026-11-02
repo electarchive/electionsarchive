@@ -15,9 +15,11 @@
   let isOpen = $state(false);
 
   function load() {
-    void import("#lib/components/cite-panel.svelte").then((module) => {
-      Panel = module.default;
-    });
+    void import("#lib/components/cite-panel.svelte")
+      .then((module) => {
+        Panel = module.default;
+      })
+      .catch(() => {});
   }
 
   $effect(() => idle(load));

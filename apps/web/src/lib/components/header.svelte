@@ -82,28 +82,31 @@
   }
 
   function load() {
-    loading ??= import("#lib/components/header-menus.svelte").then(
-      async (module) => {
+    loading ??= import("#lib/components/header-menus.svelte")
+      .then(async (module) => {
         const focused = focusedMenu();
         Menus = module.default;
         if (initial == null) {
           await refocus(focused);
         }
-      },
-    );
+      })
+      .catch(() => {
+        loading = undefined;
+      });
   }
 
   function loadNotifications() {
-    loadingNotifications ??=
-      import("#lib/components/notifications-menu.svelte").then(
-        async (module) => {
-          const focused = focusedMenu();
-          Notifications = module.default;
-          if (!isBellAsked && focused === "notifications") {
-            await refocus(focused);
-          }
-        },
-      );
+    loadingNotifications ??= import("#lib/components/notifications-menu.svelte")
+      .then(async (module) => {
+        const focused = focusedMenu();
+        Notifications = module.default;
+        if (!isBellAsked && focused === "notifications") {
+          await refocus(focused);
+        }
+      })
+      .catch(() => {
+        loadingNotifications = undefined;
+      });
   }
 
   function placeholder(

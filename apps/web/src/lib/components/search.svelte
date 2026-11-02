@@ -16,9 +16,13 @@
   let loading: Promise<void> | null = null;
 
   function load() {
-    loading ??= import("./search-palette.svelte").then((module) => {
-      Palette = module.default;
-    });
+    loading ??= import("./search-palette.svelte")
+      .then((module) => {
+        Palette = module.default;
+      })
+      .catch(() => {
+        loading = null;
+      });
   }
 
   $effect(() => {

@@ -12,8 +12,12 @@ export function loadCards() {
   loading ??= Promise.all([
     import("#lib/components/party-card.svelte"),
     import("#lib/components/person-card.svelte"),
-  ]).then(([party, person]) => {
-    cards.party = party.default;
-    cards.person = person.default;
-  });
+  ])
+    .then(([party, person]) => {
+      cards.party = party.default;
+      cards.person = person.default;
+    })
+    .catch(() => {
+      loading = undefined;
+    });
 }

@@ -63,9 +63,11 @@
 
   $effect(() => {
     if (previewing && parse == null) {
-      void import("#lib/markdown-tree.js").then((module) => {
-        parse = module.parseMarkdown;
-      });
+      void import("#lib/markdown-tree.js")
+        .then((module) => {
+          parse = module.parseMarkdown;
+        })
+        .catch(() => {});
     }
   });
   const changed = $derived.by(() => {

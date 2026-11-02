@@ -22,9 +22,11 @@
   let Places = $state<typeof PlaceMap | null>(null);
 
   $effect(() => {
-    void import("#routes/[...path]/map.svelte").then((module) => {
-      Places = module.default;
-    });
+    void import("#routes/[...path]/map.svelte")
+      .then((module) => {
+        Places = module.default;
+      })
+      .catch(() => {});
   });
 
   const queryClient = useQueryClient();

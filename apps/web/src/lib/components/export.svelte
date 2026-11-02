@@ -25,9 +25,11 @@
   let isOpen = $state(false);
 
   function load() {
-    void import("#lib/components/export-menu.svelte").then((module) => {
-      Menu = module.default;
-    });
+    void import("#lib/components/export-menu.svelte")
+      .then((module) => {
+        Menu = module.default;
+      })
+      .catch(() => {});
   }
 
   $effect(() => idle(load));

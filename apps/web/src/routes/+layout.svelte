@@ -53,9 +53,11 @@
 
   $effect(() =>
     idle(() => {
-      void import("#lib/components/overlays.svelte").then((module) => {
-        Overlays = module.default;
-      });
+      void import("#lib/components/overlays.svelte")
+        .then((module) => {
+          Overlays = module.default;
+        })
+        .catch(() => {});
     }),
   );
 

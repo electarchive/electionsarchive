@@ -20,11 +20,13 @@
   let loading: Promise<void> | undefined;
 
   function load() {
-    loading ??= import("#lib/components/contrib/edit-sheet.svelte").then(
-      (module) => {
+    loading ??= import("#lib/components/contrib/edit-sheet.svelte")
+      .then((module) => {
         Sheet = module.default;
-      },
-    );
+      })
+      .catch(() => {
+        loading = undefined;
+      });
   }
 
   $effect(() => {

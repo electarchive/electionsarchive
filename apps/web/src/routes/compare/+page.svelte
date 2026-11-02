@@ -18,9 +18,11 @@
   let Search = $state<typeof SearchPanel | null>(null);
 
   function load() {
-    void import("./search.svelte").then((module) => {
-      Search = module.default;
-    });
+    void import("./search.svelte")
+      .then((module) => {
+        Search = module.default;
+      })
+      .catch(() => {});
   }
 
   $effect(() => idle(load));

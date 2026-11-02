@@ -53,11 +53,11 @@
 
   $effect(() => {
     if (head?.diff?.map != null && Boundaries == null) {
-      void import("#lib/components/contrib/boundary-map.svelte").then(
-        (module) => {
+      void import("#lib/components/contrib/boundary-map.svelte")
+        .then((module) => {
           Boundaries = module.default;
-        },
-      );
+        })
+        .catch(() => {});
     }
   });
   const pending = $derived(
