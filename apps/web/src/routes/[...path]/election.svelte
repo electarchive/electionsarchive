@@ -56,6 +56,7 @@
   import SameDay from "./same-day.svelte";
   import Seated from "./seated.svelte";
   import Seatflow from "./seatflow.svelte";
+  import SectionSkeleton from "./section-skeleton.svelte";
   import Series from "./series.svelte";
   import States from "./states.svelte";
   import Sweep from "./sweep.svelte";
@@ -97,23 +98,48 @@
   });
 
   const client = useQueryClient();
+  function seed<T>(
+    value: T | Promise<T>,
+    put: (data: T) => void,
+  ): T | Promise<T> {
+    if (value instanceof Promise) {
+      return value.then((data) => {
+        put(data);
+        return data;
+      });
+    }
+    put(value);
+    return value;
+  }
+
+  const seeded = untrack(() => ({
+    governments: seed(sections.governments, (data) =>
+      client.setQueryData(
+        orpc.elections.governments.queryKey({ input: { id } }),
+        data,
+      ),
+    ),
+    regions: seed(sections.regions, (data) =>
+      client.setQueryData(
+        orpc.elections.regions.queryKey({ input: { id } }),
+        data,
+      ),
+    ),
+    tiers: seed(sections.tiers, (data) =>
+      client.setQueryData(
+        orpc.elections.tiers.queryKey({ input: { id } }),
+        data,
+      ),
+    ),
+    alongside: seed(sections.alongside, (data) =>
+      client.setQueryData(
+        orpc.elections.alongside.queryKey({ input: { id } }),
+        data,
+      ),
+    ),
+  }));
+
   untrack(() => {
-    client.setQueryData(
-      orpc.elections.governments.queryKey({ input: { id } }),
-      sections.governments,
-    );
-    client.setQueryData(
-      orpc.elections.regions.queryKey({ input: { id } }),
-      sections.regions,
-    );
-    client.setQueryData(
-      orpc.elections.tiers.queryKey({ input: { id } }),
-      sections.tiers,
-    );
-    client.setQueryData(
-      orpc.elections.alongside.queryKey({ input: { id } }),
-      sections.alongside,
-    );
     if (sections.winners != null) {
       client.setQueryData(
         orpc.elections.winners.queryKey({ input: { id } }),
@@ -2049,9 +2075,18 @@
         all={m.election_series_all_label}
       />
     {/if}
-    {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
-      <SameDay place={sameDay.place} races={sameDay.races} />
-    {/if}
+    {#await sameDay}
+      <span
+        class="block rounded-xs bg-muted block-3 inline-[min(100%,24rem)] motion-safe:animate-pulse"
+        role="status"
+        aria-busy="true"
+        aria-label={m.preview_loading()}
+      ></span>
+    {:then sameDay}
+      {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
+        <SameDay place={sameDay.place} races={sameDay.races} />
+      {/if}
+    {/await}
   </div>
 </header>
 
@@ -2068,6 +2103,14 @@
 {:else}
   {@render body()}
 {/if}
+
+{#snippet regions()}
+  {#await seeded.regions}
+    <SectionSkeleton shape="table" />
+  {:then}
+    <Regions {id} />
+  {/await}
+{/snippet}
 
 {#snippet body()}
   {#if isSwept && focus === -1}
@@ -2842,7 +2885,7 @@
         {/if}
       {/if}
       {#if index === regionsAt}
-        <Regions {id} />
+        {@render regions()}
       {/if}
       {#if index === 0 && focus === -1 && others.some((other) => other.results.length > 0 || other.lede != null || other.isPrimaries) && !isBallot}
         {@render board()}
@@ -3487,29 +3530,49 @@
     </section>
   {/if}
 
-  {#if sections.local != null}
-    <Local local={sections.local} isOwn={true} />
-  {/if}
-  {#if sections.counties != null}
-    <Counties counties={sections.counties} />
-  {/if}
+  {#await sections.local}
+    <SectionSkeleton shape="columns" />
+  {:then local}
+    {#if local != null}
+      <Local {local} isOwn={true} />
+    {/if}
+  {/await}
+  {#await sections.counties}
+    <SectionSkeleton shape="columns" label={m.counties_title()} />
+  {:then counties}
+    {#if counties != null}
+      <Counties {counties} />
+    {/if}
+  {/await}
   {#if scope == null}
-    <Alongside {id} />
-    <Governments {id} {chamber} />
+    {#await seeded.alongside}
+      <SectionSkeleton shape="columns" label={m.alongside_title()} />
+    {:then}
+      <Alongside {id} />
+    {/await}
+    {#await seeded.governments}
+      <SectionSkeleton shape="cards" label={m.governments_title()} />
+    {:then}
+      <Governments {id} {chamber} />
+    {/await}
     {#if regionsAt === -1}
-      <Regions {id} />
+      {@render regions()}
     {/if}
   {/if}
   <Gains {id} within={scope?.id} />
   <ByElections {id} within={scope?.id} />
 
   {#if isTiled}
-    <Tiers
-      {id}
-      {parts}
-      noun={partNoun ?? ""}
-      race={ordered.find((race) => race.electors != null)?.name ?? null}
-    />
+    {#await seeded.tiers}
+      <SectionSkeleton shape="tiles" label={m.tiers_title()} />
+    {:then}
+      <Tiers
+        {id}
+        {parts}
+        noun={partNoun ?? ""}
+        race={ordered.find((race) => race.electors != null)?.name ?? null}
+      />
+    {/await}
   {:else if parts.length >= 40}
     <Winners {id} {parts} hasMap={!isSwept} />
   {:else if parts.length > 0}

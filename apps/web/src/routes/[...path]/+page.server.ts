@@ -1,5 +1,4 @@
-import { call } from "@orpc/server";
-import { archive } from "#lib/server/pages.js";
+import { archive, call } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";

@@ -301,6 +301,36 @@ function negotiate(accept: string | null) {
   return weights.md > weights.html ? "md" : null;
 }
 
+async function settle(data: Awaited<ReturnType<typeof archive>>) {
+  if (data.kind !== "election") {
+    return data;
+  }
+  const { sections } = data;
+  const [governments, regions, tiers, alongside, sameDay, local, counties] =
+    await Promise.all([
+      sections.governments,
+      sections.regions,
+      sections.tiers,
+      sections.alongside,
+      data.sameDay,
+      sections.local,
+      sections.counties,
+    ]);
+  return {
+    ...data,
+    sameDay,
+    sections: {
+      ...sections,
+      governments,
+      regions,
+      tiers,
+      alongside,
+      local,
+      counties,
+    },
+  };
+}
+
 async function load(segments: Array<string>, search: URLSearchParams) {
   const [head = "", ...rest] = segments;
   if (segments.length === 0) {
@@ -351,7 +381,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return results(search);
     }
   }
-  const whole = await archive(segments.join("/"), search);
+  const whole = await settle(await archive(segments.join("/"), search));
   const picked =
     whole.kind === "election" && whole.race != null
       ? whole.election.races.find(

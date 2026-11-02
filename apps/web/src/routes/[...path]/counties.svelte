@@ -7,7 +7,7 @@
     counties,
   }: {
     counties: NonNullable<
-      Extract<PageData, { kind: "election" }>["sections"]["counties"]
+      Awaited<Extract<PageData, { kind: "election" }>["sections"]["counties"]>
     >;
   } = $props();
 

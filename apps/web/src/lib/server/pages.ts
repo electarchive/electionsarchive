@@ -1,4 +1,5 @@
-import { call, ORPCError } from "@orpc/server";
+import { getRequestEvent } from "$app/server";
+import { call as invoke, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import type { Prose } from "#lib/contrib.js";
@@ -7,8 +8,8 @@ import { headline } from "#lib/coverage.js";
 import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
 import { summarize } from "#lib/live/summary.js";
-import { era } from "#lib/party.js";
 import { m } from "#lib/paraglide/messages.js";
+import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
 import { compactPlaces } from "#lib/server/compare.js";
 import { db } from "#lib/server/db/index.js";
@@ -24,6 +25,45 @@ import {
 } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import { canonicalPath } from "#lib/server/territory.js";
+
+const names = new Map<unknown, string>(
+  Object.entries(router).flatMap(([group, procedures]) =>
+    Object.entries<unknown>(procedures).map(([key, procedure]) => [
+      procedure,
+      `${group}.${key}`,
+    ]),
+  ),
+);
+
+const timings = new WeakMap<App.Locals, Array<string>>();
+
+function asked() {
+  try {
+    return getRequestEvent().locals;
+  } catch {
+    return null;
+  }
+}
+
+export const call: typeof invoke = async (procedure, ...rest) => {
+  const promise = invoke(procedure, ...rest);
+  const locals = asked();
+  if (locals != null) {
+    const start = performance.now();
+    const done = () => {
+      timings.set(locals, [
+        ...(timings.get(locals) ?? []),
+        `${names.get(procedure) ?? "call"};dur=${(performance.now() - start).toFixed(1)}`,
+      ]);
+    };
+    void promise.then(done, done);
+  }
+  return promise;
+};
+
+export function timing(locals: App.Locals) {
+  return timings.get(locals)?.join(", ") ?? null;
+}
 
 async function found<T>(promise: Promise<T>) {
   try {
@@ -42,6 +82,17 @@ function eager<T>(promise: Promise<T>) {
     settled = { value };
   });
   return (): T | Promise<T> => (settled == null ? promise : settled.value);
+}
+
+async function soon<T>(promise: Promise<T>) {
+  return Promise.race([
+    promise
+      .then((value): { value: T | Promise<T> } => ({ value }))
+      .catch(() => ({ value: promise })),
+    new Promise<{ value: Promise<T> }>((done) => {
+      setTimeout(done, 150, { value: promise });
+    }),
+  ]);
 }
 
 let looking = 0;
@@ -1307,41 +1358,34 @@ export async function archive(path: string, search: URLSearchParams) {
     if (place != null && scope == null) {
       error(404);
     }
-    const [
-      election,
-      governments,
-      regions,
-      tiers,
-      cycle,
-      series,
-      alongside,
-      sameDay,
-      local,
-      counties,
-      winners,
-      ledger,
-    ] = await found(
-      Promise.all([
-        call(router.elections.get, { ...input, within: scope?.id }),
-        call(router.elections.governments, input),
-        call(router.elections.regions, input),
-        call(router.elections.tiers, input),
-        call(router.elections.cycle, input),
-        call(router.elections.series, input),
-        call(router.elections.alongside, input),
-        call(router.elections.races, input).catch(() => null),
+    const later = Promise.all([
+      soon(call(router.elections.governments, input)),
+      soon(call(router.elections.regions, input)),
+      soon(call(router.elections.tiers, input)),
+      soon(call(router.elections.alongside, input)),
+      soon(call(router.elections.races, input).catch(() => null)),
+      soon(
         scope != null || day?.date == null || day.tier !== "county"
-          ? null
+          ? Promise.resolve(null)
           : call(router.elections.local, {
               polity: day.polity,
               date: day.date,
             }),
+      ),
+      soon(
         scope != null || day?.date == null || day.tier !== "state"
-          ? null
+          ? Promise.resolve(null)
           : call(router.elections.counties, {
               polity: day.polity,
               date: day.date,
             }),
+      ),
+    ]);
+    const [election, cycle, series, winners, ledger] = await found(
+      Promise.all([
+        call(router.elections.get, { ...input, within: scope?.id }),
+        call(router.elections.cycle, input),
+        call(router.elections.series, input),
         scope != null || day?.isLocal !== true
           ? null
           : call(router.elections.winners, input),
@@ -1359,6 +1403,15 @@ export async function archive(path: string, search: URLSearchParams) {
     ) {
       error(404);
     }
+    const [
+      { value: governments },
+      { value: regions },
+      { value: tiers },
+      { value: alongside },
+      { value: sameDay },
+      { value: local },
+      { value: counties },
+    ] = await later;
     return {
       kind: "election" as const,
       id: slug.entity_id,
@@ -1906,12 +1959,12 @@ export async function livePage(path: string, at: string | null) {
                 shareIn: summary.estimate.shareIn.mid,
               },
         source: race.source,
-      };
-    }),
-  };
-}
         feed:
           race.feed === "none" || race.feed === "outside"
             ? ("none" as const)
             : ("live" as const),
         note: summary.later == null ? null : m.live_twin_later(),
+      };
+    }),
+  };
+}

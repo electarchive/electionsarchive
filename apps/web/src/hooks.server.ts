@@ -6,6 +6,7 @@ import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
 import { mark, purge } from "#lib/server/edge.js";
+import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
 import { twin } from "#lib/server/twin.js";
 
@@ -102,6 +103,15 @@ const twinHandle: Handle = async ({ event, resolve }) => {
 const edgeHandle: Handle = async ({ event, resolve }) =>
   mark(event, await resolve(event));
 
+const timingHandle: Handle = async ({ event, resolve }) => {
+  const response = await resolve(event);
+  const entries = timing(event.locals);
+  if (entries != null) {
+    response.headers.set("server-timing", entries);
+  }
+  return response;
+};
+
 export const init: ServerInit = () => {
   process.on("unhandledRejection", (error) => {
     console.error("An unhandled rejection:", error);
@@ -112,6 +122,7 @@ export const init: ServerInit = () => {
 export const handle: Handle = sequence(
   csrfHandle,
   edgeHandle,
+  timingHandle,
   readOnlyHandle,
   paraglideHandle,
   twinHandle,
