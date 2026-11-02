@@ -374,12 +374,12 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_nv
 
         enr_nv.collect(client, get, lambda url, content: store("NV", url, content, ".html"))
-    if not only or "MO" in only:
-        from ea.sources.us import enr_mo
     if not only or "TN" in only:
         from ea.sources.us import enr_tn
 
         enr_tn.collect(client, get, lambda url, content, suffix: store("TN", url, content, suffix))
+    if not only or "MO" in only:
+        from ea.sources.us import enr_mo
 
         enr_mo.collect(client, get, lambda url, content, suffix: store("MO", url, content, suffix))
     if not only or "WI" in only:
@@ -600,13 +600,13 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_or.rows(url, path, urls)
         return
-    if state == "TX":
-        from ea.sources.us import enr_tx
     if state == "TN" and url.endswith("/data.js"):
         from ea.sources.us import enr_tn
 
         yield from enr_tn.rows(url, path)
         return
+    if state == "TX":
+        from ea.sources.us import enr_tx
 
         yield from enr_tx.rows(url, path, urls)
         return
@@ -1079,9 +1079,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         return
     detail = json.loads(path.read_bytes())
     found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
+    seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
     if "breakdownResults" not in detail:
         return
-    seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
     status = detail.get("reportingStatus") or {}
     as_of = status.get("asOf")
     localities = (
