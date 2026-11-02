@@ -1735,35 +1735,57 @@
             : [race.name.slice(0, split), race.name.slice(split + 2)];
       const top = race.balance.parts
         .filter((part) => part.value > 0)
-        .toSorted((a, b) => b.value - a.value)
-        .slice(0, race.balance.isCount ? 2 : 1);
+        .toSorted((a, b) => b.value - a.value);
+      const [first, second] = top;
+      const isShared =
+        race.balance.isCount && first != null && first.value === 1;
+      const label = isQuestion
+        ? home != null && title.startsWith(`${home} `)
+          ? title.slice(home.length + 1)
+          : title
+        : rest === ""
+          ? title
+          : rest.charAt(0).toUpperCase() + rest.slice(1);
       const item = {
         anchor: race.anchor,
         label: isQuestion
-          ? home != null && title.startsWith(`${home} `)
-            ? title.slice(home.length + 1)
-            : title
-          : rest === ""
-            ? title
-            : rest.charAt(0).toUpperCase() + rest.slice(1),
-        swatch: race.scope == null ? null : (tints.get(race.scope) ?? null),
-        lead: top.map((part) => ({
-          key: part.key,
-          label: part.label,
-          color: part.color,
-          value: race.balance.isCount ? count(part.value) : percent(part.value),
-        })),
+          ? label.slice(label.lastIndexOf(": ") + 1).trim()
+          : label.replace(/^\d{4} /u, ""),
+        leader:
+          first == null
+            ? null
+            : {
+                label: isShared
+                  ? listed(
+                      top.slice(0, 3).map((part) => ({ name: part.label })),
+                    )
+                  : first.label,
+                color: first.color,
+              },
+        figure:
+          first == null || isShared
+            ? null
+            : race.balance.isCount
+              ? second == null
+                ? count(first.value)
+                : `${count(first.value)}–${count(second.value)}`
+              : top.length === 1
+                ? m.map_unopposed()
+                : percent(first.value),
         detail: isQuestion
           ? rest === ""
             ? null
             : rest
-          : top.length > 0
+          : first != null
             ? null
             : race.results.length === 0 && race.field.length > 0
               ? listed(race.field)
               : race.count > 1
                 ? m.race_contests({ count: count(race.count) })
                 : null,
+        tint:
+          first?.color ??
+          (race.scope == null ? null : (tints.get(race.scope) ?? null)),
         parts: race.balance.parts.map((part) => ({
           key: part.key,
           color: part.color,
@@ -1792,7 +1814,10 @@
               items: [
                 isQuestion
                   ? lone.item
-                  : { ...lone.item, label: lone.race.name },
+                  : {
+                      ...lone.item,
+                      label: lone.race.name.replace(/^\d{4} /u, ""),
+                    },
               ],
             };
           }
@@ -1868,7 +1893,8 @@
     if (pane == null) {
       return;
     }
-    if (pane.getBoundingClientRect().top < 0) {
+    const top = pane.getBoundingClientRect().top;
+    if (top < 0 || top > innerHeight * 0.7) {
       pane.scrollIntoView();
     }
     pane.focus({ preventScroll: true });
@@ -1889,9 +1915,14 @@
 </script>
 
 <header
-  class="col-span-12 grid gap-x-8 gap-y-3 bg-card px-3.5 pbs-4 pbe-3.5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+  class={cn("col-span-12 grid gap-x-8 gap-y-3 bg-card px-3.5 pbs-4 pbe-3.5", {
+    "md:grid-cols-[minmax(0,1fr)_auto] md:items-end": !isNavigated,
+    "gap-x-0": isNavigated,
+    "lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:gap-x-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,38rem)]":
+      isNavigated && rail.length === 1,
+  })}
 >
-  <div class="grid gap-1.5 min-inline-0">
+  <div class="grid content-start gap-1.5 min-inline-0">
     <h1 class="title">
       {election.name}
     </h1>
@@ -1905,6 +1936,25 @@
         >
       {/if}
     </p>
+  </div>
+  {#if isNavigated}
+    <Navigator
+      class={cn({
+        "lg:col-start-2 lg:row-span-3 lg:row-start-1": rail.length === 1,
+        "lg:pbs-2": rail.length > 1,
+      })}
+      sections={rail}
+      current={focus === -1 ? null : chosen}
+      href={link}
+      select={(anchor: string | null) => void select(anchor)}
+      contests={searchable}
+    />
+  {/if}
+  <div
+    class={cn("grid content-start gap-1.5 min-inline-0 empty:hidden", {
+      "lg:col-start-1": isNavigated && rail.length === 1,
+    })}
+  >
     {#if election.coverage != null}
       <p class="text-[0.9375rem] font-semibold">
         {m.election_partial({
@@ -1984,38 +2034,34 @@
       </p>
     {/if}
   </div>
-  {#if series.length > 1}
-    <Series
-      {series}
-      label={m.election_series_label()}
-      all={m.election_series_all_label}
-    />
-  {/if}
-  {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
-    <SameDay place={sameDay.place} races={sameDay.races} />
-  {/if}
+  <div
+    class={cn("grid gap-3 min-inline-0 empty:hidden", {
+      contents: !isNavigated,
+      "lg:col-span-2": isNavigated && rail.length === 1,
+    })}
+  >
+    {#if series.length > 1}
+      <Series
+        {series}
+        label={m.election_series_label()}
+        all={m.election_series_all_label}
+      />
+    {/if}
+    {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
+      <SameDay place={sameDay.place} races={sameDay.races} />
+    {/if}
+  </div>
 </header>
 
 {@render ticket()}
 
 {#if isNavigated}
   <div
-    class="col-span-12 flex flex-col gap-px bg-border lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]"
+    bind:this={pane}
+    class="col-span-12 flex flex-col gap-px bg-border outline-none min-inline-0 after:grow after:bg-card after:content-['']"
+    tabindex="-1"
   >
-    <Navigator
-      sections={rail}
-      current={focus === -1 ? null : chosen}
-      href={link}
-      select={(anchor: string | null) => void select(anchor)}
-      contests={searchable}
-    />
-    <div
-      bind:this={pane}
-      class="flex flex-col gap-px bg-border outline-none min-inline-0 after:grow after:bg-card after:content-[''] max-lg:scroll-mbs-14"
-      tabindex="-1"
-    >
-      {@render body()}
-    </div>
+    {@render body()}
   </div>
 {:else}
   {@render body()}
