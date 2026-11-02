@@ -1,5 +1,6 @@
 import html
 import json
+import os
 import re
 import subprocess
 from collections.abc import Callable
@@ -16,6 +17,7 @@ API = "https://app.enhancedvoting.com/results/public/api/"
 CDN = "https://app.enhancedvoting.com/cdn/results/"
 COUNTIES = {"Westchester": "westchester-county-ny", "Suffolk": "suffolk-county-ny", "Monroe": "monroe-county-ny"}
 NASSAU = "https://app.nassaucountyny.gov/BOE/results/election2.html"
+ERIE = "https://erie.resultscaster.com/api/resultscasts"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
 LEGISLATURE = re.compile(
     r"(?P<chamber>State Senator|Member of (?:the )?Assembly),? (?:District )?(?P<district>\d+)(?:st|nd|rd|th)?(?: Senatorial| Assembly)?(?: District)?",
@@ -85,11 +87,78 @@ def collect(client: httpx.Client, get: Callable, store: Callable[[str, bytes, st
         store(f"{API}jurisdictions/{slug}", listing, ".json")
         store(url, election, ".json")
         store(f"{url}/report", content, ".xlsx" if excel else ".pdf")
+    erie(client, get, store)
     page = get(client, NASSAU, HEADERS)
     if page and f"{DAY:%B} {DAY.day}, {DAY.year}".upper() in page.decode(errors="replace").upper():
         store(NASSAU, page, ".html")
     else:
         print(f"NY: no {DAY} page for Nassau")
+
+
+def erie(client: httpx.Client, get: Callable, store: Callable[[str, bytes, str], None]) -> None:
+    slug = os.environ.get("EA_ERIE_SLUG")
+    if slug is None:
+        listing = get(client, ERIE, HEADERS)
+        slug = next(
+            (
+                cast["slug"]
+                for cast in json.loads(listing or "{}").get("Items") or []
+                if (cast.get("electionDate") or {})
+                .get("localDateTimeDisplay", "")
+                .startswith(f"{DAY.month}/{DAY.day}/{DAY.year} ")
+                and not cast.get("isTesting")
+                and "test" not in f"{cast['slug']} {cast.get('title')}".lower()
+            ),
+            None,
+        )
+    if slug is None:
+        print(f"NY: no {DAY} results cast for Erie")
+        return
+    base = f"{ERIE}/{slug}"
+    parts = {"status": get(client, f"{base}/status", HEADERS), "shell": get(client, f"{base}/shell", HEADERS)}
+    for group in json.loads(parts["shell"] or "{}").get("groups") or []:
+        parts[f"results/{quote(group)}"] = get(client, f"{base}/results/{quote(group)}", HEADERS)
+    if len(parts) < 3 or not all(parts.values()):
+        print(f"NY: incomplete Erie results cast {slug}")
+        return
+    for name, content in parts.items():
+        store(f"{base}/{name}", content, ".json")
+
+
+def erie_rows(url: str, urls: dict[str, Path]):
+    base = url.removesuffix("/status")
+    shell = json.loads(urls[f"{base}/shell"].read_bytes())
+    status = json.loads(urls[url].read_bytes())
+    stamp = status.get("lastUploadDTTM")
+    as_of = datetime.fromisoformat(stamp[:19] + "+00:00").isoformat() if stamp else None
+    totals: dict[str, dict[str, int]] = {}
+    seen: dict[str, tuple[int | None, int | None]] = {}
+    for n, group in enumerate(shell["groups"]):
+        path = urls.get(f"{base}/results/{quote(group)}")
+        if path is None:
+            return
+        for contest in json.loads(path.read_bytes())["election"]["contests"]:
+            tally = totals.setdefault(contest["key"], {})
+            for choice in contest["choices"]:
+                tally[choice["key"]] = tally.get(choice["key"], 0) + (choice["votes"] or 0)
+            if n == 0:
+                seen[contest["key"]] = (contest.get("progress"), contest.get("progressTotal"))
+    for contest in shell["contests"]:
+        key = contest["contestAltTallyKey"]
+        title = " ".join(contest["title"].replace(" & ", " and ").split())
+        for choice in contest["choices"]:
+            parties = [
+                a["name"].replace("<NL>", " ") for a in choice.get("affiliations") or [] if a["abbreviation"] != "NON"
+            ]
+            yield row(
+                "Erie",
+                title,
+                person(choice["name"]),
+                "/".join(parties),
+                totals.get(key, {}).get(choice["choiceAltTallyKey"], 0),
+                as_of,
+                seen.get(key, (None, None)),
+            )
 
 
 def reporting(detail: dict) -> tuple[int | None, int | None]:
@@ -124,6 +193,9 @@ def row(county: str, title: str, candidate: str, party: str, votes: int, as_of: 
 def rows(url: str, path: Path, urls: dict[str, Path]):
     if url == NASSAU:
         yield from nassau(path)
+        return
+    if url.startswith(ERIE) and url.endswith("/status"):
+        yield from erie_rows(url, urls)
         return
     found = re.fullmatch(API + r"elections/([^/]+)/[^/]+/report", url)
     if found is None:
