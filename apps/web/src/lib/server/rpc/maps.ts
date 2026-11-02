@@ -63,7 +63,7 @@ export const maps = {
         method: "GET",
         path: "/maps/zooms",
         summary:
-          "Find the dense clusters of small places on a map, such as Paris and its inner suburbs on a map of French constituencies, and draw each one at its own scale: its name, its frame in map and geographic coordinates, the places at its core, the cluster it sits inside, and a simplified SVG path for every place in its frame",
+          "Find the dense clusters of small places on a map, such as Paris and its inner suburbs on a map of French constituencies, and draw each one at its own scale: its name, its frame in map and geographic coordinates, the places at its core, the cluster it sits inside, and a simplified SVG path for every place in its frame, drawn from the frame's top-left corner with its longer side 600 units long",
       }),
     )
     .input(

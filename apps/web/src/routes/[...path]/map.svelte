@@ -31,6 +31,7 @@
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
+  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -1141,6 +1142,7 @@
   });
   let zooms = $state.raw<Awaited<ReturnType<typeof orpc.maps.zooms.call>>>([]);
   let lit = $state<number | null>(null);
+  let isZooming = $state(false);
   const asking = $derived(
     nested == null && places.rows.length >= 24
       ? `${tiles} ${places.rows.length}`
@@ -1158,27 +1160,41 @@
           },
     );
     if (ask == null) {
+      isZooming = false;
       return;
     }
     let isCurrent = true;
-    void orpc.maps.zooms.call(ask).then(
-      (found) => {
+    isZooming = true;
+    void orpc.maps.zooms
+      .call(ask)
+      .then(
+        (found) => {
+          if (isCurrent) {
+            zooms = found;
+          }
+        },
+        () => {},
+      )
+      .finally(() => {
         if (isCurrent) {
-          zooms = found;
+          isZooming = false;
         }
-      },
-      () => {},
-    );
+      });
     return () => {
       isCurrent = false;
     };
   });
+  const isLensPending = $derived(
+    isZooming && !isSummary && places.rows.length >= 150,
+  );
   const lensHeight = $derived.by(() => {
-    let ratio = 0;
+    let ratio = isLensPending ? 3.3 : 0;
     for (const zone of zooms) {
       ratio += zone.width / zone.height;
     }
-    const fitted = (boxWidth - 18 * zooms.length) / Math.max(ratio, 1);
+    const fitted =
+      (boxWidth - 18 * Math.max(zooms.length, isLensPending ? 3 : 0)) /
+      Math.max(ratio, 1);
     return Math.floor(
       Math.min(narrow ? 168 : 240, Math.max(narrow ? 140 : 136, fitted)),
     );
@@ -1195,6 +1211,7 @@
       ? []
       : zooms.map((zone, index) => {
           const parent = zone.within == null ? null : zooms[zone.within];
+          const scale = 600 / Math.max(zone.width, zone.height);
           const named =
             zone.name === ""
               ? m.map_zoom_closer()
@@ -1213,16 +1230,16 @@
               zone.kind !== "exact"
                 ? m.map_zoom_closer()
                 : named,
-            view: `${zone.x} ${zone.y} ${zone.width} ${zone.height}`,
+            view: `0 0 ${zone.width * scale} ${zone.height * scale}`,
             inline: lensHeight * (zone.width / zone.height),
             inner: zooms.flatMap((other) =>
               other.within === index
                 ? [
                     {
-                      x: other.x,
-                      y: other.y,
-                      width: other.width,
-                      height: other.height,
+                      x: (other.x - zone.x) * scale,
+                      y: (other.y - zone.y) * scale,
+                      width: other.width * scale,
+                      height: other.height * scale,
                     },
                   ]
                 : [],
@@ -3563,13 +3580,26 @@
       </div>
     {/if}
   </div>
-  {#if lenses.length > 0}
+  {#if lenses.length > 0 || isLensPending}
     <section
       class="scroll-fade-x flex items-start gap-4 overflow-x-auto pbe-1"
       aria-label={m.map_zooms_label()}
+      aria-busy={lenses.length === 0}
       data-zooms
       transition:fade={{ duration: calm ? 0 : 150 }}
     >
+      {#if lenses.length === 0}
+        {#each [1.2, 0.9, 1.2] as ratio, at (at)}
+          <div class="grid shrink-0 gap-1.5" aria-hidden="true">
+            <Skeleton class="rounded-sm block-[1.21875rem] inline-24" />
+            <Skeleton
+              class="rounded-sm"
+              style="inline-size: {lensHeight *
+                ratio}px; block-size: {lensHeight}px"
+            />
+          </div>
+        {/each}
+      {/if}
       {#each lenses as lens (lens.index)}
         <figure
           class={cn("grid shrink-0 gap-1.5", {

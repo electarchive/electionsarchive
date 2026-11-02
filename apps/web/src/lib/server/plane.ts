@@ -433,8 +433,8 @@ const padded = (box: ReturnType<typeof extent>) => {
   const pad = span * 0.08;
   let width = box.east - box.west + pad * 2;
   let height = box.north - box.south + pad * 2;
-  width = Math.max(width, height * 0.8);
-  height = Math.max(height, width / 1.5);
+  width = Math.max(width, height * 0.6);
+  height = Math.max(height, width / 1.8);
   const x = (box.west + box.east) / 2;
   const y = (box.south + box.north) / 2;
   return {
@@ -540,13 +540,53 @@ export const zooms = async (tiles: string, ks: Array<number>) => {
         unit.north > box.south &&
         unit.south < box.north,
     );
+  const side = (units: Array<Measured>) => {
+    const box = padded(extent(units));
+    return Math.max(box.east - box.west, box.north - box.south);
+  };
+  const groups = dense(main, span, 80).map((units) => ({
+    units,
+    side: side(units),
+  }));
+  for (let at = 0; at < groups.length; at++) {
+    for (let next = at + 1; next < groups.length; next++) {
+      const [one, two] = [groups[at], groups[next]];
+      if (one == null || two == null) {
+        continue;
+      }
+      const [a, b] = [padded(extent(one.units)), padded(extent(two.units))];
+      const units = [...one.units, ...two.units];
+      const merged = side(units);
+      if (
+        a.west < b.east &&
+        b.west < a.east &&
+        a.south < b.north &&
+        b.south < a.north &&
+        merged <= Math.max(one.side, two.side) * 1.5 &&
+        merged <= span / 7
+      ) {
+        groups[at] = { units, side: Math.max(one.side, two.side) };
+        groups.splice(next, 1);
+        next = at;
+      }
+    }
+  }
+  const need = (units: Array<Measured>) => {
+    let total = 0;
+    for (const unit of units) {
+      total += Math.min(4, (span / 160 / unit.size) ** 2);
+    }
+    return total;
+  };
   const found: Array<{
     core: Array<Measured>;
     box: ReturnType<typeof extent>;
     within: number | null;
   }> = [];
-  for (const group of dense(main, span, 80)
-    .toSorted((a, b) => b.length - a.length)
+  for (const group of groups
+    .map((group) => group.units)
+    .filter((units) => need(units) >= 16)
+    .toSorted((a, b) => need(b) - need(a))
     .slice(0, 3)) {
     const box = padded(extent(group));
     const at = found.length;
@@ -555,7 +595,7 @@ export const zooms = async (tiles: string, ks: Array<number>) => {
     const nested = dense(inside(box), inner, 30).toSorted(
       (a, b) => b.length - a.length,
     )[0];
-    if (nested != null && nested.length < group.length) {
+    if (nested != null && nested.length >= 10 && nested.length < group.length) {
       found.push({ core: nested, box: padded(extent(nested)), within: at });
     }
   }
@@ -581,13 +621,23 @@ export const zooms = async (tiles: string, ks: Array<number>) => {
           ${sql.param(frames.map((frame) => frame.east))}::float8[],
           ${sql.param(frames.map((frame) => frame.north))}::float8[]
         ) f(index, west, south, east, north)
+      ),
+      cut as (
+        select f.index, p.k, f.west, f.north, greatest(f.east - f.west, f.north - f.south) as side,
+          ST_CollectionExtract(ST_ClipByBox2D(p.geom, ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)), 3) as geom
+        from frames f
+        join planed p on p.geom && ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)
+      ),
+      thin as (
+        select index, k, west, north, side,
+          ST_SnapToGrid(ST_Scale(ST_Translate(
+            ST_CoverageSimplify(geom, side / 360) over (partition by index),
+          -west, -north), 600 / side, 600 / side), 1) as geom
+        from cut where not ST_IsEmpty(geom)
       )
-      select f.index, p.k, ST_AsSVG(ST_Scale(ST_SimplifyPreserveTopology(
-          ST_ClipByBox2D(p.geom, ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)),
-          greatest(f.east - f.west, f.north - f.south) / 700), 0.001, 0.001), 0, 1) as d
-      from frames f
-      join planed p on p.geom && ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)
-      order by f.index, p.k
+      select index, k, ST_AsSVG(geom, 1, 0) as d
+      from thin where not ST_IsEmpty(geom)
+      order by index, k
     `),
     db.execute<{
       index: number;
