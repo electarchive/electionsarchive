@@ -87,6 +87,11 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.enr_2026"
             else nyc_enr_live.plan(conn, feed, paths)
         )
+        conn.execute(
+            """update live.issue set resolved = true
+               where feed_id = %s and kind = 'unmatched' and not resolved and detail <> all(%s)""",
+            [feed, sorted(set(unmatched))],
+        )
         for line in sorted(set(unmatched)):
             issue(conn, feed, "unmatched", line)
         written = 0
