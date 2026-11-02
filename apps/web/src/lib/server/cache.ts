@@ -6,7 +6,7 @@ import { Buffer } from "node:buffer";
 import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
-import { codeVersion } from "virtual:code-version";
+import { codeVersion, procedureVersions } from "virtual:code-version";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { db } from "#lib/server/db/index.js";
 import { localizeNames } from "#lib/server/names.js";
@@ -18,6 +18,15 @@ const LARGEST = 64 * 1024 ** 2;
 const LIFETIME = 30 * 86_400;
 const CHECK = 5000;
 const GENERATION = codeVersion ?? build;
+const VERSIONS = new Map<string, string>();
+const parsed: unknown = JSON.parse(procedureVersions ?? "{}");
+for (const [name, version] of Object.entries<unknown>(
+  typeof parsed === "object" && parsed != null ? { ...parsed } : {},
+)) {
+  if (typeof version === "string") {
+    VERSIONS.set(name, version);
+  }
+}
 
 const pack = promisify(zstdCompress);
 const unpack = promisify(zstdDecompress);
@@ -56,13 +65,13 @@ function client() {
 
 client();
 
-async function recall(key: string) {
+async function recall(slot: string) {
   const reader = client();
   if (reader == null) {
     return null;
   }
   try {
-    const found = await reader.get(`c:${GENERATION}:${key}`);
+    const found = await reader.get(slot);
     if (found == null) {
       return null;
     }
@@ -87,15 +96,13 @@ async function recall(key: string) {
   }
 }
 
-function keep(key: string, version: string, value: unknown) {
+function keep(slot: string, version: string, value: unknown) {
   try {
     const payload = serialize({ version, value });
     const writer = client();
     if (writer != null && payload.length <= LARGEST) {
       void pack(payload)
-        .then(async (packed) =>
-          writer.set(`c:${GENERATION}:${key}`, packed, { EX: LIFETIME }),
-        )
+        .then(async (packed) => writer.set(slot, packed, { EX: LIFETIME }))
         .catch(() => null);
     }
     return payload.length;
@@ -142,7 +149,12 @@ function put(key: string, entry: Entry) {
   evict();
 }
 
-function store<T>(key: string, compute: () => Promise<T>, isStrict: boolean) {
+function store<T>(
+  key: string,
+  slot: string,
+  compute: () => Promise<T>,
+  isStrict: boolean,
+) {
   const entry: Entry = {
     value: Promise.resolve(),
     version: state.version,
@@ -152,7 +164,7 @@ function store<T>(key: string, compute: () => Promise<T>, isStrict: boolean) {
   };
   let recalled = 0;
   entry.value = (async () => {
-    const found = await recall(key);
+    const found = await recall(slot);
     if (found != null && (found.version === entry.version || !isStrict)) {
       entry.version = found.version;
       recalled = found.size;
@@ -165,7 +177,7 @@ function store<T>(key: string, compute: () => Promise<T>, isStrict: boolean) {
       const value = await entry.value;
       const isFresh = entry.version === state.version;
       const size =
-        isFresh && recalled === 0 ? keep(key, entry.version, value) : recalled;
+        isFresh && recalled === 0 ? keep(slot, entry.version, value) : recalled;
       entry.isSettled = true;
       if (entries.get(key) !== entry) {
         return;
@@ -174,7 +186,7 @@ function store<T>(key: string, compute: () => Promise<T>, isStrict: boolean) {
       state.size += size;
       evict();
       if (!isFresh) {
-        renew(key, entry, compute);
+        renew(key, slot, entry, compute);
       }
     } catch {
       if (entries.get(key) === entry) {
@@ -204,7 +216,12 @@ async function drain() {
   }
 }
 
-function renew(key: string, hit: Entry, compute: () => Promise<unknown>) {
+function renew(
+  key: string,
+  slot: string,
+  hit: Entry,
+  compute: () => Promise<unknown>,
+) {
   hit.isRenewing = true;
   waiting.push(async () => {
     const version = state.version;
@@ -213,7 +230,7 @@ function renew(key: string, hit: Entry, compute: () => Promise<unknown>) {
       const next: Entry = {
         value: Promise.resolve(value),
         version,
-        size: keep(key, version, value),
+        size: keep(slot, version, value),
         isSettled: true,
         isRenewing: false,
       };
@@ -231,10 +248,12 @@ export async function remember<T>(
   shared: string,
   compute: () => Promise<T>,
   isStrict = false,
+  generation = GENERATION,
 ) {
   const locale = getLocale();
   const isBase = locale === baseLocale;
   const key = isBase ? shared : `${locale}|${shared}`;
+  const slot = `c:${generation}:${key}`;
   const run = isBase
     ? compute
     : async () => localizeNames(await compute(), locale);
@@ -247,16 +266,16 @@ export async function remember<T>(
     entries.delete(key);
     entries.set(key, hit);
     if (isStrict && hit.version !== state.version) {
-      const next = store(key, run, true);
+      const next = store(key, slot, run, true);
       put(key, next);
       return next.value as Promise<T>;
     }
     if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
-      renew(key, hit, run);
+      renew(key, slot, hit, run);
     }
     return hit.value as Promise<T>;
   }
-  const entry = store(key, run, isStrict);
+  const entry = store(key, slot, run, isStrict);
   put(key, entry);
   return entry.value as Promise<T>;
 }
@@ -287,6 +306,7 @@ function cached(isStrict: boolean) {
         return result.output;
       },
       isStrict,
+      VERSIONS.get(name),
     );
     return { output, context: {} };
   });

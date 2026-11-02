@@ -27,6 +27,7 @@ export default defineConfig(({ command }) => {
       devtoolsJson(),
       codeVersion({
         inputs: ["../../pnpm-lock.yaml", "../../packages/db/migrations"],
+        procedures: "src/lib/server/rpc",
       }),
       command === "build" &&
         paraglideVitePlugin({
