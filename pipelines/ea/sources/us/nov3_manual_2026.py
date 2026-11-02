@@ -82,6 +82,31 @@ SCHOOLS = {
     ("AZ", "Payson Unified School District No. 10"): "0406070",
     ("AZ", "Safford Unified School District No. 1"): "0407240",
     ("AZ", "Blue Ridge Unified School District No. 32"): "0406580",
+    ("AZ", "Agua Fria Union High School District No. 216"): "0400450",
+    ("AZ", "Alhambra Elementary School District No. 68"): "0400600",
+    ("AZ", "Arlington Elementary School District No. 47"): "0400840",
+    ("AZ", "Balsz Elementary School District No. 31"): "0401050",
+    ("AZ", "Cartwright Elementary School District No. 83"): "0401680",
+    ("AZ", "Cave Creek Unified School District No. 93"): "0400001",
+    ("AZ", "Creighton Elementary School District No. 14"): "0402430",
+    ("AZ", "Dysart Unified School District No. 89"): "0402690",
+    ("AZ", "Fountain Hills Unified School District No. 98"): "0403040",
+    ("AZ", "Gilbert Unified School District No. 41"): "0403400",
+    ("AZ", "Glendale Union High School District No. 205"): "0403450",
+    ("AZ", "Isaac Elementary School District No. 5"): "0403960",
+    ("AZ", "Litchfield Elementary School District No. 79"): "0404380",
+    ("AZ", "Littleton Elementary School District No. 65"): "0404440",
+    ("AZ", "Mesa Unified School District No. 4"): "0404970",
+    ("AZ", "Osborn Elementary School District No. 8"): "0405670",
+    ("AZ", "Paradise Valley Unified School District No. 69"): "0405930",
+    ("AZ", "Peoria Unified School District No. 11"): "0406250",
+    ("AZ", "Phoenix Elementary School District No. 1"): "0406300",
+    ("AZ", "Riverside Elementary School District No. 2"): "0407020",
+    ("AZ", "Saddle Mountain Unified School District No. 90"): "0407170",
+    ("AZ", "Scottsdale Unified School District No. 48"): "0407570",
+    ("AZ", "Tolleson Union High School District No. 214"): "0408520",
+    ("AZ", "Union Elementary School District No. 62"): "0408820",
+    ("AZ", "Washington Elementary School District No. 6"): "0409060",
 }
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
@@ -620,6 +645,131 @@ COUNTIES = {
         "AZ",
         "https://www.tollesonaz.gov/",
         "MF-503/maricopa/City of Tolleson Publicity Pamphlet 2026 General Election.pdf",
+    ),
+    "04013-aguafriaunionh": (
+        "AZ",
+        "https://schoolsup.org/agua-fria-2026-ballot",
+        "N3M-web/az-schoolsup/AguaFriaUSD_2026.pdf",
+    ),
+    "04013-alhambraelemen": (
+        "AZ",
+        "https://schoolsup.org/alhambra-2026-ballot",
+        "N3M-web/az-schoolsup/AlhambraESD2026.pdf",
+    ),
+    "04013-arlingtoneleme": (
+        "AZ",
+        "https://schoolsup.org/arlington-2026-ballot",
+        "N3M-web/az-schoolsup/ArlingtonESD2026.pdf",
+    ),
+    "04013-balszelementar": (
+        "AZ",
+        "https://schoolsup.org/balsz-2026-ballot",
+        "N3M-web/az-schoolsup/BalszESD2026.pdf",
+    ),
+    "04013-cartwrightelem": (
+        "AZ",
+        "https://schoolsup.org/cartwright-2026-ballot",
+        "N3M-web/az-schoolsup/CartwrightESD2026.pdf",
+    ),
+    "04013-cavecreekunifi": (
+        "AZ",
+        "https://schoolsup.org/cave-creek-2026-ballot",
+        "N3M-web/az-schoolsup/CaveCreekUSD2026.pdf",
+    ),
+    "04013-creightoneleme": (
+        "AZ",
+        "https://schoolsup.org/creighton-2026-ballot",
+        "N3M-web/az-schoolsup/CreightonESD2026.pdf",
+    ),
+    "04013-dysartunified": (
+        "AZ",
+        "https://schoolsup.org/dysart-2026-ballot",
+        "N3M-web/az-schoolsup/DysartUSD2026.pdf",
+    ),
+    "04013-fountainhillsu": (
+        "AZ",
+        "https://schoolsup.org/fountain-hills-2026-ballot",
+        "N3M-web/az-schoolsup/FountainHillsUSD2026.pdf",
+    ),
+    "04013-gilbertunified": (
+        "AZ",
+        "https://schoolsup.org/gilbert-2026-ballot",
+        "N3M-web/az-schoolsup/GilbertUSD2026.pdf",
+    ),
+    "04013-glendaleunionh": (
+        "AZ",
+        "https://schoolsup.org/glendale-2026-ballot",
+        "N3M-web/az-schoolsup/GlendaleUnionHSD2026.pdf",
+    ),
+    "04013-isaacelementar": (
+        "AZ",
+        "https://schoolsup.org/isaac-2026-ballot",
+        "N3M-web/az-schoolsup/IsaacESD2026.pdf",
+    ),
+    "04013-litchfieldelem": (
+        "AZ",
+        "https://schoolsup.org/litchfield-2026-ballot",
+        "N3M-web/az-schoolsup/LitchfieldESD2026.pdf",
+    ),
+    "04013-littletoneleme": (
+        "AZ",
+        "https://schoolsup.org/littleton-2026-ballot",
+        "N3M-web/az-schoolsup/LittletonESD2026.pdf",
+    ),
+    "04013-mesaunified": (
+        "AZ",
+        "https://schoolsup.org/mesa-2026-ballot",
+        "N3M-web/az-schoolsup/MesaUSD2026.pdf",
+    ),
+    "04013-osbornelementa": (
+        "AZ",
+        "https://schoolsup.org/osborn-2026-ballot",
+        "N3M-web/az-schoolsup/OsbornESD2026.pdf",
+    ),
+    "04013-paradisevalley": (
+        "AZ",
+        "https://schoolsup.org/paradise-valley-2026-ballot",
+        "N3M-web/az-schoolsup/ParadiseValleyUSD2026.pdf",
+    ),
+    "04013-peoriaunified": (
+        "AZ",
+        "https://schoolsup.org/peoria-2026-ballot",
+        "N3M-web/az-schoolsup/PeoriaUSD2026.pdf",
+    ),
+    "04013-phoenixelement": (
+        "AZ",
+        "https://schoolsup.org/phoenix-elementary-2026-ballot",
+        "N3M-web/az-schoolsup/PhoenixESD2026.pdf",
+    ),
+    "04013-riversideeleme": (
+        "AZ",
+        "https://schoolsup.org/riverside-2026-ballot",
+        "N3M-web/az-schoolsup/RiversideESD2026.pdf",
+    ),
+    "04013-saddlemountain": (
+        "AZ",
+        "https://schoolsup.org/saddle-mountain-2026-ballot",
+        "N3M-web/az-schoolsup/SaddleMountainUSD2026.pdf",
+    ),
+    "04013-scottsdaleunif": (
+        "AZ",
+        "https://schoolsup.org/scottsdale-2026-ballot",
+        "N3M-web/az-schoolsup/ScottsdaleUSD2026.pdf",
+    ),
+    "04013-tollesonunionh": (
+        "AZ",
+        "https://schoolsup.org/tolleson-2026-ballot",
+        "N3M-web/az-schoolsup/TollesonUnionHSD2026.pdf",
+    ),
+    "04013-unionelementar": (
+        "AZ",
+        "https://schoolsup.org/union-2026-ballot",
+        "N3M-web/az-schoolsup/UnionESD2026.pdf",
+    ),
+    "04013-washingtonelem": (
+        "AZ",
+        "https://schoolsup.org/washington-2026-ballot",
+        "N3M-web/az-schoolsup/WashingtonESD2026.pdf",
     ),
     "04013-wick": (
         "AZ",
@@ -1270,11 +1420,16 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:{state}:{code}:measure:{slug(label)}"
-            contest = cs.key("us.contest", contest_key)
             contest_path = f"{path}/{DAY}-general/{slug(label)}"
-            if civil.slugs.get(contest_path, contest) != contest:
-                print("slug taken:", contest_path)
-                continue
+            held = civil.slugs.get(contest_path)
+            if held is not None:
+                current = conn.execute(
+                    "select entity_id from external_id where scheme = 'us.contest' and value = %s", [contest_key]
+                ).fetchone()
+                if current is None or current[0] != held:
+                    print("slug taken:", contest_path)
+                    continue
+            contest = cs.key("us.contest", contest_key)
             civil.slugs[contest_path] = contest
             cs.add(
                 "contest",
