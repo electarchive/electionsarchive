@@ -181,7 +181,7 @@
     </span>
     <div
       class={cn(
-        "relative col-span-2 touch-pan-y lg:col-span-1 lg:col-start-2 lg:row-start-1",
+        "relative col-span-2 touch-pan-y select-none [-webkit-tap-highlight-color:transparent] lg:col-span-1 lg:col-start-2 lg:row-start-1",
         { "block-9": row.isNation, "block-6": !row.isNation },
       )}
       role="presentation"
@@ -194,7 +194,7 @@
         aria-hidden="true"
       ></span>
       <svg
-        class="sweep absolute inset-0 block block-full inline-full"
+        class="sweep absolute inset-0 block block-full inline-full [&_a]:outline-none"
         viewBox="0 0 {round(span)} 100"
         preserveAspectRatio="none"
         aria-hidden="true"
