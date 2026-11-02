@@ -3,6 +3,7 @@
   import { ArrowUpRightIcon } from "@lucide/svelte";
   import type { Site } from "#lib/server/site.js";
   import Cite from "#lib/components/cite.svelte";
+  import Language from "#lib/components/language.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import SystemStatus from "#lib/components/system-status.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -264,6 +265,7 @@
         >
       </a>
       <span class="ms-auto max-sm:ms-0">{m.footer_rights()}</span>
+      <Language />
       <a
         href={resolve("/[slug=project]", { slug: "privacy" })}
         class="underline decoration-transparent underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"

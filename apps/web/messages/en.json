@@ -1,5 +1,11 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
+  "language_label": "Language",
+  "language_search": "Search languages",
+  "language_empty": "No matching language",
+  "language_banner_text": "This site is also available in English.",
+  "language_banner_switch": "Switch to English",
+  "language_banner_dismiss": "No thanks",
   "party_history_best": "Best result",
   "party_history_latest": "Latest",
   "party_history_lede": "Vote share in each election on record, with the share of seats won.",

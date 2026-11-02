@@ -13,6 +13,7 @@
   import { on } from "svelte/events";
   import Footer from "#lib/components/footer.svelte";
   import Header from "#lib/components/header.svelte";
+  import LanguageBanner from "#lib/components/language-banner.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import embedStyles from "#lib/embed.css?url";
   import { idle } from "#lib/idle.js";
@@ -198,7 +199,10 @@
           class="fixed inset-s-3 inset-bs-3 z-50 -translate-y-24 rounded-sm border border-foreground bg-card px-3 py-2 text-sm font-semibold opacity-0 focus-visible:translate-y-0 focus-visible:opacity-100"
           >{m.skip_to_content()}</a
         >
-        <Header />
+        <div>
+          <LanguageBanner />
+          <Header />
+        </div>
         <div
           id="content"
           tabindex="-1"
