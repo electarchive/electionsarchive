@@ -1277,10 +1277,11 @@ def plan(
             return best, False
 
         for (office, name, people), places in races.items():
+            numbered = re.match(r"\s*(?:proposition|prop)\.?\s+(\d+)\b", name, re.IGNORECASE)
             spelled = re.sub(
                 rf"\b({'|'.join(TENS)})[- ]({'|'.join(ORDINALS)})\b",
                 lambda found: f"{TENS[found[1]]}{ORDINALS[found[2]]}",
-                name.lower(),
+                (f"proposition {numbered[1]}" if numbered else name).lower(),
             )
             spelled = re.sub(rf"\b({'|'.join(ORDINALS)})\b", lambda found: ORDINALS[found[1]], spelled)
             words = {
