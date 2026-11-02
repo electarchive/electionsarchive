@@ -1733,10 +1733,10 @@ export const seats = {
         select q.id, q.area, q.day, q.until, q.general, q.since, q."isHere", q.now, q.winner,
           coalesce(sp.party, q.before) as before, q.member, q.via, q.majority,
           (select n.body_md from note n where n.entity_id = q.id::uuid and n.kind = 'context' order by n.id limit 1) as cause,
-          (q.now like 'person:%' or exists (select from party x where x.id::text = q.now and x.kind = 'independent_group'))
+          coalesce((q.now like 'person:%' or exists (select from party x where x.id::text = q.now and x.kind = 'independent_group'))
             and (coalesce(sp.party, q.before) like 'person:%' or exists (
               select from party x where x.id::text = coalesce(sp.party, q.before) and x.kind = 'independent_group'
-            )) as "isOther"
+            )), false) as "isOther"
         from listed q
         left join lateral (
           select coalesce(pm.into_id, co.party_id)::text as party

@@ -3,6 +3,7 @@ export type Match = "party" | "person" | "family";
 export type Grouping = "option" | "alliance" | "party";
 
 export type Option = {
+  k?: number;
   contest: string;
   kind: string;
   party: string | null;
@@ -333,13 +334,13 @@ function usual(
   };
 }
 
-export function compare(
+export function keying(
   current: Side,
   earlier: Side | null,
   relations: Array<Relation>,
   match: Match = "party",
   grouping: Grouping = "option",
-): Array<Row> {
+) {
   const root = ancestry(relations, match);
   const options = (earlier == null ? [current] : [current, earlier]).flatMap(
     (side) => side.options,
@@ -508,6 +509,23 @@ export function compare(
     personal.has(option.person) && !base(option).startsWith("alliance:")
       ? `person:${option.person}`
       : base(option);
+  return { root, anchors, roaming, identify };
+}
+
+export function compare(
+  current: Side,
+  earlier: Side | null,
+  relations: Array<Relation>,
+  match: Match = "party",
+  grouping: Grouping = "option",
+): Array<Row> {
+  const { root, anchors, roaming, identify } = keying(
+    current,
+    earlier,
+    relations,
+    match,
+    grouping,
+  );
   const settle = (groups: Map<string, Group>) =>
     new Map(
       groups

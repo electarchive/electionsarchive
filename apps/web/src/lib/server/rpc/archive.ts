@@ -1,6 +1,6 @@
 import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
-import { ancestry, compare } from "@ea/analytics";
+import { ancestry, compare, keying } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
@@ -2406,6 +2406,7 @@ async function load(
           .toArray()
           .toSorted((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0))
           .map((row): Option => ({
+            k: row.k,
             contest: row.contest,
             kind: row.kind,
             party: row.party,
@@ -4323,13 +4324,14 @@ async function tabulate(
       ? null
       : await db.execute<{
           contest: string;
+          option: number;
           person: string | null;
           party: string | null;
           isIndependent: boolean;
           seats: number;
           isStv: boolean;
         }>(sql`
-          select c.id as contest, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id) as party,
+          select c.id as contest, o.k as option, coalesce(m.into_id, cy.person_id) as person, coalesce(pm.into_id, o.party_id) as party,
             coalesce(cy.is_independent, false) as "isIndependent", w.seats,
             coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as "isStv"
           from contest c
@@ -4359,17 +4361,35 @@ async function tabulate(
     const won = options.filter((option) =>
       chosenOnes.has(`${option.contest}:${option.person}`),
     );
-    const held = new Map<string, number>();
     const seatEntries = row.isContest
       ? (seatsWon.get(row.owner ?? "") ?? [])
       : [];
+    let total = 0;
     for (const entry of seatEntries) {
+      total += entry.seats;
+    }
+    const isMulti = won.length > 1 || total > 1;
+    const identify =
+      side == null || seatEntries.length === 0
+        ? null
+        : keying(
+            side,
+            then?.get(row.k)?.side ?? null,
+            lineage,
+            match,
+            isMulti ? "party" : grouping,
+          ).identify;
+    const held = new Map<string, number>();
+    for (const entry of seatEntries) {
+      const option = options.find((option) => option.k === entry.option);
       const key =
-        entry.party != null
-          ? `party:${entry.party}`
-          : entry.isIndependent
-            ? "independent"
-            : `person:${entry.person}`;
+        option != null && identify != null
+          ? identify(option)
+          : entry.party != null
+            ? `party:${entry.party}`
+            : entry.isIndependent
+              ? "independent"
+              : `person:${entry.person}`;
       held.set(key, (held.get(key) ?? 0) + entry.seats);
     }
     let split: number | null = null;
@@ -4384,14 +4404,7 @@ async function tabulate(
       }
       split = (last - next) / side.valid;
     }
-    return {
-      isMulti:
-        won.length > 1 ||
-        held.size > 1 ||
-        held.values().some((count) => count > 1),
-      held,
-      split,
-    };
+    return { isMulti, held, split };
   });
   const results = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
