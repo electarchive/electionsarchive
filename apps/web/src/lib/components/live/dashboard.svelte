@@ -5,6 +5,7 @@
     LiveOffice,
   } from "@ea/analytics/live";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
@@ -16,7 +17,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
-  import { numbers, percent } from "#lib/format.js";
+  import { dates, numbers, percent } from "#lib/format.js";
   import {
     clock as clockOf,
     compact,
@@ -643,10 +644,24 @@
       {/if}
       <BoardLink election={election.slug} />
     </p>
-    <h1 class="title text-balance">{m.night_nation_title()}</h1>
-    {#if !forecasts}
-      <p class="text-sm text-muted-foreground">{m.board_forecast_off()}</p>
-    {/if}
+    <div class="grid gap-1.5">
+      <h1 class="title text-balance">{m.night_nation_title()}</h1>
+      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-lg/snug">
+        <a
+          href={resolve("/[...path]", { path: election.slug })}
+          class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          >{election.title}</a
+        >
+        <time datetime={election.date} class="text-muted-foreground"
+          >{dates({
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            timeZone: "UTC",
+          }).format(new Date(`${election.date}T00:00:00Z`))}</time
+        >
+      </p>
+    </div>
     <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
@@ -714,10 +729,31 @@
           <dd class="font-figures text-2xl font-[760] tabular-nums">
             {wait(next.at)}<span
               class="ms-1.5 text-base font-semibold text-muted-foreground uppercase"
-              >{next.states.slice(0, 4).join(" ")}{next.states.length > 4
-                ? ` +${next.states.length - 4}`
-                : ""}</span
-            >
+              >{next.states.slice(0, 4).join(" ")}</span
+            >{#if next.states.length > 4}
+              <span
+                class="group relative ms-1 text-base font-semibold text-muted-foreground"
+              >
+                <button
+                  type="button"
+                  aria-describedby="next-more"
+                  class="cursor-help underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+                  >+{next.states.length - 4}</button
+                >
+                <span
+                  id="next-more"
+                  role="tooltip"
+                  class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 font-sans text-xs font-normal whitespace-nowrap text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+                >
+                  <span class="font-semibold"
+                    >{m.night_kpi_next_more({ time: clockOf(next.at) })}</span
+                  >
+                  {#each next.states.slice(4) as code (code)}
+                    <span class="text-muted-foreground">{name(code)}</span>
+                  {/each}
+                </span>
+              </span>
+            {/if}
           </dd>
         </div>
       {/if}
@@ -796,7 +832,7 @@
   {/if}
 
   <section
-    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
+    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-8"
   >
     <div class="grid content-start gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
@@ -872,7 +908,7 @@
       </p>
     </div>
 
-    <aside class="grid content-start gap-8">
+    <aside class="lg:col-start-2 lg:row-span-2 lg:row-start-1">
       {#if chambers != null && pair != null}
         <Ladder
           view={chambers[view]}
@@ -883,62 +919,63 @@
           {tint}
         />
       {/if}
-      <section class="grid gap-2">
-        <div class="grid gap-0.5">
-          <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
-          {#if closings[0] != null}
-            <p class="text-xs text-muted-foreground">
-              {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
-            </p>
-          {/if}
-        </div>
-        <ol class="grid gap-1.5">
-          {#each closings as closing (closing.at)}
-            {const isPast = $derived(Date.parse(closing.at) <= clock)}
-            <li
-              class={cn(
-                "grid grid-cols-[5rem_1fr] items-baseline gap-2 text-[0.8125rem]",
-                { "text-muted-foreground": isPast },
-              )}
-            >
-              <span class="group relative justify-self-start">
-                <button
-                  type="button"
-                  aria-describedby="closing-{closing.at}"
-                  class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
-                  >{clockOf(closing.at)}</button
-                >
-                <span
-                  id="closing-{closing.at}"
-                  role="tooltip"
-                  class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
-                >
-                  <span class="font-semibold">{m.night_closings_local()}</span>
-                  {#each closing.local as entry (entry.time)}
-                    <span class="flex items-baseline justify-between gap-4">
-                      <span class="uppercase">{entry.codes.join(", ")}</span>
-                      <span
-                        class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
-                        >{entry.time}</span
-                      >
-                    </span>
-                  {/each}
-                </span>
-              </span>
-              <span class="flex flex-wrap gap-1">
-                {#each closing.states as code (code)}
-                  <a
-                    href={href(code)}
-                    class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
-                    >{code}</a
-                  >
+    </aside>
+
+    <section class="grid content-start gap-2 lg:col-start-1 lg:row-start-2">
+      <div class="grid gap-0.5">
+        <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+        {#if closings[0] != null}
+          <p class="text-xs text-muted-foreground">
+            {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
+          </p>
+        {/if}
+      </div>
+      <ol class="gap-x-10 sm:columns-2">
+        {#each closings as closing (closing.at)}
+          {const isPast = $derived(Date.parse(closing.at) <= clock)}
+          <li
+            class={cn(
+              "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
+              { "text-muted-foreground": isPast },
+            )}
+          >
+            <span class="group relative justify-self-start">
+              <button
+                type="button"
+                aria-describedby="closing-{closing.at}"
+                class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+                >{clockOf(closing.at)}</button
+              >
+              <span
+                id="closing-{closing.at}"
+                role="tooltip"
+                class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+              >
+                <span class="font-semibold">{m.night_closings_local()}</span>
+                {#each closing.local as entry (entry.time)}
+                  <span class="flex items-baseline justify-between gap-4">
+                    <span class="uppercase">{entry.codes.join(", ")}</span>
+                    <span
+                      class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
+                      >{entry.time}</span
+                    >
+                  </span>
                 {/each}
               </span>
-            </li>
-          {/each}
-        </ol>
-      </section>
-    </aside>
+            </span>
+            <span class="flex flex-wrap gap-1">
+              {#each closing.states as code (code)}
+                <a
+                  href={href(code)}
+                  class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
+                  >{code}</a
+                >
+              {/each}
+            </span>
+          </li>
+        {/each}
+      </ol>
+    </section>
   </section>
 
   {#if pair != null}
