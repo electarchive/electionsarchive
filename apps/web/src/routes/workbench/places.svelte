@@ -3,6 +3,7 @@
   import type { orpc } from "#lib/rpc.js";
   import { fits } from "#lib/fits.js";
   import { count, natural, percent, points } from "#lib/format.js";
+  import { figure } from "#lib/indices.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -20,7 +21,9 @@
     hovered: string | null;
   } = $props();
 
-  let column = $state<"name" | "share" | "change" | "valid">("name");
+  let column = $state<"name" | "share" | "change" | "effective" | "valid">(
+    "name",
+  );
   let isDescending = $state(false);
   let isAll = $state(false);
 
@@ -32,9 +35,14 @@
       .map((row) => {
         const share = row.shares[at] ?? 0;
         const earlier = row.earlier?.[at];
+        let sum = 0;
+        for (const part of row.shares) {
+          sum += part ** 2;
+        }
         return {
           ...row,
           share,
+          effective: sum > 0 ? 1 / sum : null,
           change: earlier == null ? null : share - earlier,
           lead:
             row.leader == null
@@ -84,6 +92,12 @@
     ...(contest.target == null
       ? []
       : [{ key: "change" as const, label: m.col_change(), isNumeric: true }]),
+    {
+      key: "effective" as const,
+      label: m.indices_effective(),
+      isNumeric: true,
+      isWide: true,
+    },
     {
       key: "valid" as const,
       label: m.col_votes(),
@@ -233,6 +247,12 @@
                 {/if}
               </td>
             {/if}
+            <td
+              class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5 max-sm:hidden"
+              >{row.effective == null
+                ? ""
+                : figure("effectiveVotes", row.effective)}</td
+            >
             <td
               class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5 max-sm:hidden"
               >{count(row.valid)}</td

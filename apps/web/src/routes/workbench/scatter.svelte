@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { SvelteSet } from "svelte/reactivity";
   import type { orpc } from "#lib/rpc.js";
-  import { count, percent, plural, points } from "#lib/format.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { count, numbers, percent, plural, points } from "#lib/format.js";
+  import { figure } from "#lib/indices.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -22,6 +24,7 @@
 
   let width = $state(0);
   let height = $state(0);
+  let axis = $state<"earlier" | "effective">("earlier");
   let brush = $state<{ x0: number; y0: number; x1: number; y1: number } | null>(
     null,
   );
@@ -37,13 +40,19 @@
       .flatMap((row) => {
         const earlier = row.earlier?.[at];
         const share = row.shares[at];
-        return earlier == null || share == null
+        let sum = 0;
+        for (const part of row.earlier ?? []) {
+          sum += part ** 2;
+        }
+        const x = axis === "earlier" ? earlier : sum > 0 ? 1 / sum : null;
+        return earlier == null || share == null || x == null
           ? []
           : [
               {
                 k: row.k,
                 name: row.name,
-                x: earlier,
+                x,
+                earlier,
                 y: share - earlier,
                 share,
                 valid: row.valid,
@@ -83,8 +92,8 @@
     return { mx, my, slope, most, gained };
   });
   const domain = $derived.by(() => {
-    let left = 1;
-    let right = 0;
+    let left = Infinity;
+    let right = -Infinity;
     let low = 0;
     let high = 0;
     for (const dot of dots) {
@@ -93,10 +102,16 @@
       low = Math.min(low, dot.y);
       high = Math.max(high, dot.y);
     }
-    const across = Math.max((right - left) * 0.04, 0.01);
+    const across = Math.max(
+      (right - left) * 0.04,
+      axis === "earlier" ? 0.01 : 0.05,
+    );
     const tall = Math.max((high - low) * 0.08, 0.005);
     return {
-      x: [Math.max(0, left - across), Math.min(1, right + across)] as const,
+      x:
+        axis === "earlier"
+          ? ([Math.max(0, left - across), Math.min(1, right + across)] as const)
+          : ([Math.max(1, left - across), right + across] as const),
       y: [low - tall, high + tall] as const,
     };
   });
@@ -158,13 +173,26 @@
     return placed;
   });
   const shown = $derived(dots.find((dot) => dot.name === hovered) ?? null);
-  const trend = $derived(
-    Math.abs(stats.slope) < 0.012 || stats.my <= 0
+  const trend = $derived.by(() => {
+    if (axis === "effective") {
+      const spread = stats.slope * (domain.x[1] - domain.x[0]);
+      return Math.abs(spread) < 0.012 || stats.my <= 0
+        ? null
+        : spread > 0
+          ? m.workbench_shift_trend_split()
+          : m.workbench_shift_trend_settled();
+    }
+    return Math.abs(stats.slope) < 0.012 || stats.my <= 0
       ? null
       : stats.slope > 0
         ? m.workbench_shift_trend_up({ name: focus?.label ?? "" })
-        : m.workbench_shift_trend_down({ name: focus?.label ?? "" }),
-  );
+        : m.workbench_shift_trend_down({ name: focus?.label ?? "" });
+  });
+  const tickLabel = (tick: number) =>
+    axis === "earlier"
+      ? percent(tick, 0)
+      : numbers({ maximumFractionDigits: 1 }).format(tick);
+  const year = $derived(String(contest.target?.year ?? ""));
   const noun = $derived(
     plural(
       contest.places?.levels.find(
@@ -248,6 +276,16 @@
       {#if trend != null}
         <span class="text-muted-foreground">{trend}</span>
       {/if}
+      <Segmented
+        class="ms-auto"
+        size="sm"
+        options={[
+          { value: "earlier", label: m.workbench_scatter_x({ year }) },
+          { value: "effective", label: m.indices_effective_votes() },
+        ]}
+        bind:value={axis}
+        label={m.workbench_scatter_axis()}
+      />
     </div>
     <div
       class="relative aspect-10/7 min-block-0 lg:aspect-auto lg:min-block-48"
@@ -304,7 +342,7 @@
               y={height - 8}
               text-anchor="middle"
               class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
-              >{percent(tick, 0)}</text
+              >{tickLabel(tick)}</text
             >
           {/each}
           {#each ys as tick (tick)}
@@ -415,9 +453,17 @@
           >
             <span class="truncate font-semibold">{shown.name}</span>
             <span class="font-figures tabular-nums"
-              >{percent(shown.x)} → {percent(shown.share)}
+              >{percent(shown.earlier)} → {percent(shown.share)}
               <span class="font-semibold">{points(shown.y)}</span></span
             >
+            {#if axis === "effective"}
+              <span class="font-figures tabular-nums"
+                >{m.indices_effective_votes()}: {figure(
+                  "effectiveVotes",
+                  shown.x,
+                )}</span
+              >
+            {/if}
             <span class="font-figures text-muted-foreground tabular-nums"
               >{m.workbench_results_total({ count: count(shown.valid) })}</span
             >
@@ -429,8 +475,10 @@
       class="flex flex-wrap justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground"
     >
       <span
-        >{m.workbench_scatter_x({ year: String(contest.target.year ?? "") })} →
-        {m.workbench_scatter_y({ year: String(contest.target.year ?? "") })} ↑</span
+        >{axis === "earlier"
+          ? m.workbench_scatter_x({ year })
+          : `${m.indices_effective_votes()}, ${year}`} →
+        {m.workbench_scatter_y({ year })} ↑</span
       >
       <span>{m.workbench_shift_key()}</span>
     </figcaption>
