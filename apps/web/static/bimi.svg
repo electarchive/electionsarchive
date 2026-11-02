@@ -1,0 +1,5 @@
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Elections Archive</title>
+  <rect width="32" height="32" fill="#ffe03a"/>
+  <path fill="none" stroke="#15171a" stroke-width="2.4" stroke-linecap="square" d="M9.5 7 V25 M13.75 7 V25 M18 7 V25 M22.25 7 V25 M5.5 21 L26.5 11"/>
+</svg>
