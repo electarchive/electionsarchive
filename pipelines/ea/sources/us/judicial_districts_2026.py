@@ -1,5 +1,4 @@
 import csv
-from collections import defaultdict
 from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID
@@ -13,6 +12,7 @@ VERSION = "1"
 ROWS = Path(__file__).with_name("judicial_districts_2026.tsv")
 PUBLISHERS = {
     "www.elections.il.gov": ("Illinois State Board of Elections", "Judicial Officers Book"),
+    "electionresults.iowa.gov": ("Iowa Secretary of State", "2026 General Election Results, Detail XML"),
 }
 
 

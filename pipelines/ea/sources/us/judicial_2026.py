@@ -94,7 +94,7 @@ def emit() -> Path:
             ).fetchone()[0]
             if state == "MI" and row["court"] == "appeals":
                 area = cs.area("us.judicial_district", f"MI:appellate-{seat[0]}")
-            election =cs.key("us.election", f"2026-11-03:{state}")
+            election = cs.key("us.election", f"2026-11-03:{state}")
             if election in cs.minted:
                 raise LookupError(f"no 2026-11-03 election for {state}")
             office = cs.key("us.office", f"{slug(title)}{'-retention' if retention else ''}:{state}")
@@ -119,13 +119,17 @@ def emit() -> Path:
                     term="remainder" if "unexpired" in seat.lower() else "full",
                     round_number=1,
                     previous_round_id=None,
-                    electoral_system_id=cs.key("us.electoral_system", "retention" if retention else "block" if magnitude > 1 else "fptp"),
+                    electoral_system_id=cs.key(
+                        "us.electoral_system", "retention" if retention else "block" if magnitude > 1 else "fptp"
+                    ),
                     default_result_kind="counted",
                 )
                 label = f"{title}{f', {seat}' if seat else ''}"
                 name(
                     contest,
-                    f"2026 {state} {label} retention: {row['candidate']}" if retention else f"2026 {state} {label} election",
+                    f"2026 {state} {label} retention: {row['candidate']}"
+                    if retention
+                    else f"2026 {state} {label} election",
                 )
                 cs.add(
                     "slug",
@@ -148,7 +152,9 @@ def emit() -> Path:
             party = PARTIES[row["party"]] if row["party"] else None
             option = cs.key("us.option", f"{key}:{'yes' if retention else slug(text)}")
             if retention:
-                cs.add("contest_option", id=option, contest_id=contest, kind="answer", party_id=None, ballot_label="Yes")
+                cs.add(
+                    "contest_option", id=option, contest_id=contest, kind="answer", party_id=None, ballot_label="Yes"
+                )
                 cs.add(
                     "contest_option",
                     id=cs.key("us.option", f"{key}:no"),
@@ -178,5 +184,17 @@ def emit() -> Path:
             )
             cs.add("citation", entity_id=candidacy, source_id=sources[row["source"]], locator=None)
             counts["candidates"] += 1
+        staged = {str(row["id"]) for row in cs.rows.get("contest_option", [])}
+        for option, contest, label in conn.execute(
+            """select o.id, o.contest_id, o.ballot_label from contest_option o join changeset c on c.id = o.changeset_id
+               where c.pipeline = %s and o.kind = 'candidate'
+                 and not exists (select from candidacy where option_id = o.id)
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_set r join result_value v on v.result_set_k = r.k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            [SOURCE],
+        ).fetchall():
+            if str(option) not in staged:
+                cs.add("option_drop", option_id=option, contest_id=contest, reason=f"{label} has no candidacy left")
         print(counts)
         return cs.write()
