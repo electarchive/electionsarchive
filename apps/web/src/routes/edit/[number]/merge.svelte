@@ -295,6 +295,10 @@
     }
   }
 
+  const picked = $derived(
+    assessed.find((entry) => entry.pair.key === selected)?.duplicate?.id,
+  );
+
   function pickEntity(id: string) {
     const item = assessed.find((entry) => entry.duplicate?.id === id);
     if (item != null) {
@@ -609,7 +613,10 @@
             <li>
               <button
                 type="button"
-                class="grid gap-0.5 border-be py-1.5 ps-3 text-start inline-full hover:bg-muted"
+                class={cn(
+                  "grid gap-0.5 border-be py-1.5 ps-3 text-start inline-full hover:bg-muted",
+                  { "bg-muted": merge.id === picked },
+                )}
                 onclick={() => pickEntity(merge.id)}
               >
                 <span class="truncate font-semibold"

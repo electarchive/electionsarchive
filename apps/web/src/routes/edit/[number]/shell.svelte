@@ -11,6 +11,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { Session } from "./session.svelte.js";
+  import Divider from "./divider.svelte";
 
   let {
     session,
@@ -60,6 +61,10 @@
   );
 
   const check = $derived(session.check);
+
+  let columns = $state<HTMLDivElement>();
+  let outlineWidth = $state(240);
+  let inspectorWidth = $state(352);
 
   const clock = (value: string) =>
     new Intl.DateTimeFormat(getLocale(), { timeStyle: "short" }).format(
@@ -131,7 +136,10 @@
   </header>
 
   <div
-    class="grid grid-cols-1 overflow-y-auto min-block-0 lg:grid-cols-[15rem_minmax(0,1fr)_22rem] lg:overflow-hidden"
+    bind:this={columns}
+    class="relative grid grid-cols-1 overflow-y-auto min-block-0 lg:grid-cols-[var(--outline)_minmax(0,1fr)_var(--inspector)] lg:overflow-hidden"
+    style:--outline="{outlineWidth}px"
+    style:--inspector="{inspectorWidth}px"
   >
     <nav
       class="border-be lg:overflow-y-auto lg:border-e lg:border-be-0 max-lg:hidden"
@@ -142,11 +150,40 @@
       </h2>
       {@render outline()}
     </nav>
+    <Divider
+      bind:value={outlineWidth}
+      min={176}
+      max={400}
+      step={16}
+      storage="ea:ws-outline"
+      label={m.ws_outline_resize()}
+      measure={(x) => {
+        const rect = columns?.getBoundingClientRect();
+        return rect == null ? null : x - rect.left;
+      }}
+      class="absolute inset-y-0 z-10 -translate-x-1/2 inline-2 max-lg:hidden"
+      style="inset-inline-start: var(--outline)"
+    />
 
     <main class="lg:overflow-y-auto lg:min-block-0">
       {@render editor()}
     </main>
 
+    <Divider
+      bind:value={inspectorWidth}
+      min={256}
+      max={560}
+      step={16}
+      reverse
+      storage="ea:ws-inspector"
+      label={m.ws_inspector_resize()}
+      measure={(x) => {
+        const rect = columns?.getBoundingClientRect();
+        return rect == null ? null : rect.right - x;
+      }}
+      class="absolute inset-y-0 z-10 translate-x-1/2 inline-2 max-lg:hidden"
+      style="inset-inline-end: var(--inspector)"
+    />
     <aside
       class="grid grid-rows-[auto_minmax(0,1fr)] border-bs lg:border-s lg:border-bs-0 lg:min-block-0"
       aria-label={m.ws_inspector()}

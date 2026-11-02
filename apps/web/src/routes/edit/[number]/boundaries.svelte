@@ -978,7 +978,11 @@
           {#each changed as row (`${row.key.area_id}|${row.key.valid_from}`)}
             {const named = $derived(labels.get(row.key.area_id ?? ""))}
             {const area = $derived(row.fields.area_km2)}
-            <tr class="border-be">
+            <tr
+              class={cn("border-be", {
+                "bg-muted": focus != null && focus === named?.code,
+              })}
+            >
               <td class="py-1.5 pe-2">
                 <button
                   type="button"

@@ -38,6 +38,7 @@
   import { cn } from "#lib/utils.js";
   import { templateTitle } from "#lib/workspace.js";
   import type { PageData } from "./$types";
+  import Divider from "./divider.svelte";
   import Scan from "./scan.svelte";
   import { Session } from "./session.svelte.js";
   import Shell from "./shell.svelte";
@@ -124,7 +125,6 @@
   let showScan = $state(true);
   let split = $state(46);
   let body = $state<HTMLDivElement | null>(null);
-  let dragging = $state(false);
   let pasted = $state<{
     contest: number;
     rows: number;
@@ -899,17 +899,6 @@
       cell = null;
     }
   }
-
-  function resize(event: PointerEvent) {
-    if (!dragging || body == null) {
-      return;
-    }
-    const box = body.getBoundingClientRect();
-    split = Math.min(
-      72,
-      Math.max(24, ((event.clientX - box.left) / box.width) * 100),
-    );
-  }
 </script>
 
 <Shell
@@ -1124,7 +1113,6 @@
           bind:this={body}
           class={cn("grid min-block-0", {
             "xl:grid-cols-[var(--scan)_0.5rem_minmax(0,1fr)]": showScan,
-            "select-none": dragging,
           })}
           style:--scan="{split}%"
         >
@@ -1171,32 +1159,19 @@
             {/if}
           </section>
           {#if showScan}
-            <button
-              type="button"
-              class="group grid cursor-col-resize touch-none place-items-center max-xl:hidden"
-              aria-label={m.ws_scan_resize()}
-              onpointerdown={(event) => {
-                event.currentTarget.setPointerCapture(event.pointerId);
-                dragging = true;
+            <Divider
+              bind:value={split}
+              min={24}
+              max={72}
+              step={2}
+              storage="ea:ws-scan"
+              label={m.ws_scan_resize()}
+              measure={(x) => {
+                const box = body?.getBoundingClientRect();
+                return box == null ? null : ((x - box.left) / box.width) * 100;
               }}
-              onpointermove={resize}
-              onpointerup={() => (dragging = false)}
-              onpointercancel={() => (dragging = false)}
-              onkeydown={(event) => {
-                if (event.key === "ArrowLeft") {
-                  split = Math.max(24, split - 2);
-                } else if (event.key === "ArrowRight") {
-                  split = Math.min(72, split + 2);
-                }
-              }}
-            >
-              <span
-                class={cn(
-                  "bg-border block-full inline-px group-hover:bg-foreground group-focus-visible:bg-foreground",
-                  { "bg-foreground": dragging },
-                )}
-              ></span>
-            </button>
+              class="max-xl:hidden"
+            />
           {/if}
 
           <section

@@ -249,6 +249,13 @@ class Payload(TypedDict, total=False):
     evidence: dict[str, Evidence]
 
 
+def _named(conn: Connection, entity: UUID) -> str:
+    found = conn.execute(
+        "select text from name where entity_id = %s order by is_preferred desc, id limit 1", [entity]
+    ).fetchone()
+    return str(entity) if found is None else f"{found[0]} ({entity})"
+
+
 def _uuid(value: object, where: str) -> UUID:
     if not isinstance(value, str):
         raise TypeError(f"{where}: expected an id, got {value!r}")
@@ -1294,9 +1301,9 @@ def _typed(conn: Connection, cs: Changeset, value: object, where: str, kind: str
     if row is None:
         raise ValueError(f"{where}: entity {entity} does not exist")
     if row[1] or entity in cs.retired:
-        raise ValueError(f"{where}: entity {entity} was merged or retired")
+        raise ValueError(f"{where}: {_named(conn, entity)} was merged or retired")
     if row[0] != kind:
-        raise ValueError(f"{where}: {entity} is a {row[0]}, not a {kind}")
+        raise ValueError(f"{where}: {_named(conn, entity)} is a {row[0]}, not a {kind}")
     return entity
 
 
@@ -1914,7 +1921,7 @@ def compile(
             if id == into:
                 raise ValueError(f"{where}: a record cannot merge into itself")
             if id in merging:
-                raise ValueError(f"{where}: {id} is merged twice")
+                raise ValueError(f"{where}: {_named(conn, id)} is merged twice")
             types: dict[UUID, str] = {}
             for entity, field in ((id, "id"), (into, "into")):
                 row = conn.execute(
@@ -1926,14 +1933,14 @@ def compile(
                 if row is None:
                     raise ValueError(f"{where}.{field}: entity {entity} does not exist")
                 if row[1] or entity in cs.retired:
-                    raise ValueError(f"{where}.{field}: entity {entity} is retired")
+                    raise ValueError(f"{where}.{field}: {_named(conn, entity)} is retired")
                 if row[2]:
-                    raise ValueError(f"{where}.{field}: entity {entity} is already merged")
+                    raise ValueError(f"{where}.{field}: {_named(conn, entity)} is already merged")
                 types[entity] = row[0]
             if types[id] != types[into]:
                 raise ValueError(f"{where}: a {types[id]} cannot merge into a {types[into]}")
             if cs.survivors.get(into, into) == id:
-                raise ValueError(f"{where}: {into} already merges into {id}")
+                raise ValueError(f"{where}: {_named(conn, into)} already merges into {_named(conn, id)}")
             merging.add(id)
             cs.merge(id, into)
             for key in cited:
@@ -2055,7 +2062,7 @@ def compile(
         entity = _uuid(str(row["entity_id"]), f"{where}.entity_id")
         entity = cs.survivors.get(entity, entity)
         if entity in cs.retired:
-            raise ValueError(f"{where}: entity {entity} is retired")
+            raise ValueError(f"{where}: {_named(conn, entity)} is retired")
         if conn.execute("select from entity where id = %s", [entity]).fetchone() is None:
             raise ValueError(f"{where}: entity {entity} does not exist")
         row["entity_id"] = entity
@@ -2675,6 +2682,18 @@ def _discard(conn: Connection, changeset_id: str) -> None:
         folder.rename(DATA / "retired" / "changesets" / changeset_id)
 
 
+def _idle() -> None:
+    with connect() as conn:
+        for (changeset_id,) in conn.execute(
+            """select c.id::text from changeset c
+               where c.author_kind in ('user', 'agent') and c.status in ('draft', 'pending_review')
+                 and c.created_at < now() - interval '24 hours'
+                 and not exists (select from proposal p where p.head_changeset_id = c.id)
+                 and to_regnamespace('cs_' || replace(c.id::text, '-', '')) is not null"""
+        ).fetchall():
+            _discard(conn, changeset_id)
+
+
 def _prepared(conn: Connection, proposal: UUID, payload: object) -> tuple[str, int, dict[str, object], object] | None:
     fold = _fold(conn, cast(Payload, payload))
     undefaulted = False
@@ -3018,6 +3037,7 @@ def serve() -> None:
         resume(listener)
         while True:
             sweep()
+            _idle()
             _folds()
             while work() or process():
                 pass

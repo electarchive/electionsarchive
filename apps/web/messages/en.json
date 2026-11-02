@@ -3680,6 +3680,8 @@
   "ws_scan_fit": "Fit to width",
   "ws_scan_zoom": "Zoom {percent}",
   "ws_scan_resize": "Resize the scan and the grid",
+  "ws_outline_resize": "Resize the outline",
+  "ws_inspector_resize": "Resize the inspector",
   "ws_scan_hide": "Hide scan",
   "ws_scan_show": "Show scan",
   "ws_evidence_scan": "Scan: {filename}",

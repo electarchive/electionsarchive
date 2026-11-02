@@ -44,6 +44,7 @@
 
   const proposal = $derived(data.proposal);
   const head = $derived(proposal.revisions.at(0));
+  const several = $derived(new Set(head?.diff?.entities).size > 1);
   const job = $derived(proposal.jobs.at(0));
   const pending = $derived(
     job?.status === "queued" || job?.status === "running",
@@ -502,12 +503,19 @@
     <ul class="mbs-2 grid border-bs text-sm">
       {#each rows as row, i (i)}
         {const anchor = $derived(rowAnchor(row))}
+        {const record = $derived(
+          row.entity_id != null && (several || row.table === "external_id")
+            ? proposal.records[row.entity_id]
+            : null,
+        )}
         <li
           id={anchorId(anchor)}
           class="group grid scroll-mbs-24 grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
         >
           <span class="text-muted-foreground"
-            >{tables[row.table]?.() ?? row.table}{#if row.op === "drop"}<span
+            >{tables[row.table]?.() ?? row.table}{#if record != null}<span
+                class="block text-xs text-pretty text-foreground">{record}</span
+              >{/if}{#if row.op === "drop"}<span
                 class="block text-xs font-semibold text-foreground"
                 >{m.proposal_removed()}</span
               >{/if}{#if row.table === "party_color" && row.op !== "add"}<span

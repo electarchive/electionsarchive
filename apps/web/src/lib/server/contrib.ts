@@ -19,6 +19,7 @@ import {
   schemes,
 } from "#lib/contrib.js";
 import { authDb, db } from "#lib/server/db/index.js";
+import { names } from "#lib/server/rpc/archive.js";
 import { submittable } from "#lib/server/standing.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
@@ -863,7 +864,24 @@ export async function proposal(number: number) {
       limit 20
     `),
   ]);
-  return { ...found, revisions: revisions.rows, jobs: jobs.rows };
+  const touched = new Set<string>();
+  for (const revision of revisions.rows) {
+    for (const row of revision.diff?.rows ?? []) {
+      if (row.entity_id != null) {
+        touched.add(row.entity_id);
+      }
+    }
+  }
+  const { full } =
+    touched.size > 0
+      ? await names([...touched])
+      : { full: new Map<string, string>() };
+  return {
+    ...found,
+    revisions: revisions.rows,
+    jobs: jobs.rows,
+    records: Object.fromEntries(full),
+  };
 }
 
 export const changeCount = (revision: SQL) => sql`
