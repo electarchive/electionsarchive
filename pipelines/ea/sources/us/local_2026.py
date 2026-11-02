@@ -8148,7 +8148,12 @@ def parse() -> None:
         .filter(pl.col("Contest").is_not_null())
         .group_by("County", "Contest")
     ):
-        if group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))["Party"].is_duplicated().any():
+        if (
+            str(contest) not in schools
+            and group.filter(pl.col("Party").is_in(["REPUBLICAN PARTY", "DEMOCRATIC PARTY"]))["Party"]
+            .is_duplicated()
+            .any()
+        ):
             if not str(contest).startswith("City of") or str(county) not in ballot_text:
                 continue
             printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
@@ -8170,7 +8175,7 @@ def parse() -> None:
         for row in group.iter_rows(named=True):
             suffix = str(row["Suffix"] or "").strip()
             nickname = suffix if suffix.startswith('"') else ""
-            named, independent = party(row["Party"])
+            named, independent = (None, False) if str(contest) in schools else party(row["Party"])
             feeds["KY"].append(
                 {
                     "county": place,
