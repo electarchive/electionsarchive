@@ -1,11 +1,11 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
-  import { page } from "$app/state";
   import type { Anchor, CommentView, DiffRow } from "#lib/contrib.js";
   import BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import CommentItem from "#lib/components/contrib/comment-item.svelte";
+  import Discussion from "#lib/components/contrib/discussion.svelte";
   import Proof from "#lib/components/contrib/proof.svelte";
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -29,6 +29,7 @@
     schemeLabel,
     schemes,
     stateLabel,
+    threaded,
     tierLabel,
     verdictLabel,
   } from "#lib/contrib.js";
@@ -275,24 +276,11 @@
   let reason = $state("");
   let busy = $state(false);
 
-  const roots = $derived(
-    data.comments.filter((comment) => comment.parent_id == null),
-  );
-  const replies = $derived.by(() => {
-    const found = new Map<string, Array<CommentView>>();
-    for (const comment of data.comments) {
-      if (comment.parent_id != null) {
-        found.set(comment.parent_id, [
-          ...(found.get(comment.parent_id) ?? []),
-          comment,
-        ]);
-      }
-    }
-    return found;
-  });
+  const thread = $derived(threaded(data.comments));
+  const replies = $derived(thread.replies);
   const pinned = $derived.by(() => {
     const found = new Map<string, Array<CommentView>>();
-    for (const comment of roots) {
+    for (const comment of thread.roots) {
       if (comment.anchor != null) {
         const key = anchorId(comment.anchor);
         found.set(key, [...(found.get(key) ?? []), comment]);
@@ -890,53 +878,14 @@
   {/if}
 
   {#if proposal.state !== "draft"}
-    <section class="mbs-10" aria-labelledby="discussion">
-      <div class="flex items-baseline justify-between gap-4">
-        <h2 id="discussion" class="heading">{m.discussion_heading()}</h2>
-        {#if data.comments.length > 0}
-          <span class="font-figures text-xs text-muted-foreground"
-            >{m.discussion_count({ count: data.comments.length })}</span
-          >
-        {/if}
-      </div>
-      {#if roots.length === 0}
-        <p
-          class="mbs-2 border-bs pbs-3 text-sm text-pretty text-muted-foreground"
-        >
-          {m.discussion_empty()}
-        </p>
-      {:else}
-        <ol class="mbs-2 grid border-bs">
-          {#each roots as comment (comment.id)}
-            <li class="border-be py-4">
-              <CommentItem
-                {comment}
-                replies={replies.get(comment.id) ?? []}
-                head={head?.n ?? null}
-                canReply={canComment}
-                canModerate={data.canModerate}
-                canAccept={data.canAccept}
-              />
-            </li>
-          {/each}
-        </ol>
-      {/if}
-      <div class="mbs-4">
-        {#if canComment}
-          <CommentComposer action="?/comment" />
-        {:else if data.commenter === "signed_out"}
-          <p class="text-sm">
-            <a
-              class="underline underline-offset-2"
-              href="/sign-in?next={encodeURIComponent(page.url.pathname)}"
-              >{m.discussion_sign_in()}</a
-            >
-          </p>
-        {:else if data.commenter === "unverified"}
-          <p class="text-sm text-muted-foreground">{m.discussion_verify()}</p>
-        {/if}
-      </div>
-    </section>
+    <Discussion
+      comments={data.comments}
+      head={head?.n ?? null}
+      commenter={data.commenter}
+      {canComment}
+      canModerate={data.canModerate}
+      canAccept={data.canAccept}
+    />
   {/if}
 
   {#if data.canDecide && !pending}

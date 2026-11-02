@@ -2,6 +2,7 @@ import { call } from "@orpc/server";
 import { redirect } from "@sveltejs/kit";
 import { person } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
+import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -10,5 +11,5 @@ export const load: PageServerLoad = async ({ params }) => {
   if (path != null && path !== `people/${params.slug}`) {
     redirect(301, `/${path}`);
   }
-  return page;
+  return { ...page, talk: await talkLink(page.id) };
 };

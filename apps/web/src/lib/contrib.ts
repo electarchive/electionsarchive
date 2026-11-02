@@ -722,3 +722,37 @@ export type CommentView = {
   accepted_revision: number | null;
   mine: boolean;
 };
+
+export function threaded(comments: Array<CommentView>) {
+  const roots: Array<CommentView> = [];
+  const replies = new Map<string, Array<CommentView>>();
+  for (const comment of comments) {
+    if (comment.parent_id == null) {
+      roots.push(comment);
+    } else {
+      replies.set(comment.parent_id, [
+        ...(replies.get(comment.parent_id) ?? []),
+        comment,
+      ]);
+    }
+  }
+  return { roots, replies };
+}
+
+export type TopicView = {
+  id: string;
+  title: string;
+  status: "open" | "resolved";
+  author: string | null;
+  handle: string | null;
+  created_at: string;
+  updated_at: string;
+  comments: number;
+};
+
+export type TalkProposal = {
+  number: number;
+  title: string;
+  state: ProposalState;
+  updated_at: string;
+};

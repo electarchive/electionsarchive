@@ -19,12 +19,13 @@ import { live } from "#lib/server/rpc/live.js";
 import { maps } from "#lib/server/rpc/maps.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
+import { talk } from "#lib/server/rpc/talk.js";
 import { uploads } from "#lib/server/rpc/uploads.js";
 
 export const READ_ONLY_MESSAGE =
   "This preview of electionsarchive.com is read-only, so it doesn't accept changes yet.";
 
-export const contributions = { admin, agents, proposals, uploads };
+export const contributions = { admin, agents, proposals, talk, uploads };
 
 export const reads = {
   bodies,
@@ -58,6 +59,7 @@ export const served = READ_ONLY
       admin: closed.router(admin),
       agents: closed.router(agents),
       proposals: closed.router(proposals),
+      talk: closed.router(talk),
       uploads: closed.router(uploads),
     }
   : router;

@@ -6,6 +6,7 @@
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { SvelteSet } from "svelte/reactivity";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
+  import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Logo from "#lib/components/logo.svelte";
   import Name from "#lib/components/name.svelte";
   import ShareImage from "#lib/components/share-image.svelte";
@@ -182,6 +183,7 @@
             />{m.versus_action()}</a
           >
           {#if !READ_ONLY}
+            <TalkLink talk={data.talk} />
             <EditPanel
               entity={data.id}
               label={party.name}

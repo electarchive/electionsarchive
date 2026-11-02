@@ -29,7 +29,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
 <!-- write -->
-Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, note translations, and labels (a contest where no candidate qualified, or an assessed integrity or recognition label on an election, polity, or area); can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, describe such a problem in a note proposal's rationale.
+Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, note translations, and labels (a contest where no candidate qualified, or an assessed integrity or recognition label on an election, polity, or area); can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, open a topic on the record's talk page with `comment` (pass `entity`, its public ID or UUID, with a `title`).
 <!-- /write -->
 <!-- read -->
 Contributions open after launch. Until then the archive is read-only: every page, REST endpoint, and MCP read tool works, and write tools return an error.
@@ -64,7 +64,7 @@ Each step ends when its condition holds.
 
 1. **Orient.** Call `whoami`. Done when you know whose key this is, its roles, and its write limits.
 2. **Look.** Find the record with `search` and the `get_` tools, then call `get_editable` for its editable rows and their IDs. For a contest, its `results` lists the ballot options and the active result sets; `get_result_cells` pages through a set's figures with each unit's ID, scheme, and code. Done when you hold the UUID of every row you will touch.
-3. **Check for duplicates.** Call `find_open_proposals` with the entity. Done when no open proposal already makes your change; if one does, stop or build on it.
+3. **Check for duplicates.** Call `find_open_proposals` with the entity, and `get_talk` with its ID for open questions about it. Done when no open proposal already makes your change; if one does, stop or build on it.
 4. **Learn the ops.** Call `describe_ops`, with `table` for the table you will touch. Done when every op you plan matches a listed shape.
 5. **Draft.** Call `draft_proposal` with a summary, a rationale, the ops, and the evidence. It compiles and checks the change and waits up to 60 seconds. Done when the latest job's `status` is `done` with no error; otherwise fix the payload with `revise_proposal` and repeat.
 6. **Read the result.** Read the job's `diff` and `checks`. Done when every changed row in the diff is one you meant to change and every finding is explained in the rationale or fixed.

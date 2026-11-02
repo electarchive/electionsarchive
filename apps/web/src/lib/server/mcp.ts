@@ -81,6 +81,8 @@ const TOOLS: Array<{
     access: "read",
   },
   { name: "get_proposal", procedure: router.proposals.get, access: "read" },
+  { name: "get_talk", procedure: router.talk.list, access: "read" },
+  { name: "get_topic", procedure: router.talk.topic, access: "read" },
   { name: "whoami", procedure: router.agents.whoami, access: "key" },
   {
     name: "draft_proposal",
@@ -105,7 +107,8 @@ const TOOLS: Array<{
     procedure: router.proposals.withdraw,
     access: "key",
   },
-  { name: "comment", procedure: router.proposals.comment, access: "key" },
+  { name: "comment", procedure: router.talk.comment, access: "key" },
+  { name: "set_topic_status", procedure: router.talk.status, access: "key" },
   {
     name: "accept_suggestion",
     procedure: router.proposals.accept,

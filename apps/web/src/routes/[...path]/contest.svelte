@@ -6,6 +6,7 @@
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
+  import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
@@ -63,6 +64,7 @@
 
   const {
     id,
+    talk,
     unit: path,
     contest,
     lists,
@@ -81,6 +83,7 @@
     sameDay,
   }: {
     id: string;
+    talk: { id: string; open: number } | null;
     unit: string;
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
@@ -1304,12 +1307,12 @@
       <Preview
         class={cn(
           "justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground",
-          { "max-md:pe-20": !READ_ONLY },
+          { "max-md:pe-32": !READ_ONLY },
         )}
         path={contest.path}>{contest.name}</Preview
       >
     {/if}
-    <h1 class={cn("title", { "max-md:pe-20": !READ_ONLY })} data-scope-title>
+    <h1 class={cn("title", { "max-md:pe-32": !READ_ONLY })} data-scope-title>
       {(drilled ? heading : contest.name).replaceAll("\u2014", "\u2060—")}
     </h1>
     <p
@@ -1403,8 +1406,9 @@
   </div>
   {#if !READ_ONLY}
     <div
-      class="col-start-1 row-start-1 self-start justify-self-end md:col-start-2"
+      class="col-start-1 row-start-1 flex gap-2 self-start justify-self-end md:col-start-2"
     >
+      <TalkLink {talk} compact />
       <EditPanel
         entity={id}
         label={contest.name}

@@ -231,6 +231,7 @@
       {const Contest = $derived((await import("./contest.svelte")).default)}
       <Contest
         id={data.id}
+        talk={data.talk}
         unit={data.unit}
         contest={data.contest}
         lists={data.lists}

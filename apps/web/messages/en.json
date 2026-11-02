@@ -3958,6 +3958,43 @@
   "discussion_suggestion_outdated": "Outdated: the proposal has a newer revision.",
   "discussion_field_text": "Text",
   "discussion_field_value": "Value",
+  "talk_action": "Talk",
+  "talk_tab_record": "Record",
+  "talk_tab_talk": "Talk",
+  "talk_tabs": "Record pages",
+  "talk_page_title": "Talk: {name}",
+  "talk_lede": "Ask about this record, flag an error, or share a source. Anyone can read these topics; signed-in contributors can join in.",
+  "talk_open_heading": "Open topics",
+  "talk_resolved_heading": "Resolved topics",
+  "talk_empty": "No topics yet. Open one to ask a question or flag a problem with this record.",
+  "talk_started": "Started by {author} on {date}",
+  "talk_new": "Open a topic",
+  "talk_new_title": "Title",
+  "talk_new_title_placeholder": "What's it about?",
+  "talk_new_body_placeholder": "Explain the question or problem, and link any sources",
+  "talk_new_submit": "Open topic",
+  "talk_sign_in": "Sign in to open a topic.",
+  "talk_proposals_heading": "Proposals about this record",
+  "talk_status_open": "Open",
+  "talk_status_resolved": "Resolved",
+  "talk_resolve": "Mark resolved",
+  "talk_reopen": "Reopen",
+  "talk_back": "All topics on {name}",
+  "talk_updated": "Updated {date}",
+  "talk_link": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Talk, {countText} open topic",
+        "countPlural=*": "Talk, {countText} open topics"
+      }
+    }
+  ],
   "discussion_on": "On {label}",
   "discussion_agent": "with {agent} ({model})",
   "discussion_body_label": "Comment text",

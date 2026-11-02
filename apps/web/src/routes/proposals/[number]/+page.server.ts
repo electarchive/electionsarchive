@@ -2,12 +2,17 @@ import { error, fail, isHttpError } from "@sveltejs/kit";
 import * as v from "valibot";
 import { decide, proposal, roles } from "#lib/server/contrib.js";
 import {
+  attempt,
+  editAction,
+  field,
+  hideAction,
+  Id,
+} from "#lib/server/discussion-actions.js";
+import {
   acceptSuggestion,
   AnchorSchema,
   Body,
   commentOnProposal,
-  editComment,
-  hideComment,
   proposalThread,
   suggestableRows,
   SuggestionSchema,
@@ -131,25 +136,6 @@ const decision =
     return { decided: verb };
   };
 
-const attempt = async (work: () => Promise<unknown>) => {
-  try {
-    await work();
-  } catch (error_) {
-    if (isHttpError(error_)) {
-      return fail(error_.status, { message: error_.body.message });
-    }
-    throw error_;
-  }
-  return null;
-};
-
-const field = (form: FormData, name: string) => {
-  const value = form.get(name);
-  return typeof value === "string" && value !== "" ? value : null;
-};
-
-const Id = v.pipe(v.string(), v.uuid());
-
 export const actions: Actions = {
   comment: async ({ params, locals, request }) => {
     if (locals.user == null) {
@@ -204,48 +190,8 @@ export const actions: Actions = {
       )) ?? { commented: true }
     );
   },
-  edit_comment: async ({ locals, request }) => {
-    if (locals.user == null) {
-      return fail(401, { message: "Sign in to edit." });
-    }
-    const userId = locals.user.id;
-    const form = await request.formData();
-    const id = field(form, "id");
-    const body = v.safeParse(Body, form.get("body") ?? "");
-    if (id == null || !v.is(Id, id)) {
-      return fail(400, { message: "That comment isn't valid." });
-    }
-    if (!body.success) {
-      return fail(400, { message: body.issues[0].message });
-    }
-    return (
-      (await attempt(async () =>
-        editComment({ userId, id, body: body.output }),
-      )) ?? { edited: id }
-    );
-  },
-  hide_comment: async ({ locals, request }) => {
-    if (locals.user == null) {
-      return fail(401, { message: "Sign in to moderate." });
-    }
-    const userId = locals.user.id;
-    const form = await request.formData();
-    const id = field(form, "id");
-    if (id == null || !v.is(Id, id)) {
-      return fail(400, { message: "That comment isn't valid." });
-    }
-    const reason = !form.has("restore")
-      ? String(form.get("reason") ?? "")
-          .normalize("NFC")
-          .trim()
-          .slice(0, 500)
-      : null;
-    return (
-      (await attempt(async () => hideComment({ userId, id, reason }))) ?? {
-        hidden: id,
-      }
-    );
-  },
+  edit_comment: editAction,
+  hide_comment: hideAction,
   accept_suggestion: async ({ params, locals, request }) => {
     if (locals.user == null) {
       return fail(401, { message: "Sign in to accept suggestions." });

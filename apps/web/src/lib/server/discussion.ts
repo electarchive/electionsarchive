@@ -131,7 +131,7 @@ export function suggestableRows(
 
 const limit = createRateLimiter({ prefix: `${PROJECT}:comments` });
 
-async function allowed(userId: string) {
+export async function allowed(userId: string) {
   const { rows } = await db.execute<{ verified: boolean; banned: boolean }>(sql`
     select email_verified as verified,
            coalesce(banned, false) and (ban_expires is null or ban_expires > now()) as banned

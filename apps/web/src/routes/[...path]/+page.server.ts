@@ -1,6 +1,7 @@
 import { call } from "@orpc/server";
 import { archive } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
+import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
 
 async function seed(path: string) {
@@ -27,6 +28,9 @@ async function soon<T>(pending: Promise<T | null>) {
 
 export const load: PageServerLoad = async ({ params, url }) => {
   const data = await archive(params.path, url.searchParams);
+  if (data.kind === "contest") {
+    return { ...data, talk: await talkLink(data.id) };
+  }
   if (data.kind !== "polity") {
     return data;
   }

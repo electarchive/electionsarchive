@@ -21,6 +21,7 @@
     submit = m.discussion_comment(),
     autofocus = false,
     suggestable = null,
+    titled = false,
     onclose,
   }: {
     action: string;
@@ -32,6 +33,7 @@
     submit?: string;
     autofocus?: boolean;
     suggestable?: Record<string, string> | null;
+    titled?: boolean;
     onclose?: () => void;
   } = $props();
 
@@ -45,6 +47,7 @@
   const tabsId = $props.id();
 
   let body = $state(untrack(() => initial));
+  let title = $state("");
   let previewing = $state(false);
   let busy = $state(false);
   let message = $state<string | null>(null);
@@ -92,6 +95,7 @@
       await update({ reset: false });
       if (result.type === "success") {
         body = "";
+        title = "";
         previewing = false;
         suggesting = false;
         onclose?.();
@@ -114,6 +118,19 @@
   {/if}
   {#if id != null}
     <input type="hidden" name="id" value={id} />
+  {/if}
+  {#if titled}
+    <label class="grid gap-1 text-sm font-semibold">
+      {m.talk_new_title()}
+      <Input
+        bind:value={title}
+        name="title"
+        required
+        maxlength={200}
+        placeholder={m.talk_new_title_placeholder()}
+        class="font-normal"
+      />
+    </label>
   {/if}
   <Tabs
     id={tabsId}
@@ -229,7 +246,10 @@
           >{m.discussion_cancel()}</Button
         >
       {/if}
-      <Button type="submit" size="sm" disabled={busy || body.trim() === ""}
+      <Button
+        type="submit"
+        size="sm"
+        disabled={busy || body.trim() === "" || (titled && title.trim() === "")}
         >{submit}</Button
       >
     </div>
