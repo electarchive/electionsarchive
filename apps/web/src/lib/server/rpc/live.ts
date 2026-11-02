@@ -495,6 +495,10 @@ const done = new Map<
   string,
   { key: string; value: Awaited<ReturnType<typeof night>> }
 >();
+const held = new Map<
+  string,
+  { key: string; value: Awaited<ReturnType<typeof night>> }
+>();
 const pending = new Map<
   string,
   { key: string; value: Promise<Awaited<ReturnType<typeof night>>> }
@@ -1301,9 +1305,11 @@ export const live = {
         `),
         switches(),
       ]);
-      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${input.path}`;
+      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${found.path}|${found.rest}`;
       const key = shown.results ? (stamp.rows[0]?.key ?? "") : "";
-      const ready = done.get(slot);
+      const kept =
+        found.rest === "" && found.path.split("/").length <= 3 ? held : done;
+      const ready = kept.get(slot);
       if (ready?.key === key) {
         return ready.value;
       }
@@ -1323,9 +1329,9 @@ export const live = {
         pending.set(slot, running);
         value
           .then((result) => {
-            done.delete(slot);
-            done.set(slot, { key, value: result });
-            if (done.size > 64) {
+            kept.delete(slot);
+            kept.set(slot, { key, value: result });
+            if (kept === done && done.size > 64) {
               done.delete(done.keys().next().value ?? "");
             }
           })
