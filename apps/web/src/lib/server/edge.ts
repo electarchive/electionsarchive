@@ -1,33 +1,11 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { version as build, dev } from "$app/env";
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { cookieName, isLocale } from "#lib/paraglide/runtime.js";
 
 const LOCALE = "x-locale";
 
 const BUILD = "build";
-
-const KEPT = path.resolve("../../data/immutable");
-
-const IMMUTABLE = /^\/_app\/immutable\/((?:[\w-]+\/)*[\w.-]+\.(\w+))$/u;
-
-const TYPES: Record<string, string> = {
-  js: "text/javascript",
-  css: "text/css",
-  json: "application/json",
-  map: "application/json",
-  wasm: "application/wasm",
-  svg: "image/svg+xml",
-  png: "image/png",
-  jpg: "image/jpeg",
-  webp: "image/webp",
-  avif: "image/avif",
-  woff: "font/woff",
-  woff2: "font/woff2",
-  ttf: "font/ttf",
-};
 
 const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
@@ -143,27 +121,4 @@ export function skewed({ isDataRequest, url }: RequestEvent) {
       headers: { "cache-control": "no-store", "x-sveltekit-version": build },
     },
   );
-}
-
-export async function kept({ request, url }: RequestEvent) {
-  const found = IMMUTABLE.exec(url.pathname);
-  if (found == null || !["GET", "HEAD"].includes(request.method)) {
-    return null;
-  }
-  const [, file = "", extension = ""] = found;
-  try {
-    const body = await readFile(path.join(KEPT, file));
-    return new Response(request.method === "HEAD" ? null : body, {
-      headers: {
-        "cache-control": "public, max-age=31536000, immutable",
-        "content-type": TYPES[extension] ?? "application/octet-stream",
-        "content-length": String(body.length),
-      },
-    });
-  } catch {
-    return new Response("Not found", {
-      status: 404,
-      headers: { "cache-control": "no-store" },
-    });
-  }
 }

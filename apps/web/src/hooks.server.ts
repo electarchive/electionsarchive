@@ -7,7 +7,7 @@ import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
 import { refreshing } from "#lib/server/cache.js";
-import { kept, mark, skewed } from "#lib/server/edge.js";
+import { mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
@@ -107,9 +107,6 @@ const twinHandle: Handle = async ({ event, resolve }) => {
   return response;
 };
 
-const keptHandle: Handle = async ({ event, resolve }) =>
-  (await kept(event)) ?? resolve(event);
-
 const edgeHandle: Handle = async ({ event, resolve }) =>
   skewed(event) ?? mark(event, await resolve(event));
 
@@ -142,7 +139,6 @@ export const init: ServerInit = () => {
 };
 
 export const handle: Handle = sequence(
-  keptHandle,
   guardHandle,
   csrfHandle,
   edgeHandle,
