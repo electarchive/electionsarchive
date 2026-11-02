@@ -19,6 +19,7 @@ import {
   schemes,
 } from "#lib/contrib.js";
 import { authDb, db } from "#lib/server/db/index.js";
+import { submittable } from "#lib/server/standing.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
 
@@ -32,8 +33,8 @@ const escalations = (id: SQL) => sql`
       ) then 'findings' end,
       case when ep.prescreen is null or ep.prescreen ->> 'verdict' <> 'clean'
              or (ep.prescreen ->> 'revision')::int is distinct from er.n then 'prescreen' end,
-      case when (select count(*) from proposal q
-                 where q.author_user_id = ep.author_user_id and q.state = 'published') < 3 then 'newcomer' end,
+      case when contributor_level(ep.author_user_id) = 0 then 'newcomer' end,
+      case when account_limited(ep.author_user_id, 'probation') then 'probation' end,
       case when exists (
         select from jsonb_array_elements(er.diff -> 'rows') x
         join entity e on e.id = (x ->> 'entity_id')::uuid and e.type in ('polity', 'party')
@@ -384,6 +385,7 @@ export async function propose({
   quote: string;
   summary: string;
 }) {
+  await submittable(userId, changes.length);
   const hasDates = (change: Change) =>
     change.kind === "image" && (change.from != null || change.to != null);
   const requiresSource = (change: Change) =>
@@ -864,6 +866,16 @@ export async function proposal(number: number) {
   return { ...found, revisions: revisions.rows, jobs: jobs.rows };
 }
 
+export const changeCount = (revision: SQL) => sql`
+  (select count(*) from jsonb_array_elements(${revision}.diff -> 'rows') x
+   where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page')
+      or (x ->> 'table' = 'citation' and (x ->> 'op' = 'drop' or x -> 'fields' -> 'locator' -> 1 ->> 'op' = 'cite')))::int
+`;
+
+export const shown = (proposal: SQL) => sql`
+  not (${proposal}.decided_at is null and coalesce(${proposal}.prescreen ->> 'verdict', '') in ('spam', 'abuse'))
+`;
+
 export async function queue() {
   const { rows } = await db.execute<{
     number: number;
@@ -883,8 +895,7 @@ export async function queue() {
            p.submitted_at::text,
            case when p.state = 'approved' and p.decided_by is not null and r.diff ? 'fold'
                 then case when r.diff -> 'fold' ? 'mismatch' then 'mismatch' else 'awaiting' end end as fold,
-           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page')
-              or (x ->> 'table' = 'citation' and (x ->> 'op' = 'drop' or x -> 'fields' -> 'locator' -> 1 ->> 'op' = 'cite')))::int as changes,
+           ${changeCount(sql`r`)} as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings,
            case when (p.prescreen ->> 'revision')::int = r.n then p.prescreen ->> 'verdict' end as prescreen,
            case when (p.prereview ->> 'revision')::int = r.n then p.prereview ->> 'recommendation' end as recommendation,
@@ -968,6 +979,9 @@ export async function decide({
         ? "A rejection needs a reason."
         : "A request for changes needs a reason.",
     );
+  }
+  if (!allowed.admin && found.escalations.includes("probation")) {
+    error(409, "This proposal needs an admin: probation.");
   }
   if (verb === "approve" && !allowed.admin && found.escalations.length > 0) {
     error(

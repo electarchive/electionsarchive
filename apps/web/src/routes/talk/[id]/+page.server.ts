@@ -2,6 +2,7 @@ import { error, fail, isHttpError, redirect } from "@sveltejs/kit";
 import * as v from "valibot";
 import { commenterOf } from "#lib/server/discussion-actions.js";
 import { Body } from "#lib/server/discussion.js";
+import { watching } from "#lib/server/feeds.js";
 import {
   PublicId,
   startTopic,
@@ -25,10 +26,15 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   if (entity.public_id !== params.id) {
     redirect(301, `/talk/${entity.public_id}`);
   }
+  const kind = entity.type === "polity" ? "polity" : "entity";
   return {
     entity,
     ...(await topics(entity.id)),
     commenter: commenterOf(locals.user),
+    watch:
+      locals.user == null
+        ? null
+        : { kind, watching: await watching(locals.user.id, kind, entity.id) },
   };
 };
 

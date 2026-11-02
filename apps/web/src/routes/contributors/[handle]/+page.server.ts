@@ -1,5 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import { contributor, HANDLE } from "#lib/server/contributors.js";
+import { watching } from "#lib/server/feeds.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
@@ -12,5 +13,16 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
   }
   setHeaders({ "cache-control": "no-store" });
   const { userId, ...found } = await contributor(handle);
-  return { ...found, mine: locals.user?.id === userId };
+  const mine = locals.user?.id === userId;
+  return {
+    ...found,
+    mine,
+    watch:
+      locals.user == null || mine
+        ? null
+        : {
+            id: userId,
+            watching: await watching(locals.user.id, "user", userId),
+          },
+  };
 };

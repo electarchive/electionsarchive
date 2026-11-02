@@ -15,6 +15,7 @@ import {
 import { contributors } from "#lib/server/rpc/contributors.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
 import { admin } from "#lib/server/rpc/desk.js";
+import { recentChanges, watches } from "#lib/server/rpc/feeds.js";
 import { indices } from "#lib/server/rpc/indices.js";
 import { live } from "#lib/server/rpc/live.js";
 import { maps } from "#lib/server/rpc/maps.js";
@@ -33,6 +34,7 @@ export const contributions = {
   proposals,
   talk,
   uploads,
+  watches,
 };
 
 export const reads = {
@@ -47,6 +49,7 @@ export const reads = {
   parties,
   people,
   polities,
+  recentChanges,
   search,
   seats,
 };
@@ -70,5 +73,6 @@ export const served = READ_ONLY
       proposals: closed.router(proposals),
       talk: closed.router(talk),
       uploads: closed.router(uploads),
+      watches: closed.router(watches),
     }
   : router;

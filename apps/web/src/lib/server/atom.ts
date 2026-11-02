@@ -15,6 +15,13 @@ const escape = (value: string) =>
 
 const instant = (value: string) => new Date(value).toISOString();
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
+
+const identify = (origin: string, id: string) =>
+  UUID.test(id)
+    ? `urn:uuid:${id}`
+    : `tag:${new URL(origin).hostname},2026:${id}`;
+
 export function atom({
   origin,
   self,
@@ -46,7 +53,7 @@ export function atom({
     ...entries.map((entry) =>
       [
         "<entry>",
-        `<id>urn:uuid:${entry.id}</id>`,
+        `<id>${escape(identify(origin, entry.id))}</id>`,
         `<title>${escape(entry.title)}</title>`,
         `<updated>${instant(entry.updated)}</updated>`,
         entry.path == null

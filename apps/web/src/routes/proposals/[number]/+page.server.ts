@@ -18,6 +18,7 @@ import {
   SuggestionSchema,
   threadComments,
 } from "#lib/server/discussion.js";
+import { watching } from "#lib/server/feeds.js";
 import type { Action, Actions, PageServerLoad } from "./$types";
 
 const parse = (value: string) => {
@@ -34,6 +35,9 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     proposal(parse(params.number)),
     roles(locals.user?.id),
   ]);
+  const isWatching =
+    found.submitted_at != null &&
+    (await watching(locals.user?.id, "proposal", found.id));
   const viewer = locals.user?.id;
   const comments = await threadComments(
     await proposalThread(found.id),
@@ -106,6 +110,10 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     canDecide: found.state === "open" && isReviewer,
     canReject: allowed.admin || found.tier === 1,
     canApprove: allowed.admin || (found.tier === 1 && escalations.length === 0),
+    watch:
+      found.submitted_at == null
+        ? null
+        : { id: found.id, watching: isWatching },
   };
 };
 

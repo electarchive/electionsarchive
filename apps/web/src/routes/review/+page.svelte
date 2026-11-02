@@ -11,6 +11,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Tabs from "./tabs.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -27,8 +28,9 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto px-4 pbs-6 pbe-24 max-inline-5xl max-sm:px-3">
+<main class="mx-auto px-4 pbs-6 pbe-24 max-inline-5xl max-sm:px-3">
   <h1 class="title">{m.review_title()}</h1>
+  <Tabs current="queue" />
   {#if !data.allowed}
     <p class="mbs-4 text-sm text-muted-foreground">{m.review_forbidden()}</p>
   {:else if data.proposals.length === 0}
@@ -181,4 +183,4 @@
       </table>
     </div>
   {/if}
-</div>
+</main>

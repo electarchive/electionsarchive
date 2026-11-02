@@ -1,9 +1,7 @@
-import type { SQL } from "drizzle-orm";
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { ProposalState } from "#lib/contrib.js";
-import type { Entry } from "#lib/server/atom.js";
 import { db } from "#lib/server/db/index.js";
 
 export const HANDLE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/u;
@@ -63,9 +61,15 @@ export async function contributor(handle: string) {
     bio_md: string | null;
     links: Array<ContributorLink>;
     member_since: string;
+    level: number;
+    limited: boolean;
   }>(sql`
     select p.user_id, p.handle, p.display_name, p.affiliation, p.bio_md, p.links,
-           (u.created_at at time zone 'UTC')::date::text as member_since
+           (u.created_at at time zone 'UTC')::date::text as member_since,
+           contributor_level(p.user_id)::int as level,
+           (coalesce(u.banned, false) and (u.ban_expires is null or u.ban_expires > now()))
+             or exists (select from account_limit l where l.user_id = p.user_id and l.lifted_at is null
+                        and (l.expires_at is null or l.expires_at > now())) as limited
     from profile p join users u on u.id = p.user_id
     where p.handle = ${handle}
   `);
@@ -113,26 +117,4 @@ export async function contributor(handle: string) {
     proposals: proposals.rows,
     agents: agents.rows,
   };
-}
-
-export async function activityEntries(where: SQL, limit = 50) {
-  const { rows } = await db.execute<Entry>(sql`
-    select a.id, a.summary as title, a.at::text as updated,
-           coalesce(f.display_name, f.handle) as author,
-           case
-             when p.number is not null
-               then '/proposals/' || p.number || coalesce('#comment-' || a.comment_id, '')
-             when t.kind = 'talk'
-               then '/talk/' || ea_public_id(e.type, e.id) || '/' || t.id || coalesce('#comment-' || a.comment_id, '')
-           end as path
-    from activity a
-    left join proposal p on p.id = a.proposal_id
-    left join thread t on t.id = a.thread_id
-    left join entity e on e.id = t.entity_id
-    left join profile f on f.user_id = a.actor_user_id
-    where (a.proposal_id is null or p.submitted_at is not null) and (${where})
-    order by a.at desc
-    limit ${limit}
-  `);
-  return rows;
 }

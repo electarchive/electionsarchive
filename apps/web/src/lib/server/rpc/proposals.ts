@@ -4,6 +4,8 @@ import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
+import { PROPOSAL_STATES } from "#lib/contrib.js";
+import { shown } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import {
   acceptSuggestion,
@@ -15,6 +17,7 @@ import {
   threadComments,
 } from "#lib/server/discussion.js";
 import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
+import { submittable } from "#lib/server/standing.js";
 
 const Uuid = v.pipe(v.string(), v.uuid());
 
@@ -266,6 +269,10 @@ export async function submitDraft(number: number, owner: Owner) {
   if (found.busy) {
     error(409, "A job on this proposal is still running.");
   }
+  const { rows } = await db.execute<{ ops: number }>(sql`
+    select coalesce(jsonb_array_length(draft -> 'ops'), 0) as ops from proposal where id = ${found.id}
+  `);
+  await submittable(owner.userId, rows[0]?.ops ?? 0);
   await db.execute(sql`
     insert into proposal_revision (proposal_id, n, payload)
     select id, 1, draft from proposal where id = ${found.id}
@@ -277,18 +284,7 @@ export async function submitDraft(number: number, owner: Owner) {
 const Filters = v.object({
   entity: v.optional(Uuid),
   polity: v.optional(Uuid),
-  state: v.optional(
-    v.picklist([
-      "draft",
-      "open",
-      "changes_requested",
-      "approved",
-      "published",
-      "rejected",
-      "withdrawn",
-      "reverted",
-    ]),
-  ),
+  state: v.optional(v.picklist(PROPOSAL_STATES)),
   mine: v.optional(v.picklist(["true", "false"])),
 });
 
@@ -324,7 +320,7 @@ export const proposals = {
         from proposal p
         left join users a on a.id = p.author_user_id
         left join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
-        where (p.submitted_at is not null or p.author_user_id = ${ownerId}::uuid)
+        where (p.author_user_id = ${ownerId}::uuid or (p.submitted_at is not null and ${shown(sql`p`)}))
           and (${input.entity ?? null}::text is null or r.diff -> 'entities' ? ${input.entity ?? null}::text)
           and (${input.polity ?? null}::uuid is null or p.polity_id = ${input.polity ?? null}::uuid)
           and (${input.state ?? null}::text is null or p.state::text = ${input.state ?? null}::text)
@@ -439,6 +435,7 @@ export const proposals = {
             `A ${found.state} proposal can't be revised; open a new proposal instead.`,
           );
         }
+        await submittable(owner.userId, input.ops.length, { counted: false });
         const n = (found.head ?? 0) + 1;
         await db.execute(sql`
           with revision as (

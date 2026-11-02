@@ -2,15 +2,18 @@ import type { Box } from "#lib/map/engine.svelte.js";
 import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 
-export type ProposalState =
-  | "draft"
-  | "open"
-  | "changes_requested"
-  | "approved"
-  | "published"
-  | "rejected"
-  | "withdrawn"
-  | "reverted";
+export const PROPOSAL_STATES = [
+  "draft",
+  "open",
+  "changes_requested",
+  "approved",
+  "published",
+  "rejected",
+  "withdrawn",
+  "reverted",
+] as const;
+
+export type ProposalState = (typeof PROPOSAL_STATES)[number];
 
 export const nameKinds = [
   "official",
@@ -312,6 +315,7 @@ export const ESCALATIONS = [
   "findings",
   "prescreen",
   "newcomer",
+  "probation",
   "preferred_name",
   "large",
   "conflict",
@@ -357,6 +361,7 @@ export const escalationLabel: Record<Escalation, () => string> = {
   findings: m.escalation_findings,
   prescreen: m.escalation_prescreen,
   newcomer: m.escalation_newcomer,
+  probation: m.escalation_probation,
   preferred_name: m.escalation_preferred_name,
   large: m.escalation_large,
   conflict: m.escalation_conflict,
@@ -756,3 +761,81 @@ export type TalkProposal = {
   state: ProposalState;
   updated_at: string;
 };
+
+export type FeedEntry = {
+  id: string;
+  at: string;
+  kind: string;
+  author: string | null;
+  handle: string | null;
+  agent: string | null;
+  number: number | null;
+  title: string | null;
+  tier: number | null;
+  state: ProposalState | null;
+  thread: string | null;
+  comment: string | null;
+  entity: { name: string; public_id: string } | null;
+  polity: string | null;
+  polity_path: string | null;
+  pipeline: string | null;
+  batches: number;
+};
+
+const proposalEvents: Record<string, (inputs: { title: string }) => string> = {
+  proposal_submitted: m.feed_proposal_submitted,
+  proposal_revised: m.feed_proposal_revised,
+  changes_requested: m.feed_changes_requested,
+  proposal_rejected: m.feed_proposal_rejected,
+  proposal_withdrawn: m.feed_proposal_withdrawn,
+  proposal_published: m.feed_proposal_published,
+  proposal_reverted: m.feed_proposal_reverted,
+  commented: m.feed_commented_proposal,
+};
+
+const topicEvents: Record<
+  string,
+  (inputs: { topic: string; record: string }) => string
+> = {
+  commented: m.feed_commented_topic,
+  topic_opened: m.feed_topic_opened,
+  topic_resolved: m.feed_topic_resolved,
+};
+
+export function describe(entry: FeedEntry) {
+  if (entry.kind === "imported") {
+    return {
+      text: entry.title ?? "",
+      href: entry.polity_path == null ? null : `/${entry.polity_path}`,
+    };
+  }
+  const anchor = entry.comment == null ? "" : `#comment-${entry.comment}`;
+  if (entry.number != null) {
+    const event = proposalEvents[entry.kind];
+    const title = entry.title ?? `#${entry.number}`;
+    return {
+      text: event == null ? title : event({ title }),
+      href: `/proposals/${entry.number}${anchor}`,
+    };
+  }
+  const event = topicEvents[entry.kind];
+  const topic = entry.title ?? "";
+  const record = entry.entity?.name ?? "";
+  return {
+    text: event == null ? topic : event({ topic, record }),
+    href:
+      entry.entity == null || entry.thread == null
+        ? null
+        : `/talk/${entry.entity.public_id}/${entry.thread}${anchor}`,
+  };
+}
+
+export function byline(entry: FeedEntry) {
+  if (entry.kind === "imported") {
+    return m.feed_imported_by({ pipeline: entry.pipeline ?? "" });
+  }
+  const author = entry.author ?? m.feed_someone();
+  return entry.agent == null
+    ? author
+    : m.feed_via_agent({ author, agent: entry.agent });
+}

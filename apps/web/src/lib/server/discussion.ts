@@ -8,6 +8,7 @@ import { mentionsOf } from "#lib/markdown.js";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
+import { talkable } from "#lib/server/standing.js";
 
 export type Author = {
   userId: string;
@@ -132,18 +133,7 @@ export function suggestableRows(
 const limit = createRateLimiter({ prefix: `${PROJECT}:comments` });
 
 export async function allowed(userId: string) {
-  const { rows } = await db.execute<{ verified: boolean; banned: boolean }>(sql`
-    select email_verified as verified,
-           coalesce(banned, false) and (ban_expires is null or ban_expires > now()) as banned
-    from users where id = ${userId}
-  `);
-  const found = rows[0];
-  if (found == null || found.banned) {
-    error(403, "This account can't comment.");
-  }
-  if (!found.verified) {
-    error(403, "Verify your email address before commenting.");
-  }
+  await talkable(userId);
   const { isAllowed, retryAfter } = await limit(
     {
       name: "comments",

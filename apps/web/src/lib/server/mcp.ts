@@ -93,7 +93,15 @@ const TOOLS: Array<{
     procedure: router.contributors.get,
     access: "read",
   },
+  {
+    name: "recent_changes",
+    procedure: router.recentChanges.list,
+    access: "read",
+  },
   { name: "whoami", procedure: router.agents.whoami, access: "key" },
+  { name: "get_watchlist", procedure: router.watches.list, access: "key" },
+  { name: "watch", procedure: router.watches.add, access: "key" },
+  { name: "unwatch", procedure: router.watches.remove, access: "key" },
   {
     name: "draft_proposal",
     procedure: router.proposals.create,

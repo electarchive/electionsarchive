@@ -1,4 +1,5 @@
 <script lang="ts">
+  import WatchButton from "#lib/components/contrib/watch-button.svelte";
   import Markdown from "#lib/components/markdown.svelte";
   import { stateLabel } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
@@ -39,6 +40,10 @@
       {#if data.profile.affiliation != null}
         <span>{data.profile.affiliation}</span>
       {/if}
+      <span>{m.account_level({ level: String(data.profile.level) })}</span>
+      {#if data.profile.limited}
+        <span class="font-semibold text-foreground">{m.account_limited()}</span>
+      {/if}
       <span
         >{m.contributor_since({
           date: date(data.profile.member_since.slice(0, 7)),
@@ -51,6 +56,14 @@
           >{m.contributor_edit()}</a
         >
       </p>
+    {:else if data.watch != null}
+      <div>
+        <WatchButton
+          kind="user"
+          id={data.watch.id}
+          watching={data.watch.watching}
+        />
+      </div>
     {/if}
   </header>
 

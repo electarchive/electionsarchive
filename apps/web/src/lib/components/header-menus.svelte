@@ -8,6 +8,7 @@
   import {
     AtSignIcon,
     ChevronRightIcon,
+    EyeIcon,
     KeyRoundIcon,
     LogInIcon,
     LogOutIcon,
@@ -131,6 +132,14 @@
         {#if !READ_ONLY}
           <DropdownMenu.Item>
             {#snippet child({ props })}
+              <a {...props} href={resolve("/watchlist")}>
+                <EyeIcon class="text-muted-foreground" />
+                {m.watchlist_title()}
+              </a>
+            {/snippet}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item>
+            {#snippet child({ props })}
               <a {...props} href={resolve("/settings/keys")}>
                 <KeyRoundIcon class="text-muted-foreground" />
                 {m.keys_nav()}
@@ -237,6 +246,10 @@
               {m.profile_nav()}
             </Button>
             {#if !READ_ONLY}
+              <Button href={resolve("/watchlist")} size="sm">
+                <EyeIcon />
+                {m.watchlist_title()}
+              </Button>
               <Button href={resolve("/settings/keys")} size="sm">
                 <KeyRoundIcon />
                 {m.keys_nav()}

@@ -1,12 +1,8 @@
 import { error } from "@sveltejs/kit";
-import { sql } from "drizzle-orm";
 import { m } from "#lib/paraglide/messages.js";
 import { atom } from "#lib/server/atom.js";
-import {
-  activityEntries,
-  contributor,
-  HANDLE,
-} from "#lib/server/contributors.js";
+import { contributor, HANDLE } from "#lib/server/contributors.js";
+import { atomEntries, contributorStream } from "#lib/server/feeds.js";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params, url }) => {
@@ -21,9 +17,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     page: `/contributors/${profile.handle}`,
     title: m.contributor_feed_title({ name }),
     subtitle: m.contributor_feed_subtitle({ handle: profile.handle }),
-    entries: await activityEntries(
-      sql`a.actor_user_id = ${userId}::uuid or (p.author_user_id = ${userId}::uuid and a.kind in ('changes_requested', 'proposal_rejected', 'proposal_published', 'proposal_reverted'))`,
-    ),
+    entries: atomEntries(await contributorStream(userId)),
     fallback: profile.member_since,
   });
 };

@@ -9,12 +9,12 @@ import { pipeline } from "node:stream/promises";
 import * as v from "valibot";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
+import { uploadable } from "#lib/server/standing.js";
 
 const DATA = path.resolve("../../data");
 const INBOX = path.join(DATA, "inbox", "uploads");
 const PAGES = "raw/contrib/pages/";
 const LIMIT = 200 * 1024 ** 2;
-const DAILY = 2 * 1024 ** 3;
 
 const streaming = new Set<string>();
 
@@ -72,22 +72,16 @@ export async function receive({
   }
   streaming.add(userId);
   try {
-    const { rows } = await db.execute<{ busy: boolean; used: string }>(sql`
-      select bool_or(status = 'received') as busy, coalesce(sum(bytes), 0)::text as used
+    const allowance = await uploadable(userId, length);
+    const { rows } = await db.execute<{ busy: boolean }>(sql`
+      select bool_or(status = 'received') as busy
       from upload
       where owner_user_id = ${userId} and created_at > now() - interval '1 day'
     `);
-    const used = Number(rows[0]?.used ?? 0);
     if (rows[0]?.busy === true) {
       error(
         429,
         "You already have an upload in progress. Wait for it to finish, then try again.",
-      );
-    }
-    if (used + (length ?? 0) > DAILY) {
-      error(
-        429,
-        "This file would take you past the 2 GB daily upload limit. Try again later.",
       );
     }
     await mkdir(INBOX, { recursive: true });
@@ -113,10 +107,10 @@ export async function receive({
       if (bytes === 0) {
         error(400, "The file is empty.");
       }
-      if (used + bytes > DAILY) {
+      if (allowance.uploaded + bytes > allowance.uploads) {
         error(
           429,
-          "This file would take you past the 2 GB daily upload limit. Try again later.",
+          "This file would take you past your daily upload limit. Try again tomorrow.",
         );
       }
       return await db.transaction(async (tx) => {

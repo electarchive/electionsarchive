@@ -2,6 +2,7 @@
   import type { TopicView } from "#lib/contrib.js";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import RecordTabs from "#lib/components/contrib/record-tabs.svelte";
+  import WatchButton from "#lib/components/contrib/watch-button.svelte";
   import { stateLabel } from "#lib/contrib.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -62,6 +63,15 @@
     <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
       {m.talk_lede()}
     </p>
+    {#if data.watch != null}
+      <div>
+        <WatchButton
+          kind={data.watch.kind}
+          id={data.entity.id}
+          watching={data.watch.watching}
+        />
+      </div>
+    {/if}
   </header>
 
   <section class="mbs-8" aria-labelledby="talk-open">
