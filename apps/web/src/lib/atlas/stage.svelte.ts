@@ -2,15 +2,15 @@ import type * as Maplibre from "maplibre-gl";
 import type { Lens } from "#lib/atlas/color.js";
 import type { Mosaic, Sheet } from "#lib/atlas/data.js";
 import type { Tier } from "#lib/atlas/tiers.js";
-import type { Engine } from "#lib/map/engine.svelte.js";
+import type { Arrow, Engine } from "#lib/map/engine.svelte.js";
 import { admits, hue, QUIET, read, tone } from "#lib/atlas/color.js";
 import { fade } from "#lib/atlas/tiers.js";
+import { radius } from "#lib/map/engine.svelte.js";
 
 export type Hit = { set: Sheet; i: number; tier: number; source: string };
 type Drawn = { set: Sheet; source: string; tier: number; dots: string | null };
 
 const GROUP = "sheet";
-const DOT = 0.015;
 
 export class Stage {
   labels = $state.raw<Array<{ k: number; name: string; x: number; y: number }>>(
@@ -307,15 +307,24 @@ export class Stage {
     const stops: Array<number> = [];
     if (this.#locked == null) {
       if (Number.isFinite(range.start)) {
-        stops.push(range.start, 0, range.start + 0.4, 0.9);
+        stops.push(range.start, 0, range.start + 0.4, 0.88);
       }
       if (Number.isFinite(range.end)) {
         if (stops.length === 0) {
-          stops.push(range.end - 0.4, 0.9);
+          stops.push(range.end - 0.4, 0.88);
         }
         stops.push(range.end, 0);
       }
     }
+    const opacity =
+      stops.length >= 4
+        ? ([
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            ...stops,
+          ] as Maplibre.ExpressionSpecification)
+        : 0.88;
     engine.add(
       {
         id,
@@ -323,31 +332,16 @@ export class Stage {
         source: id,
         layout: { "circle-sort-key": ["-", 0, ["get", "votes"]] },
         paint: {
-          "circle-radius": [
-            "interpolate",
-            ["exponential", 2],
-            ["zoom"],
-            0,
-            ["*", size, 2 ** -4],
-            22,
-            ["*", size, 2 ** 18],
-          ],
+          "circle-radius": radius(size),
           "circle-color": [
             "coalesce",
             ["feature-state", "dot"],
             "rgba(0, 0, 0, 0)",
           ],
-          "circle-opacity":
-            stops.length >= 4
-              ? ([
-                  "interpolate",
-                  ["linear"],
-                  ["zoom"],
-                  ...stops,
-                ] as Maplibre.ExpressionSpecification)
-              : 0.9,
+          "circle-opacity": opacity,
+          "circle-stroke-opacity": opacity,
           "circle-stroke-color": "var(--card)",
-          "circle-stroke-width": ["case", [">", size, 0], 0.6, 0],
+          "circle-stroke-width": ["case", [">", size, 0], 1, 0],
         },
       },
       "points",
@@ -409,6 +403,60 @@ export class Stage {
     return this.#hits[tier]?.get(k) ?? null;
   }
 
+  within(tier: number) {
+    const box = this.#engine.gl?.getBounds() ?? null;
+    for (let at = tier; at >= 0; at -= 1) {
+      const hits: Array<Hit> = [];
+      let isBounded = true;
+      for (const hit of this.#hits[at]?.values() ?? []) {
+        const { set, i } = hit;
+        if (set.places.leader[i] == null) {
+          continue;
+        }
+        const x = set.places.x[i];
+        const y = set.places.y[i];
+        if (x == null || y == null) {
+          isBounded = false;
+          hits.push(hit);
+        } else if (box == null || box.contains([x, y])) {
+          hits.push(hit);
+        }
+      }
+      if (hits.length > 0 || at === 0) {
+        return { hits, isBounded };
+      }
+    }
+    return { hits: [], isBounded: true };
+  }
+
+  arrows(tier: number, lens: Lens, picked: Set<number>) {
+    for (let at = tier; at >= 0; at -= 1) {
+      const items: Array<Arrow> = [];
+      for (const { set, i } of this.#hits[at]?.values() ?? []) {
+        const x = set.places.x[i];
+        const y = set.places.y[i];
+        if (x == null || y == null) {
+          continue;
+        }
+        const reading = read(set, i, lens);
+        if (reading.swing == null || !admits(set, reading, lens)) {
+          continue;
+        }
+        items.push({
+          at: [x, y],
+          swing: reading.swing,
+          color: lens.tone(reading.swing >= 0 ? lens.first : lens.second),
+          weight: set.places.valid[i] ?? 0,
+          isMuted: picked.size > 0 && !picked.has(set.places.k[i] ?? 0),
+        });
+      }
+      if (items.length > 0) {
+        return items;
+      }
+    }
+    return [];
+  }
+
   find(k: number) {
     for (const hits of this.#hits.toReversed()) {
       const hit = hits.get(k);
@@ -463,7 +511,13 @@ export class Stage {
     );
   }
 
-  paint(lens: Lens, picked: Set<number>, mark: string) {
+  paint(
+    lens: Lens,
+    picked: Set<number>,
+    mark: string,
+    scale: number,
+    isArrowed: boolean,
+  ) {
     const engine = this.#engine;
     const isDotted = lens.mode === "votes";
     for (const [key, drawn] of this.#drawn) {
@@ -482,7 +536,7 @@ export class Stage {
         const reading = read(set, i, lens);
         const color = tone(set, i, lens, reading);
         fills.set(k, {
-          color: isDotted && drawn.dots != null ? QUIET : color,
+          color: (isDotted || isArrowed) && drawn.dots != null ? QUIET : color,
           on: true,
           picked: picked.has(k),
           hatched:
@@ -492,7 +546,7 @@ export class Stage {
         });
         dots.set(k, {
           dot: color,
-          size: isDotted ? DOT * Math.sqrt(set.places.valid[i] ?? 0) : 0,
+          size: isDotted ? scale * Math.sqrt(set.places.valid[i] ?? 0) : 0,
         });
         const held = set.places.held?.[i];
         if (

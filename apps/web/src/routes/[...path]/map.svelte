@@ -44,7 +44,13 @@
   } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
-  import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
+  import {
+    Engine,
+    largest,
+    proportional,
+    radius,
+    reach,
+  } from "#lib/map/engine.svelte.js";
   import { covering } from "#lib/map/hexes.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -1768,7 +1774,16 @@
       ),
     };
   });
-  const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
+  const furthest = $derived(
+    reach([...changes.values()].map((change) => change.swing)),
+  );
+  const total = $derived.by(() => {
+    let sum = 0;
+    for (const row of places.rows) {
+      sum += row.valid;
+    }
+    return sum;
+  });
   const isDeclared = $derived(places.rows.every((row) => row.valid === 0));
   let isShaded = $state(false);
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
@@ -2368,51 +2383,28 @@
       );
     }
     engine.points("dots", []);
-    engine.points("arrows", []);
     engine.points("seats", []);
     engine.add(
       {
         id: "bubble",
         type: "circle",
         source: "dots",
+        layout: { "circle-sort-key": ["-", 0, ["get", "votes"]] },
         paint: {
-          "circle-radius": ["coalesce", ["feature-state", "radius"], 0],
+          "circle-radius": radius(["coalesce", ["feature-state", "size"], 0]),
           "circle-color": [
             "coalesce",
             ["feature-state", "color"],
             "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
           ],
-          "circle-opacity": 0.86,
+          "circle-opacity": 0.88,
           "circle-stroke-color": "var(--card)",
           "circle-stroke-width": [
             "case",
-            [">", ["coalesce", ["feature-state", "radius"], 0], 0],
-            0.75,
+            [">", ["coalesce", ["feature-state", "size"], 0], 0],
+            1,
             0,
           ],
-        },
-      },
-      "points",
-    );
-    engine.add(
-      {
-        id: "arrow",
-        type: "symbol",
-        source: "arrows",
-        layout: {
-          "icon-image": "arrow",
-          "icon-size": ["get", "size"],
-          "icon-rotate": ["get", "rotate"],
-          "icon-rotation-alignment": "map",
-          "icon-anchor": "left",
-          "icon-allow-overlap": true,
-          "icon-ignore-placement": true,
-          "symbol-sort-key": ["get", "order"],
-        },
-        paint: {
-          "icon-color": ["get", "color"],
-          "icon-halo-color": "var(--card)",
-          "icon-halo-width": 1,
         },
       },
       "points",
@@ -2517,9 +2509,23 @@
                 ],
           )
         : [];
-    const tips = [0, 1].map((index) =>
-      read(colors[index] ?? "var(--muted-foreground)"),
-    );
+    const arrows =
+      view === "arrows"
+        ? places.rows.flatMap((row) => {
+            const swing = changes.get(row.k)?.swing;
+            return row.at == null || away.has(row.k) || swing == null
+              ? []
+              : [
+                  {
+                    at: row.at,
+                    swing,
+                    color: colors[swing >= 0 ? 0 : 1] ?? "var(--muted-foreground)",
+                    weight: row.valid,
+                  },
+                ];
+          })
+        : [];
+    const scale = engine.bubbles(total);
     const striped = runoffs.map((row) => row.k);
     const rough: Maplibre.FilterSpecification = [
       "all",
@@ -2563,38 +2569,12 @@
       engine.points(
         "dots",
         places.rows.flatMap((row) =>
-          row.at == null || away.has(row.k) ? [] : [{ k: row.k, at: row.at }],
+          row.at == null || away.has(row.k)
+            ? []
+            : [{ k: row.k, at: row.at, properties: { votes: row.valid } }],
         ),
       );
-      engine.points(
-        "arrows",
-        view === "arrows"
-          ? places.rows.flatMap((row) => {
-              const change = changes.get(row.k)?.swing;
-              if (
-                row.at == null ||
-                away.has(row.k) ||
-                change == null ||
-                Math.abs(change) < 0.001
-              ) {
-                return [];
-              }
-              const size = Math.min(1, Math.abs(change) / 0.2);
-              const tilt = 12 + size * 48;
-              return [
-                {
-                  at: row.at,
-                  properties: {
-                    color: tips[change >= 0 ? 0 : 1] ?? "",
-                    size: 0.35 + size * 0.95,
-                    rotate: change >= 0 ? -tilt : 180 + tilt,
-                    order: size,
-                  },
-                },
-              ];
-            })
-          : [],
-      );
+      engine.arrows(arrows, furthest);
       engine.points(
         "seats",
         pips.map((pip) => ({
@@ -2613,7 +2593,7 @@
         } else if (view === "bubbles") {
           bubbles.set(k, {
             color,
-            radius: Math.sqrt((rows.get(k)?.valid ?? 0) / biggest) * 28,
+            size: scale * Math.sqrt(rows.get(k)?.valid ?? 0),
           });
         } else {
           areas.set(k, { color });
@@ -3796,30 +3776,32 @@
             </span>
           {:else}
             <span class="flex items-center gap-1">
-              <svg
-                class="rotate-180 block-3 inline-6"
-                viewBox="0 0 64 24"
-                style:color={colors[1]}
-                ><path
-                  fill="currentColor"
-                  d="M4 9.5h36v-6l19 8.5-19 8.5v-6H4z"
-                /></svg
-              >
-              <svg
-                class="block-3 inline-6"
-                viewBox="0 0 64 24"
-                style:color={colors[0]}
-                ><path
-                  fill="currentColor"
-                  d="M4 9.5h36v-6l19 8.5-19 8.5v-6H4z"
-                /></svg
-              >
+              {#each [1, 0] as side (side)}
+                <svg
+                  class={cn("block-4 inline-6", { "-scale-x-100": side === 1 })}
+                  viewBox="0 0 24 16"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style:color={colors[side]}
+                  ><path
+                    stroke="currentColor"
+                    d="M4.6 13.2 19.4 2.8M13.4 3.2l6-.4-2.4 5.5"
+                  /></svg
+                >
+              {/each}
             </span>
           {/if}
           <span class="font-semibold">{names[0]}</span>
         </span>
         <span class="font-figures text-xs text-muted-foreground tabular-nums"
-          >{m.map_swing_scale({ low: "2", high: "10" })}</span
+          >{view === "arrows"
+            ? m.map_swing_scale({
+                low: "0",
+                high: String(Math.round(furthest * 1000) / 10),
+              })
+            : m.map_swing_scale({ low: "2", high: "10" })}</span
         >
       </div>
     {:else if view === "flips" && span != null}

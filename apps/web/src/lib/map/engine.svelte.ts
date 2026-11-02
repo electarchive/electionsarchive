@@ -7,6 +7,53 @@ import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
+export type Arrow = {
+  at: [number, number];
+  swing: number;
+  color: string;
+  weight?: number;
+  isMuted?: boolean;
+};
+
+const REACHES = [0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.3];
+const TILT = (35 * Math.PI) / 180;
+const LARGEST = 64;
+
+function isPoint(
+  value: unknown,
+): value is { type: "Point"; coordinates: Array<number> } {
+  return (
+    typeof value === "object" &&
+    value != null &&
+    "type" in value &&
+    value.type === "Point" &&
+    "coordinates" in value &&
+    Array.isArray(value.coordinates)
+  );
+}
+
+export function reach(swings: Array<number>) {
+  const sizes = swings
+    .map((swing) => Math.abs(swing))
+    .filter((size) => size > 0)
+    .toSorted((a, b) => a - b);
+  const top = sizes[Math.floor(sizes.length * 0.9)] ?? 0.1;
+  return REACHES.find((edge) => edge >= top) ?? 0.3;
+}
+
+export function radius(
+  size: Maplibre.ExpressionSpecification,
+): Maplibre.ExpressionSpecification {
+  return [
+    "interpolate",
+    ["exponential", 2],
+    ["zoom"],
+    ...Array.from({ length: 23 }, (_, zoom) => [
+      zoom,
+      ["min", LARGEST, ["*", size, 2 ** zoom]],
+    ]).flat(),
+  ] as Maplibre.ExpressionSpecification;
+}
 type Padding = { top: number; right: number; bottom: number; left: number };
 type Slot =
   | "ground"
@@ -325,39 +372,6 @@ function seated(colors: Array<string>, card: string, edge: string) {
   };
 }
 
-function arrow() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 24;
-  const pen = canvas.getContext("2d", { willReadFrequently: true });
-  if (pen != null) {
-    pen.fillStyle = "#fff";
-    pen.shadowColor = "#fff";
-    pen.shadowBlur = 3;
-    pen.beginPath();
-    for (const [x, y] of [
-      [4, 9.5],
-      [40, 9.5],
-      [40, 3.5],
-      [59, 12],
-      [40, 20.5],
-      [40, 14.5],
-      [4, 14.5],
-    ] as const) {
-      pen.lineTo(x, y);
-    }
-    pen.closePath();
-    pen.fill();
-  }
-  return {
-    width: 64,
-    height: 24,
-    data: new Uint8Array(
-      pen?.getImageData(0, 0, 64, 24).data.buffer ?? new ArrayBuffer(6144),
-    ),
-  };
-}
-
 export function proportional(
   held: Iterable<Array<[number, number]> | null | undefined>,
 ) {
@@ -421,6 +435,8 @@ export class Engine {
   #probe: HTMLElement | null = null;
   #cache = new Map<string, string>();
   #canvas: CanvasRenderingContext2D | null = null;
+  #overlay: HTMLCanvasElement | null = null;
+  #arrows: { items: Array<Arrow>; reach: number } | null = null;
 
   constructor(
     frame: Box,
@@ -524,6 +540,13 @@ export class Engine {
         this.#options.onMoveEnd?.();
       });
       gl.on("resize", () => this.#hold(gl));
+      const overlay = document.createElement("canvas");
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.style.cssText =
+        "position:absolute;inset:0;inline-size:100%;block-size:100%;pointer-events:none";
+      host.append(overlay);
+      this.#overlay = overlay;
+      gl.on("render", () => this.#sketch(gl));
       for (const kind of ["mousemove", "click"] as const) {
         gl.on(kind, (event) => {
           if (kind === "mousemove" && !isHover(event.originalEvent)) {
@@ -578,6 +601,7 @@ export class Engine {
       }
       engines.delete(this.#id);
       this.#probe?.remove();
+      this.#overlay?.remove();
       this.gl?.remove();
       this.gl = null;
       this.isLoaded = false;
@@ -635,9 +659,6 @@ export class Engine {
       gl.updateImage("runoff", paper);
     } else {
       gl.addImage("runoff", paper);
-    }
-    if (!gl.hasImage("arrow")) {
-      gl.addImage("arrow", arrow(), { sdf: true });
     }
   }
 
@@ -858,13 +879,207 @@ export class Engine {
     return Number.isFinite(box.west) ? box : null;
   }
 
+  arrows(items: Array<Arrow>, reach: number) {
+    this.#arrows =
+      items.length === 0
+        ? null
+        : {
+            items: items.toSorted(
+              (a, b) =>
+                Number(a.isMuted === true) - Number(b.isMuted === true) ||
+                (b.weight ?? 0) - (a.weight ?? 0) ||
+                Math.abs(b.swing) - Math.abs(a.swing),
+            ),
+            reach,
+          };
+    const gl = this.gl;
+    if (gl != null) {
+      this.#sketch(gl);
+    }
+  }
+
+  bubbles(total: number, box: Box = this.#frame) {
+    const gl = this.gl;
+    if (gl == null || total <= 0) {
+      return 0;
+    }
+    const canvas = gl.getCanvas();
+    const area = canvas.clientWidth * canvas.clientHeight * 0.5;
+    return Math.sqrt((0.1 * area) / (Math.PI * total)) / 2 ** this.fitZoom(box);
+  }
+
+  compose() {
+    const gl = this.gl;
+    if (gl == null) {
+      return null;
+    }
+    const source = gl.getCanvas();
+    const out = document.createElement("canvas");
+    out.width = source.width;
+    out.height = source.height;
+    const pen = out.getContext("2d");
+    if (pen == null) {
+      return null;
+    }
+    pen.drawImage(source, 0, 0);
+    if (this.#overlay != null && this.#arrows != null) {
+      pen.drawImage(this.#overlay, 0, 0, out.width, out.height);
+    }
+    return out;
+  }
+
+  #sketch(gl: Maplibre.Map) {
+    const overlay = this.#overlay;
+    const pen = overlay?.getContext("2d");
+    if (overlay == null || pen == null) {
+      return;
+    }
+    const width = overlay.clientWidth;
+    const height = overlay.clientHeight;
+    const scale = devicePixelRatio;
+    if (overlay.width !== Math.round(width * scale)) {
+      overlay.width = Math.round(width * scale);
+    }
+    if (overlay.height !== Math.round(height * scale)) {
+      overlay.height = Math.round(height * scale);
+    }
+    pen.setTransform(scale, 0, 0, scale, 0, 0);
+    pen.clearRect(0, 0, width, height);
+    const arrows = this.#arrows;
+    if (arrows == null) {
+      return;
+    }
+    const placed: Array<{ x: number; y: number; arrow: Arrow }> = [];
+    let inside = 0;
+    for (const arrow of arrows.items) {
+      const point = gl.project(arrow.at);
+      if (
+        point.x < -LARGEST ||
+        point.y < -LARGEST ||
+        point.x > width + LARGEST ||
+        point.y > height + LARGEST
+      ) {
+        continue;
+      }
+      if (
+        point.x >= 0 &&
+        point.y >= 0 &&
+        point.x <= width &&
+        point.y <= height
+      ) {
+        inside += 1;
+      }
+      placed.push({ x: point.x, y: point.y, arrow });
+    }
+    const spacing = Math.sqrt((width * height) / Math.max(1, inside));
+    const longest = Math.min(56, Math.max(18, spacing * 1.5));
+    const weight = Math.min(2.25, Math.max(1.25, longest / 24));
+    const gap = longest * 0.55;
+    const taken = new Map<string, Array<{ x: number; y: number }>>();
+    const kept: typeof placed = [];
+    for (const entry of placed) {
+      const column = Math.floor(entry.x / gap);
+      const row = Math.floor(entry.y / gap);
+      let isNear = false;
+      for (let dx = -1; dx <= 1 && !isNear; dx += 1) {
+        for (let dy = -1; dy <= 1 && !isNear; dy += 1) {
+          for (const other of taken.get(`${column + dx}:${row + dy}`) ?? []) {
+            if (Math.hypot(other.x - entry.x, other.y - entry.y) < gap) {
+              isNear = true;
+              break;
+            }
+          }
+        }
+      }
+      if (isNear) {
+        continue;
+      }
+      const cell = `${column}:${row}`;
+      taken.set(cell, [...(taken.get(cell) ?? []), entry]);
+      kept.push(entry);
+    }
+    kept.reverse();
+    const marks = [...this.#slots]
+      .filter(
+        ([id, slot]) => slot === "labels" && gl.getLayer(id)?.type === "symbol",
+      )
+      .map(([id]) => id);
+    const boxes =
+      marks.length === 0
+        ? []
+        : gl.queryRenderedFeatures({ layers: marks }).flatMap((feature) => {
+            const name = feature.properties.name;
+            const shape: unknown = feature.geometry;
+            if (!isPoint(shape) || typeof name !== "string") {
+              return [];
+            }
+            const [lng = 0, lat = 0] = shape.coordinates;
+            const point = gl.project([lng, lat]);
+            const half = name.length * 3.6 + 6;
+            return [
+              {
+                west: point.x - half,
+                east: point.x + half,
+                north: point.y - 10,
+                south: point.y + 10,
+              },
+            ];
+          });
+    const halo = this.read("var(--card)");
+    pen.lineCap = "round";
+    pen.lineJoin = "round";
+    for (const { x, y, arrow } of kept) {
+      const size = Math.min(1, Math.abs(arrow.swing) / arrows.reach);
+      if (size < 0.01) {
+        continue;
+      }
+      const length = Math.max(4, longest * size);
+      const side = arrow.swing >= 0 ? 1 : -1;
+      const dx = side * Math.cos(TILT);
+      const dy = -Math.sin(TILT);
+      const from = [x - (dx * length) / 2, y - (dy * length) / 2] as const;
+      const to = [x + (dx * length) / 2, y + (dy * length) / 2] as const;
+      const head = Math.min(6, Math.max(2.5, length * 0.4)) + weight;
+      const angle = Math.atan2(dy, dx);
+      const path = new Path2D();
+      path.moveTo(from[0], from[1]);
+      path.lineTo(to[0], to[1]);
+      path.moveTo(
+        to[0] - head * Math.cos(angle - 0.55),
+        to[1] - head * Math.sin(angle - 0.55),
+      );
+      path.lineTo(to[0], to[1]);
+      path.lineTo(
+        to[0] - head * Math.cos(angle + 0.55),
+        to[1] - head * Math.sin(angle + 0.55),
+      );
+      const reachX = (Math.abs(dx) * length) / 2;
+      const reachY = (Math.abs(dy) * length) / 2;
+      const isCovered = boxes.some(
+        (box) =>
+          x + reachX > box.west &&
+          x - reachX < box.east &&
+          y + reachY > box.north &&
+          y - reachY < box.south,
+      );
+      pen.globalAlpha = arrow.isMuted === true ? 0.22 : isCovered ? 0.45 : 1;
+      pen.strokeStyle = halo;
+      pen.lineWidth = weight + 2.5;
+      pen.stroke(path);
+      pen.strokeStyle = this.read(arrow.color);
+      pen.lineWidth = weight;
+      pen.stroke(path);
+    }
+    pen.globalAlpha = 1;
+  }
+
   project(at: [number, number]) {
     return this.gl?.project(at) ?? null;
   }
 
   snapshot() {
     try {
-      return this.gl?.getCanvas().toDataURL("image/webp", 0.85) ?? null;
+      return this.compose()?.toDataURL("image/webp", 0.85) ?? null;
     } catch {
       return null;
     }

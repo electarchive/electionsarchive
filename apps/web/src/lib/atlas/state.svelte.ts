@@ -36,6 +36,7 @@ export class View {
   only = $state<string | null>(null);
   isFlippedOnly = $state(false);
   isBasemap = $state(true);
+  isArrows = $state(true);
   picked = $state.raw<Array<number>>([]);
   at: [number, number, number] | null = null;
 
@@ -54,6 +55,7 @@ export class View {
     this.only = query.get("only");
     this.isFlippedOnly = query.get("flipped") === "1";
     this.isBasemap = query.get("basemap") !== "off";
+    this.isArrows = query.get("arrows") !== "off";
     this.picked = (query.get("pick") ?? "")
       .split(",")
       .map(Number)
@@ -75,6 +77,7 @@ export class View {
       only: this.only,
       flipped: this.isFlippedOnly ? "1" : null,
       basemap: this.isBasemap ? null : "off",
+      arrows: this.isArrows ? null : "off",
       pick: this.picked.length === 0 ? null : this.picked.join(","),
     };
   }

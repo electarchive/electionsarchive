@@ -32,6 +32,8 @@
     isAllied,
     isEstimated,
     noun,
+    scope,
+    stretch,
   }: {
     view: View;
     lens: Lens;
@@ -43,8 +45,13 @@
     isAllied: boolean;
     isEstimated: boolean;
     noun: string;
+    scope: string;
+    stretch: number;
   } = $props();
 
+  const compared = $derived(
+    view.vs === "previous" ? (targets[0]?.id ?? null) : view.vs,
+  );
   const picks = $derived(legend.slice(0, 3));
   const extras = $derived(legend.slice(3));
   const extra = $derived(
@@ -144,7 +151,12 @@
           },
           {
             at: 0,
-            label: lens.mode === "swing" ? m.atlas_no_shift() : m.atlas_even(),
+            label:
+              lens.mode === "swing"
+                ? m.atlas_no_shift()
+                : lens.mode === "lean"
+                  ? m.atlas_lean_even({ name: scope })
+                  : m.atlas_even(),
           },
           {
             at: span.domain[1],
@@ -167,7 +179,7 @@
       >{m.map_color_by()}</span
     >
     <div class="flex flex-wrap gap-1.5">
-      {#each [{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), { value: "votes" as const, label: m.map_mode_bubbles() }, ...(lens.isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "flips" as const, label: m.map_mode_flips() }] : [])] as choice (choice.value)}
+      {#each [{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), { value: "votes" as const, label: m.map_mode_bubbles() }, ...(legend.length > 1 ? [{ value: "lean" as const, label: m.map_mode_lean() }] : []), ...(lens.isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "flips" as const, label: m.map_mode_flips() }] : [])] as choice (choice.value)}
         <button
           type="button"
           class={cn(
@@ -263,7 +275,7 @@
       >
       <Select.Root
         type="single"
-        value={view.vs ?? ""}
+        value={compared ?? ""}
         onValueChange={(value) => {
           view.vs = value === "" ? null : value;
           if (
@@ -277,7 +289,7 @@
         }}
       >
         <Select.Trigger class="inline-full">
-          {targets.find((target) => target.id === view.vs)?.label ??
+          {targets.find((target) => target.id === compared)?.label ??
             m.atlas_compare_none()}
         </Select.Trigger>
         <Select.Content>
@@ -388,6 +400,69 @@
           }
         }
       />
+    {/if}
+
+    {#if lens.mode === "lean"}
+      <p class="text-xs text-pretty text-muted-foreground">
+        {m.atlas_lean_key({ name: scope })}
+      </p>
+    {/if}
+
+    {#if lens.mode === "swing"}
+      <label class="flex items-center justify-between gap-2 text-[0.8125rem]">
+        {m.map_mode_arrows()}
+        <Switch
+          checked={view.isArrows}
+          onCheckedChange={(value: boolean) => (view.isArrows = value)}
+        />
+      </label>
+      {#if view.isArrows}
+        <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
+          <span class="flex items-center gap-1.5" aria-hidden="true">
+            {#each [lens.second, lens.first] as key, at (at)}
+              {#if at === 1}
+                <svg
+                  class="block-4 inline-6"
+                  viewBox="0 0 24 16"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style:color={lens.tone(key)}
+                  ><path
+                    stroke="currentColor"
+                    d="M4.6 13.2 19.4 2.8M13.4 3.2l6-.4-2.4 5.5"
+                  /></svg
+                >
+              {/if}
+              <span class="font-semibold"
+                >{legend.find((item) => item.key === key)?.label ?? ""}</span
+              >
+              {#if at === 0}
+                <svg
+                  class="-scale-x-100 block-4 inline-6"
+                  viewBox="0 0 24 16"
+                  fill="none"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style:color={lens.tone(key)}
+                  ><path
+                    stroke="currentColor"
+                    d="M4.6 13.2 19.4 2.8M13.4 3.2l6-.4-2.4 5.5"
+                  /></svg
+                >
+              {/if}
+            {/each}
+          </span>
+          <span class="font-figures text-muted-foreground tabular-nums"
+            >{m.map_swing_scale({
+              low: "0",
+              high: String(Math.round(stretch * 1000) / 10),
+            })}</span
+          >
+        </div>
+      {/if}
     {/if}
 
     {#if lens.isCompared}

@@ -8,6 +8,7 @@ export const MODES = [
   "votes",
   "swing",
   "flips",
+  "lean",
 ] as const;
 export type Mode = (typeof MODES)[number];
 
@@ -18,6 +19,7 @@ export type Lens = {
   whom: string | null;
   isBanded: boolean;
   isCompared: boolean;
+  baseline: number;
   range: [number, number] | null;
   only: string | null;
   isFlippedOnly: boolean;
@@ -69,11 +71,20 @@ function step(value: number, edges: Array<number>) {
 }
 
 export function scale(mode: Mode) {
-  return mode === "share"
-    ? { domain: [0, 1] as [number, number], step: 0.05 }
-    : mode === "swing"
-      ? { domain: [-0.3, 0.3] as [number, number], step: 0.025 }
-      : { domain: [-0.8, 0.8] as [number, number], step: 0.05 };
+  switch (mode) {
+    case "share": {
+      return { domain: [0, 1] as [number, number], step: 0.05 };
+    }
+    case "swing": {
+      return { domain: [-0.3, 0.3] as [number, number], step: 0.025 };
+    }
+    case "lean": {
+      return { domain: [-0.6, 0.6] as [number, number], step: 0.04 };
+    }
+    default: {
+      return { domain: [-0.8, 0.8] as [number, number], step: 0.05 };
+    }
+  }
 }
 
 export function share(set: Sheet, i: number, key: string | null | undefined) {
@@ -82,7 +93,7 @@ export function share(set: Sheet, i: number, key: string | null | undefined) {
   return value == null ? null : value / 10_000;
 }
 
-function was(set: Sheet, i: number, key: string | null | undefined) {
+export function was(set: Sheet, i: number, key: string | null | undefined) {
   const index = slot(set, key);
   const value = index < 0 ? null : (set.places.before[index]?.[i] ?? null);
   return value == null ? null : value / 10_000;
@@ -115,9 +126,13 @@ export function read(set: Sheet, i: number, lens: Lens) {
       ? mine
       : lens.mode === "swing"
         ? swing
-        : leader == null
-          ? null
-          : margin;
+        : lens.mode === "lean"
+          ? a == null || b == null || leader == null
+            ? null
+            : margin - lens.baseline
+          : leader == null
+            ? null
+            : margin;
   const held = set.places.held?.[i] ?? null;
   return {
     leader,
@@ -191,17 +206,27 @@ export function tone(
             STRENGTHS[step(Math.abs(reading.swing), SWINGS)] ?? 100,
           );
     }
+    case "lean": {
+      return reading.value == null
+        ? DIM
+        : mix(
+            lens.tone(reading.value >= 0 ? lens.first : lens.second),
+            LEANS[step(Math.abs(reading.value), BINS)] ?? 100,
+          );
+    }
     case "flips": {
       return reading.isUnmatched
         ? DIM
         : mix(hue(set, reading.leader, lens), reading.isFlip ? 100 : 16);
     }
     default: {
-      return mix(
-        hue(set, reading.owner, lens),
+      const strength =
         set.places.valid[i] === 0 || (reading.held != null && !lens.isBanded)
           ? 100
-          : (LEANS[step(reading.lead, BINS)] ?? 100),
+          : (LEANS[step(reading.lead, BINS)] ?? 100);
+      return mix(
+        hue(set, reading.owner, lens),
+        lens.mode === "votes" ? Math.max(54, strength) : strength,
       );
     }
   }

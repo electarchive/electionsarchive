@@ -9,6 +9,7 @@
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import SearchIcon from "@lucide/svelte/icons/search";
+  import SheetIcon from "@lucide/svelte/icons/sheet";
   import XIcon from "@lucide/svelte/icons/x";
   import { untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
@@ -17,6 +18,8 @@
   import type { Mosaic, Sheet, Shell } from "#lib/atlas/data.js";
   import type { Hit } from "#lib/atlas/stage.svelte.js";
   import type { Tier } from "#lib/atlas/tiers.js";
+  import Analysis from "#lib/atlas/analysis.svelte";
+  import { admits, hue, read, share, was } from "#lib/atlas/color.js";
   import { load, loadMosaic } from "#lib/atlas/data.js";
   import Drawer from "#lib/atlas/drawer.svelte";
   import Hover from "#lib/atlas/hover.svelte";
@@ -38,9 +41,9 @@
   import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { date, plural } from "#lib/format.js";
+  import { count, date, plural } from "#lib/format.js";
   import { basemap } from "#lib/map/basemap.js";
-  import { Engine, proportional } from "#lib/map/engine.svelte.js";
+  import { Engine, proportional, reach } from "#lib/map/engine.svelte.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -93,6 +96,8 @@
   let begins = $state.raw<Array<number>>([]);
   let zoom = $state(0);
   let tier = $state(0);
+  let moved = $state(0);
+  let isAnalyzing = $state(false);
   let hovered = $state.raw<Hit | null>(null);
   let pointer = $state<{ x: number; y: number } | null>(null);
   const room = $state({ width: 0, height: 0 });
@@ -168,10 +173,38 @@
   const labels = $derived(
     new Map(legend.map((item) => [item.key, item.label])),
   );
+  const baseline = $derived.by(() => {
+    const [one, two] = base?.legend ?? [];
+    if (one == null || two == null) {
+      return 0;
+    }
+    const at = above?.places.k.indexOf(head.scope.k) ?? -1;
+    const set = above != null && at !== -1 ? above : base;
+    if (set == null) {
+      return 0;
+    }
+    const column = (item: { key: string; label: string }) =>
+      set.places.shares[
+        set.legend.findIndex(
+          (entry) => entry.key === item.key || entry.label === item.label,
+        )
+      ] ?? [];
+    const ahead = column(one);
+    const behind = column(two);
+    let votes = 0;
+    let spread = 0;
+    for (const i of set === above ? [at] : set.places.k.keys()) {
+      const valid = set.places.valid[i] ?? 0;
+      votes += valid;
+      spread += (((ahead[i] ?? 0) - (behind[i] ?? 0)) / 10_000) * valid;
+    }
+    return votes === 0 ? 0 : spread / votes;
+  });
   const lens = $derived.by<Lens>(() => {
     const mode =
       (!isCompared && (view.mode === "swing" || view.mode === "flips")) ||
-      (view.mode === "split" && !isProportional)
+      (view.mode === "split" && !isProportional) ||
+      (view.mode === "lean" && legend.length < 2)
         ? "winner"
         : view.mode;
     const first = legend[0]?.key ?? null;
@@ -185,6 +218,7 @@
           : null,
       isBanded: mode === "split" || (mode === "winner" && !isProportional),
       isCompared,
+      baseline,
       range: view.range,
       only: view.only,
       isFlippedOnly: view.isFlippedOnly,
@@ -243,6 +277,7 @@
         camera = engine.isFramed
           ? null
           : `${middle.lng.toFixed(4)},${middle.lat.toFixed(4)},${gl.getZoom().toFixed(2)}`;
+        moved += 1;
         stage.letter(tier);
         deepen();
       },
@@ -728,6 +763,20 @@
       : [a, { x: b.x, y: a.y }, b, { x: a.x, y: b.y }];
   }
 
+  function save() {
+    engine.compose()?.toBlob((blob) => {
+      if (blob == null) {
+        return;
+      }
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = `${["map", ...path.split("/").filter((part) => part !== "")].join("-")}.png`;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(href), 1000);
+    }, "image/png");
+  }
+
   function title(hit: Hit) {
     const found = hit.set.places.name[hit.i] ?? "";
     return found === "" ? "…" : found;
@@ -1029,6 +1078,94 @@
       )
       .slice(0, 8);
   });
+  const analysis = $derived.by(() => {
+    if (!isAnalyzing || base == null) {
+      return null;
+    }
+    void moved;
+    void stage.version;
+    void drawn;
+    void room.width;
+    void room.height;
+    const { hits, isBounded } = stage.within(tier);
+    const rows: Array<{
+      k: number;
+      name: string;
+      where: string;
+      valid: number;
+      first: number | null;
+      second: number | null;
+      margin: number | null;
+      before: number | null;
+      swing: number | null;
+      tone: string;
+      hit: Hit;
+    }> = [];
+    for (const hit of hits) {
+      const { set, i } = hit;
+      const reading = read(set, i, lens);
+      if (!admits(set, reading, lens)) {
+        continue;
+      }
+      rows.push({
+        k: set.places.k[i] ?? 0,
+        name: title(hit),
+        where: where(hit),
+        valid: set.places.valid[i] ?? 0,
+        first: share(set, i, lens.first),
+        second: share(set, i, lens.second),
+        margin: reading.isMeasured ? reading.margin : null,
+        before: reading.swing == null ? null : reading.margin - reading.swing,
+        swing: reading.swing,
+        tone: hue(set, reading.leader, lens),
+        hit,
+      });
+    }
+    const places = plural(now?.noun ?? "");
+    return {
+      rows,
+      title: isBounded
+        ? m.atlas_in_view({ count: count(rows.length), places })
+        : m.atlas_listed({ count: count(rows.length), places }),
+    };
+  });
+  const exported = $derived.by(() => {
+    const items = legend;
+    const then = isCompared && year != null ? year : null;
+    return {
+      columns: [
+        m.atlas_column_place(),
+        m.atlas_column_within(),
+        m.atlas_column_votes(),
+        ...items.map((item) => item.label),
+        ...(then == null ? [] : items.map((item) => `${item.label} ${then}`)),
+        m.atlas_column_margin(),
+        ...(then == null ? [] : [m.atlas_column_swing()]),
+      ],
+      table: () => {
+        const rows = analysis?.rows ?? [];
+        const chosen = new Set(view.picked);
+        return (
+          chosen.size > 0 ? rows.filter((row) => chosen.has(row.k)) : rows
+        ).map((row) => {
+          const { set, i } = row.hit;
+          const round = (value: number | null) =>
+            value == null ? null : Math.round(value * 100_000) / 1000;
+          return [
+            row.name,
+            row.where,
+            row.valid,
+            ...items.map((item) => round(share(set, i, item.key))),
+            ...(then == null
+              ? []
+              : items.map((item) => round(was(set, i, item.key)))),
+            round(row.margin),
+            ...(then == null ? [] : [round(row.swing)]),
+          ];
+        });
+      },
+    };
+  });
   const isEstimated = $derived(
     isCompared &&
       (base?.estimated === true ||
@@ -1258,9 +1395,29 @@
     });
   });
 
+  const total = $derived.by(() => {
+    let sum = 0;
+    for (const valid of base?.places.valid ?? []) {
+      sum += valid ?? 0;
+    }
+    return sum;
+  });
+  const bubble = $derived.by(() => {
+    void room.width;
+    void room.height;
+    return base == null || engine.gl == null
+      ? 0
+      : engine.bubbles(total, base.frame ?? undefined);
+  });
+  const isArrowed = $derived(lens.mode === "swing" && view.isArrows);
+  let stretch = $state(0.1);
+
   $effect(() => {
     const mark = JSON.stringify([
       lens.mode,
+      lens.baseline,
+      bubble,
+      isArrowed,
       lens.whom,
       lens.first,
       lens.second,
@@ -1276,7 +1433,26 @@
     if (engine.gl == null) {
       return;
     }
-    untrack(() => stage.paint(lens, new Set(view.picked), mark));
+    untrack(() =>
+      stage.paint(lens, new Set(view.picked), mark, bubble, isArrowed),
+    );
+  });
+
+  $effect(() => {
+    void stage.version;
+    void drawn;
+    const level = tier;
+    const picked = new Set(view.picked);
+    if (engine.gl == null) {
+      return;
+    }
+    if (!isArrowed) {
+      untrack(() => engine.arrows([], 0));
+      return;
+    }
+    const items = stage.arrows(level, lens, picked);
+    stretch = reach(items.map((item) => item.swing));
+    untrack(() => engine.arrows(items, stretch));
   });
 
   $effect(() => {
@@ -1475,6 +1651,8 @@
     isAllied={base?.isAllied ?? false}
     {isEstimated}
     noun={now?.noun ?? ""}
+    scope={head.scope.name}
+    {stretch}
   />
 {/snippet}
 
@@ -1747,8 +1925,58 @@
             onclick={() => (view.isBasemap = !view.isBasemap)}
             ><MapIcon class="block-4 inline-4" /></button
           >
+          <button
+            type="button"
+            class={cn("grid place-items-center border-bs block-9 inline-9", {
+              "bg-foreground text-card": isAnalyzing,
+              "hover:bg-secondary": !isAnalyzing,
+            })}
+            aria-label={m.atlas_analysis()}
+            title={m.atlas_analysis()}
+            aria-pressed={isAnalyzing}
+            onclick={() => (isAnalyzing = !isAnalyzing)}
+            ><SheetIcon class="block-4 inline-4" /></button
+          >
         </div>
       </div>
+
+      {#if analysis != null}
+        <div
+          class={cn(
+            "absolute z-30 overflow-clip bg-card shadow-menu ring-1 ring-border",
+            {
+              "inset-s-16 inset-e-3 inset-be-3 rounded-md block-[min(22rem,46%)]":
+                wide.current,
+              "inset-x-0 inset-be-0 rounded-t-lg block-[64%]": !wide.current,
+            },
+          )}
+        >
+          <Analysis
+            rows={analysis.rows}
+            sides={[
+              labels.get(lens.first ?? "") ?? "",
+              labels.get(lens.second ?? "") ?? "",
+            ]}
+            title={analysis.title}
+            year={isCompared ? year : null}
+            now={head.date?.slice(0, 4) ?? null}
+            picked={view.picked}
+            columns={exported.columns}
+            table={exported.table}
+            resolve={(css: string) => engine.read(css)}
+            onpick={(ks: Array<number>) => {
+              view.picked = ks;
+            }}
+            onhover={(k: number | null) =>
+              hover(k == null ? null : stage.find(k))}
+            onimage={save}
+            onclose={() => {
+              isAnalyzing = false;
+              hover(null);
+            }}
+          />
+        </div>
+      {/if}
 
       {#if !wide.current}
         <Drawer
