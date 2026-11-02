@@ -33,6 +33,18 @@
   setContext("figures", new Set<string>());
 
   let Overlays = $state<Component | null>(null);
+  let isInteractive = $state(false);
+
+  $effect(() => {
+    const offs = (["pointerdown", "keydown"] as const).map((type) =>
+      on(window, type, () => (isInteractive = true), { once: true }),
+    );
+    return () => {
+      for (const off of offs) {
+        off();
+      }
+    };
+  });
 
   $effect(() =>
     idle(() => {
@@ -170,7 +182,10 @@
 
 <QueryClientProvider client={queryClient}>
   <SvelteQueryDevtools />
-  <ModeWatcher modeStorageKey={embed == null ? undefined : "ea-embed-mode"} />
+  <ModeWatcher
+    modeStorageKey={embed == null ? undefined : "ea-embed-mode"}
+    disableTransitions={isInteractive}
+  />
   <Tooltip.Provider>
     {#if embed == null}
       <div class="grid grid-rows-[auto_1fr_auto] min-block-dvh">

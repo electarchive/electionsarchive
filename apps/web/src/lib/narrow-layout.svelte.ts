@@ -6,17 +6,23 @@ let isNarrow: boolean | null = null;
 const rootRem = () =>
   Number(getComputedStyle(document.documentElement).fontSize.slice(0, -2));
 
+const rootScale = () => {
+  const size = document.documentElement.style.fontSize;
+  return size.endsWith("%") ? Number(size.slice(0, -1)) / 100 : 1;
+};
+
 const subscribe = createSubscriber((update) => {
-  let rem = rootRem();
+  let rem: number | null = null;
   let width: number | null = null;
   const refresh = () => {
-    const next = width == null ? null : width < 48 * rem;
+    const next = width == null || rem == null ? null : width < 48 * rem;
     if (next !== isNarrow) {
       isNarrow = next;
       update();
     }
   };
   const resize = new ResizeObserver(([entry]) => {
+    rem ??= rootRem();
     width = entry?.contentBoxSize[0]?.inlineSize ?? width;
     refresh();
   });
@@ -41,5 +47,5 @@ export function isNarrowLayout(): boolean {
   }
 
   subscribe();
-  return isNarrow ?? document.body.clientWidth < 48 * rootRem();
+  return isNarrow ?? matchMedia(`(width < ${48 * rootScale()}rem)`).matches;
 }
