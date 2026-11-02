@@ -7510,6 +7510,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
                 if their_marks == marks
                 and not ((tail.startswith("ceda:") or state == "CA") and other_place(mine, theirs))
                 and not (tail.endswith(":family-court") and re.search(r"(?i)\bcounty court\b", contest))
+                and not ("criminal" in mine and "criminal" not in theirs and tail.endswith(":county-judge"))
                 and not (
                     (
                         named := re.match(
