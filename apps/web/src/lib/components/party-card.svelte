@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { createQuery } from "@tanstack/svelte-query";
+  import Logo from "#lib/components/logo.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -85,30 +86,51 @@
   </p>
 {:else}
   {const party = $derived(query.data)}
-  <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
-    <p class="flex items-baseline gap-2 text-[1.0625rem]/tight font-[720]">
-      <span
-        class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-        style:background-color={color ?? swatch(party.color, `party:${id}`)}
-      ></span>
-      <span>
-        {party.name}
-        {#if party.short != null && !party.name.includes(party.short)}
-          <span
-            class="ms-1 font-sans text-[0.8125rem] font-normal text-muted-foreground"
-            >{party.short}</span
-          >
-        {/if}
-      </span>
-    </p>
-    {#if party.polity != null}
-      <p class="text-[0.8125rem] text-muted-foreground">
-        {m.party_in({
-          kind: KINDS[party.kind]?.() ?? party.kind,
-          polity: party.polity.name,
-        })}
-      </p>
+  <div class="flex items-center gap-3 px-3 pbs-2.5 pbe-2">
+    {#if party.logo?.shape === "mark"}
+      <Logo
+        logo={party.logo}
+        label={party.name}
+        kind="mark"
+        size={40}
+        isEager
+      />
     {/if}
+    <div class="grid gap-0.5 min-inline-0">
+      {#if party.logo?.shape === "wordmark"}
+        <Logo
+          logo={party.logo}
+          label={party.name}
+          kind="lockup"
+          size={26}
+          isEager
+          class="mbe-1.5 object-left max-inline-full"
+        />
+      {/if}
+      <p class="flex items-baseline gap-2 text-[1.0625rem]/tight font-[720]">
+        <span
+          class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+          style:background-color={color ?? swatch(party.color, `party:${id}`)}
+        ></span>
+        <span>
+          {party.name}
+          {#if party.short != null && !party.name.includes(party.short)}
+            <span
+              class="ms-1 font-sans text-[0.8125rem] font-normal text-muted-foreground"
+              >{party.short}</span
+            >
+          {/if}
+        </span>
+      </p>
+      {#if party.polity != null}
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.party_in({
+            kind: KINDS[party.kind]?.() ?? party.kind,
+            polity: party.polity.name,
+          })}
+        </p>
+      {/if}
+    </div>
   </div>
   {#if party.span != null}
     <dl class="grid grid-cols-2 gap-px border-bs bg-border">

@@ -25647,6 +25647,7 @@ export const parties = {
         kind: v.string(),
         polity: v.nullable(Link),
         wikidata: v.nullable(v.string()),
+        logo: v.nullable(LogoRef),
         span: v.nullable(
           v.object({ from: v.string(), to: v.string(), contests: v.number() }),
         ),
@@ -25797,7 +25798,7 @@ export const parties = {
         ...relations.rows.flatMap((row) => row.other ?? []),
         ...peers,
       ];
-      const [entities, slugs, spans, named] = await Promise.all([
+      const [entities, slugs, spans, named, marks] = await Promise.all([
         refs([
           party.id,
           ...polity,
@@ -25815,6 +25816,7 @@ export const parties = {
           group by 1
         `),
         renames(party.id),
+        logos([party.id], null),
       ]);
       const self = entities.get(party.id);
       const ranges = new Map(spans.rows.map((row) => [row.party, row]));
@@ -25831,6 +25833,7 @@ export const parties = {
                 path: slugs.get(party.polity) ?? null,
               },
         wikidata: party.wikidata,
+        logo: marks[party.id] ?? null,
         span:
           party.from == null || party.to == null
             ? null
