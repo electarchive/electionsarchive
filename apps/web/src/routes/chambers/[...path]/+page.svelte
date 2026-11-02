@@ -634,6 +634,7 @@
             here={null}
             place={body.name}
             link={null}
+            body={data.id}
             size={open.length > 0
               ? apportioned
               : term.size != null && held <= term.size

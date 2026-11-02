@@ -2836,8 +2836,9 @@ async function chamber(
     polity: string | null;
     path: string | null;
     base: string | null;
+    body: string | null;
   }>(sql`
-    select z.seats as size, exists (select from contest k where k.allocation_parent_id = c.id) as "isParent",
+    select z.seats as size, c.body_id as body, exists (select from contest k where k.allocation_parent_id = c.id) as "isParent",
       case when c.id = r.id then z.seats end as need,
       case
         when exists (select from contest k where k.allocation_parent_id = c.id) then '{}'
@@ -2967,6 +2968,7 @@ async function chamber(
         }
       : null,
     size: shape?.size ?? null,
+    body: shape?.body ?? null,
     places: places.map((place) => ({ name: place.name, path: place.path })),
     here: at === -1 ? null : at,
     parties: rows.map((row) => ({
@@ -6644,6 +6646,7 @@ export const contests = {
           v.object({
             link: v.nullable(Link),
             size: v.nullable(v.number()),
+            body: v.nullable(v.string()),
             places: v.array(Link),
             here: v.nullable(v.number()),
             parties: v.array(

@@ -40,6 +40,7 @@
     partners: pairs = [],
     governing: governed = [],
     chamber = null,
+    body = chamber,
     title = null,
     isLinked = false,
     isUp = false,
@@ -71,6 +72,7 @@
     partners?: Array<Array<string>>;
     governing?: Array<string>;
     chamber?: string | null;
+    body?: string | null;
     title?: string | null;
     isLinked?: boolean;
     isUp?: boolean;
@@ -79,6 +81,7 @@
 
   const uid = $props.id();
   const S = 100;
+  const BENCHED = new Set(["01a13b8d-56e9-747a-a0a6-f9741f70db7e"]);
 
   const folded = $derived.by(() => {
     const groups = Map.groupBy(
@@ -241,7 +244,74 @@
     }
     return { rows, thick, radii, counts };
   });
-  const dot = $derived(Math.round(0.84 * layout.thick * S * 1000) / 1000);
+  const isBenched = $derived(body != null && BENCHED.has(body));
+  const speaker = $derived(
+    isBenched
+      ? (folded.find((party) => /^speaker$/iu.test(party.label.trim())) ?? null)
+      : null,
+  );
+  const front = $derived.by(() => {
+    const sitting = folded.filter(
+      (party) => party !== speaker && !party.key.startsWith("category:"),
+    );
+    const named = sitting.filter((party) => governing.includes(party.key));
+    if (named.length > 0) {
+      return new Set(named.map((party) => party.key));
+    }
+    const lead = sitting.toSorted((a, b) => b.seats - a.seats)[0];
+    return new Set(
+      lead == null
+        ? []
+        : (partners.find((pair) => pair.includes(lead.key)) ?? [lead.key]),
+    );
+  });
+  const sequence = $derived.by(() => {
+    if (!isBenched) {
+      return ordered;
+    }
+    const sized = ordered.toSorted(
+      (a, b) =>
+        Number(a.key.startsWith("category:")) -
+          Number(b.key.startsWith("category:")) || b.seats - a.seats,
+    );
+    return [
+      ...sized.filter((party) => party === speaker),
+      ...sized.filter((party) => front.has(party.key)),
+      ...sized.filter((party) => party !== speaker && !front.has(party.key)),
+    ];
+  });
+  const bench = $derived.by(() => {
+    const chair = speaker?.seats ?? 0;
+    let ruling = 0;
+    for (const party of folded) {
+      if (front.has(party.key)) {
+        ruling += party.seats;
+      }
+    }
+    const facing = Math.max(0, totals.all - chair - ruling);
+    const aisle = chair > 0 ? 1.6 : 0;
+    let best = { columns: 1, near: ruling, far: facing, floor: 3 };
+    let closest = Infinity;
+    for (let columns = 4; columns <= 90; columns++) {
+      const near = Math.ceil(ruling / columns);
+      const far = Math.ceil(facing / columns);
+      const floor = Math.max(4, Math.round(0.42 * (near + far)));
+      const miss = Math.abs(
+        Math.log((columns + aisle) / (near + far + floor) / 2.4),
+      );
+      if (miss < closest) {
+        closest = miss;
+        best = { columns, near, far, floor };
+      }
+    }
+    const pitch = (2 * S) / (best.columns + aisle);
+    return { ...best, chair, ruling, pitch, start: -S + aisle * pitch };
+  });
+  const dot = $derived(
+    Math.round(
+      (isBenched ? 0.42 * bench.pitch : 0.84 * layout.thick * S) * 1000,
+    ) / 1000,
+  );
   const ring = $derived(Math.max(0.6, 0.22 * dot));
   const striped = $derived(
     new Set(
@@ -249,7 +319,30 @@
     ),
   );
 
-  const seats = $derived.by(() => {
+  const spots = $derived.by(() => {
+    const found: Array<{ x: number; y: number }> = [];
+    if (isBenched) {
+      const { chair, ruling, near, far, floor, pitch, start } = bench;
+      for (let seat = 0; seat < chair; seat++) {
+        found.push({
+          x: start - 0.9 * pitch,
+          y: (seat - (chair - 1) / 2) * pitch,
+        });
+      }
+      for (let seat = 0; seat < ruling; seat++) {
+        found.push({
+          x: start + (Math.floor(seat / near) + 0.5) * pitch,
+          y: (floor / 2 + (seat % near) + 0.5) * pitch,
+        });
+      }
+      for (let seat = 0; seat < totals.all - chair - ruling; seat++) {
+        found.push({
+          x: start + (Math.floor(seat / far) + 0.5) * pitch,
+          y: -(floor / 2 + (seat % far) + 0.5) * pitch,
+        });
+      }
+      return found;
+    }
     const positions: Array<{ angle: number; radius: number }> = [];
     for (const [row, radius] of layout.radii.entries()) {
       const seated = layout.counts[row] ?? 0;
@@ -267,18 +360,26 @@
       }
     }
     positions.sort((a, b) => b.angle - a.angle || a.radius - b.radius);
-    const placed = positions.map((position, index) => ({
-      x: Math.round(position.radius * S * Math.cos(position.angle) * 100) / 100,
-      y:
-        Math.round(-position.radius * S * Math.sin(position.angle) * 100) / 100,
-      angle: position.angle,
+    for (const position of positions) {
+      found.push({
+        x: position.radius * S * Math.cos(position.angle),
+        y: -position.radius * S * Math.sin(position.angle),
+      });
+    }
+    return found;
+  });
+
+  const seats = $derived.by(() => {
+    const placed = spots.map((spot, index) => ({
+      x: Math.round(spot.x * 100) / 100,
+      y: Math.round(spot.y * 100) / 100,
       party: "",
       local: false,
       index,
       member: null as Member | null,
     }));
     let start = 0;
-    for (const party of ordered) {
+    for (const party of sequence) {
       const block = placed.slice(start, start + party.seats);
       start += party.seats;
       const queue = [...party.members];
@@ -350,19 +451,50 @@
         held === 0 &&
         (size === totals.all || (size == null && isComplete))),
   );
-  const majorityAngle = $derived.by(() => {
+  const outer = $derived((layout.radii.at(-1) ?? 1) * S + dot);
+  const mark = $derived.by(() => {
+    if (!whole || totals.all <= 1) {
+      return null;
+    }
+    if (isBenched) {
+      const { ruling, near, floor, pitch, start } = bench;
+      if (ruling < majority || near === 0) {
+        return null;
+      }
+      const x = start + (Math.floor((majority - 1) / near) + 0.5) * pitch;
+      const y = (floor / 2 + near) * pitch + 2;
+      return { x1: x, y1: y, x2: x, y2: y + 6 };
+    }
     const before = seats[majority - 2];
     const after = seats[majority - 1];
-    return before == null || after == null
-      ? Math.PI / 2
-      : (before.angle + after.angle) / 2;
+    const angle =
+      before == null || after == null
+        ? Math.PI / 2
+        : (Math.atan2(-before.y, before.x) + Math.atan2(-after.y, after.x)) / 2;
+    return {
+      x1: (outer + 2) * Math.cos(angle),
+      y1: -(outer + 2) * Math.sin(angle),
+      x2: (outer + 8) * Math.cos(angle),
+      y2: -(outer + 8) * Math.sin(angle),
+    };
   });
-  const outer = $derived((layout.radii.at(-1) ?? 1) * S + dot);
-  const box = $derived({
-    x: -outer - 1,
-    y: -outer - (whole ? 10 : 1),
-    width: 2 * outer + 2,
-    height: outer + (whole ? 10 : 1) + 1,
+  const box = $derived.by(() => {
+    if (isBenched) {
+      const { near, far, floor, pitch } = bench;
+      const top = -(floor / 2 + far) * pitch - 1;
+      return {
+        x: -S - 1,
+        y: top,
+        width: 2 * S + 2,
+        height: (floor / 2 + near) * pitch + (mark == null ? 1 : 9) - top,
+      };
+    }
+    return {
+      x: -outer - 1,
+      y: -outer - (whole ? 10 : 1),
+      width: 2 * outer + 2,
+      height: outer + (whole ? 10 : 1) + 1,
+    };
   });
   const center = $derived(
     link == null
@@ -371,10 +503,26 @@
         : { value: totals.all, of: whole ? null : size }
       : { value: totals.local, of: totals.all },
   );
-  const font = $derived.by(() => {
-    const hole = (layout.radii[0] ?? 0.5) * S - dot - 1.5;
+  const label = $derived.by(() => {
     const digits = count(center.value).length;
-    return Math.max(
+    if (isBenched) {
+      const { columns, floor, pitch, start } = bench;
+      const font = Math.max(
+        6,
+        Math.min(
+          (center.of == null ? 0.7 : 0.56) * floor * pitch,
+          (0.6 * columns * pitch) / (0.58 * digits + 0.2),
+        ),
+      );
+      return {
+        font,
+        x: start + (columns * pitch) / 2,
+        y: center.of == null ? 0.36 * font : 0.2 * font,
+        sub: 0.54 * font,
+      };
+    }
+    const hole = (layout.radii[0] ?? 0.5) * S - dot - 1.5;
+    const font = Math.max(
       6,
       Math.min(
         0.66 * hole,
@@ -382,6 +530,12 @@
         center.of == null ? Infinity : 0.62 * hole,
       ),
     );
+    return {
+      font,
+      x: 0,
+      y: center.of == null ? -0.5 : -0.42 * font - 1,
+      sub: -0.5,
+    };
   });
   const caption = $derived.by(() => {
     if (held > 0) {
@@ -535,17 +689,8 @@
     const { x, y } = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       matrix.inverse(),
     );
-    const radius = Math.hypot(x, y);
-    const pad = dot + layout.thick * S;
-    if (
-      radius < (layout.radii[0] ?? 0.5) * S - pad ||
-      radius > outer + pad ||
-      y > pad
-    ) {
-      active = null;
-      return;
-    }
-    let best = { index: -1, distance: Infinity };
+    const reach = isBenched ? 0.75 * bench.pitch : dot + layout.thick * S;
+    let best = { index: -1, distance: reach ** 2 };
     for (const seat of seats) {
       const distance = (seat.x - x) ** 2 + (seat.y - y) ** 2;
       if (distance < best.distance) {
@@ -581,7 +726,9 @@
   <figure class="grid justify-items-center gap-2">
     <div
       class="relative inline-full"
-      style:max-inline-size="{Math.min(26, 11 + 2.4 * layout.rows)}rem"
+      style:max-inline-size="{isBenched
+        ? Math.min(30, 12 + 0.45 * bench.columns)
+        : Math.min(26, 11 + 2.4 * layout.rows)}rem"
     >
       <svg
         {@attach (svg: SVGSVGElement) =>
@@ -648,6 +795,19 @@
         }}
         onblur={() => (active = null)}
       >
+        {#if isBenched}
+          <g class="pointer-events-none stroke-border" aria-hidden="true">
+            {#each [-1, 1] as side (side)}
+              <line
+                stroke-width="0.8"
+                x1={bench.start}
+                x2={bench.start + bench.columns * bench.pitch}
+                y1={side * (bench.floor / 2 - 0.9) * bench.pitch}
+                y2={side * (bench.floor / 2 - 0.9) * bench.pitch}
+              />
+            {/each}
+          </g>
+        {/if}
         {#each seats as seat (seat.index)}
           {const lit = $derived(
             lead == null
@@ -683,7 +843,9 @@
               .join(", ")}
             r={seat.party === "" || seat.party === "~seceded"
               ? dot - 0.3 * ring
-              : dot}
+              : seat.index < bench.chair && isBenched
+                ? 1.3 * dot
+                : dot}
             stroke-dasharray={seat.party === "~seceded"
               ? `${0.9 * ring} ${0.7 * ring}`
               : undefined}
@@ -752,30 +914,27 @@
             />
           </g>
         {/if}
-        {#if whole && totals.all > 1}
+        {#if mark != null}
           <line
             class="stroke-foreground"
             stroke-width="1.2"
             stroke-linecap="round"
-            x1={(outer + 2) * Math.cos(majorityAngle)}
-            y1={-(outer + 2) * Math.sin(majorityAngle)}
-            x2={(outer + 8) * Math.cos(majorityAngle)}
-            y2={-(outer + 8) * Math.sin(majorityAngle)}
+            {...mark}
           />
         {/if}
         <text
           class="pointer-events-none fill-foreground font-figures font-[780] tabular-nums"
-          style:font-size="{font}px"
-          x="0"
-          y={center.of == null ? -0.5 : -0.42 * font - 1}
+          style:font-size="{label.font}px"
+          x={label.x}
+          y={label.y}
           text-anchor="middle">{count(center.value)}</text
         >
         {#if center.of != null}
           <text
             class="pointer-events-none fill-muted-foreground font-figures tabular-nums"
-            style:font-size="{0.3 * font}px"
-            x="0"
-            y="-0.5"
+            style:font-size="{0.3 * label.font}px"
+            x={label.x}
+            y={label.sub}
             text-anchor="middle">{m.seats_of({ count: count(center.of) })}</text
           >
         {/if}

@@ -1985,6 +1985,7 @@
       place={seatsPlace}
       link={chamber?.link ?? null}
       size={chamber?.size ?? null}
+      body={chamber?.body ?? null}
       {change}
     />
     {#if contest.kind === "list_allocation"}

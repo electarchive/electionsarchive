@@ -38,6 +38,7 @@
     place={contest.scope.name}
     link={contest.chamber.link}
     size={contest.chamber.size}
+    body={contest.chamber.body}
     {change}
   />
 {/if}
