@@ -1,6 +1,7 @@
 import csv
 import hashlib
 import os
+import re
 import time
 from collections import defaultdict
 from datetime import date
@@ -34,6 +35,7 @@ REPORTS = Path(
     os.environ.get("EA_REPORTS") or (ROOT / ".agents" / "spec" if (ROOT / ".agents").is_dir() else DATA / "reports")
 )
 CATEGORIES = ("known_gap", "blocked", "not_applicable")
+GRAINS = ("results", "county", "precinct", "fine", "shapes", "turnout", "candidates", "dates", "party")
 GRAINS = ("results", "county", "precinct", "fine", "shapes", "turnout", "candidates", "dates", "party")
 LOCAL = {"county", "municipal", "school", "special_district", "local_measure"}
 ERAS = ((1789, 1823), (1824, 1899), (1900, 1966), (1967, 1999), (2000, 2015), (2016, 2025))
@@ -656,9 +658,18 @@ def registry() -> list[dict]:
     with GAPS.open() as f:
         rows = list(csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"))
     for i, row in enumerate(rows):
-        if row["category"] not in CATEGORIES:
+        problem = (
+            f"category {row['category']!r} is not one of {', '.join(CATEGORIES)}"
+            if row["category"] not in CATEGORIES
+            else f"grain {row['grain']!r} is not one of {', '.join(GRAINS)}"
+            if row["grain"] not in GRAINS
+            else f"checked {row['checked']!r} is not a YYYY-MM-DD date"
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["checked"] or "") is None
+            else None
+        )
+        if problem is not None:
             raise ValueError(
-                f"{GAPS.name} row {i + 1} ({row['polity']} {row['state']} {row['years']}): category {row['category']!r} is not one of {', '.join(CATEGORIES)}"
+                f"{GAPS.name} row {i + 1} ({row['polity']} {row['state']} {row['years']} {row['label']!r}): {problem}"
             )
         first, dash, last = row["years"].partition("-")
         row |= {
