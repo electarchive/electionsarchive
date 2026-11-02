@@ -3,9 +3,10 @@ import json
 import math
 import re
 import zipfile
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 import shapefile
@@ -118,6 +119,10 @@ DISTRICT = (
 MONTH = "The database gives only the month of this election, not the day."
 YEAR = "The database gives only the year of this election."
 FIRSTLESS = "This was a runoff. The database records only the deciding round, and the archive does not hold the first."
+TWIN = (
+    "Withdrawn: the archive holds this race from another source that lists the same candidates, dated to the day. The "
+    "database dates it only to the month or year, so its copy is not shown."
+)
 
 
 def fetch() -> None:
@@ -225,6 +230,12 @@ def _short(name: str) -> tuple[str, str]:
     words = [slug(word) for word in re.sub(r"\b(?:Jr|Sr|II|III|IV)\b\.?", " ", name).replace(",", " ").split()]
     words = [word for word in words if len(word) > 1]
     return (words[0], words[-1]) if words else ("", "")
+
+
+def _surname(name: str) -> str:
+    text = re.sub(r"(?i)\b(?:jr|sr|ii|iii|iv)\b\.?", " ", name).strip(" ,")
+    words = (text.split(",")[0] if "," in text else text).split()
+    return slug(words[-1]) if words else ""
 
 
 def emit() -> Path:
@@ -437,6 +448,31 @@ def emit() -> Path:
                    where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline in ('us.wards', 'us.chicago_boe', 'us.ceda', 'us.houston_citysec', 'us.medsl_local', 'us.bexar', 'us.dallas_citysec', 'us.electionsfl')"""
             )
         }
+        held = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join contest c on c.id = x.entity_id
+                   join changeset s on s.id = c.changeset_id
+                   where x.scheme = 'us.contest' and x.value like 'alged:%%' and s.pipeline = %s
+                     and not exists (select from entity_merge m where m.entity_id = c.id)
+                     and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+                [SOURCE],
+            ).fetchall()
+        )
+        dated: dict[tuple[UUID, int], list[tuple[int, date, UUID, UUID, set[str]]]] = defaultdict(list)
+        for contest, election, polity, day, ballots in conn.execute(
+            """select c.id, e.id, e.polity_id, e.date_from, array_agg(y.ballot_name)
+               from contest c join election e on e.id = c.election_id and e.date_precision = 'day'
+               join changeset s on s.id = c.changeset_id and s.pipeline <> %s
+               join contest_option p on p.contest_id = c.id join candidacy y on y.option_id = p.id
+               where e.polity_id = any(%s) and y.ballot_name is not null
+                 and exists (select from result_set r where r.contest_id = c.id and r.status = 'active')
+                 and not exists (select from entity_merge m where m.entity_id = c.id)
+                 and not exists (select from entity_retirement t where t.entity_id = c.id)
+               group by 1, 2, 3, 4""",
+            [SOURCE, [polity for polity, *_ in polities.values()]],
+        ).fetchall():
+            dated[(polity, day.year)].append((day.month, day, contest, election, set(map(_surname, ballots)) - {""}))
+        twins: dict[UUID, tuple[date, UUID, UUID]] = {}
         for (contest_id,), rows in frame.sort("contest", "votes", descending=[False, True]).group_by(
             "contest", maintain_order=True
         ):
@@ -454,6 +490,23 @@ def emit() -> Path:
             if code not in polities:
                 continue
             polity, place, path, word = polities[code]
+            if not (month == 11 and usps != "LA"):
+                names = {
+                    _surname(full_name)
+                    for full_name in rows["full_name"]
+                    if not re.fullmatch(r"(?i)scattering|write-?ins?", full_name)
+                } - {""}
+                found = sorted(
+                    (day, contest, election)
+                    for held_month, day, contest, election, theirs in dated.get((polity, year), [])
+                    if (month is None or held_month == month)
+                    and names
+                    and len(names & theirs) * 2 > max(len(names), len(theirs))
+                )
+                if found:
+                    if (ours := held.get(f"alged:{contest_id}")) is not None:
+                        twins[ours] = found[-1]
+                    continue
             city = len(code) == 5 and word == "City"
             place = place.removeprefix("City of ") if city else place
             geoid = code.removeprefix("sd")
@@ -761,5 +814,28 @@ def emit() -> Path:
             cs.add(
                 "note_drop", note_id=note, entity_id=entity, body_md=text, reason="The election is now dated to the day"
             )
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
+        for row in conn.execute(
+            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                where r.contest_id = any(%s::uuid[]) and r.status <> 'withdrawn'""",
+            [list(twins)],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+            cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=TWIN)
+        for ours, (_, contest, _) in twins.items():
+            cs.merge(ours, contest)
+        emptied: dict[UUID, set[UUID]] = defaultdict(set)
+        for election, contest in conn.execute(
+            """select c.election_id, c.id from contest c join changeset s on s.id = c.changeset_id
+               where c.election_id in (select election_id from contest where id = any(%s::uuid[]))
+                 and not exists (select from entity_merge m where m.entity_id = c.id)
+                 and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+            [list(twins)],
+        ).fetchall():
+            emptied[election].add(twins[contest][2] if contest in twins else contest)
+        for election, targets in emptied.items():
+            if len(targets) == 1 and (target := next(iter(targets))) in {twin[2] for twin in twins.values()}:
+                cs.merge(election, target)
+        print(f"{len(twins)} contests withdrawn as twins of day-dated contests from other pipelines")
         cs.pool("A scattering or write-in line in ALGED read as a candidate")
         return cs.write()

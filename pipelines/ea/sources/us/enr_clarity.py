@@ -1223,7 +1223,7 @@ def _classify(
                     bare = re.sub(rf"\b{name}\b", " ", plain)
                 rest = re.sub(rf"\b{re.escape(name)}\b", " ", bare)
                 seat, rest = _seat(rest)
-                if seat is None and (region := re.search(r"\b(\d+[A-Z]?)\b(?! ?(?:YR|YEAR|FOR\b))", rest)):
+                if seat is None and (region := re.search(r"(?<!/)\b(\d+[A-Z]?)\b(?!/| ?(?:YR|YEAR|FOR\b))", rest)):
                     seat = f"Region {region[1]}"
                 if seat is None and st == "NY":
                     seat = _title(_residue(rest, "EDUCATION|ED|SCHOOLS?")) or None
