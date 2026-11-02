@@ -220,7 +220,7 @@
 </script>
 
 <section
-  class="grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
+  class="@container grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
 >
   <div class="flex flex-wrap items-end justify-between gap-3">
     <h2 class="heading text-lg!">{m.night_explorer_title()}</h2>
@@ -238,38 +238,50 @@
       bind:value={office}
       label={m.night_explorer_office()}
       size="sm"
+      class="max-sm:-mx-4 max-sm:px-4 max-sm:max-inline-[calc(100%+2rem)]"
     />
     <Segmented
       options={FOCUSES}
       bind:value={focus}
       label={m.night_explorer_status()}
       size="sm"
+      class="max-sm:-mx-4 max-sm:px-4 max-sm:max-inline-[calc(100%+2rem)]"
     />
   </div>
   <div
-    class="relative overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+    class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
     {@attach fits}
   >
     <table
-      class="table-fixed border-collapse text-[0.8125rem] inline-full"
-      style:min-inline-size="{minimum}rem"
+      class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-(--minimum) @max-[73rem]:block @max-[73rem]:min-inline-0"
+      style:--minimum="{minimum}rem"
     >
-      <colgroup>
+      <colgroup class="@max-[73rem]:hidden">
         {#each COLUMNS as column (column.label)}
           <col style:inline-size="{column.width}rem" />
         {/each}
       </colgroup>
       <thead
-        class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
+        class="sticky inset-bs-0 z-2 bg-background @max-[73rem]:block @max-[73rem]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
       >
-        <tr>
+        <tr
+          class="@max-[73rem]:scroll-fade-x @max-[73rem]:flex @max-[73rem]:items-center @max-[73rem]:gap-1.5 @max-[73rem]:py-2"
+        >
+          <td
+            class="hidden pe-1 text-xs text-muted-foreground @max-[73rem]:block"
+            >{m.night_explorer_sort()}</td
+          >
           {#each COLUMNS as column (column.label)}
             <th
               scope="col"
-              class={cn("py-1.5 pe-3 font-semibold whitespace-nowrap", {
-                "text-end": column.isEnd,
-                "text-start": !column.isEnd,
-              })}
+              class={cn(
+                "py-1.5 pe-3 font-semibold whitespace-nowrap shadow-[inset_0_-1px_0_var(--color-foreground)] @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:shadow-none",
+                {
+                  "text-end": column.isEnd,
+                  "text-start": !column.isEnd,
+                  "@max-[73rem]:hidden": column.id == null,
+                },
+              )}
               aria-sort={column.id != null && key === column.id
                 ? isAscending
                   ? "ascending"
@@ -283,8 +295,14 @@
                 <button
                   type="button"
                   class={cn(
-                    "inline-flex items-center gap-0.5 hover:underline",
+                    "inline-flex items-center gap-0.5 hover:underline @max-[73rem]:flex-row @max-[73rem]:gap-1 @max-[73rem]:rounded-sm @max-[73rem]:border @max-[73rem]:px-2 @max-[73rem]:text-xs @max-[73rem]:keycap @max-[73rem]:block-6 @max-[73rem]:hover:no-underline @max-[73rem]:focus-visible:ring-2 @max-[73rem]:focus-visible:ring-ring/50 @max-[73rem]:focus-visible:outline-none pointer-coarse:@max-[73rem]:block-9",
                     { "flex-row-reverse": column.isEnd },
+                    {
+                      "@max-[73rem]:border-primary @max-[73rem]:bg-primary @max-[73rem]:text-primary-foreground":
+                        key === id,
+                      "@max-[73rem]:border-input @max-[73rem]:bg-card @max-[73rem]:hover:bg-secondary":
+                        key !== id,
+                    },
                   )}
                   onclick={() => sortBy(id)}
                 >
@@ -302,11 +320,11 @@
           {/each}
         </tr>
       </thead>
-      <tbody {@attach windowed.anchor}>
+      <tbody class="@max-[73rem]:block" {@attach windowed.anchor}>
         {#if windowed.before > 0}
-          <tr aria-hidden="true">
+          <tr aria-hidden="true" class="@max-[73rem]:block">
             <td
-              class="p-0"
+              class="p-0 @max-[73rem]:block"
               colspan={COLUMNS.length}
               style:block-size="{windowed.before}px"
             ></td>
@@ -319,19 +337,25 @@
           )}
           {const isLeft = $derived((seat.signed ?? 0) >= 0)}
           <tr
-            class="border-be border-border hover:highlighter"
+            class="relative border-be border-border hover:highlighter @max-[73rem]:flex @max-[73rem]:flex-wrap @max-[73rem]:items-center @max-[73rem]:gap-x-3 @max-[73rem]:py-2.5 @max-[73rem]:before:order-3 @max-[73rem]:before:basis-full @max-[73rem]:before:content-[''] @max-[73rem]:after:order-6 @max-[73rem]:after:basis-full @max-[73rem]:after:content-['']"
             {@attach windowed.measure(index)}
           >
-            <th scope="row" class="py-1.5 pe-3 text-start font-normal">
-              <a href={href(seat)} class="grid hover:underline">
+            <th
+              scope="row"
+              class="py-1.5 pe-3 text-start font-normal @max-[73rem]:order-1 @max-[73rem]:flex-1 @max-[73rem]:p-0 @max-[73rem]:min-inline-0"
+            >
+              <a
+                href={href(seat)}
+                class="grid outline-none after:absolute after:inset-0 hover:underline focus-visible:underline @max-[73rem]:flex @max-[73rem]:items-center @max-[73rem]:gap-x-2"
+              >
                 <span
-                  class="flex items-center gap-1.5 font-semibold whitespace-nowrap"
+                  class="flex items-center gap-1.5 font-semibold whitespace-nowrap @max-[73rem]:text-sm"
                   >{label(seat)}
                   {#if seat.isFlip}
                     <Flip party={short(seat.side)} color={tint(seat.side)} />
                   {/if}
                 </span>
-                <span class="text-xs text-muted-foreground"
+                <span class="truncate text-xs text-muted-foreground"
                   >{summary.race.office === "house"
                     ? place(summary.race.state)
                     : summary.race.office === "senate"
@@ -340,27 +364,39 @@
                 >
               </a>
             </th>
-            <td class="py-1.5 pe-3">
-              <span class="grid">
-                <span class="flex items-center gap-1.5">
+            <td
+              class="py-1.5 pe-3 @max-[73rem]:order-7 @max-[73rem]:flex-1 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs @max-[73rem]:min-inline-0"
+            >
+              <span
+                class="grid @max-[73rem]:flex @max-[73rem]:items-center @max-[73rem]:gap-1.5"
+              >
+                <span class="flex shrink-0 items-center gap-1.5">
+                  <span class="hidden text-muted-foreground @max-[73rem]:inline"
+                    >{m.night_explorer_held()}</span
+                  >
                   <span
                     class="rounded-full block-2 inline-2"
                     style:background-color={tint(seat.held)}
-                  ></span>{short(seat.held)}
+                  ></span>
+                  <span class="@max-[73rem]:sr-only">{short(seat.held)}</span>
                 </span>
                 <span
-                  class="truncate text-xs text-muted-foreground max-inline-36"
+                  class="truncate text-xs text-muted-foreground max-inline-36 @max-[73rem]:text-foreground @max-[73rem]:max-inline-none"
                   >{seat.holder}</span
                 >
               </span>
             </td>
-            <td class="py-1.5 pe-3">
+            <td
+              class="py-1.5 pe-3 @max-[73rem]:order-4 @max-[73rem]:flex-1 @max-[73rem]:p-0 @max-[73rem]:pbs-1 @max-[73rem]:min-inline-0"
+            >
               {#if ahead == null}
                 <span class="text-muted-foreground"
                   >{m.night_nation_waiting()}</span
                 >
               {:else}
-                <span class="grid">
+                <span
+                  class="grid @max-[73rem]:flex @max-[73rem]:flex-wrap @max-[73rem]:items-baseline @max-[73rem]:gap-x-1.5"
+                >
                   <span class="flex items-center gap-1.5">
                     <span
                       class="rounded-full block-2 inline-2"
@@ -388,10 +424,10 @@
                 </span>
               {/if}
             </td>
-            <td class="py-1.5 pe-3">
+            <td class="py-1.5 pe-3 @max-[73rem]:order-2 @max-[73rem]:p-0">
               <span class="flex items-center gap-2">
                 <span
-                  class="relative shrink-0 block-3 inline-24"
+                  class="relative shrink-0 block-3 inline-24 @max-[73rem]:inline-14"
                   aria-hidden="true"
                 >
                   <span
@@ -423,7 +459,7 @@
                   {/if}
                 </span>
                 <span
-                  class="font-figures tabular-nums"
+                  class="font-figures tabular-nums @max-[73rem]:text-end @max-[73rem]:font-semibold @max-[73rem]:min-inline-10"
                   style:color={summary.total === 0
                     ? undefined
                     : tone(ahead ?? undefined)}
@@ -433,8 +469,18 @@
                 >
               </span>
             </td>
-            <td class="py-1.5 pe-3">
-              <span class="flex items-center gap-2">
+            <td
+              class={cn(
+                "py-1.5 pe-3 @max-[73rem]:order-8 @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs",
+                { "@max-[73rem]:hidden": summary.counted == null },
+              )}
+            >
+              <span class="hidden @max-[73rem]:inline"
+                >{m.night_races_counted({
+                  share: percent(summary.counted ?? 0, 0),
+                })}</span
+              >
+              <span class="flex items-center gap-2 @max-[73rem]:hidden">
                 <span
                   class="relative overflow-hidden rounded-xs bg-muted block-1.5 inline-12"
                   aria-hidden="true"
@@ -451,13 +497,27 @@
                 >
               </span>
             </td>
-            <td class="py-1.5 pe-3 text-end font-figures tabular-nums">
-              {seat.remaining == null || seat.remaining < 1
-                ? "–"
-                : compact(seat.remaining)}
+            {const isDone = $derived(
+              seat.remaining == null || seat.remaining < 1,
+            )}
+            <td
+              class={cn(
+                "py-1.5 pe-3 text-end font-figures tabular-nums @max-[73rem]:order-9 @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs @max-[73rem]:text-muted-foreground",
+                { "@max-[73rem]:hidden": isDone },
+              )}
+            >
+              <span class="@max-[73rem]:hidden"
+                >{isDone ? "–" : compact(seat.remaining ?? 0)}</span
+              ><span class="hidden @max-[73rem]:inline"
+                >{m.night_explorer_left_count({
+                  count: compact(seat.remaining ?? 0),
+                })}</span
+              >
             </td>
             {#if forecasts}
-              <td class="py-1.5 pe-3 text-end whitespace-nowrap">
+              <td
+                class="py-1.5 pe-3 text-end whitespace-nowrap @max-[73rem]:order-5 @max-[73rem]:p-0 @max-[73rem]:pbs-1"
+              >
                 {#if seat.rating === "projected"}
                   <span
                     class="text-xs font-semibold"
@@ -485,23 +545,23 @@
               </td>
             {/if}
             <td
-              class="py-1.5 text-end font-figures text-muted-foreground tabular-nums"
+              class="py-1.5 text-end font-figures text-muted-foreground tabular-nums @max-[73rem]:order-10 @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs"
               >{summary.at == null ? "–" : clock(summary.at)}</td
             >
           </tr>
         {:else}
-          <tr>
+          <tr class="@max-[73rem]:block">
             <td
               colspan={COLUMNS.length}
-              class="py-8 text-center text-muted-foreground"
+              class="py-8 text-center text-muted-foreground @max-[73rem]:block"
               >{m.night_explorer_empty()}</td
             >
           </tr>
         {/each}
         {#if windowed.after > 0}
-          <tr aria-hidden="true">
+          <tr aria-hidden="true" class="@max-[73rem]:block">
             <td
-              class="p-0"
+              class="p-0 @max-[73rem]:block"
               colspan={COLUMNS.length}
               style:block-size="{windowed.after}px"
             ></td>

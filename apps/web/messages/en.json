@@ -4785,6 +4785,8 @@
   "night_explorer_remaining": "Votes left",
   "night_explorer_chance": "Chance",
   "night_explorer_updated": "Updated",
+  "night_explorer_sort": "Sort",
+  "night_explorer_left_count": "{count} left",
   "night_flip": "Flip",
   "night_explorer_flip": "{party} flip",
   "night_explorer_incumbent": "Incumbent",

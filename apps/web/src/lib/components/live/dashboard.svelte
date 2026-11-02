@@ -1032,17 +1032,17 @@
   {/if}
 
   <section
-    class="grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
+    class="@container grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
   >
     <h2 class="heading text-lg!">{m.night_nation_table()}</h2>
     <div
-      class="relative overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+      class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
       {@attach fits}
     >
       <table
-        class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-240"
+        class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-240 @max-[60rem]:block @max-[60rem]:shadow-[inset_0_1px_0_var(--color-foreground)] @max-[60rem]:min-inline-0"
       >
-        <colgroup>
+        <colgroup class="@max-[60rem]:hidden">
           <col class="inline-40" />
           <col class="inline-32" />
           <col />
@@ -1051,7 +1051,7 @@
           <col class="inline-20" />
         </colgroup>
         <thead
-          class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
+          class="sticky inset-bs-0 z-2 bg-background @max-[60rem]:sr-only [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
         >
           <tr class="text-start">
             <th scope="col" class="py-1.5 ps-1 text-start font-semibold"
@@ -1074,16 +1074,21 @@
             >
           </tr>
         </thead>
-        <tbody {@attach states.anchor}>
+        <tbody class="@max-[60rem]:block" {@attach states.anchor}>
           {#if states.before > 0}
-            <tr aria-hidden="true">
-              <td class="p-0" colspan="6" style:block-size="{states.before}px"
+            <tr aria-hidden="true" class="@max-[60rem]:block">
+              <td
+                class="p-0 @max-[60rem]:block"
+                colspan="6"
+                style:block-size="{states.before}px"
               ></td>
             </tr>
           {/if}
           {#each states.entries as { value: code, index, key } (key)}
             {const all = $derived(byState.get(code) ?? [])}
             {const share = $derived(reported(code))}
+            {const senate = $derived(of(code, "senate")[0])}
+            {const governor = $derived(of(code, "governor")[0])}
             {const house = $derived(of(code, "house"))}
             {const latest = $derived(
               all
@@ -1093,7 +1098,7 @@
             )}
             <tr
               class={cn(
-                "cursor-pointer border-be border-border hover:highlighter",
+                "cursor-pointer border-be border-border hover:highlighter @max-[60rem]:flex @max-[60rem]:flex-wrap @max-[60rem]:items-center @max-[60rem]:gap-x-4 @max-[60rem]:py-2.5 @max-[60rem]:before:order-4 @max-[60rem]:before:basis-full @max-[60rem]:before:content-[''] @max-[60rem]:after:order-7 @max-[60rem]:after:basis-full @max-[60rem]:after:content-['']",
                 { highlighter: hovered === code },
               )}
               {@attach states.measure(index)}
@@ -1105,11 +1110,11 @@
             >
               <th
                 scope="row"
-                class="truncate py-1.5 ps-1 pe-3 text-start font-semibold"
+                class="truncate py-1.5 ps-1 pe-3 text-start font-semibold @max-[60rem]:order-1 @max-[60rem]:flex-1 @max-[60rem]:p-0 @max-[60rem]:text-sm @max-[60rem]:min-inline-0"
                 ><a href={href(code)} class="hover:underline">{name(code)}</a
                 ></th
               >
-              <td class="py-1.5">
+              <td class="py-1.5 @max-[60rem]:order-2 @max-[60rem]:p-0">
                 <span class="flex items-center gap-2">
                   <span
                     class="relative overflow-hidden rounded-xs bg-muted block-1.5 inline-16"
@@ -1126,11 +1131,40 @@
                   >
                 </span>
               </td>
-              <td class="py-1.5 pe-4">{@render chip(of(code, "senate")[0])}</td>
-              <td class="py-1.5 pe-4">
-                {@render chip(of(code, "governor")[0])}
+              <td
+                class={cn(
+                  "py-1.5 pe-4 @max-[60rem]:order-5 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
+                  { "@max-[60rem]:hidden": senate == null },
+                )}
+              >
+                <span
+                  class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
+                  >{m.night_nation_senate()}</span
+                >
+                {@render chip(senate)}
               </td>
-              <td class="py-1.5">
+              <td
+                class={cn(
+                  "py-1.5 pe-4 @max-[60rem]:order-6 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
+                  { "@max-[60rem]:hidden": governor == null },
+                )}
+              >
+                <span
+                  class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
+                  >{m.night_nation_governor()}</span
+                >
+                {@render chip(governor)}
+              </td>
+              <td
+                class={cn(
+                  "py-1.5 @max-[60rem]:order-8 @max-[60rem]:flex @max-[60rem]:basis-full @max-[60rem]:items-baseline @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5",
+                  { "@max-[60rem]:hidden": house.length === 0 },
+                )}
+              >
+                <span
+                  class="hidden shrink-0 text-xs text-muted-foreground @max-[60rem]:inline"
+                  >{m.night_nation_house()}</span
+                >
                 {#if house.length === 0}
                   <span class="text-muted-foreground">–</span>
                 {:else}
@@ -1154,14 +1188,17 @@
                 {/if}
               </td>
               <td
-                class="py-1.5 pe-1 text-end font-figures text-muted-foreground tabular-nums"
+                class="py-1.5 pe-1 text-end font-figures text-muted-foreground tabular-nums @max-[60rem]:order-3 @max-[60rem]:p-0 @max-[60rem]:text-xs"
                 >{latest === "" ? "–" : clockOf(latest)}</td
               >
             </tr>
           {/each}
           {#if states.after > 0}
-            <tr aria-hidden="true">
-              <td class="p-0" colspan="6" style:block-size="{states.after}px"
+            <tr aria-hidden="true" class="@max-[60rem]:block">
+              <td
+                class="p-0 @max-[60rem]:block"
+                colspan="6"
+                style:block-size="{states.after}px"
               ></td>
             </tr>
           {/if}
