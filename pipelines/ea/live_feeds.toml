@@ -302,6 +302,14 @@ publisher = "Vermont Secretary of State"
 url = "https://electionresults.vermont.gov/"
 
 [[feed]]
+id = "us.enr_2026.ak"
+adapter = "us.enr_2026"
+params = { state = "AK" }
+poller = "muktedir"
+publisher = "Alaska Division of Elections"
+url = "https://www.elections.alaska.gov/results/26GENR/"
+
+[[feed]]
 id = "us.enr_2026.hi"
 adapter = "us.enr_2026"
 params = { state = "HI" }

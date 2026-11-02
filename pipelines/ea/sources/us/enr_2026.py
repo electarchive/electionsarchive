@@ -20,13 +20,15 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.clarity_local import COUNTIES, STATES
 from ea.sources.us.county_changes import ct_regions
-from ea.sources.us.oe_primaries_2026 import ALIASES, FIPS, OFFICIAL, plain, town_counties
+from ea.sources.us.oe_primaries_2026 import ALIASES, OFFICIAL, plain, town_counties
+from ea.sources.us.oe_primaries_2026 import FIPS as COUNTY_FIPS
 from ea.store import DATA, Connection, connect
 
 SOURCE = "us.enr_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date.fromisoformat(os.environ.get("ENR_2026_DAY", "2026-11-03"))
+FIPS = {**COUNTY_FIPS, "AK": "02"}
 ONLY = set(filter(None, os.environ.get("ENR_2026_STATES", "").split(",")))
 HEADERS = {"User-Agent": "electionsarchive.com"}
 EV = {
@@ -394,6 +396,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_de
 
         enr_de.collect(client, get, lambda url, content, suffix: store("DE", url, content, suffix))
+    if not only or "AK" in only:
+        from ea.sources.us import enr_ak
+
+        enr_ak.collect(client, get, lambda url, content, suffix: store("AK", url, content, suffix))
     if not only or "HI" in only:
         from ea.sources.us import enr_hi
 
@@ -617,6 +623,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_de
 
         yield from enr_de.rows(url, path, urls)
+        return
+    if state == "AK":
+        from ea.sources.us import enr_ak
+
+        yield from enr_ak.rows(url, path, urls)
         return
     if state == "HI":
         from ea.sources.us import enr_hi
@@ -1153,6 +1164,10 @@ def plan(
         counties.setdefault((code[:2], plain(text)), id)
         counties[(code[:2], code)] = id
         codes.setdefault((code[:2], plain(text)), code)
+    for code, id in conn.execute(
+        "select code, id from reporting_unit where scheme_code in ('us.sldl', 'us.sldu') and code like 'AK:%'"
+    ).fetchall():
+        counties[("02", code)] = id
     unmatched: list[str] = []
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
     local_keys: set[str] = set()
@@ -1426,7 +1441,7 @@ def plan(
             .agg(pl.col("reporting").max(), pl.col("total").max())
             .select(pl.col("reporting").sum(), pl.col("total").sum())
             .row(0)
-            if state in ("FL", "NJ", "NM", "SD", "ND")
+            if state in ("AK", "FL", "NJ", "NM", "SD", "ND")
             else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
         )
         sums: dict[tuple[UUID, UUID], int] = {}
