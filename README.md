@@ -1,32 +1,30 @@
 <div align="center">
 
-<img src="apps/web/static/favicon.svg" width="72" height="72" alt="Elections Archive logo: a tally mark on yellow">
-
-# Elections Archive
-
-**Every election in the world, down to the ballot box.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.webp">
+  <img src="docs/images/banner-light.webp" alt="Elections Archive: every election in the world, down to the ballot box. 964,460 contests, 224,962 elections, 67,416 places that hold elections, and the earliest election in 1787." width="100%">
+</picture>
 
 [![CI](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml/badge.svg)](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml)
 [![Code: AGPL-3.0](https://img.shields.io/badge/code-AGPL--3.0-15171a)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-15171a)](https://creativecommons.org/licenses/by/4.0/)
 [![MCP server](https://img.shields.io/badge/MCP-ready-ffe03a)](https://electionsarchive.com/agents)
 
-[Website](https://electionsarchive.com) · [API](https://electionsarchive.com/api/v1/openapi.json) · [For agents](https://electionsarchive.com/agents) · [Docs](docs/architecture.md) · [Contributing](CONTRIBUTING.md)
+[Website](https://electionsarchive.com) · [API](https://electionsarchive.com/api/v1/openapi.json) · [Connect your agent](https://electionsarchive.com/agents) · [How the data gets in](docs/pipelines.md) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
-<br>
+Elections Archive holds results for more than 960,000 contests in 224,000 elections, from the 1787 elections in the United States to this year's, by precinct, polling station, and ballot box where the official count goes that deep. Every number links to the source that published it.
 
 <p align="center">
   <img src="docs/images/map.webp" alt="County map of the 2024 United States presidential election on electionsarchive.com, shaded by margin, with a color key and a histogram of county margins" width="100%">
 </p>
 
-Elections Archive holds results for more than 900,000 contests, from the 1787 elections in the United States to this year's, by precinct, polling station, and ballot box where the official count goes that deep. Every number links to the source that published it.
-
-- **Every number has a receipt.** Each figure traces to a source and to the changeset that wrote it. Figures read from scanned books keep the page and the box on that page they came from.
+- **Every number cites its source.** Each figure traces to a source and to the changeset that wrote it. Figures read from scanned books keep the page and the box on that page they came from.
 - **Down to the finest unit.** Precincts in the US, ballot boxes in Türkiye, polling stations in France, sections in Brazil, and polling districts in Germany.
 - **Declared, then checked.** Official winners and seats are stored as declared. A seat engine, tested against real elections, recomputes them for comparison and never overwrites them.
-- **Built for agents.** Every page is also Markdown and JSON, the REST API is described by OpenAPI, and an MCP server exposes the same tools.
+- **Live on election night.** Returns update as counties report, and every race has a share card that redraws as the count moves.
+- **Built for agents.** Every page is also Markdown and JSON, the REST API is described by OpenAPI, and an MCP server and an agent skill expose the same data.
 - **Open to corrections.** Anyone can propose a fix with a citation. Proposals, evidence, and decisions are public.
 
 ## What's inside
@@ -47,6 +45,14 @@ Elections Archive holds results for more than 900,000 contests, from the 1787 el
 
 Depth varies by country and year. The [coverage page](https://electionsarchive.com/coverage) measures each country against an outside count of its elections and lists what is still missing.
 
+## Every race, ready to share
+
+<p align="center">
+  <img src="docs/images/share-card.webp" alt="Share card for the 2024 Pennsylvania US Senate race: both candidates with vote shares and totals, a winner tag, a share bar, and a county map shaded by the leading party" width="100%">
+</p>
+
+Each contest page has a card like this one, drawn from the same numbers as the page. Add `.png` to a page's path under `/og/live/` to get it; during a count it redraws every minute.
+
 ## Use it
 
 Add `.md` or `.json` to any page:
@@ -61,7 +67,21 @@ Search and query through REST:
 curl "https://electionsarchive.com/api/v1/search?q=istanbul"
 ```
 
-Connect an agent over MCP. Reading needs no key; proposing changes needs one from [your settings](https://electionsarchive.com/settings/keys).
+### Connect your agent
+
+Install the skill, which teaches an agent the site's URLs, twins, and API:
+
+```bash
+npx skills add electarchive/electionsarchive
+```
+
+Or add the MCP server. In Claude Code:
+
+```bash
+claude mcp add --transport http electionsarchive https://electionsarchive.com/mcp
+```
+
+In any other client:
 
 ```json
 {
@@ -74,7 +94,9 @@ Connect an agent over MCP. Reading needs no key; proposing changes needs one fro
 }
 ```
 
-## How it works
+Reading needs no key. Proposing changes needs one from [your settings](https://electionsarchive.com/settings/keys). The [agents page](https://electionsarchive.com/agents) has setup for other clients and example questions.
+
+## How the data gets in
 
 ```mermaid
 flowchart LR
@@ -90,7 +112,7 @@ flowchart LR
   D --> B["Bulk releases"]
 ```
 
-One database is the source of truth, and the only way to write to it is a changeset. Pipelines and people produce changesets the same way, and every changeset passes the same checks before it is published. Read more in [docs/architecture.md](docs/architecture.md), [docs/data-model.md](docs/data-model.md), and [docs/pipelines.md](docs/pipelines.md).
+One database is the source of truth, and the only way to write to it is a changeset. Each source has a pipeline that fetches the official files into a raw cache, parses them, and emits a changeset; people and agents propose changesets the same way. Every changeset passes the same checks before it is published. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through the whole workflow with Canada's federal elections as the example, and [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
 
 ## Run it locally
 
