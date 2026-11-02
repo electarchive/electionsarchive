@@ -406,56 +406,60 @@
   <dl
     class="mbs-6 grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-y text-sm max-sm:grid-cols-1"
   >
-    <dt class="py-2 text-muted-foreground max-sm:pbe-0">
-      {decided == null ? m.proposal_checks() : m.proposal_decision()}
-    </dt>
-    <dd class="py-2" role="status">
-      {#if pending}
-        {(working[job?.kind ?? ""] ?? m.proposal_checking)()}
-      {:else if job?.status === "failed"}
-        <span class="whitespace-pre-line"
-          >{m.proposal_failed({ reason: job.error ?? job.kind })}</span
-        >
-      {:else if decided != null}
-        <span class="font-semibold"
-          >{decided({
-            name: proposal.decider ?? m.proposal_unknown_author(),
-            date: day(proposal.decided_at),
-          })}</span
-        >
-        {#if proposal.decision_reason != null}
-          <span class="block text-pretty">{proposal.decision_reason}</span>
-        {/if}
-      {:else if fold != null}
-        {const pipeline = $derived(
-          fold.sets.map((item) => item.pipeline).join(", "),
-        )}
-        <span class="block text-pretty"
-          >{fold.mismatch == null
-            ? m.proposal_fold_waiting({ pipeline })
-            : m.proposal_fold_mismatch({
-                pipeline,
-                count: fold.mismatch.cells,
+    <div class="col-span-full grid grid-cols-subgrid">
+      <dt class="py-2 text-muted-foreground max-sm:pbe-0">
+        {decided == null ? m.proposal_checks() : m.proposal_decision()}
+      </dt>
+      <dd class="py-2">
+        <div role="status">
+          {#if pending}
+            {(working[job?.kind ?? ""] ?? m.proposal_checking)()}
+          {:else if job?.status === "failed"}
+            <span class="whitespace-pre-line"
+              >{m.proposal_failed({ reason: job.error ?? job.kind })}</span
+            >
+          {:else if decided != null}
+            <span class="font-semibold"
+              >{decided({
+                name: proposal.decider ?? m.proposal_unknown_author(),
+                date: day(proposal.decided_at),
               })}</span
-        >
-      {:else if head?.checks?.unchanged === true}
-        {m.proposal_unchanged()}
-      {:else if findings === 0}
-        {m.proposal_checks_passed()}
-      {:else}
-        {m.proposal_findings({ count: findings })}
-        <ul class="mbs-1 grid gap-0.5 text-muted-foreground">
-          {#each found as item (item.code)}
-            <li class="flex items-baseline gap-2">
-              <span class="text-pretty">{item.label}</span>
-              {#if item.value > 1}
-                <span class="font-figures">{count(item.value)}</span>
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </dd>
+            >
+            {#if proposal.decision_reason != null}
+              <span class="block text-pretty">{proposal.decision_reason}</span>
+            {/if}
+          {:else if fold != null}
+            {const pipeline = $derived(
+              fold.sets.map((item) => item.pipeline).join(", "),
+            )}
+            <span class="block text-pretty"
+              >{fold.mismatch == null
+                ? m.proposal_fold_waiting({ pipeline })
+                : m.proposal_fold_mismatch({
+                    pipeline,
+                    count: fold.mismatch.cells,
+                  })}</span
+            >
+          {:else if head?.checks?.unchanged === true}
+            {m.proposal_unchanged()}
+          {:else if findings === 0}
+            {m.proposal_checks_passed()}
+          {:else}
+            {m.proposal_findings({ count: findings })}
+            <ul class="mbs-1 grid gap-0.5 text-muted-foreground">
+              {#each found as item (item.code)}
+                <li class="flex items-baseline gap-2">
+                  <span class="text-pretty">{item.label}</span>
+                  {#if item.value > 1}
+                    <span class="font-figures">{count(item.value)}</span>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+      </dd>
+    </div>
     {#if proposal.prescreen != null || proposal.state === "open"}
       <div class="col-span-full grid grid-cols-subgrid border-bs">
         <dt class="py-2 text-muted-foreground max-sm:pbe-0">

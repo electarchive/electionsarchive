@@ -68,12 +68,12 @@
               style="time"
               class="pbs-0.5 font-figures text-xs text-muted-foreground"
             />
-            <div class="grid gap-0.5 min-inline-0">
+            <div class="grid gap-1.5 min-inline-0">
               {#if described.href == null}
                 <span class="text-pretty">{described.text}</span>
               {:else}
                 <a
-                  class="text-pretty underline-offset-4 hover:underline"
+                  class="-my-0.5 py-0.5 text-pretty underline-offset-4 hover:underline"
                   href={described.href}>{described.text}</a
                 >
               {/if}
@@ -84,7 +84,7 @@
                   <span>{byline(entry)}</span>
                 {:else}
                   <a
-                    class="underline-offset-4 hover:text-foreground hover:underline"
+                    class="-my-1 py-1 underline-offset-4 hover:text-foreground hover:underline"
                     href="/contributors/{entry.handle}">{byline(entry)}</a
                   >
                 {/if}
@@ -93,7 +93,7 @@
                     <span>{entry.polity}</span>
                   {:else}
                     <a
-                      class="underline-offset-4 hover:text-foreground hover:underline"
+                      class="-my-1 py-1 underline-offset-4 hover:text-foreground hover:underline"
                       href="/{entry.polity_path}">{entry.polity}</a
                     >
                   {/if}
