@@ -261,10 +261,20 @@
         (held.get(b) ?? 0) - (held.get(a) ?? 0),
     );
   });
-  const columns = $derived(
-    sheets.map((term, index) => {
-      const x0 = sx(Date.parse(term.start));
-      const x1 = sx(Date.parse(term.end ?? today));
+  const lay = () => {
+    const known = info;
+    const ranked = order;
+    const grouped = blocs;
+    const depth = inner;
+    const tallest = peak;
+    const from = low;
+    const span = Math.max(high - low, 1);
+    const across = width - 2 * PAD.side;
+    const place = (value: number) =>
+      PAD.side + ((value - from) / span) * across;
+    return sheets.map((term, index) => {
+      const x0 = place(Date.parse(term.start));
+      const x1 = place(Date.parse(term.end ?? today));
       const full =
         term.seceded > 0 ? (term.apportioned ?? term.size) : term.size;
       const empty =
@@ -272,7 +282,7 @@
           ? Math.max(0, full - term.total - term.seceded)
           : 0;
       const whole = Math.max(term.total + term.seceded + empty, 1);
-      const unit = isShare ? inner / whole : inner / peak;
+      const unit = isShare ? depth / whole : depth / tallest;
       const stack = (
         parties: Array<{ party: string | null; seats: number }>,
         near: Record<string, string | null> = {},
@@ -283,7 +293,7 @@
         const entry = (party: string | null) => ({
           key: party ?? "none",
           party,
-          lean: info.get(party ?? "")?.lean ?? null,
+          lean: known.get(party ?? "")?.lean ?? null,
           near: party == null ? null : (near[party] ?? null),
           seats: seats.get(party) ?? 0,
         });
@@ -293,13 +303,13 @@
           [...seats.keys()].map(entry).filter((item) => item.seats > 0),
         )) {
           layers.set(party, {
-            y0: PAD.top + inner - below * unit,
-            y1: PAD.top + inner - (below + value) * unit,
+            y0: PAD.top + depth - below * unit,
+            y1: PAD.top + depth - (below + value) * unit,
           });
           below += value;
         }
-        let top = PAD.top + inner - below * unit;
-        for (const { party } of arrange(order.map(entry)).toReversed()) {
+        let top = PAD.top + depth - below * unit;
+        for (const { party } of arrange(ranked.map(entry)).toReversed()) {
           const at = layers.get(party);
           if (at == null) {
             layers.set(party, { y0: top, y1: top });
@@ -332,8 +342,8 @@
         const { layers, below: seated } = stack(part.parties, part.near);
         const spans = new Map(
           Map.groupBy(
-            [...layers].filter(([key]) => blocs.has(key ?? "")),
-            ([key]) => blocs.get(key ?? "")?.group ?? "",
+            [...layers].filter(([key]) => grouped.has(key ?? "")),
+            ([key]) => grouped.get(key ?? "")?.group ?? "",
           )
             .entries()
             .map(
@@ -354,20 +364,20 @@
         const late = Math.min(open, part.entrants);
         return {
           ...part,
-          x0: at === 0 ? x0 : sx(Date.parse(part.from)),
-          x1: after == null ? x1 : sx(Date.parse(after.from)),
+          x0: at === 0 ? x0 : place(Date.parse(part.from)),
+          x1: after == null ? x1 : place(Date.parse(after.from)),
           to: after?.from ?? term.end,
           stack: layers,
           spans,
           empty: open - late,
           late,
           undated: {
-            y0: PAD.top + inner - (seated + term.seceded) * unit,
-            y1: PAD.top + inner - (seated + term.seceded + late) * unit,
+            y0: PAD.top + depth - (seated + term.seceded) * unit,
+            y1: PAD.top + depth - (seated + term.seceded + late) * unit,
           },
           vacant: {
-            y0: PAD.top + inner - (seated + term.seceded + late) * unit,
-            y1: PAD.top + inner - (seated + term.seceded + open) * unit,
+            y0: PAD.top + depth - (seated + term.seceded + late) * unit,
+            y1: PAD.top + depth - (seated + term.seceded + open) * unit,
           },
         };
       });
@@ -381,16 +391,40 @@
         parts,
         whole,
         seceded: {
-          y0: PAD.top + inner - below * unit,
-          y1: PAD.top + inner - (below + term.seceded) * unit,
+          y0: PAD.top + depth - below * unit,
+          y1: PAD.top + depth - (below + term.seceded) * unit,
         },
         line:
           PAD.top +
-          inner -
-          (isShare ? (majority / Math.max(n, 1)) * inner : majority * unit),
+          depth -
+          (isShare ? (majority / Math.max(n, 1)) * depth : majority * unit),
       };
-    }),
-  );
+    });
+  };
+  let memo: { inputs: Array<unknown>; value: ReturnType<typeof lay> } | null =
+    null;
+  const columns = $derived.by(() => {
+    const inputs = [
+      sheets,
+      info,
+      order,
+      blocs,
+      inner,
+      peak,
+      low,
+      high,
+      width,
+      isShare,
+    ];
+    if (
+      memo != null &&
+      inputs.every((input, index) => input === memo?.inputs[index])
+    ) {
+      return memo.value;
+    }
+    memo = { inputs, value: lay() };
+    return memo.value;
+  });
   const slices = $derived(
     columns.flatMap((column) =>
       column.parts.map((part) => ({ ...part, column: column.index })),
@@ -425,15 +459,17 @@
       (a, b) => (blocks.get(a) ?? 0) - (blocks.get(b) ?? 0),
     ),
   );
-  const bands = $derived(
-    [
+  const bands = $derived.by(() => {
+    const parts = drawn;
+    const laid = columns;
+    return [
       ...order.map((party) => ({ party, isGroup: false })),
       ...groups.map((party) => ({ party, isGroup: true })),
     ].map(({ party, isGroup }) => {
-      const runs = drawn.map((part, index) => {
-        const before = drawn[index - 1];
-        const after = drawn[index + 1];
-        const column = columns[part.column];
+      const runs = parts.map((part, index) => {
+        const before = parts[index - 1];
+        const after = parts[index + 1];
+        const column = laid[part.column];
         const ease = Math.min(
           5,
           ((column?.x1 ?? 0) - (column?.x0 ?? 0)) * 0.22,
@@ -492,23 +528,26 @@
         d += "Z";
       }
       return { party, isGroup, d: d.replaceAll(/(\.\d)\d+/g, "$1") };
-    }),
-  );
+    });
+  });
   const majority = $derived.by(() => {
+    const laid = columns;
     let d = "";
-    for (const [index, column] of columns.entries()) {
+    for (const [index, column] of laid.entries()) {
       if (column.term.isPartial) {
         continue;
       }
       const isJoined =
         index > 0 &&
-        columns[index - 1]?.term.isPartial === false &&
-        column.x0 - (columns[index - 1]?.x1 ?? 0) < 1;
+        laid[index - 1]?.term.isPartial === false &&
+        column.x0 - (laid[index - 1]?.x1 ?? 0) < 1;
       d += `${isJoined ? "L" : "M"}${column.x0},${column.line}L${column.x1},${column.line}`;
     }
     return d;
   });
   const names = $derived.by(() => {
+    const parts = slices;
+    const laid = columns;
     const placed: Array<{ party: string; x: number; y: number; text: string }> =
       [];
     for (const party of [...groups, ...order]) {
@@ -517,8 +556,8 @@
       }
       let best: { x: number; y: number; room: number; text: string } | null =
         null;
-      for (const part of slices) {
-        const text = label(party, columns[part.column]?.term.names);
+      for (const part of parts) {
+        const text = label(party, laid[part.column]?.term.names);
         const at = part.spans.get(party) ?? part.stack.get(party);
         const thick = at == null ? 0 : at.y0 - at.y1;
         const wide = part.x1 - part.x0;

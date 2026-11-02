@@ -265,17 +265,27 @@ export function arrange<
       break;
     }
   }
-  const spot = (party: T) =>
-    party.lean ??
-    (isUnplaced(party)
-      ? ((party.near == null
-          ? null
-          : parties.find((other) =>
-              (other.keys ?? [other.key]).includes(party.near ?? ""),
-            )?.lean) ??
-          middle ??
-          Infinity) + 0.005
-      : Infinity);
+  const leans = new Map<string, number | null>();
+  for (const party of parties) {
+    for (const key of party.keys ?? [party.key]) {
+      if (!leans.has(key)) {
+        leans.set(key, party.lean);
+      }
+    }
+  }
+  const spots = new Map<T, number>();
+  for (const party of parties) {
+    spots.set(
+      party,
+      party.lean ??
+        (isUnplaced(party)
+          ? ((party.near == null ? null : leans.get(party.near)) ??
+              middle ??
+              Infinity) + 0.005
+          : Infinity),
+    );
+  }
+  const spot = (party: T) => spots.get(party) ?? Infinity;
   return parties.toSorted(
     (a, b) =>
       spot(a) - spot(b) || b.seats - a.seats || a.key.localeCompare(b.key),
