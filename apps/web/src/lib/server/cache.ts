@@ -1,4 +1,5 @@
 import { version as build, building } from "$app/env";
+import { PAGES_DATABASE_URL } from "$app/env/private";
 import { os as base, Procedure } from "@orpc/server";
 import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
@@ -6,7 +7,9 @@ import { Buffer } from "node:buffer";
 import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
+import pg from "pg";
 import { codeVersion, procedureVersions } from "virtual:code-version";
+import { PROJECT } from "#lib/constants.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { db } from "#lib/server/db/index.js";
 import { localizeNames } from "#lib/server/names.js";
@@ -65,13 +68,70 @@ function client() {
 
 client();
 
-async function recall(slot: string) {
-  const reader = client();
-  if (reader == null) {
+let shelved: Promise<pg.Pool | null> | null = null;
+
+async function open() {
+  const pool = new pg.Pool({
+    connectionString: PAGES_DATABASE_URL,
+    max: 8,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 2000,
+    statement_timeout: 10_000,
+    application_name: PROJECT,
+  });
+  pool.on("error", (error) => {
+    console.error("An idle cache connection failed:", error);
+  });
+  await pool.query(`
+    create table if not exists entry (
+      slot text primary key,
+      version text not null,
+      body bytea not null,
+      stored_at timestamptz not null default now()
+    );
+    alter table entry alter column body set storage external;
+  `);
+  return pool;
+}
+
+async function shelf() {
+  if (building || PAGES_DATABASE_URL == null) {
     return null;
   }
+  shelved ??= open().catch((error: unknown) => {
+    console.error("The persistent cache is unavailable:", error);
+    setTimeout(() => {
+      shelved = null;
+    }, 30_000);
+    return null;
+  });
+  return shelved;
+}
+
+async function retrieve(slot: string) {
+  const reader = client();
+  const cached = await reader?.get(slot).catch(() => null);
+  if (cached != null) {
+    return cached;
+  }
+  const pool = await shelf();
+  if (pool == null) {
+    return null;
+  }
+  const result = await pool.query<{ body: Buffer }>(
+    "select body from entry where slot = $1",
+    [slot],
+  );
+  const stored = result.rows[0]?.body;
+  if (stored != null && reader != null) {
+    void reader.set(slot, stored, { EX: LIFETIME }).catch(() => null);
+  }
+  return stored ?? null;
+}
+
+async function recall(slot: string) {
   try {
-    const found = await reader.get(slot);
+    const found = await retrieve(slot);
     if (found == null) {
       return null;
     }
@@ -96,13 +156,26 @@ async function recall(slot: string) {
   }
 }
 
+async function shelve(slot: string, version: string, packed: Buffer) {
+  const pool = await shelf();
+  await pool?.query(
+    `insert into entry (slot, version, body) values ($1, $2, $3)
+      on conflict (slot) do update set version = excluded.version, body = excluded.body, stored_at = now()`,
+    [slot, version, packed],
+  );
+}
+
 function keep(slot: string, version: string, value: unknown) {
   try {
     const payload = serialize({ version, value });
-    const writer = client();
-    if (writer != null && payload.length <= LARGEST) {
+    if (payload.length <= LARGEST) {
       void pack(payload)
-        .then(async (packed) => writer.set(slot, packed, { EX: LIFETIME }))
+        .then(async (packed) =>
+          Promise.all([
+            client()?.set(slot, packed, { EX: LIFETIME }),
+            shelve(slot, version, packed),
+          ]),
+        )
         .catch(() => null);
     }
     return payload.length;
