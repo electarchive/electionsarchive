@@ -25,6 +25,7 @@
     percent,
     plural,
     points,
+    sentence,
   } from "#lib/format.js";
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -1484,7 +1485,7 @@
           nominated: row.nominated,
           supported: row.supported,
         })),
-        lede:
+        lede: sentence(
           outright !== undefined
             ? outright
             : race.isPrimaries
@@ -1591,7 +1592,8 @@
                                       ).replace(/^\+/u, ""),
                                       runner: definite(named(runner)),
                                     }),
-        next:
+        ),
+        next: sentence(
           race.runoff?.runner == null
             ? turned == null || isShort
               ? null
@@ -1623,6 +1625,7 @@
                     ? race.runoff.runnerShort
                     : race.runoff.runner,
               }),
+        ),
       };
     }),
   );

@@ -7,6 +7,9 @@ const dateFormats = new Map<string, Intl.DateTimeFormat>();
 
 export const natural = new Intl.Collator(undefined, { numeric: true }).compare;
 
+export const sentence = (text: string | null) =>
+  text?.replace(/\.\.$/u, ".") ?? null;
+
 export function numbers(options: Intl.NumberFormatOptions = {}) {
   const locale = getLocale();
   const key = `${locale}|${JSON.stringify(options)}`;

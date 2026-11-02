@@ -1,5 +1,12 @@
 import type { archive } from "#lib/server/pages.js";
-import { count, definite, percent, points, precision } from "#lib/format.js";
+import {
+  count,
+  definite,
+  percent,
+  points,
+  precision,
+  sentence,
+} from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
@@ -46,7 +53,10 @@ export function winners(contest: Page["contest"]) {
     : null;
 }
 
-export function verdict(contest: Page["contest"]) {
+export const verdict = (contest: Page["contest"]) =>
+  sentence(summarize(contest));
+
+function summarize(contest: Page["contest"]) {
   const isAsked = isQuestion(contest);
   const isSeat = isSeated(contest);
   const members = winners(contest);
