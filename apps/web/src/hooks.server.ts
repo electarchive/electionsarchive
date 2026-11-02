@@ -6,6 +6,7 @@ import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
 import { mark, purge } from "#lib/server/edge.js";
+import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
 import { twin } from "#lib/server/twin.js";
@@ -120,6 +121,7 @@ export const init: ServerInit = () => {
 };
 
 export const handle: Handle = sequence(
+  guardHandle,
   csrfHandle,
   edgeHandle,
   timingHandle,
