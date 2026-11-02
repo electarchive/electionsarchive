@@ -5,6 +5,7 @@ import earcut from "earcut";
 import { untrack } from "svelte";
 import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
+import { Mosaic, sampled } from "#lib/map/mosaic.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
 export type Arrow = {
@@ -73,7 +74,6 @@ type Paint =
     ? [K, V]
     : never;
 type State = Record<string, string | number | boolean>;
-type Raster = { ids: Uint32Array; index: Uint8Array | Uint16Array };
 type Options = {
   cooperative?: boolean;
   maxZoom?: number;
@@ -108,11 +108,7 @@ let library: Promise<{
   PMTiles: typeof PMTiles;
   protocol: Protocol;
 }> | null = null;
-const engines = new Map<string, Engine>();
 const archives = new Map<string, PMTiles>();
-const rasters = new Map<string, Promise<Raster | null>>();
-const loaded = new Map<string, Raster>();
-let serial = 0;
 let kit: { maplibre: typeof Maplibre; PMTiles: typeof PMTiles } | null = null;
 
 const attach = (
@@ -145,85 +141,6 @@ async function load() {
     maplibre.setWorkerUrl(worker.default);
     const protocol = new Protocol();
     maplibre.addProtocol("pmtiles", protocol.tile);
-    maplibre.addProtocol("ids", async ({ url }) => {
-      const match =
-        /^ids:\/\/(\d+)\/(.+)\/(\d+)\/(\d+)\/(\d+)\?v=\d+(?:&focus=(\d+))?$/u.exec(
-          url,
-        );
-      const [, owner = "", key = "", z = "0", x = "0", y = "0", focus] =
-        match ?? [];
-      const engine = engines.get(owner);
-      const name = `${key}/${z}/${x}/${y}`;
-      let pending = rasters.get(name);
-      if (pending == null) {
-        pending = archive(PMTiles, key)
-          .getZxy(Number(z), Number(x), Number(y))
-          .then((found) => {
-            if (found == null) {
-              return null;
-            }
-            const view = new DataView(found.data);
-            const total = view.getUint32(0, true);
-            const ids = new Uint32Array(total);
-            let id = 0;
-            for (const j of ids.keys()) {
-              id += view.getInt32(4 + 4 * j, true);
-              ids[j] = id;
-            }
-            const tile = {
-              ids,
-              index:
-                total <= 256
-                  ? new Uint8Array(found.data, 4 + 4 * total, SIZE * SIZE)
-                  : new Uint16Array(found.data, 4 + 4 * total, SIZE * SIZE),
-            };
-            loaded.set(name, tile);
-            return tile;
-          });
-        rasters.set(name, pending);
-        if (rasters.size > 240) {
-          const oldest = rasters.keys().next().value ?? "";
-          rasters.delete(oldest);
-          loaded.delete(oldest);
-        }
-      }
-      const tile = await pending;
-      const pixels = new Uint32Array(SIZE * SIZE);
-      if (tile != null && engine != null && focus == null) {
-        const lut = tile.ids.map((k) => engine.tints.get(k) ?? 0);
-        let p = 0;
-        for (const value of tile.index) {
-          pixels[p] = lut[value] ?? 0;
-          p += 1;
-        }
-      } else if (tile != null && engine != null && focus !== "0") {
-        const target = tile.ids.indexOf(Number(focus));
-        const { index } = tile;
-        let p = 0;
-        for (const value of target === -1 ? [] : index) {
-          if (value === target) {
-            const column = p % SIZE;
-            const row = (p - column) / SIZE;
-            for (const d of [1, 2]) {
-              if (
-                (column >= d && index[p - d] !== target) ||
-                (column < SIZE - d && index[p + d] !== target) ||
-                (row >= d && index[p - SIZE * d] !== target) ||
-                (row < SIZE - d && index[p + SIZE * d] !== target)
-              ) {
-                pixels[p] = engine.ink;
-              }
-            }
-          }
-          p += 1;
-        }
-      }
-      return {
-        data: await createImageBitmap(
-          new ImageData(new Uint8ClampedArray(pixels.buffer), SIZE, SIZE),
-        ),
-      };
-    });
     kit = { maplibre, PMTiles };
     return { maplibre, PMTiles, protocol };
   });
@@ -408,10 +325,6 @@ export class Engine {
   credits = $state<Array<string>>([]);
   theme = $state(0);
   gl = $state.raw<Maplibre.Map | null>(null);
-  tints = new Map<number, number>();
-  ink = 0;
-
-  #id = String((serial += 1));
   #frame: Box;
   #padding: (width: number, height: number) => Padding;
   #options: Options;
@@ -419,7 +332,11 @@ export class Engine {
   #limit: Box | null;
   #layers = new Map<
     string,
-    { spec: Maplibre.LayerSpecification; group: string; rank: number }
+    {
+      spec: Maplibre.LayerSpecification | Maplibre.CustomLayerInterface;
+      group: string;
+      rank: number;
+    }
   >();
   #sources = new Map<string, { group: string; isVector: boolean }>();
   #painted = new Map<string, Map<number, State>>();
@@ -430,8 +347,7 @@ export class Engine {
   #seats = new Map<string, Array<string>>();
   #slots = new Map<string, Slot>();
   #rasterKeys: Array<string> = [];
-  #version = 0;
-  #spotted = 0;
+  #mosaic: Mosaic | null = null;
   #probe: HTMLElement | null = null;
   #cache = new Map<string, string>();
   #canvas: CanvasRenderingContext2D | null = null;
@@ -452,7 +368,6 @@ export class Engine {
   mount = (host: HTMLElement) => {
     let isGone = false;
     const offs: Array<() => void> = [];
-    engines.set(this.#id, this);
     this.#probe = document.createElement("span");
     this.#probe.hidden = true;
     host.append(this.#probe);
@@ -599,11 +514,11 @@ export class Engine {
       for (const off of offs) {
         off();
       }
-      engines.delete(this.#id);
       this.#probe?.remove();
       this.#overlay?.remove();
       this.gl?.remove();
       this.gl = null;
+      this.#mosaic = null;
       this.isLoaded = false;
     };
   };
@@ -670,6 +585,9 @@ export class Engine {
     gl.setPaintProperty("paper", "background-color", this.read("var(--card)"));
     this.#dress(gl);
     for (const [id, layer] of this.#layers) {
+      if (layer.spec.type === "custom") {
+        continue;
+      }
       for (const [key, value] of Object.entries(layer.spec.paint ?? {})) {
         gl.setPaintProperty(
           id,
@@ -1236,7 +1154,7 @@ export class Engine {
   }
 
   add(
-    spec: Maplibre.LayerSpecification,
+    spec: Maplibre.LayerSpecification | Maplibre.CustomLayerInterface,
     slot: Slot,
     options: { group?: string; rank?: number } = {},
   ) {
@@ -1254,17 +1172,21 @@ export class Engine {
                 layer.rank > rank && this.#slots.get(id) === slot,
             )
             .toSorted(([, a], [, b]) => a.rank - b.rank)[0]?.[0];
-    const resolved = {
-      ...spec,
-      paint: Object.fromEntries(
-        Object.entries(spec.paint ?? {}).map(([key, value]) => [
-          key,
-          this.#resolve(value),
-        ]),
-      ),
-    } as Maplibre.LayerSpecification;
-    gl.style.addLayer(resolved, after ?? `slot:${slot}`, CHECKED);
-    gl._update(true);
+    if (spec.type === "custom") {
+      gl.addLayer(spec, after ?? `slot:${slot}`);
+    } else {
+      const resolved = {
+        ...spec,
+        paint: Object.fromEntries(
+          Object.entries(spec.paint ?? {}).map(([key, value]) => [
+            key,
+            this.#resolve(value),
+          ]),
+        ),
+      } as Maplibre.LayerSpecification;
+      gl.style.addLayer(resolved, after ?? `slot:${slot}`, CHECKED);
+      gl._update(true);
+    }
     this.#layers.set(spec.id, { spec, group: options.group ?? "", rank });
     this.#slots.set(spec.id, slot);
   }
@@ -1282,6 +1204,10 @@ export class Engine {
   style(id: string, key: string, value: unknown) {
     const layer = this.#layers.get(id);
     if (layer == null || this.gl == null) {
+      return;
+    }
+    if (layer.spec.type === "custom") {
+      this.#mosaic?.fade(id, value as number | ReadonlyArray<unknown>);
       return;
     }
     layer.spec = {
@@ -1325,7 +1251,7 @@ export class Engine {
       this.#painted.delete(id);
     }
     this.#rasterKeys = this.#rasterKeys.filter((key) =>
-      this.#sources.has(`ids:${key}`),
+      this.#layers.has(`ids:${key}`),
     );
   }
 
@@ -1448,38 +1374,22 @@ export class Engine {
 
   drape(keys: Array<string>, group = "") {
     const gl = this.gl;
-    if (gl == null) {
+    const { PMTiles } = kit ?? {};
+    if (gl == null || PMTiles == null) {
       return;
     }
+    this.#mosaic ??= new Mosaic(gl, (key) => archive(PMTiles, key));
     this.#rasterKeys = keys;
     for (const key of keys) {
       for (const isFocus of [false, true]) {
         const id = `${isFocus ? "spot" : "ids"}:${key}`;
-        if (gl.getSource(id) == null) {
-          attach(gl, id, {
-            type: "raster",
-            tiles: [this.#rasterUrl(key, isFocus)],
-            tileSize: 256,
-            maxzoom: 8,
-          });
-          this.#sources.set(id, { group, isVector: false });
-        }
         this.add(
-          {
-            id,
-            type: "raster",
-            source: id,
-            paint: { "raster-fade-duration": 0 },
-          },
+          this.#mosaic.layer(id, key, isFocus),
           isFocus ? "focus" : "fills",
           { group, rank: isFocus ? -1 : 0.5 },
         );
       }
     }
-  }
-
-  #rasterUrl(key: string, isFocus: boolean) {
-    return `ids://${this.#id}/${key}/{z}/{x}/{y}?v=${this.#version}${isFocus ? `&focus=${this.#spotted}` : ""}`;
   }
 
   tint(colors: Map<number, string>) {
@@ -1491,36 +1401,20 @@ export class Engine {
       ).map(Number);
       return (r | (g << 8) | (b << 16) | (Math.round(a * 255) << 24)) >>> 0;
     };
-    this.tints.clear();
+    const tints = new Map<number, number>();
     for (const [k, css] of colors) {
       let value = packed.get(css);
       if (value == null) {
         value = pack(css);
         packed.set(css, value);
       }
-      this.tints.set(k, value);
+      tints.set(k, value);
     }
-    this.ink = pack("var(--foreground)");
-    this.#version += 1;
-    for (const key of this.#rasterKeys) {
-      this.gl
-        ?.getSource<Maplibre.RasterTileSource>(`ids:${key}`)
-        ?.setTiles([this.#rasterUrl(key, false)]);
-    }
+    this.#mosaic?.tint(tints, pack("var(--foreground)"));
   }
 
   spot(k: number | null) {
-    const next = k ?? 0;
-    if (next === this.#spotted) {
-      return;
-    }
-    this.#spotted = next;
-    this.#version += 1;
-    for (const key of this.#rasterKeys) {
-      this.gl
-        ?.getSource<Maplibre.RasterTileSource>(`spot:${key}`)
-        ?.setTiles([this.#rasterUrl(key, true)]);
-    }
+    this.#mosaic?.spot(k ?? 0);
   }
 
   pick(point: { x: number; y: number }, layers?: Array<string>) {
@@ -1531,7 +1425,12 @@ export class Engine {
     const ranked = (
       layers ??
       [...this.#layers]
-        .filter(([, layer]) => layer.rank >= 0 && layer.spec.type !== "raster")
+        .filter(
+          ([, layer]) =>
+            layer.rank >= 0 &&
+            layer.spec.type !== "raster" &&
+            layer.spec.type !== "custom",
+        )
         .toSorted(([, a], [, b]) => b.rank - a.rank)
         .map(([id]) => id)
     ).filter((id) => gl.getLayer(id) != null);
@@ -1567,8 +1466,11 @@ export class Engine {
         const x = ((at.lng + 180) / 360) * world;
         const y =
           (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world;
-        const tile = loaded.get(
-          `${key}/${z}/${Math.floor(x / SIZE)}/${Math.floor(y / SIZE)}`,
+        const tile = sampled(
+          key,
+          z,
+          Math.floor(x / SIZE),
+          Math.floor(y / SIZE),
         );
         if (tile == null) {
           continue;
@@ -1579,7 +1481,7 @@ export class Engine {
               (Math.floor(y) % SIZE) * SIZE + (Math.floor(x) % SIZE)
             ] ?? 0
           ] ?? 0;
-        if (this.tints.has(k)) {
+        if (this.#mosaic?.tints.has(k) === true) {
           return k;
         }
         break;
