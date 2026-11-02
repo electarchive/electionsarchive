@@ -72,6 +72,7 @@ STATES = [
 ]
 ELECTION = "2026-11-03-general"
 DAY = date(2026, 11, 3)
+CLOSE = datetime(2026, 11, 3, 23, 0, tzinfo=UTC)
 FALL = (date(2026, 10, 1), date(2026, 12, 31))
 WEBS = [
     web.rstrip("/")
@@ -255,8 +256,10 @@ def hubs(conn: Connection) -> tuple[list[tuple[str, str]], str]:
     return paths, note
 
 
-def verdict(ok: bool) -> str:
-    return "green" if ok else "red"
+def verdict(ok: bool, waiting: bool = False) -> str:
+    if not ok:
+        return "red"
+    return "yellow" if waiting else "green"
 
 
 def run() -> int:
@@ -329,14 +332,23 @@ def run() -> int:
     hosts = [tested.get(n, (False, f"host: no answer within {DEADLINE} s", [])) for n in range(len(feeds))]
 
     covered: dict[str, str] = {}
+    pending: dict[str, str] = {}
+    before = now < CLOSE
     for feed, (host_ok, host_note, pages) in zip(feeds, hosts, strict=True):
         feed_id = feed["id"]
         notes = [host_note]
         ok = host_ok
+        waiting = False
+        if before and not host_ok and host_note == "host: no result pages":
+            ok = waiting = True
         dated, day_note = election(feed, pages)
+        if before and not dated and day_note and day_note.startswith("file dated"):
+            dated = waiting = True
         ok = ok and dated
         if day_note:
             notes.append(day_note)
+        if waiting:
+            notes.append(f"waiting for polls to close ({CLOSE:%Y-%m-%d %H:%M} UTC)")
         row = stored.get(feed_id)
         if row is None:
             ok = False
@@ -373,16 +385,24 @@ def run() -> int:
             ok = False
         if counts:
             notes.append("issues " + ", ".join(f"{kind} {count}" for kind, count in sorted(counts.items())))
-        rows.append((verdict(ok), feed_id, "; ".join(notes)))
+        rows.append((verdict(ok, waiting), feed_id, "; ".join(notes)))
         params = feed.get("params")
         if isinstance(params, dict) and "state" in params and ok:
-            covered[params["state"]] = feed_id
+            (pending if waiting else covered)[params["state"]] = feed_id
 
     for state in STATES:
         feed_id = covered.get(state)
+        waiting_id = pending.get(state) if feed_id is None else None
         listed = any(isinstance(f.get("params"), dict) and f["params"].get("state") == state for f in feeds)
-        reason = f"feed {feed_id}" if feed_id else ("feed listed but red" if listed else "no statewide feed")
-        rows.append((verdict(feed_id is not None), f"state {state}", reason))
+        if feed_id:
+            reason = f"feed {feed_id}"
+        elif waiting_id:
+            reason = f"feed {waiting_id} waiting for polls to close"
+        else:
+            reason = "feed listed but red" if listed else "no statewide feed"
+        rows.append(
+            (verdict(feed_id is not None or waiting_id is not None, waiting_id is not None), f"state {state}", reason)
+        )
 
     rows += served
     rows.append(("info", "hubs", sampled))
@@ -396,5 +416,6 @@ def run() -> int:
         print(f"{color.upper():5}  {name:<{width}}  {reason}")
     red = sum(1 for row in rows if row[0] == "red")
     green = sum(1 for row in rows if row[0] == "green")
-    print(f"\n{green} green, {red} red")
+    yellow = sum(1 for row in rows if row[0] == "yellow")
+    print(f"\n{green} green, {yellow} yellow, {red} red")
     return 1 if red else 0
