@@ -2274,6 +2274,7 @@ function polityMarkdown(
   const sourced = usual == null ? null : { usual, isMixed: tally.size > 1 };
   return [
     `# ${polity.name}`,
+    ...[formerly(polity.former, getLocale())].flatMap((line) => line ?? []),
     byline(polity.breadcrumbs, link, null),
     ...(polity.latest == null &&
     polity.results.length > 0 &&

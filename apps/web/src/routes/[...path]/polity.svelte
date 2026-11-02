@@ -16,7 +16,9 @@
   import { count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { formerly } from "#lib/relations.js";
   import { orpc } from "#lib/rpc.js";
   import { settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
@@ -38,6 +40,7 @@
   }: { id: string; polity: Extract<PageData, { kind: "polity" }>["polity"] } =
     $props();
 
+  const former = $derived(formerly(polity.former, getLocale()));
   const client = useQueryClient();
 
   untrack(() => {
@@ -467,6 +470,11 @@
       ><ArrowLeftRightIcon class="block-3.5 inline-3.5" />{m.versus_action()}</a
     >
   </div>
+  {#if former != null}
+    <p class="text-[0.9375rem] text-pretty text-muted-foreground">
+      {former}
+    </p>
+  {/if}
   {#if span != null}
     <p class="text-[0.9375rem] text-muted-foreground">
       {m.polity_lede({

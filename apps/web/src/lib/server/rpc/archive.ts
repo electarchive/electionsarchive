@@ -1886,10 +1886,10 @@ async function load(
                 rs.completeness, rs.is_default, rs.source_id
               from sets rs
               ${
-        owners.length === 0
-          ? sql`cross join unnest(${sql.param(areaKs)}::int[]) as a(k)`
-          : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
-      }
+                owners.length === 0
+                  ? sql`cross join unnest(${sql.param(areaKs)}::int[]) as a(k)`
+                  : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
+              }
               join lateral (
                 select count(distinct f.option_k) filter (where f.option_k <> 0) as options
                 from (${FACTS[facts](sql`rs.k`, sql`a.k`, units)}) f where f.measure = any(${COUNTED}) and f.value > 0
@@ -3378,7 +3378,11 @@ async function delegations(root: string, ks: Array<number>) {
 }
 
 async function nomination(contest: Found, isRoot: boolean) {
-  if (!isRoot || contest.kind !== "delegate_allocation" || contest.id !== contest.root) {
+  if (
+    !isRoot ||
+    contest.kind !== "delegate_allocation" ||
+    contest.id !== contest.root
+  ) {
     return null;
   }
   const ballots = (await convention(contest.root)).filter(
@@ -4517,6 +4521,13 @@ async function tabulate(
         ),
     ),
   );
+  const named = new Map(
+    results.flatMap((entries) =>
+      entries
+        .filter((entry) => entry.key.startsWith("person:"))
+        .map((entry) => [entry.key, entry] as const),
+    ),
+  );
   const usual = new Map<
     string,
     Map<string, { entry: (typeof results)[number][number]; votes: number }>
@@ -4568,6 +4579,20 @@ async function tabulate(
       }
     }
     const result = (results[index] ?? []).map((entry, _, all) => {
+      const known =
+        entry.key.startsWith("party:") && entry.current?.person != null
+          ? named.get(`person:${entry.current.person}`)
+          : null;
+      if (known != null && known.current?.party === entry.current?.party) {
+        return {
+          ...entry,
+          key: known.key,
+          label: known.label,
+          short: known.short,
+          color: known.color,
+          lean: known.lean,
+        };
+      }
       if (
         entry.key.startsWith("party:") &&
         entry.current?.person != null &&
@@ -4609,13 +4634,6 @@ async function tabulate(
       result.length === 0
         ? new Map(seated)
         : new Map(
-  const named = new Map(
-    results.flatMap((entries) =>
-      entries
-        .filter((entry) => entry.key.startsWith("person:"))
-        .map((entry) => [entry.key, entry] as const),
-    ),
-  );
             result.map((entry, at) => [
               entry.key,
               seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
@@ -4667,20 +4685,6 @@ async function tabulate(
       isMulti: elects[index]?.isMulti === true,
     };
   });
-      const known =
-        entry.key.startsWith("party:") && entry.current?.person != null
-          ? named.get(`person:${entry.current.person}`)
-          : null;
-      if (known != null && known.current?.party === entry.current?.party) {
-        return {
-          ...entry,
-          key: known.key,
-          label: known.label,
-          short: known.short,
-          color: known.color,
-          lean: known.lean,
-        };
-      }
   const silent = rows.flatMap((row, index) =>
     row.owner == null || now[tier[index] ?? 0]?.has(row.k) === true
       ? []
@@ -20635,6 +20639,14 @@ export const polities = {
         kind: v.string(),
         parent: v.nullable(v.string()),
         breadcrumbs: v.array(Link),
+        former: v.array(
+          v.object({
+            name: v.string(),
+            short: v.nullable(v.string()),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+          }),
+        ),
         polities: v.array(
           v.object({
             name: v.string(),
@@ -21205,11 +21217,21 @@ export const polities = {
               b.date.localeCompare(a.date) ||
               a.tier - b.tier,
           )[0]?.id ?? null;
+      const former = await db.execute<{
+        name: string;
+        from: string | null;
+        to: string;
+      }>(sql`
+        select text as name, lower(valid)::text as from, upper(valid)::text as to
+        from name where entity_id = ${input.id}::uuid and kind = 'historical' and upper(valid) is not null
+        order by upper(valid), lower(valid) nulls first
+      `);
       return {
         name: labels.full.get(input.id) ?? "",
         kind: polity.kind,
         parent: polity.parent,
         breadcrumbs: crumbs.slice(0, -1),
+        former: former.rows.map((row) => ({ ...row, short: null })),
         polities: subdivisions.rows
           .map((row) => ({
             name: labels.full.get(row.id) ?? "",
