@@ -53,6 +53,7 @@ class Map:
     links: tuple[tuple[str, str], ...] = ()
     isles: frozenset[str] = frozenset()
     groups: dict[str, str] | None = None
+    split: bool = False
 
 
 type Run = tuple[date, date, dict[str, BaseGeometry], dict[str, int], Map, list[str]]
@@ -120,6 +121,39 @@ FR_CORNER: dict[str, tuple[bool, float, float]] = {
     "ZX": (False, 37, 21),
     "986": (False, 44, 21),
 }
+TR_REGIONS = {
+    "TR1": "34",
+    "TR2": "10 17 22 39 59 h-catalca h-gelibolu",
+    "TR3": "03 09 20 35 43 45 48 64",
+    "TR4": "11 14 16 26 41 54 77 81",
+    "TR5": "06 42 70",
+    "TR6": "01 07 15 31 32 33 46 80 h-cebelibereket h-kozan h-mersinold",
+    "TR7": "38 40 50 51 58 66 68 71 h-aksaray",
+    "TR8": "05 18 19 37 55 57 60 67 74 78",
+    "TR9": "08 28 29 52 53 61 h-batum h-sebinkarahisar",
+    "TRA": "04 24 25 36 69 75 76 h-ardahan h-oltu",
+    "TRB": "12 13 23 30 44 49 62 65",
+    "TRC": "02 21 27 47 56 63 72 73 79 h-ergani h-siverek",
+}
+TR_NAMES = (
+    {code: code for codes in TR_REGIONS.values() for code in codes.split() if not code.startswith("h-")}
+    | {
+        "h-aksaray": "AKS",
+        "h-ardahan": "ARD",
+        "h-batum": "BTM",
+        "h-catalca": "ÇTL",
+        "h-cebelibereket": "CBR",
+        "h-ergani": "ERG",
+        "h-gelibolu": "GLB",
+        "h-kozan": "KOZ",
+        "h-mersinold": "MRS",
+        "h-oltu": "OLT",
+        "h-sebinkarahisar": "ŞKH",
+        "h-siverek": "SVR",
+    }
+    | {region: region for region in TR_REGIONS}
+)
+TR_PROJECTION = "+proj=laea +lat_0=39 +lon_0=35 +datum=WGS84 +units=m +no_defs"
 US_CORNER: dict[str, tuple[bool, float, float]] = {
     "02": (False, 10, -2),
     "15": (False, 30, 6),
@@ -902,6 +936,13 @@ def encode(rings: list[list[tuple[int, int]]]) -> str:
     return "".join(out)
 
 
+def snake(cells: Iterable[Cell]) -> list[Cell]:
+    rows: dict[int, list[Cell]] = defaultdict(list)
+    for cell in cells:
+        rows[cell[1]].append(cell)
+    return [cell for at, z in enumerate(sorted(rows)) for cell in sorted(rows[z], reverse=at % 2 == 1)]
+
+
 def union(cells: Iterable[Cell]) -> BaseGeometry:
     return shapely.set_precision(shapely.union_all([hexagon(*c) for c in cells]), 0.001)
 
@@ -966,6 +1007,18 @@ def drawn(district: dict[Cell, str], seats: dict[str, int], m: Map) -> dict:
         },
         "labels": labels,
         "counts": counts,
+        **(
+            {
+                "seats": {
+                    code: [path(union(order[at : at + K])) for at in range(0, len(order), K)]
+                    for code, cells in sorted(by_code.items())
+                    if seats.get(code, 1) > 1
+                    for order in [snake(cells)]
+                }
+            }
+            if m.split
+            else {}
+        ),
     }
 
 
@@ -1067,8 +1120,12 @@ def tiles(district: dict[Cell, str], seats: dict[str, int], m: Map, scheme: str)
     shift = top - (top & 1)
     grid = {(x + (z - (z & 1)) // 2, z - shift): code for (x, z), code in placed.items()}
     hexes: dict[str, list[int]] = defaultdict(list)
-    for (q, r), code in sorted(grid.items()):
-        hexes[code].extend([q, -r])
+    owned: dict[str, list[Cell]] = defaultdict(list)
+    for cell, code in sorted(grid.items()):
+        owned[code].append(cell)
+    for code, cells in owned.items():
+        for q, r in snake(cells) if m.split else cells:
+            hexes[code].extend([q, -r])
     shape = outline(
         Tiles(scheme, 0, 2, m.names, {}, m.groups), {cell: m.names[m.unit[code]] for cell, code in grid.items()}
     )
@@ -1231,6 +1288,64 @@ def fr_runs() -> Iterator[Run]:
         )
 
 
+def tr_runs() -> Iterator[Run]:
+    with connect() as db:
+        db.execute("set statement_timeout = '600s'")
+        rows = db.execute(
+            """
+            with recursive base as (
+              select c.election_id, coalesce(pa.id, d.id) as province, coalesce(c.magnitude, 1) as seats
+              from contest c join body b on b.id = c.body_id and b.kind = 'unicameral'
+              join election e on e.id = c.election_id
+              join area d on d.id = c.district_area_id and d.scheme_code in ('tr.il', 'tr.secim_cevresi')
+              left join area_parent ap on d.scheme_code = 'tr.secim_cevresi' and ap.area_id = d.id
+                and ap.valid @> e.date_from
+              left join area pa on pa.id = ap.parent_id and pa.scheme_code = 'tr.il'
+              where c.kind in ('body_seats', 'list_allocation') and c.party_scope_id is null and not c.notional
+            ), up(start, id, parent, kind) as (
+              select e.id, e.id, e.parent_id, e.kind from election e where e.id in (select election_id from base)
+              union all
+              select up.start, e.id, e.parent_id, e.kind from up join election e on e.id = up.parent
+            )
+            select r.date_from, ac.code, b.province, sum(b.seats)::int
+            from base b join up on up.start = b.election_id and up.parent is null
+            join election r on r.id = up.id
+            join area_code ac on ac.area_id = b.province
+            where not exists (select 1 from up skip where skip.start = b.election_id and skip.kind = any(%(skip)s))
+            group by 1, 2, 3
+            """,
+            {"skip": list(SKIP)},
+        ).fetchall()
+    found: dict[date, dict[str, tuple[str, int]]] = defaultdict(dict)
+    for day, code, area, seats in rows:
+        found[day][code] = (area, seats)
+    regions = {code: region for region, codes in TR_REGIONS.items() for code in codes.split()}
+    for day, contests in sorted(found.items()):
+        with connect() as db:
+            texts = dict(
+                db.execute(
+                    """
+                    select g.area_id, st_astext(st_buffer(st_simplify(st_transform(g.geom, %(projection)s), 500), 0))
+                    from area_geometry g where g.area_id = any(%(areas)s) and g.valid @> %(day)s
+                    """,
+                    {"areas": [area for area, _ in contests.values()], "projection": TR_PROJECTION, "day": day},
+                ).fetchall()
+            )
+        if len(texts) < len(contests) / 2:
+            continue
+        shapes = {
+            code: make_valid(wkt.loads(texts[area])) for code, (area, _) in sorted(contests.items()) if area in texts
+        }
+        yield (
+            day,
+            day,
+            shapes,
+            {code: contests[code][1] for code in shapes},
+            Map({code: code for code in shapes}, TR_NAMES, merge=regions, groups=regions, split=True),
+            sorted(set(contests) - set(shapes)),
+        )
+
+
 def layouts(prefix: str, scheme: str, runs: Iterable[Run], out: Path = OUT) -> list[str]:
     report = []
     index: dict[str, str] = {}
@@ -1269,5 +1384,6 @@ def build() -> str:
             *layouts("us-cd", "us.cd", us_runs()),
             *layouts("gb-pcon", "gb.pcon", gb_runs()),
             *layouts("fr-circ", "fr.circonscription", fr_runs()),
+            *layouts("tr-il", "tr.il", tr_runs()),
         ]
     )

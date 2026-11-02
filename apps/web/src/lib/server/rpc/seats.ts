@@ -5,6 +5,7 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import france from "#lib/server/hex/fr-circ.json";
 import britain from "#lib/server/hex/gb-pcon.json";
+import turkey from "#lib/server/hex/tr-il.json";
 import america from "#lib/server/hex/us-cd.json";
 import {
   coarse,
@@ -26,6 +27,7 @@ const CARTOGRAMS = Object.fromEntries(
       states: Record<string, string>;
       labels: Record<string, [number, number, string, number?]>;
       counts: Record<string, [number, number, number]>;
+      seats?: Record<string, Array<string>>;
       tiles: {
         hexes: Record<string, Array<number>>;
         regions?: Record<string, string>;
@@ -40,6 +42,7 @@ const CARTOGRAMS = Object.fromEntries(
         "../hex/us-cd-[0-9]*.json",
         "../hex/gb-pcon-[0-9]*.json",
         "../hex/fr-circ-[0-9]*.json",
+        "../hex/tr-il-[0-9]*.json",
       ],
       { import: "default" },
     ),
@@ -52,6 +55,7 @@ const CARTOGRAM_SETS: Record<
   "us.cd": { prefix: "us-cd", roots: america },
   "gb.pcon": { prefix: "gb-pcon", roots: britain },
   "fr.circonscription": { prefix: "fr-circ", roots: france },
+  "tr.il": { prefix: "tr-il", roots: turkey },
 };
 const cartogram = async (scheme: string, root: string) => {
   const set = CARTOGRAM_SETS[scheme];
@@ -118,6 +122,14 @@ const tiled = async (id: string, within: string | undefined) => {
       where c.election_id = tree.id and c.kind = 'body_seats' and c.allocation_parent_id is null
         and c.party_scope_id is null and not c.notional
         and (coalesce(c.magnitude, 1) = 1 or a.scheme_code in ('us.cd', 'gb.pcon'))
+      union
+      select p.id, p.k, p.scheme_code from contest c
+      join body b on b.id = c.body_id and b.kind = 'unicameral'
+      join area d on d.id = c.district_area_id and d.scheme_code in ('tr.il', 'tr.secim_cevresi')
+      left join area_parent ap on d.scheme_code = 'tr.secim_cevresi' and ap.area_id = d.id and ap.valid @> tree.day
+      join area p on p.id = coalesce(ap.parent_id, d.id) and p.scheme_code = 'tr.il'
+      where c.election_id = tree.id and c.kind in ('body_seats', 'list_allocation')
+        and c.party_scope_id is null and not c.notional
       offset 0
     ) a
     join area_code ac on ac.area_id = a.id and (ac.valid @> tree.day or ac.valid is null or a.scheme = 'us.cd')
@@ -199,6 +211,7 @@ const tiled = async (id: string, within: string | undefined) => {
             districts: rows.flatMap((row) => {
               const d = drawn.districts[row.code];
               const point = drawn.points[row.code];
+              const seats = drawn.seats?.[row.code];
               return d == null || point == null
                 ? []
                 : [
@@ -208,6 +221,7 @@ const tiled = async (id: string, within: string | undefined) => {
                       x: point[0],
                       y: point[1],
                       isApart: isApart(row.code),
+                      ...(seats != null && { seats }),
                     },
                   ];
             }),
@@ -1826,7 +1840,7 @@ export const seats = {
         method: "GET",
         path: "/elections/{id}/hexes",
         summary:
-          "Place each single-member seat of an election, and each state-level unit across the country, on equal-area hex layouts where they exist; a partial layout keeps cells for units without a result",
+          "Place each seat of an election, and each state-level unit across the country, on equal-area hex layouts where they exist. For a district with several seats, the response lists one cartogram shape per seat, so clients can color each seat by the party that won it; a partial layout keeps cells for units without a result.",
       }),
     )
     .input(
@@ -1871,6 +1885,7 @@ export const seats = {
                   x: v.number(),
                   y: v.number(),
                   isApart: v.boolean(),
+                  seats: v.optional(v.array(v.string())),
                 }),
               ),
               states: v.array(v.string()),

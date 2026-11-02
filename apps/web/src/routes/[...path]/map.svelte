@@ -154,6 +154,7 @@
           x: number;
           y: number;
           isApart: boolean;
+          seats?: Array<string>;
         }>;
         states: Array<string>;
         labels: Array<{
@@ -673,7 +674,14 @@
     }
     const grouped = new Map<
       number,
-      { k: number; x: number; y: number; d: string; isApart: boolean }
+      {
+        k: number;
+        x: number;
+        y: number;
+        d: string;
+        isApart: boolean;
+        seats?: Array<string>;
+      }
     >();
     for (const [k, { isApart, spots }] of members) {
       let x = 0;
@@ -683,7 +691,16 @@
         x += at.x / spots.length;
         y += at.y / spots.length;
       }
-      grouped.set(k, { k, x, y, d: trace(spots), isApart });
+      grouped.set(k, {
+        k,
+        x,
+        y,
+        d: trace(spots),
+        isApart,
+        ...(spots.length > 1
+          ? { seats: spots.map((spot) => trace([spot])) }
+          : {}),
+      });
     }
     const cells = [...grouped.values()];
     const line = (edges: Array<Array<number>>) =>
@@ -813,6 +830,49 @@
     return isSummary
       ? new Map(fills((css) => engine.read(css)))
       : new Map<number, string>();
+  });
+  const slotted = $derived.by(() => {
+    void engine.theme;
+    const result = new Map<number, Array<string>>();
+    if (grid == null || view !== "winner" || only != null) {
+      return result;
+    }
+    const nested = Map.groupBy(places.districts ?? [], (row) => row.within);
+    for (const row of places.rows) {
+      const seats = grid.at.get(row.k)?.seats;
+      if (seats == null) {
+        continue;
+      }
+      const won = new Map<number, number>();
+      for (const part of [row, ...(nested.get(row.k) ?? [])]) {
+        const held =
+          part.held ??
+          (part.leader == null || part.seats == null
+            ? []
+            : [[part.leader, part.seats] as const]);
+        for (const [index, count] of held) {
+          won.set(index, (won.get(index) ?? 0) + count);
+        }
+      }
+      if (won.size < 2) {
+        continue;
+      }
+      const order = [...won].toSorted(
+        (a, b) =>
+          b[1] - a[1] || (row.shares[b[0]] ?? 0) - (row.shares[a[0]] ?? 0),
+      );
+      const fill: Array<string> = [];
+      for (const [index, won] of order) {
+        const tone = engine.read(colors[index] ?? "var(--muted-foreground)");
+        for (let at = 0; at < won; at += 1) {
+          fill.push(tone);
+        }
+      }
+      if (fill.length === seats.length) {
+        result.set(row.k, fill);
+      }
+    }
+    return result;
   });
   const credited = $derived(grid == null ? (sources ?? engine.credits) : []);
   const stretch = $derived(
@@ -2826,6 +2886,19 @@
               }
             }}
           />
+          {const parts = $derived(slotted.get(cell.k))}
+          {#if parts != null && cell.seats != null}
+            {#each cell.seats as seat, at (at)}
+              <path d={seat} fill={parts[at]} pointer-events="none" />
+            {/each}
+            <path
+              d={cell.d}
+              fill="none"
+              stroke="var(--card)"
+              stroke-width={grid.seam}
+              pointer-events="none"
+            />
+          {/if}
         {/each}
         <path
           d={grid.regions}
