@@ -82,7 +82,7 @@
     aria-current={isOn ? "page" : undefined}
     aria-disabled={option.disabled ? true : undefined}
     title={option.title ?? (option.isIconOnly ? option.label : undefined)}
-    data-sveltekit-noscroll
+    data-sveltekit-reset="false"
     class={cn(
       "group/segment -ms-px inline-flex shrink-0 items-center justify-center gap-1.5 border border-input bg-card font-semibold whitespace-nowrap keycap outline-none first:ms-0 first:rounded-s-sm last:rounded-e-sm focus-visible:z-20 focus-visible:ring-2 focus-visible:ring-ring/50 pointer-coarse:block-10",
       {
