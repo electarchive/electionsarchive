@@ -3,7 +3,12 @@
   import BountyStatus from "#lib/components/contrib/bounty-status.svelte";
   import WatchButton from "#lib/components/contrib/watch-button.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
-  import { CATEGORY_LABELS, GRAIN_LABELS, levelLabel } from "#lib/coverage.js";
+  import {
+    CATEGORY_LABELS,
+    GRAIN_LABELS,
+    levelLabel,
+    STAGE_LABELS,
+  } from "#lib/coverage.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { ActionData, PageData } from "./$types";
@@ -34,7 +39,10 @@
       },
       {
         term: m.bounty_stage(),
-        value: bounty.stage === "" ? null : bounty.stage,
+        value:
+          bounty.stage === ""
+            ? null
+            : (STAGE_LABELS[bounty.stage]?.() ?? bounty.stage),
       },
       { term: m.bounty_category(), value: CATEGORY_LABELS[bounty.category]() },
       {

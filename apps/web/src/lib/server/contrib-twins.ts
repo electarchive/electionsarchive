@@ -12,7 +12,12 @@ import {
   stateLabel,
   tierLabel,
 } from "#lib/contrib.js";
-import { CATEGORY_LABELS, GRAIN_LABELS, levelLabel } from "#lib/coverage.js";
+import {
+  CATEGORY_LABELS,
+  GRAIN_LABELS,
+  levelLabel,
+  STAGE_LABELS,
+} from "#lib/coverage.js";
 import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { atom } from "#lib/server/atom.js";
@@ -393,7 +398,7 @@ export function bountyMarkdown(origin: string, bounty: Bounty) {
       m.bounty_level(),
       bounty.level === "" ? "" : levelLabel(bounty.polity, bounty.level),
     ],
-    [m.bounty_stage(), bounty.stage],
+    [m.bounty_stage(), STAGE_LABELS[bounty.stage]?.() ?? bounty.stage],
     [m.bounty_category(), CATEGORY_LABELS[bounty.category]()],
     [m.bounty_checked(), bounty.checked ?? ""],
     [m.bounty_state(), bountyStatus(bounty)],

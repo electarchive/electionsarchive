@@ -682,6 +682,13 @@ export const GRAIN_LABELS: Record<string, () => string> = {
   party: m.coverage_grain_party,
 };
 
+export const STAGE_LABELS: Record<string, () => string> = {
+  general: m.ws_ekind_general,
+  primary: m.ws_ekind_primary,
+  runoff: m.ws_ekind_runoff,
+  special: m.ws_ekind_special,
+};
+
 export const GAP_GRAINS: Record<Goal, ReadonlyArray<string>> = {
   county: ["results", "county"],
   history: ["results", "county"],
