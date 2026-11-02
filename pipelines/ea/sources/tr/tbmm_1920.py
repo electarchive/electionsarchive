@@ -225,11 +225,13 @@ def words(text: str) -> set[str]:
 
 def clause(bio: str, term: int, province: str) -> str:
     label = LABELS[term]
+    bio = re.sub(r"Mil-?\s*let-?\s*vekili", "Milletvekili", bio)
+    bio = re.sub(r"\b([IVX]+)\s+(?=Dönem)", r"\1. ", bio)
     found = []
     for segment in re.split(r"\s[–-]\s", bio):
         if "Milletvekili" not in segment or "Dönem" not in segment or "Meb" in segment.split("Milletvekili")[0][-60:]:
             continue
-        for part in re.split(r",\s*|\s+ve\s+(?=[IVX]+\.\s*Dönem)", segment):
+        for part in re.split(r",\s*|\s+ve\s+(?=[IVX]+\.\s*(?:\([^)]*\)\s*)?Dönem)", segment):
             head = re.split(r"Dönem", part, maxsplit=1)
             if len(head) == 2 and label in re.findall(r"\b([IVX]+)\.", head[0] + "."):
                 found.append((part, segment))
