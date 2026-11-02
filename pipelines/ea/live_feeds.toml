@@ -210,6 +210,14 @@ publisher = "Dane County Clerk"
 url = "https://elections.countyofdane.com/"
 
 [[feed]]
+id = "us.enr_2026.ny"
+adapter = "us.enr_2026"
+params = { state = "NY" }
+poller = "muktedir"
+publisher = "Westchester, Suffolk, Monroe, and Nassau County boards of elections"
+url = "https://app.nassaucountyny.gov/BOE/results/election2.html"
+
+[[feed]]
 id = "us.enr_2026.al"
 adapter = "us.enr_2026"
 params = { state = "AL" }
