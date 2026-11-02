@@ -672,8 +672,9 @@
           {/if}
           {#each line.backers as backer, index (index)}
             <span
-              class="block text-[0.8125rem] text-pretty text-muted-foreground"
+              class="block text-[0.8125rem] text-pretty text-muted-foreground [@media(width>=48rem)]:whitespace-normal!"
               >{backer.head}{#each backer.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
+                    class="whitespace-nowrap"
                     label={part.text}
                     party={part.party}
                   />{/if}{/each}{backer.tail}</span
