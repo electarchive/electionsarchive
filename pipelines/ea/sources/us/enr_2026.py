@@ -256,9 +256,12 @@ def fetch() -> None:
             content,
             suffix=suffix,
             retrieved_at=datetime.now(UTC),
-            media_type={".json": "application/json", ".html": "text/html", ".csv": "text/csv"}.get(
-                suffix, "text/tab-separated-values"
-            ),
+            media_type={
+                ".json": "application/json",
+                ".html": "text/html",
+                ".csv": "text/csv",
+                ".xml": "application/xml",
+            }.get(suffix, "text/tab-separated-values"),
         )
         pages.setdefault(state, {})[url] = key
 
@@ -379,6 +382,18 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_ny
 
         enr_ny.collect(client, get, lambda url, content, suffix: store("NY", url, content, suffix))
+    if not only or "NJ" in only:
+        from ea.sources.us import enr_nj
+
+        enr_nj.collect(client, get, lambda url, content, suffix: store("NJ", url, content, suffix))
+    if not only or "OH" in only:
+        from ea.sources.us import enr_oh
+
+        enr_oh.collect(client, get, lambda url, content: store("OH", url, content, ".xml"))
+    if not only or "OR" in only:
+        from ea.sources.us import enr_or
+
+        enr_or.collect(client, get, lambda url, content: store("OR", url, content, ".json"))
     missing: list[str] = []
     for fips, (tenant, *_) in COUNTIES.items():
         state = STATES[fips[:2]]
@@ -546,6 +561,16 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
+    if url.startswith("https://liveresults.ohiosos.gov/"):
+        from ea.sources.us import enr_oh
+
+        yield from enr_oh.rows(url, path, urls)
+        return
+    if state == "OR":
+        from ea.sources.us import enr_or
+
+        yield from enr_or.rows(url, path, urls)
+        return
     if state == "TX":
         from ea.sources.us import enr_tx
 
@@ -587,7 +612,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for contest in root.iter("Contest"):
             found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
-            if tenant and found:
+            if tenant and found and state != "NJ":
                 continue
             for choice in contest.iter("Choice"):
                 for kind in choice.iter("VoteType"):
@@ -1354,7 +1379,7 @@ def plan(
             .agg(pl.col("reporting").max(), pl.col("total").max())
             .select(pl.col("reporting").sum(), pl.col("total").sum())
             .row(0)
-            if state == "FL"
+            if state in ("FL", "NJ")
             else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
         )
         sums: dict[tuple[UUID, UUID], int] = {}

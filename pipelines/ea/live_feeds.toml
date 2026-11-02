@@ -245,9 +245,16 @@ note = "county election sites only"
 id = "us.enr_2026.oh"
 adapter = "us.enr_2026"
 params = { state = "OH" }
+poller = "muktedir"
 publisher = "Ohio Secretary of State"
-url = "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/"
-note = "county election sites only"
+url = "https://liveresults.ohiosos.gov/"
+
+[[feed]]
+id = "us.enr_2026.or"
+adapter = "us.enr_2026"
+params = { state = "OR" }
+publisher = "Oregon Secretary of State"
+url = "https://results.oregonvotes.gov/"
 
 [[feed]]
 id = "us.nyc_enr"
