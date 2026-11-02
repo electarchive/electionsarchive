@@ -10437,7 +10437,7 @@ def parse() -> None:
         for st, geoid, full in (
             gazetteer.filter(
                 pl.col("USPS").is_in(
-                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY"]
+                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY", "TN"]
                 )
                 & (pl.col("FUNCSTAT") == "A")
             )
@@ -10457,12 +10457,12 @@ def parse() -> None:
         claimed = {
             path
             for (path,) in conn.execute(
-                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|ks|wy|ny)/[^/]+$'"
+                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|ks|wy|ny|tn)/[^/]+$'"
             )
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'KS', 'WY', 'NY')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'KS', 'WY', 'NY', 'TN')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -10588,7 +10588,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE', 'TN'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -10636,6 +10636,7 @@ def parse() -> None:
                                         "pub",
                                         "schs",
                                         "sd",
+                                        *(("municipal", "system") if state == "TN" else ()),
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -11044,7 +11045,7 @@ def parse() -> None:
                                 or (
                                     sort == "school"
                                     or state
-                                    in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL", "NE")
+                                    in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL", "NE", "TN")
                                 )
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
@@ -11102,7 +11103,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY", "TN")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
@@ -11244,7 +11245,7 @@ def parse() -> None:
                             if (me_seated or role in ("council", "commission", "board-of-directors"))
                             and re.search(r"\bat large\b", post)
                             else f"{slot[1].title()} {slot[2]}"
-                            if state == "TX"
+                            if state in ("TX", "TN")
                             and role == "board-of-education"
                             and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
                             else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
