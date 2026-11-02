@@ -288,7 +288,15 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                  and w.candidacy_id is null and w.seats is not null
                where m.members > w.seats"""
                 ).format(outcomes=stage.staged("outcome")),
-            )
+            ),
+            (
+                "outcomes.member_off_list",
+                sql.SQL(
+                    """select o.option_id, o.result_set_id, jsonb_build_object('kind', p.kind, 'candidacy', o.candidacy_id)
+               from {outcomes} o join {options} p on p.id = o.option_id
+               where o.candidacy_id is not null and p.kind not in ('list', 'independents', 'others')"""
+                ).format(outcomes=stage.staged("outcome"), options=stage.either("contest_option", "id", "kind")),
+            ),
         ]
         if "candidacy_id" in stage.tables["outcome"]
         else []
