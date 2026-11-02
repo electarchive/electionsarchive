@@ -214,7 +214,7 @@ id = "us.enr_2026.ny"
 adapter = "us.enr_2026"
 params = { state = "NY" }
 poller = "muktedir"
-publisher = "Westchester, Suffolk, Monroe, and Nassau County boards of elections"
+publisher = "Westchester, Suffolk, Monroe, Nassau, and Erie County boards of elections"
 url = "https://app.nassaucountyny.gov/BOE/results/election2.html"
 
 [[feed]]
