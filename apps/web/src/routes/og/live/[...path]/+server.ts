@@ -293,12 +293,10 @@ function colorOf(control: Control, family: Family) {
   return /republican/iu.test(family.name) ? "#c01c28" : "#1a5fb4";
 }
 
-function chamberRow(
+function tally(
   view: ChamberView,
   seats: Array<Seat>,
-  label: string,
   [left, right]: [Family, Family],
-  [leftColor, rightColor]: [string, string],
 ) {
   const held = { left: 0, right: 0 };
   for (const entry of seats) {
@@ -310,64 +308,156 @@ function chamberRow(
       }
     }
   }
-  const { size } = view;
-  const totals = {
-    left:
-      view.tallies.left.holdover +
-      view.tallies.left.won +
-      view.tallies.left.projected +
-      view.tallies.left.ahead,
-    right:
-      view.tallies.right.holdover +
-      view.tallies.right.won +
-      view.tallies.right.projected +
-      view.tallies.right.ahead,
-  };
-  const other =
-    view.tallies.other.holdover +
-    view.tallies.other.won +
-    view.tallies.other.projected +
-    view.tallies.other.ahead;
+  const seated = (group: ChamberView["tallies"]["left"]) =>
+    group.holdover + group.won + group.projected + group.ahead;
   const isCounting = seats.some((entry) => entry.summary.total > 0);
-  const figure = (value: number, color: string, isEnd: boolean) =>
-    h(
-      "div",
-      {
-        display: "flex",
-        justifyContent: isEnd ? "flex-end" : "flex-start",
-        width: 70,
-        fontSize: 40,
-        fontWeight: 800,
-        lineHeight: 1,
-        letterSpacing: "-0.02em",
-        color: isCounting ? color : mix(color, 0.5),
-      },
-      count(value),
+  return {
+    held,
+    isCounting,
+    other: seated(view.tallies.other),
+    left: seated(view.tallies.left) + (isCounting ? 0 : held.left),
+    right: seated(view.tallies.right) + (isCounting ? 0 : held.right),
+  };
+}
+
+function figure(
+  value: number,
+  color: string,
+  isEnd: boolean,
+  isCounting: boolean,
+) {
+  return h(
+    "div",
+    {
+      display: "flex",
+      justifyContent: isEnd ? "flex-end" : "flex-start",
+      width: 70,
+      fontSize: 40,
+      fontWeight: 800,
+      lineHeight: 1,
+      letterSpacing: "-0.02em",
+      color: isCounting ? color : mix(color, 0.5),
+    },
+    count(value),
+  );
+}
+
+function rowHeader(label: string, detail: string, aside: string) {
+  return h(
+    "div",
+    {
+      display: "flex",
+      alignItems: "baseline",
+      justifyContent: "space-between",
+      fontSize: 19,
+      color: MUTED,
+    },
+    [
+      h("div", { display: "flex", alignItems: "baseline", gap: 12 }, [
+        h(
+          "div",
+          { display: "flex", fontSize: 26, fontWeight: 800, color: INK },
+          label,
+        ),
+        detail,
+      ]),
+      aside,
+    ],
+  );
+}
+
+function governorRow(
+  view: ChamberView,
+  seats: Array<Seat>,
+  pairing: [Family, Family],
+  [leftColor, rightColor]: [string, string],
+) {
+  const totals = tally(view, seats, pairing);
+  const notUp =
+    view.tallies.left.holdover +
+    view.tallies.right.holdover +
+    view.tallies.other.holdover;
+  const ordered = seats.toSorted(
+    (a, b) =>
+      b.lean - a.lean ||
+      a.summary.race.state.localeCompare(b.summary.race.state),
+  );
+  const tint = (entry: Seat) => {
+    const id = entry.summary.total > 0 ? entry.side : entry.held;
+    const color =
+      id === pairing[0].id
+        ? leftColor
+        : id === pairing[1].id
+          ? rightColor
+          : id == null
+            ? null
+            : OTHER;
+    if (color == null) {
+      return FILL;
+    }
+    if (entry.rating === "won" || entry.rating === "projected") {
+      return mix(color, entry.rating === "won" ? 1 : 0.85);
+    }
+    return mix(
+      color,
+      entry.summary.total > 0
+        ? 0.3 + 0.4 * Math.min(1, Math.abs(entry.lean))
+        : 0.24,
     );
+  };
+  const stack = ordered.length > 18 ? 2 : 1;
+  const columns = Math.ceil(ordered.length / stack);
+  const size = stack === 2 ? 15 : Math.min(26, Math.floor(332 / columns) - 3);
+  const tile = (entry: Seat | undefined) =>
+    h("div", {
+      width: size,
+      height: stack === 2 ? size : 26,
+      borderRadius: 3,
+      backgroundColor: entry == null ? PAPER : tint(entry),
+    });
   return h("div", { display: "flex", flexDirection: "column", gap: 8 }, [
-    h(
-      "div",
-      {
-        display: "flex",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-        fontSize: 19,
-        color: MUTED,
-      },
-      [
-        h("div", { display: "flex", alignItems: "baseline", gap: 12 }, [
-          h(
-            "div",
-            { display: "flex", fontSize: 26, fontWeight: 800, color: INK },
-            label,
-          ),
-          m.night_state_seats_up({ count: count(seats.length) }),
-        ]),
-        m.night_chamber_majority({ count: count(view.majority) }),
-      ],
+    rowHeader(
+      m.night_nation_governors(),
+      m.night_governors_races({ count: count(seats.length) }),
+      m.night_tally_not_up({ count: count(notUp) }),
     ),
     h("div", { display: "flex", alignItems: "center", gap: 14 }, [
-      figure(totals.left + (isCounting ? 0 : held.left), leftColor, false),
+      figure(totals.left, leftColor, false, totals.isCounting),
+      h(
+        "div",
+        { display: "flex", flexGrow: 1, justifyContent: "center", gap: 3 },
+        Array.from({ length: columns }, (_, column) =>
+          h(
+            "div",
+            { display: "flex", flexDirection: "column", gap: 3 },
+            Array.from({ length: stack }, (_, row) =>
+              tile(ordered[column * stack + row]),
+            ),
+          ),
+        ),
+      ),
+      figure(totals.right, rightColor, true, totals.isCounting),
+    ]),
+  ]);
+}
+
+function chamberRow(
+  view: ChamberView,
+  seats: Array<Seat>,
+  label: string,
+  pairing: [Family, Family],
+  [leftColor, rightColor]: [string, string],
+) {
+  const { size } = view;
+  const { held, other, isCounting, ...totals } = tally(view, seats, pairing);
+  return h("div", { display: "flex", flexDirection: "column", gap: 8 }, [
+    rowHeader(
+      label,
+      m.night_state_seats_up({ count: count(seats.length) }),
+      m.night_chamber_majority({ count: count(view.majority) }),
+    ),
+    h("div", { display: "flex", alignItems: "center", gap: 14 }, [
+      figure(totals.left, leftColor, false, isCounting),
       h(
         "div",
         { display: "flex", position: "relative", flexGrow: 1, height: 26 },
@@ -412,7 +502,7 @@ function chamberRow(
           }),
         ],
       ),
-      figure(totals.right + (isCounting ? 0 : held.right), rightColor, true),
+      figure(totals.right, rightColor, true, isCounting),
     ]),
   ]);
 }
@@ -442,21 +532,33 @@ async function nationBody(
         entry.summary.race.office === office &&
         STATES.has(entry.summary.race.state),
     );
-  const rows = (
-    [
-      ["senate", m.night_nation_senate(), control.holdovers.senate],
-      ["house", m.night_nation_house(), {}],
-      ["governor", m.night_nation_governor(), control.holdovers.governor],
-    ] as const
-  ).map(([office, label, holdovers]) =>
-    chamberRow(
-      chamber(pick(office), office, holdovers, pairing),
-      pick(office),
-      label,
+  const rows = [
+    ...(
+      [
+        ["senate", m.night_nation_senate(), control.holdovers.senate],
+        ["house", m.night_nation_house(), {}],
+      ] as const
+    ).map(([office, label, holdovers]) =>
+      chamberRow(
+        chamber(pick(office), office, holdovers, pairing),
+        pick(office),
+        label,
+        pairing,
+        colors,
+      ),
+    ),
+    governorRow(
+      chamber(
+        pick("governor"),
+        "governor",
+        control.holdovers.governor,
+        pairing,
+      ),
+      pick("governor"),
       pairing,
       colors,
     ),
-  );
+  ];
   const side = (id: string | null) =>
     id == null
       ? null
