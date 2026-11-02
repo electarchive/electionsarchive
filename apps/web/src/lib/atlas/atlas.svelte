@@ -131,7 +131,10 @@
   let chase = $state<number | null>(null);
   let isSwitching = $state(false);
   let isHelping = $state(false);
-  let switcher = $state<{ move: (delta: -1 | 1) => void } | null>(null);
+  let switcher = $state<{
+    move?: (delta: -1 | 1) => void;
+    [key: string]: unknown;
+  } | null>(null);
   let built = "";
   let isQueued = false;
   const asked = new Set<string>();
@@ -1630,8 +1633,8 @@
     }
     const toggles: Record<string, () => void> = {
       "?": () => (isHelping = true),
-      "[": () => switcher?.move(-1),
-      "]": () => switcher?.move(1),
+      "[": () => switcher?.move?.(-1),
+      "]": () => switcher?.move?.(1),
       g: () => (isSwitching = true),
       t: () => (isAnalyzing = !isAnalyzing),
       s: () => (isAdding = !isAdding),
@@ -2084,7 +2087,7 @@
             active={tier}
             locked={locked?.code ?? null}
             isCompact={!wide.current || !tall.current}
-            onlock={(code) => {
+            onlock={(code: string | null) => {
               view.level = code;
             }}
           />
