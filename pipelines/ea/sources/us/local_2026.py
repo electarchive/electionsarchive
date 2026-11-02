@@ -7886,6 +7886,7 @@ def parse() -> None:
             ("green", "green-party"),
             ("constitution", "constitution-party"),
             ("forward", "forward-party"),
+            ("kentucky party", "KY:kentucky-party"),
         ):
             if word.startswith(prefix):
                 return key, False
@@ -8331,7 +8332,9 @@ def parse() -> None:
             continue
         head, code = cells[: len(cells) - 13], cells[len(cells) - 13].strip()
         suffix = head.pop().strip() if head[-1].strip() in ("JR", "SR", "II", "III", "IV") else ""
-        named, independent = party({"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian"}.get(code, code))
+        named, independent = party(
+            {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian", "FWD": "Forward"}.get(code, code)
+        )
         feeds["NM"].append(
             {
                 "county": head[-4],
@@ -12067,6 +12070,10 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 election_path,
                 scope,
             ) = templates[tail]
+            if kind == "office" and system is None:
+                magnitude = magnitude or int(group["seats"][0] or 1)
+                if magnitude == 1:
+                    system = cs.key("us.electoral_system", "fptp")
             if area is None and office_id is None and body_id is not None:
                 area = next(
                     iter(
