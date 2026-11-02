@@ -616,6 +616,16 @@ const PlaceRow = v.pipe(
     isRecorded: v.optional(v.boolean()),
     isPool: v.optional(v.boolean()),
     status: v.optional(v.string()),
+    runoff: v.optional(
+      v.object({
+        path: v.nullable(v.string()),
+        date: v.string(),
+        bar: v.nullable(v.number()),
+        shares: v.array(FINE),
+        winner: v.nullable(v.number()),
+        margin: v.nullable(FINE),
+      }),
+    ),
   }),
   v.transform((row) => {
     const scale = 10 ** Math.max(5, Math.ceil(Math.log10(2 * row.valid + 1)));
@@ -4353,6 +4363,84 @@ async function tabulate(
   const transferred = new Set(
     elected?.rows.flatMap((row) => (row.isStv ? [row.contest] : [])),
   );
+  const chained =
+    owners.length === 0
+      ? []
+      : rowsOf(
+          await db.execute<{
+            contest: string;
+            runoff: string;
+            date: string;
+            bar: number | null;
+            person: string | null;
+            party: string | null;
+            votes: number;
+            isWon: boolean;
+          }>(sql`
+            with recursive chain(first, id, depth) as (
+              select c.id, n.id, 1
+              from contest c
+              join contest n on n.previous_round_id = c.id
+              join election ne on ne.id = n.election_id
+              where c.id = any(${sql.param(owners)}::uuid[]) and ne.kind = 'runoff' and ne.status::text not in ('canceled', 'annulled')
+              union all
+              select chain.first, n.id, chain.depth + 1
+              from chain
+              join contest n on n.previous_round_id = chain.id
+              join election ne on ne.id = n.election_id
+              where chain.depth < 4 and ne.kind = 'runoff' and ne.status::text not in ('canceled', 'annulled')
+            ),
+            last as (select distinct on (first) first, id from chain order by first, depth desc)
+            select last.first as contest, last.id as runoff, e.date_from::text as date,
+              case when coalesce(f.rules_override ->> 'formula', es.rules ->> 'formula', '') in ('two_round', 'supplementary')
+                then coalesce((f.rules_override ->> 'majority')::float8, (es.rules ->> 'majority')::float8, 0.5) end as bar,
+              coalesce(m.into_id, cy.person_id) as person,
+              coalesce(pm.into_id, o.party_id, (
+                select l.party_id from contest_option l
+                where l.parent_option_id = o.id and l.party_id is not null
+                order by l.ballot_position nulls last, l.k limit 1
+              )) as party,
+              coalesce(t.votes, 0)::float8 as votes,
+              exists (
+                select from outcome x where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won')
+              ) as "isWon"
+            from last
+            join contest f on f.id = last.first
+            left join electoral_system es on es.id = f.electoral_system_id
+            join contest n on n.id = last.id
+            join election e on e.id = n.election_id
+            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            left join area spot on spot.id = coalesce(n.district_area_id, pt.area_id)
+            left join lateral (
+              select rs.id, rs.k from result_set rs where rs.contest_id = n.id
+              order by rs.is_default desc, array_position(${STAGES}, rs.stage)
+              limit 1
+            ) rs on true
+            join contest_option o on o.contest_id = n.id and o.parent_option_id is null
+            left join lateral (
+              select c.person_id from candidacy c
+              where c.option_id = o.id and c.role = 'head' order by c.id limit 1
+            ) cy on true
+            left join entity_merge m on m.entity_id = cy.person_id
+            left join entity_merge pm on pm.entity_id = o.party_id
+            left join lateral (
+              select sum(r.value) as votes from result_rollup r
+              where r.result_set_k = rs.k and r.area_k = spot.k
+                and r.option_k = any(array(select l.k from contest_option l where l.id = o.id or l.parent_option_id = o.id))
+                and r.measure = (
+                  select y.measure from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = spot.k and y.measure = any(${COUNTED})
+                  order by array_position(${COUNTED}, y.measure) limit 1
+                )
+                and r.count_round = (
+                  select max(y.count_round) from result_rollup y where y.result_set_k = rs.k and y.area_k = spot.k
+                )
+            ) t on true
+          `),
+        );
+  const runoffPaths = await paths([
+    ...new Set(chained.map((row) => row.runoff)),
+  ]);
   const elects = rows.map((row, index) => {
     const side = row.isContest
       ? now[tier[index] ?? 0]?.get(row.k)?.side
@@ -4677,6 +4765,54 @@ async function tabulate(
       ] as const;
     }),
   );
+  const runoffs = new Map(
+    Map.groupBy(chained, (row) => row.contest)
+      .entries()
+      .map(([contest, entries]) => {
+        const votes = new Map<string, number>();
+        let total = 0;
+        let winner: string | null = null;
+        for (const entry of entries) {
+          total += entry.votes;
+          const key = [
+            entry.person == null ? null : `person:${entry.person}`,
+            entry.party == null ? null : `party:${root(entry.party)}`,
+          ].find((candidate) => candidate != null && legend.has(candidate));
+          if (key == null) {
+            continue;
+          }
+          votes.set(key, (votes.get(key) ?? 0) + entry.votes);
+          if (entry.isWon) {
+            winner = key;
+          }
+        }
+        const order = votes
+          .entries()
+          .toArray()
+          .toSorted((a, b) => b[1] - a[1]);
+        winner ??= total > 0 ? (order[0]?.[0] ?? null) : null;
+        const item = legend.get(winner ?? "");
+        if (item != null) {
+          item.lead = true;
+        }
+        const head = entries[0];
+        return [
+          contest,
+          {
+            path: head == null ? null : (runoffPaths.get(head.runoff) ?? null),
+            date: head?.date ?? "",
+            bar: head?.bar ?? null,
+            total,
+            votes,
+            winner,
+            margin:
+              total > 0
+                ? ((order[0]?.[1] ?? 0) - (order[1]?.[1] ?? 0)) / total
+                : null,
+          },
+        ] as const;
+      }),
+  );
   const ranked = legend
     .values()
     .filter((item) => item.votes > 0 || item.lead)
@@ -4821,6 +4957,7 @@ async function tabulate(
                   : [],
               )
             : [];
+        const chain = row.isContest ? runoffs.get(row.owner ?? "") : undefined;
         return {
           k: row.k,
           name: row.name,
@@ -4828,6 +4965,20 @@ async function tabulate(
           contest: row.isContest,
           isRemainder: row.isRemainder ?? false,
           isCounted: row.isCounted,
+          ...(chain != null && {
+            runoff: {
+              path: chain.path,
+              date: chain.date,
+              bar: chain.bar,
+              shares: kept.map((item) =>
+                chain.total > 0
+                  ? (chain.votes.get(item.key) ?? 0) / chain.total
+                  : 0,
+              ),
+              winner: position.get(chain.winner ?? "") ?? null,
+              margin: chain.margin,
+            },
+          }),
           ...(isTally && { isTally }),
           valid,
           shares: kept.map(

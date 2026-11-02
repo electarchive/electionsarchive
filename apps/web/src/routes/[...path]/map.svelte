@@ -33,7 +33,14 @@
   import * as Select from "#lib/components/ui/select/index.js";
   import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
-  import { count, percent, plural, points, precision } from "#lib/format.js";
+  import {
+    count,
+    dates,
+    percent,
+    plural,
+    points,
+    precision,
+  } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
@@ -848,9 +855,9 @@
       for (const part of [row, ...(nested.get(row.k) ?? [])]) {
         const held =
           part.held ??
-          (part.leader == null || part.seats == null
+          (decided(part) == null || part.seats == null
             ? []
-            : [[part.leader, part.seats] as const]);
+            : [[decided(part) ?? 0, part.seats] as const]);
         for (const [index, count] of held) {
           won.set(index, (won.get(index) ?? 0) + count);
         }
@@ -1416,8 +1423,8 @@
                 (after[0] ?? 0) -
                 (after[1] ?? 0) -
                 ((before[0] ?? 0) - (before[1] ?? 0)),
-              from: isForward ? row.leader : row.prior,
-              to: isForward ? row.prior : row.leader,
+              from: isForward ? decided(row) : row.prior,
+              to: isForward ? row.prior : decided(row),
               before,
               after,
             },
@@ -1518,10 +1525,14 @@
       return [{ at: row.at, tones, order: -(rows.get(row.k)?.valid ?? 0) }];
     });
   });
+  const decided = (row: (typeof places.rows)[number]) =>
+    row.runoff == null ? row.leader : row.runoff.winner;
   const leading = (row: (typeof places.rows)[number]) =>
-    view === "winner" && isProportional && row.held != null
-      ? largest(row.held, (index) => row.shares[index] ?? 0)
-      : row.leader;
+    row.runoff != null
+      ? row.runoff.winner
+      : view === "winner" && isProportional && row.held != null
+        ? largest(row.held, (index) => row.shares[index] ?? 0)
+        : row.leader;
   const isUnmatched = $derived(
     unmatched.size > 0 && typeof view === "string" && COMPARED.has(view),
   );
@@ -1583,7 +1594,7 @@
   const leads = $derived.by(() => {
     const counted = Map.groupBy(
       places.rows.filter(
-        (row) => row.leader != null && !(isBanded && row.held != null),
+        (row) => leading(row) != null && !(isBanded && row.held != null),
       ),
       (row) => leading(row) ?? 0,
     )
@@ -1628,9 +1639,12 @@
           !(isBanded && row.held != null) &&
           row.isCounted !== false &&
           row.valid > 0 &&
-          row.margin != null
+          (row.runoff?.margin ?? row.margin) != null
         ) {
-          const at = row.held == null ? bin(row.margin) : LEANS.length - 1;
+          const at =
+            row.held == null
+              ? bin(row.runoff?.margin ?? row.margin)
+              : LEANS.length - 1;
           counts[at] = (counts[at] ?? 0) + 1;
         }
       }
@@ -1732,6 +1746,11 @@
   );
   const moved = $derived(
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
+  );
+  const runoffs = $derived(
+    view === "winner" || view === "flips"
+      ? places.rows.filter((row) => row.runoff != null)
+      : [],
   );
   const ranked = $derived(
     current == null
@@ -1954,6 +1973,17 @@
         }
         continue;
       }
+      if (
+        row.runoff != null &&
+        row.runoff.winner == null &&
+        (view === "winner" || view === "bubbles")
+      ) {
+        result.push([
+          row.k,
+          read("color-mix(in oklab, var(--muted-foreground) 30%, var(--card))"),
+        ]);
+        continue;
+      }
       const shown =
         typeof only === "number" &&
         (row.held?.some(([index]) => index === only) ?? false)
@@ -1967,7 +1997,7 @@
             !isShaded ||
             (view === "winner" && isProportional && row.held != null)
           ? 100
-          : (LEANS[bin(row.margin)] ?? 100);
+          : (LEANS[bin(row.runoff?.margin ?? row.margin)] ?? 100);
       let tone = colors[shown] ?? "var(--muted-foreground)";
       let isGray = grays.get(tone);
       if (isGray == null) {
@@ -2014,7 +2044,7 @@
         tone =
           colors[
             view === "flips"
-              ? (change.to ?? row.leader)
+              ? (change.to ?? decided(row) ?? row.leader)
               : change.swing >= 0
                 ? 0
                 : 1
@@ -2120,6 +2150,7 @@
       ["blank", "absent"],
       ["norun", "norun"],
       ["unmatched", "hatch"],
+      ["runoff", "runoff"],
     ] as const) {
       engine.add(
         {
@@ -2457,6 +2488,7 @@
     const tips = [0, 1].map((index) =>
       read(colors[index] ?? "var(--muted-foreground)"),
     );
+    const striped = runoffs.map((row) => row.k);
     const rough: Maplibre.FilterSpecification = [
       "all",
       inland,
@@ -2473,6 +2505,11 @@
         "all",
         inland,
         ["in", ["id"], ["literal", skipped.map((row) => row.k)]],
+      ]);
+      engine.filter("runoff", [
+        "all",
+        inland,
+        ["in", ["id"], ["literal", striped]],
       ]);
       engine.filter("split", [
         "all",
@@ -2898,6 +2935,24 @@
           }
         }}
       >
+        {#if runoffs.length > 0}
+          {const step = $derived(grid.size * 0.5)}
+          <defs>
+            <pattern
+              id="{uid}-runoff"
+              patternUnits="userSpaceOnUse"
+              width={step}
+              height={step}
+              patternTransform="rotate(45)"
+            >
+              <path
+                d="M0 0V{step}"
+                stroke="color-mix(in oklab, var(--card) 85%, transparent)"
+                stroke-width={grid.size * 0.12}
+              />
+            </pattern>
+          </defs>
+        {/if}
         {#each grid.cells as cell (cell.k)}
           {const row = $derived(rows.get(cell.k))}
           <path
@@ -2913,11 +2968,11 @@
             tabindex={cell.k === (focus ?? grid.cells[0]?.k) ? 0 : -1}
             aria-label={row == null
               ? undefined
-              : row.leader == null
+              : decided(row) == null
                 ? row.name
                 : m.map_hex_seat({
                     name: row.name,
-                    winner: names[row.leader] ?? "",
+                    winner: names[decided(row) ?? -1] ?? "",
                   })}
             data-k={cell.k}
             onpointermove={(event) => {
@@ -2995,6 +3050,9 @@
               stroke-width={grid.seam}
               pointer-events="none"
             />
+          {/if}
+          {#if row?.runoff != null && runoffs.length > 0}
+            <path d={cell.d} fill="url(#{uid}-runoff)" pointer-events="none" />
           {/if}
         {/each}
         <path
@@ -3763,6 +3821,11 @@
             >
           </button>
         {/each}
+        {#if runoffs.length > 0}
+          {@render gap("runoff", m.map_runoff_key(), [
+            ...new Set(runoffs.map((row) => row.name)),
+          ])}
+        {/if}
       </div>
     {:else if view === "turnout_change"}
       <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
@@ -3947,6 +4010,11 @@
             </span>
             <span>{m.map_seats_key()}</span>
           </span>
+        {/if}
+        {#if runoffs.length > 0}
+          {@render gap("runoff", m.map_runoff_key(), [
+            ...new Set(runoffs.map((row) => row.name)),
+          ])}
         {/if}
         {#if missing.length > 0}
           {@render gap(
@@ -4441,26 +4509,34 @@
   </a>
 {/snippet}
 
-{#snippet gap(shape: "absent" | "norun", label: string, names: Array<string>)}
+{#snippet gap(
+  shape: "absent" | "norun" | "runoff",
+  label: string,
+  names: Array<string>,
+)}
   {const isListed = $derived(names.length <= 5)}
   <span
     class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground min-block-7"
     title={isListed ? undefined : names.join(", ")}
   >
-    <svg
-      viewBox="0 0 10 10"
-      class="rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_6%,var(--card))] ring-1 ring-border block-2.5 inline-2.5"
-      aria-hidden="true"
-    >
-      <path
-        d={shape === "absent"
-          ? "M2.5 2.5h.01M7.5 7.5h.01M7.5 2.5h.01M2.5 7.5h.01"
-          : "M1 3h4M6 7h4M0 7h1"}
-        stroke="currentColor"
-        stroke-width={shape === "absent" ? 1.75 : 1}
-        stroke-linecap={shape === "absent" ? "round" : "butt"}
-      />
-    </svg>
+    {#if shape === "runoff"}
+      {@render striped()}
+    {:else}
+      <svg
+        viewBox="0 0 10 10"
+        class="rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_6%,var(--card))] ring-1 ring-border block-2.5 inline-2.5"
+        aria-hidden="true"
+      >
+        <path
+          d={shape === "absent"
+            ? "M2.5 2.5h.01M7.5 7.5h.01M7.5 2.5h.01M2.5 7.5h.01"
+            : "M1 3h4M6 7h4M0 7h1"}
+          stroke="currentColor"
+          stroke-width={shape === "absent" ? 1.75 : 1}
+          stroke-linecap={shape === "absent" ? "round" : "butt"}
+        />
+      </svg>
+    {/if}
     <span class="shrink-0">{label}</span>
     {#if isListed}
       <span class="text-pretty text-foreground"
@@ -4716,6 +4792,112 @@
   {/if}
 {/snippet}
 
+{#snippet striped(isSmall = false)}
+  <svg
+    viewBox="0 0 10 10"
+    class={cn(
+      "shrink-0 rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_70%,var(--card))] text-card",
+      { "block-2 inline-2": isSmall, "block-2.5 inline-2.5": !isSmall },
+    )}
+    aria-hidden="true"
+    ><path d="M-1 4L4-1M-1 9L9-1M4 11L11 4" stroke="currentColor" /></svg
+  >
+{/snippet}
+
+{#snippet tick(bar: number)}
+  <span
+    class="absolute -inset-y-0.5 bg-foreground/60 inline-px"
+    style:inset-inline-start="{bar * 100}%"
+    aria-hidden="true"
+  ></span>
+{/snippet}
+
+{#snippet second(runoff: NonNullable<(typeof places.rows)[number]["runoff"]>)}
+  {const finalists = $derived(
+    runoff.shares
+      .map((share, index) => ({ share, index }))
+      .filter((entry) => entry.share > 0)
+      .toSorted(
+        (a, b) =>
+          Number(b.index === runoff.winner) -
+            Number(a.index === runoff.winner) || b.share - a.share,
+      )
+      .slice(0, 2),
+  )}
+  {const when = $derived(
+    dates({
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${runoff.date}T00:00:00Z`)),
+  )}
+  {const label = (index: number) =>
+    current?.people?.[index] ?? names[index] ?? places.legend[index]?.label}
+  <span class="grid gap-1.5 border-bs border-border pbs-2">
+    <span class="text-xs text-pretty text-muted-foreground"
+      >{runoff.bar == null
+        ? m.map_runoff_dated({ date: when })
+        : m.map_runoff_line({ bar: percent(runoff.bar, 0), date: when })}</span
+    >
+    {#if finalists.length > 0}
+      {const first = $derived(finalists[0])}
+      {const other = $derived(finalists[1])}
+      <span
+        class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-baseline gap-x-3 text-[0.8125rem]"
+      >
+        <span class="flex items-baseline gap-1.5 min-inline-0">
+          <span
+            class={cn("truncate", {
+              "font-semibold": first?.index === runoff.winner,
+            })}>{first == null ? "" : label(first.index)}</span
+          >
+          <span class="font-figures text-xs tabular-nums"
+            >{first == null
+              ? ""
+              : percent(first.share, precision(runoff.margin))}</span
+          >
+        </span>
+        {#if other != null}
+          <span
+            class="flex flex-row-reverse items-baseline gap-1.5 min-inline-0"
+          >
+            <span class="truncate">{label(other.index)}</span>
+            <span class="font-figures text-xs tabular-nums"
+              >{percent(other.share, precision(runoff.margin))}</span
+            >
+          </span>
+        {/if}
+      </span>
+      <span class="relative flex gap-px block-2">
+        {#each finalists as entry (entry.index)}
+          <span
+            class="rounded-xs first:rounded-e-none last:rounded-s-none only:rounded-xs"
+            style:background-color={colors[entry.index]}
+            style:flex-grow={entry.share}
+          ></span>
+        {/each}
+        {#if runoff.bar != null}
+          {@render tick(runoff.bar)}
+        {/if}
+      </span>
+    {:else if runoff.winner != null}
+      <span
+        class="flex items-center gap-2 text-[0.8125rem]"
+        style:--party={colors[runoff.winner]}
+      >
+        <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>
+        <span class="font-semibold">{label(runoff.winner)}</span>
+        <span class="text-muted-foreground">{m.outcome_won()}</span>
+      </span>
+    {:else}
+      <span class="text-[0.8125rem] text-muted-foreground"
+        >{m.map_runoff_pending()}</span
+      >
+    {/if}
+  </span>
+{/snippet}
+
 {#snippet readout(isSheet = false)}
   {#if current != null}
     {const tallied = $derived(isTally || current.isTally === true)}
@@ -4724,6 +4906,7 @@
         .map((share, index) => ({ share, index }))
         .toSorted((a, b) => b.share - a.share);
       return current.margin == null ||
+        current.runoff != null ||
         places.legend.length === 1 ||
         first == null ||
         second == null ||
@@ -4736,33 +4919,53 @@
     })}
     <span class="flex items-baseline justify-between gap-3">
       <span class="font-semibold text-pretty">{current.name}</span>
-      {#if moved?.from != null && moved.to != null && moved.from !== moved.to}
-        <span
-          class="flex shrink-0 items-center gap-1 rounded-xs bg-secondary px-1.5 text-xs font-semibold"
-          style:--party={colors[moved.to]}
-          ><span class="rounded-xs bg-(--party) chip block-2 inline-2"
-          ></span>{m.map_flipped()}</span
-        >
-      {:else if current.margin != null && places.legend.length === 1}
-        <span class="shrink-0 text-xs text-muted-foreground"
-          >{m.map_unopposed()}</span
-        >
-      {:else if current.margin != null}
-        <span
-          class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
-          >{tallied
-            ? new Intl.NumberFormat(getLocale(), {
-                signDisplay: "exceptZero",
-              }).format(lead ?? Math.round(current.margin * current.valid))
-            : points(current.margin)}</span
-        >
-      {/if}
+      <span class="flex shrink-0 items-baseline gap-2">
+        {#if current.runoff != null}
+          <span
+            class="flex items-center gap-1 self-center rounded-xs bg-secondary px-1.5 text-xs font-semibold"
+            >{@render striped(true)}{m.map_runoff()}</span
+          >
+        {/if}
+        {#if moved?.from != null && moved.to != null && moved.from !== moved.to}
+          <span
+            class="flex items-center gap-1 self-center rounded-xs bg-secondary px-1.5 text-xs font-semibold"
+            style:--party={colors[moved.to]}
+            ><span class="rounded-xs bg-(--party) chip block-2 inline-2"
+            ></span>{m.map_flipped()}</span
+          >
+        {:else if current.runoff != null}
+          {#if current.runoff.margin != null}
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
+              >{points(current.runoff.margin)}</span
+            >
+          {/if}
+        {:else if current.margin != null && places.legend.length === 1}
+          <span class="text-xs text-muted-foreground">{m.map_unopposed()}</span>
+        {:else if current.margin != null}
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
+            >{tallied
+              ? new Intl.NumberFormat(getLocale(), {
+                  signDisplay: "exceptZero",
+                }).format(lead ?? Math.round(current.margin * current.valid))
+              : points(current.margin)}</span
+          >
+        {/if}
+      </span>
     </span>
     <span class="grid gap-1">
       {#each ranked as entry (entry.index)}
         {const option = $derived(places.legend[entry.index])}
         <span
-          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-0.5 text-[0.8125rem]"
+          class={cn(
+            "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-0.5 text-[0.8125rem]",
+            {
+              "opacity-55":
+                current.runoff != null &&
+                current.runoff.shares.some((share) => share > 0) &&
+                (current.runoff.shares[entry.index] ?? 0) === 0,
+            },
+          )}
           style:--party={colors[entry.index]}
         >
           {const person = $derived(current.people?.[entry.index] ?? null)}
@@ -4780,7 +4983,8 @@
           <span class="flex items-baseline gap-1.5 min-inline-0">
             <span
               class={cn("truncate", {
-                "font-semibold": entry.index === current.leader,
+                "font-semibold":
+                  current.runoff == null && entry.index === current.leader,
               })}>{person ?? names[entry.index] ?? option?.label}</span
             >
             {#if tag != null}
@@ -4804,15 +5008,21 @@
                 : percent(entry.share, precision(current.margin))}</span
             >
           </span>
-          <span class="col-span-2 rounded-xs bg-muted block-1.5">
+          <span class="relative col-span-2 rounded-xs bg-muted block-1.5">
             <span
               class="block rounded-xs bg-(--party) block-full"
               style:inline-size="{entry.share * 100}%"
             ></span>
+            {#if current.runoff?.bar != null}
+              {@render tick(current.runoff.bar)}
+            {/if}
           </span>
         </span>
       {/each}
     </span>
+    {#if current.runoff != null}
+      {@render second(current.runoff)}
+    {/if}
     {#if isCompared && places.estimated === true && current.earlier != null && span != null}
       <span class="text-xs text-muted-foreground"
         >{m.map_estimated_line({ year: span.from })}</span

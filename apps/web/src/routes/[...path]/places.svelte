@@ -116,10 +116,12 @@
   const colors = $derived(
     places.legend.map((item) => swatch(item.color, item.key)),
   );
+  const decided = (row: (typeof places.rows)[number]) =>
+    row.runoff == null ? row.leader : row.runoff.winner;
   const leads = $derived(
     Map.groupBy(
-      places.rows.filter((row) => row.leader != null),
-      (row) => row.leader ?? 0,
+      places.rows.filter((row) => decided(row) != null),
+      (row) => decided(row) ?? 0,
     )
       .entries()
       .map(
@@ -188,8 +190,8 @@
     listed.map((row) => {
       const before = span?.forward === true ? row.shares : row.earlier;
       const after = span?.forward === true ? row.earlier : row.shares;
-      const from = span?.forward === true ? row.leader : row.prior;
-      const to = span?.forward === true ? row.prior : row.leader;
+      const from = span?.forward === true ? decided(row) : row.prior;
+      const to = span?.forward === true ? row.prior : decided(row);
       return {
         before,
         after,
@@ -234,11 +236,13 @@
         move: shifts[index],
         value:
           key === "leader"
-            ? row.leader == null
-              ? -1
-              : (row.shares[row.leader] ?? -1)
+            ? row.runoff != null
+              ? (row.runoff.shares[row.runoff.winner ?? -1] ?? -1)
+              : row.leader == null
+                ? -1
+                : (row.shares[row.leader] ?? -1)
             : key === "margin"
-              ? (row.margin ?? -1)
+              ? (row.runoff?.margin ?? row.margin ?? -1)
               : key === "valid"
                 ? row.valid
                 : key === "delegates"
@@ -250,7 +254,7 @@
           (needle === "" || fold(row.name).includes(needle)) &&
           (pick == null ||
             (pick === "flip" && shifts[index]?.flip != null) ||
-            pick === row.leader ||
+            pick === decided(row) ||
             pick === `${shifts[index]?.flip?.from}>${shifts[index]?.flip?.to}`),
       }))
       .filter((entry) => entry.match)
@@ -464,7 +468,8 @@
             ></span>
             <span
               class={cn("truncate", {
-                "font-semibold": entry.index === row.leader,
+                "font-semibold":
+                  row.runoff == null && entry.index === row.leader,
               })}>{titles[entry.index]}</span
             >
           </span>
@@ -975,7 +980,33 @@
                 </Tooltip.Trigger>
               </td>
               <td class="px-2 py-1.5 whitespace-nowrap">
-                {#if row.leader != null}
+                {#if row.runoff != null}
+                  {const runoff = $derived(row.runoff)}
+                  <span class="flex items-center gap-1.5">
+                    {#if runoff.winner != null}
+                      <Name
+                        class="relative z-1 truncate font-semibold max-inline-40"
+                        tabindex={-1}
+                        label={titles[runoff.winner] ?? ""}
+                        color={colors[runoff.winner]}
+                        person={places.legend[runoff.winner]?.person}
+                        party={places.legend[runoff.winner]?.party}
+                      />
+                      {#if runoff.shares.some((share) => share > 0)}
+                        <span
+                          class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                          >{percent(runoff.shares[runoff.winner] ?? 0)}</span
+                        >
+                      {/if}
+                    {/if}
+                    <svelte:element
+                      this={runoff.path == null ? "span" : "a"}
+                      href={runoff.path == null ? undefined : unit(runoff.path)}
+                      class="relative z-1 rounded-xs bg-secondary px-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                      >{m.places_runoff()}</svelte:element
+                    >
+                  </span>
+                {:else if row.leader != null}
                   <span class="flex items-center gap-1.5">
                     <Name
                       class="relative z-1 truncate font-semibold max-inline-40"
@@ -1032,7 +1063,11 @@
                   { "max-md:hidden": comparing },
                 )}
               >
-                {#if row.margin != null && places.legend.length === 1}
+                {#if row.runoff != null}
+                  {#if row.runoff.margin != null}
+                    {points(row.runoff.margin)}
+                  {/if}
+                {:else if row.margin != null && places.legend.length === 1}
                   <span class="font-sans text-muted-foreground"
                     >{m.map_unopposed()}</span
                   >

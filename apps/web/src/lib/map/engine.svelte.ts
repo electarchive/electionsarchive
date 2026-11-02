@@ -627,6 +627,15 @@ export class Engine {
         gl.addImage(shape, pattern(shape, ink));
       }
     }
+    const paper = pattern(
+      "hatch",
+      this.read("color-mix(in oklab, var(--card) 85%, transparent)"),
+    );
+    if (gl.hasImage("runoff")) {
+      gl.updateImage("runoff", paper);
+    } else {
+      gl.addImage("runoff", paper);
+    }
     if (!gl.hasImage("arrow")) {
       gl.addImage("arrow", arrow(), { sdf: true });
     }
