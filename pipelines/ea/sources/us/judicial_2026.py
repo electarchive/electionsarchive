@@ -9,7 +9,13 @@ from ea.store import connect
 SOURCE = "us.judicial_2026"
 VERSION = "1"
 ROWS = Path(__file__).with_name("judicial_2026.tsv")
-PARTIES = {"Democrat": "democratic-party", "Democratic": "democratic-party", "Republican": "republican-party"}
+PARTIES = {
+    "Democrat": "democratic-party",
+    "Democratic": "democratic-party",
+    "Republican": "republican-party",
+    "Libertarian": "libertarian-party",
+    "Green": "green-party",
+}
 
 
 def read() -> list[dict[str, str]]:
@@ -76,6 +82,7 @@ def emit() -> Path:
             title = row["office"]
             seat = row["seat"]
             retention = row["kind"] == "retention"
+            magnitude = int(row["seats"] or 1)
             stub = f"{slug(title)}{f':{slug(seat)}' if seat else ''}"
             key = f"2026-11-03:{state}:{stub}" + (f":{slug(row['candidate'])}" if retention else "")
             polity = cs.polity(f"US-{state}")
@@ -108,11 +115,11 @@ def emit() -> Path:
                     district_area_id=area,
                     seat_id=None,
                     boundary_set_id=None,
-                    magnitude=1,
-                    term="full",
+                    magnitude=magnitude,
+                    term="remainder" if "unexpired" in seat.lower() else "full",
                     round_number=1,
                     previous_round_id=None,
-                    electoral_system_id=cs.key("us.electoral_system", "retention" if retention else "fptp"),
+                    electoral_system_id=cs.key("us.electoral_system", "retention" if retention else "block" if magnitude > 1 else "fptp"),
                     default_result_kind="counted",
                 )
                 label = f"{title}{f', {seat}' if seat else ''}"
