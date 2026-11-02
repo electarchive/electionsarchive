@@ -5,7 +5,10 @@
   const {
     entity,
     current,
-  }: { entity: { id: string; public_id: string }; current: "talk" } = $props();
+  }: {
+    entity: { id: string; public_id: string };
+    current: "talk" | "history";
+  } = $props();
 
   const tabs = $derived([
     { key: "record", href: `/id/${entity.id}`, label: m.talk_tab_record() },
@@ -13,6 +16,11 @@
       key: "talk",
       href: `/talk/${entity.public_id}`,
       label: m.talk_tab_talk(),
+    },
+    {
+      key: "history",
+      href: `/history/${entity.public_id}`,
+      label: m.talk_tab_history(),
     },
   ]);
 </script>

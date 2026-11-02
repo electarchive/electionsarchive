@@ -1,8 +1,16 @@
 import { error } from "@sveltejs/kit";
-import type { FeedEntry, ProposalState } from "#lib/contrib.js";
+import type { FeedEntry, HistoryEntry, ProposalState } from "#lib/contrib.js";
 import type { Entry } from "#lib/server/atom.js";
+import type { change } from "#lib/server/history.js";
 import type { view } from "#lib/server/rpc/proposals.js";
-import { byline, describe, stateLabel, tierLabel } from "#lib/contrib.js";
+import {
+  byline,
+  describe,
+  historyByline,
+  roleLabel,
+  stateLabel,
+  tierLabel,
+} from "#lib/contrib.js";
 import { m } from "#lib/paraglide/messages.js";
 import { atom } from "#lib/server/atom.js";
 
@@ -224,6 +232,100 @@ export function proposalMarkdown(
         "",
         comment.body ?? "",
       );
+    }
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+const historyExtra = (entry: HistoryEntry) =>
+  [
+    roleLabel[entry.role](),
+    historyByline(entry),
+    entry.number == null ? null : m.history_proposal({ number: entry.number }),
+    entry.state == null || entry.state === "published"
+      ? null
+      : stateLabel[entry.state](),
+  ].filter((part) => part != null);
+
+export function historyMarkdown(
+  origin: string,
+  entity: { public_id: string; name: string },
+  entries: Array<HistoryEntry>,
+  next: string | null,
+) {
+  const lines = [
+    `# ${inline(m.history_page_title({ name: entity.name }))}`,
+    "",
+    m.history_lede(),
+  ];
+  if (entries.length === 0) {
+    lines.push("", m.history_empty());
+  }
+  let day = "";
+  for (const entry of entries) {
+    if (entry.at.slice(0, 10) !== day) {
+      day = entry.at.slice(0, 10);
+      lines.push("", `## ${day}`, "");
+    }
+    lines.push(
+      `- ${entry.at.slice(11, 16)} UTC: [${inline(entry.title ?? entry.summary)}](${origin}/history/${entity.public_id}/${entry.changeset}) (${inline(historyExtra(entry).join("; "))})`,
+    );
+  }
+  if (next != null) {
+    lines.push("", `Older entries: \`before=${next}\``);
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+export const historyEntries = (
+  publicId: string,
+  entries: Array<HistoryEntry>,
+): Array<Entry> =>
+  entries.map((entry) => ({
+    id: entry.changeset,
+    title: `${roleLabel[entry.role]()}: ${entry.title ?? entry.summary}`,
+    updated: entry.at,
+    author: historyByline(entry),
+    path: `/history/${publicId}/${entry.changeset}`,
+  }));
+
+export function changeMarkdown(
+  origin: string,
+  found: Awaited<ReturnType<typeof change>>,
+) {
+  const { entity, entry, changes, names } = found;
+  const shown = (value: unknown) =>
+    value == null
+      ? m.history_empty_value()
+      : typeof value === "string"
+        ? (names[value] ?? value)
+        : JSON.stringify(value);
+  const lines = [
+    `# ${inline(entry.title ?? entry.summary)}`,
+    "",
+    `- Record: [${inline(entity.name)}](${origin}/history/${entity.public_id})`,
+    `- ${m.history_published({ date: entry.at.slice(0, 10), time: entry.at.slice(11, 16) })}`,
+    `- ${inline(historyExtra(entry).join("; "))}`,
+    ...(entry.number == null
+      ? []
+      : [`- Proposal: ${origin}/proposals/${entry.number}`]),
+    "",
+    `## ${m.history_fields()}`,
+    "",
+  ];
+  if (changes.length === 0) {
+    lines.push(m.history_no_fields());
+  } else {
+    lines.push(
+      "| Table | Op | Field | Before | After |",
+      "| --- | --- | --- | --- | --- |",
+    );
+    for (const item of changes) {
+      for (const field of item.fields) {
+        lines.push(
+          `| ${item.table} | ${item.op} | ${field.field} | ${item.op === "add" ? "" : inline(shown(field.before))} | ${item.op === "drop" ? "" : inline(shown(field.after))} |`,
+        );
+      }
     }
   }
   return `${lines.join("\n")}\n`;

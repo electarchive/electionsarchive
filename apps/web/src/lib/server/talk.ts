@@ -9,7 +9,7 @@ import { db } from "#lib/server/db/index.js";
 import { allowed } from "#lib/server/discussion.js";
 import { names } from "#lib/server/rpc/archive.js";
 
-const publicPattern = /^[a-z]{2}_[0-7][0-9a-hjkmnp-tv-z]{25}$/u;
+export const publicPattern = /^[a-z]{2}_[0-7][0-9a-hjkmnp-tv-z]{25}$/u;
 
 export const PublicId = v.pipe(
   v.string(),

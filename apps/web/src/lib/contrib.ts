@@ -839,3 +839,38 @@ export function byline(entry: FeedEntry) {
     ? author
     : m.feed_via_agent({ author, agent: entry.agent });
 }
+
+export type HistoryEntry = {
+  changeset: string;
+  at: string;
+  author_kind: string;
+  pipeline: string | null;
+  summary: string;
+  role: "created" | "changed" | "merged" | "retired" | "cited";
+  number: number | null;
+  title: string | null;
+  state: ProposalState | null;
+  author: string | null;
+  handle: string | null;
+  agent: string | null;
+};
+
+export const roleLabel: Record<HistoryEntry["role"], () => string> = {
+  created: m.history_role_created,
+  changed: m.history_role_changed,
+  merged: m.history_role_merged,
+  retired: m.history_role_retired,
+  cited: m.history_role_cited,
+};
+
+export function historyByline(entry: HistoryEntry) {
+  if (entry.number == null) {
+    return entry.pipeline == null
+      ? m.feed_someone()
+      : m.feed_imported_by({ pipeline: entry.pipeline });
+  }
+  const author = entry.author ?? m.feed_someone();
+  return entry.agent == null
+    ? author
+    : m.feed_via_agent({ author, agent: entry.agent });
+}

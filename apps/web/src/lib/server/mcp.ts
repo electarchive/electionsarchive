@@ -93,6 +93,8 @@ const TOOLS: Array<{
     procedure: router.contributors.get,
     access: "read",
   },
+  { name: "get_history", procedure: router.histories.list, access: "read" },
+  { name: "get_change", procedure: router.histories.change, access: "read" },
   {
     name: "recent_changes",
     procedure: router.recentChanges.list,
