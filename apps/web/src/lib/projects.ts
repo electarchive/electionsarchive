@@ -1,6 +1,7 @@
 export const PROJECTS = [
   "about",
   "architecture",
+  "indices",
   "license",
   "contribute",
   "privacy",

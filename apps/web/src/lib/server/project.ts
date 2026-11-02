@@ -15,6 +15,7 @@ export function projectTitle(slug: Project) {
   return {
     about: m.about_title,
     architecture: m.architecture_title,
+    indices: m.indices_page_title,
     license: m.license_title,
     contribute: m.contribute_title,
     privacy: m.privacy_title,
@@ -94,6 +95,45 @@ function sections(slug: Project): Array<Section> {
           id: "code",
           title: m.architecture_code_title(),
           body: m.architecture_code_body(),
+        },
+      ];
+    }
+    case "indices": {
+      return [
+        {
+          id: "rules",
+          title: m.indices_rules_title(),
+          body: m.indices_rules_body(),
+        },
+        {
+          id: "effective",
+          title: m.indices_effective_title(),
+          body: m.indices_effective_body(),
+        },
+        {
+          id: "disproportionality",
+          title: m.indices_gallagher(),
+          body: m.indices_disproportionality_body(),
+        },
+        {
+          id: "volatility",
+          title: m.indices_volatility(),
+          body: m.indices_volatility_body(),
+        },
+        {
+          id: "nationalization",
+          title: m.indices_nationalization(),
+          body: m.indices_nationalization_body(),
+        },
+        {
+          id: "calls",
+          title: m.indices_calls_title(),
+          body: m.indices_calls_body(),
+        },
+        {
+          id: "access",
+          title: m.indices_access_title(),
+          body: m.indices_access_body({ id: "{id}" }),
         },
       ];
     }
@@ -236,6 +276,7 @@ export function project(slug: Project) {
     lede: {
       about: m.about_lede,
       architecture: m.architecture_lede,
+      indices: m.indices_page_lede,
       license: m.license_lede,
       contribute: m.contribute_lede,
       privacy: m.privacy_lede,

@@ -36,6 +36,7 @@ import {
   plural,
   points,
 } from "#lib/format.js";
+import { caveatLabel, figure, figureLabel } from "#lib/indices.js";
 import { stamp } from "#lib/live/format.js";
 import methodology from "#lib/live/methodology.json";
 import { sum } from "#lib/live/standing.js";
@@ -67,6 +68,9 @@ type Data = Awaited<ReturnType<typeof load>>;
 type Ledger = InferRouterOutputs<typeof router>["contests"]["ledger"];
 type Winners = InferRouterOutputs<typeof router>["elections"]["winners"];
 type Known = InferRouterOutputs<typeof router>["coverage"]["known"];
+type Indices = InferRouterOutputs<typeof router>["indices"];
+type Caveat =
+  Indices["polity"]["series"][number]["points"][number]["caveats"][number];
 type Link = (name: string, path: string | null) => string;
 
 const year = (value: string | null) => value?.slice(0, 4) ?? "";
@@ -401,28 +405,35 @@ async function load(segments: Array<string>, search: URLSearchParams) {
             })
         : [],
     );
-    const [byes, tiers, chambers, known, hexes, states] = await Promise.all([
-      call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
-      found.scope == null &&
-      parts.length > 1 &&
-      parts.every((child) => /^us\/[a-z]{2}\/[^/]+$/.test(child.path ?? ""))
-        ? call(router.elections.tiers, { id: found.id })
-        : null,
-      partial.size > 4
-        ? []
-        : Promise.all(
-            partial.values().map(async (id) =>
-              call(router.bodies.get, { id })
-                .then((body) => ({ id, body }))
-                .catch(() => null),
+    const [byes, tiers, chambers, known, hexes, states, indices] =
+      await Promise.all([
+        call(router.seats.byElections, {
+          id: found.id,
+          within: found.scope?.id,
+        }),
+        found.scope == null &&
+        parts.length > 1 &&
+        parts.every((child) => /^us\/[a-z]{2}\/[^/]+$/.test(child.path ?? ""))
+          ? call(router.elections.tiers, { id: found.id })
+          : null,
+        partial.size > 4
+          ? []
+          : Promise.all(
+              partial.values().map(async (id) =>
+                call(router.bodies.get, { id })
+                  .then((body) => ({ id, body }))
+                  .catch(() => null),
+              ),
             ),
-          ),
-      call(router.coverage.known, { id: found.id }),
-      call(router.seats.hexes, { id: found.id, within: found.scope?.id }),
-      found.scope == null && parts.length > 0 && parts.length < 40
-        ? call(router.elections.states, { id: found.id })
-        : null,
-    ]);
+        call(router.coverage.known, { id: found.id }),
+        call(router.seats.hexes, { id: found.id, within: found.scope?.id }),
+        found.scope == null && parts.length > 0 && parts.length < 40
+          ? call(router.elections.states, { id: found.id })
+          : null,
+        found.scope == null
+          ? call(router.indices.election, { id: found.id }).catch(() => null)
+          : null,
+      ]);
     return {
       ...found,
       byes,
@@ -431,6 +442,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       known,
       hexes,
       states,
+      indices,
     };
   }
   if (found.kind === "contest") {
@@ -447,14 +459,22 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   const isNational = ["sovereign_state", "supranational"].includes(
     found.polity.kind,
   );
-  const [record, holders, known] = await Promise.all([
+  const [record, holders, known, indices] = await Promise.all([
     call(router.polities.record, { id: found.id }),
     isNational || found.polity.kind === "federal_unit"
       ? null
       : call(router.polities.holders, { id: found.id }),
     isNational ? call(router.coverage.known, { id: found.id }) : [],
+    isNational || found.polity.kind === "federal_unit"
+      ? Promise.race([
+          call(router.indices.polity, { id: found.id }).catch(() => null),
+          new Promise<null>((done) => {
+            setTimeout(done, 5000, null);
+          }),
+        ])
+      : null,
   ]);
-  return { ...found, record, holders, known };
+  return { ...found, record, holders, known, indices };
 }
 
 export async function twin({ request, url }: RequestEvent) {
@@ -671,6 +691,7 @@ function markdown(
     case "polity": {
       return [
         ...polityMarkdown(data.polity, data.record, data.holders, link),
+        ...(data.indices == null ? [] : seriesMarkdown(data.indices, link)),
         ...knownMarkdown(data.known, link, true),
       ];
     }
@@ -703,6 +724,7 @@ function markdown(
           data.states,
           link,
         ),
+        ...(data.indices == null ? [] : indicesMarkdown(data.indices, link)),
         ...(data.sameDay?.races.some((race) => !race.isOwn) === true
           ? sameDayMarkdown(data.sameDay, link)
           : []),
@@ -872,6 +894,135 @@ function markdown(
       ];
     }
   }
+}
+
+function indicesMarkdown(indices: Indices["election"], link: Link) {
+  if (indices.chambers.length === 0) {
+    return [];
+  }
+  const shown = (kind: Parameters<typeof figure>[0], value: number | null) =>
+    value == null ? "" : figure(kind, value);
+  return [
+    `## ${m.indices_title()}`,
+    link(m.indices_method(), "indices"),
+    table(
+      [
+        m.indices_chamber(),
+        figureLabel("effectiveVotes"),
+        figureLabel("effectiveSeats"),
+        figureLabel("gallagher"),
+        figureLabel("loosemoreHanby"),
+        figureLabel("volatility"),
+        figureLabel("nationalization"),
+      ],
+      indices.chambers.map((chamber) => [
+        chamber.name,
+        shown("effectiveVotes", chamber.effectiveVotes?.value ?? null),
+        shown("effectiveSeats", chamber.effectiveSeats?.value ?? null),
+        shown("gallagher", chamber.gallagher?.value ?? null),
+        shown("loosemoreHanby", chamber.loosemoreHanby?.value ?? null),
+        shown("volatility", chamber.volatility?.value ?? null),
+        shown("nationalization", chamber.nationalization?.value ?? null),
+      ]),
+    ),
+    indices.chambers
+      .flatMap((chamber) => {
+        const notes = [
+          m.indices_basis({
+            votes: count(chamber.basis.votes),
+            seats: count(chamber.basis.seats),
+          }),
+          ...(chamber.volatility == null
+            ? []
+            : [
+                m.indices_compared({
+                  election: link(
+                    chamber.volatility.previous.name,
+                    chamber.volatility.previous.path,
+                  ),
+                }),
+              ]),
+          ...(chamber.nationalization == null
+            ? []
+            : [
+                m.indices_units({
+                  count: count(chamber.nationalization.units),
+                  noun: plural(chamber.nationalization.noun),
+                }),
+              ]),
+        ].map((note) => `${note}.`);
+        const caveats = [
+          ...new Set([
+            ...chamber.caveats,
+            ...(chamber.volatility?.caveats ?? []),
+            ...(chamber.nationalization?.caveats ?? []),
+          ])
+            .values()
+            .map(caveatLabel),
+        ];
+        return [...notes, ...caveats].map((note) =>
+          indices.chambers.length > 1
+            ? `- ${chamber.name}: ${note}`
+            : `- ${note}`,
+        );
+      })
+      .join("\n"),
+  ];
+}
+
+function seriesMarkdown(indices: Indices["polity"], link: Link) {
+  return indices.series.flatMap((entry) => {
+    const years = new Map<Caveat, Array<number>>();
+    for (const point of entry.points) {
+      for (const caveat of point.caveats) {
+        years.set(caveat, [...(years.get(caveat) ?? []), point.year]);
+      }
+    }
+    return [
+      `## ${m.indices_title()}: ${entry.name}`,
+      link(m.indices_method(), "indices"),
+      table(
+        [
+          m.indices_election(),
+          figureLabel("effectiveVotes"),
+          figureLabel("effectiveSeats"),
+          figureLabel("gallagher"),
+          figureLabel("volatility"),
+          figureLabel("nationalization"),
+        ],
+        entry.points
+          .toReversed()
+          .map((point) => [
+            link(point.name, point.path),
+            point.effectiveVotes == null
+              ? ""
+              : figure("effectiveVotes", point.effectiveVotes),
+            point.effectiveSeats == null
+              ? ""
+              : figure("effectiveSeats", point.effectiveSeats),
+            point.gallagher == null ? "" : figure("gallagher", point.gallagher),
+            point.volatility == null
+              ? ""
+              : figure("volatility", point.volatility),
+            point.nationalization == null
+              ? ""
+              : figure("nationalization", point.nationalization),
+          ]),
+      ),
+      ...(years.size === 0
+        ? []
+        : [
+            years
+              .entries()
+              .map(
+                ([caveat, list]) =>
+                  `- ${caveatLabel(caveat).replace(/\.$/u, "")} (${[...new Set(list)].join(", ")}).`,
+              )
+              .toArray()
+              .join("\n"),
+          ]),
+    ];
+  });
 }
 
 function sameDayMarkdown(

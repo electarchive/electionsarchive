@@ -44,6 +44,11 @@ const TOOLS: Array<{
     access: "read",
   },
   {
+    name: "get_contest_indices",
+    procedure: router.indices.contest,
+    access: "read",
+  },
+  {
     name: "get_contest_ledger",
     procedure: router.contests.ledger,
     access: "read",

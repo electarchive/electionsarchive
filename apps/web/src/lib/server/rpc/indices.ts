@@ -25,6 +25,7 @@ type Chamber = {
   body: string;
   name: string;
   anchor: string;
+  path: string | null;
   size: number;
   uncontested: number;
   entries: Array<Entry>;
@@ -223,6 +224,7 @@ function assemble(election: Election, body: string): Chamber | null {
     body,
     name: counted.name,
     anchor: counted.anchor,
+    path: counted.path ?? null,
     size,
     uncontested,
     entries,
@@ -403,6 +405,7 @@ async function compute(
     body: chamber.body,
     name: chamber.name,
     anchor: chamber.anchor,
+    path: chamber.path,
     basis: {
       votes,
       seats,
@@ -464,6 +467,7 @@ const Indices = v.object({
   body: v.string(),
   name: v.string(),
   anchor: v.string(),
+  path: v.nullable(v.string()),
   basis: v.object({
     votes: v.number(),
     seats: v.number(),
@@ -558,6 +562,47 @@ async function pool<T, R>(
   return results;
 }
 
+async function measure(id: string) {
+  const found = await db.execute<{ polity: string; date: string }>(sql`
+    select polity_id::text as polity, date_from::text as date from election where id = ${id}::uuid
+  `);
+  const head = found.rows[0];
+  const own = await chambers(id);
+  if (head == null || own.length === 0) {
+    return { chambers: [] };
+  }
+  const record = await series(head.polity);
+  const paths = await ids(
+    record.flatMap((entry) =>
+      entry.points.flatMap((point) => point.path ?? []),
+    ),
+  );
+  return {
+    chambers: await Promise.all(
+      own.map(async (chamber) => {
+        const points = (
+          record.find((entry) => entry.id === chamber.body)?.points ?? []
+        ).filter((point) => point.date < head.date);
+        let previous: Previous | null = null;
+        for (const point of points.toReversed()) {
+          const before = paths.get(point.path ?? "");
+          if (before == null) {
+            continue;
+          }
+          const match = (await chambers(before)).find(
+            (entry) => entry.body === chamber.body,
+          );
+          if (match != null) {
+            previous = { ...point, chamber: match };
+          }
+          break;
+        }
+        return compute(chamber, head.date, previous);
+      }),
+    ),
+  };
+}
+
 export const indices = {
   election: os
     .meta(
@@ -570,44 +615,31 @@ export const indices = {
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
     .output(v.object({ chambers: v.array(Indices) }))
+    .handler(async ({ input }) => measure(input.id)),
+  contest: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/indices",
+        summary:
+          "Compute the political science indices of the chamber a list contest fills, when the contest is the one whose votes and seats the chamber's figures count",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
+    .output(v.object({ chamber: v.nullable(Indices) }))
     .handler(async ({ input }) => {
-      const found = await db.execute<{ polity: string; date: string }>(sql`
-        select polity_id::text as polity, date_from::text as date from election where id = ${input.id}::uuid
+      const found = await db.execute<{ election: string; path: string }>(sql`
+        select c.election_id::text as election, s.path from contest c
+        join slug s on s.entity_id = c.id and s.is_current
+        where c.id = ${input.id}::uuid and c.kind = 'list_allocation'
       `);
       const head = found.rows[0];
-      const own = await chambers(input.id);
-      if (head == null || own.length === 0) {
-        return { chambers: [] };
+      if (head == null) {
+        return { chamber: null };
       }
-      const record = await series(head.polity);
-      const paths = await ids(
-        record.flatMap((entry) =>
-          entry.points.flatMap((point) => point.path ?? []),
-        ),
-      );
+      const { chambers: measured } = await measure(head.election);
       return {
-        chambers: await Promise.all(
-          own.map(async (chamber) => {
-            const points = (
-              record.find((entry) => entry.id === chamber.body)?.points ?? []
-            ).filter((point) => point.date < head.date);
-            let previous: Previous | null = null;
-            for (const point of points.toReversed()) {
-              const id = paths.get(point.path ?? "");
-              if (id == null) {
-                continue;
-              }
-              const match = (await chambers(id)).find(
-                (entry) => entry.body === chamber.body,
-              );
-              if (match != null) {
-                previous = { ...point, chamber: match };
-              }
-              break;
-            }
-            return compute(chamber, head.date, previous);
-          }),
-        ),
+        chamber: measured.find((chamber) => chamber.path === head.path) ?? null,
       };
     }),
   polity: os
