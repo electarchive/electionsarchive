@@ -12,6 +12,7 @@ export type Geography = {
   tiles: string;
   scheme: string;
   outline: Array<Array<[number, number]>>;
+  isEdged?: boolean;
   frame: { west: number; south: number; east: number; north: number };
   places: Array<{ areaId: string; k: number; at: [number, number] }>;
 };

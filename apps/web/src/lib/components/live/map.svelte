@@ -320,6 +320,35 @@
           { group: "live-layers", rank: 1 },
         );
       }
+      if (geography.isEdged === true && geography.outline.length > 0) {
+        engine.add(
+          {
+            id: "live-edge",
+            type: "line",
+            source: engine.shapes(
+              "live-edge",
+              { type: "MultiLineString", coordinates: geography.outline },
+              "live-layers",
+            ),
+            layout: { "line-join": "round" },
+            paint: {
+              "line-color":
+                "color-mix(in oklab, var(--foreground) 72%, transparent)",
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                8,
+                1,
+                13,
+                1.8,
+              ],
+            },
+          },
+          "focus",
+          { group: "live-layers" },
+        );
+      }
       engine.frame(geography.frame);
       painted = geography.tiles;
     }

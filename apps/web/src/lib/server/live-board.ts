@@ -31,24 +31,37 @@ export async function geography(
   if (scheme == null) {
     return null;
   }
-  const box = await db.execute<{
-    tiles: string;
-    west: number;
-    south: number;
-    east: number;
-    north: number;
-  }>(sql`
-    select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-      st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-    from boundary_set bs, lateral (
-      select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-      from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(framed)}::uuid[]) and g.valid @> ${date}::date
-    ) x
-    where bs.scheme_code = ${scheme} and bs.valid @> ${date}::date
-    order by bs.valid_from desc nulls last limit 1
-  `);
-  const row = box.rows[0];
-  if (row == null) {
+  const extent = async (ids: Array<string>) => {
+    const box = await db.execute<{
+      tiles: string;
+      west: number | null;
+      south: number | null;
+      east: number | null;
+      north: number | null;
+    }>(sql`
+      select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+        st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+      from boundary_set bs, lateral (
+        select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+        from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date
+      ) x
+      where bs.scheme_code = ${scheme} and bs.valid @> ${date}::date
+      order by bs.valid_from desc nulls last limit 1
+    `);
+    return box.rows[0];
+  };
+  let region = framed;
+  let row = await extent(region);
+  if (row?.west == null && framed !== areaIds) {
+    region = areaIds;
+    row = await extent(region);
+  }
+  if (
+    row?.west == null ||
+    row.south == null ||
+    row.east == null ||
+    row.north == null
+  ) {
     return null;
   }
   const drawn = isOutlined
@@ -66,7 +79,7 @@ export async function geography(
         select p.geom, least(sqrt(ST_Area(p.geom)) / 2000, 250) as t from (
           select ST_Union(ST_SimplifyPreserveTopology(${plane("g.geom", "a.scheme_code")}, 50)) as geom
           from area_geometry g join area a on a.id = g.area_id
-          where g.area_id = any(${sql.param(framed)}::uuid[]) and g.valid @> ${date}::date
+          where g.area_id = any(${sql.param(region)}::uuid[]) and g.valid @> ${date}::date
         ) p
       ) q
     `)
@@ -75,6 +88,7 @@ export async function geography(
     tiles: row.tiles,
     scheme: scheme.split(".", 1)[0] ?? scheme,
     outline: drawn?.rows[0]?.rings ?? [],
+    isEdged: region.some((id) => !areaIds.includes(id)),
     frame: {
       west: row.west,
       south: row.south,

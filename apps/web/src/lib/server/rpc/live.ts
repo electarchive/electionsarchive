@@ -822,26 +822,52 @@ async function ratios(
 async function geography(
   contests: Array<{ id: string; path: string; district: string | null }>,
   date: string,
+  isWide: boolean,
 ) {
   const house = contests.filter((row) => /\/house-[^/]+$/u.test(row.path));
   const statewide = contests.filter(
     (row) => !house.includes(row) && TOP.test(row.path.split("/").at(-1) ?? ""),
   );
+  const local = isWide
+    ? contests.filter(
+        (row) =>
+          !house.includes(row) &&
+          !statewide.includes(row) &&
+          row.district != null,
+      )
+    : [];
+  const wide = [...statewide, ...local].map((row) => row.id);
   const result = await db.execute<{ contest: string; unit: string }>(sql`
     with h as (
       select c.id as contest, g.geom from contest c
       join area_geometry g on g.area_id = c.district_area_id and g.valid @> ${date}::date
       where c.id = any(${sql.param(house.map((row) => row.id))}::uuid[])
+    ), l as materialized (
+      select c.id as contest, g.geom from contest c
+      join area a on a.id = c.district_area_id and a.scheme_code not in ('us.state', 'us.county')
+      join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
+      where c.id = any(${sql.param(local.map((row) => row.id))}::uuid[])
+    ), near as materialized (
+      select l.contest, l.geom as d, u.id, cg.geom from l
+      join area_geometry cg on cg.geom && l.geom and cg.valid @> ${date}::date
+      join reporting_unit u on u.area_id = cg.area_id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
     )
     select c.id as contest, u.id as unit from contest c
     join reporting_unit s on s.area_id = c.district_area_id and s.scheme_code = 'us.state' and s.valid @> ${date}::date
     join reporting_unit u on u.parent_id = s.id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
-    where c.id = any(${sql.param(statewide.map((row) => row.id))}::uuid[])
+    where c.id = any(${sql.param(wide)}::uuid[])
+    union
+    select c.id, u.id from contest c
+    join reporting_unit u on u.area_id = c.district_area_id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
+    where c.id = any(${sql.param(local.map((row) => row.id))}::uuid[])
     union
     select h.contest, u.id from h
     join area_geometry cg on cg.geom && h.geom and cg.valid @> ${date}::date
     join reporting_unit u on u.area_id = cg.area_id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
     where st_area(st_intersection(cg.geom, h.geom)) > 0.005 * st_area(cg.geom)
+    union
+    select contest, id from near
+    where st_area(st_intersection(geom, d)) > least(0.005 * st_area(geom), 0.05 * st_area(d))
   `);
   return result.rows;
 }
@@ -887,7 +913,7 @@ async function night(
         order by f.as_of
       `),
       remember(
-        `live:fixed:v1:${found.path}|${found.rest}|${detail}`,
+        `live:fixed:v2:${found.path}|${found.rest}|${detail}`,
         async () => {
           const [choices, incumbents, settled, prior, drawn, placed] =
             await Promise.all([
@@ -898,7 +924,13 @@ async function night(
               `),
               certified(contests),
               baselines(picked, found.date),
-              detail === "national" ? [] : geography(picked, found.date),
+              detail === "national"
+                ? []
+                : geography(
+                    picked,
+                    found.date,
+                    detail === "race" || found.path.split("/").length > 3,
+                  ),
               jurisdictions(contests),
             ]);
           return {
@@ -1168,6 +1200,13 @@ async function night(
     const top = Math.max(0, ...tally);
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
+    const isLocal = !house && !TOP.test(seat);
+    const reported = new Set(
+      counts.flatMap((entry) => {
+        const scheme = unitOf.get(entry.unitId)?.scheme;
+        return scheme == null ? [] : [scheme];
+      }),
+    );
     const source = mine.at(-1);
     const where = placed.get(row.id);
     const kind =
@@ -1238,9 +1277,13 @@ async function night(
           isIncumbent: sitting.has(choice.id),
         };
       }),
+      area: row.district,
       units: [...seen].flatMap((unit) => {
         const known = unitOf.get(unit);
-        return known == null ? [] : [known];
+        return known == null ||
+          (isLocal && reported.size > 0 && !reported.has(known.scheme))
+          ? []
+          : [known];
       }),
       frames: raceFrames,
       counts,

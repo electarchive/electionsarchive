@@ -88,13 +88,19 @@ export async function livePage(path: string, at: string | null) {
       election.races.find((race) => race.office === "governor") ??
       election.races[0] ??
       null);
+  const units = focus?.units ?? [];
+  const reported = new Set(focus?.counts.map((entry) => entry.unitId));
+  const scheme =
+    units.find((unit) => reported.has(unit.id))?.scheme ?? units[0]?.scheme;
   const areas = [
     ...new Set(
-      (focus?.units ?? []).flatMap((unit) =>
-        unit.areaId == null ? [] : [unit.areaId],
+      units.flatMap((unit) =>
+        unit.areaId == null || unit.scheme !== scheme ? [] : [unit.areaId],
       ),
     ),
   ];
+  const framed =
+    focus?.office === "other" && focus.area != null ? [focus.area] : areas;
   const [nation, standing, map] = await Promise.all([
     isNation
       ? remember(`live:nation:v2:${election.date}`, async () =>
@@ -108,8 +114,8 @@ export async function livePage(path: string, at: string | null) {
       : null,
     isNation || focus == null
       ? null
-      : remember(`live:geography:v2:${focus.slug}`, async () =>
-          geography(areas, election.date),
+      : remember(`live:geography:v4:${focus.slug}:${scheme ?? ""}`, async () =>
+          geography(areas, election.date, framed),
         ),
   ]);
   return {

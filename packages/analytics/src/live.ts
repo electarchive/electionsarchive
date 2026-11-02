@@ -49,6 +49,7 @@ export type LiveRace = {
   office: LiveOffice;
   state: string;
   district: string | null;
+  area?: string | null;
   options: Array<LiveOption>;
   units: Array<LiveUnit>;
   frames: Array<LiveFrame>;

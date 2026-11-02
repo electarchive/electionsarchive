@@ -51,6 +51,11 @@
   const RECOUNT: Record<string, number> = { mi: 2000 };
 
   let mode = $state<Mode>("lead");
+  const modes = $derived<Array<Mode>>(
+    race.baseline.length > 0
+      ? ["lead", "bubbles", "shift", "counted"]
+      : ["lead", "bubbles", "counted"],
+  );
 
   const counties = $derived(
     new Map(
@@ -62,7 +67,7 @@
 
   function href(unitId: string) {
     const name = counties.get(unitId);
-    return base == null || name == null
+    return base?.split("/").length !== 3 || name == null
       ? null
       : toLive(`${base}/place/${placeSlug(name)}`);
   }
@@ -407,7 +412,7 @@
         {options}
         {now}
         {estimate}
-        modes={["lead", "bubbles", "shift", "counted"]}
+        {modes}
         title={m.night_map_counted_title()}
         bind:mode
         {href}
@@ -440,7 +445,7 @@
         {options}
         {now}
         {estimate}
-        modes={["lead", "bubbles", "shift", "counted"]}
+        {modes}
         title={m.night_map_counted_title()}
         bind:mode
         {href}

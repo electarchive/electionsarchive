@@ -56,7 +56,7 @@
           null),
   );
   const counties = $derived.by(() => {
-    if (anchor == null) {
+    if (anchor == null || election.slug.split("/").length !== 3) {
       return [];
     }
     const now = standing(anchor, { at: null, isFinal: true });

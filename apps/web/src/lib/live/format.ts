@@ -7,6 +7,12 @@ export function tone(option: LiveOption | undefined) {
   if (option == null) {
     return "var(--muted-foreground)";
   }
+  if (option.party == null) {
+    const answer = swatch(null, `answer:${option.label.toLowerCase()}`);
+    if (answer === "var(--yes)" || answer === "var(--no)") {
+      return answer;
+    }
+  }
   return swatch(
     option.party?.color === "" ? null : option.party?.color,
     option.party == null
