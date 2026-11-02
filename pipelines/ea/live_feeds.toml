@@ -200,6 +200,13 @@ publisher = "West Virginia Secretary of State"
 url = "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout"
 
 [[feed]]
+id = "us.enr_2026.wi"
+adapter = "us.enr_2026"
+params = { state = "WI" }
+publisher = "Dane County Clerk"
+url = "https://elections.countyofdane.com/"
+
+[[feed]]
 id = "us.enr_2026.al"
 adapter = "us.enr_2026"
 params = { state = "AL" }

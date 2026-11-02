@@ -371,6 +371,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_mo
 
         enr_mo.collect(client, get, lambda url, content, suffix: store("MO", url, content, suffix))
+    if not only or "WI" in only:
+        from ea.sources.us import enr_wi
+
+        enr_wi.collect(client, get, lambda url, content, suffix: store("WI", url, content, suffix))
     missing: list[str] = []
     for fips, (tenant, *_) in COUNTIES.items():
         state = STATES[fips[:2]]
@@ -552,6 +556,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_mo
 
         yield from enr_mo.rows(url, path, urls)
+        return
+    if state == "WI":
+        from ea.sources.us import enr_wi
+
+        yield from enr_wi.rows(url, path, urls)
         return
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
