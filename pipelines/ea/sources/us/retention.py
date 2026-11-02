@@ -1146,7 +1146,9 @@ def parse_state(only: str, inputs: list[tuple[int, Path]], official: pl.DataFram
     )
     variants: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     for state, name, mixed in [
-        *official.filter((pl.col("answer") == "yes") & pl.col("name").is_not_null()).select("state", "name", pl.lit(True)).iter_rows(),
+        *official.filter((pl.col("answer") == "yes") & pl.col("name").is_not_null())
+        .select("state", "name", pl.lit(True))
+        .iter_rows(),
         *frame.filter(pl.col("name").is_not_null()).select("state", "name", pl.lit(False)).unique().iter_rows(),
     ]:
         first, last = identity(name)

@@ -167,9 +167,7 @@ def early(path: Path, stage: str, year: int) -> list[dict[str, object]]:
             cursor += 1
         width = len(total)
         count = width - 1
-        tokens = [
-            [t for t in split(re.sub(r"\bCounty\b|\bMisc\.?", "  ", ln)) if t.strip()] for ln in header
-        ]
+        tokens = [[t for t in split(re.sub(r"\bCounty\b|\bMisc\.?", "  ", ln)) if t.strip()] for ln in header]
         tokens = [t for t in tokens if t]
         if count == 1 and len(tokens) >= 2:
             tokens = [[tokens[0][0]], [tokens[-1][0]]]
@@ -193,7 +191,9 @@ def early(path: Path, stage: str, year: int) -> list[dict[str, object]]:
         for column in range(width):
             printed = sum(numbers[column] for numbers in rows.values())
             if printed != total[column]:
-                print("printed total differs from the county rows:", year, stage, position, column, total[column], printed)
+                print(
+                    "printed total differs from the county rows:", year, stage, position, column, total[column], printed
+                )
         found.append(
             {"court": TITLES[head[1].lower()], "position": int(position), "candidates": candidates, "rows": rows}
         )
