@@ -48,7 +48,7 @@ id = "us.enr_2026.mo"
 adapter = "us.enr_2026"
 params = { state = "MO" }
 poller = "muktedir"
-publisher = "St. Louis County Board of Elections"
+publisher = "St. Louis County and Jackson County boards of elections"
 url = "https://extcontent.stlouisco.com/BOE/eResults/"
 
 [[feed]]
