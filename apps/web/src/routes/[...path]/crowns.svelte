@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ComponentProps } from "svelte";
-  import { plural } from "#lib/format.js";
+  import { capitalize, plural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
@@ -51,7 +51,7 @@
           const name = plural(entry.places.levels[0]?.noun ?? "");
           return {
             code: entry.places.level,
-            label: name.charAt(0).toUpperCase() + name.slice(1),
+            label: capitalize(name),
             count: entry.places.rows.length,
             path: "",
             query: "",

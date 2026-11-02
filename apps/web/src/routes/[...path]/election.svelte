@@ -17,6 +17,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { gapNote } from "#lib/coverage.js";
   import {
+    capitalize,
     count,
     date,
     definite,
@@ -1658,9 +1659,7 @@
             : [
                 {
                   value: "partner",
-                  label: m.map_view_winners({
-                    noun: noun.charAt(0).toUpperCase() + noun.slice(1),
-                  }),
+                  label: m.map_view_winners({ noun: capitalize(noun) }),
                 },
                 { value: "own", label: m.map_view_list() },
               ]),
@@ -1745,7 +1744,7 @@
           : title
         : rest === ""
           ? title
-          : rest.charAt(0).toUpperCase() + rest.slice(1);
+          : capitalize(rest);
       const item = {
         anchor: race.anchor,
         label: isQuestion
@@ -2556,9 +2555,7 @@
                       race.places.levels.length > 1
                       ? race.places.levels.map((entry) => ({
                           code: entry.code,
-                          label:
-                            entry.noun.charAt(0).toUpperCase() +
-                            entry.noun.slice(1),
+                          label: capitalize(entry.noun),
                           count: entry.count,
                           path: "",
                           query: "",
@@ -2572,7 +2569,7 @@
                           const noun = entry.levels[0]?.noun ?? "";
                           return {
                             code: entry.level,
-                            label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                            label: capitalize(noun),
                             count: entry.rows.length,
                             path: "",
                             query: "",

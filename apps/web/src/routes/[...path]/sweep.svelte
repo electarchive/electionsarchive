@@ -2,7 +2,7 @@
   import type { ComponentProps } from "svelte";
   import { createQuery } from "@tanstack/svelte-query";
   import Name from "#lib/components/name.svelte";
-  import { count, percent, plural, points } from "#lib/format.js";
+  import { capitalize, count, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -248,7 +248,7 @@
         class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-[0.8125rem]"
       >
         <span class="font-bold"
-          >{nouns.charAt(0).toUpperCase() + nouns.slice(1)}
+          >{capitalize(nouns)}
           <span
             class="font-figures font-normal text-muted-foreground tabular-nums"
             >{count(topTotal)}</span

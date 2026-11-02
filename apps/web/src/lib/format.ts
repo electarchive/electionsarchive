@@ -1,5 +1,6 @@
+import { localNouns } from "#lib/nouns.js";
 import { m } from "#lib/paraglide/messages.js";
-import { getLocale } from "#lib/paraglide/runtime.js";
+import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 
 const numberFormats = new Map<string, Intl.NumberFormat>();
 const dateFormats = new Map<string, Intl.DateTimeFormat>();
@@ -131,7 +132,16 @@ export function definite(label: string, isStart = false) {
     : label;
 }
 
+export function capitalize(text: string) {
+  return text.replace(/^./u, (first) => first.toLocaleUpperCase(getLocale()));
+}
+
 export function plural(noun: string) {
+  const locale = getLocale();
+  const local = locale === baseLocale ? undefined : localNouns(noun, locale);
+  if (local != null) {
+    return local;
+  }
   const fixed: Record<string, string> = {
     "country abroad": "countries abroad",
     "province or territory": "provinces or territories",

@@ -3,7 +3,7 @@
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
-  import { count } from "#lib/format.js";
+  import { capitalize, count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -196,7 +196,7 @@
               const name = entry.places.levels[0]?.noun ?? "";
               return {
                 code: entry.places.level,
-                label: name.charAt(0).toUpperCase() + name.slice(1),
+                label: capitalize(name),
                 count: entry.places.rows.length,
                 path: "",
                 query: "",

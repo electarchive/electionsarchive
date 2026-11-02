@@ -28,6 +28,7 @@ import {
   US_COLUMNS,
 } from "#lib/coverage.js";
 import {
+  capitalize,
   count,
   date,
   definite,
@@ -749,12 +750,7 @@ function markdown(
                   : []),
               ].join(" "),
               table(
-                [
-                  noun.charAt(0).toUpperCase() + noun.slice(1),
-                  m.col_name(),
-                  m.col_option(),
-                  m.col_party(),
-                ],
+                [capitalize(noun), m.col_name(), m.col_option(), m.col_party()],
                 winners.rows
                   .map((row) => ({
                     ...row,
@@ -3897,9 +3893,7 @@ function electionMarkdown(
         `## ${m.regions_title({ name: chamber.name, noun: chamber.noun ?? "" })}`,
         table(
           [
-            chamber.noun == null
-              ? m.regions_place()
-              : `${chamber.noun.charAt(0).toUpperCase()}${chamber.noun.slice(1)}`,
+            chamber.noun == null ? m.regions_place() : capitalize(chamber.noun),
             ...shown.map((column) => column.label),
             ...(hasOthers ? [m.regions_others()] : []),
             m.regions_total(),
@@ -4602,9 +4596,7 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
     ];
   });
   const others = atlas.levels.filter((entry) => entry.code !== atlas.level);
-  const heading = plural(level?.noun ?? "").replace(/^./u, (first) =>
-    first.toUpperCase(),
-  );
+  const heading = capitalize(plural(level?.noun ?? ""));
   return [
     `# ${atlas.scope.unit === "" ? m.atlas_page_title_plain({ title: atlas.title }) : m.atlas_page_title({ title: atlas.title, place: atlas.scope.name })}`,
     byline(
@@ -5379,7 +5371,7 @@ function contestMarkdown(
         ].join(" "),
         table(
           [
-            group.charAt(0).toUpperCase() + group.slice(1),
+            capitalize(group),
             m.col_name(),
             m.col_leader(),
             m.col_share(),

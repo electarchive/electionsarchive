@@ -9,6 +9,7 @@ import { zstdCompress, zstdDecompress } from "node:zlib";
 import { codeVersion } from "virtual:code-version";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { db } from "#lib/server/db/index.js";
+import { localizeNames } from "#lib/server/names.js";
 import { redis } from "#lib/server/redis.js";
 
 const LIMIT = 20_000;
@@ -232,7 +233,11 @@ export async function remember<T>(
   isStrict = false,
 ) {
   const locale = getLocale();
-  const key = locale === baseLocale ? shared : `${locale}|${shared}`;
+  const isBase = locale === baseLocale;
+  const key = isBase ? shared : `${locale}|${shared}`;
+  const run = isBase
+    ? compute
+    : async () => localizeNames(await compute(), locale);
   if (isStrict || Date.now() - state.checked >= CHECK) {
     state.checking ??= refresh();
     await state.checking;
@@ -242,16 +247,16 @@ export async function remember<T>(
     entries.delete(key);
     entries.set(key, hit);
     if (isStrict && hit.version !== state.version) {
-      const next = store(key, compute, true);
+      const next = store(key, run, true);
       put(key, next);
       return next.value as Promise<T>;
     }
     if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
-      renew(key, hit, compute);
+      renew(key, hit, run);
     }
     return hit.value as Promise<T>;
   }
-  const entry = store(key, compute, isStrict);
+  const entry = store(key, run, isStrict);
   put(key, entry);
   return entry.value as Promise<T>;
 }

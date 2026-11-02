@@ -702,7 +702,7 @@
   ],
   "ledger_open": "{name} öffnen",
   "ledger_unplaced": "In {place} unbekannt: {group}",
-  "places_leads": "{label} führt in {count}",
+  "places_leads": "{label} vorn: {count}",
   "places_reconcile": "Die {nouns} ergeben zusammen {sum} der {total} gültigen Stimmen. Die folgenden Zeilen enthalten den Rest, den kein einzelner Ort umfasst.",
   "places_reconcile_short": "Diese Zeilen ergeben zusammen {sum} der {total} gültigen Stimmen. Der Rest wurde ohne Ortszuordnung gemeldet.",
   "channels_title": "Art der Stimmabgabe",

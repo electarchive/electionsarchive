@@ -13,7 +13,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { count, date, percent } from "#lib/format.js";
+  import { capitalize, count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -680,9 +680,7 @@
                 ? plain
                 : short,
           )}
-          {const label = $derived(
-            stripped.charAt(0).toUpperCase() + stripped.slice(1),
-          )}
+          {const label = $derived(capitalize(stripped))}
           <li class="grid content-start gap-1.5">
             <p class="text-sm font-semibold text-pretty">
               {#if race.path == null}
@@ -977,7 +975,7 @@
                 )}
                 {const label = $derived(
                   election.lead == null
-                    ? short.charAt(0).toUpperCase() + short.slice(1)
+                    ? capitalize(short)
                     : election.lead.more > 0
                       ? m.polity_local_more({
                           place: election.lead.place,

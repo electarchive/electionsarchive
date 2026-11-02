@@ -2,7 +2,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import type { Tier } from "#lib/atlas/tiers.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
-  import { count } from "#lib/format.js";
+  import { capitalize, count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -60,7 +60,7 @@
   const current = $derived(
     shown.find((tier) => tier.code === locked) ?? chain[active] ?? null,
   );
-  const name = (noun: string) => noun.charAt(0).toUpperCase() + noun.slice(1);
+  const name = (noun: string) => capitalize(noun);
 </script>
 
 {#snippet menu()}
