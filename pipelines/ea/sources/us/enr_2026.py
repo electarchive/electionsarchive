@@ -1298,7 +1298,7 @@ def plan(
                         continue
                 elif (
                     re.fullmatch(r"\d{5}|\d{10}", segment)
-                    and (len(places) != 1 or codes.get((FIPS[state], plain(places[0]))) != segment[:5])
+                    and (len(places) != 1 or codes.get((FIPS[state], plain(places[0])), places[0]) != segment[:5])
                     or len(places) == 1
                     and not re.match(r"\d|sd|house$|senate$", segment)
                     and contest not in judicial
