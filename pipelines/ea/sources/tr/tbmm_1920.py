@@ -790,6 +790,29 @@ def emit() -> Path:
         for line in report:
             print("count differs", line)
 
+        held_tenures = conn.execute(
+            """select t.id, t.person_id, t.changeset_id, t.from_date, t.to_date, t.contest_id,
+                      (select string_agg(n.text, ' ') from name n where n.entity_id = t.person_id and n.kind = 'official')
+               from tenure t join changeset ch on ch.id = t.changeset_id
+               where t.body_id = %s and ch.pipeline = %s
+                 and not exists (select from entity_merge m where m.entity_id in (t.id, t.person_id))
+               order by t.changeset_id, t.id""",
+            [assembly, SOURCE],
+        ).fetchall()
+        by_place: dict[tuple[object, ...], list[tuple[UUID, UUID, UUID, set[str]]]] = {}
+        for tenure_id, person_id, written_by, start_day, end_day, contest_id, texts in held_tenures:
+            place = (start_day, contest_id) if contest_id is not None else (start_day, end_day, None)
+            by_place.setdefault(place, []).append((tenure_id, person_id, written_by, words(texts or "")))
+        for members in by_place.values():
+            for index, (tenure_id, person_id, written_by, tokens) in enumerate(members):
+                for kept_tenure, kept_person, kept_by, kept_tokens in members[:index]:
+                    if person_id == kept_person or written_by == kept_by or len(tokens & kept_tokens) < 2:
+                        continue
+                    if tokens <= kept_tokens or kept_tokens <= tokens:
+                        cs.merge(person_id, kept_person)
+                        cs.merge(tenure_id, kept_tenure)
+                        break
+
         digits = re.compile(r"\d+")
         shouted = re.compile(r"(?<!\w)(?=\w*[A-ZÇĞİÖŞÜ]{2})[A-ZÇĞİÖŞÜi]+(?!\w)")
 
