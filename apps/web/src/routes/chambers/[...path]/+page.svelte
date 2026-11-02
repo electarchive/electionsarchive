@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Seats from "#routes/[...path]/seats.svelte";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
@@ -7,17 +6,11 @@
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import { partyOn, segments, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
-  import * as Select from "#lib/components/ui/select/index.js";
-  import { Slider } from "#lib/components/ui/slider/index.js";
   import { count, date, definite, natural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { era, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import type { PageData } from "./$types";
-  import Council from "./council.svelte";
-  import Roster from "./roster.svelte";
-  import Stream from "./stream.svelte";
-  import Switcher from "./switcher.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -416,6 +409,9 @@
           {/if}
         </div>
         {#if body.siblings.length > 1}
+          {const Switcher = $derived(
+            (await import("./switcher.svelte")).default,
+          )}
           <Switcher siblings={body.siblings} current={data.id} />
         {/if}
       </div>
@@ -509,6 +505,7 @@
         {/if}
       </dl>
 
+      {const Stream = $derived((await import("./stream.svelte")).default)}
       <Stream
         terms={data.terms}
         parties={data.parties}
@@ -533,6 +530,9 @@
             onclick={() => (selected = Math.max(0, selected - 1))}
             ><ChevronLeftIcon class="block-4 inline-4" /></button
           >
+          {const Select = $derived(
+            await import("#lib/components/ui/select/index.js"),
+          )}
           <Select.Root
             type="single"
             value={String(selected)}
@@ -598,6 +598,9 @@
             class="font-figures text-[0.8125rem] font-semibold tabular-nums min-inline-36"
             >{m.chamber_on({ date: date(on) })}</span
           >
+          {const Slider = $derived(
+            (await import("#lib/components/ui/slider/index.js")).Slider,
+          )}
           <Slider
             type="single"
             class="flex-1 max-inline-120 min-inline-40"
@@ -626,6 +629,9 @@
       {/if}
 
       <div class="col-span-12 grid lg:col-span-4">
+        {const Seats = $derived(
+          (await import("#routes/[...path]/seats.svelte")).default,
+        )}
         {#key term.start}
           <Seats
             isLinked
@@ -728,6 +734,7 @@
           </div>
         {/if}
         {#if members.data?.isSeated === true}
+          {const Roster = $derived((await import("./roster.svelte")).default)}
           <Roster
             mode="changes"
             members={roll}
@@ -742,6 +749,7 @@
       </section>
 
       {#if roll.length > 0 && council == null}
+        {const Roster = $derived((await import("./roster.svelte")).default)}
         <Roster
           mode="all"
           members={roll}
@@ -759,6 +767,7 @@
       {/if}
     {/if}
     {#if council != null}
+      {const Council = $derived((await import("./council.svelte")).default)}
       <Council {council} hasTenures={body.tenures > 0} name={body.name} />
     {/if}
   </article>

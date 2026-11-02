@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PlaceMap from "#routes/[...path]/map.svelte";
+  import type PlaceMap from "#routes/[...path]/map.svelte";
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
@@ -20,6 +20,16 @@
     hasTenures: boolean;
     name: string;
   } = $props();
+
+  let Places = $state<typeof PlaceMap | null>(null);
+
+  $effect(() => {
+    void import("#routes/[...path]/map.svelte")
+      .then((module) => {
+        Places = module.default;
+      })
+      .catch(() => {});
+  });
 
   const uid = $props.id();
 
@@ -174,8 +184,12 @@
     <h2 id="{uid}-map" class="text-[0.8125rem] font-bold">
       {m.council_map_title({ election: regular[0]?.name ?? "" })}
     </h2>
-    {#if mapped.map.tiles != null}
-      <PlaceMap
+    {#if mapped.map.tiles != null && Places == null}
+      <div
+        class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
+      ></div>
+    {:else if mapped.map.tiles != null && Places != null}
+      <Places
         places={mapped.places}
         colors={kinds.map((kind) => swatch(kind.color, kind.key))}
         tiles={mapped.map.tiles}

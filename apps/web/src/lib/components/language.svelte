@@ -1,6 +1,5 @@
 <script lang="ts">
   import LanguagesIcon from "@lucide/svelte/icons/languages";
-  import { Combobox } from "#lib/components/ui/combobox/index.js";
   import { LANGUAGES } from "#lib/languages.js";
   import { m } from "#lib/paraglide/messages.js";
   import {
@@ -40,6 +39,9 @@
 {#if locales.length > 1}
   <div class="flex items-center gap-1.5">
     <LanguagesIcon class="shrink-0 block-4 inline-4" aria-hidden="true" />
+    {const Combobox = $derived(
+      (await import("#lib/components/ui/combobox/index.js")).Combobox,
+    )}
     <Combobox
       {items}
       value={current}

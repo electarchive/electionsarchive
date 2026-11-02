@@ -12,7 +12,6 @@
   import type { PageData } from "./$types";
   import type { Column, Counts, Goal, Reason, Tier } from "#lib/coverage.js";
   import Bar from "#routes/coverage/bar.svelte";
-  import Gaps from "#routes/coverage/gaps.svelte";
   import {
     COLUMN_LABELS,
     COUNTRY_COLUMNS,
@@ -1523,6 +1522,9 @@
             >
             <span role="columnheader">{m.coverage_column_done()}</span>
           </div>
+          {const Gaps = $derived(
+            (await import("#routes/coverage/gaps.svelte")).default,
+          )}
           {#key `${tab}:${goal}`}
             <Gaps
               polity={data.polity}
