@@ -108,11 +108,11 @@ def emit() -> Path:
         for row in frame.iter_rows(named=True):
             title = row["title"]
             match = re.match(
-                r"(.+? COUNTY|(?:CITY|TOWN|VILLAGE) OF [A-Z .'-]+?|[A-Z]+) (?=[A-Z ]*(?:BOND|LOCAL SALES|MALT|MIXED|UNFORTIFIED|ABC|BOARD|CHARTER|REFERENDUM|ELECTION))",
+                r"(.+? COUNTY|(?:CITY|TOWN|VILLAGE) OF [A-Z .'-]+?|[A-Z]+)(?: -)? (?=[A-Z ]*(?:BOND|LOCAL SALES|MALT|MIXED|UNFORTIFIED|ABC|BOARD|CHARTER|REFERENDUM|ELECTION))",
                 title,
             )
             entity = match[1] if match else ""
-            label = title.removeprefix(entity).strip().title() if entity else title.title()
+            label = title.removeprefix(entity).strip(" -").title() if entity else title.title()
             if entity.startswith(("CITY OF", "TOWN OF", "VILLAGE OF")):
                 words = re.sub(r"^(CITY|TOWN|VILLAGE) OF ", "", title).split()
                 options = next(
