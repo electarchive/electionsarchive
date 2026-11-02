@@ -8464,7 +8464,7 @@ export const contests = {
         const kind = shape.rows[0];
         const cached = await remember(
           kind?.isBy === false
-            ? `locator:${contest.election}:${contest.series}:${kind.scheme}:${grid?.level ?? ""}`
+            ? `locatorx:${contest.election}:${contest.series}:${kind.scheme}:${grid?.level ?? ""}`
             : `locator:${contest.root}:${grid?.level ?? ""}`,
           async () => {
             const found = await db.execute<{
@@ -8500,7 +8500,13 @@ export const contests = {
                     select g.id from election g
                     where e.kind = 'by_election' and g.polity_id = e.polity_id and g.kind = 'general' and g.date_from < e.date_from
                     order by g.date_from desc limit 1
-                  ) as general
+                  ) as general,
+                  case when e.parent_id is not null and not exists (
+                    select from contest o
+                    where o.election_id = c.election_id and o.id <> c.id and o.kind = c.kind and o.round_number = c.round_number
+                      and o.body_id is not distinct from c.body_id and o.office_id is not distinct from c.office_id
+                      and o.party_scope_id is not distinct from c.party_scope_id and o.allocation_parent_id is null and not o.notional
+                  ) then array(select s.id from election s where s.parent_id = e.parent_id and s.id <> e.id) else '{}' end as wide
                 from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
                 where c.id = ${contest.root}::uuid
                   and not exists (
@@ -8512,8 +8518,8 @@ export const contests = {
                 select c.id, a.id as area, a.k, me.scheme, me.day, me.general,
                   coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as stv
                 from me join contest c
-                  on c.election_id = any(array[me.election_id, me.general])
-                  and (case when me.general is null then c.election_id = me.election_id
+                  on c.election_id = any(array[me.election_id, me.general] || me.wide)
+                  and (case when me.general is null then c.election_id = me.election_id or c.election_id = any(me.wide)
                     else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
                   and c.kind = me.kind and c.round_number = me.round_number
                   and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
@@ -13089,7 +13095,7 @@ async function races(
       group.length === 1 && group[0] != null ? [[group[0].id, group[0]]] : [],
     ),
   );
-  const groups = split.filter((group) => {
+  const kept = split.filter((group) => {
     const final = chains.get(group[0]?.id ?? "")?.final;
     return (
       group.length > 1 ||
@@ -13097,6 +13103,51 @@ async function races(
       final === group[0]?.id ||
       !lone.has(final)
     );
+  });
+  const solo = kept.flatMap((group) =>
+    group.length === 1 && group[0]?.kind === "body_seats" ? [group[0].id] : [],
+  );
+  const allotted = Map.groupBy(
+    solo.length === 0
+      ? []
+      : rowsOf(
+          await db.execute<{
+            parent: string;
+            id: string;
+            area: string;
+            k: number;
+            magnitude: number | null;
+            scheme: string;
+            noun: string | null;
+          }>(sql`
+            select c.allocation_parent_id as parent, c.id, a.id as area, a.k, c.magnitude, a.scheme_code as scheme, sc.noun
+            from contest c
+            join area a on a.id = c.district_area_id
+            left join scheme sc on sc.code = a.scheme_code
+            where c.allocation_parent_id = any(${sql.param(solo)}::uuid[]) and c.kind = 'body_seats' and not c.notional
+          `),
+        ),
+    (row) => row.parent,
+  );
+  const seatsOf = new Map<string, string>();
+  const groups = kept.map((group) => {
+    const head = group[0];
+    const kids = allotted.get(head?.id ?? "");
+    if (head == null || kids == null || group.length !== 1) {
+      return group;
+    }
+    return kids.map(({ parent, ...kid }) => {
+      seatsOf.set(kid.id, parent);
+      return {
+        ...head,
+        ...kid,
+        isRemainder: false,
+        isCounted: true,
+        isVoting: true,
+        previous: null,
+        runoffs: [],
+      };
+    });
   });
   const homes = new Map(
     groups.flatMap((group, spot) => group.map((row) => [row.id, spot])),
@@ -13106,7 +13157,7 @@ async function races(
   }
   const [labels, slugs, lineage] = await Promise.all([
     names(
-      owned.flatMap((row) => [
+      [...owned, ...groups.flat()].flatMap((row) => [
         row.id,
         ...[row.owner, row.office, row.elects, row.area, row.party].filter(
           (id) => id != null,
@@ -13116,6 +13167,7 @@ async function races(
     ),
     paths([
       ...owned.map((row) => row.id),
+      ...seatsOf.keys(),
       ...chains.values().map((chain) => chain.first),
     ]),
     branches(day),
@@ -13382,7 +13434,7 @@ async function races(
               ]),
               date,
             );
-      const results = folded
+      const reckoned = folded
         .entries()
         .map(([key, members]) => {
           const party = key.startsWith("party:") ? key.slice(6) : null;
@@ -13437,6 +13489,70 @@ async function races(
             Number(a.key.startsWith("kind:others")) -
               Number(b.key.startsWith("kind:others")) || b.votes - a.votes,
         );
+      const allot = seatsOf.get(head?.id ?? "");
+      const declared =
+        allot == null || reckoned.length > 0
+          ? []
+          : rowsOf(
+              await db.execute<{
+                party: string | null;
+                seats: number;
+                color: string | null;
+              }>(sql`
+                select d.party, d.seats, ${paint(sql`d.party`, sql`${election}::uuid`, sql`${day}::date`)} as color
+                from (
+                  select coalesce(pm.into_id, o.party_id) as party, sum(x.seats)::int as seats
+                  from result_set rs
+                  join outcome x on x.result_set_id = rs.id and x.kind in ('won', 'elected') and x.candidacy_id is null and x.seats > 0
+                  join contest_option o on o.id = x.option_id
+                  left join entity_merge pm on pm.entity_id = o.party_id
+                  where rs.contest_id = ${allot}::uuid and ${latest("rs")}
+                  group by 1
+                ) d
+                order by d.seats desc
+              `),
+            );
+      const declaredNames =
+        declared.length === 0
+          ? null
+          : await names(
+              declared.flatMap((row) =>
+                row.party == null ? [] : [parentOf.get(row.party) ?? row.party],
+              ),
+              date,
+            );
+      const results: typeof reckoned =
+        declared.length === 0
+          ? reckoned
+          : declared.map((row) => {
+              const party =
+                row.party == null
+                  ? null
+                  : (parentOf.get(row.party) ?? row.party);
+              return {
+                key: party == null ? "independent" : `party:${party}`,
+                label:
+                  party == null
+                    ? m.seats_independents()
+                    : (declaredNames?.full.get(party) ?? ""),
+                short:
+                  party == null
+                    ? null
+                    : (declaredNames?.short.get(party) ?? null),
+                color: row.color,
+                lean: null,
+                person: null,
+                party,
+                votes: 0,
+                share: 0,
+                seats: row.seats,
+                outcome: null,
+                isDeclined: false,
+                isIndependent: party == null,
+                isWriteIn: false,
+                ballots: 0,
+              };
+            });
       const returned =
         single != null || head?.isOffice === true
           ? null
@@ -13730,7 +13846,8 @@ async function races(
               ),
           poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
           isBrief ||
-          results.some((row) => row.key.startsWith("party:")) ||
+          (declared.length === 0 &&
+            results.some((row) => row.key.startsWith("party:"))) ||
           group.length < 2 ||
           head?.kind !== "body_seats"
             ? null
@@ -13776,12 +13893,32 @@ async function races(
                     case when f.person is null and g.runoff is null then (
                       select json_agg(json_build_object('party', d.party, 'seats', d.seats, 'color', ${paint(sql`d.party`, sql`${election}::uuid`, sql`${day}::date`)}) order by d.seats desc)
                       from (
-                        select coalesce(dm.into_id, dop.party_id) as party, sum(dx.seats)::int as seats
-                        from result_set ds
-                        join outcome dx on dx.result_set_id = ds.id and dx.kind in ('won', 'elected') and dx.candidacy_id is null and dx.seats > 0
-                        join contest_option dop on dop.id = dx.option_id
-                        left join entity_merge dm on dm.entity_id = dop.party_id
-                        where ds.contest_id = c.id and ${latest("ds")}
+                        with held as (
+                          select coalesce(dm.into_id, dop.party_id) as party, sum(dx.seats)::int as seats
+                          from result_set ds
+                          join outcome dx on dx.result_set_id = ds.id and dx.kind in ('won', 'elected') and dx.candidacy_id is null and dx.seats > 0
+                          join contest_option dop on dop.id = dx.option_id
+                          left join entity_merge dm on dm.entity_id = dop.party_id
+                          where ds.contest_id = c.id and ${latest("ds")}
+                          group by 1
+                        )
+                        select party, seats from held
+                        union all
+                        select dt.party, count(*)::int from (
+                          select distinct on (coalesce(tm.into_id, t.person_id)) (
+                            select coalesce(am.into_id, ta.party_id) from tenure_affiliation ta
+                            left join entity_merge am on am.entity_id = ta.party_id
+                            where ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
+                            order by lower(ta.valid) nulls first limit 1
+                          ) as party
+                          from tenure t
+                          left join entity_merge tm on tm.entity_id = t.person_id
+                          where t.contest_id = c.id
+                          order by coalesce(tm.into_id, t.person_id), 1 nulls last
+                        ) dt
+                        where dt.party is not null
+                          and dt.party not in (select party from held where party is not null)
+                          and (select sum(seats) from held) < c.magnitude
                         group by 1
                       ) d
                     ) end as declared,
@@ -14096,7 +14233,7 @@ async function races(
           labels.short.get(head?.party ?? "") ??
           labels.full.get(head?.party ?? "") ??
           null,
-        path: slugs.get(single?.id ?? "") ?? null,
+        path: slugs.get(single?.id ?? allot ?? "") ?? null,
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
         isRemainder: head?.isRemainder ?? false,

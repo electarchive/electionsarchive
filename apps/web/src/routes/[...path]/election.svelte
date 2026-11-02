@@ -2308,6 +2308,9 @@
             {@render field(race)}
           {/if}
           {#if (race.wards ?? []).length > 0}
+            {#if race.balance.parts.some((part) => part.value > 0)}
+              {@render tally(race, index === head)}
+            {/if}
             {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
               <div class="grid gap-2 pbs-1">
                 {#if race.map.tiles != null}
