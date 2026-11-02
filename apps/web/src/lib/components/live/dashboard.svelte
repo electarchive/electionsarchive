@@ -811,9 +811,6 @@
       <p class="text-sm text-pretty text-muted-foreground">
         {m.night_pick_hint()}
       </p>
-      <p class="text-xs text-pretty text-muted-foreground">
-        {m.night_pick_legend()}
-      </p>
     </div>
     <Picker
       {codes}
