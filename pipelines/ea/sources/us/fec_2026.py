@@ -2055,6 +2055,8 @@ def emit() -> Path:
                 r" \(Place \d+\)$", "", label.replace(" Washington mayoral", " District of Columbia mayoral")
             )
             _, state, chamber = template[0].split(":")
+            if f"{state}:{chamber}" == "TX:railroad-commissioner":
+                continue
             if f"{state}:{chamber}" not in offices:
                 offices[f"{state}:{chamber}"] = label
                 if f"{state}:{chamber}" in SPLIT:
