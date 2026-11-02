@@ -58,6 +58,7 @@ export type LiveRace = {
   certified: { totals: Array<number>; winners: Array<string> } | null;
   projected?: { option: string; at: string } | null;
   source: { publisher: string; url: string | null };
+  feed?: LiveFeed;
   jurisdiction?: {
     name: string;
     kind: "county" | "municipal" | "school" | "special" | "judicial" | "state";
@@ -65,6 +66,8 @@ export type LiveRace = {
   seats?: number;
   isMeasure?: boolean;
 };
+
+export type LiveFeed = "live" | "none" | "outside";
 
 export type LiveElection = {
   id: string;
@@ -74,6 +77,7 @@ export type LiveElection = {
   pollClose: Array<{ state: string; at: string }>;
   newest: string | null;
   isCertified: boolean;
+  later?: Record<string, { feed: Exclude<LiveFeed, "live">; name: string }>;
   races: Array<LiveRace>;
 };
 

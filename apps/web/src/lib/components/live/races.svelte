@@ -3,7 +3,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { HATCH, lead, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { shade, tally, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -123,11 +123,13 @@
             {@render chip(
               option,
               option == null
-                ? m.night_nation_waiting()
+                ? verdict(entry)
                 : `${surname(option)} +${lead(entry.margin)}`,
               entry.winner != null,
             )}
-            {@render meter(entry.counted)}
+            {#if entry.later == null}
+              {@render meter(entry.counted)}
+            {/if}
           </a>
         </li>
       {/each}
@@ -158,6 +160,13 @@
               {@render chip(
                 null,
                 m.night_races_waiting({ count: seats.waiting }),
+                false,
+              )}
+            {/if}
+            {#if seats.later > 0}
+              {@render chip(
+                null,
+                m.night_races_later({ count: seats.later }),
                 false,
               )}
             {/if}
@@ -203,6 +212,7 @@
                 },
               )}
               style:background-color={color}
+              style:background-image={entry.later == null ? undefined : HATCH}
               onpointerenter={(event) => {
                 if (isHover(event)) probed = entry.race.slug;
               }}

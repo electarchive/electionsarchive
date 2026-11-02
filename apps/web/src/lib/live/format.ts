@@ -106,3 +106,6 @@ export function placeSlug(name: string) {
     .replaceAll(/[^a-z0-9]+/gu, "-")
     .replaceAll(/^-|-$/gu, "");
 }
+
+export const HATCH =
+  "repeating-linear-gradient(135deg, color-mix(in oklab, var(--foreground) 32%, transparent) 0 1px, transparent 1px 4px)";

@@ -56,10 +56,14 @@
           place.contests.map((contest) => {
             const race =
               live.get(contest.slug) ??
-              stub(contest, code, found?.parties ?? {}, "other", {
-                name: place.name,
-                kind: KINDS[place.kind],
-              });
+              stub(
+                contest,
+                code,
+                found?.parties ?? {},
+                "other",
+                { name: place.name, kind: KINDS[place.kind] },
+                election.later?.[code]?.feed,
+              );
             return summarize(race, estimates[race.id] ?? null);
           }),
         ),

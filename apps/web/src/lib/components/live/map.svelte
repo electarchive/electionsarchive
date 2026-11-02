@@ -19,6 +19,7 @@
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import LaterKey from "./later-key.svelte";
   import MethodLink from "./method-link.svelte";
 
   let {
@@ -31,6 +32,7 @@
     caption,
     help,
     anchor = null,
+    isLater = false,
     href,
     mode = $bindable("lead"),
     selected = $bindable(null),
@@ -45,6 +47,7 @@
     caption?: string;
     help?: ComponentProps<typeof MethodLink>["section"];
     anchor?: string | null;
+    isLater?: boolean;
     href?: (unitId: string) => string | null;
     mode?: Mode;
     selected?: string | null;
@@ -267,6 +270,26 @@
       );
       engine.add(
         {
+          id: "live-later",
+          type: "fill",
+          source,
+          "source-layer": "areas",
+          filter: ["in", ["id"], ["literal", ks]],
+          paint: {
+            "fill-pattern": "hatch",
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "later"], false],
+              1,
+              0,
+            ],
+          },
+        },
+        "fills",
+        { group: "live-layers", rank: 1 },
+      );
+      engine.add(
+        {
           id: "live-seam",
           type: "line",
           source,
@@ -355,11 +378,16 @@
     engine.paint(
       source,
       new Map(
-        places.flatMap((place) => {
-          const row = byArea.get(place.areaId);
-          const color = row == null ? null : fill(row);
-          return color == null ? [] : [[place.k, { color }] as const];
-        }),
+        places.flatMap(
+          (place): Array<[number, Record<string, string | boolean>]> => {
+            const row = byArea.get(place.areaId);
+            const color = row == null ? null : fill(row);
+            if (isLater) {
+              return [[place.k, { later: true }]];
+            }
+            return color == null ? [] : [[place.k, { color }]];
+          },
+        ),
       ),
     );
     const scale = Math.max(...circles.map((circle) => circle.reference), 1);
@@ -425,6 +453,7 @@
       now,
       mode,
       estimate,
+      isLater,
       hovered,
       selected,
       anchor,
@@ -624,7 +653,11 @@
   <p
     class="flex flex-wrap justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground"
   >
-    <span>{caption ?? legend}</span>
+    {#if isLater}
+      <LaterKey />
+    {:else}
+      <span>{caption ?? legend}</span>
+    {/if}
     {#if hasBasemap && prefs.isBasemap}
       <span class="text-[0.6875rem]">{m.map_basemap_credit()}</span>
     {/if}
@@ -675,7 +708,9 @@
       })}
     </span>
   {:else}
-    <span class="text-xs text-muted-foreground">{m.night_tip_waiting()}</span>
+    <span class="text-xs text-muted-foreground"
+      >{isLater ? m.night_later_key() : m.night_tip_waiting()}</span
+    >
   {/if}
   {#if isLive && rest.left >= 1}
     <span

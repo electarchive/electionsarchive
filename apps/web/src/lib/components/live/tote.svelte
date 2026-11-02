@@ -17,12 +17,14 @@
     estimate,
     winners,
     isWaiting,
+    isLater = false,
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
     winners: Array<string>;
     isWaiting: boolean;
+    isLater?: boolean;
   } = $props();
 
   let isOpen = $state(false);
@@ -231,51 +233,53 @@
     {:else}
       <span></span>
     {/if}
-    <div
-      class="grid grid-cols-[auto_minmax(4rem,1fr)_auto] items-center gap-x-3 gap-y-0.5"
-    >
-      <span class="font-semibold">{m.night_counted()}</span>
+    {#if !isLater}
       <div
-        class="relative overflow-hidden rounded-full bg-muted block-1.5"
-        aria-hidden="true"
+        class="grid grid-cols-[auto_minmax(4rem,1fr)_auto] items-center gap-x-3 gap-y-0.5"
       >
-        {#if shareIn != null && isProjected}
-          <span
-            class="absolute inset-y-0 inset-s-0 bg-foreground/25 transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
-            style:inline-size="{Math.min(1, shareIn.high) * 100}%"
-          ></span>
-          <span
-            class="absolute inset-y-0 inset-s-0 rounded-full bg-foreground transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
-            style:inline-size="{Math.min(1, shareIn.mid) * 100}%"
-          ></span>
-        {:else if !isWaiting}
-          <span
-            class="absolute inset-0 bg-[repeating-linear-gradient(-45deg,var(--border)_0_4px,transparent_4px_8px)]"
-          ></span>
+        <span class="font-semibold">{m.night_counted()}</span>
+        <div
+          class="relative overflow-hidden rounded-full bg-muted block-1.5"
+          aria-hidden="true"
+        >
+          {#if shareIn != null && isProjected}
+            <span
+              class="absolute inset-y-0 inset-s-0 bg-foreground/25 transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
+              style:inline-size="{Math.min(1, shareIn.high) * 100}%"
+            ></span>
+            <span
+              class="absolute inset-y-0 inset-s-0 rounded-full bg-foreground transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
+              style:inline-size="{Math.min(1, shareIn.mid) * 100}%"
+            ></span>
+          {:else if !isWaiting}
+            <span
+              class="absolute inset-0 bg-[repeating-linear-gradient(-45deg,var(--border)_0_4px,transparent_4px_8px)]"
+            ></span>
+          {/if}
+        </div>
+        <span class="font-figures text-muted-foreground tabular-nums">
+          {#if isWaiting}
+            {m.night_counted_none()}
+          {:else if shareIn != null && isProjected}
+            {m.night_counted_share({
+              share: percent(Math.min(1, shareIn.mid), 0),
+              low: percent(Math.min(1, shareIn.low), 0),
+              high: percent(Math.min(1, shareIn.high), 0),
+            })}
+          {:else}
+            {m.night_votes({ count: count(now.total) })}
+          {/if}
+        </span>
+        {#if now.reporting != null && now.expected != null && now.expected > 0}
+          <span class="col-start-3 text-end text-xs text-muted-foreground">
+            {m.night_precincts({
+              reporting: count(now.reporting),
+              expected: count(now.expected),
+            })}
+          </span>
         {/if}
       </div>
-      <span class="font-figures text-muted-foreground tabular-nums">
-        {#if isWaiting}
-          {m.night_counted_none()}
-        {:else if shareIn != null && isProjected}
-          {m.night_counted_share({
-            share: percent(Math.min(1, shareIn.mid), 0),
-            low: percent(Math.min(1, shareIn.low), 0),
-            high: percent(Math.min(1, shareIn.high), 0),
-          })}
-        {:else}
-          {m.night_votes({ count: count(now.total) })}
-        {/if}
-      </span>
-      {#if now.reporting != null && now.expected != null && now.expected > 0}
-        <span class="col-start-3 text-end text-xs text-muted-foreground">
-          {m.night_precincts({
-            reporting: count(now.reporting),
-            expected: count(now.expected),
-          })}
-        </span>
-      {/if}
-    </div>
+    {/if}
   </div>
 
   {#if isOpen && rest.length > 0}

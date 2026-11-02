@@ -50,6 +50,7 @@
   import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
   import Hexes from "./hexes.svelte";
+  import LaterKey from "./later-key.svelte";
   import Locals from "./locals.svelte";
   import Nation from "./nation.svelte";
 
@@ -162,6 +163,8 @@
     "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
   const WAITING =
     "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
+  const LATER =
+    "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
 
   const summaries = $derived(
     election.races.map((race) => summarize(race, estimates[race.id] ?? null)),
@@ -301,6 +304,9 @@
   }
 
   function strength(summary: Summary) {
+    if (summary.later != null) {
+      return LATER;
+    }
     const called = summary.winner ?? summary.projected;
     const option = called ?? summary.leader;
     if (option == null) {
@@ -324,6 +330,9 @@
 
   function shade(summary: Summary, wanted: Mode = mode) {
     const entry = seatById.get(summary.race.id);
+    if (summary.later != null) {
+      return LATER;
+    }
     if (wanted === "counted") {
       return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
     }
@@ -350,6 +359,9 @@
   function seatShade(entry: Seat) {
     if (entry.rating === "won" || entry.rating === "projected") {
       return tint(entry.side);
+    }
+    if (entry.rating === "later") {
+      return LATER;
     }
     if (entry.rating === "waiting" || entry.side == null) {
       return WAITING;
@@ -378,6 +390,10 @@
       const races = of(code, view);
       if (races.length === 0) {
         found[code] = MUTED;
+        continue;
+      }
+      if (races.every((summary) => summary.later != null)) {
+        found[code] = LATER;
         continue;
       }
       if (view === "house") {
@@ -412,6 +428,19 @@
             ]
           : [],
       ),
+    ),
+  );
+  const later = $derived(
+    Object.keys(nation?.codes ?? {}).filter((code) => {
+      const races = of(code, view);
+      return (
+        races.length > 0 && races.every((summary) => summary.later != null)
+      );
+    }),
+  );
+  const districtLater = $derived(
+    [...districts].flatMap(([key, summary]) =>
+      summary.later == null ? [] : [key],
     ),
   );
   const districtColors = $derived(
@@ -487,7 +516,7 @@
     const ahead =
       entry.summary.winner ?? entry.summary.projected ?? entry.summary.leader;
     return ahead == null
-      ? `${entry.summary.race.title}: ${m.night_nation_waiting()}`
+      ? `${entry.summary.race.title}: ${entry.summary.later == null ? m.night_nation_waiting() : m.night_later()}`
       : `${entry.summary.race.title}: ${surname(ahead)} +${lead(entry.summary.margin)}`;
   }
 
@@ -500,7 +529,11 @@
   {#if summary == null}
     <span class="text-muted-foreground">–</span>
   {:else if summary.leader == null}
-    <span class="text-muted-foreground">{m.night_nation_waiting()}</span>
+    <span class="text-muted-foreground"
+      >{summary.later == null
+        ? m.night_nation_waiting()
+        : m.night_later()}</span
+    >
   {:else}
     {const option = $derived(
       summary.winner ?? summary.projected ?? summary.leader,
@@ -565,7 +598,7 @@
                 name: entry.holder,
               })}</span
             >
-            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
+            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
               <span class="font-figures tabular-nums"
                 >{entry.left >= entry.right ? pair[0].short : pair[1].short}
                 {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -603,7 +636,7 @@
         name: entry.holder,
       })}</span
     >
-    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
+    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
       <span class="font-figures tabular-nums"
         >{entry.left >= entry.right ? pair[0].short : pair[1].short}
         {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -912,6 +945,7 @@
           <Hexes
             cartogram={house.cartogram}
             colors={districtColors}
+            later={districtLater}
             label={m.night_house_hexes_label()}
             bind:hovered={probe}
             href={districtHref}
@@ -922,6 +956,7 @@
             geography={house.map}
             codes={house.codes}
             colors={districtColors}
+            later={districtLater}
             label={m.night_house_map()}
             bind:hovered={probe}
             onPick={async (key: string) => {
@@ -944,6 +979,7 @@
           geography={nation.map}
           codes={nation.codes}
           {colors}
+          {later}
           label={m.night_nation_map({ view: NAMES[view]() })}
           bind:hovered
           onPick={async (code: string) => goto(href(code))}
@@ -955,6 +991,9 @@
           ? m.night_house_legend()
           : LEGENDS[mode]()}
       </p>
+      {#if (view === "house" ? districtLater : later).length > 0}
+        <LaterKey />
+      {/if}
     </div>
 
     <aside class="lg:col-start-2 lg:row-span-2 lg:row-start-1">

@@ -133,7 +133,9 @@
       >{summary.counted == null
         ? entry.isUnopposed
           ? m.night_state_unopposed()
-          : m.night_nation_waiting()
+          : summary.later == null
+            ? m.night_nation_waiting()
+            : m.night_later()
         : m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
     >
     <span class="font-semibold text-foreground group-hover:underline"

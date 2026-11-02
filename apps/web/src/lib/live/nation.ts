@@ -17,7 +17,8 @@ export type Rating =
   | "lean"
   | "tossup"
   | "counting"
-  | "waiting";
+  | "waiting"
+  | "later";
 
 export type Seat = {
   summary: Summary;
@@ -162,7 +163,8 @@ export function seat(
   }
   const pick = called ?? summary.favorite ?? summary.leader;
   const side = family(control, pick);
-  let rating: Rating = total > 0 ? "counting" : "waiting";
+  let rating: Rating =
+    total > 0 ? "counting" : summary.later == null ? "waiting" : "later";
   if (summary.winner != null) {
     rating = "won";
   } else if (summary.projected != null) {

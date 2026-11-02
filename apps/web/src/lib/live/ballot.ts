@@ -55,6 +55,7 @@ export function stub(
   parties: Record<string, BallotParty>,
   office: LiveOffice = "other",
   jurisdiction: LiveRace["jurisdiction"] = null,
+  feed: LiveRace["feed"] = "live",
 ): LiveRace {
   return {
     id: contest.id,
@@ -89,6 +90,7 @@ export function stub(
     baseline: [],
     certified: null,
     source: { publisher: "", url: null },
+    feed,
     jurisdiction,
     seats: contest.seats,
     isMeasure: contest.isMeasure,
@@ -125,6 +127,7 @@ export function entries({
         parties,
         tier == null ? "other" : OFFICES[tier],
         jurisdiction,
+        election.later?.[state]?.feed,
       );
     const summary = summarize(race, estimates[race.id] ?? null);
     const held = holder(parties, contest.held);

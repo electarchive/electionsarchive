@@ -57,6 +57,7 @@
     tossup: m.night_rating_tossup,
     counting: m.night_rating_counting,
     waiting: m.night_nation_waiting,
+    later: m.night_later,
   };
 
   const TESTS: Record<Focus, (seat: Seat) => boolean> = {
@@ -114,7 +115,9 @@
     counted: (seat) => seat.summary.counted ?? null,
     remaining: (seat) => seat.remaining ?? null,
     chance: (seat) =>
-      seat.rating === "counting" || seat.rating === "waiting"
+      seat.rating === "counting" ||
+      seat.rating === "waiting" ||
+      seat.rating === "later"
         ? null
         : chance(seat),
     at: (seat) => seat.summary.at ?? null,
@@ -391,7 +394,9 @@
             >
               {#if ahead == null}
                 <span class="text-muted-foreground"
-                  >{m.night_nation_waiting()}</span
+                  >{seat.rating === "later"
+                    ? m.night_later()
+                    : m.night_nation_waiting()}</span
                 >
               {:else}
                 <span
@@ -525,7 +530,7 @@
                       ? left.color
                       : right.color}>{RATINGS.projected()}</span
                   >
-                {:else if seat.rating === "counting" || seat.rating === "waiting"}
+                {:else if seat.rating === "counting" || seat.rating === "waiting" || seat.rating === "later"}
                   <span class="text-muted-foreground"
                     >{RATINGS[seat.rating]()}</span
                   >

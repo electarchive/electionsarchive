@@ -4410,7 +4410,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     return [
       link(race.title, `live/${race.slug}`),
       race.winner == null
-        ? (race.leader ?? "")
+        ? (race.leader ?? (race.note == null ? "" : m.night_later_key()))
         : `${race.winner} (${m.live_elected()})`,
       total === 0 ? "" : count(total),
       total === 0 ? "" : points(race.margin, 1).replace(/^[+−]/u, ""),
@@ -4433,9 +4433,11 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     return [
       `### ${link(race.title, `live/${race.slug}`)}`,
       total === 0
-        ? data.at == null
-          ? m.live_waiting()
-          : m.live_no_update()
+        ? race.note != null
+          ? race.note
+          : data.at == null
+            ? m.live_waiting()
+            : m.live_no_update()
         : [
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],

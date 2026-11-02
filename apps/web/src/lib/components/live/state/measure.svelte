@@ -90,7 +90,9 @@
   {/if}
   <span class="font-figures text-xs text-muted-foreground tabular-nums"
     >{summary.counted == null
-      ? m.night_nation_waiting()
+      ? summary.later == null
+        ? m.night_nation_waiting()
+        : m.night_later()
       : m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
   >
 </a>

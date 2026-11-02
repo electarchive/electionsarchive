@@ -148,15 +148,25 @@
             {/if}
           </ol>
           <span
-            class="text-end font-figures font-semibold tabular-nums"
+            class={cn("text-end font-figures tabular-nums", {
+              "font-semibold": summary.later == null,
+              "text-xs whitespace-nowrap text-muted-foreground":
+                summary.later != null,
+            })}
             style:color={pick == null || summary.total === 0
               ? undefined
               : `color-mix(in oklab, ${tone(pick)} 75%, var(--foreground))`}
-            >{pick == null || summary.total === 0
-              ? "–"
-              : `+${lead(summary.margin)}`}</span
+            >{summary.later != null
+              ? m.night_later()
+              : pick == null || summary.total === 0
+                ? "–"
+                : `+${lead(summary.margin)}`}</span
           >
-          <span class="hidden items-center justify-end gap-1.5 sm:flex">
+          <span
+            class={cn("hidden items-center justify-end gap-1.5 sm:flex", {
+              invisible: summary.later != null,
+            })}
+          >
             <span
               class="relative overflow-hidden rounded-xs bg-muted block-1.5 inline-8"
               aria-hidden="true"

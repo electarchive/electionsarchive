@@ -74,6 +74,9 @@
     if (isUnopposed) {
       return m.night_state_unopposed();
     }
+    if (summary.later != null) {
+      return m.night_later();
+    }
     if (closes == null) {
       return null;
     }

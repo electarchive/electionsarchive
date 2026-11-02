@@ -26,6 +26,7 @@ import { Path } from "#lib/server/territory.js";
 
 const TRAITS: Record<string, Array<number>> = counties;
 const STAMP_MS = 5000;
+const LAPSE_MS = 3 * 60 * 60 * 1000;
 const stamps = new Map<
   string,
   { at: number; value: Promise<{ newest: string; isCertified: boolean }> }
@@ -895,55 +896,88 @@ async function night(
   called: Awaited<ReturnType<typeof calls>>,
 ) {
   const contests = picked.map((row) => row.id);
-  const [frames, { choices, incumbents, settled, prior, drawn, placed }] =
-    await Promise.all([
-      db.execute<{
-        k: number;
-        contest: string;
-        at: string;
-        reporting: number | null;
-        expected: number | null;
-        publisher: string;
-        url: string | null;
-      }>(sql`
-        select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
-          f.reporting, f.expected, d.publisher, d.url
-        from live.frame f join live.feed d on d.id = f.feed_id
-        where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
-        order by f.as_of
-      `),
-      remember(
-        `live:fixed:v2:${found.path}|${found.rest}|${detail}`,
-        async () => {
-          const [choices, incumbents, settled, prior, drawn, placed] =
-            await Promise.all([
-              options(contests, found.date),
-              db.execute<{ option: string }>(sql`
-                select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
-                where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
-              `),
-              certified(contests),
-              baselines(picked, found.date),
-              detail === "national"
-                ? []
-                : geography(
-                    picked,
-                    found.date,
-                    detail === "race" || found.path.split("/").length > 3,
-                  ),
-              jurisdictions(contests),
-            ]);
-          return {
-            choices,
-            incumbents: incumbents.rows,
-            settled,
-            prior,
-            drawn,
-            placed,
-          };
-        },
-      ),
-    ]);
+  const [
+    frames,
+    { choices, incumbents, settled, prior, drawn, placed },
+    feeds,
+    polities,
+  ] = await Promise.all([
+    db.execute<{
+      k: number;
+      contest: string;
+      at: string;
+      reporting: number | null;
+      expected: number | null;
+      publisher: string;
+      url: string | null;
+    }>(sql`
+      select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
+        f.reporting, f.expected, d.publisher, d.url
+      from live.frame f join live.feed d on d.id = f.feed_id
+      where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
+      order by f.as_of
+    `),
+    remember(
+      `live:fixed:v2:${found.path}|${found.rest}|${detail}`,
+      async () => {
+        const [choices, incumbents, settled, prior, drawn, placed] =
+          await Promise.all([
+            options(contests, found.date),
+            db.execute<{ option: string }>(sql`
+              select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
+              where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
+            `),
+            certified(contests),
+            baselines(picked, found.date),
+            detail === "national"
+              ? []
+              : geography(
+                  picked,
+                  found.date,
+                  detail === "race" || found.path.split("/").length > 3,
+                ),
+            jurisdictions(contests),
+          ]);
+        return {
+          choices,
+          incumbents: incumbents.rows,
+          settled,
+          prior,
+          drawn,
+          placed,
+        };
+      },
+    ),
+    db.execute<{ state: string; isRunning: boolean }>(sql`
+      select lower(d.params->>'state') as state,
+        bool_or(${shown.results}::boolean and exists (
+          select from live.frame f join contest c on c.id = f.contest_id join election e on e.id = c.election_id
+          where f.feed_id = d.id and f.status = 'active' and e.date_from = ${found.date}::date
+        )) as "isRunning"
+      from live.feed d where d.enabled and d.params ? 'state'
+      group by 1
+    `),
+    db.execute<{ state: string; id: string }>(sql`
+      select lower(substr(iso_code, 4)) as state, id from polity where iso_code ~ '^US-[A-Z]{2}$'
+    `),
+  ]);
+  const fed = new Map(feeds.rows.map((row) => [row.state, row.isRunning]));
+  const lapsed = new Map<string, "none" | "outside">();
+  for (const [state, minutes] of Object.entries(CLOSES)) {
+    if (!fed.has(state)) {
+      lapsed.set(state, "none");
+    } else if (
+      fed.get(state) === true &&
+      Date.now() > Date.parse(eastern(found.date, minutes)) + LAPSE_MS
+    ) {
+      lapsed.set(state, "outside");
+    }
+  }
+  const polityOf = new Map(
+    polities.rows.flatMap((row) =>
+      lapsed.has(row.state) ? [[row.state, row.id] as const] : [],
+    ),
+  );
   const values = await db.execute<{
     k: number;
     unit: string;
@@ -983,6 +1017,7 @@ async function night(
       [
         found.id,
         ...contests,
+        ...polityOf.values(),
         ...placed.values().map((row) => row.polity),
         ...held.rows.flatMap((row) => (row.area == null ? [] : [row.area])),
       ],
@@ -1306,6 +1341,10 @@ async function night(
           })()
         : null,
       source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
+      feed:
+        mine.length > 0 || final.length > 0
+          ? "live"
+          : (lapsed.get(parts[1] ?? "") ?? "live"),
     };
   });
   const states = [...new Set(built.map((race) => race.state))].toSorted(
@@ -1332,6 +1371,16 @@ async function night(
     newest,
     isCertified:
       built.length > 0 && built.every((race) => race.certified != null),
+    later: Object.fromEntries(
+      [...lapsed].map(([state, feed]) => [
+        state,
+        {
+          feed,
+          name:
+            titles.full.get(polityOf.get(state) ?? "") ?? state.toUpperCase(),
+        },
+      ]),
+    ),
     races: built.map((race) =>
       kept ? race : { ...race, units: [], counts: [], baseline: [] },
     ),

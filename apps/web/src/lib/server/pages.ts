@@ -8,6 +8,7 @@ import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
 import { summarize } from "#lib/live/summary.js";
 import { era } from "#lib/party.js";
+import { m } from "#lib/paraglide/messages.js";
 import { remember } from "#lib/server/cache.js";
 import { compactPlaces } from "#lib/server/compare.js";
 import { db } from "#lib/server/db/index.js";
@@ -1909,3 +1910,8 @@ export async function livePage(path: string, at: string | null) {
     }),
   };
 }
+        feed:
+          race.feed === "none" || race.feed === "outside"
+            ? ("none" as const)
+            : ("live" as const),
+        note: summary.later == null ? null : m.live_twin_later(),

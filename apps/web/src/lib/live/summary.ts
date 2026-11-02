@@ -25,6 +25,7 @@ export type Summary = {
   favorite: LiveOption | null;
   chance: number | null;
   at: string | null;
+  later: "none" | "outside" | null;
 };
 
 export function summarize(
@@ -97,6 +98,12 @@ export function summarize(
     chance:
       favorite == null ? null : (estimate?.winProbability[favorite.id] ?? null),
     at: frame?.at ?? null,
+    later:
+      race.certified == null &&
+      total === 0 &&
+      (race.feed === "none" || race.feed === "outside")
+        ? race.feed
+        : null,
   };
 }
 
@@ -117,6 +124,9 @@ export function describe(summary: Summary, closes: number, time: number) {
       name: summary.projected.label,
       time: stamp(summary.projectedAt),
     });
+  }
+  if (summary.later != null) {
+    return m.night_head_later();
   }
   if (total === 0 || leader == null) {
     return time < closes
@@ -143,7 +153,7 @@ export function describe(summary: Summary, closes: number, time: number) {
 export function verdict(summary: Summary) {
   const option = summary.winner ?? summary.leader;
   if (option == null) {
-    return m.night_nation_waiting();
+    return summary.later == null ? m.night_nation_waiting() : m.night_later();
   }
   return summary.winner == null
     ? m.night_races_leads({
@@ -173,13 +183,18 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
     { option: LiveOption; won: number; leading: number }
   >();
   let waiting = 0;
+  let later = 0;
   for (const summary of summaries) {
     if (summary.race.office !== office) {
       continue;
     }
     const option = summary.winner ?? summary.leader;
     if (option == null) {
-      waiting += 1;
+      if (summary.later == null) {
+        waiting += 1;
+      } else {
+        later += 1;
+      }
       continue;
     }
     const key = party(option);
@@ -196,5 +211,6 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
       (a, b) => b.won + b.leading - (a.won + a.leading),
     ),
     waiting,
+    later,
   };
 }

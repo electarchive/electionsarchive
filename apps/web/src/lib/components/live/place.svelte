@@ -303,7 +303,11 @@
             >
               <span class="font-figures tabular-nums"
                 >{counted == null
-                  ? m.night_place_waiting()
+                  ? entry.race.certified == null &&
+                    entry.race.feed != null &&
+                    entry.race.feed !== "live"
+                    ? m.night_later()
+                    : m.night_place_waiting()
                   : m.night_place_counted({ share: percent(counted, 0) })}</span
               >
               {#if row?.baseSigned != null}

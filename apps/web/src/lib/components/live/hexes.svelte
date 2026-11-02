@@ -4,6 +4,7 @@
   let {
     cartogram,
     colors,
+    later = [],
     label,
     hovered = $bindable(null),
     href,
@@ -17,12 +18,15 @@
       labels: Array<{ x: number; y: number; text: string }>;
     };
     colors: Record<string, string>;
+    later?: Array<string>;
     label: string;
     hovered?: string | null;
     href: (key: string) => string | null;
     onPick?: (key: string) => void;
     tip: Snippet<[string]>;
   } = $props();
+
+  const hatch = $props.id();
 
   let pointer = $state<{ x: number; y: number } | null>(null);
 
@@ -57,6 +61,17 @@
       pointer = null;
     }}
   >
+    <defs>
+      <pattern
+        id={hatch}
+        width="1.1"
+        height="1.1"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        <line y2="1.1" class="stroke-foreground/30" stroke-width="0.22" />
+      </pattern>
+    </defs>
     {#each cartogram.districts as district (district.key)}
       {const link = $derived(href(district.key))}
       <a
@@ -79,6 +94,13 @@
           fill={colors[district.key] ??
             "color-mix(in oklab, var(--muted-foreground) 9%, var(--background))"}
         />
+        {#if later.includes(district.key)}
+          <path
+            d={district.d}
+            class="pointer-events-none"
+            fill="url(#{hatch})"
+          />
+        {/if}
       </a>
     {/each}
     <g

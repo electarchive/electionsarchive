@@ -8,6 +8,7 @@
     geography,
     codes,
     colors,
+    later = [],
     label,
     hovered = $bindable(null),
     onPick,
@@ -16,6 +17,7 @@
     geography: Geography;
     codes: Record<string, string>;
     colors: Record<string, string>;
+    later?: Array<string>;
     label: string;
     hovered?: string | null;
     onPick: (code: string) => void;
@@ -109,6 +111,26 @@
       );
       engine.add(
         {
+          id: "nation-later",
+          type: "fill",
+          source,
+          "source-layer": "areas",
+          filter: ["in", ["id"], ["literal", ks]],
+          paint: {
+            "fill-pattern": "hatch",
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "later"], false],
+              1,
+              0,
+            ],
+          },
+        },
+        "fills",
+        { group: "nation-layers", rank: 1 },
+      );
+      engine.add(
+        {
           id: "nation-seam",
           type: "line",
           source,
@@ -147,7 +169,9 @@
       new Map(
         [...byK].flatMap(([k, code]) => {
           const color = colors[code];
-          return color == null ? [] : [[k, { color }] as const];
+          return color == null
+            ? []
+            : [[k, { color, later: later.includes(code) }] as const];
         }),
       ),
     );
@@ -159,7 +183,7 @@
   }
 
   $effect(() => {
-    void [colors, hovered, engine.theme];
+    void [colors, later, hovered, engine.theme];
     if (engine.isLoaded) {
       untrack(draw);
     }

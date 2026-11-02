@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import type { Entry } from "#lib/live/ballot.js";
   import type { Geography } from "#lib/live/standing.js";
+  import LaterKey from "#lib/components/live/later-key.svelte";
   import Nation from "#lib/components/live/nation.svelte";
   import Card from "#lib/components/live/state/card.svelte";
   import Sheet from "#lib/components/live/state/sheet.svelte";
@@ -41,6 +42,14 @@
     ),
   );
 
+  const later = $derived(
+    [...byArea].flatMap(([area, list]) =>
+      list.length > 0 && list.every((entry) => entry.summary.later != null)
+        ? [area]
+        : [],
+    ),
+  );
+
   let hovered = $state<string | null>(null);
   let picked = $state<string | null>(null);
   let isSheet = $state(false);
@@ -76,6 +85,7 @@
   {geography}
   {codes}
   {colors}
+  {later}
   label={m.night_state_districts_label({ chamber: name })}
   bind:hovered
   onPick={async (area: string) => {
@@ -92,6 +102,9 @@
   }}
   {tip}
 />
+{#if later.length > 0}
+  <LaterKey />
+{/if}
 
 {#if picked != null}
   {const first = $derived(byArea.get(picked)?.[0] ?? null)}

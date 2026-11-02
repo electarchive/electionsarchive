@@ -17,6 +17,7 @@
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
+  import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
   import Outstanding from "./outstanding.svelte";
   import Table from "./table.svelte";
@@ -119,6 +120,13 @@
   );
   const opens = $derived(closes - 3_600_000);
   const isWaiting = $derived(now.total === 0);
+  const later = $derived(
+    isWaiting &&
+      race.certified == null &&
+      (race.feed === "none" || race.feed === "outside")
+      ? race.feed
+      : null,
+  );
   const isLive = $derived(modeled.status === "estimating" && !now.isFinal);
   const newest = $derived(race.frames.at(-1)?.at ?? null);
   const signed = $derived(
@@ -184,6 +192,9 @@
     if (race.certified != null) {
       return "certified" as const;
     }
+    if (later != null) {
+      return "later" as const;
+    }
     if (isOffline) {
       return "offline" as const;
     }
@@ -201,6 +212,9 @@
         name: winner?.label ?? leader?.label ?? "",
         margin: lead(Math.abs(signed ?? 0)),
       });
+    }
+    if (later != null) {
+      return m.night_head_later();
     }
     if (now.total === 0) {
       return time < closes
@@ -344,7 +358,9 @@
           {
             "bg-foreground text-background": status === "live",
             "border border-border":
-              status === "before" || status === "certified",
+              status === "before" ||
+              status === "certified" ||
+              status === "later",
             "bg-(--no) text-background": status === "offline",
           },
         )}
@@ -358,6 +374,8 @@
           {m.night_status_before()}
         {:else if status === "certified"}
           {m.night_status_certified()}
+        {:else if status === "later"}
+          {m.night_later()}
         {:else}
           {m.night_status_offline()}
         {/if}
@@ -401,117 +419,143 @@
     {/if}
   </header>
 
+  {#if later != null}
+    <section class="bg-background px-4 py-6 sm:px-8">
+      {const state = $derived(
+        election.later?.[race.state]?.name ?? race.state.toUpperCase(),
+      )}
+      <Later
+        text={later === "none"
+          ? m.night_later_body({ state })
+          : m.night_later_body_missing({ state })}
+        {closes}
+        {time}
+      />
+    </section>
+  {/if}
+
   <section class="bg-background px-4 py-5 sm:px-8">
-    <Tote {options} {now} {estimate} {winners} {isWaiting} />
+    <Tote
+      {options}
+      {now}
+      {estimate}
+      {winners}
+      {isWaiting}
+      isLater={later != null}
+    />
   </section>
 
-  {#if isLive}
-    <section class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2">
-      <LiveMap
-        {geography}
-        {options}
-        {now}
-        {estimate}
-        {modes}
-        title={m.night_map_counted_title()}
-        bind:mode
-        {href}
-        bind:selected
-        bind:hovered
-      />
-      <Withheld isOff={!forecasts}>
+  {#if later == null}
+    {#if isLive}
+      <section
+        class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2"
+      >
         <LiveMap
           {geography}
           {options}
           {now}
           {estimate}
-          modes={["remaining"]}
-          title={m.night_map_left_title()}
-          caption={m.night_map_left_caption()}
-          help="turnout"
-          mode="remaining"
+          {modes}
+          title={m.night_map_counted_title()}
+          bind:mode
           {href}
           bind:selected
           bind:hovered
         />
-      </Withheld>
-    </section>
-  {:else}
-    <section
-      class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
-    >
-      <LiveMap
-        {geography}
-        {options}
-        {now}
-        {estimate}
-        {modes}
-        title={m.night_map_counted_title()}
-        bind:mode
-        {href}
-        bind:selected
-        bind:hovered
-      />
-      <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
-    </section>
-  {/if}
-
-  {#if race.certified == null || !now.isFinal}
-    <section class="grid gap-10 bg-background px-4 py-6 sm:px-8">
-      <Withheld isOff={!forecasts}>
-        <Dial
-          {options}
-          {pair}
-          {estimate}
-          history={upto}
-          counted={signed}
-          {isWaiting}
-        />
-      </Withheld>
-      {#if isLive}
         <Withheld isOff={!forecasts}>
-          <Field {options} {now} {estimate} {winners} />
+          <LiveMap
+            {geography}
+            {options}
+            {now}
+            {estimate}
+            modes={["remaining"]}
+            title={m.night_map_left_title()}
+            caption={m.night_map_left_caption()}
+            help="turnout"
+            mode="remaining"
+            {href}
+            bind:selected
+            bind:hovered
+          />
         </Withheld>
-      {/if}
-    </section>
-  {/if}
-
-  <section class="bg-background px-4 py-6 sm:px-8">
-    <Trend
-      {options}
-      {pair}
-      frames={race.frames}
-      {points}
-      expected={estimate.status === "estimating"
-        ? estimate.expectedTotal.mid
-        : null}
-      at={view}
-      {opens}
-      onPick={pick}
-    />
-  </section>
-
-  {#if isLive}
-    <section
-      class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
-    >
-      <Withheld isOff={!forecasts}>
-        <Outstanding
+      </section>
+    {:else}
+      <section
+        class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
+      >
+        <LiveMap
+          {geography}
           {options}
           {now}
           {estimate}
+          {modes}
+          title={m.night_map_counted_title()}
+          bind:mode
           {href}
           bind:selected
           bind:hovered
         />
-      </Withheld>
-      <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
+        <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
+      </section>
+    {/if}
+
+    {#if race.certified == null || !now.isFinal}
+      <section class="grid gap-10 bg-background px-4 py-6 sm:px-8">
+        <Withheld isOff={!forecasts}>
+          <Dial
+            {options}
+            {pair}
+            {estimate}
+            history={upto}
+            counted={signed}
+            {isWaiting}
+          />
+        </Withheld>
+        {#if isLive}
+          <Withheld isOff={!forecasts}>
+            <Field {options} {now} {estimate} {winners} />
+          </Withheld>
+        {/if}
+      </section>
+    {/if}
+
+    <section class="bg-background px-4 py-6 sm:px-8">
+      <Trend
+        {options}
+        {pair}
+        frames={race.frames}
+        {points}
+        expected={estimate.status === "estimating"
+          ? estimate.expectedTotal.mid
+          : null}
+        at={view}
+        {opens}
+        onPick={pick}
+      />
+    </section>
+
+    {#if isLive}
+      <section
+        class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
+      >
+        <Withheld isOff={!forecasts}>
+          <Outstanding
+            {options}
+            {now}
+            {estimate}
+            {href}
+            bind:selected
+            bind:hovered
+          />
+        </Withheld>
+        <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
+      </section>
+    {/if}
+
+    <section class="bg-background px-4 py-6 sm:px-8">
+      <Table {options} {now} {estimate} {href} bind:selected bind:hovered />
     </section>
   {/if}
-
-  <section class="bg-background px-4 py-6 sm:px-8">
-    <Table {options} {now} {estimate} {href} bind:selected bind:hovered />
-  </section>
 
   <footer
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"

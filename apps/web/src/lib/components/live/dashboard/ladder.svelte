@@ -128,7 +128,7 @@
             {/if}
           </span>
           <span class="text-end font-figures text-xs tabular-nums">
-            {#if forecasts && seat.rating !== "counting" && seat.rating !== "waiting" && seat.rating !== "won" && seat.rating !== "projected"}
+            {#if forecasts && seat.rating !== "counting" && seat.rating !== "waiting" && seat.rating !== "later" && seat.rating !== "won" && seat.rating !== "projected"}
               <span
                 style:color={seat.left >= seat.right ? left.color : right.color}
                 >{odds(chance)}</span

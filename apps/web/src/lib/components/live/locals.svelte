@@ -439,11 +439,13 @@
                     class="flex flex-wrap gap-x-3 font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
                   >
                     <span
-                      >{summary.counted == null || summary.total === 0
-                        ? m.night_local_waiting()
-                        : m.night_local_counted({
-                            share: percent(summary.counted, 0),
-                          })}</span
+                      >{summary.later != null
+                        ? m.night_later()
+                        : summary.counted == null || summary.total === 0
+                          ? m.night_local_waiting()
+                          : m.night_local_counted({
+                              share: percent(summary.counted, 0),
+                            })}</span
                     >
                     {#if local.seats > 1}
                       <span>{m.night_local_seats({ count: local.seats })}</span>

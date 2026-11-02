@@ -126,7 +126,10 @@
   );
   const isInformed = $derived(
     view.order.some(
-      (seat) => seat.rating !== "counting" && seat.rating !== "waiting",
+      (seat) =>
+        seat.rating !== "counting" &&
+        seat.rating !== "waiting" &&
+        seat.rating !== "later",
     ) &&
       !view.order.every(
         (seat) => seat.rating === "won" || seat.rating === "projected",

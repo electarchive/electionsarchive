@@ -10,6 +10,7 @@
   import { district, entries as entriesOf, seating } from "#lib/live/ballot.js";
   import {
     clock as clockOf,
+    HATCH,
     placeSlug,
     stamp,
     tone,
@@ -19,6 +20,7 @@
   import { standing } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
   import Bar from "./state/bar.svelte";
   import Card from "./state/card.svelte";
@@ -49,6 +51,8 @@
 
   const WAITING =
     "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
+  const LATER =
+    "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
 
   let picked = $state<string | null>(null);
 
@@ -117,6 +121,11 @@
   );
   const flips = $derived(everything.filter((entry) => entry.isFlip).length);
   const isLive = $derived(counting > 0 && !election.isCertified);
+  const later = $derived(
+    election.later?.[ballot.state]?.feed === "none" && counting === 0
+      ? (election.later[ballot.state] ?? null)
+      : null,
+  );
   const closes = $derived(
     election.pollClose
       .filter((entry) => entry.state === ballot.state)
@@ -212,6 +221,9 @@
 
   function shade(entry: Entry) {
     const { summary } = entry;
+    if (summary.later != null) {
+      return LATER;
+    }
     const pick = summary.winner ?? summary.leader;
     if (pick == null || summary.total === 0) {
       return entry.held == null
@@ -277,6 +289,8 @@
           {m.night_status_live()}
         {:else if election.isCertified}
           {m.night_status_certified()}
+        {:else if later != null}
+          {m.night_later()}
         {:else}
           {m.night_status_before()}
         {/if}
@@ -321,6 +335,13 @@
         </div>
       {/if}
     </dl>
+    {#if later != null}
+      <Later
+        text={m.night_later_state_body({ state: later.name })}
+        closes={null}
+        time={0}
+      />
+    {/if}
   </header>
 
   <nav
@@ -378,6 +399,9 @@
                     <span
                       class="rounded-[1px] block-4 inline-4"
                       style:background-color={shade(entry)}
+                      style:background-image={entry.summary.later == null
+                        ? undefined
+                        : HATCH}
                     ></span>
                   {/each}
                 </span>
@@ -421,6 +445,7 @@
               estimate={estimates[race.id] ?? null}
               modes={["lead", "bubbles", "shift", "counted"]}
               title={m.night_state_map_title({ race: titleOf(mapped) })}
+              isLater={mapped.summary.later != null}
               href={countyHref}
             />
           {/key}

@@ -11,6 +11,7 @@
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
+  import { HATCH } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { localize, tokenize } from "#lib/live/local.js";
   import { shade, verdict } from "#lib/live/summary.js";
@@ -100,14 +101,22 @@
   const counts = $derived.by(() => {
     let called = 0;
     let counting = 0;
+    let later = 0;
     for (const { summary } of order) {
       if (summary.winner != null || summary.projected != null) {
         called += 1;
       } else if (summary.leader != null) {
         counting += 1;
+      } else if (summary.later != null) {
+        later += 1;
       }
     }
-    return { called, counting, waiting: order.length - called - counting };
+    return {
+      called,
+      counting,
+      later,
+      waiting: order.length - called - counting - later,
+    };
   });
   const tokens = $derived(tokenize(query));
   const matched = $derived(
@@ -357,6 +366,11 @@
       <span class="font-figures tabular-nums"
         >{m.night_races_waiting({ count: counts.waiting })}</span
       >
+      {#if counts.later > 0}
+        <span class="font-figures tabular-nums"
+          >{m.night_races_later({ count: counts.later })}</span
+        >
+      {/if}
     {:else}
       <span class="truncate"
         ><span class="font-semibold text-foreground"
@@ -399,6 +413,9 @@
                   },
                 )}
                 style:background-color={color}
+                style:background-image={summary.later == null
+                  ? undefined
+                  : HATCH}
                 onpointerenter={(event) => {
                   if (isHover(event)) probed = summary.race.slug;
                 }}
