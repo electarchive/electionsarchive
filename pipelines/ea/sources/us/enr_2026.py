@@ -1284,8 +1284,11 @@ def plan(
         towns: dict[str, set[str]] = {}
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
-               where u.scheme_code = 'us.place' and u.code = any(%s)""",
-            [list({key.split(":")[2] for keys, _ in published.values() for key in keys})],
+               where u.scheme_code = 'us.place' and u.code = any(%s) and u.area_id = any(%s)""",
+            [
+                list({key.split(":")[2] for keys, _ in published.values() for key in keys}),
+                list({held[contest][0] for contest in published if held[contest][0] is not None}),
+            ],
         ).fetchall():
             towns.setdefault(code, set()).update(
                 w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | {"township", "charter", "village"}
