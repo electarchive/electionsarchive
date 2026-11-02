@@ -150,3 +150,288 @@ IA:district-6	IA	Benton, Iowa, Johnson, Jones, Linn, Tama	https://electionresult
 IA:district-7	IA	Cedar, Clinton, Jackson, Muscatine, Scott	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
 IA:district-8a	IA	Appanoose, Davis, Jefferson, Keokuk, Mahaska, Monroe, Poweshiek, Van Buren, Wapello, Washington	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
 IA:district-8b	IA	Des Moines, Henry, Lee, Louisa	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
+TX:coa-1	TX	Austin, Brazoria, Chambers, Colorado, Fort Bend, Galveston, Grimes, Harris, Waller, Washington	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-10	TX	Bosque, Brazos, Burleson, Coryell, Ellis, Falls, Freestone, Hamilton, Hill, Johnson, Leon, Limestone, Madison, Mclennan, Navarro, Robertson, Somervell, Walker	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-11	TX	Baylor, Borden, Brown, Callahan, Coleman, Comanche, Dawson, Eastland, Ector, Erath, Fisher, Gaines, Glasscock, Haskell, Howard, Jones, Knox, Martin, Midland, Mitchell, Nolan, Palo Pinto, Scurry, Shackelford, Stephens, Stonewall, Taylor, Throckmorton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-12	TX	Anderson, Angelina, Cherokee, Gregg, Henderson, Houston, Nacogdoches, Rains, Rusk, Sabine, San Augustine, Shelby, Smith, Trinity, Upshur, Van Zandt, Wood	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-13	TX	Aransas, Bee, Calhoun, Cameron, Dewitt, Goliad, Gonzales, Hidalgo, Jackson, Kenedy, Kleberg, Lavaca, Live Oak, Matagorda, Nueces, Refugio, San Patricio, Victoria, Wharton, Willacy	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-14	TX	Austin, Brazoria, Chambers, Colorado, Fort Bend, Galveston, Grimes, Harris, Waller, Washington	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-2	TX	Archer, Clay, Cooke, Denton, Hood, Jack, Montague, Parker, Tarrant, Wichita, Wise, Young	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-3	TX	Bastrop, Bell, Blanco, Burnet, Caldwell, Coke, Comal, Concho, Fayette, Hays, Irion, Lampasas, Lee, Llano, Mcculloch, Milam, Mills, Runnels, San Saba, Schleicher, Sterling, Tom Green, Travis, Williamson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-4	TX	Atascosa, Bandera, Bexar, Brooks, Dimmit, Duval, Edwards, Frio, Gillespie, Guadalupe, Jim Hogg, Jim Wells, Karnes, Kendall, Kerr, Kimble, Kinney, Lasalle, Mason, Maverick, Mcmullen, Medina, Menard, Real, Starr, Sutton, Uvalde, Val Verde, Webb, Wilson, Zapata, Zavala	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-5	TX	Collin, Dallas, Grayson, Hunt, Kaufman, Rockwall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-6	TX	Bowie, Camp, Cass, Delta, Fannin, Franklin, Gregg, Harrison, Hopkins, Hunt, Lamar, Marion, Morris, Panola, Red River, Rusk, Titus, Upshur, Wood	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-7	TX	Armstrong, Bailey, Briscoe, Carson, Castro, Childress, Cochran, Collingsworth, Cottle, Crosby, Dallam, Deaf Smith, Dickens, Donley, Floyd, Foard, Garza, Gray, Hale, Hall, Hansford, Hardeman, Hartley, Hemphill, Hockley, Hutchinson, Kent, King, Lamb, Lipscomb, Lubbock, Lynn, Moore, Motley, Ochiltree, Oldham, Parmer, Potter, Randall, Roberts, Sherman, Swisher, Terry, Wheeler, Wilbarger, Yoakum	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-8	TX	Andrews, Brewster, Crane, Crockett, Culberson, El Paso, Hudspeth, Jeff Davis, Loving, Pecos, Presidio, Reagan, Reeves, Terrell, Upton, Ward, Winkler	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:coa-9	TX	Hardin, Jasper, Jefferson, Liberty, Montgomery, Newton, Orange, Polk, San Jacinto, Tyler	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-101	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-102	TX	Bowie, Red River	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-103	TX	Cameron	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-105	TX	Kenedy, Kleberg, Nueces	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-106	TX	Dawson, Gaines, Garza, Lynn	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-107	TX	Cameron	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-109	TX	Andrews, Crane, Winkler	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-110	TX	Briscoe, Dickens, Floyd, Motley	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-111	TX	Webb	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-112	TX	Crockett, Pecos, Reagan, Sutton, Upton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-113	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-115	TX	Marion, Upshur	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-116	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-117	TX	Nueces	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-118	TX	Glasscock, Howard, Martin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-120	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-122	TX	Galveston	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-134	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-137	TX	Lubbock	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-141	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-144	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-147	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-148	TX	Nueces	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-149	TX	Brazoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-150	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-154	TX	Lamb	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-155	TX	Austin, Fayette	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-156	TX	Aransas, Bee, Live Oak, Mcmullen, San Patricio	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-157	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-158	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-159	TX	Angelina	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-160	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-168	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-169	TX	Bell	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-170	TX	Mclennan	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-171	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-172	TX	Jefferson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-173	TX	Henderson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-180	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-181	TX	Potter, Randall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-182	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-183	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-184	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-185	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-186	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-187	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-188	TX	Gregg	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-189	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-190	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-191	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-192	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-193	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-194	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-195	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-196	TX	Hunt	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-197	TX	Cameron, Willacy	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-198	TX	Bandera, Kerr	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-1a	TX	Jasper, Newton, Tyler	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-2	TX	Cherokee	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-201	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-203	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-204	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-205	TX	Culberson, El Paso, Hudspeth	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-206	TX	Hidalgo	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-207	TX	Caldwell, Comal, Hays	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-208	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-209	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-210	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-211	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-212	TX	Galveston	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-213	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-217	TX	Angelina	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-218	TX	Atascosa, Frio, Karnes, Lasalle, Wilson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-219	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-220	TX	Bosque, Comanche, Hamilton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-221	TX	Montgomery	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-222	TX	Deaf Smith, Oldham	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-223	TX	Gray	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-224	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-225	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-226	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-227	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-228	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-229	TX	Duval, Jim Hogg, Starr	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-230	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-231	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-232	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-233	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-234	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-236	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-237	TX	Lubbock	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-238	TX	Midland	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-239	TX	Brazoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-240	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-241	TX	Smith	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-242	TX	Castro, Hale, Swisher	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-243	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-244	TX	Ector	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-245	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-246	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-247	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-248	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-249	TX	Johnson, Somervell	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-250	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-251	TX	Potter, Randall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-252	TX	Jefferson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-253	TX	Chambers, Liberty	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-254	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-255	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-256	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-257	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-258	TX	Polk, San Jacinto, Trinity	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-259	TX	Jones, Shackelford	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-260	TX	Orange	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-261	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-262	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-263	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-264	TX	Bell	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-265	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-266	TX	Erath	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-267	TX	Calhoun, Dewitt, Goliad, Jackson, Refugio, Victoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-268	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-269	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-270	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-271	TX	Jack, Wise	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-273	TX	Sabine, San Augustine, Shelby	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-274	TX	Comal, Guadalupe, Hays	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-275	TX	Hidalgo	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-277	TX	Williamson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-278	TX	Leon, Madison, Walker	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-279	TX	Jefferson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-280	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-281	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-282	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-283	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-284	TX	Montgomery	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-285	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-286	TX	Cochran, Hockley	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-287	TX	Bailey, Parmer	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-288	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-289	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-290	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-291	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-292	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-293	TX	Dimmit, Maverick, Zavala	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-294	TX	Van Zandt	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-295	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-296	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-297	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-298	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-299	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-30	TX	Wichita	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-300	TX	Brazoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-301	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-302	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-303	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-304	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-305	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-306	TX	Galveston	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-307	TX	Gregg	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-308	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-309	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-31	TX	Gray, Hemphill, Lipscomb, Roberts, Wheeler	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-310	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-311	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-312	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-313	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-314	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-315	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-316	TX	Hutchinson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-317	TX	Jefferson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-318	TX	Midland	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-319	TX	Nueces	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-320	TX	Potter	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-321	TX	Smith	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-322	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-323	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-324	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-325	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-326	TX	Taylor	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-327	TX	El Paso	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-328	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-329	TX	Wharton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-330	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-331	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-355	TX	Hood	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-357	TX	Cameron	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-358	TX	Ector	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-359	TX	Montgomery	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-36	TX	Aransas, Bee, Live Oak, Mcmullen, San Patricio	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-361	TX	Brazos	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-363	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-364	TX	Lubbock	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-365	TX	Dimmit, Maverick, Zavala	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-366	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-367	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-368	TX	Williamson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-369	TX	Anderson, Cherokee, Leon	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-370	TX	Hidalgo	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-371	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-372	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-377	TX	Victoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-385	TX	Midland	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-39	TX	Haskell, Kent, Stonewall, Throckmorton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-397	TX	Grayson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-40	TX	Ellis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-403	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-412	TX	Brazoria	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-414	TX	Mclennan	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-417	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-419	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-424	TX	Blanco, Burnet, Llano, San Saba	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-428	TX	Hays	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-429	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-432	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-436	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-437	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-44	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-440	TX	Coryell	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-441	TX	Midland	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-45	TX	Bexar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-451	TX	Kendall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-452	TX	Edwards, Kimble, Mason, Mcculloch, Menard	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-455	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-456	TX	Guadalupe	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-458	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-459	TX	Travis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-46	TX	Foard, Hardeman, Wilbarger	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-466	TX	Comal	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-467	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-47	TX	Armstrong, Potter, Randall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-471	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-477	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-478	TX	Bell	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-480	TX	Williamson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-481	TX	Denton	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-482	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-484	TX	Cameron	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-485	TX	Tarrant	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-486	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-49	TX	Webb, Zapata	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-494	TX	Collin	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-495	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-496	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-497	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-498	TX	Kendall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-501	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-502	TX	Fort Bend	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-503	TX	Rockwall	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-504	TX	Ellis	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-512	TX	Williamson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-54	TX	Mclennan	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-55	TX	Harris	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-58	TX	Jefferson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-62	TX	Delta, Franklin, Hopkins, Lamar	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-64	TX	Castro, Hale, Swisher	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-66	TX	Hill	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-68	TX	Dallas	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-69	TX	Dallam, Hartley, Moore, Sherman	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-70	TX	Ector	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-74	TX	Mclennan	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-75	TX	Liberty	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-81	TX	Atascosa, Frio, Karnes, Lasalle, Wilson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-82	TX	Falls, Robertson	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-83	TX	Pecos, Terrell, Val Verde	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-85	TX	Brazos	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-86	TX	Kaufman	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-87	TX	Anderson, Freestone, Leon, Limestone	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-9	TX	Montgomery	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:district-94	TX	Nueces	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf
+TX:multicounty-court-at-law-1	TX	Fisher, Mitchell, Nolan	https://www.sos.state.tx.us/elections/forms/2026-ballot-cert.pdf

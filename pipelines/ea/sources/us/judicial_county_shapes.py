@@ -27,9 +27,9 @@ def parse() -> None:
         }
         areas = dict(
             conn.execute(
-                """select u.code, u.area_id::text from reporting_unit u
-                   where u.scheme_code = 'us.judicial_district'
-                     and not exists (select 1 from area_geometry g where g.area_id = u.area_id)"""
+                """select ac.code, a.id::text from area a join area_code ac on ac.area_id = a.id
+                   where a.scheme_code = 'us.judicial_district'
+                     and not exists (select 1 from area_geometry g where g.area_id = a.id)"""
             ).fetchall()
         )
     rows = []
