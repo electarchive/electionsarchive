@@ -87,6 +87,7 @@ export const outside = async (
     k: number;
     part: number;
     isAbroad: boolean;
+    isOver: boolean;
     code: string | null;
   }>(sql`
     with me as materialized (
@@ -94,40 +95,54 @@ export const outside = async (
       where area_id = ${area}::uuid
         and not exists (select from area_parent p where p.area_id = ${area}::uuid and p.valid @> ${day}::date)
       order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+    ),
+    drawn as materialized (
+      select a.k, a.id, a.scheme_code, g.geom, ST_PointOnSurface(g.geom) as point, ST_Area(g.geom) as size, g.valid @> ${day}::date as "isCurrent"
+      from area a
+      cross join lateral (
+        select g.geom, g.valid from area_geometry g where g.area_id = a.id
+        order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
+      ) g
+      where a.k = any(${sql.param(ks)}::int[])
+    ),
+    flagged as (
+      select d.*, d."isCurrent" and exists (
+        select from drawn o
+        where o.k <> d.k and o."isCurrent" and o.size < d.size and o.point && d.geom and ST_Covers(d.geom, o.point)
+      ) as "isOver"
+      from drawn d
     )
-    select a.k, ${insets.length === 0 ? sql`-1` : part(scheme, "g.geom")} as part,
-      not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
-        and (not ST_Intersects(me.geom, g.geom)
-          or ST_Area(ST_Intersection(ST_MakeValid(ST_ClipByBox2D(me.geom, Box2D(g.geom))), g.geom)) < 0.5 * ST_Area(g.geom)) as "isAbroad",
+    select a.k, ${insets.length === 0 ? sql`-1` : part(scheme, "a.geom")} as part, a."isOver",
+      not ST_Covers(me.geom, a.point)
+        and (not ST_Intersects(me.geom, a.geom)
+          or ST_Area(ST_Intersection(ST_MakeValid(ST_ClipByBox2D(me.geom, Box2D(a.geom))), a.geom)) < 0.5 * ST_Area(a.geom)) as "isAbroad",
       case when a.scheme_code = 'fr.departement' then (
         select c.code from area_code c where c.area_id = a.id
         order by c.valid @> ${day}::date desc limit 1
       ) end as code
-    from area a
+    from flagged a
     cross join me
-    cross join lateral (
-      select g.geom from area_geometry g where g.area_id = a.id
-      order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
-    ) g
-    where a.k = any(${sql.param(ks)}::int[])
-      and not (${sql.raw(
+    where a."isOver"
+      or not (${sql.raw(
         (projectionOf(scheme)?.within ?? [])
           .map(
             ([west, south, east, north]) =>
-              `g.geom @ ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+              `a.geom @ ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
           )
           .join(" or ") || "false",
       )})
   `);
   return found.rows.flatMap((row) => {
-    const group: "territory" | "overseas" | "abroad" | null =
-      insets[row.part]?.detached === true
-        ? scheme.startsWith("us.")
-          ? "territory"
-          : "overseas"
-        : row.part === -1 && row.isAbroad
-          ? "abroad"
-          : null;
+    const group: "territory" | "overseas" | "abroad" | "over" | null =
+      row.isOver
+        ? "over"
+        : insets[row.part]?.detached === true
+          ? scheme.startsWith("us.")
+            ? "territory"
+            : "overseas"
+          : row.part === -1 && row.isAbroad
+            ? "abroad"
+            : null;
     return group == null
       ? []
       : [{ k: row.k, group, ...(row.code != null && { code: row.code }) }];

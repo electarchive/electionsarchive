@@ -280,6 +280,51 @@ function banded(entries: Array<[string, number]>) {
   };
 }
 
+function seated(colors: Array<string>, card: string, edge: string) {
+  const across =
+    colors.length > 6 ? Math.ceil(colors.length / 2) : colors.length;
+  const down = Math.ceil(colors.length / across);
+  const dot = 14;
+  const gap = 4;
+  const pad = 5;
+  const width = pad * 2 + across * dot + (across - 1) * gap;
+  const height = pad * 2 + down * dot + (down - 1) * gap;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const pen = canvas.getContext("2d", { willReadFrequently: true });
+  if (pen != null) {
+    pen.beginPath();
+    pen.roundRect(1, 1, width - 2, height - 2, height / 2 - 1);
+    pen.fillStyle = card;
+    pen.fill();
+    pen.lineWidth = 2;
+    pen.strokeStyle = edge;
+    pen.stroke();
+    for (const [index, color] of colors.entries()) {
+      const row = Math.floor(index / across);
+      const inRow = Math.min(across, colors.length - row * across);
+      const x =
+        (width - (inRow * dot + (inRow - 1) * gap)) / 2 +
+        (index % across) * (dot + gap) +
+        dot / 2;
+      const y = pad + row * (dot + gap) + dot / 2;
+      pen.beginPath();
+      pen.arc(x, y, dot / 2, 0, Math.PI * 2);
+      pen.fillStyle = color;
+      pen.fill();
+    }
+  }
+  return {
+    width,
+    height,
+    data: new Uint8Array(
+      pen?.getImageData(0, 0, width, height).data.buffer ??
+        new ArrayBuffer(width * height * 4),
+    ),
+  };
+}
+
 function arrow() {
   const canvas = document.createElement("canvas");
   canvas.width = 64;
@@ -368,6 +413,7 @@ export class Engine {
   #marks = new Map<string, { source: string; k: number }>();
   #tinted = new Map<number, string>();
   #bands = new Map<string, Array<[string, number]>>();
+  #seats = new Map<string, Array<string>>();
   #slots = new Map<string, Slot>();
   #rasterKeys: Array<string> = [];
   #version = 0;
@@ -607,6 +653,9 @@ export class Engine {
         name,
         banded(entries.map(([css, weight]) => [this.read(css), weight])),
       );
+    }
+    for (const [name, colors] of this.#seats) {
+      gl.updateImage(name, this.#seated(colors));
     }
     for (const [source, states] of this.#painted) {
       this.paint(source, states, true);
@@ -1066,6 +1115,24 @@ export class Engine {
         { pixelRatio: 2 },
       );
       this.#bands.set(name, entries);
+    }
+    return name;
+  }
+
+  #seated(colors: Array<string>) {
+    return seated(
+      colors.map((css) => this.read(css)),
+      this.read("var(--card)"),
+      this.read("color-mix(in oklab, var(--foreground) 22%, transparent)"),
+    );
+  }
+
+  seats(colors: Array<string>) {
+    const name = `seats:${JSON.stringify(colors)}`;
+    const gl = this.gl;
+    if (gl != null && !gl.hasImage(name)) {
+      gl.addImage(name, this.#seated(colors), { pixelRatio: 2 });
+      this.#seats.set(name, colors);
     }
     return name;
   }

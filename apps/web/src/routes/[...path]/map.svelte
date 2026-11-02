@@ -105,7 +105,7 @@
     outlying?: Array<{
       k: number;
       code?: string;
-      group: "territory" | "overseas" | "abroad";
+      group: "territory" | "overseas" | "abroad" | "over";
     }> | null;
     parted?: {
       isOnly: boolean;
@@ -962,12 +962,14 @@
       );
   });
   const segments = $derived(
-    (["territory", "overseas", "abroad", "pool"] as const).flatMap((group) => {
-      const entries = remote.filter(
-        (entry) => entry.group === group && grid?.at.has(entry.k) !== true,
-      );
-      return entries.length === 0 ? [] : [{ group, entries }];
-    }),
+    (["over", "territory", "overseas", "abroad", "pool"] as const).flatMap(
+      (group) => {
+        const entries = remote.filter(
+          (entry) => entry.group === group && grid?.at.has(entry.k) !== true,
+        );
+        return entries.length === 0 ? [] : [{ group, entries }];
+      },
+    ),
   );
   const shared = (names: Array<string>) => {
     let tail = names[0] ?? "";
@@ -1181,6 +1183,13 @@
       Math.min(narrow ? 168 : 240, Math.max(narrow ? 140 : 136, fitted)),
     );
   });
+  const overs = $derived(
+    new Set(
+      (outlying ?? [])
+        .filter((entry) => entry.group === "over")
+        .map((entry) => entry.k),
+    ),
+  );
   const lenses = $derived(
     isSummary
       ? []
@@ -1197,7 +1206,7 @@
             root: zone.within ?? index,
             within: zone.within,
             frame: zone.frame,
-            units: zone.units,
+            units: zone.units.filter((piece) => !overs.has(piece.k)),
             label:
               parent != null &&
               parent.name === zone.name &&
@@ -1317,7 +1326,7 @@
         .map((row) => row.k),
     ]),
   );
-  const inland: Maplibre.ExpressionSpecification = $derived([
+  const veiled = (isOver: boolean): Maplibre.ExpressionSpecification => [
     "all",
     [
       "!",
@@ -1330,7 +1339,9 @@
             ...(blank ?? [])
               .filter((entry) => entry.isOutside)
               .map((entry) => entry.k),
-            ...(outlying ?? []).map((entry) => entry.k),
+            ...(outlying ?? [])
+              .filter((entry) => !isOver || entry.group !== "over")
+              .map((entry) => entry.k),
             ...boxed,
           ],
         ],
@@ -1341,7 +1352,9 @@
       : parted.isOnly
         ? ["in", ["id"], ["literal", parted.ks]]
         : ["!", ["in", ["id"], ["literal", parted.ks]]],
-  ]);
+  ];
+  const inland = $derived(veiled(false));
+  const ringed = $derived(veiled(true));
   const around: Maplibre.ExpressionSpecification = $derived([
     "!",
     [
@@ -1442,6 +1455,34 @@
   );
   const isBanded = $derived(
     view === "split" || (view === "winner" && !isProportional),
+  );
+  const pips = $derived(
+    grid == null && view === "winner" && !isProportional
+      ? places.rows.flatMap((row) => {
+          const held =
+            row.held ??
+            (row.leader == null || row.seats == null
+              ? []
+              : [[row.leader, row.seats] as const]);
+          let total = 0;
+          for (const [, count] of held) {
+            total += count;
+          }
+          if (row.at == null || away.has(row.k) || total < 2 || total > 12) {
+            return [];
+          }
+          const tones: Array<string> = [];
+          for (const [index, count] of held.toSorted(
+            (a, b) =>
+              b[1] - a[1] || (row.shares[b[0]] ?? 0) - (row.shares[a[0]] ?? 0),
+          )) {
+            for (let at = 0; at < count; at += 1) {
+              tones.push(colors[index] ?? "var(--muted-foreground)");
+            }
+          }
+          return [{ at: row.at, tones, order: -(rows.get(row.k)?.valid ?? 0) }];
+        })
+      : [],
   );
   const leading = (row: (typeof places.rows)[number]) =>
     view === "winner" && isProportional && row.held != null
@@ -2231,6 +2272,7 @@
     }
     engine.points("dots", []);
     engine.points("arrows", []);
+    engine.points("seats", []);
     engine.add(
       {
         id: "bubble",
@@ -2280,10 +2322,24 @@
     );
     engine.add(
       {
+        id: "seats",
+        type: "symbol",
+        source: "seats",
+        layout: {
+          "icon-image": ["get", "image"],
+          "icon-allow-overlap": false,
+          "icon-padding": 1,
+          "symbol-sort-key": ["get", "order"],
+        },
+      },
+      "points",
+    );
+    engine.add(
+      {
         id: "focus",
         type: "line",
         ...areas,
-        filter: inland,
+        filter: ringed,
         paint: {
           "line-color": "var(--foreground)",
           "line-width": 2.25,
@@ -2435,6 +2491,13 @@
               ];
             })
           : [],
+      );
+      engine.points(
+        "seats",
+        pips.map((pip) => ({
+          at: pip.at,
+          properties: { image: engine.seats(pip.tones), order: pip.order },
+        })),
       );
       const areas = new Map<number, Record<string, string | number>>();
       const deeper = new Map<number, Record<string, string | number>>();
@@ -3134,18 +3197,43 @@
         {#each segments as segment (segment.group)}
           {const heading = $derived(
             {
+              over: segment.entries.every((entry) =>
+                entry.name.includes("at-large"),
+              )
+                ? m.map_at_large()
+                : m.map_overlapping(),
               territory: m.map_outlying(),
               overseas: m.map_overseas(),
               abroad: m.map_abroad(),
               pool: m.map_offmap(),
             }[segment.group],
           )}
-          {#if (segment.entries.length === 1 && segment.group !== "territory") || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= (narrow ? 6 : 12))}
+          {const labels = $derived(
+            new Map(
+              segment.group === "over"
+                ? (rosters.get("over") ?? []).flatMap((block) =>
+                    block.lines.map((line) => [
+                      line.entry.k,
+                      block.header === ""
+                        ? line.label
+                        : `${block.header}, ${line.label}`,
+                    ]),
+                  )
+                : [],
+            ),
+          )}
+          {#if (segment.group === "over" && segment.entries.length <= (narrow ? 2 : 4)) || (segment.entries.length === 1 && segment.group !== "territory") || (segment.entries.every((entry) => entry.code != null) && segment.entries.length <= (narrow ? 6 : 12))}
             <div
               class="pointer-events-auto flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
               role="group"
               aria-label={heading}
             >
+              {#if segment.group === "over"}
+                <span
+                  class="flex items-center px-2 text-[0.6875rem] font-semibold text-muted-foreground block-7 pointer-coarse:block-10"
+                  aria-hidden="true">{heading}</span
+                >
+              {/if}
               {#each segment.entries as entry (entry.k)}
                 {const reach = (node: HTMLElement) => {
                   const box =
@@ -3161,7 +3249,7 @@
                 <button
                   type="button"
                   class={cn(
-                    "flex items-center gap-1.5 border-s border-border px-2 text-xs font-semibold block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10",
+                    "flex shrink-0 items-center gap-1.5 border-s border-border px-2 text-xs font-semibold whitespace-nowrap block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10",
                     { "bg-secondary": pinned === entry.k || focus === entry.k },
                     { "font-normal text-muted-foreground": entry.isBlank },
                   )}
@@ -3223,7 +3311,7 @@
                     style:--party={entry.fill}
                     aria-hidden="true"
                   ></span>
-                  {entry.code ?? entry.name}
+                  {entry.code ?? labels.get(entry.k) ?? entry.name}
                 </button>
               {/each}
             </div>
@@ -3793,6 +3881,24 @@
             ></span>
             <span>{m.map_idle_key()}</span>
             <span class="font-figures text-xs tabular-nums">{idle.length}</span>
+          </span>
+        {/if}
+        {#if pips.length > 0}
+          <span
+            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+          >
+            <span
+              class="flex items-center gap-0.5 rounded-full bg-card px-1 ring-1 ring-border block-3"
+              aria-hidden="true"
+            >
+              <span
+                class="rounded-full bg-muted-foreground block-1.5 inline-1.5"
+              ></span>
+              <span
+                class="rounded-full bg-muted-foreground block-1.5 inline-1.5"
+              ></span>
+            </span>
+            <span>{m.map_seats_key()}</span>
           </span>
         {/if}
         {#if missing.length > 0}

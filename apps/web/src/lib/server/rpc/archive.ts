@@ -706,7 +706,7 @@ const Sketch = v.object({
       v.object({
         k: v.number(),
         code: v.optional(v.string()),
-        group: v.picklist(["territory", "overseas", "abroad"]),
+        group: v.picklist(["territory", "overseas", "abroad", "over"]),
       }),
     ),
   ),
@@ -10022,7 +10022,7 @@ export const contests = {
               v.object({
                 k: v.number(),
                 code: v.optional(v.string()),
-                group: v.picklist(["territory", "overseas", "abroad"]),
+                group: v.picklist(["territory", "overseas", "abroad", "over"]),
               }),
             ),
           ),
