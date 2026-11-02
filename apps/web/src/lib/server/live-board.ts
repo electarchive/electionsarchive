@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
-import { db } from "#lib/server/db/index.js";
+import { liveDb as db } from "#lib/server/db/index.js";
 import america from "#lib/server/hex/us-cd.json";
 import { plane, spot } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";

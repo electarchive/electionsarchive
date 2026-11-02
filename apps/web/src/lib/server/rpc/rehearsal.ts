@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { db } from "#lib/server/db/index.js";
+import { liveDb as db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
 
 export const NIGHT = 24;

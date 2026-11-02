@@ -1,3 +1,4 @@
+import { dev } from "$app/env";
 import { AUTH_DATABASE_URL, DATABASE_URL } from "$app/env/private";
 import * as schema from "@ea/db/schema";
 import { defineRelations } from "drizzle-orm";
@@ -5,13 +6,13 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { PROJECT } from "#lib/constants.js";
 
-function connect(connectionString: string) {
+function connect(connectionString: string, max: number, timeout: number) {
   const pool = new pg.Pool({
     connectionString,
-    max: 32,
+    max,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 30_000,
-    statement_timeout: 300_000,
+    statement_timeout: dev ? 300_000 : timeout,
     application_name: PROJECT,
   });
   pool.on("error", (error) => {
@@ -31,7 +32,9 @@ function connect(connectionString: string) {
   });
 }
 
-export const db = connect(DATABASE_URL);
+export const db = connect(DATABASE_URL, 16, 60_000);
+
+export const liveDb = connect(DATABASE_URL, 8, 30_000);
 
 export const authDb =
-  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL);
+  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL, 8, 60_000);

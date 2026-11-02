@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
 import { remember } from "#lib/server/cache.js";
-import { db } from "#lib/server/db/index.js";
+import { liveDb as db } from "#lib/server/db/index.js";
 import { geography } from "#lib/server/live-board.js";
 import { night } from "#lib/server/live-page.js";
 import { names } from "#lib/server/rpc/archive.js";

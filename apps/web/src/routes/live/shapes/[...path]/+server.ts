@@ -2,7 +2,7 @@ import { call } from "@orpc/server";
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { remember } from "#lib/server/cache.js";
-import { db } from "#lib/server/db/index.js";
+import { liveDb as db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { router } from "#lib/server/rpc/router.js";
 import type { RequestHandler } from "./$types";

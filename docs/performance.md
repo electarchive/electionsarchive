@@ -65,7 +65,7 @@ The round's own results are split the same way. For a round, `load()` reads only
 - **JIT is off.** Our queries are large and generated, and their plans are expensive to compile. With JIT on, one contest page spent 14 of its 34 seconds compiling.
 - `random_page_cost = 1.1` and `effective_io_concurrency = 200`, which suit SSD storage.
 - After a restore, `vacuumdb --freeze --analyze` runs with eight jobs. Freezing sets the visibility map, so index-only scans skip the heap, and analyzing gives the planner fresh statistics.
-- The web pool holds up to 32 connections and waits up to 30 seconds for one.
+- The web app keeps two pools. Pages and the API share one of up to 16 connections, and in production a statement on it stops after 60 seconds, so a page that is slow to render cold fails instead of holding a connection for minutes. A separate pool of up to 8 connections serves live results (`/live`, its shapes and ballots, and the live RPCs, including the stamp every open live page polls), so they never wait behind archive pages. Both pools wait up to 30 seconds for a connection. Scripts that load the server code through Vite keep the 5-minute statement timeout.
 - `pg_stat_statements` and `track_io_timing` are on. Rank `pg_stat_statements` by `total_exec_time` to find the next query to fix.
 
 ## Query patterns

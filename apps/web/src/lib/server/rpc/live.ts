@@ -17,7 +17,7 @@ import * as v from "valibot";
 import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
-import { db } from "#lib/server/db/index.js";
+import { liveDb as db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
