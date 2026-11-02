@@ -1,5 +1,7 @@
 import json
 import re
+from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 from collections.abc import Callable
 from pathlib import Path
 
@@ -47,6 +49,12 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
     data = json.loads(path.read_text(encoding="utf-8"))
     contests = data["contestNames"]
     names = data["candidateNames"]
+    stamp = (
+        datetime.strptime(data["updated"], "%m/%d/%Y %I:%M %p")
+        .replace(tzinfo=ZoneInfo("America/Anchorage"))
+        .astimezone(UTC)
+        .isoformat()
+    )
 
     def tally(entry: dict, place: str, office: str, contest: str, district: str):
         for result in entry["c"]:
@@ -61,7 +69,7 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
                 "candidate": name,
                 "write_in": write_in,
                 "votes": result["t"],
-                "as_of": data["updated"],
+                "as_of": stamp,
                 "reporting": entry.get("r", 0),
                 "total": entry.get("p", 0),
             }
