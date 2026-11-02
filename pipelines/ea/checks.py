@@ -85,11 +85,14 @@ class Stage:
     def unstaged(self, table: str) -> sql.Composable:
         return sql.SQL(
             """c.id = p.changeset_id and c.pipeline = any({writers})
-               and p.tenure_id in (select tenure_id from {staged})
+               and p.tenure_id in (select tenure_id from {staged}{kept})
                and not exists (select 1 from {staged} x where {same})"""
         ).format(
             writers=self.writers(table),
             staged=self.staged(table),
+            kept=sql.SQL(" union select id from {}").format(self.staged("tenure"))
+            if "tenure" in self.tables
+            else sql.SQL(""),
             same=sql.SQL(" and ").join(
                 sql.SQL("x.{0} is not distinct from p.{0}").format(sql.Identifier(column))
                 for column in self.tables[table]
@@ -680,7 +683,8 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                            from {staged} s
                            join public.{target} p on p.id = s.id
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline} and ({current}) is distinct from ({incoming})"""
+                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'
+                             and ({current}) is distinct from ({incoming})"""
                     ).format(
                         entity=entity,
                         table=sql.Literal(table),
@@ -703,7 +707,8 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                            from {staged} s
                            join public.external_id p using (scheme, value)
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline} and p.entity_id <> s.entity_id"""
+                           where c.pipeline is distinct from {pipeline} and c.pipeline <> 'contrib'
+                             and p.entity_id <> s.entity_id"""
                     ).format(
                         table=sql.Literal(table), staged=stage.staged(table), pipeline=sql.Literal(stage.pipeline)
                     ),
@@ -719,7 +724,7 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                            from public.{target} p
                            join {staged} s on {overlaps}
                            join changeset c on c.id = p.changeset_id
-                           where not c.pipeline = any({writers})"""
+                           where not c.pipeline = any({writers}) and c.pipeline <> 'contrib'"""
                     ).format(
                         table=sql.Literal(table),
                         key=sql.Literal(stage.temporal[table][0]),
