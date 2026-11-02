@@ -408,6 +408,7 @@ REDRAWN_LOADED = {"AL", "CA", "FL", "LA", "NC", "OH", "TN", "TX", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
+OFF_BALLOT = {("RI", "REPRESENTATIVE IN GENERAL ASSEMBLY", "59", "Barros")}
 UNEXPIRED_2024 = {
     ("OH", "senate:33:g"),
     ("UT", "senate:12:g"),
@@ -1531,6 +1532,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
                 primary.join(unopposed, on=["OFFICE", "DIST#", "PARTY"]),
             ]
         ).iter_rows(named=True):
+            if (state, row["OFFICE"], row["DIST#"], row["LAST NAME"]) in OFF_BALLOT:
+                continue
             house = re.fullmatch(r"REPRESENTATIVE IN CONGRESS DISTRICT (\d+)", row["OFFICE"])
             office = (
                 "house"
