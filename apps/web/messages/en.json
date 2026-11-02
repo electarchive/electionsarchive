@@ -4026,18 +4026,13 @@
       }
     }
   ],
-  "username_nav": "Username",
-  "username_title": "Username",
-  "username_lede": "Claim a username. It will appear on your contributions once they open.",
-  "username_current": "Your username is {handle}. You can change it below.",
   "username_field": "Username",
-  "username_hint": "3 to 30 characters: lowercase letters, digits, and single hyphens. Start with a letter.",
+  "username_hint": "3 to 30 characters: lowercase letters, digits, and hyphens, starting and ending with a letter or digit.",
   "username_claim": "Claim username",
   "username_save": "Save username",
   "username_saved": "Saved.",
   "username_taken": "That username is taken. Try another.",
-  "username_invalid": "Use 3 to 30 lowercase letters, digits, or single hyphens, starting with a letter and ending with a letter or digit.",
-  "username_signed_out": "Sign in to claim a username.",
+  "username_invalid": "Use 3 to 30 lowercase letters, digits, or hyphens, starting and ending with a letter or digit.",
   "agents_lede_read_only": "Agents can read the whole archive through MCP or the REST API, with no key. Proposing changes opens after the preview.",
   "agents_step_connect_read_only": "Add the MCP server to your agent's configuration. Reading needs no key. Agents without MCP can call the REST API instead.",
   "agents_tools_note_read_only": "Every tool also has a REST endpoint.",
@@ -4857,6 +4852,77 @@
   "indices_series_read_effective": "Roughly how many parties really count. Two big parties make about 2, and more parties of similar size push it higher.",
   "indices_series_read_gallagher": "How far each party's seats strayed from its votes. Near 0, seats closely match votes; higher means the voting system rewarded some parties well beyond their vote.",
   "indices_series_read_volatility": "How much support moved between parties since the previous election. Low means voters mostly stayed put; high means a big shake-up.",
+  "contributor_accepted": "Accepted",
+  "contributor_open": "Open",
+  "contributor_rejected": "Rejected",
+  "contributor_reverted": "Reverted",
+  "contributor_page_title": "{name}, contributor",
+  "contributor_feed_title": "{name}'s activity on electionsarchive.com",
+  "contributor_feed_subtitle": "Proposals, decisions, topics, and comments by @{handle}.",
+  "contributor_since": "Member since {date}",
+  "contributor_edit": "Edit your profile",
+  "contributor_about": "About",
+  "contributor_proposals": "Proposals",
+  "contributor_no_proposals": "No submitted proposals yet.",
+  "contributor_via_agent": "Proposed through the agent {agent}",
+  "contributor_agents": "Agents",
+  "contributor_agents_lede": "Agents that proposed changes with this contributor's keys. The contributor is credited and accountable for their work.",
+  "contributor_feed": "Follow this contributor's proposals, decisions, and comments in a feed reader (Atom)",
+  "contributors_title": "Contributors",
+  "contributors_heading": "Contributors",
+  "contributors_lede": "People who claimed a username to propose fixes, discuss records, and review changes.",
+  "contributors_search_label": "Search contributors",
+  "contributors_search_placeholder": "Username or name",
+  "contributors_search": "Search",
+  "contributors_empty": "No one has claimed a username yet.",
+  "contributors_no_match": "No contributor matches that search.",
+  "contributors_next": "Next page",
+  "profile_nav": "Profile",
+  "profile_title": "Profile",
+  "profile_lede": "Claim a username. It appears on your proposals and comments and on your public profile.",
+  "profile_lede_public": "Your public profile is at",
+  "profile_signed_out": "Sign in to edit your profile.",
+  "profile_too_long": "A display name is limited to 60 characters, an affiliation to 100, and a bio to 1,000.",
+  "profile_links_invalid": "List up to four links, one per line, each starting with https://.",
+  "profile_display_name": "Display name",
+  "profile_affiliation": "Affiliation",
+  "profile_affiliation_hint": "Optional. A newsroom, university, or organization you contribute for.",
+  "profile_bio": "Bio",
+  "profile_bio_hint": "Optional. Markdown, up to 1,000 characters.",
+  "profile_links": "Links",
+  "profile_links_hint": "Optional. Up to four https:// links, one per line.",
+  "profile_license": "License my contributions under CC BY 4.0",
+  "profile_license_hint": "Required before you submit proposals. Anyone may reuse what you contribute, with credit.",
+  "profile_license_accepted": "You licensed your contributions under CC BY 4.0 on {date}.",
+  "profile_save": "Save profile",
+  "contributor_agent_proposals": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} proposal",
+        "countPlural=*": "{countText} proposals"
+      }
+    }
+  ],
+  "contributors_accepted": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} accepted",
+        "countPlural=*": "{countText} accepted"
+      }
+    }
+  ],
   "indices_band_effective_1": "One party dominates",
   "indices_band_effective_2": "Two main parties",
   "indices_band_effective_3": "A few main parties",

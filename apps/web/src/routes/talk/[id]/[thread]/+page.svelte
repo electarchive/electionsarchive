@@ -20,7 +20,7 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
+<main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <p class="text-sm">
       <a
@@ -73,4 +73,4 @@
     canComment={data.commenter === "ready"}
     canModerate={data.canModerate}
   />
-</div>
+</main>

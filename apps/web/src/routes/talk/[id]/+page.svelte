@@ -55,7 +55,7 @@
   </ol>
 {/snippet}
 
-<div class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
+<main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <h1 class="title text-balance">{data.entity.name}</h1>
     <RecordTabs entity={data.entity} current="talk" />
@@ -148,4 +148,4 @@
       </ul>
     </section>
   {/if}
-</div>
+</main>

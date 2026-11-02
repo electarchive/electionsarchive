@@ -122,9 +122,9 @@
         <DropdownMenu.Separator />
         <DropdownMenu.Item>
           {#snippet child({ props })}
-            <a {...props} href={resolve("/settings/username")}>
+            <a {...props} href={resolve("/settings/profile")}>
               <AtSignIcon class="text-muted-foreground" />
-              {m.username_nav()}
+              {m.profile_nav()}
             </a>
           {/snippet}
         </DropdownMenu.Item>
@@ -232,9 +232,9 @@
           <div
             class="grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-2"
           >
-            <Button href={resolve("/settings/username")} size="sm">
+            <Button href={resolve("/settings/profile")} size="sm">
               <AtSignIcon />
-              {m.username_nav()}
+              {m.profile_nav()}
             </Button>
             {#if !READ_ONLY}
               <Button href={resolve("/settings/keys")} size="sm">

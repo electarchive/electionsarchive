@@ -83,6 +83,16 @@ const TOOLS: Array<{
   { name: "get_proposal", procedure: router.proposals.get, access: "read" },
   { name: "get_talk", procedure: router.talk.list, access: "read" },
   { name: "get_topic", procedure: router.talk.topic, access: "read" },
+  {
+    name: "list_contributors",
+    procedure: router.contributors.list,
+    access: "read",
+  },
+  {
+    name: "get_contributor",
+    procedure: router.contributors.get,
+    access: "read",
+  },
   { name: "whoami", procedure: router.agents.whoami, access: "key" },
   {
     name: "draft_proposal",
