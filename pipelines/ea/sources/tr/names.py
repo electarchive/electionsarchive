@@ -5,8 +5,6 @@ from pathlib import Path
 from uuid import UUID, uuid5
 
 from ea.changeset import NAMESPACE, Changeset, slug
-from ea.sources.licenses import UNLICENSED
-from ea.sources.tr.ysk import PROVINCES
 from ea.store import connect
 
 SOURCE = "tr.names"
@@ -32,10 +30,16 @@ def rows() -> dict[int, list[dict[str, str]]]:
     return by_plate
 
 
+def current(plate: int) -> str:
+    from ea.sources.tr.ysk import PROVINCES
+
+    return PROVINCES[plate - 1]
+
+
 def timeline(plate: int) -> list[Segment]:
     changes = rows().get(plate, [])
     if not changes:
-        return [(None, None, PROVINCES[plate - 1])]
+        return [(None, None, current(plate))]
     starts = [instant(row["date"], row["precision"]) for row in changes]
     segments: list[Segment] = [(None, starts[0], changes[0]["old"])]
     for index, row in enumerate(changes):
@@ -46,14 +50,16 @@ def timeline(plate: int) -> list[Segment]:
 
 def province_name(plate: int, day: date | None = None) -> str:
     if day is None:
-        return PROVINCES[plate - 1]
+        return current(plate)
     for start, end, text in timeline(plate):
         if (start is None or start <= day) and (end is None or day < end):
             return text
-    return PROVINCES[plate - 1]
+    return current(plate)
 
 
 def emit() -> Path:
+    from ea.sources.licenses import UNLICENSED
+
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -70,9 +76,9 @@ def emit() -> Path:
         added: set[UUID] = set()
         wanted: set[tuple[UUID, str, date | None, date | None]] = set()
         for plate, changes in sorted(rows().items()):
-            current = PROVINCES[plate - 1]
+            present = current(plate)
             area = cs.area("tr.il", f"{plate:02}")
-            hub = hubs.get(slug(current))
+            hub = hubs.get(slug(present))
             targets = [area] if hub is None else [area, hub]
             sources: list[UUID] = []
             for row in changes:
@@ -111,7 +117,7 @@ def emit() -> Path:
                     (row, changes[index + 1] if index + 1 < len(changes) else None, row, row["new"], sources[index])
                 )
             for start, end, row, text, source in versions:
-                if text == current:
+                if text == present:
                     continue
                 bound = end if start is not None else row
                 begins = None if start is None else instant(start["date"], start["precision"])

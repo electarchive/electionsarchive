@@ -24,6 +24,7 @@ from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
+from ea.sources.tr.names import province_name
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
@@ -7098,7 +7099,12 @@ def emit() -> Path:
                     electoral_system_id=systems[system],
                     default_result_kind="counted",
                 )
-                name(contest, f"Grand National Assembly, {label}", "en")
+                dated = province_name(plate, day)
+                name(
+                    contest,
+                    f"Grand National Assembly, {dated} {number}" if number else f"Grand National Assembly, {dated}",
+                    "en",
+                )
                 cs.add("slug", path=f"{path}/parliament/{slug(label)}", entity_id=contest)
                 if day == DAY_2018 and (plate, number) == KAHRAMANMARAS:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=KAHRAMANMARAS_CAVEAT)
@@ -7557,7 +7563,12 @@ def emit() -> Path:
                     electoral_system_id=system,
                     default_result_kind="counted",
                 )
-                name(contest, f"Grand National Assembly, {label}", "en")
+                dated = province_name(plate, day)
+                name(
+                    contest,
+                    f"Grand National Assembly, {dated} {number}" if number else f"Grand National Assembly, {dated}",
+                    "en",
+                )
                 cs.add("slug", path=f"{path}/parliament/{slug(label)}", entity_id=contest)
                 rows = district_values.filter(pl.col("code") == code)
                 for caveat, applies in (
