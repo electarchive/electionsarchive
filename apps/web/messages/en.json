@@ -5399,5 +5399,14 @@
   "ws_index_bounty_link": "View the bounty",
   "contributor_bounties": "Bounties filled",
   "contributor_bounty_proposal": "Proposal #{number}",
-  "polity_known_bounty": "Bounty #{number}: help fill this gap"
+  "polity_known_bounty": "Bounty #{number}: help fill this gap",
+  "notifications_menu_view_all": "View all notifications",
+  "notifications_menu_unread": "{count} unread",
+  "notifications_menu_caught_up": "You're all caught up",
+  "notifications_menu_empty": "Nothing yet. Replies, mentions, reviews of your proposals, and changes to what you watch show up here.",
+  "notifications_menu_error": "Notifications didn't load.",
+  "notifications_menu_retry": "Try again",
+  "notifications_menu_loading": "Loading notifications",
+  "notifications_menu_mark_read": "Mark as read",
+  "notifications_menu_now": "Just now"
 }

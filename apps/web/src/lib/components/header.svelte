@@ -16,6 +16,7 @@
   import { userPrefersMode } from "mode-watcher";
   import { tick } from "svelte";
   import type HeaderMenus from "#lib/components/header-menus.svelte";
+  import type NotificationsMenu from "#lib/components/notifications-menu.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import Search from "#lib/components/search.svelte";
   import Term from "#lib/components/term.svelte";
@@ -52,6 +53,9 @@
   let Menus = $state<typeof HeaderMenus | null>(null);
   let initial = $state<"theme" | "account" | "menu" | null>(null);
   let loading: Promise<void> | undefined;
+  let Notifications = $state<typeof NotificationsMenu | null>(null);
+  let isBellAsked = $state(false);
+  let loadingNotifications: Promise<void> | undefined;
 
   const signIn = $derived(
     `${resolve("/sign-in")}?next=${encodeURIComponent(page.url.pathname)}`,
@@ -64,22 +68,42 @@
       : undefined;
   }
 
+  async function refocus(focused: string | undefined) {
+    if (focused != null) {
+      await tick();
+      document.querySelector<HTMLElement>(`[data-menu="${focused}"]`)?.focus();
+    }
+  }
+
+  function focusedMenu() {
+    return document.activeElement instanceof HTMLElement
+      ? document.activeElement.dataset.menu
+      : undefined;
+  }
+
   function load() {
     loading ??= import("#lib/components/header-menus.svelte").then(
       async (module) => {
-        const focused =
-          document.activeElement instanceof HTMLElement
-            ? document.activeElement.dataset.menu
-            : undefined;
+        const focused = focusedMenu();
         Menus = module.default;
-        if (focused != null && initial == null) {
-          await tick();
-          document
-            .querySelector<HTMLElement>(`[data-menu="${focused}"]`)
-            ?.focus();
+        if (initial == null) {
+          await refocus(focused);
         }
       },
     );
+  }
+
+  function loadNotifications() {
+    loadingNotifications ??=
+      import("#lib/components/notifications-menu.svelte").then(
+        async (module) => {
+          const focused = focusedMenu();
+          Notifications = module.default;
+          if (!isBellAsked && focused === "notifications") {
+            await refocus(focused);
+          }
+        },
+      );
   }
 
   function placeholder(
@@ -97,7 +121,28 @@
     };
   }
 
+  function openBell(event: MouseEvent) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    event.preventDefault();
+    isBellAsked = true;
+    loadNotifications();
+  }
+
   $effect(() => idle(load));
+
+  $effect(() => {
+    if (page.data.user != null && !READ_ONLY) {
+      return idle(loadNotifications);
+    }
+  });
 </script>
 
 {#snippet themeTrigger(props: Record<string, unknown>)}
@@ -130,6 +175,29 @@
   >
     <MenuIcon class="block-5 inline-5" />
     <span class="sr-only">{m.header_menu()}</span>
+  </Button>
+{/snippet}
+
+{#snippet bellTrigger(props: Record<string, unknown>)}
+  <Button
+    {...props}
+    variant="ghost"
+    size="icon"
+    class="relative max-lg:ms-auto"
+    data-menu="notifications"
+    aria-current={current(resolve("/notifications"))}
+    aria-label={page.data.unread > 0
+      ? m.notifications_bell_unread({ count: page.data.unread })
+      : m.notifications_bell()}
+  >
+    <BellIcon />
+    {#if page.data.unread > 0}
+      <span
+        class="absolute -inset-e-0.5 inset-bs-0.5 grid place-items-center rounded-full bg-marker px-1 font-figures text-[0.625rem]/4 font-bold text-[#15171a] min-inline-4"
+        aria-hidden="true"
+        >{page.data.unread > 99 ? "99+" : page.data.unread}</span
+      >
+    {/if}
   </Button>
 {/snippet}
 
@@ -184,25 +252,14 @@
       {/each}
     </nav>
     {#if page.data.user != null && !READ_ONLY}
-      <Button
-        href={resolve("/notifications")}
-        variant="ghost"
-        size="icon"
-        class="relative max-lg:ms-auto"
-        aria-current={current(resolve("/notifications"))}
-        aria-label={page.data.unread > 0
-          ? m.notifications_bell_unread({ count: page.data.unread })
-          : m.notifications_bell()}
-      >
-        <BellIcon />
-        {#if page.data.unread > 0}
-          <span
-            class="absolute -inset-e-0.5 inset-bs-0.5 grid place-items-center rounded-full bg-marker px-1 font-figures text-[0.625rem]/4 font-bold text-[#15171a] min-inline-4"
-            aria-hidden="true"
-            >{page.data.unread > 99 ? "99+" : page.data.unread}</span
-          >
-        {/if}
-      </Button>
+      {#if Notifications != null}
+        <Notifications trigger={bellTrigger} initial={isBellAsked} />
+      {:else}
+        {@render bellTrigger({
+          href: resolve("/notifications"),
+          onclick: openBell,
+        })}
+      {/if}
     {/if}
     {#if Menus != null}
       <Menus

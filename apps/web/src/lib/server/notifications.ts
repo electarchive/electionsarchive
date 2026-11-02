@@ -19,6 +19,8 @@ export type List = (typeof LISTS)[number];
 
 const DIGEST_EVENTS = 20;
 
+const LATEST = 8;
+
 const link = (path: string) => new URL(path, BASE_URL).href;
 
 export async function unreadCount(userId: string) {
@@ -39,6 +41,7 @@ export async function inbox(
   userId: string,
   show: (typeof SHOWS)[number],
   before: string | null,
+  limit?: number,
 ) {
   const found = await stream({
     activity: sql`
@@ -49,6 +52,7 @@ export async function inbox(
     `,
     imports: null,
     before,
+    limit,
   });
   const ids = found.entries.map((entry) => entry.id);
   const { rows } =
@@ -72,6 +76,32 @@ export async function inbox(
     ),
   };
 }
+
+export async function latest(userId: string) {
+  const [found, unread] = await Promise.all([
+    inbox(userId, "all", null, LATEST),
+    unreadCount(userId),
+  ]);
+  return {
+    unread,
+    entries: found.entries.map((entry) => {
+      const described = describe(entry);
+      const mark = found.marks[entry.id];
+      return {
+        id: entry.id,
+        at: entry.at,
+        text: described.text,
+        href: described.href,
+        byline: byline(entry),
+        polity: entry.polity,
+        watched: mark?.reason === "watched",
+        unread: mark?.unread ?? false,
+      };
+    }),
+  };
+}
+
+export type Latest = Awaited<ReturnType<typeof latest>>;
 
 export async function markRead(userId: string, ids: Array<string> | null) {
   await db.execute(sql`
