@@ -64,8 +64,8 @@
   "note": ""
  },
  "incumbent": {
-  "term": "görevdeki aday",
-  "note": "The shorter 'görevdeki' is also common, as in 'görevdeki başkan'."
+  "term": "görevdeki (isim)",
+  "note": "As a badge, 'Görevde'. Never 'görevdeki aday'. A defeated incumbent 'koltuğunu kaybetti'; a trailing one 'koltuğu tehlikede'."
  },
  "nominee": {
   "term": "parti adayı",
@@ -494,5 +494,13 @@
  "workbench": {
   "term": "çalışma alanı",
   "note": "Alternative: 'çalışma tezgâhı'."
+ },
+ "open seat": {
+  "term": "açık koltuk",
+  "note": ""
+ },
+ "secretary of state": {
+  "term": "eyalet sekreteri",
+  "note": "A US state's Secretary of State. The office is 'Eyalet Sekreterliği'. Never 'Dışişleri Bakanı', which is a foreign minister."
  }
 }
