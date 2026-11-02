@@ -12,7 +12,8 @@
     "sync": "svelte-kit sync",
     "skill": "node scripts/skill.js",
     "compile-paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --output-structure locale-modules --strategy cookie globalVariable baseLocale",
-    "check": "export NODE_OPTIONS=--max-old-space-size=5000 && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --tsgo"
+    "i18n:check": "node scripts/i18n-check.js",
+    "check": "node scripts/i18n-check.js && export NODE_OPTIONS=--max-old-space-size=5000 && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --tsgo"
   },
   "dependencies": {
     "@better-auth/api-key": "catalog:",

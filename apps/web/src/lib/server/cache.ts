@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
 import { codeVersion } from "virtual:code-version";
+import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { db } from "#lib/server/db/index.js";
 import { redis } from "#lib/server/redis.js";
 
@@ -226,10 +227,12 @@ function renew(key: string, hit: Entry, compute: () => Promise<unknown>) {
 }
 
 export async function remember<T>(
-  key: string,
+  shared: string,
   compute: () => Promise<T>,
   isStrict = false,
 ) {
+  const locale = getLocale();
+  const key = locale === baseLocale ? shared : `${locale}|${shared}`;
   if (isStrict || Date.now() - state.checked >= CHECK) {
     state.checking ??= refresh();
     await state.checking;
