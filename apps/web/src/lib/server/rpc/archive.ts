@@ -9853,7 +9853,7 @@ export const contests = {
         method: "GET",
         path: "/contests/{id}/ledger",
         summary:
-          "List the reporting units with no boundary shapes within a contest's place, each with the place at the given level that holds it",
+          "The vote counts a contest's map can't draw: its reporting units with no boundary shapes (such as absentee or provisional units, or precincts without published maps), with the votes of each option, grouped by the place at level (a boundary scheme, such as us.county) that holds each unit. Null when fewer than two such units exist. Past 4,000 units it returns only count and isCapped, so pass unit, a place within the contest as get_contest names it, to narrow",
       }),
     )
     .input(v.object({ ...Input.entries, level: v.optional(v.string()) }))
@@ -20853,51 +20853,109 @@ export async function record(input: { id: string; body?: string }) {
 export const polities = {
   list: os
     .meta(
-      openapi({ method: "GET", path: "/polities", summary: "List polities" }),
+      openapi({
+        method: "GET",
+        path: "/polities",
+        summary:
+          "List polities 100 a page, ordered by path, each with its election count, first and last election year, and latest general election. With no arguments it lists the countries and the EU; pass parent (a polity ID) for the polities directly below it, and kinds to keep only some kinds, such as federal_unit for states and provinces. Pass the previous page's next as cursor for the next page. To find one polity by name, use search instead",
+      }),
     )
-    .input(v.optional(v.object({ kinds: v.optional(v.array(v.string())) })))
-    .output(
-      v.array(
+    .input(
+      v.optional(
         v.object({
-          id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
-          kind: v.string(),
-          isoCode: v.nullable(v.string()),
-          name: v.string(),
-          path: v.nullable(v.string()),
-          elections: v.number(),
-          within: v.number(),
-          first: v.nullable(v.number()),
-          last: v.nullable(v.number()),
-          latest: v.nullable(Link),
+          kinds: v.optional(
+            v.array(
+              v.picklist([
+                "sovereign_state",
+                "supranational",
+                "federal_unit",
+                "region",
+                "county",
+                "municipality",
+                "submunicipal",
+                "historical_state",
+                "school_district",
+                "judicial_district",
+                "special_district",
+              ]),
+            ),
+          ),
+          parent: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+          limit: v.optional(
+            v.pipe(
+              v.union([v.number(), v.pipe(v.string(), v.toNumber())]),
+              v.integer(),
+              v.minValue(1),
+              v.maxValue(500),
+            ),
+            100,
+          ),
+          cursor: v.optional(v.string()),
         }),
       ),
     )
+    .output(
+      v.object({
+        polities: v.array(
+          v.object({
+            id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+            kind: v.string(),
+            isoCode: v.nullable(v.string()),
+            name: v.string(),
+            path: v.nullable(v.string()),
+            elections: v.number(),
+            within: v.number(),
+            first: v.nullable(v.number()),
+            last: v.nullable(v.number()),
+            latest: v.nullable(Link),
+          }),
+        ),
+        next: v.nullable(v.string()),
+      }),
+    )
     .handler(async ({ input }) => {
-      const kinds = input?.kinds == null ? null : sql.param(input.kinds);
+      const parent = input?.parent ?? null;
+      const kinds =
+        input?.kinds ??
+        (parent == null ? ["sovereign_state", "supranational"] : null);
+      const limit = input?.limit ?? 100;
       const result = await db.execute<{
         id: string;
         kind: string;
         iso_code: string | null;
+        path: string;
         elections: number;
         within: number;
         first: number | null;
         last: number | null;
         latest: string | null;
       }>(sql`
-        with recursive below(id, top) as (
-          select polity_id, parent_id from polity_parent
+        with recursive picked as materialized (
+          select p.id, p.kind, p.iso_code, s.path
+          from polity p join slug s on s.entity_id = p.id and s.is_current
+          where (${kinds == null ? null : sql.param(kinds)}::text[] is null or p.kind::text = any(${kinds == null ? null : sql.param(kinds)}::text[]))
+            and (${parent}::uuid is null or exists (select from polity_parent pp where pp.polity_id = p.id and pp.parent_id = ${parent}::uuid))
+            and s.path > ${input?.cursor ?? ""}
+          order by s.path
+          limit ${limit + 1}
+        ),
+        below(id, top) as (
+          select pp.polity_id, pp.parent_id from polity_parent pp where pp.parent_id in (select id from picked)
           union
           select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
         ),
         own as materialized (
           select polity_id, count(*)::int as n, min(extract(year from date_from))::int as first,
             max(extract(year from date_from))::int as last
-          from election e where not exists (select from entity_merge m where m.entity_id = e.id) group by polity_id
+          from election e
+          where e.polity_id in (select id from picked union select id from below)
+            and not exists (select from entity_merge m where m.entity_id = e.id)
+          group by polity_id
         ),
         nested as materialized (
           select b.top, sum(o.n)::int as n from below b join own o on o.polity_id = b.id group by b.top
         )
-        select p.id, p.kind::text, p.iso_code, coalesce(o.n, 0) as elections, coalesce(i.n, 0) as within,
+        select p.id, p.kind::text, p.iso_code, p.path, coalesce(o.n, 0) as elections, coalesce(i.n, 0) as within,
           o.first, o.last,
           case when o.n is not null then (
             select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
@@ -20905,23 +20963,23 @@ export const polities = {
               and not exists (select from entity_merge m where m.entity_id = e.id)
             order by e.kind = 'general' desc, e.date_from desc limit 1
           ) end as latest
-        from polity p
+        from picked p
         left join own o on o.polity_id = p.id
         left join nested i on i.top = p.id
-        where (${kinds}::text[] is null or p.kind::text = any(${kinds}::text[]))
-          and exists (select from slug s where s.entity_id = p.id and s.is_current)
+        order by p.path
       `);
-      const ids = result.rows.flatMap((row) =>
+      const rows = result.rows.slice(0, limit);
+      const ids = rows.flatMap((row) =>
         row.latest == null ? [row.id] : [row.id, row.latest],
       );
       const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
-      return result.rows
-        .map((row) => ({
+      return {
+        polities: rows.map((row) => ({
           id: row.id,
           kind: row.kind,
           isoCode: row.iso_code,
           name: labels.full.get(row.id) ?? "",
-          path: slugs.get(row.id) ?? null,
+          path: row.path,
           elections: row.elections,
           within: row.within,
           first: row.first,
@@ -20933,8 +20991,9 @@ export const polities = {
                   name: labels.full.get(row.latest) ?? "",
                   path: slugs.get(row.latest) ?? null,
                 },
-        }))
-        .toSorted((a, b) => natural(a.name, b.name));
+        })),
+        next: result.rows.length > limit ? (rows.at(-1)?.path ?? null) : null,
+      };
     }),
   get: os
     .meta(

@@ -360,7 +360,10 @@ export const maps = {
           order by e.date_from desc
           limit 200
         `),
-        call(polities.list, { kinds: ["sovereign_state", "supranational"] }),
+        call(polities.list, {
+          kinds: ["sovereign_state", "supranational"],
+          limit: 500,
+        }).then((found) => found.polities),
       ]);
       const ids = [
         election.id,

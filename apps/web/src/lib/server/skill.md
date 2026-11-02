@@ -38,8 +38,27 @@ Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MN
 <!-- /write -->
 <!-- read -->
 
-Contributions open after launch. Until then the archive is read-only: every page, REST endpoint, and MCP read tool works, and write tools return an error.
+The archive launched on November 2, 2026, and is read-only for now: every page, REST endpoint, and MCP read tool works, and contributions open later.
 <!-- /read -->
+
+## Reading
+
+- **Find, then fetch.** `search` (pass `q`) finds any election, contest, person, party, chamber, or place by name; the `get_` tools read one record by UUID.
+- **Places.** `list_polities` with no arguments lists the countries and the EU, 100 a page. Pass `parent` for the places directly below one, `kinds` to filter, and `cursor` (the last answer's `next`) for the following page.
+- **Results.** `get_contest` gives a contest's totals; pass `by` for a breakdown by place and `unit` to look inside one place. For a national election, read one state's or region's own election, or one contest, instead of the whole election. `get_unmapped_units` lists the vote counts a contest's map can't draw (absentee and provisional units, precincts without shapes); past 4,000 such units it returns only the count, so pass `unit`.
+- **Slow or large answers.** A first read of a large contest can take up to a minute. If a tool says the archive is still working, call it again a minute later: the answer will be ready. If a tool says an answer is too large, follow its hint to narrow the request.
+
+## Election night
+
+`get_live_results` (`GET /api/v1/live/results`) is the live board for a US general election; it defaults to the nearest one.
+
+- `chambers` holds the Senate, the House, and governorships: seats won and called by each side, seats leading, seats not up, gains, losses, and, once forecasts are shown, the chance each side controls the chamber.
+- `races` lists each race with its status (`won`, `called`, `counting`, `waiting`, or `no_feed`), the share of the expected vote counted, the top candidates with votes and shares, the margin, the winner or projected winner, the favorite's win chance, the party that held the seat, and whether it flipped.
+- Filter with `office` (`senate`, `house`, `governor`, `other`), `state` (two letters), and `status`; sort with `sort=closest` for the tightest races or `sort=updated` for the latest counts; page with `limit` and `cursor`. `election.pollsClose` gives each state's poll closing time.
+
+`get_live_race` (`GET /api/v1/live/race`) reads one race in full: pass `race`, the `path` from `get_live_results`. It adds every candidate, the turnout estimate with its range, the source, and, with `places=true`, the count in each county.
+
+Counts and calls come from the live feed and change all night, and win chances are model estimates. Say how much of the vote is counted, and never report a race as won before it is called. After certification, the official results are in `get_contest`.
 
 <!-- write -->
 

@@ -7,8 +7,9 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async () => {
   const found = await call(router.polities.list, {
     kinds: ["sovereign_state", "supranational"],
+    limit: 500,
   });
-  const polities = found
+  const polities = found.polities
     .flatMap((polity) =>
       polity.path == null || polity.latest?.path == null
         ? []

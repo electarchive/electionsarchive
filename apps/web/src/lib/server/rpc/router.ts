@@ -24,6 +24,7 @@ import { maps } from "#lib/server/rpc/maps.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
 import { talk } from "#lib/server/rpc/talk.js";
+import { tonight } from "#lib/server/rpc/tonight.js";
 import { uploads } from "#lib/server/rpc/uploads.js";
 
 export const READ_ONLY_MESSAGE =
@@ -57,6 +58,7 @@ export const reads = {
   recentChanges,
   search,
   seats,
+  tonight,
 };
 
 export const router = { ...reads, ...contributions };

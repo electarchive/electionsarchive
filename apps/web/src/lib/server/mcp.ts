@@ -49,10 +49,16 @@ const TOOLS: Array<{
     access: "read",
   },
   {
-    name: "get_contest_ledger",
+    name: "get_unmapped_units",
     procedure: router.contests.ledger,
     access: "read",
   },
+  {
+    name: "get_live_results",
+    procedure: router.tonight.results,
+    access: "read",
+  },
+  { name: "get_live_race", procedure: router.tonight.race, access: "read" },
   { name: "get_person", procedure: router.people.get, access: "read" },
   { name: "get_party", procedure: router.parties.get, access: "read" },
   {
@@ -163,11 +169,33 @@ const TOOLS: Array<{
   { name: "revert_proposal", procedure: router.admin.revert, access: "admin" },
 ];
 
+const LIVE =
+  " On election night, get_live_results has the national picture and every race, and get_live_race has one race in full.";
+
 const INSTRUCTIONS =
-  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Look before you write: find IDs with search and the get_ tools, read a record's editable rows with get_editable, and check find_open_proposals so you don't duplicate work. Every change is a proposal: describe_ops explains the payload, ops, and evidence; draft_proposal compiles and checks it; submit_proposal sends it to review. Cite evidence for every fact, quoting the source exactly. Write tools need an API key from https://electionsarchive.com/settings/keys, sent as x-api-key or a Bearer token.";
+  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source." +
+  LIVE +
+  " Look before you write: find IDs with search and the get_ tools, read a record's editable rows with get_editable, and check find_open_proposals so you don't duplicate work. Every change is a proposal: describe_ops explains the payload, ops, and evidence; draft_proposal compiles and checks it; submit_proposal sends it to review. Cite evidence for every fact, quoting the source exactly. Write tools need an API key from https://electionsarchive.com/settings/keys, sent as x-api-key or a Bearer token.";
 
 const READING =
-  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Find IDs with search, then read records with the get_ tools. This preview is read-only: no tool changes the archive.";
+  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Find IDs with search, then read records with the get_ tools." +
+  LIVE +
+  " The archive is read-only for now: no tool changes it.";
+
+const WAIT_MS = 25_000;
+
+const LARGEST = 400_000;
+
+const NARROW: Record<string, string> = {
+  get_election:
+    "Read one state's own election instead (search finds it, such as 2024 Pennsylvania general election), pass within for a UK nation or Canadian province, or read one contest with get_contest.",
+  get_contest:
+    "Leave out by for the totals, or pass unit to look inside one place.",
+  get_chamber: "Read one term's members with get_chamber_members instead.",
+  get_polity: "Leave out all, or list the places below it with list_polities.",
+};
+
+const SLOW = Symbol("slow");
 
 const closed = new Set<unknown>(
   READ_ONLY
@@ -273,10 +301,25 @@ function build(headers: Headers, isStaff: boolean) {
           ? String(value)
           : value;
     }
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
-      const output: unknown = await call(tool.procedure, input, {
+      const running: Promise<unknown> = call(tool.procedure, input, {
         context: { headers },
       });
+      running.catch(() => null);
+      const output = await Promise.race([
+        running,
+        new Promise<typeof SLOW>((resolve) => {
+          timer = setTimeout(() => {
+            resolve(SLOW);
+          }, WAIT_MS);
+        }),
+      ]);
+      if (output === SLOW) {
+        return failure(
+          "The archive is still working on that answer and will keep it ready. Call the tool again in a minute.",
+        );
+      }
       if (tool.name === "get_upload_page" && v.is(Image, output)) {
         return {
           content: [
@@ -288,9 +331,13 @@ function build(headers: Headers, isStaff: boolean) {
           ],
         };
       }
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(output) }],
-      };
+      const text = JSON.stringify(output);
+      if (text.length > LARGEST) {
+        return failure(
+          `That answer is ${String(Math.round(text.length / 1000))} KB, too large to send. ${NARROW[tool.name] ?? "Narrow it with the tool's filters or a smaller limit."}`,
+        );
+      }
+      return { content: [{ type: "text" as const, text }] };
     } catch (error_) {
       if (error_ instanceof ORPCError) {
         return failure(explain(error_.message, error_.data));
@@ -299,6 +346,8 @@ function build(headers: Headers, isStaff: boolean) {
       return failure(
         "The archive couldn't answer that just now. Try again in a minute.",
       );
+    } finally {
+      clearTimeout(timer);
     }
   });
   return server;

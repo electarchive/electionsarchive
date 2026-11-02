@@ -1,11 +1,11 @@
 import type { LiveOption } from "@ea/analytics/live";
 import type { Summary } from "#lib/live/summary.js";
-import type { LivePage } from "#lib/server/live-page.js";
+import type { Control } from "#lib/server/live-board.js";
 import { percent } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { swatch } from "#lib/party.js";
 
-export type Control = NonNullable<LivePage["control"]>;
+export type { Control } from "#lib/server/live-board.js";
 
 export type Chamber = "senate" | "house" | "governor";
 

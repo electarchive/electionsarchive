@@ -49,9 +49,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
   if (!params.path.includes("/")) {
     const found = await call(router.polities.list, {
       kinds: ["sovereign_state", "supranational"],
+      limit: 500,
     });
-    const latest = found.find((polity) => polity.path === params.path)?.latest
-      ?.path;
+    const latest = found.polities.find((polity) => polity.path === params.path)
+      ?.latest?.path;
     if (latest != null) {
       redirect(307, `/map/${latest}${url.search}`);
     }

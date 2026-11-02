@@ -302,7 +302,10 @@ export async function home() {
 
 async function welcome() {
   const [polities, layers, dated] = await Promise.all([
-    call(router.polities.list, { kinds: ["sovereign_state", "supranational"] }),
+    call(router.polities.list, {
+      kinds: ["sovereign_state", "supranational"],
+      limit: 500,
+    }).then((found) => found.polities),
     strata(),
     db.execute<{
       id: string;
