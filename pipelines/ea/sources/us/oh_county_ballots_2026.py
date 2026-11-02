@@ -1039,7 +1039,8 @@ def pick(
     row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str, str]]], used: set[UUID], fips: str
 ) -> UUID | None:
     parts = [
-        ALIASES.get(part, PRECINCT.sub("", part).replace("CUY ", "CUYAHOGA ")) for part in row["entity"].split("|")
+        ALIASES.get(part, PRECINCT.sub("", part).replace("CUY ", "CUYAHOGA "))
+        for part in re.sub(r" - \d+(?=\||$)", "", row["entity"]).split("|")
     ]
     options: list[tuple[UUID, str, str, str]] = []
     for size in range(len(parts), 0, -1):
@@ -1074,10 +1075,16 @@ def pick(
     for word in ("additional", "renewal", "replacement", "decrease", "increase"):
         if len(narrowed) > 1 and word in kind.lower():
             narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
+    first_issue = re.split(
+        r"(?<=necessary for passage\.)\s+(?=an? (?:renewal|additional|replacement)\b)",
+        row["text"],
+        1,
+        flags=re.IGNORECASE,
+    )[0]
     text = re.sub(
         r"(\d\.\d*?[1-9])0+\b",
         r"\1",
-        re.sub(r"(\d+)\.0+\b", r"\1", re.sub(r"(?<![\d.])\.(\d)", r"0.\1", row["text"].lower())),
+        re.sub(r"(\d+)\.0+\b", r"\1", re.sub(r"(?<![\d.])\.(\d)", r"0.\1", first_issue.lower())),
     )
     if len(narrowed) > 1 and "liquor" in kind.lower():
         sunday = "sunday" in kind.lower()
@@ -1219,6 +1226,7 @@ def emit() -> Path:
                 covered |= {UUID(str(contest)) for contest in pl.read_parquet(table)["contest_id"]}
         kept = [0]
         loaded: set[UUID] = set()
+        added: set[UUID] = set()
 
         def load(contest: UUID, row: dict[str, str]) -> None:
             kept[0] += 1
@@ -1232,14 +1240,16 @@ def emit() -> Path:
                     or f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
                 )
                 sources[row["url"]] = cs.source(publisher, title)
-                cs.add(
-                    "source",
-                    id=sources[row["url"]],
-                    kind="official_body",
-                    publisher=publisher,
-                    title=title,
-                    url=row["url"],
-                )
+                if sources[row["url"]] not in added:
+                    added.add(sources[row["url"]])
+                    cs.add(
+                        "source",
+                        id=sources[row["url"]],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=row["url"],
+                    )
                 cs.artifact(raw.cached(SOURCE, row["url"]), sources[row["url"]])
             cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
             cs.add(
