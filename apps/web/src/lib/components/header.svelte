@@ -224,7 +224,7 @@
         >
       </a>
       <Term
-        class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem)] -rotate-3 rounded-[2px] bg-marker px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] no-underline transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none max-sm:-inset-e-0.5"
+        class="absolute -inset-e-3 inset-bs-[calc(100%-0.375rem-5px)] -rotate-3 rounded-[2px/7px] border-y-[5px] border-transparent bg-marker bg-clip-padding px-1 text-[0.625rem]/[0.9rem] font-[780] tracking-[0.02em] text-[#15171a] no-underline transition-transform hover:rotate-0 focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none max-sm:-inset-e-0.5"
         label={m.beta_label()}
         definition={m.beta_definition()}
         side="bottom"
