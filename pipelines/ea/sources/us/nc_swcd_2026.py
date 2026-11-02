@@ -47,7 +47,7 @@ def parse() -> None:
         if "SOIL AND WATER" in contest:
             names = held.get(county, [])
             found = [name for name in names if len(names) == 1 or TRIM.sub("", name).upper() in contest]
-            if not names and contest.endswith(" DISTRICT SUPERVISOR"):
+            if not names and contest.endswith((" DISTRICT SUPERVISOR", " DISTRICT")):
                 found = [contest.removesuffix(" SUPERVISOR").title().replace(" And ", " and ")]
             if len(found) != 1:
                 print("no census district:", county, contest)
