@@ -474,6 +474,7 @@ STATEWIDE = {
     "attorney general": ("attorney-general", "Attorney General"),
     "secretary of state": ("secretary-of-state", "Secretary of State"),
     "state treasurer": ("treasurer", "Treasurer"),
+    "general treasurer": ("treasurer", "General Treasurer"),
     "state controller": ("controller", "Controller"),
     "commissioner of agriculture": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
     "commissioner of insurance": ("commissioner-of-insurance", "Commissioner of Insurance"),
@@ -507,7 +508,9 @@ STATEWIDE = {
 STATEWIDE_LABELS = "|".join(re.escape(label) for label in STATEWIDE)
 ITEMS = {
     "UT": LEGISLATIVE,
-    "RI": LEGISLATIVE,
+    "RI": re.compile(
+        r"(?P<party>REP|DEM) (?:(?P<body>Senator|Representative) in General Assembly District (?P<district>\d+)|(?P<office>Lieutenant Governor|Attorney General|Secretary of State|General Treasurer))"
+    ),
     "GA": re.compile(
         r"(?:State (?P<chamber>Senate|House) - District (?P<district>\d+)|(?P<office>"
         + STATEWIDE_LABELS
@@ -1753,14 +1756,15 @@ def emit() -> Path:
                 ).fetchone()[0]
                 counties["stlouiscity"], counties["stlouis"] = counties["29510"], counties["29189"]
             pool: dict[tuple[str, str], set[object]] = defaultdict(set)
-            for person, text in conn.execute(
-                """select distinct cy.person_id, n.text from candidacy cy
+            ran: dict[object, set[str]] = defaultdict(set)
+            for person, text, value in conn.execute(
+                """select distinct cy.person_id, n.text, x.value from candidacy cy
                    join contest_option o on o.id = cy.option_id
                    join contest co on co.id = o.contest_id
-                   join name b on b.entity_id = co.body_id and b.is_preferred and b.text !~ 'United States'
+                   left join name b on b.entity_id = co.body_id and b.is_preferred
                    join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
                    join name n on n.entity_id = cy.person_id and n.is_preferred
-                   where x.value ~ %s""",
+                   where x.value ~ %s and (b.text is null or b.text !~ 'United States')""",
                 [
                     f"^20[0-2][0-9]-[0-9-]+:{state}:(house|senate|assembly|house-of-delegates|{'|'.join(key for key, _ in STATEWIDE.values())})(:|$)"
                 ],
@@ -1770,6 +1774,7 @@ def emit() -> Path:
                 ]
                 if len(words) > 1:
                     pool[(words[0], words[-1])].add(person)
+                    ran[person].add(value.split(":")[2])
             grouped = (
                 frame.filter((pl.col("state") == state) & (pl.col("day") == day))
                 .group_by("party", "chamber", "district", "candidate", "write_in")
@@ -1906,6 +1911,8 @@ def emit() -> Path:
                         finalists[contest_key.split(":", 1)[1]].get(words[-1]) if runoff else None
                     )
                     found = {earlier} if earlier is not None else pool.get((words[0], words[-1]), set())
+                    if len(found) > 1 and len(same := {held for held in found if chamber in ran[held]}) == 1:
+                        found = same
                     if len(found) == 1:
                         person = next(iter(found))
                         counts["matched"] += 1
