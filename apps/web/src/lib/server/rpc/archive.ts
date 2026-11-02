@@ -5079,6 +5079,7 @@ async function tabulate(
                     result.find((entry) => entry.key === item.key)?.earlier
                       ?.share ?? 0,
                 ),
+          previous: then?.get(row.k)?.side.valid ?? null,
           prior: before == null ? null : (position.get(before.key) ?? null),
         };
       },
@@ -5758,7 +5759,7 @@ async function atlas(input: {
         seats,
       ]) ?? null,
     prior: row.prior == null ? null : (fold[row.prior] ?? row.prior),
-    ...(moved.has(row.k) && { earlier: null, prior: null }),
+    ...(moved.has(row.k) && { earlier: null, previous: null, prior: null }),
   }));
   const tail = /, [^,]+$/u.exec(rows[0]?.name ?? "")?.[0];
   const isShared =
@@ -5855,6 +5856,9 @@ async function atlas(input: {
             ? null
             : Math.round((row.earlier[index] ?? 0) * 10_000),
         ),
+      ),
+      previous: rows.map((row) =>
+        row.earlier == null ? null : Math.round(row.previous ?? 0),
       ),
       redrawn: rows.map((row) => moved.get(row.k) ?? null),
       ...(statuses != null && {
@@ -5956,6 +5960,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
     prior: number | null;
     shares: Array<number | null>;
     before: Array<number | null>;
+    previous: number | null;
   }> = [];
   const seen = new Set<number>();
   for (const { set, part } of sets) {
@@ -6017,6 +6022,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
         prior: prior == null ? null : (at[prior] ?? null),
         shares,
         before,
+        previous: set.places.previous[i] ?? null,
       });
     }
   }
@@ -6082,6 +6088,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
             .filter((index) => kept.has(index))
             .map((index) => rows.map((row) => row.before[index] ?? null))
         : [],
+      previous: isCompared ? rows.map((row) => row.previous) : [],
     },
   };
 }
@@ -10609,6 +10616,7 @@ export const contests = {
           prior: v.array(v.nullable(v.number())),
           shares: v.array(v.array(v.nullable(v.number()))),
           before: v.array(v.array(v.nullable(v.number()))),
+          previous: v.array(v.nullable(v.number())),
           redrawn: v.array(v.nullable(v.number())),
           status: v.optional(v.array(v.nullable(v.string()))),
         }),
@@ -10658,6 +10666,7 @@ export const contests = {
           prior: v.array(v.nullable(v.number())),
           shares: v.array(v.array(v.nullable(v.number()))),
           before: v.array(v.array(v.nullable(v.number()))),
+          previous: v.optional(v.array(v.nullable(v.number()))),
         }),
       }),
     )

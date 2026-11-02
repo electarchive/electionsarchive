@@ -21,6 +21,7 @@
   import Drawer from "#lib/atlas/drawer.svelte";
   import Hover from "#lib/atlas/hover.svelte";
   import Key from "#lib/atlas/key.svelte";
+  import Places from "#lib/atlas/places.svelte";
   import Rail from "#lib/atlas/rail.svelte";
   import Result from "#lib/atlas/result.svelte";
   import { Stage } from "#lib/atlas/stage.svelte.js";
@@ -34,14 +35,18 @@
     starts,
   } from "#lib/atlas/tiers.js";
   import Monogram from "#lib/components/monogram.svelte";
+  import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
-  import { date } from "#lib/format.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { date, plural } from "#lib/format.js";
   import { basemap } from "#lib/map/basemap.js";
   import { Engine, proportional } from "#lib/map/engine.svelte.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+
+  type Point = { x: number; y: number };
 
   const {
     contest,
@@ -98,6 +103,15 @@
   let isAdding = $state(false);
   let isArrived = $state(false);
   let isShift = false;
+  let isApart = $state(false);
+  let above = $state.raw<Sheet | null>(null);
+  let lasso = $state.raw<{
+    isBox: boolean;
+    id: number;
+    left: number;
+    top: number;
+    points: Array<Point>;
+  } | null>(null);
   let term = $state("");
   let isSearching = $state(false);
   let search = $state<HTMLInputElement | null>(null);
@@ -202,6 +216,7 @@
           },
     {
       onReady: () => {
+        engine.gl?.boxZoom.disable();
         measure();
         const at = view.at;
         if (at != null) {
@@ -464,22 +479,26 @@
   }
 
   function summarize(hits: Array<Hit>) {
+    const isCounted = hits.some(
+      (hit) => (hit.set.places.valid[hit.i] ?? 0) > 0,
+    );
     const totals = new Map<
       string,
       { label: string; votes: number; then: number; isThen: boolean }
     >();
     let valid = 0;
-    let before = 0;
-    for (const hit of hits) {
-      const { set, i } = hit;
-      const votes = set.places.valid[i] ?? 0;
-      const weight = hits.length === 1 ? 1 : votes;
+    let previous = 0;
+    let slack = 0;
+    for (const { set, i } of hits) {
+      const votes = isCounted ? (set.places.valid[i] ?? 0) : 1;
+      const was = isCounted ? (set.places.previous[i] ?? votes) : 1;
       valid += votes;
+      slack += votes / (set === mosaic?.set ? 2000 : 20_000);
       let isBefore = false;
       for (const [index, item] of set.legend.entries()) {
         const share = set.places.shares[index]?.[i];
-        const was = set.places.before[index]?.[i];
-        if (share == null && was == null) {
+        const before = set.places.before[index]?.[i];
+        if (share == null && before == null) {
           continue;
         }
         const entry = totals.get(item.key) ?? {
@@ -488,37 +507,225 @@
           then: 0,
           isThen: false,
         };
-        entry.votes += ((share ?? 0) / 10_000) * weight;
-        if (was != null) {
-          entry.then += (was / 10_000) * weight;
+        entry.votes += ((share ?? 0) / 10_000) * votes;
+        if (before != null) {
+          entry.then += (before / 10_000) * was;
           entry.isThen = true;
           isBefore = true;
         }
         totals.set(item.key, entry);
       }
       if (isBefore) {
-        before += weight;
+        previous += was;
       }
     }
-    const total = hits.length === 1 ? 1 : valid;
     const rows = [...totals]
       .map(([key, entry]) => ({
         key,
         label: entry.label,
         tone: lens.tone(key),
-        share: total === 0 ? 0 : entry.votes / total,
-        change:
-          isCompared && entry.isThen && before > 0
-            ? entry.votes / total - entry.then / before
+        share: valid === 0 ? 0 : entry.votes / valid,
+        votes: isCounted ? entry.votes : null,
+        then:
+          isCompared && entry.isThen && previous > 0
+            ? entry.then / previous
             : null,
-        isLeader: false,
       }))
-      .filter((row) => row.share > 0 || row.change != null)
-      .toSorted((a, b) => b.share - a.share);
-    if (rows[0] != null) {
-      rows[0].isLeader = true;
+      .filter((row) => row.share > 0 || row.then != null)
+      .toSorted((a, b) => b.share - a.share)
+      .map((row, index) => ({
+        ...row,
+        change: row.then == null ? null : row.share - row.then,
+        isLeader: index === 0,
+      }));
+    const [first, second] = rows;
+    const earlier = rows
+      .filter((row) => row.then != null)
+      .toSorted((a, b) => (b.then ?? 0) - (a.then ?? 0));
+    const [was, runner] = earlier;
+    return {
+      valid: isCounted ? valid : 0,
+      previous: isCounted && isCompared && previous > 0 ? previous : null,
+      isExact: slack < 0.5,
+      rows,
+      verdict:
+        first == null || second == null || first.share === 0
+          ? null
+          : {
+              label: first.label,
+              tone: first.tone,
+              margin: first.share - second.share,
+              then:
+                was == null || runner == null
+                  ? null
+                  : {
+                      label: was.label,
+                      tone: was.tone,
+                      margin: (was.then ?? 0) - (runner.then ?? 0),
+                      isFlipped: was.key !== first.key,
+                    },
+            },
+    };
+  }
+
+  function brief(hit: Hit) {
+    const { valid, rows, verdict } = summarize([hit]);
+    return {
+      k: hit.set.places.k[hit.i] ?? 0,
+      name: title(hit),
+      valid,
+      parts: rows.map((row) => ({
+        key: row.key,
+        tone: row.tone,
+        share: row.share,
+      })),
+      leader: rows[0]?.label ?? "",
+      tone: rows[0]?.tone ?? "var(--muted-foreground)",
+      margin: verdict?.margin ?? null,
+      swing:
+        verdict?.then == null || verdict.then.isFlipped
+          ? null
+          : verdict.margin - verdict.then.margin,
+      isFlipped: verdict?.then?.isFlipped ?? false,
+    };
+  }
+
+  function inside(point: { x: number; y: number }, shape: Array<Point>) {
+    let isIn = false;
+    for (
+      let at = 0, last = shape.length - 1;
+      at < shape.length;
+      last = at, at += 1
+    ) {
+      const a = shape[at];
+      const b = shape[last];
+      if (
+        a != null &&
+        b != null &&
+        a.y > point.y !== b.y > point.y &&
+        point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x
+      ) {
+        isIn = !isIn;
+      }
     }
-    return { valid, rows };
+    return isIn;
+  }
+
+  function gather(shape: Array<Point>) {
+    const gl = engine.gl;
+    if (gl == null || shape.length < 3) {
+      return;
+    }
+    const xs = shape.map((point) => point.x);
+    const ys = shape.map((point) => point.y);
+    const box = {
+      west: Math.max(0, Math.min(...xs)),
+      east: Math.min(room.width, Math.max(...xs)),
+      north: Math.max(0, Math.min(...ys)),
+      south: Math.min(room.height, Math.max(...ys)),
+    };
+    const step = Math.max(
+      4,
+      Math.sqrt(((box.east - box.west) * (box.south - box.north)) / 3000),
+    );
+    const found = new Set(view.picked);
+    for (let y = box.north + step / 2; y < box.south; y += step) {
+      for (let x = box.west + step / 2; x < box.east; x += step) {
+        if (inside({ x, y }, shape)) {
+          const hit = stage.pick({ x, y }, tier);
+          if (hit != null) {
+            found.add(hit.set.places.k[hit.i] ?? 0);
+          }
+        }
+      }
+    }
+    for (const set of shown) {
+      for (const [i, k] of set.places.k.entries()) {
+        const x = set.places.x[i];
+        const y = set.places.y[i];
+        if (x == null || y == null || found.has(k)) {
+          continue;
+        }
+        const point = gl.project([x, y]);
+        if (inside(point, shape) && stage.find(k) != null) {
+          found.add(k);
+        }
+      }
+    }
+    view.picked = [...found].slice(0, 5000);
+  }
+
+  function draw(event: PointerEvent) {
+    const isBox = event.shiftKey && event.pointerType === "mouse";
+    if (event.button !== 0 || (!isBox && !isAdding)) {
+      return;
+    }
+    const target = event.currentTarget;
+    if (lasso != null || !(target instanceof HTMLElement)) {
+      lasso = null;
+      return;
+    }
+    const frame = target.getBoundingClientRect();
+    engine.gl?.dragPan.disable();
+    lasso = {
+      isBox,
+      id: event.pointerId,
+      left: frame.left,
+      top: frame.top,
+      points: [{ x: event.clientX - frame.left, y: event.clientY - frame.top }],
+    };
+  }
+
+  function trace(event: PointerEvent) {
+    const held = lasso;
+    if (held == null || event.pointerId !== held.id) {
+      return;
+    }
+    const point = { x: event.clientX - held.left, y: event.clientY - held.top };
+    const last = held.points.at(-1);
+    if (last == null || Math.hypot(point.x - last.x, point.y - last.y) < 3) {
+      return;
+    }
+    if (
+      event.currentTarget instanceof HTMLElement &&
+      !event.currentTarget.hasPointerCapture(event.pointerId)
+    ) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+    lasso = {
+      ...held,
+      points: held.isBox
+        ? [held.points[0] ?? point, point]
+        : [...held.points, point],
+    };
+  }
+
+  function close(event: PointerEvent) {
+    const held = lasso;
+    if (held == null || event.pointerId !== held.id) {
+      return;
+    }
+    lasso = null;
+    if (!isAdding) {
+      engine.gl?.dragPan.enable();
+    }
+    const shape = held.isBox ? corners(held.points) : held.points;
+    const xs = shape.map((point) => point.x);
+    const ys = shape.map((point) => point.y);
+    if (
+      event.type === "pointerup" &&
+      Math.max(...xs) - Math.min(...xs) + Math.max(...ys) - Math.min(...ys) > 12
+    ) {
+      gather(shape);
+    }
+  }
+
+  function corners(points: Array<Point>) {
+    const a = points[0];
+    const b = points.at(-1);
+    return a == null || b == null
+      ? []
+      : [a, { x: b.x, y: a.y }, b, { x: a.x, y: b.y }];
   }
 
   function title(hit: Hit) {
@@ -560,40 +767,42 @@
       return hit == null ? [] : [hit];
     });
   });
-  const summary = $derived.by(() => {
-    void named;
-    if (picked.length === 0) {
-      const from = base;
-      const hits =
-        from == null
+  const overall = $derived.by(() => {
+    const from = base;
+    const at = above?.places.k.indexOf(head.scope.k) ?? -1;
+    return summarize(
+      above != null && at !== -1
+        ? [{ set: above, i: at, tier: 0, source: "" }]
+        : from == null
           ? []
           : from.places.k.map((_, i) => ({
               set: from,
               i,
               tier: 0,
               source: "",
-            }));
-      const { valid, rows } = summarize(hits);
+            })),
+    );
+  });
+  const summary = $derived.by(() => {
+    void named;
+    if (picked.length === 0) {
       return {
+        ...overall,
         name: head.scope.name,
         kind: [head.title, head.date == null ? "" : date(head.date)]
           .filter((part) => part !== "")
           .join(", "),
-        valid,
-        rows,
         isCombined: false,
       };
     }
-    const { valid, rows } = summarize(picked);
     const one = picked[0];
     return {
+      ...summarize(picked),
       name:
         picked.length === 1 && one != null
           ? title(one)
           : m.atlas_picked({ count: picked.length }),
       kind: picked.length === 1 && one != null ? where(one) : head.scope.name,
-      valid,
-      rows,
       isCombined: picked.length > 1,
     };
   });
@@ -609,7 +818,15 @@
   const actions = $derived.by(() => {
     const one = picked.length === 1 ? picked[0] : null;
     if (one == null) {
-      return [];
+      const crumb = head.trail.length > 1 ? head.trail.at(-2) : null;
+      return crumb == null || picked.length > 0
+        ? []
+        : [
+            {
+              label: m.atlas_up({ place: crumb.name }),
+              onclick: () => void go(crumb.unit),
+            },
+          ];
     }
     const k = one.set.places.k[one.i];
     const part = base?.parts.find((entry) => entry.k === k) ?? null;
@@ -622,8 +839,133 @@
               label: m.atlas_alone({ place: part.name }),
               onclick: () => void go(part.unit),
             },
+            ...(whole == null
+              ? [
+                  {
+                    label: m.atlas_open({ place: part.name }),
+                    href: resolve("/[...path]", {
+                      path: `${path}/${part.unit}`,
+                    }),
+                  },
+                ]
+              : []),
           ]),
     ];
+  });
+  const standing = $derived.by(() => {
+    void named;
+    const one = picked.length === 1 ? picked[0] : null;
+    const { first, second } = lens;
+    if (one == null || first == null || second == null) {
+      return null;
+    }
+    const { set, i } = one;
+    const a = set.legend.findIndex((item) => item.key === first);
+    const b = set.legend.findIndex((item) => item.key === second);
+    if (a === -1 || b === -1) {
+      return null;
+    }
+    const spread = (column: "shares" | "before", at: number) => {
+      const ahead = set.places[column][a]?.[at];
+      const behind = set.places[column][b]?.[at];
+      return ahead == null || behind == null ? null : (ahead - behind) / 10_000;
+    };
+    const margin = spread("shares", i);
+    if (margin == null) {
+      return null;
+    }
+    const held = mosaic != null && set === mosaic.set ? mosaic : null;
+    const places: Array<{ name: string; margin: number; isOwn: boolean }> = [];
+    let total = 0;
+    let weighted = 0;
+    let votes = 0;
+    for (const at of set.places.k.keys()) {
+      if (
+        set.places.leader[at] == null ||
+        (held != null &&
+          (held.part[at] !== held.part[i] || held.layer[at] !== held.layer[i]))
+      ) {
+        continue;
+      }
+      total += 1;
+      const value = spread("shares", at);
+      if (value == null) {
+        continue;
+      }
+      places.push({
+        name: set.places.name[at] ?? "",
+        margin: value,
+        isOwn: at === i,
+      });
+      weighted += value * (set.places.valid[at] ?? 0);
+      votes += set.places.valid[at] ?? 0;
+    }
+    const within =
+      held == null
+        ? set.scope.name
+        : (base?.parts[held.part[i] ?? -1]?.name ?? head.scope.name);
+    const side = (key: string) =>
+      overall.rows.find(
+        (row) => row.key === key || row.label === labels.get(key),
+      )?.share ?? 0;
+    const lead = side(first) - side(second);
+    return {
+      sides: [
+        { label: labels.get(first) ?? "", tone: lens.tone(first) },
+        { label: labels.get(second) ?? "", tone: lens.tone(second) },
+      ] as [{ label: string; tone: string }, { label: string; tone: string }],
+      place: { name: title(one), margin, before: spread("before", i) },
+      marks: [
+        {
+          name: within,
+          margin:
+            within === head.scope.name
+              ? lead
+              : votes === 0
+                ? 0
+                : weighted / votes,
+        },
+        ...(within === head.scope.name
+          ? []
+          : [{ name: head.scope.name, margin: lead }]),
+      ],
+      within,
+      siblings: {
+        noun: noun(one),
+        count: places.length,
+        total,
+        rank:
+          1 +
+          places.filter((entry) =>
+            margin >= 0 ? entry.margin > margin : entry.margin < margin,
+          ).length,
+        places: places.toSorted((x, y) => x.margin - y.margin),
+      },
+    };
+  });
+  const listed = $derived.by(() => {
+    void named;
+    void drawn;
+    if (picked.length > 1) {
+      return isApart && picked.length <= 6
+        ? { title: null, rows: picked.map((hit) => brief(hit)) }
+        : null;
+    }
+    const from = picked.length === 0 ? base : null;
+    if (from == null || from.places.k.length < 3) {
+      return null;
+    }
+    const level =
+      from.levels.find((entry) => entry.code === from.level)?.noun ?? "";
+    return {
+      title: m.atlas_largest({ places: plural(level) }),
+      rows: from.places.valid
+        .entries()
+        .toArray()
+        .toSorted(([, x], [, y]) => y - x)
+        .slice(0, 5)
+        .map(([i]) => brief({ set: from, i, tier: 0, source: "" })),
+    };
   });
   const shown = $derived.by(() => {
     void drawn;
@@ -731,6 +1073,49 @@
     return () => {
       isStale = true;
     };
+  });
+
+  const upper = $derived(
+    head.trail.length > 1 ? (head.trail.at(-2)?.unit ?? null) : null,
+  );
+
+  $effect(() => {
+    const crumb = upper;
+    const wanted =
+      crumb == null ? null : { ...ask, unit: crumb === "" ? null : crumb };
+    let isStale = false;
+    above = null;
+    if (wanted != null) {
+      void load(contest, wanted)
+        .then((set) => {
+          if (!isStale) {
+            above = set;
+          }
+        })
+        .catch(() => {});
+    }
+    return () => {
+      isStale = true;
+    };
+  });
+
+  $effect(() => {
+    const isOn = isAdding;
+    const gl = engine.gl;
+    if (gl == null) {
+      return;
+    }
+    if (isOn) {
+      gl.dragPan.disable();
+    } else {
+      gl.dragPan.enable();
+    }
+  });
+
+  $effect(() => {
+    if (picked.length < 2 || picked.length > 6) {
+      isApart = false;
+    }
   });
 
   $effect(() => {
@@ -1028,8 +1413,54 @@
     {year}
     {actions}
     {layout}
+    isApart={listed != null && listed.title == null}
     onclear={view.picked.length > 0 ? () => (view.picked = []) : null}
   />
+  {#if layout === "full" || layout === "body"}
+    {#if picked.length > 1 && picked.length <= 6}
+      <div class="grid grid-cols-[minmax(0,1fr)]">
+        <Segmented
+          label={m.atlas_selection_view()}
+          size="sm"
+          fill
+          options={[
+            { value: "together", label: m.atlas_together() },
+            { value: "apart", label: m.atlas_apart() },
+          ]}
+          value={isApart ? "apart" : "together"}
+          onValueChange={(value) => {
+            isApart = value === "apart";
+          }}
+        />
+      </div>
+    {/if}
+    {#if listed != null}
+      <Places
+        title={listed.title}
+        rows={listed.rows}
+        {year}
+        onpick={(k: number) => {
+          const hit = stage.find(k);
+          view.picked = [k];
+          if (hit != null) {
+            focus(hit);
+          }
+        }}
+        onhover={(k: number | null) => hover(k == null ? null : stage.find(k))}
+      />
+    {/if}
+    {#if standing != null}
+      <Standing
+        sides={standing.sides}
+        place={standing.place}
+        marks={standing.marks}
+        within={standing.within}
+        siblings={standing.siblings}
+        year={year == null ? null : Number(year)}
+        isCompact
+      />
+    {/if}
+  {/if}
 {/snippet}
 
 {#snippet controls()}
@@ -1155,9 +1586,30 @@
         aria-describedby="{uid}-hint"
         bind:clientWidth={room.width}
         bind:clientHeight={room.height}
+        onpointerdowncapture={draw}
+        onpointermove={trace}
+        onpointerup={close}
+        onpointercancel={close}
       >
         <div class="block-full inline-full" {@attach engine.mount}></div>
       </div>
+      {#if lasso != null && lasso.points.length > 1}
+        {const shape = $derived(
+          lasso.isBox ? corners(lasso.points) : lasso.points,
+        )}
+        <svg
+          class="pointer-events-none absolute inset-0 z-10 block-full inline-full"
+          aria-hidden="true"
+        >
+          <polygon
+            points={shape.map((point) => `${point.x},${point.y}`).join(" ")}
+            class="fill-foreground/8 stroke-foreground"
+            stroke-width="1.5"
+            stroke-dasharray="5 4"
+            stroke-linejoin="round"
+          />
+        </svg>
+      {/if}
       <p id="{uid}-hint" class="sr-only">{m.atlas_hint()}</p>
 
       <div
@@ -1177,7 +1629,15 @@
         <Hover summary={glance} point={pointer} {room} />
       {/if}
 
-      {#if pending > 0 || base == null}
+      {#if isAdding && view.picked.length === 0 && pending === 0}
+        <p
+          class="pointer-events-none absolute inset-x-0 inset-bs-3 z-10 mx-auto rounded-sm bg-foreground px-3 py-1.5 text-center text-[0.8125rem] font-semibold text-pretty text-card shadow-menu inline-fit max-inline-[min(24rem,calc(100%-6rem))]"
+          role="status"
+          transition:fade={{ duration: calm.current ? 0 : 120 }}
+        >
+          {wide.current ? m.atlas_select_hint() : m.atlas_select_hint_touch()}
+        </p>
+      {:else if pending > 0 || base == null}
         <p
           class="pointer-events-none absolute inset-x-0 inset-bs-3 z-10 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit"
           role="status"

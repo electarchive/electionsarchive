@@ -1,6 +1,6 @@
 <script lang="ts">
   import XIcon from "@lucide/svelte/icons/x";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, numbers, percent, points, precision } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -10,31 +10,68 @@
     onclear,
     actions = [],
     layout = "full",
+    isApart = false,
   }: {
     summary: {
       name: string;
       kind: string;
       valid: number;
+      previous: number | null;
+      isExact: boolean;
       isCombined: boolean;
       rows: Array<{
         key: string;
         label: string;
         tone: string;
         share: number;
+        votes: number | null;
         change: number | null;
         isLeader: boolean;
       }>;
+      verdict: {
+        label: string;
+        tone: string;
+        margin: number;
+        then: {
+          label: string;
+          tone: string;
+          margin: number;
+          isFlipped: boolean;
+        } | null;
+      } | null;
     };
     year: string | null;
     onclear: (() => void) | null;
     actions?: Array<{ label: string; href?: string; onclick?: () => void }>;
     layout?: "full" | "peek" | "head" | "body";
+    isApart?: boolean;
   } = $props();
+
+  function gap(margin: number) {
+    const digits = precision(margin);
+    return numbers({
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(Math.abs(margin) * 100);
+  }
+
+  function tally(votes: number) {
+    return summary.isExact
+      ? count(Math.round(votes))
+      : numbers({ notation: "compact", maximumSignificantDigits: 3 }).format(
+          votes,
+        );
+  }
 
   let isAll = $state(false);
   const LIMIT = 6;
   const top = $derived(summary.rows[0]?.share ?? 0);
   const rows = $derived(isAll ? summary.rows : summary.rows.slice(0, LIMIT));
+  const growth = $derived(
+    summary.previous == null || summary.previous === 0 || summary.valid === 0
+      ? null
+      : summary.valid / summary.previous - 1,
+  );
   const lead = $derived(
     summary.rows.length > 1
       ? (summary.rows[0]?.share ?? 0) - (summary.rows[1]?.share ?? 0)
@@ -70,7 +107,42 @@
     </header>
   {/if}
 
-  {#if summary.rows.length > 0 && layout !== "head"}
+  {#if summary.verdict != null && (layout === "full" || layout === "body")}
+    {const verdict = $derived(summary.verdict)}
+    <div class="grid gap-1 border-s-3 ps-2.5" style:border-color={verdict.tone}>
+      <p class="text-[0.9375rem]/5 font-semibold text-pretty">
+        {m.atlas_verdict({ name: verdict.label, points: gap(verdict.margin) })}
+      </p>
+      {#if verdict.then != null && year != null}
+        <p
+          class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] text-muted-foreground"
+        >
+          <span
+            >{m.atlas_verdict_then({
+              name: verdict.then.label,
+              points: gap(verdict.then.margin),
+              year,
+            })}</span
+          >
+          {#if verdict.then.isFlipped}
+            <span
+              class="rounded-xs px-1.5 text-xs/5 font-semibold text-card"
+              style:background={verdict.tone}>{m.map_flipped()}</span
+            >
+          {/if}
+        </p>
+      {/if}
+      {#if growth != null && year != null && Math.abs(growth) >= 0.0005}
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {growth > 0
+            ? m.atlas_votes_more({ percent: percent(growth), year })
+            : m.atlas_votes_fewer({ percent: percent(-growth), year })}
+        </p>
+      {/if}
+    </div>
+  {/if}
+
+  {#if summary.rows.length > 0 && layout !== "head" && !(isApart && layout !== "peek")}
     {#if layout === "peek"}
       {const leader = $derived(summary.rows[0])}
       {#if leader != null}
@@ -102,6 +174,12 @@
                 class={cn("flex-1 truncate", { "font-semibold": row.isLeader })}
                 >{row.label}</span
               >
+              {#if row.votes != null}
+                <span
+                  class="font-figures text-xs text-muted-foreground tabular-nums"
+                  >{tally(row.votes)}</span
+                >
+              {/if}
               {#if row.change != null}
                 <span
                   class="font-figures text-xs text-muted-foreground tabular-nums"

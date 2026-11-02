@@ -135,6 +135,10 @@ function decode(key: string, raw: Raw, base: Sheet): Mosaic | null {
           raw.places.before.length > 0
             ? raw.places.before.map((column) => scale(column))
             : raw.legend.map(() => empty),
+        previous:
+          raw.places.previous != null && raw.places.previous.length > 0
+            ? raw.places.previous
+            : raw.places.valid,
         redrawn: empty,
       },
     },
