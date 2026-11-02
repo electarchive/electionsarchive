@@ -159,12 +159,15 @@ def emit() -> Path:
         )
         labels: dict[tuple[UUID, str], UUID | None] = {}
         option_party: dict[UUID, UUID | None] = {}
-        for contest, option, party_id, k, label in conn.execute(
-            "select contest_id, id, party_id, k, ballot_label from contest_option where contest_id = any(%s)",
+        heads: set[UUID] = set()
+        for contest, option, party_id, k, label, kind in conn.execute(
+            "select contest_id, id, party_id, k, ballot_label, kind::text from contest_option where contest_id = any(%s)",
             [[contest for contest, _ in contests.values()]],
         ).fetchall():
             options[contest][party_id] = (option, tally.get(k))
             option_party[option] = party_id
+            if kind in ("independents", "others"):
+                heads.add(option)
             labels[(contest, fold(label))] = party_id
         by_votes: dict[UUID, dict[int, UUID]] = defaultdict(dict)
         for contest, option, k in conn.execute(
@@ -407,7 +410,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=declared[contest],
                     option_id=option,
-                    candidacy_id=candidacy,
+                    candidacy_id=candidacy if option in heads else None,
                     kind="elected",
                     seats=None,
                 )
