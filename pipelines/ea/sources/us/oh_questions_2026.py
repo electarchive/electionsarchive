@@ -339,6 +339,10 @@ ADDED.append(
 
 GEOIDS = {("Montgomery", "City", "Oakwood"): "3957764"}
 
+MISFILED = {
+    f"{DAY}:OH:3904458:question:general-permanent-improvements-1": "The Secretary of State's issue summary lists this levy under Oakwood City School District, not the Beach City election it was filed in.",
+}
+
 WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
 
 
@@ -641,5 +645,8 @@ def emit() -> Path:
                 )
             cs.add("note", entity_id=contest, kind="context", body_md=row["text"])
             cs.add("citation", entity_id=contest, source_id=source)
+        for key, reason in MISFILED.items():
+            if key in keyed:
+                cs.add("entity_retirement", entity_id=keyed[key], reason=reason)
         print(f"{kept} of {frame.height} questions")
         return cs.write()
