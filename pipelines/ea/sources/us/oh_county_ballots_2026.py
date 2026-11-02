@@ -193,8 +193,9 @@ COUNTY_OF = {"Stark County District Library": "Stark"}
 SCHOOLS = "us.oh_questions_2026"
 DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directory/2022/?fips=39"
 PRECINCT = re.compile(r"(?<=[a-z])\s+(?:\d+-?[A-Z]|[A-Z])$|(?<=[A-Z])\s+\d+-[A-Z]$")
+MAJORITY = re.compile(r"A\s*majority\s*affirmative\s*vote")
 START = re.compile(
-    r"^(?:Sample\s*)*(?:[#]?\d+[.]?(?:\s\d)?\s*)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
+    r"^(?:Sample\s*)*(?:[#]?\d+[.]?(?:\s\d)?\s*)?(?:Issue\s*\d+\s*)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
 )
 
 
@@ -453,7 +454,7 @@ def body_text(body: list[str]) -> str:
 
 def opens_issue(lines: list[str], cursor: int) -> bool:
     return START.match(lines[cursor]) is not None and any(
-        line.startswith("A majority affirmative vote") for line in lines[cursor + 1 : cursor + 5]
+        MAJORITY.match(line) for line in lines[cursor + 1 : cursor + 5]
     )
 
 
@@ -462,7 +463,7 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
     rows = []
     seen = set()
     for index, line in enumerate(lines):
-        if not line.startswith("A majority affirmative vote"):
+        if not MAJORITY.match(line):
             continue
         head: list[str] = []
         cursor = index - 1
@@ -478,7 +479,7 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
             print("no header:", county, head)
             continue
         head[0] = re.sub(
-            r"^(?:Sample\s*)*(?:#?\d+\.?(?:\s\d)?\s*)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)",
+            r"^(?:Sample\s*)*(?:#?\d+\.?(?:\s\d)?\s*)?(?:Issue\s*\d+\s*)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)",
             "",
             head[0],
         )
@@ -508,6 +509,47 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
     return rows
 
 
+NOTICE_KIND = re.compile(r"^(?:A|An) (renewal|additional|replacement)\b", re.IGNORECASE)
+LISTED_HEAD = re.compile(r"^(PROPOSED (?:TAX LEVY|INCOME TAX|BOND ISSUE|COMBINATION)\b.*|LOCAL OPTION.*|SPECIAL ELECTION.*)$")
+
+
+def notice_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
+    rows = []
+    for block in re.split(r"(?=Notice of Election (?:on|to be))", " ".join(line.strip() for line in lines)):
+        who = re.search(
+            r"resolution of the (?:Council|Trustees|Commissioners|Board of Education) of (?:the )?(.+?), Ohio", block
+        )
+        body = re.search(r"(?:which shall be|the question of):\s*(.*?)\s*The polls for the election", block)
+        if who is None or body is None:
+            continue
+        text = re.sub(r"\s+", " ", body[1]).strip()
+        if text.startswith("Shall an annual income tax"):
+            kind = "PROPOSED INCOME TAX"
+        elif re.search(r"sales and use tax", text[:300]):
+            kind = "PROPOSED SALES AND USE TAX"
+        else:
+            levy = NOTICE_KIND.match(text)
+            kind = f"PROPOSED TAX LEVY ({levy[1].upper()})" if levy else "PROPOSED TAX LEVY"
+        rows.append({"url": url, "county": county, "kind": kind, "entity": who[1], "text": text})
+    return rows
+
+
+def listed_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
+    lines = [line.strip() for line in lines if line.strip()]
+    heads = [index for index, line in enumerate(lines) if LISTED_HEAD.match(line)]
+    rows = []
+    for start, end in zip(heads, [*heads[1:], len(lines)], strict=False):
+        block = lines[start + 1 : end]
+        if len(block) < 3 or block[-1].endswith((".", "?")):
+            continue
+        text = re.sub(r"\s+", " ", " ".join(block[:-1])).strip()
+        named = re.search(r"(?:benefit of|imposed by) (?:the )?(.+?)(?:,| for\b| excluding\b)", text)
+        rows.append(
+            {"url": url, "county": county, "kind": lines[start], "entity": named[1] if named else block[-1], "text": text}
+        )
+    return rows
+
+
 def wayne() -> list[dict[str, str]]:
     text = subprocess.run(
         ["pdftotext", "-raw", str(raw.cached(SOURCE, WAYNE_FILE).path), "-"], capture_output=True, text=True, check=True
@@ -515,8 +557,8 @@ def wayne() -> list[dict[str, str]]:
     return ballot_issues(text.split("\n"), WAYNE_FILE, "Wayne")
 
 
-def ocr(url: str) -> list[str]:
-    folder = PARSED / "ocr" / "lorain"
+def ocr(url: str, name: str = "lorain") -> list[str]:
+    folder = PARSED / "ocr" / name
     folder.mkdir(parents=True, exist_ok=True)
     if not list(folder.glob("*.png")):
         subprocess.run(
@@ -543,10 +585,19 @@ def mf_samples() -> list[dict[str, str]]:
         if county == "Stark":
             continue
         key = mf_key(county, path)
-        text = subprocess.run(
-            ["pdftotext", "-raw", str(raw.cached(SOURCE, key).path), "-"], capture_output=True, text=True, check=True
-        ).stdout
-        for row in ballot_issues(text.split("\n"), key, county):
+        found = []
+        for flags in (["-raw"], []):
+            text = subprocess.run(
+                ["pdftotext", *flags, str(raw.cached(SOURCE, key).path), "-"], capture_output=True, text=True, check=True
+            ).stdout
+            found = ballot_issues(text.split("\n"), key, county)
+            if found:
+                break
+        if not text.strip():
+            found = ballot_issues(ocr(key, re.sub(r"\W+", "-", f"{county}-{path.stem}").lower()), key, county)
+        if not found:
+            found = notice_issues(text.split("\n"), key, county) or listed_issues(text.split("\n"), key, county)
+        for row in found:
             rows.setdefault((county, row["kind"], row["entity"], row["text"]), {**row, **mf_meta(county, path)})
     return list(rows.values())
 
@@ -678,7 +729,9 @@ def parse() -> None:
 
 
 def keys(name: str) -> set[str]:
-    bare = re.sub(r"\s+Village$", "", name)
+    name = re.sub(r"\b(of|the)(?=[A-Z])", r"\1 ", name.replace("\u2010", "-").replace("\u2011", "-"))
+    name = re.sub(r"\s*\((?:excluding|exclusive|unincorporated)[^)]*\)", "", name, flags=re.IGNORECASE)
+    bare = re.sub(r"\s*village$", "", name, flags=re.IGNORECASE)
     name = re.sub(
         r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name
     )
@@ -744,6 +797,8 @@ def pick(
             ]
         if options:
             break
+    if not options:
+        options = [c for k in keys(f"{row['county']} County") for c in contests.get(k, []) if c[0] not in used]
     options = [c for c in options if c[3] in ("", fips)]
     if row.get("hint"):
         options = [c for c in options if row["hint"] in c[2]]
@@ -759,13 +814,15 @@ def pick(
         wanted = "income tax"
     elif "BOND" in kind:
         wanted = "bond"
+    elif "SALES" in kind:
+        wanted = "sales"
     else:
         wanted = "tax levy"
     narrowed = [c for c in options if c[2].lower().startswith(wanted)]
     for word in ("additional", "renewal", "replacement", "decrease", "increase"):
         if len(narrowed) > 1 and word in kind.lower():
             narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
-    text = row["text"].lower()
+    text = re.sub(r"(\d+)\.0+\b", r"\1", re.sub(r"(?<![\d.])\.(\d)", r"0.\1", row["text"].lower()))
     if len(narrowed) > 1 and "liquor" in kind.lower():
         sunday = "sunday" in kind.lower()
         narrowed = [c for c in narrowed if ("sunday" in c[2].lower().split("purpose:")[0]) == sunday] or narrowed
@@ -788,6 +845,12 @@ def pick(
         )
         if scores[0][0] > scores[1][0]:
             narrowed = [scores[0][1]]
+    if (
+        len({c[0] for c in narrowed}) > 1
+        and len({(c[1], c[2]) for c in narrowed}) == 1
+        and "township" not in row["entity"].lower()
+    ):
+        narrowed = sorted(narrowed, key=lambda c: str(c[0]))[:1]
     if len({c[0] for c in narrowed}) != 1:
         return None
     note = narrowed[0][2].lower()
@@ -824,7 +887,7 @@ def emit() -> Path:
                join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like %s
                join election e on e.id = c.election_id
                join name n on n.entity_id = e.polity_id and n.is_preferred and n.lang = 'en'
-               left join note t on t.entity_id = c.id and t.kind = 'context'""",
+               left join lateral (select body_md from note where entity_id = c.id and kind = 'context' order by recorded_from desc limit 1) t on true""",
             [f"{DAY}:OH:%:question:%"],
         ).fetchall():
             code = code.removesuffix("-sd")
@@ -846,6 +909,14 @@ def emit() -> Path:
             polity="US-OH",
         )
         sources: dict[str, UUID] = {}
+        existing = {
+            (contest, url): body
+            for contest, url, body in conn.execute(
+                """select b.contest_id, b.url, b.body from ballot_question_text b
+                   join changeset c on c.id = b.changeset_id where c.pipeline = %s and b.kind = 'text'""",
+                [SOURCE],
+            )
+        }
         covered = {
             contest
             for (contest,) in conn.execute("select contest_id from ballot_question_text where source_id is not null")
@@ -869,7 +940,7 @@ def emit() -> Path:
                     continue
                 progress = True
                 used.add(contest)
-                if contest in covered:
+                if contest in covered and existing.get((contest, row["url"]), row["text"]) == row["text"]:
                     continue
                 kept += 1
                 if row["url"] not in sources:
