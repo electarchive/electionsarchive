@@ -35,10 +35,7 @@ FETCHED = 330
 MONTHS = {name[:3].lower(): number for number, name in enumerate(calendar.month_name) if name}
 MONTH = r"([A-Za-z]{3})[a-z]*\.?"
 FREE = re.compile(r"pd|cc0|cc-by(-sa)?-[0-9.]+(-[a-z]+)?")
-FREE_NAME = re.compile(
-    r"Public domain|CC0( 1\.0)?|CC BY(-SA)? [0-9.]+( [A-Za-z]+)?|OGL( v?[0-9.]+)?|Copyrighted free use(-link)?"
-    r"|No restrictions|Attribution|PDM-owner|Licence Ouverte"
-)
+FREE_NAME = re.compile(r"Public domain|CC0( 1\.0)?|CC BY(-SA)? [0-9.]+( [A-Za-z]+)?|OGL( v?[0-9.]+)?|Licence Ouverte")
 HOSTS = {
     "bioguide.congress.gov": "Biographical Directory of the United States Congress",
     "parl.gc.ca": "Library of Parliament",
