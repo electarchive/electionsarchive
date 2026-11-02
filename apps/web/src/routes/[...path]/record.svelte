@@ -50,9 +50,6 @@
   const tabOptions = $derived(
     series.map((entry) => ({ value: entry.id, label: entry.name })),
   );
-  const parties = $derived(
-    new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
-  );
   const current = $derived.by(() => {
     const partied = new Map(
       series.map((entry) => [
@@ -74,6 +71,19 @@
       null
     );
   });
+  const staggered = $derived.by(() => {
+    if (current == null || current.isOffice) {
+      return false;
+    }
+    const thin = current.points.filter(
+      (point) => point.size != null && point.filled < 0.6 * point.size,
+    );
+    return thin.length * 2 > current.points.length;
+  });
+  const body = createQuery(() => ({
+    ...orpc.bodies.get.queryOptions({ input: { id: current?.id ?? "" } }),
+    enabled: staggered,
+  }));
   const isSingle = $derived(
     current?.isOffice === true &&
       current.points.every((point) => point.filled === 1),
@@ -89,7 +99,7 @@
       return true;
     });
   });
-  const terms = $derived(
+  const pointTerms = $derived(
     sessions.map((point, index, all) => ({
       start: point.date,
       end:
@@ -126,15 +136,120 @@
       election: { name: point.name, path: point.path, date: point.date },
     })),
   );
+  const makeupTerms = $derived.by(() => {
+    const data = body.data;
+    if (
+      !staggered ||
+      data == null ||
+      current == null ||
+      data.makeup.length === 0
+    ) {
+      return null;
+    }
+    const tally = (entries: Array<{ seats: number }>) => {
+      let total = 0;
+      for (const entry of entries) {
+        total += entry.seats;
+      }
+      return total;
+    };
+    const seatsOn = (on: string) =>
+      (
+        data.sizes.find(
+          (entry) =>
+            entry.from != null &&
+            entry.from >= on &&
+            Date.parse(entry.from) - Date.parse(on) < 3.5e10,
+        ) ??
+        data.sizes.find(
+          (entry) =>
+            (entry.from == null || entry.from <= on) &&
+            (entry.to == null || entry.to > on),
+        )
+      )?.seats ?? null;
+    const covered = data.makeup.filter((term) => {
+      const seats = seatsOn(term.start);
+      return seats == null || tally(term.parties) >= 0.85 * seats;
+    });
+    if (covered.length < 0.8 * data.makeup.length) {
+      return null;
+    }
+    const keyOf = (entry: {
+      party: string | null;
+      category: string;
+      isIndependent: boolean;
+    }) => {
+      if (entry.category !== "elected") {
+        return `category:${entry.category}`;
+      }
+      return entry.party == null && entry.isIndependent
+        ? "independent"
+        : entry.party;
+    };
+    const bodyParties = new Map(data.parties.map((party) => [party.id, party]));
+    const first = Date.parse(data.makeup[0]?.start ?? "9999-12-31") - 2e10;
+    const final = Date.parse(data.makeup.at(-1)?.start ?? "0000-01-01") + 2e10;
+    const seatedTerms = data.makeup.map((term, index, all) => {
+      const settled = new Date(Date.parse(term.start) + 30 * 864e5)
+        .toISOString()
+        .slice(0, 10);
+      const point = current.points.findLast(
+        (entry) => entry.date <= term.start,
+      );
+      return {
+        start: term.start,
+        end: all[index + 1]?.start ?? null,
+        total: tally(term.parties),
+        size: seatsOn(term.start),
+        apportioned: term.apportioned,
+        seceded: term.seceded,
+        undated: term.undated.filter((to) => to == null || to > settled).length,
+        isSeated: true,
+        isPartial: false,
+        parties: term.parties.map((entry) => ({
+          party: keyOf(entry),
+          seats: entry.seats,
+        })),
+        names: Object.fromEntries(
+          term.parties.flatMap((entry) => {
+            const key = keyOf(entry);
+            const found = key == null ? undefined : bodyParties.get(key);
+            return key == null || found == null
+              ? []
+              : [[key, { label: found.label, short: found.short }] as const];
+          }),
+        ),
+        election:
+          point == null ||
+          Date.parse(term.start) - Date.parse(point.date) > 8e10
+            ? null
+            : { name: point.name, path: point.path, date: point.date },
+      };
+    });
+    return [
+      ...pointTerms.filter((term) => Date.parse(term.start) < first),
+      ...seatedTerms,
+      ...pointTerms.filter((term) => Date.parse(term.start) > final),
+    ];
+  });
+  const roster = $derived.by(() => {
+    const listed = record.data?.parties ?? [];
+    if (makeupTerms == null) {
+      return listed;
+    }
+    const ids = new Set(listed.map((party) => party.id));
+    return [
+      ...listed,
+      ...(body.data?.parties ?? []).filter((party) => !ids.has(party.id)),
+    ];
+  });
+  const parties = $derived(new Map(roster.map((party) => [party.id, party])));
+  const terms = $derived(makeupTerms ?? pointTerms);
   const held = $derived([
-    ...(record.data?.parties ?? []).map((party) => ({
-      ...party,
-      isStriped: false,
-      isMade: false,
-    })),
+    ...roster.map((party) => ({ ...party, isStriped: false, isMade: false })),
     ...stand(
       terms.flatMap((term) => term.parties.map((entry) => entry.party)),
-      record.data?.parties ?? [],
+      roster,
     ),
   ]);
   const band = $derived(cabinets.length > 0 ? 22 : 0);
@@ -483,7 +598,7 @@
         parties={held}
         governments={cabinets}
         link={(index: number) => {
-          const path = sessions[index]?.path;
+          const path = terms[index]?.election?.path;
           return path == null || coarse.current
             ? null
             : record.data?.scope == null
