@@ -138,8 +138,9 @@ def main() -> None:
     living = commands.add_parser("live", help="poll official election night feeds into the live schema")
     living.add_argument(
         "action",
-        choices=("run", "sync", "status"),
-        help="poll this poller's enabled feeds until stopped, load ea/live_feeds.toml into live.feed, or list feeds",
+        choices=("run", "sync", "status", "check"),
+        help="poll this poller's enabled feeds until stopped, load ea/live_feeds.toml into live.feed, list feeds, or "
+        "check that each feed, state, and page will work on the night (exits nonzero on any red row)",
     )
     living.add_argument("--poller", default="fsn1", help="which feeds to poll, by their poller column")
     living.add_argument("--once", action="store_true", help="poll each due feed once and stop")
@@ -183,6 +184,10 @@ def main() -> None:
         case "live":
             from ea import live
 
+            if args.action == "check":
+                from ea import live_check
+
+                raise SystemExit(live_check.run())
             if args.action == "run":
                 live.run(args.poller, args.once)
             else:
