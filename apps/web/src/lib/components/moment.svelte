@@ -27,9 +27,12 @@
   <Tooltip.Root delayDuration={250}>
     <Tooltip.Trigger tabindex={-1}>
       {#snippet child({ props }: { props: Record<string, unknown> })}
-        <time {...props} type={undefined} datetime={iso} class={className}
-          >{text}</time
-        >
+        {const timeProps = $derived(
+          Object.fromEntries(
+            Object.entries(props).filter(([key]) => key !== "type"),
+          ),
+        )}
+        <time {...timeProps} datetime={iso} class={className}>{text}</time>
       {/snippet}
     </Tooltip.Trigger>
     <Tooltip.Content collisionPadding={8} class="grid gap-0.5 font-figures">
