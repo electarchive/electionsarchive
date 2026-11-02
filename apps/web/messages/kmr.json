@@ -2399,6 +2399,7 @@
   "scrubber_pause": "Bisekinîne",
   "scrubber_slider": "Sala hilbijartinê",
   "scrubber_chamber": "{chamber} piştî hilbijartinê",
+  "scrubber_chamber_standing": "{chamber} wekî ku di {year} de hate hilbijartin",
   "scrubber_no_map": "Hê nexşeya {year} tune ye",
   "states_title": "Kursî li gorî eyaletên endam",
   "map_rebuilding": "Ev nexşe ji nû ve tê çêkirin. Piştî çend deqeyan dîsa binêre.",

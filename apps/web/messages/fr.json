@@ -2443,6 +2443,7 @@
   "scrubber_pause": "Pause",
   "scrubber_slider": "Année de l’élection",
   "scrubber_chamber": "{chamber} après l’élection",
+  "scrubber_chamber_standing": "{chamber} : composition élue en {year}",
   "scrubber_no_map": "Pas encore de carte pour {year}",
   "states_title": "Sièges par État membre",
   "map_rebuilding": "Cette carte est en cours de reconstruction. Revenez dans quelques minutes.",

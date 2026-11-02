@@ -2399,6 +2399,7 @@
   "scrubber_pause": "Pause",
   "scrubber_slider": "Wahljahr",
   "scrubber_chamber": "{chamber} nach der Wahl",
+  "scrubber_chamber_standing": "{chamber} nach der Wahl {year}",
   "scrubber_no_map": "Für {year} noch keine Karte",
   "states_title": "Sitze nach Mitgliedstaat",
   "map_rebuilding": "Diese Karte wird neu erstellt. Bitte versuchen Sie es in einigen Minuten erneut.",

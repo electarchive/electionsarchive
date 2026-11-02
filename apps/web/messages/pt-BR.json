@@ -2441,6 +2441,7 @@
   "scrubber_pause": "Pausar",
   "scrubber_slider": "Ano da eleição",
   "scrubber_chamber": "{chamber} após a eleição",
+  "scrubber_chamber_standing": "{chamber}: composição eleita em {year}",
   "scrubber_no_map": "Ainda não há mapa para {year}",
   "states_title": "Cadeiras por estado-membro",
   "map_rebuilding": "Este mapa está sendo reconstruído. Volte em alguns minutos.",
