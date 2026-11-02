@@ -295,7 +295,10 @@ function build(headers: Headers, isStaff: boolean) {
       if (error_ instanceof ORPCError) {
         return failure(explain(error_.message, error_.data));
       }
-      throw error_;
+      console.error(request.params.name, error_);
+      return failure(
+        "The archive couldn't answer that just now. Try again in a minute.",
+      );
     }
   });
   return server;
