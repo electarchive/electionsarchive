@@ -10,6 +10,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.store import DATA, connect
+from ea.typed import one
 
 SOURCE = "us.nh_sos_legislature"
 VERSION = "1"
@@ -183,7 +184,7 @@ def fetch() -> None:
 
 def parse() -> None:
     rows = []
-    disagreeing: set[tuple[int, str | None, int]] = set()
+    disagreeing: set[tuple[int, str | None, int | None]] = set()
     for year, name, county in ((y, n, c) for y in years() for n, c in FILES[y].items()):
         path = raw.cached(SOURCE, link(year, name)).path
         begin = len(rows)
@@ -442,10 +443,12 @@ def emit() -> Path:
                     for label, (_, votes) in matched.items()
                     if sums[label] and not label.startswith("Scatter")
                 )
-                publisher = conn.execute(
-                    "select s.publisher from result_set r join source s on s.id = r.source_id where r.id = %s",
-                    [default],
-                ).fetchone()[0]
+                publisher = one(
+                    conn.execute(
+                        "select s.publisher from result_set r join source s on s.id = r.source_id where r.id = %s",
+                        [default],
+                    )
+                )[0]
                 notes = [
                     *([("methodology", RECOUNTED)] if any(label.endswith("(recount)") for label in sums) else []),
                     *([("caveat", DOUBLED.format(publisher=publisher))] if doubled else []),

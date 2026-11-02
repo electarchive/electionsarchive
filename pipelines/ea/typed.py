@@ -15,3 +15,15 @@ def search(pattern: str | re.Pattern[str], text: str, flags: int = 0) -> re.Matc
     if found is None:
         raise LookupError(f"{pattern!r} does not match {text[:80]!r}")
     return found
+
+
+def required(found: re.Match[str] | None) -> re.Match[str]:
+    if found is None:
+        raise LookupError("the pattern did not match")
+    return found
+
+
+def present[T](value: T | None, name: str) -> T:
+    if value is None:
+        raise LookupError(f"{name} is missing")
+    return value

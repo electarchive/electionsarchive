@@ -11,6 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import ok_pri_judicial, ok_pri_pdf, ok_pri_state
 from ea.sources.us.oe_primaries_2026 import plain, title
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ok_judicial_generals"
 VERSION = "1"
@@ -110,16 +111,20 @@ def emit() -> Path:
             ("republican", "2018-06-26:OK:house:1:republican"),
             ("democratic", "2018-06-26:OK:house:1:democratic"),
         ):
-            parties[party] = conn.execute(
-                """select (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
+            parties[party] = one(
+                conn.execute(
+                    """select (select o.party_id from contest_option o where o.contest_id = c.id limit 1)
                    from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
                    where x.value = %s""",
-                [key],
-            ).fetchone()[0]
-        state_area = conn.execute(
-            """select u.area_id from reporting_unit u join polity p on p.id = u.polity_id
+                    [key],
+                )
+            )[0]
+        state_area = one(
+            conn.execute(
+                """select u.area_id from reporting_unit u join polity p on p.id = u.polity_id
                where p.iso_code = 'US-OK' and u.scheme_code = 'us.state'"""
-        ).fetchone()[0]
+            )
+        )[0]
         districts: dict[str, tuple[UUID, UUID]] = {}
         fptp = cs.key("us.electoral_system", "fptp")
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ok/%%'").fetchall()}
@@ -263,7 +268,7 @@ def emit() -> Path:
                 if rank == 0:
                     cs.add("outcome", result_set_id=result, option_id=options[candidate], kind="won")
             by_place: dict[str, int] = defaultdict(int)
-            rows = []
+            rows: list[tuple[str, str, str | None, int, int, int, int, int]] = []
             for candidate, by_county in by_candidate.items():
                 for county, votes in by_county.items():
                     fips, _ = counties[plain(county)]

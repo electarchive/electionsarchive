@@ -5,7 +5,9 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import Any
 
+from anthropic.types import ImageBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
@@ -131,7 +133,7 @@ def requests(
         for _, pages in parts:
             for page in pages:
                 for reader, dpi in dpis.items():
-                    block = {
+                    block: ImageBlockParam = {
                         "type": "image",
                         "source": {
                             "type": "base64",
@@ -152,7 +154,7 @@ def requests(
 
 def reads(
     scans: dict[str, list[tuple[str, tuple[int, ...]]]],
-) -> dict[tuple[str, int, str], dict[str, object]]:
+) -> dict[tuple[str, int, str], dict[str, Any]]:
     ready, note = batch.ensure(SOURCE, "canvass-scans", requests(scans))
     print(note)
     if not ready:
@@ -162,8 +164,8 @@ def reads(
 
 def stored(
     scans: dict[str, list[tuple[str, tuple[int, ...]]]],
-) -> dict[tuple[str, int, str], dict[str, object]]:
-    found: dict[tuple[str, int, str], dict[str, object]] = {}
+) -> dict[tuple[str, int, str], dict[str, Any]]:
+    found: dict[tuple[str, int, str], dict[str, Any]] = {}
     for day, parts in scans.items():
         source, url, _, _, dpis = LAYOUTS[day[:4]]
         sha = raw.cached(source, url.format(day[:4])).sha256

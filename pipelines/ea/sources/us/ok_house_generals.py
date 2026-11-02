@@ -179,9 +179,9 @@ def parse() -> None:
                         labels[column].append(phrase[0])
             names = [re.sub(r"\s*\(\w+\)$", "", " ".join(labels[end])) for end in ends[:-1]]
             rows.extend(tally(year, day, office, district, names, places, [value for _, value in totals]))
-    for office, district, names, places, totals in blocks_2010(pdf_text(URL_2010)):
+    for office, district, names, places, printed in blocks_2010(pdf_text(URL_2010)):
         coded = [(counties[re.sub(r"[^a-z]", "", name.lower())], cells) for name, cells in places]
-        rows.extend(tally(2010, DAYS[2010], office, district, names, coded, totals))
+        rows.extend(tally(2010, DAYS[2010], office, district, names, coded, printed))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,

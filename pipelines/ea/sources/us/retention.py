@@ -20,6 +20,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import medsl, medsl_state, ok_county, retention_iowa, retention_montana
 from ea.sources.us.medsl_state_precincts import FILES, TITLES
 from ea.store import DATA, connect
+from ea.typed import present
 
 SOURCE = "us.retention"
 VERSION = "1"
@@ -749,7 +750,8 @@ def oklahoma_counties() -> list[dict[str, object]]:
                 row = OKLAHOMA_ROW.match(line)
                 if row is None:
                     continue
-                cells = tuple(int(row[i].replace(",", "")) for i in (2, 3, 4))
+                first, second, third = (int(row[i].replace(",", "")) for i in (2, 3, 4))
+                cells = (first, second, third)
                 if row[1].upper().startswith("STATE TOTAL"):
                     totals[key] = cells
                     key = None
@@ -815,7 +817,9 @@ def oklahoma_csv() -> list[dict[str, object]]:
             assert found is not None, description
             name = found[4].strip() if found[4] else None
             number, post = (
-                (int(found[2]), int(found[3]) if found[3] else None) if found[2] else OKLAHOMA_SEATS_2012[name]
+                (int(found[2]), int(found[3]) if found[3] else None)
+                if found[2]
+                else OKLAHOMA_SEATS_2012[present(name, f"the office of {description}")]
             )
             if set(answers) != {"yes", "no"} or any(len(places) != 77 for places in answers.values()):
                 raise ValueError(f"{day} {description}: {[(key, len(places)) for key, places in answers.items()]}")

@@ -7,6 +7,7 @@ import struct
 import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 
@@ -106,7 +107,7 @@ def best(text: str) -> int | None:
 def read(pdf: Path) -> dict[tuple[str, int, str], list[dict]]:
     OCR.mkdir(parents=True, exist_ok=True)
     sections: dict[tuple[str, int, str], list[dict]] = {key: [] for key in SECTIONS}
-    current = None
+    current: tuple[str, int, str] | None = None
     chamber = None
     district = 0
     for number in PAGE_RANGE:
@@ -118,11 +119,11 @@ def read(pdf: Path) -> dict[tuple[str, int, str], list[dict]]:
                 chamber, district = "senate", 0
             if found := re.search(r"(\d)(?:st|nd|rd|th)\s+Congressional", joined):
                 chamber, district = "house", int(found[1])
-            if "Republican Party" in joined:
+            if chamber is not None and "Republican Party" in joined:
                 current = (chamber, district, "republican")
-            elif "Democratic Party" in joined:
+            elif chamber is not None and "Democratic Party" in joined:
                 current = (chamber, district, "democratic")
-            if current not in sections or not re.fullmatch(r"[A-Za-z'.]{3,}", line[0][0]):
+            if current is None or current not in sections or not re.fullmatch(r"[A-Za-z'.]{3,}", line[0][0]):
                 continue
             label = line[0]
             cells = [w for w in line[1:] if re.search(r"\d", w[0]) and w[1][0] > label[1][2] + 40]
@@ -144,7 +145,7 @@ def parse() -> None:
             ).fetchall()
         }
     names = sorted(codes)
-    frames = []
+    frames: list[dict[str, Any]] = []
     for (chamber, district, party), rows in read(pdf).items():
         candidates = list(SECTIONS[(chamber, district, party)])
         totals = list(SECTIONS[(chamber, district, party)].values())

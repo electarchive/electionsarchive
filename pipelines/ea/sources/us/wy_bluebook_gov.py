@@ -6,6 +6,7 @@ from uuid import UUID
 from ea.changeset import Changeset
 from ea.sources.us.gov_official_totals import find, surname
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.wy_bluebook_gov"
 VERSION = "1"
@@ -132,11 +133,13 @@ def emit() -> Path:
             ).fetchall()
             if len(prior) != 1:
                 raise ValueError(f"{year}: expected one default set")
-            if conn.execute(
-                """select exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+            if one(
+                conn.execute(
+                    """select exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                    join result_set r on r.k = v.result_set_k where r.id = %s and u.scheme_code = 'us.county')""",
-                [prior[0][0]],
-            ).fetchone()[0]:
+                    [prior[0][0]],
+                )
+            )[0]:
                 continue
             rows, other_box, width, height = lines(stored.path, page_number, cols, other)
             if set(rows) != {*COUNTIES, "TOTAL"}:
@@ -158,11 +161,13 @@ def emit() -> Path:
                 column: next(o for label, o in options.items() if label and surname(label) == column.lower())
                 for column in cols
             }
-            state = conn.execute(
-                """select u.id from reporting_unit u join result_value v on v.unit_k = u.k
+            state = one(
+                conn.execute(
+                    """select u.id from reporting_unit u join result_value v on v.unit_k = u.k
                    join result_set r on r.k = v.result_set_k where r.id = %s and u.scheme_code = 'us.state' limit 1""",
-                [prior[0][0]],
-            ).fetchone()[0]
+                    [prior[0][0]],
+                )
+            )[0]
             artifact = cs.artifact(stored, source_id)
             page = cs.page(artifact, page_number)
             result_set = cs.key(f"{SOURCE}.result_set", f"{year}:WY:governor")

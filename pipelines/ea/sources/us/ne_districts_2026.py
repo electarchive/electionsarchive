@@ -1,5 +1,6 @@
 import re
 import subprocess
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -56,10 +57,20 @@ def fetch() -> None:
         raw.store(SOURCE, URL, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
 
 
+@dataclass
+class Entry:
+    pre: list[str]
+    term: int
+    vote: int
+    name: str
+    incumbent: bool
+    cont: list[str] = field(default_factory=list)
+
+
 def layout(path: Path) -> list[dict[str, str | int | bool]]:
     text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True, text=True).stdout
-    entries: list[dict[str, str | int | list[str]]] = []
-    current: dict[str, str | int | list[str]] | None = None
+    entries: list[Entry] = []
+    current: Entry | None = None
     for line in text.split("\n"):
         stripped = line.strip().lstrip("\f").strip()
         if not stripped or stripped.startswith(("Nebraska Secretary", "Office", "(if applicable)", "November 3")):
@@ -71,14 +82,13 @@ def layout(path: Path) -> list[dict[str, str | int | bool]]:
             found = re.match(r"^(.*?)\s*\b(Nonincumbent|Incumbent)\b", fields[status])
             assert found is not None
             name_at = status - 1 if found.group(1) else status - 2
-            current = {
-                "pre": fields[:term],
-                "term": int(fields[term]),
-                "vote": int(fields[term + 1]),
-                "name": fields[name_at],
-                "incumbent": found.group(2) == "Incumbent",
-                "cont": [],
-            }
+            current = Entry(
+                pre=fields[:term],
+                term=int(fields[term]),
+                vote=int(fields[term + 1]),
+                name=fields[name_at],
+                incumbent=found.group(2) == "Incumbent",
+            )
             entries.append(current)
         elif (
             current is not None
@@ -89,10 +99,10 @@ def layout(path: Path) -> list[dict[str, str | int | bool]]:
             and "(" not in stripped
             and not stripped[0].isdigit()
         ):
-            current["cont"].append(stripped)  # ty: ignore[possibly-missing-attribute]
+            current.cont.append(stripped)
     rows: list[dict[str, str | int | bool]] = []
     for entry in entries:
-        pieces = [*entry["pre"], *(c for c in entry["cont"] if "Page " not in c and not re.search(r"NE \d{5}", c))]  # ty: ignore[not-iterable]
+        pieces = [*entry.pre, *(c for c in entry.cont if "Page " not in c and not re.search(r"NE \d{5}", c))]
         full = " ".join(pieces)
         if not KEEP.search(full):
             continue
@@ -115,10 +125,10 @@ def layout(path: Path) -> list[dict[str, str | int | bool]]:
             {
                 "district": body,
                 "seat": seat,
-                "term": entry["term"],
-                "vote": entry["vote"],
-                "name": " ".join(str(entry["name"]).split()),
-                "incumbent": entry["incumbent"],
+                "term": entry.term,
+                "vote": entry.vote,
+                "name": " ".join(entry.name.split()),
+                "incumbent": entry.incumbent,
             }
         )
     return rows

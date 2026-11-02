@@ -56,7 +56,7 @@ def county(code: object) -> str:
 
 
 def parse() -> None:
-    rows: list[tuple[int, str, str | None, str, str, int]] = []
+    rows: list[tuple[int, str, str, str, int]] = []
     first = sheet(2002)
     head = first.row(2)
     cc = head.index("CC")

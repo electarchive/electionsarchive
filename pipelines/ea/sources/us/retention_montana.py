@@ -161,7 +161,7 @@ def rows():
         cells: dict[str, tuple[tuple[int, scan.Box], tuple[int, scan.Box]]] = {}
         printed: tuple[int, int] | None = None
         for words in lines(pdf, page):
-            if yes_band is not None:
+            if yes_band is not None and no_band is not None:
                 yes = [(number(w), b) for w, b in words if NUMBER.fullmatch(w) and yes_band[0] <= b[2] <= yes_band[1]]
                 no = [(number(w), b) for w, b in words if NUMBER.fullmatch(w) and no_band[0] <= b[2] <= no_band[1]]
                 label = " ".join(w for w, b in words if b[2] < 300 and not NUMBER.fullmatch(w))

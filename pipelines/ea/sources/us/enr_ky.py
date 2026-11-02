@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 import httpx
 
 from ea.sources.us.enr_2026 import DAY, EV_OFFICES
+from ea.typed import required
 
 HARDIN = os.environ.get("EA_HARDIN_URL", "https://hccoky.org/26GResults/display.html")
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
@@ -52,7 +53,7 @@ def rows(url: str, path: Path):
         .replace(tzinfo=ZoneInfo("America/New_York"))
         .isoformat()
     )
-    place = re.fullmatch(r"(\d+) of (\d+).*", tokens[tokens.index("Polling Places Reporting") + 1])
+    place = required(re.fullmatch(r"(\d+) of (\d+).*", tokens[tokens.index("Polling Places Reporting") + 1]))
     reporting, total = int(place[1]), int(place[2])
     i = 0
     while i < len(tokens):

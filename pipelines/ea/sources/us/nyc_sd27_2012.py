@@ -4,6 +4,7 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 
@@ -59,7 +60,7 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "pages", wanted)[1])
 
 
-def reading(page: int, read: str) -> dict[str, object]:
+def reading(page: int, read: str) -> dict[str, Any]:
     blocks = json.loads(raw.cached(SOURCE, f"read:{page}:{read}").path.read_text())["content"]
     text = "".join(str(block["text"]) for block in blocks if block.get("type") == "text")
     return json.loads(text[text.index("{") : text.rindex("}") + 1])
@@ -87,7 +88,7 @@ NOTE = (
 )
 
 
-def tail(values: list[int | None]) -> tuple[int, int, int]:
+def tail(values: list[int | None]) -> tuple[int, ...]:
     cells = values[-3:] if len(values) in (3, 8) else [values[0], 0, 0] if len(values) == 1 else values[-3:]
     return tuple(0 if v is None else int(v) for v in cells)
 

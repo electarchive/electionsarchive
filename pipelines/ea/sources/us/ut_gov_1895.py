@@ -3,6 +3,7 @@ from pathlib import Path
 
 from ea.changeset import Changeset
 from ea.store import connect
+from ea.typed import one
 
 SOURCE = "us.ut_gov_1895"
 VERSION = "1"
@@ -31,13 +32,13 @@ def stale(conn, cs: Changeset) -> Path:
 
 def emit() -> Path:
     with connect() as conn:
-        office, area, system = conn.execute(
-            f"select {', '.join(COLUMNS)} from contest where id = %s", [CONTEST]
-        ).fetchone()
-        moved = conn.execute(
-            "select extract(year from e.date_from) = 1895 from contest c join election e on e.id = c.election_id where c.id = %s",
-            [CONTEST],
-        ).fetchone()[0]
+        office, area, system = one(conn.execute(f"select {', '.join(COLUMNS)} from contest where id = %s", [CONTEST]))
+        moved = one(
+            conn.execute(
+                "select extract(year from e.date_from) = 1895 from contest c join election e on e.id = c.election_id where c.id = %s",
+                [CONTEST],
+            )
+        )[0]
         cs = Changeset(
             conn,
             pipeline=SOURCE,

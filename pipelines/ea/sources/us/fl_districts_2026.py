@@ -9,6 +9,7 @@ import polars as pl
 from ea import raw
 from ea.sources.us import district_boards
 from ea.store import DATA, connect
+from ea.typed import required
 
 SOURCE = "us.fl_districts_2026"
 VERSION = "2"
@@ -483,7 +484,7 @@ def broward(url: str) -> list[dict[str, str | int | None]]:
 
 def brevard(url: str) -> list[dict[str, str | int | None]]:
     text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
-    rows = []
+    rows: list[dict[str, str | int | None]] = []
     for part in text.split("<h3>")[1:]:
         title = html.unescape(re.sub(r"<[^>]+>", "", part.split("</h3>")[0])).strip()
         if not DISTRICT.search(title):
@@ -606,7 +607,7 @@ def voterfocus(url: str, county: str) -> list[dict[str, str | int | None]]:
     text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
     groups: dict[str, list[str]] = {}
     for part in text.split('<div class="col-xs-12 officegroup">')[1:]:
-        office = html.unescape(re.search(r'officename">(.*?)</div>', part, re.DOTALL)[1]).strip()
+        office = html.unescape(required(re.search(r'officename">(.*?)</div>', part, re.DOTALL))[1]).strip()
         if not VOTERFOCUS.search(office) or re.search(
             r"(?i)\bcounty (?:commission|judge|court|clerk|sheriff|school)|\bjudge\b|\bcircuit\b|\bschool board\b",
             office,
@@ -621,7 +622,7 @@ def voterfocus(url: str, county: str) -> list[dict[str, str | int | None]]:
             if re.search(r"-\s*(?:Qualified|Runoff|Elected|Advanced|Unopposed)\s*\)$", status_text):
                 person = re.sub(r"\s*\([A-Z]{2,3}\)$", "", " ".join(html.unescape(name[1]).split()))
                 groups.setdefault(office, []).append(person)
-    rows = []
+    rows: list[dict[str, str | int | None]] = []
     for office, people in groups.items():
         if not people:
             continue
