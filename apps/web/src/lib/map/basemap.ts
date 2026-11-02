@@ -185,24 +185,12 @@ export function basemap(
       {
         id: "basemap:mask",
         type: "fill",
-        source: engine.shapes(
-          "basemap:mask",
-          {
-            type: "Polygon",
-            coordinates: [
-              [
-                [-180, -85],
-                [180, -85],
-                [180, 85],
-                [-180, 85],
-                [-180, -85],
-              ],
-              ...outline,
-            ],
-          },
-          "basemap",
-        ),
-        paint: { "fill-color": "var(--card)", "fill-opacity": VEIL },
+        source: engine.veil("basemap:mask", outline, "basemap"),
+        paint: {
+          "fill-color": "var(--card)",
+          "fill-opacity": VEIL,
+          "fill-antialias": false,
+        },
       },
       "etch",
       { group: "basemap" },

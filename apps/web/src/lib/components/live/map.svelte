@@ -309,24 +309,12 @@
           {
             id: "live-veil",
             type: "fill",
-            source: engine.shapes(
-              "live-veil",
-              {
-                type: "Polygon",
-                coordinates: [
-                  [
-                    [-180, -85],
-                    [180, -85],
-                    [180, 85],
-                    [-180, 85],
-                    [-180, -85],
-                  ],
-                  ...geography.outline,
-                ],
-              },
-              "live-layers",
-            ),
-            paint: { "fill-color": "var(--background)", "fill-opacity": 0.55 },
+            source: engine.veil("live-veil", geography.outline, "live-layers"),
+            paint: {
+              "fill-color": "var(--background)",
+              "fill-opacity": 0.55,
+              "fill-antialias": false,
+            },
           },
           "etch",
           { group: "live-layers", rank: 1 },

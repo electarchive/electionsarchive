@@ -1,6 +1,7 @@
 import type * as Maplibre from "maplibre-gl";
 import type { PMTiles, Protocol } from "pmtiles";
 import { dev } from "$app/env";
+import earcut from "earcut";
 import { untrack } from "svelte";
 import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
@@ -887,6 +888,7 @@ export class Engine {
     id: string,
     data: Maplibre.GeoJSONSourceSpecification["data"],
     group = "",
+    tolerance?: number,
   ) {
     const gl = this.gl;
     if (gl == null) {
@@ -896,10 +898,52 @@ export class Engine {
     if (source?.type === "geojson") {
       void (source as Maplibre.GeoJSONSource).setData(data);
     } else {
-      attach(gl, id, { type: "geojson", data });
+      attach(gl, id, {
+        type: "geojson",
+        data,
+        ...(tolerance != null && { tolerance }),
+      });
       this.#sources.set(id, { group, isVector: false });
     }
     return id;
+  }
+
+  veil(id: string, outline: Array<Array<[number, number]>>, group = "") {
+    // A world polygon with the outline as holes breaks when MapLibre snaps it to each tile's grid, so draw it as triangles.
+    const points: Array<[number, number]> = [
+      [-180, -85],
+      [180, -85],
+      [180, 85],
+      [-180, 85],
+    ];
+    const holes: Array<number> = [];
+    for (const ring of outline) {
+      holes.push(points.length);
+      points.push(...ring.slice(0, -1));
+    }
+    const corners = earcut(
+      points.flatMap(([x, y]) => [
+        x,
+        Math.log(Math.tan(Math.PI / 4 + (y * Math.PI) / 360)),
+      ]),
+      holes,
+    );
+    const triangles: Array<Array<Array<[number, number]>>> = [];
+    for (const index of corners.keys()) {
+      if (index % 3 === 0) {
+        const ring = corners.slice(index, index + 3).flatMap((corner) => {
+          const point = points[corner];
+          return point == null ? [] : [point];
+        });
+        triangles.push([[...ring, ...ring.slice(0, 1)]]);
+      }
+    }
+    return this.shapes(
+      id,
+      { type: "MultiPolygon", coordinates: triangles },
+      group,
+      0,
+    );
   }
 
   rendered(layer: string) {

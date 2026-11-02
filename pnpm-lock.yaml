@@ -284,6 +284,9 @@ catalogs:
     drizzle-orm:
       specifier: 1.0.0-rc.5
       version: 1.0.0-rc.5
+    earcut:
+      specifier: ^3.2.4
+      version: 3.2.4
     eslint:
       specifier: ^10.13.0
       version: 10.13.0
@@ -578,6 +581,9 @@ importers:
       cn:
         specifier: 'catalog:'
         version: 0.5.0
+      earcut:
+        specifier: 'catalog:'
+        version: 3.2.4
       formsnap:
         specifier: 'catalog:'
         version: 2.1.0(svelte@5.57.3(@typescript-eslint/types@8.71.2))(sveltekit-superforms@3.0.0(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(@types/json-schema@7.0.15)(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3))

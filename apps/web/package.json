@@ -62,6 +62,7 @@
     "@typescript/native": "catalog:",
     "bits-ui": "catalog:",
     "cn": "catalog:",
+    "earcut": "catalog:",
     "formsnap": "catalog:",
     "maplibre-gl": "catalog:",
     "mode-watcher": "catalog:",
