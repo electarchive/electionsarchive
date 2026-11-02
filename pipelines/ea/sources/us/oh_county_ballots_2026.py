@@ -32,9 +32,22 @@ FRANKLIN_PAGE = f"{FRANKLIN}/election-info/2026"
 FRANKLIN_DIR = INBOX / "franklin" / "notices"
 LORAIN_FILE = "https://www.voteloraincountyohio.gov/_files/ugd/2568d0_fd0d57cfa16c443899cf8c9653a28945.pdf"
 MF = DATA / "inbox" / "manual" / "MF-540"
-MF_LOOKUP = (
-    "Ashtabula Athens Tuscarawas Mahoning Licking Perry Clark Greene Harrison Geauga Richland Fulton Portage Lucas"
-).split()
+MF_LOOKUP = [
+    "Ashtabula",
+    "Athens",
+    "Tuscarawas",
+    "Mahoning",
+    "Licking",
+    "Perry",
+    "Clark",
+    "Greene",
+    "Harrison",
+    "Geauga",
+    "Richland",
+    "Fulton",
+    "Portage",
+    "Lucas",
+]
 MF_555 = DATA / "inbox" / "manual" / "MF-555"
 MF_555_COUNTIES = [
     "Meigs",
@@ -504,6 +517,33 @@ JUNK = re.compile(
 SPILLED = re.compile(
     r"Board Signatures|CHECK BOTH SIDES|Page ?2 ?of|Require voters to present|Review Both Sides|Joint Resolution of the General|\b(?:Republican|Democratic)\b"
 )
+JOINT = re.compile(r"Proposed by Joint Resolution of the General Assembly.*?adoption of Section 5\.\s*")
+SALVAGE = {
+    "us/oh/crestview-local/2026-11-03-general/permanent-improvements-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#23    1x.pdf",
+        "Crestview Local School District for the purpose",
+    ),
+    "us/oh/jackson-township-van-wert-county/2026-11-03-general/fire-protection-ems-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#16    1x.pdf",
+        "Jackson Township for the purpose",
+    ),
+    "us/oh/liberty-township-van-wert-county/2026-11-03-general/fire-protection-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#19    1x (1).pdf",
+        "Liberty Township \\(excluding the Village of Ohio City\\) for the purpose",
+    ),
+    "us/oh/champaign-county/2026-11-03-general/operate-champaign-county-health-district-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/champaign/ballotlist.aspx#0011  1x.pdf",
+        "Champaign County for the purpose of the operation",
+    ),
+    "us/oh/falls-township/2026-11-03-general/fire-protection-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/hocking/ballotlist.aspx#06    1x.pdf",
+        "Falls Township for the purpose",
+    ),
+    "us/oh/pike-county/2026-11-03-general/community-developmental-disabilities-program-services-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/pike/ballotlist.aspx#005   1x (1).pdf",
+        "Pike County for the purpose of the developmental",
+    ),
+}
 NEXT_HEAD = re.compile(r"^(?:PROPOSED\b|Proposed (?:Tax|Income|Municipal|Charter)\b)")
 CHOICE = re.compile(r"^(?:(?:FOR|AGAINST)\b[A-Z ]*|YES|NO)$")
 SPILL = re.compile(r"This proposed amendment would|Require voters to present|PHOTO IDENTIFICATION|SHALL THE AMENDMENT")
@@ -1085,6 +1125,29 @@ def pick(
     return narrowed[0][0]
 
 
+def salvage(url: str, anchor: str) -> str | None:
+    text = subprocess.run(
+        ["pdftotext", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    text = re.sub(r"\s+", " ", text)
+    found = re.search(anchor, text)
+    if found is None:
+        return None
+    end = re.compile(r"calendar year \d{4}\.").search(text, found.end())
+    if end is None:
+        return None
+    segment = JOINT.sub("", text[max(0, found.start() - 400) : end.end()])
+    segment = re.sub(
+        r"This proposed amendment would: |Require voters to present an approved form |(?<= )5 (?=calendar year)",
+        "",
+        segment,
+    )
+    segment = segment.replace("for years,", "for 5 years,") if "Pike County" in anchor else segment
+    start = max(segment.rfind(key) for key in ("A renewal of", "An additional tax", "A replacement"))
+    body = segment[start:] if start >= 0 else None
+    return None if body is None or SPILLED.search(body) else body
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "issues.parquet")
     frame = frame.filter(
@@ -1223,6 +1286,16 @@ def emit() -> Path:
                     taken.add(contest)
                     if contest not in loaded and SPILLED.search(existing[(contest, url)]):
                         load(contest, row)
+        for path, (url, anchor) in SALVAGE.items():
+            found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
+            body = salvage(url, anchor)
+            if (
+                found is not None
+                and body is not None
+                and (found[0], url) in existing
+                and SPILLED.search(existing[(found[0], url)])
+            ):
+                load(found[0], {"url": url, "text": body})
         for row in pending:
             print("no match:", row.get("county"), row["entity"], row["kind"])
         print(f"{kept[0]} of {frame.height} issues")
