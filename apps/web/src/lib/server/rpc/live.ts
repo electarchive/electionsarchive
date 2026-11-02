@@ -512,6 +512,7 @@ async function races(found: {
   rest: string;
 }) {
   const isNational = found.path.split("/").length === 2;
+  const isLocal = found.path.split("/").length > 3;
   const result =
     found.rest === ""
       ? await db.execute<{
@@ -527,7 +528,8 @@ async function races(found: {
           top as (
             select c.id from tree t join contest c on c.election_id = t.id
             join slug s on s.entity_id = c.id and s.is_current
-            where t.depth = ${isNational ? 1 : 0} and s.path ~ '^[a-z]+/[a-z]{2}/[^/]+/[^/]+$' and split_part(s.path, '/', 4) ~ ${TOP.source}
+            where t.depth = ${isNational ? 1 : 0}
+              and (${isLocal}::boolean or (s.path ~ '^[a-z]+/[a-z]{2}/[^/]+/[^/]+$' and split_part(s.path, '/', 4) ~ ${TOP.source}))
           ),
           fed as (
             select distinct f.contest_id as id from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
