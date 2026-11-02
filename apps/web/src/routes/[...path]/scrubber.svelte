@@ -50,7 +50,10 @@
       queryOptions({
         queryKey: orpc.elections.locate.queryKey({ input: { path } }),
         queryFn: async () => {
-          const found = await Promise.resolve(seed);
+          const found = await Promise.race([
+            Promise.resolve(seed).catch(() => null),
+            new Promise<null>((done) => setTimeout(done, 4000, null)),
+          ]);
           if (found == null) {
             return orpc.elections.locate.call({ path });
           }
