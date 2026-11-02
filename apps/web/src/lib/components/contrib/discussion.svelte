@@ -68,7 +68,14 @@
         >
       </p>
     {:else if commenter === "unverified"}
-      <p class="text-sm text-muted-foreground">{m.discussion_verify()}</p>
+      <p class="text-sm text-muted-foreground">
+        {m.discussion_verify()}
+        <a
+          class="text-foreground underline underline-offset-2"
+          href="/verify-email?next={encodeURIComponent(page.url.pathname)}"
+          >{m.discussion_verify_send()}</a
+        >
+      </p>
     {/if}
   </div>
 </section>

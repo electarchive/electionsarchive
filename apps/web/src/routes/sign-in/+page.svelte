@@ -70,7 +70,13 @@
       />
     </div>
     <div class="grid gap-1.5">
-      <Label for="password">{m.field_password()}</Label>
+      <div class="flex items-baseline justify-between gap-3">
+        <Label for="password">{m.field_password()}</Label>
+        <a
+          class="text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+          href={resolve("/forgot-password")}>{m.sign_in_forgot()}</a
+        >
+      </div>
       <Input
         id="password"
         name="password"

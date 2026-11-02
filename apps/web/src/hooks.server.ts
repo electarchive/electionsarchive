@@ -12,7 +12,7 @@ import { twin } from "#lib/server/twin.js";
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
 
 const WRITABLE =
-  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|settings\/profile)(?:\/|$)/u;
+  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile)(?:\/|$)/u;
 
 const PRELOADED =
   /\/sofia-sans-semi-condensed-latin-wght-normal\.[\w-]+\.woff2$/u;
