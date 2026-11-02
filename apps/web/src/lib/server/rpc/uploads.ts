@@ -14,7 +14,7 @@ export const uploads = {
         method: "POST",
         path: "/uploads",
         summary:
-          "Upload a document of up to 20 MB as base64 to cite as evidence; it's ready once its pages are rendered, usually within a minute",
+          "Upload a document of up to 20 MB as base64 to cite as evidence, or a Parquet table for POST /changesets; it's ready once its pages are rendered or its table is read, usually within a minute",
       }),
     )
     .input(

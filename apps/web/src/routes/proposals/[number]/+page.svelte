@@ -413,7 +413,9 @@
       {#if pending}
         {(working[job?.kind ?? ""] ?? m.proposal_checking)()}
       {:else if job?.status === "failed"}
-        {m.proposal_failed({ reason: job.error ?? job.kind })}
+        <span class="whitespace-pre-line"
+          >{m.proposal_failed({ reason: job.error ?? job.kind })}</span
+        >
       {:else if decided != null}
         <span class="font-semibold"
           >{decided({

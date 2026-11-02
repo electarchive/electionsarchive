@@ -4,6 +4,7 @@ import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
+import type { Standing } from "#lib/server/standing.js";
 import { PROPOSAL_STATES } from "#lib/contrib.js";
 import { shown } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
@@ -20,6 +21,14 @@ import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
 import { submittable } from "#lib/server/standing.js";
 
 const Uuid = v.pipe(v.string(), v.uuid());
+
+const EvidenceKey = v.pipe(v.string(), v.regex(/^[\w-]{1,40}$/u));
+
+const Evidence = v.record(EvidenceKey, v.looseObject({}));
+
+const Table = v.pipe(v.string(), v.regex(/^[a-z_]{1,40}$/u));
+
+const Row = v.pipe(v.number(), v.integer(), v.minValue(0));
 
 const Payload = {
   summary: Text(300),
@@ -45,9 +54,33 @@ const Payload = {
     v.minLength(1),
     v.maxLength(500),
   ),
-  evidence: v.optional(
-    v.record(v.pipe(v.string(), v.regex(/^[\w-]{1,40}$/u)), v.looseObject({})),
+  evidence: v.optional(Evidence),
+};
+
+const Artifact = {
+  summary: Text(300),
+  rationale: v.optional(Text(10_000)),
+  polity: v.optional(Uuid),
+  kind: v.picklist(["edit", "correction", "digitization"]),
+  files: v.pipe(
+    v.record(Table, Uuid),
+    v.check(
+      (files) => Object.keys(files).length > 0,
+      "files maps each table to the upload of its Parquet file.",
+    ),
   ),
+  cites: v.pipe(
+    v.array(
+      v.object({
+        table: Table,
+        rows: v.optional(v.tuple([Row, Row])),
+        evidence: v.pipe(v.array(EvidenceKey), v.minLength(1), v.maxLength(20)),
+      }),
+    ),
+    v.minLength(1),
+    v.maxLength(10_000),
+  ),
+  evidence: Evidence,
 };
 
 const Agent = {
@@ -66,13 +99,15 @@ const payloadOf = (input: {
   summary: string;
   rationale?: string;
   polity?: string;
-  ops: Array<Record<string, unknown>>;
+  ops?: Array<Record<string, unknown>>;
+  artifact?: Record<string, unknown>;
   evidence?: Record<string, Record<string, unknown>>;
   note?: string;
 }) => {
   const payload = {
     summary: input.summary,
-    ops: input.ops,
+    ...(input.ops != null && { ops: input.ops }),
+    ...(input.artifact != null && { artifact: input.artifact }),
     ...(input.rationale != null && { rationale: input.rationale }),
     ...(input.polity != null && { polity: input.polity }),
     ...(input.evidence != null && { evidence: input.evidence }),
@@ -269,15 +304,100 @@ export async function submitDraft(number: number, owner: Owner) {
   if (found.busy) {
     error(409, "A job on this proposal is still running.");
   }
-  const { rows } = await db.execute<{ ops: number }>(sql`
-    select coalesce(jsonb_array_length(draft -> 'ops'), 0) as ops from proposal where id = ${found.id}
+  const { rows } = await db.execute<{ ops: number; artifact: boolean }>(sql`
+    select coalesce(jsonb_array_length(draft -> 'ops'), 0) as ops, draft ? 'artifact' as artifact
+    from proposal where id = ${found.id}
   `);
-  await submittable(owner.userId, rows[0]?.ops ?? 0);
+  const standing = await submittable(owner.userId, rows[0]?.ops ?? 0);
+  if (rows[0]?.artifact === true) {
+    artifactable(standing);
+  }
   await db.execute(sql`
     insert into proposal_revision (proposal_id, n, payload)
     select id, 1, draft from proposal where id = ${found.id}
   `);
   await queueJob(found.id, "submit", owner.userId, 1);
+  return view(number, owner);
+}
+
+function artifactable(found: Standing) {
+  if (!found.artifacts) {
+    error(
+      403,
+      found.level < 2
+        ? "Artifact uploads open at level 2, after 20 accepted proposals at 90% or better."
+        : "This account can't upload artifacts.",
+    );
+  }
+}
+
+async function createProposal(
+  owner: Owner,
+  input: {
+    summary: string;
+    polity?: string;
+    agent_name?: string;
+    agent_model?: string;
+    bounty?: string;
+  },
+  payload: ReturnType<typeof payloadOf>,
+) {
+  const agentName = input.agent_name ?? owner.agentName;
+  const agentModel = input.agent_model ?? owner.agentModel;
+  if (agentName == null || agentModel == null) {
+    error(
+      400,
+      "Name the agent and its model in agent_name and agent_model, or set them on the key.",
+    );
+  }
+  const { rows } = await db.execute<{ id: string; number: number }>(sql`
+    insert into proposal (author_user_id, agent_key_id, agent_name, agent_model, title, polity_id, draft, bounty_id)
+    select ${owner.userId}, ${owner.keyId}, ${agentName}, ${agentModel}, ${input.summary},
+           ${input.polity ?? null}::uuid, ${JSON.stringify(payload)}::jsonb,
+           (select id from bounty where number = ${input.bounty ?? null}::int and status = 'open')
+    where ${input.polity ?? null}::uuid is null or exists (select from polity where id = ${input.polity ?? null}::uuid)
+    returning id, number
+  `);
+  const created = rows[0];
+  if (created == null) {
+    error(400, "No polity has that ID.");
+  }
+  await queueJob(created.id, "check", owner.userId, null);
+  return view(created.number, owner);
+}
+
+async function reviseProposal(
+  number: number,
+  owner: Owner,
+  payload: ReturnType<typeof payloadOf>,
+  polity: string | undefined,
+  changes: number,
+) {
+  const found = await owned(number, owner);
+  if (found.busy) {
+    error(409, "A job on this proposal is still running.");
+  }
+  if (found.state === "draft" && found.head == null) {
+    await saveDraft(number, owner, payload, polity);
+    await queueJob(found.id, "check", owner.userId, null);
+    return view(number, owner);
+  }
+  if (!["draft", "open", "changes_requested"].includes(found.state)) {
+    error(
+      409,
+      `A ${found.state} proposal can't be revised; open a new proposal instead.`,
+    );
+  }
+  await submittable(owner.userId, changes, { counted: false });
+  const n = (found.head ?? 0) + 1;
+  await db.execute(sql`
+    with revision as (
+      insert into proposal_revision (proposal_id, n, payload)
+      values (${found.id}, ${n}, ${JSON.stringify(payload)}::jsonb)
+    )
+    update proposal set title = ${payload.summary}, updated_at = now() where id = ${found.id}
+  `);
+  await queueJob(found.id, "submit", owner.userId, n);
   return view(number, owner);
 }
 
@@ -354,30 +474,45 @@ export const proposals = {
     )
     .input(v.object({ ...Payload, ...Agent, bounty: v.optional(Number_) }))
     .handler(async ({ input, context: { owner } }) =>
+      run(async () => createProposal(owner, input, payloadOf(input))),
+    ),
+  upload: writer
+    .meta(
+      openapi({
+        method: "POST",
+        path: "/changesets",
+        summary:
+          "Propose a changeset as Parquet files, one per table, uploaded first through POST /uploads: files maps each table to its upload, evidence holds the sources as in a proposal, and cites maps each table's rows, or a [start, end) range of them, to evidence keys. Columns follow the staged tables (describe_ops), new IDs are UUIDv7, and a source_id or page_id may name evidence as evidence:<key>. Pass proposal to revise one of yours. Opens at level 2; waits up to 60 s and returns the proposal with every validation failure or the check's tier, findings, and diff",
+      }),
+    )
+    .input(
+      v.object({
+        ...Artifact,
+        ...Agent,
+        bounty: v.optional(Number_),
+        proposal: v.optional(Number_),
+      }),
+    )
+    .handler(async ({ input, context: { owner } }) =>
       run(async () => {
-        const agentName = input.agent_name ?? owner.agentName;
-        const agentModel = input.agent_model ?? owner.agentModel;
-        if (agentName == null || agentModel == null) {
-          error(
-            400,
-            "Name the agent and its model in agent_name and agent_model, or set them on the key.",
-          );
-        }
-        const payload = payloadOf(input);
-        const { rows } = await db.execute<{ id: string; number: number }>(sql`
-          insert into proposal (author_user_id, agent_key_id, agent_name, agent_model, title, polity_id, draft, bounty_id)
-          select ${owner.userId}, ${owner.keyId}, ${agentName}, ${agentModel}, ${input.summary},
-                 ${input.polity ?? null}::uuid, ${JSON.stringify(payload)}::jsonb,
-                 (select id from bounty where number = ${input.bounty ?? null}::int and status = 'open')
-          where ${input.polity ?? null}::uuid is null or exists (select from polity where id = ${input.polity ?? null}::uuid)
-          returning id, number
-        `);
-        const created = rows[0];
-        if (created == null) {
-          error(400, "No polity has that ID.");
-        }
-        await queueJob(created.id, "check", owner.userId, null);
-        return view(created.number, owner);
+        artifactable(await submittable(owner.userId, 0, { counted: false }));
+        const payload = payloadOf({
+          ...input,
+          artifact: {
+            kind: input.kind,
+            files: input.files,
+            cites: input.cites,
+          },
+        });
+        return input.proposal == null
+          ? createProposal(owner, input, payload)
+          : reviseProposal(
+              Number(input.proposal),
+              owner,
+              payload,
+              input.polity,
+              0,
+            );
       }),
     ),
   check: writer
@@ -419,35 +554,15 @@ export const proposals = {
       v.object({ number: Number_, ...Payload, note: v.optional(Text(2000)) }),
     )
     .handler(async ({ input: { number, ...input }, context: { owner } }) =>
-      run(async () => {
-        const found = await owned(Number(number), owner);
-        if (found.busy) {
-          error(409, "A job on this proposal is still running.");
-        }
-        const payload = payloadOf(input);
-        if (found.state === "draft" && found.head == null) {
-          await saveDraft(Number(number), owner, payload, input.polity);
-          await queueJob(found.id, "check", owner.userId, null);
-          return view(Number(number), owner);
-        }
-        if (!["draft", "open", "changes_requested"].includes(found.state)) {
-          error(
-            409,
-            `A ${found.state} proposal can't be revised; open a new proposal instead.`,
-          );
-        }
-        await submittable(owner.userId, input.ops.length, { counted: false });
-        const n = (found.head ?? 0) + 1;
-        await db.execute(sql`
-          with revision as (
-            insert into proposal_revision (proposal_id, n, payload)
-            values (${found.id}, ${n}, ${JSON.stringify(payload)}::jsonb)
-          )
-          update proposal set title = ${input.summary}, updated_at = now() where id = ${found.id}
-        `);
-        await queueJob(found.id, "submit", owner.userId, n);
-        return view(Number(number), owner);
-      }),
+      run(async () =>
+        reviseProposal(
+          Number(number),
+          owner,
+          payloadOf(input),
+          input.polity,
+          input.ops.length,
+        ),
+      ),
     ),
   comments: reader
     .meta(

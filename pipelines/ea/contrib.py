@@ -23,8 +23,8 @@ from psycopg.types.json import Jsonb
 from ea import boundaries, plane, raw
 from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
-from ea.changeset import Changeset, bcp47, slug
-from ea.checks import Stage
+from ea.changeset import UUID_TEXT, Changeset, bcp47, slug
+from ea.checks import FACTS, KEYS, Stage
 from ea.sources import party_logos, wikidata_photos
 from ea.store import DATA, ROOT, Connection, connect
 from ea.uploads import process, sweep
@@ -61,6 +61,83 @@ EDITABLE: dict[str, dict[str, bool]] = {
 }
 
 CITED = {"name": True, "note": False, "external_id": False}
+
+ARTIFACT_TABLES = frozenset(
+    (
+        "polity",
+        "polity_parent",
+        "polity_period",
+        "polity_relation",
+        "polity_territory",
+        "area",
+        "area_code",
+        "area_parent",
+        "area_event",
+        "area_event_member",
+        "area_geometry",
+        "boundary_set",
+        "scheme",
+        "reporting_unit",
+        "reporting_unit_area",
+        "election",
+        "contest",
+        "contest_option",
+        "candidacy",
+        "candidacy_nomination",
+        "ballot_question",
+        "ballot_question_text",
+        "result_set",
+        "result_value",
+        "value_locator",
+        "outcome",
+        "electoral_system",
+        "body",
+        "body_size",
+        "body_size_part",
+        "body_chamber",
+        "body_event",
+        "body_apportionment",
+        "seat",
+        "office",
+        "tenure",
+        "tenure_event",
+        "tenure_affiliation",
+        "government",
+        "government_party",
+        "statewide_office_year",
+        "party",
+        "party_color",
+        "party_image",
+        "party_founding",
+        "party_relation",
+        "party_affiliation",
+        "party_position",
+        "alliance",
+        "alliance_member",
+        "person",
+        "person_image",
+        "person_party_membership",
+        "name",
+        "slug",
+        "external_id",
+        "note",
+        "translation",
+        "label",
+        "citation",
+        "source",
+        "finance_summary",
+    )
+)
+
+MB = 1024**2
+
+ARTIFACT_CAPS = {2: (200 * MB, 2_000_000), 3: (1024 * MB, 10_000_000)}
+
+PARQUET = "application/vnd.apache.parquet"
+
+UNCITED = ("source", "citation", "slug")
+
+EVIDENCE_REF = "evidence:"
 
 REFERENCES = {
     "wikidata": regex.compile(r"Q[1-9][0-9]*"),
@@ -241,12 +318,25 @@ class Op(TypedDict, total=False):
     exclude: list[str]
 
 
+class Cites(TypedDict, total=False):
+    table: str
+    rows: list[int]
+    evidence: list[str]
+
+
+class Bundle(TypedDict, total=False):
+    kind: str
+    files: dict[str, str]
+    cites: list[Cites]
+
+
 class Payload(TypedDict, total=False):
     summary: str
     rationale: str
     polity: str
     ops: list[Op]
     evidence: dict[str, Evidence]
+    artifact: Bundle
 
 
 def _named(conn: Connection, entity: UUID) -> str:
@@ -1702,6 +1792,352 @@ def _parents(conn: Connection, scheme: str, on: date) -> str | None:
     return None if found is None else str(found[0])
 
 
+def _schema(conn: Connection, table: str) -> dict[str, tuple[str, bool, list[str] | None]]:
+    schema: dict[str, tuple[str, bool, list[str] | None]] = {
+        column: (kind, required, labels)
+        for column, kind, required, labels in conn.execute(
+            """select a.attname, format_type(a.atttypid, a.atttypmod),
+                      a.attnotnull and not a.atthasdef and a.attidentity = '',
+                      case when t.typtype = 'e' then array(select enumlabel::text from pg_enum
+                                                          where enumtypid = t.oid order by enumsortorder) end
+               from pg_attribute a join pg_type t on t.oid = a.atttypid
+               where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped and a.attgenerated = ''
+                 and a.attname not in ('changeset_id', 'recorded_from') order by a.attnum""",
+            [f"public.{table}"],
+        ).fetchall()
+    }
+    if table in FACTS:
+        for column in KEYS:
+            held = schema.pop(f"{column.removesuffix('_id')}_k", None)
+            if held is not None:
+                schema[column] = ("uuid", held[1], None)
+    return schema
+
+
+def _references(conn: Connection, table: str) -> dict[str, str]:
+    found: dict[str, str] = dict(
+        conn.execute(
+            """select a.attname, c.confrelid::regclass::text from pg_constraint c
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+               join pg_attribute r on r.attrelid = c.confrelid and r.attnum = c.confkey[1]
+               where c.contype = 'f' and c.conrelid = %s::regclass and cardinality(c.conkey) = 1 and r.attname = 'id'""",
+            [f"public.{table}"],
+        ).fetchall()
+    )
+    return found | (dict(KEYS) if table in FACTS else {})
+
+
+def _fits(kind: str, dtype: pl.DataType) -> bool:
+    if dtype == pl.Null:
+        return True
+    if kind in ("smallint", "integer", "bigint"):
+        return dtype.is_integer()
+    if kind in ("real", "double precision") or kind.startswith("numeric"):
+        return dtype.is_numeric()
+    if kind == "boolean":
+        return dtype == pl.Boolean
+    if kind == "date":
+        return dtype in (pl.Date, pl.String)
+    if kind.startswith("timestamp"):
+        return isinstance(dtype, pl.Datetime) or dtype == pl.String
+    return dtype == pl.String
+
+
+def _more(values: list[str]) -> str:
+    return values[0] if len(values) == 1 else f"{values[0]} and {len(values) - 1:,} more"
+
+
+def _first(frame: pl.DataFrame, condition: pl.Expr) -> int | None:
+    found = frame.with_row_index("row").filter(condition)["row"]
+    return None if found.is_empty() else int(found[0])
+
+
+def _artifact(
+    conn: Connection,
+    cs: Changeset,
+    bundle: Bundle,
+    author: UUID,
+    evidence: dict[str, Evidence],
+    sources: dict[str, UUID],
+    proofs: dict[str, dict[str, str]],
+) -> None:
+    standing = conn.execute(
+        """select contributor_level(%s), exists (
+             select from account_limit where user_id = %s and kind = 'no_artifacts' and lifted_at is null
+               and (expires_at is null or expires_at > now()))""",
+        [author, author],
+    ).fetchone()
+    assert standing is not None
+    level, limited = standing
+    if limited:
+        raise ValueError("this account can't upload artifacts")
+    if level < 2:
+        raise ValueError("artifact uploads open at level 2, after 20 accepted proposals at 90% or better")
+    most_bytes, most_facts = ARTIFACT_CAPS[min(level, 3)]
+    files = bundle.get("files")
+    if not isinstance(files, dict) or not files:
+        raise ValueError("artifact.files maps each table to the upload of its Parquet file")
+    failures: list[str] = []
+    frames: dict[str, pl.DataFrame] = {}
+    size = 0
+    for table, upload in files.items():
+        where = f"artifact.files.{table}"
+        if table not in ARTIFACT_TABLES:
+            failures.append(f"{where}: {table} can't be changed through an artifact upload")
+            continue
+        try:
+            row = conn.execute(
+                """select storage_key, media_type, bytes from upload
+                   where id = %s and owner_user_id = %s and status = 'ready'""",
+                [_uuid(upload, where), author],
+            ).fetchone()
+        except (TypeError, ValueError) as failure:
+            failures.append(str(failure))
+            continue
+        if row is None:
+            failures.append(f"{where}: upload {upload} is not a ready upload of this author's")
+            continue
+        key, media_type, length = row
+        if media_type != PARQUET:
+            failures.append(f"{where}: upload {upload} is {media_type}, not Parquet")
+            continue
+        size += length
+        try:
+            frames[table] = pl.read_parquet(DATA / key)
+        except (pl.exceptions.PolarsError, OSError) as failure:
+            failures.append(f"{where}: upload {upload} is not a readable Parquet file ({failure})")
+    if size > most_bytes:
+        failures.append(f"artifact.files: {size / MB:,.1f} MB is over the {most_bytes // MB:,} MB cap at level {level}")
+    facts = sum(frames[table].height for table in FACTS if table in frames)
+    if facts > most_facts:
+        failures.append(f"artifact.files: {facts:,} fact rows is over the {most_facts:,} cap at level {level}")
+
+    refs = {
+        "source": {f"{EVIDENCE_REF}{key}": str(source) for key, source in sources.items()},
+        "source_page": {
+            f"{EVIDENCE_REF}{key}": proof["page_id"] for key, proof in proofs.items() if "page_id" in proof
+        },
+    }
+    types = {kind for (kind,) in conn.execute("select unnest(enum_range(null::entity_type))::text").fetchall()}
+    links = {table: _references(conn, table) for table in frames}
+    present: dict[str, set[str]] = {}
+    minted: set[str] = set()
+    uuid = f"^{UUID_TEXT.pattern}$"
+    for table, frame in frames.items():
+        where = f"artifact.files.{table}"
+        schema = _schema(conn, table)
+        for column, target in links[table].items():
+            if target in refs and column in frame.columns and frame[column].dtype == pl.String:
+                frame = frame.with_columns(pl.col(column).replace(refs[target]))
+                row = _first(frame, pl.col(column).str.starts_with(EVIDENCE_REF))
+                if row is not None:
+                    failures.append(
+                        f"{where}.{column}: row {row} names {frame[column][row]}, which is no evidence key"
+                        + (" with a page" if target == "source_page" else "")
+                    )
+        frames[table] = frame
+        for column in frame.columns:
+            if column in ("changeset_id", "recorded_from"):
+                failures.append(f"{where}.{column}: the archive sets {column}, never a contributor")
+            elif column not in schema:
+                failures.append(f"{where}.{column}: {table} has no column {column}")
+        for column, (kind, required, labels) in schema.items():
+            if column not in frame.columns:
+                if required:
+                    failures.append(f"{where}: {table} needs a {column} column")
+                continue
+            dtype = frame[column].dtype
+            if not _fits(kind, dtype):
+                failures.append(f"{where}.{column}: a {dtype} column can't hold {kind}")
+                continue
+            if dtype == pl.Null:
+                if required and frame.height:
+                    failures.append(f"{where}.{column}: row 0 is empty, and {column} is required")
+                continue
+            checks = [
+                (required, pl.col(column).is_null(), f"is empty, and {column} is required"),
+                (kind == "uuid", ~pl.col(column).str.contains(uuid), "is not a lowercase UUID"),
+                (
+                    labels is not None,
+                    ~pl.col(column).is_in(labels or []),
+                    f"is not one of {', '.join(labels or [])}",
+                ),
+            ]
+            for applies, condition, problem in checks:
+                row = _first(frame, condition) if applies else None
+                if row is not None:
+                    failures.append(f"{where}.{column}: row {row} {problem}")
+        if schema.get("id", ("",))[0] != "uuid" or "id" not in frame.columns or frame["id"].dtype != pl.String:
+            continue
+        ids = frame["id"].drop_nulls()
+        doubled = ids.filter(ids.is_duplicated())
+        if not doubled.is_empty():
+            failures.append(f"{where}.id: {doubled[0]} appears more than once")
+        values = [value for value in ids.unique().to_list() if UUID_TEXT.fullmatch(value)]
+        present[table] = set(values)
+        held = {
+            str(id)
+            for (id,) in conn.execute(
+                sql.SQL("select id from public.{} where id = any(%s::uuid[])").format(sql.Identifier(table)), [values]
+            ).fetchall()
+        }
+        new = [value for value in values if value not in held]
+        old = [value for value in new if UUID(value).version != 7]
+        if old:
+            failures.append(f"{where}.id: new IDs must be UUIDv7, unlike {_more(old)}")
+        if table in types:
+            taken = [
+                str(id) for (id,) in conn.execute("select id from entity where id = any(%s::uuid[])", [new]).fetchall()
+            ]
+            if taken:
+                failures.append(f"{where}.id: {_more(taken)} already belong to other records")
+            minted.update(new)
+
+    entities = set().union(*(present.get(table, set()) for table in types))
+    for table, frame in frames.items():
+        for column, target in links[table].items():
+            if column in ("id", "changeset_id") or column not in frame.columns or frame[column].dtype != pl.String:
+                continue
+            values = {value for value in frame[column].drop_nulls().unique().to_list() if UUID_TEXT.fullmatch(value)}
+            values -= entities if target == "entity" else present.get(target, set())
+            if not values:
+                continue
+            found = {
+                str(id)
+                for (id,) in conn.execute(
+                    sql.SQL("select id from public.{} where id = any(%s::uuid[])").format(sql.Identifier(target)),
+                    [list(values)],
+                ).fetchall()
+            }
+            missing = sorted(values - found)
+            if missing:
+                failures.append(f"artifact.files.{table}.{column}: no {target} has the ID {_more(missing)}")
+
+    if "slug" in frames and {"path", "entity_id"} <= set(frames["slug"].columns):
+        paths = frames["slug"]["path"].drop_nulls().to_list()
+        for n, (path, entity) in enumerate(frames["slug"].select("path", "entity_id").iter_rows()):
+            if entity not in minted:
+                failures.append(
+                    f"artifact.files.slug: row {n} gives a path to {entity}, which is not new in this upload"
+                )
+                break
+            if not path or any(not part or part != slug(part) for part in str(path).split("/")):
+                failures.append(f"artifact.files.slug: row {n} path {path!r} is not a lowercase, hyphenated slug path")
+                break
+        held = conn.execute("select path from slug where path = any(%s)", [paths]).fetchone()
+        if held is not None:
+            failures.append(f"artifact.files.slug: the path {held[0]} is taken")
+
+    cited: list[tuple[int, str, int, int, list[str]]] = []
+    spans: dict[str, list[tuple[int, int]]] = {}
+    for n, cite in enumerate(bundle.get("cites") or []):
+        where = f"artifact.cites[{n}]"
+        table = str(cite.get("table"))
+        keys = cite.get("evidence") or []
+        unknown = [key for key in keys if key not in sources]
+        if table not in frames:
+            failures.append(f"{where}: {table} is not among the files")
+            continue
+        if not keys or unknown:
+            failures.append(
+                f"{where}: " + (f"unknown evidence {', '.join(unknown)}" if unknown else "evidence is empty")
+            )
+            continue
+        height = frames[table].height
+        span = cite.get("rows")
+        if span is None:
+            span = [0, height]
+        if not (
+            isinstance(span, list)
+            and len(span) == 2
+            and all(isinstance(value, int) and not isinstance(value, bool) for value in span)
+            and 0 <= span[0] < span[1] <= height
+        ):
+            failures.append(f"{where}.rows: rows must be [start, end] with 0 <= start < end <= {height}")
+            continue
+        spans.setdefault(table, []).append((span[0], span[1]))
+        cited.append((n, table, span[0], span[1], keys))
+    for table, frame in frames.items():
+        if table in UNCITED:
+            continue
+        reached = 0
+        for start, end in sorted(spans.get(table, [])):
+            if start > reached:
+                break
+            reached = max(reached, end)
+        if reached < frame.height:
+            gap = next((start for start, _ in sorted(spans.get(table, [])) if start > reached), frame.height)
+            failures.append(
+                f"artifact.files.{table}: "
+                + (f"row {reached}" if gap - 1 == reached else f"rows {reached} to {gap - 1}")
+                + " cite no evidence in artifact.cites"
+            )
+
+    if failures:
+        raise ValueError(f"the artifact upload failed {len(failures)} validation checks:\n" + "\n".join(failures))
+
+    origins: dict[str, str] = {}
+    if "result_set" in frames and "source_id" in frames["result_set"].columns:
+        origins = {str(id): str(source) for id, source in frames["result_set"].select("id", "source_id").iter_rows()}
+    seen: set[tuple[str, str]] = set()
+    for n, table, start, end, keys in cited:
+        frame = frames[table].slice(start, end - start)
+        allowed = {str(sources[key]) for key in keys}
+        if table == "result_set" or table in FACTS:
+            column = "id" if table == "result_set" else "result_set_id"
+            sets = [str(value) for value in frame[column].drop_nulls().unique().to_list()]
+            unseen = [value for value in sets if value not in origins]
+            if unseen:
+                origins |= {
+                    str(id): str(source)
+                    for id, source in conn.execute(
+                        "select id, source_id from result_set where id = any(%s::uuid[])", [unseen]
+                    ).fetchall()
+                }
+            stray = [value for value in sets if origins.get(value) not in allowed]
+            if stray:
+                failures.append(
+                    f"artifact.cites[{n}]: result set {stray[0]} comes from source {origins.get(stray[0])}, "
+                    "which this entry's evidence doesn't name"
+                )
+                continue
+        if table in UNCITED:
+            continue
+        owner = (
+            "entity_id"
+            if "entity_id" in frame.columns
+            else "id"
+            if table in types
+            else next(
+                (
+                    column
+                    for column, target in links[table].items()
+                    if column in frame.columns and target != "source" and (target in types or target == "entity")
+                ),
+                None,
+            )
+        )
+        if owner is None:
+            continue
+        for value in frame[owner].drop_nulls().unique().to_list():
+            for key in keys:
+                if (value, key) in seen:
+                    continue
+                seen.add((value, key))
+                _cite(
+                    cs,
+                    UUID(value),
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": table, "rows": [start, end], "op": "artifact"},
+                )
+    if failures:
+        raise ValueError(f"the artifact upload failed {len(failures)} validation checks:\n" + "\n".join(failures))
+    for table, frame in frames.items():
+        cs.frame(table, frame)
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -1716,7 +2152,14 @@ def compile(
     if not summary:
         raise ValueError("summary is required")
     ops = payload.get("ops") or []
-    if not ops:
+    bundle = payload.get("artifact")
+    if bundle is not None:
+        if ops:
+            raise ValueError("an artifact upload carries no ops; send ops in their own proposal")
+        if bundle.get("kind") not in ("edit", "correction", "digitization"):
+            raise ValueError("artifact.kind must be edit, correction, or digitization")
+        kind = cast(Kind, bundle["kind"])
+    elif not ops:
         raise ValueError("ops is empty")
     if conn.execute("select from users where id = %s", [author]).fetchone() is None:
         raise ValueError(f"author {author} is not a user")
@@ -1745,6 +2188,9 @@ def compile(
         cs.manifest["rationale"] = payload.get("rationale")
     if proposal is not None:
         cast(dict[str, object], cs.manifest["scope"])["proposal"] = str(proposal)
+    if bundle is not None:
+        _artifact(conn, cs, bundle, author, evidence, sources, proofs)
+        return cs.write()
 
     refs: dict[str, UUID] = {}
     for n, op in enumerate(ops):
@@ -2718,6 +3164,8 @@ def _prepared(conn: Connection, proposal: UUID, payload: object) -> tuple[str, i
         if _apply(folder) == "unchanged":
             return None
         tier, diff, checks = _review(conn, folder.name)
+        if "artifact" in cast(Payload, payload):
+            tier = max(tier, 2)
         if undefaulted or not _undefault(conn, folder.name, checks):
             break
         _discard(conn, folder.name)

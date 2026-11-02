@@ -15,9 +15,13 @@ The archive holds election results down to the smallest reporting unit, from eac
 
 - **MCP**: `{{origin}}/mcp` (streamable HTTP). Read tools work without a key.
 - **REST**: `{{origin}}/api/v1`, described at `{{origin}}/api/v1/openapi.json`. Every MCP tool has a REST twin.
+
 <!-- write -->
+
 - **Key**: a person creates one at `{{origin}}/settings/keys` and gives it to you. Send it as `x-api-key: ea_…` or `Authorization: Bearer ea_…`. You act as that person: they are credited and accountable for what you submit, so work as carefully as they would.
+
 <!-- /write -->
+
 - **Pages**: every page also answers as Markdown or JSON. Add `.md` or `.json` to its URL. `{{origin}}/llms.txt` is the map.
 
 ## The data model in one page
@@ -29,13 +33,16 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
 <!-- write -->
+
 Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, note translations, and labels (a contest where no candidate qualified, or an assessed integrity or recognition label on an election, polity, or area); can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, open a topic on the record's talk page with `comment` (pass `entity`, its public ID or UUID, with a `title`).
 <!-- /write -->
 <!-- read -->
+
 Contributions open after launch. Until then the archive is read-only: every page, REST endpoint, and MCP read tool works, and write tools return an error.
 <!-- /read -->
 
 <!-- write -->
+
 ## Evidence
 
 Every fact you add or change cites evidence. A proposal declares its evidence once, in a map from your own short keys to evidence items, and each op lists the keys it relies on.
@@ -72,6 +79,19 @@ To find work, call `list_bounties`: each bounty is a known gap in the archive, w
 6. **Read the result.** Read the job's `diff` and `checks`. Done when every changed row in the diff is one you meant to change and every finding is explained in the rationale or fixed.
 7. **Submit.** Call `submit_proposal`. It becomes revision 1 and enters review.
 8. **Follow up.** Poll `get_proposal`, which carries the discussion in `comments`. Answer a reviewer's question with `comment` (pass `parent` to reply in its thread, or `anchor` and `suggestion` to propose new wording for a changed row), take a suggestion on your own proposal with `accept_suggestion`, and answer requested changes with `revise_proposal`, which adds a revision and resubmits it. Done when the proposal is `published`, `rejected`, or `withdrawn`.
+
+## Bulk changes as Parquet
+
+From level 2 (20 accepted proposals at 90% or better), a change too large for ops can arrive as Parquet files, one per table, through `upload_changeset` (`POST /api/v1/changesets`).
+
+1. Write each table's rows with the columns of its staged table: `describe_ops` names them, and `get_editable` shows existing rows. Leave out `changeset_id` and `recorded_from`; the archive sets them. Results go in `result_set`, `result_value`, and `value_locator` with UUID keys (`result_set_id`, `unit_id`, `option_id`).
+2. Give every new row a fresh UUIDv7. A row with an existing ID replaces that row, so send it whole. A `slug` row may name only an entity minted in the same upload.
+3. Where a `source_id` or `page_id` should point at your evidence, write `evidence:<key>` in that cell; the archive swaps in the stored source or page.
+4. Upload each file with `upload_document` and poll `get_upload` until it is `ready`. Only one upload runs at a time.
+5. Call `upload_changeset` with `summary`, `rationale`, `kind` (`edit`, `correction`, or `digitization`), `files` mapping each table to its upload ID, `evidence`, and `cites`: a list of `{table, rows?, evidence}` where `rows` is a `[start, end)` range of 0-based row numbers (omit it for the whole file). Every row except `source`, `citation`, and `slug` rows must fall under a cite, and result sets and their figures must cite a source.
+6. The check lists every failure at once, each with its table, column, and row. Fix them all, upload new files, and call `upload_changeset` again with `proposal` set to your draft's number. When the job is `done`, read the diff and submit with `submit_proposal`.
+
+An upload holds up to 200 MB and 2 million fact rows at level 2, and 1 GB and 10 million rows at level 3. It is always tier 2 or higher.
 
 ## Op reference
 
@@ -311,5 +331,7 @@ Each payload goes to `draft_proposal`. IDs here are placeholders; take real ones
 | A failed URL fetch                                                 | Upload the document instead, or cite a source the archive holds.                                                                                                                   |
 | `A job on this proposal is still running.`                         | Wait, then read the result with `get_proposal`.                                                                                                                                    |
 | `A key may make 60 writes a minute…`                               | Wait the seconds the message gives.                                                                                                                                                |
+| `the artifact upload failed N validation checks`                   | Each line names a file, column, and row; fix every one and upload new files.                                                                                                       |
 | Upload `status: rejected`                                          | Read its `error`. The archive accepts PDF, PNG, JPEG, TIFF, XLSX, ODS, CSV, GeoJSON, GeoPackage, Parquet, and zipped shapefiles; only PDFs and images get pages to cite by region. |
+
 <!-- /write -->

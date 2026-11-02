@@ -139,6 +139,11 @@ const TOOLS: Array<{
     access: "key",
   },
   { name: "upload_document", procedure: router.uploads.create, access: "key" },
+  {
+    name: "upload_changeset",
+    procedure: router.proposals.upload,
+    access: "key",
+  },
   { name: "get_upload", procedure: router.uploads.get, access: "key" },
   {
     name: "get_upload_page",
