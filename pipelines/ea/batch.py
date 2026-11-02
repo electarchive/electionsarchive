@@ -223,14 +223,15 @@ def ensure(source: str, name: str, wanted: dict[str, Want], *, approved: float |
             groups[-1].append((key, want))
             size += weight
         for group in groups:
-            requests = [Request(custom_id=f"r{index}", params=want[0]) for index, (_, want) in enumerate(group)]
+            tag = f"{source}-r" if source == "i18n" else "r"
+            requests = [Request(custom_id=f"{tag}{index}", params=want[0]) for index, (_, want) in enumerate(group)]
             created = api.messages.batches.create(requests=requests)
             job["batches"].append(
                 {
                     "id": created.id,
                     "account": account,
                     "at": time.time(),
-                    "keys": {f"r{index}": key for index, (key, _) in enumerate(group)},
+                    "keys": {f"{tag}{index}": key for index, (key, _) in enumerate(group)},
                     "estimate": sum(want[1] for _, want in group),
                 }
             )

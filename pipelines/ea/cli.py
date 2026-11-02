@@ -129,6 +129,11 @@ def main() -> None:
         "or emit the tables that passed",
     )
     scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
+    commands.add_parser(
+        "i18n",
+        help="translate apps/web/messages/en.json into every locale with Sonnet batches: glossary, translation, "
+        "review, and checks; quote prints the estimated cost (set ANTHROPIC_API_KEY)",
+    ).add_argument("action", nargs="?", choices=("run", "quote"), default="run")
     batching = commands.add_parser(
         "batch", help="Message Batches jobs, accounts, and approvals (set ANTHROPIC_API_KEY)"
     )
@@ -197,6 +202,10 @@ def main() -> None:
                 live.run(args.poller, args.once)
             else:
                 print(getattr(live, args.action)())
+        case "i18n":
+            from ea import i18n
+
+            print(i18n.quote() if args.action == "quote" else i18n.run())
         case "batch":
             from ea import batch
 
