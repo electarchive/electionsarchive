@@ -61,6 +61,12 @@
         { capture: true, passive: true },
       );
     </script>
+    <script>
+      try {
+        document.documentElement.dataset.mode =
+          localStorage.getItem("mode-watcher-mode") ?? "system";
+      } catch {}
+    </script>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="tap">

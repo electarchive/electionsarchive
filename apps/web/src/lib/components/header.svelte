@@ -139,6 +139,9 @@
   $effect(() => idle(load));
 
   $effect(() => {
+    document.documentElement.dataset.mode = userPrefersMode.current;
+  });
+  $effect(() => {
     if (page.data.user != null && !READ_ONLY) {
       return idle(loadNotifications);
     }
@@ -147,13 +150,11 @@
 
 {#snippet themeTrigger(props: Record<string, unknown>)}
   <Button {...props} variant="ghost" size="icon" data-menu="theme">
-    {#if userPrefersMode.current === "dark"}
-      <MoonIcon />
-    {:else if userPrefersMode.current === "light"}
-      <SunIcon />
-    {:else}
-      <MonitorIcon />
-    {/if}
+    <MoonIcon class="hidden in-data-[mode=dark]:block" />
+    <SunIcon class="hidden in-data-[mode=light]:block" />
+    <MonitorIcon
+      class="in-data-[mode=dark]:hidden in-data-[mode=light]:hidden"
+    />
     <span class="sr-only">{m.theme_menu()}</span>
   </Button>
 {/snippet}
