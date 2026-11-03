@@ -46,7 +46,7 @@
   </h2>
   <ol class="grid">
     {#each rows as row (row.option.id)}
-      {#if row.rank === seats}
+      {#if seats > 1 && row.rank === seats}
         <li
           class="flex items-center gap-2 pbs-2 pbe-1 text-xs text-muted-foreground"
           aria-hidden="true"

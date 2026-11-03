@@ -116,6 +116,23 @@
   const isMulti = $derived(
     seats > 1 && !race.isMeasure && options.length > seats,
   );
+  const isUnopposed = $derived(
+    seats > 1 && !race.isMeasure && options.length <= seats,
+  );
+  const isField = $derived.by(() => {
+    if (race.isMeasure) {
+      return false;
+    }
+    if (seats > 1) {
+      return true;
+    }
+    const third = now.order[2];
+    return (
+      third != null &&
+      now.total > 0 &&
+      (now.totals[third] ?? 0) / now.total >= 0.1
+    );
+  });
   const upto = $derived(
     view == null ? points : points.filter((point) => point.at <= view),
   );
@@ -226,6 +243,12 @@
       return now.isFinal && race.certified != null
         ? m.night_head_seats_filled(values)
         : m.night_head_seats_holding(values);
+    }
+    if (isUnopposed && later == null) {
+      return m.night_head_seats_unopposed({
+        seats: count(seats),
+        count: count(options.length),
+      });
     }
     if (now.isFinal && race.certified != null) {
       const winner = options.find((option) => winners.includes(option.id));
@@ -454,7 +477,7 @@
   {/if}
 
   <section class="bg-background px-4 py-5 sm:px-8">
-    {#if isMulti}
+    {#if isField}
       <Seats {options} {now} {seats} {winners} />
     {:else}
       <Tote
