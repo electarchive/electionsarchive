@@ -353,13 +353,22 @@ async function jurisdictions(contests: Array<string>) {
     scheme: string | null;
     seats: number | null;
   }>(sql`
-    select c.id as contest, p.id as polity, p.kind::text as kind, a.scheme_code as scheme,
+    select c.id as contest,
+      case when p.kind = 'sovereign_state' then coalesce(st.entity_id, p.id) else p.id end as polity,
+      case
+        when p.kind = 'sovereign_state' and st.entity_id is not null then 'federal_unit'
+        when p.kind = 'county' and split_part(cs.path, '/', 5) ~ '^(county-)?(board-of-education|school-board|board-of-school|school-committee)' then 'school_district'
+        else p.kind::text
+      end as kind,
+      a.scheme_code as scheme,
       case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats
     from contest c join election e on e.id = c.election_id
     left join body b on b.id = c.body_id
     left join office o on o.id = c.office_id
     join polity p on p.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
     left join area a on a.id = c.district_area_id
+    left join slug cs on cs.entity_id = c.id and cs.is_current
+    left join slug st on st.is_current and st.path = 'us/' || split_part(cs.path, '/', 2) and p.kind = 'sovereign_state'
     where c.id = any(${sql.param(contests)}::uuid[])
   `);
   return new Map(found.rows.map((row) => [row.contest, row]));
