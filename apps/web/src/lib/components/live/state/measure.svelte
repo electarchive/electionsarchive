@@ -2,6 +2,7 @@
   import type { Entry } from "#lib/live/ballot.js";
   import { count, percent } from "#lib/format.js";
   import { sides } from "#lib/live/local.js";
+  import { clears, line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -16,8 +17,11 @@
   const isYes = $derived(
     pair == null || pick == null
       ? null
-      : pick.id === summary.race.options[pair.yes]?.id,
+      : summary.winner == null
+        ? clears(summary.race.rule, yes, no)
+        : pick.id === summary.race.options[pair.yes]?.id,
   );
+  const needs = $derived(terms(summary.race.rule));
   const verdict = $derived.by(() => {
     if (isYes == null || total === 0) {
       return null;
@@ -83,9 +87,14 @@
           ></span>
           <span class="flex-1 bg-(--no)"></span>
         {/if}
-        <span class="absolute inset-y-0 inset-s-1/2 bg-background inline-px"
+        <span
+          class="absolute inset-y-0 bg-background inline-px"
+          style:inset-inline-start="{line(summary.race.rule) * 100}%"
         ></span>
       </span>
+      {#if needs.length > 0}
+        <span class="text-xs text-muted-foreground">{needs.join(". ")}</span>
+      {/if}
     </span>
   {/if}
   <span class="font-figures text-xs text-muted-foreground tabular-nums"

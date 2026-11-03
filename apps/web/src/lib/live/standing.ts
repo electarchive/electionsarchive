@@ -16,7 +16,31 @@ export type Geography = {
   ground?: Array<number>;
   frame: { west: number; south: number; east: number; north: number };
   places: Array<{ areaId: string; k: number; at: [number, number] }>;
+  pieces?: Pieces;
 };
+
+export type Pieces = {
+  pieces: Array<{
+    areaId: string;
+    k: number;
+    at: [number, number];
+    shape: Array<Array<Array<[number, number]>>>;
+  }>;
+  edge: Array<Array<[number, number]>>;
+  veil: Array<Array<Array<[number, number]>>>;
+};
+
+export function features(cut: Pieces) {
+  return {
+    type: "FeatureCollection" as const,
+    features: cut.pieces.map((piece) => ({
+      type: "Feature" as const,
+      id: piece.k,
+      properties: {},
+      geometry: { type: "MultiPolygon" as const, coordinates: piece.shape },
+    })),
+  };
+}
 
 export type Mode = "lead" | "bubbles" | "shift" | "counted" | "remaining";
 
@@ -117,6 +141,74 @@ function signedOf(shares: Array<number>, [a, b]: [number, number]) {
   return (shares[a] ?? 0) - (shares[b] ?? 0);
 }
 
+function tally(
+  unit: LiveUnit,
+  votes: Array<number>,
+  base: LiveBaseline | null,
+  two: [number, number],
+  row: {
+    reporting: number | null;
+    expected: number | null;
+    at: string | null;
+  } | null,
+): UnitStanding {
+  const total = sum(votes);
+  const order = ranked(votes);
+  const first = order[0];
+  const lead =
+    total > 0 ? (votes[first ?? 0] ?? 0) - (votes[order[1] ?? 1] ?? 0) : 0;
+  return {
+    unit,
+    votes,
+    total,
+    order,
+    leader: total > 0 && first != null ? first : null,
+    lead,
+    margin: total > 0 ? lead / total : 0,
+    signed:
+      total > 0
+        ? signedOf(
+            votes.map((value) => value / total),
+            two,
+          )
+        : null,
+    reporting: row?.reporting ?? null,
+    expected: row?.expected ?? null,
+    at: row?.at ?? null,
+    baseline: base,
+    baseSigned: base == null ? null : signedOf(base.shares, two),
+  };
+}
+
+export function whole(now: Standing): UnitStanding | null {
+  const rows = [...now.units.values()];
+  const unit = rows[0]?.unit;
+  if (unit == null) {
+    return null;
+  }
+  const bases = rows.flatMap((row) =>
+    row.baseline == null ? [] : [row.baseline],
+  );
+  const turnout = sum(bases.map((base) => base.turnout));
+  const base =
+    turnout > 0
+      ? {
+          unitId: unit.id,
+          label: "",
+          turnout,
+          shares: now.totals.map(
+            (_, index) =>
+              sum(
+                bases.map(
+                  (entry) => (entry.shares[index] ?? 0) * entry.turnout,
+                ),
+              ) / turnout,
+          ),
+        }
+      : null;
+  return tally(unit, now.totals, base, now.pair, now);
+}
+
 export function standing(race: LiveRace, view: View): Standing {
   const two = pair(race);
   const isFinal = view.isFinal && race.certified != null;
@@ -130,39 +222,16 @@ export function standing(race: LiveRace, view: View): Standing {
   const units = new Map<string, UnitStanding>();
   for (const unit of race.units) {
     const row = counts.get(unit.id) ?? null;
-    const votes = row?.votes ?? race.options.map(() => 0);
-    const unitTotal = sum(votes);
-    const order = ranked(votes);
-    const first = order[0];
-    const second = order[1];
-    const base = bases.get(unit.id) ?? null;
-    units.set(unit.id, {
-      unit,
-      votes,
-      total: unitTotal,
-      order,
-      leader: unitTotal > 0 && first != null ? first : null,
-      lead:
-        unitTotal > 0
-          ? (votes[first ?? 0] ?? 0) - (votes[second ?? 1] ?? 0)
-          : 0,
-      margin:
-        unitTotal > 0
-          ? ((votes[first ?? 0] ?? 0) - (votes[second ?? 1] ?? 0)) / unitTotal
-          : 0,
-      signed:
-        unitTotal > 0
-          ? signedOf(
-              votes.map((value) => value / unitTotal),
-              two,
-            )
-          : null,
-      reporting: row?.reporting ?? null,
-      expected: row?.expected ?? null,
-      at: row?.at ?? null,
-      baseline: base,
-      baseSigned: base == null ? null : signedOf(base.shares, two),
-    });
+    units.set(
+      unit.id,
+      tally(
+        unit,
+        row?.votes ?? race.options.map(() => 0),
+        bases.get(unit.id) ?? null,
+        two,
+        row,
+      ),
+    );
   }
   return {
     frame,

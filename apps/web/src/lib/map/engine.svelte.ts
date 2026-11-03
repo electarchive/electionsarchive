@@ -89,6 +89,15 @@ type Options = {
   onMoveEnd?: () => void;
 };
 
+const OPACITY: Partial<Record<string, Array<string>>> = {
+  fill: ["fill-opacity"],
+  line: ["line-opacity"],
+  symbol: ["text-opacity", "icon-opacity"],
+  circle: ["circle-opacity", "circle-stroke-opacity"],
+  raster: ["raster-opacity"],
+  custom: ["opacity"],
+};
+
 const SLOTS: Array<Slot> = [
   "ground",
   "fills",
@@ -329,6 +338,7 @@ export class Engine {
   #padding: (width: number, height: number) => Padding;
   #options: Options;
   #isFramed = true;
+  #goal: Box | null = null;
   #limit: Box | null;
   #layers = new Map<
     string,
@@ -426,9 +436,11 @@ export class Engine {
       canvas.removeAttribute("aria-label");
       canvas.tabIndex = -1;
       gl.on("movestart", (event) => {
-        if (event.originalEvent != null) {
-          this.#isFramed = false;
+        if (event.originalEvent == null) {
+          return;
         }
+        this.#isFramed = false;
+        this.#goal = null;
       });
       gl.on("move", () => this.#options.onMove?.());
       gl.on("moveend", () => {
@@ -662,8 +674,33 @@ export class Engine {
         corner(middle.x + across, middle.y - down),
       ),
     );
-    if (this.#isFramed) {
+    if (!this.#isFramed) {
+      return;
+    }
+    const drift = Math.abs((framed.zoom ?? 0) - gl.getZoom());
+    if (drift < 0.1 && !calm() && !gl.isMoving()) {
+      gl.easeTo({ ...framed, duration: 300, essential: false });
+    } else {
       gl.jumpTo(framed);
+    }
+  }
+
+  #isGoal(box: Box) {
+    const goal = this.#goal;
+    return (
+      goal != null &&
+      goal.west === box.west &&
+      goal.south === box.south &&
+      goal.east === box.east &&
+      goal.north === box.north
+    );
+  }
+
+  #settle(gl: Maplibre.Map) {
+    if (gl.isMoving()) {
+      gl.once("moveend", () => this.#hold(gl));
+    } else {
+      this.#hold(gl);
     }
   }
 
@@ -674,10 +711,12 @@ export class Engine {
     if (gl == null) {
       return;
     }
-    if (!isAnimated) {
-      this.#hold(gl);
+    if (!isAnimated || this.#isGoal(box)) {
+      this.#goal = box;
+      this.#settle(gl);
       return;
     }
+    this.#goal = box;
     gl.setMaxBounds(null);
     gl.setMinZoom(-2);
     gl.once("moveend", () => this.#hold(gl));
@@ -702,6 +741,14 @@ export class Engine {
     }
   }
 
+  home(box: Box) {
+    this.#frame = box;
+    this.#isFramed = this.#isGoal(box);
+    if (this.gl != null) {
+      this.#settle(this.gl);
+    }
+  }
+
   reset() {
     this.frame(this.#frame, true);
   }
@@ -722,20 +769,33 @@ export class Engine {
 
   zoomIn() {
     this.#isFramed = false;
+    this.#goal = null;
     this.gl?.zoomIn();
   }
 
   zoomOut() {
     this.#isFramed = false;
+    this.#goal = null;
     this.gl?.zoomOut();
   }
 
-  fit(box: Box, onDone?: () => void) {
+  fit(box: Box, onDone?: () => void, isAnimated = true) {
     const gl = this.gl;
     if (gl == null) {
       return;
     }
+    if (this.#isGoal(box)) {
+      if (onDone != null) {
+        if (gl.isMoving()) {
+          gl.once("moveend", onDone);
+        } else {
+          onDone();
+        }
+      }
+      return;
+    }
     this.#isFramed = false;
+    this.#goal = box;
     if (onDone != null) {
       gl.once("moveend", onDone);
     }
@@ -743,13 +803,14 @@ export class Engine {
     gl.fitBounds([box.west, box.south, box.east, box.north], {
       padding: this.#padding(canvas.clientWidth, canvas.clientHeight),
       maxZoom: FIT,
-      duration: calm() ? 0 : 750,
+      duration: !isAnimated || calm() ? 0 : 750,
       essential: false,
     });
   }
 
   fly(center: [number, number], zoom: number) {
     this.#isFramed = false;
+    this.#goal = null;
     this.gl?.flyTo({ center, zoom, duration: calm() ? 0 : 1100 });
   }
 
@@ -1227,6 +1288,17 @@ export class Engine {
     }
   }
 
+  fadeOut(group: string) {
+    for (const [id, layer] of this.#layers) {
+      if (layer.group !== group) {
+        continue;
+      }
+      for (const key of OPACITY[layer.spec.type] ?? []) {
+        this.style(id, key, 0);
+      }
+    }
+  }
+
   drop(group: string) {
     const gl = this.gl;
     if (gl == null) {
@@ -1492,6 +1564,7 @@ export class Engine {
 
   jump(center: [number, number], zoom: number) {
     this.#isFramed = false;
+    this.#goal = null;
     this.gl?.jumpTo({ center, zoom });
   }
 }

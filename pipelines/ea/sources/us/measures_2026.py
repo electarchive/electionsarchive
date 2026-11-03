@@ -13,6 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import measure_rules
 from ea.store import DATA, connect
 
 SOURCE = "us.measures_2026"
@@ -115,7 +116,15 @@ def parse() -> None:
             )
         if not found:
             print("text not found in source:", row["state"], row["label"], url)
-        rows.append({**{key: None if value is None else str(value) for key, value in row.items()}, "verified": found})
+        rows.append(
+            {
+                **{
+                    key: None if value is None else json.dumps(value) if isinstance(value, list) else str(value)
+                    for key, value in row.items()
+                },
+                "verified": found,
+            }
+        )
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "measures.parquet")
 
 
@@ -129,7 +138,7 @@ def emit() -> Path:
             summary="Statewide ballot measures on the November 3, 2026 ballot, with official wording",
             polity="US",
         )
-        system = cs.key("us.electoral_system", "referendum")
+        systems = {"referendum": cs.key("us.electoral_system", "referendum"), **measure_rules.emit_systems(cs)}
         states = dict(
             conn.execute(
                 """select substr(p.iso_code, 4), u.area_id from reporting_unit u
@@ -154,6 +163,13 @@ def emit() -> Path:
             ).fetchall()
         )
         labels = Counter(zip(frame["state"], frame["label"]))
+        options = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
+                   where x.scheme = 'us.option' and x.value like %s and e.retired_by is null""",
+                [f"{DAY}:%"],
+            ).fetchall()
+        )
         sources = {}
         for row in frame.iter_rows(named=True):
             state = row["state"]
@@ -181,7 +197,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=states[state],
-                electoral_system_id=system,
+                electoral_system_id=systems[measure_rules.statewide(state, row["label"])],
                 round_number=1,
                 default_result_kind="counted",
             )
@@ -198,15 +214,27 @@ def emit() -> Path:
                         path = f"{base}-{n}"
                     taken.add(path)
                 cs.add("slug", path=path, entity_id=contest)
-            for position, answer in enumerate((row.get("yes") or "Yes", row.get("no") or "No")):
+            answers = (
+                {slug(answer): answer for answer in json.loads(row["answers"])}
+                if row["answers"]
+                else {"yes": row["yes"] or "Yes", "no": row["no"] or "No"}
+            )
+            for position, (key, answer) in enumerate(answers.items()):
                 cs.add(
                     "contest_option",
-                    id=cs.key("us.option", f"{contest_key}:{('yes', 'no')[position]}"),
+                    id=cs.key("us.option", f"{contest_key}:{key}"),
                     contest_id=contest,
                     kind="answer",
                     ballot_position=position + 1,
                     ballot_label=answer,
                 )
+            for value, option in options.items():
+                if value.startswith(f"{contest_key}:") and value.removeprefix(f"{contest_key}:") not in answers:
+                    cs.add(
+                        "entity_retirement",
+                        entity_id=option,
+                        reason=f"{row['source_title']} lists no such answer for {name}",
+                    )
             cs.add(
                 "citation",
                 entity_id=contest,

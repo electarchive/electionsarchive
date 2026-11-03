@@ -5,7 +5,11 @@
   import { others } from "#lib/live/lineup.js";
   import { m } from "#lib/paraglide/messages.js";
 
-  const { rest, total }: { rest: Array<Line>; total: number } = $props();
+  const {
+    rest,
+    total,
+    hasLink = true,
+  }: { rest: Array<Line>; total: number; hasLink?: boolean } = $props();
 
   const votes = $derived.by(() => {
     let sum = 0;
@@ -26,6 +30,7 @@
           label={rest[0]?.option.label ?? ""}
           person={rest[0]?.option.person ?? null}
           hasSwatch={false}
+          {hasLink}
           class="truncate"
         />
       {:else}

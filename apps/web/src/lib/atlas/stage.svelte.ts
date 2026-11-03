@@ -233,7 +233,7 @@ export class Stage {
         type: "line",
         ...layer,
         paint: {
-          "line-color": "var(--card)",
+          "line-color": "var(--map-seam)",
           "line-width": width,
           "line-opacity":
             isFading && Number.isFinite(rim)

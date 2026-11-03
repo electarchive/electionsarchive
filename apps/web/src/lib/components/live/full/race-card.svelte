@@ -1,12 +1,14 @@
 <script lang="ts">
   import type { LiveOption } from "@ea/analytics/live";
-  import { resolve } from "$app/paths";
-  import CheckIcon from "@lucide/svelte/icons/check";
   import type { Summary } from "#lib/live/summary.js";
+  import BandLabel from "#lib/components/live/band-label.svelte";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Face from "#lib/components/live/face.svelte";
+  import Also from "#lib/components/live/state/also.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { lead, stamp, surname, tone } from "#lib/live/format.js";
+  import { bandFor, lead, paint, surname } from "#lib/live/format.js";
+  import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
   import { describe } from "#lib/live/summary.js";
@@ -41,27 +43,33 @@
   const race = $derived(summary.race);
   const last = $derived(prior(race));
   const headline = $derived(describe(summary, closes, clock));
-  const called = $derived(summary.winner ?? summary.projected);
-  const rows = $derived(
-    race.options
-      .map((option, index) => ({
-        option,
-        index,
-        votes: summary.totals[index] ?? 0,
-        share:
-          summary.total > 0 ? (summary.totals[index] ?? 0) / summary.total : 0,
-        before: last?.shares[index] ?? null,
-      }))
-      .filter((row) => !row.option.isWriteIn || row.votes > 0)
-      .toSorted(
-        (a, b) =>
-          b.votes - a.votes ||
-          (b.before ?? 0) - (a.before ?? 0) ||
-          Number(b.option.isIncumbent) - Number(a.option.isIncumbent) ||
-          a.index - b.index,
-      ),
+  const band = $derived(
+    bandFor(
+      race.options,
+      summary.projected == null
+        ? (race.certified?.winners ?? [])
+        : [summary.projected.id],
+      race.seats ?? 1,
+      summary.projected != null,
+    ),
   );
-  const shown = $derived(rows.slice(0, limit));
+  const reach = useReach();
+  const split = $derived(
+    lineup(
+      race,
+      summary.totals,
+      reach(),
+      Math.max(limit, (race.seats ?? 1) + 1),
+    ),
+  );
+  const rows = $derived(
+    split.main.map((line) => ({
+      option: line.option,
+      votes: line.votes,
+      share: line.share ?? 0,
+      before: last?.shares[race.options.indexOf(line.option)] ?? null,
+    })),
+  );
   const scale = $derived(
     Math.max(0.5, ...rows.map((row) => Math.max(row.share, row.before ?? 0))),
   );
@@ -71,7 +79,7 @@
       !forecasts ||
       favorite == null ||
       summary.chance == null ||
-      called != null ||
+      band != null ||
       summary.estimate?.status !== "estimating"
     ) {
       return null;
@@ -85,12 +93,14 @@
       : `${surname(option)} +${lead(last.margin)}`;
   });
 
-  function isCalled(option: LiveOption) {
-    return called?.id === option.id;
+  const seats = $derived(race.seats ?? 1);
+
+  function isDecided(option: LiveOption) {
+    return band?.ids.includes(option.id) === true;
   }
 </script>
 
-<article class="grid gap-3" aria-label={race.title}>
+<article class="grid grid-cols-[minmax(0,1fr)] gap-3" aria-label={race.title}>
   <header class="grid gap-1">
     <h3 class="text-[0.9375rem]/5 font-[720] tracking-tight text-balance">
       {#if isLinked}
@@ -106,126 +116,152 @@
     <p class="font-serif text-[0.9375rem]/snug text-pretty">{headline}</p>
   </header>
 
-  <ul class="grid gap-2.5">
-    {#each shown as row (row.option.id)}
-      {const color = $derived(tone(row.option))}
-      <li
-        class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5"
-      >
-        <span class="relative">
+  <div
+    class={cn(
+      "grid gap-3 transition-colors duration-700 motion-reduce:transition-none",
+      { "-mx-3 rounded-sm band p-3": band != null },
+    )}
+    style:--party={band?.fill}
+  >
+    {#if band != null}
+      <BandLabel
+        {band}
+        isMeasure={race.isMeasure ?? false}
+        at={summary.projectedAt}
+        class="text-xs"
+      />
+    {/if}
+    <ol class="grid gap-2.5">
+      {#each rows as row, rank (row.option.id)}
+        {const color = $derived(paint(row.option, band))}
+        {const isDim = $derived(band != null && !isDecided(row.option))}
+        {const isStrong = $derived(
+          band == null
+            ? row.option.id === summary.leader?.id
+            : isDecided(row.option),
+        )}
+        {#if seats > 1 && rank === seats && rows.length > seats}
+          <li
+            class="flex items-center gap-2 text-[0.6875rem] text-muted-foreground"
+            aria-hidden="true"
+          >
+            <span class="flex-1 border-bs border-dashed border-current"></span>
+            {m.night_seats_line({ count: count(seats) })}
+            <span class="flex-1 border-bs border-dashed border-current"></span>
+          </li>
+        {/if}
+        <li
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5"
+        >
           {#if row.option.photo != null || row.option.person != null}
-            <Face option={row.option} class="block-9 inline-9" />
+            <Face option={row.option} {color} class="block-9 inline-9" />
           {:else}
             <span
               class="block rounded-full block-3 inline-3"
               style:background-color={color}
             ></span>
           {/if}
-          {#if isCalled(row.option)}
+          <span class="grid gap-1 min-inline-0">
             <span
-              class="absolute -inset-e-1 -inset-be-0.5 grid place-items-center rounded-full bg-foreground text-background ring-2 ring-card block-4 inline-4"
-              title={summary.winner == null
-                ? m.night_tip_projected({ time: stamp(summary.projectedAt) })
-                : m.night_winner()}
-              ><CheckIcon
-                class="block-2.5 inline-2.5"
-                strokeWidth={3.5}
-              /></span
+              class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 min-inline-0"
             >
-          {/if}
-        </span>
-        <span class="grid gap-1 min-inline-0">
-          <span class="flex items-baseline gap-1.5 min-inline-0">
-            {#if row.option.person != null}
-              <a
-                href={resolve("/id/[id]", { id: row.option.person })}
-                class={cn(
-                  "truncate underline decoration-transparent underline-offset-2 hover:decoration-foreground",
-                  { "font-semibold": row.option.id === summary.leader?.id },
-                )}>{row.option.label}</a
-              >
-            {:else}
-              <span class="truncate">{row.option.label}</span>
-            {/if}
-            {#if row.option.isIncumbent}
-              <span
-                class="shrink-0 text-[0.6875rem] text-muted-foreground"
-                title={m.results_incumbent()}>{m.results_incumbent()}</span
-              >
-            {/if}
-          </span>
-          <span
-            class="relative overflow-visible rounded-xs bg-muted block-1.5"
-            aria-hidden="true"
-          >
+              <Name
+                label={row.option.label}
+                person={row.option.person}
+                hasSwatch={false}
+                class={cn("leading-snug wrap-anywhere", {
+                  "font-semibold": isStrong,
+                  "text-muted-foreground": isDim,
+                })}
+              />
+              {#if row.option.isIncumbent}
+                <span
+                  class="shrink-0 text-[0.6875rem] text-muted-foreground"
+                  title={m.results_incumbent()}>{m.results_incumbent()}</span
+                >
+              {/if}
+            </span>
             <span
-              class="absolute inset-y-0 inset-s-0 rounded-xs transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
-              style:inline-size="{(row.share / scale) * 100}%"
-              style:background-color={color}
-            ></span>
-            {#if row.before != null && row.before > 0}
+              class="relative overflow-visible rounded-xs bg-muted block-1.5"
+              aria-hidden="true"
+            >
               <span
-                class="absolute -inset-y-0.5 rounded-full bg-foreground/70 inline-0.5"
-                style:inset-inline-start="calc({(row.before / scale) * 100}% -
-                1px)"
-                title={m.night_tip_baseline({ margin: percent(row.before) })}
+                class="absolute inset-y-0 inset-s-0 rounded-xs transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
+                style:inline-size="{(row.share / scale) * 100}%"
+                style:background-color={color}
               ></span>
+              {#if row.before != null && row.before > 0}
+                <span
+                  class="absolute -inset-y-0.5 rounded-full bg-foreground/70 inline-0.5"
+                  style:inset-inline-start="calc({(row.before / scale) * 100}% -
+                  1px)"
+                  title={m.night_tip_baseline({ margin: percent(row.before) })}
+                ></span>
+              {/if}
+            </span>
+            {#if row.option.party != null}
+              <span class="truncate text-xs text-muted-foreground"
+                ><Name
+                  label={row.option.party.short}
+                  party={row.option.party.id}
+                  color={row.option.party.color}
+                  hasSwatch={false}
+                  class="hover:text-foreground"
+                /></span
+              >
             {/if}
           </span>
-          {#if row.option.party != null}
-            <a
-              href={resolve("/id/[id]", { id: row.option.party.id })}
-              class="truncate text-xs text-muted-foreground underline decoration-transparent underline-offset-2 hover:text-foreground hover:decoration-foreground"
-              >{row.option.party.short}</a
+          {#if summary.total > 0}
+            <span class="grid justify-items-end font-figures tabular-nums">
+              <span
+                class={cn("text-[0.9375rem] font-semibold", {
+                  "text-muted-foreground": isDim,
+                })}>{percent(row.share)}</span
+              >
+              <span class="text-xs text-muted-foreground"
+                >{count(row.votes)}</span
+              >
+            </span>
+          {:else if row.before != null && row.before > 0}
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
+              title={m.night_table_base()}>{percent(row.before)}</span
             >
           {/if}
+        </li>
+      {/each}
+    </ol>
+    <Also rest={split.rest} total={summary.total} />
+
+    <div class="grid gap-1.5">
+      <div
+        class="relative overflow-hidden rounded-xs bg-muted block-1"
+        aria-hidden="true"
+      >
+        <span
+          class="absolute inset-y-0 inset-s-0 bg-foreground transition-[inline-size] duration-700 motion-reduce:transition-none"
+          style:inline-size="{(summary.counted ?? 0) * 100}%"
+        ></span>
+      </div>
+      <p
+        class="flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-muted-foreground"
+      >
+        <span>
+          {#if summary.total === 0}
+            {m.night_counted_none()}
+          {:else if summary.counted != null}
+            {m.night_counted_expected({ share: percent(summary.counted, 0) })}
+          {:else}
+            {m.night_votes({ count: count(summary.total) })}
+          {/if}
         </span>
-        {#if summary.total > 0}
-          <span class="grid justify-items-end font-figures tabular-nums">
-            <span class="text-[0.9375rem] font-semibold"
-              >{percent(row.share)}</span
-            >
-            <span class="text-xs text-muted-foreground">{count(row.votes)}</span
-            >
-          </span>
-        {:else if row.before != null && row.before > 0}
-          <span
-            class="font-figures text-xs text-muted-foreground tabular-nums"
-            title={m.night_table_base()}>{percent(row.before)}</span
+        {#if chance != null}
+          <span class="font-semibold text-foreground"
+            >{m.night_nation_chance(chance)}</span
           >
         {/if}
-      </li>
-    {/each}
-  </ul>
-
-  <div class="grid gap-1.5">
-    <div
-      class="relative overflow-hidden rounded-xs bg-muted block-1"
-      aria-hidden="true"
-    >
-      <span
-        class="absolute inset-y-0 inset-s-0 bg-foreground transition-[inline-size] duration-700 motion-reduce:transition-none"
-        style:inline-size="{(summary.counted ?? 0) * 100}%"
-      ></span>
+      </p>
     </div>
-    <p
-      class="flex flex-wrap justify-between gap-x-3 gap-y-0.5 text-xs text-muted-foreground"
-    >
-      <span>
-        {#if summary.total === 0}
-          {m.night_counted_none()}
-        {:else if summary.counted != null}
-          {m.night_counted_expected({ share: percent(summary.counted, 0) })}
-        {:else}
-          {m.night_votes({ count: count(summary.total) })}
-        {/if}
-      </span>
-      {#if chance != null}
-        <span class="font-semibold text-foreground"
-          >{m.night_nation_chance(chance)}</span
-        >
-      {/if}
-    </p>
   </div>
 
   {#if lastMargin != null || held != null}

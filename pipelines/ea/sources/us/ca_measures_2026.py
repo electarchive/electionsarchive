@@ -10,7 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda, govmint
+from ea.sources.us import ceda, govmint, measure_rules
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_measures_2026"
@@ -205,7 +205,7 @@ def emit() -> Path:
             summary="California county, city, and school district measures on the November 3, 2026 ballot, with official wording",
             polity="US-CA",
         )
-        system = cs.key("us.electoral_system", "referendum")
+        systems = measure_rules.systems(cs, {"referendum", "referendum-ca-two-thirds", "referendum-ca-55"})
         parent = cs.key("us.election", f"{DAY}:CA")
         sources: dict[str, UUID] = {}
         elections: set[UUID] = set()
@@ -278,7 +278,13 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=area,
-                electoral_system_id=system,
+                electoral_system_id=systems[
+                    "referendum-ca-two-thirds"
+                    if "2/3" in (row["threshold"] or "")
+                    else "referendum-ca-55"
+                    if (row["threshold"] or "").startswith("55%")
+                    else "referendum"
+                ],
                 round_number=1,
                 default_result_kind="counted",
             )

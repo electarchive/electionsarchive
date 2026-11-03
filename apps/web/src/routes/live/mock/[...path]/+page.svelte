@@ -92,7 +92,7 @@
   <Night
     data={{
       ...data,
-      shown: { results: true, forecasts: true, classic: false },
+      shown: { results: true, forecasts: true },
     }}
     {election}
     {estimates}

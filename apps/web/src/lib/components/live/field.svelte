@@ -161,14 +161,16 @@
                   />
                 {/if}
               </span>
-              <span class="text-xs text-muted-foreground"
-                >{#if option?.party == null}{m.night_no_party()}{:else}<Name
-                    label={option.party.name}
-                    party={option.party.id}
-                    color={option.party.color}
-                    hasSwatch={false}
-                  />{/if}</span
-              >
+              {#if option?.isAnswer !== true}
+                <span class="text-xs text-muted-foreground"
+                  >{#if option?.party == null}{m.night_no_party()}{:else}<Name
+                      label={option.party.name}
+                      party={option.party.id}
+                      color={option.party.color}
+                      hasSwatch={false}
+                    />{/if}</span
+                >
+              {/if}
             </span>
           </th>
           <td

@@ -125,7 +125,7 @@
       </li>
     {/each}
   </ol>
-  <Also rest={split.rest} total={summary.total} />
+  <Also rest={split.rest} total={summary.total} hasLink={false} />
   <span
     class="flex items-center justify-between gap-3 text-xs text-muted-foreground"
   >

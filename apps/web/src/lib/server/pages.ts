@@ -7,7 +7,7 @@ import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
-import { cut, summarize } from "#lib/live/summary.js";
+import { closing, cut, describe, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
@@ -1990,6 +1990,12 @@ export async function livePage(path: string, at: string | null) {
               (frame) => time == null || frame.at <= time,
             ),
             certified: null,
+            projected:
+              race.projected != null &&
+              time != null &&
+              Date.parse(race.projected.at) <= Date.parse(time)
+                ? race.projected
+                : null,
           };
       const summary = summarize(
         view,
@@ -2008,6 +2014,13 @@ export async function livePage(path: string, at: string | null) {
       return {
         slug: race.slug,
         title: race.title,
+        headline:
+          summary.winner == null && summary.projected == null
+            ? null
+            : describe(summary, closing(election, race), Date.now()).replace(
+                /\.$/u,
+                "",
+              ),
         office: race.office,
         state: race.state,
         district: race.district,
@@ -2020,6 +2033,7 @@ export async function livePage(path: string, at: string | null) {
           isWriteIn: option.isWriteIn,
           isIncumbent: option.isIncumbent,
           isWinner: summary.winner?.id === option.id,
+          isProjected: summary.projected?.id === option.id,
         })),
         votes: summary.totals,
         at: summary.at,
@@ -2029,6 +2043,10 @@ export async function livePage(path: string, at: string | null) {
         margin: summary.margin,
         seat: line == null ? null : { name: line.last.label, lead: line.lead },
         winner: summary.winner?.label ?? null,
+        projected:
+          summary.projected == null
+            ? null
+            : { name: summary.projected.label, at: summary.projectedAt },
         estimate:
           summary.estimate == null || summary.estimate.status === "waiting"
             ? null

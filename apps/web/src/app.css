@@ -93,6 +93,8 @@
   --card: #ffffff;
   --card-foreground: #15171a;
   --map-low: #ffffff;
+  --map-ink: #15171a;
+  --map-seam: #c3c8cf;
   --map-rise: #4a2a87;
   --map-fall: #b35806;
   --map-road: #15171a;
@@ -130,6 +132,8 @@
   --card: #111315;
   --card-foreground: #e8eaed;
   --map-low: #c4c8ce;
+  --map-ink: #24282e;
+  --map-seam: #111315;
   --map-rise: #3d1f78;
   --map-fall: #9c4a04;
   --map-road: #000000;
@@ -272,6 +276,20 @@
 
 @utility knockout {
   color: oklch(from var(--party) clamp(0, (0.7 - l) * 1000, 1) 0 0);
+}
+
+@utility band {
+  --background: var(--party);
+  --card: var(--party);
+  --foreground: oklch(from var(--party) clamp(0, (0.7 - l) * 1000, 1) 0 0);
+  --muted-foreground: color-mix(in oklab, var(--foreground) 76%, var(--party));
+  --muted: color-mix(in oklab, var(--foreground) 16%, var(--party));
+  --secondary: var(--muted);
+  --accent: color-mix(in oklab, var(--foreground) 14%, var(--party));
+  --border: color-mix(in oklab, var(--foreground) 28%, var(--party));
+  --ring: var(--foreground);
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 @utility keycap {

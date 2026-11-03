@@ -130,9 +130,12 @@
     {isOffline}
   />
 {:else}
-  {#if rail.length > 1 || counties.length > 0}
-    <Races summaries={rail} current={data.focus} {counties} />
-  {/if}
+  <Races
+    summaries={rail}
+    current={data.focus}
+    {counties}
+    back={{ href: toLive(election.slug), label: election.title }}
+  />
   {#if race != null}
     {#key race.id}
       <Race

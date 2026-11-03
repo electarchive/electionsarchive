@@ -1,17 +1,15 @@
 import type { LiveOption } from "@ea/analytics/live";
 import { dates, numbers } from "#lib/format.js";
 import { prefs } from "#lib/live/prefs.svelte.js";
-import { swatch } from "#lib/party.js";
+import { isNeutral, side, stance, swatch } from "#lib/party.js";
 
 export function tone(option: LiveOption | undefined) {
   if (option == null) {
     return "var(--muted-foreground)";
   }
-  if (option.party == null) {
-    const answer = swatch(null, `answer:${option.label.toLowerCase()}`);
-    if (answer === "var(--yes)" || answer === "var(--no)") {
-      return answer;
-    }
+  const answer = `answer:${option.label.toLowerCase()}`;
+  if (option.party == null && side(answer) != null) {
+    return swatch(null, answer);
   }
   return swatch(
     option.party?.color === "" ? null : (option.party?.color ?? option.color),
@@ -21,9 +19,43 @@ export function tone(option: LiveOption | undefined) {
   );
 }
 
+export type Band = { ids: Array<string>; isProjected: boolean; fill: string };
+
+export function bandFor(
+  options: Array<LiveOption>,
+  ids: Array<string>,
+  seats: number,
+  isProjected: boolean,
+): Band | null {
+  if (ids.length === 0) {
+    return null;
+  }
+  const fill =
+    seats > 1 || ids.length > 1
+      ? null
+      : tone(options.find((option) => option.id === ids[0]));
+  return {
+    ids,
+    isProjected,
+    fill: fill == null || isNeutral(fill) ? "var(--marker)" : fill,
+  };
+}
+
+export function paint(option: LiveOption | undefined, band: Band | null) {
+  if (band == null) {
+    return tone(option);
+  }
+  return option != null && band.ids.includes(option.id)
+    ? "var(--foreground)"
+    : "color-mix(in oklab, var(--foreground) 34%, transparent)";
+}
+
 const SUFFIXES = new Set(["jr", "sr", "ii", "iii", "iv", "v"]);
 
 export function surname(option: LiveOption | undefined) {
+  if (option?.isAnswer === true) {
+    return stance(option.label) ?? option.label;
+  }
   const words = (option?.label ?? "")
     .trim()
     .split(/\s+/u)

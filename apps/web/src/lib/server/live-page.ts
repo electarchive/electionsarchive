@@ -2,7 +2,7 @@ import { call, ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
 import { placeSlug } from "#lib/live/format.js";
 import { remember } from "#lib/server/cache.js";
-import { control, geography, states } from "#lib/server/live-board.js";
+import { control, geography, pieces, states } from "#lib/server/live-board.js";
 import { router } from "#lib/server/rpc/router.js";
 
 export async function night(path: string) {
@@ -37,7 +37,7 @@ async function place(path: string, slug: string, at: string | null) {
   if (unit == null) {
     error(404);
   }
-  const map = await remember(`live:place:v2:${path}/${slug}`, async () =>
+  const map = await remember(`live:place:v3:${path}/${slug}`, async () =>
     geography(
       [...new Set([...counties.values()].map((entry) => entry.areaId))],
       election.date,
@@ -115,8 +115,11 @@ export async function livePage(path: string, at: string | null) {
       ),
     ),
   ];
+  const clip = focus?.area ?? null;
   const framed =
-    focus?.office === "other" && focus.area != null ? [focus.area] : areas;
+    (focus?.office === "other" || focus?.office === "house") && clip != null
+      ? [clip]
+      : areas;
   const [nation, standing, map] = await Promise.all([
     isNation
       ? remember(`live:nation:v2:${election.date}`, async () =>
@@ -124,14 +127,37 @@ export async function livePage(path: string, at: string | null) {
         )
       : null,
     isNation
-      ? remember(`live:control:v1:${election.date}`, async () =>
+      ? remember(`live:control:v2:${election.date}`, async () =>
           control(election.races, election.date),
         )
       : null,
     isNation || focus == null
       ? null
-      : remember(`live:geography:v4:${focus.slug}:${scheme ?? ""}`, async () =>
-          geography(areas, election.date, framed),
+      : remember(
+          `live:geography:v8:${focus.slug}:${scheme ?? ""}`,
+          async () => {
+            const [found, cut] = await Promise.all([
+              geography(areas, election.date, framed),
+              clip == null || scheme == null
+                ? null
+                : remember(
+                    `live:pieces:v5:${election.date}:${clip}:${scheme}`,
+                    async () => pieces(clip, election.date, scheme),
+                  ),
+            ]);
+            const kept = new Set(areas);
+            const own =
+              cut == null
+                ? []
+                : cut.pieces.filter((piece) => kept.has(piece.areaId));
+            return found == null || cut == null || own.length === 0
+              ? found
+              : {
+                  ...found,
+                  places: own.map(({ areaId, k, at }) => ({ areaId, k, at })),
+                  pieces: { ...cut, pieces: own },
+                };
+          },
         ),
   ]);
   return {

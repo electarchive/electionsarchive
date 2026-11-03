@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
-  import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import type { Band } from "#lib/live/format.js";
   import type { Standing } from "#lib/live/standing.js";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { lead, paint, surname } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Counter from "./counter.svelte";
@@ -15,16 +15,20 @@
     options,
     now,
     estimate,
-    winners,
+    band = null,
     isWaiting,
     isLater = false,
+    mark = 0.5,
+    needs = [],
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
-    winners: Array<string>;
+    band?: Band | null;
     isWaiting: boolean;
     isLater?: boolean;
+    mark?: number;
+    needs?: Array<string>;
   } = $props();
 
   let isOpen = $state(false);
@@ -75,13 +79,13 @@
     <ol class="grid grid-cols-2 items-end gap-4">
       {#each top as index, position (options[index]?.id ?? index)}
         {const option = $derived(options[index])}
-        {const color = $derived(tone(option))}
-        {const isWinner = $derived(
-          option != null && winners.includes(option.id),
+        {const color = $derived(paint(option, band))}
+        {const isDim = $derived(
+          band != null && (option == null || !band.ids.includes(option.id)),
         )}
         {const isEnd = $derived(position === 1)}
         <li
-          class={cn("grid gap-1 min-inline-0", {
+          class={cn("grid grid-cols-1 gap-1 min-inline-0", {
             "border-s-[3px] ps-3": !isEnd,
             "justify-items-end border-e-[3px] pe-3 text-end": isEnd,
           })}
@@ -94,10 +98,11 @@
           >
             <Face
               {option}
+              {color}
               class="block-10 inline-10 sm:block-11 sm:inline-11"
             />
             <span
-              class={cn("grid gap-1 min-inline-0", {
+              class={cn("grid grid-cols-1 gap-1 min-inline-0", {
                 "justify-items-end": isEnd,
               })}
             >
@@ -110,29 +115,23 @@
                   label={option?.label ?? ""}
                   person={option?.person ?? null}
                   hasSwatch={false}
-                  class="truncate text-base/tight font-[720] tracking-tight"
+                  class={cn(
+                    "truncate text-base/tight font-[720] tracking-tight",
+                    { "text-muted-foreground": isDim },
+                  )}
                 />
-                {#if isWinner}
-                  <span
-                    class="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[0.6875rem] font-semibold knockout"
-                    style:background-color={color}
-                    style:--party={color}
-                    ><CheckIcon
-                      class="block-3 inline-3"
-                      aria-hidden="true"
-                    />{m.night_winner()}</span
-                  >
-                {/if}
               </span>
-              <span
-                class="truncate text-xs text-muted-foreground max-inline-full"
-                >{#if option?.party == null}{m.night_no_party()}{:else}<Name
-                    label={option.party.name}
-                    party={option.party.id}
-                    color={option.party.color}
-                    hasSwatch={false}
-                  />{/if}</span
-              >
+              {#if option?.isAnswer !== true}
+                <span
+                  class="truncate text-xs text-muted-foreground max-inline-full"
+                  >{#if option?.party == null}{m.night_no_party()}{:else}<Name
+                      label={option.party.name}
+                      party={option.party.id}
+                      color={option.party.color}
+                      hasSwatch={false}
+                    />{/if}</span
+                >
+              {/if}
             </span>
           </span>
           <span
@@ -150,7 +149,10 @@
               <Counter
                 value={share(index)}
                 format={(value: number) => percent(value)}
-                class="text-[clamp(1.75rem,1.2rem+1.6vw,2.375rem)] leading-none font-[780] tracking-tight"
+                class={cn(
+                  "text-[clamp(1.75rem,1.2rem+1.6vw,2.375rem)] leading-none font-[780] tracking-tight",
+                  { "text-muted-foreground": isDim },
+                )}
               />
               <Counter
                 value={now.totals[index] ?? 0}
@@ -169,7 +171,7 @@
       >
         <span
           class="font-figures text-lg leading-none font-[760] tabular-nums"
-          style:color={tone(options[gap.index])}
+          style:color={paint(options[gap.index], band)}
           >{surname(options[gap.index])} +{lead(gap.margin)}</span
         >
         <span class="font-figures text-xs text-muted-foreground tabular-nums"
@@ -190,7 +192,7 @@
           <span
             class="transition-[inline-size] duration-700 ease-out block-full motion-reduce:transition-none"
             style:inline-size="{share(index) * 100}%"
-            style:background-color={tone(options[index])}
+            style:background-color={paint(options[index], band)}
             style:opacity={position === 0 || position === rest.length + 1
               ? 1
               : 0.55}
@@ -199,9 +201,13 @@
       {/each}
     {/if}
     <span
-      class="absolute inset-y-0 inset-s-1/2 -translate-x-1/2 bg-background inline-0.5"
+      class="absolute inset-y-0 -translate-x-1/2 bg-background inline-0.5"
+      style:inset-inline-start="{mark * 100}%"
     ></span>
   </div>
+  {#if needs.length > 0}
+    <p class="text-[0.8125rem] text-muted-foreground">{needs.join(". ")}</p>
+  {/if}
 
   <div
     class="grid items-start gap-x-6 gap-y-2 text-[0.8125rem] sm:grid-cols-[auto_minmax(0,1fr)]"
@@ -285,21 +291,23 @@
         <li class="flex items-baseline gap-2">
           <span
             class="self-center rounded-full block-2 inline-2"
-            style:background-color={tone(option)}
+            style:background-color={paint(option, band)}
           ></span>
           <span class="grow truncate"
             ><Name
               label={option?.label ?? ""}
               person={option?.person ?? null}
               hasSwatch={false}
-            /><span class="text-muted-foreground">
-              · {#if option?.party == null}{m.night_no_party()}{:else}<Name
-                  label={option.party.short}
-                  party={option.party.id}
-                  color={option.party.color}
-                  hasSwatch={false}
-                />{/if}</span
-            ></span
+            />{#if option?.isAnswer !== true}<span
+                class="text-muted-foreground"
+              >
+                · {#if option?.party == null}{m.night_no_party()}{:else}<Name
+                    label={option.party.short}
+                    party={option.party.id}
+                    color={option.party.color}
+                    hasSwatch={false}
+                  />{/if}</span
+              >{/if}</span
           >
           <span class="font-figures text-muted-foreground tabular-nums"
             >{count(now.totals[index] ?? 0)}</span

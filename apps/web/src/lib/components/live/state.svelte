@@ -4,8 +4,7 @@
   import type { Entry, Seating } from "#lib/live/ballot.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Ballot, BallotTier } from "#lib/server/live-ballot.js";
-  import BoardLink from "#lib/components/live/board-link.svelte";
-  import MapLink from "#lib/components/live/map-link.svelte";
+  import ViewLinks from "#lib/components/live/view-links.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
   import { district, entries as entriesOf, seating } from "#lib/live/ballot.js";
@@ -229,13 +228,13 @@
     if (pick == null || summary.total === 0) {
       return entry.held == null
         ? WAITING
-        : `color-mix(in oklab, ${entry.held.color} 22%, var(--background))`;
+        : `color-mix(in oklab, ${entry.held.color} 22%, var(--map-low))`;
     }
     const share =
       summary.winner == null
         ? Math.round(30 + 55 * Math.min(summary.margin / 0.3, 1))
         : 100;
-    return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--background))`;
+    return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--map-low))`;
   }
 
   function before(seats: Seating) {
@@ -301,8 +300,6 @@
           >{m.night_updated({ time: stamp(election.newest) })}</span
         >
       {/if}
-      <BoardLink election={election.slug} />
-      <MapLink election={election.slug} />
     </p>
     <h1 class="title text-balance">{ballot.name}</h1>
     <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">
@@ -337,6 +334,7 @@
         </div>
       {/if}
     </dl>
+    <ViewLinks election={election.slug} isNation={false} />
     {#if later != null}
       <Later
         text={m.night_later_state_body({ state: later.name })}

@@ -7,6 +7,7 @@ import type {
 import type { Control, Family, Seat } from "#lib/live/nation.js";
 import type { UnitStanding } from "#lib/live/standing.js";
 import type { Summary } from "#lib/live/summary.js";
+import { leadStrength, swingStrength } from "#lib/atlas/color.js";
 import { tone } from "#lib/live/format.js";
 import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
 import { ranked, sum } from "#lib/live/standing.js";
@@ -29,21 +30,28 @@ export const LENSES: Array<Lens> = [
   "votes",
 ];
 
+export const INSETS = new Set(["ak", "hi"]);
+export const TERRITORIES = ["pr", "gu", "vi", "mp", "as"];
+
 export const MUTED =
   "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
 export const WAITING =
   "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
 export const LATER =
   "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
+export const QUIET =
+  "color-mix(in oklab, var(--muted-foreground) 16%, var(--background))";
+export const GROUND =
+  "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
 export const BLANK =
   "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
 
 export function mix(color: string, share: number) {
-  return `color-mix(in oklab, ${color} ${Math.round(share)}%, var(--background))`;
+  return `color-mix(in oklab, ${color} ${Math.round(share)}%, var(--map-low))`;
 }
 
 export function reporting(share: number | null) {
-  return share == null ? MUTED : mix("var(--foreground)", 10 + 78 * share);
+  return share == null ? MUTED : mix("var(--map-ink)", 10 + 78 * share);
 }
 
 export function districtKey(race: LiveRace) {
@@ -143,8 +151,7 @@ export function shade(
   if (entry == null || paint === "lead") {
     const option = called ?? summary.leader;
     if (option == null) {
-      const held = entry?.held ?? null;
-      return held == null ? WAITING : mix(tint(pair, control, held), 24);
+      return WAITING;
     }
     return mix(
       tone(option),
@@ -278,10 +285,7 @@ export function unitFill(
       if (row.leader == null) {
         return BLANK;
       }
-      return mix(
-        tone(options[row.leader]),
-        26 + 74 * Math.min(row.margin / 0.4, 1),
-      );
+      return mix(tone(options[row.leader]), leadStrength(row.margin));
     }
     case "shift": {
       if (row.signed == null || row.baseSigned == null) {
@@ -290,28 +294,25 @@ export function unitFill(
       const shift = row.signed - row.baseSigned;
       return mix(
         tone(options[shift >= 0 ? pair[0] : pair[1]]),
-        12 + 88 * Math.min(Math.abs(shift) / 0.15, 1),
+        swingStrength(shift),
       );
     }
     case "last": {
       const last = lastLeader(row);
       return last == null
         ? BLANK
-        : mix(
-            tone(options[last.index]),
-            26 + 74 * Math.min(last.margin / 0.4, 1),
-          );
+        : mix(tone(options[last.index]), leadStrength(last.margin));
     }
     case "counted": {
       return row.total === 0
         ? BLANK
         : mix(
-            "var(--foreground)",
+            "var(--map-ink)",
             8 + 80 * Math.min(1, row.total / Math.max(1, expected)),
           );
     }
     default: {
-      return row.total > 0 ? mix("var(--muted-foreground)", 16) : BLANK;
+      return row.total > 0 ? QUIET : BLANK;
     }
   }
 }

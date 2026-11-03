@@ -412,7 +412,45 @@ class Changeset:
         self.manifest["scope"] = {**(scope if isinstance(scope, dict) else {}), "clears": [str(id) for id in listed]}
         print(f"clears {len(listed)} result sets that still carry ballot remainders")
 
+    def _answers(self) -> None:
+        pairs = [(UUID(str(row["entity_id"])), UUID(str(row["into_id"]))) for row in self.rows.get("entity_merge", [])]
+        if not pairs:
+            return
+        contests = {entity for entity, _ in pairs} | {self.survivors.get(into, into) for _, into in pairs}
+        dropped = {str(row["entity_id"]) for row in self.rows.get("entity_retirement", [])}
+        answers: dict[UUID, dict[str, list[UUID]]] = defaultdict(lambda: defaultdict(list))
+        staged = [
+            *self.rows.get("contest_option", []),
+            *(
+                row
+                for frame in self.frames.get("contest_option", [])
+                if "kind" in frame.columns
+                for row in frame.filter(pl.col("kind") == "answer").iter_rows(named=True)
+            ),
+        ]
+        for row in staged:
+            contest = UUID(str(row["contest_id"]))
+            if row.get("kind") == "answer" and row.get("ballot_label") is not None and contest in contests:
+                answers[contest][str(row["ballot_label"]).lower()].append(UUID(str(row["id"])))
+        for option, contest, label in self.conn.execute(
+            """select o.id, o.contest_id, lower(o.ballot_label) from contest_option o join entity e on e.id = o.id
+               where o.kind = 'answer' and o.ballot_label is not null and e.retired_by is null
+                 and o.contest_id = any(%s::uuid[]) order by o.k""",
+            [list(contests)],
+        ).fetchall():
+            if option not in self.survivors and str(option) not in dropped and option not in answers[contest][label]:
+                answers[contest][label].append(option)
+        for entity, _ in pairs:
+            into = self.survivors.get(entity, entity)
+            if entity == into or entity not in answers:
+                continue
+            for label, options in answers[entity].items():
+                if twins := answers[into].get(label):
+                    for option in options:
+                        self.merge(option, twins[0])
+
     def write(self) -> Path:
+        self._answers()
         tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
             if rows:

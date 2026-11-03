@@ -1,34 +1,54 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { untrack } from "svelte";
-  import type { Geography } from "#lib/live/standing.js";
+  import type { Geography, Pieces } from "#lib/live/standing.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
+  import { features } from "#lib/live/standing.js";
   import { basemap } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
+  import { cn } from "#lib/utils.js";
   import type { Dot, Fill } from "./model.js";
-  import { BLANK } from "./model.js";
+  import { BLANK, GROUND } from "./model.js";
 
   let {
     geography,
+    around = null,
+    aim = null,
+    seat = null,
+    hold = null,
     fills,
     dots = [],
     labels = [],
     selected = null,
     hovered = $bindable(null),
     pulses = [],
-    inset = { top: 0, bottom: 0 },
+    inset = { top: 0, bottom: 0, end: 0 },
+    isAlone = false,
     label,
     onPick,
     tip,
   }: {
     geography: Geography | null;
+    around?: {
+      tiles: string;
+      places: Array<{
+        areaId: string;
+        k: number;
+        at: [number, number];
+        name: string;
+      }>;
+    } | null;
+    aim?: Geography["frame"] | null;
+    seat?: Pieces | null;
+    hold?: { tiles: string; k: number; color: string } | null;
     fills: Map<string, Fill>;
     dots?: Array<Dot>;
     labels?: Array<{ areaId: string; text: string; rank: number }>;
     selected?: string | null;
     hovered?: string | null;
     pulses?: Array<{ key: string; areaId: string; color: string }>;
-    inset?: { top: number; bottom: number };
+    inset?: { top: number; bottom: number; end: number };
+    isAlone?: boolean;
     label: string;
     onPick: (areaId: string | null) => void;
     tip: Snippet<[string]>;
@@ -36,11 +56,17 @@
 
   const places = $derived(geography?.places ?? []);
   const kOf = $derived(new Map(places.map((place) => [place.areaId, place.k])));
+  const nearOf = $derived(
+    new Map((around?.places ?? []).map((place) => [place.areaId, place.k])),
+  );
   const areaOf = $derived(
     new Map(places.map((place) => [place.k, place.areaId])),
   );
+  const nearAreaOf = $derived(
+    new Map((around?.places ?? []).map((place) => [place.k, place.areaId])),
+  );
   const atOf = $derived(
-    new Map(places.map((place) => [place.areaId, place.at])),
+    new Map((seat?.pieces ?? places).map((place) => [place.areaId, place.at])),
   );
 
   let pointer = $state<{ x: number; y: number } | null>(null);
@@ -54,6 +80,7 @@
     group: string;
     source: string;
     fill: string;
+    near: { source: string; fill: string } | null;
   } | null = null;
   let serial = 0;
   let retired: Array<string> = [];
@@ -69,7 +96,7 @@
       const edge = Math.max(12, Math.round(Math.min(w, h) * 0.04));
       return {
         top: edge + inset.top,
-        right: edge,
+        right: edge + Math.min(inset.end, w * 0.2),
         bottom: edge + Math.min(inset.bottom, h * 0.6),
         left: edge,
       };
@@ -87,8 +114,23 @@
           engine.cursor(false);
           return;
         }
-        const k = current == null ? null : engine.pick(point, [current.fill]);
-        const areaId = k == null ? null : (areaOf.get(k) ?? null);
+        const isOutside =
+          seat == null &&
+          hold != null &&
+          engine.pick(point, ["hold-fill"]) == null;
+        const own =
+          seat != null ? "seat-fill" : isOutside ? null : current?.fill;
+        const k = own == null ? null : engine.pick(point, [own]);
+        const nearK =
+          k != null || current?.near == null
+            ? null
+            : engine.pick(point, [current.near.fill]);
+        const areaId =
+          k != null
+            ? (areaOf.get(k) ?? null)
+            : nearK == null
+              ? null
+              : (nearAreaOf.get(nearK) ?? null);
         if (kind === "click") {
           pointer = null;
           onPick(areaId);
@@ -124,10 +166,7 @@
           source,
           "source-layer": "areas",
           filter: ["in", ["id"], ["literal", ground]],
-          paint: {
-            "fill-color":
-              "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))",
-          },
+          paint: { "fill-color": GROUND },
         },
         "fills",
         { group, rank: 0 },
@@ -192,7 +231,7 @@
         "source-layer": "areas",
         filter: within,
         paint: {
-          "line-color": "var(--background)",
+          "line-color": "var(--map-seam)",
           "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.6, 9, 1.6],
         },
       },
@@ -265,37 +304,343 @@
         { group },
       );
     }
-    return { group, source, fill: `${group}-fill` };
+    return { group, source, fill: `${group}-fill`, near: neighbors(group) };
   }
+
+  function neighbors(group: string) {
+    if (around == null || around.places.length === 0) {
+      return null;
+    }
+    const source = engine.tiles(around.tiles);
+    const filter: ["in", ["id"], ["literal", Array<number>]] = [
+      "in",
+      ["id"],
+      ["literal", around.places.map((place) => place.k)],
+    ];
+    engine.add(
+      {
+        id: `${group}-near`,
+        type: "fill",
+        source,
+        "source-layer": "areas",
+        filter,
+        paint: {
+          "fill-color": "var(--foreground)",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "near"], false],
+            0.07,
+            0,
+          ],
+        },
+      },
+      "etch",
+      { group, rank: 2 },
+    );
+    engine.add(
+      {
+        id: `${group}-near-edge`,
+        type: "line",
+        source,
+        "source-layer": "areas",
+        filter,
+        layout: { "line-join": "round" },
+        paint: {
+          "line-color": "var(--foreground)",
+          "line-width": 1.5,
+          "line-dasharray": [3, 2],
+          "line-opacity": [
+            "case",
+            ["boolean", ["feature-state", "near"], false],
+            1,
+            0,
+          ],
+        },
+      },
+      "focus",
+      { group },
+    );
+    engine.add(
+      {
+        id: `${group}-near-names`,
+        type: "symbol",
+        source: engine.points(
+          `${group}-near-names`,
+          around.places.map((place) => ({
+            at: place.at,
+            properties: { name: place.name },
+          })),
+          group,
+        ),
+        layout: {
+          "text-field": ["get", "name"],
+          "text-font": ["Sofia Sans Semi Condensed SemiBold"],
+          "text-size": ["interpolate", ["linear"], ["zoom"], 4, 11, 8, 14],
+          "text-max-width": 8,
+          "text-padding": 6,
+        },
+        paint: {
+          "text-color": "var(--muted-foreground)",
+          "text-halo-color":
+            "color-mix(in oklab, var(--background) 85%, transparent)",
+          "text-halo-width": 1.4,
+        },
+      },
+      "labels",
+      { group },
+    );
+    return { source, fill: `${group}-near` };
+  }
+
+  function outline() {
+    const held = seat == null ? hold : null;
+    if (held == null) {
+      engine.drop("hold");
+    } else {
+      const only: ["==", ["id"], number] = ["==", ["id"], held.k];
+      const rest: ["!=", ["id"], number] = ["!=", ["id"], held.k];
+      if (engine.has("hold-fill")) {
+        engine.filter("hold-fill", only);
+        engine.filter("hold-edge", only);
+        engine.filter("hold-veil", rest);
+        engine.style("hold-fill", "fill-color", held.color);
+      } else {
+        const tiles = engine.tiles(held.tiles);
+        engine.add(
+          {
+            id: "hold-veil",
+            type: "fill",
+            source: tiles,
+            "source-layer": "areas",
+            filter: rest,
+            paint: {
+              "fill-color": "var(--background)",
+              "fill-opacity": 0.5,
+              "fill-antialias": false,
+            },
+          },
+          "etch",
+          { group: "hold", rank: 3 },
+        );
+        engine.add(
+          {
+            id: "hold-fill",
+            type: "fill",
+            source: tiles,
+            "source-layer": "areas",
+            filter: only,
+            paint: { "fill-color": held.color },
+          },
+          "fills",
+          { group: "hold", rank: 3 },
+        );
+        engine.add(
+          {
+            id: "hold-edge",
+            type: "line",
+            source: tiles,
+            "source-layer": "areas",
+            filter: only,
+            layout: { "line-join": "round", "line-cap": "round" },
+            paint: {
+              "line-color": "var(--foreground)",
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                5,
+                1.4,
+                10,
+                2.4,
+              ],
+            },
+          },
+          "focus",
+          { group: "hold" },
+        );
+      }
+    }
+    if (seat == null) {
+      engine.drop("seat");
+      return;
+    }
+    engine.shapes("seat-pieces", features(seat), "seat");
+    engine.shapes(
+      "seat-line",
+      { type: "MultiLineString", coordinates: seat.edge },
+      "seat",
+    );
+    engine.shapes(
+      "seat-veil",
+      { type: "MultiPolygon", coordinates: seat.veil },
+      "seat",
+    );
+    if (engine.has("seat-fill")) {
+      return;
+    }
+    const pieces = { source: "seat-pieces" } as const;
+    engine.add(
+      {
+        id: "seat-fill",
+        type: "fill",
+        ...pieces,
+        paint: {
+          "fill-color": ["coalesce", ["feature-state", "color"], BLANK],
+          "fill-color-transition": { duration: 600 },
+        },
+      },
+      "fills",
+      { group: "seat", rank: 3 },
+    );
+    engine.add(
+      {
+        id: "seat-later",
+        type: "fill",
+        ...pieces,
+        paint: {
+          "fill-pattern": "hatch",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "later"], false],
+            1,
+            0,
+          ],
+        },
+      },
+      "fills",
+      { group: "seat", rank: 4 },
+    );
+    engine.add(
+      {
+        id: "seat-veil",
+        type: "fill",
+        source: "seat-veil",
+        paint: {
+          "fill-color": "var(--background)",
+          "fill-opacity": 0.5,
+          "fill-antialias": false,
+        },
+      },
+      "etch",
+      { group: "seat", rank: 3 },
+    );
+    engine.add(
+      {
+        id: "seat-seam",
+        type: "line",
+        ...pieces,
+        paint: {
+          "line-color": "var(--map-seam)",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.8, 10, 1.6],
+        },
+      },
+      "lines",
+      { group: "seat" },
+    );
+    engine.add(
+      {
+        id: "seat-focus",
+        type: "line",
+        ...pieces,
+        layout: { "line-join": "round" },
+        paint: {
+          "line-color": "var(--foreground)",
+          "line-width": [
+            "case",
+            ["boolean", ["feature-state", "pinned"], false],
+            2.6,
+            ["boolean", ["feature-state", "hover"], false],
+            1.6,
+            0,
+          ],
+        },
+      },
+      "focus",
+      { group: "seat" },
+    );
+    engine.add(
+      {
+        id: "seat-edge",
+        type: "line",
+        source: "seat-line",
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: {
+          "line-color": "var(--foreground)",
+          "line-width": ["interpolate", ["linear"], ["zoom"], 5, 1.4, 10, 2.4],
+        },
+      },
+      "focus",
+      { group: "seat" },
+    );
+  }
+
+  function keyOf(shown: Geography) {
+    return `${shown.tiles}|${shown.places.length}|${around?.tiles ?? ""}|${around?.places.map((place) => place.k).join() ?? ""}|${JSON.stringify(shown.frame)}`;
+  }
+
+  let aimed = "";
+  let wasAlone = false;
 
   function draw() {
     const gl = engine.gl;
     if (gl == null || geography == null) {
       return;
     }
-    const key = `${geography.tiles}|${places.length}|${JSON.stringify(geography.frame)}`;
+    const key = keyOf(geography);
     if (current?.key !== key) {
-      const isFirst = current == null;
+      const isMoved = current != null && !isAlone && !wasAlone;
+      wasAlone = isAlone;
       if (current != null) {
         retired.push(current.group);
       }
       current = { key, ...layers(geography) };
-      const keep = current.group;
-      gl.once("idle", () => {
-        for (const group of retired) {
-          if (group !== keep) {
+      const fresh = current.source;
+      let isDone = false;
+      const swap = () => {
+        if (isDone) {
+          return;
+        }
+        isDone = true;
+        gl.off("sourcedata", check);
+        const gone = [...retired];
+        for (const group of gone) {
+          engine.fadeOut(group);
+        }
+        setTimeout(() => {
+          for (const group of gone) {
             engine.drop(group);
           }
+          retired = retired.filter((group) => !gone.includes(group));
+        }, 450);
+      };
+      const check = () => {
+        if (gl.getSource(fresh) == null || gl.isSourceLoaded(fresh)) {
+          swap();
         }
-        retired = retired.filter((group) => group === keep);
-      });
-      engine.frame(geography.frame, !isFirst);
+      };
+      gl.on("sourcedata", check);
+      setTimeout(swap, 1500);
+      aimed = JSON.stringify(aim);
+      if (aim == null) {
+        engine.frame(geography.frame, isMoved);
+      } else {
+        engine.home(geography.frame);
+        engine.fit(aim, undefined, isMoved);
+      }
     }
-    const { group, source } = current;
+    outline();
+    const { group } = current;
+    const source = seat == null ? current.source : "seat-pieces";
+    if (seat != null || hold != null) {
+      engine.paint(
+        current.source,
+        new Map(places.map((place) => [place.k, { color: GROUND }])),
+      );
+    }
     engine.paint(
       source,
       new Map(
-        places.flatMap(
+        (hold == null ? (seat?.pieces ?? places) : []).flatMap(
           (place): Array<[number, Record<string, string | boolean>]> => {
             const fill = fills.get(place.areaId);
             return fill == null
@@ -410,6 +755,11 @@
       hovered == null ? null : (kOf.get(hovered) ?? null),
     );
     engine.mark(
+      "near",
+      current.near?.source ?? null,
+      hovered == null ? null : (nearOf.get(hovered) ?? null),
+    );
+    engine.mark(
       "pinned",
       source,
       selected == null ? null : (kOf.get(selected) ?? null),
@@ -417,10 +767,41 @@
   }
 
   $effect(() => {
-    void [geography, fills, dots, labels, selected, hovered, engine.theme];
+    void [
+      geography,
+      around,
+      seat,
+      hold,
+      fills,
+      dots,
+      labels,
+      selected,
+      hovered,
+      engine.theme,
+    ];
     if (engine.gl != null) {
       untrack(draw);
     }
+  });
+
+  $effect(() => {
+    const target = aim;
+    const next = JSON.stringify(target);
+    if (engine.gl == null || geography == null || next === aimed) {
+      return;
+    }
+    aimed = next;
+    const shown = geography;
+    untrack(() => {
+      if (current?.key !== keyOf(shown)) {
+        return;
+      }
+      if (target == null) {
+        engine.reset();
+      } else {
+        engine.fit(target);
+      }
+    });
   });
 
   $effect(() => {
@@ -430,7 +811,10 @@
     const scheme = geography.scheme;
     const outline = geography.outline;
     const isDetailed = prefs.isBasemap;
-    untrack(() => basemap(engine, scheme, isDetailed, outline));
+    const isShownAlone = isAlone;
+    untrack(() =>
+      basemap(engine, scheme, isDetailed, outline, false, isShownAlone),
+    );
   });
 
   export function focus(areaId: string) {
@@ -446,29 +830,12 @@
     return true;
   }
 
-  export function fitTo(areaIds: Array<string>) {
-    const box = {
-      west: Infinity,
-      south: Infinity,
-      east: -Infinity,
-      north: -Infinity,
-    };
-    for (const areaId of areaIds) {
-      const k = kOf.get(areaId);
-      const part =
-        current == null || k == null ? null : engine.shape(current.source, k);
-      if (part != null) {
-        box.west = Math.min(box.west, part.west);
-        box.south = Math.min(box.south, part.south);
-        box.east = Math.max(box.east, part.east);
-        box.north = Math.max(box.north, part.north);
-      }
+  export function fly(box: Geography["frame"], isHome: boolean) {
+    if (isHome) {
+      engine.frame(box, true);
+    } else {
+      engine.fit(box);
     }
-    if (!Number.isFinite(box.west)) {
-      return false;
-    }
-    engine.fit(box);
-    return true;
   }
 
   export function zoomIn() {
@@ -522,7 +889,9 @@
 </script>
 
 <div
-  class="relative overflow-hidden bg-card block-full inline-full"
+  class={cn("relative overflow-hidden bg-card block-full inline-full", {
+    "animate-pulse bg-muted motion-reduce:animate-none": !engine.isLoaded,
+  })}
   bind:clientWidth={width}
   bind:clientHeight={height}
 >

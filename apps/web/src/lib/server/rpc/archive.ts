@@ -20,8 +20,9 @@ import * as v from "valibot";
 import type { Prose } from "#lib/contrib.js";
 import { natural } from "#lib/format.js";
 import { pollsClose } from "#lib/live/closes.js";
+import { Rule, rule } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
-import { era, independent, UNAFFILIATED } from "#lib/party.js";
+import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -2430,6 +2431,27 @@ async function load(
           : (color.get(own) ?? ""),
       ]),
   );
+  const answers = new Map<number, string>();
+  for (const group of Map.groupBy(
+    options.rows.filter(
+      (row) =>
+        row.kind === "answer" &&
+        sideOf(`answer:${(row.label ?? "").toLowerCase()}`) == null,
+    ),
+    (row) => rootOf.get(row.contest) ?? row.contest,
+  ).values()) {
+    const ranked = [
+      ...new Set(
+        group
+          .toSorted((a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0))
+          .map((row) => (row.label ?? "").toLowerCase()),
+      ),
+    ];
+    for (const row of group) {
+      const rank = ranked.indexOf((row.label ?? "").toLowerCase());
+      answers.set(row.k, UNAFFILIATED[rank % UNAFFILIATED.length] ?? "");
+    }
+  }
   const backers = backing.rows.map((row) => ({
     party: row.party,
     candidate: labels.full.get(row.person) ?? "",
@@ -2525,6 +2547,7 @@ async function load(
               null,
             color:
               tints.get(row.k) ??
+              answers.get(row.k) ??
               color.get(stand(row) ?? row.person ?? "") ??
               null,
             lean: lean.get(stand(row) ?? "") ?? null,
@@ -6879,6 +6902,7 @@ export const contests = {
           }),
         ),
         quorum: v.nullable(v.number()),
+        rule: v.optional(v.nullable(Rule)),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
         logos: LogoMap,
@@ -8074,6 +8098,7 @@ export const contests = {
         nomination: nominee,
         turnout: roll.turnout,
         quorum: roll.quorum,
+        rule: roll.rule,
         explanations,
         ballot: roll.ballot,
         isStv: roll.isStv,
@@ -12528,17 +12553,25 @@ function merge<
 
 async function poll(contest: string | null, k: number | null, isAsked = true) {
   if (contest == null || !isAsked) {
-    return { turnout: null, quorum: null, ballot: null, isStv: false };
+    return {
+      turnout: null,
+      quorum: null,
+      rule: null,
+      ballot: null,
+      isStv: false,
+    };
   }
   const found = await db.execute<{
     registered: number | null;
     voters: number | null;
     basis: "valid" | "rejected" | null;
     quorum: number | null;
+    rules: unknown;
     ballot: number | null;
     isStv: boolean;
   }>(sql`
     select t.*, ((coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'quorum')::float8 as quorum,
+      case when c.kind = 'ballot_question' then coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}') end as rules,
       (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula' = 'stv' as "isStv",
       case (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula'
         when 'block' then c.magnitude when 'limited' then c.magnitude - 1 end as ballot
@@ -12573,6 +12606,7 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
         ? null
         : { registered: row.registered, voters: row.voters, basis: row.basis },
     quorum: row?.quorum ?? null,
+    rule: rule(row?.rules),
     ballot: row?.ballot != null && row.ballot > 1 ? row.ballot : null,
     isStv: row?.isStv ?? false,
   };

@@ -13,8 +13,7 @@
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import type { House } from "#lib/server/live-board.js";
-  import BoardLink from "#lib/components/live/board-link.svelte";
-  import MapLink from "#lib/components/live/map-link.svelte";
+  import ViewLinks from "#lib/components/live/view-links.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
@@ -593,12 +592,14 @@
         </span>
         {#if entry != null}
           <span class="flex justify-between gap-3 text-muted-foreground">
-            <span
-              >{m.night_tip_held({
-                party: short(entry.held),
-                name: entry.holder,
-              })}</span
-            >
+            {#if entry.held != null}
+              <span
+                >{m.night_tip_held({
+                  party: short(entry.held),
+                  name: entry.holder,
+                })}</span
+              >
+            {/if}
             {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
               <span class="font-figures tabular-nums"
                 >{entry.left >= entry.right ? pair[0].short : pair[1].short}
@@ -631,12 +632,14 @@
   >
   {@render chip(summary)}
   <span class="flex justify-between gap-3 text-muted-foreground">
-    <span
-      >{m.night_tip_held({
-        party: short(entry.held),
-        name: entry.holder,
-      })}</span
-    >
+    {#if entry.held != null}
+      <span
+        >{m.night_tip_held({
+          party: short(entry.held),
+          name: entry.holder,
+        })}</span
+      >
+    {/if}
     {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
       <span class="font-figures tabular-nums"
         >{entry.left >= entry.right ? pair[0].short : pair[1].short}
@@ -670,12 +673,14 @@
     >
     {@render chip(summary)}
     {#if entry != null}
-      <span class="text-muted-foreground"
-        >{m.night_tip_held({
-          party: short(entry.held),
-          name: entry.holder,
-        })}</span
-      >
+      {#if entry.held != null}
+        <span class="text-muted-foreground"
+          >{m.night_tip_held({
+            party: short(entry.held),
+            name: entry.holder,
+          })}</span
+        >
+      {/if}
     {/if}
     {#if summary.counted != null}
       <span class="text-muted-foreground"
@@ -718,8 +723,6 @@
           >{m.night_updated({ time: stamp(newest) })}</span
         >
       {/if}
-      <BoardLink election={election.slug} />
-      <MapLink election={election.slug} />
     </p>
     <div class="grid gap-1.5">
       <h1 class="title text-balance">{m.night_nation_title()}</h1>
@@ -835,6 +838,7 @@
         </div>
       {/if}
     </dl>
+    <ViewLinks election={election.slug} isNation={true} />
   </header>
 
   <section

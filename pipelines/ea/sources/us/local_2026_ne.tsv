@@ -315,17 +315,17 @@ NY	Rockland County Court Judge	0	Ivonne S. Santos	Democratic	Rockland	1
 NY	Suffolk County Clerk	0	Vincent A Puleo	Republican	Suffolk	1
 NY	Suffolk County Comptroller	0	Jon Estreich	Democratic	Suffolk	1
 NY	Suffolk County Comptroller	0	Daniel P Losquadro	Republican	Suffolk	1
-NY	Suffolk County Court Judge	0	Daniel T Driscoll	Republican	Suffolk	1
-NY	Suffolk County Court Judge	0	Anthony S Senft Jr	Republican	Suffolk	1
-NY	Suffolk County Court Judge	0	Anna Acquafredda	Republican	Suffolk	1
-NY	Suffolk County Court Judge	0	James G Chalifoux	Republican	Suffolk	1
-NY	Suffolk County Family Court Judge	0	Frank A Tantone	Republican	Suffolk	1
-NY	Suffolk County Family Court Judge	0	William F Garbarino	Republican	Suffolk	1
-NY	Suffolk County Family Court Judge	0	Evan S Tanenbaum	Republican	Suffolk	1
+NY	Suffolk County Court Judge	0	Daniel T Driscoll	Republican	Suffolk	4
+NY	Suffolk County Court Judge	0	Anthony S Senft Jr	Republican	Suffolk	4
+NY	Suffolk County Court Judge	0	Anna Acquafredda	Republican	Suffolk	4
+NY	Suffolk County Court Judge	0	James G Chalifoux	Republican	Suffolk	4
+NY	Suffolk County Family Court Judge	0	Frank A Tantone	Republican	Suffolk	3
+NY	Suffolk County Family Court Judge	0	William F Garbarino	Republican	Suffolk	3
+NY	Suffolk County Family Court Judge	0	Evan S Tanenbaum	Republican	Suffolk	3
 NY	Suffolk County District Court Judge 3rd District (Huntington)	0	Matthew G Kiernan	Democratic	Suffolk	1
-NY	Suffolk County District Court Judge 5th District (Islip)	0	Alonzo G Jacobs	Democratic	Suffolk	1
-NY	Suffolk County District Court Judge 5th District (Islip)	0	Pierce F Cohalan	Democratic	Suffolk	1
-NY	Suffolk County District Court Judge 5th District (Islip)	0	Thomas D Luciano	Republican	Suffolk	1
+NY	Suffolk County District Court Judge 5th District (Islip)	0	Alonzo G Jacobs	Democratic	Suffolk	3
+NY	Suffolk County District Court Judge 5th District (Islip)	0	Pierce F Cohalan	Democratic	Suffolk	3
+NY	Suffolk County District Court Judge 5th District (Islip)	0	Thomas D Luciano	Republican	Suffolk	3
 NY	Suffolk County District Court Judge 6th District (Brookhaven)	0	Penelope J Blizzard-McGrath	Republican	Suffolk	1
 NY	Ontario County Sheriff	0	David Cirencione	Republican	Ontario	1
 NY	Ontario County Treasurer	0	Julio Chavez Olivera	Democratic	Ontario	1
@@ -1296,11 +1296,11 @@ RI	Charlestown Town Council	0	Stephen J. Stokes	Republican	Washington	0
 RI	Charlestown Town Council	0	Matthew Westover	Republican	Washington	0
 RI	Charlestown Town Council	0	Bonnita B. Van Slyke	Independent	Washington	0
 RI	Charlestown Town Council	0	Sasha Puchalski	Independent	Washington	0
-RI	Chariho School Committee	0	Craig F. Louzon	Democratic	Washington	0
-RI	Chariho School Committee	0	Linda D. Lyall	Democratic	Washington	0
-RI	Chariho School Committee	0	Holly Eaves	Democratic	Washington	0
-RI	Chariho School Committee	0	Kim M. Coulter	Republican	Washington	0
-RI	Chariho School Committee	0	Nicholas Testa	Independent	Washington	0
+RI	Charlestown Chariho School Committee	0	Craig F. Louzon	Democratic	Washington	3
+RI	Charlestown Chariho School Committee	0	Linda D. Lyall	Democratic	Washington	3
+RI	Charlestown Chariho School Committee	0	Holly Eaves	Democratic	Washington	3
+RI	Charlestown Chariho School Committee	0	Kim M. Coulter	Republican	Washington	3
+RI	Charlestown Chariho School Committee	0	Nicholas Testa	Independent	Washington	3
 RI	Charlestown Planning Commission	0	Ruth L. Platner	Nonpartisan	Washington	0
 RI	Charlestown Planning Commission	0	Coleen M. Galvin Yaroshenko	Nonpartisan	Washington	0
 RI	Charlestown Planning Commission	0	Frances M. Topping	Nonpartisan	Washington	0
@@ -1535,9 +1535,9 @@ RI	Richmond Town Council	0	James Palmisciano	Democratic	Washington	0
 RI	Richmond Town Council	0	Paul Erdos	Republican	Washington	0
 RI	Richmond Town Council	0	Norbert L. Morin	Republican	Washington	0
 RI	Richmond Town Council	0	Justin K. Price	Republican	Washington	0
-RI	Chariho School Committee	0	Patrick Farrell	Democratic	Washington	0
-RI	Chariho School Committee	0	Andrew A. McCoy	Democratic	Washington	0
-RI	Chariho School Committee	0	David Lelli	Republican	Washington	0
+RI	Richmond Chariho School Committee	0	Patrick Farrell	Democratic	Washington	2
+RI	Richmond Chariho School Committee	0	Andrew A. McCoy	Democratic	Washington	2
+RI	Richmond Chariho School Committee	0	David Lelli	Republican	Washington	2
 RI	Scituate Town Clerk	0	Gloria M. Taylor	Independent	Providence	1
 RI	Scituate Town Council	0	Michael S. Marr	Republican	Providence	0
 RI	Scituate Town Council	0	Peter W. Meusert	Republican	Providence	0
@@ -1930,52 +1930,56 @@ NY	Afton Supervisor	0	John Lawrence	Republican	Chenango	1
 NY	Afton Supervisor	0	Jason H. Wicks	Independent	Chenango	1
 NY	Bainbridge Supervisor	0	Dolores Nabinger	Democratic	Chenango	1
 NY	Columbus Supervisor	0	Charles Edmonds	Independent	Chenango	1
-NY	Columbus Supervisor	0	Elizabeth Vermeulen	Independent	Chenango	1
+NY	Columbus Town Clerk	0	Elizabeth Vermeulen	Independent	Chenango	1
 NY	Columbus Highway Superintendent	0	Kevin D. Cross	Republican	Chenango	1
 NY	Coventry Supervisor	0	Cammie Wyckoff	Independent	Chenango	1
 NY	Coventry Highway Superintendent	0	Richard Granger	Independent	Chenango	1
 NY	German Supervisor	0	Patricia Pittsley	Democratic	Chenango	1
-NY	German Supervisor	0	Ellen Maroney	Democratic	Chenango	1
+NY	German Town Clerk	0	Ellen Maroney	Democratic	Chenango	1
 NY	German Town Council	1	Michele McDonald	Republican	Chenango	1
 NY	German Town Justice	0	Morgan Feliciano	Independent	Chenango	1
 NY	Guilford Supervisor	0	Gilda P. Ward	Republican	Chenango	1
 NY	Guilford Town Clerk	0	Jodie M. Ives	Republican	Chenango	1
 NY	McDonough Supervisor	0	Raymond E. Wakefield, Jr.	Republican	Chenango	1
-NY	McDonough Supervisor	0	Wendy Rifanburg	NY:conservative-party	Chenango	1
 NY	McDonough Town Clerk	0	Shirley R. Cook	Republican	Chenango	1
 NY	McDonough Highway Superintendent	0	Todd Tefft	Republican	Chenango	1
+NY	New Berlin Supervisor	0	Wendy Rifanburg	NY:conservative-party	Chenango	1
 NY	North Norwich Supervisor	0	Robert E. Wansor	Republican	Chenango	1
 NY	Norwich Supervisor	0	Stanley D. Foulds	Republican	Chenango	1
-NY	Norwich Supervisor	0	Amy A. Winton	Republican	Chenango	1
+NY	Norwich Town Clerk	0	Amy A. Winton	Republican	Chenango	1
 NY	Norwich Highway Superintendent	0	Barry D. Christophersen	Republican	Chenango	1
 NY	Norwich Highway Superintendent	0	Tim Laughlin	Independent	Chenango	1
 NY	Norwich Tax Collector	0	Theodore W. Guinn	Republican	Chenango	1
 NY	Otselic Supervisor	0	Michael Foor-Pessin	Democratic	Chenango	1
 NY	Otselic Town Clerk	0	Cynthia J. Neal	Democratic	Chenango	1
-NY	Otselic Town Clerk	0	Linda Bailey	Democratic	Chenango	1
-NY	Otselic Town Clerk	0	Kevin A. Whritenour	Republican	Chenango	1
-NY	Otselic Town Council	1	Cal Hite	Democratic	Chenango	1
-NY	Otselic Town Council	1	Sarah Grisolini	Republican	Chenango	1
+NY	Otselic Town Council (Unexpired 2 Year Term)	1	Linda Bailey	Democratic	Chenango	1
+NY	Otselic Town Council (Unexpired 2 Year Term)	1	Kevin A. Whritenour	Republican	Chenango	1
+NY	Otselic Town Council (Unexpired 1 Year Term)	1	Cal Hite	Democratic	Chenango	1
+NY	Otselic Town Council (Unexpired 1 Year Term)	1	Sarah Grisolini	Republican	Chenango	1
 NY	Otselic Highway Superintendent	0	Jeffrey Forrest	Democratic	Chenango	1
 NY	Otselic Highway Superintendent	0	Jay R. Anderson	Independent	Chenango	1
+NY	Oxford Supervisor	0	Alan Davis	Republican	Chenango	1
 NY	Oxford Town Clerk	0	Mary Olmsted	Independent	Chenango	1
-NY	Oxford Town Clerk	0	Susan Ross	Republican	Chenango	1
+NY	Oxford Town Justice	0	Susan Ross	Republican	Chenango	1
 NY	Pharsalia Supervisor	0	Jeremiah Micklas	Democratic	Chenango	1
 NY	Pharsalia Highway Superintendent	0	Thomas Slate	Democratic	Chenango	1
 NY	Pitcher Supervisor	0	Jeffrey B. Blanchard	Republican	Chenango	1
-NY	Pitcher Supervisor	0	Timothy Manwarren	Republican	Chenango	1
-NY	Pitcher Town Council	1	Tameka L. Leib	Independent	Chenango	1
-NY	Pitcher Highway Superintendent	0	Louis Redenback	Republican	Chenango	1
-NY	Pitcher Highway Superintendent	0	Brett Wightman	NY:conservative-party	Chenango	1
+NY	Plymouth Supervisor	0	Timothy Manwarren	Republican	Chenango	1
+NY	Plymouth Town Council	1	Tameka L. Leib	Independent	Chenango	1
+NY	Plymouth Highway Superintendent	0	Louis Redenback	Republican	Chenango	1
+NY	Plymouth Highway Superintendent	0	Brett Wightman	NY:conservative-party	Chenango	1
 NY	Preston Supervisor	0	Eileen Gyles Andrews	Democratic	Chenango	1
 NY	Preston Supervisor	0	Steven Jon Palmatier	Republican	Chenango	1
 NY	Preston Town Clerk	0	Jennifer Funk	Republican	Chenango	1
-NY	Preston Town Clerk	0	Daniel L. Franklin	Republican	Chenango	1
+NY	Preston Highway Superintendent	0	Daniel L. Franklin	Republican	Chenango	1
 NY	Preston Town Justice	0	Andrew Wheatley	Independent	Chenango	1
-NY	Sherburne Supervisor	0	John J. Cammarata	Republican	Chenango	1
-NY	Sherburne Supervisor	0	Matthew B. Powrie	Republican	Chenango	1
-NY	Sherburne Supervisor	0	Geraldine W. Day	Republican	Chenango	1
-NY	Sherburne Town Justice	0	Rachel E. Miller	Republican	Chenango	1
+NY	Sherburne Supervisor	0	Charles A. Mastro	Republican	Chenango	1
+NY	Smithville Supervisor	0	John J. Cammarata	Republican	Chenango	1
+NY	Smithville Highway Superintendent	0	Robert M. Whitmore	Republican	Chenango	1
+NY	Smithville Town Justice	0	Rachel E. Miller	Republican	Chenango	1
+NY	Smyrna Supervisor	0	Matthew B. Powrie	Republican	Chenango	1
+NY	Smyrna Town Clerk	0	Geraldine W. Day	Republican	Chenango	1
+NY	Smyrna Highway Superintendent	0	Christopher Whitehead	Republican	Chenango	1
 NY	Argyle Supervisor	0	Robert A. Henke	Republican	Washington	1
 NY	Cambridge Supervisor	0	Catherine H. Fedler	Democratic	Washington	1
 NY	Cambridge Town Clerk	0	Heather A. Greenawalt	Republican	Washington	1
@@ -2082,8 +2086,8 @@ NY	Cameron Town Clerk	0	Kathleen Lyon	Independent	Steuben	1
 NY	Cameron Highway Superintendent	0	Bob Davis	Republican	Steuben	1
 NY	Campbell Supervisor	0	Norman Maynard	Republican	Steuben	1
 NY	Campbell Town Clerk	0	Michelle Seeley	Republican	Steuben	1
-NY	Campbell Town Council	1	Anthony Creaton	Republican	Steuben	1
-NY	Campbell Town Council	1	Michael Austin	Republican	Steuben	1
+NY	Campbell Town Council (Unexpired 2 Year Term)	1	Anthony Creaton	Republican	Steuben	1
+NY	Campbell Town Council (Unexpired 1 Year Term)	1	Michael Austin	Republican	Steuben	1
 NY	Campbell Highway Superintendent	0	Tony Harris	Republican	Steuben	1
 NY	Campbell Tax Collector	0	Jacquelyn Kohman	Republican	Steuben	1
 NY	Campbell Town Justice	0	Kathy Darcangelo	Republican	Steuben	1
@@ -2213,12 +2217,12 @@ RI-towns	Coventry Town Council Ward 4	0	Mia Rose Iannotti	Nonpartisan	Kent	0
 RI-towns	Coventry Town Council Ward 5	0	Scott R Copley	Nonpartisan	Kent	0
 RI-towns	Coventry Town Council At-Large	0	Frank M Brown	Nonpartisan	Kent	0
 RI-towns	Coventry Town Council At-Large	0	John Paul A Verducci	Nonpartisan	Kent	0
-RI-towns	Hopkinton Chariho School Committee	0	Gregory J Avedisian	Democratic	Washington	0
-RI-towns	Hopkinton Chariho School Committee	0	Justin Paul Bentley	Democratic	Washington	0
-RI-towns	Hopkinton Chariho School Committee	0	Catherine M Giusti	Independent	Washington	0
-RI-towns	Hopkinton Chariho School Committee	0	Robert Thomas Greene	Republican	Washington	0
-RI-towns	Hopkinton Chariho School Committee	0	Edward A Lowe	Republican	Washington	0
-RI-towns	Hopkinton Chariho School Committee	0	Larry Clark Phelps	Republican	Washington	0
+RI-towns	Hopkinton Chariho School Committee	0	Gregory J Avedisian	Democratic	Washington	3
+RI-towns	Hopkinton Chariho School Committee	0	Justin Paul Bentley	Democratic	Washington	3
+RI-towns	Hopkinton Chariho School Committee	0	Catherine M Giusti	Independent	Washington	3
+RI-towns	Hopkinton Chariho School Committee	0	Robert Thomas Greene	Republican	Washington	3
+RI-towns	Hopkinton Chariho School Committee	0	Edward A Lowe	Republican	Washington	3
+RI-towns	Hopkinton Chariho School Committee	0	Larry Clark Phelps	Republican	Washington	3
 RI-towns	Hopkinton Director of Public Welfare	0	Maria Cristina Lavigne	Republican	Washington	0
 RI-towns	Hopkinton Town Clerk	0	Marita D Murray	Independent	Washington	0
 RI-towns	Hopkinton Town Council	0	Kevin Gerard Lambert	Democratic	Washington	0
@@ -2720,17 +2724,17 @@ NJ-34007	Waterford Township Board of Education	0	Steven SORGE	Nonpartisan	Camden
 NJ-34007	Waterford Township Board of Education	0	Matthew V. HUNTER	Nonpartisan	Camden	3
 NJ-34007	Waterford Township Board of Education	0	Ciaran HENNESSEY	Nonpartisan	Camden	3
 NJ-34007	Waterford Township Board of Education	0	Jacquelyn FOY	Nonpartisan	Camden	3
-NJ-34007	Winslow Township Committee	0	Vincent BORRELLI, JR.	Republican	Camden	1
-NJ-34007	Winslow Township Committee	0	Robert STIMELSKI	Democratic	Camden	1
+NJ-34007	Winslow Township Committee Ward 1	0	Vincent BORRELLI, JR.	Republican	Camden	1
+NJ-34007	Winslow Township Committee Ward 1	0	Robert STIMELSKI	Democratic	Camden	1
 NJ-34007	Winslow Township Board of Education	0	John M. SHAW, JR.	Nonpartisan	Camden	3
 NJ-34007	Winslow Township Board of Education	0	Jovanni POLHILL	Nonpartisan	Camden	3
 NJ-34007	Winslow Township Board of Education	0	Clarence HARDY	Nonpartisan	Camden	3
-NJ-34007	Winslow Township Committee	0	Paul STUBEE	Republican	Camden	1
-NJ-34007	Winslow Township Committee	0	Evelyn M. LEVERETT	Democratic	Camden	1
-NJ-34007	Winslow Township Committee	0	Linda A. YOUNG	Republican	Camden	1
-NJ-34007	Winslow Township Committee	0	Jacquelyn LEE	Democratic	Camden	1
-NJ-34007	Winslow Township Committee	0	Christopher “Chris” WILLIAMS	Republican	Camden	1
-NJ-34007	Winslow Township Committee	0	Charles FLAMINI	Democratic	Camden	1
+NJ-34007	Winslow Township Committee Ward 2	0	Paul STUBEE	Republican	Camden	1
+NJ-34007	Winslow Township Committee Ward 2	0	Evelyn M. LEVERETT	Democratic	Camden	1
+NJ-34007	Winslow Township Committee Ward 3	0	Linda A. YOUNG	Republican	Camden	1
+NJ-34007	Winslow Township Committee Ward 3	0	Jacquelyn LEE	Democratic	Camden	1
+NJ-34007	Winslow Township Committee Ward 4	0	Christopher “Chris” WILLIAMS	Republican	Camden	1
+NJ-34007	Winslow Township Committee Ward 4	0	Charles FLAMINI	Democratic	Camden	1
 NJ-34007	Woodlynne Borough Council	0	Pablo FUENTES	Democratic	Camden	2
 NJ-34007	Woodlynne Borough Council	0	Dion BURDETT	Democratic	Camden	2
 NJ-34007	Audubon Park Borough Mayor	0	Brian BURNS	Democratic	Camden	1
@@ -3673,8 +3677,8 @@ NY	Allegany Supervisor	0	Christopher J. McPherson	Republican	Cattaraugus	1
 NY	Ashford Town Council	1	Anthony J. Arnone	Republican	Cattaraugus	1
 NY	Ashford Town Council	1	Michael Boberg		Cattaraugus	1
 NY	Conewango Town Clerk	1	Jennifer E. McGuire	Republican	Cattaraugus	1
-NY	Conewango Town Council	1	Brian Pitts	Republican	Cattaraugus	1
-NY	Conewango Town Council	1	Danny Hubbard	Republican	Cattaraugus	1
+NY	Conewango Town Council (Unexpired Term 1)	1	Brian Pitts	Republican	Cattaraugus	1
+NY	Conewango Town Council (Unexpired Term 2)	1	Danny Hubbard	Republican	Cattaraugus	1
 NY	Conewango Town Justice	0	Kalan M. Brown	Republican	Cattaraugus	1
 NY	Dayton Supervisor	0	Crystal J. Abers	Republican	Cattaraugus	1
 NY	Dayton Town Clerk	0	Kelly L. Kuhaneck	Republican	Cattaraugus	1

@@ -5468,6 +5468,139 @@ for key, publisher, title, url, local in (
         "in/hamilton_westfield_ballot.pdf",
     ),
     (
+        "IN-18097-msd-decatur",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Decatur Township Precinct 1",
+        "https://maps.indy.gov/Ballots/de001_non.pdf",
+        "in/marion_msd/de001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-perry",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Perry Township Precinct 1",
+        "https://maps.indy.gov/Ballots/pe001_non.pdf",
+        "in/marion_msd/pe001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-pike",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Pike Township Precinct 1",
+        "https://maps.indy.gov/Ballots/pk001_non.pdf",
+        "in/marion_msd/pk001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-warren",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Warren Township Precinct 20",
+        "https://maps.indy.gov/Ballots/wr020_non.pdf",
+        "in/marion_msd/wr020_non.pdf",
+    ),
+    (
+        "IN-18097-msd-wayne",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Wayne Township Precinct 2",
+        "https://maps.indy.gov/Ballots/wy002_non.pdf",
+        "in/marion_msd/wy002_non.pdf",
+    ),
+    (
+        "IN-18165-cayuga",
+        "Vermillion County Clerk",
+        "Sample ballot, General Election November 3, 2026, Precinct 03 Cayuga, in Cayuga",
+        "https://www.vermilliongov.us/wp-content/uploads/2026/09/Pct_03-CAYUGA_Act_01-IN_CAYUGA1.pdf",
+        "in/town_ballots/verm_cayuga.pdf",
+    ),
+    (
+        "IN-18165-perrysville",
+        "Vermillion County Clerk",
+        "Sample ballot, General Election November 3, 2026, Precinct 01 Highland, in Perrysville",
+        "https://www.vermilliongov.us/wp-content/uploads/2026/09/Pct_01-HIGHLAND_Act_01-IN_PERRYSVILLE1.pdf",
+        "in/town_ballots/verm_perrys.pdf",
+    ),
+    (
+        "IN-18165-fairview",
+        "Vermillion County Clerk",
+        "Sample ballot, General Election November 3, 2026, Precinct 12 Fairview 01, in Fairview Park",
+        "https://www.vermilliongov.us/wp-content/uploads/2026/09/Pct_12-FAIRVIEW_01_Act_01-IN_FAIRVIEW_PARK1.pdf",
+        "in/town_ballots/verm_fairview.pdf",
+    ),
+    (
+        "IN-18017-walton",
+        "Cass County Clerk",
+        "Sample ballot, 2026 General, Precinct Tipton II-Walton",
+        "https://www.in.gov/counties/cass/files/9_Tipton-II-Walton_English.pdf",
+        "in/town_ballots/cass_walton.pdf",
+    ),
+    (
+        "IN-18017-royal-center",
+        "Cass County Clerk",
+        "Sample ballot, 2026 General, Precinct Boone-Royal Center",
+        "https://www.in.gov/counties/cass/files/15_Boone-RC_English.pdf",
+        "in/town_ballots/cass_rc.pdf",
+    ),
+    (
+        "IN-18063-offices",
+        "Hendricks County Election Office",
+        "2026 General Ballot, offices and Vote For counts",
+        "https://www.co.hendricks.in.us/egov/documents/1781613213_68315.pdf",
+        "in/town_ballots/hend2.pdf",
+    ),
+    (
+        "IN-18063-plainfield-school",
+        "Hendricks County Election Office",
+        "Official ballot, General Election November 3, 2026, Precinct 0622 Guilford 22, Plainfield",
+        "https://www.co.hendricks.in.us/egov/documents/1790803644_25891.pdf",
+        "in/town_ballots/hend1.pdf",
+    ),
+    (
+        "IN-18061-lanesville",
+        "Harrison County Clerk",
+        "Official ballot, General Election November 3, 2026, Franklin Township",
+        "https://www.in.gov/counties/harrison/files/2026generalelectionsampleballots/Franklin.pdf",
+        "in/town_ballots/harr_Franklin.pdf",
+    ),
+    (
+        "IN-18061-south-harrison",
+        "Harrison County Clerk",
+        "Official ballot, General Election November 3, 2026, Heth Township",
+        "https://www.in.gov/counties/harrison/files/2026generalelectionsampleballots/Heth.pdf",
+        "in/town_ballots/harr_Heth.pdf",
+    ),
+    (
+        "IN-18183-wccs",
+        "Whitley County Clerk",
+        "2026 General Election sample ballot, Columbia Northwest and South, Columbia 1, 2, 4, 6, and 7",
+        "https://www.whitleycounty.in.gov/egov/documents/1789406791_3125.pdf",
+        "in/town_ballots/whit_col1.pdf",
+    ),
+    (
+        "IN-18131-francesville",
+        "Pulaski County Clerk",
+        "Sample absentee ballot, General Election November 3, 2026",
+        "https://pulaskionline.org/wp-content/uploads/2026/09/INPULG26_SampleAbsenteeBallot_RevB.pdf",
+        "in/town_ballots/pulaski.pdf",
+    ),
+    (
+        "IN-18137-milan",
+        "Ripley County Clerk",
+        "2026 General Sample Ballots, Ripley County",
+        "https://ripleycounty.in.gov/download/2026-general-sample-ballots/",
+        "in/town_ballots/ripley.pdf",
+    ),
+    (
+        "IN-18095-ingalls",
+        "Madison County Clerk",
+        "Offices up for election in 2026, Madison County",
+        "https://www.madisoncounty.in.gov/_files/ugd/918579_1cda245699b4410b9aa1a12e11afd91b.pdf",
+        "in/town_ballots/madison_offices.pdf",
+    ),
+    (
+        "IN-18085-milford",
+        "Kosciusko County Clerk",
+        "Candidate and Ballot Information, 2026 General Election, Kosciusko County",
+        "https://www.kosciusko.in.gov/topic/index.php?structureid=32&topicid=45",
+        "in/town_ballots/kosciusko_candidate_info.html",
+    ),
+    (
         "IN-18001-townships",
         "Adams County Clerk",
         "Candidate List - Abbreviated, 2026 General Election, Adams County",
@@ -7202,6 +7335,30 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+IN_BALLOT_SEATS = {
+    "Marion Decatur Township School Board, At Large": ("IN-18097-msd-decatur", 3),
+    "Marion Perry Township Public School Board, At Large": ("IN-18097-msd-perry", 3),
+    "Marion Pike Township School Board, At Large": ("IN-18097-msd-pike", 3),
+    "Marion Warren Township School Board, At Large": ("IN-18097-msd-warren", 3),
+    "Marion Wayne Township Public School Board, At Large": ("IN-18097-msd-wayne", 4),
+    "Cayuga Town Council Member, At Large": ("IN-18165-cayuga", 5),
+    "Perrysville Town Council Member, At Large": ("IN-18165-perrysville", 3),
+    "Fairview Town Council Member, At Large": ("IN-18165-fairview", 5),
+    "Walton Town Council Member, At Large": ("IN-18017-walton", 2),
+    "Royal Center Town Council Member, At Large": ("IN-18017-royal-center", 2),
+    "Clayton Town Council, At Large": ("IN-18063-offices", 2),
+    "Hendricks Plainfield School Board, Guilford Township": ("IN-18063-plainfield-school", 2),
+    "Harrison Lanesville School Board, At Large": ("IN-18061-lanesville", 2),
+    "South Harrison School Board District 1, Heth and Washington Townships": ("IN-18061-south-harrison", 1),
+    "South Harrison School Board District 4, Harrison Township": ("IN-18061-south-harrison", 2),
+    "Whitley County Consolidated School Board, District Columbia City": ("IN-18183-wccs", 2),
+    "Whitley County Consolidated School Board, District Columbia Twp": ("IN-18183-wccs", 1),
+    "Whitley County Consolidated School Board, District Thorncreek Twp": ("IN-18183-wccs", 1),
+    "Francesville Town Council, At Large": ("IN-18131-francesville", 3),
+    "Milan Town Council, At Large": ("IN-18137-milan", 3),
+    "Ingalls Town Council, At Large": ("IN-18095-ingalls", 2),
+    "Milford Town Council Member": ("IN-18085-milford", 3),
+}
 KY_PRINTED_BOARDS = (
     ("Harrison", 1, False, ("Laura Norcross",)),
     ("Harrison", 2, False, ("Mary June Brunker",)),
@@ -7921,14 +8078,25 @@ def parse() -> None:
     winners = {
         key: set(sorted(votes, key=lambda name: -votes[name])[: seats_won[key]]) for key, votes in totals.items()
     }
-    for row in csv.DictReader(
-        io.StringIO(raw.cached(SOURCE, FEEDS["NC"][0]).path.read_text(encoding="utf-8", errors="replace"))
-    ):
+    nc_rows = list(
+        csv.DictReader(
+            io.StringIO(raw.cached(SOURCE, FEEDS["NC"][0]).path.read_text(encoding="utf-8", errors="replace"))
+        )
+    )
+    on_general = {
+        (re.sub(r"\s+", " ", row["contest_name"]).strip(), row["party_candidate"])
+        for row in nc_rows
+        if row["election_dt"] == "11/03/2026"
+    }
+    for row in nc_rows:
         contest = re.sub(r"\s+", " ", row["contest_name"]).strip()
         if re.match(r"(US|NC) |DISTRICT ATTORNEY", contest) or re.search(r"SOIL AND WATER|SANITARY", contest):
             continue
         key = (contest, row["party_contest"] or row["party_candidate"])
-        if row["election_dt"] != "11/03/2026" and key in winners and row["name_on_ballot"].strip() not in winners[key]:
+        if row["election_dt"] != "11/03/2026" and (
+            (contest, row["party_candidate"]) in on_general
+            or (key in winners and row["name_on_ballot"].strip() not in winners[key])
+        ):
             continue
         partisan = row["is_partisan"] == "TRUE"
         feeds["NC"].append(
@@ -8444,7 +8612,8 @@ def parse() -> None:
             )
 
     def in_title(text: str) -> str:
-        return re.sub(r"\s+", " ", re.sub(r"\(\d+ seats?\)", "", text)).strip().lower()
+        text = re.sub(r"\(\d+ seats?\)|\([A-Za-z ]+\)$", "", text).lower()
+        return re.sub(r"\s+", " ", re.sub(r"\b(?:members?|town)\b|[-,.]", " ", text)).strip()
 
     in_seats: dict[str, tuple[int, str] | None] = {}
     for category in IN_ENR_CATEGORIES:
@@ -8467,11 +8636,15 @@ def parse() -> None:
         count = int(seats[1]) if seats else enr[0] if enr else 0
         if category == "TOWNSHIP BOARD MEMBER" and count < 2 and not re.search(r"Board, .+ Township", title):
             count, enr = 3, None
+        heading = re.sub(r"\(\d+ seats?\)|, \w[\w .]*? County\b", "", title)
+        if ballot := IN_BALLOT_SEATS.get(heading):
+            count, enr = ballot[1], None
         named, independent = party(cells[1])
         feeds["IN"].append(
             {
+                **({"feed": ballot[0]} if ballot else {}),
                 "county": county[1] if county else "",
-                "contest": re.sub(r"\(\d+ seats?\)|, \w[\w .]*? County\b", "", title),
+                "contest": heading,
                 "seats": count,
                 "cite": enr[1] if enr else None,
                 "name": cells[0],
@@ -8549,7 +8722,7 @@ def parse() -> None:
             {
                 "county": counties[0] if len(counties) == 1 else row["Filing Location"],
                 "contest": f"{counties[0] if len(counties) == 1 else ''} County {title} {row['District']}",
-                "seats": 0,
+                "seats": 3 if counties[0].upper() == "HAMPTON" and title == "County Council at Large" else 0,
                 "name": f"{row['Ballot Name (first - middle)']} {row['Ballot Name (last - suffix)']}",
                 "party": named,
                 "independent": independent,
@@ -8564,17 +8737,25 @@ def parse() -> None:
             or not re.match(r"(County|Probate|Magistrate|Metropolitan)", cells[0])
         ):
             continue
+        if cells[-3].strip() == "99":
+            continue
         head, code = cells[: len(cells) - 13], cells[len(cells) - 13].strip()
         suffix = head.pop().strip() if head[-1].strip() in ("JR", "SR", "II", "III", "IV") else ""
         named, independent = party(
             {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian", "FWD": "Forward"}.get(code, code)
         )
+        nm_contest = f"{head[-4]} County {head[0]} {' '.join(part.strip() for part in head[1:-4])}"
+        nm_name = cased(" ".join(part for part in [*head[-3:], suffix] if part))
+        if head[-4] == "Hidalgo" and head[0].endswith("At Large"):
+            nm_contest = f"{nm_contest.strip()} District {2 if nm_name.endswith('Peterson') else 1}"
         feeds["NM"].append(
             {
                 "county": head[-4],
-                "contest": f"{head[-4]} County {head[0]} {' '.join(part.strip() for part in head[1:-4])}",
-                "seats": 0,
-                "name": cased(" ".join(part for part in [*head[-3:], suffix] if part)),
+                "contest": nm_contest,
+                "seats": {("Los Alamos", "At Large"): 4, ("Union", "At Large"): 2}.get(
+                    (head[-4], head[0].removeprefix("County Commissioner ")), 0
+                ),
+                "name": nm_name,
                 "party": named,
                 "independent": independent or code in ("DTS", "IND"),
                 "unexpired": False,
@@ -11636,7 +11817,7 @@ def parse() -> None:
                         int(str(row["seats"]) or 0) <= 1
                         or state == "MD"
                         or re.search(
-                            r"(?i)\bcounty (council|commission|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
+                            r"(?i)\bcounty (council|commission(?:er)?|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
                             str(row["contest"]),
                         )
                         is not None
@@ -11824,6 +12005,8 @@ def parse() -> None:
                     lambda person: re.sub(r"-[a-z](?=-|$)", "", person), return_dtype=pl.String
                 )
             )
+            .when(pl.col("tail").str.starts_with("IN:"))
+            .then(pl.col("person").str.replace_all("-", ""))
             .otherwise(pl.col("person"))
         )
         .unique(["tail", "twin"], keep="first", maintain_order=True)
@@ -11923,6 +12106,25 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         )
         .filter(~pl.col("tail").is_in(merged) | pl.struct("tail", "unexpired", "name").is_first_distinct())
     )
+    by_owner: dict[str, list[dict]] = {}
+    for row in (
+        frame.group_by("tail").agg(pl.col("owner").first(), pl.col("person"), pl.col("feed").unique()).to_dicts()
+    ):
+        by_owner.setdefault(row["owner"], []).append(row)
+    nested = {
+        a["tail"]
+        for rows in by_owner.values()
+        for a in rows
+        for b in rows
+        if b["tail"].startswith(a["tail"] + ":")
+        and not b["tail"].endswith((":unexpired", ":remainder"))
+        and None not in a["person"]
+        and set(a["person"]) <= set(b["person"])
+        and not set(a["feed"]) & set(b["feed"])
+    }
+    if nested:
+        print("dropping duplicate races", sorted(nested))
+        frame = frame.filter(~pl.col("tail").is_in(nested))
     keys = ["tail", "template", "unexpired"]
     frame = frame.with_row_index("_row").with_columns(_lead=pl.col("fips").first().over(keys))
     frame = (
@@ -12023,6 +12225,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             "no filing": 0,
             "dropped": 0,
             "stale contests": 0,
+            "orphan people": 0,
         }
         created: set[str] = set()
         made: set[object] = set()
@@ -12501,6 +12704,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 area = cs.area("us.county", scope[3:])
             if kind == "body_seats" and group["seats"][0]:
                 magnitude = int(group["seats"][0])
+            elif kind == "office" and state == "NY" and magnitude is not None:
+                magnitude = max(magnitude, int(group["seats"][0] or 1))
             if state in ("IN", "MD") and magnitude is not None and system in plurality.values():
                 system = plurality[magnitude > 1]
             cs.add(
@@ -12618,10 +12823,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         polity_id=cs.polity("US" if row["party"] == "forward-party" else "US-NY"),
                     )
                     name(party, NEW_PARTIES[row["party"]])
-                try:
-                    option = cs.key("us.option", f"{key}:{slug(row['name'])}")
-                except ValueError:
-                    option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                 if tail in RETENTION:
                     answers = {answer: cs.key("us.option", f"{key}:{answer}") for answer in ("yes", "no")}
                     for position, (answer, answer_id) in enumerate(answers.items(), start=1):
@@ -12635,6 +12836,10 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         )
                     option = answers["yes"]
                 else:
+                    try:
+                        option = cs.key("us.option", f"{key}:{slug(row['name'])}")
+                    except ValueError:
+                        option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                     cs.add(
                         "contest_option",
                         id=option,
@@ -12708,5 +12913,18 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
             counts["stale contests"] += 1
+        used = {str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
+        for person, value in conn.execute(
+            """select p.id, x.value from person p join entity e on e.id = p.id and e.retired_by is null
+               join external_id x on x.entity_id = p.id and x.scheme = %s
+               join changeset c on c.id = x.changeset_id
+               where c.pipeline = %s and x.value like %s
+                 and not exists (select from candidacy ca where ca.person_id = p.id)""",
+            [f"{SOURCE}.person", SOURCE, f"{state}:%"],
+        ).fetchall():
+            if str(person) not in used:
+                print("retiring orphan person", value)
+                cs.add("entity_retirement", entity_id=person, reason="No longer on any official candidate list")
+                counts["orphan people"] += 1
         print(counts)
         return cs.write()

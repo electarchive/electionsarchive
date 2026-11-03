@@ -3,6 +3,7 @@
     LiveElection,
     LiveEstimate,
     LiveOption,
+    LiveRace,
   } from "@ea/analytics/live";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -14,15 +15,19 @@
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import XIcon from "@lucide/svelte/icons/x";
-  import { untrack } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Control } from "#lib/live/nation.js";
-  import type { Geography, UnitStanding } from "#lib/live/standing.js";
+  import type { Geography, Pieces, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
+  import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import RacePicker from "#lib/components/live/race-picker.svelte";
+  import Also from "#lib/components/live/state/also.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { percent } from "#lib/format.js";
   import {
     lead,
@@ -32,16 +37,25 @@
     surname,
     tone,
   } from "#lib/live/format.js";
+  import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
-  import { pair as pairOf, remainder, standing } from "#lib/live/standing.js";
+  import {
+    pair as pairOf,
+    remainder,
+    standing,
+    sum,
+    whole,
+  } from "#lib/live/standing.js";
   import { closing, describe, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { Dot, Fill, Lens, Office, Paint } from "./model.js";
   import Canvas from "./canvas.svelte";
   import CountyCard from "./county-card.svelte";
   import CountyList from "./county-list.svelte";
+  import Insets from "./insets.svelte";
   import Legend from "./legend.svelte";
   import {
     BLANK,
@@ -49,6 +63,7 @@
     districtKey,
     flipped,
     holding,
+    INSETS,
     LENSES,
     MUTED,
     OFFICES,
@@ -58,8 +73,10 @@
     shade,
     stateShade,
     tail,
+    TERRITORIES,
     unitFill,
     urgency,
+    WAITING,
   } from "./model.js";
   import NationPanel from "./nation-panel.svelte";
   import RaceCard from "./race-card.svelte";
@@ -71,8 +88,11 @@
     control,
     districts,
     geography,
+    around = null,
     nationPath,
     names,
+    frame,
+    boxes,
     clock,
     isOffline,
     forecasts,
@@ -87,8 +107,15 @@
     control: Control | null;
     districts: { map: Geography; codes: Record<string, string> } | null;
     geography: Geography | null;
+    around?: {
+      tiles: string;
+      places: Geography["places"];
+      codes: Record<string, string>;
+    } | null;
     nationPath: string;
     names: Record<string, string>;
+    frame: Geography["frame"] | null;
+    boxes: Record<string, Geography["frame"]>;
     clock: number;
     isOffline: boolean;
     forecasts: boolean;
@@ -96,11 +123,16 @@
 
   const VIEW = { at: null, isFinal: true };
   const wide = new MediaQuery("min-width: 48rem", false);
+
+  let isMounted = $state(false);
+  onMount(() => {
+    isMounted = true;
+  });
   const toLive = liveLinks();
 
   let canvas = $state<{
     focus: (areaId: string) => void;
-    fitTo: (areaIds: Array<string>) => boolean;
+    fly: (box: Geography["frame"], isHome: boolean) => void;
     zoomIn: () => void;
     zoomOut: () => void;
     reset: () => void;
@@ -116,17 +148,21 @@
   let sheet = $state(0);
   let room = $state(0);
   let controlsHeight = $state(0);
+  let legendHeight = $state(0);
   let pulses = $state<Array<{ key: string; areaId: string; color: string }>>(
     [],
   );
   let fresh = $state<Array<string>>([]);
 
   const isNation = $derived(nation != null);
+  let isNationFramed = $derived(isNation);
   const date = $derived(election.slug.split("/").at(-1) ?? "");
   const code = $derived(
     isNation ? null : (election.slug.split("/")[1] ?? null),
   );
   const found = $derived(board(election, estimates, control));
+  const parties = $derived(reach(election.races));
+  provideReach(() => parties);
   const params = $derived(page.url.searchParams);
 
   function stateName(value: string) {
@@ -153,6 +189,43 @@
     return match ?? "lead";
   });
   const pick = $derived(isNation ? params.get("pick") : null);
+  const isSpread = $derived(isNation && params.get("view") === "counties");
+
+  let spread = $state.raw<{
+    office: Office;
+    value: Awaited<ReturnType<typeof orpc.live.counties.call>>;
+  } | null>(null);
+  let isSpreading = $state(false);
+
+  $effect(() => {
+    if (!isSpread) {
+      return;
+    }
+    const wanted = office;
+    void election.newest;
+    let isCurrent = true;
+    isSpreading = true;
+    orpc.live.counties.call({ path: nationPath, office: wanted }).then(
+      (value) => {
+        if (isCurrent) {
+          spread = { office: wanted, value };
+          isSpreading = false;
+        }
+      },
+      () => {
+        if (isCurrent) {
+          isSpreading = false;
+        }
+      },
+    );
+    return () => {
+      isCurrent = false;
+    };
+  });
+
+  const spreadData = $derived(
+    isSpread && spread?.office === office ? spread.value : null,
+  );
 
   const statewide = $derived(
     found.summaries
@@ -181,14 +254,24 @@
   );
   const raceTail = $derived.by(() => {
     const wanted = params.get("race");
-    if (wanted === "house" && hasOverview) {
-      return "house";
+    if (wanted === "house") {
+      if (hasOverview) {
+        return "house";
+      }
+      const seat = seats[0];
+      if (seat != null) {
+        return tail(seat.race);
+      }
     }
     if (
       wanted != null &&
       found.summaries.some((summary) => tail(summary.race) === wanted)
     ) {
       return wanted;
+    }
+    const matched = statewide.find((summary) => summary.race.office === wanted);
+    if (matched != null) {
+      return tail(matched.race);
     }
     const first = statewide[0] ?? seats[0];
     if (first == null) {
@@ -209,17 +292,22 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
-  const hasVotes = $derived((current?.total ?? 0) > 0);
+  const hasVotes = $derived(
+    isSpread
+      ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
+      : isNation
+        ? found.summaries.some(
+            (summary) => summary.race.office === office && summary.total > 0,
+          )
+        : (current?.total ?? 0) > 0,
+  );
   const lens = $derived.by((): Lens => {
     const wanted = params.get("color");
     const match = LENSES.find((entry) => entry === wanted);
     if (isOverview) {
       return match === "counted" ? "counted" : "lead";
     }
-    if (match != null && (hasVotes || match === "last")) {
-      return match;
-    }
-    return hasVotes ? "lead" : "last";
+    return match != null && (hasVotes || match === "last") ? match : "lead";
   });
 
   const counties = $derived.by(() => {
@@ -256,6 +344,7 @@
       name: string;
       row: UnitStanding;
       counted: number | null;
+      expected: number;
       color: string;
     }> = [];
     for (const unit of race.units) {
@@ -272,6 +361,7 @@
           row.total > 0
             ? Math.min(1, row.total / Math.max(1, rest.expected))
             : null,
+        expected: rest.expected,
         color: unitFill(row, lens, race.options, racePair, rest.expected),
       });
     }
@@ -280,9 +370,180 @@
   const rowByArea = $derived(
     new Map(rows.map((entry) => [entry.areaId, entry])),
   );
+  const entire = $derived.by(() => {
+    if (race == null || raceStanding == null || rows.length > 0) {
+      return null;
+    }
+    const unit = race.units.find((unit) => unit.scheme === "us.state");
+    const row = unit == null ? null : raceStanding.units.get(unit.id);
+    if (unit?.areaId == null || row == null) {
+      return null;
+    }
+    const rest = remainder(row, estimate, race.options, racePair);
+    return {
+      areaId: unit.areaId,
+      color: unitFill(row, lens, race.options, racePair, rest.expected),
+    };
+  });
+
+  const spreadRows = $derived.by(() => {
+    const out = new Map<
+      string,
+      {
+        areaId: string;
+        name: string;
+        state: string;
+        race: LiveRace;
+        row: UnitStanding;
+        pair: [number, number];
+        counted: number | null;
+        color: string;
+      }
+    >();
+    for (const entry of spreadData?.races ?? []) {
+      const held = standing(entry, VIEW);
+      const two = pairOf(entry);
+      for (const unit of entry.units) {
+        const row = held.units.get(unit.id);
+        if (unit.areaId == null || row == null || out.has(unit.areaId)) {
+          continue;
+        }
+        const rest = remainder(row, null, entry.options, two);
+        out.set(unit.areaId, {
+          areaId: unit.areaId,
+          name: placeName(unit.name),
+          state: entry.state,
+          race: entry,
+          row,
+          pair: two,
+          counted:
+            row.total > 0
+              ? Math.min(1, row.total / Math.max(1, rest.expected))
+              : null,
+          color: unitFill(row, lens, entry.options, two, rest.expected),
+        });
+      }
+    }
+    return out;
+  });
 
   const nationCodes = $derived(nation?.codes ?? {});
+  const nearCodes = $derived(
+    new Map(Object.entries(around?.codes ?? {}).map(([key, id]) => [id, key])),
+  );
   const districtCodes = $derived(districts?.codes ?? {});
+  const aim = $derived(
+    isNation || race == null
+      ? null
+      : (boxes[districtCodes[districtKey(race) ?? ""] ?? ""] ?? null),
+  );
+
+  const seatArea = $derived(
+    isNation || race == null || districts == null
+      ? null
+      : (districtCodes[districtKey(race) ?? ""] ?? null),
+  );
+  let cut = $state.raw<{ areaId: string; found: Pieces } | null>(null);
+  const seat = $derived(
+    cut != null && cut.areaId === seatArea ? cut.found : null,
+  );
+
+  const nearSeats = $derived(
+    race?.office !== "house" || seatArea == null || isOverview
+      ? null
+      : new Map(
+          Object.entries(districtCodes).flatMap(([key, id]) =>
+            id === seatArea ? [] : [[id, key] as const],
+          ),
+        ),
+  );
+  const isOutlying = (state: string | null | undefined) =>
+    state != null && (INSETS.has(state) || TERRITORIES.includes(state));
+  const isAlone = $derived(isOutlying(code));
+  const nearby = $derived(
+    isAlone
+      ? null
+      : nearSeats != null && districts != null
+        ? {
+            tiles: districts.map.tiles,
+            places: districts.map.places.flatMap((place) => {
+              const [state = "", number = ""] =
+                nearSeats.get(place.areaId)?.split("-") ?? [];
+              return state === ""
+                ? []
+                : [
+                    {
+                      ...place,
+                      name: `${state.toUpperCase()}-${number === "0" ? "AL" : number}`,
+                    },
+                  ];
+            }),
+          }
+        : around == null
+          ? null
+          : {
+              tiles: around.tiles,
+              places: around.places.map((place) => ({
+                ...place,
+                name: stateName(nearCodes.get(place.areaId) ?? ""),
+              })),
+            },
+  );
+  const hold = $derived.by(() => {
+    const k = districts?.map.places.find(
+      (place) => place.areaId === seatArea,
+    )?.k;
+    return seat != null || districts == null || k == null
+      ? null
+      : { tiles: districts.map.tiles, k, color: shared ?? BLANK };
+  });
+
+  $effect(() => {
+    const areaId = seatArea;
+    if (areaId == null || untrack(() => cut?.areaId) === areaId) {
+      return;
+    }
+    let isGone = false;
+    const load = async (tries: number): Promise<void> => {
+      try {
+        const response = await fetch(`/live/pieces/${election.date}/${areaId}`);
+        if (response.ok) {
+          const found = (await response.json()) as Pieces;
+          if (!isGone) {
+            cut = { areaId, found };
+          }
+          return;
+        }
+        if (response.status === 404) {
+          return;
+        }
+      } catch {}
+      if (tries > 1 && !isGone) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        return load(tries - 1);
+      }
+    };
+    void load(4);
+    return () => {
+      isGone = true;
+    };
+  });
+
+  function flyTo(state: string, district: string | null = null) {
+    isNationFramed = false;
+    if (isAlone || isOutlying(state)) {
+      return;
+    }
+    const box = district == null ? null : boxes[districtCodes[district] ?? ""];
+    if (box != null) {
+      canvas?.fly(box, false);
+      return;
+    }
+    const home = boxes[nationCodes[state] ?? around?.codes[state] ?? ""];
+    if (home != null) {
+      canvas?.fly(home, true);
+    }
+  }
   const isHouseMap = $derived(
     isNation && office === "house" && districts != null,
   );
@@ -297,15 +558,49 @@
     isHouseMap || isOverview ? districtCodes : nationCodes,
   );
 
-  const mapGeography = $derived(
+  const isSpreadShown = $derived(spreadData?.map != null);
+  const stateKeys = $derived(
+    new Map(Object.entries(nationCodes).map(([key, areaId]) => [areaId, key])),
+  );
+
+  function stateOf(areaId: string) {
+    if (isSpreadShown) {
+      return spreadRows.get(areaId)?.state ?? null;
+    }
+    return keyOfArea.get(areaId)?.split("-")[0] ?? null;
+  }
+
+  const baseGeography = $derived(
     isNation
-      ? isHouseMap
-        ? (districts?.map ?? null)
-        : (nation?.map ?? null)
+      ? isSpreadShown
+        ? (spreadData?.map ?? null)
+        : isHouseMap
+          ? (districts?.map ?? null)
+          : (nation?.map ?? null)
       : isOverview
         ? (districts?.map ?? null)
         : geography,
   );
+  const insetPlaces = $derived(
+    isNation
+      ? (baseGeography?.places ?? []).filter((place) =>
+          INSETS.has(stateOf(place.areaId) ?? ""),
+        )
+      : [],
+  );
+  const mapGeography = $derived.by((): Geography | null => {
+    if (!isNation || baseGeography == null) {
+      return baseGeography;
+    }
+    const outside = new Set([...INSETS, ...TERRITORIES]);
+    return {
+      ...baseGeography,
+      places: baseGeography.places.filter(
+        (place) => !outside.has(stateOf(place.areaId) ?? ""),
+      ),
+      frame: frame ?? baseGeography.frame,
+    };
+  });
 
   function seatShade(summary: Summary, wanted: Paint) {
     return shade(
@@ -317,8 +612,30 @@
     );
   }
 
+  const shared = $derived.by(() => {
+    const district =
+      seatArea == null || raceStanding == null ? null : whole(raceStanding);
+    return district == null || race == null
+      ? null
+      : lens === "votes"
+        ? BLANK
+        : unitFill(
+            district,
+            lens,
+            race.options,
+            racePair,
+            sum(rows.map((entry) => entry.expected)),
+          );
+  });
+
   const fills = $derived.by(() => {
     const out = new Map<string, Fill>();
+    if (isSpreadShown) {
+      for (const [areaId, entry] of spreadRows) {
+        out.set(areaId, { color: lens === "votes" ? BLANK : entry.color });
+      }
+      return out;
+    }
     if (isNation && !isHouseMap) {
       for (const [key, areaId] of Object.entries(nationCodes)) {
         const races = (found.byState.get(key) ?? []).filter(
@@ -350,18 +667,38 @@
     }
     const isLater = current?.later != null;
     for (const place of geography?.places ?? []) {
-      const entry = rowByArea.get(place.areaId);
+      const entry =
+        rowByArea.get(place.areaId) ??
+        (place.areaId === entire?.areaId ? entire : null);
       out.set(
         place.areaId,
         entry == null
           ? { color: MUTED }
-          : { color: lens === "votes" ? BLANK : entry.color, isLater },
+          : {
+              color: lens === "votes" ? BLANK : (shared ?? entry.color),
+              isLater,
+            },
       );
     }
     return out;
   });
 
   const dots = $derived.by((): Array<Dot> => {
+    if (isSpreadShown) {
+      return lens === "votes"
+        ? [...spreadRows.values()].flatMap((entry) =>
+            entry.row.total > 0 && entry.row.leader != null
+              ? [
+                  {
+                    areaId: entry.areaId,
+                    value: entry.row.total,
+                    color: tone(entry.race.options[entry.row.leader]),
+                  },
+                ]
+              : [],
+          )
+        : [];
+    }
     if (isNation || isOverview || race == null || lens !== "votes") {
       return [];
     }
@@ -380,7 +717,7 @@
 
   const labels = $derived.by(() => {
     if (isNation) {
-      return isHouseMap
+      return isHouseMap || isSpreadShown
         ? []
         : Object.entries(nationCodes).map(([key, areaId], index) => ({
             areaId,
@@ -445,15 +782,12 @@
     void goto(url, { reset: false, replace: !isPushed });
   }
 
-  function open(target: string) {
-    const areaId = nationCodes[target];
-    if (areaId != null) {
-      canvas?.focus(areaId);
-    }
+  function open(target: string, picked: string | null = pick) {
     const district =
-      office === "house" && pick?.startsWith(`${target}-`) === true
-        ? found.districts.get(pick)
+      office === "house" && picked?.startsWith(`${target}-`) === true
+        ? found.districts.get(picked)
         : null;
+    flyTo(target, district == null ? null : picked);
     void goto(
       href(`${election.slug.split("/")[0] ?? "us"}/${target}/${date}`, {
         race:
@@ -462,7 +796,36 @@
               ? "house"
               : office
             : tail(district.race),
-        color: paint === "counted" ? "counted" : null,
+        color:
+          paint === "counted" || (isSpread && lens === "counted")
+            ? "counted"
+            : null,
+      }),
+      { reset: false },
+    );
+  }
+
+  function openCounty(areaId: string) {
+    const entry = spreadRows.get(areaId);
+    if (entry == null) {
+      return;
+    }
+    flyTo(entry.state);
+    const home =
+      office === "house"
+        ? (spreadData?.homes[areaId] ?? null)
+        : tail(entry.race);
+    void goto(
+      href(`${election.slug.split("/")[0] ?? "us"}/${entry.state}/${date}`, {
+        race: home ?? "house",
+        county:
+          home == null
+            ? null
+            : placeSlug(
+                entry.race.units.find((unit) => unit.areaId === areaId)?.name ??
+                  "",
+              ),
+        color: params.get("color"),
       }),
       { reset: false },
     );
@@ -478,36 +841,103 @@
               : race?.office === "governor"
                 ? "governor"
                 : null,
-          pick: race?.office === "house" ? (districtKey(race) ?? code) : code,
         }),
   );
 
-  function pickArea(areaId: string | null) {
+  let awayAt = 0;
+  let awayTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function rise() {
     if (isNation) {
-      const key = areaId == null ? null : (keyOfArea.get(areaId) ?? null);
+      update({ pick: null });
+    } else if (county != null) {
+      update({ county: null });
+    } else if (up != null) {
+      isNationFramed = true;
+      if (frame != null && !isAlone) {
+        canvas?.fly(frame, true);
+      }
+      void goto(up, { reset: false });
+    }
+  }
+
+  function away() {
+    clearTimeout(awayTimer);
+    const now = performance.now();
+    if (now - awayAt < 320) {
+      awayAt = 0;
+      return;
+    }
+    awayAt = now;
+    awayTimer = setTimeout(rise, 320);
+  }
+
+  function visit(target: string) {
+    flyTo(target);
+    void goto(
+      href(`${election.slug.split("/")[0] ?? "us"}/${target}/${date}`, {
+        race:
+          race?.office === "house" || isOverview
+            ? "house"
+            : (race?.office ?? null),
+        color: params.get("color"),
+      }),
+      { reset: false },
+    );
+  }
+
+  $effect(() => () => clearTimeout(awayTimer));
+
+  function pickArea(areaId: string | null) {
+    if (areaId == null) {
+      away();
+      return;
+    }
+    clearTimeout(awayTimer);
+    const seatKey = nearSeats?.get(areaId);
+    if (seatKey != null) {
+      const [state = "", number = ""] = seatKey.split("-");
+      if (state === code) {
+        update({ race: `house-${number}`, county: null });
+        return;
+      }
+      flyTo(state, seatKey);
+      void goto(
+        href(`${election.slug.split("/")[0] ?? "us"}/${state}/${date}`, {
+          race: `house-${number}`,
+          color: params.get("color"),
+        }),
+        { reset: false },
+      );
+      return;
+    }
+    const neighbor = nearCodes.get(areaId);
+    if (neighbor != null) {
+      visit(neighbor);
+      return;
+    }
+    if (isNation) {
+      if (isSpreadShown) {
+        openCounty(areaId);
+        return;
+      }
+      const key = keyOfArea.get(areaId) ?? stateKeys.get(areaId) ?? null;
       if (key == null) {
         update({ pick: null });
         return;
       }
-      if (key === pick) {
-        open(key.split("-")[0] ?? key);
-        return;
-      }
-      update({ pick: key });
-      if (!wide.current && detent === "peek") {
-        detent = "half";
-      }
+      open(key.split("-")[0] ?? key, key);
       return;
     }
     if (isOverview) {
-      const key = areaId == null ? null : keyOfArea.get(areaId);
+      const key = keyOfArea.get(areaId);
       const summary = key == null ? null : found.districts.get(key);
       if (summary != null) {
         update({ race: tail(summary.race), county: null });
       }
       return;
     }
-    const entry = areaId == null ? null : counties.get(areaId);
+    const entry = counties.get(areaId);
     update({ county: entry?.slug ?? null });
     if (entry != null && !wide.current && detent === "peek") {
       detent = "half";
@@ -517,39 +947,6 @@
   function pickRace(next: string) {
     update({ race: next, county: county?.slug ?? null });
   }
-
-  let fitted = "";
-  $effect(() => {
-    const key = `${election.slug}|${raceTail}`;
-    const target = race;
-    const box = canvas;
-    if (box == null || key === fitted || isNation) {
-      return;
-    }
-    const isFirst = fitted === "" || !fitted.startsWith(`${election.slug}|`);
-    fitted = key;
-    const areas =
-      target?.office === "house"
-        ? target.units.flatMap((unit) =>
-            unit.areaId == null ? [] : [unit.areaId],
-          )
-        : [];
-    if (areas.length === 0) {
-      if (!isFirst) {
-        box.reset();
-      }
-      return;
-    }
-    let tries = 0;
-    const attempt = () => {
-      tries += 1;
-      if (!box.fitTo(areas) && tries < 12) {
-        timer = setTimeout(attempt, 350);
-      }
-    };
-    let timer = setTimeout(attempt, isFirst ? 600 : 0);
-    return () => clearTimeout(timer);
-  });
 
   let seen: { stamp: string; totals: Map<string, number> } | null = null;
   $effect(() => {
@@ -663,25 +1060,68 @@
       .map(([value, label]) => ({
         value,
         label: label(),
-        disabled: !hasVotes && !isOverview && value !== "last",
+        disabled:
+          !hasVotes && !isOverview && value !== "last" && value !== "lead",
       })),
   );
-  const raceOptions = $derived<Array<SegmentedOption<string>>>([
-    ...statewide.map((summary) => ({
-      value: tail(summary.race),
+  const viewOptions = $derived<Array<SegmentedOption<string>>>([
+    {
+      value: "states",
       label:
-        summary.race.office === "senate" || summary.race.office === "governor"
-          ? OFFICE_NAMES[summary.race.office]()
-          : summary.race.title,
-    })),
-    ...(seats.length > 0
-      ? [{ value: "house", label: m.night_nation_house() }]
-      : []),
+        office === "house"
+          ? m.livemap_view_districts()
+          : m.livemap_view_states(),
+    },
+    { value: "counties", label: m.livemap_view_counties() },
   ]);
-  const raceGroup = $derived(
-    race?.office === "house" || isOverview ? "house" : raceTail,
+  const territories = $derived(
+    isNation
+      ? TERRITORIES.flatMap((key) => {
+          const areaId = nationCodes[key];
+          if (areaId == null) {
+            return [];
+          }
+          const wanted: Paint = isSpread
+            ? lens === "counted"
+              ? "counted"
+              : "lead"
+            : paint;
+          if (office === "house") {
+            const seat = [...found.districts].find(([seat]) =>
+              seat.startsWith(`${key}-`),
+            );
+            return seat == null
+              ? []
+              : [
+                  {
+                    key,
+                    areaId,
+                    seat: seat[0],
+                    color: seatShade(seat[1], wanted),
+                  },
+                ];
+          }
+          const races = (found.byState.get(key) ?? []).filter(
+            (summary) => summary.race.office === office,
+          );
+          return races.length === 0
+            ? []
+            : [
+                {
+                  key,
+                  areaId,
+                  seat: key,
+                  color: stateShade(races, office, wanted, found, control)
+                    .color,
+                },
+              ];
+        })
+      : [],
   );
-
+  let lit = $state<string | null>(null);
+  const insetStature = $derived(
+    wide.current ? Math.min(104, Math.max(56, room * 0.13)) : 58,
+  );
   const sides = $derived.by(() => {
     if (isNation || isOverview) {
       return (found.pair ?? []).map((family) => ({
@@ -699,16 +1139,33 @@
         : [{ name: surname(option), color: tone(option) }];
     });
   });
-  const legendKind = $derived.by((): "ramp" | "counted" | "votes" => {
-    const value = isNation ? paint : lens;
-    return value === "counted"
-      ? "counted"
-      : value === "votes"
-        ? "votes"
-        : "ramp";
-  });
+  const legendKind = $derived.by(
+    (): "ramp" | "counted" | "votes" | "waiting" => {
+      const value = isNation && !isSpread ? paint : lens;
+      if (value === "lead" && !hasVotes) {
+        return "waiting";
+      }
+      return value === "counted"
+        ? "counted"
+        : value === "votes"
+          ? "votes"
+          : "ramp";
+    },
+  );
+  const legendBins = $derived(
+    (isNation && !isSpread) || legendKind !== "ramp"
+      ? null
+      : lens === "shift"
+        ? strengths({ mode: "swing" })
+        : lens === "lead" || lens === "last"
+          ? strengths({ mode: "winner" })
+          : null,
+  );
   const legendText = $derived.by(() => {
-    if (isNation) {
+    if (legendKind === "waiting") {
+      return m.livemap_legend_waiting_hint();
+    }
+    if (isNation && !isSpread) {
       return {
         lead: m.night_nation_legend,
         chance: m.night_nation_legend_chance,
@@ -764,6 +1221,9 @@
   );
 
   const loading = $derived.by(() => {
+    if (isSpread && isSpreading && spreadData == null) {
+      return m.livemap_counties_loading();
+    }
     const to = navigating.to;
     if (
       to?.route.id !== "/live/map/[...path]" ||
@@ -772,16 +1232,30 @@
       return null;
     }
     const segments = to.params?.path?.split("/") ?? [];
-    return segments.length === 2
-      ? m.livemap_nation()
-      : stateName(segments[1] ?? "");
+    return m.map_opening({
+      place:
+        segments.length === 2
+          ? m.livemap_nation()
+          : stateName(segments[1] ?? ""),
+    });
   });
 
   function tipRace(areaId: string) {
+    if (isSpreadShown) {
+      return null;
+    }
     if (isNation || isOverview) {
-      const key = keyOfArea.get(areaId);
+      const key = keyOfArea.get(areaId) ?? stateKeys.get(areaId);
       if (key == null) {
         return null;
+      }
+      if (isHouseMap && !key.includes("-")) {
+        return {
+          title: stateName(key),
+          lines: [...found.districts].flatMap(([seat, summary]) =>
+            seat.startsWith(`${key}-`) ? [summary] : [],
+          ),
+        };
       }
       if (isHouseMap || isOverview) {
         const summary = found.districts.get(key);
@@ -810,15 +1284,10 @@
       return;
     }
     if (event.key === "Escape") {
-      if (isNation && pick != null) {
-        update({ pick: null });
-      } else if (!isNation && county != null) {
-        update({ county: null });
-      } else if (up != null) {
-        void goto(up, { reset: false });
-      } else {
+      if (isNation ? pick == null : county == null && up == null) {
         return;
       }
+      rise();
       event.preventDefault();
     } else if (event.key === "+" || event.key === "=") {
       canvas?.zoomIn();
@@ -832,42 +1301,90 @@
 
 <svelte:window onkeydown={onKey} />
 
-{#snippet optionShares(summary: Summary, limit: number)}
-  {const total = $derived(summary.total)}
-  {const last = $derived(prior(summary.race))}
+{#snippet tipLines(
+  race: LiveRace,
+  totals: Array<number>,
+  before: Array<number> | null,
+  leader: string | null,
+)}
+  {const split = $derived(lineup(race, totals, parties, 3))}
+  {const total = $derived(sum(totals))}
   <ul class="grid gap-1">
-    {#each summary.race.options
-      .map((option, index) => ({ option, index }))
-      .filter((entry) => !entry.option.isWriteIn)
-      .toSorted((a, b) => (summary.totals[b.index] ?? 0) - (summary.totals[a.index] ?? 0) || (last?.shares[b.index] ?? 0) - (last?.shares[a.index] ?? 0))
-      .slice(0, limit) as entry (entry.option.id)}
+    {#each split.main as line (line.option.id)}
+      {const then = $derived(before?.[race.options.indexOf(line.option)] ?? 0)}
       <li class="flex items-center gap-2">
         <span
           class="shrink-0 rounded-full block-2 inline-2"
-          style:background-color={tone(entry.option)}
+          style:background-color={tone(line.option)}
         ></span>
         <span
           class={cn("grow truncate", {
-            "font-semibold": summary.leader?.id === entry.option.id,
-          })}>{entry.option.label}</span
+            "font-semibold": leader === line.option.id,
+          })}>{line.option.label}</span
         >
         <span class="font-figures tabular-nums">
           {#if total > 0}
-            {percent((summary.totals[entry.index] ?? 0) / total)}
-          {:else if last != null}
-            <span class="text-muted-foreground"
-              >{percent(last.shares[entry.index] ?? 0)}</span
-            >
+            {percent(line.share ?? 0)}
+          {:else if then > 0}
+            <span class="text-muted-foreground">{percent(then)}</span>
           {/if}
         </span>
       </li>
     {/each}
   </ul>
+  <Also rest={split.rest} {total} />
+{/snippet}
+
+{#snippet countyTip(
+  name: string,
+  shown: LiveRace | null,
+  row: UnitStanding | null,
+  counted: number | null,
+  two: [number, number],
+)}
+  <p class="font-semibold">{name}</p>
+  {#if row == null || shown == null}
+    <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
+  {:else}
+    {@render tipLines(
+      shown,
+      row.votes,
+      row.baseline?.shares ?? null,
+      row.leader == null ? null : (shown.options[row.leader]?.id ?? null),
+    )}
+    <p class="text-xs text-muted-foreground">
+      {#if counted != null}
+        {m.night_tip_counted({ share: percent(counted, 0) })}
+      {:else}
+        {m.night_tip_waiting()}
+      {/if}
+    </p>
+    {#if row.baseSigned != null}
+      {const then = $derived(
+        shown.options[row.baseSigned >= 0 ? two[0] : two[1]],
+      )}
+      <p class="text-xs text-muted-foreground">
+        {m.night_tip_baseline({
+          margin: `${surname(then)} +${lead(Math.abs(row.baseSigned))}`,
+        })}
+      </p>
+    {/if}
+  {/if}
 {/snippet}
 
 {#snippet tip(areaId: string)}
   {const nationTip = $derived(tipRace(areaId))}
-  {#if nationTip != null}
+  {const neighbor = $derived(nearCodes.get(areaId) ?? null)}
+  {const nearSeat = $derived(
+    nearby?.places.find((place) => place.areaId === areaId) ?? null,
+  )}
+  {#if nearSeats?.has(areaId) === true && nearSeat != null}
+    <p class="font-semibold">{nearSeat.name}</p>
+    <p class="text-xs text-muted-foreground">{m.livemap_near_seat_hint()}</p>
+  {:else if neighbor != null}
+    <p class="font-semibold">{stateName(neighbor)}</p>
+    <p class="text-xs text-muted-foreground">{m.livemap_near_hint()}</p>
+  {:else if nationTip != null}
     <p class="font-semibold">{nationTip.title}</p>
     {#if nationTip.lines.length === 0}
       <p class="text-xs text-muted-foreground">{m.night_nation_none()}</p>
@@ -904,141 +1421,106 @@
         {#if nationTip.lines.length > 1}
           <p class="text-xs text-muted-foreground">{summary.race.title}</p>
         {/if}
-        {@render optionShares(summary, 3)}
+        {@render tipLines(
+          summary.race,
+          summary.totals,
+          prior(summary.race)?.shares ?? null,
+          summary.leader?.id ?? null,
+        )}
         <p class="text-xs text-muted-foreground">{verdict(summary)}</p>
       {/each}
     {/if}
+  {:else if isSpreadShown}
+    {const entry = $derived(spreadRows.get(areaId))}
+    {#if entry != null}
+      {@render countyTip(
+        m.livemap_county_state({
+          county: entry.name,
+          state: stateName(entry.state),
+        }),
+        entry.race,
+        entry.row,
+        entry.counted,
+        entry.pair,
+      )}
+    {/if}
   {:else}
     {const entry = $derived(rowByArea.get(areaId))}
-    {const name = $derived(counties.get(areaId)?.name ?? "")}
-    <p class="font-semibold">{name}</p>
-    {#if entry == null || race == null}
-      <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
-    {:else}
-      {const row = $derived(entry.row)}
-      <ul class="grid gap-1">
-        {#each row.order.slice(0, 3) as index (index)}
-          {const option = $derived(race.options[index])}
-          {#if option != null && (row.total > 0 || (row.baseline?.shares[index] ?? 0) > 0)}
-            <li class="flex items-center gap-2">
-              <span
-                class="shrink-0 rounded-full block-2 inline-2"
-                style:background-color={tone(option)}
-              ></span>
-              <span
-                class={cn("grow truncate", {
-                  "font-semibold": row.leader === index,
-                })}>{option.label}</span
-              >
-              <span class="font-figures tabular-nums">
-                {#if row.total > 0}
-                  {percent((row.votes[index] ?? 0) / row.total)}
-                {:else}
-                  <span class="text-muted-foreground"
-                    >{percent(row.baseline?.shares[index] ?? 0)}</span
-                  >
-                {/if}
-              </span>
-            </li>
-          {/if}
-        {/each}
-      </ul>
-      <p class="text-xs text-muted-foreground">
-        {#if entry.counted != null}
-          {m.night_tip_counted({ share: percent(entry.counted, 0) })}
-        {:else}
-          {m.night_tip_waiting()}
-        {/if}
-      </p>
-      {#if row.baseSigned != null}
-        {const then = $derived(
-          race.options[row.baseSigned >= 0 ? racePair[0] : racePair[1]],
-        )}
-        <p class="text-xs text-muted-foreground">
-          {m.night_tip_baseline({
-            margin: `${surname(then)} +${lead(Math.abs(row.baseSigned))}`,
-          })}
-        </p>
-      {/if}
-    {/if}
+    {@render countyTip(
+      counties.get(areaId)?.name ?? "",
+      race,
+      entry?.row ?? null,
+      entry?.counted ?? null,
+      racePair,
+    )}
   {/if}
 {/snippet}
 
-{#snippet controls()}
-  <div class="grid justify-items-start gap-2">
-    {#if isNation}
-      <Segmented
-        options={officeOptions}
-        value={office}
-        label={m.night_nation_views()}
-        size={wide.current ? "md" : "sm"}
-        class="bg-card/95 shadow-menu backdrop-blur-sm"
-        onValueChange={(value) => update({ office: value, pick: null })}
+{#snippet mapNav()}
+  {#if isNation}
+    <Segmented
+      options={viewOptions}
+      value={isSpread ? "counties" : "states"}
+      label={m.livemap_view()}
+      size={wide.current ? "md" : "sm"}
+      class="bg-card/95 shadow-menu backdrop-blur-sm"
+      onValueChange={(value: string) =>
+        update({ view: value === "counties" ? "counties" : null, pick: null })}
+    />
+  {:else}
+    {const target = $derived(
+      county == null
+        ? m.livemap_nation()
+        : race?.office === "house" && race.district != null
+          ? seatName(race, stateName)
+          : here,
+    )}
+    <button
+      type="button"
+      class="flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border backdrop-blur-sm keycap block-9 hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-coarse:block-10"
+      aria-label={m.atlas_up({ place: target })}
+      title={county == null ? m.livemap_up_hint() : undefined}
+      onclick={rise}
+    >
+      <ArrowLeftIcon
+        class="block-4 inline-4 rtl:-scale-x-100"
+        aria-hidden="true"
       />
-    {:else}
-      <Segmented
-        options={raceOptions}
-        value={raceGroup}
-        label={m.livemap_races()}
-        size={wide.current ? "md" : "sm"}
-        class="bg-card/95 shadow-menu backdrop-blur-sm"
-        onValueChange={(value: string) => pickRace(value)}
-      />
-      {#if raceGroup === "house" && seats.length > 1}
-        <div
-          class="flex gap-1 overflow-x-auto rounded-sm bg-card/95 p-1 shadow-menu ring-1 ring-border backdrop-blur-sm max-inline-[min(36rem,calc(100vw-4.5rem))]"
-          role="group"
-          aria-label={m.livemap_districts()}
-        >
-          {#if hasOverview}
-            <button
-              type="button"
-              class={cn(
-                "shrink-0 rounded-xs px-2.5 text-xs font-semibold block-7",
-                {
-                  "bg-foreground text-card": isOverview,
-                  "hover:bg-secondary": !isOverview,
-                },
-              )}
-              aria-pressed={isOverview}
-              onclick={() => pickRace("house")}>{m.livemap_overview()}</button
-            >
-          {/if}
-          {#each seats as summary (summary.race.id)}
-            {const isOn = $derived(summary.race.id === race?.id)}
-            {const color = $derived(seatShade(summary, "lead"))}
-            <button
-              type="button"
-              class={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-xs px-2 font-figures text-xs font-semibold tabular-nums block-7",
-                {
-                  "bg-foreground text-card": isOn,
-                  "hover:bg-secondary": !isOn,
-                },
-              )}
-              aria-pressed={isOn}
-              aria-label={summary.race.title}
-              title={summary.race.title}
-              onclick={() => pickRace(tail(summary.race))}
-              ><span
-                class="rounded-full ring-1 ring-card block-2 inline-2"
-                style:background-color={color}
-              ></span>{seatName(summary.race, stateName)
-                .split("-")
-                .at(-1)}</button
-            >
-          {/each}
-        </div>
-      {/if}
-    {/if}
-    {#if !wide.current}
-      {@render modes("sm")}
-    {/if}
-  </div>
+      {target}
+      <kbd class="pointer-coarse:hidden">esc</kbd>
+    </button>
+  {/if}
+{/snippet}
+
+{#snippet raceTabs()}
+  {#if isNation && officeOptions.length > 1}
+    <Segmented
+      options={officeOptions}
+      value={office}
+      label={m.night_nation_views()}
+      fill={officeOptions.length <= 4}
+      class={cn({ "inline-full": officeOptions.length <= 4 })}
+      onValueChange={(value) => update({ office: value, pick: null })}
+    />
+  {:else if !isNation && statewide.length + seats.length > 1}
+    <RacePicker
+      summaries={[...statewide, ...seats]}
+      current={isOverview ? null : (race?.slug ?? null)}
+      label={m.livemap_races()}
+      overview={hasOverview
+        ? {
+            label: m.livemap_overview(),
+            isCurrent: isOverview,
+            onpick: () => pickRace("house"),
+          }
+        : null}
+      onpick={(summary: Summary) => pickRace(tail(summary.race))}
+    />
+  {/if}
 {/snippet}
 
 {#snippet modes(size: "sm" | "md")}
-  {#if isNation}
+  {#if isNation && !isSpread}
     <Segmented
       options={paintOptions}
       value={paint}
@@ -1060,8 +1542,88 @@
   {/if}
 {/snippet}
 
+{#snippet insetBoxes()}
+  {#if baseGeography != null && insetPlaces.length > 0}
+    <Insets
+      tiles={baseGeography.tiles}
+      places={insetPlaces}
+      {fills}
+      {selected}
+      bind:hovered
+      stature={insetStature}
+      nameOf={(name: string) =>
+        name === "Alaska"
+          ? stateName("ak")
+          : name === "Hawaii"
+            ? stateName("hi")
+            : name}
+      labelOf={(areaId: string) => {
+        const entry = spreadRows.get(areaId);
+        return entry == null
+          ? (tipRace(areaId)?.title ?? "")
+          : m.livemap_county_state({
+              county: entry.name,
+              state: stateName(entry.state),
+            });
+      }}
+      onPick={pickArea}
+      {tip}
+    />
+  {/if}
+{/snippet}
+
+{#snippet territoryChips()}
+  {#if territories.length > 0}
+    <div class="relative flex">
+      {#if lit != null}
+        <div
+          class="pointer-events-none absolute inset-e-0 inset-be-[calc(100%+0.5rem)] z-30 grid gap-1.5 rounded-sm bg-popover/95 px-3 py-2.5 text-[0.8125rem] shadow-menu ring-1 ring-border backdrop-blur-sm inline-60 max-md:inset-s-0 max-md:inset-e-auto"
+        >
+          {@render tip(lit)}
+        </div>
+      {/if}
+      <div
+        class="pointer-events-auto flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border backdrop-blur-sm"
+        role="group"
+        aria-label={m.map_outlying()}
+      >
+        {#each territories as entry (entry.key)}
+          <button
+            type="button"
+            class="flex shrink-0 items-center gap-1.5 border-s border-border px-2 text-xs font-semibold whitespace-nowrap block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10"
+            aria-label={stateName(entry.key)}
+            onpointerenter={(event) => {
+              if (event.pointerType === "mouse") {
+                lit = entry.areaId;
+              }
+            }}
+            onpointerleave={() => (lit = null)}
+            onfocus={() => (lit = entry.areaId)}
+            onblur={() => (lit = null)}
+            onclick={() => open(entry.key, entry.seat)}
+          >
+            <span
+              class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+              style:--party={entry.color}
+              aria-hidden="true"
+            ></span>
+            {entry.key.toUpperCase()}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
+{/snippet}
+
 {#snippet legend()}
-  <Legend kind={legendKind} {sides} text={legendText} isLater={isLaterShown} />
+  <Legend
+    kind={legendKind}
+    {sides}
+    bins={legendBins}
+    text={legendText}
+    blank={isNation && !isSpread ? WAITING : BLANK}
+    isLater={isLaterShown}
+  />
 {/snippet}
 
 {#snippet summaryHead()}
@@ -1189,7 +1751,7 @@
       </ul>
     </section>
   {:else if current != null}
-    <div class="grid gap-6">
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-6">
       <RaceCard
         summary={current}
         held={holding(control, current.race)}
@@ -1338,61 +1900,204 @@
     >
   </header>
 
-  <div
-    class={cn("grid min-block-0", {
-      "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
-    })}
-  >
-    <main class="relative min-block-0" bind:clientHeight={room}>
-      {#if mapGeography == null}
-        <div
-          class="grid place-items-center p-6 text-center text-sm text-muted-foreground block-full"
-        >
-          {m.night_nation_map_missing()}
-        </div>
-      {:else}
-        <Canvas
-          bind:this={canvas}
-          geography={mapGeography}
-          {fills}
-          {dots}
-          {labels}
-          {selected}
-          bind:hovered
-          {pulses}
-          inset={{ top: controlsHeight + 12, bottom: wide.current ? 0 : sheet }}
-          label={isNation
-            ? m.night_nation_map({ view: OFFICE_NAMES[office]() })
-            : (current?.race.title ?? m.night_nation_house())}
-          onPick={pickArea}
-          {tip}
-        />
-      {/if}
-
+  {#if !isMounted}
+    <div
+      class="grid min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
+      aria-busy="true"
+    >
       <div
-        class="pointer-events-none absolute inset-x-3 inset-bs-3 z-20 flex items-start justify-between gap-2"
+        class="relative animate-pulse bg-muted min-block-0 motion-reduce:animate-none"
       >
-        <div class="pointer-events-auto" bind:clientHeight={controlsHeight}>
-          {@render controls()}
+        <Skeleton
+          class="absolute inset-s-3 inset-bs-3 rounded-sm bg-card block-9 inline-40"
+        />
+        <div
+          class="absolute inset-x-0 inset-be-0 grid gap-3 rounded-t-lg bg-card px-4 pbs-3 pbe-6 shadow-menu ring-1 ring-border md:hidden"
+        >
+          <Skeleton class="mx-auto rounded-full block-1 inline-9" />
+          <Skeleton class="rounded-sm block-9" />
+          <Skeleton class="rounded-xs block-5 inline-2/3" />
+          <Skeleton class="rounded-xs block-4 inline-5/6" />
         </div>
-        {#if !wide.current}
+      </div>
+      <div class="grid content-start gap-4 border-s bg-card p-4 max-md:hidden">
+        <Skeleton class="rounded-sm block-9" />
+        <Skeleton class="rounded-xs block-5 inline-2/3" />
+        <Skeleton class="rounded-xs block-4 inline-5/6" />
+        <div class="grid gap-3 pbs-2">
+          {#each [0, 1, 2] as row (row)}
+            <div class="grid grid-cols-[1fr_auto] items-center gap-3">
+              <Skeleton class="rounded-xs block-4" />
+              <Skeleton class="rounded-xs block-4 inline-12" />
+            </div>
+            <Skeleton class="rounded-xs block-2" />
+          {/each}
+        </div>
+        <Skeleton class="rounded-sm block-32" />
+      </div>
+    </div>
+  {:else}
+    <div
+      class={cn("grid min-block-0", {
+        "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
+      })}
+    >
+      <main class="relative min-block-0" bind:clientHeight={room}>
+        {#if mapGeography == null}
           <div
-            class="pointer-events-auto grid shrink-0 overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
+            class="grid place-items-center p-6 text-center text-sm text-muted-foreground block-full"
           >
-            <button
-              type="button"
-              class="grid place-items-center block-9 inline-9 hover:bg-secondary"
-              aria-label={m.map_reset()}
-              title={m.map_reset()}
-              onclick={() => canvas?.reset()}
-              ><ScanIcon class="block-4 inline-4" /></button
+            {m.night_nation_map_missing()}
+          </div>
+        {:else}
+          <Canvas
+            bind:this={canvas}
+            geography={mapGeography}
+            {fills}
+            {dots}
+            {labels}
+            {selected}
+            bind:hovered
+            {pulses}
+            inset={{
+              top: controlsHeight + 12,
+              bottom: wide.current
+                ? isNationFramed
+                  ? 0
+                  : legendHeight + 12
+                : sheet,
+              end: wide.current ? 48 : 0,
+            }}
+            label={isNation
+              ? m.night_nation_map({ view: OFFICE_NAMES[office]() })
+              : (current?.race.title ?? m.night_nation_house())}
+            onPick={pickArea}
+            around={nearby}
+            {isAlone}
+            {aim}
+            {seat}
+            {hold}
+            {tip}
+          />
+        {/if}
+
+        <div
+          class="pointer-events-none absolute inset-x-3 inset-bs-3 z-20 flex items-start justify-between gap-2"
+        >
+          <div class="pointer-events-auto" bind:clientHeight={controlsHeight}>
+            {@render mapNav()}
+          </div>
+          {#if !wide.current}
+            <div
+              class="pointer-events-auto grid shrink-0 overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
             >
+              <button
+                type="button"
+                class="grid place-items-center block-9 inline-9 hover:bg-secondary"
+                aria-label={m.map_reset()}
+                title={m.map_reset()}
+                onclick={() => canvas?.reset()}
+                ><ScanIcon class="block-4 inline-4" /></button
+              >
+              <button
+                type="button"
+                class={cn(
+                  "grid place-items-center border-bs block-9 inline-9",
+                  {
+                    "bg-foreground text-card": prefs.isBasemap,
+                    "hover:bg-secondary": !prefs.isBasemap,
+                  },
+                )}
+                aria-label={m.map_basemap()}
+                title={m.map_basemap()}
+                aria-pressed={prefs.isBasemap}
+                onclick={() => (prefs.isBasemap = !prefs.isBasemap)}
+                ><MapIcon class="block-4 inline-4" /></button
+              >
+            </div>
+          {/if}
+        </div>
+
+        {#if loading != null || fresh.length > 0}
+          <div
+            class="pointer-events-none absolute inset-x-0 z-20 flex justify-center px-3"
+            style:inset-block-start="{controlsHeight + 24}px"
+            aria-live="polite"
+          >
+            <p
+              class="flex items-center gap-2 rounded-full bg-foreground px-3.5 text-[0.8125rem] font-semibold text-background shadow-menu block-8"
+            >
+              {#if loading != null}
+                <LoaderCircleIcon
+                  class="animate-spin block-3.5 inline-3.5 motion-reduce:animate-none"
+                  aria-hidden="true"
+                />
+                {loading}
+              {:else}
+                <span
+                  class="rounded-full bg-destructive block-2 inline-2"
+                  aria-hidden="true"
+                ></span>
+                {m.livemap_new_votes({ places: fresh.join(", ") })}
+              {/if}
+            </p>
+          </div>
+        {/if}
+
+        {#if wide.current}
+          <div
+            class="pointer-events-none absolute inset-s-3 inset-be-3 z-20 grid justify-items-start gap-2"
+          >
+            {@render insetBoxes()}
+            <div
+              class="pointer-events-auto grid gap-3 rounded-sm bg-card/95 p-3 shadow-menu ring-1 ring-border backdrop-blur-sm inline-[min(24rem,calc(100vw-min(25rem,36vw)-6rem))]"
+              bind:clientHeight={legendHeight}
+            >
+              {@render modes("sm")}
+              {@render legend()}
+            </div>
+          </div>
+          <div class="pointer-events-none absolute inset-e-15 inset-be-3 z-20">
+            {@render territoryChips()}
+          </div>
+          <div class="absolute inset-e-3 inset-be-3 z-20 grid gap-1.5">
+            <div
+              class="grid overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
+            >
+              <button
+                type="button"
+                class="grid place-items-center block-9 inline-9 hover:bg-secondary"
+                aria-label={m.map_zoom_in()}
+                title={m.map_zoom_in()}
+                onclick={() => canvas?.zoomIn()}
+                ><PlusIcon class="block-4 inline-4" /></button
+              >
+              <button
+                type="button"
+                class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
+                aria-label={m.map_zoom_out()}
+                title={m.map_zoom_out()}
+                onclick={() => canvas?.zoomOut()}
+                ><MinusIcon class="block-4 inline-4" /></button
+              >
+              <button
+                type="button"
+                class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
+                aria-label={m.map_reset()}
+                title={m.map_reset()}
+                onclick={() => canvas?.reset()}
+                ><ScanIcon class="block-4 inline-4" /></button
+              >
+            </div>
             <button
               type="button"
-              class={cn("grid place-items-center border-bs block-9 inline-9", {
-                "bg-foreground text-card": prefs.isBasemap,
-                "hover:bg-secondary": !prefs.isBasemap,
-              })}
+              class={cn(
+                "grid place-items-center rounded-sm shadow-menu ring-1 ring-border block-9 inline-9",
+                {
+                  "bg-foreground text-card": prefs.isBasemap,
+                  "bg-card/95 hover:bg-secondary": !prefs.isBasemap,
+                },
+              )}
               aria-label={m.map_basemap()}
               title={m.map_basemap()}
               aria-pressed={prefs.isBasemap}
@@ -1400,116 +2105,55 @@
               ><MapIcon class="block-4 inline-4" /></button
             >
           </div>
-        {/if}
-      </div>
-
-      {#if loading != null || fresh.length > 0}
-        <div
-          class="pointer-events-none absolute inset-x-0 z-20 flex justify-center px-3"
-          style:inset-block-start="{controlsHeight + 24}px"
-          aria-live="polite"
-        >
-          <p
-            class="flex items-center gap-2 rounded-full bg-foreground px-3.5 text-[0.8125rem] font-semibold text-background shadow-menu block-8"
+        {:else}
+          <div
+            class="pointer-events-none absolute inset-s-3 z-20 grid justify-items-start gap-1.5"
+            style:inset-block-end="{sheet + 12}px"
           >
-            {#if loading != null}
-              <LoaderCircleIcon
-                class="animate-spin block-3.5 inline-3.5 motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-              {m.map_opening({ place: loading })}
-            {:else}
-              <span
-                class="rounded-full bg-destructive block-2 inline-2"
-                aria-hidden="true"
-              ></span>
-              {m.livemap_new_votes({ places: fresh.join(", ") })}
-            {/if}
-          </p>
-        </div>
-      {/if}
+            {@render territoryChips()}
+            {@render insetBoxes()}
+          </div>
+          <Drawer
+            {room}
+            bind:detent
+            bind:height={sheet}
+            label={m.atlas_results()}
+          >
+            {#snippet head()}
+              <div
+                class="grid grid-cols-[minmax(0,1fr)] gap-3 px-4 pbs-1 pbe-3"
+              >
+                {#if isNation}
+                  {@render raceTabs()}
+                {/if}
+                <div class="grid gap-1">
+                  {@render summaryHead()}
+                </div>
+              </div>
+            {/snippet}
+            <div class="grid grid-cols-[minmax(0,1fr)] gap-5 px-4 pbe-8">
+              {#if !isNation}
+                {@render raceTabs()}
+              {/if}
+              {@render panel()}
+              {@render modes("sm")}
+              {@render legend()}
+              {@render footer()}
+            </div>
+          </Drawer>
+        {/if}
+      </main>
 
       {#if wide.current}
-        <div
-          class="absolute inset-s-3 inset-be-3 z-20 grid gap-3 rounded-sm bg-card/95 p-3 shadow-menu ring-1 ring-border backdrop-blur-sm inline-[min(24rem,calc(100%-5rem))]"
+        <aside
+          class="grid auto-rows-max grid-cols-[minmax(0,1fr)] content-start gap-5 overflow-y-auto overscroll-contain border-s bg-card p-4"
+          aria-label={m.atlas_results()}
         >
-          {@render modes("sm")}
-          {@render legend()}
-        </div>
-        <div class="absolute inset-e-3 inset-be-3 z-20 grid gap-1.5">
-          <div
-            class="grid overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border"
-          >
-            <button
-              type="button"
-              class="grid place-items-center block-9 inline-9 hover:bg-secondary"
-              aria-label={m.map_zoom_in()}
-              title={m.map_zoom_in()}
-              onclick={() => canvas?.zoomIn()}
-              ><PlusIcon class="block-4 inline-4" /></button
-            >
-            <button
-              type="button"
-              class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
-              aria-label={m.map_zoom_out()}
-              title={m.map_zoom_out()}
-              onclick={() => canvas?.zoomOut()}
-              ><MinusIcon class="block-4 inline-4" /></button
-            >
-            <button
-              type="button"
-              class="grid place-items-center border-bs block-9 inline-9 hover:bg-secondary"
-              aria-label={m.map_reset()}
-              title={m.map_reset()}
-              onclick={() => canvas?.reset()}
-              ><ScanIcon class="block-4 inline-4" /></button
-            >
-          </div>
-          <button
-            type="button"
-            class={cn(
-              "grid place-items-center rounded-sm shadow-menu ring-1 ring-border block-9 inline-9",
-              {
-                "bg-foreground text-card": prefs.isBasemap,
-                "bg-card/95 hover:bg-secondary": !prefs.isBasemap,
-              },
-            )}
-            aria-label={m.map_basemap()}
-            title={m.map_basemap()}
-            aria-pressed={prefs.isBasemap}
-            onclick={() => (prefs.isBasemap = !prefs.isBasemap)}
-            ><MapIcon class="block-4 inline-4" /></button
-          >
-        </div>
-      {:else}
-        <Drawer
-          {room}
-          bind:detent
-          bind:height={sheet}
-          label={m.atlas_results()}
-        >
-          {#snippet head()}
-            <div class="grid gap-1 px-4 pbs-1 pbe-3">
-              {@render summaryHead()}
-            </div>
-          {/snippet}
-          <div class="grid gap-5 px-4 pbe-8">
-            {@render panel()}
-            {@render legend()}
-            {@render footer()}
-          </div>
-        </Drawer>
+          {@render raceTabs()}
+          {@render panel()}
+          {@render footer()}
+        </aside>
       {/if}
-    </main>
-
-    {#if wide.current}
-      <aside
-        class="grid content-start gap-5 overflow-y-auto overscroll-contain border-s bg-card p-4"
-        aria-label={m.atlas_results()}
-      >
-        {@render panel()}
-        {@render footer()}
-      </aside>
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>

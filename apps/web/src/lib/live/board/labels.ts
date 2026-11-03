@@ -36,7 +36,7 @@ export function strength(summary: Summary | undefined) {
     summary.winner == null
       ? Math.round(28 + 62 * Math.min(summary.margin / 0.3, 1))
       : 100;
-  return `color-mix(in oklab, ${tone(option)} ${share}%, var(--background))`;
+  return `color-mix(in oklab, ${tone(option)} ${share}%, var(--map-low))`;
 }
 
 export function districtKey(race: LiveRace) {

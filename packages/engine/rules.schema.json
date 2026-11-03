@@ -1431,6 +1431,32 @@
             "share"
           ]
         },
+        "minimum": {
+          "type": "object",
+          "properties": {
+            "share": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "strict": {
+              "type": "boolean",
+              "default": false
+            },
+            "of": {
+              "enum": [
+                "ballots",
+                "governor",
+                "previous_general"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "share",
+            "of"
+          ]
+        },
         "doubleMajority": {
           "type": "object",
           "properties": {

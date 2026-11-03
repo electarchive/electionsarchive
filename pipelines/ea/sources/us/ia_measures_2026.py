@@ -10,7 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import civmint, govmint
+from ea.sources.us import civmint, govmint, measure_rules
 from ea.store import DATA, connect
 
 SOURCE = "us.ia_measures_2026"
@@ -784,7 +784,7 @@ def emit() -> Path:
         )
         civil = civmint.Civil(conn, cs, "19", "IA")
         found = civil.found
-        system = cs.key("us.electoral_system", "referendum")
+        systems = measure_rules.systems(cs, {"referendum", "referendum-ia-60"})
         source_ids: dict[str, UUID] = {}
         added: set[UUID] = set()
         for key, (url, publisher, _) in SOURCES.items():
@@ -866,7 +866,9 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=area,
-                electoral_system_id=system,
+                electoral_system_id=systems[
+                    "referendum-ia-60" if "general obligation bonds" in (row["wording"] or "").lower() else "referendum"
+                ],
                 round_number=1,
                 default_result_kind="counted",
             )

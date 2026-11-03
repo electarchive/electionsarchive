@@ -190,7 +190,12 @@ export function seat(
   return {
     summary,
     held,
-    holder: holder?.name ?? "",
+    holder:
+      holder == null
+        ? ""
+        : holder.isVacant
+          ? m.night_holder_vacant({ name: holder.name })
+          : holder.name,
     side,
     left: pLeft,
     right: pRight,
@@ -198,7 +203,7 @@ export function seat(
     lean,
     band,
     rating,
-    isFlip: held != null && side != null && side !== held && total > 0,
+    isFlip: called != null && held != null && side != null && side !== held,
     isUpset: trailing,
     remaining:
       isEstimating && summary.race.certified == null

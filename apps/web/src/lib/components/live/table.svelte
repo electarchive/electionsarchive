@@ -18,6 +18,7 @@
     options,
     now,
     estimate,
+    answers = null,
     href,
     selected = $bindable(null),
     hovered = $bindable(null),
@@ -25,6 +26,7 @@
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
+    answers?: Array<number> | null;
     href?: (unitId: string) => string | null;
     selected?: string | null;
     hovered?: string | null;
@@ -33,6 +35,7 @@
   type Key =
     | "name"
     | "margin"
+    | "shares"
     | "base"
     | "shift"
     | "left"
@@ -49,6 +52,7 @@
 
   const a = $derived(now.pair[0]);
   const b = $derived(now.pair[1]);
+  const isPlural = $derived(answers != null);
   const isLive = $derived(estimate?.status === "estimating" && !now.isFinal);
   const key = $derived<Key>(chosen ?? (isLive ? "left" : "votes"));
 
@@ -74,7 +78,17 @@
         return entry.row.unit.name;
       }
       case "margin": {
-        return entry.row.signed ?? -Infinity;
+        return isPlural
+          ? entry.row.total > 0
+            ? entry.row.margin
+            : -Infinity
+          : (entry.row.signed ?? -Infinity);
+      }
+      case "shares": {
+        const first = answers?.[0] ?? 0;
+        return entry.row.total > 0
+          ? (entry.row.votes[first] ?? 0) / entry.row.total
+          : -Infinity;
       }
       case "base": {
         return entry.row.baseSigned ?? -Infinity;
@@ -129,11 +143,29 @@
       id: "counted",
       label: m.night_table_group_counted,
       columns: [
-        {
-          id: "margin",
-          label: m.night_table_margin,
-          aria: m.night_table_margin,
-        },
+        ...(isPlural
+          ? [
+              {
+                id: "margin" as const,
+                label: m.night_table_leading,
+                aria: m.night_table_leading,
+              },
+              {
+                id: "shares" as const,
+                label: m.night_table_shares,
+                aria: () =>
+                  m.night_table_shares_sort({
+                    name: options[answers?.[0] ?? 0]?.label ?? "",
+                  }),
+              },
+            ]
+          : [
+              {
+                id: "margin" as const,
+                label: m.night_table_margin,
+                aria: m.night_table_margin,
+              },
+            ]),
         {
           id: "counted",
           label: m.night_table_counted,
@@ -162,20 +194,34 @@
           },
         ]
       : []),
-    {
-      id: "base",
-      label: m.night_table_group_base,
-      columns: [
-        { id: "base", label: m.night_table_margin, aria: m.night_table_base },
-        { id: "shift", label: m.night_table_shift, aria: m.night_table_shift },
-      ],
-    },
+    ...(isPlural
+      ? []
+      : [
+          {
+            id: "base",
+            label: m.night_table_group_base,
+            columns: [
+              {
+                id: "base" as const,
+                label: m.night_table_margin,
+                aria: m.night_table_base,
+              },
+              {
+                id: "shift" as const,
+                label: m.night_table_shift,
+                aria: m.night_table_shift,
+              },
+            ],
+          },
+        ]),
   ]);
 
   const place = (name: string) =>
     name.replace(/, [A-Z]{2}$/u, "").replace(/ County$/u, "");
-  const ink = (value: number) =>
-    `color-mix(in oklab, ${tone(options[value >= 0 ? a : b])} 80%, var(--foreground))`;
+  const ink = (value: number) => shade(value >= 0 ? a : b);
+  const label = (index: number) => options[index]?.label ?? "";
+  const shade = (index: number) =>
+    `color-mix(in oklab, ${tone(options[index])} 80%, var(--foreground))`;
 
   function sort(next: Key) {
     if (key === next) {
@@ -230,29 +276,44 @@
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div class="grid gap-1.5">
       <h2 id="table-title" class="heading text-lg!">{m.night_table_title()}</h2>
-      <p
-        class="flex items-center gap-2 text-xs text-muted-foreground"
-        aria-hidden="true"
-      >
-        <span class="flex items-center gap-1.5"
-          ><span
-            class="rounded-full block-2 inline-2"
-            style:background-color={tone(options[a])}
-          ></span>{surname(options[a])}</span
+      {#if answers != null}
+        <ul
+          class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
+          aria-hidden="true"
         >
-        <span
-          class="relative rounded-full block-1.5 inline-10"
-          style:background="linear-gradient(to right, {tone(options[a])} 0 50%, {tone(
-            options[b],
-          )} 50% 100%)"
-        ></span>
-        <span class="flex items-center gap-1.5"
-          >{surname(options[b])}<span
-            class="rounded-full block-2 inline-2"
-            style:background-color={tone(options[b])}
-          ></span></span
+          {#each answers as index (options[index]?.id ?? index)}
+            <li class="flex items-center gap-1.5">
+              <span
+                class="shrink-0 rounded-full block-2 inline-2"
+                style:background-color={tone(options[index])}
+              ></span>{options[index]?.label ?? ""}
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p
+          class="flex items-center gap-2 text-xs text-muted-foreground"
+          aria-hidden="true"
         >
-      </p>
+          <span class="flex items-center gap-1.5"
+            ><span
+              class="rounded-full block-2 inline-2"
+              style:background-color={tone(options[a])}
+            ></span>{surname(options[a])}</span
+          >
+          <span
+            class="relative rounded-full block-1.5 inline-10"
+            style:background="linear-gradient(to right, {tone(options[a])} 0 50%,
+            {tone(options[b])} 50% 100%)"
+          ></span>
+          <span class="flex items-center gap-1.5"
+            >{surname(options[b])}<span
+              class="rounded-full block-2 inline-2"
+              style:background-color={tone(options[b])}
+            ></span></span
+          >
+        </p>
+      {/if}
     </div>
     <label class="relative flex items-center">
       <SearchIcon
@@ -366,13 +427,63 @@
                 {/if}
               </span>
             </th>
-            <td class="py-3 ps-5 pe-3">
-              <span class="flex items-center justify-end gap-3"
-                >{@render bar(row.signed)}<span class="text-end min-inline-12"
-                  >{@render margin(row.signed, false)}</span
-                ></span
-              >
-            </td>
+            {#if answers != null}
+              <td class="py-3 ps-5 pe-3">
+                {#if row.leader == null || row.total === 0}
+                  <span class="block text-end text-muted-foreground/60">–</span>
+                {:else if row.margin < 0.0005}
+                  <span class="block text-end text-muted-foreground"
+                    >{m.night_dial_tie()}</span
+                  >
+                {:else}
+                  {const name = $derived(label(row.leader))}
+                  <span class="flex items-center justify-end gap-2.5">
+                    <span
+                      class="truncate text-xs text-muted-foreground max-inline-44 max-md:hidden"
+                      title={name}>{name}</span
+                    >
+                    <span
+                      class="text-end font-figures font-semibold tabular-nums min-inline-12"
+                      style:color={shade(row.leader)}>+{lead(row.margin)}</span
+                    >
+                  </span>
+                {/if}
+              </td>
+              <td class="p-3">
+                {#if row.total > 0}
+                  <span
+                    class="ms-auto flex overflow-hidden rounded-full bg-muted block-2 inline-36"
+                    role="img"
+                    aria-label={answers
+                      .map(
+                        (index) =>
+                          `${options[index]?.label ?? ""} ${percent((row.votes[index] ?? 0) / row.total)}`,
+                      )
+                      .join(", ")}
+                  >
+                    {#each answers as index (index)}
+                      <span
+                        class="border-e border-background block-full last:border-e-0"
+                        style:inline-size="{((row.votes[index] ?? 0) /
+                          row.total) *
+                          100}%"
+                        style:background-color={tone(options[index])}
+                      ></span>
+                    {/each}
+                  </span>
+                {:else}
+                  <span class="block text-end text-muted-foreground/60">–</span>
+                {/if}
+              </td>
+            {:else}
+              <td class="py-3 ps-5 pe-3">
+                <span class="flex items-center justify-end gap-3"
+                  >{@render bar(row.signed)}<span class="text-end min-inline-12"
+                    >{@render margin(row.signed, false)}</span
+                  ></span
+                >
+              </td>
+            {/if}
             <td class="p-3">
               <span class="flex items-center justify-end gap-2.5">
                 <span
@@ -407,34 +518,36 @@
                 >
               </td>
             {/if}
-            <td class="py-3 ps-5 pe-3 text-end"
-              >{@render margin(row.baseSigned, true)}</td
-            >
-            <td class="py-3 ps-3 pe-2 text-end">
-              {#if entry.shift == null || Math.abs(entry.shift) < 0.0005}
-                <span class="text-muted-foreground/60">–</span>
-              {:else}
-                <span
-                  class="inline-flex items-center gap-1 font-figures tabular-nums"
-                  style:color={ink(entry.shift)}
-                >
-                  {#if entry.shift >= 0}
-                    <ArrowRightIcon
-                      class="block-3.5 inline-3.5"
-                      aria-hidden="true"
-                    />
-                  {:else}
-                    <ArrowLeftIcon
-                      class="block-3.5 inline-3.5"
-                      aria-hidden="true"
-                    />
-                  {/if}
-                  <span class="sr-only"
-                    >{surname(options[entry.shift >= 0 ? a : b])}</span
-                  >{lead(entry.shift)}
-                </span>
-              {/if}
-            </td>
+            {#if answers == null}
+              <td class="py-3 ps-5 pe-3 text-end"
+                >{@render margin(row.baseSigned, true)}</td
+              >
+              <td class="py-3 ps-3 pe-2 text-end">
+                {#if entry.shift == null || Math.abs(entry.shift) < 0.0005}
+                  <span class="text-muted-foreground/60">–</span>
+                {:else}
+                  <span
+                    class="inline-flex items-center gap-1 font-figures tabular-nums"
+                    style:color={ink(entry.shift)}
+                  >
+                    {#if entry.shift >= 0}
+                      <ArrowRightIcon
+                        class="block-3.5 inline-3.5"
+                        aria-hidden="true"
+                      />
+                    {:else}
+                      <ArrowLeftIcon
+                        class="block-3.5 inline-3.5"
+                        aria-hidden="true"
+                      />
+                    {/if}
+                    <span class="sr-only"
+                      >{surname(options[entry.shift >= 0 ? a : b])}</span
+                    >{lead(entry.shift)}
+                  </span>
+                {/if}
+              </td>
+            {/if}
           </tr>
         {/each}
       </tbody>

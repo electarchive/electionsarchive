@@ -1,18 +1,22 @@
 <script lang="ts">
-  import { percent } from "#lib/format.js";
   import { HATCH } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { mix } from "./model.js";
+  import Scale from "./scale.svelte";
 
   const {
     kind,
     sides,
+    bins = null,
     text,
+    blank,
     isLater = false,
   }: {
-    kind: "ramp" | "counted" | "votes";
+    kind: "ramp" | "counted" | "votes" | "waiting";
     sides: Array<{ name: string; color: string }>;
+    bins?: Array<{ from: number; to: number | null; strength: number }> | null;
     text: string;
+    blank: string;
     isLater?: boolean;
   } = $props();
 
@@ -20,7 +24,9 @@
 </script>
 
 <div class="grid gap-2">
-  {#if kind === "ramp" && sides.length > 0}
+  {#if kind === "ramp" && bins != null && sides[0] != null && sides[1] != null}
+    <Scale sides={[sides[0], sides[1]]} {bins} />
+  {:else if kind === "ramp" && sides.length > 0}
     <div class="grid gap-1">
       <div class="flex gap-px overflow-hidden rounded-xs" aria-hidden="true">
         {#each sides as side, index (side.name)}
@@ -44,22 +50,16 @@
       </div>
     </div>
   {:else if kind === "counted"}
-    <div class="grid gap-1">
-      <div class="flex gap-px overflow-hidden rounded-xs" aria-hidden="true">
-        {#each [10, 30, 50, 70, 88] as step (step)}
-          <span
-            class="flex-1 block-2.5"
-            style:background-color={mix("var(--foreground)", step)}
-          ></span>
-        {/each}
-      </div>
-      <div
-        class="flex justify-between font-figures text-[0.6875rem]/4 tabular-nums"
-      >
-        <span>{percent(0, 0)}</span>
-        <span>{percent(1, 0)}</span>
-      </div>
-    </div>
+    <Scale />
+  {:else if kind === "waiting"}
+    <p class="flex items-center gap-2 text-[0.6875rem]/4 font-semibold">
+      <span
+        class="shrink-0 rounded-xs ring-1 ring-border block-3 inline-4"
+        style:background-color={blank}
+        aria-hidden="true"
+      ></span>
+      {m.livemap_legend_waiting()}
+    </p>
   {:else if kind === "votes"}
     <div class="flex items-end gap-2" aria-hidden="true">
       {#each [6, 11, 18] as size (size)}

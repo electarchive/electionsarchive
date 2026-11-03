@@ -7,6 +7,7 @@ import {
   precision,
   sentence,
 } from "#lib/format.js";
+import { shown } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
@@ -85,36 +86,46 @@ function summarize(contest: Page["contest"]) {
           quorum: percent(contest.quorum),
           share: percent(top.current.share),
         })
-      : top?.current?.outcome === "lost" && yes.test(top.label)
-        ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
-        : top?.current?.outcome === "lost"
-          ? m.race_lede_lost({
-              answer: named(top),
-              share: percent(top.current.share),
-            })
-          : top?.current?.outcome === "won" &&
-              next?.current != null &&
-              yes.test(top.label)
-            ? m.race_lede_measure_passed({ share: percent(top.current.share) })
+      : top?.current?.outcome === "lost" &&
+          yes.test(top.label) &&
+          contest.rule?.majority != null &&
+          top.current.share < contest.rule.majority.share
+        ? m.race_lede_measure_short({
+            share: percent(top.current.share),
+            needed: shown(contest.rule.majority.share),
+          })
+        : top?.current?.outcome === "lost" && yes.test(top.label)
+          ? m.race_lede_measure_blocked({ share: percent(top.current.share) })
+          : top?.current?.outcome === "lost"
+            ? m.race_lede_lost({
+                answer: named(top),
+                share: percent(top.current.share),
+              })
             : top?.current?.outcome === "won" &&
                 next?.current != null &&
-                /^(?:no|against|reject|nein|hayır|não)/iu.test(top.label)
-              ? m.race_lede_measure_failed({
+                yes.test(top.label)
+              ? m.race_lede_measure_passed({
                   share: percent(top.current.share),
                 })
-              : top?.current?.outcome === "won" && next?.current != null
-                ? m.race_lede_won({
-                    party: named(top),
-                    share: percent(
-                      top.current.share,
-                      precision(top.current.share - next.current.share),
-                    ),
-                    margin: points(
-                      top.current.share - next.current.share,
-                    ).replace(/^\+/u, ""),
-                    runner: named(next),
+              : top?.current?.outcome === "won" &&
+                  next?.current != null &&
+                  /^(?:no|against|reject|nein|hayır|não)/iu.test(top.label)
+                ? m.race_lede_measure_failed({
+                    share: percent(top.current.share),
                   })
-                : null;
+                : top?.current?.outcome === "won" && next?.current != null
+                  ? m.race_lede_won({
+                      party: named(top),
+                      share: percent(
+                        top.current.share,
+                        precision(top.current.share - next.current.share),
+                      ),
+                      margin: points(
+                        top.current.share - next.current.share,
+                      ).replace(/^\+/u, ""),
+                      runner: named(next),
+                    })
+                  : null;
   }
   const [elector, second] = contest.electors?.rows ?? [];
   if (elector != null) {

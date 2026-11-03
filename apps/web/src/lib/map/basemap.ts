@@ -17,7 +17,7 @@ const REGULAR = ["Sofia Sans Semi Condensed Regular"];
 const STRONG = ["Sofia Sans Semi Condensed SemiBold"];
 const HALO = "color-mix(in oklab, var(--card) 88%, transparent)";
 const VEIL = 0.6;
-const drawn = new WeakMap<Engine, string>();
+const drawn = new WeakMap<Engine, { key: string; base: string }>();
 
 export function basemap(
   engine: Engine,
@@ -25,16 +25,20 @@ export function basemap(
   isDetailed: boolean,
   outline: Array<Array<[number, number]>> | null,
   isBoxed = false,
+  isAlone = false,
 ) {
-  const key = JSON.stringify([scheme, isDetailed, outline, isBoxed]);
-  if (
-    drawn.get(engine) === key &&
-    engine.gl?.getLayer("basemap:earth") != null
-  ) {
+  const key = JSON.stringify([scheme, isDetailed, outline, isBoxed, isAlone]);
+  const base = JSON.stringify([scheme, isDetailed]);
+  const was = drawn.get(engine);
+  const isDrawn = engine.gl?.getLayer("basemap:earth") != null;
+  if (was?.key === key && isDrawn) {
     return;
   }
-  drawn.set(engine, key);
-  engine.drop("basemap");
+  drawn.set(engine, { key, base });
+  const isKept = was?.base === base && isDrawn && outline != null;
+  if (!isKept) {
+    engine.drop("basemap");
+  }
   if (outline == null || !SCHEMES.has(scheme)) {
     return;
   }
@@ -50,9 +54,17 @@ export function basemap(
       coordinates: outline.map((ring) => [ring.toReversed()]),
     },
   ];
-  const outside: Maplibre.ExpressionSpecification = isFocused
-    ? ["!", within]
-    : ["has", "out"];
+  const outside: Maplibre.ExpressionSpecification = isAlone
+    ? ["==", 1, 0]
+    : isFocused
+      ? ["!", within]
+      : ["has", "out"];
+  const scope: Maplibre.ExpressionSpecification | null = isBoxed
+    ? ["!", ["has", "inset"]]
+    : isAlone
+      ? ["has", "inset"]
+      : null;
+  const veiled = isFocused ? (isAlone ? 1 : VEIL) : 0;
   const inside: Maplibre.ExpressionSpecification = isFocused
     ? within
     : ["!", ["has", "out"]];
@@ -64,16 +76,26 @@ export function basemap(
       : never,
     id: string,
     slot: "ground" | "etch" | "labels",
-  ) =>
+  ) => {
+    const own: Maplibre.FilterSpecification | null =
+      "filter" in spec ? (spec.filter ?? null) : null;
+    const filter: Maplibre.FilterSpecification | null =
+      scope == null
+        ? own
+        : own == null
+          ? scope
+          : (["all", scope, own] as Maplibre.FilterSpecification);
+    if (isKept) {
+      engine.filter(`basemap:${id}`, filter);
+      for (const [name, value] of Object.entries(spec.paint ?? {})) {
+        engine.style(`basemap:${id}`, name, value);
+      }
+      return;
+    }
     engine.add(
       {
         ...spec,
-        ...(isBoxed && {
-          filter:
-            "filter" in spec && spec.filter != null
-              ? ["all", ["!", ["has", "inset"]], spec.filter]
-              : ["!", ["has", "inset"]],
-        }),
+        ...(filter != null && { filter }),
         id: `basemap:${id}`,
         source:
           "source-layer" in spec &&
@@ -85,6 +107,7 @@ export function basemap(
       slot,
       { group: "basemap" },
     );
+  };
   add(
     {
       type: "fill",
@@ -180,15 +203,18 @@ export function basemap(
       "etch",
     );
   }
-  if (isFocused) {
+  const veil = engine.veil("basemap:mask", outline, "basemap");
+  if (isKept) {
+    engine.style("basemap:mask", "fill-opacity", veiled);
+  } else {
     engine.add(
       {
         id: "basemap:mask",
         type: "fill",
-        source: engine.veil("basemap:mask", outline, "basemap"),
+        source: veil,
         paint: {
           "fill-color": "var(--card)",
-          "fill-opacity": VEIL,
+          "fill-opacity": veiled,
           "fill-antialias": false,
         },
       },

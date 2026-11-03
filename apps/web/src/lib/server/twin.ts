@@ -44,6 +44,7 @@ import methodology from "#lib/live/methodology.json";
 import { sum } from "#lib/live/standing.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
+import { terms } from "#lib/measure.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -4555,9 +4556,11 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     }
     return [
       link(race.title, `live/${race.slug}`),
-      race.winner == null
-        ? (race.leader ?? (race.note == null ? "" : m.night_later_key()))
-        : `${race.winner} (${m.live_elected()})`,
+      race.winner != null
+        ? `${race.winner} (${m.live_elected()})`
+        : race.projected != null
+          ? `${race.projected.name} (${m.night_band_projected()})`
+          : (race.leader ?? (race.note == null ? "" : m.night_later_key())),
       total === 0 ? "" : count(total),
       total === 0 ? "" : points(race.margin, 1).replace(/^[+−]/u, ""),
       ...(data.forecasts
@@ -4578,6 +4581,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     const { estimate } = race;
     return [
       `### ${link(race.title, `live/${race.slug}`)}`,
+      ...(isRace || race.headline == null ? [] : [`**${race.headline}.**`]),
       total === 0
         ? (race.note ??
           (data.at == null ? m.live_waiting() : m.live_no_update()))
@@ -4585,7 +4589,11 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],
               rows.map((row) => [
-                row.isWinner ? `${row.label} (${m.live_elected()})` : row.label,
+                row.isWinner
+                  ? `${row.label} (${m.live_elected()})`
+                  : row.isProjected
+                    ? `${row.label} (${m.night_band_projected()})`
+                    : row.label,
                 row.party,
                 count(row.votes),
                 percent(row.votes / total),
@@ -4653,6 +4661,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       link,
       election.date,
     ),
+    ...(isRace && data.races[0]?.headline != null
+      ? [`**${data.races[0].headline}.**`]
+      : []),
     m.live_twin_note(),
     ...(data.forecasts ? [] : [m.live_twin_forecast_off()]),
     `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: stamp(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: stamp(election.newest) })}**`,
@@ -4987,6 +4998,7 @@ function contestMarkdown(
         ? `[${m.wording_link()}](${row.url ?? ""})`
         : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
     }),
+    contest.rule == null ? "" : `${terms(contest.rule).join(". ")}.`,
     [
       verdict(contest),
       comeback(contest, rounds),

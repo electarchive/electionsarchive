@@ -5,8 +5,10 @@
   import XIcon from "@lucide/svelte/icons/x";
   import type { UnitStanding } from "#lib/live/standing.js";
   import Face from "#lib/components/live/face.svelte";
+  import Also from "#lib/components/live/state/also.svelte";
   import { count, percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
+  import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { remainder } from "#lib/live/standing.js";
   import { shade, summarize, verdict } from "#lib/live/summary.js";
@@ -87,25 +89,23 @@
       ? null
       : remainder(row, estimate, options, pair),
   );
+  const reach = useReach();
+  const split = $derived(
+    row == null || race == null
+      ? null
+      : lineup(race, row.votes, reach(), Math.max(5, (race.seats ?? 1) + 1)),
+  );
   const rows = $derived(
-    row == null
-      ? []
-      : options
-          .map((option, index) => ({
-            option,
-            index,
-            votes: row.votes[index] ?? 0,
-            share: row.total > 0 ? (row.votes[index] ?? 0) / row.total : 0,
-            before: row.baseline?.shares[index] ?? null,
-          }))
-          .filter((entry) => !entry.option.isWriteIn || entry.votes > 0)
-          .toSorted(
-            (a, b) =>
-              b.votes - a.votes ||
-              (b.before ?? 0) - (a.before ?? 0) ||
-              a.index - b.index,
-          )
-          .slice(0, 5),
+    split?.main.map((line) => {
+      const index = options.indexOf(line.option);
+      return {
+        option: line.option,
+        index,
+        votes: line.votes,
+        share: line.share ?? 0,
+        before: row?.baseline?.shares[index] ?? null,
+      };
+    }) ?? [],
   );
   const scale = $derived(
     Math.max(
@@ -229,6 +229,7 @@
         </li>
       {/each}
     </ul>
+    <Also rest={split?.rest ?? []} total={row.total} />
 
     <div class="grid gap-1.5">
       <div

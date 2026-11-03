@@ -1,9 +1,11 @@
 import type {
+  LiveBaseline,
   LiveElection,
   LiveFrame,
   LiveOffice,
   LiveOption,
   LiveRace,
+  LiveUnit,
   LiveUnitCount,
 } from "@ea/analytics/live";
 import type { SQL } from "drizzle-orm";
@@ -15,15 +17,19 @@ import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
+import { rule } from "#lib/measure.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
-import { UNAFFILIATED } from "#lib/party.js";
+import { side, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
-import { portraits } from "#lib/server/live-board.js";
+import {
+  framing,
+  portraits,
+  geography as shaped,
+} from "#lib/server/live-board.js";
 import { localizeNames } from "#lib/server/names.js";
-import { plane } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
@@ -354,6 +360,7 @@ async function jurisdictions(contests: Array<string>) {
     kind: string;
     scheme: string | null;
     seats: number | null;
+    rules: unknown;
   }>(sql`
     select c.id as contest,
       case when p.kind = 'sovereign_state' then coalesce(st.entity_id, p.id) else p.id end as polity,
@@ -363,8 +370,10 @@ async function jurisdictions(contests: Array<string>) {
         else p.kind::text
       end as kind,
       a.scheme_code as scheme,
-      case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats
+      case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats,
+      case when c.kind = 'ballot_question' then es.rules || coalesce(c.rules_override, '{}') end as rules
     from contest c join election e on e.id = c.election_id
+    left join electoral_system es on es.id = c.electoral_system_id
     left join body b on b.id = c.body_id
     left join office o on o.id = c.office_id
     join polity p on p.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
@@ -460,7 +469,7 @@ const STATEWIDE = [
   "secretary-of-state",
 ];
 
-type Shown = { results: boolean; forecasts: boolean; classic: boolean };
+type Shown = { results: boolean; forecasts: boolean };
 
 const done = new Map<
   string,
@@ -478,11 +487,10 @@ const pending = new Map<
 async function stored() {
   const result = await db.execute<Shown>(sql`
     select coalesce(bool_or(shown) filter (where name = 'results'), false) as results,
-      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts,
-      coalesce(bool_or(shown) filter (where name = 'classic'), false) as classic
+      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts
     from live.switch
   `);
-  return result.rows[0] ?? { results: false, forecasts: false, classic: false };
+  return result.rows[0] ?? { results: false, forecasts: false };
 }
 
 async function switches() {
@@ -903,6 +911,7 @@ async function night(
   detail: "race" | "state" | "national",
   shown: Shown,
   called: Awaited<ReturnType<typeof calls>>,
+  slot = "",
 ) {
   const contests = picked.map((row) => row.id);
   const [
@@ -935,7 +944,7 @@ async function night(
       order by f.as_of
     `),
     remember(
-      `live:fixed:v2:${found.path}|${found.rest}|${detail}`,
+      `live:fixed:v2:${found.path}|${found.rest}|${detail}${slot}`,
       async () => {
         const [choices, incumbents, settled, prior, drawn, placed] =
           await Promise.all([
@@ -1055,6 +1064,13 @@ async function night(
       },
     ]),
   );
+  const fold = (unit: string) => {
+    const known = unitOf.get(unit);
+    const parent = known?.parentId == null ? null : unitOf.get(known.parentId);
+    return parent?.areaId != null && parent.areaId === known?.areaId
+      ? parent.id
+      : unit;
+  };
   const traitsOf = new Map(
     held.rows.flatMap((row) => {
       const traits = row.scheme === "us.county" ? TRAITS[row.code] : undefined;
@@ -1076,8 +1092,9 @@ async function night(
     const counts: Array<LiveUnitCount> = [];
     const last = new Map<string, string>();
     const seen = new Set<string>(
-      (drawnBy.get(row.id) ?? []).map((line) => line.unit),
+      (drawnBy.get(row.id) ?? []).map((line) => fold(line.unit)),
     );
+    const current = new Map<string, Array<number>>();
     for (const frame of mine) {
       const totals = own.map(() => 0);
       const byUnit = new Map<string, Array<number>>();
@@ -1097,8 +1114,21 @@ async function night(
         reporting: frame.reporting,
         expected: frame.expected,
       });
+      const touched = new Set<string>();
       for (const [unit, votes] of byUnit) {
+        current.set(unit, votes);
+        touched.add(fold(unit));
+      }
+      for (const unit of touched) {
         seen.add(unit);
+        const votes = own.map(() => 0);
+        for (const [member, part] of current) {
+          if (fold(member) === unit) {
+            for (const [position, value] of part.entries()) {
+              votes[position] = (votes[position] ?? 0) + value;
+            }
+          }
+        }
         const key = votes.join(",");
         if (last.get(unit) !== key) {
           last.set(unit, key);
@@ -1112,7 +1142,10 @@ async function night(
         }
       }
     }
-    const lines = priorBy.get(row.id) ?? [];
+    const lines = (priorBy.get(row.id) ?? []).map((line) => ({
+      ...line,
+      unit: fold(line.unit),
+    }));
     const seats = lines.filter((line) => line.kind === "seat");
     const reach = new Set(
       seats.length > 0
@@ -1249,15 +1282,22 @@ async function night(
       }
     }
     const tally = raceFrames.at(-1)?.totals ?? certifiedTotals;
-    const loose = own.some(
-      (choice) => choice.kind === "answer" || choice.key.startsWith("party:"),
-    )
+    const loose = own.some((choice) => choice.key.startsWith("party:"))
       ? []
-      : own.filter((choice) => choice.kind !== "write_in");
+      : own.filter(
+          (choice) =>
+            choice.kind !== "write_in" &&
+            (choice.kind !== "answer" ||
+              side(`answer:${choice.name.toLowerCase()}`) == null),
+        );
     const top = Math.max(0, ...tally);
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
     const isLocal = !house && !TOP.test(seat);
+    const carried = new Set([
+      ...counts.map((entry) => entry.unitId),
+      ...baseline.map((entry) => entry.unitId),
+    ]);
     const reported = new Set(
       counts.flatMap((entry) => {
         const scheme = unitOf.get(entry.unitId)?.scheme;
@@ -1287,6 +1327,7 @@ async function night(
           ? null
           : { name: titles.full.get(where.polity) ?? "", kind },
       seats: where?.seats ?? 1,
+      rule: rule(where?.rules),
       isMeasure:
         own.some((choice) => choice.kind === "answer") &&
         own.every(
@@ -1307,6 +1348,7 @@ async function night(
             ...(place !== -1 && {
               color: UNAFFILIATED[place % UNAFFILIATED.length],
             }),
+            ...(choice.kind === "answer" && { isAnswer: true }),
             isWriteIn: choice.kind === "write_in",
             isIncumbent: sitting.has(choice.id),
           };
@@ -1342,7 +1384,10 @@ async function night(
       units: [...seen].flatMap((unit) => {
         const known = unitOf.get(unit);
         return known == null ||
-          (isLocal && reported.size > 0 && !reported.has(known.scheme))
+          (isLocal && reported.size > 0 && !reported.has(known.scheme)) ||
+          (known.parentId != null &&
+            carried.has(known.parentId) &&
+            !carried.has(unit))
           ? []
           : [known];
       }),
@@ -1367,13 +1412,27 @@ async function night(
           })()
         : null,
       source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
-      isClassic: shown.classic,
       feed:
         mine.length > 0 || final.length > 0
           ? "live"
           : (lapsed.get(parts[1] ?? "") ?? "live"),
     };
   });
+  for (const race of built) {
+    const of = race.rule?.minimum?.of;
+    if (race.rule != null && (of === "ballots" || of === "governor")) {
+      const governor = built.find(
+        (other) => other.state === race.state && other.office === "governor",
+      );
+      const totals =
+        governor?.certified?.totals ?? governor?.frames.at(-1)?.totals;
+      let votes = 0;
+      for (const value of totals ?? []) {
+        votes += value;
+      }
+      race.rule.base = totals == null ? null : votes;
+    }
+  }
   const states = [...new Set(built.map((race) => race.state))].toSorted(
     (a, b) => a.localeCompare(b),
   );
@@ -1420,6 +1479,254 @@ async function night(
         const value = estimate({ race, at: null });
         return [race.id, kept ? value : { ...value, units: [] }];
       }),
+    ),
+  };
+}
+
+const SPREAD = {
+  senate: /^senate(?:-special)?$/u,
+  governor: /^governor$/u,
+  house: /^house-(?:\d+|at-large)$/u,
+};
+
+const spread = new Map<
+  string,
+  { key: string; value: Promise<Awaited<ReturnType<typeof spreadOut>>> }
+>();
+
+function countyRace(race: LiveRace): LiveRace {
+  const units = race.units.flatMap((unit): Array<LiveUnit> =>
+    unit.scheme === "us.county" && unit.areaId != null
+      ? [{ ...unit, parentId: null }]
+      : [],
+  );
+  const ids = new Set(units.map((unit) => unit.id));
+  const latest = new Map<string, LiveUnitCount>();
+  for (const row of race.counts) {
+    const held = latest.get(row.unitId);
+    if (ids.has(row.unitId) && (held == null || held.at <= row.at)) {
+      latest.set(row.unitId, row);
+    }
+  }
+  const last = race.frames.at(-1);
+  return {
+    ...race,
+    units,
+    counts: [...latest.values()],
+    frames: last == null ? [] : [last],
+    baseline: race.baseline.flatMap((row): Array<LiveBaseline> =>
+      ids.has(row.unitId)
+        ? [
+            {
+              unitId: row.unitId,
+              label: row.label,
+              turnout: row.turnout,
+              shares: row.shares,
+            },
+          ]
+        : [],
+    ),
+  };
+}
+
+function houseRace(races: Array<LiveRace>): LiveRace | null {
+  const first = races[0];
+  if (first == null) {
+    return null;
+  }
+  const index = new Map<string, number>();
+  const options: Array<LiveOption> = [];
+  const slots = races.map((race) =>
+    race.options.map((option) => {
+      const key = option.party?.id ?? option.id;
+      const at = index.get(key) ?? options.length;
+      if (at === options.length) {
+        index.set(key, at);
+        options.push(
+          option.party == null
+            ? option
+            : {
+                ...option,
+                id: key,
+                label: option.party.name,
+                person: null,
+                photo: null,
+                isIncumbent: false,
+              },
+        );
+      }
+      return at;
+    }),
+  );
+  const units = new Map<string, LiveUnit>();
+  const counts = new Map<string, LiveUnitCount>();
+  const weights = new Map<
+    string,
+    { label: string; turnout: number; votes: Array<number> }
+  >();
+  const totals = options.map(() => 0);
+  let at = "";
+  for (const [position, race] of races.entries()) {
+    const slot = slots[position] ?? [];
+    const own = countyRace(race);
+    const areaOf = new Map(
+      own.units.map((unit) => [unit.id, unit.areaId ?? ""]),
+    );
+    for (const unit of own.units) {
+      const areaId = unit.areaId ?? "";
+      if (!units.has(areaId)) {
+        units.set(areaId, { ...unit, id: areaId });
+      }
+    }
+    for (const row of own.counts) {
+      const areaId = areaOf.get(row.unitId) ?? "";
+      const held = counts.get(areaId) ?? {
+        unitId: areaId,
+        at: row.at,
+        votes: options.map(() => 0),
+        reporting: null,
+        expected: null,
+      };
+      for (const [option, value] of row.votes.entries()) {
+        const to = slot[option] ?? 0;
+        held.votes[to] = (held.votes[to] ?? 0) + value;
+      }
+      if (row.at > held.at) {
+        held.at = row.at;
+      }
+      counts.set(areaId, held);
+    }
+    for (const row of own.baseline) {
+      const areaId = areaOf.get(row.unitId) ?? "";
+      const held = weights.get(areaId) ?? {
+        label: row.label,
+        turnout: 0,
+        votes: options.map(() => 0),
+      };
+      held.turnout += row.turnout;
+      for (const [option, share] of row.shares.entries()) {
+        const to = slot[option] ?? 0;
+        held.votes[to] = (held.votes[to] ?? 0) + share * row.turnout;
+      }
+      weights.set(areaId, held);
+    }
+    for (const [option, value] of (
+      race.certified?.totals ??
+      race.frames.at(-1)?.totals ??
+      []
+    ).entries()) {
+      const to = slot[option] ?? 0;
+      totals[to] = (totals[to] ?? 0) + value;
+    }
+    const last = race.frames.at(-1)?.at ?? "";
+    if (last > at) {
+      at = last;
+    }
+    for (const row of own.counts) {
+      if (row.at > at) {
+        at = row.at;
+      }
+    }
+  }
+  return {
+    ...first,
+    id: `house:${first.state}`,
+    district: null,
+    options,
+    units: [...units.values()],
+    counts: [...counts.values()],
+    baseline: [...weights].flatMap(([areaId, held]): Array<LiveBaseline> =>
+      held.turnout > 0
+        ? [
+            {
+              unitId: areaId,
+              label: held.label,
+              turnout: held.turnout,
+              shares: held.votes.map((value) => value / held.turnout),
+            },
+          ]
+        : [],
+    ),
+    frames: at === "" ? [] : [{ at, totals, reporting: null, expected: null }],
+    certified: null,
+    projected: null,
+  };
+}
+
+async function spreadOut(
+  found: Awaited<ReturnType<typeof election>>,
+  picked: Awaited<ReturnType<typeof races>>,
+  chosen: keyof typeof SPREAD,
+  shown: Shown,
+  called: Awaited<ReturnType<typeof calls>>,
+) {
+  const result = await night(
+    found,
+    picked,
+    "state",
+    shown,
+    called,
+    `|${chosen}`,
+  );
+  const kept =
+    chosen === "house"
+      ? Map.groupBy(result.election.races, (race) => race.state)
+          .values()
+          .flatMap((group) => {
+            const race = houseRace(group);
+            return race == null ? [] : [race];
+          })
+          .toArray()
+      : result.election.races.map((race) => countyRace(race));
+  const areas = [
+    ...new Set(
+      kept.flatMap((race) =>
+        race.units.flatMap((unit) =>
+          unit.areaId == null ? [] : [unit.areaId],
+        ),
+      ),
+    ),
+  ];
+  const framed = [
+    ...new Set(
+      kept.flatMap((race) =>
+        TERRITORIES.has(race.state) ||
+        race.state === "ak" ||
+        race.state === "hi"
+          ? []
+          : race.units.flatMap((unit) =>
+              unit.areaId == null ? [] : [unit.areaId],
+            ),
+      ),
+    ),
+  ];
+  const map = await remember(
+    `live:spread:v2:${found.date}:${chosen}:${String(areas.length)}`,
+    async () =>
+      shaped(areas, found.date, framed.length > 0 ? framed : areas, false),
+  );
+  const homes = new Map<string, { tail: string; turnout: number }>();
+  if (chosen === "house") {
+    for (const race of result.election.races) {
+      const areaOf = new Map(
+        race.units.map((unit) => [unit.id, unit.areaId ?? ""]),
+      );
+      for (const row of race.baseline) {
+        const areaId = areaOf.get(row.unitId) ?? "";
+        if (areaId !== "" && row.turnout > (homes.get(areaId)?.turnout ?? -1)) {
+          homes.set(areaId, {
+            tail: race.slug.split("/").at(-1) ?? "",
+            turnout: row.turnout,
+          });
+        }
+      }
+    }
+  }
+  return {
+    races: kept,
+    map,
+    homes: Object.fromEntries(
+      [...homes].map(([areaId, home]) => [areaId, home.tail]),
     ),
   };
 }
@@ -1473,7 +1780,7 @@ export const live = {
         switches(),
         calls(picked.map((row) => row.id)),
       ]);
-      const slot = `${getLocale()}|${String(shown.results)}|${String(shown.forecasts)}|${String(shown.classic)}|${found.path}|${found.rest}`;
+      const slot = `${getLocale()}|${String(shown.results)}|${String(shown.forecasts)}|${found.path}|${found.rest}`;
       const key = shown.results
         ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
         : "";
@@ -1516,6 +1823,44 @@ export const live = {
           });
       }
       return ready?.value ?? running.value;
+    }),
+  counties: base
+    .input(
+      v.objectAsync({
+        path: Path,
+        office: v.picklist(["senate", "governor", "house"]),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await election(input.path);
+      if (found.rest !== "" || found.path.split("/").length !== 2) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const picked = (await races(found)).filter((row) =>
+        SPREAD[input.office].test(row.path.split("/", 4)[3] ?? ""),
+      );
+      const [stamp, shown, called] = await Promise.all([
+        db.execute<{ key: string }>(sql`
+          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+          from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
+        `),
+        switches(),
+        calls(picked.map((row) => row.id)),
+      ]);
+      const slot = `${getLocale()}|${String(shown.results)}|${found.path}|${input.office}`;
+      const key = `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`;
+      const held = spread.get(slot);
+      if (held?.key === key) {
+        return held.value;
+      }
+      const value = spreadOut(found, picked, input.office, shown, called);
+      spread.set(slot, { key, value });
+      value.catch(() => {
+        if (spread.get(slot)?.value === value) {
+          spread.delete(slot);
+        }
+      });
+      return value;
     }),
   stamp: base
     .input(v.object({ path: v.string(), isRehearsal: v.optional(v.boolean()) }))
@@ -1622,26 +1967,17 @@ export const live = {
         );
       }
       const scheme = input.level === "us.nyc_ad" ? "us.sldl" : input.level;
-      const tiles = await db.execute<{
-        tiles: string;
-        west: number;
-        south: number;
-        east: number;
-        north: number;
-      }>(sql`
-        select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-          st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-        from boundary_set bs, lateral (
-          select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-          from area_geometry g join area a on a.id = g.area_id
-          where g.area_id = any(${sql.param([...new Set(values.map((row) => row.id))])}::uuid[])
-            and g.valid @> ${chosen.date}::date
-        ) x
-        where bs.scheme_code = ${scheme} and bs.valid @> ${chosen.date}::date
-        order by bs.valid_from desc nulls last limit 1
-      `);
-      const frame = tiles.rows[0];
-      if (frame == null) {
+      const frame = await framing(
+        scheme,
+        [...new Set(values.map((row) => row.id))],
+        chosen.date,
+      );
+      if (
+        frame?.west == null ||
+        frame.south == null ||
+        frame.east == null ||
+        frame.north == null
+      ) {
         return null;
       }
       const titles = await names(

@@ -217,7 +217,7 @@ export function shade(summary: Summary) {
     return null;
   }
   return summary.winner == null
-    ? `color-mix(in oklab, ${tone(option)} ${Math.round(22 + 48 * Math.min(summary.margin / 0.3, 1))}%, var(--background))`
+    ? `color-mix(in oklab, ${tone(option)} ${Math.round(22 + 48 * Math.min(summary.margin / 0.3, 1))}%, var(--map-low))`
     : tone(option);
 }
 

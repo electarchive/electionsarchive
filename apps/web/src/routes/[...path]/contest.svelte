@@ -15,6 +15,7 @@
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { gapNote } from "#lib/coverage.js";
   import { count, date, percent, points } from "#lib/format.js";
+  import { terms } from "#lib/measure.js";
   import {
     explain,
     isDerived,
@@ -1375,6 +1376,13 @@
         {[held, verdict, comeback, vacancy]
           .filter((part) => part != null)
           .join(" ")}
+      </p>
+    {/if}
+    {#if question && contest.rule != null}
+      <p
+        class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch]"
+      >
+        {terms(contest.rule).join(". ")}.
       </p>
     {/if}
     {#if held != null && handover != null && handover.basis !== "same"}

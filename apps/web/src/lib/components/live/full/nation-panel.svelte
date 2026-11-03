@@ -2,11 +2,12 @@
   import type { LiveElection } from "@ea/analytics/live";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import MapPinnedIcon from "@lucide/svelte/icons/map-pinned";
   import type { Control } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
-  import { percent } from "#lib/format.js";
+  import { numbers, percent } from "#lib/format.js";
   import { HATCH } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { breakdown, odds } from "#lib/live/nation.js";
@@ -84,6 +85,60 @@
       ),
   );
   const isCounting = $derived(races.some((summary) => summary.total > 0));
+  const isInformed = $derived(
+    view != null &&
+      view.order.some(
+        (seat) =>
+          seat.rating !== "counting" &&
+          seat.rating !== "waiting" &&
+          seat.rating !== "later",
+      ) &&
+      !view.order.every(
+        (seat) => seat.rating === "won" || seat.rating === "projected",
+      ),
+  );
+  const span = $derived.by(() => {
+    if (view == null) {
+      return { low: 0, high: 0 };
+    }
+    let low = view.pmf.length - 1;
+    let high = 0;
+    for (const [index, value] of view.pmf.entries()) {
+      if (value > 0.0005) {
+        low = Math.min(low, index);
+        high = Math.max(high, index);
+      }
+    }
+    const pad = Math.max(2, Math.round((high - low) * 0.15));
+    return {
+      low: Math.max(0, Math.min(low, view.majority - 1) - pad),
+      high: Math.min(view.size, Math.max(high, view.majority) + pad),
+    };
+  });
+  const peak = $derived(
+    Math.max(...(view?.pmf.slice(span.low, span.high + 1) ?? []), 0.0001),
+  );
+
+  function chanceOf(summary: Summary) {
+    const seat = found.seats.get(summary.race.id);
+    if (
+      !forecasts ||
+      pair == null ||
+      seat == null ||
+      seat.rating === "waiting" ||
+      seat.rating === "counting" ||
+      seat.rating === "later" ||
+      seat.rating === "won" ||
+      seat.rating === "projected"
+    ) {
+      return null;
+    }
+    const isLeft = seat.left >= seat.right;
+    return {
+      value: odds(isLeft ? seat.left : seat.right),
+      color: pair[isLeft ? 0 : 1].color,
+    };
+  }
 
   const code = $derived(picked == null ? null : (picked.split("-")[0] ?? null));
   const shown = $derived(
@@ -191,9 +246,21 @@
           >{verdict(summary)}</span
         >
       </span>
-      <span class="font-figures text-xs text-muted-foreground tabular-nums">
+      {const chance = $derived(chanceOf(summary))}
+      <span
+        class="grid justify-items-end font-figures text-xs text-muted-foreground tabular-nums"
+      >
+        {#if chance != null}
+          <span
+            class="font-semibold"
+            style:color={chance.color}
+            title={m.livemap_win_chance()}>{chance.value}</span
+          >
+        {/if}
         {#if summary.counted != null && summary.total > 0}
-          {percent(summary.counted, 0)}
+          <span title={m.livemap_counted_share()}
+            >{percent(summary.counted, 0)}</span
+          >
         {/if}
       </span>
     </button>
@@ -254,7 +321,85 @@
         <span>{breakdown(view.tallies.left)}</span>
         <span class="text-end">{breakdown(view.tallies.right)}</span>
       </div>
-      {#if forecasts && isCounting && office !== "governor"}
+      {#if forecasts && isInformed && office !== "governor"}
+        <div class="grid gap-1.5 border-bs border-border pbs-3">
+          <div
+            class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs"
+          >
+            <span class="font-semibold">{m.night_chamber_odds()}</span>
+            <span
+              class="flex gap-3 font-figures font-semibold whitespace-nowrap tabular-nums"
+            >
+              <span style:color={pair[0].color}
+                >{pair[0].short} {odds(view.control.left)}</span
+              >
+              <span style:color={pair[1].color}
+                >{pair[1].short} {odds(view.control.right)}</span
+              >
+              {#if view.control.none >= 0.005}
+                <span class="font-normal text-muted-foreground"
+                  >{m.night_chamber_split({
+                    share: odds(view.control.none),
+                  })}</span
+                >
+              {/if}
+            </span>
+          </div>
+          <svg
+            viewBox="{span.low - 0.5} 0 {span.high - span.low + 1} 40"
+            preserveAspectRatio="none"
+            class="overflow-visible block-12 inline-full"
+            role="img"
+            aria-label={m.night_chamber_histogram({ party: pair[0].name })}
+          >
+            {#each { length: span.high - span.low + 1 } as _, offset (offset)}
+              {const count = $derived(span.low + offset)}
+              {const value = $derived(view.pmf[count] ?? 0)}
+              <rect
+                x={count - 0.42}
+                y={40 - (value / peak) * 38}
+                width="0.84"
+                height={(value / peak) * 38}
+                fill={count >= view.majority
+                  ? pair[0].color
+                  : view.size - count >= view.majority
+                    ? pair[1].color
+                    : "var(--muted-foreground)"}
+                opacity={count >= view.range[0] && count <= view.range[1]
+                  ? 1
+                  : 0.4}
+              >
+                <title>{pair[0].short} {count}: {percent(value, 1)}</title>
+              </rect>
+            {/each}
+            <line
+              x1={view.majority - 0.5}
+              x2={view.majority - 0.5}
+              y1="-2"
+              y2="40"
+              stroke="var(--foreground)"
+              stroke-width="1.5"
+              vector-effect="non-scaling-stroke"
+            />
+          </svg>
+          <p
+            class="flex justify-between gap-2 font-figures text-[0.6875rem]/4 text-muted-foreground tabular-nums"
+          >
+            <span>{span.low}</span>
+            <span class="text-center"
+              >{m.night_chamber_expected({
+                party: pair[0].short.slice(0, 1),
+                seats: numbers({ maximumFractionDigits: 1 }).format(
+                  view.expected.left,
+                ),
+                low: view.range[0],
+                high: view.range[1],
+              })}</span
+            >
+            <span>{span.high}</span>
+          </p>
+        </div>
+      {:else if forecasts && isCounting && office !== "governor"}
         <p class="flex justify-between gap-3 text-xs font-semibold">
           <span
             >{m.night_nation_chance({
@@ -315,17 +460,22 @@
       <div class="grid gap-2">
         <button
           type="button"
-          class="flex items-center justify-center gap-2 rounded-sm bg-foreground px-3 text-sm font-semibold text-background block-10 hover:bg-foreground/90"
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-sm bg-foreground px-3 py-2.5 text-start text-sm/snug font-semibold text-background min-block-10 hover:bg-foreground/90"
           onclick={() => onOpen(code)}
-          ><MapPinnedIcon
-            class="block-4 inline-4"
+          ><MapPinnedIcon class="block-4 inline-4" aria-hidden="true" /><span
+            class="text-balance"
+            >{m.livemap_drill({ place: states(code) })}</span
+          ><ChevronRightIcon
+            class="opacity-70 block-4 inline-4"
             aria-hidden="true"
-          />{m.livemap_drill({ place: states(code) })}</button
+          /></button
         >
         <a
           href={toLive(`${country}/${code}/${date}`)}
-          class="flex items-center justify-center gap-1.5 rounded-sm px-3 text-[0.8125rem] font-semibold ring-1 ring-input block-9 hover:bg-secondary"
-          >{m.night_map_open({ place: states(code) })}<ArrowUpRightIcon
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-sm px-3 py-2 text-[0.8125rem]/snug font-semibold ring-1 ring-input min-block-9 hover:bg-secondary"
+          ><span class="text-balance"
+            >{m.night_map_open({ place: states(code) })}</span
+          ><ArrowUpRightIcon
             class="text-muted-foreground block-3.5 inline-3.5"
             aria-hidden="true"
           /></a

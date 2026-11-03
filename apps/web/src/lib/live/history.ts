@@ -16,7 +16,7 @@ const kept = new Map<string, LiveEstimate>();
 
 function key(race: LiveRace, at: string) {
   const frame = race.frames.findLast((entry) => entry.at <= at);
-  return `${race.id}|${at}|${sum(frame?.totals ?? [])}|${frame?.reporting ?? ""}|${race.certified == null ? "" : "c"}|${race.isClassic === true ? "classic" : ""}`;
+  return `${race.id}|${at}|${sum(frame?.totals ?? [])}|${frame?.reporting ?? ""}|${race.certified == null ? "" : "c"}`;
 }
 
 export function estimateAt(race: LiveRace, at: string | null) {

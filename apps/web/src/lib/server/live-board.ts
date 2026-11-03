@@ -1,9 +1,38 @@
 import { sql } from "drizzle-orm";
-import type { Geography } from "#lib/live/standing.js";
+import type { Geography, Pieces } from "#lib/live/standing.js";
 import { liveDb as db } from "#lib/server/db/index.js";
 import america from "#lib/server/hex/us-cd.json";
 import { plane, spot } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
+
+export async function framing(
+  scheme: string,
+  ids: Array<string>,
+  date: string,
+) {
+  const box = await db.execute<{
+    tiles: string;
+    west: number | null;
+    south: number | null;
+    east: number | null;
+    north: number | null;
+  }>(sql`
+    select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+      st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+    from boundary_set bs, lateral (
+      select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+      from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date
+    ) x
+    where bs.scheme_code = ${scheme} and (bs.valid @> ${date}::date or bs.valid_from > ${date}::date)
+    order by (
+        select count(*) from area_geometry g
+        where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date and g.valid @> bs.as_of
+      ) desc,
+      abs(bs.as_of - ${date}::date)
+    limit 1
+  `);
+  return box.rows[0];
+}
 
 export async function geography(
   areaIds: Array<string>,
@@ -32,25 +61,7 @@ export async function geography(
   if (scheme == null) {
     return null;
   }
-  const extent = async (ids: Array<string>) => {
-    const box = await db.execute<{
-      tiles: string;
-      west: number | null;
-      south: number | null;
-      east: number | null;
-      north: number | null;
-    }>(sql`
-      select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-        st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-      from boundary_set bs, lateral (
-        select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-        from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date
-      ) x
-      where bs.scheme_code = ${scheme} and bs.valid @> ${date}::date
-      order by bs.valid_from desc nulls last limit 1
-    `);
-    return box.rows[0];
-  };
+  const extent = async (ids: Array<string>) => framing(scheme, ids, date);
   const ground = isGrounded
     ? (
         await db.execute<{ id: string; k: number }>(sql`
@@ -123,6 +134,102 @@ export async function geography(
           ],
     ),
   };
+}
+
+export async function pieces(
+  clip: string,
+  date: string,
+  scheme: string,
+): Promise<Pieces | null> {
+  const found = await db.execute<{
+    pieces: Pieces["pieces"] | null;
+    edge: Pieces["edge"] | null;
+    veil: Pieces["veil"] | null;
+  }>(sql`
+    with edge as materialized (
+      select ST_MakeValid(g.geom) as geom from area a
+      join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
+      where a.id = ${clip}::uuid and a.scheme_code not in ('us.state', 'us.county')
+      order by g.valid_from desc nulls last limit 1
+    ),
+    picked as materialized (
+      select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
+      from edge e join area_geometry g on g.geom && e.geom and g.valid @> ${date}::date
+      join area a on a.id = g.area_id and a.scheme_code = ${scheme}
+      order by a.id, g.valid_from desc nulls last
+    ),
+    cut as materialized (
+      select p.id, p.k, p.scheme, ST_Area(p.geom) as whole, ST_Area(e.geom) as clip,
+        ST_CollectionExtract(ST_Intersection(ST_MakeValid(ST_ClipByBox2D(p.geom, e.geom)), e.geom), 3) as geom
+      from picked p cross join edge e
+    ),
+    planed as materialized (
+      select id, k, ${plane("geom", "scheme")} as geom from cut
+      where not ST_IsEmpty(geom) and ST_Area(geom) >= 0.004 * least(whole, clip)
+    ),
+    thin as materialized (
+      select id, k, ST_CollectionExtract(ST_ReducePrecision(ST_MakeValid(
+        ST_Transform(ST_SetSRID(ST_CoverageSimplify(geom, t) over (), 3857), 4326)
+      ), 0.00001), 3) as geom
+      from (select id, k, geom, sqrt(sum(ST_Area(geom)) over ()) / 1500 as t from planed) q
+    ),
+    whole as materialized (
+      select ST_UnaryUnion(ST_Collect(ST_MakeValid(geom))) as geom from thin
+    )
+    select
+      (select json_agg(json_build_object(
+        'areaId', id, 'k', k,
+        'at', json_build_array(round(ST_X(p)::numeric, 5), round(ST_Y(p)::numeric, 5)),
+        'shape', ST_AsGeoJSON(ST_Multi(geom), 5)::json -> 'coordinates'
+      )) from thin cross join lateral (select ST_PointOnSurface(geom) as p) s where not ST_IsEmpty(geom)) as pieces,
+      (select ST_AsGeoJSON(ST_Multi(ST_Boundary(geom)), 5)::json -> 'coordinates' from whole) as edge,
+      (select ST_AsGeoJSON(ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeEnvelope(-180, -85, 180, 85, 4326), geom), 3)), 5)::json -> 'coordinates' from whole) as veil
+  `);
+  const row = found.rows[0];
+  return row?.pieces == null || row.pieces.length === 0
+    ? null
+    : { pieces: row.pieces, edge: row.edge ?? [], veil: row.veil ?? [] };
+}
+
+export async function boxes(areaIds: Array<string>, date: string) {
+  if (areaIds.length === 0) {
+    return {};
+  }
+  const found = await db.execute<{
+    id: string;
+    west: number | null;
+    south: number | null;
+    east: number | null;
+    north: number | null;
+  }>(sql`
+    select x.id, st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+    from (
+      select a.id, ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+      from area_geometry g join area a on a.id = g.area_id
+      where g.area_id = any(${sql.param(areaIds)}::uuid[]) and g.valid @> ${date}::date
+      group by a.id
+    ) x
+  `);
+  return Object.fromEntries(
+    found.rows.flatMap((row) =>
+      row.west == null ||
+      row.south == null ||
+      row.east == null ||
+      row.north == null
+        ? []
+        : [
+            [
+              row.id,
+              {
+                west: row.west,
+                south: row.south,
+                east: row.east,
+                north: row.north,
+              },
+            ],
+          ],
+    ),
+  );
 }
 
 export async function states(date: string) {
@@ -307,35 +414,42 @@ export async function control(
     .filter((race) => SIDES.has(race.office))
     .map((race) => race.id);
   const [held, kept] = await Promise.all([
-    db.execute<{ contest: string; person: string; party: string | null }>(sql`
+    db.execute<{
+      contest: string;
+      person: string;
+      vacant: boolean;
+      party: string | null;
+    }>(sql`
       with up as materialized (
         select c.id, c.seat_id, c.office_id, c.body_id, c.district_area_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
       ),
       sitting as materialized (
-        select t.id, t.person_id, t.contest_id, t.seat_id, t.office_id, t.body_id, t.from_date, s.district_area_id
+        select t.id, t.person_id, t.contest_id, t.seat_id, t.office_id, t.body_id, t.from_date, t.to_date, s.district_area_id
         from tenure t left join seat s on s.id = t.seat_id
-        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date - 730)
       ),
       held as (
-        select distinct on (m.contest) m.contest, m.tenure, m.person, m.won from (
-          select u.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won, t.from_date
+        select distinct on (m.contest) m.contest, m.tenure, m.person, m.won, m.to_date <= ${date}::date as vacant from (
+          select u.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won, t.from_date, t.to_date
           from up u join sitting t on t.seat_id = u.seat_id
           union all
-          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date, t.to_date
           from up u join sitting t on t.office_id = u.office_id
           union all
-          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date, t.to_date
           from up u cross join lateral (
             select u.district_area_id as area_id
             union
             select x.area_id from area_code y join area_code x on x.code = y.code where y.area_id = u.district_area_id
           ) a
-          join sitting t on t.body_id = u.body_id and t.district_area_id = a.area_id
+          join sitting t on t.body_id = u.body_id
+          left join contest w on w.id = t.contest_id
           where u.seat_id is null and u.office_id is null
+            and (t.district_area_id = a.area_id or (w.body_id = u.body_id and w.district_area_id = a.area_id))
         ) m
-        order by m.contest, m.from_date desc
+        order by m.contest, m.to_date is null or m.to_date > ${date}::date desc, m.from_date desc
       )
-      select h.contest, h.person, coalesce(
+      select h.contest, h.person, h.vacant, coalesce(
         (select ta.party_id from tenure_affiliation ta where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
         (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = h.person and o.party_id is not null
           order by (o.contest_id = h.won) desc nulls last, o.contest_id desc limit 1)
@@ -414,7 +528,11 @@ export async function control(
     holders: Object.fromEntries(
       held.rows.map((row) => [
         row.contest,
-        { party: family(row.party), name: people.full.get(row.person) ?? "" },
+        {
+          party: family(row.party),
+          name: people.full.get(row.person) ?? "",
+          isVacant: row.vacant,
+        },
       ]),
     ),
     holdovers,

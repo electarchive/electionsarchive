@@ -5,6 +5,16 @@ const NEUTRALS = [78, 56, 36].map(
     `color-mix(in oklab, var(--muted-foreground) ${amount}%, var(--card))`,
 );
 
+const BLANK = "color-mix(in oklab, var(--muted-foreground) 20%, var(--card))";
+
+export function isNeutral(color: string) {
+  return (
+    color === BLANK ||
+    color === "var(--muted-foreground)" ||
+    NEUTRALS.includes(color)
+  );
+}
+
 const SIDES = new Map([
   ["answer:leave", "#005ea7"],
   ["answer:remain", "#f7c600"],
@@ -62,6 +72,24 @@ export function independent(rank: number) {
   );
 }
 
+const YES = /^(?:yes|sì|evet|for|approve|i agree|in favor)(?=$|\s)/iu;
+const NO = /^(?:no|hayır|against|reject|i do not agree)(?=$|\s)/iu;
+
+export function side(key: string) {
+  const answer = key.startsWith("answer:") ? key.slice(7) : null;
+  if (answer != null && YES.test(answer)) {
+    return "var(--yes)";
+  }
+  if (answer != null && NO.test(answer)) {
+    return "var(--no)";
+  }
+  return SIDES.get(key) ?? null;
+}
+
+export function stance(label: string) {
+  return (YES.exec(label) ?? NO.exec(label))?.[0] ?? null;
+}
+
 export function swatch(color: string | null | undefined, key: string) {
   const id = key.replace(/^party:/, "");
   const chosen =
@@ -70,7 +98,7 @@ export function swatch(color: string | null | undefined, key: string) {
     return independent(0);
   }
   if (chosen == null && ["", "none", "party:"].includes(key)) {
-    return "color-mix(in oklab, var(--muted-foreground) 20%, var(--card))";
+    return BLANK;
   }
   if (chosen != null && NEUTRALS.includes(chosen)) {
     return chosen;
@@ -93,11 +121,9 @@ export function swatch(color: string | null | undefined, key: string) {
     }
     return `light-dark(oklch(from ${base} min(l, 0.86) c h), oklch(from ${base} max(l, 0.52) c h))`;
   }
-  if (/^answer:(?:yes|sì|evet|for|approve|i agree)(?:$|\s)/u.test(key)) {
-    return "var(--yes)";
-  }
-  if (/^answer:(?:no|hayır|against|reject|i do not agree)(?:$|\s)/u.test(key)) {
-    return "var(--no)";
+  const sided = side(key);
+  if (sided != null) {
+    return sided;
   }
   let hash = 0;
   for (const character of key) {
