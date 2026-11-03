@@ -1,17 +1,13 @@
 <script lang="ts">
-  import type { Part } from "svelte-islands";
   import { resolve } from "$app/paths";
+  import type { orpc } from "#lib/rpc.js";
   import { m } from "#lib/paraglide/messages.js";
-  import type { PageData } from "./$types";
 
   const {
     counties,
   }: {
-    counties: Exclude<
-      NonNullable<
-        Awaited<Extract<PageData, { kind: "election" }>["sections"]["counties"]>
-      >,
-      Part<unknown>
+    counties: NonNullable<
+      Awaited<ReturnType<typeof orpc.elections.counties.call>>
     >;
   } = $props();
 

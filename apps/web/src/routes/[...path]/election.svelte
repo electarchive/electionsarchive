@@ -104,15 +104,17 @@
 
   const client = useQueryClient();
   function seed<T>(
-    value: T | Promise<T> | Part<T>,
+    value: T | Promise<T | null> | Part<T> | null,
     put: (data: T) => void,
-  ): T | Promise<T> | null {
-    if (value instanceof Part) {
+  ): T | Promise<T | null> | null {
+    if (value == null || value instanceof Part) {
       return null;
     }
     if (value instanceof Promise) {
       return value.then((data) => {
-        put(data);
+        if (data != null) {
+          put(data);
+        }
         return data;
       });
     }
@@ -133,12 +135,6 @@
         data,
       ),
     ),
-    tiers: seed(sections.tiers, (data) =>
-      client.setQueryData(
-        orpc.elections.tiers.queryKey({ input: { id } }),
-        data,
-      ),
-    ),
     alongside: seed(sections.alongside, (data) =>
       client.setQueryData(
         orpc.elections.alongside.queryKey({ input: { id } }),
@@ -148,17 +144,20 @@
     winners: seed(
       sections.winners instanceof Promise
         ? sections.winners
-            .then(
-              async (data) =>
-                data ??
-                (browser
-                  ? client.fetchQuery(
-                      orpc.elections.winners.queryOptions({ input: { id } }),
-                    )
-                  : null),
+            .then(async (data) =>
+              data instanceof Part
+                ? null
+                : (data ??
+                  (browser
+                    ? client.fetchQuery(
+                        orpc.elections.winners.queryOptions({ input: { id } }),
+                      )
+                    : null)),
             )
             .catch(() => null)
-        : sections.winners,
+        : sections.winners instanceof Part
+          ? null
+          : sections.winners,
       (data) => {
         if (data != null) {
           client.setQueryData(
@@ -593,9 +592,6 @@
       : null,
   );
 
-  const hexes = createQuery(() =>
-    orpc.seats.hexes.queryOptions({ input: { id, within: scope?.id } }),
-  );
   const governments = createQuery(() =>
     orpc.elections.governments.queryOptions({ input: { id } }),
   );
@@ -1784,6 +1780,17 @@
     }),
   );
   const races = $derived(built.slice(0, ordered.length));
+  const hexes = createQuery(() => ({
+    ...orpc.seats.hexes.queryOptions({ input: { id, within: scope?.id } }),
+    enabled:
+      browser &&
+      (isSwept ||
+        races.some(
+          (race) =>
+            race.map != null &&
+            (race.places?.part == null || peek(race.places.part) != null),
+        )),
+  }));
   const partners = $derived(
     new Map(built.slice(ordered.length).map((race) => [race.anchor, race])),
   );
@@ -3755,21 +3762,17 @@
       <Local {local} isOwn={true} />
     {/if}
   {/await}
-  {#if sections.counties instanceof Part}
-    <Island part={sections.counties} when="visible">
-      {#snippet children(counties)}
-        <Counties {counties} />
-      {/snippet}
-    </Island>
-  {:else}
-    {#await sections.counties}
-      <SectionSkeleton shape="columns" label={m.counties_title()} />
-    {:then counties}
-      {#if counties != null}
-        <Counties {counties} />
-      {/if}
-    {/await}
-  {/if}
+  {#await sections.counties}
+    <SectionSkeleton shape="columns" label={m.counties_title()} />
+  {:then found}
+    {#if found != null}
+      <Island part={found} when="visible">
+        {#snippet children(counties)}
+          <Counties {counties} />
+        {/snippet}
+      </Island>
+    {/if}
+  {/await}
   {#if scope == null}
     {#await seeded.alongside}
       <SectionSkeleton shape="columns" label={m.alongside_title()} />
@@ -3797,47 +3800,51 @@
         race={ordered.find((race) => race.electors != null)?.name ?? null}
       />
     {/snippet}
-    {#if sections.tiers instanceof Part}
-      <Island part={sections.tiers} when="visible">
-        {#snippet children(tiers)}
-          <Cached
-            key={orpc.elections.tiers.queryKey({ input: { id } })}
-            value={tiers}
-          >
-            {@render tiled()}
-          </Cached>
-        {/snippet}
-      </Island>
-    {:else}
-      {#await seeded.tiers}
-        <SectionSkeleton shape="tiles" label={m.tiers_title()} />
-      {:then}
+    {#await sections.tiers}
+      <SectionSkeleton shape="tiles" label={m.tiers_title()} />
+    {:then found}
+      {#if found == null}
         {@render tiled()}
-      {/await}
-    {/if}
+      {:else}
+        <Island part={found} when="visible">
+          {#snippet children(tiers)}
+            <Cached
+              key={orpc.elections.tiers.queryKey({ input: { id } })}
+              value={tiers}
+            >
+              {@render tiled()}
+            </Cached>
+          {/snippet}
+        </Island>
+      {/if}
+    {/await}
   {:else if parts.length >= 40 || election.isCrowded}
-    {#if sections.winners instanceof Part}
-      <Island part={sections.winners} when="visible">
-        {#snippet children(
-          winners: NonNullable<
-            Extract<typeof sections.winners, Part<unknown>>["loaded"]
-          >["value"],
-        )}
-          <Cached
-            key={orpc.elections.winners.queryKey({ input: { id } })}
-            value={winners}
-          >
-            <Winners {id} parts={winners.children ?? parts} hasMap={!isSwept} />
-          </Cached>
-        {/snippet}
-      </Island>
-    {:else}
-      {#await seeded.winners}
-        <SectionSkeleton shape="table" />
-      {:then}
+    {#await sections.winners}
+      <SectionSkeleton shape="table" />
+    {:then found}
+      {#if found instanceof Part}
+        <Island part={found} when="visible">
+          {#snippet children(
+            winners: NonNullable<
+              Extract<Awaited<typeof sections.winners>, Part<unknown>>["loaded"]
+            >["value"],
+          )}
+            <Cached
+              key={orpc.elections.winners.queryKey({ input: { id } })}
+              value={winners}
+            >
+              <Winners
+                {id}
+                parts={winners.children ?? parts}
+                hasMap={!isSwept}
+              />
+            </Cached>
+          {/snippet}
+        </Island>
+      {:else}
         <Winners {id} {parts} hasMap={!isSwept} />
-      {/await}
-    {/if}
+      {/if}
+    {/await}
   {:else if parts.length > 0}
     <States {id} />
     {#if election.seated != null}

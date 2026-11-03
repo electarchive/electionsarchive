@@ -1,20 +1,15 @@
 <script lang="ts">
   import Versus from "#routes/compare/places.svelte";
-  import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
-  import {
-    createQuery,
-    queryOptions,
-    useQueryClient,
-  } from "@tanstack/svelte-query";
+  import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import { Island } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { capitalize, count, date, percent } from "#lib/format.js";
+  import { capitalize, count, date, fold, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -43,24 +38,6 @@
     $props();
 
   const former = $derived(formerly(polity.former, getLocale()));
-  const client = useQueryClient();
-
-  untrack(() => {
-    const queryKey = orpc.polities.record.queryKey({ input: { id } });
-    if (polity.record instanceof Promise) {
-      if (browser) {
-        void client.prefetchQuery(
-          queryOptions({
-            queryKey,
-            queryFn: async () =>
-              (await polity.record) ?? orpc.polities.record.call({ id }),
-          }),
-        );
-      }
-    } else if (polity.record != null) {
-      client.setQueryData(queryKey, polity.record);
-    }
-  });
 
   const uid = $props.id();
   const isLocal = $derived(
@@ -179,20 +156,46 @@
   const kindOptions = $derived(
     kinds.map((key) => ({ value: key, label: KINDS[key]?.() ?? key })),
   );
+  let searched = $state(untrack(() => query.trim()));
+  $effect(() => {
+    const next = query.trim();
+    const timer = setTimeout(() => {
+      searched = next;
+    }, 150);
+    return () => {
+      clearTimeout(timer);
+    };
+  });
+  const isSearching = $derived(polity.places.isPartial && query.trim() !== "");
   const listed = createQuery(() => ({
     ...orpc.polities.get.queryOptions({ input: { id } }),
-    enabled: polity.places.isPartial && (isAllPlaces || query.trim() !== ""),
+    enabled: polity.places.isPartial && isAllPlaces && !isSearching,
   }));
-  const pool = $derived(listed.data?.polities ?? polity.polities);
-  const children = $derived(
-    pool.filter(
+  const found = createQuery(() => ({
+    ...orpc.polities.places.queryOptions({
+      input: {
+        id,
+        q: searched,
+        kind: kind === "all" ? undefined : kind,
+        limit: 200,
+      },
+    }),
+    enabled: isSearching && searched !== "",
+    placeholderData: keepPreviousData,
+  }));
+  const pool = $derived(
+    isSearching
+      ? (found.data?.polities ?? polity.polities)
+      : (listed.data?.polities ?? polity.polities),
+  );
+  const children = $derived.by(() => {
+    const needle = fold(query.trim());
+    return pool.filter(
       (child) =>
         (kind === "all" || child.kind === kind) &&
-        child.name
-          .toLocaleLowerCase()
-          .includes(query.trim().toLocaleLowerCase()),
-    ),
-  );
+        fold(child.name).includes(needle),
+    );
+  });
   const placeRows = new Windowed(() => ({
     items:
       isAllPlaces || query.trim() !== "" ? children : children.slice(0, 20),
@@ -859,11 +862,42 @@
   {@render inPlace()}
 {/if}
 
-<Timeline
-  {id}
-  isExpected={polity.latest != null &&
-    ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
-/>
+{#await polity.record}
+  {#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
+    <section
+      class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+      aria-busy="true"
+    >
+      <h2 class="heading">
+        {m.record_title()}
+      </h2>
+      <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
+        {m.record_lede()}
+      </p>
+      <div
+        class="animate-pulse rounded-sm bg-muted block-65.5 motion-reduce:animate-none"
+      ></div>
+      <div class="block-10"></div>
+    </section>
+  {/if}
+{:then found}
+  {#if found != null}
+    <div class="col-span-12 grid">
+      <Island part={found} ssr={false} when="visible">
+        {#snippet children(record)}
+          <Timeline
+            {id}
+            {record}
+            isExpected={polity.latest != null &&
+              ["sovereign_state", "supranational", "federal_unit"].includes(
+                polity.kind,
+              )}
+          />
+        {/snippet}
+      </Island>
+    </div>
+  {/if}
+{/await}
 
 {#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
   {#await import("./system.svelte")}

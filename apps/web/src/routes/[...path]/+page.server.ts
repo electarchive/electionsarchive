@@ -14,8 +14,10 @@ const LEGEND = 8;
 function parted<T>(
   name: string,
   value: T | Promise<T>,
-): T | Promise<T> | Part<NonNullable<T>> {
-  return value instanceof Promise || value == null ? value : part(name, value);
+): Part<NonNullable<T>> | Promise<Part<NonNullable<T>> | null> | null {
+  const wrap = (resolved: T) =>
+    resolved == null ? null : part(name, resolved);
+  return value instanceof Promise ? value.then(wrap) : wrap(value);
 }
 
 async function seed(path: string) {
@@ -109,9 +111,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
       sections.mayoral ||
       (!(winners instanceof Promise) && (winners?.tiers.length ?? 0) > 0);
     const children = elections.filter((child) => !child.isStage);
-    const isParted =
-      !isSweep && winners != null && !(winners instanceof Promise);
+    const isParted = !isSweep && winners != null;
     const isCrowded = isParted && children.length > CROWD;
+    const listed = isCrowded ? children : null;
     return {
       ...data,
       sections: {
@@ -123,10 +125,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
             : sections.regions,
         counties: parted("election.counties", sections.counties),
         winners: isParted
-          ? part("election.winners", {
-              ...winners,
-              children: isCrowded ? children : null,
-            })
+          ? parted(
+              "election.winners",
+              winners instanceof Promise
+                ? winners.then((found) =>
+                    found == null ? null : { ...found, children: listed },
+                  )
+                : { ...winners, children: listed },
+            )
           : winners,
       },
       election: {
@@ -205,7 +211,15 @@ export const load: PageServerLoad = async ({ params, url }) => {
     calendar,
     places,
     scrubber,
-    record,
+    record: parted(
+      "polity.record",
+      record == null ||
+        record instanceof Promise ||
+        record.series.length > 0 ||
+        record.governments.length > 0
+        ? record
+        : null,
+    ),
   };
   if (!places.isPartial) {
     return { ...data, polity };
