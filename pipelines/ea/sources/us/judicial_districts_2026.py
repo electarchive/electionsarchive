@@ -20,7 +20,9 @@ PUBLISHERS = {
     ),
     "sos.nebraska.gov": ("Nebraska Secretary of State", "List of Judges Who Filed for Retention, November 3, 2026"),
     "vote.utah.gov": ("Utah Elections Office", "2026 Candidate Filings"),
+    "www.nvsos.gov": ("Nevada Secretary of State", "2026 General Election: Statewide Certified List of Candidates"),
 }
+BORROWED = {"www.nvsos.gov": "us.nv_districts_2026"}
 
 
 def read() -> list[dict[str, str]]:
@@ -33,7 +35,18 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
+            if (host := urlparse(url).netloc) in BORROWED:
+                held = raw.cached(BORROWED[host], url)
+                raw.store(
+                    SOURCE,
+                    url,
+                    held.path.read_bytes(),
+                    suffix=held.path.suffix,
+                    retrieved_at=held.retrieved_at,
+                    media_type=held.media_type or "application/pdf",
+                )
+            else:
+                raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
 
 
 def emit() -> Path:
@@ -43,7 +56,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Circuit and district judges standing for retention on November 3, 2026, from each state's official judicial roster",
+            summary="Circuit and district judges standing for retention or election on November 3, 2026, from each state's official judicial roster",
             polity="US",
         )
 
@@ -86,6 +99,7 @@ def emit() -> Path:
             states[state] = (area, polity, election)
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%%'").fetchall()}
         retention = cs.key("us.electoral_system", "retention")
+        fptp = cs.key("us.electoral_system", "fptp")
 
         districts: dict[str, UUID] = {}
         for row in rows:
@@ -129,7 +143,77 @@ def emit() -> Path:
 
         offices: dict[tuple[str, str], UUID] = {}
         contests = 0
+        seats: dict[str, list[dict[str, str]]] = {}
         for row in rows:
+            if row["system"] == "fptp":
+                key = f"2026-11-03:{row['state']}:{slug(row['office'])}:{slug(row['label'])}"
+                seats.setdefault(key + (f":{slug(row['seat'])}" if row["seat"] else ""), []).append(row)
+        for key, people in seats.items():
+            row = people[0]
+            state, title = row["state"], row["office"]
+            _, state_polity, election = states[state]
+            office = offices.get((state, title))
+            if office is None:
+                office = offices[(state, title)] = cs.key("us.office", f"{slug(title)}:{state}")
+                if office in cs.minted:
+                    cs.add("office", id=office, polity_id=state_polity, kind="other")
+                    name(office, f"{title}, {state}")
+            contest = cs.key("us.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="office",
+                office_id=office,
+                body_id=None,
+                district_area_id=districts[row["district"]],
+                seat_id=None,
+                boundary_set_id=None,
+                magnitude=1,
+                term="full",
+                round_number=1,
+                previous_round_id=None,
+                electoral_system_id=fptp,
+                default_result_kind="counted",
+            )
+            label = ", ".join(part for part in (title, row["label"], row["seat"]) if part)
+            name(contest, f"2026 {state} {label} election")
+            path = f"us/{state.lower()}/2026-11-03-general/{slug(label)}"
+            if path in taken:
+                raise ValueError(f"{label} would take {path}")
+            taken.add(path)
+            cs.add("slug", path=path, entity_id=contest)
+            cs.add("citation", entity_id=contest, source_id=sources[row["source"]], locator=None)
+            for each in people:
+                who = f"{key}:{slug(each['candidate'])}"
+                option = cs.key("us.option", who)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=None,
+                    ballot_label=each["candidate"],
+                )
+                person = cs.key(f"{SOURCE}.person", who)
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                name(person, each["candidate"])
+                candidacy = cs.key("us.candidacy", who)
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=each["candidate"],
+                    is_independent=False,
+                )
+                cs.add("citation", entity_id=candidacy, source_id=sources[each["source"]], locator=None)
+            contests += 1
+        for row in rows:
+            if row["system"] != "retention":
+                continue
             state = row["state"]
             _, state_polity, election = states[state]
             title = row["office"]

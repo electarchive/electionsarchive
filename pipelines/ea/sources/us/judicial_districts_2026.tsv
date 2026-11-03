@@ -1,285 +1,397 @@
-state	district	label	parent	office	candidate	source
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Adam Giganti	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	John M. Madonia	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Gail L. Noll	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Zachary A. Schmidt	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Allison Lorton	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Christopher Reif	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Raylene Grischow	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-3	Third Judicial Circuit		Circuit Judge	Dennis R. Ruth	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-3-subcircuit-2	Third Judicial Circuit, 2nd Subcircuit	IL:circuit-3	Subcircuit Judge	Amy Maher	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Ann Celine Walsh	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Monique O'Toole	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Richard D. Felice	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf
-IA	IA:district-1a	Judicial District 1A		District Associate Judge	Mark T. Hostager	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1a	Judicial District 1A		District Associate Judge	Stephanie C. Rattenborg	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1a	Judicial District 1A		Associate Juvenile Judge	Thomas J. Straka	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1a	Judicial District 1A		District Judge	Alan Heavens	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1b	Judicial District 1B		District Associate Judge	Linnea M.N. Nicol	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1b	Judicial District 1B		District Associate Judge	Michelle Jungers	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1b	Judicial District 1B		District Associate Judge	Patrice Jaye Eichman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-1b	Judicial District 1B		District Judge	Joel A. Dalrymple	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Associate Judge	Adam Sauer	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Associate Judge	Karen Kaufman Salic	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Associate Judge	Mark Milder	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Judge	Christopher Foy	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Judge	Colleen D. Weiland	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Judge	DeDra Schroeder	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2a	Judicial District 2A		District Judge	Gregg R. Rosenbladt	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Associate Judge	Joseph L. Tofilon	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Associate Judge	Kathryn E. Austin	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Associate Judge	Stephen A. Owen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Judge	Amy Moore	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Judge	Angela L. Doyle	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Judge	Ashley Sparks	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Judge	Bethany Currie	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-2b	Judicial District 2B		District Judge	Christopher Polking	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Associate Judge	Jennifer Bennett Finn	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Associate Judge	Kristi Busse	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Judge	Adam Miller	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Judge	Andrew J. Smith	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Judge	Carl J. Petersen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3a	Judicial District 3A		District Judge	Charles Borth	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Associate Judge	Daniel P. Vakulskas	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Associate Judge	John C. Nelson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Associate Judge	Mark C. Cord	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Associate Judge	Melinda Wicks	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Judge	Tod J. Deck	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-3b	Judicial District 3B		District Judge	Zachary S. Hindman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Associate Judge	Ashley N. West-Joons	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Associate Judge	Matthew A. Schuling	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Associate Judge	Scott Strait	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Amy L. Zacharias	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Craig Michael Dreismeier	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Donna Bothwell	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Justin R. Wyatt	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Margaret J. Reyes	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-4	Judicial District 4		District Judge	Michael Donn Hooper	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5a	Judicial District 5A		District Associate Judge	Mark F. Schlenker	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5a	Judicial District 5A		District Associate Judge	Steven W. Guiter	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5a	Judicial District 5A		District Judge	Michael K. Jacobsen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5a	Judicial District 5A		District Judge	Nicholas Bailey	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5a	Judicial District 5A		District Judge	Thomas P. Murphy	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5b	Judicial District 5B		District Associate Judge	Andrew Zimmerman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5b	Judicial District 5B		District Judge	Elisabeth S. Reynoldson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Ashley Stewart	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Brendan L. Greiner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Jordan Brackey	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Kimberly Ayotte	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Lynn Poschner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Associate Judge	Tabitha Turner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Celene Gogerty	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Christopher Kemp	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Coleman McAllister	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Joseph W. Seidlin	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Lawrence P. McLellan	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Samantha J. Gronewald	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Sarah Crane	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-5c	Judicial District 5C		District Judge	Scott J. Beattie	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Associate Judge	Angie Johnston	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Associate Judge	Casey D. Jones	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Associate Judge	Kristin Schneider	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Judge	Jason D. Besler	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Judge	Mark Fisher	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-6	Judicial District 6		District Judge	Michael Harris	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Associate Judge	Cheryl E. Traum	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Elizabeth O'Donnell	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Henry William Latham II	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Jeffrey McDaniel	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Joel William Barrows	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Mark Ray Lawson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Patrick A. McElyea	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-7	Judicial District 7		District Judge	Tamra J. Roberts	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8a	Judicial District 8A		District Associate Judge	Jennifer Nicole Jensen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8a	Judicial District 8A		District Associate Judge	Susan Cole	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8a	Judicial District 8A		District Judge	Amber L. Thompson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8a	Judicial District 8A		District Judge	Dustin Hite	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8b	Judicial District 8B		District Associate Judge	Emily S. Dean	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-IA	IA:district-8b	Judicial District 8B		District Judge	Wyatt P. Peterson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip
-CO	CO:district-1	First Judicial District		District Court Judge	Chantel E. Contiguglia	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Ryan P. Loewer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Meegan Miloud	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Andrew C. Poland	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Christopher Rhamey	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Tamara S. Russell	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-1	First Judicial District		District Court Judge	Christopher C. Zenisek	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-gilpin	Gilpin County Court	CO:district-1	County Court Judge	Timothy Lane	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Sara Garrido	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Corinne Magid	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Jennifer Lynn Melton	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Christopher J. Baumann	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Michael W.V. Angel	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	John Eric Elliff	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Lisa Gomez	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Elizabeth D. Leith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Andrew Luxen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Elizabeth Joan McCarthy	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Jon J. Olafson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-2	Second Judicial District		District Court Judge	Sarah Block Wallace	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Kerri Lombardi	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Andrea Eddy	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Olympia Z. Fay	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Chelsea Malone	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Michelle Martinez-Thomas	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Isaam L. Shamsid-Deen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Judith Smith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-3	Third Judicial District		District Court Judge	Pierce L. Fowler	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-huerfano	Huerfano County Court	CO:district-3	County Court Judge	Dawn Mann	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	Erin Lynn Sokol	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	William B. Bain	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	Hilary Gurney	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	Dennis L. McGuire	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	Amanda J. Philipps	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-4	Fourth Judicial District		District Court Judge	Gregory Robert Werner	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Sam Burney	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Marika Frady	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Meredith Patrick Cord	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Ann M. Rotolo	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-eagle	Eagle County Court	CO:district-5	County Court Judge	Inga Haagenson Causey	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-7	Seventh Judicial District		District Court Judge	D. Cory Jackson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-7	Seventh Judicial District		District Court Judge	Kellie L. Starritt	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-hinsdale	Hinsdale County Court	CO:district-7	County Court Judge	James R. McDonald	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-jackson	Jackson County Court	CO:district-8	County Court Judge	Chelsea Williams Ryan	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	Katharine "Jenny" Ellison	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	Thomas L. Lynch	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	Matthew R. Zehe	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-9	Ninth Judicial District		District Court Judge	Elise Myer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-garfield	Garfield County Court	CO:district-9	County Court Judge	Jonathan Bruce Pototsky	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-rio-blanco	Rio Blanco County Court	CO:district-9	County Court Judge	Jay A. Edwards	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-10	Tenth Judicial District		District Court Judge	William David Alexander	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-10	Tenth Judicial District		District Court Judge	Michelle Chostner	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-10	Tenth Judicial District		District Court Judge	Allison P. Ernst	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-10	Tenth Judicial District		District Court Judge	Tayler M. Thomas	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-11	Eleventh Judicial District		District Court Judge	Amanda Hunter	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-11	Eleventh Judicial District		District Court Judge	Dayna L. Vise	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-custer	Custer County Court	CO:district-11	County Court Judge	Michael Patrick Halpin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-fremont	Fremont County Court	CO:district-11	County Court Judge	Alexandra Robak	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-park	Park County Court	CO:district-11	County Court Judge	Brian Louis Green	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-12	Twelfth Judicial District		District Court Judge	Amanda C. Hopkins	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-12	Twelfth Judicial District		District Court Judge	Michael A. Gonzales	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-alamosa	Alamosa County Court	CO:district-12	County Court Judge	Daniel Walzl	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-costilla	Costilla County Court	CO:district-12	County Court Judge	Tamara McSherry Sullivan	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-mineral	Mineral County Court	CO:district-12	County Court Judge	Hollie Wheelwright	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-13	Thirteenth Judicial District		District Court Judge	Dina M. Christiansen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-washington	Washington County Court	CO:district-13	County Court Judge	Kelly S. Hansen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-14	Fourteenth Judicial District		District Court Judge	Brittany Schneider	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-grand	Grand County Court	CO:district-14	County Court Judge	Nicholas Catanzarite	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-moffat	Moffat County Court	CO:district-14	County Court Judge	James Hesson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-15	Fifteenth Judicial District		District Court Judge	Tarryn L. Johnson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-prowers	Prowers County Court	CO:district-15	County Court Judge	Curtis Lane Porter	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-crowley	Crowley County Court	CO:district-16	County Court Judge	Jeremy P. Boyce	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-otero	Otero County Court	CO:district-16	County Court Judge	William Culver	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Caryn A. Datz	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Sean Patrick Finn	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Priscilla Loew	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Jeffrey Dean Ruff	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Kelley R. Southerland	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-adams	Adams County Court	CO:district-17	County Court Judge	Lara M. Jimenez	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-adams	Adams County Court	CO:district-17	County Court Judge	MaryAnn "Mariana" Vielma	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Michelle Ann Amico	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	LaQunya Latrese Baker-McKay	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Jacob A. Edson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Thomas W. Henderson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Michelle Jones	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	David N. Karpel	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Natalie G. Stricklin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Darren L. Vahle	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Christine A. Washburn	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Christina Marie Apostoli	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Colleen Clark	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Cheryl Rowles-Stokes	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-19	Nineteenth Judicial District		District Court Judge	Audrey A. Galloway	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-19	Nineteenth Judicial District		District Court Judge	Timothy Gerard Kerns	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	John J. Briggs	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	Michele Lynn Meyer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	Dana Nichols	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-20	Twentieth Judicial District		District Court Judge	Nancy Woodruff Salomone	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-20	Twentieth Judicial District		District Court Judge	Michael Kotlarczyk	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-20	Twentieth Judicial District		District Court Judge	J. Chris Larson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Elizabeth House Moulton Brodsky	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Monica Haenselman	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Zachary Ilya Malkinson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Jeremy Chaffin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Craig Peter Henderson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Gretchen B. Larson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-21	Twenty-First Judicial District		District Court Judge	JenniLynn E. Lawrence	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-mesa	Mesa County Court	CO:district-21	County Court Judge	Scott Joseph Burrill	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-mesa	Mesa County Court	CO:district-21	County Court Judge	Bruce R. Raaum	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	William Young Furse	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Andrew Baum	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Victoria E. Klingensmith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Theresa Slade	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Daniel W. Warhola	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-douglas	Douglas County Court	CO:district-22	County Court Judge	Lawrence Bowling	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-CO	CO:county-court-douglas	Douglas County Court	CO:district-22	County Court Judge	Kolony L. Fields	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list
-NE	NE:appeals-2	Court of Appeals, District 2		Court of Appeals Judge	Michael W. Pirtle	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-1	District Court, District 1		District Court Judge	Ricky A. Schreiner	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-1	District Court, District 1		District Court Judge	Julie D. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-1	District Court, District 1		District Court Judge	David J. A. Bargen	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-2	District Court, District 2		District Court Judge	Stefanie A. Martinez	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-2	District Court, District 2		District Court Judge	Michael A. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-2	District Court, District 2		District Court Judge	George A. Thompson	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-3	District Court, District 3		District Court Judge	Darla Ideus	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-3	District Court, District 3		District Court Judge	Andrew Jacobsen	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-3	District Court, District 3		District Court Judge	Kevin R. McManaman	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-3	District Court, District 3		District Court Judge	Matthew O. Mellor	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-4	District Court, District 4		District Court Judge	Duane C. Dougherty	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-4	District Court, District 4		District Court Judge	Marlon A. Polk	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-4	District Court, District 4		District Court Judge	Molly B. Keane	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-4	District Court, District 4		District Court Judge	LeAnne M. Srb	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-4	District Court, District 4		District Court Judge	Katie L. Benson	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-6	District Court, District 6		District Court Judge	Geoffrey Hall	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-9	District Court, District 9		District Court Judge	John H. Marsh	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-9	District Court, District 9		District Court Judge	Patrick M. Lee	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-10	District Court, District 10		District Court Judge	Morgan R. Farquhar	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-11	District Court, District 11		District Court Judge	Cindy Volkmer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-11	District Court, District 11		District Court Judge	Patrick M. Heng	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-12	District Court, District 12		District Court Judge	Andrea Miller	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:district-12	District Court, District 12		District Court Judge	Travis P. O'Gorman	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:juvenile-2	Separate Juvenile Court, Sarpy County		Separate Juvenile Court Judge	Sarah M. Moore	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:juvenile-4	Separate Juvenile Court, Douglas County		Separate Juvenile Court Judge	Matthew R. Kahler	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-1	County Court, District 1		County Court Judge	Richard R. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-2	County Court, District 2		County Court Judge	Todd J. Hutton	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-2	County Court, District 2		County Court Judge	S. Colin Palm	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-3	County Court, District 3		County Court Judge	Rodney D. Reuter	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	Marcena M. Hendrix	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	John E. Huber	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	Marcela A. Keim	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	Sheryl L. Lohaus	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	Craig Q. McDermott	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-4	County Court, District 4		County Court Judge	Stephanie Steigleder Shearer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-5	County Court, District 5		County Court Judge	Denise Kracl	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-6	County Court, District 6		County Court Judge	Thomas J. Klein	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-6	County Court, District 6		County Court Judge	Sara E. Bauer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-8	County Court, District 8		County Court Judge	Kale B. Burdick	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-9	County Court, District 9		County Court Judge	Alfred E. Corey III	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-9	County Court, District 9		County Court Judge	Bryan S. McQuay	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-10	County Court, District 10		County Court Judge	Michael P. Burns	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-11	County Court, District 11		County Court Judge	Tanya Roberts-Connick	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-12	County Court, District 12		County Court Judge	Kristen D. Mickey	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-NE	NE:county-court-12	County Court, District 12		County Court Judge	Aaron J. Conn	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf
-UT	UT:district-3	Third Judicial District		District Court Judge	Coral Sanchez	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-5	Fifth Judicial District		District Court Judge	Jay Winward	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-1	First Judicial District		District Court Judge	Kirk Max Morgan	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-3	Third Judicial District		District Court Judge	Matthew David Bates	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-5	Fifth Judicial District		District Court Judge	Matthew L. Bell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Robert Garrett Neill	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-3	Third Judicial District		District Court Judge	Todd Shaughnessy	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Aaron William Flater	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-4	Fourth Judicial District		District Court Judge	Anthony Leonard Howell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-3	Third Judicial District		District Court Judge	Charles A. Stormont	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-2	Second Judicial District		District Court Judge	Eldred Blaine Rawson	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-5	Fifth Judicial District		District Court Judge	Eric Russell Gentry	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-2	Second Judicial District		District Court Judge	Jason Craig Nelson	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Jeffrey J. Noland	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-2	Second Judicial District		District Court Judge	Jennifer Lyn Valencia	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-4	Fourth Judicial District		District Court Judge	Kraig Powell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-4	Fourth Judicial District		District Court Judge	Thomas Low	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-7	Seventh Juvenile Court District		Juvenile Court Judge	Craig Miles Bunnell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-6	Sixth Juvenile Court District		Juvenile Court Judge	Alex Goble	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-4	Fourth Judicial District		District Court Judge	Jared William Eldridge	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Rick Westmoreland	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Steven K. Beck	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Susan Heather Eisenman	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:district-6	Sixth Judicial District		District Court Judge	Mandy Sue Larsen	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
-UT	UT:juvenile-4	Fourth Juvenile Court District		Juvenile Court Judge	Douglas John Nielsen	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx
+state	district	label	parent	office	candidate	source	system	seat
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Adam Giganti	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	John M. Madonia	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Gail L. Noll	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Zachary A. Schmidt	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Allison Lorton	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Christopher Reif	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-7	Seventh Judicial Circuit		Circuit Judge	Raylene Grischow	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-3	Third Judicial Circuit		Circuit Judge	Dennis R. Ruth	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-3-subcircuit-2	Third Judicial Circuit, 2nd Subcircuit	IL:circuit-3	Subcircuit Judge	Amy Maher	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Ann Celine Walsh	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Monique O'Toole	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IL	IL:circuit-18	Eighteenth Judicial Circuit		Circuit Judge	Richard D. Felice	https://www.elections.il.gov/Downloads/ElectionOperations/PDF/JudicialOfficers.pdf	retention	
+IA	IA:district-1a	Judicial District 1A		District Associate Judge	Mark T. Hostager	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1a	Judicial District 1A		District Associate Judge	Stephanie C. Rattenborg	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1a	Judicial District 1A		Associate Juvenile Judge	Thomas J. Straka	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1a	Judicial District 1A		District Judge	Alan Heavens	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1b	Judicial District 1B		District Associate Judge	Linnea M.N. Nicol	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1b	Judicial District 1B		District Associate Judge	Michelle Jungers	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1b	Judicial District 1B		District Associate Judge	Patrice Jaye Eichman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-1b	Judicial District 1B		District Judge	Joel A. Dalrymple	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Associate Judge	Adam Sauer	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Associate Judge	Karen Kaufman Salic	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Associate Judge	Mark Milder	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Judge	Christopher Foy	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Judge	Colleen D. Weiland	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Judge	DeDra Schroeder	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2a	Judicial District 2A		District Judge	Gregg R. Rosenbladt	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Associate Judge	Joseph L. Tofilon	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Associate Judge	Kathryn E. Austin	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Associate Judge	Stephen A. Owen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Judge	Amy Moore	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Judge	Angela L. Doyle	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Judge	Ashley Sparks	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Judge	Bethany Currie	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-2b	Judicial District 2B		District Judge	Christopher Polking	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Associate Judge	Jennifer Bennett Finn	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Associate Judge	Kristi Busse	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Judge	Adam Miller	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Judge	Andrew J. Smith	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Judge	Carl J. Petersen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3a	Judicial District 3A		District Judge	Charles Borth	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Associate Judge	Daniel P. Vakulskas	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Associate Judge	John C. Nelson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Associate Judge	Mark C. Cord	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Associate Judge	Melinda Wicks	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Judge	Tod J. Deck	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-3b	Judicial District 3B		District Judge	Zachary S. Hindman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Associate Judge	Ashley N. West-Joons	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Associate Judge	Matthew A. Schuling	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Associate Judge	Scott Strait	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Amy L. Zacharias	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Craig Michael Dreismeier	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Donna Bothwell	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Justin R. Wyatt	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Margaret J. Reyes	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-4	Judicial District 4		District Judge	Michael Donn Hooper	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5a	Judicial District 5A		District Associate Judge	Mark F. Schlenker	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5a	Judicial District 5A		District Associate Judge	Steven W. Guiter	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5a	Judicial District 5A		District Judge	Michael K. Jacobsen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5a	Judicial District 5A		District Judge	Nicholas Bailey	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5a	Judicial District 5A		District Judge	Thomas P. Murphy	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5b	Judicial District 5B		District Associate Judge	Andrew Zimmerman	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5b	Judicial District 5B		District Judge	Elisabeth S. Reynoldson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Ashley Stewart	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Brendan L. Greiner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Jordan Brackey	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Kimberly Ayotte	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Lynn Poschner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Associate Judge	Tabitha Turner	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Celene Gogerty	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Christopher Kemp	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Coleman McAllister	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Joseph W. Seidlin	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Lawrence P. McLellan	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Samantha J. Gronewald	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Sarah Crane	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-5c	Judicial District 5C		District Judge	Scott J. Beattie	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Associate Judge	Angie Johnston	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Associate Judge	Casey D. Jones	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Associate Judge	Kristin Schneider	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Judge	Jason D. Besler	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Judge	Mark Fisher	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-6	Judicial District 6		District Judge	Michael Harris	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Associate Judge	Cheryl E. Traum	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Elizabeth O'Donnell	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Henry William Latham II	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Jeffrey McDaniel	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Joel William Barrows	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Mark Ray Lawson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Patrick A. McElyea	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-7	Judicial District 7		District Judge	Tamra J. Roberts	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8a	Judicial District 8A		District Associate Judge	Jennifer Nicole Jensen	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8a	Judicial District 8A		District Associate Judge	Susan Cole	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8a	Judicial District 8A		District Judge	Amber L. Thompson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8a	Judicial District 8A		District Judge	Dustin Hite	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8b	Judicial District 8B		District Associate Judge	Emily S. Dean	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+IA	IA:district-8b	Judicial District 8B		District Judge	Wyatt P. Peterson	https://electionresults.iowa.gov/IA/127077/382865/reports/detailxml.zip	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Chantel E. Contiguglia	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Ryan P. Loewer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Meegan Miloud	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Andrew C. Poland	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Christopher Rhamey	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Tamara S. Russell	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-1	First Judicial District		District Court Judge	Christopher C. Zenisek	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-gilpin	Gilpin County Court	CO:district-1	County Court Judge	Timothy Lane	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Sara Garrido	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Corinne Magid	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-jefferson	Jefferson County Court	CO:district-1	County Court Judge	Jennifer Lynn Melton	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Christopher J. Baumann	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Michael W.V. Angel	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	John Eric Elliff	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Lisa Gomez	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Elizabeth D. Leith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Andrew Luxen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Elizabeth Joan McCarthy	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Jon J. Olafson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-2	Second Judicial District		District Court Judge	Sarah Block Wallace	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Kerri Lombardi	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Andrea Eddy	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Olympia Z. Fay	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Chelsea Malone	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Michelle Martinez-Thomas	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Isaam L. Shamsid-Deen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-denver	Denver County Court	CO:district-2	County Court Judge	Judith Smith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-3	Third Judicial District		District Court Judge	Pierce L. Fowler	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-huerfano	Huerfano County Court	CO:district-3	County Court Judge	Dawn Mann	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	Erin Lynn Sokol	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	William B. Bain	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	Hilary Gurney	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	Dennis L. McGuire	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	Amanda J. Philipps	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-4	Fourth Judicial District		District Court Judge	Gregory Robert Werner	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Sam Burney	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Marika Frady	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Meredith Patrick Cord	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-el-paso	El Paso County Court	CO:district-4	County Court Judge	Ann M. Rotolo	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-eagle	Eagle County Court	CO:district-5	County Court Judge	Inga Haagenson Causey	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-7	Seventh Judicial District		District Court Judge	D. Cory Jackson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-7	Seventh Judicial District		District Court Judge	Kellie L. Starritt	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-hinsdale	Hinsdale County Court	CO:district-7	County Court Judge	James R. McDonald	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-jackson	Jackson County Court	CO:district-8	County Court Judge	Chelsea Williams Ryan	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	"Katharine ""Jenny"" Ellison"	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	Thomas L. Lynch	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-larimer	Larimer County Court	CO:district-8	County Court Judge	Matthew R. Zehe	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-9	Ninth Judicial District		District Court Judge	Elise Myer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-garfield	Garfield County Court	CO:district-9	County Court Judge	Jonathan Bruce Pototsky	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-rio-blanco	Rio Blanco County Court	CO:district-9	County Court Judge	Jay A. Edwards	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-10	Tenth Judicial District		District Court Judge	William David Alexander	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-10	Tenth Judicial District		District Court Judge	Michelle Chostner	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-10	Tenth Judicial District		District Court Judge	Allison P. Ernst	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-10	Tenth Judicial District		District Court Judge	Tayler M. Thomas	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-11	Eleventh Judicial District		District Court Judge	Amanda Hunter	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-11	Eleventh Judicial District		District Court Judge	Dayna L. Vise	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-custer	Custer County Court	CO:district-11	County Court Judge	Michael Patrick Halpin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-fremont	Fremont County Court	CO:district-11	County Court Judge	Alexandra Robak	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-park	Park County Court	CO:district-11	County Court Judge	Brian Louis Green	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-12	Twelfth Judicial District		District Court Judge	Amanda C. Hopkins	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-12	Twelfth Judicial District		District Court Judge	Michael A. Gonzales	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-alamosa	Alamosa County Court	CO:district-12	County Court Judge	Daniel Walzl	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-costilla	Costilla County Court	CO:district-12	County Court Judge	Tamara McSherry Sullivan	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-mineral	Mineral County Court	CO:district-12	County Court Judge	Hollie Wheelwright	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-13	Thirteenth Judicial District		District Court Judge	Dina M. Christiansen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-washington	Washington County Court	CO:district-13	County Court Judge	Kelly S. Hansen	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-14	Fourteenth Judicial District		District Court Judge	Brittany Schneider	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-grand	Grand County Court	CO:district-14	County Court Judge	Nicholas Catanzarite	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-moffat	Moffat County Court	CO:district-14	County Court Judge	James Hesson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-15	Fifteenth Judicial District		District Court Judge	Tarryn L. Johnson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-prowers	Prowers County Court	CO:district-15	County Court Judge	Curtis Lane Porter	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-crowley	Crowley County Court	CO:district-16	County Court Judge	Jeremy P. Boyce	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-otero	Otero County Court	CO:district-16	County Court Judge	William Culver	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Caryn A. Datz	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Sean Patrick Finn	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Priscilla Loew	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Jeffrey Dean Ruff	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-17	Seventeenth Judicial District		District Court Judge	Kelley R. Southerland	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-adams	Adams County Court	CO:district-17	County Court Judge	Lara M. Jimenez	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-adams	Adams County Court	CO:district-17	County Court Judge	"MaryAnn ""Mariana"" Vielma"	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Michelle Ann Amico	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	LaQunya Latrese Baker-McKay	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Jacob A. Edson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Thomas W. Henderson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Michelle Jones	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	David N. Karpel	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Natalie G. Stricklin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Darren L. Vahle	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-18	Eighteenth Judicial District		District Court Judge	Christine A. Washburn	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Christina Marie Apostoli	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Colleen Clark	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-arapahoe	Arapahoe County Court	CO:district-18	County Court Judge	Cheryl Rowles-Stokes	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-19	Nineteenth Judicial District		District Court Judge	Audrey A. Galloway	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-19	Nineteenth Judicial District		District Court Judge	Timothy Gerard Kerns	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	John J. Briggs	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	Michele Lynn Meyer	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-weld	Weld County Court	CO:district-19	County Court Judge	Dana Nichols	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-20	Twentieth Judicial District		District Court Judge	Nancy Woodruff Salomone	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-20	Twentieth Judicial District		District Court Judge	Michael Kotlarczyk	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-20	Twentieth Judicial District		District Court Judge	J. Chris Larson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Elizabeth House Moulton Brodsky	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Monica Haenselman	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-boulder	Boulder County Court	CO:district-20	County Court Judge	Zachary Ilya Malkinson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Jeremy Chaffin	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Craig Peter Henderson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-21	Twenty-First Judicial District		District Court Judge	Gretchen B. Larson	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-21	Twenty-First Judicial District		District Court Judge	JenniLynn E. Lawrence	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-mesa	Mesa County Court	CO:district-21	County Court Judge	Scott Joseph Burrill	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-mesa	Mesa County Court	CO:district-21	County Court Judge	Bruce R. Raaum	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	William Young Furse	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Andrew Baum	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Victoria E. Klingensmith	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Theresa Slade	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:district-22	Twenty-Second Judicial District		District Court Judge	Daniel W. Warhola	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-douglas	Douglas County Court	CO:district-22	County Court Judge	Lawrence Bowling	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+CO	CO:county-court-douglas	Douglas County Court	CO:district-22	County Court Judge	Kolony L. Fields	https://judicialperformance.colorado.gov/2026-judicial-performance-evaluations-full-list	retention	
+NE	NE:appeals-2	Court of Appeals, District 2		Court of Appeals Judge	Michael W. Pirtle	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-1	District Court, District 1		District Court Judge	Ricky A. Schreiner	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-1	District Court, District 1		District Court Judge	Julie D. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-1	District Court, District 1		District Court Judge	David J. A. Bargen	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-2	District Court, District 2		District Court Judge	Stefanie A. Martinez	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-2	District Court, District 2		District Court Judge	Michael A. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-2	District Court, District 2		District Court Judge	George A. Thompson	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-3	District Court, District 3		District Court Judge	Darla Ideus	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-3	District Court, District 3		District Court Judge	Andrew Jacobsen	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-3	District Court, District 3		District Court Judge	Kevin R. McManaman	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-3	District Court, District 3		District Court Judge	Matthew O. Mellor	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-4	District Court, District 4		District Court Judge	Duane C. Dougherty	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-4	District Court, District 4		District Court Judge	Marlon A. Polk	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-4	District Court, District 4		District Court Judge	Molly B. Keane	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-4	District Court, District 4		District Court Judge	LeAnne M. Srb	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-4	District Court, District 4		District Court Judge	Katie L. Benson	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-6	District Court, District 6		District Court Judge	Geoffrey Hall	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-9	District Court, District 9		District Court Judge	John H. Marsh	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-9	District Court, District 9		District Court Judge	Patrick M. Lee	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-10	District Court, District 10		District Court Judge	Morgan R. Farquhar	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-11	District Court, District 11		District Court Judge	Cindy Volkmer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-11	District Court, District 11		District Court Judge	Patrick M. Heng	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-12	District Court, District 12		District Court Judge	Andrea Miller	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:district-12	District Court, District 12		District Court Judge	Travis P. O'Gorman	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:juvenile-2	Separate Juvenile Court, Sarpy County		Separate Juvenile Court Judge	Sarah M. Moore	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:juvenile-4	Separate Juvenile Court, Douglas County		Separate Juvenile Court Judge	Matthew R. Kahler	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-1	County Court, District 1		County Court Judge	Richard R. Smith	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-2	County Court, District 2		County Court Judge	Todd J. Hutton	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-2	County Court, District 2		County Court Judge	S. Colin Palm	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-3	County Court, District 3		County Court Judge	Rodney D. Reuter	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	Marcena M. Hendrix	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	John E. Huber	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	Marcela A. Keim	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	Sheryl L. Lohaus	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	Craig Q. McDermott	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-4	County Court, District 4		County Court Judge	Stephanie Steigleder Shearer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-5	County Court, District 5		County Court Judge	Denise Kracl	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-6	County Court, District 6		County Court Judge	Thomas J. Klein	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-6	County Court, District 6		County Court Judge	Sara E. Bauer	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-8	County Court, District 8		County Court Judge	Kale B. Burdick	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-9	County Court, District 9		County Court Judge	Alfred E. Corey III	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-9	County Court, District 9		County Court Judge	Bryan S. McQuay	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-10	County Court, District 10		County Court Judge	Michael P. Burns	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-11	County Court, District 11		County Court Judge	Tanya Roberts-Connick	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-12	County Court, District 12		County Court Judge	Kristen D. Mickey	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+NE	NE:county-court-12	County Court, District 12		County Court Judge	Aaron J. Conn	https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_List_of_Judges_Who_Filed_for_Retention_List_8.3.26.pdf	retention	
+UT	UT:district-3	Third Judicial District		District Court Judge	Coral Sanchez	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-5	Fifth Judicial District		District Court Judge	Jay Winward	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-1	First Judicial District		District Court Judge	Kirk Max Morgan	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-3	Third Judicial District		District Court Judge	Matthew David Bates	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-5	Fifth Judicial District		District Court Judge	Matthew L. Bell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Robert Garrett Neill	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-3	Third Judicial District		District Court Judge	Todd Shaughnessy	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Aaron William Flater	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-4	Fourth Judicial District		District Court Judge	Anthony Leonard Howell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-3	Third Judicial District		District Court Judge	Charles A. Stormont	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-2	Second Judicial District		District Court Judge	Eldred Blaine Rawson	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-5	Fifth Judicial District		District Court Judge	Eric Russell Gentry	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-2	Second Judicial District		District Court Judge	Jason Craig Nelson	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Jeffrey J. Noland	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-2	Second Judicial District		District Court Judge	Jennifer Lyn Valencia	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-4	Fourth Judicial District		District Court Judge	Kraig Powell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-4	Fourth Judicial District		District Court Judge	Thomas Low	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-7	Seventh Juvenile Court District		Juvenile Court Judge	Craig Miles Bunnell	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-6	Sixth Juvenile Court District		Juvenile Court Judge	Alex Goble	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-4	Fourth Judicial District		District Court Judge	Jared William Eldridge	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-2	Second Juvenile Court District		Juvenile Court Judge	Rick Westmoreland	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Steven K. Beck	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-3	Third Juvenile Court District		Juvenile Court Judge	Susan Heather Eisenman	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:district-6	Sixth Judicial District		District Court Judge	Mandy Sue Larsen	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+UT	UT:juvenile-4	Fourth Juvenile Court District		Juvenile Court Judge	Douglas John Nielsen	https://vote.utah.gov/wp-content/uploads/2026/10/Candidate-Filing-2026.xlsx	retention	
+NV	NV:district-11	Eleventh Judicial District		District Court Judge	Bryce Shields	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-5	Fifth Judicial District		District Court Judge	Nathan Gent	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-5	Fifth Judicial District		District Court Judge	"Kimberly A. (""Kim"") Wanker"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-5	Fifth Judicial District		District Court Judge	Jason Earnest	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-5	Fifth Judicial District		District Court Judge	Robert W. Lane	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-1	First Judicial District		District Court Judge	Jason D. Woodbury	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-1	First Judicial District		District Court Judge	Kristin N. Luis	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-7	Seventh Judicial District		District Court Judge	Steve L. Dobrescu	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-7	Seventh Judicial District		District Court Judge	Jane M. Eberhardy	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-7	Seventh Judicial District		District Court Judge	Dylan V. Frehner	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-10	Tenth Judicial District		District Court Judge	Thomas Stockard	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	
+NV	NV:district-8	Eighth Judicial District		District Court Judge	"Bita ""Marie"" Yeager"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Carli Lynn Kierny	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Monica Trujillo	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 3
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Nadia Krall	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 4
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Veronica Barisich	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 5
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Tracy Hibbetts	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 5
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jacqueline M. Bluth	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 6
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Danielle K. Pieper	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 7
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Austin Beaumont	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 8
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jessica K. Peterson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 8
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Maria Alice Gall	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 9
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Tierra D. Jones	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 10
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Anna Albertson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 11
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Dan Gilliam	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 12
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Michelle Leavitt	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 12
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Adam Ganz	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 13
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Tina Talim	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 14
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Joe Hardy Jr.	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 15
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Tim Williams	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 16
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jennifer Schwartz	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 17
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jake Villani	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 17
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Mary Kay Holthus	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 18
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Crystal Eller	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 19
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Eric Johnson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 20
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Tara Clark Newberry	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 21
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Alex Hubert	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 21
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Susan Johnson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 22
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Martina Bauhaus	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 23
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jasmin Lilly-Spells	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 23
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Colleen Brown	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 24
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Kathleen E. Delaney	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 25
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jessica Goodey	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 26
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Erika Mendoza	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 27
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Noreen C. DeMonte	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 28
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Danielle A. Tarmu	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 28
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Alex Quagge	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 29
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jacob Reynolds	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 29
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Josh Santeramo	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 30
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jerry A. Wiese II	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 30
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Joanna S. Kishner	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 31
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Alexandra Beth McLeod	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 31
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Christy Craig	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 32
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Maria-Belleza D. “Mari” Parladé	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department A
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Linda Marquis	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department B
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Gregory G. Gordon	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department C
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Patricia A. Marr	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department D
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Gwynneth Smith	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department D
+NV	NV:district-8	Eighth Judicial District		District Court Judge	"Charles ""Chuck"" Hoskin"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department E
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Timothy Treffinger	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department E
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Denise L. Gentile	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department F
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Rhonda K. Forsberg	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department G
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Emily McFarling	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department H
+NV	NV:district-8	Eighth Judicial District		District Court Judge	"Soonhee ""Sunny"" Bailey"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department I
+NV	NV:district-8	Eighth Judicial District		District Court Judge	"Dedree ""DEE"" Butler"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department J
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Cynthia N. Giuliani	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department K
+NV	NV:district-8	Eighth Judicial District		District Court Judge	David S. Gibson Jr.	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department L
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Amy M. Mastin	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department M
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Michel Gaudet	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department N
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Kerri Jean Maxey	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department N
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Gina McConnell	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department O
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Jennifer Isso	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department P
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Mary Perry	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department P
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Bryce C. Duckworth	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department Q
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Marilyn A. Caston	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department R
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Bill Henderson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department R
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Kristine Brewer	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department S
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Randall Forman	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department S
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Nadin Cutter	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department T
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Dawn R. Throne	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department U
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Margaret E. Pickard	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department V
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Stacy Rocheleau	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department W
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Heidi Almase	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department X
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Adriana Rincon White	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department Y
+NV	NV:district-8	Eighth Judicial District		District Court Judge	Amber Candelaria	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department Z
+NV	NV:district-8	Eighth Judicial District		District Court Judge	"Michele ""Shell"" Mercer"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Family Division, Department Z
+NV	NV:district-9	Ninth Judicial District		District Court Judge	Nathan Tod Young	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-9	Ninth Judicial District		District Court Judge	Tom Gregory	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-4	Fourth Judicial District		District Court Judge	Kriston N. Hill	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-4	Fourth Judicial District		District Court Judge	Al Kacin	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-4	Fourth Judicial District		District Court Judge	Mason E. Simons	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 3
+NV	NV:district-6	Sixth Judicial District		District Court Judge	Michael R. Montero	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-3	Third Judicial District		District Court Judge	"John ""JP"" Schlegelmilch"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-3	Third Judicial District		District Court Judge	Stephen B. Rye	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2
+NV	NV:district-2	Second Judicial District		District Court Judge	Derek C. Dreiling	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-2	Second Judicial District		District Court Judge	"Edmund ""Joe"" Gorman"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 1
+NV	NV:district-2	Second Judicial District		District Court Judge	Dixie Grossman	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 2, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Tammy M. Riggs	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 3
+NV	NV:district-2	Second Judicial District		District Court Judge	Connie Steinheimer	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 4
+NV	NV:district-2	Second Judicial District		District Court Judge	"Kristine E. ""Kris"" Riley"	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 5, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Lynne Jones	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 6
+NV	NV:district-2	Second Judicial District		District Court Judge	Egan K. Walker	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 7
+NV	NV:district-2	Second Judicial District		District Court Judge	Barry Breslow	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 8
+NV	NV:district-2	Second Judicial District		District Court Judge	Scott Freeman	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 9
+NV	NV:district-2	Second Judicial District		District Court Judge	Kathleen A. Sigurdson	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 10
+NV	NV:district-2	Second Judicial District		District Court Judge	Paige Dollinger	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 11, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Sandra A. Unsworth	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 12, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Alexander C. Morey	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 13, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Lance White	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 13, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	Tamatha Schreinert	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 14, Family Court
+NV	NV:district-2	Second Judicial District		District Court Judge	David A. Hardy	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 15
+NV	NV:district-2	Second Judicial District		District Court Judge	Aimee E. Banales	https://www.nvsos.gov/sos/elections/election-information/2026-election-information	fptp	Department 16, Family Court
