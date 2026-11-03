@@ -421,6 +421,7 @@ UNEXPIRED_2024 = {
 }
 REMEDIAL_2024 = {("ND", "house:9:gs"): ("house:9-a:g", "house:9-b:g"), ("UT", "senate:21:gs"): ()}
 HOLDOVER_2020 = {("MT", "upper")}
+MAGNITUDE_2026 = {("VT", "house:windsor-3:g"): 2, ("VT", "house:lamoille-3:g"): 1}
 VACANCY_2026 = {
     ("CO", "senate:17:g"),
     ("CO", "senate:21:g"),
@@ -1346,7 +1347,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
             text = re.sub(
                 r"^(State Representative|State Senator|State Treasurer|Representative|Rep\.|Senator|Congress(?:man|woman)"
                 r"|Lieutenant Governor|Governor|Attorney General|Auditor of State|Secretary of State"
-                r"|Justice of the Peace|Justice|Mayor|Sheriff|School Board Director) ",
+                r"|Justice of the Peace|Justice|Mayor|Sheriff|School Board Director|Council (?:Member|Man|Woman)|Councilm[ae]n"
+                r"|Councilwom[ae]n|Alderm[ae]n|Alderwom[ae]n) ",
                 "",
                 row["Candidate Name"],
             ).replace(", ", " ")
@@ -2159,6 +2161,10 @@ def emit() -> Path:
                 for seat, (template, label, path) in picked.items():
                     if (state, seat) in VACANCY_2026:
                         continue
+                    if (state, seat) in MAGNITUDE_2026:
+                        magnitude = MAGNITUDE_2026[state, seat]
+                        system = cs.key("us.electoral_system", "block" if magnitude > 1 else "fptp")
+                        template = (*template[:7], magnitude, template[8], system, *template[10:])
                     key = f"{DAY}:{state}:{seat}"
                     legislative[template[0]] = (
                         key,
