@@ -6,8 +6,9 @@
   import Face from "#lib/components/live/face.svelte";
   import Also from "#lib/components/live/state/also.svelte";
   import Name from "#lib/components/name.svelte";
+  import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, percent } from "#lib/format.js";
-  import { bandFor, lead, paint, surname } from "#lib/live/format.js";
+  import { bandFor, lead, paint, surname, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
@@ -28,7 +29,13 @@
     isLinked = true,
   }: {
     summary: Summary;
-    held: { party: string; name: string } | null;
+    held: {
+      party: string;
+      partyId: string;
+      color: string;
+      person: string;
+      name: string;
+    } | null;
     flip: { party: string; color: string } | null;
     closes: number;
     clock: number;
@@ -92,6 +99,16 @@
       ? null
       : `${surname(option)} +${lead(last.margin)}`;
   });
+
+  const previous = $derived(
+    (last?.shares ?? [])
+      .flatMap((share, index) => {
+        const option = race.options[index];
+        return option == null || share <= 0 ? [] : [{ option, share }];
+      })
+      .toSorted((a, b) => b.share - a.share)
+      .slice(0, 4),
+  );
 
   const seats = $derived(race.seats ?? 1);
 
@@ -270,12 +287,64 @@
     >
       {#if lastMargin != null}
         <dt class="text-muted-foreground">{m.night_table_base()}</dt>
-        <dd class="text-end font-figures tabular-nums">{lastMargin}</dd>
+        <dd class="flex justify-end min-inline-0">
+          <HoverCard.Root openDelay={120} closeDelay={60}>
+            <HoverCard.Trigger>
+              {#snippet child({ props })}
+                <a
+                  {...props}
+                  href={toLive(race.slug)}
+                  class="truncate font-figures tabular-nums underline decoration-border decoration-dotted underline-offset-3 transition-colors hover:decoration-foreground focus-visible:decoration-foreground"
+                  role={undefined}
+                  aria-haspopup={undefined}
+                  aria-expanded={undefined}>{lastMargin}</a
+                >
+              {/snippet}
+            </HoverCard.Trigger>
+            <HoverCard.Content
+              collisionPadding={8}
+              align="end"
+              class="grid gap-2.5 inline-[min(17rem,calc(100vw-2rem))]"
+            >
+              <p class="text-xs font-semibold">{m.night_table_base()}</p>
+              <ol class="grid gap-2">
+                {#each previous as line (line.option.id)}
+                  <li
+                    class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-1 text-xs"
+                  >
+                    <span class="truncate"
+                      >{line.option.party?.name ?? line.option.label}</span
+                    >
+                    <span class="font-figures font-semibold tabular-nums"
+                      >{percent(line.share)}</span
+                    >
+                    <span
+                      class="col-span-2 overflow-hidden rounded-xs bg-muted block-1"
+                      ><span
+                        class="block block-full"
+                        style:inline-size="{line.share * 100}%"
+                        style:background-color={tone(line.option)}
+                      ></span></span
+                    >
+                  </li>
+                {/each}
+              </ol>
+            </HoverCard.Content>
+          </HoverCard.Root>
+        </dd>
       {/if}
       {#if held != null}
         <dt class="text-muted-foreground">{m.livemap_held()}</dt>
         <dd class="flex items-center justify-end gap-1.5 text-end min-inline-0">
-          <span class="truncate">{held.name} ({held.party})</span>
+          <span class="truncate"
+            ><Name label={held.name} person={held.person} hasSwatch={false} />
+            (<Name
+              label={held.party}
+              party={held.partyId}
+              color={held.color}
+              hasSwatch={false}
+            />)</span
+          >
           {#if flip != null}
             <Flip party={flip.party} color={flip.color} />
           {/if}

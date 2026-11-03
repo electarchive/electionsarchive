@@ -5,6 +5,7 @@
     LiveRace,
   } from "@ea/analytics/live";
   import { untrack } from "svelte";
+  import type { Holder } from "#lib/live/ballot.js";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import MapLink from "#lib/components/live/map-link.svelte";
@@ -29,6 +30,7 @@
   import Outstanding from "./outstanding.svelte";
   import Seats from "./seats.svelte";
   import Shares from "./shares.svelte";
+  import Seat from "./state/seat.svelte";
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
   import Trend from "./trend.svelte";
@@ -38,6 +40,7 @@
     election,
     race,
     geography,
+    seat = null,
     base = null,
     clock: time,
     at = $bindable(null),
@@ -48,6 +51,7 @@
     election: LiveElection;
     race: LiveRace;
     geography: Geography | null;
+    seat?: { held: Holder | null } | null;
     base?: string | null;
     clock: number;
     at?: string | null;
@@ -494,6 +498,9 @@
         <span class="font-figures tabular-nums"
           >{m.night_updated({ time: stamp(view ?? newest) })}</span
         >
+      {/if}
+      {#if seat != null}
+        <Seat held={seat.held} />
       {/if}
       <BoardLink election={election.slug} race={race.slug} />
       <MapLink election={election.slug} state={race.state} race={race.slug} />

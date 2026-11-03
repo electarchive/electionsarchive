@@ -47,7 +47,7 @@
 
 <section class="grid content-start gap-2">
   <div class="grid gap-0.5">
-    <h2 class="heading text-lg!">{m.night_ladder_title()}</h2>
+    <h3 class="heading text-base!">{m.night_ladder_title()}</h3>
     <p class="text-xs text-pretty text-muted-foreground">
       {view.needed <= 0
         ? m.night_ladder_secured({ party: left.name })

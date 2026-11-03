@@ -199,6 +199,9 @@ export function verdict(summary: Summary) {
       lead: count(line.lead),
     });
   }
+  if (summary.winner == null && summary.projected != null) {
+    return m.night_races_projected({ name: surname(summary.projected) });
+  }
   const option = summary.winner ?? summary.leader;
   if (option == null) {
     return summary.later == null ? m.night_nation_waiting() : m.night_later();

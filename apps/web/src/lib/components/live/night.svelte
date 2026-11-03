@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
+  import type { Holder } from "#lib/live/ballot.js";
   import type { Ballot } from "#lib/server/live-ballot.js";
   import type { LivePage } from "#lib/server/live-page.js";
   import Dashboard from "#lib/components/live/dashboard.svelte";
@@ -23,7 +24,10 @@
     at = $bindable(),
     isFinal = $bindable(),
   }: {
-    data: LivePage & { ballot?: Ballot | null };
+    data: LivePage & {
+      ballot?: Ballot | null;
+      seat?: { held: Holder | null } | null;
+    };
     election: LiveElection;
     estimates: Record<string, LiveEstimate>;
     clock: number;
@@ -142,6 +146,7 @@
         {election}
         {race}
         geography={data.geography}
+        seat={data.seat ?? null}
         base={election.slug}
         {clock}
         {isOffline}

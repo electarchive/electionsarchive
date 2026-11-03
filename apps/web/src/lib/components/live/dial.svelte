@@ -163,9 +163,14 @@
   const ticks = $derived.by(() => {
     const step =
       reach > 0.2 ? 0.1 : reach > 0.08 ? 0.05 : reach > 0.04 ? 0.02 : 0.01;
-    const marks: Array<number> = [];
-    for (let value = step; value <= reach + 1e-9; value += step) {
-      marks.push(value, -value);
+    const every = Math.max(1, Math.ceil(34 / ((step / (2 * reach)) * width)));
+    const marks: Array<{ value: number; isLabeled: boolean }> = [];
+    for (let index = 1; index * step <= reach + 1e-9; index += 1) {
+      const isLabeled = index % every === 0;
+      marks.push(
+        { value: index * step, isLabeled },
+        { value: -index * step, isLabeled },
+      );
     }
     return marks;
   });
@@ -208,396 +213,404 @@
   });
 </script>
 
-<section
-  class="grid gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)_minmax(0,14rem)]"
-  aria-labelledby="dial-title"
->
-  <div class="grid content-start gap-2.5">
-    <div class="flex items-center gap-1">
-      <h2 id="dial-title" class="text-[0.8125rem] font-semibold">
-        {m.night_dial_title()}
-      </h2>
-      <MethodLink section="ranges" />
-    </div>
-    <div
-      class="grid gap-2"
-      role="img"
-      aria-label={isLive && favored != null
-        ? m.night_dial_aria({ name: favored.label, chance: percent(chance, 0) })
-        : idle}
-    >
-      <div
-        class="flex items-center justify-between gap-3 text-xs font-semibold"
-      >
-        <span class="flex items-center gap-1.5" style:color={toneA}
-          ><span
-            class="rounded-full block-2 inline-2"
-            style:background-color={toneA}
-          ></span>{surname(a)}</span
-        >
-        <span class="flex items-center gap-1.5" style:color={toneB}
-          >{surname(b)}<span
-            class="rounded-full block-2 inline-2"
-            style:background-color={toneB}
-          ></span></span
-        >
+<div class="@container">
+  <section
+    class="grid gap-x-10 gap-y-6 @4xl:grid-cols-[minmax(0,17rem)_minmax(0,1fr)_minmax(0,14rem)]"
+    aria-labelledby="dial-title"
+  >
+    <div class="grid content-start gap-2.5">
+      <div class="flex items-center gap-1">
+        <h2 id="dial-title" class="text-[0.8125rem] font-semibold">
+          {m.night_dial_title()}
+        </h2>
+        <MethodLink section="ranges" />
       </div>
-      <div class="flex items-baseline justify-between gap-3 block-10">
-        {#each [{ value: p, color: toneA }, { value: 1 - p, color: toneB }] as side, position (position)}
-          {const isAhead = $derived(isLive && side.value >= 0.5)}
-          {#if isLive}
-            <span
-              class={cn(
-                "font-figures leading-none tracking-tight tabular-nums",
-                {
-                  "text-[2.25rem] font-[780]": isAhead,
-                  "text-xl font-semibold text-muted-foreground": !isAhead,
-                },
-              )}
-              style:color={isAhead ? side.color : undefined}
-              >{percent(side.value, 0)}</span
+      <div
+        class="grid gap-2"
+        role="img"
+        aria-label={isLive && favored != null
+          ? m.night_dial_aria({
+              name: favored.label,
+              chance: percent(chance, 0),
+            })
+          : idle}
+      >
+        <div
+          class="flex items-center justify-between gap-3 text-xs font-semibold"
+        >
+          <span class="flex items-center gap-1.5" style:color={toneA}
+            ><span
+              class="rounded-full block-2 inline-2"
+              style:background-color={toneA}
+            ></span>{surname(a)}</span
+          >
+          <span class="flex items-center gap-1.5" style:color={toneB}
+            >{surname(b)}<span
+              class="rounded-full block-2 inline-2"
+              style:background-color={toneB}
+            ></span></span
+          >
+        </div>
+        <div class="flex items-baseline justify-between gap-3 block-10">
+          {#each [{ value: p, color: toneA }, { value: 1 - p, color: toneB }] as side, position (position)}
+            {const isAhead = $derived(isLive && side.value >= 0.5)}
+            {#if isLive}
+              <span
+                class={cn(
+                  "font-figures leading-none tracking-tight tabular-nums",
+                  {
+                    "text-[2.25rem] font-[780]": isAhead,
+                    "text-xl font-semibold text-muted-foreground": !isAhead,
+                  },
+                )}
+                style:color={isAhead ? side.color : undefined}
+                >{percent(side.value, 0)}</span
+              >
+            {:else}
+              <span
+                class="font-figures text-xl leading-none font-semibold text-muted-foreground/50"
+                aria-hidden="true">–</span
+              >
+            {/if}
+          {/each}
+        </div>
+      </div>
+      <div class="relative block-2.5" aria-hidden="true">
+        {#if isLive}
+          <span
+            class="absolute inset-y-0 inset-s-0 rounded-s-full"
+            style:inline-size="{split.current * 100}%"
+            style:background-color={toneA}
+          ></span>
+          <span
+            class="absolute inset-y-0 inset-e-0 rounded-e-full"
+            style:inline-size="{(1 - split.current) * 100}%"
+            style:background-color={toneB}
+          ></span>
+          <span
+            class="absolute -inset-y-0.5 -translate-x-1/2 bg-background inline-0.5"
+            style:left="{split.current * 100}%"
+          ></span>
+        {:else}
+          <span
+            class="absolute inset-0 rounded-full border border-dashed border-border"
+          ></span>
+        {/if}
+        <span class="absolute -inset-y-1 inset-s-1/2 bg-foreground/50 inline-px"
+        ></span>
+      </div>
+      <p class="truncate text-xs text-muted-foreground">
+        {#if isLive && favored != null}
+          {isSettled
+            ? m.night_dial_settled({ name: favored.label })
+            : m.night_dial_chance({ name: favored.label })}
+        {:else}
+          {idle}
+        {/if}
+      </p>
+      <figure class="grid gap-1 pbs-1">
+        <figcaption class="text-xs text-muted-foreground">
+          {m.night_dial_history()}
+        </figcaption>
+        <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2">
+          <div class="relative overflow-hidden rounded-xs bg-muted/40 block-14">
+            {#if spark.line === ""}
+              <span
+                class="absolute inset-x-0 inset-bs-1/2 border-bs border-dashed border-foreground/25"
+                aria-hidden="true"
+              ></span>
+              <span
+                class="absolute inset-0 grid place-items-center text-[0.6875rem] text-muted-foreground"
+                ><span class="bg-background/80 px-1.5"
+                  >{m.night_dial_history_empty()}</span
+                ></span
+              >
+            {:else}
+              <svg
+                viewBox="0 0 100 40"
+                preserveAspectRatio="none"
+                class="absolute inset-0 block-full inline-full"
+                aria-hidden="true"
+              >
+                <defs>
+                  <clipPath id="dial-above"
+                    ><rect x="0" y="0" width="100" height="20" /></clipPath
+                  >
+                  <clipPath id="dial-below"
+                    ><rect x="0" y="20" width="100" height="20" /></clipPath
+                  >
+                </defs>
+                <path
+                  d={spark.fill}
+                  fill={toneA}
+                  fill-opacity="0.18"
+                  clip-path="url(#dial-above)"
+                />
+                <path
+                  d={spark.fill}
+                  fill={toneB}
+                  fill-opacity="0.18"
+                  clip-path="url(#dial-below)"
+                />
+                <line
+                  x1="0"
+                  x2="100"
+                  y1="20"
+                  y2="20"
+                  stroke="var(--foreground)"
+                  stroke-opacity="0.35"
+                  stroke-dasharray="2 2"
+                  vector-effect="non-scaling-stroke"
+                />
+                <path
+                  d={spark.line}
+                  fill="none"
+                  stroke={toneA}
+                  stroke-width="1.75"
+                  vector-effect="non-scaling-stroke"
+                  stroke-linejoin="round"
+                  clip-path="url(#dial-above)"
+                />
+                <path
+                  d={spark.line}
+                  fill="none"
+                  stroke={toneB}
+                  stroke-width="1.75"
+                  vector-effect="non-scaling-stroke"
+                  stroke-linejoin="round"
+                  clip-path="url(#dial-below)"
+                />
+              </svg>
+            {/if}
+          </div>
+          <div
+            class="grid content-between text-[0.6875rem] font-semibold"
+            aria-hidden="true"
+          >
+            <span style:color={toneA}>{surname(a)}</span>
+            <span style:color={toneB}>{surname(b)}</span>
+          </div>
+        </div>
+      </figure>
+    </div>
+
+    <figure class="grid content-start gap-2.5">
+      <figcaption
+        class="flex items-baseline justify-between gap-3 text-[0.8125rem]"
+      >
+        <span class="font-semibold">{m.night_dial_margin()}</span>
+        {#if isLive && !isSettled}
+          <span
+            class="font-figures font-semibold tabular-nums"
+            style:color={band.mid >= 0 ? toneA : toneB}>{signed(band.mid)}</span
+          >
+        {/if}
+      </figcaption>
+      <div class="relative" bind:clientWidth={width}>
+        <svg
+          viewBox="0 0 {width} {PLOT + 30}"
+          class="block overflow-visible inline-full"
+          style:block-size="{PLOT + 30}px"
+          role="img"
+          aria-label={isLive && a != null
+            ? m.night_dial_dots_aria({ count: count(winsA), name: a.label })
+            : idle}
+        >
+          <rect
+            x="0"
+            y="0"
+            width={x(0)}
+            height={PLOT}
+            fill={toneA}
+            fill-opacity="0.04"
+          />
+          <rect
+            x={x(0)}
+            y="0"
+            width={width - x(0)}
+            height={PLOT}
+            fill={toneB}
+            fill-opacity="0.04"
+          />
+          {#each ticks as { value: tick, isLabeled } (tick)}
+            <line
+              x1={x(tick)}
+              x2={x(tick)}
+              y1="0"
+              y2={PLOT}
+              stroke="var(--border)"
+              stroke-dasharray="2 3"
+            />
+            {#if isLabeled}
+              <text
+                x={x(tick)}
+                y={PLOT + 22}
+                text-anchor={Math.abs(tick) < reach - 1e-6
+                  ? "middle"
+                  : tick > 0
+                    ? "start"
+                    : "end"}
+                class="font-figures text-[10px] tabular-nums"
+                style:fill={tick >= 0 ? toneA : toneB}
+                fill-opacity="0.75">+{lead(Math.abs(tick), 0)}</text
+              >
+            {/if}
+          {/each}
+          {#if isLive && !isSettled}
+            <rect
+              x={x(band.high)}
+              y={PLOT + 2}
+              width={Math.max(2, x(band.low) - x(band.high))}
+              height="5"
+              rx="2.5"
+              fill={band.mid >= 0 ? toneA : toneB}
+              fill-opacity="0.3"
+            />
+          {/if}
+          {#if dots.list.length > 0}
+            {#each dots.list as dot (dot.id)}
+              <circle
+                r={dots.size / 2 - 0.6}
+                cx="0"
+                cy="0"
+                fill={dot.isA ? toneA : toneB}
+                class="transition-transform duration-700 ease-out motion-reduce:transition-none"
+                style:transform="translate({dot.cx}px, {dot.cy}px)"
+                style:transition-delay="{prefersReducedMotion.current
+                  ? 0
+                  : (dot.id % 20) * 12}ms"
+              />
+            {/each}
+          {/if}
+          <line
+            x1="0"
+            x2={width}
+            y1={PLOT}
+            y2={PLOT}
+            stroke="var(--foreground)"
+            stroke-opacity="0.55"
+          />
+          <line
+            x1={x(0)}
+            x2={x(0)}
+            y1="-4"
+            y2={PLOT + 8}
+            stroke="var(--foreground)"
+            stroke-width="1.25"
+          />
+          {#if !isLive}
+            <foreignObject x="0" y="0" {width} height={PLOT - 8}>
+              <p
+                class="grid place-items-center p-4 text-center text-xs/snug text-pretty text-muted-foreground block-full"
+              >
+                <span class="bg-background/85 px-2 py-1 max-inline-64"
+                  >{m.night_dial_dots_empty()}</span
+                >
+              </p>
+            </foreignObject>
+          {/if}
+          {#if isLive && !isSettled}
+            <path
+              d="M{x(band.mid)} {PLOT + 2} l-5 -8 h10 z"
+              fill={band.mid >= 0 ? toneA : toneB}
+              stroke="var(--background)"
+              stroke-width="1.5"
+            />
+          {/if}
+          {#if counted != null}
+            <circle
+              cx={x(counted)}
+              cy={PLOT}
+              r="4.5"
+              fill="var(--background)"
+              stroke="var(--foreground)"
+              stroke-width="2"
+            />
+          {/if}
+          <text
+            x={x(0)}
+            y={PLOT + 22}
+            text-anchor="middle"
+            class="fill-foreground text-[11px] font-semibold"
+            >{m.night_dial_tie()}</text
+          >
+        </svg>
+      </div>
+      <p
+        class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground min-block-5"
+      >
+        <span class="flex items-center gap-1.5">
+          <span class="flex gap-0.5"
+            ><span
+              class="rounded-full block-1.5 inline-1.5"
+              style:background-color={toneA}
+            ></span><span
+              class="rounded-full block-1.5 inline-1.5"
+              style:background-color={toneB}
+            ></span></span
+          >
+          {m.night_dial_dots()}
+        </span>
+        <span class="flex items-center gap-1.5"
+          ><span
+            class="rounded-full border-2 border-foreground block-2.5 inline-2.5"
+          ></span>{m.night_dial_counted()}</span
+        >
+        {#if isLive && !isSettled}
+          <span class="flex items-center gap-1.5">
+            <span class="rounded-full bg-foreground/30 block-1.5 inline-4"
+            ></span>
+            {m.night_dial_range(range)}
+          </span>
+        {/if}
+      </p>
+    </figure>
+
+    <dl
+      class="grid content-start text-[0.8125rem] @max-4xl:grid-cols-2 @4xl:divide-y @4xl:divide-border"
+    >
+      <div class="grid gap-1 pbe-3">
+        <dt class="text-muted-foreground">{m.night_dial_expected()}</dt>
+        <dd class="font-figures tabular-nums">
+          {#if isLive && estimate != null && !isSettled}
+            <span class="text-xl font-semibold"
+              >{compact(estimate.expectedTotal.mid)}</span
+            >
+            <span class="block text-xs text-muted-foreground"
+              >{compact(estimate.expectedTotal.low)}–{compact(
+                estimate.expectedTotal.high,
+              )}</span
             >
           {:else}
             <span
-              class="font-figures text-xl leading-none font-semibold text-muted-foreground/50"
+              class="block text-xl/tight font-semibold text-muted-foreground/50"
               aria-hidden="true">–</span
             >
           {/if}
-        {/each}
+        </dd>
       </div>
-    </div>
-    <div class="relative block-2.5" aria-hidden="true">
-      {#if isLive}
-        <span
-          class="absolute inset-y-0 inset-s-0 rounded-s-full"
-          style:inline-size="{split.current * 100}%"
-          style:background-color={toneA}
-        ></span>
-        <span
-          class="absolute inset-y-0 inset-e-0 rounded-e-full"
-          style:inline-size="{(1 - split.current) * 100}%"
-          style:background-color={toneB}
-        ></span>
-        <span
-          class="absolute -inset-y-0.5 -translate-x-1/2 bg-background inline-0.5"
-          style:left="{split.current * 100}%"
-        ></span>
-      {:else}
-        <span
-          class="absolute inset-0 rounded-full border border-dashed border-border"
-        ></span>
-      {/if}
-      <span class="absolute -inset-y-1 inset-s-1/2 bg-foreground/50 inline-px"
-      ></span>
-    </div>
-    <p class="truncate text-xs text-muted-foreground">
-      {#if isLive && favored != null}
-        {isSettled
-          ? m.night_dial_settled({ name: favored.label })
-          : m.night_dial_chance({ name: favored.label })}
-      {:else}
-        {idle}
-      {/if}
-    </p>
-    <figure class="grid gap-1 pbs-1">
-      <figcaption class="text-xs text-muted-foreground">
-        {m.night_dial_history()}
-      </figcaption>
-      <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2">
-        <div class="relative overflow-hidden rounded-xs bg-muted/40 block-14">
-          {#if spark.line === ""}
-            <span
-              class="absolute inset-x-0 inset-bs-1/2 border-bs border-dashed border-foreground/25"
-              aria-hidden="true"
-            ></span>
-            <span
-              class="absolute inset-0 grid place-items-center text-[0.6875rem] text-muted-foreground"
-              ><span class="bg-background/80 px-1.5"
-                >{m.night_dial_history_empty()}</span
-              ></span
+      <div
+        class="grid gap-1 @max-4xl:border-s @max-4xl:border-border @max-4xl:ps-4 @4xl:pbs-3"
+      >
+        <dt class="text-muted-foreground">{m.night_dial_left()}</dt>
+        <dd class="font-figures tabular-nums">
+          {#if isLive && estimate != null && !isSettled}
+            <span class="text-xl font-semibold"
+              >{count(
+                Math.max(
+                  0,
+                  Math.round(estimate.expectedTotal.mid - estimate.counted),
+                ),
+              )}</span
             >
           {:else}
-            <svg
-              viewBox="0 0 100 40"
-              preserveAspectRatio="none"
-              class="absolute inset-0 block-full inline-full"
-              aria-hidden="true"
+            <span
+              class="block text-xl/tight font-semibold text-muted-foreground/50"
+              aria-hidden="true">–</span
             >
-              <defs>
-                <clipPath id="dial-above"
-                  ><rect x="0" y="0" width="100" height="20" /></clipPath
-                >
-                <clipPath id="dial-below"
-                  ><rect x="0" y="20" width="100" height="20" /></clipPath
-                >
-              </defs>
-              <path
-                d={spark.fill}
-                fill={toneA}
-                fill-opacity="0.18"
-                clip-path="url(#dial-above)"
-              />
-              <path
-                d={spark.fill}
-                fill={toneB}
-                fill-opacity="0.18"
-                clip-path="url(#dial-below)"
-              />
-              <line
-                x1="0"
-                x2="100"
-                y1="20"
-                y2="20"
-                stroke="var(--foreground)"
-                stroke-opacity="0.35"
-                stroke-dasharray="2 2"
-                vector-effect="non-scaling-stroke"
-              />
-              <path
-                d={spark.line}
-                fill="none"
-                stroke={toneA}
-                stroke-width="1.75"
-                vector-effect="non-scaling-stroke"
-                stroke-linejoin="round"
-                clip-path="url(#dial-above)"
-              />
-              <path
-                d={spark.line}
-                fill="none"
-                stroke={toneB}
-                stroke-width="1.75"
-                vector-effect="non-scaling-stroke"
-                stroke-linejoin="round"
-                clip-path="url(#dial-below)"
-              />
-            </svg>
           {/if}
-        </div>
-        <div
-          class="grid content-between text-[0.6875rem] font-semibold"
-          aria-hidden="true"
-        >
-          <span style:color={toneA}>{surname(a)}</span>
-          <span style:color={toneB}>{surname(b)}</span>
-        </div>
+        </dd>
       </div>
-    </figure>
-  </div>
-
-  <figure class="grid content-start gap-2.5">
-    <figcaption
-      class="flex items-baseline justify-between gap-3 text-[0.8125rem]"
-    >
-      <span class="font-semibold">{m.night_dial_margin()}</span>
-      {#if isLive && !isSettled}
-        <span
-          class="font-figures font-semibold tabular-nums"
-          style:color={band.mid >= 0 ? toneA : toneB}>{signed(band.mid)}</span
-        >
-      {/if}
-    </figcaption>
-    <div class="relative" bind:clientWidth={width}>
-      <svg
-        viewBox="0 0 {width} {PLOT + 30}"
-        class="block overflow-visible inline-full"
-        style:block-size="{PLOT + 30}px"
-        role="img"
-        aria-label={isLive && a != null
-          ? m.night_dial_dots_aria({ count: count(winsA), name: a.label })
-          : idle}
-      >
-        <rect
-          x="0"
-          y="0"
-          width={x(0)}
-          height={PLOT}
-          fill={toneA}
-          fill-opacity="0.04"
-        />
-        <rect
-          x={x(0)}
-          y="0"
-          width={width - x(0)}
-          height={PLOT}
-          fill={toneB}
-          fill-opacity="0.04"
-        />
-        {#each ticks as tick (tick)}
-          <line
-            x1={x(tick)}
-            x2={x(tick)}
-            y1="0"
-            y2={PLOT}
-            stroke="var(--border)"
-            stroke-dasharray="2 3"
-          />
-          <text
-            x={x(tick)}
-            y={PLOT + 22}
-            text-anchor={Math.abs(tick) < reach - 1e-6
-              ? "middle"
-              : tick > 0
-                ? "start"
-                : "end"}
-            class="font-figures text-[10px] tabular-nums"
-            style:fill={tick >= 0 ? toneA : toneB}
-            fill-opacity="0.75">+{lead(Math.abs(tick), 0)}</text
-          >
-        {/each}
-        {#if isLive && !isSettled}
-          <rect
-            x={x(band.high)}
-            y={PLOT + 2}
-            width={Math.max(2, x(band.low) - x(band.high))}
-            height="5"
-            rx="2.5"
-            fill={band.mid >= 0 ? toneA : toneB}
-            fill-opacity="0.3"
-          />
-        {/if}
-        {#if dots.list.length > 0}
-          {#each dots.list as dot (dot.id)}
-            <circle
-              r={dots.size / 2 - 0.6}
-              cx="0"
-              cy="0"
-              fill={dot.isA ? toneA : toneB}
-              class="transition-transform duration-700 ease-out motion-reduce:transition-none"
-              style:transform="translate({dot.cx}px, {dot.cy}px)"
-              style:transition-delay="{prefersReducedMotion.current
-                ? 0
-                : (dot.id % 20) * 12}ms"
-            />
-          {/each}
-        {/if}
-        <line
-          x1="0"
-          x2={width}
-          y1={PLOT}
-          y2={PLOT}
-          stroke="var(--foreground)"
-          stroke-opacity="0.55"
-        />
-        <line
-          x1={x(0)}
-          x2={x(0)}
-          y1="-4"
-          y2={PLOT + 8}
-          stroke="var(--foreground)"
-          stroke-width="1.25"
-        />
-        {#if !isLive}
-          <foreignObject x="0" y="0" {width} height={PLOT - 8}>
-            <p
-              class="grid place-items-center p-4 text-center text-xs/snug text-pretty text-muted-foreground block-full"
-            >
-              <span class="bg-background/85 px-2 py-1 max-inline-64"
-                >{m.night_dial_dots_empty()}</span
-              >
-            </p>
-          </foreignObject>
-        {/if}
-        {#if isLive && !isSettled}
-          <path
-            d="M{x(band.mid)} {PLOT + 2} l-5 -8 h10 z"
-            fill={band.mid >= 0 ? toneA : toneB}
-            stroke="var(--background)"
-            stroke-width="1.5"
-          />
-        {/if}
-        {#if counted != null}
-          <circle
-            cx={x(counted)}
-            cy={PLOT}
-            r="4.5"
-            fill="var(--background)"
-            stroke="var(--foreground)"
-            stroke-width="2"
-          />
-        {/if}
-        <text
-          x={x(0)}
-          y={PLOT + 22}
-          text-anchor="middle"
-          class="fill-foreground text-[11px] font-semibold"
-          >{m.night_dial_tie()}</text
-        >
-      </svg>
-    </div>
-    <p
-      class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground min-block-5"
-    >
-      <span class="flex items-center gap-1.5">
-        <span class="flex gap-0.5"
-          ><span
-            class="rounded-full block-1.5 inline-1.5"
-            style:background-color={toneA}
-          ></span><span
-            class="rounded-full block-1.5 inline-1.5"
-            style:background-color={toneB}
-          ></span></span
-        >
-        {m.night_dial_dots()}
-      </span>
-      <span class="flex items-center gap-1.5"
-        ><span
-          class="rounded-full border-2 border-foreground block-2.5 inline-2.5"
-        ></span>{m.night_dial_counted()}</span
-      >
-      {#if isLive && !isSettled}
-        <span class="flex items-center gap-1.5">
-          <span class="rounded-full bg-foreground/30 block-1.5 inline-4"></span>
-          {m.night_dial_range(range)}
-        </span>
-      {/if}
-    </p>
-  </figure>
-
-  <dl
-    class="grid content-start text-[0.8125rem] lg:divide-y lg:divide-border max-lg:grid-cols-2"
-  >
-    <div class="grid gap-1 pbe-3">
-      <dt class="text-muted-foreground">{m.night_dial_expected()}</dt>
-      <dd class="font-figures tabular-nums">
-        {#if isLive && estimate != null && !isSettled}
-          <span class="text-xl font-semibold"
-            >{compact(estimate.expectedTotal.mid)}</span
-          >
-          <span class="block text-xs text-muted-foreground"
-            >{compact(estimate.expectedTotal.low)}–{compact(
-              estimate.expectedTotal.high,
-            )}</span
-          >
-        {:else}
-          <span
-            class="block text-xl/tight font-semibold text-muted-foreground/50"
-            aria-hidden="true">–</span
-          >
-        {/if}
-      </dd>
-    </div>
-    <div
-      class="grid gap-1 lg:pbs-3 max-lg:border-s max-lg:border-border max-lg:ps-4"
-    >
-      <dt class="text-muted-foreground">{m.night_dial_left()}</dt>
-      <dd class="font-figures tabular-nums">
-        {#if isLive && estimate != null && !isSettled}
-          <span class="text-xl font-semibold"
-            >{count(
-              Math.max(
-                0,
-                Math.round(estimate.expectedTotal.mid - estimate.counted),
-              ),
-            )}</span
-          >
-        {:else}
-          <span
-            class="block text-xl/tight font-semibold text-muted-foreground/50"
-            aria-hidden="true">–</span
-          >
-        {/if}
-      </dd>
-    </div>
-  </dl>
-</section>
+    </dl>
+  </section>
+</div>

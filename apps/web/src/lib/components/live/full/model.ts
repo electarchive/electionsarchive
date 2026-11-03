@@ -322,8 +322,12 @@ export function holding(control: Control | null, race: LiveRace) {
   if (holder?.party == null) {
     return null;
   }
+  const party = control?.parties[holder.party];
   return {
-    party: control?.parties[holder.party]?.short ?? "",
+    party: party?.short ?? "",
+    partyId: holder.party,
+    color: swatch(party?.color ?? null, `party:${holder.party}`),
+    person: holder.person,
     name: holder.name,
   };
 }

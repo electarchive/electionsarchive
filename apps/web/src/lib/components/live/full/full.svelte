@@ -23,9 +23,12 @@
   import type { Summary } from "#lib/live/summary.js";
   import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import Dial from "#lib/components/live/dial.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
   import Also from "#lib/components/live/state/also.svelte";
+  import Withheld from "#lib/components/live/withheld.svelte";
   import Monogram from "#lib/components/monogram.svelte";
+  import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { percent } from "#lib/format.js";
@@ -37,6 +40,7 @@
     surname,
     tone,
   } from "#lib/live/format.js";
+  import { history } from "#lib/live/history.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
@@ -292,6 +296,28 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
+  const forecast = $derived.by(() => {
+    if (
+      race == null ||
+      current == null ||
+      estimate == null ||
+      estimate.status === "unavailable" ||
+      race.certified != null ||
+      current.projected != null ||
+      current.winner != null ||
+      current.total === 0 ||
+      (race.isMeasure === true &&
+        race.options.filter((option) => !option.isWriteIn).length > 2)
+    ) {
+      return null;
+    }
+    const [a, b] = racePair;
+    return {
+      history: history(race, null),
+      counted:
+        ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total,
+    };
+  });
   const hasVotes = $derived(
     isSpread
       ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
@@ -1507,6 +1533,7 @@
       summaries={[...statewide, ...seats]}
       current={isOverview ? null : (race?.slug ?? null)}
       label={m.livemap_races()}
+      isCompact
       overview={hasOverview
         ? {
             label: m.livemap_overview(),
@@ -1654,7 +1681,17 @@
       {/if}
     </div>
   {:else if current != null}
-    <p class="truncate text-[0.9375rem] font-[720]">{current.race.title}</p>
+    <div class="flex items-start justify-between gap-3">
+      <p class="line-clamp-2 text-[0.9375rem]/5 font-[720] text-pretty">
+        {current.race.title}
+      </p>
+      <Button
+        href={toLive(current.race.slug)}
+        size="sm"
+        variant="outline"
+        class="shrink-0">{m.night_state_results()}</Button
+      >
+    </div>
     <p class="line-clamp-2 font-serif text-sm/snug text-pretty">
       {describe(current, closing(election, current.race), clock)}
     </p>
@@ -1760,6 +1797,18 @@
         {clock}
         {forecasts}
       />
+      {#if forecast != null}
+        <Withheld isOff={!forecasts}>
+          <Dial
+            options={current.race.options}
+            pair={racePair}
+            {estimate}
+            history={forecast.history}
+            counted={forecast.counted}
+            isWaiting={false}
+          />
+        </Withheld>
+      {/if}
       <CountyList
         {rows}
         options={current.race.options}
@@ -1794,7 +1843,7 @@
 {/snippet}
 
 <div
-  class="fixed inset-0 z-40 grid grid-rows-[auto_minmax(0,1fr)] bg-card text-foreground"
+  class="fixed inset-0 z-40 grid grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] bg-card text-foreground"
 >
   <header
     class="relative z-30 flex items-center gap-x-3 border-be bg-card px-3 block-14 md:gap-x-4 md:px-4"
@@ -1902,7 +1951,7 @@
 
   {#if !isMounted}
     <div
-      class="grid min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
+      class="grid grid-cols-[minmax(0,1fr)] min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
       aria-busy="true"
     >
       <div
@@ -1940,6 +1989,7 @@
     <div
       class={cn("grid min-block-0", {
         "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
+        "grid-cols-[minmax(0,1fr)]": !wide.current,
       })}
     >
       <main class="relative min-block-0" bind:clientHeight={room}>

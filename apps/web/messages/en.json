@@ -4486,6 +4486,7 @@
   "night_races_leads": "{name} leads by {margin}",
   "night_races_waiting": "{count} waiting",
   "night_races_won": "{name} won",
+  "night_races_projected": "{name} projected to win",
   "night_index_all": "All {count} races",
   "night_index_previous": "Previous race: {race}",
   "night_index_next": "Next race: {race}",

@@ -151,7 +151,7 @@ async function holders(
   isNation: boolean,
 ) {
   return remember(
-    isNation ? `live:control:v2:${date}` : `live:holders:v2:${key}`,
+    isNation ? `live:control:v3:${date}` : `live:holders:v3:${key}`,
     async () => control(races, date),
   );
 }
