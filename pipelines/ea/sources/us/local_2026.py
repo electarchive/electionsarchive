@@ -10555,7 +10555,7 @@ def parse() -> None:
                 unowned[state_code].append(
                     (
                         county_code,
-                        full,
+                        re.sub(r" township$", " Township", full),
                         f"town:{geoid}",
                         owned.get(f"town:{geoid}")
                         or f"us/{state_code.lower()}/{slug(full)}-{slug(counties_ks[county_code])}-county",
