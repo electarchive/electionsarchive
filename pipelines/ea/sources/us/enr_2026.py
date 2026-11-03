@@ -1626,7 +1626,14 @@ def plan(
                     and difflib.SequenceMatcher(None, words[-1], terms(name)[-1]).ratio() >= 0.9
                 ]
                 hits = [(1, option) for option in spelled] if len(spelled) == 1 else []
-            if hits and (len(hits) == 1 or hits[0][0] > hits[1][0]):
+            if hits and (
+                len(hits) == 1
+                or hits[0][0] > hits[1][0]
+                or len(
+                    {tuple(w for w in words if len(w) > 1) for option, words in named if option in {h[1] for h in hits}}
+                )
+                == 1
+            ):
                 ballots[name] = hits[0][1]
             else:
                 unmatched.append(f"{contest_key}: no option for {name}")
