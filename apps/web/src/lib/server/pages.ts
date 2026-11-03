@@ -2042,7 +2042,7 @@ export async function livePage(path: string, at: string | null) {
                         mid: band.mid * flip,
                         high: Math.max(band.low * flip, band.high * flip),
                       },
-                shareIn: summary.estimate.shareIn.mid,
+                shareIn: Math.min(0.99, summary.estimate.shareIn.mid),
               },
         source: race.source,
         feed:

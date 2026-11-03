@@ -55,7 +55,7 @@ export function history(race: LiveRace, until: string | null): Array<Point> {
       high: Math.max(low, high),
       share:
         found.status === "estimating" || found.status === "too-early"
-          ? Math.min(1, found.shareIn.mid)
+          ? Math.min(0.99, found.shareIn.mid)
           : null,
       isLive: found.status === "estimating",
     });

@@ -63,7 +63,7 @@
         share:
           found?.share ??
           (expected != null && expected > 0
-            ? Math.min(1, total / expected)
+            ? Math.min(0.99, total / expected)
             : null),
         band: found?.isLive === true ? found : null,
       };

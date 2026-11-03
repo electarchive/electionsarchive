@@ -229,7 +229,7 @@
       return m.night_head_estimating({
         name,
         margin: lead(Math.abs(signed ?? 0)),
-        share: percent(Math.min(1, estimate.shareIn.mid), 0),
+        share: percent(Math.min(0.99, estimate.shareIn.mid), 0),
       });
     }
     return m.night_head_counting({

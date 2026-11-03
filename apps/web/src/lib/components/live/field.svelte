@@ -83,7 +83,7 @@
     `${(Math.max(0, Math.min(ceiling, value)) / ceiling) * 100}%`;
   const shareIn = $derived(
     isLive && estimate != null
-      ? Math.min(1, estimate.shareIn.mid)
+      ? Math.min(0.99, estimate.shareIn.mid)
       : now.isFinal
         ? 1
         : null,

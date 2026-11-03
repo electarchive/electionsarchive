@@ -57,13 +57,13 @@ export function summarize(
     estimate != null &&
     (estimate.status === "estimating" || estimate.status === "too-early")
   ) {
-    counted = Math.min(1, estimate.shareIn.mid);
+    counted = Math.min(0.99, estimate.shareIn.mid);
   } else if (
     frame?.reporting != null &&
     frame.expected != null &&
     frame.expected > 0
   ) {
-    counted = Math.min(1, frame.reporting / frame.expected);
+    counted = Math.min(0.99, frame.reporting / frame.expected);
   }
   const leader =
     total > 0 && first != null ? (race.options[first] ?? null) : null;
@@ -140,7 +140,7 @@ export function describe(summary: Summary, closes: number, time: number) {
     return m.night_head_estimating({
       name: leader.label,
       margin: lead(margin),
-      share: percent(Math.min(1, estimate.shareIn.mid), 0),
+      share: percent(Math.min(0.99, estimate.shareIn.mid), 0),
     });
   }
   return m.night_head_counting({
