@@ -3,7 +3,7 @@ import { version as build, dev } from "$app/env";
 import { createHash } from "node:crypto";
 import { cookieName, isLocale } from "#lib/paraglide/runtime.js";
 
-const LOCALE = "x-locale";
+export const LOCALE = "x-locale";
 
 const BUILD = "build";
 
@@ -34,10 +34,10 @@ function isShareable(
     return false;
   }
   const chosen = cookies.get(cookieName);
-  return (
-    (request.headers.get(LOCALE) ?? undefined) === chosen &&
-    (chosen == null || isLocale(chosen))
-  );
+  const edge = request.headers.get(LOCALE);
+  return chosen == null
+    ? edge == null || isLocale(edge)
+    : edge === chosen && isLocale(chosen);
 }
 
 async function settled(response: Response, isMoved: boolean) {

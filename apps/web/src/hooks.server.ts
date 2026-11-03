@@ -4,16 +4,34 @@ import { building, dev } from "$app/env";
 import { READ_ONLY } from "$app/env/public";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
+import {
+  cookieName,
+  defineCustomServerStrategy,
+  isLocale,
+} from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
 import { refreshing } from "#lib/server/cache.js";
-import { mark, skewed } from "#lib/server/edge.js";
+import { LOCALE, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
 import { twin } from "#lib/server/twin.js";
 
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
+
+const CHOSEN = new RegExp(String.raw`(?:^|;\s*)${cookieName}=`, "u");
+
+defineCustomServerStrategy("custom-edge", {
+  getLocale: (request) => {
+    const edge = request?.headers.get(LOCALE);
+    return edge != null &&
+      isLocale(edge) &&
+      !CHOSEN.test(request?.headers.get("cookie") ?? "")
+      ? edge
+      : undefined;
+  },
+});
 
 const REFRESH = "x-ea-refresh";
 

@@ -1,4 +1,16 @@
 import { version } from "$app/env";
+import {
+  defineCustomClientStrategy,
+  isLocale,
+} from "#lib/paraglide/runtime.js";
+
+defineCustomClientStrategy("custom-edge", {
+  getLocale: () => {
+    const { lang } = document.documentElement;
+    return isLocale(lang) ? lang : undefined;
+  },
+  setLocale: () => {},
+});
 
 const native = fetch.bind(globalThis);
 

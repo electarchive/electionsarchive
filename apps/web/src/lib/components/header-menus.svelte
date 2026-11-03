@@ -20,6 +20,7 @@
   } from "@lucide/svelte";
   import { setMode, userPrefersMode } from "mode-watcher";
   import { onMount } from "svelte";
+  import Language from "#lib/components/language.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
@@ -27,6 +28,7 @@
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { locales } from "#lib/paraglide/runtime.js";
 
   const {
     links,
@@ -219,6 +221,12 @@
             onValueChange={theme}
           />
         </div>
+        {#if locales.length > 1}
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-semibold">{m.language_label()}</span>
+            <Language />
+          </div>
+        {/if}
         <label class="flex items-center justify-between gap-3 text-sm">
           {m.palette_safe()}
           <Switch bind:checked={palette.isSafe} />
