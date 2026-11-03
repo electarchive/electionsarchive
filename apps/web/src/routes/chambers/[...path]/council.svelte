@@ -378,14 +378,13 @@
     <h2 id="{uid}-holders" class="text-lg/tight font-[740] tracking-[-0.012em]">
       {m.council_holders_title()}
     </h2>
-    <p
-      class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
-    >
-      {m.council_holders_lede()}
-      {#if !hasTenures}
+    {#if !hasTenures}
+      <p
+        class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+      >
         {m.council_tenures_note()}
-      {/if}
-    </p>
+      </p>
+    {/if}
   </div>
   <div class="columns-xs gap-x-8">
     {#each opened.has("holders") ? council.seats : council.seats.slice(0, 12) as seat (seat.key)}

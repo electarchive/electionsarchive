@@ -261,11 +261,7 @@ export function historyMarkdown(
   entries: Array<HistoryEntry>,
   next: string | null,
 ) {
-  const lines = [
-    `# ${inline(m.history_page_title({ name: entity.name }))}`,
-    "",
-    m.history_lede(),
-  ];
+  const lines = [`# ${inline(m.history_page_title({ name: entity.name }))}`];
   if (entries.length === 0) {
     lines.push("", m.history_empty());
   }

@@ -1163,17 +1163,16 @@
         <h2 id="{uid}-results" class="text-[0.8125rem] font-bold">
           {m.polity_results_title({ place: polity.name })}
         </h2>
-        <p class="text-[0.8125rem] text-muted-foreground">
-          {m.polity_results_lede({ place: polity.name })}
-          {#if sourced != null}
+        {#if sourced != null}
+          <p class="text-[0.8125rem] text-muted-foreground">
             {(sourced.isMixed
               ? m.polity_results_sourced_most
               : m.polity_results_sourced_one)({
               place: polity.name,
               publisher: sourced.usual,
             })}
-          {/if}
-        </p>
+          </p>
+        {/if}
       </div>
       <ol class="grid">
         {#each results as group (group.date)}

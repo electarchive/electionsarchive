@@ -38,12 +38,7 @@
 
 {#snippet body()}
   <div class="grid gap-3 p-3">
-    <div class="grid gap-0.5">
-      <p class="text-[0.9375rem] font-semibold">{m.footer_cite()}</p>
-      <p class="text-[0.8125rem] text-pretty text-muted-foreground">
-        {m.footer_cite_lede()}
-      </p>
-    </div>
+    <p class="text-[0.9375rem] font-semibold">{m.footer_cite()}</p>
     <Segmented
       options={FORMATS.map((value) => ({ value, label: value }))}
       bind:value={format}

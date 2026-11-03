@@ -352,9 +352,6 @@
           <h2 id="members-title" class="heading">
             {m.party_members_title()}
           </h2>
-          <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-            {m.party_members_lede({ name: party.name })}
-          </p>
         </div>
         <ul class="grid text-sm">
           {#each data.members as member, index (index)}

@@ -20,9 +20,6 @@
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <h1 class="title">{m.changelog_title()}</h1>
-    <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
-      {m.changelog_lede()}
-    </p>
   </header>
 
   {#if data.versions.length === 0}

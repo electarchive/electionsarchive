@@ -421,9 +421,7 @@
               class="group grid gap-3 py-4"
               href={resolve("/[...path]", { path: election.path })}
             >
-              <span
-                class="flex flex-wrap items-baseline justify-between gap-x-4"
-              >
+              <span class="grid gap-1">
                 <span
                   class="text-lg/tight font-[740] tracking-[-0.012em] text-balance underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
                   >{election.name}</span
@@ -447,12 +445,7 @@
         class="grid content-start gap-3 px-3.5 pbs-6 pbe-6"
         aria-labelledby="past-title"
       >
-        <div class="grid gap-0.5">
-          <h2 id="past-title" class="heading">{m.home_today()}</h2>
-          <p class="text-[0.8125rem] text-muted-foreground">
-            {m.home_today_lede()}
-          </p>
-        </div>
+        <h2 id="past-title" class="heading">{m.home_today()}</h2>
         <ol class="grid gap-x-6 sm:grid-cols-2">
           {#each past as election (election.path)}
             <li

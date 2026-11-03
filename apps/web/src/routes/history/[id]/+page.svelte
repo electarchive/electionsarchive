@@ -40,9 +40,6 @@
   <header class="grid gap-3">
     <h1 class="title text-balance">{data.entity.name}</h1>
     <RecordTabs entity={data.entity} current="history" />
-    <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
-      {m.history_lede()}
-    </p>
   </header>
 
   {#if data.entries.length === 0}

@@ -58,9 +58,6 @@
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <h1 class="title">{m.proposals_heading()}</h1>
-    <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
-      {m.proposals_lede()}
-    </p>
     <div class="grid gap-1.5">
       <FilterNav
         label={m.proposals_filter_state()}

@@ -1755,7 +1755,6 @@ function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
       ? []
       : [
           `## ${m.home_today()}`,
-          m.home_today_lede(),
           table(
             [m.col_date(), m.col_election(), m.col_polity()],
             data.past.map((election) => [
@@ -3851,7 +3850,6 @@ function electionMarkdown(
       ? []
       : [
           `## ${m.alongside_title()}`,
-          m.alongside_lede(),
           ...alongside.flatMap((group) => [
             `### ${link(group.name, group.path)}`,
             table(
@@ -6550,7 +6548,7 @@ function chamberMarkdown(
                 .join("\n"),
             ]),
           `## ${m.council_holders_title()}`,
-          `${m.council_holders_lede()}${body.tenures > 0 ? "" : ` ${m.council_tenures_note()}`}`,
+          ...(body.tenures > 0 ? [] : [m.council_tenures_note()]),
           council.seats
             .map(
               (seat) =>

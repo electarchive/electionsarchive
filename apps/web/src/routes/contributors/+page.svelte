@@ -27,9 +27,6 @@
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
     <h1 class="title">{m.contributors_heading()}</h1>
-    <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
-      {m.contributors_lede()}
-    </p>
     <form method="GET" role="search" class="flex gap-2 max-inline-md">
       <Input
         name="q"

@@ -348,11 +348,6 @@
       <h2 id="{uid}-title" class="heading">
         {panels.length > 0 ? m.tiers_title() : m.election_places({ noun })}
       </h2>
-      {#if panels.length > 0}
-        <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-          {m.tiers_lede({ noun })}
-        </p>
-      {/if}
     </div>
     <div
       class={cn("grid grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-6", {

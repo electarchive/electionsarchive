@@ -27,11 +27,6 @@
       <h2 id="{uid}-title" class="text-[0.8125rem] font-bold">
         {m.alongside_title()}
       </h2>
-      <p
-        class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
-      >
-        {m.alongside_lede()}
-      </p>
     </div>
     <div class="columns-sm gap-x-8">
       {#each groups as group (group.path ?? group.name)}
