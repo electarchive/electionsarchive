@@ -12,6 +12,7 @@ import {
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
 import { refreshing } from "#lib/server/cache.js";
+import { isTraining } from "#lib/server/crawlers.js";
 import { LOCALE, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
@@ -118,9 +119,20 @@ const authHandle: Handle = async ({ event, resolve }) => {
 };
 
 const twinHandle: Handle = async ({ event, resolve }) => {
-  const response = (await twin(event)) ?? (await resolve(event));
+  const isReader = isTraining(event.request.headers.get("user-agent"));
+  const twinned = await twin(event, isReader);
+  const isFallback =
+    isReader &&
+    twinned?.status === 404 &&
+    !/\.(?:md|json)$/u.test(event.url.pathname);
+  const response =
+    twinned == null || isFallback ? await resolve(event) : twinned;
   if (response.headers.get("content-type")?.startsWith("text/html") === true) {
     response.headers.append("vary", "Accept");
+  }
+  if (isFallback) {
+    response.headers.append("vary", "User-Agent");
+    response.headers.set("cache-control", "private, no-cache");
   }
   return response;
 };

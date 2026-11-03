@@ -524,20 +524,38 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   return { ...found, record, holders, known, indices };
 }
 
-export async function twin({ request, url }: RequestEvent) {
-  if (
-    !["GET", "HEAD"].includes(request.method) ||
-    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog)(?:\/|\.|$)/.test(
-      url.pathname,
-    )
-  ) {
+export async function twin(
+  { fetch, request, url }: RequestEvent,
+  isReader: boolean,
+) {
+  if (!["GET", "HEAD"].includes(request.method)) {
     return null;
   }
   const suffix = /\.(json|md)$/.exec(url.pathname)?.[1] as
     | keyof typeof TYPES
     | undefined;
-  const format = suffix ?? negotiate(request.headers.get("accept"));
+  const asked = suffix ?? negotiate(request.headers.get("accept"));
+  const format = asked ?? (isReader ? "md" : null);
   if (format == null) {
+    return null;
+  }
+  const varies = asked == null ? "Accept, User-Agent" : "Accept";
+  if (/^\/(?:agents|proposals|bounties|recent|changelog)$/.test(url.pathname)) {
+    const sibling = await fetch(`${url.pathname}.${format}${url.search}`, {
+      method: request.method,
+    });
+    const response = new Response(sibling.body, sibling);
+    response.headers.set("vary", varies);
+    if (asked == null) {
+      response.headers.set("cache-control", "private, no-cache");
+    }
+    return response;
+  }
+  if (
+    /^\/(?:api|rpc|lab|_app|llms\.txt|robots\.txt|sitemap\.xml|sitemaps|og|agents|proposals|bounties|recent|watchlist|history|changelog)(?:\/|\.|$)/.test(
+      url.pathname,
+    )
+  ) {
     return null;
   }
   const pathname =
@@ -545,11 +563,14 @@ export async function twin({ request, url }: RequestEvent) {
       ? url.pathname
       : url.pathname.slice(0, -suffix.length - 1).replace(/^\/index$/, "") ||
         "/";
-  const headers = {
+  const headers: Record<string, string> = {
     "content-type": TYPES[format],
-    vary: "Accept",
+    vary: varies,
     link: `<${url.origin}${pathname}>; rel="canonical"`,
   };
+  if (asked == null) {
+    headers["cache-control"] = "private, no-cache";
+  }
   try {
     const data = await load(
       pathname.split("/").filter((segment) => segment !== ""),
