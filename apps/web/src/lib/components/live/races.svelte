@@ -128,7 +128,7 @@
                 : `${surname(option)} +${lead(entry.margin)}`,
               entry.winner != null,
             )}
-            {#if entry.later == null}
+            {#if entry.later == null && entry.counted != null}
               {@render meter(entry.counted)}
             {/if}
           </a>

@@ -69,16 +69,19 @@
             label={row.option.label}
             person={row.option.person}
             hasSwatch={false}
-            hasLink={false}
             class={cn("truncate font-sans", {
               "font-semibold": row.isInside,
               "text-muted-foreground": !row.isInside,
             })}
           />
           {#if row.option.party != null}
-            <span class="shrink-0 text-xs text-muted-foreground"
-              >{row.option.party.short}</span
-            >
+            <Name
+              label={row.option.party.short}
+              party={row.option.party.id}
+              color={row.option.party.color}
+              hasSwatch={false}
+              class="shrink-0 text-xs text-muted-foreground"
+            />
           {/if}
         </span>
         <span
