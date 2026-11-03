@@ -18,7 +18,10 @@ DETAILS = 40
 MINUTE = 55
 IDLE = 600
 RANK = {"General": 0, "Statewide": 1}
-CHAMBERS = {"State House": "house", "State Senate": "senate"}
+CHAMBERS = {
+    "State House": {"house", "assembly", "house-of-delegates", "legislature"},
+    "State Senate": {"senate", "legislature"},
+}
 CONGRESS = re.compile(r"-(\d+|AL)$")
 CACHE: dict[int, tuple[tuple, float, bytes]] = {}
 QUEUE: dict[str, list[dict[str, str]]] = {}
@@ -146,40 +149,47 @@ def seats(state: str) -> dict[str, set[str]]:
                    join contest_option o on o.contest_id = x.entity_id and o.parent_option_id is null and o.kind <> 'write_in'
                    left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
                    where x.scheme = 'us.contest' and x.value ~ %s""",
-                [rf"^{DAY}:{state}:(house|senate):[^:]+:g"],
+                [rf"^{DAY}:{state}:(house|assembly|house-of-delegates|legislature|senate)(:[^:]+){{1,2}}:gs?$"],
             ).fetchall():
                 found.setdefault(key, set()).add(person(label))
         SEATS[state] = found
     return SEATS[state]
 
 
-def legislature(state: str, chamber: str, race: dict) -> str | None:
+def legislature(state: str, chambers: set[str], race: dict) -> tuple[str, str] | None:
     people = {person(c.get("name") or "") for c in race.get("candidates") or []} - {""}
     if not people:
         return None
     numbers = {
         n.lstrip("0") for n in re.findall(r"\d+", f"{race.get('district') or ''} {race.get('election_name') or ''}")
     }
+    special = bool(re.search(r"unexpired|special", race.get("election_name") or "", re.IGNORECASE))
     scored = sorted(
         (
             (
                 len(people & wanted) / len(people | wanted),
                 bool(numbers & set(re.findall(r"\d+", key.split(":")[3]))),
+                key.endswith(":gs") == special,
                 key,
             )
             for key, wanted in seats(state).items()
-            if key.split(":")[2] == chamber
+            if key.split(":")[2] in chambers
         ),
         reverse=True,
     )
-    if not scored or scored[0][0] < 0.5 or len(scored) > 1 and scored[1][:2] == scored[0][:2]:
-        return None
-    return scored[0][2].split(":", 3)[3]
+    for picks in ([s for s in scored if s[0] >= 0.5], [s for s in scored if s[1] and s[0] > 0]):
+        if picks and (len(picks) == 1 or picks[1][:3] != picks[0][:3]):
+            _, _, chamber, seat = picks[0][3].split(":", 3)
+            return chamber, seat
+    return None
 
 
 def office(state: str, race: dict) -> tuple[str, str, str] | None:
     kind = race.get("election_type") or ""
     title = race.get("type") or ""
+    if title in CHAMBERS:
+        seat = legislature(state, CHAMBERS[title], race) if kind != "Statewide" else None
+        return (*seat, "") if seat else None
     if kind == "General":
         if title == "US Senate":
             return "senate", "", ""
@@ -187,9 +197,6 @@ def office(state: str, race: dict) -> tuple[str, str, str] | None:
         if title == "House of Representatives" and found:
             return "house", "0" if found[1] == "AL" else str(int(found[1])), ""
         return None
-    if title in CHAMBERS:
-        seat = legislature(state, CHAMBERS[title], race) if kind == "Local" else None
-        return (CHAMBERS[title], seat, "") if seat else None
     if kind == "Statewide":
         return ("governor", "", "") if title == "Governor" else ("state", "", race.get("election_name") or title)
     return "other", "", race.get("election_name") or title
