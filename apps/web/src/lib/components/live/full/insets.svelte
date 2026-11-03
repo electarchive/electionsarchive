@@ -153,7 +153,7 @@
               class="cursor-pointer outline-none"
               d={unit.d}
               fill={fills.get(unit.areaId)?.color ?? MUTED}
-              stroke="var(--card)"
+              stroke="var(--map-seam)"
               stroke-width="0.6"
               stroke-linejoin="round"
               vector-effect="non-scaling-stroke"

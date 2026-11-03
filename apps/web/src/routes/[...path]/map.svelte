@@ -2251,7 +2251,7 @@
         ...areas,
         filter: own == null ? inland : ["all", inland, ["!", around]],
         paint: {
-          "line-color": "var(--card)",
+          "line-color": "var(--map-seam)",
           "line-width":
             side < 16
               ? [
@@ -2381,7 +2381,7 @@
           id: "nested-seam",
           type: "line",
           ...nestedAreas,
-          paint: { "line-color": "var(--card)", "line-width": 0.75 },
+          paint: { "line-color": "var(--map-seam)", "line-width": 0.75 },
         },
         "fills",
       );

@@ -226,7 +226,7 @@
         "source-layer": "areas",
         filter: within,
         paint: {
-          "line-color": "var(--background)",
+          "line-color": "var(--map-seam)",
           "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.6, 9, 1.6],
         },
       },
@@ -489,7 +489,7 @@
         type: "line",
         ...pieces,
         paint: {
-          "line-color": "var(--background)",
+          "line-color": "var(--map-seam)",
           "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.8, 10, 1.6],
         },
       },

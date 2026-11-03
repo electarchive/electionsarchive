@@ -170,7 +170,7 @@
           source,
           "source-layer": "areas",
           filter: ["in", ["id"], ["literal", ks]],
-          paint: { "line-color": "var(--background)", "line-width": 1.1 },
+          paint: { "line-color": "var(--map-seam)", "line-width": 1.1 },
         },
         "lines",
         { group: "nation-layers" },

@@ -304,7 +304,7 @@
           ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
-            "line-color": "var(--background)",
+            "line-color": "var(--map-seam)",
             "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 9, 1.4],
           },
         },
