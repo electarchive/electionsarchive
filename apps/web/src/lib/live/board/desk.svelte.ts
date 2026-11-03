@@ -20,7 +20,8 @@ export class Desk {
       if (
         summary.race.office === "house" ||
         summary.total === 0 ||
-        summary.winner != null
+        summary.winner != null ||
+        summary.projected != null
       ) {
         continue;
       }

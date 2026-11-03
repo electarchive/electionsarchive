@@ -1,13 +1,13 @@
 <script lang="ts">
   import type { LiveOffice } from "@ea/analytics/live";
-  import CheckIcon from "@lucide/svelte/icons/check";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
-  import { short } from "#lib/live/board/labels.js";
+  import { ahead, called, short } from "#lib/live/board/labels.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Mark from "./mark.svelte";
 
   const {
     desk,
@@ -24,15 +24,15 @@
       ) {
         continue;
       }
-      const ahead = summary.winner ?? summary.leader;
-      if (kind === "closest" && summary.winner == null) {
+      const option = ahead(summary);
+      if (kind === "closest" && called(summary) == null) {
         found.push(summary);
       }
       if (
         kind === "flips" &&
-        ahead != null &&
-        !ahead.isIncumbent &&
-        summary.race.options.some((option) => option.isIncumbent)
+        option != null &&
+        !option.isIncumbent &&
+        summary.race.options.some((entry) => entry.isIncumbent)
       ) {
         found.push(summary);
       }
@@ -40,7 +40,7 @@
     return found.toSorted((a, b) =>
       kind === "closest"
         ? a.margin - b.margin
-        : Number(b.winner != null) - Number(a.winner != null) ||
+        : Number(called(b) != null) - Number(called(a) != null) ||
           b.margin - a.margin,
     );
   });
@@ -53,7 +53,7 @@
 {:else}
   <ol class="grid text-[0.8125em]">
     {#each rows as summary (summary.race.id)}
-      {const option = $derived(summary.winner ?? summary.leader)}
+      {const option = $derived(ahead(summary))}
       {const isPicked = $derived(desk.selected?.id === summary.race.id)}
       <li>
         <button
@@ -74,12 +74,7 @@
             <span class="truncate text-muted-foreground"
               >{surname(option ?? undefined)}</span
             >
-            {#if summary.winner != null}
-              <CheckIcon
-                class="shrink-0 block-3 inline-3"
-                aria-label={m.board_power_won()}
-              />
-            {/if}
+            <Mark {summary} />
           </span>
           <span class="font-figures font-semibold tabular-nums"
             >+{lead(summary.margin)}</span

@@ -3,10 +3,11 @@
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
-  import { MUTED, short, strength } from "#lib/live/board/labels.js";
+  import { ahead, MUTED, short, strength } from "#lib/live/board/labels.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import Atlas from "./atlas.svelte";
+  import Mark from "./mark.svelte";
 
   const { desk, office = "senate" }: { desk: Desk; office?: LiveOffice } =
     $props();
@@ -53,10 +54,9 @@
     if (office !== "house") {
       return races[0];
     }
-    const groups = Map.groupBy(races, (summary) =>
-      summary.winner == null && summary.leader == null
-        ? ""
-        : (summary.winner ?? summary.leader)?.party?.id,
+    const groups = Map.groupBy(
+      races,
+      (summary) => ahead(summary)?.party?.id ?? "",
     );
     let best: Array<Summary> = [];
     for (const [key, group] of groups) {
@@ -76,7 +76,7 @@
     <span class="text-muted-foreground">{m.night_nation_none()}</span>
   {/if}
   {#each races.slice(0, 4) as summary (summary.race.id)}
-    {const option = $derived(summary.winner ?? summary.leader)}
+    {const option = $derived(ahead(summary))}
     <span class="flex items-center justify-between gap-3">
       <span class="text-muted-foreground">{short(summary.race)}</span>
       {#if option == null}
@@ -91,6 +91,7 @@
           <span class="font-figures text-muted-foreground tabular-nums"
             >+{lead(summary.margin)}</span
           >
+          <Mark {summary} />
         </span>
       {/if}
     </span>

@@ -3,9 +3,15 @@
   import type { Summary } from "#lib/live/summary.js";
   import Hexes from "#lib/components/live/hexes.svelte";
   import { percent } from "#lib/format.js";
-  import { districtKey, short, strength } from "#lib/live/board/labels.js";
+  import {
+    ahead,
+    districtKey,
+    short,
+    strength,
+  } from "#lib/live/board/labels.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import Mark from "./mark.svelte";
 
   const { desk }: { desk: Desk } = $props();
 
@@ -32,7 +38,7 @@
   {#if summary == null}
     <span class="font-semibold">{key.toUpperCase()}</span>
   {:else}
-    {const option = $derived(summary.winner ?? summary.leader)}
+    {const option = $derived(ahead(summary))}
     <span class="font-semibold">{short(summary.race)}</span>
     {#if option == null}
       <span class="text-muted-foreground">{m.night_nation_waiting()}</span>
@@ -46,6 +52,7 @@
         <span class="font-figures text-muted-foreground tabular-nums"
           >+{lead(summary.margin)}</span
         >
+        <Mark {summary} />
       </span>
     {/if}
     {#if summary.counted != null}

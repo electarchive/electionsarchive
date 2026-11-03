@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LiveOffice } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
-  import { short, strength } from "#lib/live/board/labels.js";
+  import { ahead, called, short, strength } from "#lib/live/board/labels.js";
   import { lead, surname } from "#lib/live/format.js";
   import { cn } from "#lib/utils.js";
 
@@ -21,7 +21,7 @@
   );
 
   function describe(summary: (typeof tiles)[number]) {
-    const option = summary.winner ?? summary.leader;
+    const option = ahead(summary);
     return option == null
       ? short(summary.race)
       : `${short(summary.race)}: ${surname(option)} +${lead(summary.margin)}`;
@@ -36,7 +36,7 @@
 >
   {#each tiles as summary (summary.race.id)}
     {const isPicked = $derived(desk.selected?.id === summary.race.id)}
-    {const isWon = $derived(summary.winner != null)}
+    {const isWon = $derived(called(summary) != null)}
     <li>
       <button
         type="button"

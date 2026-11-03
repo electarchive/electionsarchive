@@ -38,7 +38,7 @@
           >
             <span
               class="font-figures text-[1.75em] leading-none font-[760] tabular-nums"
-              style:color={tone(group.option)}>{group.won + group.leading}</span
+              style:color={tone(group.option)}>{group.seats}</span
             >
             <span
               class="grid text-[0.6875em] leading-tight"
@@ -47,7 +47,11 @@
               <span class="font-semibold">{name(group)}</span>
               <span class="font-figures text-muted-foreground tabular-nums"
                 >{m.board_power_won()}
-                {group.won}, {m.board_power_leading().toLocaleLowerCase()}
+                {group.won}{#if group.projected > 0},
+                  {m.night_rating_projected().toLocaleLowerCase()}
+                  {group.projected}{/if}, {m
+                  .board_power_leading()
+                  .toLocaleLowerCase()}
                 {group.leading}</span
               >
             </span>
@@ -67,6 +71,11 @@
         ></span>
         <span
           class="transition-[inline-size] duration-700 motion-reduce:transition-none"
+          style:inline-size="{(group.projected / seats) * 100}%"
+          style:background-color="color-mix(in oklab, {tone(group.option)} 75%, var(--background))"
+        ></span>
+        <span
+          class="transition-[inline-size] duration-700 motion-reduce:transition-none"
           style:inline-size="{(group.leading / seats) * 100}%"
           style:background-color="color-mix(in oklab, {tone(group.option)} 45%, var(--background))"
         ></span>
@@ -77,6 +86,11 @@
           class="transition-[inline-size] duration-700 motion-reduce:transition-none"
           style:inline-size="{(right.leading / seats) * 100}%"
           style:background-color="color-mix(in oklab, {tone(right.option)} 45%, var(--background))"
+        ></span>
+        <span
+          class="transition-[inline-size] duration-700 motion-reduce:transition-none"
+          style:inline-size="{(right.projected / seats) * 100}%"
+          style:background-color="color-mix(in oklab, {tone(right.option)} 75%, var(--background))"
         ></span>
         <span
           class="transition-[inline-size] duration-700 motion-reduce:transition-none"

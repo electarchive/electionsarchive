@@ -4,38 +4,20 @@
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { bandFor, paint, tone } from "#lib/live/format.js";
+  import { paint, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
+  import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Also from "./also.svelte";
   import Seat from "./seat.svelte";
 
-  const {
-    entry,
-    href,
-    title,
-    isMapped = false,
-  }: {
-    entry: Entry;
-    href: string;
-    title: string;
-    isMapped?: boolean;
-  } = $props();
+  const { entry, href, title }: { entry: Entry; href: string; title: string } =
+    $props();
 
   const summary = $derived(entry.summary);
   const race = $derived(summary.race);
-  const band = $derived(
-    bandFor(
-      race.options,
-      summary.projected == null
-        ? (race.certified?.winners ??
-            (summary.winner == null ? [] : [summary.winner.id]))
-        : [summary.projected.id],
-      race.seats ?? 1,
-      summary.projected != null,
-    ),
-  );
+  const band = $derived(bandOf(summary));
   const reach = useReach();
   const split = $derived(lineup(race, summary.totals, reach(), 4));
 </script>
@@ -44,7 +26,6 @@
   {href}
   class={cn(
     "group grid content-start gap-3 bg-background p-4 transition-colors duration-700 outline-none motion-reduce:transition-none sm:px-5",
-    { "shadow-[inset_3px_0_0_var(--foreground)]": isMapped },
     {
       "hover:highlighter focus-visible:highlighter": band == null,
       "band focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset":
