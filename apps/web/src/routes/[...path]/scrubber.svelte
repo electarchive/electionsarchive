@@ -6,13 +6,8 @@
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import PauseIcon from "@lucide/svelte/icons/pause";
   import PlayIcon from "@lucide/svelte/icons/play";
-  import {
-    createQuery,
-    keepPreviousData,
-    queryOptions,
-    useQueryClient,
-  } from "@tanstack/svelte-query";
-  import { untrack } from "svelte";
+  import { queryOptions, useQueryClient } from "@tanstack/svelte-query";
+  import { onDestroy, untrack } from "svelte";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -40,45 +35,68 @@
 
   const uid = $props.id();
   const client = useQueryClient();
-
-  untrack(() => {
-    const path = latest?.path;
-    if (!browser || seed == null || path == null) {
-      return;
-    }
-    void client.prefetchQuery(
-      queryOptions({
-        queryKey: orpc.elections.locate.queryKey({ input: { path } }),
-        queryFn: async () => {
-          const found = await Promise.race([
-            Promise.resolve(seed).catch(() => null),
-            new Promise<null>((done) => setTimeout(done, 4000, null)),
-          ]);
-          if (found == null) {
-            return orpc.elections.locate.call({ path });
-          }
-          const input = { input: { id: found.located.id } };
-          client.setQueryData(orpc.elections.get.queryKey(input), found.hub);
-          client.setQueryData(orpc.seats.hexes.queryKey(input), found.hexes);
-          return found.located;
-        },
-      }),
-    );
-  });
-
-  const record = createQuery(() =>
+  const wanted = untrack(
+    () => Number(page.url.searchParams.get("year")) || null,
+  );
+  const recordOptions = untrack(() =>
     orpc.polities.record.queryOptions({ input: { id } }),
   );
 
+  async function load(path: string) {
+    const seeded =
+      path === latest?.path
+        ? await Promise.resolve(seed).catch(() => null)
+        : null;
+    const found = seeded?.path === path ? seeded : null;
+    const located =
+      found == null
+        ? await client.fetchQuery(
+            orpc.elections.locate.queryOptions({ input: { path } }),
+          )
+        : found.located;
+    const input = { input: { id: located.id } };
+    if (found != null) {
+      client.setQueryData(orpc.elections.get.queryKey(input), found.hub);
+      client.setQueryData(orpc.seats.hexes.queryKey(input), found.hexes);
+    }
+    const [hub, hexes] = await Promise.all([
+      client.fetchQuery(orpc.elections.get.queryOptions(input)),
+      client.fetchQuery(orpc.seats.hexes.queryOptions(input)).catch(() => null),
+    ]);
+    const race =
+      hub.races.find((entry) => entry.map != null && entry.places != null) ??
+      null;
+    const states =
+      race == null
+        ? await client.fetchQuery(orpc.elections.states.queryOptions(input))
+        : null;
+    return { hub, hexes, race, states };
+  }
+  const viewOptions = (path: string) =>
+    queryOptions({
+      queryKey: ["scrubber", path] as const,
+      queryFn: async () => load(path),
+    });
+
+  const stored = client.getQueryData(recordOptions.queryKey) ?? null;
+  let record = $state(stored);
+  let isRecordSettled = $state(stored != null);
+  let current = $state<{
+    path: string;
+    view: Awaited<ReturnType<typeof load>> | null;
+    isFailed: boolean;
+  } | null>(null);
+  let previous = $state<Awaited<ReturnType<typeof load>> | null>(null);
   let at = $state<number | null>(null);
   let isPlaying = $state(false);
-  let isDragging = $state(false);
-  let isEngaged = $state(false);
-  let settled = $state<string | null>(null);
+  let isDragging = false;
+  let isEngaged = false;
   let swipe: { x: number; y: number } | null = null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let playback: ReturnType<typeof setInterval> | undefined;
 
   const parties = $derived(
-    new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
+    new Map((record?.parties ?? []).map((party) => [party.id, party])),
   );
   const tint = (party: string | null) =>
     party == null
@@ -86,7 +104,7 @@
       : swatch(parties.get(party)?.color ?? null, `party:${party}`);
 
   const own = $derived(
-    (record.data?.series ?? []).filter((series) => !series.isAbroad),
+    (record?.series ?? []).filter((series) => !series.isAbroad),
   );
   const chamber = $derived(
     own
@@ -125,9 +143,6 @@
         return { ...point, tone: tint(top?.party ?? null) };
       }),
   );
-  const wanted = untrack(
-    () => Number(page.url.searchParams.get("year")) || null,
-  );
   const asked = $derived(
     wanted == null ? -1 : steps.findIndex((entry) => entry.year >= wanted),
   );
@@ -135,19 +150,11 @@
     Math.min(at ?? (asked === -1 ? steps.length - 1 : asked), steps.length - 1),
   );
 
-  $effect(() => {
-    if (at != null) {
-      keep({
-        year:
-          index === steps.length - 1 ? null : String(steps[index]?.year ?? ""),
-      });
-    }
-  });
   const step = $derived(
     steps[index] ??
       (latest?.path == null ||
       latest.date == null ||
-      (record.isPending && wanted != null)
+      (!isRecordSettled && wanted != null)
         ? null
         : {
             path: latest.path,
@@ -161,82 +168,122 @@
   const along = (year: number) =>
     last === first ? 0.5 : (year - first) / (last - first);
 
-  $effect(() => {
-    const path = step?.path ?? null;
-    const timer = setTimeout(() => (settled = path), isDragging ? 260 : 0);
-    return () => clearTimeout(timer);
-  });
-
-  $effect(() => {
-    if (!isPlaying) {
-      return;
-    }
-    const timer = setInterval(() => {
-      if (index >= steps.length - 1) {
-        isPlaying = false;
-      } else {
-        at = index + 1;
-      }
-    }, 1600);
-    return () => clearInterval(timer);
-  });
-
-  const located = createQuery(() => ({
-    ...orpc.elections.locate.queryOptions({ input: { path: settled ?? "" } }),
-    enabled: settled != null,
-    placeholderData: keepPreviousData,
-    staleTime: Infinity,
-  }));
-  const hub = createQuery(() => ({
-    ...orpc.elections.get.queryOptions({
-      input: { id: located.data?.id ?? "" },
-    }),
-    enabled: located.data != null,
-    placeholderData: keepPreviousData,
-  }));
-
-  $effect(() => {
-    if (!isEngaged || isDragging || hub.isPending) {
+  const nearby = () => {
+    if (!isEngaged || isDragging) {
       return;
     }
     for (const near of [steps[index - 1], steps[index + 1]]) {
       if (near != null) {
-        void client
-          .ensureQueryData(
-            orpc.elections.locate.queryOptions({ input: { path: near.path } }),
-          )
-          .then(async (found) =>
-            client.prefetchQuery(
-              orpc.elections.get.queryOptions({ input: { id: found.id } }),
-            ),
-          );
+        void client.prefetchQuery(viewOptions(near.path));
       }
     }
+  };
+  const show = (path: string) => {
+    if (current?.path === path && !current.isFailed) {
+      return;
+    }
+    if (current?.view != null) {
+      previous = current.view;
+    }
+    const cached = client.getQueryData(viewOptions(path).queryKey);
+    current = { path, view: cached ?? null, isFailed: false };
+    if (cached != null) {
+      nearby();
+      return;
+    }
+    client.fetchQuery(viewOptions(path)).then(
+      (view) => {
+        if (current?.path === path) {
+          current = { path, view, isFailed: false };
+          nearby();
+        }
+      },
+      () => {
+        if (current?.path === path) {
+          current = { path, view: null, isFailed: true };
+        }
+      },
+    );
+  };
+  const sync = () => {
+    clearTimeout(timer);
+    if (step != null) {
+      show(step.path);
+    }
+  };
+  const go = (next: number, delay = 0) => {
+    at = next;
+    keep({
+      year:
+        index === steps.length - 1 ? null : String(steps[index]?.year ?? ""),
+    });
+    if (delay === 0) {
+      sync();
+    } else {
+      clearTimeout(timer);
+      timer = setTimeout(sync, delay);
+    }
+  };
+  const stop = () => {
+    isPlaying = false;
+    clearInterval(playback);
+  };
+  const play = () => {
+    if (index >= steps.length - 1) {
+      go(0);
+    }
+    isPlaying = true;
+    clearInterval(playback);
+    playback = setInterval(() => {
+      if (index >= steps.length - 1) {
+        stop();
+      } else {
+        go(index + 1);
+      }
+    }, 1600);
+  };
+  const engage = () => {
+    if (!isEngaged) {
+      isEngaged = true;
+      nearby();
+    }
+  };
+
+  if (browser) {
+    untrack(() => {
+      sync();
+      if (!isRecordSettled) {
+        client
+          .fetchQuery(recordOptions)
+          .then(
+            (data) => {
+              record = data;
+            },
+            () => {},
+          )
+          .finally(() => {
+            isRecordSettled = true;
+            sync();
+          });
+      }
+    });
+  }
+  onDestroy(() => {
+    clearTimeout(timer);
+    clearInterval(playback);
   });
 
-  const race = $derived(
-    hub.data?.races.find(
-      (entry) => entry.map != null && entry.places != null,
-    ) ?? null,
+  const view = $derived(
+    current?.isFailed === true ? null : (current?.view ?? previous),
   );
-  const hexes = createQuery(() => ({
-    ...orpc.seats.hexes.queryOptions({ input: { id: located.data?.id ?? "" } }),
-    enabled: located.data != null,
-    placeholderData: keepPreviousData,
-  }));
-  const states = createQuery(() => ({
-    ...orpc.elections.states.queryOptions({
-      input: { id: located.data?.id ?? "" },
-    }),
-    enabled: located.data != null && hub.data != null && race == null,
-    placeholderData: keepPreviousData,
-  }));
+  const hub = $derived(view?.hub ?? null);
+  const race = $derived(view?.race ?? null);
   const places = $derived.by(() => {
     const own = race?.places;
     if (race == null || own == null || race.count <= 1) {
       return own ?? null;
     }
-    const later = (hub.data?.races ?? [])
+    const later = (hub?.races ?? [])
       .filter(
         (other) =>
           other.name === race.name &&
@@ -303,9 +350,7 @@
     };
   });
   const isStale = $derived(
-    hub.isPlaceholderData ||
-      located.isPlaceholderData ||
-      settled !== (step?.path ?? null),
+    current?.view == null || current.path !== step?.path,
   );
   const balance = $derived.by(() => {
     if (race == null) {
@@ -390,7 +435,7 @@
     const next =
       steps[index + 1]?.date ??
       `${Number(from.slice(0, 4)) + 2}${from.slice(4)}`;
-    const all = record.data?.governments ?? [];
+    const all = record?.governments ?? [];
     return (
       all.find((entry) => entry.from > from && entry.from < next) ??
       all.findLast(
@@ -410,17 +455,19 @@
         best = { index: spot, distance };
       }
     }
-    at = best.index;
+    if (best.index !== index) {
+      go(best.index, 260);
+    }
   };
 </script>
 
-{#if record.isPending || step != null}
+{#if !isRecordSettled || step != null}
   <section
     class="relative col-span-12 grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
     aria-labelledby="{uid}-title"
     data-export
-    onpointerenter={() => (isEngaged = true)}
-    onfocusin={() => (isEngaged = true)}
+    onpointerenter={engage}
+    onfocusin={engage}
   >
     <Export name="history" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
@@ -445,10 +492,11 @@
           class="flex items-center gap-1.5 rounded-sm border border-input bg-card ps-2 pe-3 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
           aria-pressed={isPlaying}
           onclick={() => {
-            if (!isPlaying && index >= steps.length - 1) {
-              at = 0;
+            if (isPlaying) {
+              stop();
+            } else {
+              play();
             }
-            isPlaying = !isPlaying;
           }}
         >
           {#if isPlaying}
@@ -474,7 +522,7 @@
           onpointerdown={(event) => {
             event.currentTarget.setPointerCapture(event.pointerId);
             isDragging = true;
-            isPlaying = false;
+            stop();
             pick(event);
           }}
           onpointermove={(event) => {
@@ -482,8 +530,14 @@
               pick(event);
             }
           }}
-          onpointerup={() => (isDragging = false)}
-          onpointercancel={() => (isDragging = false)}
+          onpointerup={() => {
+            isDragging = false;
+            sync();
+          }}
+          onpointercancel={() => {
+            isDragging = false;
+            sync();
+          }}
           onkeydown={(event) => {
             const moves: Record<string, number> = {
               ArrowLeft: -1,
@@ -498,8 +552,8 @@
             const move = moves[event.key];
             if (move != null) {
               event.preventDefault();
-              isPlaying = false;
-              at = Math.max(0, Math.min(steps.length - 1, index + move));
+              stop();
+              go(Math.max(0, Math.min(steps.length - 1, index + move)));
             }
           }}
         >
@@ -565,10 +619,12 @@
                   Math.abs(dx) > 40 &&
                   Math.abs(dx) > Math.abs(event.clientY - swipe.y) * 1.5
                 ) {
-                  isPlaying = false;
-                  at = Math.max(
-                    0,
-                    Math.min(steps.length - 1, index + (dx < 0 ? 1 : -1)),
+                  stop();
+                  go(
+                    Math.max(
+                      0,
+                      Math.min(steps.length - 1, index + (dx < 0 ? 1 : -1)),
+                    ),
                   );
                 }
               }
@@ -584,11 +640,11 @@
                 class="font-figures text-4xl/none font-[780] tracking-[-0.02em]"
                 >{step.year}</span
               >
-              {#if hub.data != null}
+              {#if hub != null}
                 <a
                   class="truncate text-[0.8125rem] font-semibold underline decoration-border underline-offset-4"
                   href={resolve("/[...path]", { path: step.path })}
-                  >{hub.data.name}</a
+                  >{hub.name}</a
                 >
               {/if}
             </p>
@@ -602,8 +658,8 @@
                     disabled={index + button.move < 0 ||
                       index + button.move > steps.length - 1}
                     onclick={() => {
-                      isPlaying = false;
-                      at = index + button.move;
+                      stop();
+                      go(index + button.move);
                     }}
                   >
                     <button.icon class="block-5 inline-5" />
@@ -612,12 +668,12 @@
               </div>
             {/if}
           </div>
-          {#if hub.data?.coverage != null}
+          {#if hub?.coverage != null}
             <p class="mbe-2 text-[0.8125rem] font-semibold lg:hidden">
               {m.election_partial({
-                held: count(hub.data.coverage.held),
-                of: count(hub.data.coverage.of),
-                noun: hub.data.coverage.noun,
+                held: count(hub.coverage.held),
+                of: count(hub.coverage.of),
+                noun: hub.coverage.noun,
               })}
             </p>
           {/if}
@@ -632,7 +688,7 @@
                   swatch(item.color, item.key),
                 )}
                 tiles={race.map.tiles}
-                hexes={hexes.data ?? null}
+                hexes={view?.hexes ?? null}
                 own={race.map.own}
                 nested={race.map.nested}
                 frame={race.map.frame}
@@ -657,8 +713,8 @@
               {m.map_rebuilding()}
             </p>
           {/if}
-        {:else if race == null && states.data != null}
-          {const drawn = $derived(states.data)}
+        {:else if race == null && view?.states != null}
+          {const drawn = $derived(view.states)}
           {#key drawn.tiles}
             <PlaceMap
               places={drawn.places}
@@ -679,7 +735,23 @@
               span={null}
             />
           {/key}
-        {:else if hub.isPending || isStale || states.isFetching}
+        {:else if current?.isFailed === true}
+          <div
+            class="grid place-items-center gap-3 border border-dashed border-border px-4 py-6 text-center text-sm text-pretty text-muted-foreground"
+            role="alert"
+          >
+            <p>{m.scrubber_failed({ year: String(step?.year ?? "") })}</p>
+            <button
+              type="button"
+              class="rounded-sm border border-input bg-card px-3 text-[0.8125rem] font-semibold text-foreground block-8 hover:bg-secondary"
+              onclick={() => {
+                if (current != null) {
+                  show(current.path);
+                }
+              }}>{m.search_retry()}</button
+            >
+          </div>
+        {:else if current?.view == null}
           <div
             class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"
           ></div>
@@ -700,18 +772,17 @@
           >
             {step?.year ?? ""}
           </p>
-          {#if hub.data != null && step != null}
+          {#if hub != null && step != null}
             <a
               class="text-[0.9375rem] font-semibold text-pretty underline decoration-border underline-offset-4 hover:decoration-foreground"
-              href={resolve("/[...path]", { path: step.path })}
-              >{hub.data.name}</a
+              href={resolve("/[...path]", { path: step.path })}>{hub.name}</a
             >
-            {#if hub.data.coverage != null}
+            {#if hub.coverage != null}
               <p class="text-[0.8125rem] font-semibold text-pretty">
                 {m.election_partial({
-                  held: count(hub.data.coverage.held),
-                  of: count(hub.data.coverage.of),
-                  noun: hub.data.coverage.noun,
+                  held: count(hub.coverage.held),
+                  of: count(hub.coverage.of),
+                  noun: hub.coverage.noun,
                 })}
               </p>
             {/if}

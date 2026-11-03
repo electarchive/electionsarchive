@@ -2261,6 +2261,7 @@
   "scrubber_chamber": "{chamber} piştî hilbijartinê",
   "scrubber_chamber_standing": "{chamber} wekî ku di {year} de hate hilbijartin",
   "scrubber_no_map": "Hê nexşeya {year} tune ye",
+  "scrubber_failed": "Nexşeya {year} nehat barkirin.",
   "states_title": "Kursî li gorî eyaletên endam",
   "map_rebuilding": "Ev nexşe ji nû ve tê çêkirin. Piştî çend deqeyan dîsa binêre.",
   "scrubber_government": "Hukûmeta piştî wê",

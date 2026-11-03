@@ -2305,6 +2305,7 @@
   "scrubber_chamber": "{chamber} après l’élection",
   "scrubber_chamber_standing": "{chamber} : composition élue en {year}",
   "scrubber_no_map": "Pas encore de carte pour {year}",
+  "scrubber_failed": "La carte de {year} n’a pas pu être chargée.",
   "states_title": "Sièges par État membre",
   "map_rebuilding": "Cette carte est en cours de reconstruction. Revenez dans quelques minutes.",
   "scrubber_government": "Gouvernement suivant",

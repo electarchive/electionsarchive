@@ -2261,6 +2261,7 @@
   "scrubber_chamber": "{chamber} nach der Wahl",
   "scrubber_chamber_standing": "{chamber} nach der Wahl {year}",
   "scrubber_no_map": "Für {year} noch keine Karte",
+  "scrubber_failed": "Die Karte für {year} konnte nicht geladen werden.",
   "states_title": "Sitze nach Mitgliedstaat",
   "map_rebuilding": "Diese Karte wird neu erstellt. Bitte versuchen Sie es in einigen Minuten erneut.",
   "scrubber_government": "Anschließende Regierung",

@@ -2303,6 +2303,7 @@
   "scrubber_chamber": "{chamber} após a eleição",
   "scrubber_chamber_standing": "{chamber}: composição eleita em {year}",
   "scrubber_no_map": "Ainda não há mapa para {year}",
+  "scrubber_failed": "O mapa de {year} não carregou.",
   "states_title": "Cadeiras por estado-membro",
   "map_rebuilding": "Este mapa está sendo reconstruído. Volte em alguns minutos.",
   "scrubber_government": "Governo seguinte",

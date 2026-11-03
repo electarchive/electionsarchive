@@ -2257,6 +2257,7 @@
   "scrubber_chamber": "Seçim sonrası {chamber}",
   "scrubber_chamber_standing": "{year} seçiminden çıkan {chamber}",
   "scrubber_no_map": "{year} için henüz harita yok",
+  "scrubber_failed": "{year} haritası yüklenemedi.",
   "states_title": "Üye devletlere göre sandalyeler",
   "map_rebuilding": "Bu harita yeniden oluşturuluyor. Birkaç dakika sonra tekrar bakın.",
   "scrubber_government": "Ardından kurulan hükümet",
