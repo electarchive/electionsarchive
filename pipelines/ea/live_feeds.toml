@@ -78,6 +78,7 @@ url = "https://sos.iowa.gov/elections/results/"
 id = "us.enr_2026.id"
 adapter = "us.enr_2026"
 params = { state = "ID" }
+poller = "muktedir"
 publisher = "Idaho Secretary of State"
 url = "https://voteidaho.gov"
 
