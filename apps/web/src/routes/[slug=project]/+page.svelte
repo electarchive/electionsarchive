@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import CiteBody from "#lib/components/cite-body.svelte";
   import Prose from "#lib/components/prose.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -62,12 +63,13 @@
         </h2>
         <div class="grid gap-4">
           <Prose body={section.body} />
-          {#if section.quote != null}
-            <blockquote
-              class="border-s-2 border-foreground bg-muted px-4 py-3 text-sm/relaxed wrap-break-word select-all"
-            >
-              {section.quote}
-            </blockquote>
+          {#if section.isCite === true}
+            <div class="max-inline-136">
+              <CiteBody
+                published={data.site.published}
+                release={data.site.release}
+              />
+            </div>
           {/if}
         </div>
       </section>

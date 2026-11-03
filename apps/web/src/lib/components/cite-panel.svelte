@@ -1,16 +1,9 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import CopyIcon from "@lucide/svelte/icons/copy";
-  import { toast } from "svelte-sonner";
-  import type { Format } from "#lib/site.js";
-  import { copy } from "#lib/clipboard.js";
-  import { Button } from "#lib/components/ui/button/index.js";
+  import CiteBody from "#lib/components/cite-body.svelte";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
-  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { cite, FORMATS } from "#lib/site.js";
 
   let {
     published,
@@ -21,46 +14,14 @@
     release: { calver: string; doi: string | null } | null;
     isOpen?: boolean;
   } = $props();
-  let format = $state<Format>("APA");
 
   const narrow = $derived(isNarrowLayout());
-  const text = $derived(
-    isOpen
-      ? cite(format, {
-          origin: page.url.origin,
-          published,
-          release,
-          today: new Date(),
-        })
-      : "",
-  );
 </script>
 
 {#snippet body()}
   <div class="grid gap-3 p-3">
     <p class="text-[0.9375rem] font-semibold">{m.footer_cite()}</p>
-    <Segmented
-      options={FORMATS.map((value) => ({ value, label: value }))}
-      bind:value={format}
-      label={m.footer_cite()}
-      size="sm"
-      fill
-    />
-    <pre
-      class="overflow-auto rounded-sm border bg-secondary px-2.5 py-2 font-figures text-xs/relaxed wrap-break-word whitespace-pre-wrap max-block-60">{text}</pre>
-    <Button
-      variant="outline"
-      size="sm"
-      class="justify-self-start"
-      onclick={() => {
-        void copy(text).then(() =>
-          toast.success(m.footer_cite_copied({ format })),
-        );
-      }}
-      ><CopyIcon class="block-3.5 inline-3.5" />{m.footer_cite_copy({
-        format,
-      })}</Button
-    >
+    <CiteBody {published} {release} />
   </div>
 {/snippet}
 

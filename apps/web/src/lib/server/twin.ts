@@ -64,7 +64,9 @@ import {
 } from "#lib/server/pages.js";
 import { isProject, project } from "#lib/server/project.js";
 import { router } from "#lib/server/rpc/router.js";
+import { site } from "#lib/server/site.js";
 import { listSources } from "#lib/server/sources.js";
+import { cite, FORMATS } from "#lib/site.js";
 import { slateLine } from "#lib/slate.js";
 import {
   categoryLedes,
@@ -376,7 +378,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     return atlasPage(rest.join("/"), search);
   }
   if (rest.length === 0 && isProject(head)) {
-    return { kind: "project" as const, ...project(head) };
+    return { kind: "project" as const, ...project(head), site: await site() };
   }
   switch (rest.length === 0 ? head : "") {
     case "coverage": {
@@ -4210,7 +4212,12 @@ function projectMarkdown(
     ...data.sections.flatMap((section) => [
       `## ${section.title}`,
       section.body.replaceAll("](/", () => `](${origin}/`),
-      ...(section.quote == null ? [] : [`> ${section.quote}`]),
+      ...(section.isCite === true
+        ? FORMATS.map(
+            (format) =>
+              `${format}:\n\n\`\`\`\n${cite(format, { origin, published: data.site.published, release: data.site.release, today: new Date() })}\n\`\`\``,
+          )
+        : []),
     ]),
   ];
 }

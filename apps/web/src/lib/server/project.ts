@@ -5,7 +5,7 @@ import { PROJECTS } from "#lib/projects.js";
 const UPDATED = "2026-11-01";
 const SLUGS = new Set<string>(PROJECTS);
 
-type Section = { id: string; title: string; body: string; quote?: string };
+type Section = { id: string; title: string; body: string; isCite?: boolean };
 
 export function isProject(slug: string): slug is Project {
   return SLUGS.has(slug);
@@ -158,7 +158,7 @@ function sections(slug: Project): Array<Section> {
           id: "cite",
           title: m.license_cite_title(),
           body: m.license_cite_body(),
-          quote: m.license_cite_example(),
+          isCite: true,
         },
         {
           id: "contributions",
