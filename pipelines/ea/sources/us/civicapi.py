@@ -192,6 +192,8 @@ def office(state: str, race: dict) -> tuple[str, str, str] | None:
         return (*seat, "") if seat else None
     if state == "DC" and title == "Mayor":
         kind = "Statewide"
+    if title == "Governor's Council":
+        return "state", "", race.get("election_name") or title
     if kind == "General":
         if title == "Delegate":
             return "house", "0", ""
@@ -206,8 +208,7 @@ def office(state: str, race: dict) -> tuple[str, str, str] | None:
     return "other", "", race.get("election_name") or title
 
 
-def rows(state: str, path: Path):
-    page = json.loads(path.read_bytes())
+def rows(state: str, page: dict):
     race = page["race"]
     if race.get("test_data") or race.get("province") != state:
         return
@@ -266,10 +267,29 @@ def rows(state: str, path: Path):
 
 
 def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
+    pages: dict[tuple, tuple[tuple[int, str], str, dict]] = {}
+    for url, path in paths.items():
+        if not url.startswith(BASE):
+            continue
+        page = json.loads(path.read_bytes())
+        race = page["race"]
+        candidates = race.get("candidates") or []
+        regions = list((race.get("region_results") or {}).values())
+        same = (
+            page["search"].get("type"),
+            race.get("election_name"),
+            tuple(sorted(c.get("name") or "" for c in candidates)),
+            tuple(sorted(r.get("name") or "" for r in regions)),
+            (race.get("district"), race.get("municipality"))
+            if all(r.get("type") in ("State", "All") for r in regions)
+            else None,
+        )
+        rank = (sum(int(c.get("votes") or 0) for c in candidates), race.get("last_updated") or "")
+        if same not in pages or rank > pages[same][0]:
+            pages[same] = (rank, url, page)
     found = [
         {"state": state, "page": url, "scope": "", **row}
-        for url, path in paths.items()
-        if url.startswith(BASE)
-        for row in rows(state, path)
+        for _, url, page in pages.values()
+        for row in rows(state, page)
     ]
     return pl.DataFrame(found, schema=table({}).schema)
