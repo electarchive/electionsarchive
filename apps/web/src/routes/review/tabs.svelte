@@ -1,9 +1,10 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
-  const { current }: { current: "queue" | "accounts" } = $props();
+  const { current }: { current: "queue" | "accounts" | "usage" } = $props();
 
   const tabs = $derived([
     { key: "queue", href: resolve("/review"), label: m.review_tab_queue() },
@@ -12,6 +13,15 @@
       href: resolve("/review/accounts"),
       label: m.review_tab_accounts(),
     },
+    ...(page.data.admin === true
+      ? [
+          {
+            key: "usage",
+            href: resolve("/review/usage"),
+            label: m.review_tab_usage(),
+          },
+        ]
+      : []),
   ]);
 </script>
 

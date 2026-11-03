@@ -13,6 +13,7 @@ import * as v from "valibot";
 import { roles } from "#lib/server/contrib.js";
 import { keyOwner } from "#lib/server/rpc/keyed.js";
 import { contributions, router } from "#lib/server/rpc/router.js";
+import { count, introduce } from "#lib/server/usage.js";
 
 type Access = "read" | "key" | "admin";
 
@@ -275,7 +276,11 @@ function explain(message: string, data: unknown) {
   return lines.join("\n");
 }
 
-function build(headers: Headers, isStaff: boolean) {
+function build(
+  headers: Headers,
+  owner: { keyId: string; userId: string } | null,
+  isStaff: boolean,
+) {
   const server = new Server(
     { name: "electionsarchive", title: "electionsarchive.com", version: "1" },
     {
@@ -293,6 +298,7 @@ function build(headers: Headers, isStaff: boolean) {
     if (tool == null || (!isStaff && tool.access === "admin")) {
       return failure(`There is no tool named ${request.params.name}.`);
     }
+    count(headers, owner, tool.name);
     const input: Record<string, unknown> = {};
     const given = Object.entries(request.params.arguments ?? {});
     for (const [name, value] of given) {
@@ -356,8 +362,9 @@ function build(headers: Headers, isStaff: boolean) {
 export async function handle(request: Request) {
   const { headers } = request;
   let isStaff = false;
+  let owner: Awaited<ReturnType<typeof keyOwner>> = null;
   try {
-    const owner = await keyOwner(headers);
+    owner = await keyOwner(headers);
     if (owner != null) {
       const allowed = await roles(owner.userId);
       isStaff = allowed.admin || allowed.reviewer;
@@ -379,14 +386,19 @@ export async function handle(request: Request) {
     }
     throw error_;
   }
-  const server = build(headers, isStaff);
+  const server = build(headers, owner, isStaff);
   const transport = new WebStandardStreamableHTTPServerTransport({
     enableJsonResponse: true,
     maxRequestBodySize: 30 * 1024 ** 2,
   });
   await server.connect(transport);
   try {
-    return await transport.handleRequest(request);
+    const response = await transport.handleRequest(request);
+    const client = server.getClientVersion()?.name;
+    if (client != null) {
+      introduce(headers, owner, client);
+    }
+    return response;
   } finally {
     await server.close();
   }

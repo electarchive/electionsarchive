@@ -147,15 +147,15 @@
               </a>
             {/snippet}
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
-            {#snippet child({ props })}
-              <a {...props} href={resolve("/settings/keys")}>
-                <KeyRoundIcon class="text-muted-foreground" />
-                {m.keys_nav()}
-              </a>
-            {/snippet}
-          </DropdownMenu.Item>
         {/if}
+        <DropdownMenu.Item>
+          {#snippet child({ props })}
+            <a {...props} href={resolve("/settings/keys")}>
+              <KeyRoundIcon class="text-muted-foreground" />
+              {m.keys_nav()}
+            </a>
+          {/snippet}
+        </DropdownMenu.Item>
         <form method="POST" action={resolve("/sign-out")}>
           <DropdownMenu.Item class="inline-full">
             {#snippet child({ props })}
@@ -263,11 +263,11 @@
                 <EyeIcon />
                 {m.watchlist_title()}
               </Button>
-              <Button href={resolve("/settings/keys")} size="sm">
-                <KeyRoundIcon />
-                {m.keys_nav()}
-              </Button>
             {/if}
+            <Button href={resolve("/settings/keys")} size="sm">
+              <KeyRoundIcon />
+              {m.keys_nav()}
+            </Button>
             <form method="POST" action={resolve("/sign-out")} class="grid">
               <Button type="submit" size="sm">
                 <LogOutIcon />

@@ -20,7 +20,7 @@ const REFRESH = "x-ea-refresh";
 const LOOPBACK = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 const WRITABLE =
-  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile|unsubscribe)(?:\/|$)/u;
+  /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|forgot-password|reset-password|verify-email|settings\/profile|settings\/keys|unsubscribe)(?:\/|$)/u;
 
 const FORM_TYPES = new Set([
   "application/x-www-form-urlencoded",

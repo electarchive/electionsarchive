@@ -7,6 +7,11 @@ export const load: PageServerLoad = async ({ locals, setHeaders, url }) => {
   const allowed = await roles(locals.user?.id);
   const q = url.searchParams.get("q")?.trim().slice(0, 100) ?? "";
   return allowed.admin || allowed.reviewer
-    ? { allowed: true, q, accounts: await accounts(q === "" ? null : q) }
-    : { allowed: false, q, accounts: [] };
+    ? {
+        allowed: true,
+        admin: allowed.admin,
+        q,
+        accounts: await accounts(q === "" ? null : q),
+      }
+    : { allowed: false, admin: false, q, accounts: [] };
 };

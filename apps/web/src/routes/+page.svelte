@@ -152,7 +152,11 @@
   <meta property="og:video:type" content="video/mp4" />
   <meta property="og:video:width" content="1920" />
   <meta property="og:video:height" content="1008" />
-  {@html `<script type="application/ld+json">${JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}</script>`}
+  <svelte:element this={"script"} type="application/ld+json"
+    >{JSON.stringify(jsonLd)
+      .replaceAll("<", String.raw`\u003c`)
+      .replaceAll("&", String.raw`\u0026`)}</svelte:element
+  >
 </svelte:head>
 
 <ShareImage
@@ -167,7 +171,7 @@
   >
     <div class="grid content-start gap-5">
       <h1
-        class="text-[clamp(2.25rem,1.3rem+3.4vw,4.25rem)] leading-[0.95] font-[800] tracking-[-0.03em] text-balance max-inline-[16ch]"
+        class="text-[clamp(2.25rem,1.3rem+3.4vw,4.25rem)] leading-[0.95] font-extrabold tracking-[-0.03em] text-balance max-inline-[16ch]"
       >
         {m.home_headline()}
       </h1>
@@ -177,7 +181,7 @@
         {m.home_lede()}
       </p>
       <form
-        class="grid gap-2 max-inline-[36rem]"
+        class="grid gap-2 max-inline-xl"
         role="search"
         action={resolve("/search")}
         method="get"
@@ -253,7 +257,7 @@
         {#if next != null}
           <div class="grid gap-2 border-be pbe-4">
             <p
-              class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-[-0.025em]"
+              class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-tight"
             >
               <time datetime={next.date}>{when(next.days, next.date)}</time>
             </p>

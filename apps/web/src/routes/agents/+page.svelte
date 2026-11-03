@@ -107,15 +107,13 @@
             {@render code(chosen.code, chosen.label)}
           {/if}
         </div>
-        {#if !READ_ONLY}
-          <p class="text-sm text-pretty text-muted-foreground">
-            {m.agents_key_body()}
-            <a
-              class="font-semibold text-foreground underline underline-offset-4"
-              href="/settings/keys">{m.agents_step_key_link()}</a
-            >
-          </p>
-        {/if}
+        <p class="text-sm text-pretty text-muted-foreground">
+          {m.agents_key_body()}
+          <a
+            class="font-semibold text-foreground underline underline-offset-4"
+            href="/settings/keys">{m.agents_step_key_link()}</a
+          >
+        </p>
       </section>
     </div>
 

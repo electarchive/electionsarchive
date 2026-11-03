@@ -1,8 +1,10 @@
 import type { Handle } from "@sveltejs/kit/hooks";
 import { building } from "$app/env";
+import { createHash } from "node:crypto";
 import { promises as dns } from "node:dns";
 import { BlockList, isIP } from "node:net";
 import { redis } from "#lib/server/redis.js";
+import { keyOwner } from "#lib/server/rpc/keyed.js";
 
 type Operator = {
   name: string;
@@ -112,12 +114,14 @@ const RATE = 4;
 const BUDGET = 300;
 const EARNED = 2;
 const CONCURRENT = 16;
+const KEYED = 4;
 const CHARGED = 30;
 const LONGEST = 120_000;
 const REMEMBERED = 6 * 3_600_000;
 const REMEMBER_LIMIT = 50_000;
 const REFRESH = 12 * 3_600_000;
 const STORED = "guard:lists:v1";
+const VERIFIED = 300_000;
 
 const FORBIDDEN =
   "This site admits only verified search crawlers. Scripts and agents can read any page as Markdown or JSON by adding .md or .json to its URL.";
@@ -129,6 +133,7 @@ const pools = new Map<string, number>();
 const clients = new Map<string, Client>();
 const verdicts = new Map<string, { isGenuine: boolean; at: number }>();
 const ranges = new Map<string, BlockList>();
+const keys = new Map<string, { id: string | null; at: number }>();
 let crawling = 0;
 let inFlight = 0;
 
@@ -269,7 +274,7 @@ async function genuine(operator: Operator, address: string, family: 4 | 6) {
   return isGenuine;
 }
 
-function owner(address: string, family: 4 | 6) {
+export function bucket(address: string, family: 4 | 6) {
   if (family === 4) {
     return address;
   }
@@ -282,7 +287,7 @@ function owner(address: string, family: 4 | 6) {
   return groups.slice(0, 4).join(":");
 }
 
-function refuse(status: 403 | 429 | 503, wait = 60) {
+function refuse(status: 403 | 429 | 503, wait = 60, scale = 1) {
   return new Response(
     status === 403 ? FORBIDDEN : status === 429 ? LIMITED : BUSY,
     {
@@ -292,7 +297,7 @@ function refuse(status: 403 | 429 | 503, wait = 60) {
         "content-type": "text/plain; charset=utf-8",
         ...(status !== 403 && { "retry-after": String(wait) }),
         ...(status === 429 && {
-          "ratelimit-policy": `"requests";q=${BURST};w=${BURST / RATE}, "time";q=${BUDGET};w=${BUDGET / EARNED}`,
+          "ratelimit-policy": `"requests";q=${BURST * scale};w=${BURST / RATE}, "time";q=${BUDGET * scale};w=${BUDGET / EARNED}`,
           ratelimit: `"requests";r=0;t=${wait}`,
         }),
       },
@@ -352,27 +357,33 @@ function crawl(pool: string, limit: number) {
   };
 }
 
-function limit(key: string) {
+function limit(key: string, scale: number) {
   const now = Date.now();
   const client = clients.get(key) ?? {
-    tokens: BURST,
-    seconds: BUDGET,
+    tokens: BURST * scale,
+    seconds: BUDGET * scale,
     at: now,
     running: 0,
   };
   const elapsed = (now - client.at) / 1000;
-  client.tokens = Math.min(BURST, client.tokens + elapsed * RATE);
-  client.seconds = Math.min(BUDGET, client.seconds + elapsed * EARNED);
+  client.tokens = Math.min(
+    BURST * scale,
+    client.tokens + elapsed * RATE * scale,
+  );
+  client.seconds = Math.min(
+    BUDGET * scale,
+    client.seconds + elapsed * EARNED * scale,
+  );
   client.at = now;
   clients.set(key, client);
-  if (client.running >= CONCURRENT) {
+  if (client.running >= CONCURRENT * Math.min(scale, 2)) {
     return 1;
   }
   if (client.tokens < 1) {
-    return Math.ceil((1 - client.tokens) / RATE);
+    return Math.ceil((1 - client.tokens) / (RATE * scale));
   }
   if (client.seconds <= 0) {
-    return Math.ceil(-client.seconds / EARNED) + 1;
+    return Math.ceil(-client.seconds / (EARNED * scale)) + 1;
   }
   client.tokens -= 1;
   client.running++;
@@ -381,6 +392,30 @@ function limit(key: string) {
     client.running--;
     client.seconds -= Math.min(CHARGED, (performance.now() - started) / 1000);
   };
+}
+
+async function keyed(headers: Headers) {
+  const key =
+    headers.get("x-api-key") ??
+    /^Bearer\s+(ea_\S+)$/iu.exec(headers.get("authorization") ?? "")?.[1];
+  if (key == null || key === "") {
+    return null;
+  }
+  const now = Date.now();
+  const hash = createHash("sha256").update(key).digest("hex");
+  const known = keys.get(hash);
+  if (known != null && now - known.at < VERIFIED) {
+    return known.id;
+  }
+  let id: string | null = null;
+  try {
+    id = (await keyOwner(headers))?.keyId ?? null;
+  } catch {}
+  if (keys.size >= REMEMBER_LIMIT) {
+    keys.clear();
+  }
+  keys.set(hash, { id, at: now });
+  return id;
 }
 
 async function admit(request: Request, pathname: string) {
@@ -426,9 +461,14 @@ async function admit(request: Request, pathname: string) {
   ) {
     return { status: 403 } as const;
   }
-  const outcome = limit(owner(address, version));
+  const key = await keyed(request.headers);
+  const scale = key == null ? 1 : KEYED;
+  const outcome = limit(
+    key == null ? bucket(address, version) : `key:${key}`,
+    scale,
+  );
   return typeof outcome === "number"
-    ? ({ status: 429, wait: outcome } as const)
+    ? ({ status: 429, wait: outcome, scale } as const)
     : ({ status: 200, release: outcome } as const);
 }
 
@@ -438,7 +478,7 @@ export const guardHandle: Handle = async ({ event, resolve }) => {
     return refuse(verdict.status);
   }
   if (verdict.status === 429) {
-    return refuse(429, verdict.wait);
+    return refuse(429, verdict.wait, verdict.scale);
   }
   if (FREE.test(event.url.pathname)) {
     return resolve(event);

@@ -15,12 +15,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 
 - **MCP**: `{{origin}}/mcp` (streamable HTTP). Read tools work without a key.
 - **REST**: `{{origin}}/api/v1`, described at `{{origin}}/api/v1/openapi.json`. Every MCP tool has a REST twin.
-
-<!-- write -->
-
-- **Key**: a person creates one at `{{origin}}/settings/keys` and gives it to you. Send it as `x-api-key: ea_…` or `Authorization: Bearer ea_…`. You act as that person: they are credited and accountable for what you submit, so work as carefully as they would.
-
-<!-- /write -->
+- **Key**: reading needs none. A person can create one at `{{origin}}/settings/keys` and give it to you: with it you get higher rate limits, and they see your calls there. Send it as `x-api-key: ea_…` or `Authorization: Bearer ea_…`.<!-- write --> Write tools need it. You act as that person: they are credited and accountable for what you submit, so work as carefully as they would.<!-- /write -->
 
 - **Pages**: every page also answers as Markdown or JSON. Add `.md` or `.json` to its URL. `{{origin}}/llms.txt` is the map.
 

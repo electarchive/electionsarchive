@@ -7,7 +7,7 @@
   import { Input } from "#lib/components/ui/input/index.js";
   import { Label } from "#lib/components/ui/label/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { date } from "#lib/format.js";
+  import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getConfirmationContext } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
@@ -145,11 +145,27 @@
               <td class="py-2 pe-4 font-figures whitespace-nowrap max-sm:hidden"
                 >{day(key.created_at)}</td
               >
-              <td class="py-2 pe-4 font-figures whitespace-nowrap max-sm:hidden"
-                >{key.last_request == null
-                  ? m.keys_never_used()
-                  : day(key.last_request)}</td
+              <td
+                class="py-2 pe-4 max-sm:col-start-1 max-sm:p-0 max-sm:text-xs"
               >
+                <span class="font-figures whitespace-nowrap"
+                  >{key.last_request == null
+                    ? m.keys_never_used()
+                    : day(key.last_request)}</span
+                >
+                {#if key.usage != null && key.usage.month > 0}
+                  <span
+                    class="block font-figures text-xs whitespace-nowrap text-muted-foreground"
+                    >{m.keys_usage_calls({
+                      today: count(key.usage.today),
+                      month: count(key.usage.month),
+                    })}</span
+                  >
+                  <span class="block text-xs text-muted-foreground"
+                    >{key.usage.tools.join(", ")}</span
+                  >
+                {/if}
+              </td>
               <td
                 class={cn(
                   "py-2 pe-4 font-figures whitespace-nowrap max-sm:col-start-1 max-sm:p-0 max-sm:text-xs",

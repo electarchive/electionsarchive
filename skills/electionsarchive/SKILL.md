@@ -15,6 +15,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 
 - **MCP**: `https://electionsarchive.com/mcp` (streamable HTTP). Read tools work without a key.
 - **REST**: `https://electionsarchive.com/api/v1`, described at `https://electionsarchive.com/api/v1/openapi.json`. Every MCP tool has a REST twin.
+- **Key**: reading needs none. A person can create one at `https://electionsarchive.com/settings/keys` and give it to you: with it you get higher rate limits, and they see your calls there. Send it as `x-api-key: ea_…` or `Authorization: Bearer ea_…`.
 
 - **Pages**: every page also answers as Markdown or JSON. Add `.md` or `.json` to its URL. `https://electionsarchive.com/llms.txt` is the map.
 

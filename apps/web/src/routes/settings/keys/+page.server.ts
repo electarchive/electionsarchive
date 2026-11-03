@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { auth } from "#lib/server/auth.js";
 import { authDb } from "#lib/server/db/index.js";
+import { keyUsage } from "#lib/server/usage.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 const KEY_LIMIT = 10;
@@ -58,7 +59,32 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user == null) {
     redirect(303, `/sign-in?next=${encodeURIComponent(url.pathname)}`);
   }
-  return { keys: await keys(locals.user.id), limit: KEY_LIMIT };
+  const [rows, usage] = await Promise.all([
+    keys(locals.user.id),
+    keyUsage(locals.user.id),
+  ]);
+  return {
+    keys: rows.map((key) => {
+      const used = usage?.get(key.id);
+      const last = [used?.last_at, key.last_request]
+        .filter((value) => value != null)
+        .toSorted((a, b) => a.localeCompare(b))
+        .at(-1);
+      return {
+        ...key,
+        last_request: last ?? null,
+        usage:
+          usage == null
+            ? null
+            : {
+                today: used?.today ?? 0,
+                month: used?.month ?? 0,
+                tools: used?.tools ?? [],
+              },
+      };
+    }),
+    limit: KEY_LIMIT,
+  };
 };
 
 export const actions: Actions = {
