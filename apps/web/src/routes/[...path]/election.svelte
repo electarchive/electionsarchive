@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import type { Part } from "svelte-islands";
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -12,7 +11,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
-  import { Island, peek } from "svelte-islands";
+  import { Island, load, Part, peek } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
@@ -42,6 +41,7 @@
   import Alongside from "./alongside.svelte";
   import Balance from "./balance.svelte";
   import ByElections from "./byelections.svelte";
+  import Cached from "./cached.svelte";
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
   import Electors from "./electors.svelte";
@@ -104,9 +104,12 @@
 
   const client = useQueryClient();
   function seed<T>(
-    value: T | Promise<T>,
+    value: T | Promise<T> | Part<T>,
     put: (data: T) => void,
-  ): T | Promise<T> {
+  ): T | Promise<T> | null {
+    if (value instanceof Part) {
+      return null;
+    }
     if (value instanceof Promise) {
       return value.then((data) => {
         put(data);
@@ -180,8 +183,39 @@
   };
 
   const ledger = $derived(sections.ledger ?? null);
+  let fetched = $state.raw<{
+    hash: string;
+    at: Array<number>;
+    races: typeof election.races;
+  } | null>(null);
+  const pending = $derived(
+    election.rest != null && fetched?.hash !== election.rest.part.hash
+      ? election.rest
+      : null,
+  );
+  const every = $derived.by(() => {
+    if (election.rest == null || fetched?.hash !== election.rest.part.hash) {
+      return election.races;
+    }
+    const spots = new Set(fetched.at);
+    const head = election.races.values();
+    const tail = fetched.races.values();
+    return Array.from(
+      { length: election.races.length + fetched.races.length },
+      (_, at) => (spots.has(at) ? tail.next() : head.next()).value,
+    ).filter((race) => race != null);
+  });
+  const more = () => {
+    const rest = pending;
+    if (rest == null) {
+      return;
+    }
+    void load(rest.part).then((value) => {
+      fetched = { hash: rest.part.hash, ...value };
+    });
+  };
   const materialized = $derived(
-    election.races.map((race) => ({
+    every.map((race) => ({
       ...race,
       places:
         race.places == null
@@ -445,6 +479,11 @@
     chosen == null ? -1 : lined.findIndex((race) => race.anchor === chosen),
   );
   const isNavigated = $derived(lined.length > 2 || focus !== -1);
+  $effect(() => {
+    if (chosen != null && focus === -1) {
+      more();
+    }
+  });
   const isBallot = $derived(
     lined.length > 2 && lined.every((race) => race.kind === "ballot_question"),
   );
@@ -1795,9 +1834,12 @@
   );
   const listing = $state({ isOpen: false });
   const boarded = $derived(
-    listing.isOpen || !election.races.some((race) => race.deferred != null)
+    listing.isOpen || !every.some((race) => race.deferred != null)
       ? others
       : others.slice(0, 48),
+  );
+  const unloaded = $derived(
+    pending == null ? 0 : pending.races + pending.questions,
   );
 
   const office = (race: (typeof races)[number]) =>
@@ -2052,6 +2094,10 @@
       href={link}
       select={(anchor: string | null) => void select(anchor)}
       contests={searchable}
+      pending={pending == null
+        ? null
+        : { races: pending.races, questions: pending.questions }}
+      {more}
     />
   {/if}
   <div
@@ -3212,7 +3258,7 @@
       </h2>
     {:else}
       <h2 id="board-title" class="sr-only">
-        {m.board_title({ count: races.length })}
+        {m.board_title({ count: races.length + unloaded })}
       </h2>
     {/if}
     <ol
@@ -3269,13 +3315,17 @@
         </li>
       {/each}
     </ol>
-    {#if boarded.length < others.length}
+    {#if boarded.length < others.length || pending != null}
       <button
         type="button"
         class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+        aria-busy={listing.isOpen && pending != null}
+        onpointerenter={more}
         onclick={() => {
           listing.isOpen = true;
-        }}>{m.places_show_all({ count: count(others.length) })}</button
+          more();
+        }}
+        >{m.places_show_all({ count: count(others.length + unloaded) })}</button
       >
     {/if}
   </section>
@@ -3661,13 +3711,21 @@
       <Local {local} isOwn={true} />
     {/if}
   {/await}
-  {#await sections.counties}
-    <SectionSkeleton shape="columns" label={m.counties_title()} />
-  {:then counties}
-    {#if counties != null}
-      <Counties {counties} />
-    {/if}
-  {/await}
+  {#if sections.counties instanceof Part}
+    <Island part={sections.counties} when="visible">
+      {#snippet children(counties)}
+        <Counties {counties} />
+      {/snippet}
+    </Island>
+  {:else}
+    {#await sections.counties}
+      <SectionSkeleton shape="columns" label={m.counties_title()} />
+    {:then counties}
+      {#if counties != null}
+        <Counties {counties} />
+      {/if}
+    {/await}
+  {/if}
   {#if scope == null}
     {#await seeded.alongside}
       <SectionSkeleton shape="columns" label={m.alongside_title()} />
@@ -3687,22 +3745,55 @@
   <ByElections {id} within={scope?.id} />
 
   {#if isTiled}
-    {#await seeded.tiers}
-      <SectionSkeleton shape="tiles" label={m.tiers_title()} />
-    {:then}
+    {#snippet tiled()}
       <Tiers
         {id}
         {parts}
         noun={partNoun ?? ""}
         race={ordered.find((race) => race.electors != null)?.name ?? null}
       />
-    {/await}
-  {:else if parts.length >= 40}
-    {#await seeded.winners}
-      <SectionSkeleton shape="table" />
-    {:then}
-      <Winners {id} {parts} hasMap={!isSwept} />
-    {/await}
+    {/snippet}
+    {#if sections.tiers instanceof Part}
+      <Island part={sections.tiers} when="visible">
+        {#snippet children(tiers)}
+          <Cached
+            key={orpc.elections.tiers.queryKey({ input: { id } })}
+            value={tiers}
+          >
+            {@render tiled()}
+          </Cached>
+        {/snippet}
+      </Island>
+    {:else}
+      {#await seeded.tiers}
+        <SectionSkeleton shape="tiles" label={m.tiers_title()} />
+      {:then}
+        {@render tiled()}
+      {/await}
+    {/if}
+  {:else if parts.length >= 40 || election.isCrowded}
+    {#if sections.winners instanceof Part}
+      <Island part={sections.winners} when="visible">
+        {#snippet children(
+          winners: NonNullable<
+            Extract<typeof sections.winners, Part<unknown>>["loaded"]
+          >["value"],
+        )}
+          <Cached
+            key={orpc.elections.winners.queryKey({ input: { id } })}
+            value={winners}
+          >
+            <Winners {id} parts={winners.children ?? parts} hasMap={!isSwept} />
+          </Cached>
+        {/snippet}
+      </Island>
+    {:else}
+      {#await seeded.winners}
+        <SectionSkeleton shape="table" />
+      {:then}
+        <Winners {id} {parts} hasMap={!isSwept} />
+      {/await}
+    {/if}
   {:else if parts.length > 0}
     <States {id} />
     {#if election.seated != null}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Part } from "svelte-islands";
   import { resolve } from "$app/paths";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
@@ -6,8 +7,11 @@
   const {
     counties,
   }: {
-    counties: NonNullable<
-      Awaited<Extract<PageData, { kind: "election" }>["sections"]["counties"]>
+    counties: Exclude<
+      NonNullable<
+        Awaited<Extract<PageData, { kind: "election" }>["sections"]["counties"]>
+      >,
+      Part<unknown>
     >;
   } = $props();
 

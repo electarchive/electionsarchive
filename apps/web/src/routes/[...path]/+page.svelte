@@ -19,9 +19,10 @@
     }
     const rest = visible.pathname.slice(data.path.length + 2);
     return visible.pathname.startsWith(`/${data.path}/`) &&
-      data.election.races.some(
-        (race) => race.anchor === rest.replace(/-total$/u, ""),
-      )
+      (data.election.rest != null ||
+        data.election.races.some(
+          (race) => race.anchor === rest.replace(/-total$/u, ""),
+        ))
       ? rest
       : null;
   });

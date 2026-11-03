@@ -1,9 +1,21 @@
+import type { Part } from "svelte-islands";
 import { part } from "svelte-islands/server";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
 import { tallied } from "./tally.js";
+
+const BOARD = 49;
+const QUESTIONS = 7;
+const CROWD = 200;
+
+function parted<T>(
+  name: string,
+  value: T | Promise<T>,
+): T | Promise<T> | Part<T> {
+  return value instanceof Promise || value == null ? value : part(name, value);
+}
 
 async function seed(path: string) {
   const located = await call(router.elections.locate, { path });
@@ -20,35 +32,94 @@ export const load: PageServerLoad = async ({ params, url }) => {
     return { ...data, talk: await talkLink(data.id) };
   }
   if (data.kind === "election") {
-    const { races, contests } = data.election;
+    const { races, contests, elections } = data.election;
     const placed = new Set(
       races.flatMap((race) => [
         ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
         ...(race.path == null ? [] : [race.path]),
       ]),
     );
+    const isDeferred = races.some((race) => race.deferred != null);
+    const shaped = races.map((race) => ({
+      ...race,
+      places:
+        race.places == null
+          ? null
+          : {
+              ...race.places,
+              rows: part("election.places", race.places.rows),
+              tally: tallied(race.places),
+            },
+    }));
+    const ordered = Map.groupBy(shaped, (race) => race.scope)
+      .values()
+      .flatMap((group) => [
+        ...group.filter((race) => race.results.length !== 1),
+        ...group.filter((race) => race.results.length === 1),
+      ])
+      .toArray();
+    const isQuestion = (race: (typeof ordered)[number]) =>
+      race.kind === "ballot_question";
+    const asked = params.path
+      .slice(data.path.length + 1)
+      .replace(/-total$/u, "");
+    const kept = new Set([
+      ...ordered.filter((race) => race.anchor === asked),
+      ...ordered.filter((race) => !isQuestion(race)).slice(0, BOARD),
+      ...ordered.filter((race) => isQuestion(race)).slice(0, QUESTIONS),
+    ]);
+    const isSplit = isDeferred && kept.size < ordered.length;
+    const rest = ordered.flatMap((race, at) => (kept.has(race) ? [] : [at]));
+    const { sections } = data;
+    const { winners } = sections;
+    const isSweep =
+      sections.mayoral ||
+      (!(winners instanceof Promise) && (winners?.tiers.length ?? 0) > 0);
+    const children = elections.filter((child) => !child.isStage);
+    const isParted =
+      !isSweep && winners != null && !(winners instanceof Promise);
+    const isCrowded = isParted && children.length > CROWD;
     return {
       ...data,
+      sections: {
+        ...sections,
+        tiers: parted("election.tiers", sections.tiers),
+        counties: parted("election.counties", sections.counties),
+        winners: isParted
+          ? part("election.winners", {
+              ...winners,
+              children: isCrowded ? children : null,
+            })
+          : winners,
+      },
       election: {
         ...data.election,
-        unplaced: races.some((race) => race.deferred != null)
+        elections: isCrowded
+          ? elections.filter((child) => child.isStage)
+          : elections,
+        isCrowded,
+        unplaced: isDeferred
           ? []
           : contests.flatMap((contest) =>
               contest.path == null || placed.has(contest.path)
                 ? []
                 : [{ name: contest.name, path: contest.path }],
             ),
-        races: races.map((race) => ({
-          ...race,
-          places:
-            race.places == null
-              ? null
-              : {
-                  ...race.places,
-                  rows: part("election.places", race.places.rows),
-                  tally: tallied(race.places),
-                },
-        })),
+        races: isSplit ? ordered.filter((race) => kept.has(race)) : shaped,
+        rest: isSplit
+          ? {
+              races: ordered.filter(
+                (race) => !kept.has(race) && !isQuestion(race),
+              ).length,
+              questions: ordered.filter(
+                (race) => !kept.has(race) && isQuestion(race),
+              ).length,
+              part: part("election.races", {
+                at: rest,
+                races: ordered.filter((race) => !kept.has(race)),
+              }),
+            }
+          : null,
       },
     };
   }
