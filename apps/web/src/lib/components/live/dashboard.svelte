@@ -398,7 +398,7 @@
         }
         const seats = tally(races, "house");
         const top = seats.groups[0];
-        const share = top == null ? 0 : (top.won + top.leading) / races.length;
+        const share = top == null ? 0 : top.seats / races.length;
         found[code] =
           top == null
             ? WAITING
@@ -582,9 +582,7 @@
             style:background-color={tone(group.option)}
           ></span>{group.option.party?.short ?? surname(group.option)}</span
         >
-        <span class="font-figures tabular-nums"
-          >{group.won + group.leading}</span
-        >
+        <span class="font-figures tabular-nums">{group.seats}</span>
       </span>
     {/each}
     <span class="text-muted-foreground"

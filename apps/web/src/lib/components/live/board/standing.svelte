@@ -46,7 +46,7 @@
               ><span class="sr-only"
                 >{group.option.party?.short ?? surname(group.option)}</span
               >
-              {group.won + group.leading}</span
+              {group.seats}</span
             >
           {:else}
             <span class="font-figures text-muted-foreground tabular-nums"
@@ -63,6 +63,12 @@
               class="transition-[inline-size] duration-700 motion-reduce:transition-none"
               style:inline-size="{(group.won / row.seats) * 100}%"
               style:background-color={tone(group.option)}
+            ></span>
+            <span
+              class="transition-[inline-size] duration-700 motion-reduce:transition-none"
+              style:inline-size="{(group.projected / row.seats) * 100}%"
+              style:background-color="color-mix(in oklab, {tone(group.option)} 75%,
+              var(--background))"
             ></span>
             <span
               class="transition-[inline-size] duration-700 motion-reduce:transition-none"

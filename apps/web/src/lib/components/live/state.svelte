@@ -5,7 +5,6 @@
   import type { Geography } from "#lib/live/standing.js";
   import type { Ballot, BallotTier } from "#lib/server/live-ballot.js";
   import ViewLinks from "#lib/components/live/view-links.svelte";
-  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
   import { district, entries as entriesOf, seating } from "#lib/live/ballot.js";
   import {
@@ -53,8 +52,6 @@
     "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
   const LATER =
     "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
-
-  let picked = $state<string | null>(null);
 
   function make(tier: BallotTier, chamber: string | null = null) {
     return entriesOf({
@@ -145,21 +142,15 @@
     ),
   );
   const mapped = $derived(
-    mappable.find((entry) => entry.contest.id === picked) ??
-      mappable[0] ??
-      top[0] ??
-      null,
+    mappable.length > 1 ? null : (mappable[0] ?? top[0] ?? null),
   );
-  const views = $derived(
-    mappable.map((entry) => ({
-      value: entry.contest.id,
-      label: entry.contest.title,
-    })),
-  );
+  const columns = $derived(top.length === 4 ? 2 : Math.min(top.length, 3));
   const counties = $derived(
     new Map(
-      (mapped?.summary.race.units ?? []).flatMap((unit) =>
-        unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+      (mapped == null ? mappable : [mapped]).flatMap((entry) =>
+        entry.summary.race.units.flatMap((unit) =>
+          unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+        ),
       ),
     ),
   );
@@ -224,14 +215,15 @@
     if (summary.later != null) {
       return LATER;
     }
-    const pick = summary.winner ?? summary.leader;
+    const called = summary.winner ?? summary.projected;
+    const pick = called ?? summary.leader;
     if (pick == null || summary.total === 0) {
       return entry.held == null
         ? WAITING
         : `color-mix(in oklab, ${entry.held.color} 22%, var(--map-low))`;
     }
     const share =
-      summary.winner == null
+      called == null
         ? Math.round(30 + 55 * Math.min(summary.margin / 0.3, 1))
         : 100;
     return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--map-low))`;
@@ -364,7 +356,97 @@
     </ul>
   </nav>
 
-  {#if top.length > 0}
+  {#snippet below()}
+    {#if house.length > 0}
+      <a
+        href="#house"
+        class="grid gap-1.5 rounded-xs py-2 outline-none hover:highlighter focus-visible:highlighter"
+      >
+        <span
+          class="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-semibold"
+          >{m.night_state_house()}<span
+            class="font-figures text-xs font-normal text-muted-foreground tabular-nums"
+            >{before(houseSeats)}</span
+          ></span
+        >
+        <span class="flex flex-wrap gap-0.5" aria-hidden="true">
+          {#each house as entry (entry.contest.id)}
+            <span
+              class="rounded-[1px] block-4 inline-4"
+              style:background-color={shade(entry)}
+              style:background-image={entry.summary.later == null
+                ? undefined
+                : HATCH}
+            ></span>
+          {/each}
+        </span>
+      </a>
+    {/if}
+    {#each chambers as chamber (chamber.id)}
+      <a
+        href="#legislature"
+        class="grid gap-1.5 rounded-xs py-2 outline-none hover:highlighter focus-visible:highlighter"
+      >
+        <span
+          class="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-semibold"
+          >{chamber.name}<span
+            class="font-figures text-xs font-normal text-muted-foreground tabular-nums"
+            >{before(chamber.seats)}</span
+          ></span
+        >
+        <Bar seats={chamber.seats} isSmall />
+      </a>
+    {/each}
+  {/snippet}
+
+  {#snippet map(entry: Entry)}
+    {#if geography != null}
+      {const race = $derived(entry.summary.race)}
+      {#key race.id}
+        <LiveMap
+          {geography}
+          options={race.options}
+          now={standing(race, { at: null, isFinal: true })}
+          estimate={estimates[race.id] ?? null}
+          modes={["lead", "bubbles", "shift", "counted"]}
+          title={m.night_state_map_title({ race: titleOf(entry) })}
+          isLater={entry.summary.later != null}
+          href={countyHref}
+        />
+      {/key}
+    {/if}
+  {/snippet}
+
+  {#if top.length > 0 && mapped == null}
+    <section
+      id="top"
+      class="grid scroll-mbs-12 gap-px bg-border"
+      aria-label={m.night_state_top()}
+    >
+      <div
+        class="grid gap-px lg:grid-cols-[repeat(var(--columns),minmax(0,1fr))]"
+        style:--columns={columns}
+      >
+        {#each top as entry (entry.contest.id)}
+          <div class="row-span-2 grid grid-rows-subgrid gap-px">
+            <Ticket {entry} href={href(entry)} title={titleOf(entry)} />
+            <div class="grid content-start bg-background p-4 sm:px-6">
+              {#if mappable.includes(entry)}
+                {@render map(entry)}
+              {/if}
+            </div>
+          </div>
+        {/each}
+      </div>
+      {#if house.length > 0 || chambers.length > 0}
+        <div
+          class="grid content-start gap-x-10 gap-y-1 bg-background p-4 sm:px-5 md:grid-cols-2 xl:grid-cols-3"
+        >
+          {@render below()}
+        </div>
+      {/if}
+    </section>
+  {:else if top.length > 0}
     <section
       id="top"
       class="grid scroll-mbs-12 gap-px bg-border lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
@@ -372,83 +454,17 @@
     >
       <div class="flex flex-col gap-px bg-border">
         {#each top as entry (entry.contest.id)}
-          <Ticket
-            {entry}
-            href={href(entry)}
-            title={titleOf(entry)}
-            isMapped={mappable.length > 1 &&
-              mapped?.contest.id === entry.contest.id}
-          />
+          <Ticket {entry} href={href(entry)} title={titleOf(entry)} />
         {/each}
         {#if house.length > 0 || chambers.length > 0}
           <div class="grid grow content-start gap-1 bg-background p-4 sm:px-5">
-            {#if house.length > 0}
-              <a
-                href="#house"
-                class="grid gap-1.5 rounded-xs py-2 outline-none hover:highlighter focus-visible:highlighter"
-              >
-                <span
-                  class="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-semibold"
-                  >{m.night_state_house()}<span
-                    class="font-figures text-xs font-normal text-muted-foreground tabular-nums"
-                    >{before(houseSeats)}</span
-                  ></span
-                >
-                <span class="flex flex-wrap gap-0.5" aria-hidden="true">
-                  {#each house as entry (entry.contest.id)}
-                    <span
-                      class="rounded-[1px] block-4 inline-4"
-                      style:background-color={shade(entry)}
-                      style:background-image={entry.summary.later == null
-                        ? undefined
-                        : HATCH}
-                    ></span>
-                  {/each}
-                </span>
-              </a>
-            {/if}
-            {#each chambers as chamber (chamber.id)}
-              <a
-                href="#legislature"
-                class="grid gap-1.5 rounded-xs py-2 outline-none hover:highlighter focus-visible:highlighter"
-              >
-                <span
-                  class="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-semibold"
-                  >{chamber.name}<span
-                    class="font-figures text-xs font-normal text-muted-foreground tabular-nums"
-                    >{before(chamber.seats)}</span
-                  ></span
-                >
-                <Bar seats={chamber.seats} isSmall />
-              </a>
-            {/each}
+            {@render below()}
           </div>
         {/if}
       </div>
       {#if geography != null && mapped != null}
-        {const race = $derived(mapped.summary.race)}
         <div class="grid content-start gap-3 bg-background p-4 sm:px-6">
-          {#if views.length > 1}
-            <Segmented
-              options={views}
-              value={mapped.contest.id}
-              onValueChange={(value: string) => (picked = value)}
-              label={m.night_state_map_label()}
-              size="sm"
-            />
-          {/if}
-          {#key race.id}
-            <LiveMap
-              {geography}
-              options={race.options}
-              now={standing(race, { at: null, isFinal: true })}
-              estimate={estimates[race.id] ?? null}
-              modes={["lead", "bubbles", "shift", "counted"]}
-              title={m.night_state_map_title({ race: titleOf(mapped) })}
-              isLater={mapped.summary.later != null}
-              href={countyHref}
-            />
-          {/key}
+          {@render map(mapped)}
         </div>
       {/if}
     </section>

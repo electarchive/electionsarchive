@@ -11,10 +11,10 @@
   import type { Summary } from "#lib/live/summary.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
-  import { bandFor, HATCH, surname, tone } from "#lib/live/format.js";
+  import { HATCH, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { localize, tokenize } from "#lib/live/local.js";
-  import { shade, tally, verdict } from "#lib/live/summary.js";
+  import { bandOf, shade, tally, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -357,17 +357,7 @@
   {const summary = $derived(entry.summary)}
   {const option = $derived(summary.winner ?? summary.leader)}
   {const isCurrent = $derived(summary.race.slug === current)}
-  {const band = $derived(
-    bandFor(
-      summary.race.options,
-      summary.projected == null
-        ? (summary.race.certified?.winners ??
-            (summary.winner == null ? [] : [summary.winner.id]))
-        : [summary.projected.id],
-      summary.race.seats ?? 1,
-      summary.projected != null,
-    ),
-  )}
+  {const band = $derived(bandOf(summary))}
   <li class="border-be border-border">
     {#snippet body()}
       <span
@@ -477,9 +467,7 @@
           <span class="flex items-center gap-1.5 font-semibold">
             {@render swatch(tone(group.option))}
             {group.option.party?.short ?? surname(group.option)}
-            <span class="font-figures tabular-nums"
-              >{group.won + group.leading}</span
-            >
+            <span class="font-figures tabular-nums">{group.seats}</span>
           </span>
         {/each}
         {#if seats.waiting > 0}

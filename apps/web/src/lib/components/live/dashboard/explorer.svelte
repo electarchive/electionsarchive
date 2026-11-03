@@ -10,7 +10,6 @@
   import { fits } from "#lib/fits.js";
   import { percent } from "#lib/format.js";
   import {
-    bandFor,
     clock,
     compact,
     lead,
@@ -19,6 +18,7 @@
     tone,
   } from "#lib/live/format.js";
   import { odds } from "#lib/live/nation.js";
+  import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
@@ -349,17 +349,7 @@
             summary.winner ?? summary.projected ?? summary.leader,
           )}
           {const isLeft = $derived((seat.signed ?? 0) >= 0)}
-          {const band = $derived(
-            bandFor(
-              summary.race.options,
-              summary.projected == null
-                ? (summary.race.certified?.winners ??
-                    (summary.winner == null ? [] : [summary.winner.id]))
-                : [summary.projected.id],
-              summary.race.seats ?? 1,
-              summary.projected != null,
-            ),
-          )}
+          {const band = $derived(bandOf(summary))}
           {const fill = $derived(
             band == null
               ? isLeft

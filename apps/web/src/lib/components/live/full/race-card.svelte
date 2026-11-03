@@ -8,11 +8,11 @@
   import Name from "#lib/components/name.svelte";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, percent } from "#lib/format.js";
-  import { bandFor, lead, paint, surname, tone } from "#lib/live/format.js";
+  import { lead, paint, surname, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
-  import { describe } from "#lib/live/summary.js";
+  import { bandOf, describe } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { prior } from "./model.js";
@@ -50,16 +50,7 @@
   const race = $derived(summary.race);
   const last = $derived(prior(race));
   const headline = $derived(describe(summary, closes, clock));
-  const band = $derived(
-    bandFor(
-      race.options,
-      summary.projected == null
-        ? (race.certified?.winners ?? [])
-        : [summary.projected.id],
-      race.seats ?? 1,
-      summary.projected != null,
-    ),
-  );
+  const band = $derived(bandOf(summary));
   const reach = useReach();
   const split = $derived(
     lineup(

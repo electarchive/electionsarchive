@@ -6,7 +6,7 @@ import type {
   LiveRace,
 } from "@ea/analytics/live";
 import { count, percent } from "#lib/format.js";
-import { lead, stamp, surname, tone } from "#lib/live/format.js";
+import { bandFor, lead, stamp, surname, tone } from "#lib/live/format.js";
 import { ranked, sum } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
 
@@ -105,6 +105,18 @@ export function summarize(
         ? race.feed
         : null,
   };
+}
+
+export function bandOf(summary: Summary, seats = summary.race.seats ?? 1) {
+  const { race, projected, winner } = summary;
+  return bandFor(
+    race.options,
+    projected == null
+      ? (race.certified?.winners ?? (winner == null ? [] : [winner.id]))
+      : [projected.id],
+    seats,
+    projected != null,
+  );
 }
 
 export function closing(election: LiveElection, race: LiveRace) {
@@ -231,7 +243,13 @@ export function party(option: LiveOption | null) {
 export function tally(summaries: Array<Summary>, office: LiveOffice) {
   const groups = new Map<
     string,
-    { option: LiveOption; won: number; leading: number }
+    {
+      option: LiveOption;
+      won: number;
+      projected: number;
+      leading: number;
+      seats: number;
+    }
   >();
   let waiting = 0;
   let later = 0;
@@ -239,7 +257,7 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
     if (summary.race.office !== office) {
       continue;
     }
-    const option = summary.winner ?? summary.leader;
+    const option = summary.winner ?? summary.projected ?? summary.leader;
     if (option == null) {
       if (summary.later == null) {
         waiting += 1;
@@ -249,18 +267,25 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
       continue;
     }
     const key = party(option);
-    const group = groups.get(key) ?? { option, won: 0, leading: 0 };
-    if (summary.winner == null) {
+    const group = groups.get(key) ?? {
+      option,
+      won: 0,
+      projected: 0,
+      leading: 0,
+      seats: 0,
+    };
+    if (summary.winner != null) {
+      group.won += 1;
+    } else if (summary.projected == null) {
       group.leading += 1;
     } else {
-      group.won += 1;
+      group.projected += 1;
     }
+    group.seats += 1;
     groups.set(key, group);
   }
   return {
-    groups: [...groups.values()].toSorted(
-      (a, b) => b.won + b.leading - (a.won + a.leading),
-    ),
+    groups: [...groups.values()].toSorted((a, b) => b.seats - a.seats),
     waiting,
     later,
   };

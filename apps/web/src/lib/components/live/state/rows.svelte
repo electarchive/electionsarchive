@@ -4,9 +4,10 @@
   import type { Entry } from "#lib/live/ballot.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
-  import { bandFor, lead, paint, stamp, tone } from "#lib/live/format.js";
+  import { lead, paint, stamp, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { highlight } from "#lib/live/local.js";
+  import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -25,19 +26,6 @@
   } = $props();
 
   const parties = useReach();
-
-  function bandOf(entry: Entry) {
-    const { summary } = entry;
-    return bandFor(
-      summary.race.options,
-      summary.projected == null
-        ? (summary.race.certified?.winners ??
-            (summary.winner == null ? [] : [summary.winner.id]))
-        : [summary.projected.id],
-      entry.contest.seats,
-      summary.projected != null,
-    );
-  }
 
   function lines(entry: Entry) {
     const { summary } = entry;
@@ -74,7 +62,7 @@
     {#each entries as entry (entry.contest.id)}
       {const summary = $derived(entry.summary)}
       {const pick = $derived(summary.winner ?? summary.leader)}
-      {const band = $derived(bandOf(entry))}
+      {const band = $derived(bandOf(entry.summary, entry.contest.seats))}
       <li class="border-be border-border">
         <a
           href={href(entry)}
