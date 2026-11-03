@@ -92,9 +92,14 @@ function tierOf(row: {
 }
 
 function clean(title: string, prefix: string | null) {
-  let found = title
-    .replace(/^\d{4} /u, "")
-    .replace(/ (?:special )?election$/u, "")
+  let found = title.replace(/^\d{4} /u, "");
+  if (prefix != null && found.endsWith(` in ${prefix}`)) {
+    found = found.slice(0, -` in ${prefix}`.length);
+  }
+  found = found
+    .replace(/ (special )?election$/u, (_, special?: string) =>
+      special == null ? "" : " special",
+    )
     .replace(/ gubernatorial$/u, " governor");
   for (const glue of [": ", " "]) {
     if (prefix != null && found.startsWith(`${prefix}${glue}`)) {
@@ -489,7 +494,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v7:${election.slug}`, async () => {
+  return remember(`live:ballot:v8:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");
