@@ -12,10 +12,11 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode, rekey, repair
 from ea.store import DATA, connect
 
 SOURCE = "us.mn_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FILES = "https://electionresultsfiles.sos.mn.gov/{day}/{name}"
 DAYS = tuple(
@@ -80,11 +81,10 @@ def _shapes(link: str) -> list[tuple[Mapping[str, object], str]]:
 
 def _table(day: date, name: str, columns: list[str]) -> pl.DataFrame:
     frame = pl.read_csv(
-        raw.cached(SOURCE, url(day, name)).path,
+        decode(raw.cached(SOURCE, url(day, name)).path.read_bytes()).encode(),
         separator=";",
         has_header=False,
         infer_schema=False,
-        encoding="utf8-lossy",
         quote_char=None,
         truncate_ragged_lines=True,
     )
@@ -593,6 +593,7 @@ def emit() -> Path:
                     continue
                 else:
                     ballot = title(choice) if choice.isupper() else choice
+                    rekey(cs, ballot)
                     person_key = (code, slug(ballot))
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"MN:{code}:{slug(ballot)}")
@@ -672,4 +673,5 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        repair(cs)
         return cs.write()
