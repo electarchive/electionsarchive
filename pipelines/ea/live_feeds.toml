@@ -866,3 +866,11 @@ params = { state = "WY" }
 poller = "muktedir"
 publisher = "civicAPI"
 url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.guam_live"
+adapter = "us.guam_live"
+interval = 300
+poller = "muktedir"
+publisher = "Guam Election Commission"
+url = "https://gec.guam.gov/2026-general-election-info/"
