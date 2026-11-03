@@ -423,10 +423,11 @@
                 : "none"
               : `party:${row.party}`,
           label:
-            party?.label ??
             row.label ??
+            party?.label ??
             (row.isIndependent ? m.seats_independents() : m.record_none()),
-          short: party?.short ?? null,
+          short:
+            row.label == null ? (party?.short ?? null) : (row.short ?? null),
           color: party?.color ?? null,
           lean: party?.lean ?? null,
           seats: row.seats,

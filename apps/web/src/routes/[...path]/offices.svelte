@@ -121,7 +121,8 @@
                           )}
                         ></span>
                         <span
-                          >{row.label ??
+                          >{row.short ??
+                            row.label ??
                             party?.short ??
                             party?.label ??
                             (row.isIndependent === true
