@@ -190,7 +190,12 @@ export function seat(
   return {
     summary,
     held,
-    holder: holder?.name ?? "",
+    holder:
+      holder == null
+        ? ""
+        : holder.isVacant
+          ? m.night_holder_vacant({ name: holder.name })
+          : holder.name,
     side,
     left: pLeft,
     right: pRight,

@@ -414,35 +414,42 @@ export async function control(
     .filter((race) => SIDES.has(race.office))
     .map((race) => race.id);
   const [held, kept] = await Promise.all([
-    db.execute<{ contest: string; person: string; party: string | null }>(sql`
+    db.execute<{
+      contest: string;
+      person: string;
+      vacant: boolean;
+      party: string | null;
+    }>(sql`
       with up as materialized (
         select c.id, c.seat_id, c.office_id, c.body_id, c.district_area_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
       ),
       sitting as materialized (
-        select t.id, t.person_id, t.contest_id, t.seat_id, t.office_id, t.body_id, t.from_date, s.district_area_id
+        select t.id, t.person_id, t.contest_id, t.seat_id, t.office_id, t.body_id, t.from_date, t.to_date, s.district_area_id
         from tenure t left join seat s on s.id = t.seat_id
-        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date - 730)
       ),
       held as (
-        select distinct on (m.contest) m.contest, m.tenure, m.person, m.won from (
-          select u.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won, t.from_date
+        select distinct on (m.contest) m.contest, m.tenure, m.person, m.won, m.to_date <= ${date}::date as vacant from (
+          select u.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won, t.from_date, t.to_date
           from up u join sitting t on t.seat_id = u.seat_id
           union all
-          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date, t.to_date
           from up u join sitting t on t.office_id = u.office_id
           union all
-          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date, t.to_date
           from up u cross join lateral (
             select u.district_area_id as area_id
             union
             select x.area_id from area_code y join area_code x on x.code = y.code where y.area_id = u.district_area_id
           ) a
-          join sitting t on t.body_id = u.body_id and t.district_area_id = a.area_id
+          join sitting t on t.body_id = u.body_id
+          left join contest w on w.id = t.contest_id
           where u.seat_id is null and u.office_id is null
+            and (t.district_area_id = a.area_id or (w.body_id = u.body_id and w.district_area_id = a.area_id))
         ) m
-        order by m.contest, m.from_date desc
+        order by m.contest, m.to_date is null or m.to_date > ${date}::date desc, m.from_date desc
       )
-      select h.contest, h.person, coalesce(
+      select h.contest, h.person, h.vacant, coalesce(
         (select ta.party_id from tenure_affiliation ta where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
         (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = h.person and o.party_id is not null
           order by (o.contest_id = h.won) desc nulls last, o.contest_id desc limit 1)
@@ -521,7 +528,11 @@ export async function control(
     holders: Object.fromEntries(
       held.rows.map((row) => [
         row.contest,
-        { party: family(row.party), name: people.full.get(row.person) ?? "" },
+        {
+          party: family(row.party),
+          name: people.full.get(row.person) ?? "",
+          isVacant: row.vacant,
+        },
       ]),
     ),
     holdovers,

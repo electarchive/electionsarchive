@@ -592,12 +592,14 @@
         </span>
         {#if entry != null}
           <span class="flex justify-between gap-3 text-muted-foreground">
-            <span
-              >{m.night_tip_held({
-                party: short(entry.held),
-                name: entry.holder,
-              })}</span
-            >
+            {#if entry.held != null}
+              <span
+                >{m.night_tip_held({
+                  party: short(entry.held),
+                  name: entry.holder,
+                })}</span
+              >
+            {/if}
             {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
               <span class="font-figures tabular-nums"
                 >{entry.left >= entry.right ? pair[0].short : pair[1].short}
@@ -630,12 +632,14 @@
   >
   {@render chip(summary)}
   <span class="flex justify-between gap-3 text-muted-foreground">
-    <span
-      >{m.night_tip_held({
-        party: short(entry.held),
-        name: entry.holder,
-      })}</span
-    >
+    {#if entry.held != null}
+      <span
+        >{m.night_tip_held({
+          party: short(entry.held),
+          name: entry.holder,
+        })}</span
+      >
+    {/if}
     {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
       <span class="font-figures tabular-nums"
         >{entry.left >= entry.right ? pair[0].short : pair[1].short}
@@ -669,12 +673,14 @@
     >
     {@render chip(summary)}
     {#if entry != null}
-      <span class="text-muted-foreground"
-        >{m.night_tip_held({
-          party: short(entry.held),
-          name: entry.holder,
-        })}</span
-      >
+      {#if entry.held != null}
+        <span class="text-muted-foreground"
+          >{m.night_tip_held({
+            party: short(entry.held),
+            name: entry.holder,
+          })}</span
+        >
+      {/if}
     {/if}
     {#if summary.counted != null}
       <span class="text-muted-foreground"

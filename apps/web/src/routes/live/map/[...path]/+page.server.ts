@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const whole = nationPath === params.path ? found : await night(nationPath);
   const nationElection: LiveElection = whole.election;
   const [held, districts, nation] = await Promise.all([
-    remember(`live:control:v1:${election.date}`, async () =>
+    remember(`live:control:v2:${election.date}`, async () =>
       control(nationElection.races, election.date),
     ),
     remember(`live:house:v3:${election.date}`, async () =>
