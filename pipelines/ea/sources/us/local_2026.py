@@ -11627,7 +11627,13 @@ def parse() -> None:
     frame = (
         pl.DataFrame(rows)
         .with_columns(person=pl.col("name").map_elements(slug, return_dtype=pl.String))
-        .unique(["tail", "person"], keep="first", maintain_order=True)
+        .with_columns(
+            twin=pl.when(pl.col("fips") == "KY")
+            .then(pl.col("person").str.replace_all(r"-[a-z](?=-|$)", ""))
+            .otherwise(pl.col("person"))
+        )
+        .unique(["tail", "twin"], keep="first", maintain_order=True)
+        .drop("twin")
         .with_columns(
             template=pl.col("tail").replace(templated),
             title=pl.col("tail").replace_strict({tail: value[0] for tail, value in minted.items()}, default=None),
