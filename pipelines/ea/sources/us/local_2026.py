@@ -11387,6 +11387,27 @@ def parse() -> None:
                     minted[tail] = (f"County Board of Education, Trustee Area {coe[1]}", place, "", "")
                 if (
                     template is None
+                    and state == "IL"
+                    and place
+                    and (
+                        ros := re.fullmatch(
+                            r"(?i)(?:.+? county )?regional superintendent of schools(?:, (.+))?",
+                            re.sub(r"\s+", " ", str(row["contest"])).strip(),
+                        )
+                    )
+                ):
+                    suffix = f"-{slug(ros[1])}" if ros[1] else ""
+                    template, tail = "", f"IL:{row['fips']}:regional-superintendent{suffix}"
+                    minted[tail] = (
+                        f"Regional Superintendent of Schools, {ros[1]}"
+                        if ros[1]
+                        else "Regional Superintendent of Schools",
+                        place,
+                        "",
+                        "",
+                    )
+                if (
+                    template is None
                     and place
                     and (
                         int(str(row["seats"]) or 0) <= 1
