@@ -94,6 +94,24 @@ SYSTEMS: dict[str, tuple[str, dict[str, object], str, str]] = {
         "Missouri local bond at a general election, four-sevenths of Yes and No votes",
         "General obligation bonds of a county, city, school district, or other subdivision need four-sevenths of the votes cast at a general municipal election or a state general or primary election, and two-thirds at any other election (Mo. Const. art. VI, § 26(b)).",
     ),
+    "referendum-id-55": (
+        "US-ID",
+        {"formula": "referendum", "majority": {"share": 0.55}},
+        "Idaho school plant facilities levy, 55 percent of Yes and No votes",
+        "A school plant facilities reserve fund levy that brings the district's plant facilities and bond levies to less than 0.2 percent of market value needs 55 percent of the electors voting (Idaho Code § 33-804(1)).",
+    ),
+    "referendum-id-60": (
+        "US-ID",
+        {"formula": "referendum", "majority": {"share": 0.6}},
+        "Idaho school plant facilities levy, 60 percent of Yes and No votes",
+        "A school plant facilities reserve fund levy that brings the district's plant facilities and bond levies to at least 0.2 and less than 0.3 percent of market value needs 60 percent of the electors voting (Idaho Code § 33-804(2)).",
+    ),
+    "referendum-mp-two-thirds": (
+        "US-MP",
+        {"formula": "referendum", "majority": {"share": TWO_THIRDS}},
+        "Northern Mariana Islands constitutional convention question, two-thirds of votes cast",
+        "The legislature convenes a constitutional convention only if two-thirds of the votes cast on the question are affirmative (N.M.I. Const. art. XVIII, § 2(c)).",
+    ),
     "referendum-ok-60": (
         "US-OK",
         {"formula": "referendum", "majority": {"share": 0.6}},
@@ -149,6 +167,8 @@ STATEWIDE = {
 def statewide(state: str, label: str) -> str:
     if state == "CO":
         return "referendum-co-55" if label.startswith("Amendment") else "referendum"
+    if state == "MP":
+        return "referendum-mp-two-thirds" if label.startswith("Constitutional Convention") else "referendum"
     return STATEWIDE.get(state, "referendum")
 
 
@@ -178,4 +198,42 @@ def california(entity: str, wording: str) -> str:
         return "referendum"
     if re.search(r"special tax|parcel tax|general obligation bonds?", wording, re.IGNORECASE):
         return "referendum-ca-two-thirds"
+    return "referendum"
+
+
+LOCAL = {
+    ("CA", "Liberty Union High School District", "Measure X: School Bonds"): "referendum-ca-55",
+    ("CA", "City of Alameda", "Measure L: General Obligation Bond"): "referendum-ca-two-thirds",
+    ("CA", "United Water Conservation District", "Measure D: Water Supply Bond"): "referendum-ca-two-thirds",
+    (
+        "CA",
+        "Riverside County Transportation Commission",
+        "Measure A: Traffic Relief and Road Repair Renewal",
+    ): "referendum-ca-two-thirds",
+    (
+        "CA",
+        "Desert Recreation District",
+        "Measure P: Local Park Repair and Senior Services",
+    ): "referendum-ca-two-thirds",
+    ("CA", "City of Richmond", "Measure Q: Fire Facilities Bonds"): "referendum-ca-two-thirds",
+    ("CA", "City of Colfax", "Measure I: Street Improvement Sales Tax"): "referendum-ca-two-thirds",
+    ("CA", "Sonoma County", "Measure H: Regional Parks Sales Tax"): "referendum-ca-two-thirds",
+    ("CA", "City of Mill Valley", "Measure T: Municipal Service Tax"): "referendum-ca-two-thirds",
+    ("CA", "City of Monterey", "Measure S: Sales Tax"): "referendum-ca-two-thirds",
+    ("CA", "North County Recreation and Park District", "Measure V: Parcel Tax"): "referendum-ca-two-thirds",
+    ("CA", "Soledad-Mission Recreation District", "Measure U: Parcel Tax"): "referendum-ca-two-thirds",
+    ("CA", "Isla Vista Community Services District", "Measure E2026: Utility Users' Tax"): "referendum-ca-two-thirds",
+    ("ID", "Highland Joint School District No. 305", "Plant facility levy"): "referendum-id-55",
+    ("ID", "Moscow School District No. 281", "School plant facilities reserve fund levy"): "referendum-id-60",
+}
+
+
+def local(state: str, entity: str, label: str, wording: str) -> str:
+    found = LOCAL.get((state, entity, label))
+    if found is not None:
+        return found
+    if state == "CA":
+        return california(entity, wording)
+    if state == "WA":
+        return washington(entity, label, wording)
     return "referendum"

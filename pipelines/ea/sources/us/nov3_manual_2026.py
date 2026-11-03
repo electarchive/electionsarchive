@@ -1375,7 +1375,15 @@ def emit() -> Path:
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
         systems = measure_rules.systems(
-            cs, {"referendum", "referendum-ca-two-thirds", "referendum-ca-55", "referendum-wa-60-validated"}
+            cs,
+            {
+                "referendum",
+                "referendum-ca-two-thirds",
+                "referendum-ca-55",
+                "referendum-wa-60-validated",
+                "referendum-id-55",
+                "referendum-id-60",
+            },
         )
         sources: dict[str, UUID] = {}
         added: set[UUID] = set()
@@ -1469,13 +1477,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=area,
-                electoral_system_id=systems[
-                    measure_rules.california(row["entity"], row["wording"] or "")
-                    if state == "CA"
-                    else measure_rules.washington(row["entity"], label, row["wording"] or "")
-                    if state == "WA"
-                    else "referendum"
-                ],
+                electoral_system_id=systems[measure_rules.local(state, row["entity"], label, row["wording"] or "")],
                 round_number=1,
                 default_result_kind="counted",
             )
