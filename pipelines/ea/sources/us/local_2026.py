@@ -5587,6 +5587,20 @@ for key, publisher, title, url, local in (
         "in/town_ballots/ripley.pdf",
     ),
     (
+        "IN-18095-ingalls",
+        "Madison County Clerk",
+        "Offices up for election in 2026, Madison County",
+        "https://www.madisoncounty.in.gov/_files/ugd/918579_1cda245699b4410b9aa1a12e11afd91b.pdf",
+        "in/town_ballots/madison_offices.pdf",
+    ),
+    (
+        "IN-18085-milford",
+        "Kosciusko County Clerk",
+        "Candidate and Ballot Information, 2026 General Election, Kosciusko County",
+        "https://www.kosciusko.in.gov/topic/index.php?structureid=32&topicid=45",
+        "in/town_ballots/kosciusko_candidate_info.html",
+    ),
+    (
         "IN-18001-townships",
         "Adams County Clerk",
         "Candidate List - Abbreviated, 2026 General Election, Adams County",
@@ -7342,6 +7356,8 @@ IN_BALLOT_SEATS = {
     "Whitley County Consolidated School Board, District Thorncreek Twp": ("IN-18183-wccs", 1),
     "Francesville Town Council, At Large": ("IN-18131-francesville", 3),
     "Milan Town Council, At Large": ("IN-18137-milan", 3),
+    "Ingalls Town Council, At Large": ("IN-18095-ingalls", 2),
+    "Milford Town Council Member": ("IN-18085-milford", 3),
 }
 KY_PRINTED_BOARDS = (
     ("Harrison", 1, False, ("Laura Norcross",)),
