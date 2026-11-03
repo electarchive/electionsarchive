@@ -719,9 +719,26 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     opened == null
       ? 0
       : Math.max(0, (Date.parse(stamp) - Date.parse(opened)) / 86_400_000);
-  const left =
+  const shown = race.frames.filter(
+    (frame) => Date.parse(frame.at) <= Date.parse(stamp),
+  );
+  const night = shown.findLast(
+    (frame) =>
+      opened != null &&
+      Date.parse(frame.at) <=
+        Date.parse(opened) + MODEL.tail.grace * 86_400_000,
+  );
+  const onNight = night == null ? 0 : sum(night.totals);
+  const latest = shown.length > 0 ? sum(shown.at(-1)!.totals) : 0;
+  const left = Math.min(
     tail *
-    Math.exp(-Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail));
+      Math.exp(
+        -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
+      ),
+    isClassic || onNight <= 0 || latest <= 0
+      ? Infinity
+      : Math.max(0, tail * onNight - (latest - onNight)) / latest,
+  );
   if (race.certified != null) {
     const totals = race.certified.totals;
     const all = sum(totals);
