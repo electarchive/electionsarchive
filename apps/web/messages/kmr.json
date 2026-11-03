@@ -166,9 +166,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kursî hat dagirtin, partî nehatiye tomarkirin",
         "countPlural=*": "{countText} kursî hatin dagirtin, partî nehatine tomarkirin"
@@ -182,9 +180,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kursî hat dagirtin",
         "countPlural=*": "{countText} kursî hatin dagirtin"
@@ -259,9 +255,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} hilbijartin",
         "countPlural=*": "{countText} hilbijartin"
@@ -295,13 +289,8 @@
   "col_final_ballot": "Dengdana dawîn",
   "delegates_primary": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} delege, di hilbijartina pêşîn de hatiye hilbijartin",
         "countPlural=*": "{count} delege, di hilbijartina pêşîn de hatine hilbijartin"
@@ -310,13 +299,8 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} delege, bi caucusan hatiye hilbijartin",
         "countPlural=*": "{count} delege, bi caucusan hatine hilbijartin"
@@ -325,13 +309,8 @@
   ],
   "delegates_convention": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} delege, di kongreya eyaletê de hatiye hilbijartin",
         "countPlural=*": "{count} delege, di kongreya eyaletê de hatine hilbijartin"
@@ -340,13 +319,8 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} delege, bê girêdan",
         "countPlural=*": "{count} delege, hemû bê girêdan"
@@ -430,9 +404,7 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Beriya hilbijartina giştî ya {year}, di vê parlamentoyê de 1 hilbijartina navberê hat kirin.",
         "countPlural=*": "Beriya hilbijartina giştî ya {year}, di vê parlamentoyê de {count} hilbijartinên navberê hatin kirin."
@@ -441,13 +413,8 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Di vê parlamentoyê de heta niha 1 hilbijartina navberê hatiye kirin.",
         "countPlural=*": "Di vê parlamentoyê de heta niha {count} hilbijartinên navberê hatine kirin."
@@ -456,13 +423,8 @@
   ],
   "byes_changed": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Xwediyê 1 kursiyê guherî.",
         "countPlural=*": "Xwediyê {count} kursiyan guherî."
@@ -648,9 +610,7 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "Li derveyî welat, di nav {count} {nouns} de, ji bo {name} {rank}emîn a herî baş e."
       }
@@ -692,9 +652,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} {groups} ji bilî encamên li jor hatine nîşandan encameke din tune ye, ji ber vê yekê li vir nehatiye rêzkirin.",
         "countPlural=*": "{countText} {groups} ji bilî encamên li jor hatine nîşandan encamên din tune ne, ji ber vê yekê li vir nehatine rêzkirin."
@@ -740,9 +698,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -751,13 +707,8 @@
   ],
   "map_electoral": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} dengê kolejê",
         "countPlural=*": "{count} dengên kolejê"
@@ -800,9 +751,7 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{party} li {where} {count} kursî bi dest xist",
         "countPlural=*": "{party} li {where} {count} kursî bi dest xist"
@@ -879,9 +828,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} komeya encaman",
         "countPlural=*": "{countText} komeyên encaman"
@@ -895,9 +842,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} pêşbazî",
         "countPlural=*": "{countText} pêşbazî"
@@ -911,9 +856,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sînor",
         "countPlural=*": "{countText} sînor"
@@ -931,13 +874,8 @@
   "check_votes_valid_unit": "{name}: tevahiya dengan {votes} e, lê {valid} pusulaya derbasdar hatine ragihandin",
   "checks_turnout": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} yeke ji hejmara hilbijêrên tomarkirî bêtir pusula radigihîne",
         "countPlural=*": "{count} yeke ji hejmara hilbijêrên tomarkirî bêtir pusula radigihînin"
@@ -946,13 +884,8 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} yeke dengan radigihîne ku bi pusulayên wê yên derbasdar re nayên hev",
         "countPlural=*": "{count} yeke dengan radigihînin ku bi pusulayên wan ên derbasdar re nayên hev"
@@ -964,13 +897,8 @@
   "election_unplaced_detail": "Van pêşbaziyan, wekî kursiyên zanîngehê, qada wan a erdnigarî tune ye û ji tablo û nexşeyê hatine derxistin.",
   "election_parts": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} beş",
         "countPlural=*": "{count} beş"
@@ -1003,9 +931,7 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "1 kursî bê hevrik hate bidestxistin, ji ber vê di wê de tu deng nehatin dayîn: {parties}.",
         "seatsPlural=*": "{seats} kursî bê hevrik hatin bidestxistin, ji ber vê di wan de tu deng nehatin dayîn: {parties}."
@@ -1020,9 +946,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 {noun} heye ku tê de ji yekê zêdetir endam hatine hilbijartin. Dengderên wê dikarîbûn ji yekê zêdetir deng bidin, ji ber vê tevahî dengên hatine dayîn têne jimartin, ne dengder.",
         "countPlural=*": "{count} {nouns} hene ku tê de ji yekê zêdetir endam hatine hilbijartin. Dengderên wan dikarîbûn ji yekê zêdetir deng bidin, ji ber vê tevahî dengên hatine dayîn têne jimartin, ne dengder."
@@ -1067,13 +991,8 @@
   "race_contests_nonvoting": "{count} pêşbazî, {nonvoting} ji wan pêşbaziyên delegeyên bê mafê dengdanê ne",
   "race_contests": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} pêşbazî",
         "countPlural=*": "{count} pêşbazî"
@@ -1143,9 +1062,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rêveberiyeke herêmî",
         "countPlural=*": "{countText} rêveberiyên herêmî"
@@ -1159,9 +1076,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} navçe",
         "countPlural=*": "{countText} navçe"
@@ -1345,13 +1260,8 @@
   "lists_title": "Lîsteyên berendaman",
   "lists_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên rêzkirî yên partiyan hat tijîkirin",
         "seatsPlural=*": "{seats} kursî ji lîsteyên rêzkirî yên partiyan hatin tijîkirin"
@@ -1362,13 +1272,8 @@
   "lists_unranked_title": "Endamên hilbijartî",
   "lists_unranked_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên partiyan hat tijîkirin. Di çavkaniyê de tenê navên endamên hilbijartî hene, ne lîsteyên rêzkirî yên tevahî.",
         "seatsPlural=*": "{seats} kursî ji lîsteyên partiyan hatin tijîkirin. Di çavkaniyê de tenê navên endamên hilbijartî hene, ne lîsteyên rêzkirî yên tevahî."
@@ -1378,13 +1283,8 @@
   "lists_open_title": "Berendam li gorî lîsteyê",
   "lists_open_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên vekirî yên partiyan hat tijîkirin, berendamên her lîsteyê li gorî dengên kesane hatine rêzkirin",
         "seatsPlural=*": "{seats} kursî ji lîsteyên vekirî yên partiyan hatin tijîkirin, berendamên her lîsteyê li gorî dengên kesane hatine rêzkirin"
@@ -1394,13 +1294,8 @@
   "col_members": "Endamên hilbijartî",
   "lists_all": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Hemû {count} lîste",
         "countPlural=*": "Hemû {count} lîste"
@@ -1411,13 +1306,8 @@
   "lists_collapse": "Serê lîsteyan nîşan bide",
   "lists_more": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} berendamek din",
         "countPlural=*": "{count} berendamên din"
@@ -1426,13 +1316,8 @@
   ],
   "lists_seats": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} kursî",
         "countPlural=*": "{count} kursî"
@@ -1526,9 +1411,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} pêşbazî li ser pusulayê",
         "countPlural=*": "{countText} pêşbazî li ser pusulayê"
@@ -1606,9 +1489,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kursî hat bidestxistin",
         "countPlural=*": "{countText} kursî hatin bidestxistin"
@@ -1625,10 +1506,7 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": [
-        "seatsPlural",
-        "officesPlural"
-      ],
+      "selectors": ["seatsPlural", "officesPlural"],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} kursî, {officesText} wezîfe hat bidestxistin",
         "seatsPlural=one, officesPlural=*": "{seatsText} kursî, {officesText} wezîfe hatin bidestxistin",
@@ -1869,9 +1747,7 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "Li {place}, di nav {count} {nouns} de, ji bo {name} {rank}emîn a herî baş e."
       }
@@ -2064,13 +1940,8 @@
   "tiers_tile_tacit": "{place}: {party} ji {total} kursiyan {seats} bi dest xistin, {tacit} ji wan bê hevrik hatin ragihandin",
   "tiers_tacit": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} kursî bê hevrik hate ragihandin, dengdan nehate kirin.",
         "countPlural=*": "{count} kursî bê hevrik hatin ragihandin, dengdan nehate kirin."
@@ -2152,9 +2023,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kursî li ber dengdanê",
         "countPlural=*": "{countText} kursî li ber dengdanê"
@@ -2207,9 +2076,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} endam",
         "countPlural=*": "{countText} endam"
@@ -2348,13 +2215,8 @@
   "changelog_first": "Guhertoya yekem a etîketkirî. Guhertinên berê di dîroka commitan de ne.",
   "changelog_commits": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} guhertin",
         "countPlural=*": "{count} guhertin"
@@ -2371,13 +2233,8 @@
   "person_majority": "Piranî: {count}",
   "person_scattered": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Di {count} pêşbaziyê de jî dengên bi nivîsandina nav stand",
         "countPlural=*": "Di {count} pêşbaziyan de jî dengên bi nivîsandina nav stand"
@@ -2391,9 +2248,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Li {states}, ji hilbijêrekî kolejê yê bêwefa {count} deng stand",
         "countPlural=*": "Li {states}, ji hilbijêrên kolejê yên bêwefa {count} deng stand"
@@ -2407,9 +2262,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Li {states} {count} deng ji kolejê stand",
         "countPlural=*": "Li {states} {count} deng ji kolejê stand"
@@ -2524,9 +2377,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} encam",
         "countPlural=*": "{countText} encam"
@@ -2664,13 +2515,8 @@
   "map_landing_lede": "Hilbijartina herî dawî ya her welatî li ser nexşeyeke bi ekrana tije veke. Ji encamên neteweyî heta yekeya raporkirinê ya herî biçûk nêzîk bibe, bi hilbijartinên berê re bide ber hev û ji pêşbaziyekê derbasî ya din bibe.",
   "map_landing_elections": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} hilbijartin",
         "countPlural=*": "{count} hilbijartin"
@@ -2863,9 +2709,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} valahiya naskirî nîşan bide",
         "countPlural=*": "Hemû {countText} valahiyên naskirî nîşan bide"
@@ -3123,9 +2967,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} serkeftin",
         "countPlural=*": "{countText} serkeftin"
@@ -3287,9 +3129,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} hejmar, ku li gorî awayê dengdanê an dora jimartinê hatiye dabeşkirin, li vir nayê nîşandan.",
         "countPlural=*": "{countText} hejmar, ku li gorî awayê dengdanê an dora jimartinê hatine dabeşkirin, li vir nayên nîşandan."
@@ -3303,9 +3143,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} cih ku tevahiya dengên berendaman ji dengên derbasdar cuda ye",
         "countPlural=*": "{countText} cih ku tevahiya dengên berendaman ji dengên derbasdar cuda ye"
@@ -3319,9 +3157,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} hejmar hate guhertin",
         "countPlural=*": "{countText} hejmar hatine guhertin"
@@ -3347,9 +3183,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} guhertin, ji aliyê desteya edîtoran ve tê vekolîn",
         "countPlural=*": "{countText} guhertin, ji aliyê desteya edîtoran ve têne vekolîn"
@@ -3549,9 +3383,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} dîtin ji bo vekolînê",
         "countPlural=*": "{countText} dîtin ji bo vekolînê"
@@ -3593,9 +3425,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Dubarekirina {pipeline} di {countText} jimarê de ji vê rastkirinê cuda ye. Pêşniyar pejirandî dimîne heta ku barker were rastkirin û dîsa bê dubarekirin.",
         "countPlural=*": "Dubarekirina {pipeline} di {countText} jimaran de ji vê rastkirinê cuda ye. Pêşniyar pejirandî dimîne heta ku barker were rastkirin û dîsa bê dubarekirin."
@@ -3609,9 +3439,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} jimar",
         "countPlural=*": "{countText} jimar"
@@ -3651,9 +3479,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} guhertin",
         "countPlural=*": "{countText} guhertin"
@@ -3866,9 +3692,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rêz",
         "countPlural=*": "{countText} rêz"
@@ -4109,9 +3933,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} hejmar",
         "countPlural=*": "{countText} hejmar"
@@ -4125,9 +3947,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} qutî",
         "countPlural=*": "{countText} qutî"
@@ -4141,9 +3961,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} cih",
         "countPlural=*": "{countText} cih"
@@ -4157,9 +3975,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rêz hat pêvekirin.",
         "countPlural=*": "{countText} rêz hatin pêvekirin."
@@ -4173,9 +3989,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} cih nehat dîtin û wekî cihekî nû hat zêdekirin. Kodê wî kontrol bike.",
         "countPlural=*": "{countText} cih nehatin dîtin û wekî cihên nû hatin zêdekirin. Kodên wan kontrol bike."
@@ -4189,9 +4003,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} rêz di torê de cih negirt û hat berdan.",
         "countPlural=*": "{countText} rêz di torê de cih negirtin û hatin berdan."
@@ -4205,9 +4017,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Ger pelekî din bikar bînî, qutiya ku li ser vî pelî hatiye xêzkirin tê rakirin.",
         "countPlural=*": "Ger pelekî din bikar bînî, {countText} qutiyên ku li ser vî pelî hatine xêzkirin têne rakirin."
@@ -4285,9 +4095,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} sînor diguhere.",
         "countPlural=*": "{countText} sînor diguherin."
@@ -4301,9 +4109,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} herêmeke nû.",
         "countPlural=*": "{countText} herêmên nû."
@@ -4317,9 +4123,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} kod bi tu herêmê re nayê hevgirtin. Qada nav hilbijêre da ku wekî herêmeke nû were zêdekirin, an jî wê derxe.",
         "countPlural=*": "{countText} kod bi tu herêmê re nayên hevgirtin. Qada nav hilbijêre da ku wekî herêmên nû bên zêdekirin, an jî wan derxe."
@@ -4333,9 +4137,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Di qada nav de navê {countText} herêma nû tune ye.",
         "countPlural=*": "Di qada nav de navê {countText} herêmên nû tune ne."
@@ -4349,9 +4151,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} şekl",
         "countPlural=*": "{countText} şekl"
@@ -4368,9 +4168,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} şîrove",
         "countPlural=*": "{countText} şîrove"
@@ -4439,9 +4237,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Gotûbêj, mijarên vekirî: {countText}",
         "countPlural=*": "Gotûbêj, mijarên vekirî: {countText}"
@@ -4458,9 +4254,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} tîp ma",
         "countPlural=*": "{countText} tîp mane"
@@ -4474,9 +4268,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} bersiv",
         "countPlural=*": "{countText} bersiv"
@@ -5079,13 +4871,8 @@
   "night_chamber_others": "Serbixwe û yên din",
   "night_chamber_not_up": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} kursî îsal nayê hilbijartin",
         "countPlural=*": "{count} kursî îsal nayên hilbijartin"
@@ -5096,13 +4883,8 @@
   "night_chamber_open": "Hemû pêşbaziyan di grafîka {title} de bibîne",
   "night_governors_races": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} pêşbazî",
         "countPlural=*": "{count} pêşbazî"
@@ -5116,6 +4898,7 @@
   "night_state_polls": "Dengdan diqede",
   "night_state_jump": "Beşên vê rûpelê",
   "night_state_top": "Pêşbaziyên sereke",
+  "night_back_to_top": "Vegere serî",
   "night_state_statewide": "Wezîfeyên tevahiya eyaletê",
   "night_state_house": "Meclîsa Nûneran a DY",
   "night_state_legislature": "Meclîsa eyaletê",
@@ -5253,9 +5036,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Di {countText} hilbijartina dora duyem de pêşengê dora yekem têk çû.",
         "countPlural=*": "Di {countText} hilbijartinên dora duyem de pêşengê dora yekem têk çû."
@@ -5269,9 +5050,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} serkeftiyê herêma hilbijartinê kursî nestand, ji ber ku dengê lîsteya partiyê têra kursiyê nekir.",
         "countPlural=*": "{countText} serkeftiyên herêmên hilbijartinê kursî nestandin, ji ber ku dengê lîsteya partiyê têra kursiyan nekir."
@@ -5285,9 +5064,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} berendamek mafdar beriya dora duyem vekişiya.",
         "countPlural=*": "{countText} berendamên mafdar beriya dora duyem vekişiyan."
@@ -5303,9 +5080,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} dora duyem ji {from} berendaman bû {to} berendam",
         "countPlural=*": "{countText} dorên duyem ji {from} berendaman bûn {to} berendam"
@@ -5495,9 +5270,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} pêşniyar",
         "countPlural=*": "{countText} pêşniyar"
@@ -5511,9 +5284,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} hat pejirandin",
         "countPlural=*": "{countText} hatin pejirandin"
@@ -5604,9 +5375,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Rojê {countText} pêşniyar",
         "countPlural=*": "Rojê {countText} pêşniyar"
@@ -5653,9 +5422,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} vegerandin hat xistin rêzê.",
         "countPlural=*": "{countText} vegerandin hat xistin rêzê."
@@ -5683,9 +5450,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} komek",
         "countPlural=*": "{countText} komek"
@@ -5728,9 +5493,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} guhertin",
         "countPlural=*": "{countText} guhertin"
@@ -5813,9 +5576,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Agahdarî, {countText} nexwendî",
         "countPlural=*": "Agahdarî, {countText} nexwendî"
@@ -5854,9 +5615,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} agahdariyeke nû",
         "countPlural=*": "{countText} agahdariyên nû"
@@ -5870,9 +5629,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Tiştek li Elections Archive li benda te ye.",
         "countPlural=*": "{countText} tişt li Elections Archive li benda te ne."
@@ -5886,9 +5643,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Agahdariyeke nû ji te re hat",
         "countPlural=*": "{countText} agahdariyên nû ji te re hatin"
@@ -5904,9 +5659,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Lîsteya şopandina te îro: {countText} nûvekirin",
         "countPlural=*": "Lîsteya şopandina te îro: {countText} nûvekirin"
@@ -5920,9 +5673,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Lîsteya şopandina te vê hefteyê: {countText} nûvekirin",
         "countPlural=*": "Lîsteya şopandina te vê hefteyê: {countText} nûvekirin"
@@ -5936,9 +5687,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} nûvekirin li ser tiştên ku tu dişopînî.",
         "countPlural=*": "{countText} nûvekirin li ser tiştên ku tu dişopînî."
