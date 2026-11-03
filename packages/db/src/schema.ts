@@ -208,7 +208,6 @@ export const profile = snakeCase.table("profile", {
   links: jsonb().notNull().default([]),
   licenseAcceptedAt: time(),
   feedToken: text().unique(),
-  digest: boolean().notNull().default(false),
   createdAt: time().notNull().defaultNow(),
 });
 

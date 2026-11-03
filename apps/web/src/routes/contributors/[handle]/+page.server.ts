@@ -14,13 +14,13 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     redirect(301, `/contributors/${handle}`);
   }
   setHeaders({ "cache-control": "no-store" });
-  const { userId, ...found } = await contributor(handle);
+  const { userId, profile, counts, proposals, agents } =
+    await contributor(handle);
   const mine = locals.user?.id === userId;
   return {
-    ...found,
-    bio:
-      found.profile.bio_md == null ? null : parseMarkdown(found.profile.bio_md),
-    bounties: await credits(userId),
+    profile,
+    bio: profile.bio_md == null ? null : parseMarkdown(profile.bio_md),
+    work: { counts, proposals, agents, bounties: await credits(userId) },
     mine,
     watch:
       locals.user == null || mine

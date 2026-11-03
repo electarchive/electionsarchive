@@ -16,7 +16,9 @@ declare global {
       user: { name: string; email: string } | null;
       unread: number;
     }
-    // interface PageState {}
+    interface PageState {
+      saved?: boolean;
+    }
     // interface Platform {}
   }
 }
