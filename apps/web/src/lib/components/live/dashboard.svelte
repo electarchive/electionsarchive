@@ -80,8 +80,13 @@
 
   type Mode = "lead" | "chance" | "flips" | "counted";
 
-  let view = $state<Chamber>("senate");
-  let mode = $state<Mode>("lead");
+  const OFFICES = ["senate", "governor", "house"] as const;
+
+  const modes = $state<Record<Chamber, Mode>>({
+    senate: "lead",
+    governor: "lead",
+    house: "lead",
+  });
   let hovered = $state<string | null>(null);
   let layout = $state<"shapes" | "hexes">("hexes");
   let probe = $state<string | null>(null);
@@ -112,10 +117,6 @@
 
   $effect(() => {
     const path = election.slug;
-    if (view === "house") {
-      void loadHouse(path);
-      return;
-    }
     if ("requestIdleCallback" in window) {
       const id = requestIdleCallback(() => void loadHouse(path), {
         timeout: 4000,
@@ -131,12 +132,6 @@
     governor: m.night_nation_governor,
     house: m.night_nation_house,
   };
-  const VIEWS = $derived<Array<SegmentedOption<Chamber>>>(
-    (["senate", "governor", "house"] as const).map((value) => ({
-      value,
-      label: NAMES[value](),
-    })),
-  );
   const MODES = $derived<Array<SegmentedOption<Mode>>>(
     (
       [
@@ -328,7 +323,7 @@
       : `color-mix(in oklab, var(--foreground) ${Math.round(10 + 78 * share)}%, var(--background))`;
   }
 
-  function shade(summary: Summary, wanted: Mode = mode) {
+  function shade(summary: Summary, wanted: Mode) {
     const entry = seatById.get(summary.race.id);
     if (summary.later != null) {
       return LATER;
@@ -384,7 +379,7 @@
     );
   }
 
-  const colors = $derived.by(() => {
+  function colorsFor(view: Chamber, mode: Mode) {
     const found: Record<string, string> = {};
     for (const code of Object.keys(nation?.codes ?? {})) {
       const races = of(code, view);
@@ -411,9 +406,14 @@
         continue;
       }
       const first = races[0];
-      found[code] = first == null ? MUTED : shade(first);
+      found[code] = first == null ? MUTED : shade(first, mode);
     }
     return found;
+  }
+  const colors = $derived({
+    senate: colorsFor("senate", modes.senate),
+    governor: colorsFor("governor", modes.governor),
+    house: colorsFor("house", modes.house),
   });
 
   const districts = $derived(
@@ -430,14 +430,19 @@
       ),
     ),
   );
-  const later = $derived(
-    Object.keys(nation?.codes ?? {}).filter((code) => {
+  function laterFor(view: Chamber) {
+    return Object.keys(nation?.codes ?? {}).filter((code) => {
       const races = of(code, view);
       return (
         races.length > 0 && races.every((summary) => summary.later != null)
       );
-    }),
-  );
+    });
+  }
+  const later = $derived({
+    senate: laterFor("senate"),
+    governor: laterFor("governor"),
+    house: laterFor("house"),
+  });
   const districtLater = $derived(
     [...districts].flatMap(([key, summary]) =>
       summary.later == null ? [] : [key],
@@ -445,7 +450,10 @@
   );
   const districtColors = $derived(
     Object.fromEntries(
-      [...districts].map(([key, summary]) => [key, shade(summary)]),
+      [...districts].map(([key, summary]) => [
+        key,
+        shade(summary, modes.house),
+      ]),
     ),
   );
   const hasShapes = $derived(house?.map != null);
@@ -559,7 +567,7 @@
   {/if}
 {/snippet}
 
-{#snippet tip(code: string)}
+{#snippet tip(code: string, view: Chamber)}
   {const races = $derived(of(code, view))}
   <span class="text-sm font-semibold">{name(code)}</span>
   {#if races.length === 0}
@@ -919,158 +927,168 @@
     {/if}
   {/if}
 
-  <section
-    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-8"
-  >
-    <div class="grid content-start gap-3">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <Segmented
-          options={VIEWS}
-          bind:value={view}
-          label={m.night_nation_views()}
-        />
-        <div class="flex flex-wrap items-center gap-2">
-          <Segmented
-            options={MODES}
-            bind:value={mode}
-            label={m.night_color_label()}
-            size="sm"
-          />
-          {#if view === "house" && hasShapes && hasHexes}
-            <Segmented
-              options={LAYOUTS}
-              bind:value={layout}
-              label={m.night_house_layout()}
-              size="sm"
-            />
-          {/if}
-        </div>
-      </div>
-      {#if view === "house" && house != null && (hasShapes || hasHexes)}
-        {#if isHexes && house.cartogram != null}
-          <Hexes
-            cartogram={house.cartogram}
-            colors={districtColors}
-            later={districtLater}
-            label={m.night_house_hexes_label()}
-            bind:hovered={probe}
-            href={districtHref}
-            tip={district}
-          />
-        {:else if house.map != null}
-          <Nation
-            geography={house.map}
-            codes={house.codes}
-            colors={districtColors}
-            later={districtLater}
-            label={m.night_house_map()}
-            bind:hovered={probe}
-            onPick={async (key: string) => {
-              const link = districtHref(key);
-              if (link != null) {
-                await goto(link);
-              }
-            }}
-            tip={district}
-          />
-        {/if}
-      {:else if nation == null}
-        <p
-          class="grid aspect-[1.6] place-items-center rounded-sm border border-dashed border-border p-4 text-center text-sm text-muted-foreground inline-full"
-        >
-          {m.night_nation_map_missing()}
+  <section class="grid content-start gap-2 bg-background px-4 py-6 sm:px-8">
+    <div class="grid gap-0.5">
+      <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+      {#if closings[0] != null}
+        <p class="text-xs text-muted-foreground">
+          {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
         </p>
-      {:else}
-        <Nation
-          geography={nation.map}
-          codes={nation.codes}
-          {colors}
-          {later}
-          label={m.night_nation_map({ view: NAMES[view]() })}
-          bind:hovered
-          onPick={async (code: string) => goto(href(code))}
-          {tip}
-        />
-      {/if}
-      <p class="text-xs text-muted-foreground">
-        {view === "house" && mode === "lead"
-          ? m.night_house_legend()
-          : LEGENDS[mode]()}
-      </p>
-      {#if (view === "house" ? districtLater : later).length > 0}
-        <LaterKey />
       {/if}
     </div>
-
-    <aside class="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-      {#if chambers != null && pair != null}
-        <Ladder
-          view={chambers[view]}
-          sides={pair}
-          {forecasts}
-          {label}
-          href={seatHref}
-          {tint}
-        />
-      {/if}
-    </aside>
-
-    <section class="grid content-start gap-2 lg:col-start-1 lg:row-start-2">
-      <div class="grid gap-0.5">
-        <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
-        {#if closings[0] != null}
-          <p class="text-xs text-muted-foreground">
-            {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
-          </p>
-        {/if}
-      </div>
-      <ol class="gap-x-10 sm:columns-2">
-        {#each closings as closing (closing.at)}
-          {const isPast = $derived(Date.parse(closing.at) <= clock)}
-          <li
-            class={cn(
-              "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
-              { "text-muted-foreground": isPast },
-            )}
-          >
-            <span class="group relative justify-self-start">
-              <button
-                type="button"
-                aria-describedby="closing-{closing.at}"
-                class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
-                >{clockOf(closing.at)}</button
-              >
-              <span
-                id="closing-{closing.at}"
-                role="tooltip"
-                class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
-              >
-                <span class="font-semibold">{m.night_closings_local()}</span>
-                {#each closing.local as entry (entry.time)}
-                  <span class="flex items-baseline justify-between gap-4">
-                    <span class="uppercase">{entry.codes.join(", ")}</span>
-                    <span
-                      class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
-                      >{entry.time}</span
-                    >
-                  </span>
-                {/each}
-              </span>
-            </span>
-            <span class="flex flex-wrap gap-1">
-              {#each closing.states as code (code)}
-                <a
-                  href={href(code)}
-                  class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
-                  >{code}</a
-                >
+    <ol class="gap-x-10 sm:columns-2 xl:columns-3">
+      {#each closings as closing (closing.at)}
+        {const isPast = $derived(Date.parse(closing.at) <= clock)}
+        <li
+          class={cn(
+            "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
+            { "text-muted-foreground": isPast },
+          )}
+        >
+          <span class="group relative justify-self-start">
+            <button
+              type="button"
+              aria-describedby="closing-{closing.at}"
+              class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+              >{clockOf(closing.at)}</button
+            >
+            <span
+              id="closing-{closing.at}"
+              role="tooltip"
+              class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+            >
+              <span class="font-semibold">{m.night_closings_local()}</span>
+              {#each closing.local as entry (entry.time)}
+                <span class="flex items-baseline justify-between gap-4">
+                  <span class="uppercase">{entry.codes.join(", ")}</span>
+                  <span
+                    class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
+                    >{entry.time}</span
+                  >
+                </span>
               {/each}
             </span>
-          </li>
-        {/each}
-      </ol>
-    </section>
+          </span>
+          <span class="flex flex-wrap gap-1">
+            {#each closing.states as code (code)}
+              <a
+                href={href(code)}
+                class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
+                >{code}</a
+              >
+            {/each}
+          </span>
+        </li>
+      {/each}
+    </ol>
   </section>
+
+  {#each OFFICES as view (view)}
+    {#snippet stateTip(code: string)}
+      {@render tip(code, view)}
+    {/snippet}
+    {const mode = $derived(modes[view])}
+    {const isDistricts = $derived(
+      view === "house" && house != null && (hasShapes || hasHexes),
+    )}
+    <section
+      class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-10"
+      aria-labelledby="night-office-{view}"
+    >
+      <div class="grid content-start gap-3">
+        <div
+          class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+        >
+          <h2 id="night-office-{view}" class="heading text-xl!">
+            {NAMES[view]()}
+          </h2>
+          <div class="flex flex-wrap items-center gap-2">
+            <Segmented
+              options={MODES}
+              bind:value={modes[view]}
+              label={m.night_color_label()}
+              size="sm"
+            />
+            {#if view === "house" && hasShapes && hasHexes}
+              <Segmented
+                options={LAYOUTS}
+                bind:value={layout}
+                label={m.night_house_layout()}
+                size="sm"
+              />
+            {/if}
+          </div>
+        </div>
+        {#if isDistricts && house != null}
+          {#if isHexes && house.cartogram != null}
+            <Hexes
+              cartogram={house.cartogram}
+              colors={districtColors}
+              later={districtLater}
+              label={m.night_house_hexes_label()}
+              bind:hovered={probe}
+              href={districtHref}
+              tip={district}
+            />
+          {:else if house.map != null}
+            <Nation
+              geography={house.map}
+              codes={house.codes}
+              colors={districtColors}
+              later={districtLater}
+              label={m.night_house_map()}
+              bind:hovered={probe}
+              onPick={async (key: string) => {
+                const link = districtHref(key);
+                if (link != null) {
+                  await goto(link);
+                }
+              }}
+              tip={district}
+            />
+          {/if}
+        {:else if nation == null}
+          <p
+            class="grid aspect-[1.6] place-items-center rounded-sm border border-dashed border-border p-4 text-center text-sm text-muted-foreground inline-full"
+          >
+            {m.night_nation_map_missing()}
+          </p>
+        {:else}
+          <Nation
+            geography={nation.map}
+            codes={nation.codes}
+            colors={colors[view]}
+            later={later[view]}
+            label={m.night_nation_map({ view: NAMES[view]() })}
+            bind:hovered
+            onPick={async (code: string) => goto(href(code))}
+            tip={stateTip}
+          />
+        {/if}
+        <p class="text-xs text-muted-foreground">
+          {view === "house" && mode === "lead"
+            ? m.night_house_legend()
+            : LEGENDS[mode]()}
+        </p>
+        {#if (isDistricts ? districtLater : later[view]).length > 0}
+          <LaterKey />
+        {/if}
+      </div>
+
+      {#if chambers != null && pair != null}
+        <aside>
+          <Ladder
+            view={chambers[view]}
+            sides={pair}
+            {forecasts}
+            {label}
+            href={seatHref}
+            {tint}
+          />
+        </aside>
+      {/if}
+    </section>
+  {/each}
 
   {#if pair != null}
     <Pulse {points} sides={pair} />
