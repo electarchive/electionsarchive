@@ -4480,6 +4480,7 @@
   "night_races_leads": "{name} führt mit {margin} Vorsprung",
   "night_races_waiting": "{count} ausstehend",
   "night_races_won": "{name} gewann",
+  "night_races_projected": "{name} gewinnt laut Hochrechnung",
   "night_index_all": "Alle {count} Wahlen",
   "night_index_previous": "Vorherige Wahl: {race}",
   "night_index_next": "Nächste Wahl: {race}",

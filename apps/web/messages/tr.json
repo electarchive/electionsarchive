@@ -4480,6 +4480,7 @@
   "night_races_leads": "{name}, {margin} farkla önde",
   "night_races_waiting": "Bekliyor: {count}",
   "night_races_won": "{name} kazandı",
+  "night_races_projected": "Tahmini kazanan: {name}",
   "night_index_all": "{count} yarışın tümü",
   "night_index_previous": "Önceki yarış: {race}",
   "night_index_next": "Sonraki yarış: {race}",

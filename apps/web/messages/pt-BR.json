@@ -4554,6 +4554,7 @@
   "night_races_leads": "{name} lidera por {margin}",
   "night_races_waiting": "Aguardando: {count}",
   "night_races_won": "{name} venceu",
+  "night_races_projected": "{name} tem vitória projetada",
   "night_index_all": "Todas as {count} disputas",
   "night_index_previous": "Disputa anterior: {race}",
   "night_index_next": "Próxima disputa: {race}",

@@ -4480,6 +4480,7 @@
   "night_races_leads": "{name} bi {margin} li pêş e",
   "night_races_waiting": "{count} li bendê ne",
   "night_races_won": "{name} bi ser ket",
+  "night_races_projected": "Pêşbînî: {name} bi ser dikeve",
   "night_index_all": "Hemû {count} pêşbazî",
   "night_index_previous": "Pêşbaziya berê: {race}",
   "night_index_next": "Pêşbaziya din: {race}",

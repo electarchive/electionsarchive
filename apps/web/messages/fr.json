@@ -4556,6 +4556,7 @@
   "night_races_leads": "{name} mène de {margin}",
   "night_races_waiting": "En attente : {count}",
   "night_races_won": "{name} l'emporte",
+  "night_races_projected": "Projection : {name} l'emporte",
   "night_index_all": "Les {count} scrutins",
   "night_index_previous": "Scrutin précédent : {race}",
   "night_index_next": "Scrutin suivant : {race}",
