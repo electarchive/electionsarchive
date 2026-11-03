@@ -2080,7 +2080,9 @@ def transcribed(spec: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, f
     return cells, totals, problems
 
 
-def table(spec: dict[str, Any], effort: Literal["low", "medium"]) -> tuple[list[dict[str, Any]], dict[str, float], list[str]]:
+def table(
+    spec: dict[str, Any], effort: Literal["low", "medium"]
+) -> tuple[list[dict[str, Any]], dict[str, float], list[str]]:
     if "transcribed" in spec:
         return transcribed(spec)
     cells: list[dict[str, Any]] = []
