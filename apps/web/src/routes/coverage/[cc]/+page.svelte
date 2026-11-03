@@ -1522,9 +1522,7 @@
             >
             <span role="columnheader">{m.coverage_column_done()}</span>
           </div>
-          {const Gaps = $derived(
-            (await import("#routes/coverage/gaps.svelte")).default,
-          )}
+          {const Gaps = $derived(data.Gaps)}
           {#key `${tab}:${goal}`}
             <Gaps
               polity={data.polity}

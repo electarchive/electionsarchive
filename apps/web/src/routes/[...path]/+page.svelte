@@ -228,8 +228,7 @@
       </nav>
     {/if}
     {#if data.kind === "contest"}
-      {const Contest = $derived((await import("./contest.svelte")).default)}
-      <Contest
+      <data.View
         id={data.id}
         talk={data.talk}
         unit={data.unit}
@@ -250,9 +249,8 @@
         standing={data.standing}
       />
     {:else if data.kind === "election"}
-      {const Election = $derived((await import("./election.svelte")).default)}
       {#key `${data.id}${query}`}
-        <Election
+        <data.View
           id={data.id}
           path={data.path}
           {query}
@@ -266,12 +264,10 @@
         />
       {/key}
     {:else if data.kind === "day"}
-      {const Day = $derived((await import("./day.svelte")).default)}
-      <Day {data} />
+      <data.View {data} />
     {:else}
-      {const Polity = $derived((await import("./polity.svelte")).default)}
       {#key data.id}
-        <Polity id={data.id} polity={data.polity} />
+        <data.View id={data.id} polity={data.polity} />
       {/key}
     {/if}
   </article>

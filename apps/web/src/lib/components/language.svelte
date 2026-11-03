@@ -39,22 +39,21 @@
 {#if locales.length > 1}
   <div class="flex items-center gap-1.5">
     <LanguagesIcon class="shrink-0 block-4 inline-4" aria-hidden="true" />
-    {const Combobox = $derived(
-      (await import("#lib/components/ui/combobox/index.js")).Combobox,
-    )}
-    <Combobox
-      {items}
-      value={current}
-      label={m.language_label()}
-      placeholder={m.language_label()}
-      search={m.language_search()}
-      empty={m.language_empty()}
-      class="bg-card block-7 inline-auto min-inline-36"
-      onValueChange={(value) => {
-        if (value != null && isLocale(value) && value !== current) {
-          void setLocale(value);
-        }
-      }}
-    />
+    {#await import("#lib/components/ui/combobox/index.js") then { Combobox }}
+      <Combobox
+        {items}
+        value={current}
+        label={m.language_label()}
+        placeholder={m.language_label()}
+        search={m.language_search()}
+        empty={m.language_empty()}
+        class="bg-card block-7 inline-auto min-inline-36"
+        onValueChange={(value) => {
+          if (value != null && isLocale(value) && value !== current) {
+            void setLocale(value);
+          }
+        }}
+      />
+    {/await}
   </div>
 {/if}
