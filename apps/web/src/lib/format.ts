@@ -7,6 +7,10 @@ const dateFormats = new Map<string, Intl.DateTimeFormat>();
 
 export const natural = new Intl.Collator(undefined, { numeric: true }).compare;
 
+export function fold(text: string) {
+  return text.toLowerCase().normalize("NFD").replaceAll(/\p{M}/gu, "");
+}
+
 export const sentence = (text: string | null) =>
   text?.replace(/\.\.$/u, ".") ?? null;
 
