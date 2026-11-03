@@ -97,7 +97,7 @@ def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str],
         if response.status_code < 400:
             CACHE[id] = (signature, time.time(), wrap(RACES[state][id], response.json()))
     for id in RACES.get(state, {}):
-        if id in CACHE:
+        if id in CACHE and any(c.get("votes") for c in json.loads(CACHE[id][2])["race"].get("candidates") or []):
             store(f"{BASE}race/{id}", CACHE[id][2], ".json")
 
 
@@ -189,6 +189,12 @@ def rows(state: str, path: Path):
         return
     regions = list((race.get("region_results") or {}).values())
     counties: list[dict] = [r for r in regions if r.get("type") == "County" and r.get("fips")]
+    if state == "AK":
+        counties = [
+            {**r, "fips": f"AK:{found[1]}"}
+            for r in regions
+            if (found := re.fullmatch(r"House District (\d+)", r.get("name") or ""))
+        ]
     if not counties and all(r.get("type") == "State" for r in regions):
         counties = [{**r, "fips": FIPS[state]} for r in regions] or [
             {"fips": FIPS[state], "candidates": race.get("candidates") or []}
