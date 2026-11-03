@@ -356,3 +356,513 @@ adapter = "us.nyc_enr"
 publisher = "Board of Elections in the City of New York"
 url = "https://enr.boenyc.gov/"
 note = "city contests and districts inside the city; statewide races and districts that cross the city line wait for a statewide feed"
+
+[[feed]]
+id = "us.civicapi.ak"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "AK" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.al"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "AL" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ar"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "AR" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.az"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "AZ" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ca"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "CA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.co"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "CO" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ct"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "CT" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.dc"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "DC" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.de"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "DE" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.fl"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "FL" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ga"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "GA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.hi"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "HI" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ia"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "IA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.id"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "ID" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.il"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "IL" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.in"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "IN" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ks"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "KS" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ky"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "KY" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.la"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "LA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ma"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.md"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MD" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.me"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "ME" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.mi"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MI" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.mn"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MN" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.mo"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MO" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ms"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MS" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.mt"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "MT" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nc"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NC" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nd"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "ND" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ne"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NE" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nh"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NH" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nj"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NJ" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nm"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NM" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.nv"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NV" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ny"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "NY" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.oh"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "OH" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ok"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "OK" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.or"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "OR" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.pa"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "PA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ri"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "RI" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.sc"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "SC" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.sd"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "SD" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.tn"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "TN" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.tx"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "TX" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.ut"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "UT" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.va"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "VA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.vt"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "VT" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.wa"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "WA" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.wi"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "WI" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.wv"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "WV" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"
+
+[[feed]]
+id = "us.civicapi.wy"
+adapter = "us.civicapi"
+interval = 60
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "WY" }
+poller = "muktedir"
+publisher = "civicAPI"
+url = "https://civicapi.org/"

@@ -1237,6 +1237,8 @@ def plan(
         "select code, id from reporting_unit where scheme_code in ('us.sldl', 'us.sldu') and code like 'AK:%'"
     ).fetchall():
         counties[("02", code)] = id
+    for code, id in conn.execute("select code, id from reporting_unit where scheme_code = 'us.state'").fetchall():
+        counties[(code, code)] = id
     unmatched: list[str] = []
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
     local_keys: set[str] = set()

@@ -10,7 +10,7 @@ from uuid import UUID
 
 import httpx
 
-from ea.sources.us import enr_2026, nyc_enr_live
+from ea.sources.us import civicapi, enr_2026, nyc_enr_live
 from ea.store import DATA, Connection, connect
 
 FEEDS = Path(__file__).with_name("live_feeds.toml")
@@ -54,6 +54,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         enr_2026.collect(
             client, {params["state"]}, lambda _, url, content, suffix: pages.update({url: (content, suffix)})
         )
+    elif adapter == "us.civicapi":
+        civicapi.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
     elif adapter == "us.nyc_enr":
         pages = nyc_enr_live.collect(client)
     else:
@@ -85,6 +87,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         tallies, unmatched = (
             enr_2026.plan(conn, enr_2026.table({params["state"]: paths}), lambda _, __: None)
             if adapter == "us.enr_2026"
+            else enr_2026.plan(conn, civicapi.frame(params["state"], paths), lambda _, __: None)
+            if adapter == "us.civicapi"
             else nyc_enr_live.plan(conn, feed, paths)
         )
         conn.execute(
@@ -187,7 +191,7 @@ def run(poller: str, once: bool = False) -> None:
     client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS)
     due: dict[str, float] = {}
     running: dict[str, Future[None]] = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool, ThreadPoolExecutor(max_workers=6) as fallback:
         while True:
             with connect() as conn:
                 feeds = conn.execute(
@@ -199,7 +203,9 @@ def run(poller: str, once: bool = False) -> None:
                 if feed in running or due.get(feed, 0) > now:
                     continue
                 due[feed] = now + interval
-                running[feed] = pool.submit(attempt, feed, adapter, params, client)
+                running[feed] = (fallback if adapter == "us.civicapi" else pool).submit(
+                    attempt, feed, adapter, params, client
+                )
             for feed, future in list(running.items()):
                 if future.done():
                     del running[feed]
