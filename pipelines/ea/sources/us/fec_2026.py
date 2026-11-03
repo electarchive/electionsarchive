@@ -2710,10 +2710,11 @@ def emit() -> Path:
                     ).fetchone()
                     is None
                 )
+                possessive = f"{state_name}'" if state_name.endswith("Islands") else f"{state_name}'s"
                 title = (
-                    f"2026 U.S. House election in {state_name}'s at-large congressional district"
+                    f"2026 U.S. House election in {possessive} at-large congressional district"
                     if at_large
-                    else f"2026 U.S. House election in {state_name}'s {number}{suffix} congressional district"
+                    else f"2026 U.S. House election in {possessive} {number}{suffix} congressional district"
                 )
                 path = f"us/{state.lower()}/{DAY}-general/house-{number}"
             elif chamber == "senate":
@@ -2734,6 +2735,8 @@ def emit() -> Path:
                     title = title.replace(" election", f" election ({label})")
                     path = "-".join([path, *rest])
             name(contest, title)
+            if contest not in cs.minted and chamber == "house" and state_name.endswith("Islands"):
+                cs.add("name", entity_id=contest, text=title, lang="en", kind="official", is_preferred=True)
             cs.add("slug", path=path, entity_id=contest)
             if chamber == "house" and state == "LA":
                 cs.add(
