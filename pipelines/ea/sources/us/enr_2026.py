@@ -43,6 +43,7 @@ EV = {
     "AZ": ("app.enhancedvoting.com", "Arizona"),
     "TN": ("app.enhancedvoting.com", "shelby-county-tn"),
 }
+CLARITY_EIDS = {"SC": ["127300"], "WV": ["127496"]}
 CLARITY = {
     "CO": "https://results.enr.clarityelections.com/CO/",
     "IA": "https://electionresults.iowa.gov/IA/",
@@ -378,6 +379,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
                 if datetime.strptime(e["Date"].split()[0], "%m/%d/%Y").date() == DAY
                 and not re.search(r"TEST|MOCK|TRAINING", e["ElectionName"].upper())
             ]
+            or CLARITY_EIDS.get(state, [])
         )
         if not ids:
             print(f"{state}: no election on {DAY}")
@@ -763,7 +765,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             else None
         )
         for contest in root.iter("Contest"):
-            found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
+            found = EV_OFFICES.fullmatch(re.sub(r"\s+", " ", contest.get("text") or "").strip())
             if tenant and found:
                 continue
             for choice in contest.iter("Choice"):
