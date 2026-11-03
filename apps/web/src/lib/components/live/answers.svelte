@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
-  import CheckIcon from "@lucide/svelte/icons/check";
+  import type { Band } from "#lib/live/format.js";
   import type { Standing } from "#lib/live/standing.js";
   import { count, percent } from "#lib/format.js";
-  import { lead, tone } from "#lib/live/format.js";
+  import { lead, paint } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Counter from "./counter.svelte";
@@ -12,14 +12,14 @@
     options,
     now,
     estimate,
-    winners,
+    band = null,
     isWaiting,
     isLater = false,
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
-    winners: Array<string>;
+    band?: Band | null;
     isWaiting: boolean;
     isLater?: boolean;
   } = $props();
@@ -62,7 +62,7 @@
         <span
           class="border-e border-background transition-[inline-size] duration-700 ease-out block-full last:border-e-0 motion-reduce:transition-none"
           style:inline-size="{share(index) * 100}%"
-          style:background-color={tone(options[index])}
+          style:background-color={paint(options[index], band)}
         ></span>
       {/each}
     {/if}
@@ -70,31 +70,25 @@
   <ol class="grid border-bs border-foreground/80">
     {#each order as index (options[index]?.id ?? index)}
       {const option = $derived(options[index])}
-      {const color = $derived(tone(option))}
-      {const isWinner = $derived(option != null && winners.includes(option.id))}
-      {const isFirst = $derived(index === first)}
+      {const color = $derived(paint(option, band))}
+      {const isDecided = $derived(
+        band != null && option != null && band.ids.includes(option.id),
+      )}
+      {const isFirst = $derived(band == null && index === first)}
+      {const isStrong = $derived(isFirst || isDecided)}
       <li
-        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-1.5 border-be border-border py-3 sm:grid-cols-[minmax(0,1fr)_minmax(8rem,16rem)_auto]"
+        class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-1.5 border-be border-border py-3 sm:grid-cols-[minmax(0,1fr)_minmax(8rem,16rem)_minmax(6.5rem,auto)]"
       >
         <span class="grid gap-1 border-s-[3px] ps-3" style:border-color={color}>
           <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span
               class={cn("text-[0.9375rem]/snug tracking-tight text-pretty", {
-                "font-[720]": isFirst || isWinner,
-                "font-medium": !isFirst && !isWinner,
+                "font-[720]": isStrong,
+                "font-medium": !isStrong,
+                "text-muted-foreground": band != null && !isDecided,
               })}>{option?.label ?? ""}</span
             >
-            {#if isWinner}
-              <span
-                class="flex shrink-0 items-center gap-1 rounded-full px-1.5 py-px text-[0.6875rem] font-semibold knockout"
-                style:background-color={color}
-                style:--party={color}
-                ><CheckIcon
-                  class="block-3 inline-3"
-                  aria-hidden="true"
-                />{m.night_winner()}</span
-              >
-            {:else if isFirst && gap != null && winners.length === 0}
+            {#if isFirst && gap != null}
               <span
                 class="shrink-0 rounded-full border px-1.5 py-px text-[0.6875rem] font-semibold"
                 style:border-color={color}
@@ -103,7 +97,7 @@
               >
             {/if}
           </span>
-          {#if isFirst && gap != null}
+          {#if index === first && gap != null}
             <span
               class="font-figures text-xs text-muted-foreground tabular-nums"
               >{m.night_answers_lead({
@@ -136,8 +130,9 @@
               value={share(index)}
               format={(value: number) => percent(value)}
               class={cn("text-xl leading-none tracking-tight", {
-                "font-[780]": isFirst || isWinner,
-                "font-semibold": !isFirst && !isWinner,
+                "font-[780]": isStrong,
+                "font-semibold": !isStrong,
+                "text-muted-foreground": band != null && !isDecided,
               })}
             />
             <Counter

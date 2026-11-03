@@ -6,8 +6,15 @@
 
   const {
     option,
+    color = null,
     class: className,
-  }: { option: LiveOption | undefined; class?: string } = $props();
+  }: {
+    option: LiveOption | undefined;
+    color?: string | null;
+    class?: string;
+  } = $props();
+
+  const ring = $derived(color ?? tone(option));
 </script>
 
 {#if option != null && (option.photo != null || option.person != null)}
@@ -17,7 +24,7 @@
         "shrink-0 rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card",
         className,
       )}
-      style:--party={tone(option)}
+      style:--party={ring}
       src={option.photo}
       alt=""
       loading="lazy"
@@ -28,7 +35,7 @@
         "grid shrink-0 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none",
         className,
       )}
-      style:--party={tone(option)}
+      style:--party={ring}
       aria-hidden="true">{initials(option.label)}</span
     >
   {/if}

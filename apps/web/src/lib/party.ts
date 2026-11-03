@@ -5,6 +5,16 @@ const NEUTRALS = [78, 56, 36].map(
     `color-mix(in oklab, var(--muted-foreground) ${amount}%, var(--card))`,
 );
 
+const BLANK = "color-mix(in oklab, var(--muted-foreground) 20%, var(--card))";
+
+export function isNeutral(color: string) {
+  return (
+    color === BLANK ||
+    color === "var(--muted-foreground)" ||
+    NEUTRALS.includes(color)
+  );
+}
+
 const SIDES = new Map([
   ["answer:leave", "#005ea7"],
   ["answer:remain", "#f7c600"],
@@ -88,7 +98,7 @@ export function swatch(color: string | null | undefined, key: string) {
     return independent(0);
   }
   if (chosen == null && ["", "none", "party:"].includes(key)) {
-    return "color-mix(in oklab, var(--muted-foreground) 20%, var(--card))";
+    return BLANK;
   }
   if (chosen != null && NEUTRALS.includes(chosen)) {
     return chosen;

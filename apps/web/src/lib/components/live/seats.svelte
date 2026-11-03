@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { LiveOption } from "@ea/analytics/live";
+  import type { Band } from "#lib/live/format.js";
   import type { Standing } from "#lib/live/standing.js";
   import Name from "#lib/components/name.svelte";
   import { count } from "#lib/format.js";
-  import { tone } from "#lib/live/format.js";
+  import { paint } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -11,12 +12,12 @@
     options,
     now,
     seats,
-    winners,
+    band = null,
   }: {
     options: Array<LiveOption>;
     now: Standing;
     seats: number;
-    winners: Array<string>;
+    band?: Band | null;
   } = $props();
 
   const top = $derived(Math.max(1, ...now.totals));
@@ -31,9 +32,9 @@
               rank,
               votes: now.totals[at] ?? 0,
               isInside:
-                winners.length > 0
-                  ? winners.includes(option.id)
-                  : now.total > 0 && rank < seats,
+                band == null
+                  ? now.total > 0 && rank < seats
+                  : band.ids.includes(option.id),
             },
           ];
     }),
@@ -59,7 +60,7 @@
         </li>
       {/if}
       <li
-        class="grid grid-cols-[1.75rem_minmax(0,1fr)_minmax(4rem,12rem)_5.5rem] items-center gap-x-3 font-figures text-sm tabular-nums block-8"
+        class="grid grid-cols-[1.25rem_minmax(0,1fr)_3rem_4rem] items-center gap-x-3 font-figures text-sm tabular-nums block-8 sm:grid-cols-[1.75rem_minmax(0,1fr)_minmax(4rem,12rem)_5.5rem]"
       >
         <span class="text-end text-xs text-muted-foreground"
           >{row.rank + 1}</span
@@ -91,8 +92,8 @@
           <span
             class="absolute inset-y-0 inset-s-0 transition-[inline-size] duration-700 motion-reduce:transition-none"
             style:inline-size="{(row.votes / top) * 100}%"
-            style:background-color={tone(row.option)}
-            style:opacity={row.isInside ? 1 : 0.45}
+            style:background-color={paint(row.option, band)}
+            style:opacity={row.isInside || band != null ? 1 : 0.45}
           ></span>
         </span>
         <span class={cn("text-end", { "font-semibold": row.isInside })}

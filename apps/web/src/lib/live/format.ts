@@ -19,6 +19,17 @@ export function tone(option: LiveOption | undefined) {
   );
 }
 
+export type Band = { ids: Array<string>; isProjected: boolean };
+
+export function paint(option: LiveOption | undefined, band: Band | null) {
+  if (band == null) {
+    return tone(option);
+  }
+  return option != null && band.ids.includes(option.id)
+    ? "var(--foreground)"
+    : "color-mix(in oklab, var(--foreground) 34%, transparent)";
+}
+
 const SUFFIXES = new Set(["jr", "sr", "ii", "iii", "iv", "v"]);
 
 export function surname(option: LiveOption | undefined) {
