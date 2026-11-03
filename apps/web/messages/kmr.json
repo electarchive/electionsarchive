@@ -5027,6 +5027,7 @@
   "night_explorer_empty": "Tu pêşbazî bi van fîlteran re li hev nayê.",
   "night_explorer_independent": "Serbixwe",
   "night_tip_held": "Di destê {party} de: {name}",
+  "night_holder_vacant": "vala, cara dawî di destê {name} de bû",
   "seatflow_rounds_title": "Kursî çawa hatin diyarkirin",
   "seatflow_votes_title": "Dengê herêma hilbijartinê û dengê lîsteyê",
   "seatflow_both": "Her du dor",

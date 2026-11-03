@@ -5027,6 +5027,7 @@
   "night_explorer_empty": "Bu filtrelere uyan yarış yok.",
   "night_explorer_independent": "Bağımsız",
   "night_tip_held": "Elinde tutan: {party}, {name}",
+  "night_holder_vacant": "boş (son görev sahibi: {name})",
   "seatflow_rounds_title": "Sandalyeler nasıl belirlendi",
   "seatflow_votes_title": "Seçim çevresi oyu ve liste oyu",
   "seatflow_both": "Her iki tur",

@@ -5027,6 +5027,7 @@
   "night_explorer_empty": "Keine Wahl entspricht diesen Filtern.",
   "night_explorer_independent": "Parteilos",
   "night_tip_held": "Sitz von {party}: {name}",
+  "night_holder_vacant": "vakant, zuletzt von {name} gehalten",
   "seatflow_rounds_title": "Wie die Sitze entschieden wurden",
   "seatflow_votes_title": "Wahlkreisstimme und Listenstimme",
   "seatflow_both": "Beide Wahlgänge",

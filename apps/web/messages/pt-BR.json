@@ -5103,6 +5103,7 @@
   "night_explorer_empty": "Nenhuma disputa corresponde a estes filtros.",
   "night_explorer_independent": "Independente",
   "night_tip_held": "Cadeira de {party}: {name}",
+  "night_holder_vacant": "vaga; último ocupante: {name}",
   "seatflow_rounds_title": "Como as cadeiras foram decididas",
   "seatflow_votes_title": "Voto na circunscrição e voto na lista",
   "seatflow_both": "Os dois turnos",

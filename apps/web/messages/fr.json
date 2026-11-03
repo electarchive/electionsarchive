@@ -5105,6 +5105,7 @@
   "night_explorer_empty": "Aucun scrutin ne correspond à ces filtres.",
   "night_explorer_independent": "Indépendant",
   "night_tip_held": "Détenu par {party} : {name}",
+  "night_holder_vacant": "vacant, dernier titulaire : {name}",
   "seatflow_rounds_title": "Comment les sièges ont été attribués",
   "seatflow_votes_title": "Vote de circonscription et vote de liste",
   "seatflow_both": "Les deux tours",
