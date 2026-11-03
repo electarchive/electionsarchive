@@ -20,13 +20,14 @@ import polars as pl
 
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode, rekey, repair
 from ea.offices import Offices
 from ea.sources.us import cog, govmint, ia_districts_2026, ky_ballots, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
 SOURCE = "us.local_2026"
-VERSION = "1"
+VERSION = "2"
 DAY = date(2026, 11, 3)
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
 COUSUB_GAZETTEER = (
@@ -8928,9 +8929,7 @@ def parse() -> None:
     subdivisions = list(
         csv.reader(
             io.StringIO(
-                raw.cached(mn_local.SOURCE, mn_local.url(mn_local.COUNTIES, "MCDTbl.txt")).path.read_text(
-                    encoding="utf-8", errors="replace"
-                )
+                decode(raw.cached(mn_local.SOURCE, mn_local.url(mn_local.COUNTIES, "MCDTbl.txt")).path.read_bytes())
             ),
             delimiter=";",
         )
@@ -8940,7 +8939,7 @@ def parse() -> None:
     first_code: dict[tuple[str, str], str] = {}
     for key in ("MN", "MN-county", "MN-school"):
         for cells in csv.reader(
-            io.StringIO(raw.cached(SOURCE, FEEDS[key][0]).path.read_text(encoding="utf-8", errors="replace")),
+            io.StringIO(decode(raw.cached(SOURCE, FEEDS[key][0]).path.read_bytes())),
             delimiter=";",
         ):
             if len(cells) < 11 or cells[10] == "WI" or "QUESTION" in cells[4].upper():
@@ -12806,6 +12805,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     person = next(iter(pool))
                     counts["matched"] += 1
                 else:
+                    rekey(cs, row["name"])
                     person = cs.key(
                         f"{SOURCE}.person",
                         f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}",
@@ -12926,5 +12926,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 print("retiring orphan person", value)
                 cs.add("entity_retirement", entity_id=person, reason="No longer on any official candidate list")
                 counts["orphan people"] += 1
+        counts["renamed people"] = repair(cs)
         print(counts)
         return cs.write()
