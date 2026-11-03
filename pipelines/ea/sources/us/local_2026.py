@@ -12106,6 +12106,25 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         )
         .filter(~pl.col("tail").is_in(merged) | pl.struct("tail", "unexpired", "name").is_first_distinct())
     )
+    by_owner: dict[str, list[dict]] = {}
+    for row in (
+        frame.group_by("tail").agg(pl.col("owner").first(), pl.col("person"), pl.col("feed").unique()).to_dicts()
+    ):
+        by_owner.setdefault(row["owner"], []).append(row)
+    nested = {
+        a["tail"]
+        for rows in by_owner.values()
+        for a in rows
+        for b in rows
+        if b["tail"].startswith(a["tail"] + ":")
+        and not b["tail"].endswith((":unexpired", ":remainder"))
+        and None not in a["person"]
+        and set(a["person"]) <= set(b["person"])
+        and not set(a["feed"]) & set(b["feed"])
+    }
+    if nested:
+        print("dropping duplicate races", sorted(nested))
+        frame = frame.filter(~pl.col("tail").is_in(nested))
     keys = ["tail", "template", "unexpired"]
     frame = frame.with_row_index("_row").with_columns(_lead=pl.col("fips").first().over(keys))
     frame = (
