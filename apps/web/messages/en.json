@@ -4291,7 +4291,7 @@
   "home_og_alt": "Elections Archive: Every election in the world, down to the ballot box. Result sheets on a yellow desk show the 2008 US presidential election, the 2024 UK general election, the 2013 German federal election, the June 2019 İstanbul mayoral election, and the 2025 New York City Democratic mayoral primary, mapped by election district.",
   "night_counted": "Counted",
   "night_counted_none": "No votes counted yet",
-  "night_counted_share": "About {share} of the expected vote ({low} to {high})",
+  "night_counted_expected": "{share} of the expected vote",
   "night_dial_aria": "{name} has a {chance} chance of winning",
   "night_dial_band": "80% range",
   "night_dial_chance": "{name}'s chance of winning",

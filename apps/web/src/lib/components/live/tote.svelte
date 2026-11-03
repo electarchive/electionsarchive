@@ -261,10 +261,8 @@
           {#if isWaiting}
             {m.night_counted_none()}
           {:else if shareIn != null && isProjected}
-            {m.night_counted_share({
+            {m.night_counted_expected({
               share: percent(Math.min(0.99, shareIn.mid), 0),
-              low: percent(Math.min(0.99, shareIn.low), 0),
-              high: percent(Math.min(0.99, shareIn.high), 0),
             })}
           {:else}
             {m.night_votes({ count: count(now.total) })}
