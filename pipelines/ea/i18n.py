@@ -478,8 +478,7 @@ def seeded(locale: str, source: dict[str, Message], sources: dict[str, str]) -> 
     shipped: dict[str, Message] = json.loads(file.read_text()) if file.exists() else {}
     for key, value in source.items():
         current = fingerprint(value)
-        entry = entries.get(key)
-        if key in shipped and sources.get(key) == current and (entry is None or entry["en"] != current):
+        if key in shipped and sources.get(key) == current:
             text = shipped[key]
             entries[key] = {
                 "en": current,
