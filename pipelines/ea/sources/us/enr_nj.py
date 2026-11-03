@@ -80,7 +80,12 @@ def rows(url: str, path: Path):
     if tenant is None:
         return
     with zipfile.ZipFile(path) as archive:
-        lines = list(csv.DictReader(io.StringIO(archive.read("summary.csv").decode("utf-8-sig"))))
+        content = archive.read("summary.csv")
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("cp1252")
+    lines = list(csv.DictReader(io.StringIO(text)))
     races: dict[str, list[dict[str, str]]] = {}
     for line in lines:
         races.setdefault(re.sub(r"\s*\(Vote For \d+\)$", "", line["contest name"].strip()), []).append(line)
