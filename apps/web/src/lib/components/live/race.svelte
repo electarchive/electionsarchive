@@ -4,22 +4,20 @@
     LiveEstimate,
     LiveRace,
   } from "@ea/analytics/live";
-  import CircleCheckIcon from "@lucide/svelte/icons/circle-check";
-  import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import { untrack } from "svelte";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
-  import { clock, lead, placeSlug, stamp, tone } from "#lib/live/format.js";
+  import { bandFor, clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
   import { liveLinks } from "#lib/live/links.js";
   import { standing, sum } from "#lib/live/standing.js";
   import { quiet } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { isNeutral } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import Answers from "./answers.svelte";
+  import BandLabel from "./band-label.svelte";
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
@@ -160,34 +158,14 @@
       ? (options.find((option) => option.id === race.projected?.option) ?? null)
       : null,
   );
-  const band = $derived.by(() => {
-    const ids = projected == null ? winners : [projected.id];
-    if (ids.length === 0) {
-      return null;
-    }
-    const fill =
-      seats > 1 || ids.length > 1
-        ? null
-        : tone(options.find((option) => option.id === ids[0]));
-    return {
-      ids,
-      isProjected: projected != null,
-      fill: fill == null || isNeutral(fill) ? "var(--marker)" : fill,
-    };
-  });
-  const badge = $derived.by(() => {
-    if (band?.isProjected === true) {
-      return race.isMeasure
-        ? m.night_band_projected_answer()
-        : m.night_band_projected();
-    }
-    if (race.isMeasure) {
-      return m.night_band_certified_answer();
-    }
-    return (band?.ids.length ?? 0) > 1
-      ? m.night_band_certified_seats()
-      : m.night_band_certified();
-  });
+  const band = $derived(
+    bandFor(
+      options,
+      projected == null ? winners : [projected.id],
+      seats,
+      projected != null,
+    ),
+  );
   const closes = $derived(
     Date.parse(
       election.pollClose.find((entry) => entry.state === race.state)?.at ??
@@ -552,36 +530,12 @@
         )}
       >
         {#if band != null}
-          <p
-            class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.8125rem]"
-          >
-            <span
-              class={cn(
-                "inline-flex items-center gap-1.5 rounded-full py-0.5 ps-1.5 pe-2.5 font-semibold",
-                {
-                  "border border-dashed border-current": band.isProjected,
-                  "bg-foreground text-background": !band.isProjected,
-                },
-              )}
-            >
-              {#if band.isProjected}
-                <CircleDashedCheckIcon
-                  class="block-4 inline-4"
-                  aria-hidden="true"
-                />
-              {:else}
-                <CircleCheckIcon class="block-4 inline-4" aria-hidden="true" />
-              {/if}
-              {badge}
-            </span>
-            {#if band.isProjected}
-              <span class="text-muted-foreground"
-                >{m.night_band_called({
-                  time: stamp(race.projected?.at ?? null),
-                })}</span
-              >
-            {/if}
-          </p>
+          <BandLabel
+            {band}
+            isMeasure={race.isMeasure ?? false}
+            at={race.projected?.at ?? null}
+            class="text-[0.8125rem]"
+          />
         {/if}
         {#if isField}
           <Seats {options} {now} {seats} {band} />
