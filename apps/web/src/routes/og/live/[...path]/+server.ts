@@ -848,7 +848,7 @@ function raceBody(summary: Summary, width: number) {
           fontSize: 20,
           color: MUTED,
         },
-        isCounting || summary.winner != null
+        summary.winner != null || (isCounting && summary.counted != null)
           ? [
               h(
                 "div",
@@ -859,12 +859,7 @@ function raceBody(summary: Summary, width: number) {
               h(
                 "div",
                 { display: "flex" },
-                summary.counted == null && summary.winner == null
-                  ? m.night_counted_none()
-                  : percent(
-                      summary.winner != null ? 1 : (summary.counted ?? 0),
-                      0,
-                    ),
+                percent(summary.winner != null ? 1 : (summary.counted ?? 0), 0),
               ),
               ...(chance == null || summary.winner != null
                 ? []
@@ -883,26 +878,28 @@ function raceBody(summary: Summary, width: number) {
                     ),
                   ]),
             ]
-          : [
-              h(
-                "div",
-                { display: "flex", color: INK, fontWeight: 600 },
-                m.night_counted_none(),
-              ),
-              ...(baseline == null
-                ? []
-                : [
-                    h(
-                      "div",
-                      {
-                        display: "flex",
-                        paddingLeft: 16,
-                        borderLeft: `1px solid ${RULE}`,
-                      },
-                      baseline,
-                    ),
-                  ]),
-            ],
+          : isCounting
+            ? []
+            : [
+                h(
+                  "div",
+                  { display: "flex", color: INK, fontWeight: 600 },
+                  m.night_counted_none(),
+                ),
+                ...(baseline == null
+                  ? []
+                  : [
+                      h(
+                        "div",
+                        {
+                          display: "flex",
+                          paddingLeft: 16,
+                          borderLeft: `1px solid ${RULE}`,
+                        },
+                        baseline,
+                      ),
+                    ]),
+              ],
       ),
     ],
   );

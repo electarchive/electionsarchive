@@ -126,8 +126,14 @@
   function note(code: string) {
     const all = [...senate(code), ...governor(code)];
     const first = all[0];
-    if (first == null || all.some((summary) => summary.total > 0)) {
+    if (first == null) {
       return null;
+    }
+    if (all.some((summary) => summary.total > 0)) {
+      const share = all.find((summary) => summary.counted != null)?.counted;
+      return share == null
+        ? null
+        : m.night_tip_counted({ share: percent(share, 0) });
     }
     const at = closes(first);
     return Date.now() < at
@@ -339,7 +345,7 @@
       {m.night_pick_quiet()}
     </p>
   {:else}
-    <div class="grid gap-2.5 divide-y divide-border">
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-2.5 divide-y divide-border">
       {#each found as item (item.summary.race.id)}
         {const described = $derived(describe(item.summary))}
         <div class="pbe-2.5 last:pbe-0">
@@ -415,7 +421,9 @@
           >
             {#snippet card()}
               {const status = $derived(note(code))}
-              <span class="flex items-baseline justify-between gap-3">
+              <span
+                class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+              >
                 <span class="text-sm font-semibold">{name(code)}</span>
                 {#if status != null}
                   <span

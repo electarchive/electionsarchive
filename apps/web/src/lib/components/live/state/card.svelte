@@ -116,7 +116,7 @@
   });
 </script>
 
-<div class="grid gap-2">
+<div class="grid grid-cols-[minmax(0,1fr)] gap-2">
   <span class="flex items-baseline justify-between gap-3">
     <span class="text-[0.8125rem]/snug font-semibold text-pretty"
       >{heading ?? ""}</span

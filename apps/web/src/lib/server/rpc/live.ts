@@ -581,9 +581,11 @@ async function baselines(
       `${parts[0]}/${parts[1]}/${suffix}/${name}`;
     return {
       ...row,
-      seats: seat.startsWith("house")
-        ? generals.rows.map(({ suffix }) => at(suffix, seat))
-        : [],
+      seats:
+        seat.startsWith("house") ||
+        (parts.length === 4 && (TOP.test(seat) || STATEWIDE.includes(seat)))
+          ? generals.rows.map(({ suffix }) => at(suffix, seat))
+          : [],
       presidents:
         parts.length === 4 && (TOP.test(seat) || STATEWIDE.includes(seat))
           ? generals.rows.map(({ suffix }) => at(suffix, "president"))
@@ -614,7 +616,7 @@ async function baselines(
       .map((path) => byPath.get(path))
       .find((candidate) => candidate != null);
     return [
-      ...(seat == null
+      ...(seat == null || (president != null && !row.path.includes("/house"))
         ? []
         : [{ contest: row.id, prior: seat.id, kind: "seat" as const }]),
       ...(president == null
@@ -635,7 +637,8 @@ async function baselines(
     select p.id as prior, x.k from unnest(${sql.param([...new Set(pairs.map((row) => row.prior))])}::uuid[]) as p(id) cross join lateral (
       select rs.k from result_set rs
       where rs.contest_id = p.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
-        and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
+        and (select u.scheme_code in ('us.county', 'us.county_part') or u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
+          from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1)
       order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part')) desc nulls last,
         rs.is_default desc, rs.stage = 'certified' desc limit 1
     ) x
@@ -669,10 +672,12 @@ async function baselines(
       left join reach r on r.party_id = line.party_id
       order by top.id, l.votes desc nulls last, r.n desc nulls last
     )
-    select c.k, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit,
+    select c.k, case when u.scheme_code = 'us.county_part' then u.parent_id else u.id end as unit,
       coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
     from counted c join reporting_unit u on u.k = c.unit_k
-      and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+      and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null
+        or u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
+          and not exists (select from counted w join reporting_unit y on y.k = w.unit_k where w.k = c.k and y.scheme_code in ('us.county', 'us.county_part')))
     join contest_option o on o.k = c.option_k
     join lead on lead.top = coalesce(o.parent_option_id, o.id)
     left join party_affiliation a on a.party_id = lead.party and a.kind = 'regional_branch' and a.valid @> ${date}::date

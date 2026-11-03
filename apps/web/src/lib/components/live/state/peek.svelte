@@ -45,7 +45,7 @@
   </HoverCard.Trigger>
   <HoverCard.Content
     collisionPadding={8}
-    class="grid gap-2.5 inline-[min(19rem,calc(100vw-2rem))]"
+    class="grid grid-cols-[minmax(0,1fr)] gap-2.5 inline-[min(19rem,calc(100vw-2rem))]"
   >
     {@render card()}
   </HoverCard.Content>
