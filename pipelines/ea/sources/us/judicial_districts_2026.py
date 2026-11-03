@@ -21,6 +21,15 @@ PUBLISHERS = {
     "sos.nebraska.gov": ("Nebraska Secretary of State", "List of Judges Who Filed for Retention, November 3, 2026"),
     "vote.utah.gov": ("Utah Elections Office", "2026 Candidate Filings"),
     "www.nvsos.gov": ("Nevada Secretary of State", "2026 General Election: Statewide Certified List of Candidates"),
+    "www.sos.mo.gov": ("Missouri Secretary of State", "2026 General Election Certification of Candidates"),
+    "web.sos.ky.gov": ("Kentucky Secretary of State", "Candidate Filings, 2026 General Election"),
+}
+PAGES = {
+    "13": "Commonwealth's Attorney",
+    "15": "Judge of the Court of Appeals",
+    "16": "Circuit Judge",
+    "17": "District Judge",
+    "20": "Circuit Judge, Family Court",
 }
 BORROWED = {"www.nvsos.gov": "us.nv_districts_2026"}
 
@@ -67,6 +76,8 @@ def emit() -> Path:
         sources: dict[str, UUID] = {}
         for url in sorted({row["source"] for row in rows}):
             publisher, title = PUBLISHERS[urlparse(url).netloc]
+            if page := PAGES.get(url.rpartition("id=")[2]):
+                title = f"{title}: {page}"
             sources[url] = cs.source(publisher, title)
             if sources[url] in cs.minted:
                 cs.add(
@@ -97,7 +108,7 @@ def emit() -> Path:
             if election in cs.minted:
                 raise LookupError(f"no 2026-11-03 election for {state}")
             states[state] = (area, polity, election)
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%%'").fetchall()}
+        taken = dict(conn.execute("select path, entity_id from slug where path like 'us/%%'").fetchall())
         retention = cs.key("us.electoral_system", "retention")
         fptp = cs.key("us.electoral_system", "fptp")
 
@@ -115,7 +126,7 @@ def emit() -> Path:
             path = f"us/{row['state'].lower()}/{slug(row['label'])}"
             if path in taken:
                 raise ValueError(f"{row['label']} would take {path}")
-            taken.add(path)
+            taken[path] = polity
             cs.add("polity", id=polity, kind="judicial_district", iso_code=None)
             name(polity, f"{row['label']}, {row['state']}")
             cs.add("polity_parent", polity_id=polity, parent_id=state_polity)
@@ -179,9 +190,9 @@ def emit() -> Path:
             label = ", ".join(part for part in (title, row["label"], row["seat"]) if part)
             name(contest, f"2026 {state} {label} election")
             path = f"us/{state.lower()}/2026-11-03-general/{slug(label)}"
-            if path in taken:
+            if taken.get(path, contest) != contest:
                 raise ValueError(f"{label} would take {path}")
-            taken.add(path)
+            taken[path] = contest
             cs.add("slug", path=path, entity_id=contest)
             cs.add("citation", entity_id=contest, source_id=sources[row["source"]], locator=None)
             for each in people:
@@ -192,7 +203,7 @@ def emit() -> Path:
                     id=option,
                     contest_id=contest,
                     kind="candidate",
-                    party_id=None,
+                    party_id=cs.key("us.party", each["party"]) if each["party"] else None,
                     ballot_label=each["candidate"],
                 )
                 person = cs.key(f"{SOURCE}.person", who)
@@ -246,10 +257,10 @@ def emit() -> Path:
             name(contest, f"2026 {state} {label} retention: {row['candidate']}")
             base = f"us/{state.lower()}/2026-11-03-general/{slug(label)}-{slug(row['candidate'])}"
             path, count = base, 1
-            while path in taken:
+            while taken.get(path, contest) != contest:
                 count += 1
                 path = f"{base}-{count}"
-            taken.add(path)
+            taken[path] = contest
             cs.add("slug", path=path, entity_id=contest)
             cs.add("citation", entity_id=contest, source_id=sources[row["source"]], locator=None)
             yes = cs.key("us.option", f"{key}:yes")
