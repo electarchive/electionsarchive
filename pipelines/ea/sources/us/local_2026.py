@@ -1531,6 +1531,7 @@ FILLER = {
     "seat",
 }
 NO_FILING = "No Candidate Filed"
+RETENTION = frozenset({"MP:69:justice"})
 ROLES = frozenset(
     [
         "commissioner",
@@ -12353,14 +12354,29 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     option = cs.key("us.option", f"{key}:{slug(row['name'])}")
                 except ValueError:
                     option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
-                cs.add(
-                    "contest_option",
-                    id=option,
-                    contest_id=contest,
-                    kind="candidate",
-                    party_id=party,
-                    ballot_label=row["name"],
-                )
+                if tail in RETENTION:
+                    answers = {
+                        answer: cs.key("us.option", f"{key}:{answer}") for answer in ("yes", "no")
+                    }
+                    for position, (answer, answer_id) in enumerate(answers.items(), start=1):
+                        cs.add(
+                            "contest_option",
+                            id=answer_id,
+                            contest_id=contest,
+                            kind="answer",
+                            ballot_position=position,
+                            ballot_label=answer.capitalize(),
+                        )
+                    option = answers["yes"]
+                else:
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=party,
+                        ballot_label=row["name"],
+                    )
                 try:
                     candidacy = cs.key("us.candidacy", f"{key}:{slug(row['name'])}")
                 except ValueError:
