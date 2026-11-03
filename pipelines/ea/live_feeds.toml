@@ -335,6 +335,16 @@ publisher = "Hawaii Office of Elections"
 url = "https://elections.hawaii.gov/election-results/"
 
 [[feed]]
+id = "us.enr_2026.wy"
+adapter = "us.enr_2026"
+interval = 120
+params = { state = "WY" }
+poller = "muktedir"
+publisher = "Wyoming Secretary of State"
+url = "https://sos.wyo.gov/Elections/Docs/2026/2026GeneralResults.aspx"
+note = "statewide and legislative summary PDFs by county, read with pdftotext, so the feed polls from muktedir"
+
+[[feed]]
 id = "us.nyc_enr"
 adapter = "us.nyc_enr"
 publisher = "Board of Elections in the City of New York"
