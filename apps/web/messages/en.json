@@ -4316,6 +4316,8 @@
   "night_head_before": "Polls close at {time}",
   "night_head_counting": "{name} leads by {margin} points with {count} votes counted",
   "night_dial_unavailable": "No estimate for this race, because there is no earlier result here to compare with.",
+  "night_dial_none_title": "No estimate for this race",
+  "night_dial_none_body": "There is no earlier result for this race to compare the count with, so we can't estimate a chance of winning or a final margin. The count updates here as results come in.",
   "night_head_estimating": "{name} leads by {margin} points with about {share} of the expected vote counted",
   "night_head_tied": "Tied with {count} votes counted",
   "night_head_waiting": "Waiting for the first votes",

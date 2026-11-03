@@ -19,6 +19,7 @@
   import Field from "./field.svelte";
   import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
+  import MethodLink from "./method-link.svelte";
   import Outstanding from "./outstanding.svelte";
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
@@ -108,6 +109,7 @@
         },
   );
   const points = $derived(forecasts ? history(race, null) : []);
+  const isUnestimated = $derived(forecasts && modeled.status === "unavailable");
   const upto = $derived(
     view == null ? points : points.filter((point) => point.at <= view),
   );
@@ -446,7 +448,7 @@
   </section>
 
   {#if later == null}
-    {#if isLive}
+    {#if isLive && !isUnestimated}
       <section
         class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2"
       >
@@ -499,7 +501,19 @@
       </section>
     {/if}
 
-    {#if race.certified == null || !now.isFinal}
+    {#if isUnestimated && (race.certified == null || !now.isFinal)}
+      <section class="grid gap-1 bg-background px-4 py-5 sm:px-8">
+        <div class="flex items-center gap-1">
+          <h2 class="text-[0.8125rem] font-semibold">
+            {m.night_dial_none_title()}
+          </h2>
+          <MethodLink section="limits" />
+        </div>
+        <p class="text-sm text-muted-foreground max-inline-[60ch]">
+          {m.night_dial_none_body()}
+        </p>
+      </section>
+    {:else if race.certified == null || !now.isFinal}
       <section class="grid gap-10 bg-background px-4 py-6 sm:px-8">
         <Withheld isOff={!forecasts}>
           <Dial
@@ -534,7 +548,7 @@
       />
     </section>
 
-    {#if isLive}
+    {#if isLive && !isUnestimated}
       <section
         class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
       >
