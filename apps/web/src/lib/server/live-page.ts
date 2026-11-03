@@ -37,7 +37,7 @@ async function place(path: string, slug: string, at: string | null) {
   if (unit == null) {
     error(404);
   }
-  const map = await remember(`live:place:v2:${path}/${slug}`, async () =>
+  const map = await remember(`live:place:v3:${path}/${slug}`, async () =>
     geography(
       [...new Set([...counties.values()].map((entry) => entry.areaId))],
       election.date,

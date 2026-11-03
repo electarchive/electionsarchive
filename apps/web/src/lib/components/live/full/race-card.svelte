@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { LiveOption } from "@ea/analytics/live";
-  import { resolve } from "$app/paths";
   import type { Summary } from "#lib/live/summary.js";
   import BandLabel from "#lib/components/live/band-label.svelte";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Face from "#lib/components/live/face.svelte";
   import Also from "#lib/components/live/state/also.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
   import { bandFor, lead, paint, surname } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
@@ -93,12 +93,14 @@
       : `${surname(option)} +${lead(last.margin)}`;
   });
 
+  const seats = $derived(race.seats ?? 1);
+
   function isDecided(option: LiveOption) {
     return band?.ids.includes(option.id) === true;
   }
 </script>
 
-<article class="grid gap-3" aria-label={race.title}>
+<article class="grid grid-cols-[minmax(0,1fr)] gap-3" aria-label={race.title}>
   <header class="grid gap-1">
     <h3 class="text-[0.9375rem]/5 font-[720] tracking-tight text-balance">
       {#if isLinked}
@@ -129,8 +131,8 @@
         class="text-xs"
       />
     {/if}
-    <ul class="grid gap-2.5">
-      {#each rows as row (row.option.id)}
+    <ol class="grid gap-2.5">
+      {#each rows as row, rank (row.option.id)}
         {const color = $derived(paint(row.option, band))}
         {const isDim = $derived(band != null && !isDecided(row.option))}
         {const isStrong = $derived(
@@ -138,6 +140,16 @@
             ? row.option.id === summary.leader?.id
             : isDecided(row.option),
         )}
+        {#if seats > 1 && rank === seats && rows.length > seats}
+          <li
+            class="flex items-center gap-2 text-[0.6875rem] text-muted-foreground"
+            aria-hidden="true"
+          >
+            <span class="flex-1 border-bs border-dashed border-current"></span>
+            {m.night_seats_line({ count: count(seats) })}
+            <span class="flex-1 border-bs border-dashed border-current"></span>
+          </li>
+        {/if}
         <li
           class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5"
         >
@@ -150,26 +162,18 @@
             ></span>
           {/if}
           <span class="grid gap-1 min-inline-0">
-            <span class="flex items-baseline gap-1.5 min-inline-0">
-              {#if row.option.person != null}
-                <a
-                  href={resolve("/id/[id]", { id: row.option.person })}
-                  class={cn(
-                    "truncate underline decoration-transparent underline-offset-2 hover:decoration-foreground",
-                    {
-                      "font-semibold": isStrong,
-                      "text-muted-foreground": isDim,
-                    },
-                  )}>{row.option.label}</a
-                >
-              {:else}
-                <span
-                  class={cn("truncate", {
-                    "font-semibold": isStrong,
-                    "text-muted-foreground": isDim,
-                  })}>{row.option.label}</span
-                >
-              {/if}
+            <span
+              class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 min-inline-0"
+            >
+              <Name
+                label={row.option.label}
+                person={row.option.person}
+                hasSwatch={false}
+                class={cn("leading-snug wrap-anywhere", {
+                  "font-semibold": isStrong,
+                  "text-muted-foreground": isDim,
+                })}
+              />
               {#if row.option.isIncumbent}
                 <span
                   class="shrink-0 text-[0.6875rem] text-muted-foreground"
@@ -196,10 +200,14 @@
               {/if}
             </span>
             {#if row.option.party != null}
-              <a
-                href={resolve("/id/[id]", { id: row.option.party.id })}
-                class="truncate text-xs text-muted-foreground underline decoration-transparent underline-offset-2 hover:text-foreground hover:decoration-foreground"
-                >{row.option.party.short}</a
+              <span class="truncate text-xs text-muted-foreground"
+                ><Name
+                  label={row.option.party.short}
+                  party={row.option.party.id}
+                  color={row.option.party.color}
+                  hasSwatch={false}
+                  class="hover:text-foreground"
+                /></span
               >
             {/if}
           </span>
@@ -222,7 +230,7 @@
           {/if}
         </li>
       {/each}
-    </ul>
+    </ol>
     <Also rest={split.rest} total={summary.total} />
 
     <div class="grid gap-1.5">

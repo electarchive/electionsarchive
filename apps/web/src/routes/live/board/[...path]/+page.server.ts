@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
   setHeaders({ "x-robots-tag": "noindex, follow" });
   const isNation = election.slug.split("/").length === 2;
   const district = isNation
-    ? await remember(`live:house:v2:${election.date}`, async () =>
+    ? await remember(`live:house:v3:${election.date}`, async () =>
         house(election.id, election.date),
       )
     : null;

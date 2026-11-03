@@ -23,6 +23,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import RacePicker from "#lib/components/live/race-picker.svelte";
   import Also from "#lib/components/live/state/also.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -369,6 +370,21 @@
   const rowByArea = $derived(
     new Map(rows.map((entry) => [entry.areaId, entry])),
   );
+  const entire = $derived.by(() => {
+    if (race == null || raceStanding == null || rows.length > 0) {
+      return null;
+    }
+    const unit = race.units.find((unit) => unit.scheme === "us.state");
+    const row = unit == null ? null : raceStanding.units.get(unit.id);
+    if (unit?.areaId == null || row == null) {
+      return null;
+    }
+    const rest = remainder(row, estimate, race.options, racePair);
+    return {
+      areaId: unit.areaId,
+      color: unitFill(row, lens, race.options, racePair, rest.expected),
+    };
+  });
 
   const spreadRows = $derived.by(() => {
     const out = new Map<
@@ -441,32 +457,37 @@
           ),
         ),
   );
+  const isOutlying = (state: string | null | undefined) =>
+    state != null && (INSETS.has(state) || TERRITORIES.includes(state));
+  const isAlone = $derived(isOutlying(code));
   const nearby = $derived(
-    nearSeats != null && districts != null
-      ? {
-          tiles: districts.map.tiles,
-          places: districts.map.places.flatMap((place) => {
-            const [state = "", number = ""] =
-              nearSeats.get(place.areaId)?.split("-") ?? [];
-            return state === ""
-              ? []
-              : [
-                  {
-                    ...place,
-                    name: `${state.toUpperCase()}-${number === "0" ? "AL" : number}`,
-                  },
-                ];
-          }),
-        }
-      : around == null
-        ? null
-        : {
-            tiles: around.tiles,
-            places: around.places.map((place) => ({
-              ...place,
-              name: stateName(nearCodes.get(place.areaId) ?? ""),
-            })),
-          },
+    isAlone
+      ? null
+      : nearSeats != null && districts != null
+        ? {
+            tiles: districts.map.tiles,
+            places: districts.map.places.flatMap((place) => {
+              const [state = "", number = ""] =
+                nearSeats.get(place.areaId)?.split("-") ?? [];
+              return state === ""
+                ? []
+                : [
+                    {
+                      ...place,
+                      name: `${state.toUpperCase()}-${number === "0" ? "AL" : number}`,
+                    },
+                  ];
+            }),
+          }
+        : around == null
+          ? null
+          : {
+              tiles: around.tiles,
+              places: around.places.map((place) => ({
+                ...place,
+                name: stateName(nearCodes.get(place.areaId) ?? ""),
+              })),
+            },
   );
   const hold = $derived.by(() => {
     const k = districts?.map.places.find(
@@ -510,6 +531,9 @@
 
   function flyTo(state: string, district: string | null = null) {
     isNationFramed = false;
+    if (isAlone || isOutlying(state)) {
+      return;
+    }
     const box = district == null ? null : boxes[districtCodes[district] ?? ""];
     if (box != null) {
       canvas?.fly(box, false);
@@ -643,7 +667,9 @@
     }
     const isLater = current?.later != null;
     for (const place of geography?.places ?? []) {
-      const entry = rowByArea.get(place.areaId);
+      const entry =
+        rowByArea.get(place.areaId) ??
+        (place.areaId === entire?.areaId ? entire : null);
       out.set(
         place.areaId,
         entry == null
@@ -828,7 +854,7 @@
       update({ county: null });
     } else if (up != null) {
       isNationFramed = true;
-      if (frame != null) {
+      if (frame != null && !isAlone) {
         canvas?.fly(frame, true);
       }
       void goto(up, { reset: false });
@@ -1096,22 +1122,6 @@
   const insetStature = $derived(
     wide.current ? Math.min(104, Math.max(56, room * 0.13)) : 58,
   );
-  const raceOptions = $derived<Array<SegmentedOption<string>>>([
-    ...statewide.map((summary) => ({
-      value: tail(summary.race),
-      label:
-        summary.race.office === "senate" || summary.race.office === "governor"
-          ? OFFICE_NAMES[summary.race.office]()
-          : summary.race.title,
-    })),
-    ...(seats.length > 0
-      ? [{ value: "house", label: m.night_nation_house() }]
-      : []),
-  ]);
-  const raceGroup = $derived(
-    race?.office === "house" || isOverview ? "house" : raceTail,
-  );
-
   const sides = $derived.by(() => {
     if (isNation || isOverview) {
       return (found.pair ?? []).map((family) => ({
@@ -1483,77 +1493,29 @@
 {/snippet}
 
 {#snippet raceTabs()}
-  {const count = $derived(isNation ? officeOptions.length : raceOptions.length)}
-  {#if count > 1}
-    <div class="-mx-1 scrollbar-none overflow-x-auto px-1">
-      {#if isNation}
-        <Segmented
-          options={officeOptions}
-          value={office}
-          label={m.night_nation_views()}
-          fill={count <= 4}
-          class={cn({ "inline-full": count <= 4 })}
-          onValueChange={(value) => update({ office: value, pick: null })}
-        />
-      {:else}
-        <Segmented
-          options={raceOptions}
-          value={raceGroup}
-          label={m.livemap_races()}
-          fill={count <= 4}
-          class={cn({ "inline-full": count <= 4 })}
-          onValueChange={(value: string) => pickRace(value)}
-        />
-      {/if}
-    </div>
-  {/if}
-{/snippet}
-
-{#snippet seatChips()}
-  {#if !isNation}
-    {#if raceGroup === "house" && seats.length > 1}
-      <div
-        class="flex scrollbar-thin gap-1 overflow-x-auto rounded-sm border border-input bg-card p-1"
-        role="group"
-        aria-label={m.livemap_districts()}
-      >
-        {#if hasOverview}
-          <button
-            type="button"
-            class={cn(
-              "shrink-0 rounded-xs px-2.5 text-xs font-semibold block-7",
-              {
-                "bg-foreground text-card": isOverview,
-                "hover:bg-secondary": !isOverview,
-              },
-            )}
-            aria-pressed={isOverview}
-            onclick={() => pickRace("house")}>{m.livemap_overview()}</button
-          >
-        {/if}
-        {#each seats as summary (summary.race.id)}
-          {const isOn = $derived(summary.race.id === race?.id)}
-          {const color = $derived(seatShade(summary, "lead"))}
-          <button
-            type="button"
-            class={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-xs px-2 font-figures text-xs font-semibold tabular-nums block-7",
-              { "bg-foreground text-card": isOn, "hover:bg-secondary": !isOn },
-            )}
-            aria-pressed={isOn}
-            aria-label={summary.race.title}
-            title={summary.race.title}
-            onclick={() => pickRace(tail(summary.race))}
-            ><span
-              class="rounded-full ring-1 ring-card block-2 inline-2"
-              style:background-color={color}
-            ></span>{seatName(summary.race, stateName)
-              .split("-")
-              .at(-1)}</button
-          >
-        {/each}
-      </div>
-    {/if}
+  {#if isNation && officeOptions.length > 1}
+    <Segmented
+      options={officeOptions}
+      value={office}
+      label={m.night_nation_views()}
+      fill={officeOptions.length <= 4}
+      class={cn({ "inline-full": officeOptions.length <= 4 })}
+      onValueChange={(value) => update({ office: value, pick: null })}
+    />
+  {:else if !isNation && statewide.length + seats.length > 1}
+    <RacePicker
+      summaries={[...statewide, ...seats]}
+      current={isOverview ? null : (race?.slug ?? null)}
+      label={m.livemap_races()}
+      overview={hasOverview
+        ? {
+            label: m.livemap_overview(),
+            isCurrent: isOverview,
+            onpick: () => pickRace("house"),
+          }
+        : null}
+      onpick={(summary: Summary) => pickRace(tail(summary.race))}
+    />
   {/if}
 {/snippet}
 
@@ -1789,7 +1751,7 @@
       </ul>
     </section>
   {:else if current != null}
-    <div class="grid gap-6">
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-6">
       <RaceCard
         summary={current}
         held={holding(control, current.race)}
@@ -2011,6 +1973,7 @@
               : (current?.race.title ?? m.night_nation_house())}
             onPick={pickArea}
             around={nearby}
+            {isAlone}
             {aim}
             {seat}
             {hold}
@@ -2157,15 +2120,21 @@
             label={m.atlas_results()}
           >
             {#snippet head()}
-              <div class="grid gap-3 px-4 pbs-1 pbe-3">
-                {@render raceTabs()}
+              <div
+                class="grid grid-cols-[minmax(0,1fr)] gap-3 px-4 pbs-1 pbe-3"
+              >
+                {#if isNation}
+                  {@render raceTabs()}
+                {/if}
                 <div class="grid gap-1">
                   {@render summaryHead()}
                 </div>
               </div>
             {/snippet}
-            <div class="grid gap-5 px-4 pbe-8">
-              {@render seatChips()}
+            <div class="grid grid-cols-[minmax(0,1fr)] gap-5 px-4 pbe-8">
+              {#if !isNation}
+                {@render raceTabs()}
+              {/if}
               {@render panel()}
               {@render modes("sm")}
               {@render legend()}
@@ -2177,11 +2146,10 @@
 
       {#if wide.current}
         <aside
-          class="grid auto-rows-max content-start gap-5 overflow-y-auto overscroll-contain border-s bg-card p-4"
+          class="grid auto-rows-max grid-cols-[minmax(0,1fr)] content-start gap-5 overflow-y-auto overscroll-contain border-s bg-card p-4"
           aria-label={m.atlas_results()}
         >
           {@render raceTabs()}
-          {@render seatChips()}
           {@render panel()}
           {@render footer()}
         </aside>

@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ params }) => {
     error(404);
   }
   return json(
-    await remember(`live:house:v2:${election.date}`, async () =>
+    await remember(`live:house:v3:${election.date}`, async () =>
       house(election.id, election.date),
     ),
   );

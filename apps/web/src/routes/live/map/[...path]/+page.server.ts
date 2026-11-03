@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ params }) => {
     remember(`live:control:v1:${election.date}`, async () =>
       control(nationElection.races, election.date),
     ),
-    remember(`live:house:v2:${election.date}`, async () =>
+    remember(`live:house:v3:${election.date}`, async () =>
       house(nationElection.id, election.date),
     ),
     remember(`live:nation:v2:${election.date}`, async () =>
@@ -85,11 +85,12 @@ export const load: PageServerLoad = async ({ params }) => {
       ),
     ),
   ];
-  const built = await remember(`live:full:v1:${election.slug}`, async () =>
-    geography(areas, election.date),
-  );
   const code = segments[1] ?? "";
-  const home = framed[nation?.codes[code] ?? ""];
+  const own = nation?.codes[code];
+  const built = await remember(`live:full:v2:${election.slug}`, async () =>
+    geography(areas.length === 0 && own != null ? [own] : areas, election.date),
+  );
+  const home = framed[own ?? ""];
   const map = built == null || home == null ? built : { ...built, frame: home };
   const ids = new Set(election.races.map((race) => race.id));
   const mine = Object.fromEntries(
@@ -127,7 +128,7 @@ export const load: PageServerLoad = async ({ params }) => {
           },
     geography: map,
     around:
-      nation == null
+      nation == null || OUTLYING.has(code)
         ? null
         : {
             tiles: nation.map.tiles,

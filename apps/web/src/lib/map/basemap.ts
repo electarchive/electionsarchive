@@ -25,8 +25,9 @@ export function basemap(
   isDetailed: boolean,
   outline: Array<Array<[number, number]>> | null,
   isBoxed = false,
+  isAlone = false,
 ) {
-  const key = JSON.stringify([scheme, isDetailed, outline, isBoxed]);
+  const key = JSON.stringify([scheme, isDetailed, outline, isBoxed, isAlone]);
   const base = JSON.stringify([scheme, isDetailed]);
   const was = drawn.get(engine);
   const isDrawn = engine.gl?.getLayer("basemap:earth") != null;
@@ -53,9 +54,17 @@ export function basemap(
       coordinates: outline.map((ring) => [ring.toReversed()]),
     },
   ];
-  const outside: Maplibre.ExpressionSpecification = isFocused
-    ? ["!", within]
-    : ["has", "out"];
+  const outside: Maplibre.ExpressionSpecification = isAlone
+    ? ["==", 1, 0]
+    : isFocused
+      ? ["!", within]
+      : ["has", "out"];
+  const scope: Maplibre.ExpressionSpecification | null = isBoxed
+    ? ["!", ["has", "inset"]]
+    : isAlone
+      ? ["has", "inset"]
+      : null;
+  const veiled = isFocused ? (isAlone ? 1 : VEIL) : 0;
   const inside: Maplibre.ExpressionSpecification = isFocused
     ? within
     : ["!", ["has", "out"]];
@@ -70,15 +79,12 @@ export function basemap(
   ) => {
     const own: Maplibre.FilterSpecification | null =
       "filter" in spec ? (spec.filter ?? null) : null;
-    const filter: Maplibre.FilterSpecification | null = isBoxed
-      ? own == null
-        ? ["!", ["has", "inset"]]
-        : ([
-            "all",
-            ["!", ["has", "inset"]],
-            own,
-          ] as Maplibre.FilterSpecification)
-      : own;
+    const filter: Maplibre.FilterSpecification | null =
+      scope == null
+        ? own
+        : own == null
+          ? scope
+          : (["all", scope, own] as Maplibre.FilterSpecification);
     if (isKept) {
       engine.filter(`basemap:${id}`, filter);
       for (const [name, value] of Object.entries(spec.paint ?? {})) {
@@ -199,7 +205,7 @@ export function basemap(
   }
   const veil = engine.veil("basemap:mask", outline, "basemap");
   if (isKept) {
-    engine.style("basemap:mask", "fill-opacity", isFocused ? VEIL : 0);
+    engine.style("basemap:mask", "fill-opacity", veiled);
   } else {
     engine.add(
       {
@@ -208,7 +214,7 @@ export function basemap(
         source: veil,
         paint: {
           "fill-color": "var(--card)",
-          "fill-opacity": isFocused ? VEIL : 0,
+          "fill-opacity": veiled,
           "fill-antialias": false,
         },
       },

@@ -2,6 +2,7 @@
   import type { LiveElection } from "@ea/analytics/live";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import MapPinnedIcon from "@lucide/svelte/icons/map-pinned";
   import type { Control } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
@@ -459,17 +460,22 @@
       <div class="grid gap-2">
         <button
           type="button"
-          class="flex items-center justify-center gap-2 rounded-sm bg-foreground px-3 text-sm font-semibold text-background block-10 hover:bg-foreground/90"
+          class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-sm bg-foreground px-3 py-2.5 text-start text-sm/snug font-semibold text-background min-block-10 hover:bg-foreground/90"
           onclick={() => onOpen(code)}
-          ><MapPinnedIcon
-            class="block-4 inline-4"
+          ><MapPinnedIcon class="block-4 inline-4" aria-hidden="true" /><span
+            class="text-balance"
+            >{m.livemap_drill({ place: states(code) })}</span
+          ><ChevronRightIcon
+            class="opacity-70 block-4 inline-4"
             aria-hidden="true"
-          />{m.livemap_drill({ place: states(code) })}</button
+          /></button
         >
         <a
           href={toLive(`${country}/${code}/${date}`)}
-          class="flex items-center justify-center gap-1.5 rounded-sm px-3 text-[0.8125rem] font-semibold ring-1 ring-input block-9 hover:bg-secondary"
-          >{m.night_map_open({ place: states(code) })}<ArrowUpRightIcon
+          class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2.5 rounded-sm px-3 py-2 text-[0.8125rem]/snug font-semibold ring-1 ring-input min-block-9 hover:bg-secondary"
+          ><span class="text-balance"
+            >{m.night_map_open({ place: states(code) })}</span
+          ><ArrowUpRightIcon
             class="text-muted-foreground block-3.5 inline-3.5"
             aria-hidden="true"
           /></a

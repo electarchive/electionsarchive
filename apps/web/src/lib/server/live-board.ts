@@ -5,6 +5,35 @@ import america from "#lib/server/hex/us-cd.json";
 import { plane, spot } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
 
+export async function framing(
+  scheme: string,
+  ids: Array<string>,
+  date: string,
+) {
+  const box = await db.execute<{
+    tiles: string;
+    west: number | null;
+    south: number | null;
+    east: number | null;
+    north: number | null;
+  }>(sql`
+    select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+      st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+    from boundary_set bs, lateral (
+      select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+      from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date
+    ) x
+    where bs.scheme_code = ${scheme} and (bs.valid @> ${date}::date or bs.valid_from > ${date}::date)
+    order by (
+        select count(*) from area_geometry g
+        where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date and g.valid @> bs.as_of
+      ) desc,
+      abs(bs.as_of - ${date}::date)
+    limit 1
+  `);
+  return box.rows[0];
+}
+
 export async function geography(
   areaIds: Array<string>,
   date: string,
@@ -32,25 +61,7 @@ export async function geography(
   if (scheme == null) {
     return null;
   }
-  const extent = async (ids: Array<string>) => {
-    const box = await db.execute<{
-      tiles: string;
-      west: number | null;
-      south: number | null;
-      east: number | null;
-      north: number | null;
-    }>(sql`
-      select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-        st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-      from boundary_set bs, lateral (
-        select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-        from area_geometry g join area a on a.id = g.area_id where g.area_id = any(${sql.param(ids)}::uuid[]) and g.valid @> ${date}::date
-      ) x
-      where bs.scheme_code = ${scheme} and bs.valid @> ${date}::date
-      order by bs.valid_from desc nulls last limit 1
-    `);
-    return box.rows[0];
-  };
+  const extent = async (ids: Array<string>) => framing(scheme, ids, date);
   const ground = isGrounded
     ? (
         await db.execute<{ id: string; k: number }>(sql`

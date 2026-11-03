@@ -23,9 +23,12 @@ import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
-import { portraits, geography as shaped } from "#lib/server/live-board.js";
+import {
+  framing,
+  portraits,
+  geography as shaped,
+} from "#lib/server/live-board.js";
 import { localizeNames } from "#lib/server/names.js";
-import { plane } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
@@ -1678,7 +1681,7 @@ async function spreadOut(
     ),
   ];
   const map = await remember(
-    `live:spread:v1:${found.date}:${chosen}:${String(areas.length)}`,
+    `live:spread:v2:${found.date}:${chosen}:${String(areas.length)}`,
     async () =>
       shaped(areas, found.date, framed.length > 0 ? framed : areas, false),
   );
@@ -1944,26 +1947,17 @@ export const live = {
         );
       }
       const scheme = input.level === "us.nyc_ad" ? "us.sldl" : input.level;
-      const tiles = await db.execute<{
-        tiles: string;
-        west: number;
-        south: number;
-        east: number;
-        north: number;
-      }>(sql`
-        select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-          st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-        from boundary_set bs, lateral (
-          select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-          from area_geometry g join area a on a.id = g.area_id
-          where g.area_id = any(${sql.param([...new Set(values.map((row) => row.id))])}::uuid[])
-            and g.valid @> ${chosen.date}::date
-        ) x
-        where bs.scheme_code = ${scheme} and bs.valid @> ${chosen.date}::date
-        order by bs.valid_from desc nulls last limit 1
-      `);
-      const frame = tiles.rows[0];
-      if (frame == null) {
+      const frame = await framing(
+        scheme,
+        [...new Set(values.map((row) => row.id))],
+        chosen.date,
+      );
+      if (
+        frame?.west == null ||
+        frame.south == null ||
+        frame.east == null ||
+        frame.north == null
+      ) {
         return null;
       }
       const titles = await names(

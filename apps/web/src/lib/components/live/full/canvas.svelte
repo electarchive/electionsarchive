@@ -23,6 +23,7 @@
     hovered = $bindable(null),
     pulses = [],
     inset = { top: 0, bottom: 0, end: 0 },
+    isAlone = false,
     label,
     onPick,
     tip,
@@ -47,6 +48,7 @@
     hovered?: string | null;
     pulses?: Array<{ key: string; areaId: string; color: string }>;
     inset?: { top: number; bottom: number; end: number };
+    isAlone?: boolean;
     label: string;
     onPick: (areaId: string | null) => void;
     tip: Snippet<[string]>;
@@ -396,12 +398,30 @@
       engine.drop("hold");
     } else {
       const only: ["==", ["id"], number] = ["==", ["id"], held.k];
+      const rest: ["!=", ["id"], number] = ["!=", ["id"], held.k];
       if (engine.has("hold-fill")) {
         engine.filter("hold-fill", only);
         engine.filter("hold-edge", only);
+        engine.filter("hold-veil", rest);
         engine.style("hold-fill", "fill-color", held.color);
       } else {
         const tiles = engine.tiles(held.tiles);
+        engine.add(
+          {
+            id: "hold-veil",
+            type: "fill",
+            source: tiles,
+            "source-layer": "areas",
+            filter: rest,
+            paint: {
+              "fill-color": "var(--background)",
+              "fill-opacity": 0.5,
+              "fill-antialias": false,
+            },
+          },
+          "etch",
+          { group: "hold", rank: 3 },
+        );
         engine.add(
           {
             id: "hold-fill",
@@ -559,6 +579,7 @@
   }
 
   let aimed = "";
+  let wasAlone = false;
 
   function draw() {
     const gl = engine.gl;
@@ -567,7 +588,8 @@
     }
     const key = keyOf(geography);
     if (current?.key !== key) {
-      const isFirst = current == null;
+      const isMoved = current != null && !isAlone && !wasAlone;
+      wasAlone = isAlone;
       if (current != null) {
         retired.push(current.group);
       }
@@ -600,10 +622,10 @@
       setTimeout(swap, 1500);
       aimed = JSON.stringify(aim);
       if (aim == null) {
-        engine.frame(geography.frame, !isFirst);
+        engine.frame(geography.frame, isMoved);
       } else {
         engine.home(geography.frame);
-        engine.fit(aim, undefined, !isFirst);
+        engine.fit(aim, undefined, isMoved);
       }
     }
     outline();
@@ -789,7 +811,10 @@
     const scheme = geography.scheme;
     const outline = geography.outline;
     const isDetailed = prefs.isBasemap;
-    untrack(() => basemap(engine, scheme, isDetailed, outline));
+    const isShownAlone = isAlone;
+    untrack(() =>
+      basemap(engine, scheme, isDetailed, outline, false, isShownAlone),
+    );
   });
 
   export function focus(areaId: string) {
