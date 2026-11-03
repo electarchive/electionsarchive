@@ -327,11 +327,10 @@ async function options(contests: Array<string>, date: string) {
     kind: row.kind,
     person: row.person,
     photo: row.person == null ? null : (faces.get(row.person) ?? null),
-    name:
-      (row.person == null ? null : named.full.get(row.person)) ??
-      row.ballot ??
-      row.label ??
-      "",
+    name: label(
+      row.person == null ? null : named.full.get(row.person),
+      row.ballot ?? row.label,
+    ),
     party:
       row.party == null
         ? null
@@ -561,6 +560,13 @@ async function listRaces(found: {
           where s.path = ${`${found.path}/${found.rest}`} and s.is_current
         `);
   return result.rows;
+}
+
+function label(full: string | null | undefined, ballot: string | null) {
+  if (full != null && !full.includes(" ") && ballot?.endsWith(` ${full}`)) {
+    return ballot;
+  }
+  return full ?? ballot ?? "";
 }
 
 async function baselines(

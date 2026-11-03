@@ -21,6 +21,7 @@
   import LiveMap from "./map.svelte";
   import MethodLink from "./method-link.svelte";
   import Outstanding from "./outstanding.svelte";
+  import Seats from "./seats.svelte";
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
   import Trend from "./trend.svelte";
@@ -110,6 +111,10 @@
   );
   const points = $derived(forecasts ? history(race, null) : []);
   const isUnestimated = $derived(forecasts && modeled.status === "unavailable");
+  const seats = $derived(race.seats ?? 1);
+  const isMulti = $derived(
+    seats > 1 && !race.isMeasure && options.length > seats,
+  );
   const upto = $derived(
     view == null ? points : points.filter((point) => point.at <= view),
   );
@@ -208,6 +213,20 @@
 
   const headline = $derived.by(() => {
     const leader = options[now.order[0] ?? 0];
+    if (isMulti && now.total > 0 && later == null) {
+      const last = now.order[seats - 1] ?? 0;
+      const next = now.order[seats] ?? 0;
+      const values = {
+        seats: count(seats),
+        count: count(now.total),
+        name: options[last]?.label ?? "",
+        next: options[next]?.label ?? "",
+        lead: count((now.totals[last] ?? 0) - (now.totals[next] ?? 0)),
+      };
+      return now.isFinal && race.certified != null
+        ? m.night_head_seats_won(values)
+        : m.night_head_seats(values);
+    }
     if (now.isFinal && race.certified != null) {
       const winner = options.find((option) => winners.includes(option.id));
       return m.night_head_won({
@@ -437,17 +456,25 @@
   {/if}
 
   <section class="bg-background px-4 py-5 sm:px-8">
-    <Tote
-      {options}
-      {now}
-      {estimate}
-      {winners}
-      {isWaiting}
-      isLater={later != null}
-    />
+    {#if isMulti}
+      <Seats {options} {now} {seats} {winners} />
+    {:else}
+      <Tote
+        {options}
+        {now}
+        {estimate}
+        {winners}
+        {isWaiting}
+        isLater={later != null}
+      />
+    {/if}
   </section>
 
-  {#if later == null}
+  {#if later == null && isMulti}
+    <section class="bg-background px-4 py-6 sm:px-8">
+      <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
+    </section>
+  {:else if later == null}
     {#if isLive && !isUnestimated}
       <section
         class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2"
