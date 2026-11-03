@@ -5,6 +5,7 @@
   import type { Geography } from "#lib/live/standing.js";
   import type { Ballot, BallotTier } from "#lib/server/live-ballot.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import MapLink from "#lib/components/live/map-link.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
   import { district, entries as entriesOf, seating } from "#lib/live/ballot.js";
@@ -301,6 +302,7 @@
         >
       {/if}
       <BoardLink election={election.slug} />
+      <MapLink election={election.slug} />
     </p>
     <h1 class="title text-balance">{ballot.name}</h1>
     <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">

@@ -1,0 +1,365 @@
+import type {
+  LiveElection,
+  LiveEstimate,
+  LiveOption,
+  LiveRace,
+} from "@ea/analytics/live";
+import type { Control, Family, Seat } from "#lib/live/nation.js";
+import type { UnitStanding } from "#lib/live/standing.js";
+import type { Summary } from "#lib/live/summary.js";
+import { tone } from "#lib/live/format.js";
+import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
+import { ranked, sum } from "#lib/live/standing.js";
+import { summarize } from "#lib/live/summary.js";
+import { swatch } from "#lib/party.js";
+
+export type Office = "senate" | "governor" | "house";
+export type Paint = "lead" | "chance" | "flips" | "counted";
+export type Lens = "lead" | "shift" | "last" | "counted" | "votes";
+export type Fill = { color: string; isLater?: boolean };
+export type Dot = { areaId: string; value: number; color: string };
+
+export const OFFICES: Array<Office> = ["senate", "governor", "house"];
+export const PAINTS: Array<Paint> = ["lead", "flips", "counted", "chance"];
+export const LENSES: Array<Lens> = [
+  "lead",
+  "shift",
+  "last",
+  "counted",
+  "votes",
+];
+
+export const MUTED =
+  "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
+export const WAITING =
+  "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
+export const LATER =
+  "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
+export const BLANK =
+  "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
+
+export function mix(color: string, share: number) {
+  return `color-mix(in oklab, ${color} ${Math.round(share)}%, var(--background))`;
+}
+
+export function reporting(share: number | null) {
+  return share == null ? MUTED : mix("var(--foreground)", 10 + 78 * share);
+}
+
+export function districtKey(race: LiveRace) {
+  return race.office === "house" && race.district != null
+    ? `${race.state}-${Math.trunc(Number(race.district))}`
+    : null;
+}
+
+export function tail(race: LiveRace) {
+  return race.slug.split("/").at(-1) ?? "";
+}
+
+export function board(
+  election: LiveElection,
+  estimates: Record<string, LiveEstimate>,
+  control: Control | null,
+) {
+  const summaries = election.races.map((race) =>
+    summarize(race, estimates[race.id] ?? null),
+  );
+  const pair = sides(control);
+  const seats = new Map<string, Seat>();
+  if (pair != null) {
+    for (const summary of summaries) {
+      if (summary.race.office !== "other") {
+        seats.set(summary.race.id, seat(summary, control, pair));
+      }
+    }
+  }
+  const byState = Map.groupBy(summaries, (summary) => summary.race.state);
+  const districts = new Map<string, Summary>();
+  for (const summary of summaries) {
+    const key = districtKey(summary.race);
+    if (key != null) {
+      districts.set(key, summary);
+    }
+  }
+  const of = (office: Office) =>
+    [...seats.values()].filter(
+      (entry) =>
+        entry.summary.race.office === office &&
+        STATES.has(entry.summary.race.state),
+    );
+  const chambers =
+    pair == null
+      ? null
+      : {
+          senate: chamber(
+            of("senate"),
+            "senate",
+            control?.holdovers.senate ?? {},
+            pair,
+          ),
+          house: chamber(of("house"), "house", {}, pair),
+          governor: chamber(
+            of("governor"),
+            "governor",
+            control?.holdovers.governor ?? {},
+            pair,
+          ),
+        };
+  return { summaries, pair, seats, byState, districts, chambers };
+}
+
+export type Board = ReturnType<typeof board>;
+
+export function tint(
+  pair: [Family, Family] | null,
+  control: Control | null,
+  id: string | null,
+) {
+  if (id == null) {
+    return WAITING;
+  }
+  for (const side of pair ?? []) {
+    if (side.id === id) {
+      return side.color;
+    }
+  }
+  return swatch(control?.parties[id]?.color, `party:${id}`);
+}
+
+export function shade(
+  summary: Summary,
+  entry: Seat | undefined,
+  paint: Paint,
+  pair: [Family, Family] | null,
+  control: Control | null,
+) {
+  if (summary.later != null) {
+    return LATER;
+  }
+  if (paint === "counted") {
+    return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
+  }
+  const called = summary.winner ?? summary.projected;
+  if (entry == null || paint === "lead") {
+    const option = called ?? summary.leader;
+    if (option == null) {
+      const held = entry?.held ?? null;
+      return held == null ? WAITING : mix(tint(pair, control, held), 24);
+    }
+    return mix(
+      tone(option),
+      called == null ? 30 + 60 * Math.min(summary.margin / 0.3, 1) : 100,
+    );
+  }
+  if (paint === "flips") {
+    if (!entry.isFlip) {
+      return summary.total > 0 ? MUTED : WAITING;
+    }
+    return mix(
+      tint(pair, control, entry.side),
+      entry.rating === "won" || entry.rating === "projected" ? 100 : 70,
+    );
+  }
+  if (entry.rating === "waiting" || entry.rating === "counting") {
+    return summary.total > 0
+      ? mix(tone(summary.leader ?? undefined), 22)
+      : WAITING;
+  }
+  const isLeft = entry.left >= entry.right;
+  const sure = Math.abs(entry.left - entry.right);
+  return pair == null
+    ? WAITING
+    : mix(pair[isLeft ? 0 : 1].color, 18 + 82 * sure);
+}
+
+export function stateShade(
+  races: Array<Summary>,
+  office: Office,
+  paint: Paint,
+  found: Board,
+  control: Control | null,
+): Fill {
+  if (races.length === 0) {
+    return { color: MUTED };
+  }
+  if (races.every((summary) => summary.later != null)) {
+    return { color: LATER, isLater: true };
+  }
+  if (office === "house") {
+    if (paint === "counted") {
+      const share = races.map(
+        (summary) => summary.counted ?? (summary.total > 0 ? 0.02 : null),
+      );
+      const known = share.filter((value) => value != null);
+      return {
+        color: reporting(known.length === 0 ? null : sum(known) / known.length),
+      };
+    }
+    const groups = new Map<string, { option: LiveOption; seats: number }>();
+    for (const summary of races) {
+      const option = summary.winner ?? summary.projected ?? summary.leader;
+      if (option == null) {
+        continue;
+      }
+      const key = option.party?.id ?? option.id;
+      const held = groups.get(key);
+      groups.set(key, { option, seats: (held?.seats ?? 0) + 1 });
+    }
+    const top = [...groups.values()].toSorted((a, b) => b.seats - a.seats)[0];
+    return {
+      color:
+        top == null
+          ? WAITING
+          : mix(tone(top.option), 25 + (70 * top.seats) / races.length),
+    };
+  }
+  const first = races[0];
+  return {
+    color:
+      first == null
+        ? MUTED
+        : shade(
+            first,
+            found.seats.get(first.race.id),
+            paint,
+            found.pair,
+            control,
+          ),
+  };
+}
+
+export function prior(race: LiveRace) {
+  const totals = race.options.map(() => 0);
+  let turnout = 0;
+  for (const row of race.baseline) {
+    turnout += row.turnout;
+    for (const [index, share] of row.shares.entries()) {
+      totals[index] = (totals[index] ?? 0) + share * row.turnout;
+    }
+  }
+  if (turnout <= 0) {
+    return null;
+  }
+  const shares = totals.map((value) => value / turnout);
+  const order = ranked(shares);
+  const first = order[0];
+  const second = order[1];
+  return {
+    turnout,
+    shares,
+    leader: first ?? null,
+    margin:
+      first == null ? 0 : (shares[first] ?? 0) - (shares[second ?? -1] ?? 0),
+  };
+}
+
+export function lastLeader(row: UnitStanding) {
+  const shares = row.baseline?.shares ?? [];
+  const order = ranked(shares);
+  const first = order[0];
+  if (first == null || (shares[first] ?? 0) <= 0) {
+    return null;
+  }
+  return {
+    index: first,
+    margin: (shares[first] ?? 0) - (shares[order[1] ?? -1] ?? 0),
+  };
+}
+
+export function unitFill(
+  row: UnitStanding,
+  lens: Lens,
+  options: Array<LiveOption>,
+  pair: [number, number],
+  expected: number,
+): string {
+  switch (lens) {
+    case "lead": {
+      if (row.leader == null) {
+        return BLANK;
+      }
+      return mix(
+        tone(options[row.leader]),
+        26 + 74 * Math.min(row.margin / 0.4, 1),
+      );
+    }
+    case "shift": {
+      if (row.signed == null || row.baseSigned == null) {
+        return BLANK;
+      }
+      const shift = row.signed - row.baseSigned;
+      return mix(
+        tone(options[shift >= 0 ? pair[0] : pair[1]]),
+        12 + 88 * Math.min(Math.abs(shift) / 0.15, 1),
+      );
+    }
+    case "last": {
+      const last = lastLeader(row);
+      return last == null
+        ? BLANK
+        : mix(
+            tone(options[last.index]),
+            26 + 74 * Math.min(last.margin / 0.4, 1),
+          );
+    }
+    case "counted": {
+      return row.total === 0
+        ? BLANK
+        : mix(
+            "var(--foreground)",
+            8 + 80 * Math.min(1, row.total / Math.max(1, expected)),
+          );
+    }
+    default: {
+      return row.total > 0 ? mix("var(--muted-foreground)", 16) : BLANK;
+    }
+  }
+}
+
+export function holding(control: Control | null, race: LiveRace) {
+  const holder = control?.holders[race.id];
+  if (holder?.party == null) {
+    return null;
+  }
+  return {
+    party: control?.parties[holder.party]?.short ?? "",
+    name: holder.name,
+  };
+}
+
+export function flipped(
+  entry: Seat | undefined,
+  pair: [Family, Family] | null,
+  control: Control | null,
+) {
+  if (entry?.isFlip !== true || entry.side == null) {
+    return null;
+  }
+  const side = pair?.find((family) => family.id === entry.side);
+  return {
+    party: side?.short ?? control?.parties[entry.side]?.short ?? "",
+    color: tint(pair, control, entry.side),
+  };
+}
+
+export function seatName(race: LiveRace, states: (code: string) => string) {
+  if (race.office !== "house") {
+    return states(race.state);
+  }
+  const number = Math.trunc(Number(race.district ?? ""));
+  return `${race.state.toUpperCase()}-${Number.isNaN(number) || number === 0 ? "AL" : number}`;
+}
+
+export function urgency(summary: Summary, closes: number) {
+  if (summary.later != null) {
+    return [4, 0];
+  }
+  const called = summary.winner ?? summary.projected;
+  if (summary.total > 0 && called == null) {
+    return [0, summary.margin];
+  }
+  if (called != null) {
+    return [2, -summary.total];
+  }
+  return [1, closes];
+}

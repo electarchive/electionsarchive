@@ -62,7 +62,9 @@
   );
 
   const isPending = $derived(
-    navigating.to != null && navigating.to.url.pathname !== page.url.pathname,
+    navigating.to != null &&
+      navigating.to.url.pathname !== page.url.pathname &&
+      navigating.to.route.id !== "/live/map/[...path]",
   );
 
   const embed = $derived(
@@ -174,7 +176,7 @@
 
 <svelte:head>
   <title>electionsarchive.com</title>
-  {#if !["/", "/[...path]", "/live/[...path]", "/people/[slug]", "/parties/[...path]"].includes(page.route.id ?? "")}
+  {#if !["/", "/[...path]", "/live/[...path]", "/live/map/[...path]", "/people/[slug]", "/parties/[...path]"].includes(page.route.id ?? "")}
     <meta
       name="description"
       content="Every election in ten polities, down to the finest reporting unit, with a source for every number."

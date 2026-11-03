@@ -14,6 +14,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import type { House } from "#lib/server/live-board.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import MapLink from "#lib/components/live/map-link.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
@@ -718,6 +719,7 @@
         >
       {/if}
       <BoardLink election={election.slug} />
+      <MapLink election={election.slug} />
     </p>
     <div class="grid gap-1.5">
       <h1 class="title text-balance">{m.night_nation_title()}</h1>
