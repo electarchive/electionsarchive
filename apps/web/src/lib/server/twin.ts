@@ -4202,49 +4202,37 @@ function projectMarkdown(
 function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
   const three = (value: number | undefined) => (value ?? 0).toFixed(3);
   const measures = [
-    [
-      m.method_score_brier(),
-      (side: 0 | 1, row: typeof data.score.all) => three(row.brier[side]),
-    ],
-    [
-      m.method_score_log(),
-      (side: 0 | 1, row: typeof data.score.all) => three(row.log[side]),
-    ],
+    [m.method_score_brier(), (row: typeof data.score.all) => three(row.brier)],
+    [m.method_score_log(), (row: typeof data.score.all) => three(row.log)],
     [
       m.method_score_error(),
-      (side: 0 | 1, row: typeof data.score.all) =>
-        points(row.error[side] ?? 0, 1).replace(/^[+−]/u, ""),
+      (row: typeof data.score.all) =>
+        points(row.error, 1).replace(/^[+−]/u, ""),
     ],
     [
       m.method_score_cover(),
-      (side: 0 | 1, row: typeof data.score.all) =>
-        percent(row.cover[side] ?? 0, 0),
+      (row: typeof data.score.all) => percent(row.cover, 0),
     ],
     [
       m.method_score_turnout(),
-      (side: 0 | 1, row: typeof data.score.all) =>
-        percent(row.turnout[side] ?? 0),
+      (row: typeof data.score.all) => percent(row.turnout),
     ],
     [
       m.method_score_turnout_cover(),
-      (side: 0 | 1, row: typeof data.score.all) =>
-        percent(row.turnoutCover[side] ?? 0, 0),
+      (row: typeof data.score.all) => percent(row.turnoutCover, 0),
     ],
     [
       m.method_score_miss(),
-      (side: 0 | 1, row: typeof data.score.all) =>
+      (row: typeof data.score.all) =>
         m.method_score_of({
-          count: count(row.miss[side]?.[0] ?? 0),
-          total: count(row.miss[side]?.[1] ?? 0),
+          count: count(row.miss[0] ?? 0),
+          total: count(row.miss[1] ?? 0),
         }),
     ],
   ] as const;
   return [
     `# ${m.method_title()}`,
     m.method_lede(),
-    `## ${m.method_hero_title()}`,
-    m.method_hero_caption(),
-    m.method_hero_miss(),
     `## ${m.method_how_title()}`,
     m.method_how_body(),
     [
@@ -4267,6 +4255,7 @@ function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
       m.method_margin_uniform(),
       m.method_margin_stronghold(),
       m.method_margin_size(),
+      m.method_margin_traits(),
       m.method_margin_order(),
     ]
       .map((line) => `- ${line}`)
@@ -4285,47 +4274,33 @@ function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
         [m.method_order_other(), points(data.other).replace(/^\+/u, "")],
       ],
     ),
+    `## ${m.method_hero_title()}`,
+    m.method_hero_caption(),
+    m.method_hero_miss(),
     `## ${m.method_ranges_title()}`,
     m.method_ranges_body(),
     m.method_ranges_status(),
     `## ${m.method_testing_title()}`,
     m.method_testing_body({ races: count(data.races) }),
     m.method_testing_summary({
-      current: three(data.score.all.brier[0]),
-      previous: three(data.score.all.brier[1]),
-      error: points(data.score.all.error[0] ?? 0, 1).replace(/^[+−]/u, ""),
+      brier: three(data.score.all.brier),
+      error: points(data.score.all.error, 1).replace(/^[+−]/u, ""),
     }),
     table(
-      [
-        m.method_counted_axis(),
-        `${m.method_brier_chart()}: ${m.method_current()}`,
-        m.method_previous(),
-        `${m.method_cover_chart()}: ${m.method_current()}`,
-        m.method_previous(),
-      ],
+      [m.method_counted_axis(), m.method_brier_chart(), m.method_cover_chart()],
       data.checkpoints.map((row) => [
         percent(row.q, 0),
-        three(row.brier[0]),
-        three(row.brier[1]),
-        percent(row.cover[0] ?? 0, 0),
-        percent(row.cover[1] ?? 0, 0),
+        three(row.brier),
+        percent(row.cover, 0),
       ]),
     ),
     `### ${m.method_score_title()}`,
     table(
-      [
-        m.method_score_metric(),
-        `${m.method_score_all()}: ${m.method_current()}`,
-        m.method_previous(),
-        `${m.method_score_close()}: ${m.method_current()}`,
-        m.method_previous(),
-      ],
+      [m.method_score_metric(), m.method_score_all(), m.method_score_close()],
       measures.map(([label, show]) => [
         label,
-        show(0, data.score.all),
-        show(1, data.score.all),
-        show(0, data.score.close),
-        show(1, data.score.close),
+        show(data.score.all),
+        show(data.score.close),
       ]),
     ),
     `## ${m.method_limits_title()}`,

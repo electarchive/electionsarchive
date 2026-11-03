@@ -14,7 +14,7 @@
   }: {
     title: string;
     note: string;
-    series: Array<{ q: number; current: number; previous: number }>;
+    series: Array<{ q: number; value: number }>;
     low: number;
     high: number;
     target?: number;
@@ -33,10 +33,10 @@
   const x = (q: number) => LEFT + q * (width - LEFT - RIGHT);
   const y = (value: number) =>
     TOP + ((high - value) / (high - low)) * (HEIGHT - TOP - BOTTOM);
-  const line = (pick: (row: { current: number; previous: number }) => number) =>
-    `M${series.map((row) => `${x(row.q)},${y(Math.max(low, Math.min(high, pick(row))))}`).join("L")}`;
-  const current = $derived(line((row) => row.current));
-  const previous = $derived(line((row) => row.previous));
+  const clamp = (value: number) => Math.max(low, Math.min(high, value));
+  const current = $derived(
+    `M${series.map((row) => `${x(row.q)},${y(clamp(row.value))}`).join("L")}`,
+  );
   const label = (value: number) =>
     kind === "share"
       ? percent(value, 0)
@@ -100,13 +100,6 @@
         >
       {/each}
       <path
-        d={previous}
-        fill="none"
-        class="stroke-muted-foreground"
-        stroke-width="1.75"
-        stroke-dasharray="5 4"
-      />
-      <path
         d={current}
         fill="none"
         class="stroke-foreground"
@@ -115,7 +108,7 @@
       {#each series as row (row.q)}
         <circle
           cx={x(row.q)}
-          cy={y(Math.max(low, Math.min(high, row.current)))}
+          cy={y(clamp(row.value))}
           r="3"
           class="fill-foreground"
         />
@@ -127,16 +120,14 @@
       <thead>
         <tr>
           <th scope="col">{m.method_counted_axis()}</th>
-          <th scope="col">{m.method_current()}</th>
-          <th scope="col">{m.method_previous()}</th>
+          <th scope="col">{title}</th>
         </tr>
       </thead>
       <tbody>
         {#each series as row (row.q)}
           <tr>
             <th scope="row">{percent(row.q, 0)}</th>
-            <td>{label(row.current)}</td>
-            <td>{label(row.previous)}</td>
+            <td>{label(row.value)}</td>
           </tr>
         {/each}
       </tbody>

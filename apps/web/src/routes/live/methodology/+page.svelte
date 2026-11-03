@@ -21,13 +21,11 @@
   );
   const brier = methodology.checkpoints.map((row) => ({
     q: row.q,
-    current: row.brier[0] ?? 0,
-    previous: row.brier[1] ?? 0,
+    value: row.brier,
   }));
   const cover = methodology.checkpoints.map((row) => ({
     q: row.q,
-    current: row.cover[0] ?? 0,
-    previous: row.cover[1] ?? 0,
+    value: row.cover,
   }));
 
   const sections = [
@@ -35,6 +33,7 @@
     { id: "turnout", title: m.method_turnout_title() },
     { id: "margin", title: m.method_margin_title() },
     { id: "count-order", title: m.method_order_title() },
+    { id: "replay", title: m.method_hero_title() },
     { id: "ranges", title: m.method_ranges_title() },
     { id: "testing", title: m.method_testing_title() },
     { id: "limits", title: m.method_limits_title() },
@@ -66,58 +65,48 @@
     numbers({ minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(
       value,
     );
-  type Pair = Array<number>;
-  type Row = {
-    brier: Pair;
-    log: Pair;
-    error: Pair;
-    cover: Pair;
-    turnout: Pair;
-    turnoutCover: Pair;
-    miss: Array<Pair>;
-  };
   const measures: Array<{
     label: string;
     hint: string;
-    show: (row: Row, side: 0 | 1) => string;
+    show: (row: typeof score.all) => string;
   }> = [
     {
       label: m.method_score_brier(),
       hint: m.method_score_brier_hint(),
-      show: (row, side) => score3(row.brier[side] ?? 0),
+      show: (row) => score3(row.brier),
     },
     {
       label: m.method_score_log(),
       hint: m.method_score_log_hint(),
-      show: (row, side) => score3(row.log[side] ?? 0),
+      show: (row) => score3(row.log),
     },
     {
       label: m.method_score_error(),
       hint: m.method_score_error_hint(),
-      show: (row, side) => lead(row.error[side] ?? 0),
+      show: (row) => lead(row.error),
     },
     {
       label: m.method_score_cover(),
       hint: m.method_score_cover_hint(),
-      show: (row, side) => percent(row.cover[side] ?? 0, 0),
+      show: (row) => percent(row.cover, 0),
     },
     {
       label: m.method_score_turnout(),
       hint: m.method_score_turnout_hint(),
-      show: (row, side) => percent(row.turnout[side] ?? 0),
+      show: (row) => percent(row.turnout),
     },
     {
       label: m.method_score_turnout_cover(),
       hint: m.method_score_turnout_cover_hint(),
-      show: (row, side) => percent(row.turnoutCover[side] ?? 0, 0),
+      show: (row) => percent(row.turnoutCover, 0),
     },
     {
       label: m.method_score_miss(),
       hint: m.method_score_miss_hint(),
-      show: (row, side) =>
+      show: (row) =>
         m.method_score_of({
-          count: count(row.miss[side]?.[0] ?? 0),
-          total: count(row.miss[side]?.[1] ?? 0),
+          count: count(row.miss[0] ?? 0),
+          total: count(row.miss[1] ?? 0),
         }),
     },
   ];
@@ -134,23 +123,6 @@
     <h1 class="title">{m.method_title()}</h1>
     <p class="text-lg text-muted-foreground">{m.method_lede()}</p>
   </header>
-
-  <section
-    aria-labelledby="hero-title"
-    class="grid gap-4 border-bs-[3px] border-foreground pbs-3"
-  >
-    <div class="grid gap-2 max-inline-[68ch]">
-      <h2 id="hero-title" class="heading">{m.method_hero_title()}</h2>
-      <p class="text-sm text-muted-foreground">{m.method_hero_caption()}</p>
-    </div>
-    <Replay
-      final={methodology.replay.final}
-      points={methodology.replay.points}
-      {blue}
-      {red}
-    />
-    <p class="text-sm max-inline-[68ch]">{m.method_hero_miss()}</p>
-  </section>
 
   <div class="grid gap-10 lg:grid-cols-[12rem_minmax(0,1fr)] lg:gap-12">
     <nav
@@ -244,6 +216,24 @@
       </section>
 
       <section
+        id="replay"
+        aria-labelledby="hero-title"
+        class="grid scroll-mbs-6 gap-5 border-bs-[3px] border-foreground pbs-3"
+      >
+        <div class="grid gap-2 max-inline-[68ch]">
+          <h2 id="hero-title" class="heading">{m.method_hero_title()}</h2>
+          <p class="text-sm text-muted-foreground">{m.method_hero_caption()}</p>
+        </div>
+        <Replay
+          final={methodology.replay.final}
+          points={methodology.replay.points}
+          {blue}
+          {red}
+        />
+        <p class="text-sm max-inline-[68ch]">{m.method_hero_miss()}</p>
+      </section>
+
+      <section
         id="ranges"
         aria-labelledby="ranges-title"
         class="grid scroll-mbs-6 gap-5 border-bs-[3px] border-foreground pbs-3"
@@ -271,26 +261,11 @@
           <p>{m.method_testing_body({ races: count(methodology.races) })}</p>
           <p class="font-semibold">
             {m.method_testing_summary({
-              current: score3(score.all.brier[0] ?? 0),
-              previous: score3(score.all.brier[1] ?? 0),
-              error: lead(score.all.error[0] ?? 0),
+              brier: score3(score.all.brier),
+              error: lead(score.all.error),
             })}
           </p>
         </div>
-        <ul
-          class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground"
-          aria-hidden="true"
-        >
-          <li class="flex items-center gap-1.5">
-            <span class="bg-foreground block-[2.5px] inline-5"
-            ></span>{m.method_current()}
-          </li>
-          <li class="flex items-center gap-1.5">
-            <span
-              class="border-bs-2 border-dashed border-muted-foreground inline-5"
-            ></span>{m.method_previous()}
-          </li>
-        </ul>
         <div class="grid gap-8 md:grid-cols-3">
           <Checkpoints
             title={m.method_brier_chart()}
@@ -322,36 +297,15 @@
                 <tr class="border-bs-[3px] border-foreground">
                   <th
                     scope="col"
-                    rowspan="2"
                     class="py-2 pe-3 text-start align-bottom font-semibold"
                   >
                     {m.method_score_metric()}
                   </th>
-                  <th
-                    scope="colgroup"
-                    colspan="2"
-                    class="py-2 ps-3 text-end font-semibold"
+                  <th scope="col" class="py-2 ps-3 text-end font-semibold"
                     >{m.method_score_all()}</th
                   >
-                  <th
-                    scope="colgroup"
-                    colspan="2"
-                    class="py-2 ps-3 text-end font-semibold"
+                  <th scope="col" class="py-2 ps-3 text-end font-semibold"
                     >{m.method_score_close()}</th
-                  >
-                </tr>
-                <tr class="border-be text-xs text-muted-foreground">
-                  <th scope="col" class="ps-3 pbe-2 text-end font-normal"
-                    >{m.method_current()}</th
-                  >
-                  <th scope="col" class="ps-3 pbe-2 text-end font-normal"
-                    >{m.method_previous()}</th
-                  >
-                  <th scope="col" class="ps-3 pbe-2 text-end font-normal"
-                    >{m.method_current()}</th
-                  >
-                  <th scope="col" class="ps-3 pbe-2 text-end font-normal"
-                    >{m.method_previous()}</th
                   >
                 </tr>
               </thead>
@@ -369,19 +323,11 @@
                     </th>
                     <td
                       class="py-2 ps-3 text-end font-figures font-semibold tabular-nums"
-                      >{measure.show(score.all, 0)}</td
-                    >
-                    <td
-                      class="py-2 ps-3 text-end font-figures text-muted-foreground tabular-nums"
-                      >{measure.show(score.all, 1)}</td
+                      >{measure.show(score.all)}</td
                     >
                     <td
                       class="py-2 ps-3 text-end font-figures font-semibold tabular-nums"
-                      >{measure.show(score.close, 0)}</td
-                    >
-                    <td
-                      class="py-2 ps-3 text-end font-figures text-muted-foreground tabular-nums"
-                      >{measure.show(score.close, 1)}</td
+                      >{measure.show(score.close)}</td
                     >
                   </tr>
                 {/each}
