@@ -12618,10 +12618,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         polity_id=cs.polity("US" if row["party"] == "forward-party" else "US-NY"),
                     )
                     name(party, NEW_PARTIES[row["party"]])
-                try:
-                    option = cs.key("us.option", f"{key}:{slug(row['name'])}")
-                except ValueError:
-                    option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                 if tail in RETENTION:
                     answers = {answer: cs.key("us.option", f"{key}:{answer}") for answer in ("yes", "no")}
                     for position, (answer, answer_id) in enumerate(answers.items(), start=1):
@@ -12635,6 +12631,10 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         )
                     option = answers["yes"]
                 else:
+                    try:
+                        option = cs.key("us.option", f"{key}:{slug(row['name'])}")
+                    except ValueError:
+                        option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                     cs.add(
                         "contest_option",
                         id=option,
