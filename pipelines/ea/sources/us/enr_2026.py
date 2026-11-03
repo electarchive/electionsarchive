@@ -1594,6 +1594,8 @@ def plan(
                 named.append((option, terms(label)))
         ballots: dict[str, UUID] = {}
         for name, write_in in group.select("candidate", "write_in").unique().iter_rows():
+            if re.match(r"(?i)no nomination", name):
+                continue
             if write_in or WRITE_IN.search(name):
                 if scattered is None:
                     scattered = scatter(contest_key, contest)
