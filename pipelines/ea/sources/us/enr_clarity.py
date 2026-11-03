@@ -20,11 +20,12 @@ import shapefile
 
 from ea import portals, raw
 from ea.changeset import NAMESPACE, Changeset, slug
+from ea.encoding import DOUBLED, repair, restorer
 from ea.offices import Offices
 from ea.store import DATA, connect
 
 SOURCE = "us.enr_clarity"
-VERSION = "1"
+VERSION = "2"
 HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
@@ -1665,6 +1666,18 @@ def emit(
     county_names = {row["county_fips"]: row["county"].upper() for row in listed}
     contests = pl.read_parquet(parsed / "contests.parquet")
     lines = pl.read_parquet(parsed / "lines.parquet")
+    with connect() as conn:
+        restore = restorer(conn)
+        garbled = {text: restore(text) for text in lines["choice"].unique().to_list() if restore(text) != text}
+        stale = {
+            slug(restore(text)): slug(text)
+            for (text,) in conn.execute(
+                """select distinct y.ballot_name from candidacy y join changeset c on c.id = y.changeset_id
+                   where c.pipeline = %s and (strpos(y.ballot_name, chr(65533)) > 0 or strpos(y.ballot_name, %s) > 0)""",
+                [source, DOUBLED],
+            )
+        }
+    lines = lines.with_columns(pl.col("choice").replace(garbled))
     made = {
         (scheme, code): (display, geom, json.loads(shares))
         for scheme, code, display, geom, shares in pl.read_parquet(parsed / "polities.parquet").iter_rows()
@@ -2759,7 +2772,9 @@ def emit(
                     continue
                 else:
                     ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", choice))
-                    old = slug(_title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", was)))
+                    old = stale.get(slug(ballot)) or slug(
+                        _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", was))
+                    )
                     if old != slug(ballot):
                         cs.renamed[f":{slug(ballot)}"] = f":{old}"
                     option = options[same] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
@@ -3014,4 +3029,5 @@ def emit(
                     text=text,
                     reason="a party, ballot-number, or write-in label in the name",
                 )
+        repair(cs)
         return cs.write()
