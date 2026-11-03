@@ -7921,14 +7921,25 @@ def parse() -> None:
     winners = {
         key: set(sorted(votes, key=lambda name: -votes[name])[: seats_won[key]]) for key, votes in totals.items()
     }
-    for row in csv.DictReader(
-        io.StringIO(raw.cached(SOURCE, FEEDS["NC"][0]).path.read_text(encoding="utf-8", errors="replace"))
-    ):
+    nc_rows = list(
+        csv.DictReader(
+            io.StringIO(raw.cached(SOURCE, FEEDS["NC"][0]).path.read_text(encoding="utf-8", errors="replace"))
+        )
+    )
+    on_general = {
+        (re.sub(r"\s+", " ", row["contest_name"]).strip(), row["party_candidate"])
+        for row in nc_rows
+        if row["election_dt"] == "11/03/2026"
+    }
+    for row in nc_rows:
         contest = re.sub(r"\s+", " ", row["contest_name"]).strip()
         if re.match(r"(US|NC) |DISTRICT ATTORNEY", contest) or re.search(r"SOIL AND WATER|SANITARY", contest):
             continue
         key = (contest, row["party_contest"] or row["party_candidate"])
-        if row["election_dt"] != "11/03/2026" and key in winners and row["name_on_ballot"].strip() not in winners[key]:
+        if row["election_dt"] != "11/03/2026" and (
+            (contest, row["party_candidate"]) in on_general
+            or (key in winners and row["name_on_ballot"].strip() not in winners[key])
+        ):
             continue
         partisan = row["is_partisan"] == "TRUE"
         feeds["NC"].append(
@@ -8550,7 +8561,7 @@ def parse() -> None:
             {
                 "county": counties[0] if len(counties) == 1 else row["Filing Location"],
                 "contest": f"{counties[0] if len(counties) == 1 else ''} County {title} {row['District']}",
-                "seats": 0,
+                "seats": 3 if counties[0].upper() == "HAMPTON" and title == "County Council at Large" else 0,
                 "name": f"{row['Ballot Name (first - middle)']} {row['Ballot Name (last - suffix)']}",
                 "party": named,
                 "independent": independent,
@@ -8565,17 +8576,25 @@ def parse() -> None:
             or not re.match(r"(County|Probate|Magistrate|Metropolitan)", cells[0])
         ):
             continue
+        if cells[-3].strip() == "99":
+            continue
         head, code = cells[: len(cells) - 13], cells[len(cells) - 13].strip()
         suffix = head.pop().strip() if head[-1].strip() in ("JR", "SR", "II", "III", "IV") else ""
         named, independent = party(
             {"DEM": "Democratic", "REP": "Republican", "LIB": "Libertarian", "FWD": "Forward"}.get(code, code)
         )
+        nm_contest = f"{head[-4]} County {head[0]} {' '.join(part.strip() for part in head[1:-4])}"
+        nm_name = cased(" ".join(part for part in [*head[-3:], suffix] if part))
+        if head[-4] == "Hidalgo" and head[0].endswith("At Large"):
+            nm_contest = f"{nm_contest.strip()} District {2 if nm_name.endswith('Peterson') else 1}"
         feeds["NM"].append(
             {
                 "county": head[-4],
-                "contest": f"{head[-4]} County {head[0]} {' '.join(part.strip() for part in head[1:-4])}",
-                "seats": 0,
-                "name": cased(" ".join(part for part in [*head[-3:], suffix] if part)),
+                "contest": nm_contest,
+                "seats": {("Los Alamos", "At Large"): 4, ("Union", "At Large"): 2}.get(
+                    (head[-4], head[0].removeprefix("County Commissioner ")), 0
+                ),
+                "name": nm_name,
                 "party": named,
                 "independent": independent or code in ("DTS", "IND"),
                 "unexpired": False,
@@ -11637,7 +11656,7 @@ def parse() -> None:
                         int(str(row["seats"]) or 0) <= 1
                         or state == "MD"
                         or re.search(
-                            r"(?i)\bcounty (council|commission|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
+                            r"(?i)\bcounty (council|commission(?:er)?|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
                             str(row["contest"]),
                         )
                         is not None
@@ -12504,6 +12523,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 area = cs.area("us.county", scope[3:])
             if kind == "body_seats" and group["seats"][0]:
                 magnitude = int(group["seats"][0])
+            elif kind == "office" and state == "NY" and magnitude is not None:
+                magnitude = max(magnitude, int(group["seats"][0] or 1))
             if state in ("IN", "MD") and magnitude is not None and system in plurality.values():
                 system = plurality[magnitude > 1]
             cs.add(
