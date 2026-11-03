@@ -22,6 +22,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (path == null) {
     error(400, "Missing path");
   }
+  const watch = new Set(url.searchParams.get("watch")?.split(","));
   const { election, estimates } = await projections(path);
   const races = election.races.flatMap((race) => {
     const found = estimates[race.id];
@@ -45,9 +46,10 @@ export const GET: RequestHandler = async ({ request, url }) => {
       found?.status === "estimating" ? Math.min(1, found.shareIn.mid) : null;
     const isCalled = race.projected != null;
     if (
-      race.certified != null ||
       total === 0 ||
-      (!isCalled && (chance == null || chance < 0.9))
+      (!watch.has(race.id) &&
+        (race.certified != null ||
+          (!isCalled && (chance == null || chance < 0.9))))
     ) {
       return [];
     }
@@ -93,9 +95,15 @@ export const GET: RequestHandler = async ({ request, url }) => {
         source: race.source,
         lines,
         called: race.projected ?? null,
+        calledChance:
+          race.projected != null && found?.status === "estimating"
+            ? (found.winProbability[race.projected.option] ?? null)
+            : null,
+        isCertified: race.certified != null,
         isUncontested,
         isReady:
           !isCalled &&
+          race.certified == null &&
           chance != null &&
           chance >= RULE.chance &&
           (isUncontested || (counted ?? 0) >= RULE.counted),
