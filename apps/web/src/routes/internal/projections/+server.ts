@@ -100,6 +100,7 @@ export const GET: RequestHandler = async ({ request, url }) => {
             ? (found.winProbability[race.projected.option] ?? null)
             : null,
         isCertified: race.certified != null,
+        winners: race.certified?.winners ?? null,
         isUncontested,
         isReady:
           !isCalled &&
