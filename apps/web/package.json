@@ -47,6 +47,7 @@
     "modern-screenshot": "catalog:",
     "pg": "catalog:",
     "satori": "catalog:",
+    "svelte-islands": "catalog:",
     "valibot": "catalog:"
   },
   "devDependencies": {

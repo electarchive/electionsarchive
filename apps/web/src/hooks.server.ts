@@ -1,9 +1,10 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
-import { building, dev } from "$app/env";
+import { building, dev, version } from "$app/env";
 import { READ_ONLY } from "$app/env/public";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
+import { handle as islands } from "svelte-islands/server";
 import {
   cookieName,
   defineCustomServerStrategy,
@@ -11,7 +12,7 @@ import {
 } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
-import { refreshing } from "#lib/server/cache.js";
+import { refreshing, stash, unstash } from "#lib/server/cache.js";
 import { isTraining } from "#lib/server/crawlers.js";
 import { LOCALE, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
@@ -137,6 +138,20 @@ const twinHandle: Handle = async ({ event, resolve }) => {
   return response;
 };
 
+const islandsHandle = islands({
+  store: {
+    get: async (key) => unstash(`islands:${key}`),
+    set: async (key, text) => stash(`islands:${key}`, text),
+  },
+  prepare: ({ url, headers }, event) => {
+    url.searchParams.set("build", version);
+    const locale = event.request.headers.get(LOCALE);
+    if (locale != null) {
+      headers.set(LOCALE, locale);
+    }
+  },
+});
+
 const edgeHandle: Handle = async ({ event, resolve }) =>
   skewed(event) ?? mark(event, await resolve(event));
 
@@ -171,6 +186,7 @@ export const init: ServerInit = () => {
 export const handle: Handle = sequence(
   guardHandle,
   csrfHandle,
+  islandsHandle,
   edgeHandle,
   refreshHandle,
   timingHandle,

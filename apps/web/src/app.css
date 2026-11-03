@@ -4,6 +4,12 @@
 @import "@fontsource-variable/noto-naskh-arabic";
 @import "@fontsource-variable/piazzolla/opsz.css";
 @import "@fontsource-variable/sofia-sans-semi-condensed";
+@import "svelte-islands/styles.css";
+
+:root {
+  --island-bone: var(--muted);
+  --island-radius: 0.125rem;
+}
 
 @font-face {
   font-family: "Sofia Sans Semi Condensed Fallback";

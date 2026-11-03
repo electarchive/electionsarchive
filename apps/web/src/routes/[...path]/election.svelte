@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
+  import type { Part } from "svelte-islands";
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -10,6 +12,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
+  import { Island, peek } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
@@ -61,6 +64,7 @@
   import Series from "./series.svelte";
   import States from "./states.svelte";
   import Sweep from "./sweep.svelte";
+  import { led, tallied } from "./tally.js";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
 
@@ -176,8 +180,21 @@
   };
 
   const ledger = $derived(sections.ledger ?? null);
+  const materialized = $derived(
+    election.races.map((race) => ({
+      ...race,
+      places:
+        race.places == null
+          ? null
+          : {
+              ...race.places,
+              part: race.places.rows,
+              rows: peek(race.places.rows)?.value ?? [],
+            },
+    })),
+  );
   const laid = $derived.by(() => {
-    const grouped = Map.groupBy(election.races, (race) => race.scope)
+    const grouped = Map.groupBy(materialized, (race) => race.scope)
       .values()
       .flatMap((group) => [
         ...group.filter((race) => race.results.length !== 1),
@@ -479,20 +496,18 @@
       }),
     ),
   );
-  const fill = <
-    T extends {
-      deferred: string | null;
-      results: Array<{ key: string; color: string | null }>;
-    },
-  >(
-    race: T,
-  ) => {
+  const fill = <R extends { key: string; color: string | null }>(race: {
+    deferred: string | null;
+    results: Array<R>;
+  }) => {
     const found = filled.get(race.deferred ?? "");
     return found == null
-      ? race
+      ? {}
       : {
-          ...race,
-          places: found.places,
+          places:
+            found.places == null
+              ? null
+              : { ...found.places, part: null, tally: tallied(found.places) },
           map: found.map,
           since: found.since,
           results: race.results.map((row) => ({
@@ -501,8 +516,8 @@
           })),
         };
   };
-  const arranged = $derived(laid.map(fill));
-  const ordered = $derived(lined.map(fill));
+  const arranged = $derived(laid.map((race) => ({ ...race, ...fill(race) })));
+  const ordered = $derived(lined.map((race) => ({ ...race, ...fill(race) })));
 
   const stages = $derived(
     election.elections
@@ -523,23 +538,6 @@
       ? parts[0]?.noun
       : null,
   );
-
-  const unplaced = $derived.by(() => {
-    if (election.races.some((race) => race.deferred != null)) {
-      return [];
-    }
-    const placed = new Set(
-      arranged.flatMap((race) => [
-        ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
-        ...(race.path == null ? [] : [race.path]),
-      ]),
-    );
-    return election.contests.flatMap((contest) =>
-      contest.path == null || placed.has(contest.path)
-        ? []
-        : [{ name: contest.name, path: contest.path }],
-    );
-  });
 
   const hexes = createQuery(() =>
     orpc.seats.hexes.queryOptions({ input: { id, within: scope?.id } }),
@@ -1011,10 +1009,8 @@
         (row) => row.key !== leader?.key && !joined.includes(row.key),
       );
       const legend = race.places?.legend ?? [];
-      const districts = race.places?.rows ?? [];
-      const wins = districts.filter((row) =>
-        joined.includes(legend[row.leader ?? -1]?.key ?? ""),
-      ).length;
+      const leads = race.places?.tally.leads ?? [];
+      const wins = led(legend, leads, joined);
       const elector = race.electors?.rows[0];
       const second = race.electors?.rows[1];
       let appointed = race.electors?.appointed ?? 0;
@@ -1119,7 +1115,8 @@
           (other) =>
             other !== race && other.name === race.name && other.count === 1,
         );
-      const isTallied = isSplit && districts.length === race.count;
+      const isTallied =
+        isSplit && (race.places?.tally.count ?? 0) === race.count;
       const noun = race.places?.levels[0]?.noun ?? "";
       const wards = race.wards ?? [];
       const sent = wards.filter((row) => row.runoff != null);
@@ -1331,7 +1328,7 @@
             ]),
           ),
         );
-        if (finals.size > 0) {
+        if (later.some((other) => (other.places?.tally.count ?? 0) > 0)) {
           const merged = [
             ...race.places.legend,
             ...Map.groupBy(
@@ -1477,11 +1474,7 @@
                         person: row.keys.length > 1 ? null : row.person,
                         party: row.keys.length > 1 ? null : row.party,
                         value: isTallied
-                          ? districts.filter((place) =>
-                              row.keys.includes(
-                                legend[place.leader ?? -1]?.key ?? "",
-                              ),
-                            ).length
+                          ? led(legend, leads, row.keys)
                           : (row.seats ?? 0),
                         delta: change == null || isTallied ? undefined : delta,
                         photo: null,
@@ -1814,9 +1807,7 @@
   const tints = $derived(
     new Map(
       races.flatMap((race) => {
-        const first =
-          race.places?.legend[0] ??
-          race.places?.rows.find((row) => row.declared != null)?.declared;
+        const first = race.places?.legend[0] ?? race.places?.tally.declared;
         return race.scope == null || first == null
           ? []
           : [
@@ -1833,9 +1824,7 @@
       people.map((person) => person.name),
     );
   const contested = (race: (typeof races)[number]) =>
-    (race.places?.rows ?? []).filter(
-      (row) => row.path != null && (row.valid ?? 0) > 0,
-    ).length;
+    race.places?.tally.contested ?? 0;
 
   const rail = $derived.by(() => {
     const home = election.breadcrumbs.at(-1)?.name;
@@ -2495,35 +2484,40 @@
             {#if race.balance.parts.some((part) => part.value > 0)}
               {@render tally(race, index === head)}
             {/if}
-            {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
-              <div class="grid gap-2 pbs-1">
-                {#if race.map.tiles != null}
-                  <PlaceMap
-                    places={race.outcomes.places}
-                    colors={race.outcomes.tones}
-                    tiles={race.map.tiles}
-                    own={race.map.own}
-                    nested={race.map.nested}
-                    frame={race.map.frame}
-                    blank={race.map.blank ?? null}
-                    outlying={race.map.outlying ?? null}
-                    parted={race.map.parted ?? null}
-                    approximate={race.map.approximate}
-                    sources={race.map.credits}
-                    noun={race.places?.levels[0]?.noun ?? ""}
-                    votes={race.outcomes.votes ?? race.votes}
-                    names={race.outcomes.titles}
-                    levels={[]}
-                    span={null}
-                  />
-                {:else}
-                  <p
-                    class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
-                  >
-                    {m.map_rebuilding()}
-                  </p>
-                {/if}
-              </div>
+            {#snippet outlined()}
+              {#if race.outcomes != null && race.map != null}
+                <div class="grid gap-2 pbs-1">
+                  {#if race.map.tiles != null}
+                    <PlaceMap
+                      places={race.outcomes.places}
+                      colors={race.outcomes.tones}
+                      tiles={race.map.tiles}
+                      own={race.map.own}
+                      nested={race.map.nested}
+                      frame={race.map.frame}
+                      blank={race.map.blank ?? null}
+                      outlying={race.map.outlying ?? null}
+                      parted={race.map.parted ?? null}
+                      approximate={race.map.approximate}
+                      sources={race.map.credits}
+                      noun={race.places?.levels[0]?.noun ?? ""}
+                      votes={race.outcomes.votes ?? race.votes}
+                      names={race.outcomes.titles}
+                      levels={[]}
+                      span={null}
+                    />
+                  {:else}
+                    <p
+                      class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+                    >
+                      {m.map_rebuilding()}
+                    </p>
+                  {/if}
+                </div>
+              {/if}
+            {/snippet}
+            {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= (race.places?.tally.count ?? 0)}
+              {@render held(race.places?.part ?? null, outlined, "wards")}
             {/if}
             {@render wards(race.wards ?? [], race.anchor, race.lede)}
           {/if}
@@ -2571,7 +2565,7 @@
             ? `${path}/${target.anchor}`
             : null,
         )}
-        {#snippet mapped()}
+        {#snippet drawn()}
           {#if race.map != null && race.places != null}
             {const option = $derived(regionals[index]?.data ?? null)}
             {const picked = $derived(levelled[index]?.data ?? null)}
@@ -2793,6 +2787,9 @@
             {/if}
           {/if}
         {/snippet}
+        {#snippet mapped()}
+          {@render held(race.places?.part ?? null, drawn, "map")}
+        {/snippet}
         {#snippet summary()}
           <div
             class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
@@ -2933,48 +2930,53 @@
         {#if ledger != null && index === seatflowAt}
           <Seatflow {ledger} rows={race.results} {path} />
         {/if}
-        {#if race.places != null && !race.isTotal}
-          {const shown = $derived(
-            regional[index] === "world.country"
-              ? (worlds[index]?.data?.places ?? race.places)
-              : regional[index] != null &&
-                  regional[index] === regionals[index]?.data?.places.level
-                ? regionals[index].data.places
+        {#snippet tabled()}
+          {#if race.places != null}
+            {const shown = $derived(
+              regional[index] === "world.country"
+                ? (worlds[index]?.data?.places ?? race.places)
                 : regional[index] != null &&
-                    regional[index] === levelled[index]?.data?.places.level
-                  ? levelled[index].data.places
-                  : (views[index]?.partner?.places ??
-                    (views[index]?.facet === "first"
-                      ? race.places
-                      : (race.decided?.places ?? race.places))),
-          )}
-          <Places
-            places={{
-              ...shown,
-              levels: shown.levels.filter(
-                (level) => level.code === shown.level,
-              ),
-            }}
-            span={null}
-            trace={race.count === 1 && shown !== views[index]?.partner?.places
-              ? race.path
-              : null}
-            publishers={[]}
-            votes={shown === race.decided?.places
-              ? m.col_votes()
-              : shown === views[index]?.partner?.places
-                ? views[index].partner.votes
-                : race.votes}
-            isTally={race.isTally}
-            isMapped={isMapped ||
-              races.some(
-                (other) =>
-                  "drawn" in other &&
-                  other.drawn === race.anchor &&
-                  other.map != null,
-              )}
-            limit={index === focus ? 100 : isBallot ? 5 : 10}
-          />
+                    regional[index] === regionals[index]?.data?.places.level
+                  ? regionals[index].data.places
+                  : regional[index] != null &&
+                      regional[index] === levelled[index]?.data?.places.level
+                    ? levelled[index].data.places
+                    : (views[index]?.partner?.places ??
+                      (views[index]?.facet === "first"
+                        ? race.places
+                        : (race.decided?.places ?? race.places))),
+            )}
+            <Places
+              places={{
+                ...shown,
+                levels: shown.levels.filter(
+                  (level) => level.code === shown.level,
+                ),
+              }}
+              span={null}
+              trace={race.count === 1 && shown !== views[index]?.partner?.places
+                ? race.path
+                : null}
+              publishers={[]}
+              votes={shown === race.decided?.places
+                ? m.col_votes()
+                : shown === views[index]?.partner?.places
+                  ? views[index].partner.votes
+                  : race.votes}
+              isTally={race.isTally}
+              isMapped={isMapped ||
+                races.some(
+                  (other) =>
+                    "drawn" in other &&
+                    other.drawn === race.anchor &&
+                    other.map != null,
+                )}
+              limit={index === focus ? 100 : isBallot ? 5 : 10}
+            />
+          {/if}
+        {/snippet}
+        {#if race.places != null && !race.isTotal}
+          {@render held(race.places.part, tabled, "table")}
         {/if}
       {/if}
       {#if index === regionsAt}
@@ -3580,6 +3582,16 @@
   </div>
 {/snippet}
 
+{#snippet held(part: Part | null, content: Snippet, view: string)}
+  {#if part == null}
+    {@render content()}
+  {:else}
+    <Island {part} {view} when="visible">
+      {@render content()}
+    </Island>
+  {/if}
+{/snippet}
+
 {#snippet tally(race: (typeof races)[number], isLead: boolean)}
   <div class="grid content-end gap-3">
     {#if race.whole == null}
@@ -3614,14 +3626,14 @@
 {#snippet trailing()}
   {@render road(true)}
 
-  {#if unplaced.length > 0}
+  {#if election.unplaced.length > 0}
     <section class="col-span-12 bg-card px-3.5 py-3">
       <h2 class="text-[0.8125rem] font-bold">{m.election_unplaced()}</h2>
       <p class="mbe-1.5 text-[0.8125rem] text-muted-foreground">
         {m.election_unplaced_detail()}
       </p>
       <ul class="grid gap-x-6 text-sm sm:grid-cols-2 lg:grid-cols-3">
-        {#each unplaced as contest, index (index)}
+        {#each election.unplaced as contest, index (index)}
           <li class="border-be border-border/60 py-1.5 last:border-be-0">
             <Preview class="font-semibold hover:highlighter" path={contest.path}
               >{contest.name}</Preview

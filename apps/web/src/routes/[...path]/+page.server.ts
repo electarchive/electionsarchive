@@ -1,7 +1,9 @@
+import { part } from "svelte-islands/server";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
+import { tallied } from "./tally.js";
 
 async function seed(path: string) {
   const located = await call(router.elections.locate, { path });
@@ -16,6 +18,39 @@ export const load: PageServerLoad = async ({ params, url }) => {
   const data = await archive(params.path, url.searchParams);
   if (data.kind === "contest") {
     return { ...data, talk: await talkLink(data.id) };
+  }
+  if (data.kind === "election") {
+    const { races, contests } = data.election;
+    const placed = new Set(
+      races.flatMap((race) => [
+        ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
+        ...(race.path == null ? [] : [race.path]),
+      ]),
+    );
+    return {
+      ...data,
+      election: {
+        ...data.election,
+        unplaced: races.some((race) => race.deferred != null)
+          ? []
+          : contests.flatMap((contest) =>
+              contest.path == null || placed.has(contest.path)
+                ? []
+                : [{ name: contest.name, path: contest.path }],
+            ),
+        races: races.map((race) => ({
+          ...race,
+          places:
+            race.places == null
+              ? null
+              : {
+                  ...race.places,
+                  rows: part("election.places", race.places.rows),
+                  tally: tallied(race.places),
+                },
+        })),
+      },
+    };
   }
   if (data.kind !== "polity") {
     return data;
