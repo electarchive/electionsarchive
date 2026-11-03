@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from collections.abc import Generator
@@ -254,37 +255,87 @@ def answer(params: MessageCreateParamsNonStreaming) -> dict[str, object] | str:
     }
 
 
+class Progress(TypedDict):
+    job: str
+    pid: int
+    total: int
+    answered: int
+    failed: int
+    started: float
+    updated: float
+    finished: NotRequired[float]
+
+
+def report(progress: Progress) -> str:
+    done = progress["answered"] + progress["failed"]
+    elapsed = progress.get("finished", progress["updated"]) - progress["started"]
+    line = (
+        f"{progress['job']}: {done} of {progress['total']} requests ({done / progress['total']:.0%}), "
+        f"{progress['failed']} failed, {elapsed / 60:.0f} min"
+    )
+    if "finished" in progress:
+        return f"{line}, finished {datetime.fromtimestamp(progress['finished']):%H:%M}"
+    try:
+        os.kill(progress["pid"], 0)
+    except ProcessLookupError:
+        return f"{line}, stopped (process {progress['pid']} is gone)"
+    left = elapsed / done * (progress["total"] - done) if done else None
+    return f"{line}, running" + (f", about {left / 60:.0f} min left" if left is not None else "")
+
+
+def progress(source: str = "") -> list[str]:
+    files = sorted((JOBS / source).glob("**/*.progress"), key=lambda file: file.stat().st_mtime)
+    return [report(json.loads(file.read_text())) for file in files]
+
+
 def work(job: Job, source: str, todo: dict[str, Want]) -> str:
     spent = 0.0
-    failed = 0
     limited = ""
+    file = path(source, job["name"]).with_suffix(".progress")
+    now = time.time()
+    progress: Progress = {
+        "job": f"{source}/{job['name']}",
+        "pid": os.getpid(),
+        "total": len(todo),
+        "answered": 0,
+        "failed": 0,
+        "started": now,
+        "updated": now,
+    }
+    file.write_text(json.dumps(progress))
     with ThreadPoolExecutor(WORKERS) as pool:
         running = {pool.submit(answer, want[0]): key for key, want in todo.items()}
         for future in as_completed(running):
             key = running[future]
             message = future.result()
             if isinstance(message, str):
+                progress["failed"] += 1
                 if "limit" in message.lower():
                     limited = message
-                    continue
-                failed += 1
-                job["attempts"][key] = job["attempts"].get(key, 0) + 1
-                job["failed"][key] = message
-                continue
-            spent += cast(float, message["cost_usd"])
-            raw.store(
-                source,
-                key,
-                json.dumps(message, ensure_ascii=False).encode(),
-                suffix=".json",
-                retrieved_at=datetime.now(UTC),
-                media_type="application/json",
-            )
-            job["failed"].pop(key, None)
+                else:
+                    job["attempts"][key] = job["attempts"].get(key, 0) + 1
+                    job["failed"][key] = message
+            else:
+                progress["answered"] += 1
+                spent += cast(float, message["cost_usd"])
+                raw.store(
+                    source,
+                    key,
+                    json.dumps(message, ensure_ascii=False).encode(),
+                    suffix=".json",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/json",
+                )
+                job["failed"].pop(key, None)
+            progress["updated"] = time.time()
+            file.write_text(json.dumps(progress))
+            print(report(progress), file=sys.stderr, flush=True)
+    progress["finished"] = time.time()
+    file.write_text(json.dumps(progress))
     if limited:
         raise SystemExit(f"BLOCKED: rate limit on Claude Code ({limited}); run the step again once it lifts")
-    return f"ran {len(todo)} requests on Claude Code ({len(todo) - failed} answered, list price ${spent:.2f}); " + (
-        f"{failed} failed and run again next time" if failed else "none failed"
+    return f"ran {len(todo)} requests on Claude Code ({progress['answered']} answered, list price ${spent:.2f}); " + (
+        f"{progress['failed']} failed and run again next time" if progress["failed"] else "none failed"
     )
 
 
@@ -438,4 +489,5 @@ def status() -> str:
         waiting = [sent for sent in job["batches"] if "ended" not in sent]
         if waiting:
             lines.append(f"open batch:{job['source']}/{job['name']}: {len(waiting)} batches")
+    lines.extend(progress())
     return "\n".join(lines) or "no accounts, approvals, or jobs"
