@@ -244,10 +244,6 @@
         >
           {#if shareIn != null && isProjected}
             <span
-              class="absolute inset-y-0 inset-s-0 bg-foreground/25 transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
-              style:inline-size="{Math.min(1, shareIn.high) * 100}%"
-            ></span>
-            <span
               class="absolute inset-y-0 inset-s-0 rounded-full bg-foreground transition-[inline-size] duration-700 ease-out motion-reduce:transition-none"
               style:inline-size="{Math.min(1, shareIn.mid) * 100}%"
             ></span>
