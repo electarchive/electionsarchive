@@ -7,6 +7,7 @@
   import { createQuery } from "@tanstack/svelte-query";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
@@ -1585,15 +1586,17 @@
   >
     {#snippet more()}
       {#if cycle.others.length > 0}
-        <details class="text-[0.8125rem]">
-          <summary
-            class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-          >
-            {m.cycle_others()}
-            <span class="font-figures tabular-nums"
-              >{count(cycle.others.length)}</span
+        <Disclosure class="text-[0.8125rem]">
+          {#snippet summary()}
+            <summary
+              class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
             >
-          </summary>
+              {m.cycle_others()}
+              <span class="font-figures tabular-nums"
+                >{count(cycle.others.length)}</span
+              >
+            </summary>
+          {/snippet}
           <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
             {#each cycle.others as other (other.party.id)}
               <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
@@ -1619,7 +1622,7 @@
               </li>
             {/each}
           </ul>
-        </details>
+        </Disclosure>
       {/if}
     {/snippet}
   </Road>
@@ -2618,11 +2621,13 @@
         <ul class="grid gap-1.5 text-sm/snug">
           {#each checks as check (check.code)}
             <li>
-              <details class="group">
-                <summary
-                  class="cursor-pointer marker:text-muted-foreground hover:highlighter"
-                  >{check.summary}</summary
-                >
+              <Disclosure class="group">
+                {#snippet summary()}
+                  <summary
+                    class="cursor-pointer marker:text-muted-foreground hover:highlighter"
+                    >{check.summary}</summary
+                  >
+                {/snippet}
                 <ul
                   class="mbs-1.5 grid gap-1 overflow-y-auto border-s ps-3 text-[0.8125rem] text-muted-foreground max-block-64"
                 >
@@ -2630,7 +2635,7 @@
                     <li>{unit}</li>
                   {/each}
                 </ul>
-              </details>
+              </Disclosure>
             </li>
           {/each}
         </ul>

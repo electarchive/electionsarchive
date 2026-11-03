@@ -14,6 +14,7 @@
   import { Island, load, Part, peek } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -3225,15 +3226,17 @@
   >
     {#snippet more()}
       {#if cycle.parts.length > 0}
-        <details class="text-[0.8125rem]">
-          <summary
-            class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-          >
-            {m.cycle_parts()}
-            <span class="font-figures tabular-nums"
-              >{count(cycle.parts.length)}</span
+        <Disclosure class="text-[0.8125rem]">
+          {#snippet summary()}
+            <summary
+              class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
             >
-          </summary>
+              {m.cycle_parts()}
+              <span class="font-figures tabular-nums"
+                >{count(cycle.parts.length)}</span
+              >
+            </summary>
+          {/snippet}
           <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
             {#each cycle.parts as part (part.place)}
               <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
@@ -3265,7 +3268,7 @@
               </li>
             {/each}
           </ul>
-        </details>
+        </Disclosure>
       {/if}
     {/snippet}
   </Road>

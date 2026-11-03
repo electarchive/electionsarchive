@@ -4,6 +4,7 @@
   import { on } from "svelte/events";
   import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date, natural } from "#lib/format.js";
@@ -431,13 +432,15 @@
                       {/if}
                     </span>
                     {#if event.move.members.length > 1}
-                      <details class="group">
-                        <summary
-                          class="cursor-pointer font-semibold marker:text-muted-foreground"
-                          >{m.chamber_step_members({
-                            count: event.move.members.length,
-                          })}</summary
-                        >
+                      <Disclosure class="group">
+                        {#snippet summary()}
+                          <summary
+                            class="cursor-pointer font-semibold marker:text-muted-foreground"
+                            >{m.chamber_step_members({
+                              count: event.move.members.length,
+                            })}</summary
+                          >
+                        {/snippet}
                         <ul class="grid gap-0.5 ps-3.5 pbs-1">
                           {#each event.move.members as member (member.person)}
                             <li class="flex items-baseline gap-1.5 truncate">
@@ -454,7 +457,7 @@
                             </li>
                           {/each}
                         </ul>
-                      </details>
+                      </Disclosure>
                     {/if}
                   </span>
                   <span class="text-xs font-semibold whitespace-nowrap"

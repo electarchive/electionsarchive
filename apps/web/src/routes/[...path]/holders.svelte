@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, credit, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -237,21 +238,23 @@
       {/if}
     {/each}
     {#if formers.length > 0}
-      <details class="grid content-start gap-3">
-        <summary
-          class="cursor-pointer justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
-        >
-          {m.holders_former()}
-          <span class="font-normal text-muted-foreground"
-            >({count(formers.length)})</span
+      <Disclosure class="grid content-start gap-3">
+        {#snippet summary()}
+          <summary
+            class="cursor-pointer justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
           >
-        </summary>
+            {m.holders_former()}
+            <span class="font-normal text-muted-foreground"
+              >({count(formers.length)})</span
+            >
+          </summary>
+        {/snippet}
         <div class="grid content-start gap-4 pbs-3">
           {#each formers as group (group.id)}
             {@render list(group)}
           {/each}
         </div>
-      </details>
+      </Disclosure>
     {/if}
   </section>
 {/if}
