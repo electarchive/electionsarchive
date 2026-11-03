@@ -21,7 +21,6 @@ export default defineConfig(({ command }) => {
         adapter: adapter(),
         csrf: { trustedOrigins: ["*"] },
         env: { dir: "../.." },
-        compilerOptions: { experimental: { async: true } },
         inspector: { toggleKeyCombo: "control-o" },
       }),
       devtoolsJson(),
