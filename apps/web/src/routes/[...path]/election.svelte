@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
@@ -137,16 +138,35 @@
         data,
       ),
     ),
+    winners: seed(
+      sections.winners instanceof Promise
+        ? sections.winners
+            .then(
+              async (data) =>
+                data ??
+                (browser
+                  ? client.fetchQuery(
+                      orpc.elections.winners.queryOptions({ input: { id } }),
+                    )
+                  : null),
+            )
+            .catch(() => null)
+        : sections.winners,
+      (data) => {
+        if (data != null) {
+          client.setQueryData(
+            orpc.elections.winners.queryKey({ input: { id } }),
+            data,
+          );
+        }
+      },
+    ),
   }));
 
-  untrack(() => {
-    if (sections.winners != null) {
-      client.setQueryData(
-        orpc.elections.winners.queryKey({ input: { id } }),
-        sections.winners,
-      );
-    }
-  });
+  const swept = createQuery(() => ({
+    ...orpc.elections.winners.queryOptions({ input: { id } }),
+    enabled: false,
+  }));
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,
@@ -417,7 +437,8 @@
       new Set(ordered.flatMap((race) => race.scope ?? [])).size > 1,
   );
   const isSwept = $derived(
-    scope == null && (sections.winners?.tiers.length ?? 0) > 0,
+    scope == null &&
+      (swept.data == null ? sections.mayoral : swept.data.tiers.length > 0),
   );
   const shown = $derived(
     isNavigated
@@ -2114,11 +2135,17 @@
 
 {#snippet body()}
   {#if isSwept && focus === -1}
-    <Sweep
-      {id}
-      year={election.date?.slice(0, 4) ?? ""}
-      hexes={hexes.data ?? null}
-    />
+    {#await seeded.winners}
+      <div class="col-span-12 grid min-block-svh">
+        <SectionSkeleton shape="columns" />
+      </div>
+    {:then}
+      <Sweep
+        {id}
+        year={election.date?.slice(0, 4) ?? ""}
+        hexes={hexes.data ?? null}
+      />
+    {/await}
   {/if}
 
   {#if election.composition != null && focus === -1}
@@ -3574,7 +3601,11 @@
       />
     {/await}
   {:else if parts.length >= 40}
-    <Winners {id} {parts} hasMap={!isSwept} />
+    {#await seeded.winners}
+      <SectionSkeleton shape="table" />
+    {:then}
+      <Winners {id} {parts} hasMap={!isSwept} />
+    {/await}
   {:else if parts.length > 0}
     <States {id} />
     {#if election.seated != null}

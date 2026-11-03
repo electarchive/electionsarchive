@@ -84,7 +84,16 @@ function eager<T>(promise: Promise<T>) {
   return (): T | Promise<T> => (settled == null ? promise : settled.value);
 }
 
-async function soon<T>(promise: Promise<T>) {
+export async function capped<T>(promise: Promise<T | null>) {
+  return Promise.race([
+    promise,
+    new Promise<null>((done) => {
+      setTimeout(done, 30_000, null);
+    }),
+  ]);
+}
+
+export async function soon<T>(promise: Promise<T>) {
   return Promise.race([
     promise
       .then((value): { value: T | Promise<T> } => ({ value }))
@@ -1410,15 +1419,32 @@ export async function archive(path: string, search: URLSearchParams) {
               date: day.date,
             }),
       ),
+      soon(
+        scope != null || day?.isLocal !== true
+          ? Promise.resolve(null)
+          : capped(call(router.elections.winners, input).catch(() => null)),
+      ),
     ]);
-    const [election, cycle, series, winners, ledger] = await found(
+    const [election, cycle, series, mayoral, ledger] = await found(
       Promise.all([
         call(router.elections.get, { ...input, within: scope?.id }),
         call(router.elections.cycle, input),
         call(router.elections.series, input),
         scope != null || day?.isLocal !== true
-          ? null
-          : call(router.elections.winners, input),
+          ? false
+          : db
+              .execute<{ isMayoral: boolean }>(
+                sql`
+                  select count(*) filter (
+                    where exists (
+                      select from contest c join office f on f.id = c.office_id
+                      where c.election_id = k.id and c.kind = 'office' and f.kind = 'mayor'
+                    )
+                  ) * 10 >= count(*) * 9 as "isMayoral"
+                  from election k where k.parent_id = ${slug.entity_id}::uuid
+                `,
+              )
+              .then((found) => found.rows[0]?.isMayoral === true),
         scope == null
           ? call(router.elections.ledger, input).catch(() => null)
           : null,
@@ -1441,6 +1467,7 @@ export async function archive(path: string, search: URLSearchParams) {
       { value: sameDay },
       { value: local },
       { value: counties },
+      { value: winners },
     ] = await later;
     return {
       kind: "election" as const,
@@ -1460,6 +1487,7 @@ export async function archive(path: string, search: URLSearchParams) {
         local,
         counties,
         winners,
+        mayoral,
         ledger,
       },
       within,

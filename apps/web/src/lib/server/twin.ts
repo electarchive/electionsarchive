@@ -319,16 +319,25 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
     return data;
   }
   const { sections } = data;
-  const [governments, regions, tiers, alongside, sameDay, local, counties] =
-    await Promise.all([
-      sections.governments,
-      sections.regions,
-      sections.tiers,
-      sections.alongside,
-      data.sameDay,
-      sections.local,
-      sections.counties,
-    ]);
+  const [
+    governments,
+    regions,
+    tiers,
+    alongside,
+    sameDay,
+    local,
+    counties,
+    winners,
+  ] = await Promise.all([
+    sections.governments,
+    sections.regions,
+    sections.tiers,
+    sections.alongside,
+    data.sameDay,
+    sections.local,
+    sections.counties,
+    sections.winners,
+  ]);
   return {
     ...data,
     sameDay,
@@ -340,6 +349,8 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
       alongside,
       local,
       counties,
+      winners,
+      mayoral: undefined,
     },
   };
 }
