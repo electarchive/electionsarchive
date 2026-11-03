@@ -7,7 +7,7 @@ import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
-import { summarize } from "#lib/live/summary.js";
+import { cut, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
@@ -2004,6 +2004,7 @@ export async function livePage(path: string, at: string | null) {
       const frame = view.frames.at(-1) ?? null;
       const flip = toward(summary.estimate, summary.favorite ?? undefined);
       const band = summary.estimate?.margin;
+      const line = summary.total > 0 ? cut(summary) : null;
       return {
         slug: race.slug,
         title: race.title,
@@ -2026,6 +2027,7 @@ export async function livePage(path: string, at: string | null) {
         expected: frame?.expected ?? null,
         leader: summary.leader?.label ?? null,
         margin: summary.margin,
+        seat: line == null ? null : { name: line.last.label, lead: line.lead },
         winner: summary.winner?.label ?? null,
         estimate:
           summary.estimate == null || summary.estimate.status === "waiting"

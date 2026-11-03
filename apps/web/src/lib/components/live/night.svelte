@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
+  import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import type { Ballot } from "#lib/server/live-ballot.js";
   import type { LivePage } from "#lib/server/live-page.js";
   import Dashboard from "#lib/components/live/dashboard.svelte";
@@ -11,6 +12,7 @@
   import { liveLinks } from "#lib/live/links.js";
   import { remainder, standing } from "#lib/live/standing.js";
   import { summarize } from "#lib/live/summary.js";
+  import { m } from "#lib/paraglide/messages.js";
 
   let {
     data,
@@ -31,6 +33,18 @@
   } = $props();
 
   const toLive = liveLinks();
+
+  let scrollY = $state(0);
+  let innerHeight = $state(0);
+
+  function rise() {
+    window.scrollTo({
+      top: 0,
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  }
 
   const ORDER = { senate: 0, governor: 1, house: 2, other: 3 };
 
@@ -86,6 +100,8 @@
   });
 </script>
 
+<svelte:window bind:scrollY bind:innerHeight />
+
 {#if data.place != null}
   <Place
     {election}
@@ -132,4 +148,15 @@
       />
     {/key}
   {/if}
+{/if}
+
+{#if innerHeight > 0 && scrollY > innerHeight}
+  <button
+    type="button"
+    class="fixed inset-e-4 inset-be-4 z-30 flex items-center gap-1.5 rounded-full bg-background px-3.5 py-2 text-[0.8125rem] font-semibold shadow-md ring-1 ring-border transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-foreground focus-visible:outline-none print:hidden"
+    onclick={rise}
+  >
+    <ArrowUpIcon class="block-4 inline-4" aria-hidden="true" />
+    {m.night_back_to_top()}
+  </button>
 {/if}

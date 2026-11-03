@@ -4541,6 +4541,18 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
   ].toSorted(([a], [b]) => a.localeCompare(b));
   const brief = (race: (typeof data.races)[number]) => {
     const total = sum(race.votes);
+    if (race.seat != null) {
+      return [
+        link(race.title, `live/${race.slug}`),
+        m.night_races_seat({
+          name: race.seat.name,
+          lead: count(race.seat.lead),
+        }),
+        "",
+        "",
+        ...(data.forecasts ? [""] : []),
+      ];
+    }
     return [
       link(race.title, `live/${race.slug}`),
       race.winner == null
