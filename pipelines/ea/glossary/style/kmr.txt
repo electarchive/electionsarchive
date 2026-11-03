@@ -10,6 +10,7 @@ Register
 - No exclamation marks or marketing tone.
 
 Sentences
+- Less is more. Keep sentences short and in plain order. Never hang a remark on the end of a sentence after a comma (", ku ev ...", ", yanî ...", or a trailing figure or judgment); give it its own sentence or drop it. When the English is wordy, say the point more simply.
 - One idea per sentence; split long English sentences. The verb goes at the end.
 - Use established Kurmanji words; do not borrow a Turkish word when a common Kurmanji one exists, and never calque Turkish phrasing.
 - Get the ezafe right in gender and number: "encamên hilbijartinê", "kursiyên partiyê", "dengê derbasdar". Use the oblique case after prepositions and the ergative construction with transitive past verbs.

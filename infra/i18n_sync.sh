@@ -24,7 +24,7 @@ log "main at $base needs translations"
 cd pipelines
 uv sync -q
 set +e
-timeout 15m anthropic-batch uv run ea i18n run --once
+timeout 15m uv run ea i18n run --once
 code=$?
 set -e
 cd "$tree"
@@ -36,7 +36,7 @@ elif [ "$code" -ne 0 ]; then
   exit "$code"
 fi
 if ! node apps/web/scripts/i18n-check.js > /dev/null 2>&1; then
-  log "batches still running; the next tick resumes"
+  log "some strings still need translations; the next tick resumes"
   exit 0
 fi
 "$repo/node_modules/.bin/oxfmt" apps/web/messages > /dev/null

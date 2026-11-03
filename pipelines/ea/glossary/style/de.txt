@@ -11,6 +11,7 @@ Register
 - No exclamation marks or marketing tone.
 
 Sentences
+- Less is more. Keep sentences short and in plain order. Never hang a remark on the end of a sentence after a comma (", was ...", ", womit ...", ", also ...", or a trailing figure or judgment); give it its own sentence or drop it. When the English is wordy, say the point more simply.
 - Avoid Nominalstil: a verb beats chains like "die Durchführung der Berechnung der ...". Split long English sentences.
 - Keep the verb bracket readable; do not push a long list between the auxiliary and the participle.
 - "contest" and "race" are "Wahl" or the office ("Gouverneurswahl", "Senatswahl"), never "Wettbewerb"; "Rennen" only in election-night prose.

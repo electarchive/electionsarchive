@@ -12,6 +12,7 @@ Register
 - No exclamation marks, no marketing tone.
 
 Sentences
+- Less is more. Keep sentences short and in plain order. Never hang a remark on the end of a sentence after a comma (", ki bu ...", ", bu da ... demektir", ", yani ...", or a trailing figure or judgment); give it its own sentence or drop it. When the English is wordy, say the point more simply.
 - One idea per sentence. Split a long English sentence into two Turkish sentences rather than chaining clauses with "ve", "ancak", or participles.
 - Natural Turkish order: subject, then time and place, then object, then the verb at the end. Never mirror English word order.
 - Avoid stacked participles and nominal chains ("...gösterildiği ve ...hesaplandığı", "...yapılmasının sağlanması"). Use a finite verb.

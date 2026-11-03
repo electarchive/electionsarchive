@@ -11,6 +11,7 @@ Register
 - No exclamation marks or marketing tone.
 
 Sentences
+- Less is more. Keep sentences short and in plain order. Never hang a remark on the end of a sentence after a comma (", o que ...", ", ou seja, ...", ", tornando ...", or a trailing figure or judgment); give it its own sentence or drop it. When the English is wordy, say the point more simply.
 - Verbs over noun chains ("a realização do cálculo da distribuição ..."). Split long English sentences.
 - Brazilian election vocabulary: "apuração", "urnas apuradas", "segundo turno", "votos válidos", "abstenção", "cadeira", "disputa".
 - No "estar sendo" chains; the gerund only where Brazilians naturally use it.

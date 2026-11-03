@@ -1,12 +1,16 @@
 import fcntl
 import json
 import os
+import shutil
+import subprocess
+import tempfile
 import time
 from collections.abc import Generator
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import NotRequired, TypedDict
+from typing import NotRequired, TypedDict, cast
 
 import anthropic
 import httpx
@@ -28,6 +32,9 @@ MAX_REQUESTS = 100_000
 MAX_BYTES = 200_000_000
 MARGIN = 0.95
 ATTEMPTS = 3
+LOCAL = {"i18n"}
+WORKERS = 8
+TIMEOUT = 3600
 
 type Want = tuple[MessageCreateParamsNonStreaming, float]
 
@@ -190,6 +197,97 @@ def pick(projected: float) -> str:
     return min(room)[1]
 
 
+def answer(params: MessageCreateParamsNonStreaming) -> dict[str, object] | str:
+    system = params.get("system", "")
+    head = system if isinstance(system, str) else "\n\n".join(block["text"] for block in system)
+    content = list(params["messages"])[-1]["content"]
+    if not isinstance(content, str):
+        return "only a plain-text user message can run on Claude Code"
+    output = params.get("output_config", {})
+    env = {key: value for key, value in os.environ.items() if key not in ("ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL")}
+    with tempfile.TemporaryDirectory() as scratch:
+        prompt = Path(scratch) / "system.txt"
+        prompt.write_text(head)
+        try:
+            done = subprocess.run(
+                [
+                    shutil.which("claude") or str(Path.home() / ".local/bin/claude"),
+                    "-p",
+                    "--model",
+                    params["model"],
+                    "--effort",
+                    output.get("effort") or "medium",
+                    "--tools",
+                    "",
+                    "--setting-sources",
+                    "",
+                    "--strict-mcp-config",
+                    "--no-session-persistence",
+                    "--system-prompt-file",
+                    str(prompt),
+                    "--output-format",
+                    "json",
+                ],
+                input=content,
+                capture_output=True,
+                text=True,
+                timeout=TIMEOUT,
+                env=env,
+                cwd=scratch,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return f"Claude Code ran past {TIMEOUT} seconds"
+    try:
+        result = json.loads(done.stdout)
+    except json.JSONDecodeError:
+        return (done.stderr or done.stdout or f"claude exited {done.returncode}").strip()[:300]
+    if result.get("is_error") or result.get("subtype") != "success":
+        return str(result.get("result") or result.get("subtype"))[:300]
+    return {
+        "type": "message",
+        "role": "assistant",
+        "model": params["model"],
+        "content": [{"type": "text", "text": result["result"]}],
+        "usage": result.get("usage", {}),
+        "cost_usd": result.get("total_cost_usd", 0.0),
+    }
+
+
+def work(job: Job, source: str, todo: dict[str, Want]) -> str:
+    spent = 0.0
+    failed = 0
+    limited = ""
+    with ThreadPoolExecutor(WORKERS) as pool:
+        running = {pool.submit(answer, want[0]): key for key, want in todo.items()}
+        for future in as_completed(running):
+            key = running[future]
+            message = future.result()
+            if isinstance(message, str):
+                if "limit" in message.lower():
+                    limited = message
+                    continue
+                failed += 1
+                job["attempts"][key] = job["attempts"].get(key, 0) + 1
+                job["failed"][key] = message
+                continue
+            spent += cast(float, message["cost_usd"])
+            raw.store(
+                source,
+                key,
+                json.dumps(message, ensure_ascii=False).encode(),
+                suffix=".json",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/json",
+            )
+            job["failed"].pop(key, None)
+    if limited:
+        raise SystemExit(f"BLOCKED: rate limit on Claude Code ({limited}); run the step again once it lifts")
+    return f"ran {len(todo)} requests on Claude Code ({len(todo) - failed} answered, list price ${spent:.2f}); " + (
+        f"{failed} failed and run again next time" if failed else "none failed"
+    )
+
+
 def ensure(source: str, name: str, wanted: dict[str, Want], *, approved: float | None = None) -> tuple[bool, str]:
     with opened(source, name) as job:
         notes = collect(job)
@@ -197,9 +295,13 @@ def ensure(source: str, name: str, wanted: dict[str, Want], *, approved: float |
             return False, f"waiting for batch:{source}/{name} ({'; '.join(notes)})"
         held = raw.keys(source)
         todo = {key: want for key, want in wanted.items() if key not in held and job["attempts"].get(key, 0) < ATTEMPTS}
-        gave_up = [key for key in wanted if key not in held and key not in todo]
+        if todo and source in LOCAL:
+            notes.append(work(job, source, todo))
+            held = raw.keys(source)
+            todo = {}
         if not todo:
-            done = f"{len(wanted) - len(gave_up)} of {len(wanted)} read"
+            gave_up = [key for key in wanted if key not in held and job["attempts"].get(key, 0) >= ATTEMPTS]
+            done = f"{sum(key in held for key in wanted)} of {len(wanted)} read"
             return True, "; ".join(
                 [done, *notes, *(f"gave up on {key}: {job['failed'].get(key, '')}" for key in gave_up)]
             )

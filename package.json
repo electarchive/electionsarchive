@@ -9,7 +9,7 @@
     "skill": "pnpm --filter @ea/web skill",
     "compile-paraglide": "pnpm --filter @ea/web compile-paraglide",
     "i18n:check": "pnpm --filter @ea/web i18n:check",
-    "translate": "cd pipelines && anthropic-batch uv run ea i18n",
+    "translate": "cd pipelines && uv run ea i18n",
     "check": "pnpm --recursive --workspace-concurrency=1 run check",
     "test": "pnpm --filter @ea/engine test",
     "lint": "knip && SVELTE_ESLINT_PARSER_EXPERIMENTAL_TS_SYS_HOOK=1 eslint .",

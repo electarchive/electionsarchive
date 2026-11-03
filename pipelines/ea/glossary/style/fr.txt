@@ -11,6 +11,7 @@ Register
 - No exclamation marks or marketing tone.
 
 Sentences
+- Less is more. Keep sentences short and in plain order. Never hang a remark on the end of a sentence after a comma (", ce qui ...", ", soit ...", ", faisant de ...", or a trailing figure or judgment); give it its own sentence or drop it. When the English is wordy, say the point more simply.
 - Avoid heavy noun chains ("la mise en œuvre du calcul de la répartition ..."); use a verb. Split long English sentences.
 - "race" is "scrutin", "élection", or the office; "course" only in election-night prose.
 - Make articles agree with what a placeholder holds; when its gender is unknown, avoid the article or use a colon label.

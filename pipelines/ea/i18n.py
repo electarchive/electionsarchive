@@ -13,7 +13,7 @@ from ea import batch, raw
 from ea.store import DATA
 
 SOURCE = "i18n"
-MODEL = "claude-sonnet-5-5"
+MODEL = "claude-opus-5-5"
 WEB = Path(__file__).resolve().parents[2] / "apps" / "web"
 MESSAGES = WEB / "messages"
 GLOSSARY = Path(__file__).resolve().parent / "glossary"
@@ -24,8 +24,6 @@ REDO = WORK / "redo"
 LOCK = MESSAGES / ".source.json"
 SETTINGS = WEB / "project.inlang" / "settings.json"
 EFFORT = "medium"
-STAGE_EFFORT = {"translate": "high", "review": "high"}
-AUTO = 3.0
 ATTEMPTS = 3
 POLL = 30
 CHUNK_CHARS = 20_000
@@ -666,6 +664,7 @@ def glossary_wants(targets: list[str]) -> dict[str, batch.Want]:
 PRINCIPLES = """Writing principles, from the site's own editor:
 - Plain and direct. Concrete words over abstract ones; common phrases over coined ones; nothing is sold.
 - Keep each subject close to its verb. No stacks of nouns, no chains of participles or modifiers.
+- Less is more. Short sentences in plain subject-then-verb order. Never hang a remark on the end of a sentence after a comma (", which ...", ", making ...", a trailing figure or judgment): give it its own sentence or drop it.
 - Give actions to people and programs, not to pages, documents, data, or ideas.
 - The English is impersonal and never says "we", "our", or "us". Never add a first-person voice for the site.
 - No dashes as sentence punctuation, no exclamation marks, no filler such as "please", "simply", or "just".
@@ -796,7 +795,7 @@ def wants(
         params: dict[str, object] = {
             "model": MODEL,
             "max_tokens": 32_000,
-            "output_config": {"effort": STAGE_EFFORT[stage]},
+            "output_config": {"effort": EFFORT},
             "system": head,
             "messages": [{"role": "user", "content": prompt}],
         }
@@ -1084,8 +1083,7 @@ def step(targets: list[str], *, redo: bool = False) -> tuple[bool, str]:
         plan = planned(work / f"{stage}.plan.json", build)
         if plan:
             wanted = {request: want for request, (_, want, _) in plan.items()}
-            projected = sum(want[1] for want in wanted.values())
-            done, note = batch.ensure(SOURCE, prefix + stage, wanted, approved=AUTO if projected < AUTO else None)
+            done, note = batch.ensure(SOURCE, prefix + stage, wanted)
             notes_out.append(note)
             if not done:
                 return False, "; ".join(notes_out)
