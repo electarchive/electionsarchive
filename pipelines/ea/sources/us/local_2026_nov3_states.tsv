@@ -262,10 +262,10 @@ GU-66	Consolidated Commission on Utilities	0	Simon A. Sanchez		Guam	3
 GU-66	Consolidated Commission on Utilities	0	Kenneth Robert Perez		Guam	3
 GU-66	Consolidated Commission on Utilities	0	Francis Edward Borja Santos		Guam	3
 GU-66	Consolidated Commission on Utilities	0	Roy Salvador Agudon Adonay		Guam	3
-GU-66	Education Board	0	John R. Taitano II		Guam	
-GU-66	Education Board	0	Ronald Anthony Ayuyu		Guam	
-GU-66	Education Board	0	Isaiah John Aguon		Guam	
-GU-66	Education Board	0	Ronald Lewis McNinch Jr.		Guam	
+GU-66	Education Board	0	John R. Taitano II		Guam	4
+GU-66	Education Board	0	Ronald Anthony Ayuyu		Guam	4
+GU-66	Education Board	0	Isaiah John Aguon		Guam	4
+GU-66	Education Board	0	Ronald Lewis McNinch Jr.		Guam	4
 VI-78-stx	Legislature, St. Croix District	0	Mutasem Moe Mustafa	Independent	St. Croix	7
 VI-78-stx	Legislature, St. Croix District	0	Elizabeth HansenWatley	Independent	St. Croix	7
 VI-78-stx	Legislature, St. Croix District	0	Alvin Milligan	Independent	St. Croix	7
@@ -329,112 +329,112 @@ VI-78-stt	Board of Elections, St. John District	0	Raven Phillips	Independent	St.
 VI-78-stt	Board of Elections, St. John District	0	Preston R. Evans	Democratic	St. John	1
 VI-78-stt	Board of Elections, St. Thomas District	0	Kevin A. Rodriquez	Democratic	St. Thomas	2
 VI-78-stt	Board of Elections, St. Thomas District	0	Harriet A. Mercer	Republican	St. Thomas	2
-AS-60	House, District 1 (Manu’a)	0	Fetui F. Fetu Jr.		American Samoa	
-AS-60	House, District 1 (Manu’a)	0	Mana’oimalo Fa’aaliga Matagi		American Samoa	
-AS-60	House, District 1 (Manu’a)	0	Paepaetele Mapu Jamias		American Samoa	
-AS-60	House, District 1 (Manu’a)	0	Satia Aokuso Satia		American Samoa	
-AS-60	House, District 1 (Manu’a)	0	Vala Porotesano Liusamoa		American Samoa	
-AS-60	House, District 2 (Manu’a)	0	Niuatoa Loleni Faiai		American Samoa	
-AS-60	House, District 2 (Manu’a)	0	Tiaoali’i Fauagiga T. Sai		American Samoa	
-AS-60	House, District 3 (Vaifanua)	0	Shaun O. Va’a		American Samoa	
-AS-60	House, District 3 (Vaifanua)	0	Tiapula Dr. Toafa Vaiaga’e		American Samoa	
-AS-60	House, District 4 (Saole)	0	Dr. Va’asa Simanu		American Samoa	
-AS-60	House, District 4 (Saole)	0	Titiali’i Kitara Vaiau		American Samoa	
-AS-60	House, District 4 (Saole)	0	Vitolio Ioane Lotu		American Samoa	
-AS-60	House, District 5 (Sua #1)	0	Luaitaua Gene Pan		American Samoa	
-AS-60	House, District 5 (Sua #1)	0	Lynn Nu’uuli Pulou-Alaimalo		American Samoa	
-AS-60	House, District 6 (Sua #2)	0	Avaolagi Ta’atiatia I.Mata’utia Sua		American Samoa	
-AS-60	House, District 6 (Sua #2)	0	Matagaono Vaimaga Maiava		American Samoa	
-AS-60	House, District 7 (Maoputasi #1)	0	Vailoata Eteuati Amituanai		American Samoa	
-AS-60	House, District 8 (Maoputasi #2)	0	Malaeoletalu Melesio Gurr		American Samoa	
-AS-60	House, District 8 (Maoputasi #2)	0	Leiviifiloa Mariota K. Tuiasosopo		American Samoa	
-AS-60	House, District 9 (Maoputasi #3)	0	Trude Gasetotolemasina Ledoux-Sunia		American Samoa	
-AS-60	House, District 10 (Maoputasi #4)	0	Saena Omar Shalhout		American Samoa	
-AS-60	House, District 10 (Maoputasi #4)	0	Talali Perry T. Loloaso Wightman-Uia		American Samoa	
-AS-60	House, District 10 (Maoputasi #4)	0	Tapai Alailepule Ben Vaivao		American Samoa	
-AS-60	House, District 11 (Maoputasi #5)	0	Faimealelei Anthony Fu’e Allen		American Samoa	
-AS-60	House, District 11 (Maoputasi #5)	0	Muaiavaona Fofoga Pila		American Samoa	
-AS-60	House, District 12 (Ituau)	0	Manumaua Wayne Wilson		American Samoa	
-AS-60	House, District 12 (Ituau)	0	Sauasetoa Tautoloitua Soliai Ho Ching		American Samoa	
-AS-60	House, District 13 (Fofo)	0	Fiu J. Saelua		American Samoa	
-AS-60	House, District 14 (Alataua)	0	Mona Uli		American Samoa	
-AS-60	House, District 14 (Alataua)	0	Savali Talavou Ale		American Samoa	
-AS-60	House, District 15 (Tualauta)	0	Alex Sene Jr.		American Samoa	
-AS-60	House, District 15 (Tualauta)	0	Ben Vaomu Solomona Sauvao		American Samoa	
-AS-60	House, District 15 (Tualauta)	0	Fagaima Larry Sanitoa		American Samoa	
-AS-60	House, District 15 (Tualauta)	0	Sefulu Mika Kelemete		American Samoa	
-AS-60	House, District 15 (Tualauta)	0	Tapusalaia “Tap” Moemalemalo Maneafaiga		American Samoa	
-AS-60	House, District 16 (Tualatai)	0	Manavaalofa Tutuila Manase		American Samoa	
-AS-60	House, District 17 (Aitulagi/Leasina)	0	Ape Mike Asifoa		American Samoa	
-AS-60	House, District 17 (Aitulagi/Leasina)	0	Fuasali’i I. Iose		American Samoa	
+AS-60	House, District 1 (Manu’a)	0	Fetui F. Fetu Jr.		American Samoa	2
+AS-60	House, District 1 (Manu’a)	0	Mana’oimalo Fa’aaliga Matagi		American Samoa	2
+AS-60	House, District 1 (Manu’a)	0	Paepaetele Mapu Jamias		American Samoa	2
+AS-60	House, District 1 (Manu’a)	0	Satia Aokuso Satia		American Samoa	2
+AS-60	House, District 1 (Manu’a)	0	Vala Porotesano Liusamoa		American Samoa	2
+AS-60	House, District 2 (Manu’a)	0	Niuatoa Loleni Faiai		American Samoa	1
+AS-60	House, District 2 (Manu’a)	0	Tiaoali’i Fauagiga T. Sai		American Samoa	1
+AS-60	House, District 3 (Vaifanua)	0	Shaun O. Va’a		American Samoa	1
+AS-60	House, District 3 (Vaifanua)	0	Tiapula Dr. Toafa Vaiaga’e		American Samoa	1
+AS-60	House, District 4 (Saole)	0	Dr. Va’asa Simanu		American Samoa	1
+AS-60	House, District 4 (Saole)	0	Titiali’i Kitara Vaiau		American Samoa	1
+AS-60	House, District 4 (Saole)	0	Vitolio Ioane Lotu		American Samoa	1
+AS-60	House, District 5 (Sua #1)	0	Luaitaua Gene Pan		American Samoa	1
+AS-60	House, District 5 (Sua #1)	0	Lynn Nu’uuli Pulou-Alaimalo		American Samoa	1
+AS-60	House, District 6 (Sua #2)	0	Avaolagi Ta’atiatia I.Mata’utia Sua		American Samoa	1
+AS-60	House, District 6 (Sua #2)	0	Matagaono Vaimaga Maiava		American Samoa	1
+AS-60	House, District 7 (Maoputasi #1)	0	Vailoata Eteuati Amituanai		American Samoa	1
+AS-60	House, District 8 (Maoputasi #2)	0	Malaeoletalu Melesio Gurr		American Samoa	1
+AS-60	House, District 8 (Maoputasi #2)	0	Leiviifiloa Mariota K. Tuiasosopo		American Samoa	1
+AS-60	House, District 9 (Maoputasi #3)	0	Trude Gasetotolemasina Ledoux-Sunia		American Samoa	1
+AS-60	House, District 10 (Maoputasi #4)	0	Saena Omar Shalhout		American Samoa	1
+AS-60	House, District 10 (Maoputasi #4)	0	Talali Perry T. Loloaso Wightman-Uia		American Samoa	1
+AS-60	House, District 10 (Maoputasi #4)	0	Tapai Alailepule Ben Vaivao		American Samoa	1
+AS-60	House, District 11 (Maoputasi #5)	0	Faimealelei Anthony Fu’e Allen		American Samoa	1
+AS-60	House, District 11 (Maoputasi #5)	0	Muaiavaona Fofoga Pila		American Samoa	1
+AS-60	House, District 12 (Ituau)	0	Manumaua Wayne Wilson		American Samoa	2
+AS-60	House, District 12 (Ituau)	0	Sauasetoa Tautoloitua Soliai Ho Ching		American Samoa	2
+AS-60	House, District 13 (Fofo)	0	Fiu J. Saelua		American Samoa	1
+AS-60	House, District 14 (Alataua)	0	Mona Uli		American Samoa	1
+AS-60	House, District 14 (Alataua)	0	Savali Talavou Ale		American Samoa	1
+AS-60	House, District 15 (Tualauta)	0	Alex Sene Jr.		American Samoa	2
+AS-60	House, District 15 (Tualauta)	0	Ben Vaomu Solomona Sauvao		American Samoa	2
+AS-60	House, District 15 (Tualauta)	0	Fagaima Larry Sanitoa		American Samoa	2
+AS-60	House, District 15 (Tualauta)	0	Sefulu Mika Kelemete		American Samoa	2
+AS-60	House, District 15 (Tualauta)	0	Tapusalaia “Tap” Moemalemalo Maneafaiga		American Samoa	2
+AS-60	House, District 16 (Tualatai)	0	Manavaalofa Tutuila Manase		American Samoa	1
+AS-60	House, District 17 (Aitulagi/Leasina)	0	Ape Mike Asifoa		American Samoa	1
+AS-60	House, District 17 (Aitulagi/Leasina)	0	Fuasali’i I. Iose		American Samoa	1
 MP-69	Justice	0	Alexandro Cruz Castro	Nonpartisan	Northern Mariana Islands	1
 MP-69	Attorney General	0	Joaquin Deleon Guerrero Torres	Nonpartisan	Northern Mariana Islands	1
 MP-69	Attorney General	0	Jonathan Robert Glass	Nonpartisan	Northern Mariana Islands	1
 MP-69	Attorney General	0	Michael Norita Evangelista	Nonpartisan	Northern Mariana Islands	1
-MP-69	Senate, 1st Senatorial District	0	Robert Jr Harrison Myers	Independent	Northern Mariana Islands	
-MP-69	Senate, 1st Senatorial District	0	Tito Songao Hocog II	Republican	Northern Mariana Islands	
-MP-69	Senate, 1st Senatorial District	0	Donald Manalang Manglona	Independent	Northern Mariana Islands	
-MP-69	Senate, 2nd Senatorial District	0	Francisco Quichuchu Cruz	Republican	Northern Mariana Islands	
-MP-69	Senate, 2nd Senatorial District	0	Jude Untalan Hofschneider	Republican	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Celina Roberto Babauta	Democratic	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Corina Lorraine Magofna	Independent	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Vicente Castro Camacho	Independent	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Marco Taisakan Peter	Republican	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Vinnie Vinson Flores Sablan	Republican	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Crispin Manglona Sablan	Independent	Northern Mariana Islands	
-MP-69	Senate, 3rd Senatorial District	0	Edwin Raymond Borja Quitugua	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Janet Ulloa Maratita	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Raymond Ulloa Palacios	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Joseph Arriola Flores	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Diego Vincent Fejeran Camacho	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	John Deleon Guerrero Demapan Jr.	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Roy Christopher Aldan Ada	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Cecilia Remedio Taitano Fitial	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Patrick Matagolai Cepeda	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Benusto Piteg	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Alfredo Javier Cabael	Republican	Northern Mariana Islands	
-MP-69	House, District 1	0	Roman Cepeda Benavente	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Vincent Raymond Seman Aldan	Independent	Northern Mariana Islands	
-MP-69	House, District 1	0	Ricardo Castro Cruz Jr.	Democratic	Northern Mariana Islands	
-MP-69	House, District 2	0	John Paul Palacios Sablan	Independent	Northern Mariana Islands	
-MP-69	House, District 2	0	Daniel Jr Iwashita Aquino	Independent	Northern Mariana Islands	
-MP-69	House, District 2	0	Keith Cabrera Ada	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Ralph Naraja Yumul	Independent	Northern Mariana Islands	
-MP-69	House, District 3	0	Marissa Renee Flores	Independent	Northern Mariana Islands	
-MP-69	House, District 3	0	Steve Kap Soo Jang	Independent	Northern Mariana Islands	
-MP-69	House, District 3	0	Elias Jerome Malite Rangamar	Independent	Northern Mariana Islands	
-MP-69	House, District 3	0	Del Ariel Benson	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Edward C Arriola Jr.	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Quaid Taima Ogumoro Ngirchongor	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Andrew Lujan Orsini	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Yvette Reyes Sablan	Republican	Northern Mariana Islands	
-MP-69	House, District 3	0	Carlos Ebert Santos	Independent	Northern Mariana Islands	
-MP-69	House, District 3	0	Gabriel Boki Babauta	Democratic	Northern Mariana Islands	
-MP-69	House, District 3	0	Denita Kaipat Yangetmai	Democratic	Northern Mariana Islands	
-MP-69	House, District 4	0	Joel Castro Camacho	Independent	Northern Mariana Islands	
-MP-69	House, District 4	0	James Kennedy Weilbacher DLG Benjamin	Republican	Northern Mariana Islands	
-MP-69	House, District 4	0	Malcolm Jason Omar	Republican	Northern Mariana Islands	
-MP-69	House, District 5	0	Ted Anthony Deleon Guerrero	Republican	Northern Mariana Islands	
-MP-69	House, District 5	0	Angelo Atalig Camacho	Independent	Northern Mariana Islands	
-MP-69	House, District 5	0	Peter Francis Reyes Muna	Democratic	Northern Mariana Islands	
-MP-69	House, District 5	0	Leila Haveia Fleming Clark Staffler	Democratic	Northern Mariana Islands	
-MP-69	House, District 6	0	Joseph Romaldo Evangelista Santos	Republican	Northern Mariana Islands	
-MP-69	House, District 7	0	Julie Marie Atalig Ogo	Independent	Northern Mariana Islands	
+MP-69	Senate, 1st Senatorial District	0	Robert Jr Harrison Myers	Independent	Northern Mariana Islands	2
+MP-69	Senate, 1st Senatorial District	0	Tito Songao Hocog II	Republican	Northern Mariana Islands	2
+MP-69	Senate, 1st Senatorial District	0	Donald Manalang Manglona	Independent	Northern Mariana Islands	2
+MP-69	Senate, 2nd Senatorial District	0	Francisco Quichuchu Cruz	Republican	Northern Mariana Islands	2
+MP-69	Senate, 2nd Senatorial District	0	Jude Untalan Hofschneider	Republican	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Celina Roberto Babauta	Democratic	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Corina Lorraine Magofna	Independent	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Vicente Castro Camacho	Independent	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Marco Taisakan Peter	Republican	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Vinnie Vinson Flores Sablan	Republican	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Crispin Manglona Sablan	Independent	Northern Mariana Islands	2
+MP-69	Senate, 3rd Senatorial District	0	Edwin Raymond Borja Quitugua	Independent	Northern Mariana Islands	2
+MP-69	House, District 1	0	Janet Ulloa Maratita	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	Raymond Ulloa Palacios	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	Joseph Arriola Flores	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	Diego Vincent Fejeran Camacho	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	John Deleon Guerrero Demapan Jr.	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Roy Christopher Aldan Ada	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Cecilia Remedio Taitano Fitial	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Patrick Matagolai Cepeda	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Benusto Piteg	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Alfredo Javier Cabael	Republican	Northern Mariana Islands	6
+MP-69	House, District 1	0	Roman Cepeda Benavente	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	Vincent Raymond Seman Aldan	Independent	Northern Mariana Islands	6
+MP-69	House, District 1	0	Ricardo Castro Cruz Jr.	Democratic	Northern Mariana Islands	6
+MP-69	House, District 2	0	John Paul Palacios Sablan	Independent	Northern Mariana Islands	2
+MP-69	House, District 2	0	Daniel Jr Iwashita Aquino	Independent	Northern Mariana Islands	2
+MP-69	House, District 2	0	Keith Cabrera Ada	Republican	Northern Mariana Islands	2
+MP-69	House, District 3	0	Ralph Naraja Yumul	Independent	Northern Mariana Islands	6
+MP-69	House, District 3	0	Marissa Renee Flores	Independent	Northern Mariana Islands	6
+MP-69	House, District 3	0	Steve Kap Soo Jang	Independent	Northern Mariana Islands	6
+MP-69	House, District 3	0	Elias Jerome Malite Rangamar	Independent	Northern Mariana Islands	6
+MP-69	House, District 3	0	Del Ariel Benson	Republican	Northern Mariana Islands	6
+MP-69	House, District 3	0	Edward C Arriola Jr.	Republican	Northern Mariana Islands	6
+MP-69	House, District 3	0	Quaid Taima Ogumoro Ngirchongor	Republican	Northern Mariana Islands	6
+MP-69	House, District 3	0	Andrew Lujan Orsini	Republican	Northern Mariana Islands	6
+MP-69	House, District 3	0	Yvette Reyes Sablan	Republican	Northern Mariana Islands	6
+MP-69	House, District 3	0	Carlos Ebert Santos	Independent	Northern Mariana Islands	6
+MP-69	House, District 3	0	Gabriel Boki Babauta	Democratic	Northern Mariana Islands	6
+MP-69	House, District 3	0	Denita Kaipat Yangetmai	Democratic	Northern Mariana Islands	6
+MP-69	House, District 4	0	Joel Castro Camacho	Independent	Northern Mariana Islands	2
+MP-69	House, District 4	0	James Kennedy Weilbacher DLG Benjamin	Republican	Northern Mariana Islands	2
+MP-69	House, District 4	0	Malcolm Jason Omar	Republican	Northern Mariana Islands	2
+MP-69	House, District 5	0	Ted Anthony Deleon Guerrero	Republican	Northern Mariana Islands	2
+MP-69	House, District 5	0	Angelo Atalig Camacho	Independent	Northern Mariana Islands	2
+MP-69	House, District 5	0	Peter Francis Reyes Muna	Democratic	Northern Mariana Islands	2
+MP-69	House, District 5	0	Leila Haveia Fleming Clark Staffler	Democratic	Northern Mariana Islands	2
+MP-69	House, District 6	0	Joseph Romaldo Evangelista Santos	Republican	Northern Mariana Islands	1
+MP-69	House, District 7	0	Julie Marie Atalig Ogo	Independent	Northern Mariana Islands	1
 MP-69	Mayor, Rota	0	Aubry Manglona Hocog	Republican	Northern Mariana Islands	1
 MP-69	Mayor, Tinian and Aguiguan	0	Antonio San Nicolas Borja	Republican	Northern Mariana Islands	1
 MP-69	Mayor, Saipan	0	Ramon "RB" Jose Blas Camacho	Independent	Northern Mariana Islands	1
 MP-69	Mayor, Saipan	0	Joseph Muna Mendiola	Independent	Northern Mariana Islands	1
 MP-69	Mayor, Northern Islands	0	Keli Aiken Tenorio	Republican	Northern Mariana Islands	1
 MP-69	Mayor, Northern Islands	0	Valentino Nicky Taisacan Jr.	Independent	Northern Mariana Islands	1
-MP-69	Municipal Council, Rota	0	Sandra Mesngon Masga	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Rota	0	Tillie Castro Taimanao	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Rota	0	Jonovan Hocog Lizama	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Tinian and Aguiguan	0	Chad Ellie Palacios	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Tinian and Aguiguan	0	Wally Flores Villagomez	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Tinian and Aguiguan	0	Ana Marie Cruz San Nicolas	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Saipan	0	Anthony Tenorio Benavente	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Saipan	0	Antonia Manibusan Tudela	Nonpartisan	Northern Mariana Islands	
-MP-69	Municipal Council, Saipan	0	Marian Deleon Guerrero Tudela	Nonpartisan	Northern Mariana Islands	
+MP-69	Municipal Council, Rota	0	Sandra Mesngon Masga	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Rota	0	Tillie Castro Taimanao	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Rota	0	Jonovan Hocog Lizama	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Tinian and Aguiguan	0	Chad Ellie Palacios	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Tinian and Aguiguan	0	Wally Flores Villagomez	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Tinian and Aguiguan	0	Ana Marie Cruz San Nicolas	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Saipan	0	Anthony Tenorio Benavente	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Saipan	0	Antonia Manibusan Tudela	Nonpartisan	Northern Mariana Islands	3
+MP-69	Municipal Council, Saipan	0	Marian Deleon Guerrero Tudela	Nonpartisan	Northern Mariana Islands	3
 MP-69	Board of Education, Saipan	0	Daniel Ogo Quitugua	Nonpartisan	Northern Mariana Islands	1
 WY-56003-towns	Town of Basin Mayor	0	Charles (Chuck) Hopkin	Nonpartisan	Big Horn	1
 WY-56003-towns	Town of Basin Mayor	0	Carl R. Olson	Nonpartisan	Big Horn	1
