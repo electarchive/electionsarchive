@@ -240,24 +240,30 @@ id = "us.enr_2026.al"
 adapter = "us.enr_2026"
 params = { state = "AL" }
 publisher = "Alabama Secretary of State"
-url = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
-note = "county election sites only"
+url = "https://www2.alabamavotes.gov/electionnight/statewideresultsbycontest.aspx?ecode=1001305"
 
 [[feed]]
 id = "us.enr_2026.mi"
 adapter = "us.enr_2026"
 params = { state = "MI" }
 publisher = "Michigan Board of State Canvassers"
-url = "https://mielections.us/election/results/2026PRI_CENR.html"
-note = "county election sites only"
+url = "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=11-3-2026"
+note = "county election sites only; the statewide results sit behind a Cloudflare challenge"
 
 [[feed]]
 id = "us.enr_2026.ne"
 adapter = "us.enr_2026"
 params = { state = "NE" }
 publisher = "Nebraska Secretary of State"
-url = "https://sos.nebraska.gov/elections"
-note = "county election sites only"
+url = "https://electionresults.nebraska.gov/"
+
+[[feed]]
+id = "us.enr_2026.mt"
+adapter = "us.enr_2026"
+params = { state = "MT" }
+poller = "muktedir"
+publisher = "Montana Secretary of State"
+url = "https://electionresults.mt.gov/"
 
 [[feed]]
 id = "us.enr_2026.oh"

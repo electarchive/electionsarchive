@@ -432,11 +432,15 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_ak
 
         enr_ak.collect(client, get, lambda url, content, suffix: store("AK", url, content, suffix))
+    if not only or "AL" in only:
+        from ea.sources.us import enr_al
+
+        enr_al.collect(client, get, lambda url, content, suffix: store("AL", url, content, suffix))
     if not only or "HI" in only:
         from ea.sources.us import enr_hi
 
         enr_hi.collect(client, get, lambda url, content, suffix: store("HI", url, content, suffix))
-    for state in ("NM", "SD", "ND"):
+    for state in ("NM", "SD", "ND", "NE", "MT"):
         if not only or state in only:
             from ea.sources.us import enr_ajax
 
@@ -676,12 +680,17 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_ak.rows(url, path, urls)
         return
+    if state == "AL" and "alabamavotes.gov" in url:
+        from ea.sources.us import enr_al
+
+        yield from enr_al.rows(url, path)
+        return
     if state == "HI":
         from ea.sources.us import enr_hi
 
         yield from enr_hi.rows(url, path, urls)
         return
-    if state in ("NM", "SD", "ND"):
+    if state in ("NM", "SD", "ND", "NE", "MT"):
         from ea.sources.us import enr_ajax
 
         yield from enr_ajax.rows(url, path)
@@ -1416,7 +1425,9 @@ def plan(
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
-            retention = state == "IL" and bool(re.search(r"^retain\b|^retention\b|\bjudge retention\b", name, re.IGNORECASE))
+            retention = state == "IL" and bool(
+                re.search(r"^retain\b|^retention\b|\bjudge retention\b", name, re.IGNORECASE)
+            )
             if retention:
                 words = set(terms(name)[-1:])
             wide = office == "state" or bool(APPEALS.search(name)) or retention
@@ -1577,7 +1588,7 @@ def plan(
             .agg(pl.col("reporting").max(), pl.col("total").max())
             .select(pl.col("reporting").sum(), pl.col("total").sum())
             .row(0)
-            if state in ("AK", "FL", "NJ", "NM", "SD", "ND")
+            if state in ("AK", "AL", "FL", "NJ", "NM", "SD", "ND", "NE", "MT")
             else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
         )
         sums: dict[tuple[UUID, UUID], int] = {}
