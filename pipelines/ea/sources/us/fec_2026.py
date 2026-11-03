@@ -31,6 +31,11 @@ BROWSER = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 FL_URL = "https://dos.elections.myflorida.com/candidates/extractCanList.asp?elecID=20261103-GEN"
+GUAM_MATES = {
+    "Vicente A. Ada": "Edward John Calvo",
+    "Therese Maria Terlaje": "Sabina Eileen Perez",
+}
+
 OFFICIAL = {
     "FL": (
         "Florida Department of State, Division of Elections",
@@ -2873,6 +2878,26 @@ def emit() -> Path:
                 elif (key, person) in nominated:
                     cs.add("citation", entity_id=candidacy, source_id=nominated[(key, person)], locator=None)
                 counts["candidates"] += 1
+                if state == "GU" and chamber == "governor" and ballot in GUAM_MATES:
+                    if person not in cs.minted and not conn.execute(
+                        "select 1 from name where entity_id = %s and text = %s", (person, ballot)
+                    ).fetchone():
+                        cs.add("name", entity_id=person, text=ballot, lang="en", kind="official", is_preferred=True)
+                    mate_name = GUAM_MATES[ballot]
+                    mate = cs.key(f"{SOURCE}.person", f"GU:{slug(mate_name)}")
+                    if mate in cs.minted:
+                        cs.add("person", id=mate)
+                        name(mate, mate_name)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{fresh}:running_mate"),
+                        person_id=mate,
+                        option_id=option,
+                        role="running_mate",
+                        is_independent=party_id is None,
+                    )
+                    if listing is not None:
+                        cs.add("citation", entity_id=mate, source_id=sources[listing], locator=None)
                 if tacit is not None:
                     publisher, title, addresses, context = TACIT_SOURCES[tacit[2]]
                     if f"tacit:{tacit[2]}" not in sources:
