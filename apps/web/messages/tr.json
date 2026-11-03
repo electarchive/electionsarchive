@@ -5810,5 +5810,6 @@
   "livemap_win_chance": "Kazanma olasılığı",
   "livemap_counted_share": "Beklenen oyların sayılan kısmı",
   "livemap_near_hint": "Bu eyaletin sonuçlarını görmek için tıklayın",
+  "livemap_near_seat_hint": "Bu seçim bölgesinin sonuçlarını görmek için tıklayın",
   "livemap_up_hint": "Ya da eyaletin dışında herhangi bir yere tıkla"
 }

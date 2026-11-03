@@ -5905,5 +5905,6 @@
   "livemap_win_chance": "Chances de victoire",
   "livemap_counted_share": "Part des bulletins attendus déjà dépouillés",
   "livemap_near_hint": "Cliquez pour voir les résultats de cet État",
+  "livemap_near_seat_hint": "Cliquez pour voir les résultats de ce district",
   "livemap_up_hint": "Ou cliquez n'importe où en dehors de l'État"
 }

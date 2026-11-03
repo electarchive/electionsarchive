@@ -4704,6 +4704,7 @@
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
     "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
     "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_near_seat_hint": "248ba6cd7c340680e94429bc8e5e9f61",
     "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "fr": {
@@ -9411,6 +9412,7 @@
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
     "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
     "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_near_seat_hint": "248ba6cd7c340680e94429bc8e5e9f61",
     "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "kmr": {
@@ -14118,6 +14120,7 @@
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
     "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
     "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_near_seat_hint": "248ba6cd7c340680e94429bc8e5e9f61",
     "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "pt-BR": {
@@ -18825,6 +18828,7 @@
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
     "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
     "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_near_seat_hint": "248ba6cd7c340680e94429bc8e5e9f61",
     "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "tr": {
@@ -23532,6 +23536,7 @@
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
     "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
     "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_near_seat_hint": "248ba6cd7c340680e94429bc8e5e9f61",
     "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   }
 }

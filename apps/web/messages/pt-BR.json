@@ -5903,5 +5903,6 @@
   "livemap_win_chance": "Chance de vitória",
   "livemap_counted_share": "Parcela dos votos esperados já apurada",
   "livemap_near_hint": "Clique para ver os resultados deste estado",
+  "livemap_near_seat_hint": "Clique para ver os resultados deste distrito",
   "livemap_up_hint": "Ou clique em qualquer lugar fora do estado"
 }

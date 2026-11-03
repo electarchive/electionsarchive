@@ -5810,5 +5810,6 @@
   "livemap_win_chance": "Siegchance",
   "livemap_counted_share": "Ausgezählter Anteil der erwarteten Stimmen",
   "livemap_near_hint": "Klicken Sie, um die Ergebnisse dieses Bundesstaats zu sehen",
+  "livemap_near_seat_hint": "Klicken Sie, um die Ergebnisse dieses Distrikts zu sehen",
   "livemap_up_hint": "Oder irgendwo außerhalb des Bundesstaats klicken"
 }
