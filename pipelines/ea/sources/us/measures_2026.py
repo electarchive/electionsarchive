@@ -115,7 +115,15 @@ def parse() -> None:
             )
         if not found:
             print("text not found in source:", row["state"], row["label"], url)
-        rows.append({**{key: None if value is None else str(value) for key, value in row.items()}, "verified": found})
+        rows.append(
+            {
+                **{
+                    key: None if value is None else json.dumps(value) if isinstance(value, list) else str(value)
+                    for key, value in row.items()
+                },
+                "verified": found,
+            }
+        )
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "measures.parquet")
 
 
@@ -154,6 +162,11 @@ def emit() -> Path:
             ).fetchall()
         )
         labels = Counter(zip(frame["state"], frame["label"]))
+        options = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.option' and value like %s", [f"{DAY}:%"]
+            ).fetchall()
+        )
         sources = {}
         for row in frame.iter_rows(named=True):
             state = row["state"]
@@ -198,15 +211,27 @@ def emit() -> Path:
                         path = f"{base}-{n}"
                     taken.add(path)
                 cs.add("slug", path=path, entity_id=contest)
-            for position, answer in enumerate((row.get("yes") or "Yes", row.get("no") or "No")):
+            answers = (
+                {slug(answer): answer for answer in json.loads(row["answers"])}
+                if row["answers"]
+                else {"yes": row["yes"] or "Yes", "no": row["no"] or "No"}
+            )
+            for position, (key, answer) in enumerate(answers.items()):
                 cs.add(
                     "contest_option",
-                    id=cs.key("us.option", f"{contest_key}:{('yes', 'no')[position]}"),
+                    id=cs.key("us.option", f"{contest_key}:{key}"),
                     contest_id=contest,
                     kind="answer",
                     ballot_position=position + 1,
                     ballot_label=answer,
                 )
+            for value, option in options.items():
+                if value.startswith(f"{contest_key}:") and value.removeprefix(f"{contest_key}:") not in answers:
+                    cs.add(
+                        "entity_retirement",
+                        entity_id=option,
+                        reason=f"{row['source_title']} lists no such answer for {name}",
+                    )
             cs.add(
                 "citation",
                 entity_id=contest,

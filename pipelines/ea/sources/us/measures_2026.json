@@ -492,7 +492,15 @@
   "ncsl_id": "Official State Gun Question",
   "ncsl_title": "Official State Gun of Idaho",
   "yes": null,
-  "no": null
+  "no": null,
+  "answers": [
+   "Winchester Model 1894 (.30-30)",
+   "Winchester Model 1873 “Gun that Won the West” (.44-40)",
+   "1873 Colt Single Action Army Revolver “Peacemaker” (.45 Colt)",
+   "M1 Garand rifle (.30-06)",
+   "Colt M1911 .45 automatic Colt pistol (.45 ACP)",
+   "Remington Model 700 bolt-action rifle (.30-06)"
+  ]
  },
  {
   "state": "ID",
