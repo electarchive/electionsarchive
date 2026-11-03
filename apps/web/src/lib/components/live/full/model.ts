@@ -29,6 +29,9 @@ export const LENSES: Array<Lens> = [
   "votes",
 ];
 
+export const INSETS = new Set(["ak", "hi"]);
+export const TERRITORIES = ["pr", "gu", "vi", "mp", "as"];
+
 export const MUTED =
   "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
 export const WAITING =
@@ -143,8 +146,7 @@ export function shade(
   if (entry == null || paint === "lead") {
     const option = called ?? summary.leader;
     if (option == null) {
-      const held = entry?.held ?? null;
-      return held == null ? WAITING : mix(tint(pair, control, held), 24);
+      return WAITING;
     }
     return mix(
       tone(option),

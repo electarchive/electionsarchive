@@ -64,6 +64,7 @@
   geography={data.geography}
   nationPath={data.nationPath}
   names={data.names}
+  frame={data.frame}
   {clock}
   {isOffline}
   forecasts={data.shown.forecasts}

@@ -5,8 +5,10 @@
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Face from "#lib/components/live/face.svelte";
+  import Also from "#lib/components/live/state/also.svelte";
   import { count, percent } from "#lib/format.js";
   import { lead, stamp, surname, tone } from "#lib/live/format.js";
+  import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
   import { describe } from "#lib/live/summary.js";
@@ -42,26 +44,23 @@
   const last = $derived(prior(race));
   const headline = $derived(describe(summary, closes, clock));
   const called = $derived(summary.winner ?? summary.projected);
-  const rows = $derived(
-    race.options
-      .map((option, index) => ({
-        option,
-        index,
-        votes: summary.totals[index] ?? 0,
-        share:
-          summary.total > 0 ? (summary.totals[index] ?? 0) / summary.total : 0,
-        before: last?.shares[index] ?? null,
-      }))
-      .filter((row) => !row.option.isWriteIn || row.votes > 0)
-      .toSorted(
-        (a, b) =>
-          b.votes - a.votes ||
-          (b.before ?? 0) - (a.before ?? 0) ||
-          Number(b.option.isIncumbent) - Number(a.option.isIncumbent) ||
-          a.index - b.index,
-      ),
+  const reach = useReach();
+  const split = $derived(
+    lineup(
+      race,
+      summary.totals,
+      reach(),
+      Math.max(limit, (race.seats ?? 1) + 1),
+    ),
   );
-  const shown = $derived(rows.slice(0, limit));
+  const rows = $derived(
+    split.main.map((line) => ({
+      option: line.option,
+      votes: line.votes,
+      share: line.share ?? 0,
+      before: last?.shares[race.options.indexOf(line.option)] ?? null,
+    })),
+  );
   const scale = $derived(
     Math.max(0.5, ...rows.map((row) => Math.max(row.share, row.before ?? 0))),
   );
@@ -107,7 +106,7 @@
   </header>
 
   <ul class="grid gap-2.5">
-    {#each shown as row (row.option.id)}
+    {#each rows as row (row.option.id)}
       {const color = $derived(tone(row.option))}
       <li
         class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5"
@@ -197,6 +196,7 @@
       </li>
     {/each}
   </ul>
+  <Also rest={split.rest} total={summary.total} />
 
   <div class="grid gap-1.5">
     <div

@@ -8,11 +8,13 @@
     kind,
     sides,
     text,
+    blank,
     isLater = false,
   }: {
-    kind: "ramp" | "counted" | "votes";
+    kind: "ramp" | "counted" | "votes" | "waiting";
     sides: Array<{ name: string; color: string }>;
     text: string;
+    blank: string;
     isLater?: boolean;
   } = $props();
 
@@ -60,6 +62,15 @@
         <span>{percent(1, 0)}</span>
       </div>
     </div>
+  {:else if kind === "waiting"}
+    <p class="flex items-center gap-2 text-[0.6875rem]/4 font-semibold">
+      <span
+        class="shrink-0 rounded-xs ring-1 ring-border block-3 inline-4"
+        style:background-color={blank}
+        aria-hidden="true"
+      ></span>
+      {m.livemap_legend_waiting()}
+    </p>
   {:else if kind === "votes"}
     <div class="flex items-end gap-2" aria-hidden="true">
       {#each [6, 11, 18] as size (size)}

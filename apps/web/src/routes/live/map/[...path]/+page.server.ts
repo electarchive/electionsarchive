@@ -5,6 +5,8 @@ import { control, geography, house, states } from "#lib/server/live-board.js";
 import { night } from "#lib/server/live-page.js";
 import type { PageServerLoad } from "./$types";
 
+const OUTLYING = new Set(["ak", "hi", "pr", "vi", "gu", "mp", "as"]);
+
 export const load: PageServerLoad = async ({ params }) => {
   const segments = params.path.split("/");
   if (segments[0] !== "us" || segments.length < 2 || segments.length > 3) {
@@ -30,6 +32,15 @@ export const load: PageServerLoad = async ({ params }) => {
     ),
   ]);
   if (segments.length === 2) {
+    const lower = Object.entries(nation?.codes ?? {}).flatMap(([key, id]) =>
+      OUTLYING.has(key) ? [] : [id],
+    );
+    const frame = await remember(`live:lower:v1:${election.date}`, async () =>
+      lower.length === 0
+        ? null
+        : ((await geography(lower, election.date, lower, false))?.frame ??
+          null),
+    );
     return {
       ...found,
       nationPath,
@@ -41,6 +52,7 @@ export const load: PageServerLoad = async ({ params }) => {
           ? null
           : { map: districts.map, codes: districts.codes },
       geography: null,
+      frame,
     };
   }
   const areas = [
@@ -93,5 +105,6 @@ export const load: PageServerLoad = async ({ params }) => {
             codes: mine,
           },
     geography: map,
+    frame: null,
   };
 };

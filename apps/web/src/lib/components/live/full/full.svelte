@@ -3,6 +3,7 @@
     LiveElection,
     LiveEstimate,
     LiveOption,
+    LiveRace,
   } from "@ea/analytics/live";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -21,6 +22,7 @@
   import type { Geography, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import Also from "#lib/components/live/state/also.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { percent } from "#lib/format.js";
@@ -32,16 +34,24 @@
     surname,
     tone,
   } from "#lib/live/format.js";
+  import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
-  import { pair as pairOf, remainder, standing } from "#lib/live/standing.js";
+  import {
+    pair as pairOf,
+    remainder,
+    standing,
+    sum,
+  } from "#lib/live/standing.js";
   import { closing, describe, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { Dot, Fill, Lens, Office, Paint } from "./model.js";
   import Canvas from "./canvas.svelte";
   import CountyCard from "./county-card.svelte";
   import CountyList from "./county-list.svelte";
+  import Insets from "./insets.svelte";
   import Legend from "./legend.svelte";
   import {
     BLANK,
@@ -49,6 +59,7 @@
     districtKey,
     flipped,
     holding,
+    INSETS,
     LENSES,
     MUTED,
     OFFICES,
@@ -58,8 +69,10 @@
     shade,
     stateShade,
     tail,
+    TERRITORIES,
     unitFill,
     urgency,
+    WAITING,
   } from "./model.js";
   import NationPanel from "./nation-panel.svelte";
   import RaceCard from "./race-card.svelte";
@@ -73,6 +86,7 @@
     geography,
     nationPath,
     names,
+    frame,
     clock,
     isOffline,
     forecasts,
@@ -89,6 +103,7 @@
     geography: Geography | null;
     nationPath: string;
     names: Record<string, string>;
+    frame: Geography["frame"] | null;
     clock: number;
     isOffline: boolean;
     forecasts: boolean;
@@ -127,6 +142,8 @@
     isNation ? null : (election.slug.split("/")[1] ?? null),
   );
   const found = $derived(board(election, estimates, control));
+  const parties = $derived(reach(election.races));
+  provideReach(() => parties);
   const params = $derived(page.url.searchParams);
 
   function stateName(value: string) {
@@ -153,6 +170,43 @@
     return match ?? "lead";
   });
   const pick = $derived(isNation ? params.get("pick") : null);
+  const isSpread = $derived(isNation && params.get("view") === "counties");
+
+  let spread = $state.raw<{
+    office: Office;
+    value: Awaited<ReturnType<typeof orpc.live.counties.call>>;
+  } | null>(null);
+  let isSpreading = $state(false);
+
+  $effect(() => {
+    if (!isSpread) {
+      return;
+    }
+    const wanted = office;
+    void election.newest;
+    let isCurrent = true;
+    isSpreading = true;
+    orpc.live.counties.call({ path: nationPath, office: wanted }).then(
+      (value) => {
+        if (isCurrent) {
+          spread = { office: wanted, value };
+          isSpreading = false;
+        }
+      },
+      () => {
+        if (isCurrent) {
+          isSpreading = false;
+        }
+      },
+    );
+    return () => {
+      isCurrent = false;
+    };
+  });
+
+  const spreadData = $derived(
+    isSpread && spread?.office === office ? spread.value : null,
+  );
 
   const statewide = $derived(
     found.summaries
@@ -209,17 +263,22 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
-  const hasVotes = $derived((current?.total ?? 0) > 0);
+  const hasVotes = $derived(
+    isSpread
+      ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
+      : isNation
+        ? found.summaries.some(
+            (summary) => summary.race.office === office && summary.total > 0,
+          )
+        : (current?.total ?? 0) > 0,
+  );
   const lens = $derived.by((): Lens => {
     const wanted = params.get("color");
     const match = LENSES.find((entry) => entry === wanted);
     if (isOverview) {
       return match === "counted" ? "counted" : "lead";
     }
-    if (match != null && (hasVotes || match === "last")) {
-      return match;
-    }
-    return hasVotes ? "lead" : "last";
+    return match != null && (hasVotes || match === "last") ? match : "lead";
   });
 
   const counties = $derived.by(() => {
@@ -281,6 +340,47 @@
     new Map(rows.map((entry) => [entry.areaId, entry])),
   );
 
+  const spreadRows = $derived.by(() => {
+    const out = new Map<
+      string,
+      {
+        areaId: string;
+        name: string;
+        state: string;
+        race: LiveRace;
+        row: UnitStanding;
+        pair: [number, number];
+        counted: number | null;
+        color: string;
+      }
+    >();
+    for (const entry of spreadData?.races ?? []) {
+      const held = standing(entry, VIEW);
+      const two = pairOf(entry);
+      for (const unit of entry.units) {
+        const row = held.units.get(unit.id);
+        if (unit.areaId == null || row == null || out.has(unit.areaId)) {
+          continue;
+        }
+        const rest = remainder(row, null, entry.options, two);
+        out.set(unit.areaId, {
+          areaId: unit.areaId,
+          name: placeName(unit.name),
+          state: entry.state,
+          race: entry,
+          row,
+          pair: two,
+          counted:
+            row.total > 0
+              ? Math.min(1, row.total / Math.max(1, rest.expected))
+              : null,
+          color: unitFill(row, lens, entry.options, two, rest.expected),
+        });
+      }
+    }
+    return out;
+  });
+
   const nationCodes = $derived(nation?.codes ?? {});
   const districtCodes = $derived(districts?.codes ?? {});
   const isHouseMap = $derived(
@@ -297,15 +397,49 @@
     isHouseMap || isOverview ? districtCodes : nationCodes,
   );
 
-  const mapGeography = $derived(
+  const isSpreadShown = $derived(spreadData?.map != null);
+  const stateKeys = $derived(
+    new Map(Object.entries(nationCodes).map(([key, areaId]) => [areaId, key])),
+  );
+
+  function stateOf(areaId: string) {
+    if (isSpreadShown) {
+      return spreadRows.get(areaId)?.state ?? null;
+    }
+    return keyOfArea.get(areaId)?.split("-")[0] ?? null;
+  }
+
+  const baseGeography = $derived(
     isNation
-      ? isHouseMap
-        ? (districts?.map ?? null)
-        : (nation?.map ?? null)
+      ? isSpreadShown
+        ? (spreadData?.map ?? null)
+        : isHouseMap
+          ? (districts?.map ?? null)
+          : (nation?.map ?? null)
       : isOverview
         ? (districts?.map ?? null)
         : geography,
   );
+  const insetPlaces = $derived(
+    isNation
+      ? (baseGeography?.places ?? []).filter((place) =>
+          INSETS.has(stateOf(place.areaId) ?? ""),
+        )
+      : [],
+  );
+  const mapGeography = $derived.by((): Geography | null => {
+    if (!isNation || baseGeography == null) {
+      return baseGeography;
+    }
+    const outside = new Set([...INSETS, ...TERRITORIES]);
+    return {
+      ...baseGeography,
+      places: baseGeography.places.filter(
+        (place) => !outside.has(stateOf(place.areaId) ?? ""),
+      ),
+      frame: frame ?? baseGeography.frame,
+    };
+  });
 
   function seatShade(summary: Summary, wanted: Paint) {
     return shade(
@@ -319,6 +453,12 @@
 
   const fills = $derived.by(() => {
     const out = new Map<string, Fill>();
+    if (isSpreadShown) {
+      for (const [areaId, entry] of spreadRows) {
+        out.set(areaId, { color: lens === "votes" ? BLANK : entry.color });
+      }
+      return out;
+    }
     if (isNation && !isHouseMap) {
       for (const [key, areaId] of Object.entries(nationCodes)) {
         const races = (found.byState.get(key) ?? []).filter(
@@ -362,6 +502,21 @@
   });
 
   const dots = $derived.by((): Array<Dot> => {
+    if (isSpreadShown) {
+      return lens === "votes"
+        ? [...spreadRows.values()].flatMap((entry) =>
+            entry.row.total > 0 && entry.row.leader != null
+              ? [
+                  {
+                    areaId: entry.areaId,
+                    value: entry.row.total,
+                    color: tone(entry.race.options[entry.row.leader]),
+                  },
+                ]
+              : [],
+          )
+        : [];
+    }
     if (isNation || isOverview || race == null || lens !== "votes") {
       return [];
     }
@@ -380,7 +535,7 @@
 
   const labels = $derived.by(() => {
     if (isNation) {
-      return isHouseMap
+      return isHouseMap || isSpreadShown
         ? []
         : Object.entries(nationCodes).map(([key, areaId], index) => ({
             areaId,
@@ -445,15 +600,17 @@
     void goto(url, { reset: false, replace: !isPushed });
   }
 
-  function open(target: string) {
-    const areaId = nationCodes[target];
+  function open(target: string, picked: string | null = pick) {
+    const district =
+      office === "house" && picked?.startsWith(`${target}-`) === true
+        ? found.districts.get(picked)
+        : null;
+    const areaId =
+      (district == null ? null : districtCodes[picked ?? ""]) ??
+      nationCodes[target];
     if (areaId != null) {
       canvas?.focus(areaId);
     }
-    const district =
-      office === "house" && pick?.startsWith(`${target}-`) === true
-        ? found.districts.get(pick)
-        : null;
     void goto(
       href(`${election.slug.split("/")[0] ?? "us"}/${target}/${date}`, {
         race:
@@ -462,7 +619,36 @@
               ? "house"
               : office
             : tail(district.race),
-        color: paint === "counted" ? "counted" : null,
+        color:
+          paint === "counted" || (isSpread && lens === "counted")
+            ? "counted"
+            : null,
+      }),
+      { reset: false },
+    );
+  }
+
+  function openCounty(areaId: string) {
+    const entry = spreadRows.get(areaId);
+    if (entry == null) {
+      return;
+    }
+    canvas?.focus(areaId);
+    const home =
+      office === "house"
+        ? (spreadData?.homes[areaId] ?? null)
+        : tail(entry.race);
+    void goto(
+      href(`${election.slug.split("/")[0] ?? "us"}/${entry.state}/${date}`, {
+        race: home ?? "house",
+        county:
+          home == null
+            ? null
+            : placeSlug(
+                entry.race.units.find((unit) => unit.areaId === areaId)?.name ??
+                  "",
+              ),
+        color: params.get("color"),
       }),
       { reset: false },
     );
@@ -484,19 +670,19 @@
 
   function pickArea(areaId: string | null) {
     if (isNation) {
-      const key = areaId == null ? null : (keyOfArea.get(areaId) ?? null);
+      if (areaId != null && isSpreadShown) {
+        openCounty(areaId);
+        return;
+      }
+      const key =
+        areaId == null
+          ? null
+          : (keyOfArea.get(areaId) ?? stateKeys.get(areaId) ?? null);
       if (key == null) {
         update({ pick: null });
         return;
       }
-      if (key === pick) {
-        open(key.split("-")[0] ?? key);
-        return;
-      }
-      update({ pick: key });
-      if (!wide.current && detent === "peek") {
-        detent = "half";
-      }
+      open(key.split("-")[0] ?? key, key);
       return;
     }
     if (isOverview) {
@@ -663,8 +849,67 @@
       .map(([value, label]) => ({
         value,
         label: label(),
-        disabled: !hasVotes && !isOverview && value !== "last",
+        disabled:
+          !hasVotes && !isOverview && value !== "last" && value !== "lead",
       })),
+  );
+  const viewOptions = $derived<Array<SegmentedOption<string>>>([
+    {
+      value: "states",
+      label:
+        office === "house"
+          ? m.livemap_view_districts()
+          : m.livemap_view_states(),
+    },
+    { value: "counties", label: m.livemap_view_counties() },
+  ]);
+  const territories = $derived(
+    isNation
+      ? TERRITORIES.flatMap((key) => {
+          const areaId = nationCodes[key];
+          if (areaId == null) {
+            return [];
+          }
+          const wanted: Paint = isSpread
+            ? lens === "counted"
+              ? "counted"
+              : "lead"
+            : paint;
+          if (office === "house") {
+            const seat = [...found.districts].find(([seat]) =>
+              seat.startsWith(`${key}-`),
+            );
+            return seat == null
+              ? []
+              : [
+                  {
+                    key,
+                    areaId,
+                    seat: seat[0],
+                    color: seatShade(seat[1], wanted),
+                  },
+                ];
+          }
+          const races = (found.byState.get(key) ?? []).filter(
+            (summary) => summary.race.office === office,
+          );
+          return races.length === 0
+            ? []
+            : [
+                {
+                  key,
+                  areaId,
+                  seat: key,
+                  color: stateShade(races, office, wanted, found, control)
+                    .color,
+                },
+              ];
+        })
+      : [],
+  );
+  let lit = $state<string | null>(null);
+  const insetStature = $derived(
+    wide.current ? Math.min(104, Math.max(56, room * 0.13)) : 58,
   );
   const raceOptions = $derived<Array<SegmentedOption<string>>>([
     ...statewide.map((summary) => ({
@@ -699,16 +944,24 @@
         : [{ name: surname(option), color: tone(option) }];
     });
   });
-  const legendKind = $derived.by((): "ramp" | "counted" | "votes" => {
-    const value = isNation ? paint : lens;
-    return value === "counted"
-      ? "counted"
-      : value === "votes"
-        ? "votes"
-        : "ramp";
-  });
+  const legendKind = $derived.by(
+    (): "ramp" | "counted" | "votes" | "waiting" => {
+      const value = isNation && !isSpread ? paint : lens;
+      if (value === "lead" && !hasVotes) {
+        return "waiting";
+      }
+      return value === "counted"
+        ? "counted"
+        : value === "votes"
+          ? "votes"
+          : "ramp";
+    },
+  );
   const legendText = $derived.by(() => {
-    if (isNation) {
+    if (legendKind === "waiting") {
+      return m.livemap_legend_waiting_hint();
+    }
+    if (isNation && !isSpread) {
       return {
         lead: m.night_nation_legend,
         chance: m.night_nation_legend_chance,
@@ -764,6 +1017,9 @@
   );
 
   const loading = $derived.by(() => {
+    if (isSpread && isSpreading && spreadData == null) {
+      return m.livemap_counties_loading();
+    }
     const to = navigating.to;
     if (
       to?.route.id !== "/live/map/[...path]" ||
@@ -772,16 +1028,30 @@
       return null;
     }
     const segments = to.params?.path?.split("/") ?? [];
-    return segments.length === 2
-      ? m.livemap_nation()
-      : stateName(segments[1] ?? "");
+    return m.map_opening({
+      place:
+        segments.length === 2
+          ? m.livemap_nation()
+          : stateName(segments[1] ?? ""),
+    });
   });
 
   function tipRace(areaId: string) {
+    if (isSpreadShown) {
+      return null;
+    }
     if (isNation || isOverview) {
-      const key = keyOfArea.get(areaId);
+      const key = keyOfArea.get(areaId) ?? stateKeys.get(areaId);
       if (key == null) {
         return null;
+      }
+      if (isHouseMap && !key.includes("-")) {
+        return {
+          title: stateName(key),
+          lines: [...found.districts].flatMap(([seat, summary]) =>
+            seat.startsWith(`${key}-`) ? [summary] : [],
+          ),
+        };
       }
       if (isHouseMap || isOverview) {
         const summary = found.districts.get(key);
@@ -832,37 +1102,75 @@
 
 <svelte:window onkeydown={onKey} />
 
-{#snippet optionShares(summary: Summary, limit: number)}
-  {const total = $derived(summary.total)}
-  {const last = $derived(prior(summary.race))}
+{#snippet tipLines(
+  race: LiveRace,
+  totals: Array<number>,
+  before: Array<number> | null,
+  leader: string | null,
+)}
+  {const split = $derived(lineup(race, totals, parties, 3))}
+  {const total = $derived(sum(totals))}
   <ul class="grid gap-1">
-    {#each summary.race.options
-      .map((option, index) => ({ option, index }))
-      .filter((entry) => !entry.option.isWriteIn)
-      .toSorted((a, b) => (summary.totals[b.index] ?? 0) - (summary.totals[a.index] ?? 0) || (last?.shares[b.index] ?? 0) - (last?.shares[a.index] ?? 0))
-      .slice(0, limit) as entry (entry.option.id)}
+    {#each split.main as line (line.option.id)}
+      {const then = $derived(before?.[race.options.indexOf(line.option)] ?? 0)}
       <li class="flex items-center gap-2">
         <span
           class="shrink-0 rounded-full block-2 inline-2"
-          style:background-color={tone(entry.option)}
+          style:background-color={tone(line.option)}
         ></span>
         <span
           class={cn("grow truncate", {
-            "font-semibold": summary.leader?.id === entry.option.id,
-          })}>{entry.option.label}</span
+            "font-semibold": leader === line.option.id,
+          })}>{line.option.label}</span
         >
         <span class="font-figures tabular-nums">
           {#if total > 0}
-            {percent((summary.totals[entry.index] ?? 0) / total)}
-          {:else if last != null}
-            <span class="text-muted-foreground"
-              >{percent(last.shares[entry.index] ?? 0)}</span
-            >
+            {percent(line.share ?? 0)}
+          {:else if then > 0}
+            <span class="text-muted-foreground">{percent(then)}</span>
           {/if}
         </span>
       </li>
     {/each}
   </ul>
+  <Also rest={split.rest} {total} />
+{/snippet}
+
+{#snippet countyTip(
+  name: string,
+  shown: LiveRace | null,
+  row: UnitStanding | null,
+  counted: number | null,
+  two: [number, number],
+)}
+  <p class="font-semibold">{name}</p>
+  {#if row == null || shown == null}
+    <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
+  {:else}
+    {@render tipLines(
+      shown,
+      row.votes,
+      row.baseline?.shares ?? null,
+      row.leader == null ? null : (shown.options[row.leader]?.id ?? null),
+    )}
+    <p class="text-xs text-muted-foreground">
+      {#if counted != null}
+        {m.night_tip_counted({ share: percent(counted, 0) })}
+      {:else}
+        {m.night_tip_waiting()}
+      {/if}
+    </p>
+    {#if row.baseSigned != null}
+      {const then = $derived(
+        shown.options[row.baseSigned >= 0 ? two[0] : two[1]],
+      )}
+      <p class="text-xs text-muted-foreground">
+        {m.night_tip_baseline({
+          margin: `${surname(then)} +${lead(Math.abs(row.baseSigned))}`,
+        })}
+      </p>
+    {/if}
+  {/if}
 {/snippet}
 
 {#snippet tip(areaId: string)}
@@ -904,63 +1212,38 @@
         {#if nationTip.lines.length > 1}
           <p class="text-xs text-muted-foreground">{summary.race.title}</p>
         {/if}
-        {@render optionShares(summary, 3)}
+        {@render tipLines(
+          summary.race,
+          summary.totals,
+          prior(summary.race)?.shares ?? null,
+          summary.leader?.id ?? null,
+        )}
         <p class="text-xs text-muted-foreground">{verdict(summary)}</p>
       {/each}
     {/if}
+  {:else if isSpreadShown}
+    {const entry = $derived(spreadRows.get(areaId))}
+    {#if entry != null}
+      {@render countyTip(
+        m.livemap_county_state({
+          county: entry.name,
+          state: stateName(entry.state),
+        }),
+        entry.race,
+        entry.row,
+        entry.counted,
+        entry.pair,
+      )}
+    {/if}
   {:else}
     {const entry = $derived(rowByArea.get(areaId))}
-    {const name = $derived(counties.get(areaId)?.name ?? "")}
-    <p class="font-semibold">{name}</p>
-    {#if entry == null || race == null}
-      <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
-    {:else}
-      {const row = $derived(entry.row)}
-      <ul class="grid gap-1">
-        {#each row.order.slice(0, 3) as index (index)}
-          {const option = $derived(race.options[index])}
-          {#if option != null && (row.total > 0 || (row.baseline?.shares[index] ?? 0) > 0)}
-            <li class="flex items-center gap-2">
-              <span
-                class="shrink-0 rounded-full block-2 inline-2"
-                style:background-color={tone(option)}
-              ></span>
-              <span
-                class={cn("grow truncate", {
-                  "font-semibold": row.leader === index,
-                })}>{option.label}</span
-              >
-              <span class="font-figures tabular-nums">
-                {#if row.total > 0}
-                  {percent((row.votes[index] ?? 0) / row.total)}
-                {:else}
-                  <span class="text-muted-foreground"
-                    >{percent(row.baseline?.shares[index] ?? 0)}</span
-                  >
-                {/if}
-              </span>
-            </li>
-          {/if}
-        {/each}
-      </ul>
-      <p class="text-xs text-muted-foreground">
-        {#if entry.counted != null}
-          {m.night_tip_counted({ share: percent(entry.counted, 0) })}
-        {:else}
-          {m.night_tip_waiting()}
-        {/if}
-      </p>
-      {#if row.baseSigned != null}
-        {const then = $derived(
-          race.options[row.baseSigned >= 0 ? racePair[0] : racePair[1]],
-        )}
-        <p class="text-xs text-muted-foreground">
-          {m.night_tip_baseline({
-            margin: `${surname(then)} +${lead(Math.abs(row.baseSigned))}`,
-          })}
-        </p>
-      {/if}
-    {/if}
+    {@render countyTip(
+      counties.get(areaId)?.name ?? "",
+      race,
+      entry?.row ?? null,
+      entry?.counted ?? null,
+      racePair,
+    )}
   {/if}
 {/snippet}
 
@@ -974,6 +1257,18 @@
         size={wide.current ? "md" : "sm"}
         class="bg-card/95 shadow-menu backdrop-blur-sm"
         onValueChange={(value) => update({ office: value, pick: null })}
+      />
+      <Segmented
+        options={viewOptions}
+        value={isSpread ? "counties" : "states"}
+        label={m.livemap_view()}
+        size={wide.current ? "md" : "sm"}
+        class="bg-card/95 shadow-menu backdrop-blur-sm"
+        onValueChange={(value: string) =>
+          update({
+            view: value === "counties" ? "counties" : null,
+            pick: null,
+          })}
       />
     {:else}
       <Segmented
@@ -1038,7 +1333,7 @@
 {/snippet}
 
 {#snippet modes(size: "sm" | "md")}
-  {#if isNation}
+  {#if isNation && !isSpread}
     <Segmented
       options={paintOptions}
       value={paint}
@@ -1060,8 +1355,87 @@
   {/if}
 {/snippet}
 
+{#snippet insetBoxes()}
+  {#if baseGeography != null && insetPlaces.length > 0}
+    <Insets
+      tiles={baseGeography.tiles}
+      places={insetPlaces}
+      {fills}
+      {selected}
+      bind:hovered
+      stature={insetStature}
+      nameOf={(name: string) =>
+        name === "Alaska"
+          ? stateName("ak")
+          : name === "Hawaii"
+            ? stateName("hi")
+            : name}
+      labelOf={(areaId: string) => {
+        const entry = spreadRows.get(areaId);
+        return entry == null
+          ? (tipRace(areaId)?.title ?? "")
+          : m.livemap_county_state({
+              county: entry.name,
+              state: stateName(entry.state),
+            });
+      }}
+      onPick={pickArea}
+      {tip}
+    />
+  {/if}
+{/snippet}
+
+{#snippet territoryChips()}
+  {#if territories.length > 0}
+    <div class="relative flex">
+      {#if lit != null}
+        <div
+          class="pointer-events-none absolute inset-e-0 inset-be-[calc(100%+0.5rem)] z-30 grid gap-1.5 rounded-sm bg-popover/95 px-3 py-2.5 text-[0.8125rem] shadow-menu ring-1 ring-border backdrop-blur-sm inline-60 max-md:inset-s-0 max-md:inset-e-auto"
+        >
+          {@render tip(lit)}
+        </div>
+      {/if}
+      <div
+        class="pointer-events-auto flex overflow-hidden rounded-sm bg-card/95 shadow-menu ring-1 ring-border backdrop-blur-sm"
+        role="group"
+        aria-label={m.map_outlying()}
+      >
+        {#each territories as entry (entry.key)}
+          <button
+            type="button"
+            class="flex shrink-0 items-center gap-1.5 border-s border-border px-2 text-xs font-semibold whitespace-nowrap block-7 first:border-s-0 hover:bg-secondary pointer-coarse:block-10"
+            aria-label={stateName(entry.key)}
+            onpointerenter={(event) => {
+              if (event.pointerType === "mouse") {
+                lit = entry.areaId;
+              }
+            }}
+            onpointerleave={() => (lit = null)}
+            onfocus={() => (lit = entry.areaId)}
+            onblur={() => (lit = null)}
+            onclick={() => open(entry.key, entry.seat)}
+          >
+            <span
+              class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+              style:--party={entry.color}
+              aria-hidden="true"
+            ></span>
+            {entry.key.toUpperCase()}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
+{/snippet}
+
 {#snippet legend()}
-  <Legend kind={legendKind} {sides} text={legendText} isLater={isLaterShown} />
+  <Legend
+    kind={legendKind}
+    {sides}
+    text={legendText}
+    blank={isNation && !isSpread ? WAITING : BLANK}
+    isLater={isLaterShown}
+  />
 {/snippet}
 
 {#snippet summaryHead()}
@@ -1417,7 +1791,7 @@
                 class="animate-spin block-3.5 inline-3.5 motion-reduce:animate-none"
                 aria-hidden="true"
               />
-              {m.map_opening({ place: loading })}
+              {loading}
             {:else}
               <span
                 class="rounded-full bg-destructive block-2 inline-2"
@@ -1431,10 +1805,18 @@
 
       {#if wide.current}
         <div
-          class="absolute inset-s-3 inset-be-3 z-20 grid gap-3 rounded-sm bg-card/95 p-3 shadow-menu ring-1 ring-border backdrop-blur-sm inline-[min(24rem,calc(100%-5rem))]"
+          class="pointer-events-none absolute inset-s-3 inset-be-3 z-20 grid justify-items-start gap-2"
         >
-          {@render modes("sm")}
-          {@render legend()}
+          {@render insetBoxes()}
+          <div
+            class="pointer-events-auto grid gap-3 rounded-sm bg-card/95 p-3 shadow-menu ring-1 ring-border backdrop-blur-sm inline-[min(24rem,calc(100vw-min(25rem,36vw)-6rem))]"
+          >
+            {@render modes("sm")}
+            {@render legend()}
+          </div>
+        </div>
+        <div class="pointer-events-none absolute inset-e-15 inset-be-3 z-20">
+          {@render territoryChips()}
         </div>
         <div class="absolute inset-e-3 inset-be-3 z-20 grid gap-1.5">
           <div
@@ -1482,6 +1864,13 @@
           >
         </div>
       {:else}
+        <div
+          class="pointer-events-none absolute inset-s-3 z-20 grid justify-items-start gap-1.5"
+          style:inset-block-end="{sheet + 12}px"
+        >
+          {@render territoryChips()}
+          {@render insetBoxes()}
+        </div>
         <Drawer
           {room}
           bind:detent

@@ -1,9 +1,11 @@
 import type {
+  LiveBaseline,
   LiveElection,
   LiveFrame,
   LiveOffice,
   LiveOption,
   LiveRace,
+  LiveUnit,
   LiveUnitCount,
 } from "@ea/analytics/live";
 import type { SQL } from "drizzle-orm";
@@ -21,7 +23,7 @@ import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
-import { portraits } from "#lib/server/live-board.js";
+import { portraits, geography as shaped } from "#lib/server/live-board.js";
 import { localizeNames } from "#lib/server/names.js";
 import { plane } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
@@ -903,6 +905,7 @@ async function night(
   detail: "race" | "state" | "national",
   shown: Shown,
   called: Awaited<ReturnType<typeof calls>>,
+  slot = "",
 ) {
   const contests = picked.map((row) => row.id);
   const [
@@ -935,7 +938,7 @@ async function night(
       order by f.as_of
     `),
     remember(
-      `live:fixed:v2:${found.path}|${found.rest}|${detail}`,
+      `live:fixed:v2:${found.path}|${found.rest}|${detail}${slot}`,
       async () => {
         const [choices, incumbents, settled, prior, drawn, placed] =
           await Promise.all([
@@ -1424,6 +1427,254 @@ async function night(
   };
 }
 
+const SPREAD = {
+  senate: /^senate(?:-special)?$/u,
+  governor: /^governor$/u,
+  house: /^house-(?:\d+|at-large)$/u,
+};
+
+const spread = new Map<
+  string,
+  { key: string; value: Promise<Awaited<ReturnType<typeof spreadOut>>> }
+>();
+
+function countyRace(race: LiveRace): LiveRace {
+  const units = race.units.flatMap((unit): Array<LiveUnit> =>
+    unit.scheme === "us.county" && unit.areaId != null
+      ? [{ ...unit, parentId: null }]
+      : [],
+  );
+  const ids = new Set(units.map((unit) => unit.id));
+  const latest = new Map<string, LiveUnitCount>();
+  for (const row of race.counts) {
+    const held = latest.get(row.unitId);
+    if (ids.has(row.unitId) && (held == null || held.at <= row.at)) {
+      latest.set(row.unitId, row);
+    }
+  }
+  const last = race.frames.at(-1);
+  return {
+    ...race,
+    units,
+    counts: [...latest.values()],
+    frames: last == null ? [] : [last],
+    baseline: race.baseline.flatMap((row): Array<LiveBaseline> =>
+      ids.has(row.unitId)
+        ? [
+            {
+              unitId: row.unitId,
+              label: row.label,
+              turnout: row.turnout,
+              shares: row.shares,
+            },
+          ]
+        : [],
+    ),
+  };
+}
+
+function houseRace(races: Array<LiveRace>): LiveRace | null {
+  const first = races[0];
+  if (first == null) {
+    return null;
+  }
+  const index = new Map<string, number>();
+  const options: Array<LiveOption> = [];
+  const slots = races.map((race) =>
+    race.options.map((option) => {
+      const key = option.party?.id ?? option.id;
+      const at = index.get(key) ?? options.length;
+      if (at === options.length) {
+        index.set(key, at);
+        options.push(
+          option.party == null
+            ? option
+            : {
+                ...option,
+                id: key,
+                label: option.party.name,
+                person: null,
+                photo: null,
+                isIncumbent: false,
+              },
+        );
+      }
+      return at;
+    }),
+  );
+  const units = new Map<string, LiveUnit>();
+  const counts = new Map<string, LiveUnitCount>();
+  const weights = new Map<
+    string,
+    { label: string; turnout: number; votes: Array<number> }
+  >();
+  const totals = options.map(() => 0);
+  let at = "";
+  for (const [position, race] of races.entries()) {
+    const slot = slots[position] ?? [];
+    const own = countyRace(race);
+    const areaOf = new Map(
+      own.units.map((unit) => [unit.id, unit.areaId ?? ""]),
+    );
+    for (const unit of own.units) {
+      const areaId = unit.areaId ?? "";
+      if (!units.has(areaId)) {
+        units.set(areaId, { ...unit, id: areaId });
+      }
+    }
+    for (const row of own.counts) {
+      const areaId = areaOf.get(row.unitId) ?? "";
+      const held = counts.get(areaId) ?? {
+        unitId: areaId,
+        at: row.at,
+        votes: options.map(() => 0),
+        reporting: null,
+        expected: null,
+      };
+      for (const [option, value] of row.votes.entries()) {
+        const to = slot[option] ?? 0;
+        held.votes[to] = (held.votes[to] ?? 0) + value;
+      }
+      if (row.at > held.at) {
+        held.at = row.at;
+      }
+      counts.set(areaId, held);
+    }
+    for (const row of own.baseline) {
+      const areaId = areaOf.get(row.unitId) ?? "";
+      const held = weights.get(areaId) ?? {
+        label: row.label,
+        turnout: 0,
+        votes: options.map(() => 0),
+      };
+      held.turnout += row.turnout;
+      for (const [option, share] of row.shares.entries()) {
+        const to = slot[option] ?? 0;
+        held.votes[to] = (held.votes[to] ?? 0) + share * row.turnout;
+      }
+      weights.set(areaId, held);
+    }
+    for (const [option, value] of (
+      race.certified?.totals ??
+      race.frames.at(-1)?.totals ??
+      []
+    ).entries()) {
+      const to = slot[option] ?? 0;
+      totals[to] = (totals[to] ?? 0) + value;
+    }
+    const last = race.frames.at(-1)?.at ?? "";
+    if (last > at) {
+      at = last;
+    }
+    for (const row of own.counts) {
+      if (row.at > at) {
+        at = row.at;
+      }
+    }
+  }
+  return {
+    ...first,
+    id: `house:${first.state}`,
+    district: null,
+    options,
+    units: [...units.values()],
+    counts: [...counts.values()],
+    baseline: [...weights].flatMap(([areaId, held]): Array<LiveBaseline> =>
+      held.turnout > 0
+        ? [
+            {
+              unitId: areaId,
+              label: held.label,
+              turnout: held.turnout,
+              shares: held.votes.map((value) => value / held.turnout),
+            },
+          ]
+        : [],
+    ),
+    frames: at === "" ? [] : [{ at, totals, reporting: null, expected: null }],
+    certified: null,
+    projected: null,
+  };
+}
+
+async function spreadOut(
+  found: Awaited<ReturnType<typeof election>>,
+  picked: Awaited<ReturnType<typeof races>>,
+  chosen: keyof typeof SPREAD,
+  shown: Shown,
+  called: Awaited<ReturnType<typeof calls>>,
+) {
+  const result = await night(
+    found,
+    picked,
+    "state",
+    shown,
+    called,
+    `|${chosen}`,
+  );
+  const kept =
+    chosen === "house"
+      ? Map.groupBy(result.election.races, (race) => race.state)
+          .values()
+          .flatMap((group) => {
+            const race = houseRace(group);
+            return race == null ? [] : [race];
+          })
+          .toArray()
+      : result.election.races.map((race) => countyRace(race));
+  const areas = [
+    ...new Set(
+      kept.flatMap((race) =>
+        race.units.flatMap((unit) =>
+          unit.areaId == null ? [] : [unit.areaId],
+        ),
+      ),
+    ),
+  ];
+  const framed = [
+    ...new Set(
+      kept.flatMap((race) =>
+        TERRITORIES.has(race.state) ||
+        race.state === "ak" ||
+        race.state === "hi"
+          ? []
+          : race.units.flatMap((unit) =>
+              unit.areaId == null ? [] : [unit.areaId],
+            ),
+      ),
+    ),
+  ];
+  const map = await remember(
+    `live:spread:v1:${found.date}:${chosen}:${String(areas.length)}`,
+    async () =>
+      shaped(areas, found.date, framed.length > 0 ? framed : areas, false),
+  );
+  const homes = new Map<string, { tail: string; turnout: number }>();
+  if (chosen === "house") {
+    for (const race of result.election.races) {
+      const areaOf = new Map(
+        race.units.map((unit) => [unit.id, unit.areaId ?? ""]),
+      );
+      for (const row of race.baseline) {
+        const areaId = areaOf.get(row.unitId) ?? "";
+        if (areaId !== "" && row.turnout > (homes.get(areaId)?.turnout ?? -1)) {
+          homes.set(areaId, {
+            tail: race.slug.split("/").at(-1) ?? "",
+            turnout: row.turnout,
+          });
+        }
+      }
+    }
+  }
+  return {
+    races: kept,
+    map,
+    homes: Object.fromEntries(
+      [...homes].map(([areaId, home]) => [areaId, home.tail]),
+    ),
+  };
+}
+
 const Input = v.objectAsync({
   path: Path,
   rehearsal: v.optional(
@@ -1516,6 +1767,44 @@ export const live = {
           });
       }
       return ready?.value ?? running.value;
+    }),
+  counties: base
+    .input(
+      v.objectAsync({
+        path: Path,
+        office: v.picklist(["senate", "governor", "house"]),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await election(input.path);
+      if (found.rest !== "" || found.path.split("/").length !== 2) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const picked = (await races(found)).filter((row) =>
+        SPREAD[input.office].test(row.path.split("/", 4)[3] ?? ""),
+      );
+      const [stamp, shown, called] = await Promise.all([
+        db.execute<{ key: string }>(sql`
+          select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+          from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
+        `),
+        switches(),
+        calls(picked.map((row) => row.id)),
+      ]);
+      const slot = `${getLocale()}|${String(shown.results)}|${found.path}|${input.office}`;
+      const key = `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`;
+      const held = spread.get(slot);
+      if (held?.key === key) {
+        return held.value;
+      }
+      const value = spreadOut(found, picked, input.office, shown, called);
+      spread.set(slot, { key, value });
+      value.catch(() => {
+        if (spread.get(slot)?.value === value) {
+          spread.delete(slot);
+        }
+      });
+      return value;
     }),
   stamp: base
     .input(v.object({ path: v.string(), isRehearsal: v.optional(v.boolean()) }))
