@@ -167,9 +167,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Sitz besetzt, keine Parteien erfasst",
         "countPlural=*": "{countText} Sitze besetzt, keine Parteien erfasst"
@@ -183,9 +181,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Sitz besetzt",
         "countPlural=*": "{countText} Sitze besetzt"
@@ -260,9 +256,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Wahl",
         "countPlural=*": "{countText} Wahlen"
@@ -296,13 +290,8 @@
   "col_final_ballot": "Letzter Wahlgang",
   "delegates_primary": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Delegierter, in der Vorwahl bestimmt",
         "countPlural=*": "{count} Delegierte, in der Vorwahl bestimmt"
@@ -311,13 +300,8 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Delegierter, in den Caucuses bestimmt",
         "countPlural=*": "{count} Delegierte, in den Caucuses bestimmt"
@@ -326,13 +310,8 @@
   ],
   "delegates_convention": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Delegierter, vom Parteitag des Bundesstaates bestimmt",
         "countPlural=*": "{count} Delegierte, vom Parteitag des Bundesstaates bestimmt"
@@ -341,13 +320,8 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Delegierter, ungebunden",
         "countPlural=*": "{count} Delegierte, alle ungebunden"
@@ -431,9 +405,7 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "In dieser Wahlperiode fand 1 Nachwahl statt, vor der Parlamentswahl {year}.",
         "countPlural=*": "In dieser Wahlperiode fanden {count} Nachwahlen statt, vor der Parlamentswahl {year}."
@@ -442,13 +414,8 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "In dieser Wahlperiode fand bisher 1 Nachwahl statt.",
         "countPlural=*": "In dieser Wahlperiode fanden bisher {count} Nachwahlen statt."
@@ -457,13 +424,8 @@
   ],
   "byes_changed": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 Sitz hat die Partei gewechselt.",
         "countPlural=*": "{count} Sitze haben die Partei gewechselt."
@@ -649,9 +611,7 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "{rank}. bestes Ergebnis für {name} unter {count} {nouns} im Ausland"
       }
@@ -693,9 +653,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} {groups}: keine weiteren Ergebnisse über die oben bereits gezeigten hinaus, daher hier nicht aufgeführt.",
         "countPlural=*": "{countText} {groups}: keine weiteren Ergebnisse über die oben bereits gezeigten hinaus, daher hier nicht aufgeführt."
@@ -741,9 +699,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -752,13 +708,8 @@
   ],
   "map_electoral": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Wahlmännerstimme",
         "countPlural=*": "{count} Wahlmännerstimmen"
@@ -801,9 +752,7 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{party} gewann {count} Sitz in {where}",
         "countPlural=*": "{party} gewann {count} Sitze in {where}"
@@ -844,13 +793,8 @@
   "check_votes_valid_unit": "{name}: Die Stimmen ergeben zusammen {votes}, gemeldet sind jedoch {valid} gültige Stimmzettel",
   "checks_turnout": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Einheit meldet mehr Stimmzettel als Wahlberechtigte",
         "countPlural=*": "{count} Einheiten melden mehr Stimmzettel als Wahlberechtigte"
@@ -859,13 +803,8 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Einheit meldet Stimmen, die nicht zu den gültigen Stimmzetteln passen",
         "countPlural=*": "{count} Einheiten melden Stimmen, die nicht zu den gültigen Stimmzetteln passen"
@@ -877,13 +816,8 @@
   "election_unplaced_detail": "Diese Wahlen, wie etwa die Universitätssitze, haben kein geografisches Gebiet und sind in Tabelle und Karte nicht enthalten.",
   "election_parts": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Teil",
         "countPlural=*": "{count} Teile"
@@ -916,9 +850,7 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "1 Sitz wurde ohne Gegenkandidaten vergeben, daher wurden dafür keine Stimmen abgegeben: {parties}.",
         "seatsPlural=*": "{seats} Sitze wurden ohne Gegenkandidaten vergeben, daher wurden dafür keine Stimmen abgegeben: {parties}."
@@ -933,9 +865,7 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "1 {noun} entsandte mehr als ein Mitglied. Die Wähler konnten mehr als eine Stimme abgeben, daher zählen die Summen Stimmen, nicht Wähler.",
         "countPlural=*": "{count} {nouns} entsandten mehr als ein Mitglied. Die Wähler konnten mehr als eine Stimme abgeben, daher zählen die Summen Stimmen, nicht Wähler."
@@ -980,13 +910,8 @@
   "race_contests_nonvoting": "{count} Wahlen, darunter {nonvoting} Wahlen von Delegierten ohne Stimmrecht",
   "race_contests": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -1056,9 +981,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} lokale Gebietskörperschaft",
         "countPlural=*": "{countText} lokale Gebietskörperschaften"
@@ -1072,9 +995,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} County",
         "countPlural=*": "{countText} Countys"
@@ -1258,13 +1179,8 @@
   "lists_title": "Kandidatenlisten",
   "lists_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus Parteilisten mit festgelegter Rangfolge besetzt",
         "seatsPlural=*": "{seats} Sitze aus Parteilisten mit festgelegter Rangfolge besetzt"
@@ -1275,13 +1191,8 @@
   "lists_unranked_title": "Gewählte Mitglieder",
   "lists_unranked_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus Parteilisten besetzt. Die Quelle nennt nur die gewählten Mitglieder, nicht die vollständigen Listen mit Rangfolge.",
         "seatsPlural=*": "{seats} Sitze aus Parteilisten besetzt. Die Quelle nennt nur die gewählten Mitglieder, nicht die vollständigen Listen mit Rangfolge."
@@ -1291,13 +1202,8 @@
   "lists_open_title": "Kandidaten nach Liste",
   "lists_open_summary": [
     {
-      "declarations": [
-        "input seats",
-        "local seatsPlural = seats: plural"
-      ],
-      "selectors": [
-        "seatsPlural"
-      ],
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus offenen Parteilisten besetzt. Die Kandidaten jeder Liste sind nach Personenstimmen gereiht.",
         "seatsPlural=*": "{seats} Sitze aus offenen Parteilisten besetzt. Die Kandidaten jeder Liste sind nach Personenstimmen gereiht."
@@ -1307,13 +1213,8 @@
   "col_members": "Gewählte Mitglieder",
   "lists_all": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Die {count} Liste",
         "countPlural=*": "Alle {count} Listen"
@@ -1324,13 +1225,8 @@
   "lists_collapse": "Listenanfang zeigen",
   "lists_more": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} weiterer Kandidat",
         "countPlural=*": "{count} weitere Kandidaten"
@@ -1339,13 +1235,8 @@
   ],
   "lists_seats": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Sitz",
         "countPlural=*": "{count} Sitze"
@@ -1439,9 +1330,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Wahl auf dem Stimmzettel",
         "countPlural=*": "{countText} Wahlen auf dem Stimmzettel"
@@ -1519,9 +1408,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Sitz gewonnen",
         "countPlural=*": "{countText} Sitze gewonnen"
@@ -1538,10 +1425,7 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": [
-        "seatsPlural",
-        "officesPlural"
-      ],
+      "selectors": ["seatsPlural", "officesPlural"],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} Sitz, {officesText} Amt gewonnen",
         "seatsPlural=one, officesPlural=*": "{seatsText} Sitz, {officesText} Ämter gewonnen",
@@ -1782,9 +1666,7 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=*": "Platz {rank} für {name} unter {count} {nouns} in {place}"
       }
@@ -1977,13 +1859,8 @@
   "tiers_tile_tacit": "{place}: {party} gewann {seats} von {total} Sitzen, davon {tacit} ohne Gegenkandidaten",
   "tiers_tacit": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Sitz wurde ohne Gegenkandidaten vergeben, ohne dass eine Abstimmung stattfand.",
         "countPlural=*": "{count} Sitze wurden ohne Gegenkandidaten vergeben, ohne dass eine Abstimmung stattfand."
@@ -2065,9 +1942,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Sitz zur Wahl",
         "countPlural=*": "{countText} Sitze zur Wahl"
@@ -2120,9 +1995,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Mitglied",
         "countPlural=*": "{countText} Mitglieder"
@@ -2261,13 +2134,8 @@
   "changelog_first": "Die erste markierte Version. Frühere Änderungen stehen im Commit-Verlauf.",
   "changelog_commits": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Änderung",
         "countPlural=*": "{count} Änderungen"
@@ -2284,13 +2152,8 @@
   "person_majority": "Mehrheit {count}",
   "person_scattered": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Erhielt außerdem handschriftlich eingetragene Stimmen in {count} Wahl",
         "countPlural=*": "Erhielt außerdem handschriftlich eingetragene Stimmen in {count} Wahlen"
@@ -2304,9 +2167,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Erhielt {count} Wahlmännerstimme von einem abtrünnigen Wahlmann in {states}",
         "countPlural=*": "Erhielt {count} Wahlmännerstimmen von abtrünnigen Wahlmännern in {states}"
@@ -2320,9 +2181,7 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Erhielt {count} Wahlmännerstimme in {states}",
         "countPlural=*": "Erhielt {count} Wahlmännerstimmen in {states}"
@@ -2437,9 +2296,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Ergebnis",
         "countPlural=*": "{countText} Ergebnisse"
@@ -2577,13 +2434,8 @@
   "map_landing_lede": "Öffnen Sie die jüngste Wahl eines beliebigen Landes auf einer Vollbildkarte. Zoomen Sie von den landesweiten Ergebnissen bis zur kleinsten Meldeeinheit. Vergleichen Sie mit früheren Wahlen und wechseln Sie zwischen einzelnen Wahlen.",
   "map_landing_elections": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -2776,9 +2628,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} bekannte Lücke anzeigen",
         "countPlural=*": "Alle {countText} bekannten Lücken anzeigen"
@@ -3036,9 +2886,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Sieg",
         "countPlural=*": "{countText} Siege"
@@ -3200,9 +3048,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} nach Stimmabgabeart oder Zählgang aufgeschlüsselte Zahl wird hier nicht angezeigt.",
         "countPlural=*": "{countText} nach Stimmabgabeart oder Zählgang aufgeschlüsselte Zahlen werden hier nicht angezeigt."
@@ -3216,9 +3062,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Ort, an dem die Kandidaten nicht die gültigen Stimmen ergeben",
         "countPlural=*": "{countText} Orte, an denen die Kandidaten nicht die gültigen Stimmen ergeben"
@@ -3232,9 +3076,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zahl geändert",
         "countPlural=*": "{countText} Zahlen geändert"
@@ -3260,9 +3102,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Änderung, geprüft von der Redaktion",
         "countPlural=*": "{countText} Änderungen, geprüft von der Redaktion"
@@ -3462,9 +3302,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Befund zu prüfen",
         "countPlural=*": "{countText} Befunde zu prüfen"
@@ -3506,9 +3344,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Der erneute Lauf von {pipeline} weicht in {countText} Zahl von dieser Korrektur ab. Der Änderungsvorschlag bleibt genehmigt, bis der Import korrigiert und erneut ausgeführt wird.",
         "countPlural=*": "Der erneute Lauf von {pipeline} weicht in {countText} Zahlen von dieser Korrektur ab. Der Änderungsvorschlag bleibt genehmigt, bis der Import korrigiert und erneut ausgeführt wird."
@@ -3522,9 +3358,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zahl",
         "countPlural=*": "{countText} Zahlen"
@@ -3564,9 +3398,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Änderung",
         "countPlural=*": "{countText} Änderungen"
@@ -3779,9 +3611,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zeile",
         "countPlural=*": "{countText} Zeilen"
@@ -4022,9 +3852,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zahl",
         "countPlural=*": "{countText} Zahlen"
@@ -4038,9 +3866,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Rahmen",
         "countPlural=*": "{countText} Rahmen"
@@ -4054,9 +3880,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Ort",
         "countPlural=*": "{countText} Orte"
@@ -4070,9 +3894,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zeile eingefügt.",
         "countPlural=*": "{countText} Zeilen eingefügt."
@@ -4086,9 +3908,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} wurde nicht gefunden und als neuer Ort hinzugefügt; prüfen Sie den Code.",
         "countPlural=*": "{countText} wurden nicht gefunden und als neue Orte hinzugefügt; prüfen Sie die Codes."
@@ -4102,9 +3922,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} passte nicht ins Raster und wurde ausgelassen.",
         "countPlural=*": "{countText} passten nicht ins Raster und wurden ausgelassen."
@@ -4118,9 +3936,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Wenn Sie eine andere Datei verwenden, wird der auf dieser Datei eingezeichnete Rahmen entfernt.",
         "countPlural=*": "Wenn Sie eine andere Datei verwenden, werden die {countText} auf dieser Datei eingezeichneten Rahmen entfernt."
@@ -4198,9 +4014,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Grenze ändert sich.",
         "countPlural=*": "{countText} Grenzen ändern sich."
@@ -4214,9 +4028,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} neues Gebiet.",
         "countPlural=*": "{countText} neue Gebiete."
@@ -4230,9 +4042,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Code passt zu keinem Gebiet. Wählen Sie ein Namensfeld, um es als neues Gebiet hinzuzufügen, oder lassen Sie es aus.",
         "countPlural=*": "{countText} Codes passen zu keinem Gebiet. Wählen Sie ein Namensfeld, um sie als neue Gebiete hinzuzufügen, oder lassen Sie sie aus."
@@ -4246,9 +4056,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} neues Gebiet hat keinen Namen im Namensfeld.",
         "countPlural=*": "{countText} neue Gebiete haben keinen Namen im Namensfeld."
@@ -4262,9 +4070,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Geometrie",
         "countPlural=*": "{countText} Geometrien"
@@ -4281,9 +4087,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Kommentar",
         "countPlural=*": "{countText} Kommentare"
@@ -4352,9 +4156,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Diskussion, {countText} offenes Thema",
         "countPlural=*": "Diskussion, {countText} offene Themen"
@@ -4371,9 +4173,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Zeichen übrig",
         "countPlural=*": "{countText} Zeichen übrig"
@@ -4387,9 +4187,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Antwort",
         "countPlural=*": "{countText} Antworten"
@@ -4967,13 +4765,8 @@
   "night_chamber_others": "Parteilose und Sonstige",
   "night_chamber_not_up": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Sitz steht dieses Jahr nicht zur Wahl",
         "countPlural=*": "{count} Sitze stehen dieses Jahr nicht zur Wahl"
@@ -4984,13 +4777,8 @@
   "night_chamber_open": "Alle Wahlen in der Grafik „{title}“ ansehen",
   "night_governors_races": [
     {
-      "declarations": [
-        "input count",
-        "local countPlural = count: plural"
-      ],
-      "selectors": [
-        "countPlural"
-      ],
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -5141,9 +4929,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "In {countText} Stichwahl unterlag der Erstplatzierte des ersten Wahlgangs.",
         "countPlural=*": "In {countText} Stichwahlen unterlag der Erstplatzierte des ersten Wahlgangs."
@@ -5157,9 +4943,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Wahlkreissieger erhielt keinen Sitz, weil die Listenstimmen seiner Partei dafür nicht ausreichten.",
         "countPlural=*": "{countText} Wahlkreissieger erhielten keinen Sitz, weil die Listenstimmen ihrer Partei dafür nicht ausreichten."
@@ -5173,9 +4957,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} qualifizierter Kandidat zog sich vor der Stichwahl zurück.",
         "countPlural=*": "{countText} qualifizierte Kandidaten zogen sich vor der Stichwahl zurück."
@@ -5191,9 +4973,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Stichwahl schrumpfte von {from} auf {to} Kandidaten",
         "countPlural=*": "{countText} Stichwahlen schrumpften von {from} auf {to} Kandidaten"
@@ -5383,9 +5163,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Änderungsvorschlag",
         "countPlural=*": "{countText} Änderungsvorschläge"
@@ -5399,9 +5177,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} angenommen",
         "countPlural=*": "{countText} angenommen"
@@ -5492,9 +5268,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Änderungsvorschlag pro Tag",
         "countPlural=*": "{countText} Änderungsvorschläge pro Tag"
@@ -5541,9 +5315,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Rücknahme in die Warteschlange gestellt.",
         "countPlural=*": "{countText} Rücknahmen in die Warteschlange gestellt."
@@ -5571,9 +5343,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Stapel",
         "countPlural=*": "{countText} Stapel"
@@ -5616,9 +5386,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Änderung",
         "countPlural=*": "{countText} Änderungen"
@@ -5701,9 +5469,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Benachrichtigungen, {countText} ungelesen",
         "countPlural=*": "Benachrichtigungen, {countText} ungelesen"
@@ -5742,9 +5508,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} neue Benachrichtigung",
         "countPlural=*": "{countText} neue Benachrichtigungen"
@@ -5758,9 +5522,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Im Elections Archive braucht etwas Ihre Aufmerksamkeit.",
         "countPlural=*": "{countText} Dinge im Elections Archive brauchen Ihre Aufmerksamkeit."
@@ -5774,9 +5536,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Sie haben eine neue Benachrichtigung",
         "countPlural=*": "Sie haben {countText} neue Benachrichtigungen"
@@ -5792,9 +5552,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Ihre Beobachtungsliste heute: {countText} Aktualisierung",
         "countPlural=*": "Ihre Beobachtungsliste heute: {countText} Aktualisierungen"
@@ -5808,9 +5566,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Ihre Beobachtungsliste diese Woche: {countText} Aktualisierung",
         "countPlural=*": "Ihre Beobachtungsliste diese Woche: {countText} Aktualisierungen"
@@ -5824,9 +5580,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} Aktualisierung zu dem, was Sie beobachten.",
         "countPlural=*": "{countText} Aktualisierungen zu dem, was Sie beobachten."

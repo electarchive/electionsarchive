@@ -39,6 +39,7 @@ if ! node apps/web/scripts/i18n-check.js > /dev/null 2>&1; then
   log "batches still running; the next tick resumes"
   exit 0
 fi
+"$repo/node_modules/.bin/oxfmt" apps/web/messages > /dev/null
 git add apps/web/messages
 if git diff --cached --quiet; then
   log "nothing to commit"
@@ -59,7 +60,7 @@ for attempt in 1 2 3; do
     fi
   fi
   if git push -q origin HEAD:main; then
-    log "pushed $(git rev-parse --short HEAD) on top of $(git rev-parse --short origin/main)"
+    log "pushed $(git rev-parse --short HEAD)"
     exit 0
   fi
   log "push $attempt rejected; retrying"
