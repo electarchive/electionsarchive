@@ -10619,6 +10619,8 @@ def parse() -> None:
                 display = str(row["district"])
                 office = str(row["contest"]).removeprefix(display).strip(" ,")
                 head, _, seat = office.partition(", ")
+                if not seat and (split := re.match(r"(Director|Commissioner) (.+)$", head)):
+                    head, seat = split.groups()
                 head = re.sub(r"^Directors?$", "Board of Directors", head)
                 tail = f"{state}:{row['fips']}-{slug(display)}:board" + (f":{slug(seat)}" if seat else "")
                 title = f"{head}, {seat}" if seat else head
