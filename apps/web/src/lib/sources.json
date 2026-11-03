@@ -1,0 +1,1333 @@
+{
+  "categories": [
+    "authorities",
+    "local",
+    "legislatures",
+    "boundaries",
+    "records",
+    "research",
+    "reference",
+    "print",
+    "news",
+    "parties",
+    "live"
+  ],
+  "entries": [
+    {
+      "id": "fr-interieur",
+      "category": "authorities",
+      "name": "Ministère de l'Intérieur",
+      "url": "https://www.interieur.gouv.fr/",
+      "countries": ["FR"],
+      "supplies": ["results", "candidates"],
+      "license": "Licence Ouverte 2.0",
+      "publishers": ["Ministère de l'Intérieur"],
+      "quote": {
+        "text": "Depuis deux siècles, au cœur de l'État dans les territoires, le ministère de l'Intérieur répond aux attentes et demandes des citoyens.",
+        "url": "https://www.interieur.gouv.fr/ministere",
+        "lang": "fr"
+      }
+    },
+    {
+      "id": "tr-ysk",
+      "category": "authorities",
+      "name": "Yüksek Seçim Kurulu",
+      "url": "https://www.ysk.gov.tr/",
+      "countries": ["TR"],
+      "supplies": ["results", "candidates"],
+      "publishers": ["Yüksek Seçim Kurulu", "Yüksek Seçim Kurulu (YSK)"],
+      "quote": {
+        "text": "Anayasa’da “Yasama Bölümü” içinde yer alan ve seçimlerin genel yönetim ve denetimini yürüten Yüksek Seçim Kurulu yedi asıl ve dört yedek üyeden oluşur.",
+        "url": "https://www.ysk.gov.tr/doc/dosyalar/Galeri/AfisBrosur/BYSK.pdf",
+        "lang": "tr"
+      }
+    },
+    {
+      "id": "de-bundeswahlleiterin",
+      "category": "authorities",
+      "name": "Die Bundeswahlleiterin",
+      "url": "https://www.bundeswahlleiterin.de/",
+      "countries": ["DE"],
+      "supplies": ["results", "boundaries"],
+      "license": "Datenlizenz Deutschland – Namensnennung 2.0",
+      "publishers": ["Die Bundeswahlleiterin"],
+      "quote": {
+        "text": "The main task of the Federal Returning Officer is supervising the proper conduct of the election while observing the deadlines laid down by law, from the preparation phase to the publication of the final election results.",
+        "url": "https://www.bundeswahlleiterin.de/en/ueber-uns/aufgaben.html",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "it-interno",
+      "category": "authorities",
+      "name": "Ministero dell'Interno",
+      "url": "https://elezioni.interno.gov.it/",
+      "countries": ["IT"],
+      "supplies": ["results", "candidates"],
+      "license": "Open by default (CAD art. 52)",
+      "publishers": ["Ministero dell'Interno"],
+      "quote": {
+        "text": "Sezione del sito del Dipartimento per gli Affari Interni e Territoriali che raccoglie informazioni e documenti sulle elezioni a cura della Direzione Centrale per i Servizi Elettorali.",
+        "url": "https://elezioni.interno.gov.it/",
+        "lang": "it"
+      }
+    },
+    {
+      "id": "ca-elections-canada",
+      "category": "authorities",
+      "name": "Elections Canada",
+      "url": "https://www.elections.ca/",
+      "countries": ["CA"],
+      "supplies": ["results", "candidates"],
+      "license": "Open Government Licence – Canada",
+      "publishers": ["Elections Canada"],
+      "quote": {
+        "text": "Headed by the Chief Electoral Officer of Canada, Elections Canada is an independent, non-partisan agency of Parliament. Its primary task is to be prepared at all times to administer an electoral event.",
+        "url": "https://www.elections.ca/content.aspx?dir=role&document=index&lang=e&section=abo",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "br-tse",
+      "category": "authorities",
+      "name": "Tribunal Superior Eleitoral",
+      "url": "https://www.tse.jus.br/",
+      "countries": ["BR"],
+      "supplies": ["results", "candidates"],
+      "license": "CC BY",
+      "publishers": ["Tribunal Superior Eleitoral"],
+      "quote": {
+        "text": "The Superior Electoral Court (TSE), the highest structure within the Electoral Justice system, plays a fundamental role in the construction and employment of Brazilian democracy.",
+        "url": "https://international.tse.jus.br/en/superior-electoral-court/the-court",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ch-bk",
+      "category": "authorities",
+      "name": "Swiss Federal Chancellery",
+      "url": "https://www.bk.admin.ch/",
+      "countries": ["CH"],
+      "supplies": ["results", "live"],
+      "license": "Open use with the source named",
+      "publishers": ["Swiss Federal Chancellery"],
+      "quote": {
+        "text": "The Federal Chancellery is the administrative office of the Federal Council.",
+        "url": "https://www.bk.admin.ch/en/the-federal-chancellery",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-electoral-commission",
+      "category": "authorities",
+      "name": "The Electoral Commission",
+      "url": "https://www.electoralcommission.org.uk/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "license": "Open Government Licence v3.0",
+      "publishers": ["The Electoral Commission", "Electoral Commission"],
+      "quote": {
+        "text": "The Electoral Commission is the independent body which oversees elections and regulates political finance in the UK. We work to promote public confidence in the democratic process and ensure its integrity.",
+        "url": "https://www.electoralcommission.org.uk/about-us",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-eoni",
+      "category": "authorities",
+      "name": "Electoral Office for Northern Ireland",
+      "url": "https://www.eoni.org.uk/",
+      "countries": ["GB"],
+      "supplies": ["results", "candidates"],
+      "license": "Open Government Licence v3.0",
+      "publishers": ["Electoral Office for Northern Ireland"],
+      "quote": {
+        "text": "The Electoral Office is an independent, non-partisan body which assists the Chief Electoral Officer for Northern Ireland in running elections and compiling the electoral register.",
+        "url": "https://www.eoni.org.uk/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-emb",
+      "category": "authorities",
+      "name": "Electoral Management Board for Scotland",
+      "url": "https://www.emb.scot/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "publishers": [
+        "The Electoral Management Board for Scotland",
+        "Electoral Management Board for Scotland"
+      ],
+      "quote": {
+        "text": "The EMB is independent of both Scottish and UK Governments and political parties and is accountable to the Scottish Parliament.",
+        "url": "https://www.emb.scot/us/us-1",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ca-qc",
+      "category": "authorities",
+      "name": "Élections Québec",
+      "url": "https://www.electionsquebec.qc.ca/",
+      "countries": ["CA"],
+      "supplies": ["results", "boundaries"],
+      "publishers": ["Élections Québec"],
+      "quote": {
+        "text": "Our institution is impartial and independent. Its mission is to ensure the integrity, transparency, and reliability of elections, and to contribute to the vitality of Québec democracy.",
+        "url": "https://www.electionsquebec.qc.ca/en/our-institution/mission-values-and-mandates/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ie-housing",
+      "category": "authorities",
+      "name": "Department of Housing, Local Government and Heritage",
+      "url": "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/",
+      "countries": ["IE"],
+      "supplies": ["results"],
+      "publishers": ["Department of Housing, Local Government and Heritage"],
+      "quote": {
+        "text": "The Department of Housing, Local Government and Heritage's mission is to support the sustainable and efficient delivery of well-planned homes and effective local government.",
+        "url": "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/organisation-information/about-the-department-of-housing-local-government-and-heritage/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "us-fec",
+      "category": "authorities",
+      "name": "Federal Election Commission",
+      "url": "https://www.fec.gov/",
+      "countries": ["US"],
+      "supplies": ["results", "candidates"],
+      "license": "Public domain",
+      "publishers": ["Federal Election Commission"],
+      "quote": {
+        "text": "The FEC is an independent government agency, created by Congress in 1974.",
+        "url": "https://www.fec.gov/about/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "us-eac",
+      "category": "authorities",
+      "name": "U.S. Election Assistance Commission",
+      "url": "https://www.eac.gov/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "license": "Public domain",
+      "publishers": ["U.S. Election Assistance Commission"],
+      "quote": {
+        "text": "The U.S. Election Assistance Commission (EAC) is an independent, bipartisan commission whose mission is to help election officials improve the administration of elections and help Americans participate in the voting process.",
+        "url": "https://www.eac.gov/about-eac",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "us-state",
+      "category": "authorities",
+      "name": "US state and territorial election offices",
+      "countries": ["US"],
+      "supplies": ["results", "candidates", "boundaries", "live"],
+      "about": "Secretaries of state, state boards and commissions, and territorial election offices certify statewide and legislative results and publish them as canvass reports, results files, and election-night pages.",
+      "isGroup": true,
+      "match": "Secretary of State|Secretary of the State|Secretary of the Commonwealth|Department of State|Division of Elections|Election Division|Elections Division|State Board|State Election|Elections Commission|Elections Board|Department of Elections|Lieutenant Governor|Office of Elections|Bureau of Elections|State Canvass|Government Accountability|Commissioner of Elections|Election Commission|Election System|Elections System|Election Office|Board of Election Laws|Board of Elections|[Ss]tate election statistics|^(\\w+\\.)?(sos|ohiosos|elections|electionresults|dos\\.elections|mielections|apps\\.arizona|ajc\\.alaska|candidatefiling|candidates\\.sos|ncsbe|in\\.gov|utah\\.gov)\\b",
+      "rank": 10
+    },
+    {
+      "id": "other-authorities",
+      "category": "authorities",
+      "name": "Other national and regional election authorities",
+      "countries": [
+        "AT",
+        "BE",
+        "BG",
+        "CY",
+        "CZ",
+        "DE",
+        "DK",
+        "EE",
+        "ES",
+        "FI",
+        "GR",
+        "HR",
+        "HU",
+        "LT",
+        "LU",
+        "LV",
+        "MT",
+        "NL",
+        "PL",
+        "PT",
+        "RO",
+        "SE",
+        "SI",
+        "SK",
+        "CA",
+        "TR",
+        "GB"
+      ],
+      "supplies": ["results"],
+      "about": "The national, state, and provincial bodies that run elections elsewhere, including the authority in each European Union member state that published the 2024 European Parliament results.",
+      "isGroup": true,
+      "match": "[Ww]ahl|Electoral|Elections (BC|Alberta)|Junta|Kiesraad|Valmyndigheten|Oikeusministeriö|Bundesministerium|SPF Intérieur|Grand-Duché|Υπουργείο|комисия|komisija|Komisja|Választási|Valimiskomisjon|rinkimų|vēlēšanu|izborno|volilna|Comissão Nacional|T\\.C\\. İçişleri|European Parliament$|National Assembly for Wales Commission",
+      "rank": 11
+    },
+    {
+      "id": "us-local",
+      "category": "local",
+      "name": "US county, city, and district election offices",
+      "countries": ["US"],
+      "supplies": ["results", "candidates", "boundaries"],
+      "about": "County clerks, boards of elections, registrars, and city and school district offices run most American elections and publish the precinct and local results that state offices leave out.",
+      "isGroup": true,
+      "match": "County|City|Town|Village|Township|Parish|Borough|ISD|School|College|District|[Mm]unicipal|[Cc]lerk|Registrar|Auditor|Supervisor of Elections|Election Commissioners|Philadelphia|Chicago|San Francisco|Cambridge|Elections Department|Election Department|clarkcountynv|county|Commissioners|Utility",
+      "rank": 8
+    },
+    {
+      "id": "uk-local",
+      "category": "local",
+      "name": "British and Irish councils and returning officers",
+      "countries": ["GB", "IE"],
+      "supplies": ["results", "candidates"],
+      "about": "Councils, returning officers, and combined authorities publish declarations for local, mayoral, police and crime commissioner, and devolved elections.",
+      "isGroup": true,
+      "match": "Council\\b|Returning Officer|Combined (County )?Authority|London Elects|GM Elects|Greater London Authority|Comhairle|City of London Corporation|London Research Centre",
+      "rank": 3
+    },
+    {
+      "id": "us-clerk",
+      "category": "legislatures",
+      "name": "Clerk of the U.S. House of Representatives",
+      "url": "https://clerk.house.gov/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "license": "Public domain",
+      "publishers": ["Clerk of the House of Representatives"],
+      "about": "The Clerk of the House publishes the official statistics of every congressional and presidential election since 1920."
+    },
+    {
+      "id": "gb-parliament",
+      "category": "legislatures",
+      "name": "UK Parliament",
+      "url": "https://www.parliament.uk/",
+      "countries": ["GB"],
+      "supplies": ["results", "people"],
+      "license": "Open Parliament Licence",
+      "publishers": ["UK Parliament", "Parliament of the United Kingdom"],
+      "quote": {
+        "text": "Parliament examines what the Government is doing, makes new laws, holds the power to set taxes and debates the issues of the day.",
+        "url": "https://www.parliament.uk/about/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-commons-library",
+      "category": "legislatures",
+      "name": "House of Commons Library",
+      "url": "https://commonslibrary.parliament.uk/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "license": "Open Parliament Licence",
+      "publishers": ["House of Commons Library"],
+      "quote": {
+        "text": "The House of Commons Library is a research and information service based in the UK Parliament.",
+        "url": "https://commonslibrary.parliament.uk/about-us/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ca-lop",
+      "category": "legislatures",
+      "name": "Library of Parliament",
+      "url": "https://lop.parl.ca/",
+      "countries": ["CA"],
+      "supplies": ["results", "people"],
+      "license": "Open Government Licence – Canada",
+      "publishers": ["Library of Parliament", "House of Commons of Canada"],
+      "quote": {
+        "text": "The Library of Parliament contributes to Canadian parliamentary democracy by creating, managing and delivering authoritative, reliable and relevant information and knowledge for and about Parliament.",
+        "url": "https://lop.parl.ca/sites/PublicWebsite/default/en_CA/About/Vision",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "it-camera",
+      "category": "legislatures",
+      "name": "Camera dei deputati",
+      "url": "https://www.camera.it/",
+      "countries": ["IT"],
+      "supplies": ["results", "people"],
+      "license": "CC BY 4.0",
+      "publishers": ["Camera dei deputati", "Senato della Repubblica"],
+      "quote": {
+        "text": "La Camera esamina e approva le leggi, sia di iniziativa del Governo, sia di iniziativa parlamentare, sia di iniziativa popolare, sia ancora d'iniziativa del Consiglio nazionale dell'economia e del lavoro o dei Consigli regionali.",
+        "url": "https://conoscere.camera.it/",
+        "lang": "it"
+      }
+    },
+    {
+      "id": "tr-tbmm",
+      "category": "legislatures",
+      "name": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www.tbmm.gov.tr/",
+      "countries": ["TR"],
+      "supplies": ["results", "people"],
+      "publishers": [
+        "Türkiye Büyük Millet Meclisi",
+        "Türkiye Büyük Millet Meclisi Vakfı",
+        "Cumhuriyet Senatosu"
+      ],
+      "about": "Türkiye's parliament, whose records list the members elected to every assembly since 1920."
+    },
+    {
+      "id": "ie-oireachtas",
+      "category": "legislatures",
+      "name": "Houses of the Oireachtas",
+      "url": "https://www.oireachtas.ie/",
+      "countries": ["IE"],
+      "supplies": ["results", "people"],
+      "license": "Oireachtas (Open Data) PSI Licence",
+      "publishers": ["Houses of the Oireachtas"],
+      "quote": {
+        "text": "The main function of the Oireachtas is to make laws for Ireland. The Oireachtas also elects the Government and approves the funding of Government Departments. An important function of the Oireachtas is to hold the Government to account.",
+        "url": "https://www.oireachtas.ie/en/visit-and-learn/how-parliament-works/role-of-the-oireachtas/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-scottish-parliament",
+      "category": "legislatures",
+      "name": "The Scottish Parliament",
+      "url": "https://www.parliament.scot/",
+      "countries": ["GB"],
+      "supplies": ["results", "people"],
+      "publishers": ["The Scottish Parliament", "Scottish Parliament"],
+      "quote": {
+        "text": "The Scottish Parliament examines what the Scottish Government is doing, makes new laws on devolved matters and debates the issues of the day.",
+        "url": "https://www.parliament.scot/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-senedd-research",
+      "category": "legislatures",
+      "name": "Senedd Research",
+      "url": "https://research.senedd.wales/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "license": "Senedd Commission copyright, reusable with acknowledgment",
+      "publishers": ["Senedd Research"],
+      "quote": {
+        "text": "We are a research and information service based in the Welsh Parliament.",
+        "url": "https://research.senedd.wales/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "eu-parliament",
+      "category": "legislatures",
+      "name": "European Parliament",
+      "url": "https://www.europarl.europa.eu/",
+      "countries": ["EU"],
+      "supplies": ["results", "people"],
+      "license": "CC BY 4.0",
+      "publishers": ["European Parliament"],
+      "quote": {
+        "text": "The European Parliament is an important forum for political debate and decision-making at the EU level.",
+        "url": "https://www.europarl.europa.eu/about-parliament/en/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "other-legislatures",
+      "category": "legislatures",
+      "name": "State legislatures and official registers",
+      "countries": ["US", "GB"],
+      "supplies": ["results", "people", "boundaries"],
+      "about": "State legislatures, their research offices, and the official registers and manuals that print past returns and members' records.",
+      "isGroup": true,
+      "match": "Legislat|General Assembly|House of Representatives|Senate|Parliament|Assembly|Parliamentary|Official Register|North Carolina Manual|Revisor",
+      "rank": 7
+    },
+    {
+      "id": "us-census",
+      "category": "boundaries",
+      "name": "U.S. Census Bureau",
+      "url": "https://www.census.gov/",
+      "countries": ["US"],
+      "supplies": ["boundaries", "results"],
+      "license": "Public domain",
+      "publishers": ["U.S. Census Bureau"],
+      "quote": {
+        "text": "The Census Bureau's mission is to serve as the nation’s leading provider of quality data about its people and economy.",
+        "url": "https://www.census.gov/about/what.html",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-ons",
+      "category": "boundaries",
+      "name": "Office for National Statistics",
+      "url": "https://www.ons.gov.uk/",
+      "countries": ["GB"],
+      "supplies": ["boundaries"],
+      "license": "Open Government Licence v3.0",
+      "publishers": ["Office for National Statistics"],
+      "quote": {
+        "text": "We are the UK’s largest independent producer of official statistics and its recognised national statistical institute.",
+        "url": "https://www.ons.gov.uk/aboutus",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "tr-tuik",
+      "category": "boundaries",
+      "name": "Türkiye İstatistik Kurumu",
+      "url": "https://www.tuik.gov.tr/",
+      "countries": ["TR"],
+      "supplies": ["results"],
+      "publishers": [
+        "Türkiye İstatistik Kurumu",
+        "Devlet İstatistik Enstitüsü"
+      ],
+      "quote": {
+        "text": "Turkish Statistical Institute (TurkStat) has been serving as the producer and coordinator of our country's official statistics since its foundation, as authorized by Turkish Statistics Law No. 5429 and Presidential Decree No. 4.",
+        "url": "https://www.tuik.gov.tr/media/corporatecontent/turkstat_quality_policy.pdf",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ch-bfs",
+      "category": "boundaries",
+      "name": "Swiss Federal Statistical Office",
+      "url": "https://www.bfs.admin.ch/",
+      "countries": ["CH"],
+      "supplies": ["results", "boundaries"],
+      "license": "Open use with the source named",
+      "publishers": [
+        "Federal Statistical Office",
+        "Amt für Statistik und Daten Kanton Zürich"
+      ],
+      "quote": {
+        "text": "As the national competence centre for official statistics, the Federal Statistical Office (FSO) is the central hub in Switzerland's data ecosystem. It supports and strengthens the whole public administration in dealing with data.",
+        "url": "https://www.bfs.admin.ch/bfs/en/home/fso.html",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "de-bkg",
+      "category": "boundaries",
+      "name": "Bundesamt für Kartographie und Geodäsie",
+      "url": "https://www.bkg.bund.de/",
+      "countries": ["DE"],
+      "supplies": ["boundaries"],
+      "license": "Datenlizenz Deutschland – Namensnennung 2.0",
+      "publishers": ["Bundesamt für Kartographie und Geodäsie"],
+      "quote": {
+        "text": "The Federal Agency for Cartography and Geodesy (BKG) is a technical agency under the Federal Ministry of the Interior and Community and a modern competence and service center.",
+        "url": "https://bkg.bund.de/EN/About-BKG/about-bkg.html",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "fr-ign",
+      "category": "boundaries",
+      "name": "Institut national de l'information géographique et forestière",
+      "url": "https://www.ign.fr/",
+      "countries": ["FR"],
+      "supplies": ["boundaries"],
+      "license": "Licence Ouverte 2.0",
+      "publishers": [
+        "Institut national de l'information géographique et forestière"
+      ],
+      "quote": {
+        "text": "IGN is the reference public operator for geographic and forest information in France.",
+        "url": "https://www.ign.fr/institut/identity-card",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "gb-os",
+      "category": "boundaries",
+      "name": "Ordnance Survey",
+      "url": "https://www.ordnancesurvey.co.uk/",
+      "countries": ["GB"],
+      "supplies": ["boundaries"],
+      "license": "Open Government Licence v3.0",
+      "publishers": ["Ordnance Survey", "Ordnance Survey of Northern Ireland"],
+      "quote": {
+        "text": "We create, maintain, and distribute detailed location information for Great Britain.",
+        "url": "https://www.ordnancesurvey.co.uk/about",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ca-statcan",
+      "category": "boundaries",
+      "name": "Statistics Canada",
+      "url": "https://www.statcan.gc.ca/",
+      "countries": ["CA"],
+      "supplies": ["boundaries"],
+      "license": "Statistics Canada Open Licence",
+      "publishers": [
+        "Statistics Canada",
+        "Elections Canada and Natural Resources Canada"
+      ],
+      "quote": {
+        "text": "As Canada's central statistical agency, Statistics Canada produces statistical data and insights to help Canadians better understand their country's population, resources, economy, society and culture.",
+        "url": "https://www.statcan.gc.ca/en/about",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "br-ibge",
+      "category": "boundaries",
+      "name": "IBGE",
+      "url": "https://www.ibge.gov.br/",
+      "countries": ["BR"],
+      "supplies": ["boundaries"],
+      "publishers": ["IBGE"],
+      "about": "Brazil's national statistics and geography institute, which publishes the official municipal and state boundaries."
+    },
+    {
+      "id": "it-istat",
+      "category": "boundaries",
+      "name": "ISTAT",
+      "url": "https://www.istat.it/",
+      "countries": ["IT"],
+      "supplies": ["boundaries"],
+      "license": "CC BY 4.0",
+      "publishers": ["ISTAT"],
+      "quote": {
+        "text": "The Italian National Institute of Statistics, a public research organisation, is the main producer of official statistics in the service of citizens and policy-makers.",
+        "url": "https://www.istat.it/en/about-istat/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "eu-eurostat",
+      "category": "boundaries",
+      "name": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/web/gisco",
+      "countries": ["EU"],
+      "supplies": ["boundaries"],
+      "license": "Free non-commercial use with the source named",
+      "publishers": ["Eurostat"],
+      "quote": {
+        "text": "GISCO is the Geographic Information System of the Commission. It provides the European Commission with geographical information, meeting its needs at 3 levels: EU, Member State and regional.",
+        "url": "https://ec.europa.eu/eurostat/web/gisco",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ch-swisstopo",
+      "category": "boundaries",
+      "name": "swisstopo",
+      "url": "https://www.swisstopo.admin.ch/",
+      "countries": ["CH"],
+      "supplies": ["boundaries"],
+      "license": "Open Government Data, free use with attribution",
+      "publishers": ["Federal Office of Topography swisstopo"],
+      "quote": {
+        "text": "The Federal Office of Topography swisstopo is Switzerland's geoinformation centre.",
+        "url": "https://www.swisstopo.admin.ch/en/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "fr-data-gouv",
+      "category": "boundaries",
+      "name": "data.gouv.fr",
+      "url": "https://www.data.gouv.fr/",
+      "countries": ["FR"],
+      "supplies": ["results", "boundaries"],
+      "license": "Licence Ouverte 2.0",
+      "publishers": ["data.gouv.fr", "Etalab"],
+      "about": "France's open data portal, which hosts the Ministry of the Interior's results files and national boundary sets."
+    },
+    {
+      "id": "natural-earth",
+      "category": "boundaries",
+      "name": "Natural Earth",
+      "url": "https://www.naturalearthdata.com/",
+      "countries": [],
+      "supplies": ["boundaries"],
+      "license": "Public domain",
+      "publishers": ["Natural Earth"],
+      "quote": {
+        "text": "A global, public domain map dataset available at three scales and featuring tightly integrated vector and raster data.",
+        "url": "https://github.com/nvkelso/natural-earth-vector",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "geonames",
+      "category": "boundaries",
+      "name": "GeoNames",
+      "url": "https://www.geonames.org/",
+      "countries": [],
+      "supplies": ["boundaries"],
+      "license": "CC BY 4.0",
+      "publishers": ["GeoNames"],
+      "quote": {
+        "text": "GeoNames is integrating geographical data such as names of places in various languages, elevation, population and others from various sources.",
+        "url": "https://www.geonames.org/about.html",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "other-statistics",
+      "category": "boundaries",
+      "name": "Other statistical offices",
+      "countries": ["DE", "CZ", "DK", "SK", "GB"],
+      "supplies": ["results", "boundaries"],
+      "about": "National and state statistical offices that publish election results or the population and area figures behind them.",
+      "isGroup": true,
+      "match": "Statisti|[SsŠš]tatistick|Records of Scotland|Research Agency",
+      "rank": 5
+    },
+    {
+      "id": "mapping",
+      "category": "boundaries",
+      "name": "Mapping, GIS, and redistricting offices",
+      "countries": ["US", "GB", "DE", "IE", "TR", "FR", "CA"],
+      "supplies": ["boundaries"],
+      "about": "Mapping agencies, county and state GIS offices, and redistricting bodies that publish the district, precinct, and ward boundaries drawn on the maps.",
+      "isGroup": true,
+      "match": "GIS\\b|^gis\\.|Geographic|Geospatial|FirstMap|Spatial|LOJIC|Planning|Resource Information|Geoinformation|Stadtentwicklung|Department of Agriculture$|Revenue and Fiscal|Economic and Demographic|Reapportionment|Redistricting|Boundary Commission|Kadastro|Tailte Éireann|Royal Commission|Finances publiques",
+      "rank": 4
+    },
+    {
+      "id": "ea-reconstructions",
+      "category": "boundaries",
+      "name": "Elections Archive reconstructions",
+      "url": null,
+      "countries": ["US"],
+      "supplies": ["boundaries"],
+      "about": "District and ward boundaries the archive rebuilt from Census voting districts and precinct results where no official shapefile of an old plan survives.",
+      "publishers": ["Elections Archive"]
+    },
+    {
+      "id": "records",
+      "category": "records",
+      "name": "Gazettes, courts, archives, and libraries",
+      "countries": ["US", "TR", "FR", "GB", "IE", "IT", "CA", "EU"],
+      "supplies": ["results", "people", "candidates"],
+      "about": "Official gazettes, court rulings, archives, and libraries that hold certified returns, appointments, and scanned historical records.",
+      "isGroup": true,
+      "match": "Supreme Court|Gazete|Gazette|Journal officiel|Anayasa|Conseil constitutionnel|legislation\\.gov\\.uk|Government Publishing|Law Revision|Archives|Library|Libraries|Historical|Historian|Glasgow Digital|Office of Governor|Prime Minister|UK Government|Public Notice|Comptroller|Local Government Finance|Judicial|judicialperformance|Yargıtay|azcourts|oscn\\.net|King's Printer|Publications Office|Belediye|Ministero della Giustizia|ExploreUK",
+      "rank": 6
+    },
+    {
+      "id": "mit-medsl",
+      "category": "research",
+      "name": "MIT Election Data and Science Lab",
+      "url": "https://electionlab.mit.edu/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "license": "CC0 1.0",
+      "publishers": ["MIT Election Data and Science Lab"],
+      "quote": {
+        "text": "By applying scientific principles to how elections are studied and administered, MEDSL aims to improve the democratic experience for all U.S. voters.",
+        "url": "https://electionlab.mit.edu/about",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "statewide-database",
+      "category": "research",
+      "name": "Statewide Database",
+      "url": "https://statewidedatabase.org/",
+      "countries": ["US"],
+      "supplies": ["results", "boundaries"],
+      "publishers": ["Statewide Database, University of California, Berkeley"],
+      "quote": {
+        "text": "We are responsible for collecting and processing data for California's decennial redistricting.",
+        "url": "https://statewidedatabase.org/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "clea",
+      "category": "research",
+      "name": "Constituency-Level Elections Archive",
+      "url": "https://electiondataarchive.org/",
+      "countries": [],
+      "supplies": ["results"],
+      "publishers": ["THEA, The Elections Archive"],
+      "about": "An archive of constituency-level results for lower and upper chamber elections around the world, compiled from official sources."
+    },
+    {
+      "id": "vest",
+      "category": "research",
+      "name": "Voting and Election Science Team",
+      "url": "https://dataverse.harvard.edu/dataverse/electionscience",
+      "countries": ["US"],
+      "supplies": ["results", "boundaries"],
+      "license": "CC BY 4.0",
+      "publishers": ["Voting and Election Science Team"],
+      "about": "A team of researchers that joins precinct results to precinct boundaries for every state and publishes them as open shapefiles."
+    },
+    {
+      "id": "klarner",
+      "category": "research",
+      "name": "Carl Klarner's state legislative returns",
+      "url": "https://doi.org/10.7910/DVN/3WZFK9",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "license": "CC0 1.0",
+      "publishers": ["Carl Klarner"],
+      "about": "A dataset of state legislative election returns for every state since 1967, compiled by Carl Klarner."
+    },
+    {
+      "id": "harvard-eda",
+      "category": "research",
+      "name": "Harvard Election Data Archive",
+      "url": "https://dataverse.harvard.edu/dataverse/eda",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "license": "CC BY 3.0",
+      "publishers": ["Harvard Election Data Archive", "Election Data Analysis"],
+      "about": "Precinct-level results for American state and federal elections in the 2000s, assembled by researchers at Harvard along with matching precinct maps."
+    },
+    {
+      "id": "parlgov",
+      "category": "research",
+      "name": "ParlGov",
+      "url": "https://www.parlgov.org/",
+      "countries": [],
+      "supplies": ["parties"],
+      "license": "CC0 1.0",
+      "publishers": ["ParlGov (Döring, Huber, and Manow)"],
+      "quote": {
+        "text": "ParlGov is a data infrastructure with information about EU and OECD democracies from 1900 to 2023.",
+        "url": "https://www.parlgov.org/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "cdsp",
+      "category": "research",
+      "name": "Centre de données socio-politiques",
+      "url": "https://cdsp.sciences-po.fr/",
+      "countries": ["FR"],
+      "supplies": ["results"],
+      "license": "ODbL 1.0",
+      "publishers": ["Centre de données socio-politiques, Sciences Po"],
+      "quote": {
+        "text": "Founded in 2005, the Centre for Sociopolitical Data provides a range of data-related infrastructures and services for the social sciences.",
+        "url": "https://cdsp.sciences-po.fr/en/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "mggg",
+      "category": "research",
+      "name": "MGGG Redistricting Lab",
+      "url": "https://mggg.org/",
+      "countries": ["US"],
+      "supplies": ["boundaries"],
+      "license": "ODbL 1.0",
+      "publishers": ["MGGG Redistricting Lab"],
+      "quote": {
+        "text": "We research data science interventions – better mechanisms, better models, better metrics – for democracy.",
+        "url": "https://www.mggg.org/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "ark",
+      "category": "research",
+      "name": "ARK Northern Ireland Elections",
+      "url": "https://www.ark.ac.uk/elections/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "publishers": ["ARK Northern Ireland Elections"],
+      "quote": {
+        "text": "Thanks to the generosity of the McDougall Trust, and the support of the Centre for Data Digitisation and Analysis at QUB, the Northern Ireland Elections site is now able to offer Excel spreadsheets covering every count of every full election in Northern Ireland since 1973.",
+        "url": "https://www.ark.ac.uk/elections/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "cain",
+      "category": "research",
+      "name": "CAIN, Ulster University",
+      "url": "https://cain.ulster.ac.uk/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "publishers": [
+        "CAIN, Ulster University",
+        "CAIN (Conflict Archive on the Internet), Ulster University",
+        "CAIN Web Service, Ulster University"
+      ],
+      "quote": {
+        "text": "CAIN: Northern Ireland Conflict, Politics, and Society. Information on 'the troubles'.",
+        "url": "https://cain.ulster.ac.uk/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "other-research",
+      "category": "research",
+      "name": "Other research and scholarship",
+      "countries": [],
+      "supplies": ["results", "boundaries", "people"],
+      "about": "Datasets, papers, and books by scholars and research centers, each cited for the specific results or boundaries taken from it.",
+      "isGroup": true,
+      "kinds": ["academic"],
+      "rank": 1
+    },
+    {
+      "id": "wikipedia",
+      "category": "reference",
+      "name": "Wikipedia",
+      "url": "https://www.wikipedia.org/",
+      "countries": [],
+      "supplies": ["results", "people", "parties"],
+      "license": "CC BY-SA 4.0",
+      "publishers": [
+        "Wikipedia",
+        "Wikipedia (pt)",
+        "Wikipedia (it)",
+        "Wikipedia (fr)",
+        "Wikipédia",
+        "Vikipedi"
+      ],
+      "quote": {
+        "text": "Wikipedia is a free online encyclopedia that anyone can edit, and millions already have.",
+        "url": "https://en.wikipedia.org/wiki/Wikipedia:About",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "wikidata",
+      "category": "reference",
+      "name": "Wikidata",
+      "url": "https://www.wikidata.org/",
+      "countries": [],
+      "supplies": ["people", "parties"],
+      "license": "CC0 1.0",
+      "publishers": ["Wikidata"],
+      "quote": {
+        "text": "Wikidata is a free, collaborative, multilingual, secondary knowledge base, collecting structured data to provide support for Wikipedia, Wikimedia Commons, the other wikis of the Wikimedia movement, and to anyone in the world.",
+        "url": "https://www.wikidata.org/wiki/Wikidata:Introduction",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "wikimedia-commons",
+      "category": "reference",
+      "name": "Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/",
+      "countries": [],
+      "supplies": ["people", "parties"],
+      "license": "Per file: public domain, CC0, CC BY, or CC BY-SA",
+      "publishers": ["Wikimedia Commons"],
+      "about": "A shared library of freely licensed images, including official portraits and party logos."
+    },
+    {
+      "id": "openelections",
+      "category": "reference",
+      "name": "OpenElections",
+      "url": "https://openelections.net/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "publishers": [
+        "OpenElections",
+        "Washington county auditors and OpenElections"
+      ],
+      "quote": {
+        "text": "The goal of OpenElections is to create the first free, comprehensive, standardized, linked set of election data for the United States, including federal, statewide and state legislative offices.",
+        "url": "https://openelections.net/about/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "democracy-club",
+      "category": "reference",
+      "name": "Democracy Club",
+      "url": "https://democracyclub.org.uk/",
+      "countries": ["GB"],
+      "supplies": ["results", "candidates"],
+      "license": "CC BY 4.0",
+      "publishers": ["Democracy Club"],
+      "quote": {
+        "text": "Democracy Club was set up in 2015 as a non-partisan non-profit to help voters find the crucial information they need on election day, regardless of how they vote.",
+        "url": "https://democracyclub.org.uk/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "unicode-cldr",
+      "category": "reference",
+      "name": "Unicode CLDR",
+      "url": "https://cldr.unicode.org/",
+      "countries": [],
+      "supplies": ["reference"],
+      "license": "Unicode License v3",
+      "publishers": ["Unicode CLDR"],
+      "quote": {
+        "text": "CLDR (Common Locale Data & Rules) supplies key information and structures critical for programs and operating systems around the world to ensure that they feel natural, no matter which language users speak or where they live.",
+        "url": "https://cldr.unicode.org/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "unitedstates",
+      "category": "reference",
+      "name": "The @unitedstates project",
+      "url": "https://github.com/unitedstates",
+      "countries": ["US"],
+      "supplies": ["people"],
+      "license": "CC0 1.0",
+      "publishers": ["The @unitedstates project"],
+      "about": "A volunteer project that keeps open data on every member of Congress, from 1789 to today."
+    },
+    {
+      "id": "ncsl",
+      "category": "reference",
+      "name": "National Conference of State Legislatures",
+      "url": "https://www.ncsl.org/",
+      "countries": ["US"],
+      "supplies": ["reference"],
+      "publishers": ["National Conference of State Legislatures"],
+      "quote": {
+        "text": "NCSL represents the legislatures in the states, territories and commonwealths of the U.S. Its mission is to advance the effectiveness, independence and integrity of legislatures and to foster interstate cooperation and facilitate the exchange of information among legislatures.",
+        "url": "https://www.ncsl.org/about-us",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "election-demon",
+      "category": "reference",
+      "name": "Election Demon",
+      "url": "http://www.election.demon.co.uk/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "publishers": ["Election Demon", "David Boothroyd"],
+      "about": "David Boothroyd's compilation of returning officers' declarations, the source for Northern Ireland House of Commons results from 1921 to 1972, Welsh Assembly results from 1999 to 2003, and London's European Parliament results from 1979 to 1999."
+    },
+    {
+      "id": "leap",
+      "category": "reference",
+      "name": "Local Elections Archive Project",
+      "url": "https://www.andrewteale.me.uk/leap/",
+      "countries": ["GB"],
+      "supplies": ["results", "candidates"],
+      "license": "CC BY-SA 3.0",
+      "publishers": ["Andrew Teale"],
+      "about": "Andrew Teale's archive of British local election results, the source for ward-level council results from 2002 to 2024 and for the first and second preferences in directly elected mayoral contests."
+    },
+    {
+      "id": "election-polling",
+      "category": "reference",
+      "name": "Election Polling",
+      "url": "https://www.electionpolling.co.uk/",
+      "countries": ["GB"],
+      "supplies": ["results"],
+      "publishers": ["Election Polling"],
+      "about": "The source for the 1975 European Community membership referendum results by counting area."
+    },
+    {
+      "id": "open-council-data",
+      "category": "reference",
+      "name": "Open Council Data UK",
+      "url": "https://www.opencouncildata.co.uk/",
+      "countries": ["GB"],
+      "supplies": ["reference"],
+      "license": "CC BY-SA 4.0",
+      "publishers": ["Open Council Data UK"],
+      "about": "The source for the number of councillors on each British council from 2016 to 2026."
+    },
+    {
+      "id": "parlconst",
+      "category": "reference",
+      "name": "UK Parliamentary Constituencies",
+      "url": "https://www.parlconst.org/",
+      "countries": ["GB"],
+      "supplies": ["boundaries"],
+      "license": "CC BY 4.0",
+      "publishers": ["parlconst.org"],
+      "about": "Maps of UK parliamentary constituencies since 1885, the source for historical constituency boundaries."
+    },
+    {
+      "id": "leip",
+      "category": "reference",
+      "name": "Dave Leip's Atlas of U.S. Presidential Elections",
+      "url": "https://uselectionatlas.org/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "publishers": [],
+      "about": "One of the compilations that Wikipedia's state-by-state presidential results tables cite, which the archive uses for some presidential results by state."
+    },
+    {
+      "id": "ballotpedia",
+      "category": "reference",
+      "name": "Ballotpedia",
+      "url": "https://ballotpedia.org/",
+      "countries": ["US"],
+      "supplies": ["results"],
+      "publishers": [],
+      "about": "The source of the figures in Wikipedia's lists of ballot measures by year, which the archive uses and which transcribe each state's canvass."
+    },
+    {
+      "id": "other-reference",
+      "category": "reference",
+      "name": "Other community projects",
+      "countries": ["US"],
+      "supplies": ["results", "candidates", "boundaries"],
+      "about": "Volunteer and open projects that compile results, boundaries, or reference data.",
+      "isGroup": true,
+      "match": "Soapbox|Ballot Brief",
+      "kinds": ["community", "aggregator"],
+      "rank": 12
+    },
+    {
+      "id": "print",
+      "category": "print",
+      "name": "Almanacs, manuals, and printed returns",
+      "countries": ["US", "GB", "TR", "IT"],
+      "supplies": ["results"],
+      "about": "Almanacs, legislative manuals, and newspapers of record that printed official returns, scanned and digitized page by page.",
+      "isGroup": true,
+      "match": "Print|Co\\.|Company|& |Press|Linotyping|Book and Job|Nabu|Tribune|Journal|Eagle|Almanac|Times|Herald|Edizioni|Armstrong",
+      "kinds": ["compendium"],
+      "rank": 9
+    },
+    {
+      "id": "news",
+      "category": "news",
+      "name": "News reports",
+      "countries": ["TR", "US", "GB", "IE", "DE"],
+      "supplies": ["results", "candidates"],
+      "about": "News reports, each cited for one specific fact, such as a certification, a recount, or a candidate's withdrawal.",
+      "isGroup": true,
+      "match": "News|TCPalm|Nugget|SouthArkansasNow|Public Radio",
+      "kinds": ["news_agency"],
+      "rank": 0
+    },
+    {
+      "id": "parties",
+      "category": "parties",
+      "name": "Political parties",
+      "countries": ["US", "TR", "IT"],
+      "supplies": ["candidates", "results"],
+      "about": "Party committees and parties' own announcements, used for candidate lists, nominations, and delegate results.",
+      "isGroup": true,
+      "match": "Partisi|Parti\\b|Party|National Committee|Political Committee|Volkspartei",
+      "rank": 2
+    },
+    {
+      "id": "civicapi",
+      "category": "live",
+      "name": "civicAPI",
+      "url": "https://civicapi.org/",
+      "countries": ["US"],
+      "supplies": ["live"],
+      "license": "Credit with a link to civicapi.org",
+      "publishers": [],
+      "quote": {
+        "text": "We believe election data should be a public good.",
+        "url": "https://civicapi.org/",
+        "lang": "en"
+      }
+    },
+    {
+      "id": "official-feeds",
+      "category": "live",
+      "name": "Official election-night results",
+      "countries": ["US"],
+      "supplies": ["live"],
+      "about": "The election-night results pages of state and county election offices, read every few minutes while votes are counted.",
+      "isGroup": true,
+      "feeds": [
+        {
+          "name": "Alabama Secretary of State",
+          "url": "https://www2.alabamavotes.gov/electionnight/statewideresultsbycontest.aspx?ecode=1001305"
+        },
+        {
+          "name": "Alaska Division of Elections",
+          "url": "https://www.elections.alaska.gov/results/26GENR/"
+        },
+        {
+          "name": "Arizona Secretary of State",
+          "url": "https://app.enhancedvoting.com/results/public/Arizona/110326GeneralElection"
+        },
+        {
+          "name": "Arkansas Secretary of State",
+          "url": "https://arkansas.tally-enr.com/"
+        },
+        {
+          "name": "Board of Elections in the City of New York",
+          "url": "https://enr.boenyc.gov/"
+        },
+        {
+          "name": "California Secretary of State",
+          "url": "https://electionresults.sos.ca.gov/"
+        },
+        {
+          "name": "Clark County Election Department",
+          "url": "https://elections.clarkcountynv.gov/ElectionResultsTV/ENR.aspx"
+        },
+        {
+          "name": "Colorado Secretary of State",
+          "url": "https://results.enr.clarityelections.com/CO/"
+        },
+        {
+          "name": "Connecticut Secretary of the State",
+          "url": "https://ctemspublic.pcctg.net/"
+        },
+        {
+          "name": "Cumberland, Essex, Passaic, and Somerset County Clerks",
+          "url": "https://results.enr.clarityelections.com/NJ/"
+        },
+        {
+          "name": "Dane County Clerk",
+          "url": "https://elections.countyofdane.com/"
+        },
+        {
+          "name": "Delaware Department of Elections",
+          "url": "https://elections.delaware.gov/results/enr/GE2026.html"
+        },
+        {
+          "name": "Florida Division of Elections",
+          "url": "https://results.elections.myflorida.com"
+        },
+        {
+          "name": "Georgia Secretary of State",
+          "url": "https://results.sos.ga.gov"
+        },
+        {
+          "name": "Hardin County Clerk",
+          "url": "https://hccoky.org/26GResults/display.html"
+        },
+        {
+          "name": "Hawaii Office of Elections",
+          "url": "https://elections.hawaii.gov/election-results/"
+        },
+        { "name": "Idaho Secretary of State", "url": "https://voteidaho.gov" },
+        {
+          "name": "Illinois State Board of Elections",
+          "url": "https://elections.il.gov/ElectionOperations/ElectionResults.aspx"
+        },
+        {
+          "name": "Indiana Secretary of State",
+          "url": "https://enr.indianavoters.in.gov"
+        },
+        {
+          "name": "Iowa Secretary of State",
+          "url": "https://sos.iowa.gov/elections/results/"
+        },
+        {
+          "name": "Kansas Secretary of State",
+          "url": "https://sos.ks.gov/elections/election-results.html"
+        },
+        {
+          "name": "Louisiana Secretary of State",
+          "url": "https://voterportal.sos.la.gov/graphical"
+        },
+        {
+          "name": "Maryland State Board of Elections",
+          "url": "https://elections.maryland.gov/elections/2026/primary_results/"
+        },
+        {
+          "name": "Michigan Board of State Canvassers",
+          "url": "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=11-3-2026"
+        },
+        {
+          "name": "Minnesota Secretary of State",
+          "url": "https://electionresultsfiles.sos.mn.gov/20260811/"
+        },
+        {
+          "name": "Montana Secretary of State",
+          "url": "https://electionresults.mt.gov/"
+        },
+        {
+          "name": "Nebraska Secretary of State",
+          "url": "https://electionresults.nebraska.gov/"
+        },
+        {
+          "name": "New Mexico Secretary of State",
+          "url": "https://electionresults.sos.nm.gov/"
+        },
+        {
+          "name": "North Carolina State Board of Elections",
+          "url": "https://www.ncsbe.gov/results-data"
+        },
+        {
+          "name": "North Dakota Secretary of State",
+          "url": "https://results.sos.nd.gov/"
+        },
+        {
+          "name": "Ohio Secretary of State",
+          "url": "https://liveresults.ohiosos.gov/"
+        },
+        {
+          "name": "Oklahoma State Election Board",
+          "url": "https://results.okelections.gov/OKER/"
+        },
+        {
+          "name": "Oregon Secretary of State",
+          "url": "https://results.oregonvotes.gov/"
+        },
+        {
+          "name": "Pennsylvania Department of State",
+          "url": "https://www.electionreturns.pa.gov/"
+        },
+        {
+          "name": "Rhode Island Board of Elections",
+          "url": "https://elections.ri.gov/elections/previous-election-results"
+        },
+        {
+          "name": "Shelby County Election Commission and Hamilton County Election Commission",
+          "url": "https://app.enhancedvoting.com/results/public/shelby-county-tn"
+        },
+        {
+          "name": "South Carolina State Election Commission",
+          "url": "https://scvotes.gov/"
+        },
+        {
+          "name": "South Dakota Secretary of State",
+          "url": "https://electionresults.sd.gov/"
+        },
+        {
+          "name": "St. Louis County and Jackson County boards of elections",
+          "url": "https://extcontent.stlouisco.com/BOE/eResults/"
+        },
+        {
+          "name": "Texas Secretary of State",
+          "url": "https://goelect.txelections.civixapps.com/ivis-enr-ui/races"
+        },
+        {
+          "name": "Utah Lieutenant Governor's Office",
+          "url": "https://electionresults.utah.gov"
+        },
+        {
+          "name": "Vermont Secretary of State",
+          "url": "https://electionresults.vermont.gov/"
+        },
+        {
+          "name": "Virginia Department of Elections",
+          "url": "https://historical.elections.virginia.gov"
+        },
+        {
+          "name": "Washington Secretary of State",
+          "url": "https://results.votewa.gov"
+        },
+        {
+          "name": "Westchester, Suffolk, Monroe, Nassau, and Erie County boards of elections",
+          "url": "https://app.nassaucountyny.gov/BOE/results/election2.html"
+        },
+        {
+          "name": "West Virginia Secretary of State",
+          "url": "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout"
+        },
+        {
+          "name": "Wyoming Secretary of State",
+          "url": "https://sos.wyo.gov/Elections/Docs/2026/2026GeneralResults.aspx"
+        }
+      ]
+    }
+  ]
+}

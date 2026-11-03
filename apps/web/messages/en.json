@@ -790,6 +790,88 @@
   "siblings_empty": "No place matches.",
   "sources_caption": "{stage}: {publisher}",
   "sources_caption_compiled": "{stage} count, compiled by {publisher}",
+  "sources_page_description": "The election authorities, archives, datasets, and feeds behind every number in the archive, grouped by kind and country.",
+  "sources_page_lede": "Every number in the archive comes from one of these {count} publishers. The main ones are listed by name and described in their own words where they have a description; the rest are grouped by kind.",
+  "sources_page_index": "Categories",
+  "sources_page_country": "Country",
+  "sources_page_all": "All",
+  "sources_page_international": "International",
+  "sources_page_category_authorities": "Election authorities",
+  "sources_page_category_authorities_lede": "National and state bodies that run elections and certify the results.",
+  "sources_page_category_local": "Local election offices",
+  "sources_page_category_local_lede": "County, city, and council offices that publish precinct and local results.",
+  "sources_page_category_legislatures": "Legislatures",
+  "sources_page_category_legislatures_lede": "Parliaments and their libraries, which keep the record of who was elected and by how many votes.",
+  "sources_page_category_boundaries": "Statistics and maps",
+  "sources_page_category_boundaries_lede": "Statistical offices and mapping agencies that publish the boundaries behind each map.",
+  "sources_page_category_records": "Gazettes and archives",
+  "sources_page_category_records_lede": "Official gazettes, court rulings, and archives that hold certified returns and historical records.",
+  "sources_page_category_research": "Research",
+  "sources_page_category_research_lede": "Academic datasets and scholarship, each cited for the results or boundaries taken from it.",
+  "sources_page_category_reference": "Reference and open data",
+  "sources_page_category_reference_lede": "Encyclopedias, open data projects, and volunteer compilations.",
+  "sources_page_category_print": "Printed returns",
+  "sources_page_category_print_lede": "Almanacs, manuals, and newspapers of record whose printed tables were scanned and digitized.",
+  "sources_page_category_news": "News reports",
+  "sources_page_category_news_lede": "Reports cited for single facts, such as a recount or a withdrawal.",
+  "sources_page_category_parties": "Political parties",
+  "sources_page_category_parties_lede": "Party announcements used for candidate lists and nominations.",
+  "sources_page_category_live": "Election-night feeds",
+  "sources_page_category_live_lede": "Counts read while votes are being tallied. Certified results replace them once they are published.",
+  "sources_page_supplies_results": "Results",
+  "sources_page_supplies_candidates": "Candidates",
+  "sources_page_supplies_boundaries": "Boundaries",
+  "sources_page_supplies_live": "Live counts",
+  "sources_page_supplies_people": "People",
+  "sources_page_supplies_parties": "Parties",
+  "sources_page_supplies_reference": "Reference data",
+  "sources_page_sets": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} result set",
+        "countPlural=*": "{countText} result sets"
+      }
+    }
+  ],
+  "sources_page_contests": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} contest",
+        "countPlural=*": "{countText} contests"
+      }
+    }
+  ],
+  "sources_page_shapes": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} boundary",
+        "countPlural=*": "{countText} boundaries"
+      }
+    }
+  ],
+  "sources_page_members": "List all {count} publishers",
+  "sources_page_feeds": "List all {count} feeds",
+  "sources_page_quoted": "Quoted from its website",
+  "sources_page_terms": "Terms: {license}",
+  "sources_page_unofficial": "Unofficial",
   "citations_title": "Also cited",
   "checks_title": "Consistency checks",
   "check_turnout_unit": "{name}: {ballots} ballots cast, {registered} registered voters",

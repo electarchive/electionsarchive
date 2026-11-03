@@ -26,6 +26,7 @@
     {
       title: m.footer_data(),
       links: [
+        { href: resolve("/sources"), label: m.sources_title() },
         {
           href: resolve("/[slug=project]", { slug: "license" }),
           label: m.license_title(),

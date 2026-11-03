@@ -63,7 +63,16 @@ import {
 } from "#lib/server/pages.js";
 import { isProject, project } from "#lib/server/project.js";
 import { router } from "#lib/server/rpc/router.js";
+import { listSources } from "#lib/server/sources.js";
 import { slateLine } from "#lib/slate.js";
+import {
+  categoryLedes,
+  categoryTitles,
+  figures,
+  leadFigure,
+  supplyLabels,
+  years,
+} from "#lib/source-kinds.js";
 import { comeback, recordLede, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
@@ -380,6 +389,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     }
     case "search": {
       return results(search);
+    }
+    case "sources": {
+      return { kind: "sources" as const, ...(await listSources()) };
     }
   }
   const whole = await settle(await archive(segments.join("/"), search));
@@ -701,6 +713,9 @@ function markdown(
     }
     case "methodology": {
       return methodologyMarkdown(data);
+    }
+    case "sources": {
+      return directoryMarkdown(data);
     }
     case "project": {
       return projectMarkdown(data, origin);
@@ -4195,6 +4210,60 @@ function projectMarkdown(
       `## ${section.title}`,
       section.body.replaceAll("](/", () => `](${origin}/`),
       ...(section.quote == null ? [] : [`> ${section.quote}`]),
+    ]),
+  ];
+}
+
+function directoryMarkdown(data: Extract<Data, { kind: "sources" }>) {
+  const regions = new Intl.DisplayNames([getLocale()], { type: "region" });
+  const named = (url: string | null, name: string) =>
+    url == null ? name : `[${name}](${url})`;
+  return [
+    `# ${m.sources_title()}`,
+    m.sources_page_lede({ count: count(data.total) }),
+    ...data.categories.flatMap((category) => [
+      `## ${categoryTitles[category.id]()}`,
+      categoryLedes[category.id](),
+      ...category.sources.flatMap((source) => {
+        const span = years(source);
+        const facts = [
+          source.countries.length === 0
+            ? m.sources_page_international()
+            : source.countries
+                .map((code) => regions.of(code) ?? code)
+                .join(", "),
+          source.supplies.map((supply) => supplyLabels[supply]()).join(", "),
+          ...(span == null ? [] : [span]),
+          ...figures(source),
+        ];
+        return [
+          `### ${named(source.url, source.name)}${source.isUnofficial ? ` (${m.sources_page_unofficial()})` : ""}`,
+          `${facts.join(". ")}.`,
+          ...(source.quote == null
+            ? source.about == null
+              ? []
+              : [source.about]
+            : [
+                `> “${source.quote.text}”\n>\n> [${m.sources_page_quoted()}](${source.quote.url})`,
+              ]),
+          ...(source.license == null
+            ? []
+            : [m.sources_page_terms({ license: source.license })]),
+          ...(source.feeds.length === 0 && source.members.length === 0
+            ? []
+            : [
+                [
+                  ...source.feeds.map(
+                    (feed) => `- ${named(feed.url, feed.name)}`,
+                  ),
+                  ...source.members.map((member) => {
+                    const detail = leadFigure(member);
+                    return `- ${named(member.url, member.name)}${detail == null ? "" : `: ${detail}`}`;
+                  }),
+                ].join("\n"),
+              ]),
+        ];
+      }),
     ]),
   ];
 }
