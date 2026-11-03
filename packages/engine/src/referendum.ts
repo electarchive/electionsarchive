@@ -13,6 +13,9 @@ export function decide(
     no: number;
     registered?: number;
     voters?: number;
+    ballots?: number;
+    governor?: number;
+    previousGeneral?: number;
     units?: Array<{ id: string; yes: number; no: number }>;
   },
 ) {
@@ -21,6 +24,21 @@ export function decide(
       throw new Error("A turnout quorum needs registered and voters");
     if (ballot.voters <= rules.quorum * ballot.registered)
       return { outcome: "quorum_failed" as const };
+  }
+  const minimum = rules.minimum;
+  if (minimum != null) {
+    const base = {
+      ballots: ballot.ballots,
+      governor: ballot.governor,
+      previous_general: ballot.previousGeneral,
+    }[minimum.of];
+    if (base == null) throw new Error(`A minimum share needs ${minimum.of}`);
+    if (
+      minimum.strict
+        ? ballot.yes <= minimum.share * base
+        : ballot.yes < minimum.share * base
+    )
+      return { outcome: "rejected" as const };
   }
   const share = rules.majority;
   const isPopular =

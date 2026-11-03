@@ -206,6 +206,13 @@ export const rules = v.variant("formula", [
         strict: v.optional(v.boolean(), false),
       }),
     ),
+    minimum: v.optional(
+      v.object({
+        share: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+        strict: v.optional(v.boolean(), false),
+        of: v.picklist(["ballots", "governor", "previous_general"]),
+      }),
+    ),
     doubleMajority: v.optional(
       v.object({
         scheme: v.string(),
