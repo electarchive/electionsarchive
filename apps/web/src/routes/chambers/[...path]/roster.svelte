@@ -299,6 +299,11 @@
   const limit = $derived(
     isAll ? feed.length : isWide.current ? (fit ?? feed.length) : 8,
   );
+  const changeRows = new Windowed(() => ({
+    items: isAll ? feed : feed.slice(0, isWide.current ? 40 : limit),
+    key: (_, index) => String(index),
+    size: 33,
+  }));
 
   $effect(() => {
     void feed.length;
@@ -379,10 +384,18 @@
           <ol
             class="grid content-start overflow-hidden rounded-sm text-[0.8125rem] ring-1 ring-border"
             style:max-block-size={clip == null ? null : `${clip}px`}
+            {@attach changeRows.anchor}
           >
-            {#each feed.slice(0, isWide.current ? feed.length : limit) as event, index (index)}
+            {#if changeRows.before > 0}
+              <li
+                aria-hidden="true"
+                style:block-size="{changeRows.before}px"
+              ></li>
+            {/if}
+            {#each changeRows.entries as { value: event, index, key } (key)}
               <li
                 inert={index >= limit}
+                {@attach changeRows.measure(index)}
                 class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
               >
                 <span
@@ -484,6 +497,12 @@
                 {/if}
               </li>
             {/each}
+            {#if changeRows.after > 0}
+              <li
+                aria-hidden="true"
+                style:block-size="{changeRows.after}px"
+              ></li>
+            {/if}
           </ol>
           {#if limit < feed.length}
             <button
