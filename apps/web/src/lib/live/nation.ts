@@ -198,7 +198,7 @@ export function seat(
     lean,
     band,
     rating,
-    isFlip: held != null && side != null && side !== held && total > 0,
+    isFlip: called != null && held != null && side != null && side !== held,
     isUpset: trailing,
     remaining:
       isEstimating && summary.race.certified == null

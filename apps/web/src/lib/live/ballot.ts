@@ -155,7 +155,10 @@ export function entries({
       isLive: found != null,
       side,
       isFlip:
-        held != null && side != null && summary.total > 0 && side !== held.id,
+        held != null &&
+        side != null &&
+        (summary.winner ?? summary.projected) != null &&
+        side !== held.id,
       isUnopposed:
         !contest.isMeasure &&
         race.options.filter((option) => !option.isWriteIn).length <=
