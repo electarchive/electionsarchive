@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import civmint, govmint
+from ea.sources.us import civmint, govmint, measure_rules
 from ea.store import DATA, connect
 
 SOURCE = "us.nov3_manual_2026"
@@ -1374,7 +1374,9 @@ def emit() -> Path:
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
-        system = cs.key("us.electoral_system", "referendum")
+        systems = measure_rules.systems(
+            cs, {"referendum", "referendum-ca-two-thirds", "referendum-ca-55", "referendum-wa-60-validated"}
+        )
         sources: dict[str, UUID] = {}
         added: set[UUID] = set()
         for county, publisher in frame.select("county", "publisher").unique("county").iter_rows():
@@ -1467,7 +1469,13 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=area,
-                electoral_system_id=system,
+                electoral_system_id=systems[
+                    measure_rules.california(row["entity"], row["wording"] or "")
+                    if state == "CA"
+                    else measure_rules.washington(row["entity"], label, row["wording"] or "")
+                    if state == "WA"
+                    else "referendum"
+                ],
                 round_number=1,
                 default_result_kind="counted",
             )
