@@ -79,7 +79,23 @@ export async function livePage(path: string, at: string | null) {
   }
   const first = await night(path);
   const isRace = first.election.slug !== path;
-  const found = isRace ? await night(first.election.slug) : first;
+  const whole = isRace ? await night(first.election.slug) : first;
+  const extra = isRace
+    ? first.election.races.filter((race) =>
+        whole.election.races.every((entry) => entry.id !== race.id),
+      )
+    : [];
+  const found =
+    extra.length === 0
+      ? whole
+      : {
+          ...whole,
+          election: {
+            ...whole.election,
+            races: [...whole.election.races, ...extra],
+          },
+          estimates: { ...whole.estimates, ...first.estimates },
+        };
   const { election } = found;
   const isNation = election.slug.split("/").length === 2;
   const focus = isRace
