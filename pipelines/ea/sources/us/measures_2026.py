@@ -164,7 +164,9 @@ def emit() -> Path:
         labels = Counter(zip(frame["state"], frame["label"]))
         options = dict(
             conn.execute(
-                "select value, entity_id from external_id where scheme = 'us.option' and value like %s", [f"{DAY}:%"]
+                """select x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
+                   where x.scheme = 'us.option' and x.value like %s and e.retired_by is null""",
+                [f"{DAY}:%"],
             ).fetchall()
         )
         sources = {}
