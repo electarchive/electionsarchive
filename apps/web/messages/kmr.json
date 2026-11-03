@@ -5808,5 +5808,7 @@
   "board_tile_body": "Pêşbaziyên ku dişopînî hilbijêre û wan li ser yek ekranê li kêleka hev bişopîne.",
   "live_views_label": "Rêyên din ên şopandina encaman",
   "livemap_win_chance": "Şansê serkeftinê",
-  "livemap_counted_share": "Rêjeya dengên hatine jimartin di nav dengên çaverêkirî de"
+  "livemap_counted_share": "Rêjeya dengên hatine jimartin di nav dengên çaverêkirî de",
+  "livemap_near_hint": "Ji bo encamên vê eyaletê bitikîne",
+  "livemap_up_hint": "An jî li cihekî derveyî eyaletê bitikîne"
 }

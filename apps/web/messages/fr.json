@@ -5903,5 +5903,7 @@
   "board_tile_body": "Choisissez les scrutins que vous suivez et affichez-les côte à côte sur un seul écran.",
   "live_views_label": "Autres façons de suivre les résultats",
   "livemap_win_chance": "Chances de victoire",
-  "livemap_counted_share": "Part des bulletins attendus déjà dépouillés"
+  "livemap_counted_share": "Part des bulletins attendus déjà dépouillés",
+  "livemap_near_hint": "Cliquez pour voir les résultats de cet État",
+  "livemap_up_hint": "Ou cliquez n'importe où en dehors de l'État"
 }

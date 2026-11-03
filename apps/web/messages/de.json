@@ -5808,5 +5808,7 @@
   "board_tile_body": "Legen Sie fest, welche Wahlen Sie verfolgen, und sehen Sie sie nebeneinander auf einem Bildschirm.",
   "live_views_label": "Weitere Möglichkeiten, die Ergebnisse zu verfolgen",
   "livemap_win_chance": "Siegchance",
-  "livemap_counted_share": "Ausgezählter Anteil der erwarteten Stimmen"
+  "livemap_counted_share": "Ausgezählter Anteil der erwarteten Stimmen",
+  "livemap_near_hint": "Klicken Sie, um die Ergebnisse dieses Bundesstaats zu sehen",
+  "livemap_up_hint": "Oder irgendwo außerhalb des Bundesstaats klicken"
 }
