@@ -1472,7 +1472,7 @@ export const live = {
         switches(),
         calls(picked.map((row) => row.id)),
       ]);
-      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${String(shown.classic)}|${found.path}|${found.rest}`;
+      const slot = `${getLocale()}|${String(shown.results)}|${String(shown.forecasts)}|${String(shown.classic)}|${found.path}|${found.rest}`;
       const key = shown.results
         ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
         : "";
