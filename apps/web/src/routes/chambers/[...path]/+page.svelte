@@ -4,6 +4,7 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import { Island, load, peek } from "svelte-islands";
   import { partyOn, segments, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
   import { count, date, definite, natural } from "#lib/format.js";
@@ -61,6 +62,13 @@
   });
 
   let chosen = $state<{ term: string; day: string } | null>(null);
+  const history = $derived(peek(data.steps)?.value[selected] ?? []);
+
+  $effect(() => {
+    if (chosen != null) {
+      void load(data.steps).catch(() => null);
+    }
+  });
   const first = $derived(members.data?.start ?? term?.start ?? "");
   const on = $derived(
     chosen != null && chosen.term === term?.start ? chosen.day : first,
@@ -201,7 +209,7 @@
   );
   const hemicycle = $derived.by(() => {
     const near =
-      term?.steps.findLast((step) => step.date <= on)?.near ?? term?.near ?? {};
+      history.findLast((step) => step.date <= on)?.near ?? term?.near ?? {};
     const keys = new Set((term?.parties ?? []).map((entry) => entry.party));
     const home = (party: string | null) => {
       const root = party == null ? null : (data.kin[party] ?? party);
@@ -506,15 +514,27 @@
       </dl>
 
       {const Stream = $derived(data.Stream)}
-      <Stream
-        terms={data.terms}
-        parties={data.parties}
-        governments={data.governments}
-        interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
-        eras={data.eras}
-        basis={data.basis}
-        bind:selected
-      />
+      <Island
+        part={data.steps}
+        when={selected === data.terms.length - 1 ? "interaction" : "eager"}
+      >
+        {#snippet children(
+          steps: NonNullable<typeof data.steps.loaded>["value"],
+        )}
+          <Stream
+            terms={data.terms.map((entry, index) => ({
+              ...entry,
+              steps: steps[index] ?? [],
+            }))}
+            parties={data.parties}
+            governments={data.governments}
+            interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
+            eras={data.eras}
+            basis={data.basis}
+            bind:selected
+          />
+        {/snippet}
+      </Island>
     {/if}
 
     {#if term != null && isParty}

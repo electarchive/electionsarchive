@@ -1,4 +1,15 @@
+import { part } from "svelte-islands/server";
 import { chamber } from "#lib/server/pages.js";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => chamber(params.path);
+export const load: PageServerLoad = async ({ params }) => {
+  const { terms, ...page } = await chamber(params.path);
+  return {
+    ...page,
+    terms: terms.map(({ steps, ...term }) => term),
+    steps: part(
+      "chamber.steps",
+      terms.map((term) => term.steps),
+    ),
+  };
+};

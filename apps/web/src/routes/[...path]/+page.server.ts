@@ -55,12 +55,22 @@ export const load: PageServerLoad = async ({ params, url }) => {
   if (data.kind !== "polity") {
     return data;
   }
-  const { polities } = data.polity;
+  const { polities, elections } = data.polity;
   const path = ["sovereign_state", "supranational"].includes(data.polity.kind)
     ? data.polity.latest?.path
     : null;
   const [{ value: scrubber }, { value: record }] = await Promise.all([
-    path == null ? { value: null } : soon(capped(seed(path).catch(() => null))),
+    path == null
+      ? { value: null }
+      : soon(
+          capped(
+            seed(path)
+              .then((found) =>
+                part("polity.scrubber", found, { fetch: "preload" }),
+              )
+              .catch(() => null),
+          ),
+        ),
     soon(
       capped(call(router.polities.record, { id: data.id }).catch(() => null)),
     ),
@@ -73,8 +83,22 @@ export const load: PageServerLoad = async ({ params, url }) => {
     ),
     isPartial: polities.length > 200,
   };
+  const dated = elections.flatMap((election) => election.year ?? []);
+  const calendar = {
+    count: elections.length,
+    first: dated.length === 0 ? null : Math.min(...dated),
+    last: dated.length === 0 ? null : Math.max(...dated),
+  };
+  const polity = {
+    ...data.polity,
+    elections: part("polity.elections", elections),
+    calendar,
+    places,
+    scrubber,
+    record,
+  };
   if (!places.isPartial) {
-    return { ...data, polity: { ...data.polity, places, scrubber, record } };
+    return { ...data, polity };
   }
   const kept = new Set([
     ...groups.values().flatMap((rows) => rows.slice(0, 20)),
@@ -88,11 +112,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
   return {
     ...data,
     polity: {
-      ...data.polity,
+      ...polity,
       polities: polities.filter((child) => kept.has(child)),
-      places,
-      scrubber,
-      record,
     },
   };
 };

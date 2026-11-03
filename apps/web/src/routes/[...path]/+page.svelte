@@ -93,9 +93,12 @@
   const years = $derived(
     data.kind === "polity"
       ? [
-          ...data.polity.elections.flatMap((entry) =>
-            entry.year == null ? [] : [entry.year],
-          ),
+          ...(data.polity.calendar.first == null
+            ? []
+            : [data.polity.calendar.first]),
+          ...(data.polity.calendar.last == null
+            ? []
+            : [data.polity.calendar.last]),
           ...data.polity.years,
         ]
       : [],

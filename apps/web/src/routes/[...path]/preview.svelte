@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
   import { preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { peek } from "svelte-islands";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { LOST, MEASURES, OUTCOMES } from "#lib/outcomes.js";
@@ -206,8 +207,9 @@
           {data.polity.name}
         </p>
       </div>
-      {#if data.polity.elections.length > 0}
-        {@render list(m.polity_elections(), data.polity.elections)}
+      {const elections = $derived(peek(data.polity.elections)?.value ?? [])}
+      {#if elections.length > 0}
+        {@render list(m.polity_elections(), elections)}
       {/if}
     {/if}
   </HoverCard.Content>

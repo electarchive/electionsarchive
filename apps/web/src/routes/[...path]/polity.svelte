@@ -10,6 +10,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
+  import { Island } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -25,6 +26,7 @@
   import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
   import Bar from "./bar.svelte";
+  import Elections from "./elections.svelte";
   import Holders from "./holders.svelte";
   import Known from "./known.svelte";
   import PlaceMap from "./map.svelte";
@@ -60,25 +62,11 @@
     }
   });
 
-  const STATUSES: Record<string, () => string> = {
-    scheduled: m.election_scheduled,
-    postponed: m.election_postponed,
-    canceled: m.election_canceled,
-    annulled: m.election_annulled,
-  };
-  const FILTERS: Record<string, () => string> = {
-    all: m.polity_filter_all,
-    general: m.polity_filter_general,
-    primary: m.polity_filter_primary,
-    runoff: m.polity_filter_runoff,
-    other: m.polity_filter_other,
-  };
-
   const uid = $props.id();
   const isLocal = $derived(
     polity.parent != null &&
       polity.results.length > 0 &&
-      (polity.elections.length === 0 ||
+      (polity.calendar.count === 0 ||
         !["sovereign_state", "supranational", "federal_unit"].includes(
           polity.kind,
         )) &&
@@ -148,57 +136,21 @@
     return series.length === 0 ? null : { ...data, series };
   });
 
-  let filter = $state(page.url.searchParams.get("show") ?? "all");
   let query = $state(page.url.searchParams.get("q") ?? "");
   let picked = $state<string | null>(page.url.searchParams.get("within"));
 
   $effect(() => {
-    keep({
-      show: filter === "all" ? null : filter,
-      q: query.trim() === "" ? null : query,
-      within: picked,
-    });
+    keep({ q: query.trim() === "" ? null : query, within: picked });
   });
   let isAllYears = $state(false);
   const opened = new SvelteSet<string>();
-  let isAllElections = $state(false);
   let isAllPlaces = $state(false);
   let isAllRaces = $state(false);
 
-  const sorts = $derived(
-    polity.elections.map((election) => ({
-      ...election,
-      sort:
-        election.kind === "general"
-          ? "general"
-          : election.kind === "primary" || election.kind === "caucus"
-            ? "primary"
-            : election.kind === "runoff"
-              ? "runoff"
-              : "other",
-    })),
-  );
-  const present = $derived(
-    Object.keys(FILTERS).filter(
-      (key) => key === "all" || sorts.some((election) => election.sort === key),
-    ),
-  );
-  const filterOptions = $derived(
-    present.map((key) => ({ value: key, label: FILTERS[key]?.() ?? key })),
-  );
-  const years = $derived(
-    Map.groupBy(
-      sorts.filter((election) => filter === "all" || election.sort === filter),
-      (election) => election.year,
-    )
-      .entries()
-      .toArray(),
-  );
   const span = $derived.by(() => {
     const dated = [
-      ...polity.elections.flatMap((election) =>
-        election.year == null ? [] : [election.year],
-      ),
+      ...(polity.calendar.first == null ? [] : [polity.calendar.first]),
+      ...(polity.calendar.last == null ? [] : [polity.calendar.last]),
       ...polity.years,
     ];
     return dated.length === 0
@@ -921,7 +873,7 @@
   {/await}
 {/if}
 
-{#if polity.elections.length > 0 || polity.results.length === 0}
+{#if polity.calendar.count > 0 || polity.results.length === 0}
   <section
     class={cn(
       "col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]",
@@ -933,123 +885,13 @@
     aria-labelledby="{uid}-elections"
     {@attach settle}
   >
-    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-      <h2 id="{uid}-elections" class="text-[0.8125rem] font-bold">
-        {m.polity_elections()}
-      </h2>
-      {#if present.length > 2}
-        <Segmented
-          options={filterOptions}
-          bind:value={filter}
-          label={m.polity_filter_label()}
-        />
-      {/if}
-    </div>
-    {#if polity.elections.length === 0}
-      <p class="text-sm text-muted-foreground">{m.polity_no_elections()}</p>
-    {:else if years.length === 0}
-      <p class="text-sm text-muted-foreground">{m.polity_none_in_filter()}</p>
-    {:else}
-      <ol class="grid">
-        {#each isAllElections ? years : years.slice(0, 12) as [year, entries] (year)}
-          <li
-            class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
-          >
-            <span
-              class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
-              >{year ?? ""}</span
-            >
-            {const isOpenYear = $derived(opened.has(`year:${year}`))}
-            <ul class="grid gap-1 text-sm">
-              {#each isOpenYear || entries.length <= 6 ? entries : entries.slice(0, 5) as election, index (index)}
-                {const dated = $derived(
-                  election.name.replace(
-                    new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
-                    "",
-                  ),
-                )}
-                {const short = $derived(
-                  dated.startsWith(`${polity.name} `)
-                    ? dated.slice(polity.name.length + 1)
-                    : dated,
-                )}
-                {const label = $derived(
-                  election.lead == null
-                    ? capitalize(short)
-                    : election.lead.more > 0
-                      ? m.polity_local_more({
-                          place: election.lead.place,
-                          count: count(election.lead.more),
-                        })
-                      : m.polity_local_one({ place: election.lead.place }),
-                )}
-                <li
-                  class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
-                >
-                  <span class="flex flex-wrap items-baseline gap-x-2">
-                    {#if election.path == null}
-                      <span>{label}</span>
-                    {:else if election.scope != null}
-                      <a
-                        class="hover:highlighter"
-                        href="{resolve('/[...path]', {
-                          path: election.path,
-                        })}?in={election.scope}">{label}</a
-                      >
-                    {:else}
-                      <Preview class="hover:highlighter" path={election.path}
-                        >{label}</Preview
-                      >
-                    {/if}
-                    {#if STATUSES[election.status] != null}
-                      <span class="highlighter px-1 text-xs font-semibold"
-                        >{STATUSES[election.status]?.()}</span
-                      >
-                    {/if}
-                  </span>
-                  <time
-                    class="text-xs text-muted-foreground tabular-nums"
-                    datetime={election.date}>{date(election.date)}</time
-                  >
-                </li>
-              {/each}
-              {#if entries.length > 6}
-                <li>
-                  <button
-                    type="button"
-                    class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
-                    aria-expanded={isOpenYear}
-                    onclick={() => {
-                      if (isOpenYear) {
-                        opened.delete(`year:${year}`);
-                      } else {
-                        opened.add(`year:${year}`);
-                      }
-                    }}
-                    >{isOpenYear
-                      ? m.regions_fewer()
-                      : m.regions_more({
-                          count: count(entries.length),
-                        })}</button
-                  >
-                </li>
-              {/if}
-            </ul>
-          </li>
-        {/each}
-      </ol>
-      {#if years.length > 12}
-        <button
-          type="button"
-          class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
-          aria-expanded={isAllElections}
-          onclick={() => (isAllElections = !isAllElections)}
-          >{isAllElections
-            ? m.polity_results_fewer()
-            : m.polity_results_more({ count: String(years.length) })}</button
-        >
-      {/if}
-    {/if}
+    <Island part={polity.elections}>
+      {#snippet children(
+        elections: NonNullable<typeof polity.elections.loaded>["value"],
+      )}
+        <Elections {elections} place={polity.name} heading="{uid}-elections" />
+      {/snippet}
+    </Island>
   </section>
 {/if}
 

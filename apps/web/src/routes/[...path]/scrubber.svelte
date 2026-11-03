@@ -8,6 +8,7 @@
   import PlayIcon from "@lucide/svelte/icons/play";
   import { queryOptions, useQueryClient } from "@tanstack/svelte-query";
   import { onDestroy, untrack } from "svelte";
+  import { load as unpack } from "svelte-islands";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -43,10 +44,11 @@
   );
 
   async function load(path: string) {
-    const seeded =
+    const held =
       path === latest?.path
         ? await Promise.resolve(seed).catch(() => null)
         : null;
+    const seeded = held == null ? null : await unpack(held).catch(() => null);
     const found = seeded?.path === path ? seeded : null;
     const located =
       found == null
