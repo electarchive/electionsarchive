@@ -32,6 +32,7 @@
     caption,
     help,
     anchor = null,
+    answers = null,
     isLater = false,
     href,
     mode = $bindable("lead"),
@@ -47,6 +48,7 @@
     caption?: string;
     help?: ComponentProps<typeof MethodLink>["section"];
     anchor?: string | null;
+    answers?: Array<number> | null;
     isLater?: boolean;
     href?: (unitId: string) => string | null;
     mode?: Mode;
@@ -650,6 +652,19 @@
       </div>
     {/if}
   </div>
+  {#if answers != null && !isLater && (mode === "lead" || mode === "bubbles")}
+    <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+      {#each answers as index (options[index]?.id ?? index)}
+        <li class="flex items-center gap-1.5">
+          <span
+            class="shrink-0 rounded-xs block-2.5 inline-2.5"
+            style:background-color={tone(options[index])}
+          ></span>
+          {options[index]?.label ?? ""}
+        </li>
+      {/each}
+    </ul>
+  {/if}
   <p
     class="flex flex-wrap justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground"
   >

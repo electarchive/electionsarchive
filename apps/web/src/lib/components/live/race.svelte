@@ -15,6 +15,7 @@
   import { quiet } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Answers from "./answers.svelte";
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
@@ -23,6 +24,7 @@
   import MethodLink from "./method-link.svelte";
   import Outstanding from "./outstanding.svelte";
   import Seats from "./seats.svelte";
+  import Shares from "./shares.svelte";
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
   import Trend from "./trend.svelte";
@@ -88,6 +90,16 @@
     standing(race, { at: view, isFinal: isFinal && view == null }),
   );
   const options = $derived(race.options);
+  const isPlural = $derived(
+    race.isMeasure === true &&
+      options.filter((option) => !option.isWriteIn).length > 2,
+  );
+  const isModeled = $derived(forecasts && !isPlural);
+  const ranking = $derived(
+    now.total > 0
+      ? now.order.filter((index) => options[index]?.isWriteIn !== true)
+      : options.flatMap((option, index) => (option.isWriteIn ? [] : [index])),
+  );
   const pair = $derived(now.pair);
   const modeled = $derived(
     now.isFinal
@@ -95,7 +107,7 @@
       : estimateAt({ ...race, certified: null }, view),
   );
   const estimate: LiveEstimate = $derived(
-    forecasts
+    isModeled
       ? modeled
       : {
           ...modeled,
@@ -110,8 +122,8 @@
           units: [],
         },
   );
-  const points = $derived(forecasts ? history(race, null) : []);
-  const isUnestimated = $derived(forecasts && modeled.status === "unavailable");
+  const points = $derived(isModeled ? history(race, null) : []);
+  const isUnestimated = $derived(isModeled && modeled.status === "unavailable");
   const seats = $derived(race.seats ?? 1);
   const isMulti = $derived(
     seats > 1 && !race.isMeasure && options.length > seats,
@@ -152,7 +164,9 @@
       ? race.feed
       : null,
   );
-  const isLive = $derived(modeled.status === "estimating" && !now.isFinal);
+  const isLive = $derived(
+    !isPlural && modeled.status === "estimating" && !now.isFinal,
+  );
   const newest = $derived(race.frames.at(-1)?.at ?? null);
   const signed = $derived(
     now.total > 0
@@ -249,6 +263,28 @@
         seats: count(seats),
         count: count(options.length),
       });
+    }
+    if (isPlural && now.total > 0 && later == null) {
+      const first = ranking[0] ?? 0;
+      const second = ranking[1] ?? 0;
+      const gap =
+        ((now.totals[first] ?? 0) - (now.totals[second] ?? 0)) / now.total;
+      const values = {
+        name: options[first]?.label ?? "",
+        next: options[second]?.label ?? "",
+        margin: lead(gap),
+      };
+      if (now.isFinal && race.certified != null) {
+        return m.night_head_answers_won({
+          ...values,
+          name:
+            options.find((option) => winners.includes(option.id))?.label ??
+            values.name,
+        });
+      }
+      return gap < 0.0005
+        ? m.night_head_tied({ count: count(now.total) })
+        : m.night_head_answers({ ...values, count: count(now.total) });
     }
     if (now.isFinal && race.certified != null) {
       const winner = options.find((option) => winners.includes(option.id));
@@ -479,6 +515,15 @@
   <section class="bg-background px-4 py-5 sm:px-8">
     {#if isField}
       <Seats {options} {now} {seats} {winners} />
+    {:else if isPlural}
+      <Answers
+        {options}
+        {now}
+        {estimate}
+        {winners}
+        {isWaiting}
+        isLater={later != null}
+      />
     {:else}
       <Tote
         {options}
@@ -539,6 +584,7 @@
           {now}
           {estimate}
           {modes}
+          answers={isPlural ? ranking : null}
           title={m.night_map_counted_title()}
           bind:mode
           {href}
@@ -561,7 +607,7 @@
           {m.night_dial_none_body()}
         </p>
       </section>
-    {:else if race.certified == null || !now.isFinal}
+    {:else if !isPlural && (race.certified == null || !now.isFinal)}
       <section class="grid gap-10 bg-background px-4 py-6 sm:px-8">
         <Withheld isOff={!forecasts}>
           <Dial
@@ -582,18 +628,29 @@
     {/if}
 
     <section class="bg-background px-4 py-6 sm:px-8">
-      <Trend
-        {options}
-        {pair}
-        frames={race.frames}
-        {points}
-        expected={estimate.status === "estimating"
-          ? estimate.expectedTotal.mid
-          : null}
-        at={view}
-        {opens}
-        onPick={pick}
-      />
+      {#if isPlural}
+        <Shares
+          {options}
+          order={ranking}
+          frames={race.frames}
+          at={view}
+          {opens}
+          onPick={pick}
+        />
+      {:else}
+        <Trend
+          {options}
+          {pair}
+          frames={race.frames}
+          {points}
+          expected={estimate.status === "estimating"
+            ? estimate.expectedTotal.mid
+            : null}
+          at={view}
+          {opens}
+          onPick={pick}
+        />
+      {/if}
     </section>
 
     {#if isLive && !isUnestimated}
@@ -615,7 +672,15 @@
     {/if}
 
     <section class="bg-background px-4 py-6 sm:px-8">
-      <Table {options} {now} {estimate} {href} bind:selected bind:hovered />
+      <Table
+        {options}
+        {now}
+        {estimate}
+        answers={isPlural ? ranking : null}
+        {href}
+        bind:selected
+        bind:hovered
+      />
     </section>
   {/if}
 
