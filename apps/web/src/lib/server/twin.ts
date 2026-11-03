@@ -1653,10 +1653,49 @@ function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
       : key === -2
         ? m.option_independents()
         : (data.strata.parties[key]?.label ?? m.home_strata_unknown());
+  const standing = (election: (typeof data.recent)[number]) => {
+    const race = election.lead;
+    if (race == null || race.results.length === 0) {
+      return [
+        `### ${link(election.name, election.path)}, ${date(election.date)}`,
+      ];
+    }
+    const isSeated = race.contested > 1;
+    const rows = race.results.map((row) => [
+      row.label,
+      isSeated
+        ? `${count(row.seats ?? 0)} / ${count(race.contested)}`
+        : percent(row.share),
+      row.isLost === true
+        ? race.quorum != null && row.share > 0.5
+          ? m.outcome_quorum()
+          : m.outcome_lost()
+        : null,
+    ]);
+    const isDecided = rows.some((row) => row[2] != null);
+    return [
+      `### ${link(election.name, election.path)}, ${date(election.date)}`,
+      ...(race.question == null ? [] : [race.question]),
+      table(
+        [
+          m.col_option(),
+          isSeated
+            ? race.results[0]?.person == null
+              ? m.col_seats()
+              : m.col_electors()
+            : m.col_share(),
+          ...(isDecided ? [m.col_result()] : []),
+        ],
+        rows.map((row) => (isDecided ? row : row.slice(0, 2))),
+      ),
+    ];
+  };
   return [
     `# ${m.wordmark()}`,
     m.home_headline(),
     m.home_lede(),
+    ...(data.decided.length === 0 ? [] : [`## ${m.home_decided()}`]),
+    ...data.decided.flatMap((election) => standing(election)),
     ...(data.upcoming.length === 0
       ? []
       : [
@@ -1711,43 +1750,7 @@ function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
           ),
         ]),
     ...(data.recent.length === 0 ? [] : [`## ${m.home_recent()}`]),
-    ...data.recent.flatMap((election) => {
-      const race = election.lead;
-      if (race == null) {
-        return [
-          `### ${link(election.name, election.path)}, ${date(election.date)}`,
-        ];
-      }
-      const isSeated = race.contested > 1;
-      const rows = race.results.map((row) => [
-        row.label,
-        isSeated
-          ? `${count(row.seats ?? 0)} / ${count(race.contested)}`
-          : percent(row.share),
-        row.isLost === true
-          ? race.quorum != null && row.share > 0.5
-            ? m.outcome_quorum()
-            : m.outcome_lost()
-          : null,
-      ]);
-      const isDecided = rows.some((row) => row[2] != null);
-      return [
-        `### ${link(election.name, election.path)}, ${date(election.date)}`,
-        ...(race.question == null ? [] : [race.question]),
-        table(
-          [
-            m.col_option(),
-            isSeated
-              ? race.results[0]?.person == null
-                ? m.col_seats()
-                : m.col_electors()
-              : m.col_share(),
-            ...(isDecided ? [m.col_result()] : []),
-          ],
-          rows.map((row) => (isDecided ? row : row.slice(0, 2))),
-        ),
-      ];
-    }),
+    ...data.recent.flatMap((election) => standing(election)),
     ...(data.past.length === 0
       ? []
       : [
@@ -4463,11 +4466,8 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     return [
       `### ${link(race.title, `live/${race.slug}`)}`,
       total === 0
-        ? race.note != null
-          ? race.note
-          : data.at == null
-            ? m.live_waiting()
-            : m.live_no_update()
+        ? (race.note ??
+          (data.at == null ? m.live_waiting() : m.live_no_update()))
         : [
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],

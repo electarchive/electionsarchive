@@ -128,6 +128,12 @@
     })),
   );
 
+  function day(value: string) {
+    return dates({ month: "long", day: "numeric", timeZone: "UTC" }).format(
+      new Date(`${value}T00:00:00Z`),
+    );
+  }
+
   function seek(event: Event, term: string) {
     event.preventDefault();
     finder.value = term;
@@ -246,86 +252,142 @@
       </form>
     </div>
 
-    {#if upcoming.length > 0}
-      <section
-        class="grid content-start gap-3 lg:border-s lg:ps-8"
-        aria-labelledby="next-title"
-      >
-        <h2 id="next-title" class="text-[0.8125rem] font-bold">
-          {m.home_next()}
-        </h2>
-        {#if next != null}
-          <div class="grid gap-2 border-be pbe-4">
-            <p
-              class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-tight"
-            >
-              <time datetime={next.date}>{when(next.days, next.date)}</time>
-            </p>
-            <a
-              class="justify-self-start text-lg/tight font-[720] text-balance underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-              href={resolve("/[...path]", { path: next.path })}>{next.name}</a
-            >
-            <p class="flex flex-wrap gap-x-4 gap-y-1 pbs-1 text-sm">
-              {#if next.isLive}
-                <a
-                  class="inline-flex items-center gap-2 rounded-sm bg-primary px-3 font-semibold text-primary-foreground block-9 hover:bg-primary/90"
-                  href={resolve("/live/[...path]", { path: next.path })}
-                  ><span
-                    class="rounded-full bg-marker block-2 inline-2"
-                    aria-hidden="true"
-                  ></span>{m.home_next_live()}</a
-                >
-              {/if}
-              <a
-                class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
-                href={resolve("/[...path]", { path: next.path })}
-                >{m.home_next_open()}</a
-              >
-              <a
-                class="inline-flex items-center gap-2 rounded-sm border border-input px-3 font-semibold block-9 hover:bg-accent"
-                href={resolve("/agents")}
-                ><svg
-                  class="block-4 inline-4"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  aria-hidden="true"
-                  ><path d="M8 1.5v2.5" /><circle
-                    cx="8"
-                    cy="1.5"
-                    r="0.75"
-                    class="fill-marker stroke-none"
-                  /><rect x="2.5" y="4" width="11" height="9" rx="2.5" /><path
-                    d="M6 8v1M10 8v1"
-                  /></svg
-                >{m.home_agents()}</a
-              >
-            </p>
-          </div>
+    {#if upcoming.length > 0 || data.decided.length > 0}
+      <div class="grid content-start gap-7 lg:border-s lg:ps-8">
+        {#if data.decided.length > 0}
+          <section
+            class="grid content-start gap-3"
+            aria-labelledby="decided-title"
+          >
+            <h2 id="decided-title" class="text-[0.8125rem] font-bold">
+              {m.home_decided()}
+            </h2>
+            <ol class="grid border-bs border-border/70">
+              {#each data.decided as election (election.path)}
+                {const isPending = $derived(
+                  election.lead == null || election.lead.results.length === 0,
+                )}
+                <li class="border-be border-border/70">
+                  <a
+                    class="group grid items-baseline gap-x-3 gap-y-1 py-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]"
+                    href={resolve("/[...path]", { path: election.path })}
+                  >
+                    <time
+                      class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                      datetime={election.date}>{day(election.date)}</time
+                    >
+                    <span class="grid gap-2 min-inline-0">
+                      <span
+                        class="text-sm font-semibold text-pretty underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
+                        >{election.name}</span
+                      >
+                      {#if isPending}
+                        <span class="text-xs text-muted-foreground"
+                          >{m.home_decided_pending()}</span
+                        >
+                      {:else}
+                        {#if election.lead?.question == null && election.lead?.name != null && election.lead.name !== election.name}
+                          <span
+                            class="line-clamp-1 text-xs text-muted-foreground"
+                            >{election.lead.name}</span
+                          >
+                        {/if}
+                        <Lead race={election.lead} isCompact />
+                      {/if}
+                    </span>
+                  </a>
+                </li>
+              {/each}
+            </ol>
+          </section>
         {/if}
-        {#if later.length > 0}
-          <ul class="grid gap-1.5 text-sm">
-            {#each later as election (election.path)}
-              <li
-                class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-baseline gap-x-3"
-              >
-                <time
-                  class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                  datetime={election.date}
-                  >{when(election.days, election.date)}</time
+        {#if upcoming.length > 0}
+          <section
+            class="grid content-start gap-3"
+            aria-labelledby="next-title"
+          >
+            <h2 id="next-title" class="text-[0.8125rem] font-bold">
+              {m.home_next()}
+            </h2>
+            {#if next != null}
+              <div class="grid gap-2 border-be pbe-4">
+                <p
+                  class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-tight"
                 >
+                  <time datetime={next.date}>{when(next.days, next.date)}</time>
+                </p>
                 <a
-                  class="font-semibold text-pretty underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href={resolve("/[...path]", { path: election.path })}
-                  >{election.name}</a
+                  class="justify-self-start text-lg/tight font-[720] text-balance underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/[...path]", { path: next.path })}
+                  >{next.name}</a
                 >
-              </li>
-            {/each}
-          </ul>
+                <p class="flex flex-wrap gap-x-4 gap-y-1 pbs-1 text-sm">
+                  {#if next.isLive}
+                    <a
+                      class="inline-flex items-center gap-2 rounded-sm bg-primary px-3 font-semibold text-primary-foreground block-9 hover:bg-primary/90"
+                      href={resolve("/live/[...path]", { path: next.path })}
+                      ><span
+                        class="rounded-full bg-marker block-2 inline-2"
+                        aria-hidden="true"
+                      ></span>{m.home_next_live()}</a
+                    >
+                  {/if}
+                  <a
+                    class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
+                    href={resolve("/[...path]", { path: next.path })}
+                    >{m.home_next_open()}</a
+                  >
+                  <a
+                    class="inline-flex items-center gap-2 rounded-sm border border-input px-3 font-semibold block-9 hover:bg-accent"
+                    href={resolve("/agents")}
+                    ><svg
+                      class="block-4 inline-4"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      aria-hidden="true"
+                      ><path d="M8 1.5v2.5" /><circle
+                        cx="8"
+                        cy="1.5"
+                        r="0.75"
+                        class="fill-marker stroke-none"
+                      /><rect
+                        x="2.5"
+                        y="4"
+                        width="11"
+                        height="9"
+                        rx="2.5"
+                      /><path d="M6 8v1M10 8v1" /></svg
+                    >{m.home_agents()}</a
+                  >
+                </p>
+              </div>
+            {/if}
+            {#if later.length > 0}
+              <ul class="grid gap-1.5 text-sm">
+                {#each later as election (election.path)}
+                  <li
+                    class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-baseline gap-x-3"
+                  >
+                    <time
+                      class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                      datetime={election.date}
+                      >{when(election.days, election.date)}</time
+                    >
+                    <a
+                      class="font-semibold text-pretty underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                      href={resolve("/[...path]", { path: election.path })}
+                      >{election.name}</a
+                    >
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </section>
         {/if}
-      </section>
+      </div>
     {/if}
   </header>
 

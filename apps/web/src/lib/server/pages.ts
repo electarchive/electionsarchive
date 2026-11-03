@@ -297,10 +297,15 @@ async function strata() {
 }
 
 export async function home() {
-  return remember("home:v5", welcome);
+  const now = Date.now();
+  const today = new Date(now).toISOString().slice(0, 10);
+  const ended = new Date(now - 12 * 3_600_000).toISOString().slice(0, 10);
+  return remember(`home:v7:${today}:${ended}`, async () =>
+    welcome(today, ended),
+  );
 }
 
-async function welcome() {
+async function welcome(today: string, ended: string) {
   const [polities, layers, dated] = await Promise.all([
     call(router.polities.list, {
       kinds: ["sovereign_state", "supranational"],
@@ -320,7 +325,7 @@ async function welcome() {
         (select e.id, e.date_from, e.kind, e.polity_id, 'recent' as when
           from election e join polity y on y.id = e.polity_id
           where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
-            and e.kind in ('general', 'referendum') and e.date_from <= current_date
+            and e.kind in ('general', 'referendum') and e.date_from < ${ended}::date
             and (
               exists (select from contest c where c.election_id = e.id)
               or (y.kind = 'sovereign_state' and exists (
@@ -331,8 +336,14 @@ async function welcome() {
         union all
         (select e.id, e.date_from, e.kind, e.polity_id, 'upcoming'
           from election e
-          where e.parent_id is null and e.date_from > current_date and not exists (select from entity_merge m where m.entity_id = e.id)
+          where e.parent_id is null and e.date_from >= ${ended}::date and not exists (select from entity_merge m where m.entity_id = e.id)
           order by e.date_from limit 4)
+        union all
+        (select e.id, e.date_from, e.kind, e.polity_id, 'decided'
+          from election e join polity y on y.id = e.polity_id
+          where e.parent_id is null and e.date_from < ${ended}::date and e.date_from >= ${ended}::date - 30
+            and not exists (select from entity_merge m where m.entity_id = e.id)
+          order by e.date_from desc, y.kind in ('sovereign_state', 'supranational') desc, (e.kind = 'general') desc limit 8)
         union all
         (select t.id, t.date_from, t.kind, t.polity_id, 'today'
           from (
@@ -341,9 +352,9 @@ async function welcome() {
               y.kind in ('sovereign_state', 'supranational') as is_national
             from election e join polity y on y.id = e.polity_id
             cross join lateral (
-              select abs(extract(doy from e.date_from) - extract(doy from current_date)) as gap
+              select abs(extract(doy from e.date_from) - extract(doy from ${today}::date)) as gap
             ) d
-            where e.parent_id is null and e.date_from < current_date - 300 and not exists (select from entity_merge m where m.entity_id = e.id)
+            where e.parent_id is null and e.date_from < ${today}::date - 300 and not exists (select from entity_merge m where m.entity_id = e.id)
               and least(d.gap, 365 - d.gap) <= 3
             order by case when y.kind in ('sovereign_state', 'supranational') then e.id else e.polity_id end,
               (e.kind = 'general') desc, e.date_from desc
@@ -380,21 +391,37 @@ async function welcome() {
     polity: row.polity,
     when: row.when,
   }));
-  const recent = elections.filter((election) => election.when === "recent");
-  const leads = await Promise.all(
-    recent.map(async (election) =>
-      call(router.elections.lead, { id: election.id }),
+  const lead = async (list: typeof elections) =>
+    Promise.all(
+      list.map(async (election) => ({
+        ...election,
+        lead: await call(router.elections.lead, { id: election.id }),
+      })),
+    );
+  const week = new Date(Date.parse(`${ended}T00:00:00Z`) - 7 * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  const decided = (
+    await lead(elections.filter((election) => election.when === "decided"))
+  )
+    .filter(
+      (election) =>
+        election.date >= week || (election.lead?.results.length ?? 0) > 0,
+    )
+    .slice(0, 4);
+  const shown = new Set(decided.map((election) => election.id));
+  const recent = await lead(
+    elections.filter(
+      (election) => election.when === "recent" && !shown.has(election.id),
     ),
   );
   return {
     kind: "home" as const,
-    today: new Date().toISOString().slice(0, 10),
+    today,
     polities: covered,
     strata: layers,
-    recent: recent.map((election, at) => ({
-      ...election,
-      lead: leads[at] ?? null,
-    })),
+    decided,
+    recent,
     upcoming: elections
       .filter((election) => election.when === "upcoming")
       .toSorted((a, b) => a.date.localeCompare(b.date)),
