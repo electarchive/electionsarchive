@@ -34,10 +34,10 @@ DATES = {
 TITLE = "United States ballot measures, by year"
 NOTE = (
     "Statewide totals as tabulated in the English Wikipedia's yearly lists of ballot measures, which transcribe "
-    "the state canvasses."
+    "Ballotpedia's figures (ballotpedia.org) from the state canvasses."
 )
 METHOD = (
-    "Statewide Yes and No totals from the English Wikipedia's list of {year} ballot measures. "
+    "Statewide Yes and No totals from the English Wikipedia's list of {year} ballot measures, which cites Ballotpedia. "
     "The outcome is the list's own Approved or Failed mark."
 )
 

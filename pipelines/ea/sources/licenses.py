@@ -6,7 +6,7 @@ from ea.sources.us import elstats
 from ea.store import connect
 
 SOURCE = "licenses"
-VERSION = "6"
+VERSION = "7"
 PUBLIC_RECORD = "Public record"
 UNLICENSED = "No license stated: facts published with attribution, raw files not redistributed"
 NEWS = "All rights reserved: a news article cited for one fact, not redistributed"
