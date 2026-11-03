@@ -15,11 +15,13 @@ import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
+import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { liveDb as db } from "#lib/server/db/index.js";
 import { portraits } from "#lib/server/live-board.js";
+import { localizeNames } from "#lib/server/names.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
@@ -860,6 +862,27 @@ async function calls(contests: Array<string>) {
   return result.rows;
 }
 
+async function localized(titles: {
+  full: Map<string, string>;
+  short: Map<string, string>;
+}) {
+  const locale = getLocale();
+  if (locale === baseLocale) {
+    return titles;
+  }
+  const { full, short } = await localizeNames(
+    {
+      full: Object.fromEntries(titles.full),
+      short: Object.fromEntries(titles.short),
+    },
+    locale,
+  );
+  return {
+    full: new Map(Object.entries(full)),
+    short: new Map(Object.entries(short)),
+  };
+}
+
 async function night(
   found: { id: string; path: string; date: string; rest: string },
   picked: Array<{ id: string; path: string; district: string | null }>,
@@ -1002,7 +1025,7 @@ async function night(
         ...held.rows.flatMap((row) => (row.area == null ? [] : [row.area])),
       ],
       found.date,
-    ),
+    ).then(localized),
     names(parties, found.date),
   ]);
   const sitting = new Set(incumbents.map((row) => row.option));
