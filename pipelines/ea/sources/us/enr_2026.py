@@ -1176,11 +1176,14 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         [{"locality": {"name": [{"text": "Shelby"}]}, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
         if state == "TN"
         else detail["breakdownResults"]
+        or [{"locality": None, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
     )
     for locality in localities:
-        place = locality["locality"]["name"][0]["text"]
+        place = locality["locality"]["name"][0]["text"] if locality["locality"] else ""
         county = (
-            town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
+            FIPS[state]
+            if locality["locality"] is None
+            else town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
             if state == "RI"
             else f"51{locality['locality']['mapFeatureId']}"
             if state == "VA"
@@ -1293,7 +1296,17 @@ def plan(
         if found is None:
             unmatched.append(f"{contest_key}: no contest")
             continue
-        work.append((state, contest_key, found[0], group, None))
+        whole = (
+            conn.execute(
+                """select u.id from reporting_unit u
+                   where u.area_id = (select district_area_id from contest where id = %s)
+                   order by u.scheme_code limit 1""",
+                [found[0]],
+            ).fetchone()
+            if set(group["county"]) == {FIPS[state]}
+            else None
+        )
+        work.append((state, contest_key, found[0], group, whole[0] if whole else None))
     for state in local["state"].unique(maintain_order=True):
         published: dict[UUID, tuple[list[str], set[str]]] = {}
         titles: dict[UUID, set[str]] = {}
