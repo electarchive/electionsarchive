@@ -14,6 +14,12 @@ ROWS = Path(__file__).with_name("judicial_districts_2026.tsv")
 PUBLISHERS = {
     "www.elections.il.gov": ("Illinois State Board of Elections", "Judicial Officers Book"),
     "electionresults.iowa.gov": ("Iowa Secretary of State", "2026 General Election Results, Detail XML"),
+    "judicialperformance.colorado.gov": (
+        "Colorado Office of Judicial Performance Evaluation",
+        "2026 Judicial Performance Evaluations, Full List",
+    ),
+    "sos.nebraska.gov": ("Nebraska Secretary of State", "List of Judges Who Filed for Retention, November 3, 2026"),
+    "vote.utah.gov": ("Utah Elections Office", "2026 Candidate Filings"),
 }
 
 
@@ -24,7 +30,10 @@ def read() -> list[dict[str, str]]:
 
 def fetch() -> None:
     for url in sorted({row["source"] for row in read()}):
-        raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
 
 
 def emit() -> Path:
@@ -102,7 +111,7 @@ def emit() -> Path:
             cs.add(
                 "area_parent",
                 area_id=area,
-                parent_id=districts[row["parent"]] if row["parent"] else state_area,
+                parent_id=districts.get(row["parent"], state_area),
             )
             name(area, f"{row['label']}, {row['state']}")
             cs.add("polity_territory", polity_id=polity, area_id=area)
