@@ -1,6 +1,7 @@
 import type { LiveElection } from "@ea/analytics/live";
 import { error } from "@sveltejs/kit";
 import { remember } from "#lib/server/cache.js";
+import { liveBallot } from "#lib/server/live-ballot.js";
 import {
   boxes,
   control,
@@ -27,7 +28,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const whole = nationPath === params.path ? found : await night(nationPath);
   const nationElection: LiveElection = whole.election;
   const [held, districts, nation] = await Promise.all([
-    remember(`live:control:v2:${election.date}`, async () =>
+    remember(`live:control:v3:${election.date}`, async () =>
       control(nationElection.races, election.date),
     ),
     remember(`live:house:v3:${election.date}`, async () =>
@@ -69,6 +70,7 @@ export const load: PageServerLoad = async ({ params }) => {
           ? null
           : { map: districts.map, codes: districts.codes },
       geography: null,
+      legislature: null,
       around: null,
       frame,
       boxes: framed,
@@ -87,9 +89,15 @@ export const load: PageServerLoad = async ({ params }) => {
   ];
   const code = segments[1] ?? "";
   const own = nation?.codes[code];
-  const built = await remember(`live:full:v2:${election.slug}`, async () =>
-    geography(areas.length === 0 && own != null ? [own] : areas, election.date),
-  );
+  const [built, ballot] = await Promise.all([
+    remember(`live:full:v2:${election.slug}`, async () =>
+      geography(
+        areas.length === 0 && own != null ? [own] : areas,
+        election.date,
+      ),
+    ),
+    liveBallot(params.path),
+  ]);
   const home = framed[own ?? ""];
   const map = built == null || home == null ? built : { ...built, frame: home };
   const ids = new Set(election.races.map((race) => race.id));
@@ -127,6 +135,32 @@ export const load: PageServerLoad = async ({ params }) => {
             codes: mine,
           },
     geography: map,
+    legislature:
+      ballot == null || map == null
+        ? null
+        : {
+            chambers: ballot.chambers.flatMap((chamber) => {
+              const drawn = ballot.maps[chamber.id];
+              return drawn == null
+                ? []
+                : [
+                    {
+                      ...chamber,
+                      map: {
+                        ...drawn,
+                        ground: [],
+                        frame: map.frame,
+                        outline: map.outline,
+                      },
+                    },
+                  ];
+            }),
+            contests: ballot.contests.filter(
+              (row) => row.tier === "upper" || row.tier === "lower",
+            ),
+            parties: ballot.parties,
+            families: ballot.families,
+          },
     around:
       nation == null || OUTLYING.has(code)
         ? null

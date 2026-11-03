@@ -22,6 +22,7 @@ import { histories } from "#lib/server/rpc/history.js";
 import { indices } from "#lib/server/rpc/indices.js";
 import { live } from "#lib/server/rpc/live.js";
 import { maps } from "#lib/server/rpc/maps.js";
+import { nation } from "#lib/server/rpc/nation.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
 import { talk } from "#lib/server/rpc/talk.js";
@@ -51,7 +52,7 @@ export const reads = {
   entities,
   histories,
   indices,
-  live: { ...live, find },
+  live: { ...live, find, nation },
   maps,
   parties,
   people,

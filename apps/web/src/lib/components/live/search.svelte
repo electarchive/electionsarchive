@@ -31,7 +31,7 @@
     codes: Array<string>;
     labels: Record<string, string>;
     href: (code: string) => string;
-    link?: ((slug: string, state: string) => string) | null;
+    link?: ((slug: string) => string) | null;
   } = $props();
 
   const toLive = liveLinks();
@@ -187,11 +187,11 @@
     })),
     ...found.races.map((entry) => ({
       key: `race:${entry.summary.race.id}`,
-      href: open(entry.summary.race.slug, entry.summary.race.state),
+      href: open(entry.summary.race.slug),
     })),
     ...locals.map((entry) => ({
       key: `local:${entry.slug}`,
-      href: open(entry.slug, entry.state),
+      href: open(entry.slug),
     })),
   ]);
   const isShown = $derived(

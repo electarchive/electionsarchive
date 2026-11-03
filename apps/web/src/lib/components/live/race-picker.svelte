@@ -22,14 +22,23 @@
     summaries,
     current = null,
     label,
-    overview = null,
+    overviews = [],
+    kinds = null,
+    search = null,
     onpick = null,
     isCompact = false,
   }: {
     summaries: Array<Summary>;
     current?: string | null;
     label: string;
-    overview?: { label: string; isCurrent: boolean; onpick: () => void } | null;
+    overviews?: Array<{
+      group: string;
+      label: string;
+      isCurrent: boolean;
+      onpick: () => void;
+    }>;
+    kinds?: Map<string, string> | null;
+    search?: Snippet | null;
     onpick?: ((summary: Summary) => void) | null;
     isCompact?: boolean;
   } = $props();
@@ -106,6 +115,10 @@
 
   function kindOf(summary: Summary) {
     const { race } = summary;
+    const known = kinds?.get(race.slug);
+    if (known != null) {
+      return known;
+    }
     if (race.office === "house") {
       return "house";
     }
@@ -180,13 +193,15 @@
                 Number.parseInt(a.race.district ?? "0", 10) -
                 Number.parseInt(b.race.district ?? "0", 10),
             )
-          : list.toSorted(
-              (a, b) =>
-                (RANK[a.race.office] ?? 2) - (RANK[b.race.office] ?? 2) ||
-                title(a.race).localeCompare(title(b.race), undefined, {
-                  numeric: true,
-                }),
-            );
+          : list.every((summary) => kinds?.has(summary.race.slug) === true)
+            ? list
+            : list.toSorted(
+                (a, b) =>
+                  (RANK[a.race.office] ?? 2) - (RANK[b.race.office] ?? 2) ||
+                  title(a.race).localeCompare(title(b.race), undefined, {
+                    numeric: true,
+                  }),
+              );
       const names = sorted.map((summary) => title(summary.race));
       const prefix =
         kind.value === "statewide" || kind.value === "house" || list.length < 2
@@ -226,7 +241,7 @@
     groups.find((group) =>
       group.entries.some((entry) => entry.summary.race.slug === current),
     )?.key ??
-      (overview?.isCurrent === true ? "house" : null) ??
+      overviews.find((entry) => entry.isCurrent)?.group ??
       groups[0]?.key ??
       "all",
   );
@@ -444,6 +459,25 @@
   </li>
 {/snippet}
 
+{#snippet overview(
+  entry: { label: string; isCurrent: boolean; onpick: () => void },
+  className: string,
+)}
+  <button
+    type="button"
+    aria-pressed={entry.isCurrent}
+    class={cn(
+      "grid place-items-center rounded-xs px-2 text-xs font-semibold block-8 pointer-coarse:block-10",
+      {
+        "bg-foreground text-background": entry.isCurrent,
+        "ring-1 ring-border hover:bg-secondary": !entry.isCurrent,
+      },
+      className,
+    )}
+    onclick={entry.onpick}>{entry.label}</button
+  >
+{/snippet}
+
 {#snippet house(entries: Array<{ summary: Summary; name: string }>)}
   {const seats = $derived(
     tally(
@@ -496,22 +530,11 @@
       class="grid grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))] gap-1"
       onpointerleave={() => (probed = null)}
     >
-      {#if overview != null}
+      {#each overviews.filter((entry) => entry.group === "house") as entry (entry.label)}
         <li class="col-span-3">
-          <button
-            type="button"
-            aria-pressed={overview.isCurrent}
-            class={cn(
-              "grid place-items-center rounded-xs px-2 text-xs font-semibold block-8 inline-full pointer-coarse:block-10",
-              {
-                "bg-foreground text-background": overview.isCurrent,
-                "ring-1 ring-border hover:bg-secondary": !overview.isCurrent,
-              },
-            )}
-            onclick={overview.onpick}>{overview.label}</button
-          >
+          {@render overview(entry, "inline-full")}
         </li>
-      {/if}
+      {/each}
       {#each entries as entry (entry.summary.race.id)}
         {const summary = $derived(entry.summary)}
         {const color = $derived(shade(summary))}
@@ -626,7 +649,15 @@
         /></button
       >
     {/if}
-    {#if isLong}
+    {#if search != null}
+      <div
+        class={cn("@max-xl:inline-full @xl:inline-72", {
+          "@max-xl:hidden": isFolded,
+        })}
+      >
+        {@render search()}
+      </div>
+    {:else if isLong}
       <label
         class={cn(
           "flex items-center gap-2 rounded-sm border border-input bg-card px-2.5 block-8 focus-within:border-foreground focus-within:ring-2 focus-within:ring-ring/40 @max-xl:inline-full @xl:inline-56 pointer-coarse:block-10",
@@ -720,6 +751,16 @@
         {#if group.key === "house"}
           {@render house(entries)}
         {:else}
+          {const maps = $derived(
+            overviews.filter((entry) => entry.group === group.key),
+          )}
+          {#if maps.length > 0}
+            <div class="flex flex-wrap gap-1 pbs-1 pbe-1.5">
+              {#each maps as entry (entry.label)}
+                {@render overview(entry, "")}
+              {/each}
+            </div>
+          {/if}
           <ul
             class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-x-4"
           >
