@@ -4931,7 +4931,7 @@
   "night_rating_tossup": "Başa baş",
   "night_rating_counting": "Sayılıyor",
   "night_ladder_title": "Salt çoğunluğa giden yol",
-  "night_ladder_help": "Yarışlar en güvenli {left} tarafından en güvenli {right} tarafına doğru sıralanır. {party} için salt çoğunluk bunların {count} tanesini gerektirir. Belirleyici yarış, onu çoğunluğa taşıyan yarıştır.",
+  "night_ladder_help": "Yarışlar, {left} için en güvenli olandan {right} için en güvenli olana doğru sıralanır. {party} çoğunluk için bunlardan {count} tanesini kazanmalı. Çoğunluğu getiren yarış belirleyici yarıştır.",
   "night_ladder_secured": "{party}, oy pusulasında tek bir yarış olmadan da salt çoğunluğa sahip.",
   "night_ladder_rank": "{party}, bu yarışa kadar tüm yarışları kazanırsa sahip olacağı sandalye sayısı",
   "night_ladder_held": "Sandalyeye sahip parti",
