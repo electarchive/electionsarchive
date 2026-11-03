@@ -58,6 +58,7 @@ export type LiveRace = {
   certified: { totals: Array<number>; winners: Array<string> } | null;
   projected?: { option: string; at: string } | null;
   source: { publisher: string; url: string | null };
+  isClassic?: boolean;
   feed?: LiveFeed;
   jurisdiction?: {
     name: string;
@@ -115,6 +116,7 @@ const MODEL = {
   pause: 2,
   moving: 0.1,
   shift: 0.028,
+  volatility: { scale: 0.9, prior: 0.1, weight: 0.02, calm: 0.2 },
   surge: 0.14,
   tail: {
     share: 0.035,
@@ -561,6 +563,22 @@ function turnout(found: Array<Unit>, center: number, spread: number) {
   };
 }
 
+function averaged(centers: Array<number>, spreads: Array<number>) {
+  let chance = 0;
+  for (const [index, center] of centers.entries()) {
+    const spread = spreads[index]!;
+    chance +=
+      spread > 0
+        ? Math.exp(logcdf(center / spread))
+        : center > 0
+          ? 1
+          : center < 0
+            ? 0
+            : 0.5;
+  }
+  return chance / centers.length;
+}
+
 function solve(
   matrix: Array<number>,
   vector: Array<number>,
@@ -673,6 +691,7 @@ function fit(
 }
 
 export function estimate({ race, at }: EstimateInput): LiveEstimate {
+  const isClassic = race.isClassic === true;
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
   const { found, a, b } = units(race, at);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
@@ -787,9 +806,34 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   }
   const residual = Math.max(0.015, Math.sqrt(squares / weights));
   const residuals = scale.map((value) => residual * value);
+  let swings = 0;
+  let swung = 0;
+  for (const unit of based) {
+    const later = unit.total - (unit.early?.total ?? unit.total);
+    if (unit.early == null || later <= 0) {
+      continue;
+    }
+    const increment =
+      (unit.margin * unit.total - unit.early.margin * unit.early.total) / later;
+    const votes = Math.min(unit.early.total, later);
+    swings += votes * (increment - unit.early.margin) ** 2;
+    swung += votes;
+  }
+  const pseudo = MODEL.volatility.weight * weight;
+  const modeScale =
+    MODEL.volatility.scale *
+    Math.sqrt(
+      Math.max(
+        0,
+        (pseudo * MODEL.volatility.prior ** 2 + swings) / (pseudo + swung) -
+          MODEL.volatility.calm ** 2,
+      ),
+    );
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
   const shareIn: Array<number> = [];
+  const centers: Array<number> = [];
+  const spreads: Array<number> = [];
   let winsA = 0;
   const perUnit = found.map(() => ({
     totals: [] as Array<number>,
@@ -800,6 +844,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const { cell, tau } = model.draw(random);
     const surge = MODEL.surge * gaussian(random);
     const shift = MODEL.shift * gaussian(random);
+    const mode = isClassic ? 0 : modeScale * gaussian(random);
     const late =
       left *
       Math.exp(
@@ -831,7 +876,11 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const coefficients = fit(found, totals, center, residuals, random);
     const order = coefficients.at(-1)!;
     let votes = 0;
+    let still = 0;
     let all = 0;
+    let shifted = 0;
+    let moded = 0;
+    let leaned = 0;
     for (const [index, unit] of found.entries()) {
       const final = totals[index]!;
       const fraction = Math.min(1, unit.total / final);
@@ -852,35 +901,54 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       } else {
         margin = prior + Math.sqrt(priorVariance) * gaussian(random);
       }
-      margin += shift * Math.sqrt(1 - fraction);
+      const reach = Math.sqrt(1 - fraction);
       const remaining = final - unit.total;
       const room = remaining * (1 - unit.others);
       const countedLead = unit.margin * unit.total;
-      const lead = clamp(margin * final - countedLead, -room, room);
+      const lead = clamp(
+        (margin + shift * reach + mode * (1 - fraction)) * final - countedLead,
+        -room,
+        room,
+      );
+      const steady = clamp(margin * final - countedLead, -room, room);
       const extra = final * late;
       const ceiling = 1 - unit.others;
-      const unitVotes =
-        countedLead +
-        lead +
-        (final > 0
+      const local = final > 0 ? MODEL.tail.local * gaussian(random) : 0;
+      const tail = (value: number, tilt: number) =>
+        final > 0
           ? extra *
             clamp(
-              (countedLead + lead) / final +
-                lean +
-                MODEL.tail.local * gaussian(random),
+              (countedLead + value) / final + tilt + local,
               -ceiling,
               ceiling,
             )
-          : 0);
+          : 0;
+      const unitVotes = countedLead + lead + tail(lead, lean);
       const unitTotal = final + extra;
       votes += unitVotes;
+      still += countedLead + steady + tail(steady, 0);
       all += unitTotal;
+      if (Math.abs(margin * final - countedLead) < room) {
+        shifted += unitTotal * reach;
+        moded += unitTotal * (1 - fraction);
+      }
+      leaned += extra;
       perUnit[index]!.totals.push(unitTotal);
       perUnit[index]!.margins.push(unitTotal > 0 ? unitVotes / unitTotal : 0);
     }
     finalMargins.push(all > 0 ? votes / all : 0);
     finalTotals.push(all);
     shareIn.push(all > 0 ? Math.min(1, counted / all) : 0);
+    centers.push(all > 0 ? still / all : 0);
+    spreads.push(
+      all > 0
+        ? Math.hypot(
+            MODEL.shift * shifted,
+            modeScale * moded,
+            MODEL.tail.lean * leaned,
+          ) / all
+        : 0,
+    );
     if (votes > 0) {
       winsA += 1;
     }
@@ -890,6 +958,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const leader = flip ? optionB : optionA;
   const runnerUp = flip ? optionA : optionB;
   const shareInBand = band(shareIn);
+  const chance = isClassic ? winsA / MODEL.draws : averaged(centers, spreads);
   const reportedUnits = found.filter((unit) => unit.total > 0).length;
   const status =
     shareInBand.mid < 0.1 || reportedUnits < Math.min(3, found.length)
@@ -906,10 +975,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       : margin,
     leader: leader.id,
     runnerUp: runnerUp.id,
-    winProbability: {
-      [optionA.id]: winsA / MODEL.draws,
-      [optionB.id]: 1 - winsA / MODEL.draws,
-    },
+    winProbability: { [optionA.id]: chance, [optionB.id]: 1 - chance },
     units: found.map((unit, index) => {
       const projected = band(perUnit[index]!.margins);
       return {
