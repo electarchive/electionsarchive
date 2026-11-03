@@ -438,15 +438,19 @@ def role(lines: list[str], number: int, at: int, path: Path) -> str:
 
 def scan() -> dict[str, Site]:
     paths = sources_files()
+    keys = set(english())
     signature = digest(
-        [CONTEXT_VERSION, *([path.as_posix(), path.stat().st_size, path.stat().st_mtime_ns] for path in paths)]
+        [
+            CONTEXT_VERSION,
+            sorted(keys),
+            *([path.as_posix(), path.stat().st_size, path.stat().st_mtime_ns] for path in paths),
+        ]
     )
     cache = WORK / "context.json"
     if cache.exists():
         stored = json.loads(cache.read_text())
         if stored.get("signature") == signature:
             return cast(dict[str, Site], stored["context"])
-    keys = set(english())
     texts: dict[Path, list[str]] = {}
     direct: dict[str, list[tuple[Path, int, int]]] = {}
     quoted: dict[str, list[tuple[Path, int, int]]] = {}

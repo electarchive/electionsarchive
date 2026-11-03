@@ -37,7 +37,7 @@ Election vocabulary as the Turkish press uses it
 - contest, race: "yarış" ("valilik yarışı", "Senato yarışı"); a whole election is "seçim". Never "seçim yarışı" where "yarış" or "seçim" alone is clear.
 - reporting (share of units counted): "açılan sandık", as on Turkish election-night television ("Açılan sandık: %62"); counties reporting: "sonuç bildiren ilçeler".
 - votes counted: "sayılan oy". turnout: "katılım" ("katılım oranı" in prose). vote share: "oy oranı". margin: "fark". swing: "oy kayması". swing state: "çekişmeli eyalet".
-- seat: "sandalye". incumbent: "görevdeki" (badge "Görevde"). flip: "el değiştirdi". hold: "korudu". gain: "... kazandı", naming the losing party where the string allows.
+- seat: "sandalye" for an assembly's seats and seat counts; "koltuk" for one person's office ("belediye başkanlığı koltuğu", "koltuğunu kaybetti"). presidential election: "cumhurbaşkanlığı seçimi", but a US presidential election is "başkanlık seçimi". incumbent: "görevdeki" (badge "Görevde"). flip: "el değiştirdi". hold: "korudu". gain: "... kazandı", naming the losing party where the string allows.
 - called (a race declared won): "kazanan ilan edildi" or "kazanan belli oldu"; too close to call: "başa baş, sonuç belli değil". preliminary results: "resmî olmayan sonuçlar"; official results: "kesin sonuçlar".
 - runoff: "ikinci tur". primary: "ön seçim". by-election: "ara seçim"; US midterms: "ara seçimler". special election: "özel seçim".
 - US congressional district: "seçim bölgesi" ("Ohio 12. seçim bölgesi"). electoral college: "Seçiciler Kurulu"; electoral votes: "seçici oyu".
