@@ -5808,5 +5808,7 @@
   "board_tile_body": "İzlediğiniz yarışları seçin. Hepsini tek ekranda yan yana takip edin.",
   "live_views_label": "Sonuçları izlemenin diğer yolları",
   "livemap_win_chance": "Kazanma olasılığı",
-  "livemap_counted_share": "Beklenen oyların sayılan kısmı"
+  "livemap_counted_share": "Beklenen oyların sayılan kısmı",
+  "livemap_near_hint": "Bu eyaletin sonuçlarını görmek için tıklayın",
+  "livemap_up_hint": "Ya da eyaletin dışında herhangi bir yere tıkla"
 }

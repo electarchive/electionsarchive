@@ -1,5 +1,6 @@
 import csv
 import html
+import io
 import re
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -12,7 +13,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.maricopa"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FOLDERS = [Path(__file__).parents[4] / "data/inbox/manual" / mf for mf in ("MF-081", "MF-082")]
 URL = "https://elections.maricopa.gov/results-and-data/historic-results.html?year={year}#{name}"
@@ -163,7 +164,7 @@ def classify(
     scope = None
     if party is not None:
         scope, text = party[1], party[2].strip()
-    seats = re.search(r"\s*\(vote(?: for)? (\d+)\)?\s*$", text, flags=re.IGNORECASE)
+    seats = re.search(r"\s*-?\s*\(?vote(?: for)? (\d+)\)?\s*$", text, flags=re.IGNORECASE)
     if seats is not None:
         vote_for = vote_for or int(seats[1])
         text = text[: seats.start()]
@@ -229,9 +230,9 @@ def classify(
         rest = pattern.sub(" ", rest)
     number = re.search(r"(?:#|NO\.?)\s*(\d+)\b", rest)
     ward = re.search(r"\bWARD (\d)\b", rest)
-    seat = re.search(r"\bDISTRICT ?#?(\d+)\b", rest)
+    seat = re.search(r"\bDISTRICT\.? ?#?(\d+)\b", rest)
     rest = re.sub(
-        r"(?:#|NO\.?)\s*\d+|\bWARD \d\b|\bDISTRICT ?#?\d+\b|\bGOV\b|\bSCH\b|\bMEMBER\b|\b[24] ?YR\b|-?\b[24]YR\b|[-#&(),]|\bTERM TO EXPIRE.*",
+        r"(?:#|NO\.?)\s*\d+|\bWARD \d\b|\bDISTRICT\.? ?#?\d+\b|\bGOV\b|\bSCH\b|\bMEMBER\b|\b[24] ?YR\b|-?\b[24]YR\b|[-#&(),]|\bTERM TO EXPIRE.*",
         " ",
         rest,
     )
@@ -247,7 +248,8 @@ def classify(
             for entry in registry_["school"]:
                 if entry[1].startswith(SCHOOL_NUMBERS[number[1]]):
                     kind, jur = "school", entry[1]
-    words = frozenset(re.sub(r"\b(?:CITY|TOWN) OF\b", " ", rest).replace("-", " ").split()) - {"DISTRICT"}
+    ordered = [w for w in re.sub(r"\b(?:CITY|TOWN) OF\b", " ", rest).replace("-", " ").split() if w != "DISTRICT"]
+    words = frozenset(ordered)
     special_words = words | ({"FIRE"} if "FIRE" in upper else set())
     if jur is None and role == "council" and seat is not None and words and words <= SURPRISE_DISTRICTS:
         kind, jur = "city", "SURPRISE"
@@ -280,7 +282,9 @@ def classify(
     if jur is None:
         return None
     if kind == "city" and role in ("council", "board"):
-        tail = " ".join(w for w in words if w not in next(e[2] for e in registry_["city"] if e[1] == jur))
+        tail = " ".join(
+            w for w in dict.fromkeys(ordered) if w not in next(e[2] for e in registry_["city"] if e[1] == jur)
+        )
         if seat is not None:
             row["seat"] = seat[1]
         elif tail:
@@ -332,13 +336,35 @@ def fetch() -> None:
         )
 
 
+def label(candidate: str, is_measure: bool) -> tuple[str | None, str, bool]:
+    prefix = re.match(r"^([A-Z]{2,4})? ?- (.*)$", candidate)
+    code, body = (prefix[1], prefix[2]) if prefix is not None else (None, candidate)
+    body = body.strip().replace("''", '"')
+    if is_measure:
+        tail = re.search(r"\b(YES|FOR|NO|AGAINST)$", body.upper())
+        body = "Yes" if tail is not None and tail[1] in ("YES", "FOR") else "No" if tail is not None else body.title()
+    elif body.lower().startswith("write") or re.search(r"print name of write|not qualified", body, re.IGNORECASE):
+        body = "Write-in"
+    elif "," in body:
+        last, _, first = body.partition(",")
+        first, _, suffix = first.strip().partition(",")
+        body = f"{first.strip()} {last.strip()}" + (f" {suffix.strip()}" if suffix else "")
+        body = body.title()
+    return code, body, body == "Write-in"
+
+
 def parse() -> None:
     csv.field_size_limit(10**9)
     PARSED.mkdir(parents=True, exist_ok=True)
     total = 0
     for day, path in files():
         rows = []
-        with path.open(encoding="utf-8-sig", errors="replace", newline="") as handle:
+        data = path.read_bytes()
+        try:
+            text = data.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            text = data.decode("cp1252", errors="replace")
+        with io.StringIO(text, newline="") as handle:
             reader = csv.reader(handle, delimiter="\t")
             head = next(reader)
             if len(head) < 5:
@@ -418,32 +444,19 @@ def parse() -> None:
     table = pl.DataFrame(labels, infer_schema_length=None)
     table.write_parquet(PARSED / "labels.parquet")
     (PARSED / "skipped.txt").write_text("\n".join(sorted(skipped)))
-    measures = set(table.filter(pl.col("type").is_in(["measure", "recall", "retention"]))["contest"].to_list())
+    measures = set(table.filter(pl.col("type").is_in(["measure", "retention"]))["contest"].to_list())
     names: dict[tuple[str, bool], tuple[str | None, str, bool]] = {}
+    garbled: dict[str, str] = {}
     for candidate in everything.join(table.select("day", "contest"), on=["day", "contest"])["candidate"].unique():
         for is_measure in (False, True):
-            prefix = re.match(r"^([A-Z]{2,4})? ?- (.*)$", candidate)
-            code, body = (prefix[1], prefix[2]) if prefix is not None else (None, candidate)
-            body = body.strip()
-            if is_measure:
-                tail = re.search(r"\b(YES|FOR|NO|AGAINST)$", body.upper())
-                body = (
-                    "Yes"
-                    if tail is not None and tail[1] in ("YES", "FOR")
-                    else "No"
-                    if tail is not None
-                    else body.title()
-                )
-            elif body.lower().startswith("write") or re.search(
-                r"print name of write|not qualified", body, re.IGNORECASE
-            ):
-                body = "Write-in"
-            elif "," in body:
-                last, _, first = body.partition(",")
-                first, _, suffix = first.strip().partition(",")
-                body = f"{first.strip()} {last.strip()}" + (f" {suffix.strip()}" if suffix else "")
-                body = body.title()
-            names[(candidate, is_measure)] = (code, body, body == "Write-in")
+            names[(candidate, is_measure)] = label(candidate, is_measure)
+            if not candidate.isascii():
+                earlier = label(re.sub(r"[^\x00-\x7f]", "\ufffd", candidate), is_measure)[1]
+                if earlier != names[(candidate, is_measure)][1]:
+                    garbled[names[(candidate, is_measure)][1]] = earlier
+    pl.DataFrame(sorted(garbled.items()), schema=["name", "garbled"], orient="row").write_parquet(
+        PARSED / "garbled.parquet"
+    )
     keys = pl.DataFrame(
         [(c, m, *v) for (c, m), v in names.items()],
         schema=["candidate", "is_measure", "prefix", "name", "write_in_flag"],
@@ -481,6 +494,13 @@ NOTE = (
     "majority of Yes and No votes, a partisan primary advances its plurality winner, and in a nonpartisan contest "
     "that a later election of the same office follows, a majority winner is elected and otherwise the top two advance."
 )
+RETIRED = (
+    "The county's results no longer yield this contest under this key: a recall is now a candidate contest for the "
+    "seat, a council contest no longer takes its seat from the vote-for count, and a district seat reads the same "
+    "on every run."
+)
+GARBLED = "The county's file was read as UTF-8 when it is Windows-1252, which garbled the accented letters."
+QUOTED = "The county's file marks a nickname with two apostrophes in place of a double quotation mark."
 NO_SEATS = " The file states no seat count for this at-large contest, so no outcomes are recorded."
 
 
@@ -518,6 +538,12 @@ def emit() -> Path:
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        fixes: dict[str, str] = {}
+        for fixed, earlier in pl.read_parquet(PARSED / "garbled.parquet").iter_rows():
+            fixes[earlier] = fixed
+            if slug(fixed) != slug(earlier):
+                cs.renamed[slug(fixed)] = slug(earlier)
 
         state = cs.polity("US-AZ")
         state_area = cs.area("us.state", "04")
@@ -568,8 +594,11 @@ def emit() -> Path:
                        select r.contest_id from outcome t join changeset c on c.id = t.changeset_id
                        join result_set r on r.id = t.result_set_id
                        join contest_option o on o.id = t.option_id and o.kind = 'answer'
-                       where c.pipeline = %s and t.candidacy_id is not null)""",
-                [SOURCE, SOURCE],
+                       where c.pipeline = %s and t.candidacy_id is not null
+                       union
+                       select o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
+                       where c.pipeline = %s and (strpos(o.ballot_label, chr(65533)) > 0 or strpos(o.ballot_label, repeat(chr(39), 2)) > 0))""",
+                [SOURCE, SOURCE, SOURCE],
             ).fetchall()
         }
         taken -= replaced
@@ -666,6 +695,7 @@ def emit() -> Path:
         owners: dict[tuple[UUID, str], UUID] = {}
         districts: set[str] = set()
         seen: set[str] = set()
+        wanted: set[str] = set()
         minted_units: set[str] = set()
         values: list[pl.DataFrame] = []
         known_names: dict[tuple[UUID, date], list[tuple[str, str]]] = {}
@@ -733,13 +763,19 @@ def emit() -> Path:
             area = None
             contest_kind, office_id, body_id = "office", None, None
             magnitude = row["seats"]
-            answers = row["type"] in ("measure", "recall", "retention")
+            recall = row["type"] == "recall"
+            role = (
+                ("mayor" if "MAYOR" in row["contest"].upper() else "council" if row["kind"] == "city" else "board")
+                if recall
+                else row["type"]
+            )
+            answers = role in ("measure", "retention")
             seat_text = row["seat"]
-            if row["type"] in ("council", "board"):
-                body_kind = "council" if row["type"] == "council" else "board"
+            if role in ("council", "board"):
+                body_kind = "council" if role == "council" else "board"
                 if row["kind"] == "county":
                     body_title, seat_label = "Maricopa County Board of Supervisors", "supervisorial district"
-                elif row["type"] == "council":
+                elif role == "council":
                     body_title, seat_label = f"{shown} {'Town' if row['jur'] in towns else 'City'} Council", "district"
                 else:
                     body_title, seat_label = (
@@ -787,19 +823,13 @@ def emit() -> Path:
                     + " election"
                     + partisan_title
                 )
-            elif row["type"] in ("office", "mayor", "retention"):
-                office = (
-                    row["office"]
-                    if row["type"] == "office"
-                    else "mayor"
-                    if row["type"] == "mayor"
-                    else "superior-court-judge"
-                )
+            elif role in ("office", "mayor", "retention"):
+                office = row["office"] if role == "office" else "mayor" if role == "mayor" else "superior-court-judge"
                 title = (
                     "Mayor"
-                    if row["type"] == "mayor"
+                    if role == "mayor"
                     else "Judge of the Superior Court"
-                    if row["type"] == "retention"
+                    if role == "retention"
                     else row["title"]
                 )
                 office_key = f"AZ:{key_body}:{office}"
@@ -813,7 +843,7 @@ def emit() -> Path:
                         name(owner, f"{shown} {title}")
                     owners[(pid, office)] = owner
                 office_id = owners[(pid, office)]
-                if seat_text is not None and row["type"] == "office":
+                if seat_text is not None and role == "office":
                     district_code = f"04:{key_body}:{office}:district-{slug(seat_text)}"
                     area = cs.area("us.local_district", district_code)
                     if area in cs.minted and district_code not in districts:
@@ -836,7 +866,7 @@ def emit() -> Path:
                 )
                 contest_title = (
                     f"{day.year} {shown} mayoral election"
-                    if row["type"] == "mayor"
+                    if role == "mayor"
                     else f"{day.year} {title}, Maricopa County, retention: {' '.join(reversed([w.strip() for w in judge.split(',', 1)])).title()}"
                     if judge
                     else f"{day.year} {shown} {title}" + (f", {seat_text}" if seat_text else "") + " election"
@@ -848,13 +878,22 @@ def emit() -> Path:
                 contest_key = f"{day}:AZ:{key_body}:{row['type']}-{slug(code_text)}"
                 contest_slug = f"{row['type']}-{slug(code_text)}"
                 contest_title = f"{day.year} {shown} " + (
-                    f"recall of {code_text.title()}"
-                    if row["type"] == "recall"
-                    else f"Measure {code_text}"
-                    if code_text.isdigit()
-                    else "ballot question"
+                    f"Measure {code_text}" if code_text.isdigit() else "ballot question"
                 )
                 magnitude = None
+            target = None
+            if recall:
+                marks = set(re.findall(r"[A-Z]+", row["code"].upper()))
+                target = next(
+                    (c for c in sorted(sums["name"]) if c != "Write-in" and c.split()[-1].upper() in marks), None
+                )
+                tag = "recall" + (f"-{slug(target.split()[-1])}" if target else "")
+                contest_key += f":{tag}"
+                contest_slug += f"-{tag}"
+                contest_title = (
+                    contest_title.removesuffix(" election") + " recall election" + (f" ({target})" if target else "")
+                )
+            wanted.add(contest_key)
             if f"{election_path}/{contest_slug}" in taken or contest_key in seen:
                 report["exists"] = report.get("exists", 0) + 1
                 continue
@@ -883,7 +922,7 @@ def emit() -> Path:
                 party_scope_id=parties.get(party),
                 electoral_system_id=system,
                 default_result_kind="counted",
-                term=row["term"],
+                term="remainder" if recall else row["term"],
             )
             name(contest, contest_title)
             cs.add("slug", path=f"{election_path}/{contest_slug}", entity_id=contest)
@@ -903,7 +942,7 @@ def emit() -> Path:
                 if row["kind"] in ("county",) or (row["kind"] == "city" and row["jur"] not in PARTIAL_CITIES)
                 else None,
             )
-            unnamed = row["type"] in ("council", "board") and magnitude is None
+            unnamed = role in ("council", "board") and magnitude is None
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + (NO_SEATS if unnamed else ""))
 
             options: dict[str, UUID] = {}
@@ -940,6 +979,7 @@ def emit() -> Path:
                             role="head",
                             ballot_name=judge_name,
                             is_independent=False,
+                            is_incumbent=True,
                         )
                     continue
                 write_in = candidate == "Write-in"
@@ -980,13 +1020,10 @@ def emit() -> Path:
                     role="head",
                     ballot_name=candidate,
                     is_independent=independent,
+                    is_incumbent=True if candidate == target else None,
                 )
-            if row["type"] in ("measure", "recall"):
-                cs.add(
-                    "ballot_question",
-                    contest_id=contest,
-                    type="recall_question" if row["type"] == "recall" else "mandatory_referendum",
-                )
+            if role == "measure":
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
             if answers:
                 tally = dict(sums.iter_rows())
                 yes, no = tally.get("Yes", 0), tally.get("No", 0)
@@ -1007,7 +1044,7 @@ def emit() -> Path:
                 named = [(c, v) for c, v in ranked.iter_rows() if c != "Write-in"]
                 total = sums["votes"].sum()
                 key = (row["kind"], row["jur"], row["type"], row["seat"], row.get("office"), row["party"])
-                primary_phase = party is not None or any(0 < (d - day).days <= 200 for d in later[key])
+                primary_phase = not recall and (party is not None or any(0 < (d - day).days <= 200 for d in later[key]))
                 decided: list[tuple[str, str]] = []
                 if party is not None:
                     n = magnitude or 1
@@ -1061,6 +1098,50 @@ def emit() -> Path:
                 )
             )
             report["new"] = report.get("new", 0) + 1
+        for contest, keys in conn.execute(
+            """select k.id, array_agg(x.value) from contest k join entity e on e.id = k.id and e.retired_by is null
+               join changeset c on c.id = k.changeset_id
+               join external_id x on x.entity_id = k.id and x.scheme = 'us.contest'
+               where c.pipeline = %s group by k.id""",
+            [SOURCE],
+        ).fetchall():
+            if wanted.isdisjoint(keys):
+                cs.add("entity_retirement", entity_id=contest, reason=RETIRED)
+                report["retired"] = report.get("retired", 0) + 1
+        words: dict[str, str] = {}
+        for earlier, fixed in fixes.items():
+            for old, new in zip(earlier.split(), fixed.split(), strict=False):
+                if "�" in old and old != new:
+                    words[old] = new
+        rows = conn.execute(
+            """select n.id, n.entity_id, n.text, n.lang, n.kind, n.is_preferred,
+                      strpos(n.text, chr(65533)) > 0 or strpos(n.text, repeat(chr(39), 2)) > 0 or n.text ~ '\\w\\?\\w'
+               from name n join person p on p.id = n.entity_id join changeset c on c.id = p.changeset_id
+               where c.pipeline = %s and exists (
+                 select from name b where b.entity_id = n.entity_id
+                   and (strpos(b.text, chr(65533)) > 0 or strpos(b.text, repeat(chr(39), 2)) > 0 or b.text ~ '\\w\\?\\w'))
+               order by n.entity_id, n.is_preferred desc, n.kind, n.text""",
+            [SOURCE],
+        ).fetchall()
+        held = {(entity, text, lang, kind) for _, entity, text, lang, kind, _, bad in rows if not bad}
+        for name_id, entity, text, lang, kind, preferred, bad in rows:
+            if not bad:
+                continue
+            quoted = re.sub(r"(?<=\w)\?(?=\w)", "�", text.replace("''", '"'))
+            fixed = fixes.get(quoted) or " ".join(words.get(w, w) for w in quoted.split())
+            if "�" in fixed or fixed == text:
+                continue
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=entity,
+                text=text,
+                reason=GARBLED if fixed != text.replace("''", '"') else QUOTED,
+            )
+            if (entity, fixed, lang, kind) not in held:
+                held.add((entity, fixed, lang, kind))
+                cs.add("name", entity_id=entity, text=fixed, lang=lang, kind=kind, is_preferred=preferred)
+            report["renamed people"] = report.get("renamed people", 0) + 1
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))

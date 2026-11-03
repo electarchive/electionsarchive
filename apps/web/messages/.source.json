@@ -4702,7 +4702,9 @@
     "board_tile_body": "59e83667a8aea02dafea10ba7250a2af",
     "live_views_label": "68fa8e930f6423c112c8cd0d7f134153",
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
-    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062"
+    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
+    "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "fr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -9407,7 +9409,9 @@
     "board_tile_body": "59e83667a8aea02dafea10ba7250a2af",
     "live_views_label": "68fa8e930f6423c112c8cd0d7f134153",
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
-    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062"
+    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
+    "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "kmr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -14112,7 +14116,9 @@
     "board_tile_body": "59e83667a8aea02dafea10ba7250a2af",
     "live_views_label": "68fa8e930f6423c112c8cd0d7f134153",
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
-    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062"
+    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
+    "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "pt-BR": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -18817,7 +18823,9 @@
     "board_tile_body": "59e83667a8aea02dafea10ba7250a2af",
     "live_views_label": "68fa8e930f6423c112c8cd0d7f134153",
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
-    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062"
+    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
+    "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   },
   "tr": {
     "language_label": "4994a8ffeba4ac3140beb89e8d41f174",
@@ -23522,6 +23530,8 @@
     "board_tile_body": "59e83667a8aea02dafea10ba7250a2af",
     "live_views_label": "68fa8e930f6423c112c8cd0d7f134153",
     "livemap_win_chance": "703c6e86e3eb5da014430d83d4a94498",
-    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062"
+    "livemap_counted_share": "962f6c13580fde4834941a3b5480f062",
+    "livemap_near_hint": "2a4f7b18a4c27f57f09dae150768c13c",
+    "livemap_up_hint": "63d090df984abbea9c7cecb34a9aed58"
   }
 }

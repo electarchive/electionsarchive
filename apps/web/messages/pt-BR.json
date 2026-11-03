@@ -5901,5 +5901,7 @@
   "board_tile_body": "Escolha as disputas que você acompanha e veja todas lado a lado na mesma tela.",
   "live_views_label": "Outras formas de acompanhar os resultados",
   "livemap_win_chance": "Chance de vitória",
-  "livemap_counted_share": "Parcela dos votos esperados já apurada"
+  "livemap_counted_share": "Parcela dos votos esperados já apurada",
+  "livemap_near_hint": "Clique para ver os resultados deste estado",
+  "livemap_up_hint": "Ou clique em qualquer lugar fora do estado"
 }
