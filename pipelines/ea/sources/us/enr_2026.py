@@ -1395,7 +1395,12 @@ def plan(
         picks = []
 
         def choose(
-            people: frozenset[str], words: set[str], places: list[str], wide: bool, seat: tuple[str, str] | None = None
+            people: frozenset[str],
+            words: set[str],
+            places: list[str],
+            wide: bool,
+            seat: tuple[str, str] | None = None,
+            lead: str | None = None,
         ):
             scored = []
             for contest, key, wanted in (
@@ -1486,7 +1491,7 @@ def plan(
                 and len({hit[4].split(":")[2] for hit in best}) == 1
             ):
                 best = [max(best, key=lambda hit: held[hit[3]][1])]
-            numbers = {w for w in words if w.isdigit()}
+            numbers = {lead} if lead else {w for w in words if w.isdigit()}
             if len(best) > 1 and numbers:
                 kept = [
                     hit for hit in best if numbers & (titles.get(hit[3], set()) | set(re.split(r"[:-]", hit[4])[2:]))
@@ -1522,7 +1527,10 @@ def plan(
                 words = set(terms(name)[-1:])
             wide = office == "state" or bool(APPEALS.search(name)) or retention
             seat = (found[1] or found[2], found[3] or "") if wide and (found := SEAT.search(name)) else None
-            best, ok = choose(people, words, places, wide, seat)
+            lead = re.match(
+                r"\s*(?:constitutional\s+)?(?:amendment|question)\s+(?:no\.?\s*)?(\d+)\s*:", name, re.IGNORECASE
+            )
+            best, ok = choose(people, words, places, wide, seat, lead[1] if lead else None)
             if ok:
                 picks.append((best[0], name, places, office))
                 continue
@@ -1678,7 +1686,10 @@ def plan(
                     and len(tokens) > 1
                     and words[0] == terms(name)[0]
                     and len(words[-1]) > 4
-                    and difflib.SequenceMatcher(None, words[-1], terms(name)[-1]).ratio() >= 0.9
+                    and (
+                        difflib.SequenceMatcher(None, words[-1], terms(name)[-1]).ratio() >= 0.9
+                        or words[-1].replace("l", "i") == terms(name)[-1].replace("l", "i")
+                    )
                 ]
                 hits = [(1, option) for option in spelled] if len(spelled) == 1 else []
             if hits and (
