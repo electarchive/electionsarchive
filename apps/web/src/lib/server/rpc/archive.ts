@@ -17953,20 +17953,24 @@ export const elections = {
           };
         });
       };
-      const [crowned, earlier, held, aggregate] = await Promise.all([
+      const earlier = db.execute<{ id: string; path: string; date: string }>(
+        sql`
+          select p.id, s.path, p.date_from::text as date
+          from election e
+          join election p on p.polity_id = e.polity_id and p.kind = e.kind and p.parent_id is null
+            and p.rerun_of_id is null and p.date_from < e.date_from
+          join slug s on s.entity_id = p.id and s.is_current
+          where e.id = ${input.id}::uuid
+            and (select count(*) from election x where x.parent_id = p.id) * 2
+              >= (select count(*) from election x where x.parent_id = e.id)
+          order by p.date_from desc limit 1
+        `,
+      );
+      const [crowned, before, preceding, held, aggregate] = await Promise.all([
         crown(input.id),
-        db.execute<{ id: string; path: string; date: string }>(
-          sql`
-            select p.id, s.path, p.date_from::text as date
-            from election e
-            join election p on p.polity_id = e.polity_id and p.kind = e.kind and p.parent_id is null
-              and p.rerun_of_id is null and p.date_from < e.date_from
-            join slug s on s.entity_id = p.id and s.is_current
-            where e.id = ${input.id}::uuid
-              and (select count(*) from election x where x.parent_id = p.id) * 2
-                >= (select count(*) from election x where x.parent_id = e.id)
-            order by p.date_from desc limit 1
-          `,
+        earlier.then((found) => found.rows[0] ?? null),
+        earlier.then(async (found) =>
+          found.rows[0] == null ? [] : crown(found.rows[0].id),
         ),
         db.execute<{ kind: string }>(
           sql`select e.kind::text as kind from election e where e.id = ${input.id}::uuid`,
@@ -18037,11 +18041,7 @@ export const elections = {
         picked == null ||
         (picked.has(row.tier) && row.office === aggregate?.rows[0]?.office);
       const rows = crowned.filter((row) => covered(row));
-      const before = earlier.rows[0] ?? null;
-      const earliest =
-        before == null
-          ? []
-          : (await crown(before.id)).filter((row) => covered(row));
+      const earliest = preceding.filter((row) => covered(row));
       const groups = [...new Set(rows.flatMap((row) => row.group ?? []))];
       const date = rows[0]?.date ?? "infinity";
       const isLayered =
