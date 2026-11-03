@@ -7591,7 +7591,42 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
     }
 
 
+MD_COUNTIES = (
+    "Allegany",
+    "Anne Arundel",
+    "Baltimore City",
+    "Baltimore County",
+    "Calvert",
+    "Caroline",
+    "Carroll",
+    "Cecil",
+    "Charles",
+    "Dorchester",
+    "Frederick",
+    "Garrett",
+    "Harford",
+    "Howard",
+    "Kent",
+    "Montgomery",
+    "Prince George's",
+    "Queen Anne's",
+    "Saint Mary's",
+    "Somerset",
+    "Talbot",
+    "Washington",
+    "Wicomico",
+    "Worcester",
+)
+MD_RESULTS = "https://elections.maryland.gov/elections/2026/general_results/gen_results_2026_by_county_{}.html"
+
+
 def fetch() -> None:
+    for number in range(1, len(MD_COUNTIES) + 1):
+        if not STATES or "MD" in STATES:
+            try:
+                raw.fetch(SOURCE, MD_RESULTS.format(number), suffix=".html")
+            except httpx.HTTPError as error:
+                print(f"MD county {number}: {error}")
     for state, (url, *_) in FEEDS.items():
         if state in DELIVERED:
             try:
@@ -7938,6 +7973,21 @@ def parse() -> None:
             "nonpartisan",
         )
 
+    md_seats: dict[tuple[str, str, str], int] = {}
+    for number, name in enumerate(MD_COUNTIES, 1):
+        try:
+            page = raw.cached(SOURCE, MD_RESULTS.format(number)).path.read_text(encoding="utf-8")
+        except LookupError:
+            continue
+        heading = district = ""
+        for tag, label in re.findall(r"<h([234])>([^<]*)</h", page):
+            if tag == "2":
+                heading, district = label.strip(), ""
+            elif vote := re.match(r"Vote for up to (\d+)", label):
+                md_seats[(name, heading, district)] = int(vote[1])
+            else:
+                district = label.strip()
+
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["MD"][0]).path.read_text(encoding="utf-8-sig"))):
         if row["Candidate Status"] != "Active" or "Write-In" in row["Filing Type and Date"]:
             continue
@@ -7964,7 +8014,18 @@ def parse() -> None:
                     county, 0
                 )
                 if title.startswith("Board of Education") and "District" not in where
-                else 0,
+                else md_seats.get(
+                    (
+                        "Saint Mary's"
+                        if county == "St. Mary's"
+                        else "Baltimore County"
+                        if county == "Baltimore"
+                        else county,
+                        title,
+                        (re.search(r"District \w+$", where) or [""])[0],
+                    ),
+                    0,
+                ),
                 "name": f"{row['Candidate First Name and Middle Name']} {row['Candidate Ballot Last Name and Suffix']}",
                 "party": named,
                 "independent": independent,
@@ -11573,6 +11634,7 @@ def parse() -> None:
                     and place
                     and (
                         int(str(row["seats"]) or 0) <= 1
+                        or state == "MD"
                         or re.search(
                             r"(?i)\bcounty (council|commission|board of commissioners|board district|coroner|board of supervisors(?: at large)?)\b",
                             str(row["contest"]),
@@ -12439,7 +12501,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 area = cs.area("us.county", scope[3:])
             if kind == "body_seats" and group["seats"][0]:
                 magnitude = int(group["seats"][0])
-            if state == "IN" and magnitude is not None and system in plurality.values():
+            if state in ("IN", "MD") and magnitude is not None and system in plurality.values():
                 system = plurality[magnitude > 1]
             cs.add(
                 "contest",
