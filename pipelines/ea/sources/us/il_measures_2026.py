@@ -155,10 +155,116 @@ MACOUPIN = (
     ("Bunker Hill Fire Protection District", "Increase Limiting Rate", BUNKER_HILL),
 )
 SKIPPED = {("17111", "Community Unit School District #300")}
+NOTICES = (
+    (
+        "17043",
+        "St Charles Community Unit School District Number 303",
+        "School Building Bonds",
+        "https://district.d303.org/referendum",
+        None,
+        "St. Charles Community Unit School District 303",
+        (
+            "Shall the Board of Education of St. Charles Community Unit School District Number 303, Kane and DuPage "
+            "Counties, Illinois, improve the sites of, build and equip additions to and alter, repair and equip school "
+            "buildings and facilities, including, but not limited to, replacing roofs, updating mechanical, electrical "
+            "and plumbing systems, installing safety and security improvements, increasing accessibility under the "
+            "Americans with Disabilities Act (ADA) and expanding space for Career and Technical Education programs; build "
+            "and equip a physical education and athletic facility; and issue its bonds to the amount of $282,500,000 for "
+            "the purpose of paying the costs thereof?"
+        ),
+    ),
+    (
+        "17043",
+        "SD 45 DuPage County",
+        "Increase Limiting Rate",
+        "https://www.d45.org/strengthen45/",
+        None,
+        "School District 45, DuPage County",
+        (
+            "Shall the limiting rate under the Property Tax Extension Limitation Law for School District Number 45, DuPage "
+            "County, Illinois, be increased by an additional amount equal to 0.2670% above the limiting rate for levy year "
+            "2025 for school purposes, including funding instructional programming, student support and services, "
+            "operations and maintenance, and safety and security improvements, and be equal to 3.2229% of the equalized "
+            "assessed value of the taxable property therein for levy year 2026?"
+        ),
+    ),
+    (
+        "17043",
+        "DuPage Community High School District Number 88",
+        "School Building Bonds",
+        "https://www.dupage88.net/site/page/17652",
+        None,
+        "DuPage High School District 88",
+        (
+            "Shall the Board of Education of DuPage Community High School District Number 88, DuPage County, Illinois, "
+            "improve the sites of, and alter, repair, and equip school buildings and facilities, including, but not "
+            "limited to, installing safety and security improvements; increasing accessibility to comply with the "
+            "Americans with Disabilities Act; updating roofing, mechanical, plumbing, electrical, heating and cooling "
+            "systems; renovating career and technical education (CTE) spaces; and installing energy-efficiency "
+            "improvements; and issue bonds of said School District to the amount of $118,000,000 for the purpose of "
+            "paying the costs thereof?"
+        ),
+    ),
+    (
+        "17043",
+        "Westmont Community Unit School District Number 201",
+        "School Building Bonds",
+        "https://cusd201.community.diligentoneplatform.com/document/3c903a24-27ea-46c1-b9af-9456ab06ff7c/",
+        None,
+        "Westmont Community Unit School District 201",
+        (
+            "Shall the Board of Education of Westmont Community Unit School District Number 201, DuPage County, Illinois, "
+            "build and equip a school building at the current location of the C.E. Miller Elementary School to replace "
+            "the J.T. Manning and C.E. Miller Elementary School Buildings, acquire land, improve the site thereof, "
+            "including creating playground space, additional parking and drop-off/pick-up zones, and issue its bonds to "
+            "the amount of $68,000,000 for the purpose of paying the costs thereof?"
+        ),
+    ),
+    (
+        "17043",
+        "Lisle Park District",
+        "Park Bonds",
+        "https://www.lisleparkdistrict.org/pdfs/transparency-portal/Resolutions/2026/Resolution081026-Referendum.pdf",
+        None,
+        "Lisle Park District",
+        (
+            "Shall the Lisle Park District, DuPage County, Illinois, replace the existing Community Center by building and "
+            "equipping a new Community Activity Center with a fitness area with cardio and strength training equipment, "
+            "an indoor walking/jogging track, multi-court gymnasium, and flexible programming spaces, and issue its bonds "
+            "to the amount of $29,750,000 for the purpose of paying the costs thereof?"
+        ),
+    ),
+    (
+        "17043",
+        "City of Aurora",
+        "Mayor Recall Electoral System",
+        "https://www.aurora.il.us/files/content/mainsite/v/42/government-and-engagement/elections/city-of-aurora-posting-notice.pdf",
+        "IL-Kane/city-of-aurora-posting-notice.pdf",
+        "City of Aurora City Clerk",
+        (
+            "Shall the City of Aurora adopt the following electoral system immediately upon passage of this binding "
+            "referendum: the Mayor may be recalled and removed by a majority vote at a recall election that may be "
+            "triggered by the filing of a recall petition signed by a number of Aurora electors equal to 20% of the total "
+            "votes cast for all candidates for mayor in the immediately preceding mayoral election; and upon the "
+            "certification of a valid recall petition, the question “Shall (name of Mayor) be recalled and removed from "
+            "the Office of Mayor of the City of Aurora” shall be placed on the ballot at the immediately succeeding "
+            "regularly-scheduled election to be held in the City of Aurora; and that in the event the Mayor is recalled "
+            "and removed, the City Council shall fill the vacancy in the office of Mayor within 30 days from the date of "
+            "the recall election, which appointment shall be for the remainder of the term, except that if more than 13 "
+            "months remain in the term, the City Council shall set a date for a special election to be held within 9 "
+            "months of the recall election at which time the voters of the City of Aurora shall elect a Mayor to serve "
+            "the remaining term in office?"
+        ),
+    ),
+)
+DOCUMENTS = {
+    url: (file, publisher, ".pdf" if url.endswith("pdf") or "diligent" in url else ".html")
+    for _, _, _, url, file, publisher, _ in NOTICES
+}
 
 
 def fetch() -> None:
-    for url, file, _, suffix in COUNTIES.values():
+    for url, file, _, suffix in [*COUNTIES.values(), *((url, *rest) for url, rest in DOCUMENTS.items())]:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -216,6 +322,15 @@ def listed_rows(county: str, listed: tuple[tuple[str, str, str], ...]) -> list[d
 
 def page_text(url: str) -> str:
     return raw.cached(SOURCE, url).path.read_text()
+
+
+def notice_rows() -> list[dict[str, str]]:
+    rows = []
+    for county, entity, label, url, _, _, wording in NOTICES:
+        text = pdf_text(url, "-raw") if DOCUMENTS[url][2] == ".pdf" else html.unescape(page_text(url))
+        assert re.sub(r"\W+", "", wording).lower() in re.sub(r"\W+", "", text).lower(), label
+        rows.append({"county": county, "entity": entity, "label": label, "wording": wording, "url": url})
+    return rows
 
 
 def cook_rows() -> list[dict[str, str]]:
@@ -307,6 +422,7 @@ def parse() -> None:
     for row in tagged:
         row["entity"] = full_name(row["entity"], row["wording"])
         row["url"] = COUNTIES[row["county"]][0]
+    tagged.extend(notice_rows())
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(tagged).unique(["county", "entity", "label"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "measures.parquet")
@@ -320,7 +436,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Illinois county, municipal, school, and special district referenda (Winnebago, Cook, McLean, McHenry, Madison, Macoupin) on the November 3, 2026 ballot, with official wording",
+            summary="Illinois county, municipal, school, and special district referenda (Winnebago, Cook, McLean, McHenry, Madison, Macoupin, and DuPage and Kane districts) on the November 3, 2026 ballot, with official wording",
             polity="US-IL",
         )
         civil = civmint.Civil(conn, cs, "17", "IL")
@@ -331,13 +447,17 @@ def emit() -> Path:
             sources[county] = cs.source(publisher, TITLE)
             cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
             cs.artifact(raw.cached(SOURCE, url), sources[county])
+        for url, (_, publisher, _) in DOCUMENTS.items():
+            sources[url] = cs.source(publisher, TITLE)
+            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[url])
         parent = cs.key("us.election", f"{DAY}:IL")
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             entity = row["entity"]
             county_key = f"us.county:{row['county']}"
-            source = sources[row["county"]]
+            source = sources[row["url"]] if row["url"] in sources else sources[row["county"]]
             option = None
             if re.match(r"(?i)(city|town|village) of ", entity):
                 option = civil.place(re.sub(r"(?i)^(city|town|village) of ", "", entity))
@@ -345,7 +465,7 @@ def emit() -> Path:
                 option = county_key
             elif entity.endswith(" Township"):
                 option = civil.town(entity, row["county"][:5])
-            elif re.search(r"School District|CUSD", entity):
+            elif re.search(r"School District|CUSD|^SD \d", entity):
                 option = civil.school(entity)
             elif f"special:{row['county']}:{entity}" in found:
                 option = f"special:{row['county']}:{entity}"
