@@ -2,7 +2,7 @@ import type { Reroute, Transport } from "@sveltejs/kit/hooks";
 import { READ_ONLY } from "$app/env/public";
 
 const CLOSED =
-  /^\/(?:edit|proposals|bounties|notifications|settings\/notifications|review|workbench|uploads|talk|contributors|watch|watchlist|settings\/keys|lab\/contrib)(?:\/|$|\.)/u;
+  /^\/(?:edit|proposals|bounties|notifications|settings\/notifications|review(?!\/usage(?:\/|$))|workbench|uploads|talk|contributors|watch|watchlist|lab\/contrib)(?:\/|$|\.)/u;
 
 export const reroute: Reroute = (request) => {
   const { pathname } = request.url;
