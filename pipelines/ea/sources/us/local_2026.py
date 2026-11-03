@@ -7984,10 +7984,10 @@ def parse() -> None:
 
     category = None
     filings = pl.read_excel(raw.cached(SOURCE, FEEDS["KY"][0]).path, infer_schema_length=0).filter(
-        pl.col("Withdrawn").is_null()
-        & pl.col("Disqualified").is_null()
-        & pl.col("Deceased").is_null()
-        & (pl.col("Party") != "WRITE-IN")
+        pl.col("Party") != "WRITE-IN"
+    )
+    lapsed_filing = (
+        pl.col("Withdrawn").is_not_null() | pl.col("Disqualified").is_not_null() | pl.col("Deceased").is_not_null()
     )
     titles = {
         "COUNTY JUDGE / EXECUTIVE": "Judge/Executive",
@@ -8086,6 +8086,22 @@ def parse() -> None:
                     "City Commission" if re.search(r"(?i)commission", above) else "City Council",
                     elect,
                 )
+
+    active = {
+        (str(row["County"]), row["First Name"], row["Last Name"], row["Office"], row["District"])
+        for row in filings.filter(~lapsed_filing).iter_rows(named=True)
+    }
+
+    def kept(row: dict[str, str | None]) -> bool:
+        if row["Withdrawn"] is None and row["Disqualified"] is None and row["Deceased"] is None:
+            return True
+        county, first, last = str(row["County"]), row["First Name"], str(row["Last Name"])
+        if row["Party"] != "NONPARTISAN" or (county, first, last, row["Office"], row["District"]) in active:
+            return False
+        words = [re.compile(rf"(?i)\b{re.escape(word)}\b") for word in (first or "", last) if word]
+        return any(all(word.search(line) for word in words) for line in ballot_text.get(county, []))
+
+    filings = filings.filter(pl.Series([kept(row) for row in filings.iter_rows(named=True)], dtype=pl.Boolean))
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
@@ -8174,6 +8190,15 @@ def parse() -> None:
             contests.append(contest)
         else:
             contests.append(None)
+    peers: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for county, post, contest in zip(filings["County"], filings["Office"], contests):
+        if contest is not None and post in ("MAYOR", "CITY LEGISLATIVE BODY"):
+            peers[(str(county), str(post))].add(contest)
+    for i, (county, post, description) in enumerate(
+        zip(filings["County"], filings["Office"], filings["Office Description"])
+    ):
+        if contests[i] is None and description is None and len(peers.get((str(county), str(post)), ())) == 1:
+            contests[i] = next(iter(peers[(str(county), str(post))]))
     for (county, contest), group in (
         filings.with_columns(pl.Series("Contest", contests, dtype=pl.String))
         .filter(pl.col("Contest").is_not_null())
