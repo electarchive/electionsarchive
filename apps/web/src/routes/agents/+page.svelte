@@ -141,7 +141,8 @@
           <dd>
             <a
               class="font-figures font-semibold break-all underline decoration-border underline-offset-4 hover:decoration-foreground"
-              href={link.href}>{link.text}</a
+              href={link.href}
+              data-sveltekit-reload>{link.text}</a
             >
           </dd>
         </div>

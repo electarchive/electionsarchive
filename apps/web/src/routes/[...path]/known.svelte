@@ -1,5 +1,6 @@
 <script lang="ts">
   import Tone from "#routes/coverage/tone.svelte";
+  import { READ_ONLY } from "$app/env/public";
   import { resolve } from "$app/paths";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { createQuery } from "@tanstack/svelte-query";
@@ -131,7 +132,7 @@
                     >
                   </p>
                   <p class="max-inline-[75ch]">{entry.note}</p>
-                  {#if entry.bounty != null}
+                  {#if entry.bounty != null && !READ_ONLY}
                     <p class="text-xs">
                       <a
                         href={resolve("/bounties/[number]", {
