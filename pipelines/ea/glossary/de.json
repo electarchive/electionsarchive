@@ -5,7 +5,7 @@
  },
  "general election": {
   "term": "Hauptwahl",
-  "note": "No single standard term. For national parliaments use 'Parlamentswahl' or 'Bundestagswahl'/'Nationalratswahl'. For the US, 'allgemeine Wahl' or 'Hauptwahl' (as opposed to 'Vorwahl'). UK: 'Unterhauswahl'."
+  "note": "No single standard term. For national parliaments use 'Parlamentswahl' or 'Bundestagswahl'/'Nationalratswahl'. For a US state, county, or local contest, 'Hauptwahl' (as opposed to 'Vorwahl'). A US-wide general election as a whole is 'Wahlen in den Vereinigten Staaten {year}', as German media name it, never 'Hauptwahl in den USA'. UK: 'Unterhauswahl'."
  },
  "primary": {
   "term": "Vorwahl",
