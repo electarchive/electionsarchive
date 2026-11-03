@@ -21,7 +21,7 @@ import type { Prose } from "#lib/contrib.js";
 import { natural } from "#lib/format.js";
 import { pollsClose } from "#lib/live/closes.js";
 import { m } from "#lib/paraglide/messages.js";
-import { era, independent, UNAFFILIATED } from "#lib/party.js";
+import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -2430,6 +2430,27 @@ async function load(
           : (color.get(own) ?? ""),
       ]),
   );
+  const answers = new Map<number, string>();
+  for (const group of Map.groupBy(
+    options.rows.filter(
+      (row) =>
+        row.kind === "answer" &&
+        sideOf(`answer:${(row.label ?? "").toLowerCase()}`) == null,
+    ),
+    (row) => rootOf.get(row.contest) ?? row.contest,
+  ).values()) {
+    const ranked = [
+      ...new Set(
+        group
+          .toSorted((a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0))
+          .map((row) => (row.label ?? "").toLowerCase()),
+      ),
+    ];
+    for (const row of group) {
+      const rank = ranked.indexOf((row.label ?? "").toLowerCase());
+      answers.set(row.k, UNAFFILIATED[rank % UNAFFILIATED.length] ?? "");
+    }
+  }
   const backers = backing.rows.map((row) => ({
     party: row.party,
     candidate: labels.full.get(row.person) ?? "",
@@ -2525,6 +2546,7 @@ async function load(
               null,
             color:
               tints.get(row.k) ??
+              answers.get(row.k) ??
               color.get(stand(row) ?? row.person ?? "") ??
               null,
             lean: lean.get(stand(row) ?? "") ?? null,

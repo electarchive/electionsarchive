@@ -11,7 +11,7 @@ import type {
   BallotTier,
 } from "#lib/server/live-ballot.js";
 import { summarize } from "#lib/live/summary.js";
-import { swatch, UNAFFILIATED } from "#lib/party.js";
+import { side, swatch, UNAFFILIATED } from "#lib/party.js";
 
 export type Holder = { id: string; short: string; name: string; color: string };
 
@@ -57,10 +57,14 @@ export function stub(
   jurisdiction: LiveRace["jurisdiction"] = null,
   feed: LiveRace["feed"] = "live",
 ): LiveRace {
-  const loose =
-    contest.isMeasure || contest.options.some((option) => option.party != null)
-      ? []
-      : contest.options.filter((option) => !option.isWriteIn);
+  const loose = contest.options.some((option) => option.party != null)
+    ? []
+    : contest.options.filter(
+        (option) =>
+          !option.isWriteIn &&
+          (!contest.isMeasure ||
+            side(`answer:${option.name.toLowerCase()}`) == null),
+      );
   return {
     id: contest.id,
     slug: contest.slug,
@@ -88,6 +92,7 @@ export function stub(
                 short: party.short,
                 color: party.color ?? "",
               },
+        ...(contest.isMeasure && !option.isWriteIn && { isAnswer: true }),
         isWriteIn: option.isWriteIn,
         isIncumbent: option.isIncumbent,
       };

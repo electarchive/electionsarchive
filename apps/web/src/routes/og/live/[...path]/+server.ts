@@ -14,6 +14,7 @@ import { pair, ranked, standing, sum } from "#lib/live/standing.js";
 import { closing, describe, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
+import { side } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
 import { hexes, shapes } from "#lib/server/live-board.js";
 import { livePage, night } from "#lib/server/live-page.js";
@@ -113,13 +114,15 @@ function hue(option: LiveOption | null | undefined, index = 0) {
   if (isHex(color)) {
     return color;
   }
-  if (option?.party == null) {
-    if (/^(?:yes|for|approve)\b/iu.test(option?.label ?? "")) {
-      return YES;
-    }
-    if (/^(?:no|against|reject)\b/iu.test(option?.label ?? "")) {
-      return NO;
-    }
+  const sided =
+    option?.party == null
+      ? side(`answer:${(option?.label ?? "").toLowerCase()}`)
+      : null;
+  if (sided === "var(--yes)") {
+    return YES;
+  }
+  if (sided === "var(--no)") {
+    return NO;
   }
   return NEUTRALS[index % NEUTRALS.length] ?? MUTED;
 }

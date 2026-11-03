@@ -18,7 +18,7 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
-import { UNAFFILIATED } from "#lib/party.js";
+import { side, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
@@ -1252,11 +1252,14 @@ async function night(
       }
     }
     const tally = raceFrames.at(-1)?.totals ?? certifiedTotals;
-    const loose = own.some(
-      (choice) => choice.kind === "answer" || choice.key.startsWith("party:"),
-    )
+    const loose = own.some((choice) => choice.key.startsWith("party:"))
       ? []
-      : own.filter((choice) => choice.kind !== "write_in");
+      : own.filter(
+          (choice) =>
+            choice.kind !== "write_in" &&
+            (choice.kind !== "answer" ||
+              side(`answer:${choice.name.toLowerCase()}`) == null),
+        );
     const top = Math.max(0, ...tally);
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
@@ -1310,6 +1313,7 @@ async function night(
             ...(place !== -1 && {
               color: UNAFFILIATED[place % UNAFFILIATED.length],
             }),
+            ...(choice.kind === "answer" && { isAnswer: true }),
             isWriteIn: choice.kind === "write_in",
             isIncumbent: sitting.has(choice.id),
           };

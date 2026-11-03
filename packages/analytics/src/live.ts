@@ -7,6 +7,7 @@ export type LiveOption = {
   photo: string | null;
   party: { id: string; name: string; short: string; color: string } | null;
   color?: string;
+  isAnswer?: boolean;
   isWriteIn: boolean;
   isIncumbent: boolean;
 };

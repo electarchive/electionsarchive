@@ -8,6 +8,7 @@ import { render as markup } from "svelte/server";
 import AgentsScene from "#lib/components/agents-scene.svelte";
 import { date, percent } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
+import { side } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
 import { archive, home, party, person } from "#lib/server/pages.js";
 import type { RequestHandler } from "./$types";
@@ -29,11 +30,8 @@ const MONOGRAM = `data:image/svg+xml;utf8,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="3" fill="${MARKER}"/><path fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="square" d="M9.5 7 V25 M13.75 7 V25 M18 7 V25 M22.25 7 V25 M5.5 21 L26.5 11"/></svg>`,
 )}`;
 const ANSWERS: Record<string, string> = {
-  "answer:yes": "#2e7d4f",
-  "answer:sì": "#2e7d4f",
-  "answer:evet": "#2e7d4f",
-  "answer:no": "#c2410c",
-  "answer:hayır": "#c2410c",
+  "var(--yes)": "#2e7d4f",
+  "var(--no)": "#c2410c",
 };
 
 const require = createRequire(import.meta.url);
@@ -65,11 +63,15 @@ const h = (
   children?: unknown,
 ): Node => ({ type, props: { style, children } });
 
-const tint = (bar: Bar, index: number) =>
-  (bar.color?.startsWith("#") === true ? bar.color : null) ??
-  ANSWERS[bar.key] ??
-  NEUTRALS[index % NEUTRALS.length] ??
-  MUTED;
+const tint = (bar: Bar, index: number) => {
+  const sided = side(bar.key);
+  return (
+    (bar.color?.startsWith("#") === true ? bar.color : null) ??
+    (sided == null ? null : (ANSWERS[sided] ?? sided)) ??
+    NEUTRALS[index % NEUTRALS.length] ??
+    MUTED
+  );
+};
 
 async function card(segments: Array<string>, search: URLSearchParams) {
   const [head = "", ...rest] = segments;

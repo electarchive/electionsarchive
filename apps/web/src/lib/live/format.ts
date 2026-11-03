@@ -1,17 +1,15 @@
 import type { LiveOption } from "@ea/analytics/live";
 import { dates, numbers } from "#lib/format.js";
 import { prefs } from "#lib/live/prefs.svelte.js";
-import { swatch } from "#lib/party.js";
+import { side, stance, swatch } from "#lib/party.js";
 
 export function tone(option: LiveOption | undefined) {
   if (option == null) {
     return "var(--muted-foreground)";
   }
-  if (option.party == null) {
-    const answer = swatch(null, `answer:${option.label.toLowerCase()}`);
-    if (answer === "var(--yes)" || answer === "var(--no)") {
-      return answer;
-    }
+  const answer = `answer:${option.label.toLowerCase()}`;
+  if (option.party == null && side(answer) != null) {
+    return swatch(null, answer);
   }
   return swatch(
     option.party?.color === "" ? null : (option.party?.color ?? option.color),
@@ -24,6 +22,9 @@ export function tone(option: LiveOption | undefined) {
 const SUFFIXES = new Set(["jr", "sr", "ii", "iii", "iv", "v"]);
 
 export function surname(option: LiveOption | undefined) {
+  if (option?.isAnswer === true) {
+    return stance(option.label) ?? option.label;
+  }
   const words = (option?.label ?? "")
     .trim()
     .split(/\s+/u)
