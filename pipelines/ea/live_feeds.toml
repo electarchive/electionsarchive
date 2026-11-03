@@ -874,3 +874,11 @@ interval = 300
 poller = "muktedir"
 publisher = "Guam Election Commission"
 url = "https://gec.guam.gov/2026-general-election-info/"
+
+[[feed]]
+id = "us.mp_cec_live"
+adapter = "us.mp_cec_live"
+interval = 120
+poller = "muktedir"
+publisher = "Commonwealth Election Commission of the Northern Mariana Islands"
+url = "https://www.votecnmi.gov.mp/general-election-2026.php"
