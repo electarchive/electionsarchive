@@ -20,6 +20,7 @@ LOCALES = ("tr", "kmr", "de", "fr", "pt-BR")
 WORK = DATA / "i18n" / "names"
 TEXTS = WORK / "texts.json"
 PLACES = WORK / "places.json"
+FIXED = i18n.GLOSSARY / "places.json"
 VOCAB = WORK / "vocab.json"
 MINED = WORK / "templates.json"
 TYPES = ("contest", "election", "body", "office", "polity", "government", "electoral_system", "alliance", "party")
@@ -113,6 +114,7 @@ Rules:
 - Write each name as a careful {language} editor at a quality newspaper would: accurate, concise, and natural, in the style of a heading.
 - Give institutions, offices, and parties their established {language} names when they have one (for example, a national parliament's usual {language} name). A party or body of a {language}-speaking country takes its own official name.
 - Keep proper nouns that have no {language} form as written.
+- Less is more: the shortest natural heading, in plain order, with no clause or remark tacked on after a comma.
 - Use the glossary below for electoral vocabulary.
 - An item with "rejected" was translated before and failed a check; the note says why. Fix that.
 
@@ -183,17 +185,17 @@ where n.lang = 'en' and n.is_preferred and en.type::text = any(%s)
 PLACE_ROWS = (
     ROOT
     + """
-select distinct n.text, case
-  when en.type = 'area' then split_part(a.scheme_code, '.', 1)
-  when p.iso_code ~ '^[A-Z]{2}$' then ''
-  else coalesce(r.iso, '')
-end
+select distinct n.text, case when en.type = 'area' then split_part(a.scheme_code, '.', 1) else coalesce(r.iso, '') end
 from name n
 join entity en on en.id = n.entity_id
 left join area a on a.id = n.entity_id
-left join polity p on p.id = n.entity_id
 left join root r on r.id = n.entity_id
-where en.type::text in ('area', 'polity') and n.lang in ('en', 'und') and length(n.text) > 2
+where en.type::text in ('area', 'polity') and length(n.text) > 2
+  and (n.lang in ('en', 'und') or n.lang = split_part(a.scheme_code, '.', 1))
+  and n.text not in (
+    select cn.text from name cn join polity cp on cp.id = cn.entity_id
+    where cp.iso_code ~ '^[A-Z]{2}$' and cn.lang in ('en', 'und')
+  )
 """
 )
 
@@ -259,6 +261,8 @@ class Miner:
                     and span[0].isupper()
                     and not (end - at == 1 and (span in GENERIC or not {"", iso} & set(self.places[span])))
                     and "{" not in span
+                    and "at-large" not in span
+                    and not any(char.isdigit() for char in span)
                 ):
                     hit = end
                     break
@@ -500,7 +504,8 @@ def parse() -> str:
             {"id": id, "english": cast(str, templates[id]["english"]), "kind": cast(str, templates[id]["kind"])}
             | {"draft": text}
             for id, text in done.items()
-            if id not in reviewed
+            if id in templates
+            and id not in reviewed
             and (id in picked or locale in FULL_REVIEW or (leftover is not None and leftover.search(text) is not None))
         ]
         for request, (want, group) in wants("names-review", REVIEW, locale, rows).items():
@@ -580,7 +585,12 @@ def emit() -> list[Path]:
     with connect() as conn:
         for locale in LOCALES:
             done = held(f"{locale}.templates")
-            exonyms = {id: text for id, text in held(f"{locale}.places").items() if text != places[id]["english"]}
+            fixed = {id: names[locale] for id, names in json.loads(FIXED.read_text()).items() if locale in names}
+            exonyms = {
+                id: text
+                for id, text in (held(f"{locale}.places") | fixed).items()
+                if id in places and text != places[id]["english"]
+            }
             bodies: dict[str, str | None] = {}
 
             def offer(english: str, body: str) -> None:

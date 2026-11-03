@@ -231,7 +231,25 @@
  "grand national assembly": {
   "term": "TBMM",
   "note": "Türkiye Büyük Millet Meclisi; in names and titles write 'TBMM' ('Grand National Assembly, Kastamonu' is 'TBMM, Kastamonu'), never a word-for-word 'Büyük Ulusal Meclis'.",
-  "avoid": ["Büyük Ulusal Meclis", "Grand Ulusal"]
+  "avoid": [
+   "Büyük Ulusal Meclis",
+   "Grand Ulusal"
+  ]
+ },
+ "virginia": {
+  "term": "Virginia",
+  "note": "The US state keeps its English spelling; West Virginia is 'Batı Virginia'.",
+  "avoid": [
+   "Virjinya"
+  ]
+ },
+ "district of columbia": {
+  "term": "Washington, D.C.",
+  "note": "The US capital district, as Turkish news names it.",
+  "avoid": [
+   "Columbia Bölgesi",
+   "Kolumbiya Bölgesi"
+  ]
  },
  "lower house": {
   "term": "alt meclis",
