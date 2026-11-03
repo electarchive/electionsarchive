@@ -17,6 +17,7 @@ import { contributors } from "#lib/server/rpc/contributors.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
 import { admin } from "#lib/server/rpc/desk.js";
 import { recentChanges, watches } from "#lib/server/rpc/feeds.js";
+import { find } from "#lib/server/rpc/find.js";
 import { histories } from "#lib/server/rpc/history.js";
 import { indices } from "#lib/server/rpc/indices.js";
 import { live } from "#lib/server/rpc/live.js";
@@ -50,7 +51,7 @@ export const reads = {
   entities,
   histories,
   indices,
-  live,
+  live: { ...live, find },
   maps,
   parties,
   people,

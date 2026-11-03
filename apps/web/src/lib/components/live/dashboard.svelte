@@ -54,6 +54,7 @@
   import LaterKey from "./later-key.svelte";
   import Locals from "./locals.svelte";
   import Nation from "./nation.svelte";
+  import Search from "./search.svelte";
 
   const {
     election,
@@ -749,6 +750,13 @@
         >
       </p>
     </div>
+    <Search
+      path={election.slug}
+      {summaries}
+      {codes}
+      labels={nation?.labels ?? {}}
+      {href}
+    />
     <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
