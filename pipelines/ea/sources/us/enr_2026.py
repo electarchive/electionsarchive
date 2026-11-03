@@ -241,7 +241,14 @@ def district_words(key: str) -> set[str]:
     return set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
 
 
+OFFICE_TEXT = re.compile(
+    r"^.*\b(?:clerk|judge|sheriff|treasurer|collector|assessor|coroner|surveyor)\b\s+(?=\S+\s+\S)", re.IGNORECASE
+)
+
+
 def person(label: str) -> str:
+    label = re.sub(r"\s+jp(?:\s+district)?\s*\d*$", "", re.sub(r"\([^)]*\)", " ", label), flags=re.IGNORECASE)
+    label = OFFICE_TEXT.sub("", label)
     words = terms(label)
     if words and words[0] in ("yes", "no"):
         return words[0]
@@ -251,6 +258,40 @@ def person(label: str) -> str:
     if comma and terms(rest):
         words = terms(f"{rest} {head}")
     return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
+
+
+def edits(a: str, b: str) -> bool:
+    if abs(len(a) - len(b)) > 1:
+        return False
+    if len(a) == len(b):
+        return sum(x != y for x, y in zip(a, b, strict=True)) == 1
+    short, long = sorted((a, b), key=len)
+    return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
+
+
+def snap(people: frozenset[str], wanted: set[str], words: set[str]) -> frozenset[str]:
+    lacking = wanted - people
+    agreed = bool(people & wanted - {"yes", "no"})
+    swaps: dict[str, str] = {}
+    for name in people - wanted - {"yes", "no"}:
+        close = [
+            other
+            for other in lacking
+            if other not in {"yes", "no"}
+            and len(name) > 4
+            and len(other) > 4
+            and (
+                name[0] == other[0]
+                and (edits(name, other) and min(len(name), len(other)) > 5 or agreed and name[1:] in words)
+                or agreed
+                and name[1:] == other[1:]
+            )
+        ]
+        if len(close) == 1:
+            swaps[name] = close[0]
+    if len(set(swaps.values())) != len(swaps):
+        return people
+    return frozenset(swaps.get(name, name) for name in people)
 
 
 def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
@@ -1398,12 +1439,13 @@ def plan(
                         titles.get(contest, set()) & words - GENERIC - {code, "public", "school", "community"}
                     ):
                         continue
-                overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
+                crowd = snap(people, wanted, words) if not wide else people
+                overlap = len(crowd & wanted) / len(crowd | wanted) if crowd | wanted else 1
                 if (
                     overlap < 0.6
-                    and people
-                    and people <= wanted
-                    and not people <= {"yes", "no"}
+                    and crowd
+                    and crowd <= wanted
+                    and not crowd <= {"yes", "no"}
                     and (re.match(r"\d|sd", segment) or contest in judicial)
                 ):
                     overlap = 0.6
