@@ -77,6 +77,7 @@ WA_TITLE = "November 5, 2024 General Election Results"
 PREFERENCES = {"DEMOCRATIC": "DEMOCRAT", "GOP": "REPUBLICAN", "STATES NO": "NO PARTY"}
 DAY = date(2024, 11, 5)
 REGULAR = {("TX", "56")}
+MAGNITUDES = {("VT", "windsor-3"): 2, ("VT", "lamoille-3"): 1}
 LEADERS = {"house:6", "house:28", "house:36", "house:38", "house:40", "senate:d", "senate:f", "senate:l"}
 SWAPPED = {
     ("AZ", "YAVAPAI", "JAY MARCIA"): "MARCIA SMITH",
@@ -945,7 +946,7 @@ def emit() -> Path:
                 + (":gs" if special == "TRUE" else ":g")
             )
             contest = cs.key("us.contest", contest_key)
-            magnitude = int(group["magnitude"][0])
+            magnitude = MAGNITUDES.get((state, code), int(group["magnitude"][0]))
             cs.add(
                 "contest",
                 id=contest,
