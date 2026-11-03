@@ -190,7 +190,11 @@ def office(state: str, race: dict) -> tuple[str, str, str] | None:
     if title in CHAMBERS:
         seat = legislature(state, CHAMBERS[title], race) if kind != "Statewide" else None
         return (*seat, "") if seat else None
+    if state == "DC" and title == "Mayor":
+        kind = "Statewide"
     if kind == "General":
+        if title == "Delegate":
+            return "house", "0", ""
         if title == "US Senate":
             return "senate", "", ""
         found = CONGRESS.search(race.get("district") or "")
@@ -230,7 +234,9 @@ def rows(state: str, path: Path):
             for r in regions
             if (found := re.fullmatch(r"House District (\d+)", r.get("name") or ""))
         ]
-    if not counties and all(r.get("type") == "State" for r in regions):
+    if state == "DC" and any(r.get("type") == "Ward" for r in regions):
+        counties = [{**r, "fips": "11001"} for r in regions if r.get("type") == "Ward"]
+    if not counties and all(r.get("type") in ("State", "All") for r in regions):
         counties = [{**r, "fips": FIPS[state]} for r in regions] or [
             {"fips": FIPS[state], "candidates": race.get("candidates") or []}
         ]

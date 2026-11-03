@@ -132,6 +132,7 @@ GENERIC = {
     "village",
 }
 NOBODY = r"(?i)^no candidat"
+COURTS = {"supreme", "criminal", "civil"}
 ORDINALS = {
     word: str(number)
     for number, word in enumerate(
@@ -1257,6 +1258,7 @@ def plan(
         held: dict[UUID, tuple[UUID | None, datetime]] = {}
         statewide: set[UUID] = set()
         judicial: set[UUID] = set()
+        courts: set[UUID] = set()
         federal: dict[UUID, set[str]] = {}
         for key, id, area, recorded, kind in conn.execute(
             """select x.value, x.entity_id, c.district_area_id, c.recorded_from, p.kind
@@ -1278,6 +1280,8 @@ def plan(
                     statewide.add(id)
                 if kind == "judicial_district" or ":judicial-district-" in key:
                     judicial.add(id)
+                elif re.search(r"judge|justice|court|chancellor", key.split(":")[2]):
+                    courts.add(id)
         for contest, label in conn.execute(
             """select o.contest_id, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
                from contest_option o
@@ -1290,10 +1294,15 @@ def plan(
             if not WRITE_IN.search(label):
                 (federal[contest] if contest in federal else published[contest][1]).add(person(label))
         seats: dict[UUID, tuple[str, str]] = {}
+        heads: dict[UUID, set[str]] = {}
         for contest, text in conn.execute(
             "select entity_id, text from name where entity_id = any(%s)", [list(published)]
         ).fetchall():
             titles.setdefault(contest, set()).update(slug(text).split("-"))
+            if ":" in text:
+                heads.setdefault(contest, set()).update(
+                    w for w in slug(text.split(":")[0]).split("-") if not w.isdigit() and w not in STOP | GENERIC
+                )
             if found := SEAT.search(text):
                 seats[contest] = (found[1] or found[2], found[3] or "")
         twins: dict[tuple[UUID | None, frozenset[str], frozenset[str]], list[UUID]] = {}
@@ -1339,21 +1348,44 @@ def plan(
             ):
                 segment = key.split(":")[2]
                 named = district_words(key)
+                judge = {w for w in key.split(":")[-1].split("-") if len(w) > 1}
                 if wide:
                     if contest not in statewide or (seat and seats.get(contest, seat) != seat):
+                        continue
+                    if people <= {"yes", "no"} and (
+                        words & {"retain", "retained", "retention"}
+                        and re.search(r":(question|measure):", key)
+                        or (contest in judicial or contest in courts)
+                        and len(judge & words) < min(2, len(judge), len(words))
+                        and not (
+                            seat and seats.get(contest) == seat and COURTS & set(segment.split("-")) == COURTS & words
+                        )
+                    ):
                         continue
                 elif (
                     re.fullmatch(r"\d{5}|\d{10}", segment)
                     and (len(places) != 1 or codes.get((FIPS[state], plain(places[0])), places[0]) != segment[:5])
                     and not (named and named <= words)
                     and "regional-superintendent" not in key
+                    and places != [FIPS[state]]
                     or people <= {"yes", "no"}
                     and ":measure:" in key
                     and named
                     and not named & words
                     or len(places) == 1
-                    and not re.match(r"\d|sd|house$|senate$", segment)
+                    and not re.match(r"\d|sd|local$|house$|senate$", segment)
                     and contest not in judicial
+                    and not (contest in courts and (people - {"yes", "no"} or len(judge & words) >= 2))
+                    or people <= {"yes", "no"}
+                    and (contest in judicial or contest in courts)
+                    and len(judge & words) < min(2, len(judge), len(words))
+                    or people <= {"yes", "no"}
+                    and places == [FIPS[state]]
+                    and re.fullmatch(r"\d{5}|\d{10}", segment)
+                    and not (
+                        heads.get(contest, set()) & words
+                        and (titles.get(contest, set()) - heads[contest]) & words - GENERIC
+                    )
                     or people <= {"yes", "no"}
                     and segment in towns
                     and not towns[segment] & words
@@ -1489,7 +1521,11 @@ def plan(
         ):
             segment = key.split(":")[2]
             place = None
-            if not re.fullmatch(r"\d{5}", segment) and re.match(r"\d|sd", segment):
+            numbered = bool(re.match(r"\d|sd", segment))
+            if re.fullmatch(r"\d{5}", segment):
+                if places == [FIPS[state]]:
+                    place = counties.get((FIPS[state], segment))
+            elif numbered or segment == "local" or places == [FIPS[state]]:
                 found = conn.execute(
                     """select u.id from reporting_unit u
                        where u.area_id = (select district_area_id from contest where id = %s)
@@ -1497,15 +1533,15 @@ def plan(
                        order by u.scheme_code = 'us.place' and u.code = %s, u.scheme_code limit 1""",
                     [contest, segment, segment],
                 ).fetchone()
-                if found is None:
+                if found is None and numbered:
                     found = conn.execute(
                         "select id from reporting_unit where scheme_code = 'us.school_district' and code = %s",
                         [segment.removeprefix("sd")],
                     ).fetchone()
-                if found is None:
+                if found is None and numbered and re.search(r":(measure|question):", key):
                     unmatched.append(f"local {state}: {name}: no unit for {key}")
                     continue
-                place = found[0]
+                place = found[0] if found else None
             part = local.filter(
                 (pl.col("state") == state)
                 & (pl.col("office") == office)
