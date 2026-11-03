@@ -1,4 +1,7 @@
 export const CLOSES: Record<string, number> = {
+  mp: 240,
+  gu: 300,
+  vi: 1080,
   ga: 1140,
   in: 1140,
   ky: 1140,
@@ -49,6 +52,7 @@ export const CLOSES: Record<string, number> = {
   or: 1380,
   wa: 1380,
   hi: 1440,
+  as: 1440,
   ak: 1500,
 };
 
