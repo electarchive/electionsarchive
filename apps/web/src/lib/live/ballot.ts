@@ -107,6 +107,7 @@ export function stub(
     jurisdiction,
     seats: contest.seats,
     isMeasure: contest.isMeasure,
+    rule: contest.rule ?? null,
   };
 }
 

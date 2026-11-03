@@ -44,6 +44,7 @@ import methodology from "#lib/live/methodology.json";
 import { sum } from "#lib/live/standing.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
+import { terms } from "#lib/measure.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -4997,6 +4998,7 @@ function contestMarkdown(
         ? `[${m.wording_link()}](${row.url ?? ""})`
         : `${row.kind === "text" ? m.wording_text() : m.wording_summary()}: ${row.body ?? ""} (${row.url == null ? source : `[${source}](${row.url})`})`;
     }),
+    contest.rule == null ? "" : `${terms(contest.rule).join(". ")}.`,
     [
       verdict(contest),
       comeback(contest, rounds),

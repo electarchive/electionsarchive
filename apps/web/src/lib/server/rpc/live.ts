@@ -17,6 +17,7 @@ import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
+import { rule } from "#lib/measure.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { side, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
@@ -359,6 +360,7 @@ async function jurisdictions(contests: Array<string>) {
     kind: string;
     scheme: string | null;
     seats: number | null;
+    rules: unknown;
   }>(sql`
     select c.id as contest,
       case when p.kind = 'sovereign_state' then coalesce(st.entity_id, p.id) else p.id end as polity,
@@ -368,8 +370,10 @@ async function jurisdictions(contests: Array<string>) {
         else p.kind::text
       end as kind,
       a.scheme_code as scheme,
-      case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats
+      case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats,
+      case when c.kind = 'ballot_question' then es.rules || coalesce(c.rules_override, '{}') end as rules
     from contest c join election e on e.id = c.election_id
+    left join electoral_system es on es.id = c.electoral_system_id
     left join body b on b.id = c.body_id
     left join office o on o.id = c.office_id
     join polity p on p.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
@@ -1323,6 +1327,7 @@ async function night(
           ? null
           : { name: titles.full.get(where.polity) ?? "", kind },
       seats: where?.seats ?? 1,
+      rule: rule(where?.rules),
       isMeasure:
         own.some((choice) => choice.kind === "answer") &&
         own.every(
@@ -1413,6 +1418,21 @@ async function night(
           : (lapsed.get(parts[1] ?? "") ?? "live"),
     };
   });
+  for (const race of built) {
+    const of = race.rule?.minimum?.of;
+    if (race.rule != null && (of === "ballots" || of === "governor")) {
+      const governor = built.find(
+        (other) => other.state === race.state && other.office === "governor",
+      );
+      const totals =
+        governor?.certified?.totals ?? governor?.frames.at(-1)?.totals;
+      let votes = 0;
+      for (const value of totals ?? []) {
+        votes += value;
+      }
+      race.rule.base = totals == null ? null : votes;
+    }
+  }
   const states = [...new Set(built.map((race) => race.state))].toSorted(
     (a, b) => a.localeCompare(b),
   );

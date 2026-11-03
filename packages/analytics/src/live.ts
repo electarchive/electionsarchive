@@ -67,6 +67,17 @@ export type LiveRace = {
   } | null;
   seats?: number;
   isMeasure?: boolean;
+  rule?: LiveRule | null;
+};
+
+export type LiveRule = {
+  majority: { share: number; strict: boolean } | null;
+  minimum: {
+    share: number;
+    strict: boolean;
+    of: "ballots" | "governor" | "previous_general";
+  } | null;
+  base?: number | null;
 };
 
 export type LiveFeed = "live" | "none" | "outside";

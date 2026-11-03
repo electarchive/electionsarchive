@@ -1,5 +1,7 @@
+import type { LiveRule } from "@ea/analytics/live";
 import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
+import { rule } from "#lib/measure.js";
 import { remember } from "#lib/server/cache.js";
 import { liveDb as db } from "#lib/server/db/index.js";
 import { geography, portraits } from "#lib/server/live-board.js";
@@ -44,6 +46,7 @@ export type BallotContest = {
   area: string | null;
   isMeasure: boolean;
   isSpecial: boolean;
+  rule?: LiveRule | null;
   options: Array<BallotOption>;
 };
 
@@ -219,10 +222,13 @@ async function statewide(id: string, date: string, stateName: string) {
     seats: number | null;
     held: string | null;
     area: string | null;
+    rules: unknown;
   }>(sql`
     select c.id, s.path, c.district_area_id as area, c.kind::text as kind, o.kind::text as office, b.kind::text as body, bp.kind::text as scope,
-      coalesce(c.body_id, o.body_id) as chamber, c.magnitude as seats, prior.party as held
+      coalesce(c.body_id, o.body_id) as chamber, c.magnitude as seats, prior.party as held,
+      case when c.kind = 'ballot_question' then es.rules || coalesce(c.rules_override, '{}') end as rules
     from contest c
+    left join electoral_system es on es.id = c.electoral_system_id
     join slug s on s.entity_id = c.id and s.is_current
     left join office o on o.id = c.office_id
     left join body b on b.id = coalesce(c.body_id, o.body_id)
@@ -323,6 +329,7 @@ async function statewide(id: string, date: string, stateName: string) {
         area: district == null ? null : row.area,
         isMeasure: row.tier === "measures",
         isSpecial: seat.includes("special"),
+        rule: rule(row.rules),
         options: own.map((option) => ({
           id: option.id,
           name: option.name,
@@ -398,7 +405,7 @@ async function tally(id: string) {
 }
 
 export async function ballotLocals(path: string) {
-  return remember(`live:ballot-locals:v2:${path}`, async () => {
+  return remember(`live:ballot-locals:v3:${path}`, async () => {
     const root = await db.execute<{ id: string; date: string }>(sql`
       select e.id, e.date_from::text as date from slug s join election e on e.id = s.entity_id
       where s.path = ${path} and s.is_current
@@ -414,11 +421,14 @@ export async function ballotLocals(path: string) {
       seats: number | null;
       polity: string;
       scope: string;
+      rules: unknown;
     }>(sql`
       ${tree(election.id)}
-      select c.id, s.path, c.kind::text as kind, c.magnitude as seats, e.polity_id as polity, p.kind::text as scope
+      select c.id, s.path, c.kind::text as kind, c.magnitude as seats, e.polity_id as polity, p.kind::text as scope,
+        case when c.kind = 'ballot_question' then es.rules || coalesce(c.rules_override, '{}') end as rules
       from tree t join election e on e.id = t.id join polity p on p.id = e.polity_id
       join contest c on c.election_id = e.id
+      left join electoral_system es on es.id = c.electoral_system_id
       join slug s on s.entity_id = c.id and s.is_current
       where t.depth > 0
       order by s.path
@@ -463,6 +473,7 @@ export async function ballotLocals(path: string) {
                 area: null,
                 isMeasure: row.kind === "ballot_question",
                 isSpecial: /special|unexpired|short-term/u.test(seat),
+                rule: rule(row.rules),
                 options: (byContest.get(row.id) ?? []).map((option) => ({
                   id: option.id,
                   name: option.name,
@@ -494,7 +505,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v8:${election.slug}`, async () => {
+  return remember(`live:ballot:v9:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");

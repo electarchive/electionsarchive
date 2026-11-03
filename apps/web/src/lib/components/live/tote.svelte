@@ -18,6 +18,8 @@
     band = null,
     isWaiting,
     isLater = false,
+    mark = 0.5,
+    needs = [],
   }: {
     options: Array<LiveOption>;
     now: Standing;
@@ -25,6 +27,8 @@
     band?: Band | null;
     isWaiting: boolean;
     isLater?: boolean;
+    mark?: number;
+    needs?: Array<string>;
   } = $props();
 
   let isOpen = $state(false);
@@ -197,9 +201,13 @@
       {/each}
     {/if}
     <span
-      class="absolute inset-y-0 inset-s-1/2 -translate-x-1/2 bg-background inline-0.5"
+      class="absolute inset-y-0 -translate-x-1/2 bg-background inline-0.5"
+      style:inset-inline-start="{mark * 100}%"
     ></span>
   </div>
+  {#if needs.length > 0}
+    <p class="text-[0.8125rem] text-muted-foreground">{needs.join(". ")}</p>
+  {/if}
 
   <div
     class="grid items-start gap-x-6 gap-y-2 text-[0.8125rem] sm:grid-cols-[auto_minmax(0,1fr)]"

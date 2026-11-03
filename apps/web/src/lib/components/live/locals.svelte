@@ -16,6 +16,7 @@
     sides,
     tokenize,
   } from "#lib/live/local.js";
+  import { clears, line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -135,13 +136,15 @@
         };
       }
       if (summary.leader != null) {
+        const isPassing = clears(
+          summary.race.rule,
+          summary.totals[pair.yes] ?? 0,
+          summary.totals[pair.no] ?? 0,
+        );
         return {
-          text:
-            summary.leader.id === yes?.id
-              ? m.night_local_passing()
-              : m.night_local_failing(),
+          text: isPassing ? m.night_local_passing() : m.night_local_failing(),
           isFinal: false,
-          isYes: summary.leader.id === yes?.id,
+          isYes: isPassing,
         };
       }
       return null;
@@ -369,9 +372,16 @@
                           <span class="flex-1 bg-(--no)"></span>
                         {/if}
                         <span
-                          class="absolute inset-y-0 inset-s-1/2 bg-background inline-px"
+                          class="absolute inset-y-0 bg-background inline-px"
+                          style:inset-inline-start="{line(summary.race.rule) *
+                            100}%"
                         ></span>
                       </span>
+                      {#if summary.race.rule != null}
+                        <span class="text-xs text-muted-foreground"
+                          >{terms(summary.race.rule).join(". ")}</span
+                        >
+                      {/if}
                     </span>
                   {:else}
                     <ol class="grid gap-0.5">

@@ -12,8 +12,10 @@
   import { bandFor, clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
   import { liveLinks } from "#lib/live/links.js";
+  import { sides } from "#lib/live/local.js";
   import { standing, sum } from "#lib/live/standing.js";
   import { quiet } from "#lib/live/summary.js";
+  import { line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Answers from "./answers.svelte";
@@ -103,6 +105,13 @@
       : options.flatMap((option, index) => (option.isWriteIn ? [] : [index])),
   );
   const pair = $derived(now.pair);
+  const mark = $derived.by(() => {
+    const sided = race.isMeasure === true ? sides(race) : null;
+    if (sided == null || race.rule == null) {
+      return 0.5;
+    }
+    return sided.yes === pair[0] ? line(race.rule) : 1 - line(race.rule);
+  });
   const modeled = $derived(
     now.isFinal
       ? estimateAt(race, null)
@@ -556,6 +565,8 @@
             {band}
             {isWaiting}
             isLater={later != null}
+            {mark}
+            needs={terms(race.rule)}
           />
         {/if}
       </div>
