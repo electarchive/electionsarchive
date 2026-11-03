@@ -174,6 +174,7 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, origin), source)
         parent = cs.key("us.election", f"{DAY}:WA")
         elections: set[UUID] = set()
+        contests: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             place = row["place"]
@@ -266,6 +267,9 @@ def emit() -> Path:
             label = row["number"]
             contest_key = f"{DAY}:WA:{code}:measure:{slug(label)}"
             contest = cs.key("us.contest", contest_key)
+            if contest in contests:
+                continue
+            contests.add(contest)
             contest_path = f"{path}/{DAY}-general/{slug(label)}"
             if slugs.get(contest_path, contest) != contest:
                 print("slug taken:", contest_path)
