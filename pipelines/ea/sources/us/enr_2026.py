@@ -1,4 +1,5 @@
 import csv
+import difflib
 import html
 import io
 import itertools
@@ -224,7 +225,7 @@ def stem(word: str) -> str:
 
 
 def terms(label: str, joined: bool = True) -> list[str]:
-    text = label.replace("’", "'")
+    text = re.sub(r",?\s+(?:M\.?D\.?|Ph\.?D\.?|D\.?D\.?S\.?|Esq\.?)$", "", label.replace("’", "'"))
     if joined:
         text = re.sub(r"(?<=[a-z])-(?=[a-z])", "", text, flags=re.IGNORECASE)
     words = [
@@ -1614,6 +1615,17 @@ def plan(
             answer = person(name)
             if answer in ("yes", "no"):
                 hits = [(1, option) for option, words in named if words and words[0] == answer] or hits
+            if not hits:
+                spelled = [
+                    option
+                    for option, words in named
+                    if len(words) > 1
+                    and len(tokens) > 1
+                    and words[0] == terms(name)[0]
+                    and len(words[-1]) > 4
+                    and difflib.SequenceMatcher(None, words[-1], terms(name)[-1]).ratio() >= 0.9
+                ]
+                hits = [(1, option) for option in spelled] if len(spelled) == 1 else []
             if hits and (len(hits) == 1 or hits[0][0] > hits[1][0]):
                 ballots[name] = hits[0][1]
             else:
