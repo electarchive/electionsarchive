@@ -5816,5 +5816,6 @@
   "livemap_win_chance": "Chance to win",
   "livemap_counted_share": "Share of the expected vote counted",
   "livemap_near_hint": "Click to see this state's results",
+  "livemap_near_seat_hint": "Click to see this district's results",
   "livemap_up_hint": "Or click anywhere outside the state"
 }

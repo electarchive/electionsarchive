@@ -8,7 +8,7 @@
   import { Engine } from "#lib/map/engine.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { Dot, Fill } from "./model.js";
-  import { BLANK } from "./model.js";
+  import { BLANK, GROUND } from "./model.js";
 
   let {
     geography,
@@ -39,7 +39,7 @@
     } | null;
     aim?: Geography["frame"] | null;
     seat?: Pieces | null;
-    hold?: { tiles: string; k: number } | null;
+    hold?: { tiles: string; k: number; color: string } | null;
     fills: Map<string, Fill>;
     dots?: Array<Dot>;
     labels?: Array<{ areaId: string; text: string; rank: number }>;
@@ -58,12 +58,10 @@
     new Map((around?.places ?? []).map((place) => [place.areaId, place.k])),
   );
   const areaOf = $derived(
-    new Map(
-      [...places, ...(around?.places ?? [])].map((place) => [
-        place.k,
-        place.areaId,
-      ]),
-    ),
+    new Map(places.map((place) => [place.k, place.areaId])),
+  );
+  const nearAreaOf = $derived(
+    new Map((around?.places ?? []).map((place) => [place.k, place.areaId])),
   );
   const atOf = $derived(
     new Map((seat?.pieces ?? places).map((place) => [place.areaId, place.at])),
@@ -114,15 +112,23 @@
           engine.cursor(false);
           return;
         }
-        const own = seat == null ? current?.fill : "seat-fill";
-        const k =
-          own == null
+        const isOutside =
+          seat == null &&
+          hold != null &&
+          engine.pick(point, ["hold-fill"]) == null;
+        const own =
+          seat != null ? "seat-fill" : isOutside ? null : current?.fill;
+        const k = own == null ? null : engine.pick(point, [own]);
+        const nearK =
+          k != null || current?.near == null
             ? null
-            : engine.pick(
-                point,
-                current?.near == null ? [own] : [own, current.near.fill],
-              );
-        const areaId = k == null ? null : (areaOf.get(k) ?? null);
+            : engine.pick(point, [current.near.fill]);
+        const areaId =
+          k != null
+            ? (areaOf.get(k) ?? null)
+            : nearK == null
+              ? null
+              : (nearAreaOf.get(nearK) ?? null);
         if (kind === "click") {
           pointer = null;
           onPick(areaId);
@@ -158,10 +164,7 @@
           source,
           "source-layer": "areas",
           filter: ["in", ["id"], ["literal", ground]],
-          paint: {
-            "fill-color":
-              "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))",
-          },
+          paint: { "fill-color": GROUND },
         },
         "fills",
         { group, rank: 0 },
@@ -388,36 +391,54 @@
   }
 
   function outline() {
-    const held = seat == null && hold != null ? hold : null;
+    const held = seat == null ? hold : null;
     if (held == null) {
       engine.drop("hold");
-    } else if (!engine.has(`hold-edge-${held.k}`)) {
-      const tiles = engine.tiles(held.tiles);
-      engine.drop("hold");
-      engine.add(
-        {
-          id: `hold-edge-${held.k}`,
-          type: "line",
-          source: tiles,
-          "source-layer": "areas",
-          filter: ["==", ["id"], held.k],
-          layout: { "line-join": "round", "line-cap": "round" },
-          paint: {
-            "line-color": "var(--foreground)",
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              5,
-              1.4,
-              10,
-              2.4,
-            ],
+    } else {
+      const only: ["==", ["id"], number] = ["==", ["id"], held.k];
+      if (engine.has("hold-fill")) {
+        engine.filter("hold-fill", only);
+        engine.filter("hold-edge", only);
+        engine.style("hold-fill", "fill-color", held.color);
+      } else {
+        const tiles = engine.tiles(held.tiles);
+        engine.add(
+          {
+            id: "hold-fill",
+            type: "fill",
+            source: tiles,
+            "source-layer": "areas",
+            filter: only,
+            paint: { "fill-color": held.color },
           },
-        },
-        "focus",
-        { group: "hold" },
-      );
+          "fills",
+          { group: "hold", rank: 3 },
+        );
+        engine.add(
+          {
+            id: "hold-edge",
+            type: "line",
+            source: tiles,
+            "source-layer": "areas",
+            filter: only,
+            layout: { "line-join": "round", "line-cap": "round" },
+            paint: {
+              "line-color": "var(--foreground)",
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                5,
+                1.4,
+                10,
+                2.4,
+              ],
+            },
+          },
+          "focus",
+          { group: "hold" },
+        );
+      }
     }
     if (seat == null) {
       engine.drop("seat");
@@ -534,7 +555,7 @@
   }
 
   function keyOf(shown: Geography) {
-    return `${shown.tiles}|${shown.places.length}|${around?.places.length ?? 0}|${JSON.stringify(shown.frame)}`;
+    return `${shown.tiles}|${shown.places.length}|${around?.tiles ?? ""}|${around?.places.map((place) => place.k).join() ?? ""}|${JSON.stringify(shown.frame)}`;
   }
 
   let aimed = "";
@@ -588,13 +609,16 @@
     outline();
     const { group } = current;
     const source = seat == null ? current.source : "seat-pieces";
-    if (seat != null) {
-      engine.paint(current.source, new Map());
+    if (seat != null || hold != null) {
+      engine.paint(
+        current.source,
+        new Map(places.map((place) => [place.k, { color: GROUND }])),
+      );
     }
     engine.paint(
       source,
       new Map(
-        (seat?.pieces ?? places).flatMap(
+        (hold == null ? (seat?.pieces ?? places) : []).flatMap(
           (place): Array<[number, Record<string, string | boolean>]> => {
             const fill = fills.get(place.areaId);
             return fill == null

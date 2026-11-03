@@ -41,6 +41,8 @@ export const LATER =
   "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
 export const QUIET =
   "color-mix(in oklab, var(--muted-foreground) 16%, var(--background))";
+export const GROUND =
+  "color-mix(in oklab, var(--muted-foreground) 5%, var(--background))";
 export const BLANK =
   "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
 

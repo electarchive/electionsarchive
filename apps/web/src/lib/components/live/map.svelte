@@ -10,7 +10,7 @@
     Standing,
     UnitStanding,
   } from "#lib/live/standing.js";
-  import { leadStrength, swingStrength } from "#lib/atlas/color.js";
+  import { leadStrength, strengths, swingStrength } from "#lib/atlas/color.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
@@ -20,6 +20,7 @@
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Scale from "./full/scale.svelte";
   import LaterKey from "./later-key.svelte";
   import MethodLink from "./method-link.svelte";
 
@@ -664,7 +665,22 @@
       </div>
     {/if}
   </div>
-  {#if answers != null && !isLater && (mode === "lead" || mode === "bubbles")}
+  {#if !isLater && (mode === "lead" || mode === "shift" || mode === "counted")}
+    <div class="max-inline-80">
+      {#if mode === "counted"}
+        <Scale />
+      {:else}
+        <Scale
+          sides={[
+            { name: surname(options[a]), color: toneA },
+            { name: surname(options[b]), color: toneB },
+          ]}
+          bins={strengths({ mode: mode === "shift" ? "swing" : "winner" })}
+        />
+      {/if}
+    </div>
+  {/if}
+  {#if answers != null && !isLater && (mode === "bubbles" || (mode === "lead" && answers.length > 2))}
     <ul class="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
       {#each answers as index (options[index]?.id ?? index)}
         <li class="flex items-center gap-1.5">

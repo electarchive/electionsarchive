@@ -415,17 +415,6 @@
   const nearCodes = $derived(
     new Map(Object.entries(around?.codes ?? {}).map(([key, id]) => [id, key])),
   );
-  const nearby = $derived(
-    around == null
-      ? null
-      : {
-          tiles: around.tiles,
-          places: around.places.map((place) => ({
-            ...place,
-            name: stateName(nearCodes.get(place.areaId) ?? ""),
-          })),
-        },
-  );
   const districtCodes = $derived(districts?.codes ?? {});
   const aim = $derived(
     isNation || race == null
@@ -443,13 +432,49 @@
     cut != null && cut.areaId === seatArea ? cut.found : null,
   );
 
+  const nearSeats = $derived(
+    race?.office !== "house" || seatArea == null || isOverview
+      ? null
+      : new Map(
+          Object.entries(districtCodes).flatMap(([key, id]) =>
+            id === seatArea ? [] : [[id, key] as const],
+          ),
+        ),
+  );
+  const nearby = $derived(
+    nearSeats != null && districts != null
+      ? {
+          tiles: districts.map.tiles,
+          places: districts.map.places.flatMap((place) => {
+            const [state = "", number = ""] =
+              nearSeats.get(place.areaId)?.split("-") ?? [];
+            return state === ""
+              ? []
+              : [
+                  {
+                    ...place,
+                    name: `${state.toUpperCase()}-${number === "0" ? "AL" : number}`,
+                  },
+                ];
+          }),
+        }
+      : around == null
+        ? null
+        : {
+            tiles: around.tiles,
+            places: around.places.map((place) => ({
+              ...place,
+              name: stateName(nearCodes.get(place.areaId) ?? ""),
+            })),
+          },
+  );
   const hold = $derived.by(() => {
     const k = districts?.map.places.find(
       (place) => place.areaId === seatArea,
     )?.k;
     return seat != null || districts == null || k == null
       ? null
-      : { tiles: districts.map.tiles, k };
+      : { tiles: districts.map.tiles, k, color: shared ?? BLANK };
   });
 
   $effect(() => {
@@ -563,6 +588,22 @@
     );
   }
 
+  const shared = $derived.by(() => {
+    const district =
+      seatArea == null || raceStanding == null ? null : whole(raceStanding);
+    return district == null || race == null
+      ? null
+      : lens === "votes"
+        ? BLANK
+        : unitFill(
+            district,
+            lens,
+            race.options,
+            racePair,
+            sum(rows.map((entry) => entry.expected)),
+          );
+  });
+
   const fills = $derived.by(() => {
     const out = new Map<string, Fill>();
     if (isSpreadShown) {
@@ -601,18 +642,6 @@
       return out;
     }
     const isLater = current?.later != null;
-    const district =
-      seatArea == null || raceStanding == null ? null : whole(raceStanding);
-    const shared =
-      district == null || race == null
-        ? null
-        : unitFill(
-            district,
-            lens,
-            race.options,
-            racePair,
-            sum(rows.map((entry) => entry.expected)),
-          );
     for (const place of geography?.places ?? []) {
       const entry = rowByArea.get(place.areaId);
       out.set(
@@ -839,6 +868,23 @@
       return;
     }
     clearTimeout(awayTimer);
+    const seatKey = nearSeats?.get(areaId);
+    if (seatKey != null) {
+      const [state = "", number = ""] = seatKey.split("-");
+      if (state === code) {
+        update({ race: `house-${number}`, county: null });
+        return;
+      }
+      flyTo(state, seatKey);
+      void goto(
+        href(`${election.slug.split("/")[0] ?? "us"}/${state}/${date}`, {
+          race: `house-${number}`,
+          color: params.get("color"),
+        }),
+        { reset: false },
+      );
+      return;
+    }
     const neighbor = nearCodes.get(areaId);
     if (neighbor != null) {
       visit(neighbor);
@@ -1319,7 +1365,13 @@
 {#snippet tip(areaId: string)}
   {const nationTip = $derived(tipRace(areaId))}
   {const neighbor = $derived(nearCodes.get(areaId) ?? null)}
-  {#if neighbor != null}
+  {const nearSeat = $derived(
+    nearby?.places.find((place) => place.areaId === areaId) ?? null,
+  )}
+  {#if nearSeats?.has(areaId) === true && nearSeat != null}
+    <p class="font-semibold">{nearSeat.name}</p>
+    <p class="text-xs text-muted-foreground">{m.livemap_near_seat_hint()}</p>
+  {:else if neighbor != null}
     <p class="font-semibold">{stateName(neighbor)}</p>
     <p class="text-xs text-muted-foreground">{m.livemap_near_hint()}</p>
   {:else if nationTip != null}
