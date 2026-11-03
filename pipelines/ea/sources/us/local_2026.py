@@ -2337,6 +2337,18 @@ NE_SOURCES["AR-05143"] = (
     "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-general-election-information",
     "ar/washington.html",
 )
+for _key in sorted(
+    {
+        _line.split("\t")[0]
+        for _line in Path(__file__).with_name("local_2026_nov3_ar.tsv").read_text().splitlines()[1:]
+    }
+):
+    NE_SOURCES[_key] = (
+        "Association of Arkansas Counties",
+        "2026 General Election: County and District Officials, candidates as of April 1, 2026",
+        "https://www.arcounties.org/site/assets/files/6757/2026candidatesgeneralelection.pdf",
+        "ar/aac_2026candidatesgeneralelection.pdf",
+    )
 for page in sorted((DATA / "inbox" / "y26" / "la").glob("*.html")):
     NE_SOURCES[f"LA-{page.stem}"] = (
         "Louisiana Secretary of State",
