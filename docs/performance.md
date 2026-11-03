@@ -15,7 +15,7 @@ Two sections of the contest page, the ballot list and the lean chart, sit below 
 Cloudflare caches every response that the origin marks as shareable. `mark()` in `apps/web/src/lib/server/edge.ts` determines this as each response leaves the server. A response is shareable when it answers a GET or HEAD with a 200, sets no `cache-control` or `set-cookie` of its own, goes to a visitor who is not signed in and sent no `authorization` or `x-api-key` header, and is not under `/api/auth`, `/mcp`, or `/rpc`. A shareable response gets two headers:
 
 - `cache-control: no-cache`, so browsers keep the page but ask the edge before reusing it. The edge answers with a 304 when the page hasn't changed.
-- `cloudflare-cdn-cache-control: public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400`, which only Cloudflare reads and never passes on. The edge serves its copy for five minutes. After that it keeps serving the old copy while it fetches a new one in the background, and if the origin fails, it serves the old copy for up to a day.
+- `cloudflare-cdn-cache-control: public, max-age=300, stale-while-revalidate=604800, stale-if-error=604800`, which only Cloudflare reads and never passes on. The edge serves its copy as fresh for five minutes. For the next seven days it keeps serving that copy at once while it fetches a new one in the background, so a visitor waits for the origin only when the edge has no copy less than a week old. If the origin fails, the edge serves its copy for up to seven days.
 
 Every other response gets `private, no-cache` unless it already set its own `cache-control`, so the edge never stores it.
 

@@ -92,7 +92,7 @@ export async function mark(event: RequestEvent, response: Response) {
     "cloudflare-cdn-cache-control",
     isLive
       ? "public, max-age=5, stale-while-revalidate=10, stale-if-error=3600"
-      : "public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400",
+      : "public, max-age=300, stale-while-revalidate=604800, stale-if-error=604800",
   );
   return response;
 }
