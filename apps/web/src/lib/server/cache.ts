@@ -187,6 +187,17 @@ function keep(slot: string, version: string, value: unknown) {
   }
 }
 
+export async function stash(slot: string, text: string) {
+  await client()?.set(slot, await pack(Buffer.from(text)), { EX: LIFETIME });
+}
+
+export async function unstash(slot: string) {
+  const found = await client()
+    ?.get(slot)
+    .catch(() => null);
+  return found == null ? null : (await unpack(found)).toString();
+}
+
 async function refresh() {
   try {
     const result = await db.execute<{ version: string }>(sql`
