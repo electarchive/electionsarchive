@@ -44,7 +44,7 @@ WARD = re.compile(r"Ward (\d) Member of the (Council|State Board of Education)$"
 CANDIDATE = re.compile(
     r"^(\S.*?)(?:\s+-\s+(Democrat|Republican|Statehood Green|Independent|Libertarian))?(?:\s{2,}.*)?$"
 )
-ANC_ROW = re.compile(r"^\s*([1-8][A-G]\d\d)(?:\s{2,}(\S.*?))?(?:\s{2,}|$)")
+ANC_ROW = re.compile(r"^\s*(\d(?:/\d)?[A-G]\d\d)(?:\s{2,}(\S.*?))?(?:\s{2,}|$)")
 INITIATIVE = ("86", "Prohibiting Force-Feeding of Birds Act of 2026")
 
 
@@ -84,7 +84,7 @@ def parse() -> None:
     for line in text(ANC, True).splitlines():
         found = ANC_ROW.match(line)
         if found:
-            rows.append((f"anc:{found[1].lower()}", (found[2] or "").strip(), ""))
+            rows.append((f"anc:{found[1].lower()}", re.sub(r"\s*\(withdrew[^)]*\)", "", found[2] or "").strip(), ""))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, schema=["section", "candidate", "party"], orient="row").write_parquet(
         PARSED / "candidates.parquet"
@@ -134,7 +134,9 @@ def emit() -> Path:
         taken = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme in ('us.contest', 'us.office', 'us.local_district')"
+                """select x.value from external_id x join changeset s on s.id = x.changeset_id
+                   where x.scheme in ('us.contest', 'us.office', 'us.local_district') and s.pipeline <> %s""",
+                [SOURCE],
             )
         }
         ((state_area,),) = conn.execute(
@@ -200,12 +202,14 @@ def emit() -> Path:
                 path = f"us/dc/{DAY}-general/state-board-of-education-{tail}"
             elif kind == "anc":
                 smd = tail.upper()
-                contest_key = f"{DAY}:DC:{PLACE}:anc:{tail}"
+                contest_key = f"{DAY}:DC:11:anc:{slug(tail)}"
                 area = district(
-                    f"DC:{PLACE}:anc:{tail}", f"Advisory Neighborhood Commission {smd}, District of Columbia", city
+                    f"DC:{PLACE}:anc:{slug(tail)}",
+                    f"Advisory Neighborhood Commission {smd}, District of Columbia",
+                    city,
                 )
                 title = f"{DAY.year} Advisory Neighborhood Commission {smd} election"
-                path = f"us/dc/{DAY}-general/anc-{tail}"
+                path = f"us/dc/{DAY}-general/anc-{slug(tail)}"
             else:
                 label = (
                     "Shadow United States Senator" if "senator" in section else "Shadow United States Representative"
