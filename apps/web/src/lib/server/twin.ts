@@ -4372,7 +4372,9 @@ function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
     m.method_margin_body_more(),
     `## ${m.method_order_title()}`,
     m.method_order_body(),
-    `- ${m.method_order_shift()}\n- ${m.method_order_tail()}`,
+    [m.method_order_shift(), m.method_order_swing(), m.method_order_tail()]
+      .map((line) => `- ${line}`)
+      .join("\n"),
     table(
       ["", m.method_order_chart()],
       [
@@ -4395,6 +4397,14 @@ function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
       brier: three(data.score.all.brier),
       error: points(data.score.all.error, 1).replace(/^[+−]/u, ""),
     }),
+    m.method_testing_real({
+      races: count(data.nights.races),
+      later: count(data.nights.later),
+    }),
+    m.method_testing_real_result({
+      cover: percent(data.score.real.cover, 0),
+      turnout: percent(data.score.real.turnoutCover, 0),
+    }),
     table(
       [m.method_counted_axis(), m.method_brier_chart(), m.method_cover_chart()],
       data.checkpoints.map((row) => [
@@ -4405,19 +4415,27 @@ function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
     ),
     `### ${m.method_score_title()}`,
     table(
-      [m.method_score_metric(), m.method_score_all(), m.method_score_close()],
+      [
+        m.method_score_metric(),
+        m.method_score_all(),
+        m.method_score_close(),
+        m.method_score_real(),
+      ],
       measures.map(([label, show]) => [
         label,
         show(data.score.all),
         show(data.score.close),
+        show(data.score.real),
       ]),
     ),
+    `${m.method_testing_repo()} [${m.method_testing_repo_link()}](https://github.com/electarchive/live-forecast)`,
     `## ${m.method_limits_title()}`,
     [
       m.method_limit_pause(),
       m.method_limit_types(),
       m.method_limit_precincts(),
       m.method_limit_baseline(),
+      m.method_limit_traits(),
       m.method_limit_order(),
     ]
       .map((line) => `- ${line}`)
