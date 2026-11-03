@@ -462,7 +462,7 @@ const STATEWIDE = [
   "secretary-of-state",
 ];
 
-type Shown = { results: boolean; forecasts: boolean; classic: boolean };
+type Shown = { results: boolean; forecasts: boolean };
 
 const done = new Map<
   string,
@@ -480,11 +480,10 @@ const pending = new Map<
 async function stored() {
   const result = await db.execute<Shown>(sql`
     select coalesce(bool_or(shown) filter (where name = 'results'), false) as results,
-      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts,
-      coalesce(bool_or(shown) filter (where name = 'classic'), false) as classic
+      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts
     from live.switch
   `);
-  return result.rows[0] ?? { results: false, forecasts: false, classic: false };
+  return result.rows[0] ?? { results: false, forecasts: false };
 }
 
 async function switches() {
@@ -1374,7 +1373,6 @@ async function night(
           })()
         : null,
       source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
-      isClassic: shown.classic,
       feed:
         mine.length > 0 || final.length > 0
           ? "live"
@@ -1728,7 +1726,7 @@ export const live = {
         switches(),
         calls(picked.map((row) => row.id)),
       ]);
-      const slot = `${getLocale()}|${String(shown.results)}|${String(shown.forecasts)}|${String(shown.classic)}|${found.path}|${found.rest}`;
+      const slot = `${getLocale()}|${String(shown.results)}|${String(shown.forecasts)}|${found.path}|${found.rest}`;
       const key = shown.results
         ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
         : "";

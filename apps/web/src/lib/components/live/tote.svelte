@@ -16,6 +16,7 @@
     now,
     estimate,
     winners,
+    projected = null,
     isWaiting,
     isLater = false,
   }: {
@@ -23,6 +24,7 @@
     now: Standing;
     estimate: LiveEstimate | null;
     winners: Array<string>;
+    projected?: string | null;
     isWaiting: boolean;
     isLater?: boolean;
   } = $props();
@@ -121,6 +123,12 @@
                       class="block-3 inline-3"
                       aria-hidden="true"
                     />{m.night_winner()}</span
+                  >
+                {:else if option != null && option.id === projected}
+                  <span
+                    class="shrink-0 rounded-full border px-1.5 py-px text-[0.6875rem] font-semibold"
+                    style:border-color={color}
+                    >{m.night_rating_projected()}</span
                   >
                 {/if}
               </span>

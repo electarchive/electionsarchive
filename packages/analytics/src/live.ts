@@ -60,7 +60,6 @@ export type LiveRace = {
   certified: { totals: Array<number>; winners: Array<string> } | null;
   projected?: { option: string; at: string } | null;
   source: { publisher: string; url: string | null };
-  isClassic?: boolean;
   feed?: LiveFeed;
   jurisdiction?: {
     name: string;
@@ -693,7 +692,6 @@ function fit(
 }
 
 export function estimate({ race, at }: EstimateInput): LiveEstimate {
-  const isClassic = race.isClassic === true;
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
   const { found, a, b } = units(race, at);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
@@ -736,7 +734,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       Math.exp(
         -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
       ),
-    isClassic || onNight <= 0 || latest <= 0
+    onNight <= 0 || latest <= 0
       ? Infinity
       : Math.max(0, tail * onNight - (latest - onNight)) / latest,
   );
@@ -853,7 +851,6 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const shareIn: Array<number> = [];
   const centers: Array<number> = [];
   const spreads: Array<number> = [];
-  let winsA = 0;
   const perUnit = found.map(() => ({
     totals: [] as Array<number>,
     margins: [] as Array<number>,
@@ -863,7 +860,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const { cell, tau } = model.draw(random);
     const surge = MODEL.surge * gaussian(random);
     const shift = MODEL.shift * gaussian(random);
-    const mode = isClassic ? 0 : modeScale * gaussian(random);
+    const mode = modeScale * gaussian(random);
     const late =
       left *
       Math.exp(
@@ -968,16 +965,13 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
           ) / all
         : 0,
     );
-    if (votes > 0) {
-      winsA += 1;
-    }
   }
   const margin = band(finalMargins);
   const flip = margin.mid < 0;
   const leader = flip ? optionB : optionA;
   const runnerUp = flip ? optionA : optionB;
   const shareInBand = band(shareIn);
-  const chance = isClassic ? winsA / MODEL.draws : averaged(centers, spreads);
+  const chance = averaged(centers, spreads);
   const reportedUnits = found.filter((unit) => unit.total > 0).length;
   const status =
     shareInBand.mid < 0.1 || reportedUnits < Math.min(3, found.length)

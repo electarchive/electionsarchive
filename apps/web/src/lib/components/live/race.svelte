@@ -150,6 +150,13 @@
     view == null ? points : points.filter((point) => point.at <= view),
   );
   const winners = $derived(now.isFinal ? (race.certified?.winners ?? []) : []);
+  const projected = $derived(
+    race.certified == null &&
+      race.projected != null &&
+      (view == null || race.projected.at <= view)
+      ? (options.find((option) => option.id === race.projected?.option) ?? null)
+      : null,
+  );
   const closes = $derived(
     Date.parse(
       election.pollClose.find((entry) => entry.state === race.state)?.at ??
@@ -292,6 +299,12 @@
       return m.night_head_won({
         name: winner?.label ?? leader?.label ?? "",
         margin: lead(Math.abs(signed ?? 0)),
+      });
+    }
+    if (projected != null) {
+      return m.night_head_projected({
+        name: projected.label,
+        time: stamp(race.projected?.at ?? null),
       });
     }
     if (later != null) {
@@ -532,6 +545,7 @@
         {now}
         {estimate}
         {winners}
+        projected={projected?.id ?? null}
         {isWaiting}
         isLater={later != null}
       />
