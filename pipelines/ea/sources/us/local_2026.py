@@ -12045,6 +12045,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             "no filing": 0,
             "dropped": 0,
             "stale contests": 0,
+            "orphan people": 0,
         }
         created: set[str] = set()
         made: set[object] = set()
@@ -12732,5 +12733,18 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
             counts["stale contests"] += 1
+        used = {str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
+        for person, value in conn.execute(
+            """select p.id, x.value from person p join entity e on e.id = p.id and e.retired_by is null
+               join external_id x on x.entity_id = p.id and x.scheme = %s
+               join changeset c on c.id = x.changeset_id
+               where c.pipeline = %s and x.value like %s
+                 and not exists (select from candidacy ca where ca.person_id = p.id)""",
+            [f"{SOURCE}.person", SOURCE, f"{state}:%"],
+        ).fetchall():
+            if str(person) not in used:
+                print("retiring orphan person", value)
+                cs.add("entity_retirement", entity_id=person, reason="No longer on any official candidate list")
+                counts["orphan people"] += 1
         print(counts)
         return cs.write()
