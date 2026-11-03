@@ -207,6 +207,7 @@
           <p>{m.method_order_body()}</p>
           <ul class="grid list-disc gap-1.5 ps-5">
             <li>{m.method_order_shift()}</li>
+            <li>{m.method_order_swing()}</li>
             <li>{m.method_order_tail()}</li>
           </ul>
         </div>
@@ -265,6 +266,18 @@
               error: lead(score.all.error),
             })}
           </p>
+          <p>
+            {m.method_testing_real({
+              races: count(methodology.nights.races),
+              later: count(methodology.nights.later),
+            })}
+          </p>
+          <p>
+            {m.method_testing_real_result({
+              cover: percent(score.real.cover, 0),
+              turnout: percent(score.real.turnoutCover, 0),
+            })}
+          </p>
         </div>
         <div class="grid gap-8 md:grid-cols-3">
           <Checkpoints
@@ -292,7 +305,7 @@
         <div class="grid gap-3">
           <h3 class="text-base font-semibold">{m.method_score_title()}</h3>
           <div class="overflow-x-auto">
-            <table class="text-sm inline-full min-inline-136">
+            <table class="text-sm inline-full min-inline-160">
               <thead>
                 <tr class="border-bs-[3px] border-foreground">
                   <th
@@ -306,6 +319,9 @@
                   >
                   <th scope="col" class="py-2 ps-3 text-end font-semibold"
                     >{m.method_score_close()}</th
+                  >
+                  <th scope="col" class="py-2 ps-3 text-end font-semibold"
+                    >{m.method_score_real()}</th
                   >
                 </tr>
               </thead>
@@ -329,12 +345,24 @@
                       class="py-2 ps-3 text-end font-figures font-semibold tabular-nums"
                       >{measure.show(score.close)}</td
                     >
+                    <td
+                      class="py-2 ps-3 text-end font-figures font-semibold tabular-nums"
+                      >{measure.show(score.real)}</td
+                    >
                   </tr>
                 {/each}
               </tbody>
             </table>
           </div>
         </div>
+        <p class="max-inline-[68ch]">
+          {m.method_testing_repo()}
+          <a
+            href="https://github.com/electarchive/live-forecast"
+            class="underline underline-offset-2 hover:no-underline focus-visible:no-underline"
+            >{m.method_testing_repo_link()}</a
+          >
+        </p>
       </section>
 
       <section
