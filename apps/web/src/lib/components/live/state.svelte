@@ -228,13 +228,13 @@
     if (pick == null || summary.total === 0) {
       return entry.held == null
         ? WAITING
-        : `color-mix(in oklab, ${entry.held.color} 22%, var(--background))`;
+        : `color-mix(in oklab, ${entry.held.color} 22%, var(--map-low))`;
     }
     const share =
       summary.winner == null
         ? Math.round(30 + 55 * Math.min(summary.margin / 0.3, 1))
         : 100;
-    return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--background))`;
+    return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--map-low))`;
   }
 
   function before(seats: Seating) {

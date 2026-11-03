@@ -7,6 +7,7 @@
   import { untrack } from "svelte";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
   import { clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
@@ -464,6 +465,7 @@
         >
       {/if}
       <BoardLink election={election.slug} race={race.slug} />
+      <MapLink election={election.slug} state={race.state} race={race.slug} />
     </p>
     <h1 class="title text-balance">{race.title}</h1>
     <p

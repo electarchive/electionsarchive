@@ -2,6 +2,7 @@
   import type { LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { UnitStanding } from "#lib/live/standing.js";
+  import { leadStrength, swingStrength } from "#lib/atlas/color.js";
   import { percent } from "#lib/format.js";
   import { MUTED } from "#lib/live/board/labels.js";
   import { lead, placeName, surname, tone } from "#lib/live/format.js";
@@ -56,18 +57,18 @@
         return MUTED;
       }
       const shift = row.signed - row.baseSigned;
-      return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${Math.round(12 + 88 * Math.min(Math.abs(shift) / 0.15, 1))}%, var(--background))`;
+      return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${swingStrength(shift)}%, var(--map-low))`;
     }
     if (mode === "counted") {
       const share = Math.min(1, row.total / Math.max(1, expectedOf(row)));
       return row.total === 0
         ? MUTED
-        : `color-mix(in oklab, var(--foreground) ${Math.round(8 + 80 * share)}%, var(--background))`;
+        : `color-mix(in oklab, var(--map-ink) ${Math.round(8 + 80 * share)}%, var(--map-low))`;
     }
     if (row.leader == null) {
       return "color-mix(in oklab, var(--muted-foreground) 16%, var(--background))";
     }
-    return `color-mix(in oklab, ${tone(options[row.leader])} ${Math.round(26 + 74 * Math.min(row.margin / 0.4, 1))}%, var(--background))`;
+    return `color-mix(in oklab, ${tone(options[row.leader])} ${leadStrength(row.margin)}%, var(--map-low))`;
   }
 
   const fills = $derived(

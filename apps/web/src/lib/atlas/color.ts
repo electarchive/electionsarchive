@@ -244,7 +244,15 @@ export function band(middle: number, lens: Lens) {
   );
 }
 
-export function strengths(lens: Lens) {
+export function leadStrength(margin: number) {
+  return LEANS[step(Math.abs(margin), BINS)] ?? 100;
+}
+
+export function swingStrength(swing: number) {
+  return STRENGTHS[step(Math.abs(swing), SWINGS)] ?? 100;
+}
+
+export function strengths(lens: Pick<Lens, "mode">) {
   if (lens.mode === "share") {
     return SHARES.map((edge, index) => ({
       from: index === 0 ? 0 : (SHARES[index - 1] ?? 0),

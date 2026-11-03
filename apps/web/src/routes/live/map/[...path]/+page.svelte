@@ -62,9 +62,11 @@
   control={data.control}
   districts={data.districts}
   geography={data.geography}
+  around={data.around}
   nationPath={data.nationPath}
   names={data.names}
   frame={data.frame}
+  boxes={data.boxes}
   {clock}
   {isOffline}
   forecasts={data.shown.forecasts}

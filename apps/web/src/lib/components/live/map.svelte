@@ -10,11 +10,12 @@
     Standing,
     UnitStanding,
   } from "#lib/live/standing.js";
+  import { leadStrength, swingStrength } from "#lib/atlas/color.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
-  import { remainder } from "#lib/live/standing.js";
+  import { features, remainder, sum, whole } from "#lib/live/standing.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -167,7 +168,7 @@
     );
   }
 
-  function fill(row: UnitStanding): string | null {
+  function fill(row: UnitStanding, expected = expectedOf(row)): string | null {
     const muted =
       "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
     switch (mode) {
@@ -175,24 +176,22 @@
         if (row.leader == null) {
           return muted;
         }
-        const strength = Math.round(26 + 74 * Math.min(row.margin / 0.4, 1));
-        return `color-mix(in oklab, ${tone(options[row.leader])} ${strength}%, var(--background))`;
+        const strength = leadStrength(row.margin);
+        return `color-mix(in oklab, ${tone(options[row.leader])} ${strength}%, var(--map-low))`;
       }
       case "shift": {
         if (row.signed == null || row.baseSigned == null) {
           return muted;
         }
         const shift = row.signed - row.baseSigned;
-        const strength = Math.round(
-          12 + 88 * Math.min(Math.abs(shift) / 0.15, 1),
-        );
-        return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${strength}%, var(--background))`;
+        const strength = swingStrength(shift);
+        return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${strength}%, var(--map-low))`;
       }
       case "counted": {
-        const share = Math.min(1, row.total / Math.max(1, expectedOf(row)));
+        const share = Math.min(1, row.total / Math.max(1, expected));
         return row.total === 0
           ? muted
-          : `color-mix(in oklab, var(--foreground) ${Math.round(8 + 80 * share)}%, var(--background))`;
+          : `color-mix(in oklab, var(--map-ink) ${Math.round(8 + 80 * share)}%, var(--map-low))`;
       }
       default: {
         return row.total > 0
@@ -236,7 +235,7 @@
           k: place.k,
           at: place.at,
           value: rest.left,
-          color: `color-mix(in oklab, ${lean >= 0 ? toneA : toneB} ${strength}%, var(--background))`,
+          color: `color-mix(in oklab, ${lean >= 0 ? toneA : toneB} ${strength}%, var(--map-low))`,
           reference: largest * 0.8,
         },
       ];
@@ -247,16 +246,25 @@
     if (geography == null || engine.gl == null) {
       return;
     }
-    const source = engine.tiles(geography.tiles, "live");
-    if (painted !== geography.tiles) {
+    const cut = geography.pieces;
+    const key = cut == null ? geography.tiles : JSON.stringify(geography.frame);
+    const source =
+      cut == null ? engine.tiles(geography.tiles, "live") : "live-pieces";
+    if (painted !== key) {
       engine.drop("live-layers");
+      if (cut != null) {
+        engine.shapes(source, features(cut), "live-layers");
+      }
+      const areas =
+        cut == null ? { source, "source-layer": "areas" } : { source };
       const ks = places.map((place) => place.k);
+      const edge =
+        cut?.edge ?? (geography.isEdged === true ? geography.outline : []);
       engine.add(
         {
           id: "live-fill",
           type: "fill",
-          source,
-          "source-layer": "areas",
+          ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
             "fill-color": [
@@ -274,8 +282,7 @@
         {
           id: "live-later",
           type: "fill",
-          source,
-          "source-layer": "areas",
+          ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
             "fill-pattern": "hatch",
@@ -294,8 +301,7 @@
         {
           id: "live-seam",
           type: "line",
-          source,
-          "source-layer": "areas",
+          ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
             "line-color": "var(--background)",
@@ -309,8 +315,7 @@
         {
           id: "live-focus",
           type: "line",
-          source,
-          "source-layer": "areas",
+          ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
             "line-color": "var(--foreground)",
@@ -345,28 +350,30 @@
           { group: "live-layers", rank: 1 },
         );
       }
-      if (geography.isEdged === true && geography.outline.length > 0) {
+      if (edge.length > 0) {
         engine.add(
           {
             id: "live-edge",
             type: "line",
             source: engine.shapes(
               "live-edge",
-              { type: "MultiLineString", coordinates: geography.outline },
+              { type: "MultiLineString", coordinates: edge },
               "live-layers",
             ),
-            layout: { "line-join": "round" },
+            layout: { "line-join": "round", "line-cap": "round" },
             paint: {
               "line-color":
-                "color-mix(in oklab, var(--foreground) 72%, transparent)",
+                cut == null
+                  ? "color-mix(in oklab, var(--foreground) 72%, transparent)"
+                  : "var(--foreground)",
               "line-width": [
                 "interpolate",
                 ["linear"],
                 ["zoom"],
                 8,
-                1,
+                cut == null ? 1 : 1.4,
                 13,
-                1.8,
+                cut == null ? 1.8 : 2.4,
               ],
             },
           },
@@ -375,15 +382,20 @@
         );
       }
       engine.frame(geography.frame);
-      painted = geography.tiles;
+      painted = key;
     }
+    const district = cut == null ? null : whole(now);
+    const shared =
+      district == null
+        ? null
+        : fill(district, sum([...now.units.values()].map(expectedOf)));
     engine.paint(
       source,
       new Map(
         places.flatMap(
           (place): Array<[number, Record<string, string | boolean>]> => {
             const row = byArea.get(place.areaId);
-            const color = row == null ? null : fill(row);
+            const color = row == null ? null : (shared ?? fill(row));
             if (isLater) {
               return [[place.k, { later: true }]];
             }

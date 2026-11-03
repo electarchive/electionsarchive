@@ -4,8 +4,10 @@
     LiveEstimate,
     LiveRace,
   } from "@ea/analytics/live";
+  import { page } from "$app/state";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
   import {
     lead,
@@ -195,6 +197,13 @@
         >
       {/if}
       <BoardLink election={election.slug} />
+      {#if election.slug.split("/").length === 3}
+        <MapLink
+          election={election.slug}
+          state={election.slug.split("/")[1] ?? ""}
+          county={page.url.pathname.split("/").at(-1) ?? null}
+        />
+      {/if}
     </p>
     <h1 class="title text-balance">{name}</h1>
     {#if share != null}

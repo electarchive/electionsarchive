@@ -1,7 +1,13 @@
 import type { LiveElection } from "@ea/analytics/live";
 import { error } from "@sveltejs/kit";
 import { remember } from "#lib/server/cache.js";
-import { control, geography, house, states } from "#lib/server/live-board.js";
+import {
+  boxes,
+  control,
+  geography,
+  house,
+  states,
+} from "#lib/server/live-board.js";
 import { night } from "#lib/server/live-page.js";
 import type { PageServerLoad } from "./$types";
 
@@ -31,16 +37,27 @@ export const load: PageServerLoad = async ({ params }) => {
       states(election.date),
     ),
   ]);
-  if (segments.length === 2) {
-    const lower = Object.entries(nation?.codes ?? {}).flatMap(([key, id]) =>
-      OUTLYING.has(key) ? [] : [id],
-    );
-    const frame = await remember(`live:lower:v1:${election.date}`, async () =>
+  const lower = Object.entries(nation?.codes ?? {}).flatMap(([key, id]) =>
+    OUTLYING.has(key) ? [] : [id],
+  );
+  const [frame, framed] = await Promise.all([
+    remember(`live:lower:v1:${election.date}`, async () =>
       lower.length === 0
         ? null
         : ((await geography(lower, election.date, lower, false))?.frame ??
           null),
-    );
+    ),
+    remember(`live:boxes:v1:${election.date}`, async () =>
+      boxes(
+        [
+          ...Object.values(nation?.codes ?? {}),
+          ...Object.values(districts.codes),
+        ],
+        election.date,
+      ),
+    ),
+  ]);
+  if (segments.length === 2) {
     return {
       ...found,
       nationPath,
@@ -52,7 +69,9 @@ export const load: PageServerLoad = async ({ params }) => {
           ? null
           : { map: districts.map, codes: districts.codes },
       geography: null,
+      around: null,
       frame,
+      boxes: framed,
     };
   }
   const areas = [
@@ -66,11 +85,13 @@ export const load: PageServerLoad = async ({ params }) => {
       ),
     ),
   ];
-  const map = await remember(`live:full:v1:${election.slug}`, async () =>
+  const built = await remember(`live:full:v1:${election.slug}`, async () =>
     geography(areas, election.date),
   );
-  const ids = new Set(election.races.map((race) => race.id));
   const code = segments[1] ?? "";
+  const home = framed[nation?.codes[code] ?? ""];
+  const map = built == null || home == null ? built : { ...built, frame: home };
+  const ids = new Set(election.races.map((race) => race.id));
   const mine = Object.fromEntries(
     Object.entries(districts.codes).filter(([key]) =>
       key.startsWith(`${code}-`),
@@ -105,6 +126,24 @@ export const load: PageServerLoad = async ({ params }) => {
             codes: mine,
           },
     geography: map,
-    frame: null,
+    around:
+      nation == null
+        ? null
+        : {
+            tiles: nation.map.tiles,
+            places: nation.map.places.filter(
+              (place) => place.areaId !== nation.codes[code],
+            ),
+            codes: Object.fromEntries(
+              Object.entries(nation.codes).filter(([key]) => key !== code),
+            ),
+          },
+    frame,
+    boxes: Object.fromEntries(
+      [...Object.values(nation?.codes ?? {}), ...kept].flatMap((id) => {
+        const box = framed[id];
+        return box == null ? [] : [[id, box]];
+      }),
+    ),
   };
 };

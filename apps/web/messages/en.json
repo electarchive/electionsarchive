@@ -5814,5 +5814,7 @@
   "board_tile_body": "Pick the races you follow and watch them side by side on one screen.",
   "live_views_label": "Other ways to follow the results",
   "livemap_win_chance": "Chance to win",
-  "livemap_counted_share": "Share of the expected vote counted"
+  "livemap_counted_share": "Share of the expected vote counted",
+  "livemap_near_hint": "Click to see this state's results",
+  "livemap_up_hint": "Or click anywhere outside the state"
 }

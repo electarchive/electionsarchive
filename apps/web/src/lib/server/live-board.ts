@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import type { Geography } from "#lib/live/standing.js";
+import type { Geography, Pieces } from "#lib/live/standing.js";
 import { liveDb as db } from "#lib/server/db/index.js";
 import america from "#lib/server/hex/us-cd.json";
 import { plane, spot } from "#lib/server/plane.js";
@@ -123,6 +123,102 @@ export async function geography(
           ],
     ),
   };
+}
+
+export async function pieces(
+  clip: string,
+  date: string,
+  scheme: string,
+): Promise<Pieces | null> {
+  const found = await db.execute<{
+    pieces: Pieces["pieces"] | null;
+    edge: Pieces["edge"] | null;
+    veil: Pieces["veil"] | null;
+  }>(sql`
+    with edge as materialized (
+      select ST_MakeValid(g.geom) as geom from area a
+      join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
+      where a.id = ${clip}::uuid and a.scheme_code not in ('us.state', 'us.county')
+      order by g.valid_from desc nulls last limit 1
+    ),
+    picked as materialized (
+      select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
+      from edge e join area_geometry g on g.geom && e.geom and g.valid @> ${date}::date
+      join area a on a.id = g.area_id and a.scheme_code = ${scheme}
+      order by a.id, g.valid_from desc nulls last
+    ),
+    cut as materialized (
+      select p.id, p.k, p.scheme, ST_Area(p.geom) as whole, ST_Area(e.geom) as clip,
+        ST_CollectionExtract(ST_Intersection(ST_MakeValid(ST_ClipByBox2D(p.geom, e.geom)), e.geom), 3) as geom
+      from picked p cross join edge e
+    ),
+    planed as materialized (
+      select id, k, ${plane("geom", "scheme")} as geom from cut
+      where not ST_IsEmpty(geom) and ST_Area(geom) >= 0.004 * least(whole, clip)
+    ),
+    thin as materialized (
+      select id, k, ST_CollectionExtract(ST_ReducePrecision(ST_MakeValid(
+        ST_Transform(ST_SetSRID(ST_CoverageSimplify(geom, t) over (), 3857), 4326)
+      ), 0.00001), 3) as geom
+      from (select id, k, geom, sqrt(sum(ST_Area(geom)) over ()) / 1500 as t from planed) q
+    ),
+    whole as materialized (
+      select ST_UnaryUnion(ST_Collect(ST_MakeValid(geom))) as geom from thin
+    )
+    select
+      (select json_agg(json_build_object(
+        'areaId', id, 'k', k,
+        'at', json_build_array(round(ST_X(p)::numeric, 5), round(ST_Y(p)::numeric, 5)),
+        'shape', ST_AsGeoJSON(ST_Multi(geom), 5)::json -> 'coordinates'
+      )) from thin cross join lateral (select ST_PointOnSurface(geom) as p) s where not ST_IsEmpty(geom)) as pieces,
+      (select ST_AsGeoJSON(ST_Multi(ST_Boundary(geom)), 5)::json -> 'coordinates' from whole) as edge,
+      (select ST_AsGeoJSON(ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeEnvelope(-180, -85, 180, 85, 4326), geom), 3)), 5)::json -> 'coordinates' from whole) as veil
+  `);
+  const row = found.rows[0];
+  return row?.pieces == null || row.pieces.length === 0
+    ? null
+    : { pieces: row.pieces, edge: row.edge ?? [], veil: row.veil ?? [] };
+}
+
+export async function boxes(areaIds: Array<string>, date: string) {
+  if (areaIds.length === 0) {
+    return {};
+  }
+  const found = await db.execute<{
+    id: string;
+    west: number | null;
+    south: number | null;
+    east: number | null;
+    north: number | null;
+  }>(sql`
+    select x.id, st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+    from (
+      select a.id, ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+      from area_geometry g join area a on a.id = g.area_id
+      where g.area_id = any(${sql.param(areaIds)}::uuid[]) and g.valid @> ${date}::date
+      group by a.id
+    ) x
+  `);
+  return Object.fromEntries(
+    found.rows.flatMap((row) =>
+      row.west == null ||
+      row.south == null ||
+      row.east == null ||
+      row.north == null
+        ? []
+        : [
+            [
+              row.id,
+              {
+                west: row.west,
+                south: row.south,
+                east: row.east,
+                north: row.north,
+              },
+            ],
+          ],
+    ),
+  );
 }
 
 export async function states(date: string) {
