@@ -12930,27 +12930,33 @@ async function universe(
   );
   return rows.length === found.rows.length
     ? rows
-    : remember(`below:${area}:${level}:${day}`, async () => {
-        const below = await db.execute<{
-          id: string;
-          k: number;
-          held: boolean;
-          outside: boolean;
-          pending: boolean;
-        }>(sql`
-          with recursive down(id, k, scheme, depth) as (
-            select ${area}::uuid, 0, ''::text, 0
-            union all
-            select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
-            join area a on a.id = p.area_id
-            where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
-          )
-          select distinct id, k, true as held, false as outside, false as pending from down
-          where depth > 0 and scheme = ${level}
-            and exists (select from area_geometry g where g.area_id = down.id and g.valid @> ${day}::date)
-        `);
-        return below.rows;
-      });
+    : remember(
+        `below:${area}:${level}:${day}`,
+        async () => {
+          const below = await db.execute<{
+            id: string;
+            k: number;
+            held: boolean;
+            outside: boolean;
+            pending: boolean;
+          }>(sql`
+            with recursive down(id, k, scheme, depth) as (
+              select ${area}::uuid, 0, ''::text, 0
+              union all
+              select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+              join area a on a.id = p.area_id
+              where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
+            )
+            select distinct id, k, true as held, false as outside, false as pending from down
+            where depth > 0 and scheme = ${level}
+              and exists (select from area_geometry g where g.area_id = down.id and g.valid @> ${day}::date)
+          `);
+          return below.rows;
+        },
+        false,
+        undefined,
+        true,
+      );
 }
 
 const framed = new Map<string, ReturnType<typeof framing>>();

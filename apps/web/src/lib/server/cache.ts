@@ -325,10 +325,11 @@ export async function remember<T>(
   compute: () => Promise<T>,
   isStrict = false,
   generation = GENERATION,
+  isNeutral = false,
 ) {
   const isRefresh = isStrict || refreshing.getStore() === true;
   const locale = getLocale();
-  const isBase = locale === baseLocale;
+  const isBase = isNeutral || locale === baseLocale;
   const key = isBase ? shared : `${locale}|${shared}`;
   const slot = `c:${generation}:${key}`;
   const run = isBase
