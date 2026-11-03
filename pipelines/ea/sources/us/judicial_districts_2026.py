@@ -23,6 +23,11 @@ PUBLISHERS = {
     "www.nvsos.gov": ("Nevada Secretary of State", "2026 General Election: Statewide Certified List of Candidates"),
     "www.sos.mo.gov": ("Missouri Secretary of State", "2026 General Election Certification of Candidates"),
     "web.sos.ky.gov": ("Kentucky Secretary of State", "Candidate Filings, 2026 General Election"),
+    "sos.ks.gov": ("Kansas Secretary of State", "2026 General Election Candidate List"),
+    "knowyourjudges.utah.gov": (
+        "Utah Judicial Performance Evaluation Commission",
+        "Judges Standing for Retention in 2026",
+    ),
 }
 PAGES = {
     "13": "Commonwealth's Attorney",
