@@ -90,7 +90,10 @@
 
 <main class="pbe-72 sm:pbe-56">
   <Night
-    data={{ ...data, shown: { results: true, forecasts: true } }}
+    data={{
+      ...data,
+      shown: { results: true, forecasts: true, classic: false },
+    }}
     {election}
     {estimates}
     {clock}

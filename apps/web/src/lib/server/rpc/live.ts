@@ -457,6 +457,9 @@ const STATEWIDE = [
   "attorney-general",
   "secretary-of-state",
 ];
+
+type Shown = { results: boolean; forecasts: boolean; classic: boolean };
+
 const done = new Map<
   string,
   { key: string; value: Awaited<ReturnType<typeof night>> }
@@ -470,16 +473,22 @@ const pending = new Map<
   { key: string; value: Promise<Awaited<ReturnType<typeof night>>> }
 >();
 
-async function switches() {
-  if ((await roles(getRequestEvent().locals.user?.id)).admin) {
-    return { results: true, forecasts: true };
-  }
-  const result = await db.execute<{ results: boolean; forecasts: boolean }>(sql`
+async function stored() {
+  const result = await db.execute<Shown>(sql`
     select coalesce(bool_or(shown) filter (where name = 'results'), false) as results,
-      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts
+      coalesce(bool_or(shown) filter (where name = 'forecasts'), false) as forecasts,
+      coalesce(bool_or(shown) filter (where name = 'classic'), false) as classic
     from live.switch
   `);
-  return result.rows[0] ?? { results: false, forecasts: false };
+  return result.rows[0] ?? { results: false, forecasts: false, classic: false };
+}
+
+async function switches() {
+  const [found, role] = await Promise.all([
+    stored(),
+    roles(getRequestEvent().locals.user?.id),
+  ]);
+  return role.admin ? { ...found, results: true, forecasts: true } : found;
 }
 
 function office(seat: string): LiveOffice {
@@ -850,7 +859,7 @@ async function night(
   found: { id: string; path: string; date: string; rest: string },
   picked: Array<{ id: string; path: string; district: string | null }>,
   detail: "race" | "state" | "national",
-  shown: { results: boolean; forecasts: boolean },
+  shown: Shown,
   called: Awaited<ReturnType<typeof calls>>,
 ) {
   const contests = picked.map((row) => row.id);
@@ -1307,6 +1316,7 @@ async function night(
           })()
         : null,
       source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
+      isClassic: shown.classic,
       feed:
         mine.length > 0 || final.length > 0
           ? "live"
@@ -1382,7 +1392,7 @@ export async function projections(path: string) {
     found,
     picked,
     found.path.split("/").length === 2 ? "national" : "state",
-    { results: true, forecasts: true },
+    { ...(await stored()), results: true, forecasts: true },
     await calls(contests),
   );
 }
@@ -1412,7 +1422,7 @@ export const live = {
         switches(),
         calls(picked.map((row) => row.id)),
       ]);
-      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${found.path}|${found.rest}`;
+      const slot = `${String(shown.results)}|${String(shown.forecasts)}|${String(shown.classic)}|${found.path}|${found.rest}`;
       const key = shown.results
         ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
         : "";
