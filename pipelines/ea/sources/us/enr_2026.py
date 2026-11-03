@@ -1237,6 +1237,7 @@ def plan(
         held: dict[UUID, tuple[UUID | None, datetime]] = {}
         statewide: set[UUID] = set()
         judicial: set[UUID] = set()
+        federal: dict[UUID, set[str]] = {}
         for key, id, area, recorded, kind in conn.execute(
             """select x.value, x.entity_id, c.district_area_id, c.recorded_from, p.kind
                from external_id x
@@ -1248,7 +1249,9 @@ def plan(
                where x.scheme = 'us.contest' and x.value like %s""",
             [f"{DAY}:{state}:%"],
         ).fetchall():
-            if not re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
+            if re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
+                federal.setdefault(id, set())
+            else:
                 published.setdefault(id, ([], set()))[0].append(key)
                 held[id] = (area, recorded)
                 if kind in ("federal_unit", "judicial_district"):
@@ -1262,10 +1265,10 @@ def plan(
                where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)
                  and (o.kind = 'answer' or not exists (
                    select from contest_option a where a.contest_id = o.contest_id and a.kind = 'answer' and a.parent_option_id is null))""",
-            [list(published)],
+            [list(published) + list(federal)],
         ).fetchall():
             if not WRITE_IN.search(label):
-                published[contest][1].add(person(label))
+                (federal[contest] if contest in federal else published[contest][1]).add(person(label))
         seats: dict[UUID, tuple[str, str]] = {}
         for contest, text in conn.execute(
             "select entity_id, text from name where entity_id = any(%s)", [list(published)]
@@ -1354,8 +1357,7 @@ def plan(
                     parts = re.split(r"[:-]", key)[2:]
                     tokens = titles.get(contest, set()) | set(parts) | {a + b for a, b in itertools.pairwise(parts)}
                     found = words & tokens
-                    if not found - GENERIC:
-                        found |= {w for w in words if stem(w) in {stem(t) for t in tokens}}
+                    found |= {w for w in words if stem(w) in {stem(t) for t in tokens}}
                     scored.append(
                         (
                             round(overlap, 2),
@@ -1380,7 +1382,7 @@ def plan(
                 kept = [
                     hit for hit in best if numbers & (titles.get(hit[3], set()) | set(re.split(r"[:-]", hit[4])[2:]))
                 ]
-                if len(kept) == 1:
+                if len(kept) == 1 or not kept:
                     best = kept
             if len(best) > 1:
                 homes = {codes.get((FIPS[state], plain(place)), place) for place in places}
@@ -1444,10 +1446,15 @@ def plan(
                 not wide
                 and people - {"yes", "no"}
                 and any(
-                    contest in statewide
-                    and not re.search(r"judge|justice|court", keys[0])
-                    and len(people & wanted) >= 0.6 * len(people | wanted)
-                    for contest, (keys, wanted) in published.items()
+                    len(people & wanted) >= 0.6 * len(people | wanted)
+                    for wanted in itertools.chain(
+                        federal.values(),
+                        (
+                            wanted
+                            for contest, (keys, wanted) in published.items()
+                            if contest in statewide and not re.search(r"judge|justice|court", keys[0])
+                        ),
+                    )
                 )
             ):
                 continue
