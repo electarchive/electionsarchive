@@ -85,7 +85,7 @@
 {/snippet}
 
 {#snippet picker()}
-  <Command.Root value={value ?? ""} loop>
+  <Command.Root value={value ?? ""} loop disableInitialScroll>
     <Command.Input placeholder={search} />
     <Command.List
       class="in-data-[slot=drawer-content]:max-h-[60dvh]"
