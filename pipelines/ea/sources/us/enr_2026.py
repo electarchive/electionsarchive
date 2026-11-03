@@ -1326,6 +1326,7 @@ def plan(
                     re.fullmatch(r"\d{5}|\d{10}", segment)
                     and (len(places) != 1 or codes.get((FIPS[state], plain(places[0])), places[0]) != segment[:5])
                     and not (named and named <= words)
+                    and "regional-superintendent" not in key
                     or people <= {"yes", "no"}
                     and ":measure:" in key
                     and named
@@ -1406,7 +1407,7 @@ def plan(
                 for w in slug(spelled).split("-")
                 if w not in STOP
             }
-            retention = state == "IL" and bool(re.search(r"^retain\b|\bjudge retention\b", name, re.IGNORECASE))
+            retention = state == "IL" and bool(re.search(r"^retain\b|^retention\b|\bjudge retention\b", name, re.IGNORECASE))
             if retention:
                 words = set(terms(name)[-1:])
             wide = office == "state" or bool(APPEALS.search(name)) or retention
