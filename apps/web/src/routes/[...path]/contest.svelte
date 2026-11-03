@@ -1968,13 +1968,24 @@
     </div>
   {/snippet}
   {#snippet crowns()}
-    {#if crowned != null}
-      <Crowns
-        maps={crowned.maps}
-        since={crowned.since}
-        year={contest.election.date?.slice(0, 4) ?? ""}
-      />
-    {/if}
+    {#await crowned}
+      <div
+        class="aspect-3/2 rounded-sm bg-muted ring-1 ring-border inline-full max-block-[min(38rem,70svh)] motion-safe:animate-pulse"
+        role="status"
+        aria-busy="true"
+        aria-label={m.preview_loading()}
+      ></div>
+    {:then found}
+      {#if found == null}
+        {@render missing()}
+      {:else}
+        <Crowns
+          maps={found.maps}
+          since={found.since}
+          year={contest.election.date?.slice(0, 4) ?? ""}
+        />
+      {/if}
+    {/await}
   {/snippet}
   {#snippet hemicycle()}
     <Seats

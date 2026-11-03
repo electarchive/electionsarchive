@@ -1319,18 +1319,31 @@ export async function archive(path: string, search: URLSearchParams) {
         sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
       )
     ).rows[0]?.id;
-    const [crowned, sameDay] =
+    const [{ value: crowned }, sameDay] =
       parent == null
-        ? [null, null]
+        ? [{ value: null }, null]
         : await Promise.all([
-            contest.kind === "body_seats" &&
-            unit === "" &&
-            (contest.places?.rows.length ?? 0) === 0
-              ? call(router.elections.winners, {
-                  id: parent,
-                  contest: slug.entity_id,
-                })
-              : null,
+            soon(
+              contest.kind === "body_seats" &&
+                unit === "" &&
+                (contest.places?.rows.length ?? 0) === 0
+                ? capped(
+                    call(router.elections.winners, {
+                      id: parent,
+                      contest: slug.entity_id,
+                    })
+                      .then((found) =>
+                        found.maps.length === 0
+                          ? null
+                          : {
+                              maps: found.maps,
+                              since: found.before?.date.slice(0, 4) ?? null,
+                            },
+                      )
+                      .catch(() => null),
+                  )
+                : Promise.resolve(null),
+            ),
             call(router.elections.races, {
               id: parent,
               contest: slug.entity_id,
@@ -1358,13 +1371,7 @@ export async function archive(path: string, search: URLSearchParams) {
       match,
       within,
       standing: standing(),
-      crowned:
-        crowned == null || crowned.maps.length === 0
-          ? null
-          : {
-              maps: crowned.maps,
-              since: crowned.before?.date.slice(0, 4) ?? null,
-            },
+      crowned,
       sameDay,
     };
   }

@@ -14,7 +14,7 @@
     focus = $bindable(null),
   }: {
     maps: NonNullable<
-      Extract<PageData, { kind: "contest" }>["crowned"]
+      Awaited<Extract<PageData, { kind: "contest" }>["crowned"]>
     >["maps"];
     hexes?: ComponentProps<typeof PlaceMap>["hexes"];
     since: string | null;
