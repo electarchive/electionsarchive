@@ -4,6 +4,8 @@ from collections import Counter, defaultdict
 from collections.abc import Callable
 from uuid import UUID
 
+from psycopg import sql
+
 from ea.changeset import Changeset, slug
 from ea.store import Connection
 
@@ -75,6 +77,40 @@ def merge(text: str, ballot: str) -> str:
     return "".join(out)
 
 
+def restage(cs: Changeset, pipeline: str) -> int:
+    restore = restorer(cs.conn)
+    count = 0
+    for table, column in (("contest_option", "ballot_label"), ("candidacy", "ballot_name")):
+        columns = [
+            attribute
+            for (attribute,) in cs.conn.execute(
+                """select attname from pg_attribute
+                   where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
+                     and attidentity = '' and attname not in ('changeset_id', 'recorded_from')""",
+                [f"public.{table}"],
+            ).fetchall()
+        ]
+        staged = {str(row.get("id")) for row in cs.rows.get(table, [])}
+        for row in cs.conn.execute(
+            sql.SQL(
+                """select {columns} from public.{table} t join changeset c on c.id = t.changeset_id
+                   where c.pipeline = %s and (strpos(t.{column}, chr(65533)) > 0 or strpos(t.{column}, %s) > 0)"""
+            ).format(
+                columns=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(name)) for name in columns),
+                table=sql.Identifier(table),
+                column=sql.Identifier(column),
+            ),
+            [pipeline, DOUBLED],
+        ).fetchall():
+            values = dict(zip(columns, row, strict=True))
+            fixed = restore(str(values[column]))
+            if GARBLED in fixed or str(values["id"]) in staged:
+                continue
+            cs.add(table, **{**values, column: fixed})
+            count += 1
+    return count
+
+
 def repair(cs: Changeset, reason: str = REASON) -> int:
     texts: dict[UUID, set[str]] = defaultdict(set)
     for row in cs.rows.get("candidacy", []):
@@ -119,16 +155,15 @@ def repair(cs: Changeset, reason: str = REASON) -> int:
             if GARBLED in old:
                 words[old.lower()] = new
         cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason=reason)
-        survivor = cs.survivors.get(entity, entity)
-        if (survivor, fixed, lang, kind) not in held:
-            held.add((survivor, fixed, lang, kind))
+        if (entity, fixed, lang, kind) not in held:
+            held.add((entity, fixed, lang, kind))
             cs.add(
                 "name",
-                entity_id=survivor,
+                entity_id=entity,
                 text=fixed,
                 lang=lang,
                 kind=kind,
-                is_preferred=preferred and survivor == entity,
+                is_preferred=preferred,
                 valid_from=start,
                 valid_to=end,
             )
