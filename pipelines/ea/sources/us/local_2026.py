@@ -8444,7 +8444,8 @@ def parse() -> None:
             )
 
     def in_title(text: str) -> str:
-        return re.sub(r"\s+", " ", re.sub(r"\(\d+ seats?\)", "", text)).strip().lower()
+        text = re.sub(r"\(\d+ seats?\)|\([A-Za-z ]+\)$", "", text).lower()
+        return re.sub(r"\s+", " ", re.sub(r"\b(?:members?|town)\b|[-,.]", " ", text)).strip()
 
     in_seats: dict[str, tuple[int, str] | None] = {}
     for category in IN_ENR_CATEGORIES:
