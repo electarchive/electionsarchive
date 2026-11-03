@@ -4,6 +4,7 @@
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { slateLine } from "#lib/slate.js";
   import type { PageData } from "./$types";
   import Balance from "./balance.svelte";
 
@@ -20,11 +21,17 @@
   } = $props();
 
   const uid = $props.id();
-  const STATES = {
-    scheduled: m.slate_scheduled,
-    counting: m.slate_counting,
-    unreported: m.slate_unreported,
-  };
+  let now = $state(Date.now());
+
+  $effect(() => {
+    now = Date.now();
+    const timer = setInterval(() => {
+      now = Date.now();
+    }, 30_000);
+    return () => {
+      clearInterval(timer);
+    };
+  });
 </script>
 
 <section
@@ -36,7 +43,7 @@
       {m.slate_title()}
     </h2>
     <p class="text-sm text-pretty text-muted-foreground">
-      {STATES[slate.state]({ date: date(held) })}
+      {slateLine(held, slate.closes, now)}
     </p>
   </div>
   {#if slate.isUnqualified}

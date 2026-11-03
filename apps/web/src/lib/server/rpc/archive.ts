@@ -19,6 +19,7 @@ import path from "node:path";
 import * as v from "valibot";
 import type { Prose } from "#lib/contrib.js";
 import { natural } from "#lib/format.js";
+import { pollsClose } from "#lib/live/closes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
@@ -6861,7 +6862,7 @@ export const contests = {
         ),
         slate: v.nullable(
           v.object({
-            state: v.picklist(["scheduled", "counting", "unreported"]),
+            closes: v.nullable(v.string()),
             isUnqualified: v.boolean(),
             options: v.array(
               v.object({
@@ -7886,7 +7887,6 @@ export const contests = {
         ),
         contest.date,
       );
-      const today = new Date().toISOString().slice(0, 10);
       const scopePath = path == null ? null : [path, ...unit].join("/");
       const stops = [
         ...ancestors.rows.map((row) => row.area),
@@ -8030,14 +8030,7 @@ export const contests = {
           !isUnqualified && listed.rows.length === 0
             ? null
             : {
-                state:
-                  contest.date != null && contest.date > today
-                    ? ("scheduled" as const)
-                    : contest.date != null &&
-                        Date.parse(today) - Date.parse(contest.date) <
-                          90 * 86_400_000
-                      ? ("counting" as const)
-                      : ("unreported" as const),
+                closes: pollsClose(path, contest.date),
                 isUnqualified,
                 options: listed.rows.map((row) => ({
                   key: String(row.k),
@@ -9243,7 +9236,9 @@ export const contests = {
       }
       if (current == null) {
         const candidates =
-          page.slate?.state === "scheduled" &&
+          page.slate != null &&
+          contest.date != null &&
+          Date.parse(contest.date) > Date.now() - 90 * 86_400_000 &&
           previous != null &&
           previous.series === contest.series
             ? comparable.filter(

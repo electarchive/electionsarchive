@@ -63,6 +63,7 @@ import {
 } from "#lib/server/pages.js";
 import { isProject, project } from "#lib/server/project.js";
 import { router } from "#lib/server/rpc/router.js";
+import { slateLine } from "#lib/slate.js";
 import { comeback, recordLede, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
@@ -5932,11 +5933,7 @@ function resultsMarkdown(
   }
   if (contest.current == null && contest.slate != null) {
     return [
-      {
-        scheduled: m.slate_scheduled,
-        counting: m.slate_counting,
-        unreported: m.slate_unreported,
-      }[contest.slate.state]({ date: date(contest.election.date) }),
+      slateLine(contest.election.date, contest.slate.closes, Date.now()),
       "",
       ...(contest.slate.isUnqualified ? [m.slate_unqualified()] : []),
       ...contest.slate.options.map((option) => {
