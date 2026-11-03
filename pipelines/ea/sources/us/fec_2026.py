@@ -1247,8 +1247,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         race = ""
         for row in cells(path.read_text(errors="replace")):
             filled = [cell for cell in row if cell]
-            if len(filled) == 1 and re.search(r"\(\d+\) Positions?$", filled[0]):
-                race = re.sub(r"\s+\d+ Year Term.*$|\s+\(\d+\) Positions?$", "", filled[0])
+            if len(filled) == 1 and re.search(r"\(\d+\) Positions?(?: Files In .+ County)?$", filled[0]):
+                race = re.sub(r"\s+\d+ Year Term.*$|\s+\(\d+\) Positions?(?: Files In .+ County)?$", "", filled[0])
             elif race and len(filled) >= 4 and re.fullmatch(r"\d\d/\d\d/\d{4}", filled[-2]):
                 if len(filled) == 5:
                     continue
@@ -2482,7 +2482,7 @@ def emit() -> Path:
                from external_id x
                join contest_option op on op.contest_id = x.entity_id
                join changeset c on c.id = op.changeset_id and c.pipeline = %s
-               left join candidacy cy on cy.option_id = op.id
+               left join candidacy cy on cy.option_id = op.id and cy.role is distinct from 'running_mate'
                where x.scheme = 'us.contest' and x.value like %s
                  and not exists (select from entity_retirement r where r.entity_id = op.id)""",
             [SOURCE, f"{DAY}:%"],
