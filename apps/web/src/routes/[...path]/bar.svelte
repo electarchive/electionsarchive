@@ -38,11 +38,12 @@
   const tether = TooltipPrimitive.createTether<string>();
   const present = $derived(parts.filter((part) => part.value > 0));
   const order = $derived.by(() => {
-    const shown = present
+    const all = present;
+    const shown = all
       .toSorted((a, b) => b.value - a.value)
       .slice(0, 2)
-      .toSorted((a, b) => parts.indexOf(a) - parts.indexOf(b));
-    const between = present.filter((part) => !shown.includes(part));
+      .toSorted((a, b) => all.indexOf(a) - all.indexOf(b));
+    const between = all.filter((part) => !shown.includes(part));
     const tiny = between.filter(
       (part) => part.value / Math.max(total, Number.EPSILON) < 0.004,
     );
