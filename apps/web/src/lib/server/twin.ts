@@ -63,6 +63,7 @@ import {
   person,
   results,
 } from "#lib/server/pages.js";
+import { jsonPage, markdownPages } from "#lib/server/paging.js";
 import { isProject, project } from "#lib/server/project.js";
 import { router } from "#lib/server/rpc/router.js";
 import { site } from "#lib/server/site.js";
@@ -625,11 +626,14 @@ export async function twin(
             ? { ...data, crowned: undefined }
             : data;
       return Response.json(
-        ledger?.places != null
-          ? { ...plain, ledger }
-          : winners != null && winners.rows.length > 0
-            ? { ...plain, winners: { ...winners, maps: undefined } }
-            : plain,
+        jsonPage(
+          ledger?.places != null
+            ? { ...plain, ledger }
+            : winners != null && winners.rows.length > 0
+              ? { ...plain, winners: { ...winners, maps: undefined } }
+              : plain,
+          url,
+        ),
         { headers },
       );
     }
@@ -641,13 +645,40 @@ export async function twin(
       const [route = "", query] = path.split("?", 2);
       return `[${name}](${url.origin}/${route}.md${query == null ? "" : `?${query}`})`;
     };
+    const pages = markdownPages(
+      markdown(data, link, url.origin, ledger, winners),
+    );
+    const at = Number(url.searchParams.get("page") ?? 1);
+    const text = Number.isSafeInteger(at) ? pages[at - 1] : undefined;
+    if (text == null) {
+      error(404);
+    }
+    const next = new URL(`${base}.md${url.search}`);
+    next.searchParams.set("page", String(at + 1));
+    const footer =
+      pages.length === 1
+        ? []
+        : [
+            at < pages.length
+              ? m.twin_page_next({
+                  page: count(at),
+                  pages: count(pages.length),
+                  next: next.href,
+                })
+              : m.twin_page_last({
+                  page: count(at),
+                  pages: count(pages.length),
+                }),
+          ];
     return new Response(
-      `${markdown(data, link, url.origin, ledger, winners).join("\n\n")}\n\n${m.twin_alternates(
-        {
+      `${[
+        text,
+        ...footer,
+        m.twin_alternates({
           html: `${url.origin}${pathname}${url.search}`,
           json: `${base}.json${url.search}`,
-        },
-      )}\n`,
+        }),
+      ].join("\n\n")}\n`,
       { headers },
     );
   } catch (error_) {
