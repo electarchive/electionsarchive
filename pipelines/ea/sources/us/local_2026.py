@@ -21,7 +21,7 @@ import polars as pl
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
 from ea.offices import Offices
-from ea.sources.us import cog, govmint, ky_ballots, mn_local
+from ea.sources.us import cog, govmint, ia_districts_2026, ky_ballots, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
@@ -2295,6 +2295,16 @@ for county, url in {
         url,
         f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton', 'St. Lawrence') else 'pdf'}",
     )
+for _line in Path(__file__).with_name("local_2026_nov3_ia.tsv").read_text().splitlines()[1:]:
+    _key, _county = _line.split("\t")[0], _line.split("\t")[5]
+    if _key not in NE_SOURCES and _county in ia_districts_2026.COUNTIES:
+        _stem, _url, _publisher = ia_districts_2026.COUNTIES[_county]
+        NE_SOURCES[_key] = (
+            _publisher,
+            "Candidate list or sample ballot, General Election November 3, 2026",
+            _url,
+            f"ia/counties/{next(ia_districts_2026.INBOX.glob(_stem + '.*')).name}",
+        )
 for fips, county in {
     "32001": "Churchill",
     "32005": "Douglas",
