@@ -5033,6 +5033,7 @@
   "night_explorer_empty": "No race matches these filters.",
   "night_explorer_independent": "Independent",
   "night_tip_held": "Held by {party}: {name}",
+  "night_holder_vacant": "vacant, last held by {name}",
   "seatflow_rounds_title": "How the seats were decided",
   "seatflow_votes_title": "Constituency vote and list vote",
   "seatflow_both": "Both rounds",

@@ -127,7 +127,7 @@ export async function livePage(path: string, at: string | null) {
         )
       : null,
     isNation
-      ? remember(`live:control:v1:${election.date}`, async () =>
+      ? remember(`live:control:v2:${election.date}`, async () =>
           control(election.races, election.date),
         )
       : null,
