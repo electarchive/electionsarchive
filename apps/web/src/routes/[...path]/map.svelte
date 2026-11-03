@@ -1702,6 +1702,20 @@
     }),
   );
   const anchor = untrack(() => (typeof shading === "number" ? shading : null));
+  const painted = $derived(
+    new Map(
+      places.legend.flatMap((item, index) =>
+        item.party == null || colors[index] == null
+          ? []
+          : [[item.party, colors[index]] as const],
+      ),
+    ),
+  );
+  const declare = (
+    declared: { color: string | null; party: string | null } | null | undefined,
+  ) =>
+    painted.get(declared?.party ?? "") ??
+    swatch(declared?.color, `party:${declared?.party}`);
   const parties = $derived(
     (isTally ? [] : places.legend)
       .map((item, index) => ({ index, name: names[index] ?? item.label }))
@@ -2017,7 +2031,7 @@
           result.push([
             row.k,
             read(
-              `color-mix(in oklab, ${swatch(row.declared.color, `party:${row.declared.party}`)} 100%, var(--map-low))`,
+              `color-mix(in oklab, ${declare(row.declared)} 100%, var(--map-low))`,
             ),
           ]);
         }
@@ -5066,7 +5080,7 @@
       <span
         class="flex items-center gap-2 text-[0.8125rem]"
         style:--party={current.leader == null
-          ? swatch(current.declared?.color, `party:${current.declared?.party}`)
+          ? declare(current.declared)
           : colors[current.leader]}
       >
         <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>

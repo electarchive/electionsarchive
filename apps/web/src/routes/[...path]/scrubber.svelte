@@ -102,6 +102,11 @@
     party == null
       ? swatch(null, "")
       : swatch(parties.get(party)?.color ?? null, `party:${party}`);
+  const paint = (item: {
+    color: string | null;
+    key: string;
+    party: string | null;
+  }) => swatch(parties.get(item.party ?? "")?.color ?? item.color, item.key);
 
   const own = $derived(
     (record?.series ?? []).filter((series) => !series.isAbroad),
@@ -370,7 +375,7 @@
           .map((row) => ({
             key: row.key,
             label: row.person == null ? (row.short ?? row.label) : row.label,
-            color: swatch(row.color, row.key),
+            color: paint(row),
             value: row.votes,
             person: row.person,
             party: row.party,
@@ -391,7 +396,7 @@
         .map((row) => ({
           key: row.key,
           label: row.person == null ? (row.short ?? row.label) : row.label,
-          color: swatch(row.color, row.key),
+          color: paint(row),
           value: isSeated ? (row.seats ?? 0) : row.share,
           person: row.person,
           party: row.party,
@@ -684,9 +689,7 @@
               <PlaceMap
                 {places}
                 isFinal
-                colors={places.legend.map((item) =>
-                  swatch(item.color, item.key),
-                )}
+                colors={places.legend.map(paint)}
                 tiles={race.map.tiles}
                 hexes={view?.hexes ?? null}
                 own={race.map.own}
@@ -719,9 +722,7 @@
             <PlaceMap
               places={drawn.places}
               isTally
-              colors={drawn.places.legend.map((item) =>
-                swatch(item.color, item.key),
-              )}
+              colors={drawn.places.legend.map(paint)}
               tiles={drawn.tiles}
               own={null}
               frame={drawn.frame}
