@@ -124,15 +124,17 @@
                   >
                 {/if}
               </span>
-              <span
-                class="truncate text-xs text-muted-foreground max-inline-full"
-                >{#if option?.party == null}{m.night_no_party()}{:else}<Name
-                    label={option.party.name}
-                    party={option.party.id}
-                    color={option.party.color}
-                    hasSwatch={false}
-                  />{/if}</span
-              >
+              {#if option?.isAnswer !== true}
+                <span
+                  class="truncate text-xs text-muted-foreground max-inline-full"
+                  >{#if option?.party == null}{m.night_no_party()}{:else}<Name
+                      label={option.party.name}
+                      party={option.party.id}
+                      color={option.party.color}
+                      hasSwatch={false}
+                    />{/if}</span
+                >
+              {/if}
             </span>
           </span>
           <span
@@ -292,14 +294,16 @@
               label={option?.label ?? ""}
               person={option?.person ?? null}
               hasSwatch={false}
-            /><span class="text-muted-foreground">
-              · {#if option?.party == null}{m.night_no_party()}{:else}<Name
-                  label={option.party.short}
-                  party={option.party.id}
-                  color={option.party.color}
-                  hasSwatch={false}
-                />{/if}</span
-            ></span
+            />{#if option?.isAnswer !== true}<span
+                class="text-muted-foreground"
+              >
+                · {#if option?.party == null}{m.night_no_party()}{:else}<Name
+                    label={option.party.short}
+                    party={option.party.id}
+                    color={option.party.color}
+                    hasSwatch={false}
+                  />{/if}</span
+              >{/if}</span
           >
           <span class="font-figures text-muted-foreground tabular-nums"
             >{count(now.totals[index] ?? 0)}</span
