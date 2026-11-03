@@ -240,6 +240,7 @@ export const tonight = {
                     majority: view.majority,
                     up: picked.length,
                     waiting: view.waiting,
+                    noLiveFeed: view.later,
                     sides: [
                       tally("left", pairing[0].short),
                       tally("right", pairing[1].short),

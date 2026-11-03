@@ -290,8 +290,11 @@ export function chamber(
     tallies[key(id === "" ? null : id)].holdover += amount;
   }
   let waiting = 0;
+  let later = 0;
   for (const entry of seats) {
-    if (entry.side == null || entry.summary.total === 0) {
+    if (entry.rating === "later") {
+      later += 1;
+    } else if (entry.side == null || entry.summary.total === 0) {
       waiting += 1;
     } else if (entry.rating === "won") {
       tallies[key(entry.side)].won += 1;
@@ -340,6 +343,7 @@ export function chamber(
     majority,
     tallies,
     waiting,
+    later,
     pmf: leftPmf,
     range: [quantile(leftPmf, 0.1), quantile(leftPmf, 0.9)] as const,
     expected: { left: expectedLeft, right: expectedRight },

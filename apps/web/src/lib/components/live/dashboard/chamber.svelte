@@ -239,6 +239,15 @@
           >{m.night_nation_waiting()}</span
         >
       {/if}
+      {#if view.later > 0}
+        <span
+          class={cn(
+            "font-figures text-sm leading-none font-semibold tabular-nums",
+            { "mbs-1.5": view.waiting > 0 },
+          )}>{view.later}</span
+        >
+        <span class="text-xs text-muted-foreground">{m.night_later_key()}</span>
+      {/if}
     </p>
     <p class="grid justify-items-end">
       <span class="text-xs font-semibold" style:color={right.color}
