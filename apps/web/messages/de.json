@@ -64,7 +64,7 @@
   "about_lede": "Elections Archive ist ein kostenloses Archiv von Wahlergebnissen. Es umfasst die Wahlen jedes Landes, von der ersten bis zur jüngsten. Es reicht bis zur feinsten Einheit, die die amtliche Zählung ausweist.",
   "about_holds_title": "Was das Archiv enthält",
   "about_holds_body": "Das Archiv deckt zehn Länder und die Europäische Union ab: die Vereinigten Staaten, das Vereinigte Königreich, die Schweiz, Kanada, Türkiye, Italien, Deutschland, Frankreich, Irland und Brasilien. Es reicht in den Vereinigten Staaten bis 1787 zurück, im Vereinigten Königreich bis 1832 und in der Schweiz bis 1848. Wo das amtliche Ergebnis so detailliert vorliegt, reicht es bis hinunter zu Wahlbezirken, Wahllokalen und Wahlurnen.\n\nDie Tiefe variiert je nach Land und Jahr. Die [Abdeckungsseite](/coverage) vergleicht jedes Land mit einer externen Übersicht seiner Wahlen und listet auf, was noch fehlt.",
-  "about_promises_title": "Unsere Versprechen",
+  "about_promises_title": "Selbstverpflichtungen",
   "about_promises_body": "- **Immer kostenlos.** Keine Bezahlstufe, keine Paywall, keine Werbung.\n- **Zu jeder Zahl eine Quelle.** Jede Zahl verlinkt auf die Quelle, die sie veröffentlicht hat, und auf die Änderung, die sie hinzugefügt hat. Zahlen aus gescannten Büchern nennen die Seite, aus der sie stammen.\n- **Amtlich festgestellt, dann nachgerechnet.** Amtliche Sieger und Sitze werden so angezeigt, wie sie festgestellt wurden. Die Sitzberechnungen des Archivs stehen daneben und ersetzen sie nie.\n- **Offen.** Der Code ist freie Software, die Daten dürfen frei weiterverwendet werden. Siehe [Lizenz](/license).\n- **Kein Tracking.** Keine Analysen, keine Tracking-Skripte, kein Datenverkauf. Siehe [Datenschutzerklärung](/privacy).\n- **Für Menschen und Agenten.** Jede Seite gibt es auch als Markdown und JSON, und dieselben Daten sind über eine API und einen [MCP-Server](/agents) verfügbar.",
   "about_status_title": "Öffentliche Vorschau",
   "about_status_body": "Die Website ist eine öffentliche Vorschau. Sie können alles lesen, die API nutzen und ein Konto anlegen. Beiträge werden später geöffnet; auf der [Beitragsseite](/contribute) steht, wie sie funktionieren werden und wie Sie schon heute helfen können.",
@@ -167,7 +167,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Sitz besetzt, keine Parteien erfasst",
         "countPlural=*": "{countText} Sitze besetzt, keine Parteien erfasst"
@@ -181,7 +183,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Sitz besetzt",
         "countPlural=*": "{countText} Sitze besetzt"
@@ -256,7 +260,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Wahl",
         "countPlural=*": "{countText} Wahlen"
@@ -290,8 +296,13 @@
   "col_final_ballot": "Letzter Wahlgang",
   "delegates_primary": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Delegierter, in der Vorwahl bestimmt",
         "countPlural=*": "{count} Delegierte, in der Vorwahl bestimmt"
@@ -300,8 +311,13 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Delegierter, in den Caucuses bestimmt",
         "countPlural=*": "{count} Delegierte, in den Caucuses bestimmt"
@@ -310,8 +326,13 @@
   ],
   "delegates_convention": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Delegierter, vom Parteitag des Bundesstaates bestimmt",
         "countPlural=*": "{count} Delegierte, vom Parteitag des Bundesstaates bestimmt"
@@ -320,8 +341,13 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Delegierter, ungebunden",
         "countPlural=*": "{count} Delegierte, alle ungebunden"
@@ -405,7 +431,9 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "In dieser Wahlperiode fand 1 Nachwahl statt, vor der Parlamentswahl {year}.",
         "countPlural=*": "In dieser Wahlperiode fanden {count} Nachwahlen statt, vor der Parlamentswahl {year}."
@@ -414,8 +442,13 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "In dieser Wahlperiode fand bisher 1 Nachwahl statt.",
         "countPlural=*": "In dieser Wahlperiode fanden bisher {count} Nachwahlen statt."
@@ -424,8 +457,13 @@
   ],
   "byes_changed": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 Sitz hat die Partei gewechselt.",
         "countPlural=*": "{count} Sitze haben die Partei gewechselt."
@@ -517,7 +555,7 @@
   "count_derived_link": "So wurde gezählt",
   "stv_title": "Zählgang für Zählgang",
   "stv_lede": "{seats} Sitze. Wer die Quote von {quota} Stimmen erreicht, ist gewählt. In jedem weiteren Zählgang werden der Überschuss eines Gewählten oder die Stimmen des Letztplatzierten auf jedem Stimmzettel auf die nächste Präferenz übertragen.",
-  "stv_quota_derived": "Die Quelle nennt die Quote nicht, daher haben wir sie nach der Droop-Formel berechnet: gültige Erstpräferenzen geteilt durch (Sitze plus eins), abgerundet, plus eins.",
+  "stv_quota_derived": "Die Quelle gibt die Quote nicht an. Sie wurde daher nach der Droop-Formel berechnet: gültige Erstpräferenzen geteilt durch die Zahl der Sitze plus eins, abgerundet, plus eins.",
   "stv_quota_declared": "Quote (festgestellt): {quota}",
   "stv_quota_computed": "Quote (berechnet, Droop): {quota}",
   "ams_title": "So wurden die Listenmandate verteilt",
@@ -611,7 +649,9 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=*": "{rank}. bestes Ergebnis für {name} unter {count} {nouns} im Ausland"
       }
@@ -635,16 +675,16 @@
   "places_shared": "Liegt in {place}",
   "places_deeper": "Ergebnisse für {noun} nach {finer} anzeigen",
   "places_title": "Ergebnisse nach {noun}",
-  "places_unmapped": "Für diese Wahl liegen noch keine Grenzen für {noun} vor, daher werden diese Ergebnisse nicht auf der Karte angezeigt.",
+  "places_unmapped": "Für diese Wahl liegen im Archiv noch keine Grenzen für {noun} vor. Die Ergebnisse werden deshalb nicht auf der Karte angezeigt.",
   "places_unrecorded": "Keine Ergebnisse erfasst",
   "places_no_votes": "Keine Stimmen gemeldet",
   "places_no_earlier": "Für {year} liegen auf dieser Ebene keine Ergebnisse vor; Verschiebungen können nicht angezeigt werden.",
   "places_level": "Ergebnisse anzeigen nach",
   "places_filter": "Nach Name filtern",
   "places_filter_empty": "Kein Ort entspricht „{query}“.",
-  "ledger_lede_mapped": "Für diese {nouns} liegen keine Grenzen vor. Deshalb steht jede unter dem Eintrag „{group}“, zu dem sie gehört. Zeigen Sie auf „{group}“, um die Einheit auf der Karte zu finden.",
-  "ledger_lede": "Für diese {nouns} liegen keine Grenzen vor. Deshalb steht jede unter dem Eintrag „{group}“, zu dem sie gehört.",
-  "ledger_lede_flat": "Für diese {nouns} liegen keine Grenzen vor. Deshalb werden sie hier statt auf der Karte aufgeführt.",
+  "ledger_lede_mapped": "Für diese {nouns} liegen im Archiv keine Grenzen vor. Daher ist jede Einheit unter der übergeordneten Einheit ({group}) aufgeführt. Zeigen Sie auf eine Einheit ({group}), um sie auf der Karte zu finden.",
+  "ledger_lede": "Für diese {nouns} liegen im Archiv keine Grenzen vor. Daher ist jede Einheit unter der übergeordneten Einheit ({group}) aufgeführt.",
+  "ledger_lede_flat": "Für diese {nouns} liegen im Archiv keine Grenzen vor. Sie werden deshalb hier statt auf der Karte aufgeführt.",
   "ledger_single": [
     {
       "declarations": [
@@ -653,7 +693,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} {groups}: keine weiteren Ergebnisse über die oben bereits gezeigten hinaus, daher hier nicht aufgeführt.",
         "countPlural=*": "{countText} {groups}: keine weiteren Ergebnisse über die oben bereits gezeigten hinaus, daher hier nicht aufgeführt."
@@ -699,7 +741,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -708,8 +752,13 @@
   ],
   "map_electoral": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Wahlmännerstimme",
         "countPlural=*": "{count} Wahlmännerstimmen"
@@ -752,7 +801,9 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{party} gewann {count} Sitz in {where}",
         "countPlural=*": "{party} gewann {count} Sitze in {where}"
@@ -793,8 +844,13 @@
   "check_votes_valid_unit": "{name}: Die Stimmen ergeben zusammen {votes}, gemeldet sind jedoch {valid} gültige Stimmzettel",
   "checks_turnout": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Einheit meldet mehr Stimmzettel als Wahlberechtigte",
         "countPlural=*": "{count} Einheiten melden mehr Stimmzettel als Wahlberechtigte"
@@ -803,8 +859,13 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Einheit meldet Stimmen, die nicht zu den gültigen Stimmzetteln passen",
         "countPlural=*": "{count} Einheiten melden Stimmen, die nicht zu den gültigen Stimmzetteln passen"
@@ -816,8 +877,13 @@
   "election_unplaced_detail": "Diese Wahlen, wie etwa die Universitätssitze, haben kein geografisches Gebiet und sind in Tabelle und Karte nicht enthalten.",
   "election_parts": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Teil",
         "countPlural=*": "{count} Teile"
@@ -850,7 +916,9 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": ["seatsPlural"],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "1 Sitz wurde ohne Gegenkandidaten vergeben, daher wurden dafür keine Stimmen abgegeben: {parties}.",
         "seatsPlural=*": "{seats} Sitze wurden ohne Gegenkandidaten vergeben, daher wurden dafür keine Stimmen abgegeben: {parties}."
@@ -865,7 +933,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 {noun} entsandte mehr als ein Mitglied. Die Wähler konnten mehr als eine Stimme abgeben, daher zählen die Summen Stimmen, nicht Wähler.",
         "countPlural=*": "{count} {nouns} entsandten mehr als ein Mitglied. Die Wähler konnten mehr als eine Stimme abgeben, daher zählen die Summen Stimmen, nicht Wähler."
@@ -910,8 +980,13 @@
   "race_contests_nonvoting": "{count} Wahlen, darunter {nonvoting} Wahlen von Delegierten ohne Stimmrecht",
   "race_contests": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -932,8 +1007,8 @@
   "polity_subdivisions": "Untergliederungen",
   "polity_districts": "Bezirke",
   "holders_title": "Wer im Amt ist",
-  "holders_lede": "Grundlage ist die jüngste Wahl, die uns für jedes Amt und jeden Sitz vorliegt. Dazu kommen unsere Angaben zu allen, die seitdem ein Amt angetreten haben.",
-  "holders_stale": "Stand der letzten Wahl, die uns vorliegt",
+  "holders_lede": "Basiert auf der jeweils jüngsten Wahl im Archiv für jedes Amt und jeden Sitz sowie auf Aufzeichnungen zu allen, die seither ein Amt angetreten haben.",
+  "holders_stale": "Stand der jüngsten Wahl im Archiv",
   "holders_elected": "Gewählt am {date}",
   "holders_reelected": "Wiedergewählt am {date}; neue Amtszeit beginnt später",
   "holders_successor": "Nachfolger gewählt am {date}:",
@@ -949,7 +1024,7 @@
   "holders_unknown_note": "Wahl vom {date}",
   "holders_at_large": "Landesweit",
   "holders_due": "Wahl im Jahr {year}",
-  "holders_partial": "Wir haben Ergebnisse für {count} von {total} Sitzen.",
+  "holders_partial": "Für {count} von {total} Sitzen liegen Ergebnisse vor.",
   "holders_former": "Frühere Ämter und Gremien",
   "wards_lede_all": "Alle {count} Sitze wurden direkt gewonnen.",
   "wards_lede": "{won} von {count} Sitzen wurden direkt gewonnen. {sent} gingen in die {round}.",
@@ -981,7 +1056,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} lokale Gebietskörperschaft",
         "countPlural=*": "{countText} lokale Gebietskörperschaften"
@@ -995,7 +1072,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} County",
         "countPlural=*": "{countText} Countys"
@@ -1016,8 +1095,8 @@
   "col_holder": "Amtsträger",
   "col_since": "Seit",
   "polity_largest_cities": "Größte Städte",
-  "polity_holdings_title": "Was wir haben",
-  "polity_holdings_lede": "Anteil der Kommunalwahlen in {place} seit 2000, die uns vollständig vorliegen, nach Art der Gebietskörperschaft und nach Bevölkerung gewichtet. Die Wahlen des laufenden Jahres bleiben bis zum Jahresende unberücksichtigt.",
+  "polity_holdings_title": "Bestand des Archivs",
+  "polity_holdings_lede": "Anteil der Kommunalwahlen in {place} seit 2000, die das Archiv vollständig vorhält, nach Verwaltungsform und gewichtet nach Bevölkerung. Die Wahlen des laufenden Jahres bleiben bis zum Jahresende unberücksichtigt.",
   "polity_holdings_link": "Abdeckung in den Vereinigten Staaten insgesamt",
   "polity_local_one": "Lokal: {place}",
   "polity_local_more": "Lokal: {place} und {count} weitere",
@@ -1040,7 +1119,7 @@
   "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Mit dieser E-Mail-Adresse besteht bereits ein Konto. Verwenden Sie eine andere Adresse.",
   "USER_ALREADY_HAS_PASSWORD": "Ihr Konto hat bereits ein Passwort.",
   "USER_EMAIL_NOT_FOUND": "E-Mail-Adresse und Passwort stimmen nicht überein. Bitte prüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
-  "USER_NOT_FOUND": "Wir konnten dieses Konto nicht finden.",
+  "USER_NOT_FOUND": "Zu diesen Angaben gibt es kein Konto.",
   "email_link_fallback": "Falls die Schaltfläche nicht funktioniert, kopieren Sie diesen Link in Ihren Browser:",
   "email_link_expiry": "Der Link ist eine Stunde lang gültig.",
   "email_footer_replies": "Antworten an diese Adresse werden nicht gelesen. Schreiben Sie stattdessen an hello@electionsarchive.com.",
@@ -1060,7 +1139,7 @@
   "change_email_subject": "Neue E-Mail-Adresse freigeben",
   "change_email_preheader": "Bestätigen Sie den Wechsel zu {newEmail}, bevor er wirksam wird.",
   "change_email_heading": "Neue E-Mail-Adresse freigeben",
-  "change_email_body": "Jemand hat darum gebeten, die E-Mail-Adresse Ihres Elections-Archive-Kontos von {email} auf {newEmail} zu ändern. Geben Sie die Änderung frei, dann senden wir einen Link an die neue Adresse, um sie zu bestätigen.",
+  "change_email_body": "Jemand hat beantragt, die E-Mail-Adresse Ihres Kontos beim Elections Archive von {email} auf {newEmail} zu ändern. Bestätigen Sie die Änderung, dann senden wir einen Link an die neue Adresse, um sie zu verifizieren.",
   "change_email_action": "Änderung freigeben",
   "change_email_reason": "Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail; Ihr Konto behält {email}. Möglicherweise kennt jemand Ihr Passwort. Ändern Sie es daher bald.",
   "password_changed_subject": "Ihr Passwort wurde geändert",
@@ -1068,7 +1147,7 @@
   "password_changed_heading": "Ihr Passwort wurde geändert",
   "password_changed_body": "Das Passwort für das Elections-Archive-Konto mit der Adresse {email} wurde soeben geändert. Wenn Sie diese Änderung vorgenommen haben, müssen Sie nichts weiter tun.\n\nFalls nicht, setzen Sie Ihr Passwort jetzt zurück, um die Person auszusperren, die es geändert hat.",
   "password_changed_action": "Passwort zurücksetzen",
-  "password_changed_reason": "Wir senden Ihnen eine E-Mail, sobald sich das Passwort Ihres Kontos ändert.",
+  "password_changed_reason": "Sie erhalten eine E-Mail, sobald sich das Passwort Ihres Kontos ändert.",
   "col_share_in": "Anteil {year}",
   "trend_label": "Anteil {from} und {to}",
   "change_title": "Veränderung in Prozentpunkten von {from} bis {to}",
@@ -1179,8 +1258,13 @@
   "lists_title": "Kandidatenlisten",
   "lists_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus Parteilisten mit festgelegter Rangfolge besetzt",
         "seatsPlural=*": "{seats} Sitze aus Parteilisten mit festgelegter Rangfolge besetzt"
@@ -1191,8 +1275,13 @@
   "lists_unranked_title": "Gewählte Mitglieder",
   "lists_unranked_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus Parteilisten besetzt. Die Quelle nennt nur die gewählten Mitglieder, nicht die vollständigen Listen mit Rangfolge.",
         "seatsPlural=*": "{seats} Sitze aus Parteilisten besetzt. Die Quelle nennt nur die gewählten Mitglieder, nicht die vollständigen Listen mit Rangfolge."
@@ -1202,8 +1291,13 @@
   "lists_open_title": "Kandidaten nach Liste",
   "lists_open_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} Sitz aus offenen Parteilisten besetzt. Die Kandidaten jeder Liste sind nach Personenstimmen gereiht.",
         "seatsPlural=*": "{seats} Sitze aus offenen Parteilisten besetzt. Die Kandidaten jeder Liste sind nach Personenstimmen gereiht."
@@ -1213,8 +1307,13 @@
   "col_members": "Gewählte Mitglieder",
   "lists_all": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Die {count} Liste",
         "countPlural=*": "Alle {count} Listen"
@@ -1225,8 +1324,13 @@
   "lists_collapse": "Listenanfang zeigen",
   "lists_more": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} weiterer Kandidat",
         "countPlural=*": "{count} weitere Kandidaten"
@@ -1235,8 +1339,13 @@
   ],
   "lists_seats": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Sitz",
         "countPlural=*": "{count} Sitze"
@@ -1319,7 +1428,7 @@
   "series_notional": "Hypothetisches Ergebnis {year}",
   "polity_lede": "{elections} von {first} bis {last}",
   "polity_within": "und {count} weitere in Untergliederungen",
-  "polity_no_local": "Für {place} liegen noch keine Kommunalwahlen vor. Die folgenden Wahlen sind landes- und bundesweit. Gezählt werden die Stimmen, die in {place} abgegeben wurden.",
+  "polity_no_local": "Das Archiv enthält noch keine Kommunalwahlen für {place}. Die folgenden Wahlen sind Wahlen auf Ebene des Bundesstaats und des Bundes, mit den in {place} abgegebenen Stimmen.",
   "polity_latest": "Letzte Wahl",
   "polity_latest_local": "Letzte Kommunalwahl",
   "polity_next": "Als Nächstes",
@@ -1330,7 +1439,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Wahl auf dem Stimmzettel",
         "countPlural=*": "{countText} Wahlen auf dem Stimmzettel"
@@ -1408,7 +1519,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Sitz gewonnen",
         "countPlural=*": "{countText} Sitze gewonnen"
@@ -1425,7 +1538,10 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": ["seatsPlural", "officesPlural"],
+      "selectors": [
+        "seatsPlural",
+        "officesPlural"
+      ],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} Sitz, {officesText} Amt gewonnen",
         "seatsPlural=one, officesPlural=*": "{seatsText} Sitz, {officesText} Ämter gewonnen",
@@ -1495,7 +1611,7 @@
   "sign_up_have_account": "Haben Sie bereits ein Konto?",
   "sign_in_forgot": "Passwort vergessen?",
   "forgot_page_title": "Passwort zurücksetzen",
-  "forgot_page_lede": "Geben Sie die E-Mail-Adresse Ihres Kontos ein. Wir senden Ihnen einen Link zum Festlegen eines neuen Passworts.",
+  "forgot_page_lede": "Geben Sie die E-Mail-Adresse Ihres Kontos ein, um einen Link zum Festlegen eines neuen Passworts zu erhalten.",
   "forgot_page_submit": "Link zum Zurücksetzen senden",
   "forgot_page_sent": "Falls ein Konto mit {email} existiert, ist ein Link zum Zurücksetzen unterwegs. Der Link ist eine Stunde lang gültig.",
   "reset_page_title": "Neues Passwort wählen",
@@ -1505,7 +1621,7 @@
   "reset_page_request": "Neuen Link anfordern",
   "reset_page_done": "Ihr Passwort wurde geändert. Melden Sie sich mit dem neuen Passwort an.",
   "verify_page_title": "E-Mail-Adresse bestätigen",
-  "verify_page_lede": "Bei Ihrer Registrierung haben wir einen Bestätigungslink an {email} gesendet. Falls Sie ihn nicht finden, senden wir Ihnen einen neuen.",
+  "verify_page_lede": "Bei der Registrierung wurde ein Bestätigungslink an {email} gesendet. Falls Sie ihn nicht finden, können Sie einen neuen anfordern.",
   "verify_page_submit": "Neuen Link senden",
   "verify_page_sent": "Ein neuer Link ist unterwegs an {email}. Er ist eine Stunde lang gültig.",
   "verify_page_done": "Ihre E-Mail-Adresse ist bestätigt.",
@@ -1666,7 +1782,9 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=*": "Platz {rank} für {name} unter {count} {nouns} in {place}"
       }
@@ -1859,8 +1977,13 @@
   "tiers_tile_tacit": "{place}: {party} gewann {seats} von {total} Sitzen, davon {tacit} ohne Gegenkandidaten",
   "tiers_tacit": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Sitz wurde ohne Gegenkandidaten vergeben, ohne dass eine Abstimmung stattfand.",
         "countPlural=*": "{count} Sitze wurden ohne Gegenkandidaten vergeben, ohne dass eine Abstimmung stattfand."
@@ -1942,7 +2065,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Sitz zur Wahl",
         "countPlural=*": "{countText} Sitze zur Wahl"
@@ -1995,7 +2120,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Mitglied",
         "countPlural=*": "{countText} Mitglieder"
@@ -2134,8 +2261,13 @@
   "changelog_first": "Die erste markierte Version. Frühere Änderungen stehen im Commit-Verlauf.",
   "changelog_commits": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Änderung",
         "countPlural=*": "{count} Änderungen"
@@ -2152,8 +2284,13 @@
   "person_majority": "Mehrheit {count}",
   "person_scattered": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Erhielt außerdem handschriftlich eingetragene Stimmen in {count} Wahl",
         "countPlural=*": "Erhielt außerdem handschriftlich eingetragene Stimmen in {count} Wahlen"
@@ -2167,7 +2304,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Erhielt {count} Wahlmännerstimme von einem abtrünnigen Wahlmann in {states}",
         "countPlural=*": "Erhielt {count} Wahlmännerstimmen von abtrünnigen Wahlmännern in {states}"
@@ -2181,7 +2320,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Erhielt {count} Wahlmännerstimme in {states}",
         "countPlural=*": "Erhielt {count} Wahlmännerstimmen in {states}"
@@ -2296,7 +2437,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Ergebnis",
         "countPlural=*": "{countText} Ergebnisse"
@@ -2354,7 +2497,7 @@
   "winners_fewer": "Weniger anzeigen",
   "winners_none": "Wahlsieger nicht erfasst",
   "winners_led": "Führend",
-  "winners_led_note": "In {count} dieser Wahlen nennen unsere Quellen keinen Sieger. Wir zeigen daher den Kandidaten mit den meisten Stimmen, gekennzeichnet als „Führend“.",
+  "winners_led_note": "In {count} dieser Rennen nennen die Quellen keinen Sieger. Angezeigt wird daher der Kandidat mit den meisten Stimmen, gekennzeichnet als „Führend“.",
   "sweep_verdict_both": "{party} gewann die meisten Stimmen und die meisten {nouns}",
   "sweep_verdict_split": "{party} gewann die meisten Stimmen, {rival} die meisten {nouns}",
   "sweep_summary": "{party} gewann {won} von {total} {nouns} und {share} der Stimmen.",
@@ -2434,8 +2577,13 @@
   "map_landing_lede": "Öffnen Sie die jüngste Wahl eines beliebigen Landes auf einer Vollbildkarte. Zoomen Sie von den landesweiten Ergebnissen bis zur kleinsten Meldeeinheit. Vergleichen Sie mit früheren Wahlen und wechseln Sie zwischen einzelnen Wahlen.",
   "map_landing_elections": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -2455,7 +2603,7 @@
   "coverage_reason_turnout_coarse_def": "Das Archiv enthält nur die Umfrageschätzung des Census Bureau zu Registrierung und Wahlteilnahme, nicht die amtlichen Zahlen.",
   "coverage_reason_turnout_absent": "Keine Wahlbeteiligung",
   "coverage_reason_turnout_absent_def": "Wahltage, für die im Archiv noch keine Angaben zur Wahlbeteiligung vorliegen.",
-  "coverage_goal_local_note": "Die Kommunalverwaltungen stammen aus dem Census of Governments 2022. Sonderdistrikte werden nur gezählt, wenn ihre Gremien gewählt werden. Distrikte mit ernannten Gremien, wie sie die Individual State Descriptions des Census Bureau ausweisen, bleiben unberücksichtigt. Eine Körperschaft wählt in den Jahren, die ihre Wahlhistorie zeigt. Liegt im Archiv keine Wahlhistorie vor, verwenden wir den kommunalen Wahlkalender des Bundesstaats für diese Art von Körperschaft. Er ist im Wahlrecht des Bundesstaats festgelegt. Wo wir die Rechtslage nicht bestätigen konnten, ist der Turnus geschätzt.",
+  "coverage_goal_local_note": "Die Kommunalverwaltungen stammen aus dem Census of Governments 2022. Sonderdistrikte werden nur gezählt, wenn ihre Gremien gewählt werden. Distrikte mit ernannten Gremien, wie sie der Bericht Individual State Descriptions des Census Bureau ausweist, bleiben unberücksichtigt. Eine Verwaltung hat in den Jahren zu wählen, die ihre Wahlhistorie zeigt. Liegt dem Archiv für eine Verwaltung keine Wahlhistorie vor, gilt der kommunale Wahlkalender des Bundesstaats für diese Verwaltungsform, wie ihn das Wahlrecht des Bundesstaats festlegt. Wo sich die Rechtslage nicht bestätigen ließ, wird der Turnus geschätzt.",
   "coverage_progress": "{complete} von {total} Wahlen",
   "coverage_progress_precincts": "{complete} von {total} Wahlbezirken",
   "coverage_progress_local": "{complete} von {total} Kommunalwahlen",
@@ -2628,7 +2776,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} bekannte Lücke anzeigen",
         "countPlural=*": "Alle {countText} bekannten Lücken anzeigen"
@@ -2786,8 +2936,8 @@
   "coverage_overview_note": "Jede Zelle verwendet dasselbe Maß: den Anteil der Wahlen, für die das Archiv Ergebnisse auf der eigenen Ebene der Wahl hat. Das ist der Wahlkreis oder Distrikt, bei bundesstaatsweiten oder nationalen Wahlen der ganze Bundesstaat oder das ganze Land. Außerhalb der USA zählt eine Wahl nur, wenn ihre Stimmen 98 % der amtlich erklärten Summe erreichen. Bei lokalen Regierungen in den USA zählt eine Zelle die Kommunalwahlen (eine Regierung, die in einem Jahr wählt), für die irgendwelche Ergebnisse vorliegen. Ergebnisse nach County, Wahlbezirk oder anderen feineren Einheiten stehen auf der Seite des jeweiligen Landes.",
   "map_no_results": "Für diese Wahl liegen keine Ergebnisse vor",
   "map_missing_title": "Keine Karte für diese Wahl",
-  "map_missing_places": "Uns liegen keine Grenzen für {noun} vor, daher lassen sich diese Ergebnisse nicht auf einer Karte darstellen. Die Tabelle unten listet sie nach {noun} auf.",
-  "map_missing_drawn": "Grenzen für diese Ergebnisse liegen vor, ließen sich aber nicht auf einer Karte darstellen.",
+  "map_missing_places": "Für {noun} liegen im Archiv keine Grenzen vor, daher lassen sich diese Ergebnisse nicht auf einer Karte darstellen. Die Tabelle unten führt sie nach {noun} auf.",
+  "map_missing_drawn": "Für diese Ergebnisse liegen Grenzen vor, sie konnten aber nicht auf einer Karte dargestellt werden.",
   "map_missing_whole": "Diese Ergebnisse sind eine Gesamtsumme für die gesamte Wahl ohne Aufschlüsselung nach Gebieten, die sich auf einer Karte zeigen ließe.",
   "results_incumbent": "Amtsinhaber",
   "results_write_in": "Handschriftlich eingetragen",
@@ -2886,7 +3036,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Sieg",
         "countPlural=*": "{countText} Siege"
@@ -3048,7 +3200,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} nach Stimmabgabeart oder Zählgang aufgeschlüsselte Zahl wird hier nicht angezeigt.",
         "countPlural=*": "{countText} nach Stimmabgabeart oder Zählgang aufgeschlüsselte Zahlen werden hier nicht angezeigt."
@@ -3062,7 +3216,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Ort, an dem die Kandidaten nicht die gültigen Stimmen ergeben",
         "countPlural=*": "{countText} Orte, an denen die Kandidaten nicht die gültigen Stimmen ergeben"
@@ -3076,7 +3232,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zahl geändert",
         "countPlural=*": "{countText} Zahlen geändert"
@@ -3102,7 +3260,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Änderung, geprüft von der Redaktion",
         "countPlural=*": "{countText} Änderungen, geprüft von der Redaktion"
@@ -3126,7 +3286,7 @@
   "edit_url_publisher": "Herausgeber",
   "edit_url_publisher_placeholder": "Wer es veröffentlicht hat",
   "edit_url_kind": "Art der Quelle",
-  "edit_url_note": "Beim Einreichen speichern wir eine Kopie der Seite, damit die Prüfenden sehen, was Sie gesehen haben.",
+  "edit_url_note": "Beim Absenden wird eine Kopie der Seite gespeichert, damit die Prüfer sehen, was Sie gesehen haben.",
   "edit_needs_link": "Geben Sie Adresse, Titel, Herausgeber und Art der Seite an.",
   "edit_mode_source": "Im Archiv",
   "edit_mode_url": "Webseite",
@@ -3302,7 +3462,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Befund zu prüfen",
         "countPlural=*": "{countText} Befunde zu prüfen"
@@ -3344,7 +3506,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Der erneute Lauf von {pipeline} weicht in {countText} Zahl von dieser Korrektur ab. Der Änderungsvorschlag bleibt genehmigt, bis der Import korrigiert und erneut ausgeführt wird.",
         "countPlural=*": "Der erneute Lauf von {pipeline} weicht in {countText} Zahlen von dieser Korrektur ab. Der Änderungsvorschlag bleibt genehmigt, bis der Import korrigiert und erneut ausgeführt wird."
@@ -3358,7 +3522,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zahl",
         "countPlural=*": "{countText} Zahlen"
@@ -3398,7 +3564,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Änderung",
         "countPlural=*": "{countText} Änderungen"
@@ -3611,7 +3779,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zeile",
         "countPlural=*": "{countText} Zeilen"
@@ -3852,7 +4022,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zahl",
         "countPlural=*": "{countText} Zahlen"
@@ -3866,7 +4038,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Rahmen",
         "countPlural=*": "{countText} Rahmen"
@@ -3880,7 +4054,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Ort",
         "countPlural=*": "{countText} Orte"
@@ -3894,7 +4070,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zeile eingefügt.",
         "countPlural=*": "{countText} Zeilen eingefügt."
@@ -3908,7 +4086,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} wurde nicht gefunden und als neuer Ort hinzugefügt; prüfen Sie den Code.",
         "countPlural=*": "{countText} wurden nicht gefunden und als neue Orte hinzugefügt; prüfen Sie die Codes."
@@ -3922,7 +4102,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} passte nicht ins Raster und wurde ausgelassen.",
         "countPlural=*": "{countText} passten nicht ins Raster und wurden ausgelassen."
@@ -3936,7 +4118,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Wenn Sie eine andere Datei verwenden, wird der auf dieser Datei eingezeichnete Rahmen entfernt.",
         "countPlural=*": "Wenn Sie eine andere Datei verwenden, werden die {countText} auf dieser Datei eingezeichneten Rahmen entfernt."
@@ -4014,7 +4198,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Grenze ändert sich.",
         "countPlural=*": "{countText} Grenzen ändern sich."
@@ -4028,7 +4214,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} neues Gebiet.",
         "countPlural=*": "{countText} neue Gebiete."
@@ -4042,7 +4230,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Code passt zu keinem Gebiet. Wählen Sie ein Namensfeld, um es als neues Gebiet hinzuzufügen, oder lassen Sie es aus.",
         "countPlural=*": "{countText} Codes passen zu keinem Gebiet. Wählen Sie ein Namensfeld, um sie als neue Gebiete hinzuzufügen, oder lassen Sie sie aus."
@@ -4056,7 +4246,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} neues Gebiet hat keinen Namen im Namensfeld.",
         "countPlural=*": "{countText} neue Gebiete haben keinen Namen im Namensfeld."
@@ -4070,7 +4262,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Geometrie",
         "countPlural=*": "{countText} Geometrien"
@@ -4087,7 +4281,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Kommentar",
         "countPlural=*": "{countText} Kommentare"
@@ -4156,7 +4352,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Diskussion, {countText} offenes Thema",
         "countPlural=*": "Diskussion, {countText} offene Themen"
@@ -4173,7 +4371,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Zeichen übrig",
         "countPlural=*": "{countText} Zeichen übrig"
@@ -4187,7 +4387,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Antwort",
         "countPlural=*": "{countText} Antworten"
@@ -4235,15 +4437,15 @@
   "night_later": "Ergebnisse später",
   "night_later_title": "Ergebnisse folgen später",
   "night_head_later": "Heute Abend keine Live-Auszählung. Die amtlichen Ergebnisse werden ergänzt, sobald sie veröffentlicht sind.",
-  "night_later_body": "{state} veröffentlicht keinen Live-Ergebnisfeed, den wir lesen können, daher gibt es für diese Wahl heute Abend keine Auszählung. Wir ergänzen die amtlichen Ergebnisse hier, sobald der Bundesstaat sie veröffentlicht oder beglaubigt.",
-  "night_later_body_missing": "Diese Wahl ist nicht im Live-Ergebnisfeed enthalten, den {state} veröffentlicht, daher gibt es heute Abend keine Auszählung. Wir ergänzen die amtlichen Ergebnisse hier, sobald sie veröffentlicht oder beglaubigt sind.",
-  "night_later_state_body": "{state} veröffentlicht keinen Live-Ergebnisfeed, den wir lesen können, daher gibt es für seine Wahlen heute Abend keine Auszählung. Wir ergänzen die amtlichen Ergebnisse hier, sobald der Bundesstaat sie veröffentlicht oder beglaubigt.",
+  "night_later_body": "{state} veröffentlicht keinen maschinenlesbaren Live-Ergebnis-Feed, daher gibt es für dieses Rennen heute Abend keinen Auszählungsstand. Die amtlichen Ergebnisse erscheinen hier, sobald der Bundesstaat sie veröffentlicht oder amtlich feststellt.",
+  "night_later_body_missing": "Dieses Rennen ist nicht im Live-Ergebnis-Feed enthalten, den {state} veröffentlicht, daher gibt es heute Abend keinen Auszählungsstand. Die amtlichen Ergebnisse erscheinen hier, sobald sie veröffentlicht oder amtlich festgestellt sind.",
+  "night_later_state_body": "{state} veröffentlicht keinen maschinenlesbaren Live-Ergebnis-Feed, daher gibt es für die Rennen dort heute Abend keinen Auszählungsstand. Die amtlichen Ergebnisse erscheinen hier, sobald der Bundesstaat sie veröffentlicht oder amtlich feststellt.",
   "night_later_before": "Die Wahllokale schließen um {time}.",
   "night_later_key": "Kein Live-Feed",
   "night_races_later": "{count} später",
   "live_twin_later": "Kein Live-Feed: Für diese Wahl gibt es heute Abend keine Auszählung. Die amtlichen Ergebnisse werden ergänzt, sobald sie veröffentlicht oder beglaubigt sind.",
   "night_head_won": "{name} gewinnt mit {margin} Punkten Vorsprung",
-  "night_head_projected": "Unsere Hochrechnung: {name} gewinnt (verkündet um {time})",
+  "night_head_projected": "Hochrechnung: {name} gewinnt (ausgerufen um {time})",
   "night_left_counted": "Ausgezählt",
   "night_left_needs": "{name} braucht {needed} der verbleibenden Stimmen und erhält davon bisher {pace}",
   "night_left_out": "{name} kann mit den verbleibenden Stimmen nicht mehr aufholen",
@@ -4386,7 +4588,7 @@
   "night_table_votes": "Stimmen",
   "night_tip_baseline": "Letztes Mal: {margin}",
   "night_tip_counted": "{share} ausgezählt",
-  "night_tip_projected": "Unsere Hochrechnung um {time}, kein amtliches Ergebnis",
+  "night_tip_projected": "Hochrechnung von {time}, kein amtliches Ergebnis",
   "night_card_projected": "Hochrechnung um {time}, inoffiziell",
   "night_tip_waiting": "Noch keine Stimmen",
   "night_tool_back": "Vorheriges Update",
@@ -4636,11 +4838,11 @@
   "board_page_actions": "Seitenoptionen",
   "board_shortcut_arrange": "Zwischen Ansicht und Anordnen wechseln",
   "night_method_link": "So funktioniert diese Schätzung",
-  "method_title": "So funktionieren unsere Live-Schätzungen",
-  "method_lede": "Am Wahlabend schätzen wir, wie jede Wahl ausgehen wird, bevor alle Stimmen ausgezählt sind. Diese Seite erklärt, wie das Modell funktioniert, wie wir es getestet haben und wo es danebenliegen kann.",
+  "method_title": "So funktionieren die Live-Schätzungen",
+  "method_lede": "Am Wahlabend schätzt das Modell, wie jedes Rennen ausgehen wird, bevor alle Stimmen ausgezählt sind. Diese Seite erklärt, wie das Modell arbeitet, wie es getestet wurde und wo es danebenliegen kann.",
   "method_contents": "Auf dieser Seite",
   "method_hero_title": "Eine Auszählung im Zeitraffer",
-  "method_hero_caption": "Präsidentschaftswahl 2020 in Pennsylvania, mit dem Endergebnis jedes Countys, ausgezählt in simulierter Reihenfolge: zuerst die Stimmen vom Wahltag, zuletzt die Briefwahlstimmen. Die gepunktete Linie zeigt den Vorsprung unter den bisher ausgezählten Stimmen. Das schattierte Band ist unser 80-%-Bereich für den endgültigen Vorsprung, die durchgezogene Linie markiert dessen Mitte.",
+  "method_hero_caption": "Das Präsidentschaftsrennen 2020 in Pennsylvania, auf Basis des Endergebnisses jedes Countys, ausgezählt in simulierter Reihenfolge: zuerst die am Wahltag abgegebenen Stimmen, zuletzt die Briefwahlstimmen. Die gepunktete Linie zeigt den Vorsprung unter den bisher ausgezählten Stimmen. Das schattierte Band ist der 80-Prozent-Bereich des Modells für den endgültigen Vorsprung, die durchgezogene Linie ist dessen Mitte.",
   "method_hero_miss": "Spät in dieser Wiedergabe pausierte Montgomery County mit mehr als 100.000 noch auszuzählenden Briefwahlstimmen. Das Modell hielt das County für fertig ausgezählt. Deshalb verfehlte der Bereich ab 88 % ausgezählter Stimmen bei jedem Kontrollpunkt den endgültigen Vorsprung. Diese noch nicht ausgezählten Stimmen konnte das Modell nicht erkennen.",
   "method_hero_final": "Endergebnis",
   "method_hero_counted": "Vorsprung in ausgezählten Stimmen",
@@ -4695,9 +4897,9 @@
   "method_ranges_status": "Eine Wahlseite nennt erst dann einen Favoriten, wenn ein Zehntel der erwarteten Stimmen ausgezählt ist. Bis dahin zeigt sie den Auszählungsstand und weist darauf hin, dass es für eine Schätzung noch zu früh ist. Sobald das Ergebnis amtlich festgestellt ist, zeigt die Seite das amtlich festgestellte Ergebnis.",
   "method_ranges_caption": "Die 500 Simulationen hinter der obigen Wiedergabe, wenn die Hälfte der Stimmen ausgezählt ist. Jeder Punkt ist der Endvorsprung einer Simulation.",
   "method_ranges_wins": "{name} gewinnt {count} von 500",
-  "method_testing_title": "So haben wir getestet",
-  "method_testing_body": "Wir haben {races} Präsidentschaftswahlen (nach Bundesstaaten), Senatswahlen und Gouverneurswahlen von 2012 bis 2024 nachgespielt. Jede Wiedergabe nutzt die Endergebnisse der Countys, die in simulierter Reihenfolge freigegeben werden. Die Stimmen jedes Countys werden in Stimmen vom Wahltag, vorzeitig persönlich abgegebene Stimmen und Briefwahlstimmen aufgeteilt. In Jahren wie 2020, als die Briefwahl stark nach Parteien gespalten war, weicht die Briefwahl stärker von den Stimmen am Wahltag ab. Manche Wiedergaben zählen zuerst die vorzeitigen Stimmen, manche zuerst die vom Wahltag, manche mischen beides. Wir haben jede Wiedergabe an neun Punkten zwischen 3 % und 95 % ausgezählter Stimmen angehalten und die Schätzung am Endergebnis gemessen. Mit denselben Wiedergaben wurde auch die Vorgängerversion des Modells bewertet.",
-  "method_testing_summary": "Über alle Zwischenstände hinweg liegt der Brier-Score des Modells bei {current}, gegenüber {previous} bei der Vorgängerversion. Seine mittlere Schätzung weicht im Durchschnitt um {error} Punkte vom Endvorsprung ab.",
+  "method_testing_title": "So wurde das Modell getestet",
+  "method_testing_body": "Die Tests spielten {races} Rennen um das Präsidentenamt (je Bundesstaat), den Senat und das Gouverneursamt von 2012 bis 2024 nach. Jeder Durchlauf nutzt die Endergebnisse der Countys, die in simulierter Reihenfolge freigegeben werden. Die Stimmen jedes Countys werden in Stimmen vom Wahltag, vorzeitig persönlich abgegebene Stimmen und Briefwahlstimmen aufgeteilt. In Jahren wie 2020, als die Briefwahl stark nach Parteien gespalten war, weichen die Briefwahlstimmen stärker von den Stimmen des Wahltags ab. Manche Durchläufe zählen zuerst die vorzeitigen Stimmen, manche zuerst die Stimmen vom Wahltag, manche mischen beides. Jeder Durchlauf wurde an neun Punkten zwischen 3 und 95 Prozent der ausgezählten Stimmen angehalten, und die Schätzung wurde mit dem Endergebnis verglichen.",
+  "method_testing_summary": "Über alle Kontrollpunkte hinweg liegt der Brier-Score des Modells bei {brier}, und seine mittlere Schätzung weicht im Durchschnitt um {error} Punkte vom endgültigen Vorsprung ab.",
   "method_brier_chart": "Brier-Score nach Anteil der ausgezählten Stimmen",
   "method_brier_note": "Niedriger ist besser. Wer immer 50 % angibt, erreicht 0,25.",
   "method_cover_chart": "Wie oft die 80-%-Spanne den Endvorsprung enthielt",
@@ -4706,8 +4908,6 @@
   "method_calibration_note": "Jeder Punkt fasst Schätzungen mit gleicher angegebener Chance zusammen. Auf der Diagonale gewinnt ein 70-%-Favorit in 70 % der Fälle.",
   "method_calibration_stated": "Angegebene Chance für die Demokraten",
   "method_calibration_observed": "Wie oft die Demokraten gewannen",
-  "method_current": "Aktuelles Modell",
-  "method_previous": "Vorheriges Modell",
   "method_target": "Ziel",
   "method_perfect": "Perfekte Kalibrierung",
   "method_counted_axis": "Anteil ausgezählter Stimmen",
@@ -4731,12 +4931,12 @@
   "method_score_miss_hint": "Schätzungen, die dem späteren Verlierer 95 % oder mehr gaben",
   "method_limits_title": "Was das Modell nicht sieht",
   "method_limit_types": "Stimmarten. Die meisten Countys melden nur Gesamtzahlen. Das Modell schließt daher aus dem Verlauf der Auszählung, wohin spät gezählte Stimmen tendieren. Es nutzt dafür keine Stimmenpakete, die als Briefwahl- oder Wahltagsstimmen gekennzeichnet sind.",
-  "method_limit_precincts": "Gemeldete Wahlbezirke. Wir speichern noch nicht, welcher Anteil der Wahlbezirke eines Countys gemeldet ist. Das Modell beurteilt daher allein anhand des Auszählungsstands, ob ein County fertig ist.",
+  "method_limit_precincts": "Gemeldete Wahlbezirke. Das Archiv speichert noch nicht, wie viele Wahlbezirke eines Countys gemeldet sind. Das Modell beurteilt daher allein anhand der Zählung, ob ein County fertig ausgezählt ist.",
   "method_limit_baseline": "Wahlen ohne brauchbare Vergleichsbasis. Für Alaska gibt es keine Daten auf County-Ebene, bei Wahlen ohne Gegenkandidat fehlt der Vergleich, und bei Kandidaten, deren Partei kein früheres Ergebnis hat, zählt allein der Auszählungsstand.",
   "method_limit_traits": "Demografie unterhalb der County-Ebene. Die demografischen Zahlen sind einige Jahre alt und beziehen sich auf ganze Countys. Für Gemeinden in Neuengland und andere Orte, die Ergebnisse unterhalb der County-Ebene melden, gibt es daher keinen demografischen Effekt.",
   "method_limit_pause": "Lange Pausen. Ein großes County, das mit vielen offenen Stimmzetteln die Auszählung unterbricht, kann fertig wirken, und das Modell unterschätzt dann, wie viele Stimmen noch fehlen. Die Wiedergabe oben zeigt das gegen Ende der Auszählung.",
   "method_score_of": "{count} von {total}",
-  "method_limit_order": "Simulierte Auszählungsreihenfolge. Die Wiedergaben verwenden echte County-Ergebnisse, aber die Reihenfolge der Auszählung ist simuliert. Die Wiedergaben prüfen also die Methode, statt eine bestimmte Nacht exakt nachzuspielen. Zusätzlich haben wir die Auszählung der Präsidentschaftswahl 2020 in Florida, Georgia, North Carolina und Pennsylvania so nachgespielt, wie sie im Laufe der Nacht tatsächlich gemeldet wurde.",
+  "method_limit_order": "Simulierte Zählreihenfolge. Die Durchläufe nutzen echte Ergebnisse der Countys, aber die Reihenfolge der Auszählung ist simuliert. Sie testen also die Methode, statt eine bestimmte Nacht genau nachzuspielen. Die Auszählung der Präsidentschaftswahl 2020 in Florida, Georgia, North Carolina und Pennsylvania wurde zusätzlich so nachgespielt, wie sie tatsächlich im Lauf der Nacht gemeldet wurde.",
   "night_color_label": "Karte einfärben nach",
   "night_color_lead": "Vorsprung",
   "night_color_chance": "Chance",
@@ -4756,7 +4956,7 @@
   "night_tally_projected": "{count} prognostiziert",
   "night_tally_ahead": "{count} vorn",
   "night_tally_not_up": "{count} stehen nicht zur Wahl",
-  "night_projected_key": "Prognostiziert: unsere Einschätzung auf Basis der bisherigen Auszählung, kein amtliches Ergebnis. Zuletzt aktualisiert um {time}.",
+  "night_projected_key": "Hochgerechnet: eine Einschätzung auf Basis der bisherigen Auszählung, kein amtliches Ergebnis. Zuletzt aktualisiert um {time}.",
   "night_chamber_odds": "Chance auf eine Mehrheit",
   "night_chamber_split": "{share} keine Mehrheit",
   "night_chamber_histogram": "Wahrscheinlichkeit jeder Sitzzahl für die {party}",
@@ -4767,8 +4967,13 @@
   "night_chamber_others": "Parteilose und Sonstige",
   "night_chamber_not_up": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Sitz steht dieses Jahr nicht zur Wahl",
         "countPlural=*": "{count} Sitze stehen dieses Jahr nicht zur Wahl"
@@ -4779,8 +4984,13 @@
   "night_chamber_open": "Alle Wahlen in der Grafik „{title}“ ansehen",
   "night_governors_races": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} Wahl",
         "countPlural=*": "{count} Wahlen"
@@ -4931,7 +5141,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "In {countText} Stichwahl unterlag der Erstplatzierte des ersten Wahlgangs.",
         "countPlural=*": "In {countText} Stichwahlen unterlag der Erstplatzierte des ersten Wahlgangs."
@@ -4945,7 +5157,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Wahlkreissieger erhielt keinen Sitz, weil die Listenstimmen seiner Partei dafür nicht ausreichten.",
         "countPlural=*": "{countText} Wahlkreissieger erhielten keinen Sitz, weil die Listenstimmen ihrer Partei dafür nicht ausreichten."
@@ -4959,7 +5173,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} qualifizierter Kandidat zog sich vor der Stichwahl zurück.",
         "countPlural=*": "{countText} qualifizierte Kandidaten zogen sich vor der Stichwahl zurück."
@@ -4975,7 +5191,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Stichwahl schrumpfte von {from} auf {to} Kandidaten",
         "countPlural=*": "{countText} Stichwahlen schrumpften von {from} auf {to} Kandidaten"
@@ -5057,7 +5275,7 @@
   "indices_effective_body": "Die effektive Parteienzahl von Markku Laakso und Rein Taagepera (1979) zählt Parteien, indem sie jede nach ihrer Größe gewichtet: `N = 1 / Σ pᵢ²`, wobei `pᵢ` der Anteil einer Partei an den Stimmen oder Sitzen ist. Zehn gleich große Parteien ergeben 10; eine Partei mit 70 % und drei mit je 10 % ergeben etwa 1,9. Das Archiv weist sie zweimal aus: nach Stimmen, für die Entscheidungen der Wählerschaft, und nach Sitzen, für die daraus hervorgegangene Kammer.\n\nDie Rae-Fragmentierung, `F = 1 − Σ pᵢ²`, ist dieselbe Summe anders gelesen: die Wahrscheinlichkeit, dass zwei zufällig gewählte Wähler oder Abgeordnete verschiedenen Parteien angehören. Die API liefert sie neben der effektiven Parteienzahl.",
   "indices_disproportionality_body": "Der Gallagher-Index, auch Index der kleinsten Quadrate, von Michael Gallagher (1991) misst, wie weit die Sitze von den Stimmen abweichen: `LSq = √(½ Σ (vᵢ − sᵢ)²)`, mit Stimmen- und Sitzanteilen in Prozent. Durch das Quadrieren der Abweichungen zählt eine große Abweichung mehr als viele kleine, sodass ein Siegerbonus bei der relativen Mehrheitswahl deutlich sichtbar wird. Die Wahl im Vereinigten Königreich 2024 erreichte 23,7.\n\nDer Loosemore-Hanby-Index, `D = ½ Σ |vᵢ − sᵢ|`, addiert die Abweichungen ohne Quadrieren. Er lässt sich als der Anteil der Sitze lesen, der über ihren Stimmenanteil hinaus an Parteien ging. Er liegt höher als der Gallagher-Index, wenn viele kleine Parteien jeweils etwas zu kurz kommen.",
   "indices_volatility_body": "Die Pedersen-Volatilität nach Mogens Pedersen (1979) misst, welcher Teil der Stimmen seit der vorherigen Wahl gewechselt hat: `V = ½ Σ |pᵢ,t − pᵢ,t−1|`. Als vorherige Wahl gilt die letzte Hauptwahl derselben Kammer im Archiv.\n\nSchwierig ist die Identität einer Partei über zwei Wahlen hinweg. Das Archiv führt zwei Parteien zusammen, wenn seine Aufzeichnungen zeigen, dass die eine in der anderen aufgegangen ist, deren Nachfolgerin ist, als Neugründung von ihr hervorging oder von ihr übernommen wurde. Das gilt auch, wenn eine Partei als Wahlliste der anderen diente oder ein regionaler Ableger von ihr ist. Es folgt den Aufzeichnungen bis zu vier Schritte weit und nur nach dem Stand am Wahltag. Eine umbenannte Partei ist im Archiv dieselbe Partei, ein neuer Name zählt also nie als Veränderung. Eine Abspaltung zählt als neue Partei, sodass sich eine Spaltung als Volatilität niederschlägt. Hat eine Partei mit 10 % der Stimmen oder mehr auf der anderen Seite keine Entsprechung, trägt die Zahl einen Hinweis: Der gesamte Anteil zählt als Veränderung, was eher eine Lücke in den Aufzeichnungen als wandernde Wähler widerspiegeln kann.",
-  "indices_nationalization_body": "Der Nationalisierungswert des Parteiensystems nach Mark Jones und Scott Mainwaring (2003) misst, wie gleichmäßig sich die Stimmen der Parteien über das Land verteilen. Für jede Partei wird der Gini-Koeffizient ihres Stimmenanteils über die Gebiete berechnet, in denen Stimmen gezählt wurden. Die Formel lautet `PNS = 1 − Gini`. Der Wert für das gesamte System gewichtet den Wert jeder Partei mit ihrem Stimmenanteil: `PSNS = Σ pᵢ × PNSᵢ`.\n\nWir haben ihn anderen Maßen vorgezogen, weil er von 0 bis 1 reicht, einfach zu berechnen und zu erklären ist und weithin verwendet wird. So lässt er sich leicht mit veröffentlichten Arbeiten vergleichen. Die Gebiete sind die feinste Ebene, die das Archiv für die gezählten Stimmen der Kammer ausweist, etwa Wahlkreise im Vereinigten Königreich oder Länder in Deutschland; jedes zählt unabhängig von seiner Größe einmal. Der Gini-Koeffizient reagiert empfindlich auf die Zahl der Gebiete, daher trägt ein Wert, der an weniger als zehn gemessen wurde, einen Hinweis.",
+  "indices_nationalization_body": "Der Nationalisierungsgrad des Parteiensystems von Mark Jones und Scott Mainwaring (2003) misst, wie gleichmäßig sich die Stimmen der Parteien über das Land verteilen. Für jede Partei wird der Gini-Koeffizient ihres Stimmenanteils über die Orte berechnet, an denen Stimmen ausgezählt wurden. Die Formel lautet `PNS = 1 − Gini`. Der Wert für das gesamte System gewichtet den Wert jeder Partei mit ihrem Stimmenanteil: `PSNS = Σ pᵢ × PNSᵢ`.\n\nDas Archiv verwendet ihn anstelle anderer Maße, weil er von 0 bis 1 reicht, einfach zu berechnen und zu erklären sowie weit verbreitet ist. So lässt er sich leicht mit veröffentlichten Arbeiten vergleichen. Die Orte sind die feinste Ebene, die das Archiv für die ausgezählten Stimmen der Kammer ausweist, etwa Wahlkreise im Vereinigten Königreich oder Länder in Deutschland, und jeder zählt unabhängig von seiner Größe einmal. Der Gini-Koeffizient reagiert empfindlich auf die Zahl der Orte, daher erhält ein Wert, der über weniger als zehn Orte gemessen wurde, einen Hinweis.",
   "indices_calls_title": "Ermessensentscheidungen",
   "indices_calls_body": "Jede dieser Entscheidungen verändert die Zahlen. Deshalb nennt jede Kennzahl die Entscheidungen, die für sie galten.\n\n- **Parteilose und Sonstige.** Manche Quellen weisen Parteilose oder kleine Kandidaten als eine Gruppe aus. Bei der effektiven Parteienzahl nach Stimmen zählt diese Gruppe als viele winzige Parteien, nicht als eine große, und jeder Sitz eines Parteilosen zählt als eigene Partei. Die Disproportionalitätsindizes behandeln die Gruppe als eine Zeile.\n- **Wahlbündnisse.** Weist eine Quelle die Sitze eines Wahlbündnisses aus und rechnet sie seinen Mitgliedsparteien zu, tut das Archiv es auch. Sind die Stimmen eines Wahlbündnisses nicht nach Parteien aufgeschlüsselt, wie in Italien, zählt das Bündnis als eine Partei, bei der Messung der Volatilität in beiden Wahlen.\n- **Schwesterparteien.** Parteien in einem dauerhaften Bündnis, die nie gegeneinander antreten, wie CDU und CSU in Deutschland, zählen als eine Partei.\n- **Sitze ohne Gegenkandidaten.** Ohne Gegenkandidaten gewonnene Sitze haben keine Stimmen und bleiben deshalb in jeder Kennzahl unberücksichtigt; die Kennzahl nennt, wie viele es sind.\n- **Wahlgänge und Ebenen.** Stimmen des ersten Wahlgangs bei Zwei-Runden-Systemen, Listenstimmen bei gemischten Systemen und Erstpräferenzen bei der übertragbaren Einzelstimmgebung, wie oben beschrieben.",
   "indices_access_title": "Zugriff auf die Zahlen",
@@ -5122,11 +5340,11 @@
   "email_verified": "Bestätigt.",
   "email_unverified": "Nicht bestätigt.",
   "email_verify_link": "Jetzt bestätigen",
-  "email_pending": "Ihre E-Mail-Adresse ändert sich in {newEmail}, sobald Sie zustimmen. Öffnen Sie den Link, den wir an {email} geschickt haben, und danach den, den wir an {newEmail} schicken. Jeder Link ist eine Stunde lang gültig.",
-  "email_pending_unverified": "Ihre E-Mail-Adresse ändert sich in {newEmail}, sobald Sie den Link öffnen, den wir dorthin geschickt haben. Er ist eine Stunde lang gültig.",
+  "email_pending": "Ihre E-Mail-Adresse wird auf {newEmail} geändert, sobald Sie zugestimmt haben. Öffnen Sie den Link, der an {email} gesendet wurde, und danach den Link an {newEmail}. Jeder Link ist eine Stunde lang gültig.",
+  "email_pending_unverified": "Ihre E-Mail-Adresse wird auf {newEmail} geändert, sobald Sie den dorthin gesendeten Link öffnen. Er ist eine Stunde lang gültig.",
   "email_new": "Neue E-Mail-Adresse",
-  "email_change_hint": "Wir schicken eine E-Mail an {email}, um die Änderung zu genehmigen, und danach einen Link an die neue Adresse, um sie zu bestätigen. Ihre E-Mail-Adresse bleibt unverändert, bis Sie beide Schritte abgeschlossen haben.",
-  "email_change_hint_unverified": "Wir schicken einen Link an die neue Adresse. Ihre E-Mail-Adresse ändert sich, sobald Sie ihn öffnen.",
+  "email_change_hint": "Eine E-Mail an {email} dient der Bestätigung der Änderung, danach wird ein Link an die neue Adresse gesendet, um sie zu verifizieren. Ihre E-Mail-Adresse bleibt unverändert, bis Sie beide Schritte abgeschlossen haben.",
+  "email_change_hint_unverified": "Ein Link geht an die neue Adresse. Ihre E-Mail-Adresse ändert sich, sobald Sie ihn öffnen.",
   "email_change": "E-Mail-Adresse ändern",
   "email_invalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
   "email_same": "Das ist bereits Ihre E-Mail-Adresse.",
@@ -5165,7 +5383,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Änderungsvorschlag",
         "countPlural=*": "{countText} Änderungsvorschläge"
@@ -5179,7 +5399,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} angenommen",
         "countPlural=*": "{countText} angenommen"
@@ -5270,7 +5492,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Änderungsvorschlag pro Tag",
         "countPlural=*": "{countText} Änderungsvorschläge pro Tag"
@@ -5317,7 +5541,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Rücknahme in die Warteschlange gestellt.",
         "countPlural=*": "{countText} Rücknahmen in die Warteschlange gestellt."
@@ -5345,7 +5571,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Stapel",
         "countPlural=*": "{countText} Stapel"
@@ -5388,7 +5616,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Änderung",
         "countPlural=*": "{countText} Änderungen"
@@ -5471,7 +5701,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Benachrichtigungen, {countText} ungelesen",
         "countPlural=*": "Benachrichtigungen, {countText} ungelesen"
@@ -5510,7 +5742,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} neue Benachrichtigung",
         "countPlural=*": "{countText} neue Benachrichtigungen"
@@ -5524,7 +5758,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Im Elections Archive braucht etwas Ihre Aufmerksamkeit.",
         "countPlural=*": "{countText} Dinge im Elections Archive brauchen Ihre Aufmerksamkeit."
@@ -5538,7 +5774,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Sie haben eine neue Benachrichtigung",
         "countPlural=*": "Sie haben {countText} neue Benachrichtigungen"
@@ -5554,7 +5792,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Ihre Beobachtungsliste heute: {countText} Aktualisierung",
         "countPlural=*": "Ihre Beobachtungsliste heute: {countText} Aktualisierungen"
@@ -5568,7 +5808,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Ihre Beobachtungsliste diese Woche: {countText} Aktualisierung",
         "countPlural=*": "Ihre Beobachtungsliste diese Woche: {countText} Aktualisierungen"
@@ -5582,7 +5824,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} Aktualisierung zu dem, was Sie beobachten.",
         "countPlural=*": "{countText} Aktualisierungen zu dem, was Sie beobachten."

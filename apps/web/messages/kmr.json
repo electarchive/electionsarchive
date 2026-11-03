@@ -64,7 +64,7 @@
   "about_lede": "Elections Archive arşîveke belaş a encamên hilbijartinan e. Ji hilbijartina yekem a her welatî heta ya herî dawî diçe. Heta yekeya herî biçûk a jimartina fermî dadikeve.",
   "about_holds_title": "Çi tê de heye",
   "about_holds_body": "Arşîv deh welatan û Yekîtiya Ewropayê digire nav xwe: Dewletên Yekbûyî yên Amerîkayê, Keyaniya Yekbûyî, Swîsre, Kanada, Tirkiye, Îtalya, Almanya, Fransa, Îrlanda û Brezîlya. Li Dewletên Yekbûyî heta 1787an, li Keyaniya Yekbûyî heta 1832an û li Swîsreyê heta 1848an diçe. Li ku jimartina fermî destûr dide, heta herêmên dengdanê, navendên dengdanê û sindoqan dadikeve.\n\nKûrahî li gorî welat û salê diguhere. [Rûpela vegirtinê](/coverage) her welatî bi lîsteyeke serbixwe ya hilbijartinên wî re dide ber hev û tiştên hê kêm nîşan dide.",
-  "about_promises_title": "Soz û peymanên me",
+  "about_promises_title": "Soz û berpirsyarî",
   "about_promises_body": "- **Her dem belaş.** Ne beşeke bi pere, ne dîwarê pereyan, ne jî reklam.\n- **Ji bo her jimareyê çavkaniyek.** Her jimare bi çavkaniya ku ew weşandiye û bi guhertina ku ew zêde kiriye ve girêdayî ye. Jimareyên ji pirtûkên skankirî rûpela xwe jî nîşan didin.\n- **Pêşî ya fermî, paşê kontrol.** Serkeftî û kursiyên fermî wekî hatine ragihandin tên nîşandan. Hesabên kursiyan ên arşîvê li kêleka wan in û tu carî nabin şûna wan.\n- **Vekirî.** Kod nermalava azad e û dane ji bo bikaranîna dubare azad in. Li [lîsansê](/license) binêre.\n- **Bê şopandin.** Ne analîtîk, ne skrîptên şopandinê, ne jî firotina daneyan. Li [siyaseta nepeniyê](/privacy) binêre.\n- **Ji bo mirov û ajanan.** Her rûpel bi Markdown û JSON jî heye. Heman dane bi API û [servera MCP](/agents) jî tên bidestxistin.",
   "about_status_title": "Pêşdîtina giştî",
   "about_status_body": "Malper pêşdîtineke giştî ye. Hûn dikarin her tiştî bixwînin, API bi kar bînin û hesabek çêkin. Beşdarî paşê vedibe; [rûpela beşdariyê](/contribute) rave dike ka ew ê çawa bixebite û îro çawa dikarin alîkarî bikin.",
@@ -167,7 +167,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} kursî tije ye, tu partî nehatiye tomarkirin",
         "countPlural=*": "{countText} kursî tije ne, tu partî nehatine tomarkirin"
@@ -181,7 +183,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} kursî hate dagirtin",
         "countPlural=*": "{countText} kursî hatin dagirtin"
@@ -256,7 +260,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} hilbijartin",
         "countPlural=*": "{countText} hilbijartin"
@@ -290,8 +296,13 @@
   "col_final_ballot": "Dengdana dawîn",
   "delegates_primary": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delege, di pêşhilbijartinê de hatiye hilbijartin",
         "countPlural=*": "{count} delege, di pêşhilbijartinê de hatine hilbijartin"
@@ -300,8 +311,13 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delege, ji aliyê kokusan ve hatiye hilbijartin",
         "countPlural=*": "{count} delege, ji aliyê kokusan ve hatine hilbijartin"
@@ -310,8 +326,13 @@
   ],
   "delegates_convention": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delege, ji aliyê kongreya eyaletê ve hatiye hilbijartin",
         "countPlural=*": "{count} delege, ji aliyê kongreya eyaletê ve hatine hilbijartin"
@@ -320,8 +341,13 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delege, bê girêdan",
         "countPlural=*": "{count} delege, hemû bê girêdan"
@@ -405,7 +431,9 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 hilbijartina navberê di vê parlamentoyê de, beriya hilbijartina giştî ya {year}, hat kirin.",
         "countPlural=*": "{count} hilbijartinên navberê di vê parlamentoyê de, beriya hilbijartina giştî ya {year}, hatin kirin."
@@ -414,8 +442,13 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Heta niha 1 hilbijartina navberê di vê parlamentoyê de hatiye kirin.",
         "countPlural=*": "Heta niha {count} hilbijartinên navberê di vê parlamentoyê de hatine kirin."
@@ -424,8 +457,13 @@
   ],
   "byes_changed": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 kursî guherî.",
         "countPlural=*": "{count} kursî guherîn."
@@ -517,7 +555,7 @@
   "count_derived_link": "Çawa hatin jimartin",
   "stv_title": "Jimartin bi jimartin",
   "stv_lede": "{seats} kursî. Berendamê ku bigihîje kotaya {quota} dengî tê hilbijartin. Di her jimartina paşê de, zêdeyiya serketiyekî an dengên berendamê herî dawîn bi tercîha din a her pusulayê ve diçin.",
-  "stv_quota_derived": "Çavkanî kotayê nîşan nade, ji ber vê me bi formula Droop hesab kir: tercîhên yekem ên derbasdar li kursî û yek tên dabeşkirin, ber bi jêr ve tên girover kirin, û yek tê zêdekirin.",
+  "stv_quota_derived": "Çavkaniyê kota çap nekiriye, ji ber vê yekê bi formula Droop hate hesibandin: tercîhên yekem ên derbasdar li hejmara kursiyan û yekê tê dabeşkirin, ber bi jêr ve tê girover kirin, paşê yek tê zêdekirin.",
   "stv_quota_declared": "Kota (ragihandî): {quota}",
   "stv_quota_computed": "Kota (hesabkirî, Droop): {quota}",
   "ams_title": "Kursiyên lîsteyê çawa hatin dabeşkirin",
@@ -611,7 +649,9 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=*": "Di nav {count} {nouns}an de yên derveyî welat de, ji bo {name} #{rank} çêtirîn e"
       }
@@ -635,16 +675,16 @@
   "places_shared": "Li {place} e",
   "places_deeper": "Encamên {noun} li gorî {finer} bibîne",
   "places_title": "Encam li gorî {noun}",
-  "places_unmapped": "Hê sînorên {noun} yên vê hilbijartinê ne di destê me de ne, ji ber vê yekê ev encam li ser nexşeyê nayên nîşandan.",
+  "places_unmapped": "Arşîv hê sînorên {noun} ên vê hilbijartinê tune ye, ji ber vê yekê ev encam li ser nexşeyê nayên nîşandan.",
   "places_unrecorded": "Tu encam nehatine tomarkirin",
   "places_no_votes": "Tu deng nehatine ragihandin",
   "places_no_earlier": "Di vê astê de ji bo {year} encam tune ne; guhertin nayên nîşandan.",
   "places_level": "Asta encaman",
   "places_filter": "Li gorî navê parzûn bike",
   "places_filter_empty": "Tu cih bi “{query}” re nayê.",
-  "ledger_lede_mapped": "Sînorên van {nouns} li ba me tune ne, ji ber vê yek bi yek di bin {group}a ku tê de ne de hatine rêzkirin. Ji bo ku wê li ser nexşeyê bibînî, nîşanî {group}ê bide.",
-  "ledger_lede": "Sînorên van {nouns} li ba me tune ne, ji ber vê yek bi yek di bin {group}a ku tê de ne de hatine rêzkirin.",
-  "ledger_lede_flat": "Sînorên van {nouns} li ba me tune ne, ji ber vê li şûna nexşeyê li vir hatine rêzkirin.",
+  "ledger_lede_mapped": "Arşîv sînorên van {nouns} tune ye, ji ber vê yekê her yek li binê {group} ya ku tê de ye hatiye lîstekirin. Ji bo ku wê li ser nexşeyê bibînî, nîşanî {group} bike.",
+  "ledger_lede": "Arşîv sînorên van {nouns} tune ye, ji ber vê yekê her yek li binê {group} ya ku tê de ye hatiye lîstekirin.",
+  "ledger_lede_flat": "Arşîv sînorên van {nouns} tune ye, ji ber vê yekê li şûna nexşeyê li vir hatine lîstekirin.",
   "ledger_single": [
     {
       "declarations": [
@@ -653,7 +693,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} {groups} ji encamên li jor hatine nîşandan wêdetir encam nîne, ji ber vê li vir nehatiye rêzkirin.",
         "countPlural=*": "{countText} {groups} ji encamên li jor hatine nîşandan wêdetir encam nîne, ji ber vê li vir nehatine rêzkirin."
@@ -699,7 +741,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -708,8 +752,13 @@
   ],
   "map_electoral": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} dengê koleja hilbijêran",
         "countPlural=*": "{count} dengên koleja hilbijêran"
@@ -752,7 +801,9 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{party} li {where} kursiyek bi dest xist",
         "countPlural=*": "{party} li {where} {count} kursî bi dest xist"
@@ -793,8 +844,13 @@
   "check_votes_valid_unit": "{name}: tevahiya dengan {votes} e, lê {valid} dengê derbasdar hatine raporkirin",
   "checks_turnout": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} yekeyê ji hilbijêrên tomarkirî zêdetir pusula raporkiriye",
         "countPlural=*": "{count} yekeyan ji hilbijêrên tomarkirî zêdetir pusula raporkirine"
@@ -803,8 +859,13 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} yekeyê dengên ku bi dengên wê yên derbasdar re hev nagirin raporkiriye",
         "countPlural=*": "{count} yekeyan dengên ku bi dengên wan yên derbasdar re hev nagirin raporkirine"
@@ -816,8 +877,13 @@
   "election_unplaced_detail": "Ev pêşbazî, wek kursiyên zanîngehê, qadeke erdnigarî nînin û ji tablo û nexşeyê hatine derxistin.",
   "election_parts": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} par",
         "countPlural=*": "{count} par"
@@ -850,7 +916,9 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": ["seatsPlural"],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "1 kursî bê hevrik hate hilbijartin, ji ber vê tê de deng nehatin dayîn: {parties}.",
         "seatsPlural=*": "{seats} kursî bê hevrik hatin hilbijartin, ji ber vê tê de deng nehatin dayîn: {parties}."
@@ -865,7 +933,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 {noun} ji yek endamî zêdetir hilbijart. Hilbijêrên wê dikaribûn ji yek dengî zêdetir bidin, ji ber vê tevahî deng dihejmêrin, ne hilbijêr.",
         "countPlural=*": "{count} {nouns} ji yek endamî zêdetir hilbijartin. Hilbijêrên wan dikaribûn ji yek dengî zêdetir bidin, ji ber vê tevahî deng dihejmêrin, ne hilbijêr."
@@ -910,8 +980,13 @@
   "race_contests_nonvoting": "{count} pêşbazî, tê de {nonvoting} pêşbaziya delegeyên bê mafê dengdanê",
   "race_contests": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} pêşbazî",
         "countPlural=*": "{count} pêşbazî"
@@ -932,8 +1007,8 @@
   "polity_subdivisions": "Beşên jêrîn",
   "polity_districts": "Çember",
   "holders_title": "Kî wezîfedar e",
-  "holders_lede": "Li ser bingeha hilbijartina herî dawî ya ku ji bo her wezîfe û kursiyê di destê me de ye, û tomarên me yên kesên ku piştre wezîfe girtine.",
-  "holders_stale": "Heta hilbijartina dawî ya di destê me de",
+  "holders_lede": "Li ser bingeha hilbijartina herî dawî ya arşîvê ji bo her wezîfe û kursiyekê, û tomarên kesên ku piştre wezîfe girtine.",
+  "holders_stale": "Heta hilbijartina herî dawî ya arşîvê",
   "holders_elected": "Di {date} de hate hilbijartin",
   "holders_reelected": "Di {date} de dîsa hate hilbijartin; heyama nû paşê dest pê dike",
   "holders_successor": "Cihgirê ku di {date} de hate hilbijartin:",
@@ -949,7 +1024,7 @@
   "holders_unknown_note": "Hilbijartina {date}",
   "holders_at_large": "Giştî",
   "holders_due": "Di {year}an de hilbijartin heye",
-  "holders_partial": "Encamên {count} ji {total} kursiyên wê di destê me de ne.",
+  "holders_partial": "Ji {total} kursiyên wê, encam ji bo {count} kursiyan hene.",
   "holders_former": "Wezîfe û saziyên berê",
   "wards_lede_all": "Hemû {count} kursî rasterast hatin bidestxistin.",
   "wards_lede": "{won} ji {count} kursiyan rasterast hatin bidestxistin. {sent} çû {round}.",
@@ -981,7 +1056,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} rêveberiya herêmî",
         "countPlural=*": "{countText} rêveberiyên herêmî"
@@ -995,7 +1072,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} navçe",
         "countPlural=*": "{countText} navçe"
@@ -1016,8 +1095,8 @@
   "col_holder": "Wezîfedar",
   "col_since": "Ji",
   "polity_largest_cities": "Bajarên herî mezin",
-  "polity_holdings_title": "Çi di destê me de ye",
-  "polity_holdings_lede": "Rêjeya hilbijartinên herêmî yên {place} ji 2000 û vir ve ku em bi temamî hene, li gorî cureyê rêveberiyê û bi giraniya nifûsê. Hilbijartinên vê salê heta salê biqede nayên hesibandin.",
+  "polity_holdings_title": "Arşîv çi di xwe de digire",
+  "polity_holdings_lede": "Rêjeya hilbijartinên herêmî yên {place} ji sala 2000 ve ku arşîv bi temamî digire, li gorî cureyê hukumetê û bi giraniya nifûsê. Hilbijartinên vê salê heta salê biqede nayên hesibandin.",
   "polity_holdings_link": "Vegirtin li seranserê Dewletên Yekbûyî",
   "polity_local_one": "Herêmî: {place}",
   "polity_local_more": "Herêmî: {place} û {count} yên din",
@@ -1040,7 +1119,7 @@
   "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Hesabek bi vê e-nameyê re heye. E-nameyeke din bi kar bîne.",
   "USER_ALREADY_HAS_PASSWORD": "Hesabê te jixwe şîfreyek heye.",
   "USER_EMAIL_NOT_FOUND": "E-name û şîfre li hev nayên. Wan kontrol bike û dîsa biceribîne.",
-  "USER_NOT_FOUND": "Me nikaribû wê hesabê bibîne.",
+  "USER_NOT_FOUND": "Ti hesab bi van agahiyan re nayê.",
   "email_link_fallback": "Heke bişkok nexebite, vê lînkê li geroka xwe kopî bike:",
   "email_link_expiry": "Lînk saetekê dixebite.",
   "email_footer_replies": "Bersivên ji vê navnîşanê re nayên xwendin. Li şûna wê ji hello@electionsarchive.com re binivîse.",
@@ -1060,7 +1139,7 @@
   "change_email_subject": "Navnîşana xwe ya nû ya e-nameyê bipejirîne",
   "change_email_preheader": "Berî ku derbasî {newEmail} bibe, guhertinê bipejirîne.",
   "change_email_heading": "Navnîşana nû ya e-nameyê bipejirîne",
-  "change_email_body": "Kesekî xwest e-nameya hesabê te yê Elections Archive ji {email} bibe {newEmail}. Guhertinê bipejirîne, em ê ji bo piştrastkirinê lînkekê bişînin navnîşana nû.",
+  "change_email_body": "Kesek xwest e-peyama hesabê te yê Elections Archive ji {email} biguherîne {newEmail}. Guhertinê bipejirîne, û girêdanek ji bo erêkirinê dê biçe navnîşana nû.",
   "change_email_action": "Guhertinê bipejirîne",
   "change_email_reason": "Heke te ev nexwestibe, vê e-nameyê paşguh bike û hesabê te dê bi {email} bimîne. Dibe ku kesek şîfreya te zanibe, ji ber vê zû biguherîne.",
   "password_changed_subject": "Şîfreya te hate guhertin",
@@ -1068,7 +1147,7 @@
   "password_changed_heading": "Şîfreya te hate guhertin",
   "password_changed_body": "Şîfreya hesabê Elections Archive yê bi {email} nû hate guhertin. Heke te ev guhertin kiriye, pêwîst e tu tiştekî bikî.\n\nHeke te nekiriye, niha şîfreya xwe nû bike da ku kesê ku guhertiye ji hesabê derxe.",
   "password_changed_action": "Şîfreya xwe nû bike",
-  "password_changed_reason": "Her dem şîfreya hesabê te biguhere, em e-nameyekê ji te re dişînin.",
+  "password_changed_reason": "Her ku şîfreya hesabê te biguhere, tu e-peyamekê distînî.",
   "col_share_in": "Rêje {year}",
   "trend_label": "Rêje di {from} û {to} de",
   "change_title": "Guhertina bi xalên sedî ji {from} heta {to}",
@@ -1179,8 +1258,13 @@
   "lists_title": "Lîsteyên berendaman",
   "lists_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên partiyê yên rêzkirî hate dagirtin",
         "seatsPlural=*": "{seats} kursî ji lîsteyên partiyê yên rêzkirî hatin dagirtin"
@@ -1191,8 +1275,13 @@
   "lists_unranked_title": "Endamên hilbijartî",
   "lists_unranked_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên partiyê hate dagirtin. Çavkanî tenê endamên hilbijartî nav dike, ne lîsteyên rêzkirî yên tevahî.",
         "seatsPlural=*": "{seats} kursî ji lîsteyên partiyê hatin dagirtin. Çavkanî tenê endamên hilbijartî nav dike, ne lîsteyên rêzkirî yên tevahî."
@@ -1202,8 +1291,13 @@
   "lists_open_title": "Berendam li gorî lîsteyê",
   "lists_open_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} kursî ji lîsteyên partiyê yên vekirî hate dagirtin; berendamên her lîsteyê li gorî dengên şexsî hatine rêzkirin",
         "seatsPlural=*": "{seats} kursî ji lîsteyên partiyê yên vekirî hatin dagirtin; berendamên her lîsteyê li gorî dengên şexsî hatine rêzkirin"
@@ -1213,8 +1307,13 @@
   "col_members": "Endamên hilbijartî",
   "lists_all": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Hemû {count} lîste",
         "countPlural=*": "Hemû {count} lîste"
@@ -1225,8 +1324,13 @@
   "lists_collapse": "Serê lîsteyan nîşan bide",
   "lists_more": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} berendamê din",
         "countPlural=*": "{count} berendamên din"
@@ -1235,8 +1339,13 @@
   ],
   "lists_seats": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} kursî",
         "countPlural=*": "{count} kursî"
@@ -1319,7 +1428,7 @@
   "series_notional": "Texmînî ya {year}",
   "polity_lede": "{elections} ji {first} heta {last}",
   "polity_within": "û {count} yên din di binyekeyan de",
-  "polity_no_local": "Hê ji bo {place} tu hilbijartinên herêmî li ba me tune ne. Pêşbaziyên li jêr yên eyaletî û federal in, bi dengên li {place} hatine dayîn.",
+  "polity_no_local": "Arşîv hê ji bo {place} tu hilbijartinên herêmî tune ye. Pêşbaziyên li jêr yên eyaletî û federal in, bi dengên ku li {place} hatine dayîn.",
   "polity_latest": "Hilbijartina herî dawî",
   "polity_latest_local": "Hilbijartina herêmî ya herî dawî",
   "polity_next": "Ya paşê",
@@ -1330,7 +1439,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} pêşbazî li ser pusulayê",
         "countPlural=*": "{countText} pêşbazî li ser pusulayê"
@@ -1408,7 +1519,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} kursî hate bidestxistin",
         "countPlural=*": "{countText} kursî hatin bidestxistin"
@@ -1425,7 +1538,10 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": ["seatsPlural", "officesPlural"],
+      "selectors": [
+        "seatsPlural",
+        "officesPlural"
+      ],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} kursî, {officesText} wezîfe hate bidestxistin",
         "seatsPlural=one, officesPlural=*": "{seatsText} kursî, {officesText} wezîfe hatin bidestxistin",
@@ -1495,7 +1611,7 @@
   "sign_up_have_account": "Berê hesabê te heye?",
   "sign_in_forgot": "Şîfreya xwe ji bîr kir?",
   "forgot_page_title": "Şîfreya xwe nû bike",
-  "forgot_page_lede": "Navnîşana e-name ya hesabê xwe binivîse, em ê lînkek ji bo hilbijartina şîfreyek nû bişînin.",
+  "forgot_page_lede": "E-peyama hesabê xwe têkevin da ku girêdanek ji bo hilbijartina şîfreyeke nû bistînin.",
   "forgot_page_submit": "Lînka nûkirinê bişîne",
   "forgot_page_sent": "Heke hesabek {email} bi kar bîne, lînkek nûkirinê hatiye şandin. Lînk saetekê dixebite.",
   "reset_page_title": "Şîfreyeke nû hilbijêre",
@@ -1505,7 +1621,7 @@
   "reset_page_request": "Lînkeke nû bixwaze",
   "reset_page_done": "Şîfreya te hate guhertin. Bi ya nû têkeve.",
   "verify_page_title": "Navnîşana e-nameya xwe bipejirîne",
-  "verify_page_lede": "Dema ku te qeyd kir, me lînkeke pejirandinê şand {email}. Heke te nedît, yeke nû bişîne.",
+  "verify_page_lede": "Gava te tomar kir, girêdanek erêkirinê ji bo {email} hate şandin. Heke tu nikaribî bibînî, yeke nû bişîne.",
   "verify_page_submit": "Lînkeke nû bişîne",
   "verify_page_sent": "Lînkeke nû ber bi {email} ve çû. Saetekê derbasdar e.",
   "verify_page_done": "Navnîşana e-nameya te hate pejirandin.",
@@ -1666,7 +1782,9 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=*": "Di nav {count} {nouns} de li {place} ji bo {name} di rêza {rank}an de baştirîn e"
       }
@@ -1859,8 +1977,13 @@
   "tiers_tile_tacit": "{place}: {party} {seats} ji {total} kursiyan bi dest xist, {tacit} ji wan bê hevrik hatin ragihandin",
   "tiers_tacit": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} kursî bê hevrik hate ragihandin, dengdan nehat kirin.",
         "countPlural=*": "{count} kursî bê hevrik hatin ragihandin, dengdan nehat kirin."
@@ -1942,7 +2065,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} kursî di hilbijartinê de ye",
         "countPlural=*": "{countText} kursî di hilbijartinê de ne"
@@ -1995,7 +2120,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} endam",
         "countPlural=*": "{countText} endam"
@@ -2134,8 +2261,13 @@
   "changelog_first": "Yekemîn guhertoya nîşankirî. Guhertinên berê di dîroka commit de ne.",
   "changelog_commits": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} guhertin",
         "countPlural=*": "{count} guhertin"
@@ -2152,8 +2284,13 @@
   "person_majority": "Piraniya mutleq {count}",
   "person_scattered": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Her wiha di {count} pêşbaziyê de dengên bi nivîsandina nav stendin",
         "countPlural=*": "Her wiha di {count} pêşbaziyan de dengên bi nivîsandina nav stendin"
@@ -2167,7 +2304,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Li {states} {count} dengê koleja hilbijêran ji hilbijêrekî sozşikîn stend.",
         "countPlural=*": "Li {states} {count} dengên koleja hilbijêran ji hilbijêrên sozşikîn stendin."
@@ -2181,7 +2320,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Li {states} {count} dengê koleja hilbijêran stend.",
         "countPlural=*": "Li {states} {count} dengên koleja hilbijêran stendin."
@@ -2296,7 +2437,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} encam",
         "countPlural=*": "{countText} encam"
@@ -2354,7 +2497,7 @@
   "winners_fewer": "Kêmtir nîşan bide",
   "winners_none": "Serkeftî nehatiye tomarkirin",
   "winners_led": "Pêşeng",
-  "winners_led_note": "Çavkaniyên me di {count} ji van pêşbaziyan de ti serkeftî nagihînin; ji ber vê yekê berendamê herî zêde deng stendiye nîşan didin û wekî Pêşeng nîşan dikin.",
+  "winners_led_note": "Çavkaniyan di {count} ji van pêşbaziyan de tu serkeftî neragihandine, ji ber vê yekê berendamê bi herî zêde deng tê nîşandan û wekî Pêşeng tê nîşankirin.",
   "sweep_verdict_both": "{party} herî zêde deng û herî zêde {nouns} bi dest xist",
   "sweep_verdict_split": "{party} herî zêde deng stand, {rival} herî zêde {nouns} bi dest xist",
   "sweep_summary": "{party} {won} ji {total} {nouns} û {share} ê dengan bi dest xist.",
@@ -2434,8 +2577,13 @@
   "map_landing_lede": "Hilbijartina herî dawî ya her welatî li ser nexşeyeke tevahiya ekranê vekin, ji encamên neteweyî heta yekeya raporkirinê ya herî biçûk nêzîk bibin, bi hilbijartinên berê re bidin ber hev û di navbera pêşbaziyan de derbas bibin.",
   "map_landing_elections": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} hilbijartin",
         "countPlural=*": "{count} hilbijartin"
@@ -2455,7 +2603,7 @@
   "coverage_reason_turnout_coarse_def": "Arşîv tenê texmîna anketê ya Daîreya Serjimêriyê ya tomarkirin û dengdanê digire, ne hejmarên fermî.",
   "coverage_reason_turnout_absent": "Rêjeya beşdariyê tune",
   "coverage_reason_turnout_absent_def": "Rojên hilbijartinê yên ku hêj di arşîvê de daneyên beşdariyê tune ne.",
-  "coverage_goal_local_note": "Hikûmetên herêmî ji Serjimêriya Hikûmetan a 2022an tên girtin. Çemberên taybet tenê dema meclîsên wan bi hilbijartinê tên hilbijartin têne jimartin. Çemberên ku meclîsên wan bi tayînê tên, wekî Raporta Danasînên Eyaletan a Buroya Serjimêriyê dide, nayên hesibandin. Hikûmet di salên ku dîroka hilbijartinên wê nîşan dide de divê dengdanê bike. Heke arşîv ji bo hikûmetekê dîroka hilbijartinê tune be, em salnameya hilbijartinên herêmî ya eyaletê ji bo wê cureyê hikûmetê bi kar tînin, ku ji hêla yasaya hilbijartinê ya eyaletê ve hatiye diyarkirin. Li cihê ku me nikaribû yasayê piştrast bikin, çerx tê texmînkirin.",
+  "coverage_goal_local_note": "Hukumetên herêmî ji Serjimara Hukumetan a 2022an tên. Herêmên taybet tenê heke lijneyên wan bi hilbijartinê hatibin sazkirin tên hesibandin. Herêmên bi lijneyên destnîşankirî, wekî raporta Individual State Descriptions a Census Bureau dide, hatine derxistin. Hukumet di salên ku dîroka hilbijartina wê nîşan dide de divê dengdanê bike. Heke arşîv ji bo hukumetekê dîroka hilbijartinê tune be, salnameya hilbijartinên herêmî ya eyaletê ji bo wê cureyê hukumetê, li gorî yasaya hilbijartinê ya eyaletê, tê sepandin. Li cihê ku yasa nehat piştrastkirin, çerx tê texmînkirin.",
   "coverage_progress": "{complete} ji {total} pêşbaziyan",
   "coverage_progress_precincts": "{complete} ji {total} herêmên dengdanê",
   "coverage_progress_local": "{complete} ji {total} hilbijartinên herêmî",
@@ -2628,7 +2776,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Kêmasiyeke naskirî nîşan bide",
         "countPlural=*": "Hemû {countText} kêmasiyên naskirî nîşan bide"
@@ -2786,8 +2936,8 @@
   "coverage_overview_note": "Her şane heman pîvanê bi kar tîne: rêjeya pêşbaziyên ku arşîv di asta xwe ya xwezayî de encamên wan hene. Ew asta çember e, an jî ji bo pêşbaziyeke eyaletî an neteweyî tevahiya eyalet an welat. Li derveyî Amerîkayê pêşbazî tenê gava tê jimartin ku dengên wê bigihîjin %98ê tevahiya ragihandî. Ji bo hukûmetên herêmî yên Amerîkayê, şane hilbijartinên herêmî dijmêre (yek hukûmet di yek salê de) ku encamek wan heye. Encamên li gorî navçe, herêma dengdanê an yekeyên din ên hûrtir li ser rûpela her welatî ne.",
   "map_no_results": "Ji bo vê pêşbaziyê encam tune ne",
   "map_missing_title": "Ji bo vê pêşbaziyê nexşe tune ye",
-  "map_missing_places": "Sînorên {noun} ne li ba me ne, ji ber vê yekê ev encam nikarin li ser nexşeyê werin xêzkirin. Tabloya jêrîn wan li gorî {noun} lîste dike.",
-  "map_missing_drawn": "Sînorên van encaman li ba me hene, lê me nikarî wan li ser nexşeyê bikişîne.",
+  "map_missing_places": "Arşîv sînorên {noun} tune ye, ji ber vê yekê ev encam li ser nexşeyê nayên xêzkirin. Tabloya li jêr wan li gorî {noun} lîste dike.",
+  "map_missing_drawn": "Ji bo van encaman sînor hene, lê li ser nexşeyê nehatin xêzkirin.",
   "map_missing_whole": "Ev encam ji bo tevahiya pêşbaziyê yek tevahî ne û dabeşkirineke li gorî cihan tune ye ku li ser nexşeyê bê nîşandan.",
   "results_incumbent": "Wezîfedarê heyî",
   "results_write_in": "Bi nivîsandina nav",
@@ -2886,7 +3036,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} serkeftin",
         "countPlural=*": "{countText} serkeftin"
@@ -3048,7 +3200,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} hejmara ku li gorî rêbaza dengdanê an dora jimartinê hatiye dabeşkirin li vir nayê nîşandan.",
         "countPlural=*": "{countText} hejmarên ku li gorî rêbaza dengdanê an dora jimartinê hatine dabeşkirin li vir nayên nîşandan."
@@ -3062,7 +3216,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} cih ku dengên berendaman bi dengên derbasdar re nayên hev",
         "countPlural=*": "{countText} cih ku dengên berendaman bi dengên derbasdar re nayên hev"
@@ -3076,7 +3232,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} hejmar hate guhertin",
         "countPlural=*": "{countText} hejmar hatin guhertin"
@@ -3102,7 +3260,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} guhertin, ji aliyê desteya edîtoran ve tê nirxandin",
         "countPlural=*": "{countText} guhertin, ji aliyê desteya edîtoran ve têne nirxandin"
@@ -3126,7 +3286,7 @@
   "edit_url_publisher": "Weşanger",
   "edit_url_publisher_placeholder": "Kê weşandiye",
   "edit_url_kind": "Cureyê çavkaniyê",
-  "edit_url_note": "Gava ku te şand, em kopiyeke rûpelê tomar dikin da ku nirxandar tiştê ku te dîtiye bibînin.",
+  "edit_url_note": "Gava tu bişînî, kopiyek ji rûpelê tê tomarkirin da ku nirxandar bibînin tu çi dîtî.",
   "edit_needs_link": "Navnîşan, sernav, weşanger û cureyê rûpelê zêde bike.",
   "edit_mode_source": "Di arşîvê de",
   "edit_mode_url": "Rûpela webê",
@@ -3302,7 +3462,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} dîtin ji bo nirxandinê",
         "countPlural=*": "{countText} dîtin ji bo nirxandinê"
@@ -3344,7 +3506,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Dubarekirina {pipeline} di {countText} jimarê de ji vê rastkirinê cuda ye. Pêşniyar heta ku loader were serrastkirin û dîsa bimeşe pejirandî dimîne.",
         "countPlural=*": "Dubarekirina {pipeline} di {countText} jimarê de ji vê rastkirinê cuda ye. Pêşniyar heta ku loader were serrastkirin û dîsa bimeşe pejirandî dimîne."
@@ -3358,7 +3522,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} jimar",
         "countPlural=*": "{countText} jimar"
@@ -3398,7 +3564,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} guhertin",
         "countPlural=*": "{countText} guhertin"
@@ -3611,7 +3779,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} rêz",
         "countPlural=*": "{countText} rêz"
@@ -3852,7 +4022,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} hejmar",
         "countPlural=*": "{countText} hejmar"
@@ -3866,7 +4038,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} qutî",
         "countPlural=*": "{countText} qutî"
@@ -3880,7 +4054,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} cih",
         "countPlural=*": "{countText} cih"
@@ -3894,7 +4070,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} rêz hate pêvekirin.",
         "countPlural=*": "{countText} rêz hatin pêvekirin."
@@ -3908,7 +4086,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} nehate dîtin û wekî cihekî nû hate zêdekirin; koda wê kontrol bike.",
         "countPlural=*": "{countText} nehatin dîtin û wekî cihên nû hatin zêdekirin; kodên wan kontrol bike."
@@ -3922,7 +4102,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} nehat nav tabloyê û hate hiştin.",
         "countPlural=*": "{countText} nehatin nav tabloyê û hatin hiştin."
@@ -3936,7 +4118,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Bikaranîna pelek din qutiya ku li ser vê yekê hatiye xêzkirin radike.",
         "countPlural=*": "Bikaranîna pelek din {countText} qutiyên ku li ser vê yekê hatine xêzkirin radike."
@@ -4014,7 +4198,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Sînorekî diguhere.",
         "countPlural=*": "{countText} sînor diguherin."
@@ -4028,7 +4214,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} herêma nû.",
         "countPlural=*": "{countText} herêmên nû."
@@ -4042,7 +4230,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} kod bi tu herêmê re li hev nayê. Qadeke navê hilbijêre da ku wekî herêmeke nû were zêdekirin, an jî wê derxe.",
         "countPlural=*": "{countText} kod bi tu herêmê re li hev nayên. Qadeke navê hilbijêre da ku wekî herêmên nû werin zêdekirin, an jî wan derxe."
@@ -4056,7 +4246,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} herêma nû di qada navê de nav nîne.",
         "countPlural=*": "{countText} herêmên nû di qada navê de nav nînin."
@@ -4070,7 +4262,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} şekl",
         "countPlural=*": "{countText} şekl"
@@ -4087,7 +4281,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} şirove",
         "countPlural=*": "{countText} şirove"
@@ -4156,7 +4352,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Gengeşe, {countText} mijara vekirî",
         "countPlural=*": "Gengeşe, {countText} mijarên vekirî"
@@ -4173,7 +4371,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} tîp maye",
         "countPlural=*": "{countText} tîp mane"
@@ -4187,7 +4387,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} bersiv",
         "countPlural=*": "{countText} bersiv"
@@ -4235,15 +4437,15 @@
   "night_later": "Encam paşê",
   "night_later_title": "Encam paşê tên",
   "night_head_later": "Îşev jimartina zindî tune. Encamên fermî gava werin weşandin dê werin zêdekirin.",
-  "night_later_body": "{state} herikîneke encamên zindî ya ku em bikaribin bixwînin naweşîne, ji ber vê îşev ji bo vê pêşbaziyê jimartin tune. Dema ku eyalet encamên fermî biweşîne an pejirîne, em ê wan li vir zêde bikin.",
-  "night_later_body_missing": "Ev pêşbazî di herikîna encamên zindî ya ku {state} diweşîne de tune, ji ber vê îşev jimartina wê tune. Dema encamên fermî werin weşandin an pejirandin, em ê wan li vir zêde bikin.",
-  "night_later_state_body": "{state} herikîneke encamên zindî ya ku em bikaribin bixwînin naweşîne, ji ber vê îşev ji bo pêşbaziyên wê jimartin tune. Dema ku eyalet encamên fermî biweşîne an pejirîne, em ê wan li vir zêde bikin.",
+  "night_later_body": "{state} herikîna encamên zindî ya ji bo makîneyê tê xwendin neweşîne, ji ber vê yekê ev pêşbazî îşev jimartinê tune ye. Dema eyalet encamên fermî biweşîne an bipejirîne, ew ê li vir xuya bibin.",
+  "night_later_body_missing": "Ev pêşbazî di herikîna encamên zindî ya ku {state} diweşîne de tune ye, ji ber vê yekê îşev jimartinê tune ye. Dema encamên fermî werin weşandin an pejirandin, ew ê li vir xuya bibin.",
+  "night_later_state_body": "{state} herikîna encamên zindî ya ji bo makîneyê tê xwendin çap nake, ji ber vê yekê di pêşbaziyên wê de îşev jimartin tune ye. Dema eyalet encamên fermî biweşîne an bipejirîne, ew ê li vir xuya bibin.",
   "night_later_before": "Sindoq di {time} de tên girtin.",
   "night_later_key": "Herikîna zindî tune",
   "night_races_later": "{count} paşê",
   "live_twin_later": "Herikîna zindî tune: îşev ji bo vê pêşbaziyê jimartin tune. Encamên fermî dema werin weşandin an pejirandin dê werin zêdekirin.",
   "night_head_won": "{name} bi {margin} xal serkeft",
-  "night_head_projected": "Em pêşbîn dikin ku {name} dê bi ser keve (di {time} de hat ragihandin)",
+  "night_head_projected": "Pêşbînî: {name} dê bi ser bikeve (di {time} de hat ragihandin)",
   "night_left_counted": "Hatine jimartin",
   "night_left_needs": "{name} ji dengên mayî {needed} hewce dike, û heta niha {pace} ji wan distîne",
   "night_left_out": "{name} êdî nikare dengên mayî bigihîje",
@@ -4386,7 +4588,7 @@
   "night_table_votes": "Deng",
   "night_tip_baseline": "Cara borî: {margin}",
   "night_tip_counted": "{share} hate jimartin",
-  "night_tip_projected": "Pêşbiniya me di {time} de, ne encama fermî ye",
+  "night_tip_projected": "Pêşbînî di {time} de, ne encameke fermî ye",
   "night_card_projected": "Di {time} de hate pêşbînîkirin, nefermî",
   "night_tip_waiting": "Hê deng tune",
   "night_tool_back": "Nûvekirina berê",
@@ -4636,11 +4838,11 @@
   "board_page_actions": "Vebijarkên rûpelê",
   "board_shortcut_arrange": "Di navbera dîtin û birêxistinkirinê de biguhere",
   "night_method_link": "Ev texmîn çawa dixebite",
-  "method_title": "Texmînên me yên zindî çawa dixebitin",
-  "method_lede": "Di şeva hilbijartinê de, beriya ku hemû deng bên jimartin, em texmîn dikin ku her pêşbazî dê li ku biqede. Ev rûpel rave dike ku model çawa dixebite, me ew çawa ceriband û ew li ku dikare xeletiyê bike.",
+  "method_title": "Texmînên zindî çawa dixebitin",
+  "method_lede": "Di şeva hilbijartinê de, model beriya ku hemû deng bên jimartin texmîn dike ka her pêşbazî dê li ku biqede. Ev rûpel rave dike ka model çawa dixebite, çawa hate ceribandin û li ku dikare xelet bibe.",
   "method_contents": "Di vê rûpelê de",
   "method_hero_title": "Jimartinek, ji nû ve lîstî",
-  "method_hero_caption": "Pêşbaziya serokatiyê ya Pennsylvaniayê ya 2020an, bi encama dawî ya her navçeyê, bi rêzeke simulekirî hatiye jimartin: pêşî dengên roja hilbijartinê, dawiyê dengên bi postê. Xeta xalxalî cudahiya dengan a di dengên heta niha hatine jimartin de ye. Herêma sîhkirî dorhêla me ya 80% ya cudahiya dawî ye, û xeta tijî navenda wê ye.",
+  "method_hero_caption": "Pêşbaziya serokatiyê ya Pennsylvaniayê ya 2020an, bi encama dawî ya her navçeyê, bi rêzeke simulekirî ya jimartinê ku dengên roja hilbijartinê pêşî û pusulayên bi postê li dawiyê ne. Xeta xalxalî cudahiya dengan di nav dengên heta nuha hatine jimartin de ye. Banda siyekirî rêza 80%ê ya modelê ji bo cudahiya dawî ye, û xeta tijî ya navîn e.",
   "method_hero_miss": "Di dawiya vê dubarekirinê de, Navçeya Montgomery rawestiya, digel ku zêdetirî 100,000 deng bi postê hê nehatibûn jimartin. Modelê navçe wek qediyayî dît, ji ber vê yekê ji 88%ê dengan hatî jimartin pê ve, dorhêl di her xala kontrolê de cudahiya dawî ji dest da. Modelê rê tune bû ku van dengên nehatî jimartin bibîne.",
   "method_hero_final": "Encama dawî",
   "method_hero_counted": "Cudahiya di dengên hatine jimartin de",
@@ -4695,9 +4897,9 @@
   "method_ranges_status": "Rûpela pêşbaziyê heta ku ji dengên hêvîkirî yek ji deh nehatibe jimartin tu pêşkeftî nîşan nade. Heta wê demê jimartinê nîşan dide û dibêje hê zû ye ji bo texmînê. Gava pêşbazî hate pejirandin, rûpel encama pejirandî nîşan dide.",
   "method_ranges_caption": "500 simulasyonên li pişt dubarekirina li jor, dema nîvê dengan hatine jimartin. Her xal cudahiya dawî ya yek simulasyonê ye.",
   "method_ranges_wins": "{name} di {count} ji 500an de serdikeve",
-  "method_testing_title": "Me çawa ceriband",
-  "method_testing_body": "Me {races} pêşbaziyên serokatiyê (li gorî eyaletan), senato û parêzgariyê yên ji 2012 heta 2024 dubare kirin. Her dubarekirin encamên dawî yên navçeyan bi rêzeke simulekirî dide xuyakirin. Dengên her navçeyê li dengên roja hilbijartinê, dengdana pêşwext a bi xwe û dengên bi postê têne dabeşkirin; di salên mîna 2020î de, dema dengdana bi postê li gorî partiyan pir cuda bû, dengên postê ji dengên roja hilbijartinê dûrtir meyl dikin. Hin dubarekirin pêşî dengên pêşwext dijmêrin, hin pêşî dengên roja hilbijartinê, hin jî herduyan tevlihev dikin. Me her dubarekirin li neh xal di navbera %3 û %95ê dengên hatine jimartin de rawestand û texmîn bi encama dawî re pîvand. Heman dubarekirinan guhertoya berê ya modelê jî pîvandin.",
-  "method_testing_summary": "Li hemû xalên kontrolê, skora Brier a modelê {current} e, dema ya guhertoya berê {previous} bû, û texmîna wê ya navîn bi navînî {error} xal ji cudahiya dawî dûr dikeve.",
+  "method_testing_title": "Model çawa hate ceribandin",
+  "method_testing_body": "Ceribandinan {races} pêşbazî ji bo serokatiyê (li gorî eyaletê), Senato û parêzgarê ji 2012 heta 2024 dubare kirin. Her dubarekirin encamên dawî yên navçeyan bi rêzeke simulekirî nîşan dide. Dengên her navçeyê li dengên roja hilbijartinê, dengdana pêşwext a bi hazirbûnê û pusulayên bi postê tên dabeşkirin; di salên mîna 2020an de, ku dengdana bi postê li gorî partiyan pir ji hev cuda bû, pusulayên bi postê bêtir ji dengên roja hilbijartinê dûr dikevin. Hin dubarekirin dengên pêşwext pêşî dihejmêrin, hin dengên roja hilbijartinê pêşî, hin jî herdu tevlihev dikin. Her dubarekirin li nehan xalan di navbera 3% û 95%ê dengên hatine jimartin de sekinî, û texmîn li hember encama dawî hate nirxandin.",
+  "method_testing_summary": "Li hemû xalên kontrolê, skora Brier a modelê {brier} e, û texmîna wê ya navîn bi navînî {error} xal ji cudahiya dawî dûr e.",
   "method_brier_chart": "Skora Brier li gorî rêjeya dengên hatine jimartin",
   "method_brier_note": "Kêmtir çêtir e. Ger her tim %50 bê gotin, skor 0,25 e.",
   "method_cover_chart": "Çend caran navbeyna %80ê cudahiya dawî girt",
@@ -4706,8 +4908,6 @@
   "method_calibration_note": "Her gilover texmînan li gorî şansa ku daye kom dike. Li ser xeta çargoşe, berendamê ku %70 pêşbînî lê hatiye kirin di %70ê caran de bi ser dikeve.",
   "method_calibration_stated": "Şansa hatî gotin ji bo Demokratê",
   "method_calibration_observed": "Demokrat çend caran bi ser ket",
-  "method_current": "Modela heyî",
-  "method_previous": "Modela berê",
   "method_target": "Armanc",
   "method_perfect": "Kalibrasyona bêkêmasî",
   "method_counted_axis": "Rêjeya dengên hatine jimartin",
@@ -4731,12 +4931,12 @@
   "method_score_miss_hint": "Texmînên ku %95 an zêdetir dabûn windakerê dawî",
   "method_limits_title": "Model çi nabîne",
   "method_limit_types": "Cureyên dengan. Piraniya çavkaniyên navçeyan tenê tevahiyan radigihînin, ji ber vê model ji tevgera jimartinê texmîn dike dengên dereng ber bi kê ve diçin, ne ji komên bi nîşana postê an roja hilbijartinê.",
-  "method_limit_precincts": "Herêmên dengdanê yên raporkirî. Em hê rêjeya herêmên dengdanê yên raporkirî ji bo her navçeyê tomar nakin, ji ber vê model tenê ji jimartinê dinirxîne ka navçe qediyaye an na.",
+  "method_limit_precincts": "Herêmên dengdanê yên raporkirî. Arşîv hê rêjeya herêmên dengdanê yên raporkirî ya her navçeyê tomar nake, ji ber vê yekê model bi tenê ji jimartina wê dinirxîne ka navçe qediyaye yan na.",
   "method_limit_baseline": "Pêşbaziyên bê bingeheke bikêrhatî. Alaska dîroka asta navçeyê tune ye, pêşbaziyên bê hevrik tiştek ji bo berawirdkirinê tune ne, û berendamên ku partiya wan encameke berê tune ye tenê bi jimartinê dimînin.",
   "method_limit_traits": "Demografî di bin asta navçeyê de. Hejmarên demografîk çend sal berê ne û hemû navçeyê digirin, ji ber vê bajarokên New Englandê û cihên din ên ku encamên di bin asta navçeyê de radigihînin bandora demografîk nagirin.",
   "method_limit_pause": "Rawestînên dirêj. Navçeyekî mezin ku bi gelek pusulayên mayî jimartinê rawestîne dikare qediyayî xuya bike, û model hingê hejmara dengên mayî kêm dinirxîne. Dubarekirina li jor vê nêzîkî dawiya jimartinê nîşan dide.",
   "method_score_of": "{count} ji {total}",
-  "method_limit_order": "Rêza jimartinê ya simulekirî. Dubarekirin encamên rastîn ên navçeyan bi kar tînin, lê rêza jimartinê simulekirî ye, ji ber vê rêbazê dicerbînin, ne şevekê bi tevahî dubare dikin. Me jimartina serokatiyê ya 2020î li Florida, Georgia, North Carolina û Pennsylvaniayê jî wekî ku bi rastî di şevê de hate raporkirin dubare kir.",
+  "method_limit_order": "Rêza jimartina simulekirî. Dubarekirin encamên rastîn ên navçeyan bi kar tînin, lê rêza jimartinê simulekirî ye, ji ber vê yekê ew rêbazê diceribînin, ne şevekê bi temamî dubare dikin. Jimartina serokatiyê ya 2020an li Florida, Georgia, North Carolina û Pennsylvaniayê jî wekî ku bi rastî di şevê de hate raporkirin hate dubarekirin.",
   "night_color_label": "Nexşeyê li gorî vê reng bike",
   "night_color_lead": "Pêşî",
   "night_color_chance": "Şans",
@@ -4756,7 +4956,7 @@
   "night_tally_projected": "{count} pêşbînîkirî",
   "night_tally_ahead": "{count} li pêş",
   "night_tally_not_up": "{count} nayê hilbijartin",
-  "night_projected_key": "Pêşbînîkirî: texmîna me ji jimartina heta niha, ne encameke fermî. Cara dawî di {time} de hate nûkirin.",
+  "night_projected_key": "Pêşbînî: ragihandinek ji jimartina heta nuha, ne encameke fermî ye. Nûvekirina dawî di {time} de.",
   "night_chamber_odds": "Şansa piraniyê",
   "night_chamber_split": "{share} piranî tune",
   "night_chamber_histogram": "Şansa her hejmara kursiyan ji bo {party}",
@@ -4767,8 +4967,13 @@
   "night_chamber_others": "Serbixwe û yên din",
   "night_chamber_not_up": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} kursî îsal li ser dengdanê nîne",
         "countPlural=*": "{count} kursî îsal li ser dengdanê nînin"
@@ -4779,8 +4984,13 @@
   "night_chamber_open": "Hemû pêşbaziyan di grafîka {title} de bibîne",
   "night_governors_races": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} pêşbazî",
         "countPlural=*": "{count} pêşbazî"
@@ -4931,7 +5141,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Di {countText} dora duyem de, pêşengê dora yekem têk çû.",
         "countPlural=*": "Di {countText} dora duyem de, pêşengê dora yekem têk çû."
@@ -4945,7 +5157,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} serkeftiyê çemberê kursî nestand, ji ber ku dengê lîsteya partiya wî/wê têr nekir.",
         "countPlural=*": "{countText} serkeftiyê çemberê kursî nestandin, ji ber ku dengê lîsteya partiya wan têr nekir."
@@ -4959,7 +5173,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} berendamê şert û mercan pêkanî beriya dora duyem vekişiya.",
         "countPlural=*": "{countText} berendamê şert û mercan pêkanî beriya dora duyem vekişiyan."
@@ -4975,7 +5191,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} dora duyem ji {from} berendam ket {to} berendam",
         "countPlural=*": "{countText} dora duyem ji {from} berendam ketin {to} berendam"
@@ -5057,7 +5275,7 @@
   "indices_effective_body": "Hejmara bandorker a partiyan, ya Markku Laakso û Rein Taagepera (1979), partiyan bi giranîkirina mezinahiya her yekê dihejmêre: `N = 1 / Σ pᵢ²`, ku `pᵢ` rêjeya dengan an kursiyên partiyekê ye. Deh partiyên wekhev 10 didin; partiyek bi 70% û sê partiyên her yek bi 10% nêzî 1,9 didin. Arşîv du caran vê radigihîne: li gorî dengan, ji bo bijartinên hilbijêran, û li gorî kursiyan, ji bo meclîsa ku jê derketiye.\n\nParçebûna Rae, `F = 1 − Σ pᵢ²`, heman berhev e ku bi awayekî din tê xwendin: îhtimala ku du hilbijêr an du endamên bi tesadufî hatine hilbijartin ji partiyên cuda bin. API wê li kêleka hejmara bandorker a partiyan vedigerîne.",
   "indices_disproportionality_body": "Indeksa Gallagher, an indeksa kêmtirîn çargoşeyan, ya Michael Gallagher (1991), dipîve ka kursî çiqasî ji dengan dûr dikevin: `LSq = √(½ Σ (vᵢ − sᵢ)²)`, bi rêjeyên deng û kursiyan ên ji sedî. Çargoşekirina cudahiyan dike ku yek cudahiyeke mezin ji gelek yên biçûk girantir be, ji ber vê bonusa serkeftî di pergala piraniya sade de bi zelalî xuya dike. Hilbijartina Qraliyeta Yekbûyî ya 2024an 23,7 stand.\n\nIndeksa Loosemore–Hanby, `D = ½ Σ |vᵢ − sᵢ|`, cudahiyan bê çargoşekirin berhev dike. Wekî rêjeya kursiyên ku ji rêjeya dengan zêdetir çûne partiyan tê xwendin. Dema gelek partiyên biçûk her yek hinekî kêm dibin, ji indeksa Gallagher bilindtir derdikeve.",
   "indices_volatility_body": "Guhezbariya Pedersen, ya Mogens Pedersen (1979), dipîve ka çiqas deng ji hilbijartina berê ve guherîne: `V = ½ Σ |pᵢ,t − pᵢ,t−1|`. Hilbijartina berê hilbijartina giştî ya dawî ya heman meclîsê ye di arşîvê de.\n\nNasnameya partiyekê di navbera du hilbijartinan de beşa zehmet e. Arşîv du partiyan dihevgire dema tomarên wê dibêjin yek têkelî ya din bûye, cihê wê girtiye, wekî wê ji nû ve hatiye damezrandin, ketiye nav wê, lîsteya wê ya hilbijartinê bûye, an şaxeke wê ya herêmî ye. Tomaran heta çar gavan dişopîne, û tenê li gorî dîroka hilbijartinê. Partiyek nav guhertî di arşîvê de heman partî ye, ji ber vê navekî nû tu carî wekî guherîn nayê hesibandin. Partiyek ku qetiyaye wekî partiyeke nû tê hesibandin, ji ber vê qetîn wekî guhezbarî xuya dike. Dema partiyek bi 10% deng an zêdetir li aliyê din hevtayek nabîne, hejmar nîşeyek digire: hemû rêje wekî guherîn tê hesibandin, ku dibe ku zêdetir valahiya tomaran nîşan bide ne ku livîna hilbijêran.",
-  "indices_nationalization_body": "Nirxa neteweyîbûna pergala partiyan, ya Mark Jones û Scott Mainwaring (2003), dipîve ka dengên partiyan çiqasî wekhev li welat belav dibin. Ji bo her partiyê, ew hevkêşeya Gini ya rêjeya dengên partiyê li cihên ku deng lê hatine jimartin digire. Formûl `PNS = 1 − Gini` ye. Nirxa tevahiya pergalê nirxa her partiyê bi rêjeya dengên wê giran dike: `PSNS = Σ pᵢ × PNSᵢ`.\n\nMe ew ji pîvanên din re hilbijart ji ber ku ji 0 heta 1 diçe, hesabkirin û ravekirina wê hêsan e, û gelek tê bikaranîn. Ev dihêle ku bi xebatên çapkirî re bi hêsanî were berhevkirin. Cih qada herî hûrgilî ye ku arşîv ji bo dengên hatine jimartin ên meclîsê radigihîne, wekî çemberên Qraliyeta Yekbûyî an eyaletên Almanyayê, û her yek bêyî mezinahiyê carekê tê hesibandin. Hevkêşeya Gini ji hejmara cihan re hesas e, ji ber vê nirxa ku li ser ji deh kêmtir hatiye pîvandin nîşeyek digire.",
+  "indices_nationalization_body": "Skora netewîbûna pergala partiyan, ji Mark Jones û Scott Mainwaring (2003), pîvan dike ka dengên partiyan çiqas wekhev li seranserê welat belav dibin. Ji bo her partiyê, ew hevkêşeya Gini ya rêjeya dengên partiyê li cihên ku deng lê hatine jimartin digire. Formula wê `PNS = 1 − Gini` ye. Skora tevahiya pergalê skora her partiyê bi rêjeya dengên wê giran dike: `PSNS = Σ pᵢ × PNSᵢ`.\n\nArşîv wê li şûna pîvanên din bi kar tîne ji ber ku ji 0 heta 1 diçe, hesibandin û ravekirina wê hêsan e, û bi berfirehî tê bikaranîn. Ev yek berhevdana bi xebatên çapkirî re hêsan dike. Cih jêrtirîn asta ne ku arşîv ji bo dengên hatine jimartin ên meclîsê radigihîne, wekî herêmên hilbijartinê li Keyaniya Yekbûyî an eyaletên Almanyayê, û her yek bêyî mezinahiyê carekê tê hesibandin. Hevkêşeya Gini ji hejmara cihan re hesas e, ji ber vê yekê skora ku li ser ji deh kêmtir cihan hatiye pîvandin nîşeyek digire.",
   "indices_calls_title": "Biryarên Dadmendî",
   "indices_calls_body": "Her yek ji van bijartinan hejmaran diguherîne, ji ber vê her hejmar yên ku li ser wê hatine sepandin lîste dike.\n\n- **Serbixwe û yên din.** Hin çavkanî serbixwe an berendamên biçûk wekî yek kom radigihînin. Ji bo hejmara bandorker a partiyan li gorî dengan, ew kom wekî gelek partiyên biçûk tê hesibandin, ne wekî yek partiyeke mezin, û her kursiyeke serbixwe wekî partiyeke ciyawaz tê hesibandin. Indeksên nehevsengiyê kom wekî yek rêz digirin.\n- **Hevpeymanî.** Dema çavkaniyek kursiyên hevpeymaniyê radigihîne û ji partiyên endam re tomar dike, arşîv jî ji wan re tomar dike. Dema dengên hevpeymaniyê li gorî partiyan nayên dabeşkirin, wekî li Îtalyayê, hevpeymanî wekî yek partî tê hesibandin, di her du hilbijartinan de dema guhezbarî tê pîvandin.\n- **Partiyên xwişk.** Partiyên di hevpeymaniyeke domdar de ku tu carî li hember hev pêşbaziyê nakin, wekî CDU û CSU ya Almanyayê, wekî yek partî têne hesibandin.\n- **Kursiyên bê hevrik.** Kursiyên bê hevrik hatine bidestxistin deng nînin, ji ber vê ji her hejmarê têne derxistin, û hejmar dibêje çend in.\n- **Dor û ast.** Dengên dora yekem di pergalên du dorî de, dengên lîsteyê di pergalên têkel de, û tercîhên yekem di bin dengê veguhezbar ê yekane de, wekî li jor hatiye vegotin.",
   "indices_access_title": "Bidestxistina hejmaran",
@@ -5122,11 +5340,11 @@
   "email_verified": "Hate piştrastkirin.",
   "email_unverified": "Nehatiye piştrastkirin.",
   "email_verify_link": "Piştrast bike",
-  "email_pending": "Dema ku tu bipejirînî, e-nameya te dê bibe {newEmail}. Pêşî lînka ku me ji {email} re şand veke, paşê ya ku em ê ji {newEmail} re bişînin. Her lînk saetekê dixebite.",
-  "email_pending_unverified": "Dema ku tu lînka ku me ji {newEmail} re şand vekî, e-nameya te dê bibe ev navnîşan. Lînk saetekê dixebite.",
+  "email_pending": "E-peyama te dê piştî pejirandina te bibe {newEmail}. Girêdana ku şandiye {email} vekin, paşê ya ku şandiye {newEmail}. Her girêdan saetekê dixebite.",
+  "email_pending_unverified": "E-peyama te dê piştî vekirina girêdana ku ji bo {newEmail} hatiye şandin bibe wê navnîşanê. Saetekê dixebite.",
   "email_new": "E-nameya nû",
-  "email_change_hint": "Em ê ji bo pejirandina guhertinê e-nameyekê ji {email} re bişînin, paşê ji bo piştrastkirinê lînkekê ji navnîşana nû re bişînin. Heta ku tu her du gavan neqedînî, e-nameya te naguhere.",
-  "email_change_hint_unverified": "Em ê lînkekê ji navnîşana nû re bişînin. Dema ku tu wê vekî, e-nameya te diguhere.",
+  "email_change_hint": "E-peyamek ji bo pejirandina guhertinê dê biçe {email}, paşê girêdanek ji bo erêkirinê dê biçe navnîşana nû. E-peyama te heta ku her du gavan temam nekî wekî xwe dimîne.",
+  "email_change_hint_unverified": "Girêdanek dê biçe navnîşana nû. E-peyama te piştî vekirina wê diguhere.",
   "email_change": "E-nameyê biguherîne",
   "email_invalid": "Navnîşaneke e-nameyê ya derbasdar binivîse.",
   "email_same": "Ev jixwe e-nameya te ye.",
@@ -5165,7 +5383,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} pêşniyar",
         "countPlural=*": "{countText} pêşniyar"
@@ -5179,7 +5399,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} hate pejirandin",
         "countPlural=*": "{countText} hatin pejirandin"
@@ -5270,7 +5492,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Rojê pêşniyarek",
         "countPlural=*": "Rojê {countText} pêşniyar"
@@ -5317,7 +5541,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} vegerandin ket rêzê.",
         "countPlural=*": "{countText} vegerandin ketin rêzê."
@@ -5345,7 +5571,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} komeya guhertinan",
         "countPlural=*": "{countText} komeyên guhertinan"
@@ -5388,7 +5616,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} guhertin",
         "countPlural=*": "{countText} guhertin"
@@ -5471,7 +5701,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Agahdarî, {countText} nexwendî",
         "countPlural=*": "Agahdarî, {countText} nexwendî"
@@ -5510,7 +5742,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} agahdariya nû",
         "countPlural=*": "{countText} agahdariyên nû"
@@ -5524,7 +5758,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Tiştek li Elections Archive bala te dixwaze.",
         "countPlural=*": "{countText} tişt li Elections Archive bala te dixwazin."
@@ -5538,7 +5774,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Agahdariyeke te ya nû heye",
         "countPlural=*": "{countText} agahdariyên te yên nû hene"
@@ -5554,7 +5792,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Lîsteya te ya şopandinê îro: {countText} nûvekirin",
         "countPlural=*": "Lîsteya te ya şopandinê îro: {countText} nûvekirin"
@@ -5568,7 +5808,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Lîsteya te ya şopandinê vê hefteyê: {countText} nûvekirin",
         "countPlural=*": "Lîsteya te ya şopandinê vê hefteyê: {countText} nûvekirin"
@@ -5582,7 +5824,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} nûvekirin li ser tiştên ku tu dişopînî.",
         "countPlural=*": "{countText} nûvekirin li ser tiştên ku tu dişopînî."
