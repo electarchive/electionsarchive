@@ -8,7 +8,7 @@ export type Point = {
   low: number;
   mid: number;
   high: number;
-  share: number;
+  share: number | null;
   isLive: boolean;
 };
 
@@ -53,7 +53,10 @@ export function history(race: LiveRace, until: string | null): Array<Point> {
       low: Math.min(low, high),
       mid: found.margin.mid * flip,
       high: Math.max(low, high),
-      share: Math.min(1, found.shareIn.mid),
+      share:
+        found.status === "estimating" || found.status === "too-early"
+          ? Math.min(1, found.shareIn.mid)
+          : null,
       isLive: found.status === "estimating",
     });
   }

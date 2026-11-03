@@ -69,7 +69,12 @@
       };
     }),
   );
-  const start = $derived(Math.min(opens, points[0]?.time ?? opens));
+  const start = $derived.by(() => {
+    const first = points[0]?.time ?? opens;
+    return first - opens > 2 * 3_600_000
+      ? first - 3_600_000
+      : Math.min(opens, first);
+  });
   const end = $derived(
     Math.max(
       opens + 5 * 3_600_000,
