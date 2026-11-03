@@ -5468,6 +5468,41 @@ for key, publisher, title, url, local in (
         "in/hamilton_westfield_ballot.pdf",
     ),
     (
+        "IN-18097-msd-decatur",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Decatur Township Precinct 1",
+        "https://maps.indy.gov/Ballots/de001_non.pdf",
+        "in/marion_msd/de001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-perry",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Perry Township Precinct 1",
+        "https://maps.indy.gov/Ballots/pe001_non.pdf",
+        "in/marion_msd/pe001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-pike",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Pike Township Precinct 1",
+        "https://maps.indy.gov/Ballots/pk001_non.pdf",
+        "in/marion_msd/pk001_non.pdf",
+    ),
+    (
+        "IN-18097-msd-warren",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Warren Township Precinct 20",
+        "https://maps.indy.gov/Ballots/wr020_non.pdf",
+        "in/marion_msd/wr020_non.pdf",
+    ),
+    (
+        "IN-18097-msd-wayne",
+        "Marion County Election Board",
+        "Sample ballot, General Election November 3, 2026, Wayne Township Precinct 2",
+        "https://maps.indy.gov/Ballots/wy002_non.pdf",
+        "in/marion_msd/wy002_non.pdf",
+    ),
+    (
         "IN-18001-townships",
         "Adams County Clerk",
         "Candidate List - Abbreviated, 2026 General Election, Adams County",
@@ -7202,6 +7237,13 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+IN_BALLOT_SEATS = {
+    "Marion Decatur Township School Board, At Large": ("IN-18097-msd-decatur", 3),
+    "Marion Perry Township Public School Board, At Large": ("IN-18097-msd-perry", 3),
+    "Marion Pike Township School Board, At Large": ("IN-18097-msd-pike", 3),
+    "Marion Warren Township School Board, At Large": ("IN-18097-msd-warren", 3),
+    "Marion Wayne Township Public School Board, At Large": ("IN-18097-msd-wayne", 4),
+}
 KY_PRINTED_BOARDS = (
     ("Harrison", 1, False, ("Laura Norcross",)),
     ("Harrison", 2, False, ("Mary June Brunker",)),
@@ -8479,11 +8521,15 @@ def parse() -> None:
         count = int(seats[1]) if seats else enr[0] if enr else 0
         if category == "TOWNSHIP BOARD MEMBER" and count < 2 and not re.search(r"Board, .+ Township", title):
             count, enr = 3, None
+        heading = re.sub(r"\(\d+ seats?\)|, \w[\w .]*? County\b", "", title)
+        if ballot := IN_BALLOT_SEATS.get(heading):
+            count, enr = ballot[1], None
         named, independent = party(cells[1])
         feeds["IN"].append(
             {
+                **({"feed": ballot[0]} if ballot else {}),
                 "county": county[1] if county else "",
-                "contest": re.sub(r"\(\d+ seats?\)|, \w[\w .]*? County\b", "", title),
+                "contest": heading,
                 "seats": count,
                 "cite": enr[1] if enr else None,
                 "name": cells[0],
