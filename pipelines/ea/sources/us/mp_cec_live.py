@@ -28,7 +28,7 @@ CONTESTS = {
     "constitutional convention": "2026-11-03:MP:question:constitutional-convention-question",
 }
 HOUSE = re.compile(r"^house .*election district (\d)")
-SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
+SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "dr", "md", "phd", "esq"}
 
 
 def collect(client: httpx.Client) -> dict[str, tuple[bytes, str]]:

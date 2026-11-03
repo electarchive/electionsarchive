@@ -882,3 +882,11 @@ interval = 120
 poller = "muktedir"
 publisher = "Commonwealth Election Commission of the Northern Mariana Islands"
 url = "https://www.votecnmi.gov.mp/general-election-2026.php"
+
+[[feed]]
+id = "us.vi_live"
+adapter = "us.vi_live"
+interval = 120
+poller = "muktedir"
+publisher = "Election System of the Virgin Islands"
+url = "https://vivote.gov/?elections=2026-general-election"
