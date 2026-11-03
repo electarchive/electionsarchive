@@ -11824,6 +11824,8 @@ def parse() -> None:
                     lambda person: re.sub(r"-[a-z](?=-|$)", "", person), return_dtype=pl.String
                 )
             )
+            .when(pl.col("tail").str.starts_with("IN:"))
+            .then(pl.col("person").str.replace_all("-", ""))
             .otherwise(pl.col("person"))
         )
         .unique(["tail", "twin"], keep="first", maintain_order=True)
