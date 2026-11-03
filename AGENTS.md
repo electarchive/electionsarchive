@@ -31,6 +31,7 @@ Read the matching file before working in its area:
 ## Conventions
 
 - Svelte 5 with runes. Strict TypeScript: no `any`; use `unknown` and narrow it.
+- Never `await` in a page's markup (`$derived(await import(...))` included). A suspended incoming page keeps the outgoing page mounted with the new route's data, and the outgoing page crashes on it. To split a route's view code, return the component from a universal `+page.ts` load (see `src/routes/[...path]/+page.ts`). For a small optional widget, use `{#await import(...) then ...}`.
 - Keep `packages/engine`, `packages/analytics`, and `packages/view-spec` free of Node-only APIs, because they also run in the browser.
 - Every dependency version lives in the `catalog:` section of `pnpm-workspace.yaml`.
 - American English in code, copy, and docs.
