@@ -389,9 +389,9 @@ BOARDS = (
     ),
     ("Guthrie", f"Guthrie County {SWCD}", "Commissioner", 2, False, ("Jamie Patrick", "Alan Wedemeyer")),
     ("Guthrie", f"Guthrie County {SWCD}", "Commissioner", 1, True, ("Adam Ebert",)),
-    ("Chickasaw", f"Chickasaw County {SWCD}", "Commissioner", None, False, ("Kim Leichtman", "Steven Mashek")),
+    ("Chickasaw", f"Chickasaw County {SWCD}", "Commissioner", 2, False, ("Kim Leichtman", "Steven Mashek")),
     ("Clayton", f"Clayton County {SWCD}", "Commissioner", 2, False, ("Travis Anderson", "Scott Hilgerson")),
-    ("Des Moines", f"Des Moines County {SWCD}", "Commissioner", None, False, ("June Morgan", "Brian Messer")),
+    ("Des Moines", f"Des Moines County {SWCD}", "Commissioner", 2, False, ("June Morgan", "Brian Messer")),
     (
         "Keokuk",
         "Keokuk County Hospital",
@@ -577,7 +577,7 @@ BOARDS = (
         "Louisa",
         f"Louisa County {SWCD}",
         "Commissioner",
-        None,
+        2,
         False,
         (
             "Kathy Dice",

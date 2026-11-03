@@ -494,10 +494,10 @@ async function switches() {
 }
 
 function office(seat: string): LiveOffice {
-  if (seat.startsWith("senate")) {
+  if (/^senate(?:-special)?$/u.test(seat)) {
     return "senate";
   }
-  if (seat.startsWith("house")) {
+  if (/^house-(?:\d+|at-large)$/u.test(seat)) {
     return "house";
   }
   return seat === "governor" ? "governor" : "other";
@@ -550,6 +550,7 @@ async function listRaces(found: {
           select c.id, s.path, c.district_area_id as district
           from contest c join slug s on s.entity_id = c.id and s.is_current
           where c.id in (select id from top union select id from fed)
+            and exists (select from contest_option o where o.contest_id = c.id)
         `)
       : await db.execute<{
           id: string;
