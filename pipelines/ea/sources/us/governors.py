@@ -322,6 +322,7 @@ def emit() -> Path:
             state = value.removeprefix("governor:")
             won[state].append((day, contest, person, set(slug(ballot or "").split("-"))))
             calendar[state].append(day)
+        candidates = {person for entries in won.values() for _, _, person, _ in entries}
         persons: dict[str, UUID] = {}
         linked: set[UUID] = set()
         previous: dict[str, UUID] = {}
@@ -360,6 +361,16 @@ def emit() -> Path:
                     persons[qid] = cs.key("wikidata", qid)
                     cs.add("person", id=persons[qid])
                     cs.add("name", entity_id=persons[qid], text=label, lang="en", kind="official", is_preferred=True)
+            if start is not None and len(words) > 1 and persons[qid] not in candidates:
+                stayed = {
+                    person
+                    for day, _, person, ballot in won[state]
+                    if start < day and (end is None or day < end) and {words[0], surname} <= ballot
+                }
+                if len(stayed) == 1 and (survivor := next(iter(stayed))) not in tagged:
+                    cs.merge(persons[qid], survivor)
+                    persons[qid] = survivor
+                    tagged.add(survivor)
             contest = match[0] if match is not None and match[1] == persons[qid] and match[0] not in linked else None
             if contest is not None:
                 linked.add(contest)
