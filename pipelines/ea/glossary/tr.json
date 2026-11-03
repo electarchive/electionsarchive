@@ -228,6 +228,11 @@
   "term": "parlamento",
   "note": "The Turkish parliament is TBMM, or 'Meclis'."
  },
+ "grand national assembly": {
+  "term": "TBMM",
+  "note": "Türkiye Büyük Millet Meclisi; in names and titles write 'TBMM' ('Grand National Assembly, Kastamonu' is 'TBMM, Kastamonu'), never a word-for-word 'Büyük Ulusal Meclis'.",
+  "avoid": ["Büyük Ulusal Meclis", "Grand Ulusal"]
+ },
  "lower house": {
   "term": "alt meclis",
   "note": ""

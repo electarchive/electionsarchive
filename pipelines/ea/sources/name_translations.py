@@ -147,7 +147,7 @@ Glossary (English: {language}, with notes):
 {glossary}"""
 )
 
-ROOTS = """
+ROOT = """
 with recursive up(id, at, depth) as (
   select id, id, 0 from polity
   union
@@ -157,7 +157,11 @@ with recursive up(id, at, depth) as (
   from up join polity p on p.id = up.at
   where p.iso_code is not null
   order by up.id, p.iso_code ~ '^[A-Z]{2}$' desc, up.depth
-), owner(id, polity_id) as (
+)"""
+
+ROOTS = (
+    ROOT
+    + """, owner(id, polity_id) as (
   select c.id, e.polity_id from contest c join election e on e.id = c.election_id
   union all select id, polity_id from election
   union all select id, polity_id from body
@@ -174,6 +178,24 @@ left join owner o on o.id = n.entity_id
 left join root r on r.id = o.polity_id
 where n.lang = 'en' and n.is_preferred and en.type::text = any(%s)
 """
+)
+
+PLACE_ROWS = (
+    ROOT
+    + """
+select distinct n.text, case
+  when en.type = 'area' then split_part(a.scheme_code, '.', 1)
+  when p.iso_code ~ '^[A-Z]{2}$' then ''
+  else coalesce(r.iso, '')
+end
+from name n
+join entity en on en.id = n.entity_id
+left join area a on a.id = n.entity_id
+left join polity p on p.id = n.entity_id
+left join root r on r.id = n.entity_id
+where en.type::text in ('area', 'polity') and n.lang in ('en', 'und') and length(n.text) > 2
+"""
+)
 
 Slots = list[tuple[str, str]]
 
@@ -185,19 +207,19 @@ def md5(text: str) -> str:
 def fetch() -> str:
     with connect() as conn:
         rows = conn.execute(ROOTS, [list(TYPES)]).fetchall()
-        places = conn.execute(
-            "select distinct n.text from name n join entity e on e.id = n.entity_id "
-            "where e.type::text in ('area', 'polity') and n.lang in ('en', 'und') and length(n.text) > 2"
-        ).fetchall()
+        places = conn.execute(PLACE_ROWS).fetchall()
     WORK.mkdir(parents=True, exist_ok=True)
     TEXTS.write_text(json.dumps([list(row) for row in rows], ensure_ascii=False))
-    PLACES.write_text(json.dumps([row[0] for row in places], ensure_ascii=False))
+    countries: dict[str, set[str]] = collections.defaultdict(set)
+    for text, iso in places:
+        countries[text].add(iso)
+    PLACES.write_text(json.dumps({text: sorted(isos) for text, isos in countries.items()}, ensure_ascii=False))
     return f"{len(rows)} names, {len(places)} place names"
 
 
 class Miner:
     def __init__(self, vocab: set[str]) -> None:
-        self.places = set(json.loads(PLACES.read_text()))
+        self.places: dict[str, list[str]] = json.loads(PLACES.read_text())
         self.vocab = vocab
 
     def rare(self, text: str, put: Callable[[str, str], str]) -> str:
@@ -216,7 +238,7 @@ class Miner:
 
         return WORD.sub(sub, text)
 
-    def mask(self, text: str) -> tuple[str, Slots]:
+    def mask(self, text: str, iso: str) -> tuple[str, Slots]:
         slots: Slots = []
 
         def put(kind: str, value: str) -> str:
@@ -235,7 +257,7 @@ class Miner:
                 if (
                     span in self.places
                     and span[0].isupper()
-                    and not (end - at == 1 and span in GENERIC)
+                    and not (end - at == 1 and (span in GENERIC or not {"", iso} & set(self.places[span])))
                     and "{" not in span
                 ):
                     hit = end
@@ -274,8 +296,8 @@ def vocab() -> set[str]:
         return set(json.loads(VOCAB.read_text()))
     miner = Miner(set())
     seen: collections.Counter[str] = collections.Counter()
-    for _, text, _ in texts():
-        template, _ = miner.mask(text)
+    for _, text, iso in texts():
+        template, _ = miner.mask(text, iso)
         seen.update(set(re.findall(r"[A-Z][\w'’.&-]*", SLOT.sub(" ", template))))
     words = {word for word, count in seen.items() if count >= 25}
     VOCAB.write_text(json.dumps(sorted(words), ensure_ascii=False))
@@ -286,8 +308,8 @@ def key(template: str) -> str:
     return md5(template)[:16]
 
 
-def split(miner: Miner, kind: str, text: str) -> tuple[str, Slots, bool]:
-    template, slots = miner.mask(text)
+def split(miner: Miner, kind: str, text: str, iso: str) -> tuple[str, Slots, bool]:
+    template, slots = miner.mask(text, iso)
     if text in SHORTS or (
         kind in WHOLE_KINDS
         and slots
@@ -308,7 +330,7 @@ def mine() -> tuple[dict[str, dict[str, object]], dict[str, dict[str, object]]]:
     counts: collections.Counter[tuple[str, str]] = collections.Counter()
     bare: set[tuple[str, str]] = set()
     for kind, text, iso in texts():
-        template, slots, whole = split(miner, kind, text)
+        template, slots, whole = split(miner, kind, text, iso)
         found = templates.setdefault(key(template), {"english": template, "kind": kind, "count": 0})
         found["count"] = cast(int, found["count"]) + 1
         if whole:
@@ -570,7 +592,7 @@ def emit() -> list[Path]:
             for id, exonym in exonyms.items():
                 offer(cast(str, places[id]["english"]), exonym)
             for kind, text, iso in names:
-                template, found, _ = split(miner, kind, text)
+                template, found, _ = split(miner, kind, text, iso)
                 pattern = done.get(key(template))
                 if pattern is None:
                     continue
