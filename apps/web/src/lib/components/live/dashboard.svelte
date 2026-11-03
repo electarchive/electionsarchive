@@ -42,6 +42,7 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
+  import Calls from "./dashboard/calls.svelte";
   import Chambers from "./dashboard/chamber.svelte";
   import Explorer from "./dashboard/explorer.svelte";
   import Flip from "./dashboard/flip.svelte";
@@ -848,7 +849,7 @@
   </header>
 
   <section
-    class="grid gap-5 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[17rem_minmax(0,36rem)] lg:gap-12"
+    class="grid gap-5 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[17rem_minmax(0,36rem)] lg:gap-12 xl:grid-cols-[17rem_minmax(0,36rem)_minmax(16rem,22rem)]"
     aria-labelledby="night-pick"
   >
     <div class="grid content-start gap-2">
@@ -876,6 +877,12 @@
       }}
       {href}
     />
+    <aside class="lg:col-span-2 xl:col-span-1" aria-labelledby="night-calls">
+      <Calls
+        {summaries}
+        href={(summary: Summary) => toLive(summary.race.slug)}
+      />
+    </aside>
   </section>
 
   {#if chambers != null && pair != null}
