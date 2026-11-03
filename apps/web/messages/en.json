@@ -3533,7 +3533,7 @@
   "agents_ask_2": "Which House races are closest tonight, and how much of the vote is counted in each?",
   "agents_ask_3": "How did Georgia's governor race shift between 2022 and tonight, county by county?",
   "agents_ask_4": "What were the closest Senate races of the last 50 years?",
-  "agents_ask_5": "How has the Labour Party's vote share changed since 1945?",
+  "agents_ask_5": "How has the Democratic share of the presidential vote in Texas changed since 1960?",
   "agents_ask_6": "Show me every election Bernie Sanders has run in, with his share of the vote.",
   "agents_more_title": "Everything else",
   "agents_tools_count": "All {count} tools",
