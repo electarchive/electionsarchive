@@ -13,7 +13,7 @@ from ea.sources.us import ca_la_svc
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_la_sov"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FIPS = "06037"
 RESULTS = "https://results.lavote.gov/ElectionResults"
@@ -66,6 +66,7 @@ MEASURE_NOTE = (
 SEATS = ' The seat count is the Registrar\'s own "Vote for no more than" line for the contest on results.lavote.gov.'
 NO_SEATS = " No seat count is stated for this at-large contest, so no outcomes are recorded."
 PARTIAL = " The jurisdiction extends beyond Los Angeles County; these are the county's precincts only."
+RETYPED = "A city treasurer, clerk, or controller race that an earlier parse read as a ballot measure; the race is now its own office contest"
 
 CITIES = {
     "AVALON": "Avalon",
@@ -318,10 +319,10 @@ JURISDICTIONS = sorted(
 )
 OFFICES = (
     (re.compile(r"\bMAYOR\b"), "mayor", "Mayor"),
-    (re.compile(r"\b(?:CTY|CITY)\s*CLK\b|\bCLERK\b"), "city-clerk", "City Clerk"),
-    (re.compile(r"\bTREA\w*\b"), "city-treasurer", "City Treasurer"),
+    (re.compile(r"(?:\b|CTY|CITY)CLK\b|\bCLERK\b"), "city-clerk", "City Clerk"),
+    (re.compile(r"\bTREA\w*\b|\bCYTR\b"), "city-treasurer", "City Treasurer"),
     (re.compile(r"\bATTRNY\b"), "city-attorney", "City Attorney"),
-    (re.compile(r"\bCONTRL\b"), "city-controller", "City Controller"),
+    (re.compile(r"\bCONTRL\b|(?<!RNT )\bCNTR\b"), "city-controller", "City Controller"),
     (re.compile(r"\bAUDITOR\b"), "city-auditor", "City Auditor"),
 )
 BOARD = re.compile(
@@ -376,15 +377,16 @@ def classify(label: str) -> dict[str, object] | None:
     if council is not None:
         return row | {"type": "council", "seat": council[1]}
     measure = re.match(r"^(?:MEAS(?:URE)?\s*)([A-Z0-9]+)$", rest)
-    if measure is None and re.fullmatch(r"-?\s*[A-Z]{1,4}", rest) and not BOARD.match(rest.strip(" -")):
-        measure = re.match(r"^-?\s*([A-Z]{1,4})$", rest)
     if measure is None and re.fullmatch(r"(?:-?\s*MEAS(?:URE)?\s*[A-Z0-9]+)", rest):
         measure = re.search(r"([A-Z0-9]+)$", rest)
+    if measure is None:
+        for pattern, office, title in OFFICES:
+            if pattern.search(rest):
+                return row | {"type": "office", "office": office, "title": title, "seat": None}
+    if measure is None and re.fullmatch(r"-?\s*[A-Z]{1,4}", rest) and not BOARD.match(rest.strip(" -")):
+        measure = re.match(r"^-?\s*([A-Z]{1,4})$", rest)
     if measure is not None:
         return row | {"type": "measure", "code": measure[1]}
-    for pattern, office, title in OFFICES:
-        if pattern.search(rest):
-            return row | {"type": "office", "office": office, "title": title, "seat": None}
     board = BOARD.match(rest)
     if board is not None and kind != "city":
         return row | {"type": "board", "seat": board[1] or board[2]}
@@ -493,6 +495,19 @@ def emit() -> Path:
             raise ValueError("the Statement of Votes Cast source must already exist")
         for url in sorted(set(rows["url"])):
             cs.artifact(raw.cached(ca_la_svc.SOURCE, url), source)
+        retyped: set[UUID] = set()
+        for value, contest in conn.execute(
+            """select x.value, x.entity_id from external_id x join entity e on e.id = x.entity_id
+               where x.scheme = 'us.contest' and x.value like '%%:CA:%%:measure-%%' and e.retired_by is null
+                 and x.entity_id in (select id from contest where changeset_id in
+                                     (select id from changeset where pipeline = %s))""",
+            [SOURCE],
+        ).fetchall():
+            code = value.rpartition(":measure-")[2]
+            if re.fullmatch(r"[a-z]{1,4}", code) and any(pattern.search(code.upper()) for pattern, _, _ in OFFICES):
+                retyped.add(contest)
+        for contest in sorted(retyped):
+            cs.add("entity_retirement", entity_id=contest, reason=RETYPED)
 
         polities: dict[tuple[str, str], tuple[UUID, str, str]] = {}
         for pid, kind, text, code, path in conn.execute(
@@ -500,8 +515,9 @@ def emit() -> Path:
                join external_id x on x.entity_id = p.id and x.scheme = 'us.polity'
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id and s.is_current
-               where x.value like any(%s)""",
-            [["place:06%", "school:06%", "special:06%", "county:06037"]],
+               where x.value like any(%s)
+               order by x.changeset_id in (select id from changeset where pipeline = %s)""",
+            [["place:06%", "school:06%", "special:06%", "county:06037"], SOURCE],
         ).fetchall():
             polities[
                 (
@@ -930,7 +946,11 @@ def emit() -> Path:
                         person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(candidate)}")
                         matched = people.get((pid, parts[0], parts[-1])) if len(parts) >= 2 else None
                         if matched is not None and matched != person:
-                            if person not in cs.minted:
+                            if person in cs.minted:
+                                for keyed in cs.rows["external_id"]:
+                                    if keyed["entity_id"] == person:
+                                        keyed["entity_id"] = matched
+                            else:
                                 cs.merge(person, matched)
                             person = matched
                         elif person in cs.minted:
