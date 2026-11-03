@@ -1057,6 +1057,13 @@ async function night(
       },
     ]),
   );
+  const fold = (unit: string) => {
+    const known = unitOf.get(unit);
+    const parent = known?.parentId == null ? null : unitOf.get(known.parentId);
+    return parent?.areaId != null && parent.areaId === known?.areaId
+      ? parent.id
+      : unit;
+  };
   const traitsOf = new Map(
     held.rows.flatMap((row) => {
       const traits = row.scheme === "us.county" ? TRAITS[row.code] : undefined;
@@ -1078,8 +1085,9 @@ async function night(
     const counts: Array<LiveUnitCount> = [];
     const last = new Map<string, string>();
     const seen = new Set<string>(
-      (drawnBy.get(row.id) ?? []).map((line) => line.unit),
+      (drawnBy.get(row.id) ?? []).map((line) => fold(line.unit)),
     );
+    const current = new Map<string, Array<number>>();
     for (const frame of mine) {
       const totals = own.map(() => 0);
       const byUnit = new Map<string, Array<number>>();
@@ -1099,8 +1107,21 @@ async function night(
         reporting: frame.reporting,
         expected: frame.expected,
       });
+      const touched = new Set<string>();
       for (const [unit, votes] of byUnit) {
+        current.set(unit, votes);
+        touched.add(fold(unit));
+      }
+      for (const unit of touched) {
         seen.add(unit);
+        const votes = own.map(() => 0);
+        for (const [member, part] of current) {
+          if (fold(member) === unit) {
+            for (const [position, value] of part.entries()) {
+              votes[position] = (votes[position] ?? 0) + value;
+            }
+          }
+        }
         const key = votes.join(",");
         if (last.get(unit) !== key) {
           last.set(unit, key);
@@ -1114,7 +1135,10 @@ async function night(
         }
       }
     }
-    const lines = priorBy.get(row.id) ?? [];
+    const lines = (priorBy.get(row.id) ?? []).map((line) => ({
+      ...line,
+      unit: fold(line.unit),
+    }));
     const seats = lines.filter((line) => line.kind === "seat");
     const reach = new Set(
       seats.length > 0
@@ -1263,6 +1287,10 @@ async function night(
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
     const isLocal = !house && !TOP.test(seat);
+    const carried = new Set([
+      ...counts.map((entry) => entry.unitId),
+      ...baseline.map((entry) => entry.unitId),
+    ]);
     const reported = new Set(
       counts.flatMap((entry) => {
         const scheme = unitOf.get(entry.unitId)?.scheme;
@@ -1348,7 +1376,10 @@ async function night(
       units: [...seen].flatMap((unit) => {
         const known = unitOf.get(unit);
         return known == null ||
-          (isLocal && reported.size > 0 && !reported.has(known.scheme))
+          (isLocal && reported.size > 0 && !reported.has(known.scheme)) ||
+          (known.parentId != null &&
+            carried.has(known.parentId) &&
+            !carried.has(unit))
           ? []
           : [known];
       }),
