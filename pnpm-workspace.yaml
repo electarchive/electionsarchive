@@ -80,7 +80,7 @@ catalog:
   shadcn-svelte: ^1.7.1
   svelte: ^5.57.3
   svelte-check: ^4.7.7
-  svelte-islands: ^0.1.0
+  svelte-islands: ^0.2.0
   svelte-sonner: ^1.2.2
   sveltekit-superforms: ^3.0.0
   tailwind-variants: ^3.3.1

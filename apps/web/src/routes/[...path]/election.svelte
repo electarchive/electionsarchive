@@ -2517,7 +2517,12 @@
               {/if}
             {/snippet}
             {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= (race.places?.tally.count ?? 0)}
-              {@render held(race.places?.part ?? null, outlined, "wards")}
+              {@render held(
+                race.places?.part ?? null,
+                outlined,
+                "wards",
+                false,
+              )}
             {/if}
             {@render wards(race.wards ?? [], race.anchor, race.lede)}
           {/if}
@@ -2788,7 +2793,7 @@
           {/if}
         {/snippet}
         {#snippet mapped()}
-          {@render held(race.places?.part ?? null, drawn, "map")}
+          {@render held(race.places?.part ?? null, drawn, "map", false)}
         {/snippet}
         {#snippet summary()}
           <div
@@ -2976,7 +2981,7 @@
           {/if}
         {/snippet}
         {#if race.places != null && !race.isTotal}
-          {@render held(race.places.part, tabled, "table")}
+          {@render held(race.places.part, tabled, "table", true)}
         {/if}
       {/if}
       {#if index === regionsAt}
@@ -3582,11 +3587,16 @@
   </div>
 {/snippet}
 
-{#snippet held(part: Part | null, content: Snippet, view: string)}
+{#snippet held(
+  part: Part | null,
+  content: Snippet,
+  view: string,
+  isDeferred: boolean,
+)}
   {#if part == null}
     {@render content()}
   {:else}
-    <Island {part} {view} when="visible">
+    <Island {part} {view} when="visible" defer={isDeferred}>
       {@render content()}
     </Island>
   {/if}
