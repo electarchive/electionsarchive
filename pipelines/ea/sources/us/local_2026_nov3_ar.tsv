@@ -17,6 +17,7 @@ AR-05001	Arkansas County Justice of the Peace District 7	0	Michelle Blasengame	I
 AR-05001	Arkansas County Justice of the Peace District 7	0	Brandee Weaver	Republican	Arkansas	1
 AR-05001	Arkansas County Justice of the Peace District 8	0	Lloyd Brosius	Republican	Arkansas	1
 AR-05001	Arkansas County Justice of the Peace District 9	0	Curtis Ahrens	Republican	Arkansas	1
+AR-05001	Arkansas County Treasurer and Collector	0	Ruby C. Dillion	Republican	Arkansas	1
 AR-05003	Ashley County Circuit Clerk	0	Kim Adams Lauhon	Republican	Ashley	1
 AR-05003	Ashley County Coroner	0	Keith Medders	Republican	Ashley	1
 AR-05003	Ashley County Assessor	0	Beth Rush	Republican	Ashley	1
@@ -702,13 +703,9 @@ AR-05069	Jefferson County Coroner	0	Chad Kelley	Democratic	Jefferson	1
 AR-05069	Jefferson County Assessor	0	Gloria Tillman	Democratic	Jefferson	1
 AR-05069	Jefferson County Clerk	0	Shawndra Taggart	Democratic	Jefferson	1
 AR-05069	Jefferson County Collector	0	Tony Washington	Democratic	Jefferson	1
-AR-05069	Jefferson County Collector	0	JOHNSON (C w/Treas) Melanie Cowell	Republican	Jefferson	1
-AR-05069	Jefferson County Collector	0	LAFAYETTE (C w/Treas) Michelle Perkison	Republican	Jefferson	1
 AR-05069	Jefferson County Judge	0	Nathaniel Todd	Republican	Jefferson	1
 AR-05069	Jefferson County Judge	0	Efrem Neely Sr.	Democratic	Jefferson	1
 AR-05069	Jefferson County Treasurer	0	Vonysha Goodwin	Democratic	Jefferson	1
-AR-05069	Jefferson County Treasurer	0	JOHNSON (C w/Coll) Melanie Cowell	Republican	Jefferson	1
-AR-05069	Jefferson County Treasurer	0	LAFAYETTE (C w/Coll) Michelle Perkison	Republican	Jefferson	1
 AR-05069	Jefferson County Sheriff	0	Lafayette Woods Jr.	Democratic	Jefferson	1
 AR-05069	Jefferson County Sheriff	0	Chris Lowery	Independent	Jefferson	1
 AR-05069	Jefferson County Justice of the Peace District 1	0	Jacqueline Tillmon	Democratic	Jefferson	1
@@ -750,6 +747,7 @@ AR-05071	Johnson County Justice of the Peace District 9	0	Susan Edens	Democratic
 AR-05071	Johnson County Justice of the Peace District 10	0	Phillip Varnell	Democratic	Johnson	1
 AR-05071	Johnson County Justice of the Peace District 10	0	Robert “Pete” Petersen	Republican	Johnson	1
 AR-05071	Johnson County Justice of the Peace District 11	0	Greg Donaldson	Republican	Johnson	1
+AR-05071	Johnson County Treasurer and Collector	0	Melanie Cowell	Republican	Johnson	1
 AR-05073	Lafayette County Circuit Clerk	0	Dana Phillips	Republican	Lafayette	1
 AR-05073	Lafayette County Coroner	0	"William C. ""Bill"" Powell"	Independent	Lafayette	1
 AR-05073	Lafayette County Assessor	0	Billie Joe Pierson	Republican	Lafayette	1
@@ -768,6 +766,7 @@ AR-05073	Lafayette County Justice of the Peace District 7	0	Horace M. “Buddy�
 AR-05073	Lafayette County Justice of the Peace District 8	0	Stephanie Harris	Democratic	Lafayette	1
 AR-05073	Lafayette County Justice of the Peace District 8	0	Jason Martin	Independent	Lafayette	1
 AR-05073	Lafayette County Justice of the Peace District 9	0	Jimmy Brackman	Independent	Lafayette	1
+AR-05073	Lafayette County Treasurer and Collector	0	Michelle Perkison	Republican	Lafayette	1
 AR-05075	Lawrence County Coroner	0	Robert Chris Warden	Republican	Lawrence	1
 AR-05075	Lawrence County Assessor	0	Vickie Slusser	Republican	Lawrence	1
 AR-05075	Lawrence County Clerk	0	Brandi Parker	Republican	Lawrence	1
@@ -951,10 +950,8 @@ AR-05093	Mississippi County Assessor	0	Brannah D. Bibbs	Republican	Mississippi	1
 AR-05093	Mississippi County Clerk	0	Tiffany D. Baker	Democratic	Mississippi	1
 AR-05093	Mississippi County Clerk	0	Tyler Franklin Dunegan	Republican	Mississippi	1
 AR-05093	Mississippi County Collector	0	Susan Goff Short	Republican	Mississippi	1
-AR-05093	Mississippi County Collector	0	MONROE (C w/Treas) Elizabeth Davenport	Republican	Mississippi	1
 AR-05093	Mississippi County Judge	0	John Alan Nelson	Republican	Mississippi	1
 AR-05093	Mississippi County Treasurer	0	Kelli Owen Jones	Republican	Mississippi	1
-AR-05093	Mississippi County Treasurer	0	MONROE (C w/Coll) Elizabeth Davenport	Republican	Mississippi	1
 AR-05093	Mississippi County Sheriff	0	Dale Cook	Republican	Mississippi	1
 AR-05093	Mississippi County Justice of the Peace District 1	0	Dana Drake Brown	Republican	Mississippi	1
 AR-05093	Mississippi County Justice of the Peace District 2	0	Michael L. White	Republican	Mississippi	1
@@ -986,6 +983,7 @@ AR-05095	Monroe County Justice of the Peace District 7	0	Jimmy Rogers	Republican
 AR-05095	Monroe County Justice of the Peace District 7	0	Sashunna Hudson	Democratic	Monroe	1
 AR-05095	Monroe County Justice of the Peace District 8	0	Doug Mayhue	Republican	Monroe	1
 AR-05095	Monroe County Justice of the Peace District 9	0	Alvin Beck	Republican	Monroe	1
+AR-05095	Monroe County Treasurer and Collector	0	Elizabeth Davenport	Republican	Monroe	1
 AR-05097	Montgomery County Coroner	0	Jeffery Blansett	Republican	Montgomery	1
 AR-05097	Montgomery County Assessor	0	Kinzie Bour	Republican	Montgomery	1
 AR-05097	Montgomery County Circuit and County Clerk	0	Misty Tweedle	Republican	Montgomery	1
@@ -1025,11 +1023,9 @@ AR-05101	Newton County Circuit and County Clerk	0	Donnie Davis	Republican	Newton
 AR-05101	Newton County Circuit and County Clerk	0	Georgia Eddings	Independent	Newton	1
 AR-05101	Newton County Collector	0	Mandy Martin	Republican	Newton	1
 AR-05101	Newton County Collector	0	Bethsheba Thompson	Independent	Newton	1
-AR-05101	Newton County Collector	0	"OUACHITA (C w/Treas) Melinda ""Missy"" Chambers"	Republican	Newton	1
 AR-05101	Newton County Judge	0	Warren Campbell	Republican	Newton	1
 AR-05101	Newton County Treasurer	0	Rebeka Cook	Independent	Newton	1
 AR-05101	Newton County Treasurer	0	Jessica Wheeler	Republican	Newton	1
-AR-05101	Newton County Treasurer	0	"OUACHITA (C w/ Coll) Melinda ""Missy"" Chambers"	Republican	Newton	1
 AR-05101	Newton County Sheriff	0	Glenn Wheeler	Republican	Newton	1
 AR-05101	Newton County Justice of the Peace District 1	0	Jamie Mefford	Republican	Newton	1
 AR-05101	Newton County Justice of the Peace District 2	0	Richard Campbell	Republican	Newton	1
@@ -1063,6 +1059,7 @@ AR-05103	Ouachita County Justice of the Peace District 8	0	Willie R. Hardy	Democ
 AR-05103	Ouachita County Justice of the Peace District 9	0	Fred Lilly	Democratic	Ouachita	1
 AR-05103	Ouachita County Justice of the Peace District 10	0	Helen Aregood	Republican	Ouachita	1
 AR-05103	Ouachita County Justice of the Peace District 11	0	Jerry N. West	Independent	Ouachita	1
+AR-05103	Ouachita County Treasurer and Collector	0	"Melinda ""Missy"" Chambers"	Republican	Ouachita	1
 AR-05105	Perry County Assessor	0	Amanda Hawkins	Republican	Perry	1
 AR-05105	Perry County Circuit and County Clerk	0	Renee Rainey	Republican	Perry	1
 AR-05105	Perry County Collector	0	Pam Eubanks	Republican	Perry	1
@@ -1179,10 +1176,8 @@ AR-05115	Pope County Justice of the Peace District 13	0	David Ivy	Republican	Pop
 AR-05117	Prairie County Assessor	0	Tabitha Gates	Republican	Prairie	1
 AR-05117	Prairie County Circuit and County Clerk	0	Gaylon Hale	Republican	Prairie	1
 AR-05117	Prairie County Collector	0	Jeffrey Bokker	Republican	Prairie	1
-AR-05117	Prairie County Collector	0	PULASKI (C w/Treas) Debra Buckner	Democratic	Prairie	1
 AR-05117	Prairie County Judge	0	Johnny Reidhar	Republican	Prairie	1
 AR-05117	Prairie County Treasurer	0	Brittney Kocourek	Republican	Prairie	1
-AR-05117	Prairie County Treasurer	0	PULASKI (C w/Coll) Debra Buckner	Democratic	Prairie	1
 AR-05117	Prairie County Sheriff	0	Jeffrey Bokker	Republican	Prairie	1
 AR-05117	Prairie County Justice of the Peace District 1	0	William H. Calhoun	Republican	Prairie	1
 AR-05117	Prairie County Justice of the Peace District 2	0	Zach Payne	Republican	Prairie	1
@@ -1290,10 +1285,8 @@ AR-05129	Searcy County Coroner	0	Eldon Harris	Republican	Searcy	1
 AR-05129	Searcy County Assessor	0	Randy A. Crumley	Republican	Searcy	1
 AR-05129	Searcy County Circuit and County Clerk	0	Michelle Loggins	Republican	Searcy	1
 AR-05129	Searcy County Collector	0	Melissa Ward	Republican	Searcy	1
-AR-05129	Searcy County Collector	0	SEBASTIAN (C w/Treas) Lora Lea Rice	Republican	Searcy	1
 AR-05129	Searcy County Judge	0	Tony M. Horton	Republican	Searcy	1
 AR-05129	Searcy County Treasurer	0	Mary Beth Martin	Republican	Searcy	1
-AR-05129	Searcy County Treasurer	0	SEBASTIAN (C w/Coll) Lora Lea Rice	Republican	Searcy	1
 AR-05129	Searcy County Sheriff	0	Kenny Cassell	Republican	Searcy	1
 AR-05129	Searcy County Justice of the Peace District 1	0	Zachary Graham	Republican	Searcy	1
 AR-05129	Searcy County Justice of the Peace District 2	0	Kim Loftin	Republican	Searcy	1
@@ -1331,6 +1324,7 @@ AR-05131	Sebastian County Justice of the Peace District 11	0	Jerry Ward	Democrat
 AR-05131	Sebastian County Justice of the Peace District 12	0	Tommy Camp	Republican	Sebastian	1
 AR-05131	Sebastian County Justice of the Peace District 12	0	L. Paul Dubar	Democratic	Sebastian	1
 AR-05131	Sebastian County Justice of the Peace District 13	0	Lorrie Runion	Republican	Sebastian	1
+AR-05131	Sebastian County Treasurer and Collector	0	Lora Lea Rice	Republican	Sebastian	1
 AR-05133	Sevier County Circuit Clerk	0	Kathy Smith	Democratic	Sevier	1
 AR-05133	Sevier County Coroner	0	Tanner Bryan	Republican	Sevier	1
 AR-05133	Sevier County Assessor	0	Shelia Ridley	Republican	Sevier	1
@@ -1426,10 +1420,8 @@ AR-05145	White County Coroner	0	Matt Smith	Republican	White	1
 AR-05145	White County Assessor	0	Gail Snyder	Republican	White	1
 AR-05145	White County Clerk	0	Carla Barnett	Republican	White	1
 AR-05145	White County Collector	0	Beth Dorton	Republican	White	1
-AR-05145	White County Collector	0	WOODRUFF (C w/Treas) Carrie Woodall	Independent	White	1
 AR-05145	White County Judge	0	Lisa Brown	Republican	White	1
 AR-05145	White County Treasurer	0	Jennifer Slane	Republican	White	1
-AR-05145	White County Treasurer	0	WOODRUFF (C w/Coll) Carrie Woodall	Independent	White	1
 AR-05145	White County Sheriff	0	Dusty Betts	Independent	White	1
 AR-05145	White County Sheriff	0	Clayton Edwards	Republican	White	1
 AR-05145	White County Justice of the Peace District 1	0	Preston Bradley Dean	Independent	White	1
@@ -1459,13 +1451,12 @@ AR-05147	Woodruff County Justice of the Peace District 7	0	John Berry Beard III	
 AR-05147	Woodruff County Justice of the Peace District 8	0	Harold Bo Collins	Democratic	Woodruff	1
 AR-05147	Woodruff County Justice of the Peace District 8	0	Brad Deshano	Independent	Woodruff	1
 AR-05147	Woodruff County Justice of the Peace District 9	0	Robert Gibbs	Democratic	Woodruff	1
+AR-05147	Woodruff County Treasurer and Collector	0	Carrie Woodall	Independent	Woodruff	1
 AR-05149	Yell County Assessor	0	Sherry Hicks	Republican	Yell	1
 AR-05149	Yell County Circuit and County Clerk	0	Anna Ward	Republican	Yell	1
-AR-05149	Yell County Collector	0	ARKANSAS (C w/Treas) Ruby C. Dillion	Republican	Yell	1
 AR-05149	Yell County Collector	0	Carol Cloud Jacobs	Independent	Yell	1
 AR-05149	Yell County Collector	0	Christie Davis	Republican	Yell	1
 AR-05149	Yell County Judge	0	Jeff Gilkey	Republican	Yell	1
-AR-05149	Yell County Treasurer	0	ARKANSAS (C w/Treas) Ruby C. Dillion	Republican	Yell	1
 AR-05149	Yell County Treasurer	0	Carol Cloud Jacobs	Independent	Yell	1
 AR-05149	Yell County Treasurer	0	Debra Craig	Republican	Yell	1
 AR-05149	Yell County Sheriff	0	Rick Padgett	Republican	Yell	1
