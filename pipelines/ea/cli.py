@@ -133,10 +133,13 @@ def main() -> None:
         "i18n",
         help="translate new and changed keys of apps/web/messages/en.json into the locales in "
         "project.inlang/settings.json (or the ones given) with Sonnet batches: glossary, translation, review, and "
-        "checks; quote prints the estimated cost of a full run (set ANTHROPIC_API_KEY)",
+        "checks; quote prints the estimated cost of a full run; redo retranslates every string into "
+        "data/i18n/redo/messages without touching the shipped files, and adopt copies the staged strings that "
+        "nobody edited since into apps/web/messages (set ANTHROPIC_API_KEY)",
     )
-    translating.add_argument("action", nargs="?", choices=("run", "quote"), default="run")
+    translating.add_argument("action", nargs="?", choices=("run", "quote", "redo", "adopt"), default="run")
     translating.add_argument("locales", nargs="*")
+    translating.add_argument("--once", action="store_true", help="advance one step and exit instead of waiting")
     batching = commands.add_parser(
         "batch", help="Message Batches jobs, accounts, and approvals (set ANTHROPIC_API_KEY)"
     )
@@ -208,7 +211,13 @@ def main() -> None:
         case "i18n":
             from ea import i18n
 
-            print(i18n.quote(args.locales) if args.action == "quote" else i18n.run(args.locales))
+            match args.action:
+                case "quote":
+                    print(i18n.quote(args.locales))
+                case "adopt":
+                    print(i18n.adopt(args.locales))
+                case _:
+                    print(i18n.run(args.locales, wait=not args.once, redo=args.action == "redo"))
         case "batch":
             from ea import batch
 

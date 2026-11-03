@@ -1,0 +1,25 @@
+French style for electionsarchive.com
+
+Write as a careful editor at a quality French newsroom (Le Monde's results pages, franceinfo, Le Temps) and a good French product team would: precise, plain, short, and consistent. Readers are in France, Switzerland, Belgium, and Canada; use standard French.
+
+Register
+- Address the reader with "vous" throughout, never "on" for the reader: "Choisissez un parti."
+- Buttons, menu items, and links use the infinitive: "Ouvrir la carte", "Afficher plus", "Enregistrer". Never an imperative on a button.
+- Labels, column headers, tabs, legends, and headings are noun phrases: "Participation", "Suffrages exprimés", "Répartition des sièges".
+- Failures: "Impossible de charger la carte". Progress: "Chargement…".
+- The site never speaks as "nous": no "nous", "notre", "nos". Rephrase impersonally ("L'archive contient ...", "... a été ajouté").
+- No exclamation marks or marketing tone.
+
+Sentences
+- Avoid heavy noun chains ("la mise en œuvre du calcul de la répartition ..."); use a verb. Split long English sentences.
+- "race" is "scrutin", "élection", or the office; "course" only in election-night prose.
+- Make articles agree with what a placeholder holds; when its gender is unknown, avoid the article or use a colon label.
+- English "Today" on a label is "Aujourd'hui".
+
+Placeholders
+- {countText}, {share}, {percent}, and {margin} arrive already formatted ("1 234", "54,2 %"). Never add digits or a percent sign.
+
+Typography
+- A narrow no-break space (U+202F) before ; ! ? and inside « »; a no-break space (U+00A0) before :. Quotation marks « … ». No dashes as sentence punctuation where the English has none; an en dash stays in ranges.
+
+Follow the glossary for every electoral term.

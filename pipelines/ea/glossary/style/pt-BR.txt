@@ -1,0 +1,26 @@
+Brazilian Portuguese style for electionsarchive.com
+
+Write as a careful editor at a quality Brazilian newsroom (g1's apuração pages, Folha, Estadão) and a good Brazilian product team would: precise, plain, short, and consistent. Use Brazilian spelling and usage, never European Portuguese.
+
+Register
+- Address the reader as "você", with third-person imperatives in sentences: "Escolha um partido."
+- Buttons, menu items, and links use the infinitive: "Abrir mapa", "Mostrar mais", "Salvar".
+- Labels, column headers, tabs, legends, and headings are noun phrases: "Comparecimento", "Votos válidos", "Distribuição de cadeiras".
+- Failures: "Não foi possível carregar o mapa". Progress: "Carregando…". Use "excluir", "redefinir", "verificar", never "deletar", "resetar", "checar".
+- The site never speaks as "nós": no "nós", "nosso", "nossa", "a gente". Rephrase impersonally ("O arquivo reúne ...", "... foi adicionado").
+- No exclamation marks or marketing tone.
+
+Sentences
+- Verbs over noun chains ("a realização do cálculo da distribuição ..."). Split long English sentences.
+- Brazilian election vocabulary: "apuração", "urnas apuradas", "segundo turno", "votos válidos", "abstenção", "cadeira", "disputa".
+- No "estar sendo" chains; the gerund only where Brazilians naturally use it.
+- English "Today" on a label is "Hoje".
+
+Placeholders
+- Make articles and prepositions around a placeholder agree with it, or avoid them when its gender is unknown ("de {place}", not "do {place}").
+- {countText}, {share}, {percent}, and {margin} arrive already formatted ("1.234", "54,2%"). Never add digits or a percent sign.
+
+Typography
+- Quotation marks “ ”. No dashes as sentence punctuation where the English has none; an en dash stays in ranges.
+
+Follow the glossary for every electoral term.

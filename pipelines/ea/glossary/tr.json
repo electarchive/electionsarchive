@@ -32,8 +32,8 @@
   "note": "Turkey has no equivalent mechanism. This is the press rendering."
  },
  "contest": {
-  "term": "seçim yarışı",
-  "note": "Descriptive rendering. For one seat, 'yarış' is also fine."
+  "term": "yarış",
+  "note": "One race for one office or seat: 'valilik yarışı', 'Senato yarışı'. For a whole election say 'seçim'. 'Seçim yarışı' only when 'yarış' alone would be unclear."
  },
  "race": {
   "term": "yarış",
@@ -73,7 +73,10 @@
  },
  "write-in": {
   "term": "listede olmayan aday",
-  "note": "A name the voter writes in by hand. Descriptive; Turkey has no write-in voting."
+  "note": "A name the voter writes in by hand. Descriptive; Turkey has no write-in voting.",
+  "avoid": [
+   "yazılı oy"
+  ]
  },
  "unopposed": {
   "term": "rakipsiz",
@@ -100,8 +103,8 @@
   "note": "Under Turkish law, blank ballots are counted as invalid."
  },
  "turnout": {
-  "term": "katılım oranı",
-  "note": "The YSK also uses 'oy kullanma oranı'."
+  "term": "katılım",
+  "note": "On a label 'Katılım'; in prose 'katılım oranı'."
  },
  "registered voters": {
   "term": "kayıtlı seçmen",
@@ -116,8 +119,8 @@
   "note": "Percentage. Also 'oy yüzdesi'."
  },
  "margin": {
-  "term": "oy farkı",
-  "note": "Difference between winner and runner-up."
+  "term": "fark",
+  "note": "'oy farkı' when votes, 'puan farkı' when percentage points; on a label just 'Fark'."
  },
  "swing": {
   "term": "oy kayması",
@@ -149,7 +152,7 @@
  },
  "district": {
   "term": "bölge",
-  "note": "US congressional district: 'kongre bölgesi'."
+  "note": "A US congressional district is 'seçim bölgesi', as AA writes it ('Ohio 12. seçim bölgesi')."
  },
  "ward": {
   "term": "mahalle",
@@ -169,7 +172,10 @@
  },
  "county": {
   "term": "ilçe",
-  "note": "Used for US, UK, and Irish counties. Never 'kontluk'."
+  "note": "Used for US, UK, and Irish counties. Never 'kontluk'.",
+  "avoid": [
+   "kontluk"
+  ]
  },
  "municipality": {
   "term": "belediye",
@@ -205,7 +211,14 @@
  },
  "chamber": {
   "term": "meclis",
-  "note": "A legislative chamber. Use 'kamara' only inside established names such as 'Avam Kamarası' and 'Lordlar Kamarası'."
+  "note": "A legislative chamber. Use 'kamara' only inside established names such as 'Avam Kamarası' and 'Lordlar Kamarası'.",
+  "avoid": [
+   "kamara"
+  ],
+  "allow": [
+   "avam kamaras",
+   "lordlar kamaras"
+  ]
  },
  "legislature": {
   "term": "yasama organı",
@@ -380,20 +393,23 @@
   "note": ""
  },
  "called": {
-  "term": "kazananı ilan edilmiş",
-  "note": "Used for a race whose winner is declared. Short form: 'kazananı belli oldu'."
+  "term": "kazanan ilan edildi",
+  "note": "A race whose winner has been declared by a projection desk; short form 'kazanan belli oldu'. Not the official result."
  },
  "projection": {
-  "term": "projeksiyon",
-  "note": "Also 'sonuç tahmini'."
+  "term": "tahmin",
+  "note": "'sonuç tahmini' in prose. Avoid 'projeksiyon'.",
+  "avoid": [
+   "projeksiyon"
+  ]
  },
  "too close to call": {
-  "term": "tahmin edilemeyecek kadar yakın",
-  "note": "Also 'başa baş'."
+  "term": "başa baş",
+  "note": "On a label: 'Başa baş'. In a sentence: 'kazanan henüz belli değil'. Never 'tahmin edilemeyecek kadar yakın'."
  },
  "reporting": {
-  "term": "açılan sandık oranı",
-  "note": "Typical Turkish election-night expression."
+  "term": "açılan sandık",
+  "note": "Election-night share counted: 'Açılan sandık: %62'. US counties reporting: 'sonuç bildiren ilçeler'."
  },
  "votes counted": {
   "term": "sayılan oy",
@@ -412,16 +428,16 @@
   "note": "Also 'erken oy kullanma'."
  },
  "flip": {
-  "term": "el değiştiren sandalye",
-  "note": "Also verb: 'el değiştirmek'."
+  "term": "el değiştirdi",
+  "note": "A seat that changes party: 'el değiştiren sandalye', or the verb 'el değiştirdi'."
  },
  "gain": {
-  "term": "sandalye kazanımı",
-  "note": "Short form: 'kazanım'."
+  "term": "kazandı",
+  "note": "Write it as a verb: '{party}, sandalyeyi X partisinden aldı' or 'kazandı'. Avoid 'kazanım'."
  },
  "hold": {
-  "term": "korunan sandalye",
-  "note": "Also 'sandalyeyi koruma'."
+  "term": "korudu",
+  "note": "Write it as a verb: '{party} sandalyeyi korudu'."
  },
  "gerrymander": {
   "term": "gerrymandering",

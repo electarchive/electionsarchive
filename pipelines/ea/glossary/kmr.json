@@ -141,15 +141,24 @@
  },
  "constituency": {
   "term": "herêma hilbijartinê",
-  "note": "Never 'çemberê hilbijartinê'."
+  "note": "Never 'çemberê hilbijartinê'.",
+  "avoid": [
+   "çember"
+  ]
  },
  "electoral district": {
   "term": "herêma hilbijartinê",
-  "note": "Never 'çemberê hilbijartinê'."
+  "note": "Never 'çemberê hilbijartinê'.",
+  "avoid": [
+   "çember"
+  ]
  },
  "district": {
   "term": "herêm",
-  "note": "An electoral or administrative district. US congressional district: 'herêma kongreyê'. Never 'çember'."
+  "note": "An electoral or administrative district. US congressional district: 'herêma kongreyê'. Never 'çember'.",
+  "avoid": [
+   "çember"
+  ]
  },
  "ward": {
   "term": "taxa",
@@ -169,7 +178,10 @@
  },
  "county": {
   "term": "navçe",
-  "note": "Used for US, UK, and Irish counties, like Turkish 'ilçe'. Never 'kontî'."
+  "note": "Used for US, UK, and Irish counties, like Turkish 'ilçe'. Never 'kontî'.",
+  "avoid": [
+   "kontî"
+  ]
  },
  "municipality": {
   "term": "şaredarî",

@@ -1,0 +1,28 @@
+Kurmanji style for electionsarchive.com
+
+Write standard Northern Kurdish (Kurmanji) in Hawar Latin script, as careful editors at Kurdish-language news outlets write it for readers in Turkey's Kurdish provinces: plain, short, idiomatic, and consistent.
+
+Register
+- Address the reader in the second person singular, as Kurmanji software does: "Partiyekê hilbijêre.", "Rûpelê nû bike." Keep it the same in every string.
+- Buttons, menu items, and links are short imperatives, verb last: "Nîşan bide", "Tomar bike", "Nexşeyê veke".
+- Labels, column headers, tabs, legends, and headings are noun phrases, not sentences: "Beşdarbûn", "Dengên derbasdar", "Belavbûna kursiyan".
+- The site never speaks as "em": no "em", "me", "yê me". Rephrase impersonally ("Di arşîvê de ... hene", "... hat zêdekirin").
+- No exclamation marks or marketing tone.
+
+Sentences
+- One idea per sentence; split long English sentences. The verb goes at the end.
+- Use established Kurmanji words; do not borrow a Turkish word when a common Kurmanji one exists, and never calque Turkish phrasing.
+- Get the ezafe right in gender and number: "encamên hilbijartinê", "kursiyên partiyê", "dengê derbasdar". Use the oblique case after prepositions and the ergative construction with transitive past verbs.
+
+Placeholders
+- Placeholders hold names and numbers in their base form. Put the ezafe or case ending on a surrounding Kurdish noun, never on the placeholder.
+- {countText}, {share}, {percent}, and {margin} arrive already formatted. Never add digits or a percent sign.
+- {noun} and {nouns} hold an area word already in Kurmanji when one exists.
+
+Typography
+- Sentence case. The letters ç ş ê î û must be right. Quotation marks “ ”. No dashes as sentence punctuation; an en dash stays only in ranges.
+
+Election vocabulary
+- election "hilbijartin"; candidate "berendam"; party "partî"; seat "kursî"; turnout "beşdarbûn" ("rêjeya beşdarbûnê" in prose); vote "deng"; voter "dengder"; result "encam", official results "encamên fermî"; ballot box "sindoq"; province "parêzgeh"; county "navçe"; district "herêm"; state "eyalet".
+- Never "çember" for a district or constituency, and never "kontî" for a county.
+- Follow the glossary for every other term.

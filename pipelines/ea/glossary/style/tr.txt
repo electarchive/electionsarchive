@@ -1,0 +1,54 @@
+Turkish style for electionsarchive.com
+
+Write the way a careful editor at a quality Turkish newsroom (BBC Türkçe, DW Türkçe, AA's election desk) and a good Turkish product team would: plain, short, idiomatic, and consistent. The reader is a Turkish voter, journalist, or researcher who has never seen the English.
+
+Register
+- Sentences address the reader with the polite plural, without the pronoun: "Bir parti seçin.", "Sayfayı yenileyin." Never "sen" forms, never "-iniz" endings like "seçiniz", never "Lütfen".
+- Buttons, menu items, links, and other one-tap commands use the bare verb stem, verb last, like Turkish software menus: "Göster", "Kaydet", "Haritayı aç", "Daha fazla göster", "Tümünü seç". Never "Gösterin" or "Kaydedin" on a button.
+- Labels, column headers, tab names, legends, and headings are noun phrases, not sentences: "Katılım", "Geçerli oy", "Sandalye dağılımı", "Bu yarış diğer yıllarda".
+- Progress states use -iyor: "Yükleniyor…", "Aranıyor…". Failures use -emedi/-amadı: "Harita yüklenemedi.", "Kaydedilemedi."
+- Status words describe a state: "Seçildi", "Görevde", "Geri çekildi", "Kesin sonuç".
+- The site never speaks as "biz": no "biz", "bizim", "-ımız", "sunuyoruz", "ekledik". Rephrase impersonally: "Arşivde ... yer alıyor", "... eklendi", "Arşiv ... gösterir".
+- No exclamation marks, no marketing tone.
+
+Sentences
+- One idea per sentence. Split a long English sentence into two Turkish sentences rather than chaining clauses with "ve", "ancak", or participles.
+- Natural Turkish order: subject, then time and place, then object, then the verb at the end. Never mirror English word order.
+- Avoid stacked participles and nominal chains ("...gösterildiği ve ...hesaplandığı", "...yapılmasının sağlanması"). Use a finite verb.
+- Things do not act like people. Not "Bu sayfa size ... gösterir"; write "Bu sayfada ... görebilirsiniz" or "Bu sayfada ... yer alır".
+- Plain, common words over bureaucratic ones: "var/yok" over "mevcut/mevcut değil", "için" over "amacıyla", "yapmak/olmak" over "gerçekleştirmek/gerçekleşmek", "göre" over "bazında", "hakkında" over "ilgili", "şu anda" over "halihazırda", "hızla" over "ivedilikle". Use "olarak" only when nothing shorter works. Prefer an active verb to "tarafından".
+- Calques to avoid: "yeniden üretmek" for reproducing a result ("aynı sonucu verir", "... ile örtüşür"), "önde bitirdi" ("öndeydi", "birinci oldu"), "sahip olmak" for plain possession ("... var"), "hareket" for activity ("yenilikler", "son gelişmeler"), "kimlik" for an ID ("kimlik numarası" or "ID").
+- English "Today", "Tomorrow", "Happening today" on a label are just "Bugün", "Yarın".
+
+Placeholders
+- Never attach a suffix to a placeholder: no "{place}'da", "{party}'nin", "{count}'u". The app fills names and numbers whose vowel harmony is unknown. Rebuild the sentence so the placeholder stands bare: put a noun after it that takes the suffix ("{year} seçiminde", "{place} için", "{name} sayfasını aç", "{party} adayı"), use a colon label ("Kaynak: {publisher}"), or open the sentence with it ("{party}, sandalyeyi korudu.").
+- After a number the noun stays singular: "{count} ilçe", "{count} sandalye", never "{count} ilçeler".
+- {countText}, {share}, {percent}, and {margin} arrive already formatted ("1.234", "%54,2"). Never add a percent sign or digits around them.
+- {noun} and {nouns} hold an area word that is already Turkish and lowercase ("ilçe", "seçim bölgesi"; "ilçeler"). Put suffixes on a following word, never on the placeholder.
+
+Typography
+- Sentence case for headings and buttons; only proper nouns take capitals. Dotted and dotless i must be right in capitals (İl, Işık).
+- Apostrophes before suffixes on proper nouns written out in the string: "ABD'de", "Ohio'da", "Türkiye'nin".
+- No dashes as sentence punctuation; use a colon, a comma, or a new sentence. An en dash stays only in number and year ranges.
+- Quotation marks “ ”. An ellipsis only where the English has one.
+- Abbreviations as the Turkish press writes them: ABD, AB, YSK, AGİT.
+
+Election vocabulary as the Turkish press uses it
+- contest, race: "yarış" ("valilik yarışı", "Senato yarışı"); a whole election is "seçim". Never "seçim yarışı" where "yarış" or "seçim" alone is clear.
+- reporting (share of units counted): "açılan sandık", as on Turkish election-night television ("Açılan sandık: %62"); counties reporting: "sonuç bildiren ilçeler".
+- votes counted: "sayılan oy". turnout: "katılım" ("katılım oranı" in prose). vote share: "oy oranı". margin: "fark". swing: "oy kayması". swing state: "çekişmeli eyalet".
+- seat: "sandalye". incumbent: "görevdeki" (badge "Görevde"). flip: "el değiştirdi". hold: "korudu". gain: "... kazandı", naming the losing party where the string allows.
+- called (a race declared won): "kazanan ilan edildi" or "kazanan belli oldu"; too close to call: "başa baş, sonuç belli değil". preliminary results: "resmî olmayan sonuçlar"; official results: "kesin sonuçlar".
+- runoff: "ikinci tur". primary: "ön seçim". by-election: "ara seçim"; US midterms: "ara seçimler". special election: "özel seçim".
+- US congressional district: "seçim bölgesi" ("Ohio 12. seçim bölgesi"). electoral college: "Seçiciler Kurulu"; electoral votes: "seçici oyu".
+- Follow the glossary for every other term, inflected as Turkish grammar needs.
+
+Examples of the target voice (English, then Turkish)
+- "Show all {count} counties" (button): "{count} ilçenin tümünü göster"
+- "This calculation reproduces the declared result.": "Bu hesaplama, açıklanan sonuçla örtüşüyor."
+- "{first} led by {firstMargin} points in {from}; {second} led by {secondMargin} in {to}.": "{from} seçiminde {first} {firstMargin} puan öndeydi. {to} seçiminde ise {second} {secondMargin} puan öndeydi."
+- "{noun} winners" (map view label): "Kazananlar ({noun})"
+- "Replies, mentions, and reviews of your proposals, plus activity on what you watch.": "Yanıtlar, sizden söz edilen yerler, önerilerinize gelen incelemeler ve izlediğiniz sayfalardaki yenilikler."
+- "These two places never voted in the same contest in the archive.": "Arşivde bu iki yerin aynı yarışta oy kullandığı bir seçim yok."
+- "Page address or ID" (input placeholder): "Sayfa adresi veya ID"
+- "Couldn't load the map": "Harita yüklenemedi"

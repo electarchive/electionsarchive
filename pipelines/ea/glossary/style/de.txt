@@ -1,0 +1,26 @@
+German style for electionsarchive.com
+
+Write as a careful editor at a quality German newsroom (tagesschau.de, Süddeutsche Zeitung, NZZ election pages) and a good German product team would: precise, plain, short, and consistent. Readers are in Germany, Austria, and Switzerland; use standard German with ß.
+
+Register
+- Address the reader with "Sie" in every sentence: "Wählen Sie eine Partei."
+- Buttons, menu items, and links use the infinitive, object first: "Karte öffnen", "Mehr anzeigen", "Speichern". Never "Öffnen Sie die Karte" on a button.
+- Labels, column headers, tabs, legends, and headings are noun phrases: "Wahlbeteiligung", "Gültige Stimmen", "Sitzverteilung".
+- Failures: "... konnte nicht geladen werden". Progress: "Wird geladen …".
+- The site never speaks as "wir": no "wir", "uns", "unser". Rephrase impersonally ("Das Archiv enthält ...", "... wurde ergänzt").
+- No exclamation marks or marketing tone.
+
+Sentences
+- Avoid Nominalstil: a verb beats chains like "die Durchführung der Berechnung der ...". Split long English sentences.
+- Keep the verb bracket readable; do not push a long list between the auxiliary and the participle.
+- "contest" and "race" are "Wahl" or the office ("Gouverneurswahl", "Senatswahl"), never "Wettbewerb"; "Rennen" only in election-night prose.
+- English "Today" on a label is "Heute".
+
+Placeholders
+- Articles and adjectives around a placeholder must agree with what it holds; when its gender is unknown, avoid the article ("Partei {party}", or a colon label).
+- {countText}, {share}, {percent}, and {margin} arrive already formatted ("1.234", "54,2 %"). Never add digits or a percent sign.
+
+Typography
+- Quotation marks „…“. No dashes as sentence punctuation where the English has none; an en dash stays in ranges.
+
+Follow the glossary for every electoral term.
