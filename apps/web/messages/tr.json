@@ -4306,6 +4306,8 @@
   "night_head_before": "Sandıklar saat {time} itibarıyla kapanıyor",
   "night_head_counting": "{count} oy sayıldığında {name} {margin} puan farkla önde",
   "night_dial_unavailable": "Bu yarış için tahmin yok, çünkü burada karşılaştırılacak daha önceki bir sonuç bulunmuyor.",
+  "night_dial_none_title": "Bu yarış için tahmin yok",
+  "night_dial_none_body": "Bu yarışta sayımla karşılaştırılacak daha önceki bir sonuç yok, bu yüzden kazanma ihtimali ve son fark tahmin edilemiyor. Sayım, sonuçlar geldikçe burada güncellenir.",
   "night_head_estimating": "Beklenen oyun yaklaşık {share} kadarı sayıldığında {name} {margin} puan farkla önde",
   "night_head_tied": "{count} oy sayıldığında berabere",
   "night_head_waiting": "İlk oylar bekleniyor",

@@ -4310,6 +4310,8 @@
   "night_head_before": "Dengdan di saet {time} de diqede",
   "night_head_counting": "{name} bi {margin} xal li pêş e, {count} deng hatine jimartin",
   "night_dial_unavailable": "Ji bo vê pêşbaziyê texmîn tune ye, ji ber ku li vir encameke berê ya berawirdkirinê tune ye.",
+  "night_dial_none_title": "Ji bo vê pêşbaziyê texmîn tune",
+  "night_dial_none_body": "Ji bo vê pêşbaziyê encameke berê tune ye ku jimartin pê re were berawirdkirin. Ji ber vê yekê şansê serkeftinê an cudahiya dawî ya dengan nayê texmînkirin. Gava encam tên, jimartin li vir tê nûkirin.",
   "night_head_estimating": "{name} bi {margin} xal li pêş e, nêzîkî {share} ya dengên çavnihêrtî hatine jimartin",
   "night_head_tied": "Wekhev e, {count} deng hatine jimartin",
   "night_head_waiting": "Li benda dengên yekem",

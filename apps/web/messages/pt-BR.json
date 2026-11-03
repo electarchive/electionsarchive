@@ -4384,6 +4384,8 @@
   "night_head_before": "As urnas fecham às {time}",
   "night_head_counting": "{name} lidera por {margin} pontos com {count} votos apurados",
   "night_dial_unavailable": "Sem estimativa para esta disputa, pois não há resultado anterior aqui para comparação.",
+  "night_dial_none_title": "Sem estimativa para esta disputa",
+  "night_dial_none_body": "Não há resultado anterior desta disputa para comparar com a apuração. Por isso, não é possível estimar a chance de vitória nem a margem final. A apuração é atualizada aqui conforme os resultados chegam.",
   "night_head_estimating": "{name} lidera por {margin} pontos com cerca de {share} dos votos esperados apurados",
   "night_head_tied": "Empate com {count} votos apurados",
   "night_head_waiting": "Aguardando os primeiros votos",

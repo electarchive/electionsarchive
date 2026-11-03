@@ -4386,6 +4386,8 @@
   "night_head_before": "Clôture des bureaux de vote à {time}",
   "night_head_counting": "{name} mène de {margin} points avec {count} votes dépouillés",
   "night_dial_unavailable": "Aucune estimation pour ce scrutin, faute de résultat antérieur à comparer ici.",
+  "night_dial_none_title": "Aucune estimation pour cette course",
+  "night_dial_none_body": "Cette course n'a aucun résultat antérieur auquel comparer le dépouillement. Il est donc impossible d'estimer la probabilité de victoire ou l'écart final. Les chiffres du dépouillement sont mis à jour ici à mesure que les résultats arrivent.",
   "night_head_estimating": "{name} mène de {margin} points avec environ {share} des votes attendus dépouillés",
   "night_head_tied": "Égalité avec {count} votes dépouillés",
   "night_head_waiting": "En attente des premiers votes",

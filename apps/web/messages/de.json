@@ -4310,6 +4310,8 @@
   "night_head_before": "Wahllokale schließen um {time}",
   "night_head_counting": "{name} führt mit {margin} Punkten bei {count} ausgezählten Stimmen",
   "night_dial_unavailable": "Keine Schätzung für diese Wahl, da hier kein früheres Ergebnis zum Vergleich vorliegt.",
+  "night_dial_none_title": "Keine Schätzung für diese Wahl",
+  "night_dial_none_body": "Für diese Wahl liegt kein früheres Ergebnis vor, mit dem sich die Auszählung vergleichen ließe. Daher lassen sich weder die Siegchance noch der endgültige Vorsprung schätzen. Sobald Ergebnisse eingehen, wird der Auszählungsstand hier aktualisiert.",
   "night_head_estimating": "{name} führt mit {margin} Punkten, etwa {share} der erwarteten Stimmen sind ausgezählt",
   "night_head_tied": "Gleichstand bei {count} ausgezählten Stimmen",
   "night_head_waiting": "Warten auf die ersten Stimmen",
