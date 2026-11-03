@@ -1,8 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { page } from "$app/state";
   import CiteBody from "#lib/components/cite-body.svelte";
   import Prose from "#lib/components/prose.svelte";
+  import TextHead from "#lib/components/text-head.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -11,11 +11,13 @@
   const { data }: { data: PageData } = $props();
 </script>
 
-<svelte:head>
-  <title>{data.title} | {m.wordmark()}</title>
-  <meta name="description" content={data.lede} />
-  <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
-</svelte:head>
+<TextHead
+  title={data.title}
+  description={data.lede}
+  type={data.slug === "architecture" || data.slug === "indices"
+    ? "TechArticle"
+    : "Article"}
+/>
 
 <main class="mx-auto grid gap-8 px-4 pbs-6 pbe-24 max-inline-7xl max-sm:px-3">
   <nav aria-label={m.footer_project()}>

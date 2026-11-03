@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TextHead from "#lib/components/text-head.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { area, REPOSITORY } from "#lib/site.js";
@@ -7,8 +8,13 @@
   const { data }: { data: PageData } = $props();
 </script>
 
+<TextHead
+  title={m.changelog_title()}
+  description={m.changelog_lede()}
+  type="TechArticle"
+/>
+
 <svelte:head>
-  <title>{m.changelog_title()}</title>
   <link
     rel="alternate"
     type="application/atom+xml"

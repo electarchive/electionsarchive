@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import TextHead from "#lib/components/text-head.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -71,12 +72,10 @@
   const opened = $state<Record<string, boolean>>({});
 </script>
 
-<svelte:head>
-  <title>{m.sources_title()} | {m.wordmark()}</title>
-  <meta name="description" content={m.sources_page_description()} />
-  <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
-  <link rel="alternate" type="text/markdown" href="{page.url.pathname}.md" />
-</svelte:head>
+<TextHead
+  title={m.sources_title()}
+  description={m.sources_page_description()}
+/>
 
 <main class="mx-auto grid gap-10 px-4 pbs-8 pbe-24 max-inline-6xl max-sm:px-3">
   <header class="grid gap-3 max-inline-[68ch]">
