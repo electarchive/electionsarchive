@@ -68,10 +68,7 @@
     void split.set(isLive ? p : 0.5, { instant: prefersReducedMotion.current });
   });
 
-  const outcomes = $derived.by(() => {
-    if (!isLive || isSettled) {
-      return [];
-    }
+  const spread = $derived.by(() => {
     const below = Math.max(0.0015, (band.mid - band.low) / 1.2816);
     const above = Math.max(0.0015, (band.high - band.mid) / 1.2816);
     const weight = below / (below + above);
@@ -92,6 +89,19 @@
       }
       return (low + high) / 2;
     };
+    return { cdf, inverse };
+  });
+
+  const middle = $derived({
+    low: spread.inverse(0.25),
+    high: spread.inverse(0.75),
+  });
+
+  const outcomes = $derived.by(() => {
+    if (!isLive || isSettled) {
+      return [];
+    }
+    const { cdf, inverse } = spread;
     const wins = Math.round(p * DOTS);
     const zero = Math.min(1, Math.max(0, cdf(0)));
     const list: Array<number> = [];
@@ -180,14 +190,40 @@
   const winsA = $derived(Math.round(p * DOTS));
   const name = (value: number) => (value >= 0 ? surname(a) : surname(b));
   const signed = (value: number) => `${name(value)} +${lead(value)}`;
-  const range = $derived.by(() => {
-    if (band.low >= 0 || band.high <= 0) {
-      const near = Math.min(Math.abs(band.low), Math.abs(band.high));
-      const far = Math.max(Math.abs(band.low), Math.abs(band.high));
-      const side = band.high <= 0 ? -1 : 1;
+  const span = (low: number, high: number) => {
+    if (low >= 0 || high <= 0) {
+      const near = Math.min(Math.abs(low), Math.abs(high));
+      const far = Math.max(Math.abs(low), Math.abs(high));
+      const side = high <= 0 ? -1 : 1;
       return { low: signed(side * near), high: signed(side * far) };
     }
-    return { low: signed(band.low), high: signed(band.high) };
+    return { low: signed(low), high: signed(high) };
+  };
+  const range = $derived(span(band.low, band.high));
+  const middleRange = $derived(span(middle.low, middle.high));
+  const isBanded = $derived(isLive && !isSettled);
+  const lean = $derived(band.mid >= 0 ? toneA : toneB);
+  const labels = $derived.by(() => {
+    const inner = { left: x(middle.high), right: x(middle.low) };
+    const outer = { left: x(band.high), right: x(band.low) };
+    const marks: Array<{ text: string; at: number; anchor: string }> = [];
+    if (inner.right - inner.left >= 28) {
+      marks.push({
+        text: percent(0.5, 0),
+        at: (inner.left + inner.right) / 2,
+        anchor: "middle",
+      });
+    }
+    if (outer.right - inner.right >= 30) {
+      marks.push({ text: percent(0.8, 0), at: outer.right - 4, anchor: "end" });
+    } else if (inner.left - outer.left >= 30) {
+      marks.push({
+        text: percent(0.8, 0),
+        at: outer.left + 4,
+        anchor: "start",
+      });
+    }
+    return marks;
   });
 
   const spark = $derived.by(() => {
@@ -399,10 +435,10 @@
         class="flex items-baseline justify-between gap-3 text-[0.8125rem]"
       >
         <span class="font-semibold">{m.night_dial_margin()}</span>
-        {#if isLive && !isSettled}
+        {#if isBanded}
           <span
             class="font-figures font-semibold tabular-nums"
-            style:color={band.mid >= 0 ? toneA : toneB}>{signed(band.mid)}</span
+            style:color={lean}>{signed(band.mid)}</span
           >
         {/if}
       </figcaption>
@@ -456,16 +492,62 @@
               >
             {/if}
           {/each}
-          {#if isLive && !isSettled}
-            <rect
-              x={x(band.high)}
-              y={PLOT + 2}
-              width={Math.max(2, x(band.low) - x(band.high))}
-              height="5"
-              rx="2.5"
-              fill={band.mid >= 0 ? toneA : toneB}
-              fill-opacity="0.3"
-            />
+          {#if isBanded}
+            <g aria-hidden="true">
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height={PLOT}
+                fill={lean}
+                fill-opacity="0.06"
+                class="transition-transform duration-700 ease-out motion-reduce:transition-none"
+                style:transform="translate({x(band.high)}px, 0) scale({Math.max(
+                  1,
+                  x(band.low) - x(band.high),
+                )}, 1)"
+              />
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height={PLOT}
+                fill={lean}
+                fill-opacity="0.1"
+                class="transition-transform duration-700 ease-out motion-reduce:transition-none"
+                style:transform="translate({x(middle.high)}px, 0) scale({Math.max(
+                  1,
+                  x(middle.low) - x(middle.high),
+                )}, 1)"
+              />
+              {#each [{ value: band.high, isMiddle: false }, { value: band.low, isMiddle: false }, { value: middle.high, isMiddle: true }, { value: middle.low, isMiddle: true }] as edge, position (position)}
+                <line
+                  x1="0"
+                  x2="0"
+                  y1="0"
+                  y2={PLOT}
+                  stroke={lean}
+                  stroke-opacity={edge.isMiddle ? 0.85 : 0.55}
+                  stroke-width={edge.isMiddle ? 1.5 : 1.25}
+                  stroke-dasharray={edge.isMiddle ? "6 3" : "3 3"}
+                  class="transition-transform duration-700 ease-out motion-reduce:transition-none"
+                  style:transform="translateX({x(edge.value)}px)"
+                />
+              {/each}
+              {#each labels as label (label.text)}
+                <text
+                  x="0"
+                  y="12"
+                  text-anchor={label.anchor}
+                  class="font-figures text-[10px] font-semibold tabular-nums transition-transform duration-700 ease-out [paint-order:stroke] motion-reduce:transition-none"
+                  fill={lean}
+                  stroke="var(--background)"
+                  stroke-width="3"
+                  stroke-linejoin="round"
+                  style:transform="translateX({label.at}px)">{label.text}</text
+                >
+              {/each}
+            </g>
           {/if}
           {#if dots.list.length > 0}
             {#each dots.list as dot (dot.id)}
@@ -509,10 +591,10 @@
               </p>
             </foreignObject>
           {/if}
-          {#if isLive && !isSettled}
+          {#if isBanded}
             <path
               d="M{x(band.mid)} {PLOT + 2} l-5 -8 h10 z"
-              fill={band.mid >= 0 ? toneA : toneB}
+              fill={lean}
               stroke="var(--background)"
               stroke-width="1.5"
             />
@@ -556,11 +638,22 @@
             class="rounded-full border-2 border-foreground block-2.5 inline-2.5"
           ></span>{m.night_dial_counted()}</span
         >
-        {#if isLive && !isSettled}
+        {#if isBanded}
           <span class="flex items-center gap-1.5">
-            <span class="rounded-full bg-foreground/30 block-1.5 inline-4"
+            <span
+              class="border-x-[1.25px] border-dashed block-3 inline-4"
+              style:border-color="color-mix(in oklab, {lean} 55%, transparent)"
+              style:background-color="color-mix(in oklab, {lean} 6%, transparent)"
             ></span>
             {m.night_dial_range(range)}
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span
+              class="border-x-[1.5px] border-dashed block-3 inline-3"
+              style:border-color="color-mix(in oklab, {lean} 85%, transparent)"
+              style:background-color="color-mix(in oklab, {lean} 16%, transparent)"
+            ></span>
+            {m.night_dial_middle(middleRange)}
           </span>
         {/if}
       </p>
