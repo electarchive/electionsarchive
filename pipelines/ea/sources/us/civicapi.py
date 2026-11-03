@@ -24,6 +24,7 @@ CACHE: dict[int, tuple[tuple, float, bytes]] = {}
 QUEUE: dict[str, list[dict[str, str]]] = {}
 RACES: dict[str, dict[int, dict]] = {}
 TOWNS: dict[str, dict[str, str]] = {}
+EQUIVALENTS: dict[str, dict[str, str]] = {}
 SEATS: dict[str, dict[str, set[str]]] = {}
 
 
@@ -120,6 +121,21 @@ def towns(state: str) -> dict[str, str]:
     return TOWNS[state]
 
 
+def equivalents(state: str) -> dict[str, str]:
+    if state not in EQUIVALENTS:
+        with connect() as conn:
+            EQUIVALENTS[state] = {
+                plain(text.rsplit(",", 1)[0]): code
+                for code, text in conn.execute(
+                    """select u.code, n.text from reporting_unit u
+                       join name n on n.entity_id = u.area_id and n.kind = 'official'
+                       where u.scheme_code = 'us.county' and u.code ~ %s""",
+                    [rf"^{FIPS[state]}\d{{3}}$"],
+                ).fetchall()
+            }
+    return EQUIVALENTS[state]
+
+
 def seats(state: str) -> dict[str, set[str]]:
     if state not in SEATS:
         with connect() as conn:
@@ -189,6 +205,18 @@ def rows(state: str, path: Path):
         return
     regions = list((race.get("region_results") or {}).values())
     counties: list[dict] = [r for r in regions if r.get("type") == "County" and r.get("fips")]
+    known = equivalents(state)
+    for region in regions:
+        name = plain(region.get("name") or "")
+        code = (
+            known.get(name) or known.get(f"{name}city")
+            if region.get("type") == "City"
+            else known.get(f"{name}county")
+            if region.get("type") == "County" and not region.get("fips")
+            else None
+        )
+        if code is not None and code not in {r["fips"] for r in counties}:
+            counties.append({**region, "fips": code})
     if state == "AK":
         counties = [
             {**r, "fips": f"AK:{found[1]}"}
@@ -205,7 +233,7 @@ def rows(state: str, path: Path):
         county = (
             region["fips"]
             if counties
-            else names.get(plain(region.get("name") or "")) or region.get("fips") or f"town {region.get('name')}"
+            else names.get(plain(region.get("name") or "")) or region.get("fips") or region.get("name") or ""
         )
         for candidate in region.get("candidates") or []:
             name = " ".join((candidate.get("name") or "").split())
