@@ -31,6 +31,9 @@ PAGES = {
     "17": "District Judge",
     "20": "Circuit Judge, Family Court",
 }
+TITLES = {
+    "https://www.elections.il.gov/ElectionOperations/EOPDFViewer.aspx?ElectionID=sejIrI%2BQmww%3D&QueryType=xF443FTCAJbIL3atac%2FUjEg7Y4yklgT1&Status=P2wRQXkiFoo%3D": "Website Candidate List, General Election, November 3, 2026",
+}
 BORROWED = {"www.nvsos.gov": "us.nv_districts_2026"}
 
 
@@ -76,6 +79,7 @@ def emit() -> Path:
         sources: dict[str, UUID] = {}
         for url in sorted({row["source"] for row in rows}):
             publisher, title = PUBLISHERS[urlparse(url).netloc]
+            title = TITLES.get(url, title)
             if page := PAGES.get(url.rpartition("id=")[2]):
                 title = f"{title}: {page}"
             sources[url] = cs.source(publisher, title)
