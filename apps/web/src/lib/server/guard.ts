@@ -3,6 +3,7 @@ import { building } from "$app/env";
 import { createHash } from "node:crypto";
 import { promises as dns } from "node:dns";
 import { BlockList, isIP } from "node:net";
+import { isTraining } from "#lib/server/crawlers.js";
 import { redis } from "#lib/server/redis.js";
 import { keyOwner } from "#lib/server/rpc/keyed.js";
 
@@ -454,7 +455,7 @@ async function admit(request: Request, pathname: string) {
   const accept = request.headers.get("accept") ?? "";
   if (
     agent === "" ||
-    (BOT.test(agent) && !SPARED.test(agent)) ||
+    (BOT.test(agent) && !SPARED.test(agent) && !isTraining(agent)) ||
     (SCRIPT.test(agent) &&
       !MACHINE.test(pathname) &&
       !/markdown|json/u.test(accept))
