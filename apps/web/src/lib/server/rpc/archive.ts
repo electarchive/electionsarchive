@@ -21,7 +21,7 @@ import type { Prose } from "#lib/contrib.js";
 import { natural } from "#lib/format.js";
 import { pollsClose } from "#lib/live/closes.js";
 import { m } from "#lib/paraglide/messages.js";
-import { era, independent } from "#lib/party.js";
+import { era, independent, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -1471,15 +1471,6 @@ const ABROAD: Record<string, string> = {
   tr: "Yurt dışı",
 };
 
-export const UNAFFILIATED = [
-  "#0e8f7e",
-  "#8250c4",
-  "#b5651d",
-  "#c03a7a",
-  "#4a7d1f",
-  "#3f6fd1",
-];
-
 export const unaffiliated = (id: string) =>
   UNAFFILIATED[Number.parseInt(id.slice(-4), 16) % UNAFFILIATED.length] ?? "";
 
@@ -2364,16 +2355,19 @@ async function load(
       color.set(person, independent(rank));
     }
   }
-  const independents = options.rows
-    .filter(
-      (row) =>
-        !color.has(stand(row) ?? row.person ?? "") &&
-        row.person != null &&
-        (tallies.get(row.k) ?? 0) >= top * 0.05,
-    )
-    .map((row) => stand(row) ?? row.person ?? "");
-  for (const id of independents) {
-    color.set(id, unaffiliated(id));
+  const independents = new Set(
+    options.rows
+      .filter(
+        (row) =>
+          !color.has(stand(row) ?? row.person ?? "") &&
+          row.person != null &&
+          (tallies.get(row.k) ?? 0) >= top * 0.05,
+      )
+      .toSorted((a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0))
+      .map((row) => stand(row) ?? row.person ?? ""),
+  );
+  for (const [rank, id] of [...independents].entries()) {
+    color.set(id, UNAFFILIATED[rank] ?? unaffiliated(id));
   }
   const side = new Map(
     options.rows.map((row) => {
@@ -9135,7 +9129,7 @@ export const contests = {
                 person == null
                   ? base
                   : base == null
-                    ? unaffiliated(person)
+                    ? (UNAFFILIATED[at] ?? unaffiliated(person))
                     : at === 0
                       ? base
                       : `oklch(from ${base} l max(c, 0.1) calc(h + ${at * 137.5}))`,

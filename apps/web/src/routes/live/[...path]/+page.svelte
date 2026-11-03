@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import Night from "#lib/components/live/night.svelte";
+  import { count } from "#lib/format.js";
   import { placeName, stamp } from "#lib/live/format.js";
   import { localize } from "#lib/live/prefs.svelte.js";
   import { closing, describe, summarize } from "#lib/live/summary.js";
@@ -29,7 +30,7 @@
   const headline = $derived(
     race == null || focused == null
       ? null
-      : describe(focused, closing(election, race), clock),
+      : describe(focused, closing(election, race), clock).replace(/\.$/u, ""),
   );
   const spot = $derived(data.place == null ? null : placeName(data.place.name));
   const name = $derived(race?.title ?? election.title);
@@ -38,18 +39,37 @@
       ? m.night_seo_title({ title: name })
       : m.night_place_seo_title({ place: spot, title: election.title }),
   );
+  const seats = $derived.by(() => {
+    if (race == null || race.isMeasure || focused?.later != null) {
+      return null;
+    }
+    const up = race.seats ?? 1;
+    const running = race.options.filter((option) => !option.isWriteIn).length;
+    return up > 1 && running > up
+      ? { seats: count(up), count: count(running) }
+      : null;
+  });
   const description = $derived(
     spot != null
       ? m.night_place_seo_description({ place: spot, title: election.title })
-      : headline == null
-        ? m.night_seo_nation({ title: election.title })
-        : election.newest == null
-          ? m.night_seo_upcoming({ headline, title: name })
-          : m.night_seo_description({
+      : seats != null && headline != null
+        ? election.newest == null
+          ? m.night_seo_seats_upcoming({ ...seats, headline, title: name })
+          : m.night_seo_seats({
+              ...seats,
               headline,
               title: name,
               time: stamp(election.newest),
-            }),
+            })
+        : headline == null
+          ? m.night_seo_nation({ title: election.title })
+          : election.newest == null
+            ? m.night_seo_upcoming({ headline, title: name })
+            : m.night_seo_description({
+                headline,
+                title: name,
+                time: stamp(election.newest),
+              }),
   );
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
   const image = $derived(
@@ -60,7 +80,9 @@
       ? m.night_place_og_alt({ place: spot, title: election.title })
       : headline == null
         ? m.night_og_nation_alt({ title: election.title })
-        : m.night_og_alt({ title: name, headline }),
+        : seats == null
+          ? m.night_og_alt({ title: name, headline })
+          : m.night_og_seats_alt({ ...seats, title: name, headline }),
   );
   const jsonld = $derived(
     JSON.stringify({

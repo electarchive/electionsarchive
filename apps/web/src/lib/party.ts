@@ -46,6 +46,15 @@ const SAFE = [
 
 export const WITHIN = Symbol("within");
 
+export const UNAFFILIATED = [
+  "#0e8f7e",
+  "#8250c4",
+  "#b5651d",
+  "#c03a7a",
+  "#4a7d1f",
+  "#3f6fd1",
+];
+
 export function independent(rank: number) {
   return (
     [NEUTRALS[1], NEUTRALS[0], NEUTRALS[2]][rank % NEUTRALS.length] ??

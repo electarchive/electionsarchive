@@ -5,7 +5,7 @@
   import { percent } from "#lib/format.js";
   import { HATCH, lead, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { shade, tally, verdict } from "#lib/live/summary.js";
+  import { cut, shade, tally, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import RaceIndex from "./race-index.svelte";
@@ -107,7 +107,8 @@
     >
       {#each cards as entry (entry.race.id)}
         {const isCurrent = $derived(entry.race.slug === current)}
-        {const option = $derived(entry.winner ?? entry.leader)}
+        {const line = $derived(entry.total > 0 ? cut(entry) : null)}
+        {const option = $derived(line?.last ?? entry.winner ?? entry.leader)}
         <li class="lg:inline-40">
           <a
             href={toLive(entry.race.slug)}
@@ -122,7 +123,7 @@
             >
             {@render chip(
               option,
-              option == null
+              option == null || line != null
                 ? verdict(entry)
                 : `${surname(option)} +${lead(entry.margin)}`,
               entry.winner != null,

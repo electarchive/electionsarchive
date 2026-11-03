@@ -114,8 +114,49 @@ export function closing(election: LiveElection, race: LiveRace) {
   );
 }
 
+export function cut(summary: Summary) {
+  const { race, totals } = summary;
+  const seats = race.seats ?? 1;
+  const order = ranked(totals).filter(
+    (index) => race.options[index]?.isWriteIn !== true,
+  );
+  const inside = order[seats - 1];
+  const outside = order[seats];
+  const last = inside == null ? null : race.options[inside];
+  const next = outside == null ? null : race.options[outside];
+  if (
+    seats < 2 ||
+    race.isMeasure === true ||
+    inside == null ||
+    outside == null ||
+    last == null ||
+    next == null
+  ) {
+    return null;
+  }
+  return {
+    seats,
+    order,
+    last,
+    next,
+    lead: (totals[inside] ?? 0) - (totals[outside] ?? 0),
+  };
+}
+
 export function describe(summary: Summary, closes: number, time: number) {
   const { leader, winner, margin, total, estimate } = summary;
+  const line = total > 0 ? cut(summary) : null;
+  if (line != null) {
+    const values = {
+      name: line.last.label,
+      seats: count(line.seats),
+      lead: count(line.lead),
+      next: line.next.label,
+    };
+    return summary.race.certified == null
+      ? m.night_head_seats_holding(values)
+      : m.night_head_seats_filled(values);
+  }
   if (winner != null) {
     return m.night_head_won({ name: winner.label, margin: lead(margin) });
   }
@@ -151,6 +192,13 @@ export function describe(summary: Summary, closes: number, time: number) {
 }
 
 export function verdict(summary: Summary) {
+  const line = summary.total > 0 ? cut(summary) : null;
+  if (line != null) {
+    return m.night_races_seat({
+      name: surname(line.last),
+      lead: count(line.lead),
+    });
+  }
   const option = summary.winner ?? summary.leader;
   if (option == null) {
     return summary.later == null ? m.night_nation_waiting() : m.night_later();
@@ -213,4 +261,29 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
     waiting,
     later,
   };
+}
+
+export function quiet(minutes: number) {
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  if (weeks > 1) {
+    return m.night_note_stale_weeks({ count: count(weeks) });
+  }
+  if (weeks === 1) {
+    return m.night_note_stale_week();
+  }
+  if (days > 1) {
+    return m.night_note_stale_days({ count: count(days) });
+  }
+  if (days === 1) {
+    return m.night_note_stale_day();
+  }
+  if (hours > 1) {
+    return m.night_note_stale_hours({ count: count(hours) });
+  }
+  if (hours === 1) {
+    return m.night_note_stale_hour();
+  }
+  return m.night_note_stale({ minutes: count(minutes) });
 }

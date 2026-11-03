@@ -6,6 +6,7 @@ export type LiveOption = {
   person: string | null;
   photo: string | null;
   party: { id: string; name: string; short: string; color: string } | null;
+  color?: string;
   isWriteIn: boolean;
   isIncumbent: boolean;
 };

@@ -10,7 +10,7 @@ import type { Summary } from "#lib/live/summary.js";
 import { count, percent } from "#lib/format.js";
 import { initial, lead, stamp, surname } from "#lib/live/format.js";
 import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
-import { pair, standing, sum } from "#lib/live/standing.js";
+import { pair, ranked, standing, sum } from "#lib/live/standing.js";
 import { closing, describe, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -109,7 +109,7 @@ function mix(color: string, amount: number) {
 }
 
 function hue(option: LiveOption | null | undefined, index = 0) {
-  const color = option?.party?.color;
+  const color = option?.party?.color ?? option?.color;
   if (isHex(color)) {
     return color;
   }
@@ -772,6 +772,139 @@ function candidate(
   );
 }
 
+function standingsBody(summary: Summary, seats: number, width: number) {
+  const { race, totals, total } = summary;
+  const order = ranked(totals).filter(
+    (index) => race.options[index]?.isWriteIn !== true,
+  );
+  const top = Math.max(1, totals[order[0] ?? 0] ?? 0);
+  const isCounting = total > 0;
+  const ranks = !isCounting
+    ? order.slice(0, 7).map((_, rank) => rank)
+    : seats + 2 <= 7
+      ? order.slice(0, seats + 2).map((_, rank) => rank)
+      : [0, 1, 2, null, seats - 2, seats - 1, seats, seats + 1];
+  const row = (rank: number) => {
+    const index = order[rank];
+    const option = index == null ? null : race.options[index];
+    if (index == null || option == null) {
+      return [];
+    }
+    const isInside =
+      race.certified == null
+        ? total > 0 && rank < seats
+        : race.certified.winners.includes(option.id);
+    const votes = totals[index] ?? 0;
+    return [
+      h("div", { display: "flex", alignItems: "center", gap: 16, height: 34 }, [
+        h(
+          "div",
+          {
+            display: "flex",
+            justifyContent: "flex-end",
+            width: 30,
+            fontSize: 18,
+            color: MUTED,
+          },
+          isCounting ? String(rank + 1) : "",
+        ),
+        h("div", {
+          width: 6,
+          height: 26,
+          backgroundColor: isInside ? hue(option, index) : FILL,
+        }),
+        line(option.label, {
+          flexGrow: 1,
+          width: 0,
+          fontSize: 25,
+          fontWeight: isInside ? 800 : isCounting ? 400 : 600,
+          color: isInside || !isCounting ? INK : MUTED,
+        }),
+        ...(total === 0
+          ? []
+          : [
+              h(
+                "div",
+                {
+                  display: "flex",
+                  width: 150,
+                  height: 10,
+                  backgroundColor: FILL,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                },
+                [
+                  h("div", {
+                    width: `${(votes / top) * 100}%`,
+                    height: "100%",
+                    backgroundColor: isInside ? hue(option, index) : OTHER,
+                  }),
+                ],
+              ),
+              h(
+                "div",
+                {
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: 110,
+                  fontSize: 24,
+                  fontWeight: isInside ? 800 : 400,
+                  color: isInside ? INK : MUTED,
+                },
+                count(votes),
+              ),
+            ]),
+      ]),
+    ];
+  };
+  const rule = (label: string) =>
+    h("div", { display: "flex", alignItems: "center", gap: 12, height: 22 }, [
+      h("div", { flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
+      h("div", { display: "flex", fontSize: 16, color: MUTED }, label),
+      h("div", { flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
+    ]);
+  const gap = h(
+    "div",
+    {
+      display: "flex",
+      paddingLeft: 46,
+      height: 18,
+      fontSize: 18,
+      color: MUTED,
+    },
+    "…",
+  );
+  return h("div", { display: "flex", flexDirection: "column", width }, [
+    ...ranks.flatMap((rank) =>
+      rank == null
+        ? [gap]
+        : [
+            ...(isCounting && rank === seats
+              ? [rule(m.night_seats_line({ count: count(seats) }))]
+              : []),
+            ...row(rank),
+          ],
+    ),
+    ...(!isCounting && order.length > ranks.length
+      ? [
+          h(
+            "div",
+            {
+              display: "flex",
+              paddingLeft: 68,
+              marginTop: 6,
+              fontSize: 21,
+              color: MUTED,
+            },
+            m.night_og_seats_more({
+              count: count(order.length - ranks.length),
+            }),
+          ),
+        ]
+      : []),
+  ]);
+}
+
 function raceBody(summary: Summary, width: number) {
   const { race } = summary;
   const [a, b] = pair(race);
@@ -1068,11 +1201,20 @@ async function card(path: string, bucket: number) {
       : (election.races.find((entry) => entry.office === "senate") ??
         election.races.find((entry) => entry.office === "governor") ??
         election.races[0]);
-    const target = election.races.find((entry) => entry.id === chosen?.id);
+    const target =
+      election.races.find((entry) => entry.id === chosen?.id) ?? chosen;
     if (target == null) {
       error(404);
     }
-    const summary = summarize(target, estimates[target.id] ?? null);
+    const summary = summarize(
+      target,
+      estimates[target.id] ?? first.estimates[target.id] ?? null,
+    );
+    const seats = target.seats ?? 1;
+    const isMulti =
+      seats > 1 &&
+      target.isMeasure !== true &&
+      target.options.filter((option) => !option.isWriteIn).length > seats;
     const closes = closing(election, target);
     if (target.certified != null) {
       status = "certified";
@@ -1095,7 +1237,11 @@ async function card(path: string, bucket: number) {
               justifyContent: "flex-end",
               flexGrow: 1,
             },
-            [raceBody(summary, width)],
+            [
+              isMulti
+                ? standingsBody(summary, seats, width)
+                : raceBody(summary, width),
+            ],
           ),
         ]),
         ...(map == null ? [] : [map]),

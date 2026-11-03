@@ -12,6 +12,7 @@
   import { estimateAt, history } from "#lib/live/history.js";
   import { liveLinks } from "#lib/live/links.js";
   import { standing, sum } from "#lib/live/standing.js";
+  import { quiet } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Dial from "./dial.svelte";
@@ -218,14 +219,13 @@
       const next = now.order[seats] ?? 0;
       const values = {
         seats: count(seats),
-        count: count(now.total),
         name: options[last]?.label ?? "",
         next: options[next]?.label ?? "",
         lead: count((now.totals[last] ?? 0) - (now.totals[next] ?? 0)),
       };
       return now.isFinal && race.certified != null
-        ? m.night_head_seats_won(values)
-        : m.night_head_seats(values);
+        ? m.night_head_seats_filled(values)
+        : m.night_head_seats_holding(values);
     }
     if (now.isFinal && race.certified != null) {
       const winner = options.find((option) => winners.includes(option.id));
@@ -330,9 +330,7 @@
     ) {
       list.push({
         id: "stale",
-        text: m.night_note_stale({
-          minutes: count(Math.round((time - Date.parse(newest)) / 60_000)),
-        }),
+        text: quiet(Math.round((time - Date.parse(newest)) / 60_000)),
         isAlert: false,
       });
     }

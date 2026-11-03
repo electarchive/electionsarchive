@@ -14,7 +14,7 @@ export function tone(option: LiveOption | undefined) {
     }
   }
   return swatch(
-    option.party?.color === "" ? null : option.party?.color,
+    option.party?.color === "" ? null : (option.party?.color ?? option.color),
     option.party == null
       ? `candidate:${option.label.toLowerCase()}`
       : `party:${option.party.id}`,
