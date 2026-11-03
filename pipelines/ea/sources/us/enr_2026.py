@@ -82,6 +82,7 @@ YESNO = {"for": "yes", "against": "no", "approve": "yes", "reject": "no"}
 SYNONYMS = {"id": "identification", "sell": "sale"}
 TENANT = re.compile(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports")
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
+PLACE_WORDS = {"township", "charter", "village", "public", "schools", "school", "community", "area", "consolidated"}
 GENERIC = {
     "an",
     "to",
@@ -268,6 +269,15 @@ def edits(a: str, b: str) -> bool:
         return sum(x != y for x, y in zip(a, b, strict=True)) == 1
     short, long = sorted((a, b), key=len)
     return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
+
+
+def placed(name: list[str], words: set[str], strict: bool) -> bool:
+    found = set(name) & words
+    if strict:
+        return not name or name[0] in words and 2 * len(found) >= len(set(name)) or any(w.isdigit() for w in found)
+    return (
+        not name or bool(found) or any(a in b or len(b) > 4 and edits(a, b) for a in name for b in words if len(a) > 4)
+    )
 
 
 def snap(people: frozenset[str], wanted: set[str], words: set[str]) -> frozenset[str]:
@@ -1371,17 +1381,19 @@ def plan(
         for same in twins.values():
             for contest in sorted(same, key=lambda id: held[id][1])[:-1]:
                 del published[contest]
-        towns: dict[str, set[str]] = {}
-        for code, text in conn.execute(
-            """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
-               where u.scheme_code = 'us.place' and u.code = any(%s) and u.area_id = any(%s)""",
+        towns: dict[str, list[list[str]]] = {}
+        for owner, text in conn.execute(
+            """select n.entity_id::text, n.text from name n where n.entity_id = any(%s)
+               union all
+               select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
+               where u.scheme_code in ('us.place', 'us.school_district') and u.code = any(%s)""",
             [
-                list({key.split(":")[2] for keys, _ in published.values() for key in keys}),
                 list({held[contest][0] for contest in published if held[contest][0] is not None}),
+                list({key.split(":")[2] for keys, _ in published.values() for key in keys}),
             ],
         ).fetchall():
-            towns.setdefault(code, set()).update(
-                w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | {"township", "charter", "village"}
+            towns.setdefault(owner, []).append(
+                [w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | PLACE_WORDS]
             )
         races: dict[tuple[str, str, frozenset[str]], list[str]] = {}
         for (office, name, county), group in local.filter(pl.col("state") == state).group_by(
@@ -1409,6 +1421,7 @@ def plan(
                 (contest, key, wanted) for contest, (keys, wanted) in published.items() for key in keys
             ):
                 segment = key.split(":")[2]
+                named_seat = {w for w in re.split(r"[:-]", key)[3:] if w.isdigit()}
                 named = district_words(key)
                 judge = {w for w in key.split(":")[-1].split("-") if len(w) > 1}
                 if wide:
@@ -1448,9 +1461,12 @@ def plan(
                         heads.get(contest, set()) & words
                         and (titles.get(contest, set()) - heads[contest]) & words - GENERIC
                     )
-                    or people <= {"yes", "no"}
-                    and segment in towns
-                    and not towns[segment] & words
+                    or re.fullmatch(r"\d{7}|\d\d-[a-z0-9-]+", segment)
+                    and (names := towns.get(str(held[contest][0]), []) + towns.get(segment, []))
+                    and len(people & wanted - {"yes", "no"}) < 2
+                    and not any(placed(name, words, not people & wanted - {"yes", "no"}) for name in names)
+                    and not (people & wanted - {"yes", "no"} and named_seat & {w for w in words if w.isdigit()})
+                    and len({w for w in key.split(":")[-1].split("-") if len(w) > 3} & words) < 5
                 ):
                     continue
                 if ":measure:public-measure-" in key:
