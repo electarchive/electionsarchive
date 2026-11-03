@@ -1487,6 +1487,9 @@ IN_SKIP = {
     "TREASURER OF STATE",
     "OTHER",
 }
+IN_ENR = "https://enr.indianavoters.in.gov/site/data/OffCatC_{}_B.json"
+IN_ENR_CATEGORIES = ("1017", "1023", "1033", "1038", "1039")
+IN_ENR_TITLE = "Election Night Results, November 3, 2026 General Election (seats per office)"
 PRIMARIES = {"NC": "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2026_03_03/results_pct_20260303.zip"}
 SYNONYMS = {
     "mayoral": "mayor",
@@ -2348,10 +2351,7 @@ NE_SOURCES["AR-05143"] = (
     "ar/washington.html",
 )
 for _key in sorted(
-    {
-        _line.split("\t")[0]
-        for _line in Path(__file__).with_name("local_2026_nov3_ar.tsv").read_text().splitlines()[1:]
-    }
+    {_line.split("\t")[0] for _line in Path(__file__).with_name("local_2026_nov3_ar.tsv").read_text().splitlines()[1:]}
 ):
     NE_SOURCES[_key] = (
         "Association of Arkansas Counties",
@@ -7621,6 +7621,8 @@ def fetch() -> None:
         )
         if state in PRIMARIES:
             raw.fetch(SOURCE, PRIMARIES[state], suffix=".zip")
+    for category in IN_ENR_CATEGORIES:
+        raw.fetch(SOURCE, IN_ENR.format(category), suffix=".json")
     for fips, url in FILES.items():
         if fips in DELIVERED:
             try:
@@ -7865,6 +7867,7 @@ def parse() -> None:
             )
 
     feeds: dict[str, list[dict[str, object]]] = defaultdict(list)
+    in_cited: dict[str, str] = {}
     templated: dict[str, str] = {}
     minted: dict[str, tuple[str, str, str, str]] = {}
     pinned: set[str] = set()
@@ -8286,6 +8289,17 @@ def parse() -> None:
                 }
             )
 
+    def in_title(text: str) -> str:
+        return re.sub(r"\s+", " ", re.sub(r"\(\d+ seats?\)", "", text)).strip().lower()
+
+    in_seats: dict[str, tuple[int, str] | None] = {}
+    for category in IN_ENR_CATEGORIES:
+        root = json.loads(raw.cached(SOURCE, IN_ENR.format(category)).path.read_bytes().decode("utf-8-sig"))["Root"]
+        races = root["StatewideSummary"]["Race"]
+        for race in races if isinstance(races, list) else [races]:
+            found = (int(race["NumofSeats"]), race["OFFICE_TITLE"].strip())
+            key = in_title(found[1])
+            in_seats[key] = found if (in_seats.get(key, found) or (0,))[0] == found[0] else None
     for cells in pl.read_excel(raw.cached(SOURCE, FEEDS["IN"][0]).path, has_header=False).iter_rows():
         if cells[0] == "OFFICE CATEGORY:":
             category = cells[1]
@@ -8295,12 +8309,17 @@ def parse() -> None:
         title = str(cells[2])
         county = re.search(r", (\w[\w .]*?) County\b", title)
         seats = re.search(r"\((\d+) seats?\)", title)
+        enr = None if seats else in_seats.get(in_title(title))
+        count = int(seats[1]) if seats else enr[0] if enr else 0
+        if category == "TOWNSHIP BOARD MEMBER" and count < 2 and not re.search(r"Board, .+ Township", title):
+            count, enr = 3, None
         named, independent = party(cells[1])
         feeds["IN"].append(
             {
                 "county": county[1] if county else "",
                 "contest": re.sub(r"\(\d+ seats?\)|, \w[\w .]*? County\b", "", title),
-                "seats": int(seats[1]) if seats else 0,
+                "seats": count,
+                "cite": enr[1] if enr else None,
                 "name": cells[0],
                 "party": named,
                 "independent": independent
@@ -11620,6 +11639,8 @@ def parse() -> None:
                     bool(row["independent"]),
                     str(row.get("feed") or key),
                 )
+                if row.get("cite"):
+                    in_cited[tail] = str(row["cite"])
             taken |= set(used)
             (state_used if key == state else county_used).update(used)
             print(f"{key}: {len(used)} contests matched, {len(missed)} not matched")
@@ -11627,6 +11648,8 @@ def parse() -> None:
             (PARSED / f"unmatched_{key}.txt").write_text("\n".join(sorted(missed)))
 
     PARSED.mkdir(parents=True, exist_ok=True)
+    if STATES is None or "IN" in STATES:
+        (PARSED / "seats_IN.json").write_text(json.dumps(in_cited, indent=1, sort_keys=True))
     uncached = set()
     for feed in {str(row["feed"]) for row in rows}:
         try:
@@ -11824,6 +11847,12 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             known.setdefault(tail, []).append((person, text))
 
         sources = {}
+        plurality = {False: cs.key("us.electoral_system", "fptp"), True: cs.key("us.electoral_system", "block")}
+        in_cited = (
+            json.loads((PARSED / "seats_IN.json").read_text())
+            if state == "IN" and (PARSED / "seats_IN.json").exists()
+            else {}
+        )
         elections = {}
         counts = {
             "contests": 0,
@@ -12311,6 +12340,10 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     area = at_large[area][0]
             elif office_id is not None and COUNTY_SCOPE.fullmatch(scope) and countywide(tail):
                 area = cs.area("us.county", scope[3:])
+            if kind == "body_seats" and group["seats"][0]:
+                magnitude = int(group["seats"][0])
+            if state == "IN" and magnitude is not None and system in plurality.values():
+                system = plurality[magnitude > 1]
             cs.add(
                 "contest",
                 id=contest,
@@ -12321,7 +12354,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 district_area_id=area,
                 seat_id=seat,
                 boundary_set_id=plan,
-                magnitude=int(group["seats"][0]) if kind == "body_seats" and group["seats"][0] else magnitude,
+                magnitude=magnitude,
                 term="remainder" if group["unexpired"][0] else term,
                 round_number=2 if chained else 1,
                 previous_round_id=previous if chained else None,
@@ -12345,6 +12378,27 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             if tail in created:
                 counts["created"] += 1
                 cs.add("citation", entity_id=contest, source_id=sources[str(group["feed"][0])], locator=None)
+            if tail in in_cited:
+                if "IN-enr" not in sources:
+                    sources["IN-enr"] = cs.source("Indiana Secretary of State", IN_ENR_TITLE)
+                    if sources["IN-enr"] in cs.minted:
+                        cs.add(
+                            "source",
+                            id=sources["IN-enr"],
+                            kind="official_body",
+                            publisher="Indiana Secretary of State",
+                            title=IN_ENR_TITLE,
+                            url="https://enr.indianavoters.in.gov/site/",
+                            license="Public record",
+                        )
+                    for category in IN_ENR_CATEGORIES:
+                        cs.artifact(raw.cached(SOURCE, IN_ENR.format(category)), sources["IN-enr"])
+                cs.add(
+                    "citation",
+                    entity_id=contest,
+                    source_id=sources["IN-enr"],
+                    locator={"office": in_cited[tail], "field": "NumofSeats"},
+                )
             counts["chained"] += chained
             if set(group["name"]) == {NO_FILING}:
                 cs.add(
