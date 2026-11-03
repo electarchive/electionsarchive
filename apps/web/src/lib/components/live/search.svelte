@@ -11,9 +11,9 @@
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
   import { haystack, score, strongest, terms } from "#lib/live/find.js";
-  import { bandFor, lead, stamp, surname, tone } from "#lib/live/format.js";
+  import { lead, stamp, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { verdict } from "#lib/live/summary.js";
+  import { bandOf, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
@@ -24,15 +24,18 @@
     codes,
     labels,
     href,
+    link = null,
   }: {
     path: string;
     summaries: Array<Summary>;
     codes: Array<string>;
     labels: Record<string, string>;
     href: (code: string) => string;
+    link?: ((slug: string, state: string) => string) | null;
   } = $props();
 
   const toLive = liveLinks();
+  const open = $derived(link ?? ((slug: string) => toLive(slug)));
   const id = $props.id();
 
   const WORDS = {
@@ -184,11 +187,11 @@
     })),
     ...found.races.map((entry) => ({
       key: `race:${entry.summary.race.id}`,
-      href: toLive(entry.summary.race.slug),
+      href: open(entry.summary.race.slug, entry.summary.race.state),
     })),
     ...locals.map((entry) => ({
       key: `local:${entry.slug}`,
-      href: toLive(entry.slug),
+      href: open(entry.slug, entry.state),
     })),
   ]);
   const isShown = $derived(
@@ -299,18 +302,6 @@
     }
   }
 
-  function banded(summary: Summary) {
-    const { race, projected, winner } = summary;
-    return bandFor(
-      race.options,
-      projected == null
-        ? (race.certified?.winners ?? (winner == null ? [] : [winner.id]))
-        : [projected.id],
-      race.seats ?? 1,
-      projected != null,
-    );
-  }
-
   function status(summary: Summary, band: Band | null) {
     if (band != null) {
       return {
@@ -415,7 +406,7 @@
 {/snippet}
 
 {#snippet race(summary: Summary, match: string | null, index: number)}
-  {const band = $derived(banded(summary))}
+  {const band = $derived(bandOf(summary))}
   {#snippet body()}
     {@render tag(code(summary))}
     <span class="grid min-inline-0">
@@ -530,7 +521,7 @@
                   class="shrink-0 text-xs text-muted-foreground max-sm:hidden"
                   >{OFFICES[entry.lead.race.office]?.()}</span
                 >
-                {@render standing(entry.lead, banded(entry.lead), false)}
+                {@render standing(entry.lead, bandOf(entry.lead), false)}
               </span>
             {/if}
           {/snippet}
