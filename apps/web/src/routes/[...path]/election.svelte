@@ -176,7 +176,7 @@
   };
 
   const ledger = $derived(sections.ledger ?? null);
-  const arranged = $derived.by(() => {
+  const laid = $derived.by(() => {
     const grouped = Map.groupBy(election.races, (race) => race.scope)
       .values()
       .flatMap((group) => [
@@ -380,11 +380,11 @@
     if (
       ledger == null ||
       (ledger.kind === "votes" &&
-        arranged.some((race) => race.isTotal && race.body === ledger.body))
+        laid.some((race) => race.isTotal && race.body === ledger.body))
     ) {
       return new Map<string, string>();
     }
-    const fellows = arranged.filter(
+    const fellows = laid.filter(
       (race) => race.body === ledger.body && !race.isTotal,
     );
     const host = fellows.find((race) =>
@@ -404,8 +404,8 @@
       ),
     );
   });
-  const ordered = $derived(
-    arranged
+  const lined = $derived(
+    laid
       .filter((race) => !tucked.has(race.anchor))
       .map((race) => ({
         ...race,
@@ -425,16 +425,14 @@
   );
 
   const focus = $derived(
-    chosen == null ? -1 : ordered.findIndex((race) => race.anchor === chosen),
+    chosen == null ? -1 : lined.findIndex((race) => race.anchor === chosen),
   );
-  const isNavigated = $derived(ordered.length > 2 || focus !== -1);
+  const isNavigated = $derived(lined.length > 2 || focus !== -1);
   const isBallot = $derived(
-    ordered.length > 2 &&
-      ordered.every((race) => race.kind === "ballot_question"),
+    lined.length > 2 && lined.every((race) => race.kind === "ballot_question"),
   );
   const isGrid = $derived(
-    isNavigated &&
-      new Set(ordered.flatMap((race) => race.scope ?? [])).size > 1,
+    isNavigated && new Set(lined.flatMap((race) => race.scope ?? [])).size > 1,
   );
   const isSwept = $derived(
     scope == null &&
@@ -450,6 +448,61 @@
   const head = $derived(Math.max(shown ?? 0, 0));
   const isActive = (index: number) =>
     shown == null ? index < 4 : index === shown;
+  const wanted = $derived([
+    ...new Set(
+      lined
+        .filter((_, index) => isActive(index))
+        .flatMap((race) => [
+          race,
+          ...laid.filter(
+            (other) =>
+              other.anchor === race.partner ||
+              (other.name === race.name && (other.round ?? 1) > 1),
+          ),
+        ])
+        .flatMap((race) => race.deferred ?? []),
+    ),
+  ]);
+  const details = createQueries(() => ({
+    queries: wanted.map((contest) => ({
+      ...orpc.elections.race.queryOptions({
+        input: { id, contest, within: scope?.id },
+      }),
+      staleTime: Infinity,
+    })),
+  }));
+  const filled = $derived(
+    new Map(
+      wanted.flatMap((contest, index) => {
+        const data = details[index]?.data;
+        return data == null ? [] : [[contest, data] as const];
+      }),
+    ),
+  );
+  const fill = <
+    T extends {
+      deferred: string | null;
+      results: Array<{ key: string; color: string | null }>;
+    },
+  >(
+    race: T,
+  ) => {
+    const found = filled.get(race.deferred ?? "");
+    return found == null
+      ? race
+      : {
+          ...race,
+          places: found.places,
+          map: found.map,
+          since: found.since,
+          results: race.results.map((row) => ({
+            ...row,
+            color: found.colors[row.key] ?? row.color,
+          })),
+        };
+  };
+  const arranged = $derived(laid.map(fill));
+  const ordered = $derived(lined.map(fill));
 
   const stages = $derived(
     election.elections
@@ -472,6 +525,9 @@
   );
 
   const unplaced = $derived.by(() => {
+    if (election.races.some((race) => race.deferred != null)) {
+      return [];
+    }
     const placed = new Set(
       arranged.flatMap((race) => [
         ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
@@ -502,7 +558,11 @@
   );
 
   const bodies = $derived([
-    ...new Set(ordered.flatMap((race) => race.body ?? [])),
+    ...new Set(
+      ordered
+        .filter((race, index) => race.deferred == null || isActive(index))
+        .flatMap((race) => race.body ?? []),
+    ),
   ]);
   const swings = createQueries(() => ({
     queries: ordered.map((race, index) => {
@@ -1739,6 +1799,12 @@
       : isBallot
         ? races
         : races.slice(1).filter((race) => !race.isLater),
+  );
+  const listing = $state({ isOpen: false });
+  const boarded = $derived(
+    listing.isOpen || !election.races.some((race) => race.deferred != null)
+      ? others
+      : others.slice(0, 48),
   );
 
   const office = (race: (typeof races)[number]) =>
@@ -3145,7 +3211,7 @@
     <ol
       class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
     >
-      {#each others as other (other.anchor)}
+      {#each boarded as other (other.anchor)}
         <li
           class="grid content-start gap-3 border-bs border-border py-4 lg:border-bs-0 max-lg:first:border-bs-0"
         >
@@ -3196,6 +3262,15 @@
         </li>
       {/each}
     </ol>
+    {#if boarded.length < others.length}
+      <button
+        type="button"
+        class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+        onclick={() => {
+          listing.isOpen = true;
+        }}>{m.places_show_all({ count: count(others.length) })}</button
+      >
+    {/if}
   </section>
 {/snippet}
 

@@ -13482,6 +13482,8 @@ export async function races(
   isBrief = false,
   isInside = false,
   isSeated = false,
+  isLean = false,
+  pick: string | null = null,
 ) {
   const day = date ?? "infinity";
   const [found, territory] = await Promise.all([
@@ -13665,12 +13667,17 @@ export async function races(
   const homes = new Map(
     groups.flatMap((group, spot) => group.map((row) => [row.id, spot])),
   );
-  if (nation == null || groups.length === 0) {
+  const isThin = isLean && groups.length > 100;
+  const picked =
+    pick == null
+      ? groups
+      : groups.filter((group) => group.some((row) => row.id === pick));
+  if (nation == null || picked.length === 0) {
     return [];
   }
   const [labels, slugs, lineage] = await Promise.all([
     names(
-      [...owned, ...groups.flat()].flatMap((row) => [
+      [...owned, ...picked.flat()].flatMap((row) => [
         row.id,
         ...[row.owner, row.office, row.elects, row.area, row.party].filter(
           (id) => id != null,
@@ -13687,7 +13694,7 @@ export async function races(
   ]);
   const parentOf = new Map(lineage.map((row) => [row.from, row.to]));
   const built = await Promise.all(
-    groups.map(async (group) => {
+    picked.map(async (group) => {
       const roots = group.map((row) => row.id);
       const head = group[0];
       const single =
@@ -13844,7 +13851,7 @@ export async function races(
           day,
           counted.length > 0 ? counted : roots,
         ),
-        lay(!isBrief),
+        lay(!isBrief && !isThin),
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
         (async () =>
           single == null && head?.isOffice === true && roots.length > 1
@@ -14166,7 +14173,7 @@ export async function races(
         );
       const [map, previous, runoff, seated, asked, wards, field] =
         await Promise.all([
-          level == null || isBrief || isPrimaries
+          level == null || isBrief || isThin || isPrimaries
             ? null
             : sketch(
                 place,
@@ -14812,9 +14819,16 @@ export async function races(
         nonvoting: group.filter((row) => !row.isVoting).length,
         sample:
           table?.sample ??
-          (isDeferred && single == null && first != null && districts.length > 1
+          ((isDeferred || isThin) &&
+          single == null &&
+          first != null &&
+          districts.length > 1
             ? first.id
             : null),
+        deferred:
+          isThin && (single != null || (first != null && districts.length > 1))
+            ? (roots.toSorted((a, b) => a.localeCompare(b))[0] ?? null)
+            : null,
         since:
           table?.since ??
           (before == null && !(isTier && straddled === 0)
@@ -15234,6 +15248,7 @@ export const elections = {
             count: v.number(),
             nonvoting: v.number(),
             sample: v.nullable(v.string()),
+            deferred: v.nullable(v.string()),
             since: v.nullable(v.string()),
             electors: v.nullable(
               v.object({
@@ -15615,7 +15630,15 @@ export const elections = {
           where n.entity_id = ${input.id}::uuid
         `),
         breadcrumbs(home, input.id),
-        races(input.id, home, election.date, false, within != null),
+        races(
+          input.id,
+          home,
+          election.date,
+          false,
+          within != null,
+          false,
+          true,
+        ),
         db.execute<{
           k: number;
           now: string | null;
@@ -17468,6 +17491,61 @@ export const elections = {
           };
         })
         .toArray();
+    }),
+  race: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/races/{contest}",
+        summary:
+          "Get the places and map of one race in an election with more than 100 races, which leaves them out; contest is the race's deferred id",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        contest: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        within: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+      }),
+    )
+    .output(
+      v.nullable(
+        v.object({
+          places: Places,
+          map: v.nullable(Sketch),
+          since: v.nullable(v.string()),
+          colors: v.record(v.string(), v.nullable(v.string())),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{ polity: string; date: string | null }>(
+        sql`select polity_id as polity, date_from::text as date from election where id = ${input.id}::uuid`,
+      );
+      const election = found.rows[0];
+      if (election == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const [race] = await races(
+        input.id,
+        input.within ?? election.polity,
+        election.date,
+        false,
+        input.within != null,
+        false,
+        false,
+        input.contest,
+      );
+      return race == null
+        ? null
+        : {
+            places: race.places,
+            map: race.map,
+            since: race.since,
+            colors: Object.fromEntries(
+              race.results.map((row) => [row.key, row.color]),
+            ),
+          };
     }),
   lead: os
     .meta(
