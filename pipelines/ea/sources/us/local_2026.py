@@ -8115,6 +8115,99 @@ def parse() -> None:
         return any(all(word.search(line) for word in words) for line in ballot_text.get(county, []))
 
     filings = filings.filter(pl.Series([kept(row) for row in filings.iter_rows(named=True)], dtype=pl.Boolean))
+    clerk: list[tuple[str, str, str, str]] = []
+    heading: tuple[str, str] | None = None
+    side = "NONPARTISAN"
+    for line in (
+        subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, FILES["KY-21111-jefferson"]).path), "-"],
+            capture_output=True,
+            check=False,
+        )
+        .stdout.decode()
+        .splitlines()
+    ):
+        if "Candidates for" in line:
+            found = re.search(r"Candidates for (.+?) (MAYOR|COUNCIL|COMMISSIONER)\b", line)
+            heading = (
+                (found[1], "MAYOR" if found[2] == "MAYOR" else "CITY LEGISLATIVE BODY")
+                if found and not re.search(r"(?i)louisville|county|school", found[1])
+                else None
+            )
+            side = "NONPARTISAN"
+        elif found := re.match(r"\s*(Republican|Democratic) Candidate", line):
+            side = f"{found[1].upper()} PARTY"
+        elif (
+            heading
+            and (found := re.match(r"(\S.*?\S)\s{2,}\S", line))
+            and not re.match(r"Revised|Page|Candidate", found[1])
+        ):
+            clerk.append((*heading, side, found[1]))
+    towns = {ky_ballots.city_letters(city): city for city, _, _, _ in clerk}
+
+    def town(description: str | None) -> str | None:
+        key = ky_ballots.city_letters(str(description or ""))
+        return (
+            key
+            if key in towns
+            else next(
+                (
+                    other
+                    for other in towns
+                    if len(key) >= 4
+                    and abs(len(other) - len(key)) <= 1
+                    and (other.startswith(key) or key.startswith(other))
+                ),
+                None,
+            )
+        )
+
+    covered = pl.Series(
+        [
+            county == "JEFFERSON" and post in ("MAYOR", "CITY LEGISLATIVE BODY") and town(description) is not None
+            for county, post, description in filings.select("County", "Office", "Office Description").iter_rows()
+        ],
+        dtype=pl.Boolean,
+    )
+    pool = filings.filter(covered).to_dicts()
+    described: dict[str, str] = {}
+    for row in pool:
+        described.setdefault(str(town(row["Office Description"])), str(row["Office Description"]))
+    listed = []
+    for city, post, side, name in clerk:
+        words = name.replace("“", '"').replace("”", '"').split()
+        suffix = (
+            words.pop().upper() if len(words) > 2 and re.fullmatch(r"(JR|SR|II|III|IV)\.?", words[-1].upper()) else None
+        )
+        key = ky_ballots.city_letters(city)
+        match = next(
+            (
+                row
+                for same in (True, False)
+                for row in pool
+                if ky_ballots.letters(str(row["Last Name"])) == ky_ballots.letters(words[-1])
+                and ky_ballots.letters(str(row["First Name"]))[:1] == ky_ballots.letters(words[0])[:1]
+                and (town(row["Office Description"]) == key) == same
+            ),
+            None,
+        )
+        if match is not None:
+            pool.remove(match)
+        listed.append(
+            (match or {column: None for column in filings.columns})
+            | {"County": "JEFFERSON", "Office": post, "Office Description": described.get(key, city)}
+            | (
+                {}
+                if match
+                else {
+                    "First Name": " ".join(words[:-1]),
+                    "Last Name": words[-1],
+                    "Suffix": suffix,
+                    "Party": side,
+                }
+            )
+        )
+    filings = pl.concat([filings.filter(~covered), pl.DataFrame(listed, schema=filings.schema)])
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
@@ -11664,7 +11757,11 @@ def parse() -> None:
         .with_columns(person=pl.col("name").map_elements(slug, return_dtype=pl.String))
         .with_columns(
             twin=pl.when(pl.col("fips") == "KY")
-            .then(pl.col("person").str.replace_all(r"-[a-z](?=-|$)", ""))
+            .then(
+                pl.col("person").map_elements(
+                    lambda person: re.sub(r"-[a-z](?=-|$)", "", person), return_dtype=pl.String
+                )
+            )
             .otherwise(pl.col("person"))
         )
         .unique(["tail", "twin"], keep="first", maintain_order=True)
@@ -12464,9 +12561,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 except ValueError:
                     option = cs.key("us.option", f"{key}:{slug(row['name'])}:reissued")
                 if tail in RETENTION:
-                    answers = {
-                        answer: cs.key("us.option", f"{key}:{answer}") for answer in ("yes", "no")
-                    }
+                    answers = {answer: cs.key("us.option", f"{key}:{answer}") for answer in ("yes", "no")}
                     for position, (answer, answer_id) in enumerate(answers.items(), start=1):
                         cs.add(
                             "contest_option",
