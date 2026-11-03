@@ -819,7 +819,23 @@ export async function chamber(path: string) {
           .join(">");
   const running = new Map<string | null, number>();
   const came = new Map<string, Map<string, number>>();
-  const days = Map.groupBy(body.changes, (row) => row.date)
+  const { changes, ...lean } = body;
+  const pairs = new Map<string, { party: string | null; seats: number }>();
+  const pair = (party: string | null, seats: number) => {
+    const key = `${party}|${seats}`;
+    const found = pairs.get(key);
+    if (found != null) {
+      return found;
+    }
+    const made = { party, seats };
+    pairs.set(key, made);
+    return made;
+  };
+  let lastNear: { key: string; value: Record<string, string | null> } = {
+    key: "{}",
+    value: {},
+  };
+  const days = Map.groupBy(changes, (row) => row.date)
     .entries()
     .map(([day, rows]) => {
       const moves = rows.map((row) => ({
@@ -846,20 +862,25 @@ export async function chamber(path: string) {
           came.set(move.to, tally);
         }
       }
+      const near = Object.fromEntries(
+        [...came]
+          .filter(([party]) => (running.get(party) ?? 0) > 0)
+          .map(([party, tally]) => [
+            party,
+            [...tally].toSorted((a, b) => b[1] - a[1])[0]?.[0] ?? null,
+          ]),
+      );
+      const key = JSON.stringify(near);
+      if (key !== lastNear.key) {
+        lastNear = { key, value: near };
+      }
       return {
         date: day,
         parties: [...running]
           .filter(([, count]) => count > 0)
-          .map(([party, count]) => ({ party, seats: count }))
+          .map(([party, count]) => pair(party, count))
           .toSorted((a, b) => b.seats - a.seats),
-        near: Object.fromEntries(
-          [...came]
-            .filter(([party]) => (running.get(party) ?? 0) > 0)
-            .map(([party, tally]) => [
-              party,
-              [...tally].toSorted((a, b) => b[1] - a[1])[0]?.[0] ?? null,
-            ]),
-        ),
+        near: lastNear.value,
         moves: moves
           .filter((move) => move.kind !== "rename")
           .map(({ kind, from, to, cause, members }) => ({
@@ -1067,7 +1088,7 @@ export async function chamber(path: string) {
   return {
     kind: "chamber" as const,
     id,
-    body,
+    body: lean,
     council,
     terms: titled,
     eras: timeline,
@@ -1118,7 +1139,7 @@ export async function chamber(path: string) {
     ),
     members,
     kin: Object.fromEntries([...kin].filter(([id, root]) => id !== root)),
-    renames: body.changes
+    renames: changes
       .filter((row) => row.kind === "rename")
       .map((row) => `${row.from}|${row.to}`),
   };
