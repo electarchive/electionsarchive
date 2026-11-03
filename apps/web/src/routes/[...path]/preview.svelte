@@ -198,8 +198,13 @@
           </p>
         {/if}
       </div>
-      {#if data.election.contests.length > 0}
-        {@render list(m.election_contests(), data.election.contests)}
+      {const contests = $derived(
+        data.election.contests == null
+          ? []
+          : (peek(data.election.contests)?.value ?? []),
+      )}
+      {#if contests.length > 0}
+        {@render list(m.election_contests(), contests)}
       {/if}
     {:else if data.kind === "polity"}
       <div class="px-3 pbs-2.5 pbe-2">

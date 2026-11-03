@@ -206,6 +206,9 @@
     ).filter((race) => race != null);
   });
   const more = () => {
+    if (election.contests != null && peek(election.contests) == null) {
+      void load(election.contests);
+    }
     const rest = pending;
     if (rest == null) {
       return;
@@ -215,17 +218,28 @@
     });
   };
   const materialized = $derived(
-    every.map((race) => ({
-      ...race,
-      places:
-        race.places == null
-          ? null
-          : {
-              ...race.places,
-              part: race.places.rows,
-              rows: peek(race.places.rows)?.value ?? [],
-            },
-    })),
+    every.map((race) => {
+      const staffed = {
+        ...race,
+        holders:
+          race.staff == null
+            ? race.holders
+            : (peek(race.staff)?.value ?? race.holders),
+      };
+      if (race.places == null) {
+        return { ...staffed, places: null };
+      }
+      const loaded = peek(race.places.rows)?.value;
+      return {
+        ...staffed,
+        places: {
+          ...race.places,
+          part: race.places.rows,
+          rows: loaded?.rows ?? [],
+          legend: loaded?.legend ?? race.places.legend,
+        },
+      };
+    }),
   );
   const laid = $derived.by(() => {
     const grouped = Map.groupBy(materialized, (race) => race.scope)
@@ -386,6 +400,7 @@
             sample: null,
             before: base.overall,
             holders: null,
+            staff: null,
             partners: [],
             runoff: null,
             results: folded,
@@ -2022,8 +2037,11 @@
       ),
     };
   });
+  const contests = $derived(
+    election.contests == null ? [] : (peek(election.contests)?.value ?? []),
+  );
   const searchable = $derived(
-    election.contests.flatMap((contest) =>
+    contests.flatMap((contest) =>
       contest.path == null || races.some((race) => race.path === contest.path)
         ? []
         : [{ name: contest.name, path: contest.path }],
@@ -2227,11 +2245,24 @@
 {/if}
 
 {#snippet regions()}
-  {#await seeded.regions}
-    <SectionSkeleton shape="table" />
-  {:then}
-    <Regions {id} />
-  {/await}
+  {#if sections.regions instanceof Part}
+    <Island part={sections.regions} view="regions" when="visible" defer>
+      {#snippet children(value)}
+        <Cached
+          key={orpc.elections.regions.queryKey({ input: { id } })}
+          {value}
+        >
+          <Regions {id} />
+        </Cached>
+      {/snippet}
+    </Island>
+  {:else}
+    {#await seeded.regions}
+      <SectionSkeleton shape="table" />
+    {:then}
+      <Regions {id} />
+    {/await}
+  {/if}
 {/snippet}
 
 {#snippet body()}
@@ -2319,32 +2350,36 @@
     <Councils councils={election.councils} />
   {/if}
 
-  {#if races.length === 0 && election.contests.length > 0}
+  {#if races.length === 0 && election.contests != null}
     <section class="col-span-12 bg-card px-3.5 py-3">
       <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
         {m.election_contests()}
       </h2>
-      <ul class="grid text-sm">
-        {#each election.contests as contest, index (index)}
-          <li
-            class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
-          >
-            {#if contest.path == null}
-              <span class="font-semibold">{contest.name}</span>
-            {:else}
-              <Preview
-                class="font-semibold hover:highlighter"
-                path={contest.path}>{contest.name}</Preview
+      <Island part={election.contests} view="contests">
+        {#snippet children(listed: typeof contests)}
+          <ul class="grid text-sm">
+            {#each listed as contest, index (index)}
+              <li
+                class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
               >
-            {/if}
-            {#if contest.children > 0}
-              <span class="shrink-0 text-[0.8125rem] text-muted-foreground"
-                >{m.election_parts({ count: contest.children })}</span
-              >
-            {/if}
-          </li>
-        {/each}
-      </ul>
+                {#if contest.path == null}
+                  <span class="font-semibold">{contest.name}</span>
+                {:else}
+                  <Preview
+                    class="font-semibold hover:highlighter"
+                    path={contest.path}>{contest.name}</Preview
+                  >
+                {/if}
+                {#if contest.children > 0}
+                  <span class="shrink-0 text-[0.8125rem] text-muted-foreground"
+                    >{m.election_parts({ count: contest.children })}</span
+                  >
+                {/if}
+              </li>
+            {/each}
+          </ul>
+        {/snippet}
+      </Island>
     </section>
   {/if}
 
@@ -2917,27 +2952,36 @@
           </div>
         {/snippet}
         {#snippet hemicycle()}
-          <Seated
-            parties={[...race.seated, ...race.lost]}
-            places={race.holders}
-            body={race.body}
-            size={race.isTier || scope != null ? null : race.size}
-            date={election.date}
-            place={race.name}
-            region={election.parent == null
-              ? null
-              : (election.breadcrumbs
-                  .filter((crumb) => crumb.path !== election.parent?.path)
-                  .at(-1)?.name ?? null)}
-            change={race.change}
-            isComplete={scope == null &&
-              !race.isTier &&
-              (race.size != null || race.count === 1)}
-            partners={race.isTier ? [] : race.partners}
-            governing={race.size === chamber?.size ? governing : []}
-            isStaggered={race.isStaggered}
-            unelected={race.unelected ?? []}
-          />
+          {#snippet seated()}
+            <Seated
+              parties={[...race.seated, ...race.lost]}
+              places={race.holders}
+              body={race.body}
+              size={race.isTier || scope != null ? null : race.size}
+              date={election.date}
+              place={race.name}
+              region={election.parent == null
+                ? null
+                : (election.breadcrumbs
+                    .filter((crumb) => crumb.path !== election.parent?.path)
+                    .at(-1)?.name ?? null)}
+              change={race.change}
+              isComplete={scope == null &&
+                !race.isTier &&
+                (race.size != null || race.count === 1)}
+              partners={race.isTier ? [] : race.partners}
+              governing={race.size === chamber?.size ? governing : []}
+              isStaggered={race.isStaggered}
+              unelected={race.unelected ?? []}
+            />
+          {/snippet}
+          {#if race.staff == null}
+            {@render seated()}
+          {:else}
+            <Island part={race.staff} view="seated" when="interaction">
+              {@render seated()}
+            </Island>
+          {/if}
           {#if index === head && scope == null && race.body != null && !race.isTier}
             {#await import("./figures.svelte")}
               <FiguresSkeleton />

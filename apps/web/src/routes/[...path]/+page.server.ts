@@ -9,11 +9,12 @@ import { tallied } from "./tally.js";
 const BOARD = 49;
 const QUESTIONS = 7;
 const CROWD = 200;
+const LEGEND = 8;
 
 function parted<T>(
   name: string,
   value: T | Promise<T>,
-): T | Promise<T> | Part<T> {
+): T | Promise<T> | Part<NonNullable<T>> {
   return value instanceof Promise || value == null ? value : part(name, value);
 }
 
@@ -40,17 +41,49 @@ export const load: PageServerLoad = async ({ params, url }) => {
       ]),
     );
     const isDeferred = races.some((race) => race.deferred != null);
-    const shaped = races.map((race) => ({
-      ...race,
-      places:
-        race.places == null
-          ? null
-          : {
-              ...race.places,
-              rows: part("election.places", race.places.rows),
-              tally: tallied(race.places),
-            },
-    }));
+    const shaped = races.map((race) => {
+      const loose = new Set(
+        race.results.flatMap((row) => (row.party == null ? [row.key] : [])),
+      );
+      const staff =
+        race.holders == null ? null : part("election.holders", race.holders);
+      const staffed = {
+        ...race,
+        holders:
+          race.holders == null || staff?.isInline !== false
+            ? race.holders
+            : {
+                places: race.holders.places.slice(0, 0),
+                seats: Object.fromEntries(
+                  Object.entries(race.holders.seats).filter(([key]) =>
+                    loose.has(key),
+                  ),
+                ),
+              },
+        staff: staff?.isInline === false ? staff : null,
+      };
+      if (race.places == null) {
+        return { ...staffed, places: null };
+      }
+      const { legend, rows } = race.places;
+      const tally = tallied(race.places);
+      const named = Math.max(
+        tally.leads.findLastIndex((leads) => leads > 0) + 1,
+        LEGEND,
+      );
+      return {
+        ...staffed,
+        places: {
+          ...race.places,
+          legend: legend.slice(0, named),
+          rows: part("election.places", {
+            rows,
+            legend: legend.length > named ? legend : null,
+          }),
+          tally,
+        },
+      };
+    });
     const ordered = Map.groupBy(shaped, (race) => race.scope)
       .values()
       .flatMap((group) => [
@@ -84,6 +117,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
       sections: {
         ...sections,
         tiers: parted("election.tiers", sections.tiers),
+        regions:
+          Array.isArray(sections.regions) && sections.regions.length > 0
+            ? part("election.regions", sections.regions)
+            : sections.regions,
         counties: parted("election.counties", sections.counties),
         winners: isParted
           ? part("election.winners", {
@@ -97,6 +134,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
         elections: isCrowded
           ? elections.filter((child) => child.isStage)
           : elections,
+        contests:
+          contests.length === 0 ? null : part("election.contests", contests),
         isCrowded,
         unplaced: isDeferred
           ? []

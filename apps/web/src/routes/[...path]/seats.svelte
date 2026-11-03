@@ -443,6 +443,14 @@
       }),
     ),
   );
+  const tones = $derived(
+    new Map(folded.map((party, at) => [party.key, `var(--seat-${at})`])),
+  );
+  const palette = $derived(
+    folded
+      .map((party, at) => `--seat-${at}: ${colors.get(party.key)}`)
+      .join("; "),
+  );
   const labels = $derived(
     new Map([
       ...folded.map((party) => [party.key, party.label] as const),
@@ -748,6 +756,7 @@
           { "pointer-events-none": isCompact },
         )}
         viewBox="{box.x} {box.y} {box.width} {box.height}"
+        style={palette}
         role="listbox"
         tabindex={isCompact ? -1 : 0}
         aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
@@ -827,7 +836,7 @@
               : places[seat.member.place]?.name,
           )}
           <circle
-            id="{uid}-seat-{seat.index}"
+            id={active === seat.index ? `${uid}-seat-${seat.index}` : undefined}
             class={{ "stroke-foreground": link != null && seat.local }}
             style:animation-delay="{Math.round(
               (seat.index / seats.length) * 640,
@@ -835,7 +844,7 @@
             cx={seat.x}
             cy={seat.y}
             role="option"
-            aria-selected={active === seat.index}
+            aria-selected={active === seat.index || undefined}
             aria-label={[
               seat.member?.name,
               labels.get(seat.party) ?? m.seats_vacant(),
@@ -867,8 +876,8 @@
               : seat.party === "~held"
                 ? "color-mix(in oklab, var(--muted-foreground) 22%, var(--card))"
                 : lit
-                  ? colors.get(seat.party)
-                  : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
+                  ? tones.get(seat.party)
+                  : `color-mix(in oklab, ${tones.get(seat.party)} 28%, var(--card))`}
           />
         {/each}
         {#if striped.size > 0}
