@@ -70,7 +70,7 @@
   aria-label={label}
   tabindex="-1"
   class={cn(
-    "scroll-fade-x flex items-end gap-4 border-be border-border",
+    "scroll-fade-x flex items-end gap-4 shadow-[inset_0_-1px_0_var(--color-border)]",
     { "text-xs": size === "sm", "text-[0.8125rem]": size === "md" },
     className,
   )}
@@ -87,7 +87,7 @@
       tabindex={isOn ? 0 : -1}
       disabled={option.disabled}
       class={cn(
-        "-mbe-px inline-flex shrink-0 items-center gap-1.5 border-be-2 border-transparent whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40",
+        "inline-flex shrink-0 items-center gap-1.5 border-be-2 border-transparent whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40",
         { "pbe-1": size === "sm", "pbs-1 pbe-1.5": size === "md" },
         {
           "border-foreground font-semibold text-foreground": isOn,

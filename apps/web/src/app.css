@@ -308,6 +308,7 @@
 
 @utility scroll-fade-x {
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-inline: contain;
   scrollbar-width: none;
   --fade-direction: to right;
