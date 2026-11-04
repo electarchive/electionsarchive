@@ -249,7 +249,7 @@
     class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 lg:grid-cols-[12.5rem_minmax(0,1fr)_11rem]"
   >
     <span
-      class="font-figures text-[2rem] leading-none font-[780] tracking-[-0.03em] tabular-nums max-lg:hidden"
+      class="font-figures text-[2rem]/none font-[780] tracking-[-0.03em] tabular-nums max-lg:hidden"
       aria-hidden="true">{at == null ? "" : Math.floor(at)}</span
     >
     <div

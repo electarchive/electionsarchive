@@ -195,9 +195,10 @@ async function assemble(
     if (!isSister && (!residual || alliance == null)) {
       continue;
     }
-    const target = isSister
-      ? { key: present[0] ?? "", label: coalition.name }
-      : { key: alliance?.key ?? "", label: coalition.name };
+    const target = {
+      key: isSister ? (present[0] ?? "") : (alliance?.key ?? ""),
+      label: coalition.name,
+    };
     for (const key of present) {
       merge.set(key, target);
     }
@@ -220,7 +221,7 @@ async function assemble(
       label: merge.get(key)?.label ?? row?.short ?? row?.label ?? key,
       votes: 0,
       seats: 0,
-      isPooled: row == null ? false : isPooled(row),
+      isPooled: row != null && isPooled(row),
     };
     entry.votes += votes.get(key)?.votes ?? 0;
     entry.seats += seats.get(key) ?? 0;
@@ -589,11 +590,7 @@ async function series(polity: string) {
   );
 }
 
-async function pool<T, R>(
-  items: Array<T>,
-  limit: number,
-  run: (item: T) => Promise<R>,
-) {
+async function pool<T, R>(items: Array<T>, run: (item: T) => Promise<R>) {
   const results: Array<R> = [];
   let next = 0;
   const worker = async () => {
@@ -605,9 +602,7 @@ async function pool<T, R>(
       }
     }
   };
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, worker),
-  );
+  await Promise.all(Array.from({ length: Math.min(4, items.length) }, worker));
   return results;
 }
 
@@ -735,7 +730,7 @@ export const indices = {
       );
       const built = await Promise.all(
         record.map(async (entry) => {
-          const loaded = await pool(entry.points, 4, async (point) => {
+          const loaded = await pool(entry.points, async (point) => {
             const id = paths.get(point.path ?? "");
             const chamber =
               id == null
@@ -751,7 +746,6 @@ export const indices = {
             );
           const computed = await pool(
             points.map((item, index) => ({ item, index })),
-            4,
             async ({ item, index }) => {
               const before = points[index - 1];
               const found = await compute(

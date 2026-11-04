@@ -38,7 +38,7 @@
   class="grid gap-2 py-3 outline-none hover:highlighter focus-visible:highlighter"
 >
   <span class="flex items-baseline justify-between gap-3">
-    <span class="text-[0.9375rem] leading-snug font-semibold text-pretty"
+    <span class="text-[0.9375rem]/snug font-semibold text-pretty"
       >{entry.contest.title}</span
     >
     {#if verdict != null}

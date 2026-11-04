@@ -70,11 +70,10 @@ export function partyOn(
 ) {
   const covering = <T extends { from: string | null; to: string | null }>(
     list: Array<T>,
-    value: string,
   ) =>
     list.find(
       (entry) =>
-        (entry.from ?? "") <= value && (entry.to == null || entry.to > value),
+        (entry.from ?? "") <= at && (entry.to == null || entry.to > at),
     );
   const at =
     member.to != null && member.to <= day
@@ -86,11 +85,10 @@ export function partyOn(
     (entry) => entry.to == null || entry.to > (member.from ?? ""),
   );
   const spell =
-    covering(spells, at) ??
-    ((spells[0]?.from ?? "") > at ? spells[0] : undefined);
+    covering(spells) ?? ((spells[0]?.from ?? "") > at ? spells[0] : undefined);
   const party =
     spell != null ? spell.party : spells.length === 0 ? member.party : null;
-  const caucus = covering(member.caucuses ?? [], at)?.party ?? null;
+  const caucus = covering(member.caucuses ?? [])?.party ?? null;
   return effective({
     ...member,
     party,

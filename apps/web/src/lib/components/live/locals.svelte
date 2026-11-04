@@ -325,7 +325,7 @@
                 >
                   <span class="flex items-baseline justify-between gap-3">
                     <span
-                      class="text-[0.8125rem] leading-snug font-semibold text-pretty"
+                      class="text-[0.8125rem]/snug font-semibold text-pretty"
                       >{@render marked(summary.race.title)}</span
                     >
                     {#if status != null}

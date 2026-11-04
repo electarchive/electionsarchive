@@ -11,11 +11,11 @@ import { recommended as inlineUtilities } from "eslint-plugin-inline-utilities";
 import path from "node:path";
 
 /**
- * Syntax-only TypeScript rules, safe in `typescript.overrides` (the base,
- * non-type-aware block).
- *
- * @type {import('@antfu/eslint-config').OptionsOverrides['overrides']}
- */
+Syntax-only TypeScript rules, safe in `typescript.overrides` (the base,
+non-type-aware block).
+
+@type {import('@antfu/eslint-config').OptionsOverrides['overrides']}
+*/
 const tsSyntacticOverrides = {
   "ts/array-type": ["error", { default: "generic" }],
   "ts/consistent-indexed-object-style": ["error", "record"],
@@ -30,12 +30,12 @@ const tsSyntacticOverrides = {
 };
 
 /**
- * Type-aware TypeScript rules. These must go in
- * `typescript.overridesTypeAware`, otherwise antfu's type-aware block (applied
- * after the base block) silently re-overrides them. See https://github.com/antfu/eslint-config/issues/521.
- *
- * @type {import('@antfu/eslint-config').OptionsOverrides['overrides']}
- */
+Type-aware TypeScript rules. These must go in
+`typescript.overridesTypeAware`, otherwise antfu's type-aware block (applied
+after the base block) silently re-overrides them. See https://github.com/antfu/eslint-config/issues/521.
+
+@type {import('@antfu/eslint-config').OptionsOverrides['overrides']}
+*/
 const tsTypeAwareOverrides = {
   "ts/non-nullable-type-assertion-style": "error",
   "ts/no-array-delete": "error",
@@ -215,6 +215,7 @@ export default antfu({
       "ts/no-unsafe-assignment": "off",
       "unicorn/no-computed-property-existence-check": "off",
       "unicorn/prefer-array-flat-map": "off",
+      "unicorn/no-unnecessary-array-flat-map": "off",
       "no-console": "off",
       "unicorn/no-top-level-assignment-in-function": "off",
       "unicorn/prefer-path2d": "off",

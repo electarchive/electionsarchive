@@ -259,10 +259,12 @@ async function refresh() {
 
 function drop(key: string) {
   const entry = entries.get(key);
-  if (entry != null) {
-    state.size -= entry.size;
-    entries.delete(key);
+  if (entry == null) {
+    return;
   }
+
+  state.size -= entry.size;
+  entries.delete(key);
 }
 
 function evict() {

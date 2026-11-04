@@ -32,7 +32,7 @@
     >
       <span
         class={cn(
-          "grid place-items-center rounded-full text-[0.625rem] leading-none font-bold block-4 inline-4",
+          "grid place-items-center rounded-full text-[0.625rem]/none font-bold block-4 inline-4",
           {
             "border border-foreground/40 text-muted-foreground":
               line.state === "passed",

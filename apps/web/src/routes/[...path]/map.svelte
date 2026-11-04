@@ -3268,7 +3268,7 @@
             }}
           >
             <span
-              class="truncate px-1.5 pbs-1 text-[0.625rem] leading-none font-semibold text-muted-foreground max-inline-(--inline)"
+              class="truncate px-1.5 pbs-1 text-[0.625rem]/none font-semibold text-muted-foreground max-inline-(--inline)"
               style:--inline="{box.inline}px">{box.name}</span
             >
             <svg
@@ -3596,7 +3596,7 @@
           </svg>
           <span
             class={cn(
-              "truncate text-[0.6875rem] leading-none text-muted-foreground max-inline-28 max-sm:max-inline-20",
+              "truncate text-[0.6875rem]/none text-muted-foreground max-inline-28 max-sm:max-inline-20",
               {
                 "hidden group-hover:block group-focus-visible:block":
                   nook.isCompact,

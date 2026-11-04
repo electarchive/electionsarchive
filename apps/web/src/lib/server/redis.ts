@@ -3,16 +3,16 @@ import { REDIS_URL } from "$app/env/private";
 import { createClient, defineScript } from "@redis/client";
 
 /**
- * GCRA over any number of rules plus a penalty box, in one atomic round trip
- * timed by the Redis clock.
- *
- * KEYS: block, violations, strikes, then one theoretical-arrival-time key per rule.
- * ARGV: cost, violation threshold (0 disables penalties), violation window ms,
- * base block ms, max block ms, strike memory ms, then per rule the emission
- * interval ms and the window ms.
- *
- * Reply: allowed (0/1), retry after ms, blocked (0/1).
- */
+GCRA over any number of rules plus a penalty box, in one atomic round trip
+timed by the Redis clock.
+
+KEYS: block, violations, strikes, then one theoretical-arrival-time key per rule.
+ARGV: cost, violation threshold (0 disables penalties), violation window ms,
+base block ms, max block ms, strike memory ms, then per rule the emission
+interval ms and the window ms.
+
+Reply: allowed (0/1), retry after ms, blocked (0/1).
+*/
 const RATE_LIMIT_SCRIPT = `
 local clock = redis.call('TIME')
 local now = tonumber(clock[1]) * 1000 + tonumber(clock[2]) / 1000
@@ -95,10 +95,10 @@ client.on("error", (error: unknown) => {
 });
 
 /**
- * The Redis client, connecting on first use so importing it at build time is
- * free. Commands issued while the connection is (re)established fail after
- * one second, so callers can fall back instead of hanging.
- */
+The Redis client, connecting on first use so importing it at build time is
+free. Commands issued while the connection is (re)established fail after
+one second, so callers can fall back instead of hanging.
+*/
 export function redis() {
   if (!client.isOpen) {
     void (async () => {

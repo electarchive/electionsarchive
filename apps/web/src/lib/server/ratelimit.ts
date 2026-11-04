@@ -3,10 +3,10 @@ import { PROJECT } from "#lib/constants.js";
 import { redis } from "#lib/server/redis.js";
 
 /**
- * A named set of rules that must all allow a request. Each rule allows at
- * most `limit` requests per `window` seconds, spread smoothly (GCRA) with
- * bursts of up to `limit`.
- */
+A named set of rules that must all allow a request. Each rule allows at
+most `limit` requests per `window` seconds, spread smoothly (GCRA) with
+bursts of up to `limit`.
+*/
 type RateLimitPolicy = {
   name: string;
   rules: Array<{ limit: number; window: number }>;
@@ -30,14 +30,14 @@ function evictOldest(map: Map<string, number>) {
 }
 
 /**
- * A distributed rate limiter on Redis. Each policy's rules are checked and
- * consumed atomically in one round trip. With a `penalty`, a client that
- * keeps hitting a limit (`violations` denials within `window` seconds) is
- * blocked from every policy for `block` seconds, doubling with each further
- * block within a day up to `maxBlock`; blocked clients are then turned away
- * locally without touching Redis. While Redis is unreachable, the same rules
- * are enforced per process from memory instead of failing open.
- */
+A distributed rate limiter on Redis. Each policy's rules are checked and
+consumed atomically in one round trip. With a `penalty`, a client that
+keeps hitting a limit (`violations` denials within `window` seconds) is
+blocked from every policy for `block` seconds, doubling with each further
+block within a day up to `maxBlock`; blocked clients are then turned away
+locally without touching Redis. While Redis is unreachable, the same rules
+are enforced per process from memory instead of failing open.
+*/
 export function createRateLimiter({
   prefix,
   penalty = { violations: 30, window: 300, block: 300, maxBlock: 86_400 },

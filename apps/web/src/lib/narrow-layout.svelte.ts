@@ -16,10 +16,12 @@ const subscribe = createSubscriber((update) => {
   let width: number | null = null;
   const refresh = () => {
     const next = width == null || rem == null ? null : width < 48 * rem;
-    if (next !== isNarrow) {
-      isNarrow = next;
-      update();
+    if (next === isNarrow) {
+      return;
     }
+
+    isNarrow = next;
+    update();
   };
   const resize = new ResizeObserver(([entry]) => {
     rem ??= rootRem();

@@ -318,7 +318,7 @@
                         : ink(entry.key)}>{entry.count}</span
                     >
                     <span
-                      class="text-[0.6875rem] leading-tight text-pretty text-muted-foreground"
+                      class="text-[0.6875rem]/tight text-pretty text-muted-foreground"
                       >{entry.text}</span
                     >
                   </span>
@@ -326,11 +326,11 @@
               {:else}
                 <span class="grid gap-0.5">
                   <span
-                    class="font-figures text-2xl leading-none font-semibold tabular-nums"
+                    class="font-figures text-2xl/none font-semibold tabular-nums"
                     style:color={ink(block.side.id)}>{block.count}</span
                   >
                   <span
-                    class="text-[0.6875rem] leading-tight text-pretty text-muted-foreground"
+                    class="text-[0.6875rem]/tight text-pretty text-muted-foreground"
                     >{m.night_ladder_side({ party: block.side.short })}</span
                   >
                 </span>
