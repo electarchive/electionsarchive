@@ -12716,11 +12716,15 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 )
             split = bool(group["unexpired"][0]) and (fips, tail) in split_tails
             key = f"{DAY}:{tail}" + (":unexpired" if split else "")
-            try:
-                contest = cs.key("us.contest", key)
-            except ValueError:
-                key = f"{key}:reissued"
-                contest = cs.key("us.contest", key)
+            base = key
+            for attempt in range(1, 10):
+                try:
+                    contest = cs.key("us.contest", key)
+                    break
+                except ValueError:
+                    key = f"{base}:reissued" + (f"-{attempt}" if attempt > 1 else "")
+            else:
+                raise ValueError(f"no free contest key for {base}")
             holder = conn.execute(
                 "select entity_id from slug where path = %s",
                 [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
