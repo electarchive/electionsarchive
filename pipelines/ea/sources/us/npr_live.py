@@ -9,7 +9,16 @@ import polars as pl
 from ea.sources.us.enr_2026 import FIPS, table
 
 BASE = "https://apps.npr.org/2026-election-results/data/"
-OFFICES = {"S": "senate", "G": "governor", "H": "house", "A": "state", "SS": "state", "I": "state"}
+OFFICES = {
+    "S": "senate",
+    "G": "governor",
+    "H": "house",
+    "USD": "house",
+    "A": "state",
+    "SS": "state",
+    "M": "state",
+    "I": "state",
+}
 COUNTIES = {"S", "G"}
 
 
@@ -37,7 +46,11 @@ def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
             continue
         url = f"{BASE}counties/{state}-{id}.json"
         district = (
-            ("0" if single else (race.get("seat") or "").removeprefix("District ")) if race["office"] == "H" else ""
+            "0"
+            if race["office"] == "USD"
+            else ("0" if single else (race.get("seat") or "").removeprefix("District "))
+            if race["office"] == "H"
+            else ""
         )
         contest = (
             f"{race.get('officeName')} {race.get('seat') or ''}: {race.get('description') or ''}"

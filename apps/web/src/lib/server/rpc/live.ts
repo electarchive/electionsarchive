@@ -15,6 +15,7 @@ import { estimate } from "@ea/analytics/live";
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
 import { rule } from "#lib/measure.js";
@@ -1079,6 +1080,9 @@ async function night(
   slot = "",
 ) {
   const contests = picked.map((row) => row.id);
+  const roster = createHash("sha1")
+    .update(contests.toSorted((x, y) => x.localeCompare(y, "en")).join(","))
+    .digest("base64url");
   const [
     frames,
     { choices, incumbents, settled, prior, drawn, placed },
@@ -1110,7 +1114,7 @@ async function night(
       order by f.as_of, f.k
     `),
     remember(
-      `live:fixed:v2:${found.path}|${found.rest}|${detail}${slot}`,
+      `live:fixed:v3:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
       async () => {
         const [choices, incumbents, settled, prior, drawn, placed] =
           await Promise.all([

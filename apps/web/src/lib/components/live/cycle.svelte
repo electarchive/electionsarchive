@@ -161,7 +161,7 @@
         {const shown = $derived(show(entry.value))}
         {const mark = $derived(sign(entry.line))}
         <div
-          class="border-s-[3px] grid content-start gap-1.5 ps-3"
+          class="grid content-start gap-1.5 border-s-[3px] ps-3"
           style:border-color={shown.color}
         >
           <dt class="text-xs text-muted-foreground">
@@ -186,7 +186,7 @@
       {/each}
 
       <div
-        class="border-s-[3px] grid content-start gap-1.5 ps-3"
+        class="grid content-start gap-1.5 border-s-[3px] ps-3"
         style:border-color={live?.color ?? "var(--border)"}
       >
         <dt class="text-xs text-muted-foreground">{m.night_cycle_now()}</dt>
@@ -216,7 +216,7 @@
       {#if projected != null && ahead != null}
         {const moved = $derived(shift(projected.mid))}
         <div
-          class="border-s-[3px] grid content-start gap-1.5 border-dashed ps-3"
+          class="grid content-start gap-1.5 border-s-[3px] border-dashed ps-3"
           style:border-color={ahead.color}
         >
           <dt class="text-xs text-muted-foreground">

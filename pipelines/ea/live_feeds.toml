@@ -1348,6 +1348,14 @@ publisher = "civicAPI"
 url = "https://civicapi.org/"
 
 [[feed]]
+id = "us.dc_boe_live"
+adapter = "us.dc_boe_live"
+interval = 120
+poller = "muktedir"
+publisher = "District of Columbia Board of Elections"
+url = "https://electionresults.dcboe.org/election_results/2026-General-Election"
+
+[[feed]]
 id = "us.guam_live"
 adapter = "us.guam_live"
 interval = 300
