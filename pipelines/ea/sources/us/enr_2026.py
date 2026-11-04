@@ -543,7 +543,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         print(f"county Clarity sites with no {DAY} file: {len(missing)}", ", ".join(missing[:12]))
     if not only or "FL" in only:
         url = f"https://flelectionfiles.floridados.gov/enightfilespublic/{DAY:%Y%m%d}_ElecResultsFL.txt"
-        content = get(client, url)
+        content = get(client, f"{url}?v={int(time.time())}")
         if content is None or len(content.splitlines()) < 2:
             official = "Y" if DAY < date.today() - timedelta(days=7) else "N"
             url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
