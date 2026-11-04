@@ -493,6 +493,7 @@
   "slate_voting": "A votação está em andamento em {date}. Os últimos locais de votação do estado fecham às {time}, e os resultados aparecerão aqui assim que forem publicados.",
   "slate_unqualified": "Nenhum candidato habilitado (apenas voto manuscrito)",
   "slate_unreported": "A votação ocorreu em {date}. Ainda não há resultados publicados para esta disputa.",
+  "slate_unreported_unopposed": "A votação ocorreu em {date}. Esta candidatura não teve adversário, por isso não houve contagem publicada ao vivo. O total de votos aparecerá aqui quando os resultados oficiais forem homologados.",
   "slate_incumbent": "Titular",
   "incumbency_defeated": "Titular derrotado",
   "incumbency_open": "Cadeira em aberto",
