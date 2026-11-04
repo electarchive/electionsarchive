@@ -9,8 +9,7 @@ import type { Router } from "#lib/server/rpc/router.js";
 const client: RouterClient<Router> = createORPCClient(
   new RPCLink({
     url: "/rpc",
-    method: (_options, path) =>
-      path.join(".") === "live.stamp" ? "GET" : "POST",
+    method: (_options, path) => (path[0] === "live" ? "GET" : "POST"),
     origin: browser ? location.origin : BASE_URL,
     ...(!browser && { fetch: async () => new Promise<Response>(() => {}) }),
   }),

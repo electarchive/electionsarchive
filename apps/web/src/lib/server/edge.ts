@@ -9,7 +9,7 @@ const BUILD = "build";
 
 export const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
-const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/stamp$))(?:\/|$)/u;
+const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/))(?:\/|$)/u;
 
 export const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 
