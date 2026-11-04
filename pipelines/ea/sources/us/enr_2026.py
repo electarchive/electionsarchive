@@ -75,6 +75,7 @@ LISTINGS = (
     "Version.json",
 )
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
+TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -1205,7 +1206,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             yield {
                 "office": ("senate" if seat[1] == "Senate" else "house")
                 if seat
-                else "other"
+                else (
+                    "state" if state == "TN" and TN_AMENDMENT.fullmatch(detail["name"][0]["text"].strip()) else "other"
+                )
                 if found is None
                 else "senate"
                 if found["senate"]
