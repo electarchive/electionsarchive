@@ -587,6 +587,15 @@ publisher = "civicAPI"
 url = "https://civicapi.org/"
 
 [[feed]]
+id = "us.npr.me"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR, since Maine's Secretary of State posts no election night results; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "ME" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/maine.html"
+
+[[feed]]
 id = "us.civicapi.mi"
 adapter = "us.civicapi"
 interval = 60
