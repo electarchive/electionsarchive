@@ -189,6 +189,7 @@ id = "us.enr_2026.tx"
 adapter = "us.enr_2026"
 interval = 120
 params = { state = "TX" }
+poller = "muktedir"
 publisher = "Texas Secretary of State"
 url = "https://goelect.txelections.civixapps.com/ivis-enr-ui/races"
 
