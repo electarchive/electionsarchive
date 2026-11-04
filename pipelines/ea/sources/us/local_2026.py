@@ -7526,6 +7526,7 @@ KY_BOARD_SEATS = {
     "Campbellsville Independent School District Board of Education": 3,
 }
 NJ_SCHOOL_PINS = {
+    ("26091", "Madison School District (lenawee)"): "2622320",
     ("34023", "Monroe Twp Sch Dist"): "3410500",
     ("34035", "Franklin Twp Sch Dist"): "3405490",
     ("34041", "Franklin Twp Sch Dist"): "3405520",
@@ -11830,6 +11831,10 @@ def parse() -> None:
                     fits = exact or fits
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
+                if state == "MI" and len({fit[4] for fit in fits}) > 1:
+                    fits = [
+                        fit for fit in fits if fit[4] in {town[3] for town in towns.get(str(row["fips"]), [])}
+                    ] or fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
@@ -13161,10 +13166,11 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     counts["matched"] += 1
                 else:
                     rekey(cs, row["name"])
-                    person = cs.key(
-                        f"{SOURCE}.person",
-                        f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}",
-                    )
+                    person_key = f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}"
+                    try:
+                        person = cs.key(f"{SOURCE}.person", person_key)
+                    except ValueError:
+                        person = cs.key(f"{SOURCE}.person", f"{person_key}:2026")
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, row["name"])
