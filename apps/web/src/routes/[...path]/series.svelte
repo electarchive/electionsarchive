@@ -348,7 +348,9 @@
   >
     <Tooltip.Root {tether} delayDuration={250}>
       {#snippet children({ payload })}
-        <ol class="me-auto flex">
+        <ol
+          class="me-auto flex font-figures text-[0.8125rem] whitespace-nowrap tabular-nums [&>li>:last-child]:relative [&>li>:last-child]:flex [&>li>:last-child]:items-center [&>li>:last-child]:border [&>li>:last-child]:border-input [&>li>:last-child]:bg-card [&>li>:last-child]:px-2.5 [&>li>:last-child]:text-muted-foreground [&>li>:last-child]:block-8 [&>li>:last-child>span]:absolute [&>li>:last-child>span]:inset-x-0 [&>li>:last-child>span]:inset-be-0 [&>li>:last-child>span]:block-0.75 [&>li>[aria-current]:last-child]:z-10 [&>li>[aria-current]:last-child]:border-foreground [&>li>[aria-current]:last-child]:highlighter [&>li>[aria-current]:last-child]:font-semibold [&>li>[aria-current]:last-child]:text-foreground [&>li>a:hover]:z-10 [&>li>a:hover]:border-foreground [&>li>a:hover]:text-foreground"
+        >
           {#each years as entry, index (entry.path ?? entry.label)}
             <li
               class={cn("-ms-px flex first:ms-0", {
@@ -357,7 +359,7 @@
             >
               {#if entry.gap != null}
                 <span
-                  class="flex items-center px-1.5 font-figures text-[0.8125rem] text-muted-foreground"
+                  class="flex items-center px-1.5 text-muted-foreground"
                   aria-hidden="true">//</span
                 >
                 <span class="sr-only">{entry.gap}</span>
@@ -368,24 +370,13 @@
                     this={entry.current || entry.href == null ? "span" : "a"}
                     {...props}
                     type={undefined}
-                    class={cn(
-                      "relative flex items-center border border-input bg-card px-2.5 font-figures text-[0.8125rem] whitespace-nowrap tabular-nums block-8",
-                      {
-                        "z-10 border-foreground highlighter font-semibold":
-                          entry.current,
-                        "text-muted-foreground": !entry.current,
-                        "hover:z-10 hover:border-foreground hover:text-foreground":
-                          !entry.current && entry.href != null,
-                      },
-                      { "line-through": entry.annulled },
-                    )}
+                    class={{ "line-through": entry.annulled }}
                     href={entry.current ? undefined : entry.href}
                     aria-current={entry.current ? "page" : undefined}
                     aria-label={entry.annulled
                       ? m.series_annulled({ year: entry.label })
                       : undefined}
                     >{entry.label}{#if entry.color != null}<span
-                        class="absolute inset-x-0 inset-be-0 block-0.75"
                         style:background={entry.paint ?? entry.color}
                         aria-hidden="true"
                       ></span>{/if}</svelte:element
