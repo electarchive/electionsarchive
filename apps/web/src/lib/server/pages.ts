@@ -485,6 +485,12 @@ export async function person(slug: string) {
 }
 
 export async function party(path: string, place: string | null = null) {
+  return remember(`party:v1:${path}:${place ?? ""}`, async () =>
+    buildParty(path, place),
+  );
+}
+
+async function buildParty(path: string, place: string | null) {
   const segments = path.split("/");
   const [{ id }, scope] = await Promise.all([
     found(
@@ -669,6 +675,10 @@ function total(parties: Array<{ seats: number }>) {
 }
 
 export async function chamber(path: string) {
+  return remember(`chamber:v1:${path}`, async () => buildChamber(path));
+}
+
+async function buildChamber(path: string) {
   const segments = path.split("/");
   const { id, polity } = await found(
     call(router.bodies.locate, {
@@ -1145,36 +1155,50 @@ export async function chamber(path: string) {
   };
 }
 
+async function rows<T>(key: string, query: () => Promise<{ rows: Array<T> }>) {
+  return remember(
+    key,
+    async () => (await query()).rows,
+    false,
+    undefined,
+    true,
+  );
+}
+
 async function season(id: string) {
-  const result = await db.execute<{ path: string }>(sql`
-    select s.path from election e
-    join contest c on c.election_id = e.id
-    join slug s on s.entity_id = c.id and s.is_current
-    where e.id = coalesce((select election_id from contest where id = ${id}::uuid), ${id}::uuid)
-      and e.kind = 'primary'
-      and exists (select from contest k where k.allocation_parent_id = c.id)
-      and not exists (select from contest o where o.election_id = e.id and o.id <> c.id)
-  `);
-  return result.rows[0]?.path ?? null;
+  const result = await rows(`season:v1:${id}`, async () =>
+    db.execute<{ path: string }>(sql`
+      select s.path from election e
+      join contest c on c.election_id = e.id
+      join slug s on s.entity_id = c.id and s.is_current
+      where e.id = coalesce((select election_id from contest where id = ${id}::uuid), ${id}::uuid)
+        and e.kind = 'primary'
+        and exists (select from contest k where k.allocation_parent_id = c.id)
+        and not exists (select from contest o where o.election_id = e.id and o.id <> c.id)
+    `),
+  );
+  return result[0]?.path ?? null;
 }
 
 export async function archive(path: string, search: URLSearchParams) {
   const segments = path.split("/");
-  const result = await db.execute<{
-    path: string;
-    entity_id: string;
-    type: string;
-    is_current: boolean;
-    current: string | null;
-  }>(sql`
-    select s.path, s.entity_id, e.type::text as type, s.is_current,
-      (select c.path from slug c where c.entity_id = s.entity_id and c.is_current) as current
-    from slug s join entity e on e.id = s.entity_id
-    where s.path = any(${sql.param(segments.map((_, index) => segments.slice(0, index + 1).join("/")))}::text[])
-    order by length(s.path) desc
-    limit 1
-  `);
-  const slug = result.rows[0];
+  const result = await rows(`slug:v1:${path}`, async () =>
+    db.execute<{
+      path: string;
+      entity_id: string;
+      type: string;
+      is_current: boolean;
+      current: string | null;
+    }>(sql`
+      select s.path, s.entity_id, e.type::text as type, s.is_current,
+        (select c.path from slug c where c.entity_id = s.entity_id and c.is_current) as current
+      from slug s join entity e on e.id = s.entity_id
+      where s.path = any(${sql.param(segments.map((_, index) => segments.slice(0, index + 1).join("/")))}::text[])
+      order by length(s.path) desc
+      limit 1
+    `),
+  );
+  const slug = result[0];
   const canonical = slug == null ? await canonicalPath(path) : path;
   if (canonical !== path) {
     const query = search.toString();
@@ -1203,22 +1227,24 @@ export async function archive(path: string, search: URLSearchParams) {
   const requested = search.get("match");
   const match =
     requested === "person" || requested === "family" ? requested : "party";
-  const region = await db.execute<{ id: string }>(sql`
-    with recursive up(id) as (
-      select coalesce(
-        (select e.polity_id from contest c join election e on e.id = c.election_id where c.id = ${slug.entity_id}::uuid),
-        (select polity_id from election where id = ${slug.entity_id}::uuid),
-        (select id from polity where id = ${slug.entity_id}::uuid)
+  const region = await rows(`region:v1:${slug.entity_id}`, async () =>
+    db.execute<{ id: string }>(sql`
+      with recursive up(id) as (
+        select coalesce(
+          (select e.polity_id from contest c join election e on e.id = c.election_id where c.id = ${slug.entity_id}::uuid),
+          (select polity_id from election where id = ${slug.entity_id}::uuid),
+          (select id from polity where id = ${slug.entity_id}::uuid)
+        )
+        union
+        select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id where upper_inf(pp.valid)
       )
-      union
-      select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id where upper_inf(pp.valid)
-    )
-    select up.id from up
-    join polity_parent pp on pp.polity_id = up.id and upper_inf(pp.valid)
-    join polity n on n.id = pp.parent_id and n.kind = 'sovereign_state'
-    limit 1
-  `);
-  const within = region.rows[0]?.id ?? null;
+      select up.id from up
+      join polity_parent pp on pp.polity_id = up.id and upper_inf(pp.valid)
+      join polity n on n.id = pp.parent_id and n.kind = 'sovereign_state'
+      limit 1
+    `),
+  );
+  const within = region[0]?.id ?? null;
   if (isDay) {
     const local = await call(router.elections.local, {
       polity: slug.entity_id,
@@ -1336,10 +1362,12 @@ export async function archive(path: string, search: URLSearchParams) {
       call(router.contests.get, { ...input, round }),
     );
     const parent = (
-      await db.execute<{ id: string }>(
-        sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
+      await rows(`parent:v1:${slug.entity_id}`, async () =>
+        db.execute<{ id: string }>(
+          sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
+        ),
       )
-    ).rows[0]?.id;
+    )[0]?.id;
     const [{ value: crowned }, sameDay] =
       parent == null
         ? [{ value: null }, null]
@@ -1404,24 +1432,30 @@ export async function archive(path: string, search: URLSearchParams) {
     const input = { id: slug.entity_id };
     const place = search.get("in");
     const [scoped, held] = await Promise.all([
-      db.execute<{ id: string; path: string }>(sql`
-        select s.entity_id as id, s.path from slug s join polity p on p.id = s.entity_id
-        where s.path = ${place} and s.is_current
-      `),
-      db.execute<{
-        polity: string;
-        date: string | null;
-        tier: string | null;
-        isLocal: boolean;
-      }>(sql`
-        select e.polity_id as polity, e.date_from::text as date,
-          case when p.kind = 'county' then 'county' when p.kind = 'federal_unit' and p.iso_code like 'US-%' then 'state' end as tier,
-          e.kind = 'local' and (select count(*) from election c where c.parent_id = e.id) >= 40 as "isLocal"
-        from election e join polity p on p.id = e.polity_id where e.id = ${slug.entity_id}::uuid
-      `),
+      place == null
+        ? []
+        : rows(`scope:v1:${place}`, async () =>
+            db.execute<{ id: string; path: string }>(sql`
+              select s.entity_id as id, s.path from slug s join polity p on p.id = s.entity_id
+              where s.path = ${place} and s.is_current
+            `),
+          ),
+      rows(`held:v1:${slug.entity_id}`, async () =>
+        db.execute<{
+          polity: string;
+          date: string | null;
+          tier: string | null;
+          isLocal: boolean;
+        }>(sql`
+          select e.polity_id as polity, e.date_from::text as date,
+            case when p.kind = 'county' then 'county' when p.kind = 'federal_unit' and p.iso_code like 'US-%' then 'state' end as tier,
+            e.kind = 'local' and (select count(*) from election c where c.parent_id = e.id) >= 40 as "isLocal"
+          from election e join polity p on p.id = e.polity_id where e.id = ${slug.entity_id}::uuid
+        `),
+      ),
     ]);
-    const scope = scoped.rows[0] ?? null;
-    const day = held.rows[0];
+    const scope = scoped[0] ?? null;
+    const day = held[0];
     if (place != null && scope == null) {
       error(404);
     }
@@ -1460,19 +1494,17 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.elections.series, input),
         scope != null || day?.isLocal !== true
           ? false
-          : db
-              .execute<{ isMayoral: boolean }>(
-                sql`
-                  select count(*) filter (
-                    where exists (
-                      select from contest c join office f on f.id = c.office_id
-                      where c.election_id = k.id and c.kind = 'office' and f.kind = 'mayor'
-                    )
-                  ) * 10 >= count(*) * 9 as "isMayoral"
-                  from election k where k.parent_id = ${slug.entity_id}::uuid
-                `,
-              )
-              .then((found) => found.rows[0]?.isMayoral === true),
+          : rows(`mayoral:v1:${slug.entity_id}`, async () =>
+              db.execute<{ isMayoral: boolean }>(sql`
+                select count(*) filter (
+                  where exists (
+                    select from contest c join office f on f.id = c.office_id
+                    where c.election_id = k.id and c.kind = 'office' and f.kind = 'mayor'
+                  )
+                ) * 10 >= count(*) * 9 as "isMayoral"
+                from election k where k.parent_id = ${slug.entity_id}::uuid
+              `),
+            ).then((flags) => flags[0]?.isMayoral === true),
         scope == null
           ? call(router.elections.ledger, input).catch(() => null)
           : null,

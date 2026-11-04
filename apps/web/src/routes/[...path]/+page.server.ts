@@ -264,6 +264,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
             : part("election.children", crowded.children),
         contests:
           contests.length === 0 ? null : part("election.contests", contests),
+        logos: part("election.logos", data.election.logos),
         isCrowded: crowded.isCrowded,
         unplaced: laid.isDeferred ? [] : unplace(races, contests),
         races: boarded,

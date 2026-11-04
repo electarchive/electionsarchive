@@ -1,10 +1,14 @@
-import { part } from "svelte-islands/server";
 import { chamber } from "#lib/server/pages.js";
+import { memo, part } from "#lib/server/parts.js";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { terms, members, ...page } = await chamber(params.path);
-  return {
+const shape = memo(
+  ({
+    terms,
+    members,
+    logos,
+    ...page
+  }: Awaited<ReturnType<typeof chamber>>) => ({
     ...page,
     members:
       members == null
@@ -15,5 +19,10 @@ export const load: PageServerLoad = async ({ params }) => {
       "chamber.steps",
       terms.map((term) => term.steps),
     ),
-  };
-};
+    logos: part("chamber.logos", logos),
+  }),
+);
+
+export const load: PageServerLoad = async ({ params }) => ({
+  ...shape(await chamber(params.path)),
+});
