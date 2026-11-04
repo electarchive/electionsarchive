@@ -1,9 +1,5 @@
 import { dev } from "$app/env";
-import {
-  AUTH_DATABASE_URL,
-  DATABASE_URL,
-  DB_POOL_MAX,
-} from "$app/env/private";
+import { AUTH_DATABASE_URL, DATABASE_URL, DB_POOL_MAX } from "$app/env/private";
 import * as schema from "@ea/db/schema";
 import { defineRelations } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";

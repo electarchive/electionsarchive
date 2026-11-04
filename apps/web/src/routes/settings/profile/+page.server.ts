@@ -378,10 +378,7 @@ export const actions: Actions = {
     const problem = (status: number, message: string) =>
       fail(status, { form: "delete" as const, message });
     const { email, has_password: hasPassword } = await account(locals.user.id);
-    if (
-      !hasPassword &&
-      confirm.trim().toLowerCase() !== email.toLowerCase()
-    ) {
+    if (!hasPassword && confirm.trim().toLowerCase() !== email.toLowerCase()) {
       return problem(400, m.delete_account_mismatch());
     }
     if (hasPassword && confirm === "") {

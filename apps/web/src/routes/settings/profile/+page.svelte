@@ -66,7 +66,9 @@
             state: { saved: true },
           });
         } else {
-          await update({ reset: name !== "profile" && result.type === "success" });
+          await update({
+            reset: name !== "profile" && result.type === "success",
+          });
         }
         if (result.type === "success" && name !== "profile") {
           confirmation = "";
@@ -98,10 +100,7 @@
 <main class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   {#if !editing}
     {#if page.state.saved}
-      <p
-        class="mbe-5 border-s-2 border-foreground ps-3 text-sm"
-        role="status"
-      >
+      <p class="mbe-5 border-s-2 border-foreground ps-3 text-sm" role="status">
         {m.profile_saved()}
       </p>
     {/if}
@@ -127,8 +126,7 @@
             {#if !READ_ONLY}
               <a
                 class="text-sm text-muted-foreground underline underline-offset-2"
-                href="/contributors/{data.handle}"
-                >{m.profile_public_page()}</a
+                href="/contributors/{data.handle}">{m.profile_public_page()}</a
               >
             {/if}
           </div>
@@ -441,7 +439,9 @@
           {/if}
           <div>
             <Button type="submit" variant="outline" disabled={busy != null}
-              >{data.hasPassword ? m.password_change() : m.password_set()}</Button
+              >{data.hasPassword
+                ? m.password_change()
+                : m.password_set()}</Button
             >
           </div>
         </form>
@@ -451,7 +451,9 @@
         class="mbs-24 grid justify-items-start gap-3 border-bs-2 border-destructive/50 pbs-6"
         aria-labelledby="delete-heading"
       >
-        <h2 id="delete-heading" class="heading">{m.delete_account_heading()}</h2>
+        <h2 id="delete-heading" class="heading">
+          {m.delete_account_heading()}
+        </h2>
         {#if data.staff}
           <p class="text-sm text-pretty text-muted-foreground">
             {m.delete_account_staff()}
@@ -495,9 +497,7 @@
                 hidden
                 readonly
               />
-              <Label for="delete-confirm"
-                >{m.delete_account_password()}</Label
-              >
+              <Label for="delete-confirm">{m.delete_account_password()}</Label>
               <Input
                 id="delete-confirm"
                 name="confirm"
