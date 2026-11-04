@@ -25,6 +25,7 @@ url = "https://electionresults.sos.ca.gov/"
 [[feed]]
 id = "us.enr_2026.co"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "CO" }
 poller = "muktedir"
 publisher = "Colorado Secretary of State"
@@ -71,6 +72,7 @@ url = "https://results.sos.ga.gov"
 [[feed]]
 id = "us.enr_2026.ia"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "IA" }
 poller = "muktedir"
 publisher = "Iowa Secretary of State"
@@ -87,6 +89,7 @@ url = "https://voteidaho.gov"
 [[feed]]
 id = "us.enr_2026.il"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "IL" }
 poller = "muktedir"
 publisher = "Illinois State Board of Elections"
@@ -102,6 +105,7 @@ url = "https://enr.indianavoters.in.gov"
 [[feed]]
 id = "us.enr_2026.ks"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "KS" }
 poller = "muktedir"
 publisher = "Kansas Secretary of State"
@@ -156,6 +160,7 @@ url = "https://results.okelections.gov/OKER/"
 [[feed]]
 id = "us.enr_2026.pa"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "PA" }
 poller = "muktedir"
 publisher = "Pennsylvania Department of State"
@@ -172,6 +177,7 @@ url = "https://elections.ri.gov/elections/previous-election-results"
 [[feed]]
 id = "us.enr_2026.sc"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "SC" }
 poller = "muktedir"
 publisher = "South Carolina State Election Commission"
@@ -189,7 +195,7 @@ note = "Shelby and Hamilton counties only; the statewide results site blocks scr
 [[feed]]
 id = "us.enr_2026.tx"
 adapter = "us.enr_2026"
-interval = 120
+interval = 180
 params = { state = "TX" }
 poller = "muktedir"
 publisher = "Texas Secretary of State"
@@ -220,6 +226,7 @@ url = "https://results.votewa.gov"
 [[feed]]
 id = "us.enr_2026.wv"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "WV" }
 poller = "muktedir"
 publisher = "West Virginia Secretary of State"
@@ -244,6 +251,7 @@ url = "https://app.nassaucountyny.gov/BOE/results/election2.html"
 [[feed]]
 id = "us.enr_2026.al"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "AL" }
 poller = "muktedir"
 publisher = "Alabama Secretary of State"
@@ -252,6 +260,7 @@ url = "https://www2.alabamavotes.gov/electionnight/statewideresultsbycontest.asp
 [[feed]]
 id = "us.enr_2026.mi"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "MI" }
 poller = "muktedir"
 publisher = "Michigan Board of State Canvassers"
@@ -261,6 +270,7 @@ note = "county election sites only; the statewide results sit behind a Cloudflar
 [[feed]]
 id = "us.enr_2026.ne"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "NE" }
 poller = "muktedir"
 publisher = "Nebraska Secretary of State"
@@ -277,6 +287,7 @@ url = "https://electionresults.mt.gov/"
 [[feed]]
 id = "us.enr_2026.oh"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "OH" }
 poller = "muktedir"
 publisher = "Ohio Secretary of State"
@@ -292,6 +303,7 @@ url = "https://results.oregonvotes.gov/"
 [[feed]]
 id = "us.enr_2026.nj"
 adapter = "us.enr_2026"
+interval = 180
 params = { state = "NJ" }
 poller = "muktedir"
 publisher = "Cumberland, Essex, Passaic, and Somerset County Clerks"
