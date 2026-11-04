@@ -133,8 +133,13 @@ const color = (party: SQL, date: SQL) => sql`
   )
 `;
 
-const tier = (adapter: SQL) =>
-  sql`case ${adapter} when 'us.npr' then 1 when 'us.civicapi' then 2 else 0 end`;
+const tier = (feed: SQL, frame: SQL) =>
+  sql`case
+    when ${feed}.adapter = 'us.civicapi' and ${feed}.params->>'districts' = 'true' and ${frame}.reporting is not null then 1
+    when ${feed}.adapter = 'us.npr' then 2
+    when ${feed}.adapter = 'us.civicapi' then 3
+    else 0
+  end`;
 
 function group(path: string) {
   const seat = path.split("/").at(-1) ?? "";
@@ -1105,7 +1110,7 @@ async function night(
         and not exists (
           select from live.frame o join live.feed od on od.id = o.feed_id
           where o.contest_id = f.contest_id and o.status = 'active' and od.enabled
-            and ${tier(sql.raw("od.adapter"))} < ${tier(sql.raw("d.adapter"))}
+            and ${tier(sql.raw("od"), sql.raw("o"))} < ${tier(sql.raw("d"), sql.raw("f"))}
             and exists (
               select from live.fetch x where x.feed_id = od.id and x.status <> 'error'
                 and x.fetched_at > now() - interval '20 minutes'
