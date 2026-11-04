@@ -535,9 +535,12 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
     if missing:
         print(f"county Clarity sites with no {DAY} file: {len(missing)}", ", ".join(missing[:12]))
     if not only or "FL" in only:
-        official = "Y" if DAY < date.today() else "N"
-        url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
+        url = f"https://flelectionfiles.floridados.gov/enightfilespublic/{DAY:%Y%m%d}_ElecResultsFL.txt"
         content = get(client, url)
+        if content is None or len(content.splitlines()) < 2:
+            official = "Y" if DAY < date.today() - timedelta(days=7) else "N"
+            url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
+            content = get(client, url)
         if content is None:
             print("FL: no extract")
         else:
@@ -835,8 +838,16 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                 "office": office or "other",
                 "contest": ""
                 if office
-                else " ".join(part for part in (row["OfficeDesc"], row["Juris1num"], row["Juris2num"]) if part),
-                "district": row["Juris1num"].lstrip("0"),
+                else " ".join(
+                    part
+                    for part in (
+                        row.get("OfficeDesc") or row.get("RaceName"),
+                        row["Juris1num"].strip(),
+                        row["Juris2num"].strip(),
+                    )
+                    if part
+                ),
+                "district": row["Juris1num"].strip().lstrip("0"),
                 "party": row["PartyName"],
                 "county": row["CountyName"],
                 "candidate": " ".join(
