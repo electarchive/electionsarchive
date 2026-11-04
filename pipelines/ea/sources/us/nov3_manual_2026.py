@@ -71,6 +71,7 @@ SCHOOLS = {
     ("ID", "Butte County Joint School District No. 111"): "1600490",
     ("CO", "Eagle County School District RE50J"): "0803540",
     ("CO", "Archuleta County School District 50JT"): "0802190",
+    ("CO", "Holyoke School District RE-1J"): "0804710",
     ("CO", "Telluride School District R-1"): "0806870",
     ("AZ", "Prescott Unified School District No. 1"): "0406730",
     ("AZ", "Vail Unified School District No. 20"): "0408850",
@@ -1227,6 +1228,11 @@ COUNTIES = {
         "CO",
         "https://www.archuletacounty.gov/wp-content/uploads/2026-Archuleta-County-General-Election-Sample-Ballot.pdf",
         "N3M-web/co/archuleta-sample-ballot.pdf",
+    ),
+    "08095-re1j": (
+        "CO",
+        "https://phillipscounty.colorado.gov/sites/g/files/lrnvjt1351/files/November-2026-Sample-Ballot-RE-1-J-and-City-of-Holyoke.pdf",
+        "MF-584/November-2026-Sample-Ballot-RE-1-J-and-City-of-Holyoke.pdf",
     ),
     "08113-r1": (
         "CO",
