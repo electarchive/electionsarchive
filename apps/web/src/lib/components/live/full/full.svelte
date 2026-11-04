@@ -27,6 +27,7 @@
   import Drawer from "#lib/atlas/drawer.svelte";
   import Cycle from "#lib/components/live/cycle.svelte";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
+  import SeatKey from "#lib/components/live/dashboard/seat-key.svelte";
   import Dial from "#lib/components/live/dial.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
   import Search from "#lib/components/live/search.svelte";
@@ -41,6 +42,7 @@
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
   import { entries as entriesOf, seating, turn } from "#lib/live/ballot.js";
+  import { swing } from "#lib/live/flips.js";
   import {
     lead,
     placeName,
@@ -92,6 +94,7 @@
     swingOf,
     tail,
     TERRITORIES,
+    turnOf,
     unitFill,
     urgency,
     WAITING,
@@ -771,6 +774,16 @@
     );
   }
 
+  function seatFill(summary: Summary, wanted: Paint): Fill {
+    const color = seatShade(summary, wanted);
+    const isLater = summary.later != null;
+    const turn =
+      wanted === "counted" ? null : turnOf(found.seats.get(summary.race.id));
+    return turn == null
+      ? { color, isLater }
+      : { color, isLater, flip: turn.flip };
+  }
+
   function seatLabel(entry: Entry) {
     const { title } = entry.contest;
     const cut = title.lastIndexOf(", ");
@@ -850,12 +863,7 @@
         const summary = found.districts.get(key);
         out.set(
           areaId,
-          summary == null
-            ? { color: MUTED }
-            : {
-                color: seatShade(summary, wanted),
-                isLater: summary.later != null,
-              },
+          summary == null ? { color: MUTED } : seatFill(summary, wanted),
         );
       }
       return out;
@@ -1327,7 +1335,6 @@
     (
       [
         ["lead", m.night_color_lead],
-        ["flips", m.night_color_flips],
         ["counted", m.night_color_counted],
         ["chance", m.night_color_chance],
       ] as const
@@ -1472,7 +1479,6 @@
       return {
         lead: m.night_nation_legend,
         chance: m.night_nation_legend_chance,
-        flips: m.night_nation_legend_flips,
         counted: m.night_nation_legend_reporting,
       }[paint]();
     }
@@ -1484,6 +1490,15 @@
       votes: m.night_legend_bubbles,
     }[lens]();
   });
+  const changing = $derived(
+    isNation && !isSpread && paint !== "counted"
+      ? swing(
+          [...found.seats.values()]
+            .filter((entry) => entry.summary.race.office === office)
+            .map((entry) => entry.shift),
+        )
+      : null,
+  );
   const isLaterShown = $derived(
     [...fills.values()].some((fill) => fill.isLater === true),
   );
@@ -2023,6 +2038,9 @@
         blank={isNation && !isSpread ? WAITING : BLANK}
         isLater={isLaterShown}
       />
+    {/if}
+    {#if changing != null && found.pair != null}
+      <SeatKey sides={found.pair} {changing} />
     {/if}
   </div>
 {/snippet}

@@ -17,7 +17,7 @@
 
   const SOLID = "oklch(0.42 0 0)";
   const NOT_UP =
-    "color-mix(in oklab, var(--muted-foreground) 22%, var(--background))";
+    "light-dark(color-mix(in oklab, var(--muted-foreground) 22%, var(--background)), color-mix(in oklab, var(--muted-foreground) 42%, var(--background)))";
   const leading = $derived(hatch("var(--muted-foreground)", "leading"));
   const shown = $derived(
     sides.filter((side) =>

@@ -8,6 +8,7 @@ import type { Control, Family, Seat } from "#lib/live/nation.js";
 import type { UnitStanding } from "#lib/live/standing.js";
 import type { Summary } from "#lib/live/summary.js";
 import { leadStrength, swingStrength } from "#lib/atlas/color.js";
+import { hatch } from "#lib/live/flips.js";
 import { tone } from "#lib/live/format.js";
 import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
 import { ranked, sum } from "#lib/live/standing.js";
@@ -15,9 +16,13 @@ import { summarize } from "#lib/live/summary.js";
 import { swatch } from "#lib/party.js";
 
 export type Office = "senate" | "governor" | "house";
-export type Paint = "lead" | "chance" | "flips" | "counted";
+export type Paint = "lead" | "chance" | "counted";
 export type Lens = "lead" | "shift" | "last" | "counted" | "votes";
-export type Fill = { color: string; isLater?: boolean };
+export type Fill = {
+  color: string;
+  isLater?: boolean;
+  flip?: "flipped" | "leading";
+};
 export type Dot = { areaId: string; value: number; color: string };
 export type Swing = {
   areaId: string;
@@ -27,7 +32,7 @@ export type Swing = {
 };
 
 export const OFFICES: Array<Office> = ["senate", "governor", "house"];
-export const PAINTS: Array<Paint> = ["lead", "flips", "counted", "chance"];
+export const PAINTS: Array<Paint> = ["lead", "counted", "chance"];
 export const LENSES: Array<Lens> = [
   "lead",
   "shift",
@@ -140,6 +145,13 @@ export function tint(
   return swatch(control?.parties[id]?.color, `party:${id}`);
 }
 
+export function turnOf(entry: Seat | undefined) {
+  const found = entry?.shift;
+  return found == null || found.flip === "held"
+    ? null
+    : { to: found.to, flip: found.flip };
+}
+
 export function shade(
   summary: Summary,
   entry: Seat | undefined,
@@ -153,6 +165,10 @@ export function shade(
   if (paint === "counted") {
     return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
   }
+  const turn = turnOf(entry);
+  if (turn != null) {
+    return hatch(tint(pair, control, turn.to), turn.flip).fill;
+  }
   const called = summary.winner ?? summary.projected;
   if (entry == null || paint === "lead") {
     const option = called ?? summary.leader;
@@ -162,16 +178,6 @@ export function shade(
     return mix(
       tone(option),
       called == null ? 30 + 60 * Math.min(summary.margin / 0.3, 1) : 100,
-    );
-  }
-  if (paint === "flips") {
-    const found = entry.shift;
-    if (found == null || found.flip === "held") {
-      return summary.total > 0 ? MUTED : WAITING;
-    }
-    return mix(
-      tint(pair, control, found.to),
-      found.flip === "flipped" ? 100 : 45,
     );
   }
   if (entry.rating === "waiting" || entry.rating === "counting") {
@@ -228,18 +234,13 @@ export function stateShade(
     };
   }
   const first = races[0];
-  return {
-    color:
-      first == null
-        ? MUTED
-        : shade(
-            first,
-            found.seats.get(first.race.id),
-            paint,
-            found.pair,
-            control,
-          ),
-  };
+  if (first == null) {
+    return { color: MUTED };
+  }
+  const entry = found.seats.get(first.race.id);
+  const color = shade(first, entry, paint, found.pair, control);
+  const turn = paint === "counted" ? null : turnOf(entry);
+  return turn == null ? { color } : { color, flip: turn.flip };
 }
 
 export function prior(race: LiveRace) {

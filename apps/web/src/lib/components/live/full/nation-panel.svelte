@@ -44,7 +44,7 @@
     election: LiveElection;
     found: Board;
     office: Office;
-    paint: "lead" | "chance" | "flips" | "counted";
+    paint: "lead" | "chance" | "counted";
     control: Control | null;
     states: (code: string) => string;
     picked: string | null;

@@ -173,7 +173,9 @@
         <span
           data-cell={index}
           class="rounded-[1px] block-3.5"
-          style:background-color="color-mix(in oklab, {cell.family.color} 18%, var(--background))"
+          style:background-color="light-dark(color-mix(in oklab, {cell.family
+            .color} 18%, var(--background)), color-mix(in oklab, {cell.family
+            .color} 38%, var(--background)))"
           aria-hidden="true"
         ></span>
       {:else if isLinked}
