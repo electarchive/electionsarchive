@@ -9489,7 +9489,7 @@ def parse() -> None:
                 )
             pending = ""
 
-    jurisdiction, contest, seats, unexpired = "", "", 0, False
+    jurisdiction, contest, seats, unexpired, header = "", "", 0, False, ""
     start, partials = len(feeds["MI-26125"]), {}
     for line in text("MI-26125", "-layout").splitlines():
         if not line.strip() or re.match(r"\s*(Updated|Official Candidate List|November 3|Petitions)", line):
@@ -9506,7 +9506,7 @@ def parse() -> None:
                 )
                 else f"{jurisdiction or 'Oakland County'} {found[1]}"
             )
-            seats, unexpired = int(found[2]), "Term Ending" in found[3]
+            seats, unexpired, header = int(found[2]), "Term Ending" in found[3], found[3]
             if contest and unexpired:
                 contest = f"{contest} Unexpired Term" + (
                     "" if partials.setdefault(contest, found[3]) == found[3] else f" {found[3]}"
@@ -9528,8 +9528,17 @@ def parse() -> None:
                     "party": named,
                     "independent": independent or found[1] == "Npa",
                     "unexpired": unexpired,
+                    "years": term[1] if (term := re.search(r"(\d+) Year Term", header)) else "",
                 }
             )
+    lengths: dict[str, set[str]] = {}
+    for row in feeds["MI-26125"][start:]:
+        if row["years"]:
+            lengths.setdefault(row["contest"], set()).add(row["years"])
+    for row in feeds["MI-26125"][start:]:
+        if len(lengths.get(row["contest"], ())) > 1:
+            row["contest"] = f"{row['contest']} {row['years']} Year Term"
+        del row["years"]
     feeds["MI-26125"][start:] = sorted(feeds["MI-26125"][start:], key=lambda row: row["unexpired"])
 
     section, jurisdiction, contest, seats, unexpired = "", "", "", 0, False
@@ -12400,6 +12409,11 @@ def emit() -> None:
 
 def emit_state(frame: pl.DataFrame, state: str) -> Path:
     NEW_PARTIES_ADDED.clear()
+    only_unexpired = set(frame.group_by("tail").agg(pl.col("unexpired").all()).filter("unexpired")["tail"])
+    doubled = {f"{tail}:unexpired" for tail in only_unexpired} & set(frame["tail"])
+    frame = frame.with_columns(
+        tail=pl.when(pl.col("tail").is_in(doubled)).then(pl.col("tail").str.replace(r":unexpired$", "")).otherwise("tail")
+    )
     tail_set = set(frame["tail"])
     merged = {
         row["tail"]
