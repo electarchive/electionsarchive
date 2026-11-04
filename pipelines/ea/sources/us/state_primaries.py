@@ -20,6 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode
 from ea.names import initials
 from ea.sources.us import (
     elstats,
@@ -2803,9 +2804,7 @@ def parse() -> None:
         for race, title in tx_elchist.races(election):
             if (found := TX_RACE.fullmatch(title)) is None:
                 continue
-            text = raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm").path.read_text(
-                errors="replace"
-            )
+            text = decode(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm").path.read_bytes())
             stamp = re.search(r"<H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
             if stamp is None:
                 raise ValueError(f"{election} {race}: no heading")
