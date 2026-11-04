@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Caveat } from "@ea/analytics/indices";
   import { createQuery } from "@tanstack/svelte-query";
+  import { Pending } from "svelte-islands";
   import type { Figure } from "#lib/indices.js";
   import { show } from "#lib/explain.svelte.js";
   import { figure, figureLabel } from "#lib/indices.js";
@@ -139,11 +140,7 @@
 {/snippet}
 
 {#if isPending}
-  <div
-    class="col-span-12 bg-card block-56 motion-safe:animate-pulse"
-    role="status"
-    aria-label={m.indices_title()}
-  ></div>
+  <Pending name="compare.system" isPending={true} reserve="14rem" />
 {:else if leads.some((lead) => lead != null)}
   <section
     class="col-span-12 grid gap-3 bg-card px-3.5 pbs-4 pbe-4"

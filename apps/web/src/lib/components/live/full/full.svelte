@@ -16,6 +16,7 @@
   import ScanIcon from "@lucide/svelte/icons/scan";
   import XIcon from "@lucide/svelte/icons/x";
   import { onMount, untrack } from "svelte";
+  import { Pending } from "svelte-islands";
   import { MediaQuery } from "svelte/reactivity";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Entry } from "#lib/live/ballot.js";
@@ -37,7 +38,6 @@
   import Monogram from "#lib/components/monogram.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
   import { entries as entriesOf, seating, turn } from "#lib/live/ballot.js";
@@ -2447,43 +2447,12 @@
     >
   </header>
 
-  {#if !isMounted}
-    <div
-      class="grid grid-cols-[minmax(0,1fr)] min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
-      aria-busy="true"
-    >
-      <div
-        class="relative animate-pulse bg-muted min-block-0 motion-reduce:animate-none"
-      >
-        <Skeleton
-          class="absolute inset-s-3 inset-bs-3 rounded-sm bg-card block-9 inline-40"
-        />
-        <div
-          class="absolute inset-x-0 inset-be-0 grid gap-3 rounded-t-lg bg-card px-4 pbs-3 pbe-6 shadow-menu ring-1 ring-border md:hidden"
-        >
-          <Skeleton class="mx-auto rounded-full block-1 inline-9" />
-          <Skeleton class="rounded-sm block-9" />
-          <Skeleton class="rounded-xs block-5 inline-2/3" />
-          <Skeleton class="rounded-xs block-4 inline-5/6" />
-        </div>
-      </div>
-      <div class="grid content-start gap-4 border-s bg-card p-4 max-md:hidden">
-        <Skeleton class="rounded-sm block-9" />
-        <Skeleton class="rounded-xs block-5 inline-2/3" />
-        <Skeleton class="rounded-xs block-4 inline-5/6" />
-        <div class="grid gap-3 pbs-2">
-          {#each [0, 1, 2] as row (row)}
-            <div class="grid grid-cols-[1fr_auto] items-center gap-3">
-              <Skeleton class="rounded-xs block-4" />
-              <Skeleton class="rounded-xs block-4 inline-12" />
-            </div>
-            <Skeleton class="rounded-xs block-2" />
-          {/each}
-        </div>
-        <Skeleton class="rounded-sm block-32" />
-      </div>
-    </div>
-  {:else}
+  <Pending
+    name="live.full"
+    isPending={!isMounted}
+    reserve="100%"
+    class="[--island-inset:0]"
+  >
     <div
       class={cn("grid min-block-0", {
         "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
@@ -2705,5 +2674,5 @@
         </aside>
       {/if}
     </div>
-  {/if}
+  </Pending>
 </div>

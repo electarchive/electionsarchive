@@ -1,4 +1,5 @@
 <script lang="ts" module>
+  import { Pending } from "svelte-islands";
   let handoff: { path: string; image: string } | null = null;
   const warmed: Record<string, boolean> = {};
 </script>
@@ -32,7 +33,6 @@
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import {
     count,
@@ -3670,16 +3670,12 @@
       transition:fade={{ duration: calm ? 0 : 150 }}
     >
       {#if lenses.length === 0}
-        {#each [1.2, 0.9, 1.2] as ratio, at (at)}
-          <div class="grid shrink-0 gap-1.5" aria-hidden="true">
-            <Skeleton class="rounded-sm block-[1.21875rem] inline-24" />
-            <Skeleton
-              class="rounded-sm"
-              style="inline-size: {lensHeight *
-                ratio}px; block-size: {lensHeight}px"
-            />
-          </div>
-        {/each}
+        <Pending
+          name="map.zooms"
+          isPending={true}
+          reserve="{lensHeight + 26}px"
+          class="[--island-inset:0]"
+        />
       {/if}
       {#each lenses as lens (lens.index)}
         <figure

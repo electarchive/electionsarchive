@@ -5,10 +5,10 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
-  import { Island } from "svelte-islands";
+  import { Await, Island } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
-  import Name from "#lib/components/name.svelte";
   import { compactPlaces } from "#lib/compare.js";
+  import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { capitalize, count, date, fold, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -30,7 +30,6 @@
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
   import Scrubber from "./scrubber.svelte";
-  import SystemSkeleton from "./system-skeleton.svelte";
 
   const {
     id,
@@ -420,6 +419,12 @@
     source != null &&
       (loaded?.id === source.key ? drawn != null : failed !== source.key),
   );
+  const isSeries = $derived(
+    polity.latest != null &&
+      ["sovereign_state", "supranational", "federal_unit"].includes(
+        polity.kind,
+      ),
+  );
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -527,6 +532,8 @@
     place={polity.name}
     latest={polity.latest}
     seed={polity.scrubber}
+    isExpected={polity.calendar.first != null &&
+      polity.calendar.first !== polity.calendar.last}
   />
 {:else if (polity.latest != null && polity.latest.races.length > 0) || polity.next != null}
   <section
@@ -863,48 +870,36 @@
   {@render inPlace()}
 {/if}
 
-{#await polity.record}
-  {#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
-    <section
-      class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
-      aria-busy="true"
-    >
-      <h2 class="heading">
-        {m.record_title()}
-      </h2>
-      <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-        {m.record_lede()}
-      </p>
-      <div
-        class="animate-pulse rounded-sm bg-muted block-65.5 motion-reduce:animate-none"
-      ></div>
-      <div class="block-10"></div>
-    </section>
-  {/if}
-{:then found}
+{#snippet recorded(found: Awaited<typeof polity.record>)}
   {#if found != null}
     <div class="col-span-12 grid">
       <Island part={found} ssr={false} when="visible">
         {#snippet children(record)}
-          <Timeline
-            {id}
-            {record}
-            isExpected={polity.latest != null &&
-              ["sovereign_state", "supranational", "federal_unit"].includes(
-                polity.kind,
-              )}
-          />
+          <Timeline {id} {record} isExpected={isSeries} />
         {/snippet}
       </Island>
     </div>
   {/if}
-{/await}
+{/snippet}
 
-{#if polity.latest != null && ["sovereign_state", "supranational", "federal_unit"].includes(polity.kind)}
-  {#await import("./system.svelte")}
-    <SystemSkeleton />
-  {:then system}
-    <system.default {id} />
+{#if isSeries}
+  <Await promise={polity.record} name="polity.record" reserve="24rem">
+    {#snippet children(found)}
+      {@render recorded(found)}
+    {/snippet}
+  </Await>
+  <Await
+    promise={import("./system.svelte")}
+    name="polity.system"
+    reserve="19rem"
+  >
+    {#snippet children(system)}
+      <system.default {id} />
+    {/snippet}
+  </Await>
+{:else}
+  {#await polity.record then found}
+    {@render recorded(found)}
   {/await}
 {/if}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveOffice } from "@ea/analytics/live";
+  import { Pending } from "svelte-islands";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
@@ -104,11 +105,12 @@
 {/snippet}
 
 {#if shapes == null}
-  <div
-    class="grid animate-pulse place-items-center rounded-xs bg-muted text-[0.75em] text-muted-foreground block-full motion-reduce:animate-none"
-  >
-    {m.board_loading()}
-  </div>
+  <Pending
+    name="live.board.nation"
+    isPending={true}
+    reserve="100%"
+    class="[--island-inset:0]"
+  />
 {:else}
   <Atlas
     {shapes}

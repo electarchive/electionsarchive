@@ -8,7 +8,7 @@
   import PlayIcon from "@lucide/svelte/icons/play";
   import { queryOptions, useQueryClient } from "@tanstack/svelte-query";
   import { onDestroy, untrack } from "svelte";
-  import { load as unpack } from "svelte-islands";
+  import { learn, Pending, load as unpack } from "svelte-islands";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -27,9 +27,11 @@
     place,
     latest,
     seed,
+    isExpected,
   }: {
     id: string;
     place: string;
+    isExpected: boolean;
     latest: { path: string | null; date: string | null } | null;
     seed: Extract<PageData, { kind: "polity" }>["polity"]["scrubber"];
   } = $props();
@@ -169,6 +171,9 @@
             year: Number(latest.date.slice(0, 4)),
             tone: "",
           }),
+  );
+  const isSeries = $derived(
+    steps.length > 1 || (isExpected && !isRecordSettled),
   );
   const first = $derived(steps[0]?.year ?? 0);
   const last = $derived(steps.at(-1)?.year ?? 0);
@@ -484,9 +489,9 @@
           id="{uid}-title"
           class="text-[clamp(1.375rem,2.2vw,1.75rem)]/tight font-[760] tracking-[-0.015em]"
         >
-          {steps.length > 1 ? m.scrubber_title({ place }) : m.polity_latest()}
+          {isSeries ? m.scrubber_title({ place }) : m.polity_latest()}
         </h2>
-        {#if steps.length > 1}
+        {#if isSeries}
           <p
             class="text-[0.875rem] text-pretty text-muted-foreground max-inline-[64ch]"
           >
@@ -494,11 +499,12 @@
           </p>
         {/if}
       </div>
-      {#if steps.length > 1}
+      {#if isSeries}
         <button
           type="button"
           class="flex items-center gap-1.5 rounded-sm border border-input bg-card ps-2 pe-3 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
           aria-pressed={isPlaying}
+          disabled={steps.length <= 1}
           onclick={() => {
             if (isPlaying) {
               stop();
@@ -516,89 +522,96 @@
       {/if}
     </div>
 
-    {#if steps.length > 1}
-      <div class="grid gap-1 pbs-5">
-        <div
-          class="relative cursor-grab touch-pan-y rounded-sm outline-offset-4 select-none block-9 before:absolute before:inset-x-0 before:-inset-y-2.5 active:cursor-grabbing"
-          role="slider"
-          tabindex="0"
-          aria-label={m.scrubber_slider()}
-          aria-valuemin={first}
-          aria-valuemax={last}
-          aria-valuenow={step?.year ?? last}
-          aria-valuetext={step == null ? undefined : date(step.date)}
-          onpointerdown={(event) => {
-            event.currentTarget.setPointerCapture(event.pointerId);
-            isDragging = true;
-            stop();
-            pick(event);
-          }}
-          onpointermove={(event) => {
-            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-              pick(event);
-            }
-          }}
-          onpointerup={() => {
-            isDragging = false;
-            sync();
-          }}
-          onpointercancel={() => {
-            isDragging = false;
-            sync();
-          }}
-          onkeydown={(event) => {
-            const moves: Record<string, number> = {
-              ArrowLeft: -1,
-              ArrowDown: -1,
-              ArrowRight: 1,
-              ArrowUp: 1,
-              PageDown: -5,
-              PageUp: 5,
-              Home: -steps.length,
-              End: steps.length,
-            };
-            const move = moves[event.key];
-            if (move != null) {
-              event.preventDefault();
+    {#if isSeries}
+      <Pending
+        name="scrubber.slider"
+        isPending={steps.length <= 1}
+        reserve="4.8125rem"
+        class="[--island-inset:0]"
+      >
+        <div class="grid gap-1 pbs-5">
+          <div
+            class="relative cursor-grab touch-pan-y rounded-sm outline-offset-4 select-none block-9 before:absolute before:inset-x-0 before:-inset-y-2.5 active:cursor-grabbing"
+            role="slider"
+            tabindex="0"
+            aria-label={m.scrubber_slider()}
+            aria-valuemin={first}
+            aria-valuemax={last}
+            aria-valuenow={step?.year ?? last}
+            aria-valuetext={step == null ? undefined : date(step.date)}
+            onpointerdown={(event) => {
+              event.currentTarget.setPointerCapture(event.pointerId);
+              isDragging = true;
               stop();
-              go(Math.max(0, Math.min(steps.length - 1, index + move)));
-            }
-          }}
-        >
-          <span
-            class="absolute inset-x-0 inset-bs-1/2 bg-border block-px"
-            aria-hidden="true"
-          ></span>
-          {#each steps as entry, spot (entry.path)}
+              pick(event);
+            }}
+            onpointermove={(event) => {
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                pick(event);
+              }
+            }}
+            onpointerup={() => {
+              isDragging = false;
+              sync();
+            }}
+            onpointercancel={() => {
+              isDragging = false;
+              sync();
+            }}
+            onkeydown={(event) => {
+              const moves: Record<string, number> = {
+                ArrowLeft: -1,
+                ArrowDown: -1,
+                ArrowRight: 1,
+                ArrowUp: 1,
+                PageDown: -5,
+                PageUp: 5,
+                Home: -steps.length,
+                End: steps.length,
+              };
+              const move = moves[event.key];
+              if (move != null) {
+                event.preventDefault();
+                stop();
+                go(Math.max(0, Math.min(steps.length - 1, index + move)));
+              }
+            }}
+          >
             <span
-              class={cn(
-                "absolute -translate-x-1/2 rounded-full transition-[block-size,opacity] duration-200 inline-1 motion-reduce:transition-none",
-                {
-                  "inset-bs-3 opacity-45 block-3": spot !== index,
-                  "inset-bs-0 block-9": spot === index,
-                },
-              )}
-              style:inset-inline-start="{along(entry.year) * 100}%"
-              style:background-color={entry.tone}
+              class="absolute inset-x-0 inset-bs-1/2 bg-border block-px"
               aria-hidden="true"
             ></span>
-          {/each}
-          {#if step != null}
-            <span
-              class="pointer-events-none absolute inset-be-[calc(100%+0.375rem)] rounded-xs bg-foreground px-1.5 font-figures text-xs font-semibold text-background tabular-nums transition-[inset-inline-start] duration-200 motion-reduce:transition-none"
-              style:inset-inline-start="{along(step.year) * 100}%"
-              style:translate="{-along(step.year) * 100}% 0"
-              aria-hidden="true">{step.year}</span
-            >
-          {/if}
+            {#each steps as entry, spot (entry.path)}
+              <span
+                class={cn(
+                  "absolute -translate-x-1/2 rounded-full transition-[block-size,opacity] duration-200 inline-1 motion-reduce:transition-none",
+                  {
+                    "inset-bs-3 opacity-45 block-3": spot !== index,
+                    "inset-bs-0 block-9": spot === index,
+                  },
+                )}
+                style:inset-inline-start="{along(entry.year) * 100}%"
+                style:background-color={entry.tone}
+                aria-hidden="true"
+              ></span>
+            {/each}
+            {#if step != null}
+              <span
+                class="pointer-events-none absolute inset-be-[calc(100%+0.375rem)] rounded-xs bg-foreground px-1.5 font-figures text-xs font-semibold text-background tabular-nums transition-[inset-inline-start] duration-200 motion-reduce:transition-none"
+                style:inset-inline-start="{along(step.year) * 100}%"
+                style:translate="{-along(step.year) * 100}% 0"
+                aria-hidden="true">{step.year}</span
+              >
+            {/if}
+          </div>
+          <div
+            class="flex justify-between font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
+            aria-hidden="true"
+          >
+            <span>{first}</span><span>{last}</span>
+          </div>
         </div>
-        <div
-          class="flex justify-between font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-          aria-hidden="true"
-        >
-          <span>{first}</span><span>{last}</span>
-        </div>
-      </div>
+      </Pending>
     {/if}
 
     <div
@@ -609,6 +622,7 @@
           "transition-opacity duration-300 min-inline-0 motion-reduce:transition-none",
           { "opacity-60": isStale },
         )}
+        {@attach current?.view == null ? undefined : learn("scrubber.map")}
       >
         {#if step != null}
           <div
@@ -756,9 +770,12 @@
             >
           </div>
         {:else if current?.view == null}
-          <div
-            class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"
-          ></div>
+          <Pending
+            name="scrubber.map"
+            isPending={true}
+            reserve="min(80svh,130vw)"
+            class="[--island-inset:0]"
+          />
         {:else}
           <p
             class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-24"

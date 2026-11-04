@@ -4,6 +4,7 @@
     LiveEstimate,
     LiveRace,
   } from "@ea/analytics/live";
+  import { Pending } from "svelte-islands";
   import type {
     BallotLocalKind,
     BallotLocals,
@@ -127,13 +128,11 @@
       <p class="text-sm text-muted-foreground" aria-live="polite">
         {m.night_state_local_loading()}
       </p>
-      <div class="grid gap-2 inline-full" aria-hidden="true">
-        {#each [0, 1, 2] as row (row)}
-          <div
-            class="animate-pulse rounded-xs bg-muted block-10 motion-reduce:animate-none"
-          ></div>
-        {/each}
-      </div>
+      <Pending
+        name="live.state.local"
+        isPending={true}
+        class="[--island-inset:0]"
+      />
     {:else}
       <Button variant="outline" size="sm" onclick={load}
         >{m.night_state_local_load()}</Button

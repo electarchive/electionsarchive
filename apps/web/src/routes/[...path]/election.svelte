@@ -9,8 +9,8 @@
     createQuery,
     useQueryClient,
   } from "@tanstack/svelte-query";
-  import { tick, untrack } from "svelte";
-  import { Island, load, Part, peek } from "svelte-islands";
+  import { flushSync, tick, untrack } from "svelte";
+  import { Await, Island, load, Part, peek, unroll } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
   import Disclosure from "#lib/components/disclosure.svelte";
@@ -46,7 +46,6 @@
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
   import Electors from "./electors.svelte";
-  import FiguresSkeleton from "./figures-skeleton.svelte";
   import Gains from "./gains.svelte";
   import Governments from "./governments.svelte";
   import Lead from "./lead.svelte";
@@ -61,7 +60,6 @@
   import SameDay from "./same-day.svelte";
   import Seated from "./seated.svelte";
   import Seatflow from "./seatflow.svelte";
-  import SectionSkeleton from "./section-skeleton.svelte";
   import Series from "./series.svelte";
   import States from "./states.svelte";
   import Sweep from "./sweep.svelte";
@@ -205,10 +203,16 @@
       (_, at) => (spots.has(at) ? tail.next() : head.next()).value,
     ).filter((race) => race != null);
   });
-  const more = () => {
+  const prefetch = () => {
     if (election.contests != null && peek(election.contests) == null) {
       void load(election.contests);
     }
+    if (pending != null) {
+      void load(pending.part);
+    }
+  };
+  const more = () => {
+    prefetch();
     const rest = pending;
     if (rest == null) {
       return;
@@ -519,6 +523,14 @@
   const head = $derived(Math.max(shown ?? 0, 0));
   const isActive = (index: number) =>
     shown == null ? index < 4 : index === shown;
+  const active = $derived(
+    (shown == null ? [0, 1, 2, 3] : [shown]).flatMap((index) => {
+      const race = ordered[index];
+      return race == null ? [] : [{ index, race }];
+    }),
+  );
+  const slot = (index: number) =>
+    active.findIndex((entry) => entry.index === index);
   const wanted = $derived([
     ...new Set(
       lined
@@ -614,7 +626,7 @@
     ),
   ]);
   const swings = createQueries(() => ({
-    queries: ordered.map((race, index) => {
+    queries: active.map(({ race }) => {
       const path = race.path ?? "";
       const by = race.places?.level;
       const year = election.date?.slice(0, 4);
@@ -625,8 +637,7 @@
           race.count === 1 &&
           race.map != null &&
           race.places != null &&
-          race.results.length !== 1 &&
-          isActive(index),
+          race.results.length !== 1,
         staleTime: Infinity,
         queryFn: async () => {
           const found = await orpc.contests.locate.call({ path });
@@ -657,7 +668,7 @@
   const shades = $state<Record<number, (typeof MODES)[number] | number>>({});
   const paired = $state<Record<number, (typeof MODES)[number] | number>>({});
   const regionals = createQueries(() => ({
-    queries: ordered.map((race, index) => ({
+    queries: active.map(({ race }) => ({
       ...orpc.elections.regional.queryOptions({
         input: { id, contest: race.sample ?? race.anchor },
       }),
@@ -665,14 +676,13 @@
         scope == null &&
         race.sample != null &&
         race.map != null &&
-        race.places != null &&
-        isActive(index),
+        race.places != null,
       staleTime: Infinity,
       meta: { quiet: true },
     })),
   }));
   const levelled = createQueries(() => ({
-    queries: ordered.map((race, index) => {
+    queries: active.map(({ race, index }) => {
       const path = race.path ?? "";
       const by = regional[index] ?? "";
       return {
@@ -743,7 +753,7 @@
     }),
   }));
   const worlds = createQueries(() => ({
-    queries: ordered.map((race, index) => ({
+    queries: active.map(({ race, index }) => ({
       ...orpc.elections.regional.queryOptions({
         input: {
           id,
@@ -924,13 +934,46 @@
     }
   }
 
-  const built = $derived(
-    [
+  const built = $derived.by(() => {
+    const totals = new Set<string | null>();
+    const covering = new Map<string | null, Set<string>>();
+    const names = new Map<string, { count: number; singles: number }>();
+    for (const other of ordered) {
+      const seen = names.get(other.name) ?? { count: 0, singles: 0 };
+      seen.count += 1;
+      seen.singles += other.count === 1 ? 1 : 0;
+      names.set(other.name, seen);
+      if (other.isTotal) {
+        totals.add(other.body);
+        continue;
+      }
+      if ((other.round ?? 1) !== 1 || other.size == null) {
+        continue;
+      }
+      let seats = 0;
+      for (const row of other.results) {
+        seats += row.seats ?? 0;
+      }
+      if (seats >= other.size * 0.95 && seats <= other.size * 1.02) {
+        covering.set(
+          other.body,
+          (covering.get(other.body) ?? new Set()).add(other.kind),
+        );
+      }
+    }
+    const rounds = new Map<string, Set<number | null>>();
+    for (const other of arranged) {
+      rounds.set(
+        other.name,
+        (rounds.get(other.name) ?? new Set()).add(other.round),
+      );
+    }
+    return [
       ...ordered,
       ...arranged
         .filter((race) => tucked.has(race.anchor))
         .map((race) => ({ ...race, partner: null })),
-    ].map((race) => {
+    ].map((race, index) => {
       const winners = race.results
         .filter((row) => (row.seats ?? 0) > 0)
         .map((row) => ({
@@ -1130,26 +1173,10 @@
           : after.get(race.body);
       const isTier =
         !race.isTotal &&
-        ordered.some((other) => {
-          if (other.body !== race.body) {
-            return false;
-          }
-          if (other.isTotal) {
-            return true;
-          }
-          if (
-            other.kind === race.kind ||
-            (other.round ?? 1) !== 1 ||
-            other.size == null
-          ) {
-            return false;
-          }
-          let seats = 0;
-          for (const row of other.results) {
-            seats += row.seats ?? 0;
-          }
-          return seats >= other.size * 0.95 && seats <= other.size * 1.02;
-        });
+        (totals.has(race.body) ||
+          [...(covering.get(race.body) ?? [])].some(
+            (kind) => kind !== race.kind,
+          ));
       const isPartial =
         !isTier &&
         whole != null &&
@@ -1159,19 +1186,13 @@
       const isRound =
         race.round != null &&
         race.count > 1 &&
-        arranged.some(
-          (other) =>
-            other.anchor !== race.anchor &&
-            other.name === race.name &&
-            other.round !== race.round,
+        [...(rounds.get(race.name) ?? [])].some(
+          (round) => round !== race.round,
         );
       const isSplit =
         race.kind !== "list_allocation" &&
         race.count > 1 &&
-        ordered.some(
-          (other) =>
-            other !== race && other.name === race.name && other.count === 1,
-        );
+        (names.get(race.name)?.singles ?? 0) > 0;
       const isTallied =
         isSplit && (race.places?.tally.count ?? 0) === race.count;
       const noun = race.places?.levels[0]?.noun ?? "";
@@ -1573,15 +1594,11 @@
             ? m.race_round({ name: race.name, round: race.round ?? 1 })
             : isSplit
               ? m.race_split({ name: race.name, noun })
-              : race.kind === "list_allocation" &&
-                  ordered.some(
-                    (other) => other.isTotal && other.body === race.body,
-                  )
+              : race.kind === "list_allocation" && totals.has(race.body)
                 ? m.race_list({ name: race.name })
                 : race.isRemainder &&
-                    ordered.some(
-                      (other) => other !== race && other.name === race.name,
-                    )
+                    (names.get(race.name)?.count ?? 0) >
+                      (index < ordered.length ? 1 : 0)
                   ? m.race_special({ name: race.name })
                   : race.name,
         votes:
@@ -1784,8 +1801,8 @@
               }),
         ),
       };
-    }),
-  );
+    });
+  });
   const races = $derived(built.slice(0, ordered.length));
   const hexes = createQuery(() => ({
     ...orpc.seats.hexes.queryOptions({ input: { id, within: scope?.id } }),
@@ -1862,10 +1879,13 @@
         : races.slice(1).filter((race) => !race.isLater),
   );
   const listing = $state({ isOpen: false });
+  const shelf = unroll(48);
   const boarded = $derived(
-    listing.isOpen || !every.some((race) => race.deferred != null)
-      ? others
-      : others.slice(0, 48),
+    listing.isOpen
+      ? others.slice(0, shelf.limit)
+      : every.some((race) => race.deferred != null)
+        ? others.slice(0, 48)
+        : others,
   );
   const unloaded = $derived(
     pending == null ? 0 : pending.races + pending.questions,
@@ -2020,15 +2040,16 @@
       ];
     });
   });
-  const sequence = $derived(
-    rail.flatMap((section) =>
+  const sequence = $derived.by(() => {
+    const anchored = new Map(races.map((race) => [race.anchor, race]));
+    return rail.flatMap((section) =>
       section.groups.flatMap((group) =>
         [...(group.head == null ? [] : [group.head]), ...group.items].flatMap(
-          (item) => races.find((race) => race.anchor === item.anchor) ?? [],
+          (item) => anchored.get(item.anchor) ?? [],
         ),
       ),
-    ),
-  );
+    );
+  });
   const grid = $derived.by(() => {
     if (!isGrid) {
       return null;
@@ -2229,18 +2250,18 @@
         all={m.election_series_all_label}
       />
     {/if}
-    {#await sameDay}
-      <span
-        class="block rounded-xs bg-muted block-3 inline-[min(100%,24rem)] motion-safe:animate-pulse"
-        role="status"
-        aria-busy="true"
-        aria-label={m.preview_loading()}
-      ></span>
-    {:then sameDay}
-      {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
-        <SameDay place={sameDay.place} races={sameDay.races} />
-      {/if}
-    {/await}
+    <Await
+      promise={sameDay}
+      name="election.same-day"
+      reserve="0.75rem"
+      class="[--island-inset:0]"
+    >
+      {#snippet children(found)}
+        {#if found != null && found.races.some((race) => !race.isOwn)}
+          <SameDay place={found.place} races={found.races} />
+        {/if}
+      {/snippet}
+    </Await>
   </div>
 </header>
 
@@ -2271,27 +2292,21 @@
       {/snippet}
     </Island>
   {:else}
-    {#await seeded.regions}
-      <SectionSkeleton shape="table" />
-    {:then}
+    <Await promise={seeded.regions} name="election.regions">
       <Regions {id} />
-    {/await}
+    </Await>
   {/if}
 {/snippet}
 
 {#snippet body()}
   {#if isSwept && focus === -1}
-    {#await seeded.winners}
-      <div class="col-span-12 grid min-block-svh">
-        <SectionSkeleton shape="columns" />
-      </div>
-    {:then}
+    <Await promise={seeded.winners} name="election.sweep" reserve="100svh">
       <Sweep
         {id}
         year={election.date?.slice(0, 4) ?? ""}
         hexes={hexes.data ?? null}
       />
-    {/await}
+    </Await>
   {/if}
 
   {#if election.composition != null && focus === -1}
@@ -2669,11 +2684,11 @@
         )}
         {#snippet drawn()}
           {#if race.map != null && race.places != null}
-            {const option = $derived(regionals[index]?.data ?? null)}
-            {const picked = $derived(levelled[index]?.data ?? null)}
+            {const option = $derived(regionals[slot(index)]?.data ?? null)}
+            {const picked = $derived(levelled[slot(index)]?.data ?? null)}
             {const region = $derived(
               regional[index] === "world.country"
-                ? (worlds[index]?.data ?? null)
+                ? (worlds[slot(index)]?.data ?? null)
                 : regional[index] === option?.places.level
                   ? option
                   : regional[index] === picked?.places.level
@@ -2681,7 +2696,7 @@
                     : null,
             )}
             {const swing = $derived(
-              region == null ? (swings[index]?.data ?? null) : null,
+              region == null ? (swings[slot(index)]?.data ?? null) : null,
             )}
             {const view = $derived(views[index])}
             {const final = $derived(
@@ -3001,11 +3016,11 @@
             </Island>
           {/if}
           {#if index === head && scope == null && race.body != null && !race.isTier}
-            {#await import("./figures.svelte")}
-              <FiguresSkeleton />
-            {:then figures}
-              <figures.default {id} body={race.body} />
-            {/await}
+            <Await promise={import("./figures.svelte")} name="figures">
+              {#snippet children(figures)}
+                <figures.default {id} body={race.body} />
+              {/snippet}
+            </Await>
           {/if}
         {/snippet}
         <Lead
@@ -3045,15 +3060,17 @@
         {/if}
         {#snippet tabled()}
           {#if race.places != null}
+            {const option = $derived(regionals[slot(index)]?.data ?? null)}
+            {const picked = $derived(levelled[slot(index)]?.data ?? null)}
             {const shown = $derived(
               regional[index] === "world.country"
-                ? (worlds[index]?.data?.places ?? race.places)
+                ? (worlds[slot(index)]?.data?.places ?? race.places)
                 : regional[index] != null &&
-                    regional[index] === regionals[index]?.data?.places.level
-                  ? regionals[index].data.places
+                    regional[index] === option?.places.level
+                  ? option.places
                   : regional[index] != null &&
-                      regional[index] === levelled[index]?.data?.places.level
-                    ? levelled[index].data.places
+                      regional[index] === picked?.places.level
+                    ? picked.places
                     : (views[index]?.partner?.places ??
                       (views[index]?.facet === "first"
                         ? race.places
@@ -3329,10 +3346,11 @@
     {/if}
     <ol
       class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
+      aria-busy={listing.isOpen && pending != null}
     >
       {#each boarded as other (other.anchor)}
         <li
-          class="grid content-start gap-3 border-bs border-border py-4 lg:border-bs-0 max-lg:first:border-bs-0"
+          class="grid content-start gap-3 border-bs border-border py-4 [contain-intrinsic-size:auto_9rem] [content-visibility:auto] lg:border-bs-0 lg:[contain-intrinsic-size:auto_12rem] max-lg:first:border-bs-0"
         >
           <div class="grid content-start gap-1">
             <h3
@@ -3380,16 +3398,25 @@
           {/if}
         </li>
       {/each}
+      {#if listing.isOpen && (boarded.length < others.length || pending != null)}
+        <li {@attach shelf.tail(others.length)}></li>
+      {/if}
     </ol>
-    {#if boarded.length < others.length || pending != null}
+    {#if !listing.isOpen && (boarded.length < others.length || pending != null)}
       <button
         type="button"
         class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
-        aria-busy={listing.isOpen && pending != null}
-        onpointerenter={more}
-        onclick={() => {
+        onpointerenter={prefetch}
+        onfocus={prefetch}
+        onclick={(event) => {
+          const from = boarded.length;
+          const section = event.currentTarget.closest("section");
           listing.isOpen = true;
-          more();
+          flushSync();
+          section
+            ?.querySelector<HTMLElement>(`ol > li:nth-child(${from}) a`)
+            ?.focus();
+          requestAnimationFrame(() => setTimeout(more));
         }}
         >{m.places_show_all({ count: count(others.length + unloaded) })}</button
       >
@@ -3769,35 +3796,31 @@
     </section>
   {/if}
 
-  {#await sections.local}
-    <SectionSkeleton shape="columns" />
-  {:then local}
-    {#if local != null}
-      <Local {local} isOwn={true} />
-    {/if}
-  {/await}
-  {#await sections.counties}
-    <SectionSkeleton shape="columns" label={m.counties_title()} />
-  {:then found}
-    {#if found != null}
-      <Island part={found} when="visible">
-        {#snippet children(counties)}
-          <Counties {counties} />
-        {/snippet}
-      </Island>
-    {/if}
-  {/await}
+  <Await promise={sections.local} name="election.local">
+    {#snippet children(local)}
+      {#if local != null}
+        <Local {local} isOwn={true} />
+      {/if}
+    {/snippet}
+  </Await>
+  <Await promise={sections.counties} name="election.counties">
+    {#snippet children(found)}
+      {#if found != null}
+        <Island part={found} when="visible">
+          {#snippet children(counties)}
+            <Counties {counties} />
+          {/snippet}
+        </Island>
+      {/if}
+    {/snippet}
+  </Await>
   {#if scope == null}
-    {#await seeded.alongside}
-      <SectionSkeleton shape="columns" label={m.alongside_title()} />
-    {:then}
+    <Await promise={seeded.alongside} name="election.alongside">
       <Alongside {id} />
-    {/await}
-    {#await seeded.governments}
-      <SectionSkeleton shape="cards" label={m.governments_title()} />
-    {:then}
+    </Await>
+    <Await promise={seeded.governments} name="election.governments">
       <Governments {id} {chamber} />
-    {/await}
+    </Await>
     {#if regionsAt === -1}
       {@render regions()}
     {/if}
@@ -3814,51 +3837,54 @@
         race={ordered.find((race) => race.electors != null)?.name ?? null}
       />
     {/snippet}
-    {#await sections.tiers}
-      <SectionSkeleton shape="tiles" label={m.tiers_title()} />
-    {:then found}
-      {#if found == null}
-        {@render tiled()}
-      {:else}
-        <Island part={found} when="visible">
-          {#snippet children(tiers)}
-            <Cached
-              key={orpc.elections.tiers.queryKey({ input: { id } })}
-              value={tiers}
-            >
-              {@render tiled()}
-            </Cached>
-          {/snippet}
-        </Island>
-      {/if}
-    {/await}
+    <Await promise={sections.tiers} name="election.tiers">
+      {#snippet children(found)}
+        {#if found == null}
+          {@render tiled()}
+        {:else}
+          <Island part={found} when="visible">
+            {#snippet children(tiers)}
+              <Cached
+                key={orpc.elections.tiers.queryKey({ input: { id } })}
+                value={tiers}
+              >
+                {@render tiled()}
+              </Cached>
+            {/snippet}
+          </Island>
+        {/if}
+      {/snippet}
+    </Await>
   {:else if election.isCrowded}
-    {#await sections.winners}
-      <SectionSkeleton shape="table" />
-    {:then found}
-      {#if found instanceof Part}
-        <Island part={found} when="visible">
-          {#snippet children(
-            winners: NonNullable<
-              Extract<Awaited<typeof sections.winners>, Part<unknown>>["loaded"]
-            >["value"],
-          )}
-            <Cached
-              key={orpc.elections.winners.queryKey({ input: { id } })}
-              value={winners}
-            >
-              <Winners
-                {id}
-                parts={election.children ?? parts}
-                hasMap={!isSwept}
-              />
-            </Cached>
-          {/snippet}
-        </Island>
-      {:else}
-        <Winners {id} parts={election.children ?? parts} hasMap={!isSwept} />
-      {/if}
-    {/await}
+    <Await promise={sections.winners} name="election.winners">
+      {#snippet children(found)}
+        {#if found instanceof Part}
+          <Island part={found} when="visible">
+            {#snippet children(
+              winners: NonNullable<
+                Extract<
+                  Awaited<typeof sections.winners>,
+                  Part<unknown>
+                >["loaded"]
+              >["value"],
+            )}
+              <Cached
+                key={orpc.elections.winners.queryKey({ input: { id } })}
+                value={winners}
+              >
+                <Winners
+                  {id}
+                  parts={election.children ?? parts}
+                  hasMap={!isSwept}
+                />
+              </Cached>
+            {/snippet}
+          </Island>
+        {:else}
+          <Winners {id} parts={election.children ?? parts} hasMap={!isSwept} />
+        {/if}
+      {/snippet}
+    </Await>
   {:else if parts.length > 0}
     <States {id} />
     {#if election.seated != null}

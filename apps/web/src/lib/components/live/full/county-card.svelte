@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import XIcon from "@lucide/svelte/icons/x";
+  import { Pending } from "svelte-islands";
   import type { UnitStanding } from "#lib/live/standing.js";
   import Face from "#lib/components/live/face.svelte";
   import Also from "#lib/components/live/state/also.svelte";
@@ -365,9 +366,11 @@
       {m.night_local_title()}
     </h3>
     {#if isLoading && locals == null}
-      <p class="animate-pulse text-xs text-muted-foreground">
-        {m.livemap_locals_loading()}
-      </p>
+      <Pending
+        name="live.county.locals"
+        isPending={true}
+        class="[--island-inset:0]"
+      />
     {:else if localRows.length === 0}
       <p class="text-xs text-muted-foreground">{m.livemap_locals_none()}</p>
     {:else}

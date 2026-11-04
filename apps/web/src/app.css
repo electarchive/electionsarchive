@@ -9,6 +9,8 @@
 :root {
   --island-bone: var(--muted);
   --island-radius: 0.125rem;
+  --island-surface: var(--card);
+  --island-inset: 0.875rem;
 }
 
 @font-face {

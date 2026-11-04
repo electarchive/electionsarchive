@@ -5,6 +5,7 @@
   import { page } from "$app/state";
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
+  import { Await } from "svelte-islands";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Disclosure from "#lib/components/disclosure.svelte";
@@ -45,7 +46,6 @@
   import Crowns from "./crowns.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
-  import FiguresSkeleton from "./figures-skeleton.svelte";
   import Lead from "./lead.svelte";
   import Ledger from "./ledger.svelte";
   import Lists from "./lists.svelte";
@@ -1980,24 +1980,24 @@
     </div>
   {/snippet}
   {#snippet crowns()}
-    {#await crowned}
-      <div
-        class="aspect-3/2 rounded-sm bg-muted ring-1 ring-border inline-full max-block-[min(38rem,70svh)] motion-safe:animate-pulse"
-        role="status"
-        aria-busy="true"
-        aria-label={m.preview_loading()}
-      ></div>
-    {:then found}
-      {#if found == null}
-        {@render missing()}
-      {:else}
-        <Crowns
-          maps={found.maps}
-          since={found.since}
-          year={contest.election.date?.slice(0, 4) ?? ""}
-        />
-      {/if}
-    {/await}
+    <Await
+      promise={crowned}
+      name="contest.crowns"
+      reserve="min(38rem,70svh)"
+      class="[--island-inset:0]"
+    >
+      {#snippet children(found)}
+        {#if found == null}
+          {@render missing()}
+        {:else}
+          <Crowns
+            maps={found.maps}
+            since={found.since}
+            year={contest.election.date?.slice(0, 4) ?? ""}
+          />
+        {/if}
+      {/snippet}
+    </Await>
   {/snippet}
   {#snippet hemicycle()}
     <Seats
@@ -2012,11 +2012,11 @@
       {change}
     />
     {#if contest.kind === "list_allocation"}
-      {#await import("./figures.svelte")}
-        <FiguresSkeleton />
-      {:then figures}
-        <figures.default {id} body={null} />
-      {/await}
+      <Await promise={import("./figures.svelte")} name="figures">
+        {#snippet children(figures)}
+          <figures.default {id} body={null} />
+        {/snippet}
+      </Await>
     {/if}
   {/snippet}
   <Lead
