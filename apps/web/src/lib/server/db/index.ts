@@ -32,9 +32,9 @@ function connect(connectionString: string, max: number, timeout: number) {
   });
 }
 
-export const db = connect(DATABASE_URL, 16, 60_000);
+export const db = connect(DATABASE_URL, 8, 60_000);
 
-export const liveDb = connect(DATABASE_URL, 8, 30_000);
+export const liveDb = connect(DATABASE_URL, 4, 30_000);
 
 export const authDb =
-  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL, 8, 60_000);
+  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL, 2, 60_000);
