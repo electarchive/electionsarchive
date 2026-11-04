@@ -77,6 +77,7 @@
       <a
         href={link ?? undefined}
         aria-label={district.key.toUpperCase()}
+        class="outline-none"
         onpointermove={(event) => track(event, district.key)}
         onclick={(event) => {
           if (onPick != null) {
