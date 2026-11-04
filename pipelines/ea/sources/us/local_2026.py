@@ -11153,6 +11153,8 @@ def parse() -> None:
                     ),
                     *unowned.get(state, []),
                 ]:
+                    if kind == "township" and state in ("KS", "NE"):
+                        label = re.sub(r" township$", " Township", label)
                     stem = [
                         "mount" if word == "mt" else word
                         for word in re.findall(
@@ -12450,6 +12452,23 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     "public-auditor",
                     "justice",
                 )
+                if (
+                    polity not in cs.minted
+                    and polity not in made
+                    and owner.startswith("town:")
+                    and st in ("KS", "NE")
+                    and place.endswith(" Township")
+                ):
+                    made.add(polity)
+                    cs.add("name", entity_id=polity, text=place, lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=cs.area("us.town", owner.split(":")[1]),
+                        text=f"{place}, {st}",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
                 if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:", "town:")):
                     made.add(polity)
                     geoid = owner.split(":")[1]
