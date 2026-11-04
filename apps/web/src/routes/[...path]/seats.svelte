@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
-  import { untrack } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { on } from "svelte/events";
   import { arrange, isUnplaced } from "#lib/caucus.js";
   import Export from "#lib/components/export.svelte";
@@ -458,6 +458,46 @@
       ["~held", m.seats_held()] as const,
     ]),
   );
+  const runs = $derived(
+    Map.groupBy(
+      seats,
+      (seat) =>
+        `${seat.party} ${seat.local} ${Math.floor((40 * seat.index) / seats.length)}`,
+    )
+      .values()
+      .flatMap((members) => {
+        const first = members[0];
+        return first == null
+          ? []
+          : [
+              {
+                key: first.index,
+                party: first.party,
+                isLocal: first.local,
+                delay: 16 * Math.floor((40 * first.index) / seats.length),
+                seats: members,
+              },
+            ];
+      })
+      .toArray(),
+  );
+  const describe = (seat: (typeof seats)[number]) =>
+    [
+      seat.member?.name,
+      labels.get(seat.party) ?? m.seats_vacant(),
+      seat.member == null || places.length < 2
+        ? null
+        : places[seat.member.place]?.name,
+      seat.member?.position == null
+        ? null
+        : m.seats_position({ position: seat.member.position }),
+    ]
+      .filter((part) => part != null)
+      .join(", ");
+  let isMounted = $state(false);
+  onMount(() => {
+    isMounted = true;
+  });
   const whole = $derived(
     isUp ||
       (link == null &&
@@ -751,7 +791,7 @@
             }
           })}
         class={cn(
-          "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&>circle]:animate-seat [&>circle]:transition-[fill] [&>circle]:duration-150 motion-reduce:[&>circle]:animate-none motion-reduce:[&>circle]:transition-none",
+          "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&>[data-run]>circle]:animate-seat [&>[data-run]>circle]:transition-[fill] [&>[data-run]>circle]:duration-150 motion-reduce:[&>[data-run]>circle]:animate-none motion-reduce:[&>[data-run]>circle]:transition-none",
           { "cursor-pointer": tip?.path != null },
           { "pointer-events-none": isCompact },
         )}
@@ -822,63 +862,57 @@
             {/each}
           </g>
         {/if}
-        {#each seats as seat (seat.index)}
+        {#each runs as run (run.key)}
           {const lit = $derived(
             lead == null
               ? picked.length > 0
-                ? picked.includes(seat.party)
-                : link == null || seat.local
-              : lead === seat.party,
+                ? picked.includes(run.party)
+                : link == null || run.isLocal
+              : lead === run.party,
           )}
-          {const where = $derived(
-            seat.member == null || places.length < 2
-              ? null
-              : places[seat.member.place]?.name,
+          {const isEmpty = $derived(
+            run.party === "" || run.party === "~seceded",
           )}
-          <circle
-            id={active === seat.index ? `${uid}-seat-${seat.index}` : undefined}
-            class={{ "stroke-foreground": link != null && seat.local }}
-            style:animation-delay="{Math.round(
-              (seat.index / seats.length) * 640,
-            )}ms"
-            cx={seat.x}
-            cy={seat.y}
-            role="option"
-            aria-selected={active === seat.index || undefined}
-            aria-label={[
-              seat.member?.name,
-              labels.get(seat.party) ?? m.seats_vacant(),
-              where,
-              seat.member?.position == null
-                ? null
-                : m.seats_position({ position: seat.member.position }),
-            ]
-              .filter((part) => part != null)
-              .join(", ")}
-            r={seat.party === "" || seat.party === "~seceded"
-              ? dot - 0.3 * ring
-              : seat.index < bench.chair && isBenched
-                ? 1.3 * dot
-                : dot}
-            stroke-dasharray={seat.party === "~seceded"
+          <g
+            data-run=""
+            aria-hidden={isMounted ? undefined : "true"}
+            class={{ "stroke-foreground": link != null && run.isLocal }}
+            style:--delay="{run.delay}ms"
+            stroke-dasharray={run.party === "~seceded"
               ? `${0.9 * ring} ${0.7 * ring}`
               : undefined}
-            stroke-width={seat.party === "" || seat.party === "~seceded"
+            stroke-width={isEmpty
               ? 0.6 * ring
-              : link != null && seat.local
+              : link != null && run.isLocal
                 ? 0.45 * ring
                 : undefined}
-            style:stroke={seat.party === "" || seat.party === "~seceded"
-              ? "var(--muted-foreground)"
-              : null}
-            style:fill={seat.party === "" || seat.party === "~seceded"
+            style:stroke={isEmpty ? "var(--muted-foreground)" : null}
+            style:fill={isEmpty
               ? "var(--card)"
-              : seat.party === "~held"
+              : run.party === "~held"
                 ? "color-mix(in oklab, var(--muted-foreground) 22%, var(--card))"
                 : lit
-                  ? tones.get(seat.party)
-                  : `color-mix(in oklab, ${tones.get(seat.party)} 28%, var(--card))`}
-          />
+                  ? tones.get(run.party)
+                  : `color-mix(in oklab, ${tones.get(run.party)} 28%, var(--card))`}
+          >
+            {#each run.seats as seat (seat.index)}
+              <circle
+                id={active === seat.index
+                  ? `${uid}-seat-${seat.index}`
+                  : undefined}
+                cx={seat.x}
+                cy={seat.y}
+                r={isEmpty
+                  ? dot - 0.3 * ring
+                  : seat.index < bench.chair && isBenched
+                    ? 1.3 * dot
+                    : dot}
+                role="option"
+                aria-selected={active === seat.index || undefined}
+                aria-label={isMounted ? describe(seat) : undefined}
+              />
+            {/each}
+          </g>
         {/each}
         {#if striped.size > 0}
           <g class="pointer-events-none" aria-hidden="true">
