@@ -10272,6 +10272,7 @@ def parse() -> None:
     codes = {"D": "Democratic", "DEM": "Democratic", "R": "Republican", "REP": "Republican", "LIB": "Libertarian"}
     for key, county in (("MI-26099", "Macomb"), ("MI-26147", "St. Clair")):
         town = post = ""
+        macomb_partials: dict[str, str] = {}
         seats, unexpired = 0, False
         for whole in text(key, "-layout").splitlines():
             line = whole.strip()
@@ -10281,6 +10282,10 @@ def parse() -> None:
                 town = ""
                 post = "" if re.search(r"(?i)files w|county", found[4]) else f"{found[1]} Board Member"
                 seats, unexpired = counts.get(found[2].lower(), 0), "partial" in found[3].lower()
+                if post and unexpired:
+                    post = f"{post} Unexpired Term" + (
+                        "" if macomb_partials.setdefault(post, found[3]) == found[3] else f" {found[3].strip()}"
+                    )
             elif found := re.match(
                 r"(?i)(\S.*?)\s*\(((?:one|two|three|four|five|six|seven)\b[^)]*)\)", line
             ) or re.match(r"(\S.*?)\s{2,}((?:One|Two|Three|Four|Five|Six|Seven) .*term.*)$", line):
@@ -12127,8 +12132,8 @@ def parse() -> None:
                 if (
                     tail is not None
                     and tail.endswith(":unexpired")
-                    and used.get(tail, str(row["contest"])) != row["contest"]
-                    and (ending := re.search(r"(?i)\bterm ending \d+/\d+/(\d{4})$", str(row["contest"])))
+                    and used.setdefault(tail, str(row["contest"])) != row["contest"]
+                    and (ending := re.search(r"(?i)\bterms? ending \d+/\d+/(\d{4})$", str(row["contest"])))
                 ):
                     tail = f"{tail}-{ending[1]}"
                 if (
@@ -12707,7 +12712,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         else ""
                     )
                     + ("-special" if "special" in tail.split(":")[3:] else "")
-                    + ("-unexpired" if tail.endswith(":unexpired") else "")
+                    + (f"-unexpired{ending[1] or ''}" if (ending := re.search(r":unexpired(-\d{4})?$", tail)) else "")
                     + ("-remainder" if tail.startswith("KY:") and tail.endswith(":remainder") else ""),
                     f"2026 {place} general election",
                     f"{home}/{DAY}-general",
@@ -12771,8 +12776,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 known[tail] = []
             elif template != tail and template in templates:
                 base = list(templates[template])
-                if tail.endswith(":unexpired"):
-                    base[15] = f"{base[15]}-unexpired"
+                if ending := re.search(r":unexpired(-\d{4})?$", tail):
+                    base[15] = f"{base[15]}-unexpired{ending[1] or ''}"
                     known[tail] = known.get(template, [])
                 elif template == f"{tail}:remainder":
                     base[1], base[9] = None, "full"
