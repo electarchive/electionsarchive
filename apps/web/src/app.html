@@ -62,6 +62,31 @@
       );
     </script>
     <script>
+      (() => {
+        let held = null;
+        const hold = (event) => {
+          const target = event.target.closest?.(
+            'button, [role="button"], [role="tab"], [role="switch"], [role="menuitem"], [role="option"]',
+          );
+          if (
+            target != null &&
+            target.closest("a[href]") == null &&
+            !(target.type === "submit" && target.form != null)
+          )
+            held = target;
+        };
+        addEventListener("click", hold, true);
+        addEventListener(
+          "hydrated",
+          () => {
+            removeEventListener("click", hold, true);
+            if (held?.isConnected) held.click();
+          },
+          { once: true },
+        );
+      })();
+    </script>
+    <script>
       try {
         document.documentElement.dataset.mode =
           localStorage.getItem("mode-watcher-mode") ?? "system";

@@ -38,6 +38,10 @@
 
   $effect(localizeZone);
 
+  $effect(() => {
+    dispatchEvent(new Event("hydrated"));
+  });
+
   let Overlays = $state<Component | null>(null);
   let isInteractive = $state(false);
 
