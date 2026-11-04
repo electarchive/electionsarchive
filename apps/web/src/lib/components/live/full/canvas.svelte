@@ -229,21 +229,6 @@
     );
     engine.add(
       {
-        id: `${group}-flip`,
-        type: "fill",
-        source,
-        "source-layer": "areas",
-        filter: within,
-        paint: {
-          "fill-pattern": "flip",
-          "fill-opacity": ["coalesce", ["feature-state", "flip"], 0],
-        },
-      },
-      "fills",
-      { group, rank: 2 },
-    );
-    engine.add(
-      {
         id: `${group}-seam`,
         type: "line",
         source,
@@ -531,19 +516,6 @@
     );
     engine.add(
       {
-        id: "seat-flip",
-        type: "fill",
-        ...pieces,
-        paint: {
-          "fill-pattern": "flip",
-          "fill-opacity": ["coalesce", ["feature-state", "flip"], 0],
-        },
-      },
-      "fills",
-      { group: "seat", rank: 4 },
-    );
-    engine.add(
-      {
         id: "seat-veil",
         type: "fill",
         source: "seat-veil",
@@ -686,8 +658,11 @@
             if (fill.isLater === true) {
               state.later = true;
             }
-            if (fill.flip != null) {
-              state.flip = fill.flip === "flipped" ? 1 : 0.5;
+            if (fill.stripe != null) {
+              state.stripe = engine.stripe(
+                seat == null ? `${group}-fill` : "seat-fill",
+                fill.stripe,
+              );
             }
             return [[place.k, state]];
           },

@@ -73,16 +73,22 @@ def emit() -> Path:
                 shx=io.BytesIO(archive.read(f"{layer}.shx")),
                 dbf=io.BytesIO(archive.read(f"{layer}.dbf")),
             )
-            for record, shape in zip(reader.records(), reader.shapes(), strict=True):
+            for item in reader.iterShapeRecords():
+                record, shape = item.record, item.shape
+                if record is None or shape is None:
+                    raise ValueError(f"{layer}: a shape record lacks its shape or attributes")
                 code = pattern.format(record["DISTRICTN"])
                 if code not in areas:
                     continue
-                geom, point = conn.execute(
+                row = conn.execute(
                     """with g as (select st_makevalid(st_setsrid(st_geomfromgeojson(%s), 4326)) as geom)
                        select encode(st_asewkb(st_multi(st_collectionextract(geom, 3))), 'hex'),
                               encode(st_asewkb(st_pointonsurface(geom)), 'hex') from g""",
                     [json.dumps(shape.__geo_interface__)],
                 ).fetchone()
+                if row is None:
+                    raise ValueError(f"{code}: PostGIS returned no geometry")
+                geom, point = row
                 cs.add(
                     "area_geometry",
                     area_id=areas[code],

@@ -69,22 +69,20 @@ export function swing(shifts: Iterable<Shift | null>): Swing {
   };
 }
 
-export function stripes(color: string) {
-  return `repeating-linear-gradient(135deg, ${color} 0 1.5px, transparent 1.5px 4px)`;
-}
+export const STRIPE = { width: 1.5, period: 4 };
 
 export function hatch(color: string, flip: "flipped" | "leading") {
-  return flip === "flipped"
-    ? {
-        fill: `color-mix(in oklab, ${color} 84%, black)`,
-        stripes: stripes(
-          `color-mix(in oklab, ${color} 45%, var(--foreground))`,
-        ),
-      }
-    : {
-        fill: marginShade(color, safety(0.34)),
-        stripes: stripes(marginShade(color, safety(0.68))),
-      };
+  const isFlipped = flip === "flipped";
+  const stripe = isFlipped
+    ? `color-mix(in oklab, ${color} 45%, var(--foreground))`
+    : marginShade(color, safety(0.68));
+  return {
+    fill: isFlipped
+      ? `color-mix(in oklab, ${color} 84%, black)`
+      : marginShade(color, safety(0.34)),
+    stripe,
+    stripes: `repeating-linear-gradient(135deg, ${stripe} 0 ${STRIPE.width}px, transparent ${STRIPE.width}px ${STRIPE.period}px)`,
+  };
 }
 
 export function ink(fill: string) {

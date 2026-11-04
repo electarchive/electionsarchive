@@ -12417,7 +12417,9 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
     only_unexpired = set(frame.group_by("tail").agg(pl.col("unexpired").all()).filter("unexpired")["tail"])
     doubled = {f"{tail}:unexpired" for tail in only_unexpired} & set(frame["tail"])
     frame = frame.with_columns(
-        tail=pl.when(pl.col("tail").is_in(doubled)).then(pl.col("tail").str.replace(r":unexpired$", "")).otherwise("tail")
+        tail=pl.when(pl.col("tail").is_in(doubled))
+        .then(pl.col("tail").str.replace(r":unexpired$", ""))
+        .otherwise("tail")
     ).filter(
         ~pl.col("tail").is_in({tail.removesuffix(":unexpired") for tail in doubled})
         | pl.struct("tail", "person").is_first_distinct()

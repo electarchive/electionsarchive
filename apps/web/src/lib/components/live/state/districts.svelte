@@ -2,11 +2,12 @@
   import { goto } from "$app/navigation";
   import type { Entry } from "#lib/live/ballot.js";
   import type { Geography } from "#lib/live/standing.js";
+  import FlipKey from "#lib/components/live/flip-key.svelte";
   import LaterKey from "#lib/components/live/later-key.svelte";
   import Nation from "#lib/components/live/nation.svelte";
   import Card from "#lib/components/live/state/card.svelte";
   import Sheet from "#lib/components/live/state/sheet.svelte";
-  import { turn } from "#lib/live/ballot.js";
+  import { entryHatch, turn } from "#lib/live/ballot.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const {
@@ -34,11 +35,20 @@
   const codes = $derived(
     Object.fromEntries([...byArea.keys()].map((area) => [area, area])),
   );
+  const firsts = $derived(
+    [...byArea].flatMap(([area, list]) => {
+      const first = list.find((entry) => !entry.contest.isSpecial) ?? list[0];
+      return first == null ? [] : [[area, first] as const];
+    }),
+  );
   const colors = $derived(
+    Object.fromEntries(firsts.map(([area, first]) => [area, shade(first)])),
+  );
+  const flips = $derived(
     Object.fromEntries(
-      [...byArea].flatMap(([area, list]) => {
-        const first = list.find((entry) => !entry.contest.isSpecial) ?? list[0];
-        return first == null ? [] : [[area, shade(first)] as const];
+      firsts.flatMap(([area, first]) => {
+        const stripe = entryHatch(first)?.stripe;
+        return stripe == null ? [] : [[area, stripe] as const];
       }),
     ),
   );
@@ -86,6 +96,7 @@
   {geography}
   {codes}
   {colors}
+  {flips}
   {later}
   label={m.night_state_districts_label({ chamber: name })}
   bind:hovered
@@ -103,6 +114,9 @@
   }}
   {tip}
 />
+{#if Object.keys(flips).length > 0}
+  <FlipKey />
+{/if}
 {#if later.length > 0}
   <LaterKey />
 {/if}

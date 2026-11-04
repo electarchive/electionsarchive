@@ -5085,6 +5085,7 @@
   "night_flip_status_flipped": "Gekippt",
   "night_flip_status_leading": "Herausforderer führt",
   "night_flip_status_held": "Gehalten",
+  "night_flip_unit_about": "Streifen markieren Orte, an denen eine andere Partei vorn liegt als bei der vorigen Wahl.",
   "night_flips_party_about": "{party}: {flipped} gekippt, {leading} in Führung",
   "night_flips_party_leading": "+{count} in Führung",
   "night_flips_count": "Gekippt: {flipped} · Herausforderer führt: {leading}",

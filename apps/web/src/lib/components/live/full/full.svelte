@@ -30,6 +30,7 @@
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import SeatKey from "#lib/components/live/dashboard/seat-key.svelte";
   import Dial from "#lib/components/live/dial.svelte";
+  import FlipKey from "#lib/components/live/flip-key.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
   import Search from "#lib/components/live/search.svelte";
   import Also from "#lib/components/live/state/also.svelte";
@@ -41,7 +42,12 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
-  import { entries as entriesOf, seating, turn } from "#lib/live/ballot.js";
+  import {
+    entries as entriesOf,
+    entryHatch,
+    seating,
+    turn,
+  } from "#lib/live/ballot.js";
   import { swing } from "#lib/live/flips.js";
   import {
     lead,
@@ -87,14 +93,15 @@
     OFFICES,
     PAINTS,
     prior,
+    seatHatch,
     seatName,
     shade,
     stateShade,
     swingOf,
     tail,
     TERRITORIES,
-    turnOf,
     unitFill,
+    unitHatch,
     urgency,
     WAITING,
   } from "./model.js";
@@ -527,6 +534,7 @@
       counted: number | null;
       expected: number;
       color: string;
+      stripe: string | null;
     }> = [];
     for (const unit of race.units) {
       const row = raceStanding.units.get(unit.id);
@@ -544,6 +552,7 @@
             : null,
         expected: rest.expected,
         color: unitFill(row, lens, race.options, racePair, rest.expected),
+        stripe: unitStripe(row, race.options),
       });
     }
     return out;
@@ -564,6 +573,7 @@
     return {
       areaId: unit.areaId,
       color: unitFill(row, lens, race.options, racePair, rest.expected),
+      stripe: unitStripe(row, race.options),
     };
   });
 
@@ -579,6 +589,7 @@
         pair: [number, number];
         counted: number | null;
         color: string;
+        stripe: string | null;
       }
     >();
     for (const entry of spreadData?.races ?? []) {
@@ -602,6 +613,7 @@
               ? Math.min(1, row.total / Math.max(1, rest.expected))
               : null,
           color: unitFill(row, lens, entry.options, two, rest.expected),
+          stripe: unitStripe(row, entry.options),
         });
       }
     }
@@ -793,14 +805,26 @@
     );
   }
 
+  function unitStripe(row: UnitStanding, options: Array<LiveOption>) {
+    return lens === "lead" ? (unitHatch(row, options)?.stripe ?? null) : null;
+  }
+
+  function seatMark(summary: Summary, wanted: Paint) {
+    return seatHatch(
+      summary,
+      found.seats.get(summary.race.id),
+      wanted,
+      found.pair,
+      control,
+    );
+  }
+
   function seatFill(summary: Summary, wanted: Paint): Fill {
-    const color = seatShade(summary, wanted);
-    const isLater = summary.later != null;
-    const turn =
-      wanted === "counted" ? null : turnOf(found.seats.get(summary.race.id));
-    return turn == null
-      ? { color, isLater }
-      : { color, isLater, flip: turn.flip };
+    return {
+      color: seatShade(summary, wanted),
+      isLater: summary.later != null,
+      stripe: seatMark(summary, wanted)?.stripe ?? null,
+    };
   }
 
   function seatLabel(entry: Entry) {
@@ -809,8 +833,16 @@
     return cut === -1 ? title : title.slice(cut + 2);
   }
 
+  function chamberMark(entry: Entry, wanted: Paint) {
+    return wanted === "counted" ? null : entryHatch(entry);
+  }
+
   function chamberShade(entry: Entry, wanted: Paint) {
     const { summary } = entry;
+    const mark = chamberMark(entry, wanted);
+    if (mark != null) {
+      return mark.fill;
+    }
     return wanted === "lead" &&
       entry.held != null &&
       summary.later == null &&
@@ -826,13 +858,20 @@
       : {
           color: chamberShade(first, wanted),
           isLater: first.summary.later != null,
+          stripe: chamberMark(first, wanted)?.stripe ?? null,
         };
   }
 
-  const shared = $derived.by(() => {
-    const district =
-      seatArea == null || raceStanding == null ? null : whole(raceStanding);
-    return district == null || race == null
+  const district = $derived(
+    seatArea == null || raceStanding == null ? null : whole(raceStanding),
+  );
+  const sharedStripe = $derived(
+    district == null || race == null
+      ? null
+      : unitStripe(district, race.options),
+  );
+  const shared = $derived(
+    district == null || race == null
       ? null
       : lens === "votes"
         ? BLANK
@@ -842,14 +881,17 @@
             race.options,
             racePair,
             sum(rows.map((entry) => entry.expected)),
-          );
-  });
+          ),
+  );
 
   const painted = $derived.by(() => {
     const out = new Map<string, Fill>();
     if (isSpreadShown) {
       for (const [areaId, entry] of spreadRows) {
-        out.set(areaId, { color: lens === "votes" ? BLANK : entry.color });
+        out.set(areaId, {
+          color: lens === "votes" ? BLANK : entry.color,
+          stripe: entry.stripe,
+        });
       }
       return out;
     }
@@ -899,6 +941,7 @@
           : {
               color: lens === "votes" ? BLANK : (shared ?? entry.color),
               isLater,
+              stripe: shared == null ? entry.stripe : sharedStripe,
             },
       );
     }
@@ -1885,6 +1928,7 @@
           ? null
           : (race?.slug ?? null)}
       label={m.livemap_races()}
+      hatchOf={(summary: Summary) => seatMark(summary, "lead")}
       isCompact
       overviews={[
         ...(hasOverview
@@ -2060,6 +2104,12 @@
     {/if}
     {#if changing != null && found.pair != null}
       <SeatKey sides={found.pair} {changing} />
+    {:else if [...painted.values()].some((fill) => fill.stripe != null)}
+      <FlipKey
+        about={rows.length > 0 || isSpreadShown
+          ? m.night_flip_unit_about()
+          : null}
+      />
     {/if}
   </div>
 {/snippet}
@@ -2216,6 +2266,7 @@
                 <span
                   class="rounded-xs ring-1 ring-border/60 block-3.5 inline-3.5"
                   style:background-color={chamberShade(entry, "lead")}
+                  style:background-image={entryHatch(entry)?.stripes}
                 ></span>
                 <span class="grid min-inline-0">
                   <span
@@ -2268,6 +2319,7 @@
               <span
                 class="rounded-xs ring-1 ring-border/60 block-3.5 inline-3.5"
                 style:background-color={seatShade(summary, "lead")}
+                style:background-image={seatMark(summary, "lead")?.stripes}
               ></span>
               <span class="grid min-inline-0">
                 <span

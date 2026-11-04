@@ -9,11 +9,12 @@
   import {
     district,
     entries as entriesOf,
+    entryHatch,
     holder,
     seating,
     turn,
   } from "#lib/live/ballot.js";
-  import { swing } from "#lib/live/flips.js";
+  import { ink, swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
     DOTS,
@@ -233,6 +234,10 @@
     if (summary.later != null) {
       return LATER;
     }
+    const mark = entryHatch(entry);
+    if (mark != null) {
+      return mark.fill;
+    }
     const called = summary.winner ?? summary.projected;
     const pick = called ?? summary.leader;
     if (pick == null || summary.total === 0) {
@@ -254,13 +259,6 @@
 
   let sheet = $state<Entry | null>(null);
   let isSheet = $state(false);
-
-  function isStrong(entry: Entry) {
-    return (
-      entry.summary.winner != null ||
-      (entry.summary.total > 0 && entry.summary.margin > 0.15)
-    );
-  }
 </script>
 
 <article class="grid gap-px bg-border" data-sveltekit-preload-data="tap">
@@ -389,7 +387,7 @@
               class="rounded-[1px] block-4 inline-4"
               style:background-color={shade(entry)}
               style:background-image={entry.summary.later == null
-                ? undefined
+                ? entryHatch(entry)?.stripes
                 : DOTS}
             ></span>
           {/each}
@@ -531,14 +529,14 @@
           <ol class="flex flex-wrap gap-1" aria-label={m.night_state_house()}>
             {#each house as entry (entry.contest.id)}
               <li>
+                {const fill = $derived(shade(entry))}
                 <Peek
                   href={href(entry)}
                   title={seatLabel(entry)}
-                  class={cn(
-                    "grid place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums block-9 inline-9 hover:outline-2 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground data-[state=open]:outline-2 data-[state=open]:outline-foreground",
-                    { "text-background": isStrong(entry) },
-                  )}
-                  style="background-color: {shade(entry)}"
+                  class="grid place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums block-9 inline-9 hover:outline-2 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground data-[state=open]:outline-2 data-[state=open]:outline-foreground"
+                  style="background-color: {fill}; background-image: {entryHatch(
+                    entry,
+                  )?.stripes ?? 'none'}; color: {ink(fill)}"
                   onTouch={() => {
                     sheet = entry;
                     isSheet = true;

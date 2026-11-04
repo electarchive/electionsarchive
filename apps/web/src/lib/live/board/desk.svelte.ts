@@ -3,7 +3,7 @@ import type { Feed } from "#lib/live/board/feed.svelte.js";
 import type { Shift } from "#lib/live/flips.js";
 import type { Control } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
-import { shift } from "#lib/live/flips.js";
+import { hatch, shift } from "#lib/live/flips.js";
 import { family } from "#lib/live/nation.js";
 import { swatch } from "#lib/party.js";
 
@@ -85,6 +85,13 @@ export class Desk {
       isCalled: called != null,
       isCounting: summary.total > 0,
     });
+  }
+
+  hatch(summary: Summary) {
+    const found = this.shifts.get(summary.race.id);
+    return found == null || found.flip === "held" || summary.later != null
+      ? null
+      : hatch(this.party(found.to).color, found.flip);
   }
 
   party(id: string) {

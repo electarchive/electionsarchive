@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import Hatches from "./hatches.svelte";
 
   let {
     cartogram,
@@ -20,7 +21,7 @@
     };
     colors: Record<string, string>;
     later?: Array<string>;
-    flips?: Record<string, "flipped" | "leading">;
+    flips?: Record<string, string>;
     label: string;
     hovered?: string | null;
     href: (key: string) => string | null;
@@ -31,6 +32,9 @@
   const id = $props.id();
 
   let pointer = $state<{ x: number; y: number } | null>(null);
+  let rect = $state<DOMRectReadOnly>();
+
+  const stripes = $derived([...new Set(Object.values(flips))]);
 
   const view = $derived(
     `${cartogram.box[0] - 1} ${cartogram.box[1] - 1} ${cartogram.box[2] - cartogram.box[0] + 2} ${cartogram.box[3] - cartogram.box[1] + 2}`,
@@ -58,6 +62,7 @@
     class="block inline-full"
     role="img"
     aria-label={label}
+    bind:contentRect={rect}
     onpointerleave={() => {
       hovered = null;
       pointer = null;
@@ -72,15 +77,15 @@
       >
         <circle cx="0.55" cy="0.55" r="0.16" class="fill-foreground/35" />
       </pattern>
-      <pattern
+      <Hatches
         id="{id}-flip"
-        width="1"
-        height="1"
-        patternUnits="userSpaceOnUse"
-        patternTransform="rotate(45)"
-      >
-        <line y2="1" class="stroke-foreground/45" stroke-width="0.4" />
-      </pattern>
+        {stripes}
+        box={[
+          cartogram.box[2] - cartogram.box[0] + 2,
+          cartogram.box[3] - cartogram.box[1] + 2,
+        ]}
+        {rect}
+      />
     </defs>
     {#each cartogram.districts as district (district.key)}
       {const link = $derived(href(district.key))}
@@ -116,8 +121,7 @@
           <path
             d={district.d}
             class="pointer-events-none"
-            fill="url(#{id}-flip)"
-            opacity={flips[district.key] === "flipped" ? 1 : 0.5}
+            fill="url(#{id}-flip-{stripes.indexOf(flips[district.key] ?? '')})"
           />
         {/if}
       </a>

@@ -29,8 +29,15 @@
     swingSafety,
   } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
+  import FlipKey from "./flip-key.svelte";
   import Legend from "./full/legend.svelte";
-  import { BLANK, GROUND, isRightward, swingOf } from "./full/model.js";
+  import {
+    BLANK,
+    GROUND,
+    isRightward,
+    swingOf,
+    unitHatch,
+  } from "./full/model.js";
   import Scale from "./full/scale.svelte";
   import LaterKey from "./later-key.svelte";
   import MethodLink from "./method-link.svelte";
@@ -212,7 +219,10 @@
         if (row.leader == null) {
           return muted;
         }
-        return marginShade(tone(options[row.leader]), marginSafety(row.margin));
+        return (
+          unitHatch(row, options)?.fill ??
+          marginShade(tone(options[row.leader]), marginSafety(row.margin))
+        );
       }
       case "shift": {
         if (row.signed == null || row.baseSigned == null) {
@@ -237,6 +247,18 @@
       }
     }
   }
+
+  function stripeOf(row: UnitStanding | null) {
+    return mode === "lead" && row != null
+      ? (unitHatch(row, options)?.stripe ?? null)
+      : null;
+  }
+
+  const hasFlips = $derived(
+    (geography?.pieces == null ? [...byArea.values()] : [whole(now)]).some(
+      (row) => stripeOf(row) != null,
+    ),
+  );
 
   const circles = $derived.by(() => {
     if (mode !== "bubbles" && mode !== "remaining") {
@@ -432,13 +454,25 @@
       source,
       new Map(
         places.flatMap(
-          (place): Array<[number, Record<string, string | boolean>]> => {
+          (
+            place,
+          ): Array<[number, Record<string, string | number | boolean>]> => {
             const row = byArea.get(place.areaId);
             const color = row == null ? null : (shared ?? fill(row));
             if (isLater) {
               return [[place.k, { later: true }]];
             }
-            return color == null ? [] : [[place.k, { color }]];
+            const stripe = stripeOf(district ?? row ?? null);
+            return color == null
+              ? []
+              : [
+                  [
+                    place.k,
+                    stripe == null
+                      ? { color }
+                      : { color, stripe: engine.stripe("live-fill", stripe) },
+                  ],
+                ];
           },
         ),
       ),
@@ -746,6 +780,9 @@
           ]}
           bins={bands(mode === "shift" ? SWING : MARGIN)}
         />
+      {/if}
+      {#if hasFlips}
+        <FlipKey about={m.night_flip_unit_about()} />
       {/if}
     </div>
   {/if}

@@ -189,7 +189,7 @@
     seats={view.order}
     {name}
     {href}
-    {shade}
+    {look}
     {line}
     summary={legend}
   />

@@ -60,6 +60,7 @@ export type UnitStanding = {
   at: string | null;
   baseline: LiveBaseline | null;
   baseSigned: number | null;
+  flip: "flipped" | "leading" | null;
 };
 
 export type Standing = {
@@ -151,12 +152,34 @@ function tally(
     expected: number | null;
     at: string | null;
   } | null,
+  isFinal: boolean,
 ): UnitStanding {
   const total = sum(votes);
   const order = ranked(votes);
   const first = order[0];
   const lead =
     total > 0 ? (votes[first ?? 0] ?? 0) - (votes[order[1] ?? 1] ?? 0) : 0;
+  const signed =
+    total > 0
+      ? signedOf(
+          votes.map((value) => value / total),
+          two,
+        )
+      : null;
+  const baseSigned = base == null ? null : signedOf(base.shares, two);
+  const isTurned =
+    base != null &&
+    signed != null &&
+    baseSigned != null &&
+    signed * baseSigned < 0 &&
+    first != null &&
+    two.includes(first) &&
+    two.every((index) => (base.shares[index] ?? 0) > 0);
+  const isCounted =
+    isFinal ||
+    (row?.reporting != null && row.expected != null && row.expected > 0
+      ? row.reporting >= row.expected
+      : total >= 0.95 * (base?.expected ?? base?.turnout ?? Infinity));
   return {
     unit,
     votes,
@@ -165,18 +188,13 @@ function tally(
     leader: total > 0 && first != null ? first : null,
     lead,
     margin: total > 0 ? lead / total : 0,
-    signed:
-      total > 0
-        ? signedOf(
-            votes.map((value) => value / total),
-            two,
-          )
-        : null,
+    signed,
     reporting: row?.reporting ?? null,
     expected: row?.expected ?? null,
     at: row?.at ?? null,
     baseline: base,
-    baseSigned: base == null ? null : signedOf(base.shares, two),
+    baseSigned,
+    flip: !isTurned ? null : isCounted ? "flipped" : "leading",
   };
 }
 
@@ -206,7 +224,7 @@ export function whole(now: Standing): UnitStanding | null {
           ),
         }
       : null;
-  return tally(unit, now.totals, base, now.pair, now);
+  return tally(unit, now.totals, base, now.pair, now, now.isFinal);
 }
 
 export function standing(race: LiveRace, view: View): Standing {
@@ -230,6 +248,7 @@ export function standing(race: LiveRace, view: View): Standing {
         bases.get(unit.id) ?? null,
         two,
         row,
+        isFinal,
       ),
     );
   }

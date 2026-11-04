@@ -10,7 +10,6 @@
     short,
     strength,
   } from "#lib/live/board/labels.js";
-  import { hatch } from "#lib/live/flips.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import Mark from "./mark.svelte";
@@ -28,31 +27,21 @@
       ),
     ),
   );
-  const turns = $derived(
-    new Map(
-      [...districts].flatMap(([key, summary]) => {
-        const found = desk.shifts.get(summary.race.id);
-        return found == null || found.flip === "held"
-          ? []
-          : [[key, { flip: found.flip, to: found.to }] as const];
-      }),
-    ),
-  );
   const colors = $derived(
     Object.fromEntries(
-      [...districts].map(([key, summary]) => {
-        const turn = turns.get(key);
-        return [
-          key,
-          turn == null
-            ? strength(summary)
-            : hatch(desk.party(turn.to).color, turn.flip).fill,
-        ];
-      }),
+      [...districts].map(([key, summary]) => [
+        key,
+        desk.hatch(summary)?.fill ?? strength(summary),
+      ]),
     ),
   );
   const flips = $derived(
-    Object.fromEntries([...turns].map(([key, turn]) => [key, turn.flip])),
+    Object.fromEntries(
+      [...districts].flatMap(([key, summary]) => {
+        const stripe = desk.hatch(summary)?.stripe;
+        return stripe == null ? [] : [[key, stripe] as const];
+      }),
+    ),
   );
 </script>
 

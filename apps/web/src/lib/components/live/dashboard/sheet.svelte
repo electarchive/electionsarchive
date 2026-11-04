@@ -11,7 +11,7 @@
     seats,
     name,
     href,
-    shade,
+    look,
     line,
     summary,
   }: {
@@ -21,7 +21,7 @@
     seats: Array<Seat>;
     name: (seat: Seat) => string;
     href: (seat: Seat) => string;
-    shade: (seat: Seat) => string;
+    look: (seat: Seat) => { fill: string; stripes?: string };
     line: Snippet<[Summary | undefined]>;
     summary: Snippet;
   } = $props();
@@ -45,7 +45,8 @@
               >
                 <span
                   class="rounded-xs block-3"
-                  style:background-color={shade(seat)}
+                  style:background-color={look(seat).fill}
+                  style:background-image={look(seat).stripes}
                 ></span>
                 <span class="truncate font-semibold">{name(seat)}</span>
                 <span class="justify-self-end text-[0.8125rem]"

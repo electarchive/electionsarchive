@@ -5,6 +5,7 @@ import earcut from "earcut";
 import { untrack } from "svelte";
 import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
+import { STRIPE } from "#lib/live/flips.js";
 import { Mosaic, sampled } from "#lib/map/mosaic.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
@@ -156,6 +157,38 @@ async function load() {
   return library;
 }
 
+const HATCH_LINES = 8;
+
+function hatchLines(zoom: number) {
+  return Math.round(HATCH_LINES * 2 ** (zoom - Math.floor(zoom)));
+}
+
+function hatched(color: string, lines: number, size: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const pen = canvas.getContext("2d", { willReadFrequently: true });
+  const step = size / lines;
+  if (pen != null) {
+    pen.strokeStyle = color;
+    pen.lineWidth = (step / Math.SQRT2) * (STRIPE.width / STRIPE.period);
+    pen.beginPath();
+    for (const line of Array.from({ length: lines * 2 + 1 }).keys()) {
+      pen.moveTo(line * step + 2, -2);
+      pen.lineTo(-2, line * step + 2);
+    }
+    pen.stroke();
+  }
+  return {
+    width: size,
+    height: size,
+    data: new Uint8Array(
+      pen?.getImageData(0, 0, size, size).data.buffer ??
+        new ArrayBuffer(size * size * 4),
+    ),
+  };
+}
+
 function pattern(shape: string, color: string) {
   const canvas = document.createElement("canvas");
   canvas.width = 8;
@@ -164,19 +197,9 @@ function pattern(shape: string, color: string) {
   if (pen != null) {
     pen.strokeStyle = color;
     pen.fillStyle = color;
-    pen.lineWidth = shape === "absent" ? 2.5 : shape === "flip" ? 1.75 : 1;
+    pen.lineWidth = shape === "absent" ? 2.5 : 1;
     pen.beginPath();
-    if (shape === "flip") {
-      for (const [x, y, length] of [
-        [-2, 10, 12],
-        [-2, 2, 4],
-        [6, 10, 4],
-      ] as const) {
-        pen.moveTo(x, y);
-        pen.lineTo(x + length, y - length);
-      }
-      pen.stroke();
-    } else if (shape === "hatch" || shape === "cross") {
+    if (shape === "hatch" || shape === "cross") {
       pen.moveTo(0, 8);
       pen.lineTo(8, 0);
       pen.stroke();
@@ -365,6 +388,9 @@ export class Engine {
   #tinted = new Map<number, string>();
   #bands = new Map<string, Array<[string, number]>>();
   #seats = new Map<string, Array<string>>();
+  #stripes = new Map<string, number>();
+  #stripeLines = HATCH_LINES;
+  #stripeTile = 128;
   #slots = new Map<string, Slot>();
   #rasterKeys: Array<string> = [];
   #mosaic: Mosaic | null = null;
@@ -476,6 +502,8 @@ export class Engine {
         });
         this.#options.onMoveEnd?.();
       });
+      this.#stripeTile = 128 * Math.ceil(gl.getPixelRatio());
+      gl.on("zoomend", () => this.#fitStripes(gl));
       gl.on("resize", () => this.#hold(gl));
       const overlay = document.createElement("canvas");
       overlay.setAttribute("aria-hidden", "true");
@@ -588,27 +616,14 @@ export class Engine {
         gl.addImage(shape, pattern(shape, ink));
       }
     }
-    for (const [name, image] of [
-      [
-        "runoff",
-        pattern(
-          "hatch",
-          this.read("color-mix(in oklab, var(--card) 85%, transparent)"),
-        ),
-      ],
-      [
-        "flip",
-        pattern(
-          "flip",
-          this.read("color-mix(in oklab, var(--foreground) 45%, transparent)"),
-        ),
-      ],
-    ] as const) {
-      if (gl.hasImage(name)) {
-        gl.updateImage(name, image);
-      } else {
-        gl.addImage(name, image);
-      }
+    const runoff = pattern(
+      "hatch",
+      this.read("color-mix(in oklab, var(--card) 85%, transparent)"),
+    );
+    if (gl.hasImage("runoff")) {
+      gl.updateImage("runoff", runoff);
+    } else {
+      gl.addImage("runoff", runoff);
     }
   }
 
@@ -640,6 +655,7 @@ export class Engine {
     for (const [name, colors] of this.#seats) {
       gl.updateImage(name, this.#seated(colors));
     }
+    this.#redrawStripes(gl);
     for (const [source, states] of this.#painted) {
       this.paint(source, states, true);
     }
@@ -1382,6 +1398,67 @@ export class Engine {
     return name;
   }
 
+  #redrawStripes(gl: Maplibre.Map) {
+    this.#stripeLines = hatchLines(gl.getZoom());
+    for (const [css, index] of this.#stripes) {
+      const name = `stripes:${index}`;
+      if (gl.hasImage(name)) {
+        gl.updateImage(
+          name,
+          hatched(this.read(css), this.#stripeLines, this.#stripeTile),
+        );
+      }
+    }
+  }
+
+  #fitStripes(gl: Maplibre.Map) {
+    if (hatchLines(gl.getZoom()) !== this.#stripeLines) {
+      this.#redrawStripes(gl);
+    }
+  }
+
+  stripe(base: string, css: string) {
+    const index = this.#stripes.get(css) ?? this.#stripes.size;
+    this.#stripes.set(css, index);
+    const name = `stripes:${index}`;
+    const gl = this.gl;
+    if (gl != null) {
+      this.#fitStripes(gl);
+      if (!gl.hasImage(name)) {
+        gl.addImage(
+          name,
+          hatched(this.read(css), this.#stripeLines, this.#stripeTile),
+          {
+            pixelRatio:
+              this.#stripeTile / (HATCH_LINES * STRIPE.period * Math.SQRT2),
+          },
+        );
+      }
+    }
+    const layer = this.#layers.get(base);
+    const slot = this.#slots.get(base);
+    if (layer?.spec.type === "fill" && slot != null) {
+      this.add(
+        {
+          ...layer.spec,
+          id: `${base}:${name}`,
+          paint: {
+            "fill-pattern": name,
+            "fill-opacity": [
+              "case",
+              ["==", ["feature-state", "stripe"], index],
+              1,
+              0,
+            ],
+          },
+        },
+        slot,
+        { group: layer.group, rank: layer.rank },
+      );
+    }
+    return index;
+  }
+
   paint(source: string, states: Map<number, State>, isMerged = false) {
     const gl = this.gl;
     const entry = this.#sources.get(source);
@@ -1458,13 +1535,14 @@ export class Engine {
     }
     this.#marks.delete(key);
     const next = source == null ? null : this.#sources.get(source);
-    if (source != null && next != null && k != null) {
-      gl.setFeatureState(
-        { source, ...(next.isVector && { sourceLayer: "areas" }), id: k },
-        { [key]: true },
-      );
-      this.#marks.set(key, { source, k });
+    if (source == null || next == null || k == null) {
+      return;
     }
+    gl.setFeatureState(
+      { source, ...(next.isVector && { sourceLayer: "areas" }), id: k },
+      { [key]: true },
+    );
+    this.#marks.set(key, { source, k });
   }
 
   drape(keys: Array<string>, group = "") {
