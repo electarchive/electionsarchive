@@ -134,6 +134,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.vi_live"
             else nyc_enr_live.plan(conn, feed, paths)
         )
+        if adapter == "us.enr_2026" and params["state"] in enr_2026.COUNTY_FEEDS:
+            tallies = [tally for tally in tallies if enr_2026.countywide(tally[1])]
         conn.execute(
             """update live.issue set resolved = true
                where feed_id = %s and kind = 'unmatched' and not resolved and detail <> all(%s)""",

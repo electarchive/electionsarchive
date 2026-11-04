@@ -20,6 +20,8 @@ def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str],
         return
     store(f"{BASE}states/{state}.json", response.content, ".json")
     for race in races:
+        if race["office"] == "H":
+            continue
         detail = client.get(f"{BASE}counties/{state}-{race['id']}.json")
         if detail.status_code < 400:
             store(f"{BASE}counties/{state}-{race['id']}.json", detail.content, ".json")

@@ -76,6 +76,7 @@ LISTINGS = (
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
 LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
+COUNTY_FEEDS = {"KY", "MI", "MO", "NJ", "NY", "TN", "WI"}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -1316,6 +1317,11 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
             "total": pl.Int64,
         },
     )
+
+
+def countywide(key: str) -> bool:
+    rest = key.split(":")[2:]
+    return rest[0].isdigit() or rest[-1] == "g" or any("judicial" in part for part in rest)
 
 
 def plan(

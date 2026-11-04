@@ -596,6 +596,69 @@ publisher = "Associated Press via NPR"
 url = "https://apps.npr.org/2026-election-results/maine.html"
 
 [[feed]]
+id = "us.npr.ky"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for Kentucky's statewide and federal races, since the official live feed covers only Hardin County; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "KY" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/kentucky.html"
+
+[[feed]]
+id = "us.npr.mi"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for Michigan's statewide and federal races, since the official live feed covers only its county feeds; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "MI" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/michigan.html"
+
+[[feed]]
+id = "us.npr.mo"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for Missouri's statewide and federal races, since the official live feed covers only Jackson and St. Louis Counties; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "MO" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/missouri.html"
+
+[[feed]]
+id = "us.npr.nj"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for New Jersey's statewide and federal races, since the official live feed covers only its county feeds; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "NJ" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/new-jersey.html"
+
+[[feed]]
+id = "us.npr.ny"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for New York's statewide and federal races, since the official live feed covers only its county feeds; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "NY" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/new-york.html"
+
+[[feed]]
+id = "us.npr.tn"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for Tennessee's statewide and federal races, since the official live feed covers only Shelby County; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "TN" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/tennessee.html"
+
+[[feed]]
+id = "us.npr.wi"
+adapter = "us.npr"
+interval = 60
+note = "Unofficial Associated Press tabulation republished by NPR for Wisconsin's statewide and federal races, since the official live feed covers only Dane County; U.S. Senate and governor by county, U.S. House by district"
+params = { state = "WI" }
+publisher = "Associated Press via NPR"
+url = "https://apps.npr.org/2026-election-results/wisconsin.html"
+
+[[feed]]
 id = "us.civicapi.mi"
 adapter = "us.civicapi"
 interval = 60
