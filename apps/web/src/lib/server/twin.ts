@@ -6060,7 +6060,12 @@ function resultsMarkdown(
   }
   if (contest.current == null && contest.slate != null) {
     return [
-      slateLine(contest.election.date, contest.slate.closes, Date.now()),
+      slateLine(
+        contest.election.date,
+        contest.slate.closes,
+        Date.now(),
+        contest.slate.options.length === 1 && !contest.slate.isUnqualified,
+      ),
       "",
       ...(contest.slate.isUnqualified ? [m.slate_unqualified()] : []),
       ...contest.slate.options.map((option) => {
