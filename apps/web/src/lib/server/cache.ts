@@ -12,7 +12,7 @@ import pg from "pg";
 import { codeVersion, procedureVersions } from "virtual:code-version";
 import { PROJECT } from "#lib/constants.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
-import { db } from "#lib/server/db/index.js";
+import { db, pagesPoolMax } from "#lib/server/db/index.js";
 import { localizeNames } from "#lib/server/names.js";
 import { redis } from "#lib/server/redis.js";
 
@@ -76,7 +76,7 @@ let shelved: Promise<pg.Pool | null> | null = null;
 async function open() {
   const pool = new pg.Pool({
     connectionString: PAGES_DATABASE_URL,
-    max: 8,
+    max: pagesPoolMax,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 2000,
     statement_timeout: 10_000,
