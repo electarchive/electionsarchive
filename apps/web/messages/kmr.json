@@ -5085,6 +5085,7 @@
   "night_flip_status_flipped": "Partî guherî",
   "night_flip_status_leading": "Partiyeke din pêş e",
   "night_flip_status_held": "Parastî",
+  "night_flip_unit_about": "Li cihên bi xêz partiya li pêş ne ya hilbijartina borî ye.",
   "night_flips_party_about": "{party}: {flipped} kursî bi dest xistin, li {leading} kursiyên din pêş e",
   "night_flips_party_leading": "+{count} pêş e",
   "night_flips_count": "Guherî: {flipped} · Pêş e: {leading}",

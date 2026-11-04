@@ -5163,6 +5163,7 @@
   "night_flip_status_flipped": "Basculé",
   "night_flip_status_leading": "En passe de basculer",
   "night_flip_status_held": "Conservé",
+  "night_flip_unit_about": "Les hachures signalent les lieux où le parti en tête n'est pas le même qu'à la dernière élection.",
   "night_flips_party_about": "{party} · basculés : {flipped} · en passe de basculer : {leading}",
   "night_flips_party_leading": "+{count} en tête",
   "night_flips_count": "Basculés : {flipped} · En tête : {leading}",

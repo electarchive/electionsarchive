@@ -5085,6 +5085,7 @@
   "night_flip_status_flipped": "El değiştirdi",
   "night_flip_status_leading": "El değiştirme yolunda",
   "night_flip_status_held": "Korundu",
+  "night_flip_unit_about": "Çizgili yerlerde önceki seçimden farklı bir parti önde.",
   "night_flips_party_about": "{party}: {flipped} sandalye el değiştirdi, {leading} sandalyede öne geçti",
   "night_flips_party_leading": "+{count} önde",
   "night_flips_count": "El değiştirdi: {flipped} · Önde: {leading}",
