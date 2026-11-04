@@ -1,6 +1,7 @@
 <script lang="ts">
+  import type { Safety } from "#lib/shade.js";
   import { percent } from "#lib/format.js";
-  import { mix } from "./model.js";
+  import { marginShade, safety } from "#lib/shade.js";
 
   const {
     sides = null,
@@ -9,7 +10,7 @@
     sides?:
       | [{ name: string; color: string }, { name: string; color: string }]
       | null;
-    bins?: Array<{ from: number; strength: number }>;
+    bins?: Array<{ from: number; safety: Safety }>;
   } = $props();
 
   const ticks = $derived.by(() => {
@@ -38,10 +39,10 @@
 {#if sides == null}
   <div class="grid gap-1">
     <div class="flex gap-px overflow-hidden rounded-xs" aria-hidden="true">
-      {#each [10, 30, 50, 70, 88] as step (step)}
+      {#each [0.1, 0.3, 0.5, 0.7, 0.88] as step (step)}
         <span
           class="flex-1 block-2.5"
-          style:background-color={mix("var(--map-ink)", step)}
+          style:background-color={marginShade("var(--map-ink)", safety(step))}
         ></span>
       {/each}
     </div>
@@ -57,10 +58,10 @@
     <div class="flex gap-px overflow-hidden rounded-xs" aria-hidden="true">
       {#each sides as side, index (index)}
         <span class="flex flex-1 gap-px" class:flex-row-reverse={index === 0}>
-          {#each bins as bin (bin.strength)}
+          {#each bins as bin (bin.safety)}
             <span
               class="flex-1 block-2.5"
-              style:background-color={mix(side.color, bin.strength)}
+              style:background-color={marginShade(side.color, bin.safety)}
             ></span>
           {/each}
         </span>

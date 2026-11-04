@@ -7,13 +7,19 @@ import type {
 import type { Control, Family, Seat } from "#lib/live/nation.js";
 import type { UnitStanding } from "#lib/live/standing.js";
 import type { Summary } from "#lib/live/summary.js";
-import { leadStrength, swingStrength } from "#lib/atlas/color.js";
 import { hatch } from "#lib/live/flips.js";
 import { tone } from "#lib/live/format.js";
 import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
 import { ranked, sum } from "#lib/live/standing.js";
 import { summarize } from "#lib/live/summary.js";
 import { swatch } from "#lib/party.js";
+import {
+  leadSafety,
+  marginSafety,
+  marginShade,
+  safety,
+  swingSafety,
+} from "#lib/shade.js";
 
 export type Office = "senate" | "governor" | "house";
 export type Paint = "lead" | "chance" | "counted";
@@ -57,12 +63,10 @@ export const GROUND =
 export const BLANK =
   "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
 
-export function mix(color: string, share: number) {
-  return `color-mix(in oklab, ${color} ${Math.round(share)}%, var(--map-low))`;
-}
-
 export function reporting(share: number | null) {
-  return share == null ? MUTED : mix("var(--map-ink)", 10 + 78 * share);
+  return share == null
+    ? MUTED
+    : marginShade("var(--map-ink)", safety(0.1 + 0.78 * share));
 }
 
 export function districtKey(race: LiveRace) {
@@ -175,21 +179,21 @@ export function shade(
     if (option == null) {
       return WAITING;
     }
-    return mix(
+    return marginShade(
       tone(option),
-      called == null ? 30 + 60 * Math.min(summary.margin / 0.3, 1) : 100,
+      leadSafety(summary.margin, called != null),
     );
   }
   if (entry.rating === "waiting" || entry.rating === "counting") {
     return summary.total > 0
-      ? mix(tone(summary.leader ?? undefined), 22)
+      ? marginShade(tone(summary.leader ?? undefined), safety(0.22))
       : WAITING;
   }
   const isLeft = entry.left >= entry.right;
   const sure = Math.abs(entry.left - entry.right);
   return pair == null
     ? WAITING
-    : mix(pair[isLeft ? 0 : 1].color, 18 + 82 * sure);
+    : marginShade(pair[isLeft ? 0 : 1].color, safety(0.18 + 0.82 * sure));
 }
 
 export function stateShade(
@@ -230,7 +234,10 @@ export function stateShade(
       color:
         top == null
           ? WAITING
-          : mix(tone(top.option), 25 + (70 * top.seats) / races.length),
+          : marginShade(
+              tone(top.option),
+              safety(0.25 + (0.7 * top.seats) / races.length),
+            ),
     };
   }
   const first = races[0];
@@ -320,30 +327,30 @@ export function unitFill(
       if (row.leader == null) {
         return BLANK;
       }
-      return mix(tone(options[row.leader]), leadStrength(row.margin));
+      return marginShade(tone(options[row.leader]), marginSafety(row.margin));
     }
     case "shift": {
       if (row.signed == null || row.baseSigned == null) {
         return BLANK;
       }
       const shift = row.signed - row.baseSigned;
-      return mix(
+      return marginShade(
         tone(options[shift >= 0 ? pair[0] : pair[1]]),
-        swingStrength(shift),
+        swingSafety(shift),
       );
     }
     case "last": {
       const last = lastLeader(row);
       return last == null
         ? BLANK
-        : mix(tone(options[last.index]), leadStrength(last.margin));
+        : marginShade(tone(options[last.index]), marginSafety(last.margin));
     }
     case "counted": {
       return row.total === 0
         ? BLANK
-        : mix(
+        : marginShade(
             "var(--map-ink)",
-            8 + 80 * Math.min(1, row.total / Math.max(1, expected)),
+            safety(0.08 + 0.8 * Math.min(1, row.total / Math.max(1, expected))),
           );
     }
     default: {

@@ -1,7 +1,8 @@
 <script lang="ts">
+  import type { Safety } from "#lib/shade.js";
   import { DOTS } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { mix } from "./model.js";
+  import { marginShade, safety } from "#lib/shade.js";
   import Scale from "./scale.svelte";
 
   const {
@@ -15,14 +16,14 @@
   }: {
     kind: "ramp" | "arrows" | "counted" | "votes" | "waiting";
     sides: Array<{ name: string; color: string }>;
-    bins?: Array<{ from: number; to: number | null; strength: number }> | null;
+    bins?: Array<{ from: number; to: number | null; safety: Safety }> | null;
     text?: string | null;
     blank: string;
     reach?: number;
     isLater?: boolean;
   } = $props();
 
-  const STEPS = [26, 52, 78, 100];
+  const STEPS = [0.26, 0.52, 0.78, 1].map((step) => safety(step));
 </script>
 
 <div class="grid gap-2">
@@ -39,7 +40,7 @@
             {#each STEPS as step (step)}
               <span
                 class="flex-1 block-2.5"
-                style:background-color={mix(side.color, step)}
+                style:background-color={marginShade(side.color, step)}
               ></span>
             {/each}
           </span>

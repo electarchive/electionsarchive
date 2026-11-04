@@ -57,6 +57,17 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import {
+    bin,
+    MARGIN,
+    marginShade,
+    QUINTILE,
+    rampSafety,
+    SAFE,
+    safety,
+    SWING,
+    swingSafety,
+  } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import { MODES, unit } from "./unit.js";
@@ -188,11 +199,6 @@
     onopen?: (k: number) => void;
   } = $props();
 
-  const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
-  const LEANS = [26, 40, 54, 68, 84, 100];
-  const STRENGTHS = [34, 54, 76, 100];
-  const STEPS = [16, 36, 56, 78, 100];
-  const SWINGS = [0.02, 0.05, 0.1];
   const COMPARED = new Set(["swing", "arrows", "flips", "turnout_change"]);
 
   const uid = $props.id();
@@ -1673,7 +1679,7 @@
         .map(Number);
       const isFlat =
         Math.max(red, green, blue) - Math.min(red, green, blue) < 24;
-      const counts = LEANS.map(() => 0);
+      const counts = MARGIN.steps.map(() => 0);
       for (const row of places.rows) {
         if (
           leading(row) === index &&
@@ -1684,8 +1690,8 @@
         ) {
           const at =
             row.held == null
-              ? bin(row.runoff?.margin ?? row.margin)
-              : LEANS.length - 1;
+              ? bin(row.runoff?.margin ?? row.margin ?? 0, MARGIN.edges)
+              : MARGIN.steps.length - 1;
           counts[at] = (counts[at] ?? 0) + 1;
         }
       }
@@ -1693,8 +1699,8 @@
         {
           index,
           name: names[index] ?? "",
-          cells: LEANS.map((strength, at) => ({
-            tone: `color-mix(in oklab, ${tone} ${isFlat ? 100 : strength}%, var(--map-low))`,
+          cells: MARGIN.steps.map((level, at) => ({
+            tone: marginShade(tone, isFlat ? SAFE : level),
             count: counts[at] ?? 0,
           })),
         },
@@ -1864,17 +1870,6 @@
     };
   });
 
-  function bin(margin: number | null) {
-    const value = margin ?? 0;
-    let index = 0;
-    for (const edge of BINS) {
-      if (value >= edge) {
-        index += 1;
-      }
-    }
-    return index;
-  }
-
   function travel(event: MouseEvent, level: (typeof levels)[number]) {
     if (
       event.metaKey ||
@@ -1996,16 +1991,13 @@
       if (view === "turnout_change") {
         const change = surges.get(row.k);
         if (change != null) {
-          let step = 0;
-          for (const edge of SWINGS) {
-            if (Math.abs(change) >= edge) {
-              step += 1;
-            }
-          }
           result.push([
             row.k,
             read(
-              `color-mix(in oklab, var(${change < 0 ? "--map-fall" : "--map-rise"}) ${STEPS[step + 1] ?? 100}%, var(--map-low))`,
+              marginShade(
+                `var(${change < 0 ? "--map-fall" : "--map-rise"})`,
+                QUINTILE.steps[bin(Math.abs(change), SWING.edges) + 1] ?? SAFE,
+              ),
             ),
           ]);
         }
@@ -2028,12 +2020,7 @@
           only == null &&
           row.declared != null
         ) {
-          result.push([
-            row.k,
-            read(
-              `color-mix(in oklab, ${declare(row.declared)} 100%, var(--map-low))`,
-            ),
-          ]);
+          result.push([row.k, read(marginShade(declare(row.declared), SAFE))]);
         }
         continue;
       }
@@ -2054,14 +2041,14 @@
           ? only
           : (leading(row) ?? row.leader);
       const dimmed = only != null && typeof only === "number" && only !== shown;
-      let strength = dimmed
-        ? 10
+      let level = dimmed
+        ? safety(0.1)
         : isDeclared ||
             row.valid === 0 ||
             !isShaded ||
             (view === "winner" && isProportional && row.held != null)
-          ? 100
-          : (LEANS[bin(row.runoff?.margin ?? row.margin)] ?? 100);
+          ? SAFE
+          : rampSafety(MARGIN, row.runoff?.margin ?? row.margin ?? 0);
       let tone = colors[shown] ?? "var(--muted-foreground)";
       let isGray = grays.get(tone);
       if (isGray == null) {
@@ -2074,10 +2061,10 @@
         grays.set(tone, isGray);
       }
       if (!dimmed && isGray) {
-        strength = 100;
+        level = SAFE;
       }
       if (view === "bubbles") {
-        strength = dimmed ? 18 : 100;
+        level = dimmed ? safety(0.18) : SAFE;
       }
       if (view === "arrows") {
         continue;
@@ -2089,22 +2076,16 @@
         }
         const isFlip =
           change.from != null && change.to != null && change.from !== change.to;
-        let size = 0;
-        for (const edge of SWINGS) {
-          if (Math.abs(change.swing) >= edge) {
-            size += 1;
-          }
-        }
-        strength =
+        level =
           view === "flips"
             ? isFlip &&
               (only == null ||
                 only === "flip" ||
                 only === change.to ||
                 only === `${change.from}>${change.to}`)
-              ? 100
-              : 13
-            : (STRENGTHS[size] ?? 100);
+              ? SAFE
+              : safety(0.13)
+            : swingSafety(change.swing);
         tone =
           colors[
             view === "flips"
@@ -2120,19 +2101,10 @@
           continue;
         }
         const share = row.shares[view] ?? 0;
-        let step = 0;
-        for (const edge of edges) {
-          if (share > edge) {
-            step += 1;
-          }
-        }
-        strength = STEPS[step] ?? 100;
+        level = rampSafety(QUINTILE, share, edges, true);
         tone = colors[view] ?? "var(--muted-foreground)";
       }
-      result.push([
-        row.k,
-        read(`color-mix(in oklab, ${tone} ${strength}%, var(--map-low))`),
-      ]);
+      result.push([row.k, read(marginShade(tone, level))]);
     }
     return result;
   }
@@ -3775,20 +3747,22 @@
           <span class="font-semibold">{names[1]}</span>
           {#if view === "swing"}
             <span class="flex font-figures tabular-nums">
-              {#each [...STRENGTHS].toReversed() as strength, at (`b${at}`)}
+              {#each SWING.steps.toReversed() as level, at (`b${at}`)}
                 <span
                   class="block-3 inline-5 first:rounded-s-xs"
-                  style:background-color="color-mix(in oklab, {colors[1] ??
-                    'var(--muted-foreground)'}
-                  {strength}%, var(--map-low))"
+                  style:background-color={marginShade(
+                    colors[1] ?? "var(--muted-foreground)",
+                    level,
+                  )}
                 ></span>
               {/each}
-              {#each STRENGTHS as strength, at (`a${at}`)}
+              {#each SWING.steps as level, at (`a${at}`)}
                 <span
                   class="block-3 inline-5 last:rounded-e-xs"
-                  style:background-color="color-mix(in oklab, {colors[0] ??
-                    'var(--muted-foreground)'}
-                  {strength}%, var(--map-low))"
+                  style:background-color={marginShade(
+                    colors[0] ?? "var(--muted-foreground)",
+                    level,
+                  )}
                 ></span>
               {/each}
             </span>
@@ -3871,11 +3845,10 @@
         >
           <span>{m.map_turnout_fell()}</span>
           <span class="flex">
-            {#each [...[3, 2, 1, 0].map((step) => ["--map-fall", STEPS[step + 1] ?? 100, -step - 1] as const), ...[0, 1, 2, 3].map((step) => ["--map-rise", STEPS[step + 1] ?? 100, step + 1] as const)] as [token, strength, key] (key)}
+            {#each [...[3, 2, 1, 0].map((step) => ["--map-fall", QUINTILE.steps[step + 1] ?? SAFE, -step - 1] as const), ...[0, 1, 2, 3].map((step) => ["--map-rise", QUINTILE.steps[step + 1] ?? SAFE, step + 1] as const)] as [token, level, key] (key)}
               <span
                 class="block-3 inline-5 first:rounded-s-xs last:rounded-e-xs"
-                style:background-color="color-mix(in oklab, var({token}) {strength}%,
-                var(--map-low))"
+                style:background-color={marginShade(`var(${token})`, level)}
               ></span>
             {/each}
           </span>
@@ -3883,9 +3856,9 @@
         </span>
         <span class="font-figures text-xs text-muted-foreground tabular-nums"
           >{m.map_turnout_bins({
-            low: String((SWINGS[0] ?? 0) * 100),
-            mid: String((SWINGS[1] ?? 0) * 100),
-            high: String((SWINGS[2] ?? 0) * 100),
+            low: String((SWING.edges[0] ?? 0) * 100),
+            mid: String((SWING.edges[1] ?? 0) * 100),
+            high: String((SWING.edges[2] ?? 0) * 100),
           })}</span
         >
       </div>
@@ -3938,12 +3911,13 @@
         >
           <span>{percent(edges[0] ?? 0)}</span>
           <span class="flex">
-            {#each STEPS.slice(0, edges.length + 1) as strength (strength)}
+            {#each QUINTILE.steps.slice(0, edges.length + 1) as level (level)}
               <span
                 class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
-                style:background-color="color-mix(in oklab, {colors[index] ??
-                  'var(--muted-foreground)'}
-                {strength}%, var(--map-low))"
+                style:background-color={marginShade(
+                  colors[index] ?? "var(--muted-foreground)",
+                  level,
+                )}
               ></span>
             {/each}
           </span>
@@ -4120,26 +4094,30 @@
                   >
                     {m.map_margin_lead()}
                   </th>
-                  {#each LEANS as strength, at (strength)}
+                  {#each MARGIN.steps as level, at (level)}
                     <th
                       class="px-0.5 text-center font-normal whitespace-nowrap"
                       scope="col"
                     >
                       {at === 0
                         ? m.map_margin_under({
-                            points: String(Math.round((BINS[0] ?? 0) * 100)),
+                            points: String(
+                              Math.round((MARGIN.edges[0] ?? 0) * 100),
+                            ),
                           })
-                        : at === LEANS.length - 1
+                        : at === MARGIN.steps.length - 1
                           ? m.map_margin_over({
                               points: String(
-                                Math.round((BINS.at(-1) ?? 0) * 100),
+                                Math.round((MARGIN.edges.at(-1) ?? 0) * 100),
                               ),
                             })
                           : m.map_margin_range({
                               from: String(
-                                Math.round((BINS[at - 1] ?? 0) * 100),
+                                Math.round((MARGIN.edges[at - 1] ?? 0) * 100),
                               ),
-                              to: String(Math.round((BINS[at] ?? 0) * 100)),
+                              to: String(
+                                Math.round((MARGIN.edges[at] ?? 0) * 100),
+                              ),
                             })}
                     </th>
                   {/each}

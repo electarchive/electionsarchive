@@ -10,7 +10,6 @@
     Standing,
     UnitStanding,
   } from "#lib/live/standing.js";
-  import { leadStrength, strengths, swingStrength } from "#lib/atlas/color.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
@@ -20,6 +19,15 @@
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine, reach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import {
+    bands,
+    MARGIN,
+    marginSafety,
+    marginShade,
+    safety,
+    SWING,
+    swingSafety,
+  } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import Legend from "./full/legend.svelte";
   import { BLANK, GROUND, isRightward, swingOf } from "./full/model.js";
@@ -204,8 +212,7 @@
         if (row.leader == null) {
           return muted;
         }
-        const strength = leadStrength(row.margin);
-        return `color-mix(in oklab, ${tone(options[row.leader])} ${strength}%, var(--map-low))`;
+        return marginShade(tone(options[row.leader]), marginSafety(row.margin));
       }
       case "shift": {
         if (row.signed == null || row.baseSigned == null) {
@@ -215,14 +222,13 @@
           return GROUND;
         }
         const shift = row.signed - row.baseSigned;
-        const strength = swingStrength(shift);
-        return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${strength}%, var(--map-low))`;
+        return marginShade(shift >= 0 ? toneA : toneB, swingSafety(shift));
       }
       case "counted": {
         const share = Math.min(1, row.total / Math.max(1, expected));
         return row.total === 0
           ? muted
-          : `color-mix(in oklab, var(--map-ink) ${Math.round(8 + 80 * share)}%, var(--map-low))`;
+          : marginShade("var(--map-ink)", safety(0.08 + 0.8 * share));
       }
       default: {
         return row.total > 0
@@ -260,13 +266,15 @@
         return [];
       }
       const lean = rest.lean ?? 0;
-      const strength = Math.round(40 + 55 * Math.min(Math.abs(lean) / 0.3, 1));
       return [
         {
           k: place.k,
           at: place.at,
           value: rest.left,
-          color: `color-mix(in oklab, ${lean >= 0 ? toneA : toneB} ${strength}%, var(--map-low))`,
+          color: marginShade(
+            lean >= 0 ? toneA : toneB,
+            safety(0.4 + 0.55 * Math.min(Math.abs(lean) / 0.3, 1)),
+          ),
           reference: largest * 0.8,
         },
       ];
@@ -736,7 +744,7 @@
             { name: surname(options[a]), color: toneA },
             { name: surname(options[b]), color: toneB },
           ]}
-          bins={strengths({ mode: mode === "shift" ? "swing" : "winner" })}
+          bins={bands(mode === "shift" ? SWING : MARGIN)}
         />
       {/if}
     </div>

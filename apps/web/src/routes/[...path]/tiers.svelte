@@ -6,6 +6,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { settle } from "#lib/settle.js";
+  import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -107,7 +108,7 @@
   const lean = (party: string | null) =>
     (party == null ? null : parties.get(party)?.lean) ?? Infinity;
   const fill = (color: string, amount: number) =>
-    `color-mix(in oklab, ${color} ${Math.round(amount * 100)}%, var(--map-low))`;
+    marginShade(color, safety(amount));
 
   const known = $derived(
     new Map(

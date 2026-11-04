@@ -2,12 +2,17 @@
   import type { LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { UnitStanding } from "#lib/live/standing.js";
-  import { leadStrength, swingStrength } from "#lib/atlas/color.js";
   import { percent } from "#lib/format.js";
   import { MUTED } from "#lib/live/board/labels.js";
   import { lead, placeName, surname, tone } from "#lib/live/format.js";
   import { standing } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
+  import {
+    marginSafety,
+    marginShade,
+    safety,
+    swingSafety,
+  } from "#lib/shade.js";
   import Atlas from "./atlas.svelte";
 
   const {
@@ -57,18 +62,18 @@
         return MUTED;
       }
       const shift = row.signed - row.baseSigned;
-      return `color-mix(in oklab, ${shift >= 0 ? toneA : toneB} ${swingStrength(shift)}%, var(--map-low))`;
+      return marginShade(shift >= 0 ? toneA : toneB, swingSafety(shift));
     }
     if (mode === "counted") {
       const share = Math.min(1, row.total / Math.max(1, expectedOf(row)));
       return row.total === 0
         ? MUTED
-        : `color-mix(in oklab, var(--map-ink) ${Math.round(8 + 80 * share)}%, var(--map-low))`;
+        : marginShade("var(--map-ink)", safety(0.08 + 0.8 * share));
     }
     if (row.leader == null) {
       return "color-mix(in oklab, var(--muted-foreground) 16%, var(--background))";
     }
-    return `color-mix(in oklab, ${tone(options[row.leader])} ${leadStrength(row.margin)}%, var(--map-low))`;
+    return marginShade(tone(options[row.leader]), marginSafety(row.margin));
   }
 
   const fills = $derived(

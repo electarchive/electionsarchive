@@ -41,6 +41,7 @@
   import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { leadSafety, marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
   import Calls from "./dashboard/calls.svelte";
@@ -313,21 +314,18 @@
     const option = called ?? summary.leader;
     if (option == null) {
       const held = seatById.get(summary.race.id)?.held ?? null;
-      return held == null
-        ? WAITING
-        : `color-mix(in oklab, ${tint(held)} 24%, var(--background))`;
+      return held == null ? WAITING : marginShade(tint(held), safety(0.24));
     }
-    const share =
-      called == null
-        ? Math.round(30 + 60 * Math.min(summary.margin / 0.3, 1))
-        : 100;
-    return `color-mix(in oklab, ${tone(option)} ${share}%, var(--background))`;
+    return marginShade(
+      tone(option),
+      leadSafety(summary.margin, called != null),
+    );
   }
 
   function reporting(share: number | null) {
     return share == null
       ? MUTED
-      : `color-mix(in oklab, var(--foreground) ${Math.round(10 + 78 * share)}%, var(--background))`;
+      : marginShade("var(--map-ink)", safety(0.1 + 0.78 * share));
   }
 
   function shade(summary: Summary, wanted: Mode) {
@@ -347,13 +345,13 @@
     }
     if (entry.rating === "waiting" || entry.rating === "counting") {
       return summary.total > 0
-        ? `color-mix(in oklab, ${tone(summary.leader ?? undefined)} 22%, var(--background))`
+        ? marginShade(tone(summary.leader ?? undefined), safety(0.22))
         : WAITING;
     }
     const isLeft = entry.left >= entry.right;
     const sure = Math.abs(entry.left - entry.right);
     const color = pair == null ? WAITING : pair[isLeft ? 0 : 1].color;
-    return `color-mix(in oklab, ${color} ${Math.round(18 + 82 * sure)}%, var(--background))`;
+    return marginShade(color, safety(0.18 + 0.82 * sure));
   }
 
   function turnOf(summary: Summary) {
@@ -389,10 +387,12 @@
       return WAITING;
     }
     if (entry.rating === "counting") {
-      return `color-mix(in oklab, ${tint(entry.side)} 28%, var(--background))`;
+      return marginShade(tint(entry.side), safety(0.28));
     }
-    const share = { solid: 82, likely: 62, lean: 44, tossup: 28 }[entry.rating];
-    return `color-mix(in oklab, ${tint(entry.side)} ${share}%, var(--background))`;
+    const share = { solid: 0.82, likely: 0.62, lean: 0.44, tossup: 0.28 }[
+      entry.rating
+    ];
+    return marginShade(tint(entry.side), safety(share));
   }
 
   function reported(code: string) {
@@ -429,7 +429,7 @@
         found[code] =
           top == null
             ? WAITING
-            : `color-mix(in oklab, ${tone(top.option)} ${Math.round(25 + 70 * share)}%, var(--background))`;
+            : marginShade(tone(top.option), safety(0.25 + 0.7 * share));
         continue;
       }
       const first = races[0];

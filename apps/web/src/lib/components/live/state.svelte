@@ -25,6 +25,7 @@
   import { liveLinks } from "#lib/live/links.js";
   import { standing } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { leadSafety, marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import Swing from "./dashboard/swing.svelte";
   import Later from "./later.svelte";
@@ -237,13 +238,9 @@
     if (pick == null || summary.total === 0) {
       return entry.held == null
         ? WAITING
-        : `color-mix(in oklab, ${entry.held.color} 22%, var(--map-low))`;
+        : marginShade(entry.held.color, safety(0.22));
     }
-    const share =
-      called == null
-        ? Math.round(30 + 55 * Math.min(summary.margin / 0.3, 1))
-        : 100;
-    return `color-mix(in oklab, ${tone(pick)} ${share}%, var(--map-low))`;
+    return marginShade(tone(pick), leadSafety(summary.margin, called != null));
   }
 
   function before(seats: Seating) {
