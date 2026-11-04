@@ -352,7 +352,7 @@ adapter = "us.enr_2026"
 params = { state = "AK" }
 poller = "muktedir"
 publisher = "Alaska Division of Elections"
-url = "https://www.elections.alaska.gov/results/26GENR/"
+url = "https://www.elections.alaska.gov/enr/26GENR/"
 
 [[feed]]
 id = "us.enr_2026.hi"
@@ -382,8 +382,8 @@ note = "city contests and districts inside the city; statewide races and distric
 id = "us.civicapi.ak"
 adapter = "us.civicapi"
 interval = 60
-note = "Unofficial results from civicAPI by House district, which pages prefer over NPR's statewide-only tabulation for races where civicAPI gives a share counted; an official feed for the same race takes precedence while it is healthy"
-params = { state = "AK", districts = "true" }
+note = "Unofficial fallback from civicAPI; an official feed for the same race takes precedence while it is healthy"
+params = { state = "AK" }
 poller = "muktedir"
 publisher = "civicAPI"
 url = "https://civicapi.org/"
