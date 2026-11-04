@@ -414,6 +414,12 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 OFF_BALLOT = {("RI", "REPRESENTATIVE IN GENERAL ASSEMBLY", "59", "Barros")}
+WITHDRAWN = {
+    "2026-11-03:GA:senate:47:g": (
+        "Justin Gillespie",
+        "Off the ballot after his conviction on September 16, 2026; his replacement, Brenda Hankinson, withdrew on October 6, and the Georgia Secretary of State's results list no Democrat for State Senate District 47",
+    )
+}
 UNEXPIRED_2024 = {
     ("OH", "senate:33:g"),
     ("UT", "senate:12:g"),
@@ -1337,6 +1343,8 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
             party = {"R": "Republican", "D": "Democratic", "L": "Libertarian", "I": "Independent"}.get(
                 row["Party"], row["Party"]
             )
+            if any(row["Name on Ballot"].strip() == name for name, _ in WITHDRAWN.values()):
+                continue
             rows.append((office, int(house[1]) if house else None, row["Name on Ballot"].strip(), party))
         return rows
     if state == "AR":
@@ -2888,9 +2896,12 @@ def emit() -> Path:
                     cs.add("citation", entity_id=candidacy, source_id=nominated[(key, person)], locator=None)
                 counts["candidates"] += 1
                 if state == "GU" and chamber == "governor" and ballot in GUAM_MATES:
-                    if person not in cs.minted and not conn.execute(
-                        "select 1 from name where entity_id = %s and text = %s", (person, ballot)
-                    ).fetchone():
+                    if (
+                        person not in cs.minted
+                        and not conn.execute(
+                            "select 1 from name where entity_id = %s and text = %s", (person, ballot)
+                        ).fetchone()
+                    ):
                         cs.add("name", entity_id=person, text=ballot, lang="en", kind="official", is_preferred=True)
                     mate_name = GUAM_MATES[ballot]
                     mate = cs.key(f"{SOURCE}.person", f"GU:{slug(mate_name)}")
@@ -2940,7 +2951,9 @@ def emit() -> Path:
                     cs.add("note", entity_id=result_set, kind="context", body_md=context)
                     cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{tacit[2]}"], locator=None)
             reason = (
-                f"Not on the certified {state_name} 2026 general election candidate list"
+                WITHDRAWN[key][1]
+                if key in WITHDRAWN
+                else f"Not on the certified {state_name} 2026 general election candidate list"
                 if listing is not None
                 else f"No longer a nominee in the archive's {state_name} 2026 primary result sets"
             )
