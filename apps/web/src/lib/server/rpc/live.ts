@@ -531,6 +531,124 @@ async function settle<T>(
 
 const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
 
+type Replayed = {
+  totals: Array<[string, number]>;
+  units: Array<[string, Array<[string, number]>]>;
+};
+
+type Replay = {
+  ks: Array<number>;
+  frames: Map<number, Replayed>;
+  last: Map<string, string>;
+};
+
+const replays = new Map<string, Replay>();
+const interned = new Map<string, string>();
+
+function intern(text: string) {
+  const known = interned.get(text);
+  if (known != null) {
+    return known;
+  }
+  interned.set(text, text);
+  return text;
+}
+
+function leads(head: Array<number>, whole: Array<number>) {
+  return head.length <= whole.length && head.every((k, at) => whole[at] === k);
+}
+
+async function framed(ks: Array<number>) {
+  if (ks.length === 0) {
+    return new Map<
+      number,
+      Array<{ unit: string; option: string; votes: number }>
+    >();
+  }
+  const result = await db.execute<{
+    k: number;
+    unit: string;
+    option: string;
+    votes: number;
+  }>(sql`
+    select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
+    from live.value v join contest_option o on o.id = v.option_id
+    where v.frame_k = any(${sql.param(ks)}::bigint[])
+    group by 1, 2, 3
+  `);
+  return Map.groupBy(result.rows, (row) => row.k);
+}
+
+function extend(
+  kept: Replay,
+  ks: Array<number>,
+  byK: Awaited<ReturnType<typeof framed>>,
+) {
+  for (const k of ks.slice(kept.ks.length)) {
+    const totals = new Map<string, number>();
+    const pairs = new Map<string, Array<[string, number]>>();
+    for (const row of byK.get(k) ?? []) {
+      const option = intern(row.option);
+      const unit = intern(row.unit);
+      totals.set(option, (totals.get(option) ?? 0) + row.votes);
+      const held = pairs.get(unit) ?? [];
+      held.push([option, row.votes]);
+      pairs.set(unit, held);
+    }
+    const units: Replayed["units"] = [];
+    for (const [unit, votes] of pairs) {
+      const key = votes
+        .map(([option, value]) => `${option}:${value}`)
+        .toSorted((x, y) => x.localeCompare(y, "en"))
+        .join(";");
+      if (kept.last.get(unit) !== key) {
+        kept.last.set(unit, key);
+        units.push([unit, votes]);
+      }
+    }
+    kept.ks.push(k);
+    kept.frames.set(k, { totals: [...totals], units });
+  }
+}
+
+async function replay(frames: Array<{ k: number; contest: string }>) {
+  const bases = [...Map.groupBy(frames, (row) => row.contest)].map(
+    ([contest, rows]) => {
+      const ks = rows.map((row) => row.k);
+      let kept = replays.get(contest);
+      if (kept == null || !leads(kept.ks, ks)) {
+        kept = { ks: [], frames: new Map(), last: new Map() };
+        replays.set(contest, kept);
+      }
+      return { contest, kept, ks, from: kept.ks.length };
+    },
+  );
+  const byK = await framed(bases.flatMap(({ ks, from }) => ks.slice(from)));
+  const sorted = Map.groupBy(bases, ({ kept, ks }) =>
+    leads(kept.ks, ks) || leads(ks, kept.ks) ? "settled" : "crossed",
+  );
+  const redone = (sorted.get("crossed") ?? []).map(({ contest, ks }) => {
+    const kept: Replay = { ks: [], frames: new Map(), last: new Map() };
+    replays.set(contest, kept);
+    return { kept, ks };
+  });
+  const again = await framed(redone.flatMap(({ ks }) => ks));
+  const entries = new Map<number, Replayed>();
+  for (const [{ kept, ks }, source] of [
+    ...(sorted.get("settled") ?? []).map((base) => [base, byK] as const),
+    ...redone.map((base) => [base, again] as const),
+  ]) {
+    extend(kept, ks, source);
+    for (const k of ks) {
+      const entry = kept.frames.get(k);
+      if (entry != null) {
+        entries.set(k, entry);
+      }
+    }
+  }
+  return entries;
+}
+
 async function stored() {
   const result = await db.execute<Shown>(sql`
     select coalesce(bool_or(shown) filter (where name = 'results'), false) as results,
@@ -989,7 +1107,7 @@ async function night(
                 and x.fetched_at > now() - interval '20 minutes'
             )
         )
-      order by f.as_of
+      order by f.as_of, f.k
     `),
     remember(
       `live:fixed:v2:${found.path}|${found.rest}|${detail}${slot}`,
@@ -1052,20 +1170,12 @@ async function night(
       lapsed.has(row.state) ? [[row.state, row.id] as const] : [],
     ),
   );
-  const values = await db.execute<{
-    k: number;
-    unit: string;
-    option: string;
-    votes: number;
-  }>(sql`
-    select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
-    from live.value v join contest_option o on o.id = v.option_id
-    where v.frame_k = any(${sql.param(frames.rows.map((row) => row.k))}::bigint[])
-    group by 1, 2, 3
-  `);
+  const replayed = await replay(frames.rows);
   const unitIds = [
     ...new Set([
-      ...values.rows.map((row) => row.unit),
+      ...replayed
+        .values()
+        .flatMap((entry) => entry.units.map(([unit]) => unit)),
       ...prior.lines.map((row) => row.unit),
       ...drawn.map((row) => row.unit),
     ]),
@@ -1125,7 +1235,6 @@ async function night(
       return traits == null ? [] : [[row.id, traits] as const];
     }),
   );
-  const byFrame = Map.groupBy(values.rows, (row) => row.k);
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
   const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
@@ -1145,17 +1254,25 @@ async function night(
     const current = new Map<string, Array<number>>();
     const members = new Map<string, Set<string>>();
     for (const frame of mine) {
+      const entry = replayed.get(frame.k);
       const totals = own.map(() => 0);
-      const byUnit = new Map<string, Array<number>>();
-      for (const value of byFrame.get(frame.k) ?? []) {
-        const position = index.get(value.option);
-        if (position == null) {
-          continue;
+      for (const [option, votes] of entry?.totals ?? []) {
+        const position = index.get(option);
+        if (position != null) {
+          totals[position] = (totals[position] ?? 0) + votes;
         }
-        totals[position] = (totals[position] ?? 0) + value.votes;
-        const votes = byUnit.get(value.unit) ?? own.map(() => 0);
-        votes[position] = (votes[position] ?? 0) + value.votes;
-        byUnit.set(value.unit, votes);
+      }
+      const byUnit = new Map<string, Array<number>>();
+      for (const [unit, pairs] of entry?.units ?? []) {
+        for (const [option, value] of pairs) {
+          const position = index.get(option);
+          if (position == null) {
+            continue;
+          }
+          const votes = byUnit.get(unit) ?? own.map(() => 0);
+          votes[position] = (votes[position] ?? 0) + value;
+          byUnit.set(unit, votes);
+        }
       }
       raceFrames.push({
         at: frame.at,
