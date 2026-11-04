@@ -6,6 +6,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
   import type { PageData } from "./$types";
+  import PreviewHost from "./preview-host.svelte";
   import Preview from "./preview.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -208,6 +209,7 @@
 </svelte:head>
 
 <ShareImage src="{page.url.origin}/og{page.url.pathname}.png" alt={title} />
+<PreviewHost />
 
 <main class="pbe-16">
   <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
