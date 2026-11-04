@@ -37,7 +37,7 @@
         ? null
         : {
             key: "author",
-            label: m.proposals_by({ handle: data.query.author }),
+            label: m.proposals_by({ handle: `@${data.query.author}` }),
           },
     ].filter((chip) => chip != null),
   );

@@ -43,7 +43,12 @@
       {m.slate_title()}
     </h2>
     <p class="text-sm text-pretty text-muted-foreground">
-      {slateLine(held, slate.closes, now)}
+      {slateLine(
+        held,
+        slate.closes,
+        now,
+        slate.options.length === 1 && !slate.isUnqualified,
+      )}
     </p>
   </div>
   {#if slate.isUnqualified}

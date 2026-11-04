@@ -3,14 +3,7 @@
   import type { Lens } from "#lib/atlas/color.js";
   import type { Sheet } from "#lib/atlas/data.js";
   import type { View } from "#lib/atlas/state.svelte.js";
-  import {
-    admits,
-    band,
-    mix,
-    read,
-    scale,
-    strengths,
-  } from "#lib/atlas/color.js";
+  import { admits, band, read, scale, strengths } from "#lib/atlas/color.js";
   import Histogram from "#lib/atlas/histogram.svelte";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -19,6 +12,7 @@
   import { count, percent } from "#lib/format.js";
   import { largest } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { marginShade } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -399,14 +393,14 @@
 
     {#if lens.mode !== "votes" && lens.mode !== "flips"}
       <div class="flex items-stretch gap-px" aria-hidden="true">
-        {#each ramp as stop (stop.strength)}
+        {#each ramp as stop (stop.safety)}
           <span
             class="flex-1 block-2"
-            style:background={mix(
+            style:background={marginShade(
               lens.mode === "share"
                 ? lens.tone(lens.whom)
                 : "var(--muted-foreground)",
-              stop.strength,
+              stop.safety,
             )}
           ></span>
         {/each}

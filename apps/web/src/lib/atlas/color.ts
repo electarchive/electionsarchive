@@ -1,5 +1,17 @@
 import type { Sheet } from "#lib/atlas/data.js";
 import { largest } from "#lib/map/engine.svelte.js";
+import {
+  bands,
+  MARGIN,
+  marginSafety,
+  marginShade,
+  SAFE,
+  safety,
+  SHARE,
+  shareSafety,
+  SWING,
+  swingSafety,
+} from "#lib/shade.js";
 
 export const MODES = [
   "winner",
@@ -28,13 +40,6 @@ export type Lens = {
 
 export type Reading = ReturnType<typeof read>;
 
-const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
-const LEANS = [26, 40, 54, 68, 84, 100];
-const STRENGTHS = [34, 54, 76, 100];
-const SHARES = [0.3, 0.4, 0.5, 0.6, 0.7];
-const STEPS = [14, 30, 48, 66, 84, 100];
-const SWINGS = [0.02, 0.05, 0.1];
-
 export const DIM =
   "color-mix(in oklab, var(--muted-foreground) 11%, var(--card))";
 export const QUIET =
@@ -54,20 +59,6 @@ export function slot(set: Sheet, key: string | null | undefined) {
     indexes.set(set.legend, found);
   }
   return found.get(key) ?? -1;
-}
-
-export function mix(tone: string, strength: number) {
-  return `color-mix(in oklab, ${tone} ${strength}%, var(--map-low))`;
-}
-
-function step(value: number, edges: Array<number>) {
-  let index = 0;
-  for (const edge of edges) {
-    if (value >= edge) {
-      index += 1;
-    }
-  }
-  return index;
 }
 
 export function scale(mode: Mode) {
@@ -193,40 +184,40 @@ export function tone(
   }
   switch (lens.mode) {
     case "share": {
-      return mix(
-        lens.tone(lens.whom),
-        STEPS[step(reading.value ?? 0, SHARES)] ?? 100,
-      );
+      return marginShade(lens.tone(lens.whom), shareSafety(reading.value ?? 0));
     }
     case "swing": {
       return reading.swing == null
         ? DIM
-        : mix(
+        : marginShade(
             lens.tone(reading.swing >= 0 ? lens.first : lens.second),
-            STRENGTHS[step(Math.abs(reading.swing), SWINGS)] ?? 100,
+            swingSafety(reading.swing),
           );
     }
     case "lean": {
       return reading.value == null
         ? DIM
-        : mix(
+        : marginShade(
             lens.tone(reading.value >= 0 ? lens.first : lens.second),
-            LEANS[step(Math.abs(reading.value), BINS)] ?? 100,
+            marginSafety(reading.value),
           );
     }
     case "flips": {
       return reading.isUnmatched
         ? DIM
-        : mix(hue(set, reading.leader, lens), reading.isFlip ? 100 : 16);
+        : marginShade(
+            hue(set, reading.leader, lens),
+            safety(reading.isFlip ? 1 : 0.16),
+          );
     }
     default: {
-      const strength =
+      const level =
         set.places.valid[i] === 0 || (reading.held != null && !lens.isBanded)
-          ? 100
-          : (LEANS[step(reading.lead, BINS)] ?? 100);
-      return mix(
+          ? SAFE
+          : marginSafety(reading.lead);
+      return marginShade(
         hue(set, reading.owner, lens),
-        lens.mode === "votes" ? Math.max(54, strength) : strength,
+        lens.mode === "votes" ? safety(Math.max(0.54, level)) : level,
       );
     }
   }
@@ -234,37 +225,16 @@ export function tone(
 
 export function band(middle: number, lens: Lens) {
   if (lens.mode === "share") {
-    return mix(lens.tone(lens.whom), STEPS[step(middle, SHARES)] ?? 100);
+    return marginShade(lens.tone(lens.whom), shareSafety(middle));
   }
-  return mix(
+  return marginShade(
     lens.tone(middle >= 0 ? lens.first : lens.second),
-    (lens.mode === "swing"
-      ? STRENGTHS[step(Math.abs(middle), SWINGS)]
-      : LEANS[step(Math.abs(middle), BINS)]) ?? 100,
+    lens.mode === "swing" ? swingSafety(middle) : marginSafety(middle),
   );
 }
 
-export function leadStrength(margin: number) {
-  return LEANS[step(Math.abs(margin), BINS)] ?? 100;
-}
-
-export function swingStrength(swing: number) {
-  return STRENGTHS[step(Math.abs(swing), SWINGS)] ?? 100;
-}
-
 export function strengths(lens: Pick<Lens, "mode">) {
-  if (lens.mode === "share") {
-    return SHARES.map((edge, index) => ({
-      from: index === 0 ? 0 : (SHARES[index - 1] ?? 0),
-      to: edge,
-      strength: STEPS[index] ?? 100,
-    }));
-  }
-  const edges = lens.mode === "swing" ? SWINGS : BINS;
-  const levels = lens.mode === "swing" ? STRENGTHS : LEANS;
-  return levels.map((strength, index) => ({
-    from: index === 0 ? 0 : (edges[index - 1] ?? 0),
-    to: edges[index] ?? null,
-    strength,
-  }));
+  return bands(
+    lens.mode === "share" ? SHARE : lens.mode === "swing" ? SWING : MARGIN,
+  );
 }

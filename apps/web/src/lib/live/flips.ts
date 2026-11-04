@@ -1,3 +1,5 @@
+import { marginShade, safety } from "#lib/shade.js";
+
 export type Flip = "flipped" | "leading" | "held";
 
 export type Shift = { flip: Flip; from: string; to: string };
@@ -80,10 +82,8 @@ export function hatch(color: string, flip: "flipped" | "leading") {
         ),
       }
     : {
-        fill: `color-mix(in oklab, ${color} 34%, var(--background))`,
-        stripes: stripes(
-          `color-mix(in oklab, ${color} 68%, var(--background))`,
-        ),
+        fill: marginShade(color, safety(0.34)),
+        stripes: stripes(marginShade(color, safety(0.68))),
       };
 }
 

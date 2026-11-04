@@ -8,6 +8,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { settle } from "#lib/settle.js";
+  import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
   const { id, within }: { id: string; within?: string } = $props();
@@ -184,7 +185,10 @@
                   sheet.cells.get(`${row.key}|${column.key}`) ?? 0,
                 )}
                 {const fill = $derived(
-                  `color-mix(in oklab, ${row.color} ${Math.round(14 + (cell / Math.max(1, sheet.peak)) * 66)}%, var(--card))`,
+                  marginShade(
+                    row.color,
+                    safety(0.14 + (cell / Math.max(1, sheet.peak)) * 0.66),
+                  ),
                 )}
                 {const isPicked = $derived(
                   picked?.to === row.key && picked.from === column.key,

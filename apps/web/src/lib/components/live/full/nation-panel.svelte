@@ -13,13 +13,13 @@
   import { breakdown, odds } from "#lib/live/nation.js";
   import { closing, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import type { Board, Office } from "./model.js";
   import {
     districtKey,
     flipped,
     holding,
-    mix,
     seatName,
     shade,
     urgency,
@@ -178,26 +178,34 @@
     const size = view.size;
     const parts = [
       { key: "lw", count: left.won + left.projected, color: pair[0].color },
-      { key: "la", count: left.ahead, color: mix(pair[0].color, 55) },
+      {
+        key: "la",
+        count: left.ahead,
+        color: marginShade(pair[0].color, safety(0.55)),
+      },
       {
         key: "lh",
         count: left.holdover,
-        color: mix(pair[0].color, 30),
+        color: marginShade(pair[0].color, safety(0.3)),
         isHeld: true,
       },
       {
         key: "o",
         count: other.won + other.projected + other.ahead + other.holdover,
-        color: mix("var(--muted-foreground)", 55),
+        color: marginShade("var(--muted-foreground)", safety(0.55)),
       },
       { key: "w", count: view.waiting + view.later, color: WAITING },
       {
         key: "rh",
         count: right.holdover,
-        color: mix(pair[1].color, 30),
+        color: marginShade(pair[1].color, safety(0.3)),
         isHeld: true,
       },
-      { key: "ra", count: right.ahead, color: mix(pair[1].color, 55) },
+      {
+        key: "ra",
+        count: right.ahead,
+        color: marginShade(pair[1].color, safety(0.55)),
+      },
       { key: "rw", count: right.won + right.projected, color: pair[1].color },
     ];
     return {

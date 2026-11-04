@@ -3,6 +3,7 @@ import type { Kind } from "#lib/live/board/layout.js";
 import type { Summary } from "#lib/live/summary.js";
 import { tone } from "#lib/live/format.js";
 import { m } from "#lib/paraglide/messages.js";
+import { leadSafety, marginShade } from "#lib/shade.js";
 
 export const MUTED =
   "color-mix(in oklab, var(--muted-foreground) 8%, var(--background))";
@@ -40,11 +41,10 @@ export function strength(summary: Summary | undefined) {
   if (summary == null || option == null) {
     return WAITING;
   }
-  const share =
-    called(summary) == null
-      ? Math.round(28 + 62 * Math.min(summary.margin / 0.3, 1))
-      : 100;
-  return `color-mix(in oklab, ${tone(option)} ${share}%, var(--map-low))`;
+  return marginShade(
+    tone(option),
+    leadSafety(summary.margin, called(summary) != null),
+  );
 }
 
 export function districtKey(race: LiveRace) {

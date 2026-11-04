@@ -5,6 +5,7 @@
   import type { Snippet } from "svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -195,8 +196,10 @@
               {:else}
                 <polygon
                   points={polygon(cell, side)}
-                  fill={half.color}
-                  fill-opacity={0.16 + 0.84 * half.strength}
+                  fill={marginShade(
+                    half.color,
+                    safety(0.16 + 0.84 * half.strength),
+                  )}
                 />
               {/if}
             {/each}

@@ -9,6 +9,7 @@ export function slateLine(
   held: string | null,
   closes: string | null,
   now: number,
+  isUnopposed: boolean,
 ) {
   const day = date(held);
   const ended =
@@ -16,7 +17,9 @@ export function slateLine(
       ? Date.parse(`${held}T12:00:00Z`) + 86_400_000
       : Date.parse(closes);
   if (held == null || now >= ended) {
-    return m.slate_unreported({ date: day });
+    return (isUnopposed ? m.slate_unreported_unopposed : m.slate_unreported)({
+      date: day,
+    });
   }
   if (closes != null && eastern.format(now) >= held) {
     return m.slate_voting({

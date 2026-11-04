@@ -8,6 +8,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { settle } from "#lib/settle.js";
+  import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
   const { id }: { id: string } = $props();
@@ -279,7 +280,11 @@
                 {const cell = $derived(row.cells[slot.column] ?? 0)}
                 {const share = $derived(cell / Math.max(1, row.seats))}
                 {const fill = $derived(
-                  `color-mix(in oklab, ${chamber.columns[slot.column]?.color} ${Math.round(12 + share * 58)}%, var(--card))`,
+                  marginShade(
+                    chamber.columns[slot.column]?.color ??
+                      "var(--muted-foreground)",
+                    safety(0.12 + share * 0.58),
+                  ),
                 )}
                 <td
                   class={cn("p-0.5", {

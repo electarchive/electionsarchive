@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     self: `/contributors/${profile.handle}.atom`,
     page: `/contributors/${profile.handle}`,
     title: m.contributor_feed_title({ name }),
-    subtitle: m.contributor_feed_subtitle({ handle: profile.handle }),
+    subtitle: m.contributor_feed_subtitle({ handle: `@${profile.handle}` }),
     entries: atomEntries(await contributorStream(userId)),
     fallback: profile.member_since,
   });

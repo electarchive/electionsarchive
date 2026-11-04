@@ -23,7 +23,6 @@
   import type { Geography, Pieces, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import type { Ballot } from "#lib/server/live-ballot.js";
-  import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
   import Cycle from "#lib/components/live/cycle.svelte";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
@@ -66,6 +65,7 @@
   import { reach as arrowReach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
+  import { bands, MARGIN, marginShade, safety, SWING } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import type { Dot, Fill, Lens, Office, Paint, Swing } from "./model.js";
   import Canvas from "./canvas.svelte";
@@ -83,7 +83,6 @@
     INSETS,
     isRightward,
     LENSES,
-    mix,
     MUTED,
     OFFICES,
     PAINTS,
@@ -796,7 +795,7 @@
       entry.held != null &&
       summary.later == null &&
       summary.total === 0
-      ? mix(entry.held.color, 22)
+      ? marginShade(entry.held.color, safety(0.22))
       : shade(summary, undefined, wanted, null, null);
   }
 
@@ -1466,9 +1465,9 @@
     (isNation && !isSpread) || legendKind !== "ramp"
       ? null
       : lens === "shift"
-        ? strengths({ mode: "swing" })
+        ? bands(SWING)
         : lens === "lead" || lens === "last"
-          ? strengths({ mode: "winner" })
+          ? bands(MARGIN)
           : null,
   );
   const legendText = $derived.by(() => {

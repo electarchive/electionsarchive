@@ -229,6 +229,7 @@ OK_RACE = re.compile(r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESE
 PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
 PA_ELECTION: dict[date, str] = {}
 PA_OFFICES = {"2": "senate", "3": "governor", "11": "house"}
+IN_CATEGORIES = {"1005": "house", "1018": "senate", "1040": "house", "1037": "state", "1041": "state", "1047": "state"}
 NOTE = (
     "Unofficial election night results as the publisher's reporting site showed them at the time given. Counts change as "
     "ballots are counted and until the canvass certifies them; the certified canvass will publish as a separate result set."
@@ -672,10 +673,11 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
             settings = get(client, f"{base}settings.json")
             found = json.loads(settings.decode("utf-8-sig"))["Root"] if settings else {}
             if found.get("CurrentElection") == f"{DAY:%m/%d/%Y}" and found.get("ElectionType") == "G":
-                url = f"{base}OffCatC_1005_{found['VersionType']}.json"
-                content = get(client, url)
-                if content is not None:
-                    store("IN", url, content, ".json")
+                for category in IN_CATEGORIES:
+                    url = f"{base}OffCatC_{category}_{found['VersionType']}.json"
+                    content = get(client, url)
+                    if content is not None:
+                        store("IN", url, content, ".json")
                 break
         else:
             print("IN: no general settings")
@@ -1196,15 +1198,24 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             }
         return
     if state == "IN":
-        for region in json.loads(path.read_bytes().decode("utf-8-sig"))["Root"]["OfficeCategory"]["Regions"]["Region"]:
+        category = json.loads(path.read_bytes().decode("utf-8-sig"))["Root"]["OfficeCategory"]
+        office = IN_CATEGORIES.get(category["OFFICECATEGORYID"])
+        regions = category["Regions"]["Region"]
+        for region in (regions if isinstance(regions, list) else [regions]) if office else []:
             races = region["Races"]["Race"]
             for race in races if isinstance(races, list) else [races]:
-                for candidate in race["Candidates"]["Candidate"]:
+                candidates = race["Candidates"]["Candidate"]
+                for candidate in candidates if isinstance(candidates, list) else [candidates]:
                     yield {
-                        "office": "house",
-                        "district": region["MAP_JURISDICTION_NAME"],
+                        "office": office,
+                        "contest": race["OFFICE_TITLE"] if office == "state" else "",
+                        "district": ""
+                        if office == "state"
+                        else region["MAP_JURISDICTION_NAME"]
+                        if category["OFFICECATEGORYID"] == "1005"
+                        else f"{int(region['MAP_JURISDICTION_NAME'])}:g",
                         "party": candidate["PARTY_ABBREV"],
-                        "county": race["Jurisdiction"]["FIPS"],
+                        "county": region["MAP_FIPS"] if office == "state" else race["Jurisdiction"]["FIPS"],
                         "candidate": re.sub(r"\s*\(W/I\)$", "", candidate["NAME_ON_BALLOT"]),
                         "write_in": "(W/I)" in candidate["NAME_ON_BALLOT"],
                         "votes": int(candidate["TOTAL_VOTES"] or 0),
@@ -1613,7 +1624,7 @@ def plan(
                         and len(key.split(":")) > 3
                         and key.split(":")[3] in words
                     )
-                ):
+                ) or (overlap < 0.6 and wide and len(wanted - {"yes", "no"}) >= 2 and wanted <= crowd):
                     overlap = 0.6
                 if overlap >= 0.6:
                     parts = re.split(r"[:-]", key)[2:]

@@ -9,6 +9,7 @@ import { count, percent } from "#lib/format.js";
 import { bandFor, lead, stamp, surname, tone } from "#lib/live/format.js";
 import { ranked, sum } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
+import { leadSafety, marginShade } from "#lib/shade.js";
 
 export type Summary = {
   race: LiveRace;
@@ -231,9 +232,10 @@ export function shade(summary: Summary) {
   if (option == null) {
     return null;
   }
-  return summary.winner == null
-    ? `color-mix(in oklab, ${tone(option)} ${Math.round(22 + 48 * Math.min(summary.margin / 0.3, 1))}%, var(--map-low))`
-    : tone(option);
+  return marginShade(
+    tone(option),
+    leadSafety(summary.margin, summary.winner != null),
+  );
 }
 
 export function party(option: LiveOption | null) {
