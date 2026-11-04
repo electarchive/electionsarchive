@@ -1098,17 +1098,31 @@ async function night(
       publisher: string;
       url: string | null;
     }>(sql`
+      with latest as (
+        select distinct on (o.feed_id, o.contest_id) o.feed_id, o.contest_id, od.adapter,
+          (select sum(v.votes) from live.value v where v.frame_k = o.k) as votes,
+          exists (
+            select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
+              and x.fetched_at > now() - interval '20 minutes'
+          ) as fresh
+        from live.frame o join live.feed od on od.id = o.feed_id
+        where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
+        order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
+      ), ranked as (
+        select l.*, l.votes >= 0.97 * max(l.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
+        from latest l
+      )
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
         f.reporting, f.expected, d.publisher, d.url
       from live.frame f join live.feed d on d.id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
         and not exists (
-          select from live.frame o join live.feed od on od.id = o.feed_id
-          where o.contest_id = f.contest_id and o.status = 'active' and od.enabled
-            and ${tier(sql.raw("od.adapter"))} < ${tier(sql.raw("d.adapter"))}
-            and exists (
-              select from live.fetch x where x.feed_id = od.id and x.status <> 'error'
-                and x.fetched_at > now() - interval '20 minutes'
+          select from ranked o
+          left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
+          where o.contest_id = f.contest_id and o.fresh and o.complete
+            and (
+              ${tier(sql.raw("o.adapter"))} < ${tier(sql.raw("d.adapter"))}
+              or own.complete is not true
             )
         )
       order by f.as_of, f.k
