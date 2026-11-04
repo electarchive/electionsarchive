@@ -38,11 +38,11 @@
         })}
       </p>
     </div>
-    <ol class="columns-xs gap-x-8 text-sm">
+    <ol
+      class="columns-xs gap-x-8 text-sm *:grid *:break-inside-avoid *:gap-0.5 *:border-be *:border-border/60 *:py-2 pointer-coarse:*:py-2.5"
+    >
       {#each counties.counties as county (county.path ?? county.name)}
-        <li
-          class="grid break-inside-avoid gap-0.5 border-be border-border/60 py-2 pointer-coarse:py-2.5"
-        >
+        <li>
           <span class="flex items-baseline justify-between gap-3">
             {#if county.path == null}
               <span class="font-semibold">{county.name}</span>
@@ -57,11 +57,12 @@
               >{m.local_governments({ count: county.governments.length })}</span
             >
           </span>
-          <span class="text-[0.8125rem] text-pretty text-muted-foreground">
+          <span
+            class="text-[0.8125rem] text-pretty text-muted-foreground [&_a]:underline [&_a]:decoration-transparent [&_a]:underline-offset-2 [&_a:hover]:text-foreground [&_a:hover]:decoration-foreground"
+          >
             {#each county.governments.slice(0, 4) as government, index (index)}
               <span
                 >{#if government.path == null}{government.name}{:else}<a
-                    class="underline decoration-transparent underline-offset-2 hover:text-foreground hover:decoration-foreground"
                     href={resolve("/[...path]", { path: government.path })}
                     >{government.name}</a
                   >{/if}{index < Math.min(4, county.governments.length) - 1
