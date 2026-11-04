@@ -4361,6 +4361,7 @@
   "night_legend_lead": "Renk tonu öndeki farkın büyüklüğünü gösterir",
   "night_legend_remaining": "Renk koyulaştıkça sayılacak oy artar",
   "night_legend_shift": "Son seçimden bu yana farktaki değişim",
+  "night_legend_arrows": "Her ok, bir yerde oyların önceki seçime göre ne kadar kaydığını gösterir. Okun yönü, oyunu artıran tarafı gösterir. Ok ne kadar uzunsa kayma o kadar büyüktür.",
   "night_majority": "Salt çoğunluk",
   "night_map_bubbles": "Oy",
   "night_map_counted": "Sayılan oy",
