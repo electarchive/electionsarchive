@@ -264,7 +264,8 @@ def district_words(key: str) -> set[str]:
     parts = key.split(":")
     if len(parts) < 6 or not re.fullmatch(r"\d{5}", parts[2]):
         return set()
-    return set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
+    words = set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
+    return words - {"no"} if any(not w.isdigit() for w in words - {"no"}) else words
 
 
 OFFICE_TEXT = re.compile(
@@ -309,7 +310,7 @@ def placed(name: list[str], words: set[str], strict: bool, whole: bool = False, 
     if strict and whole and core:
         return core <= words or not apart and any(w.isdigit() for w in found)
     if strict:
-        return not name or name[0] in words and 2 * len(found) >= len(set(name)) or any(w.isdigit() for w in found)
+        return not name or name[0] in words and 2 * len(found) > len(set(name)) or any(w.isdigit() for w in found)
     return (
         not name or bool(found) or any(a in b or len(b) > 4 and edits(a, b) for a in name for b in words if len(a) > 4)
     )
