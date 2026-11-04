@@ -792,7 +792,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         yield from enr_ky.rows(url, path)
         return
     if state == "MI" and url.startswith(
-        ("https://app.enhancedvoting.com/", "https://michigan.totalvote.com/", "https://electionresults.ewashtenaw.org/")
+        (
+            "https://app.enhancedvoting.com/",
+            "https://michigan.totalvote.com/",
+            "https://electionresults.ewashtenaw.org/",
+        )
     ):
         from ea.sources.us import enr_mi
 
@@ -1596,7 +1600,16 @@ def plan(
                     and crowd
                     and crowd <= wanted
                     and not crowd <= {"yes", "no"}
-                    and (re.match(r"\d|sd", segment) or contest in judicial or wide and len(crowd) >= 2)
+                    and (
+                        re.match(r"\d|sd", segment)
+                        or contest in judicial
+                        or wide
+                        and len(crowd) >= 2
+                        or segment in ("house", "senate")
+                        and segment in words
+                        and len(key.split(":")) > 3
+                        and key.split(":")[3] in words
+                    )
                 ):
                     overlap = 0.6
                 if overlap >= 0.6:
