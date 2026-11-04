@@ -55,6 +55,7 @@ url = "https://extcontent.stlouisco.com/BOE/eResults/"
 id = "us.enr_2026.fl"
 adapter = "us.enr_2026"
 params = { state = "FL" }
+poller = "muktedir"
 publisher = "Florida Division of Elections"
 url = "https://results.elections.myflorida.com"
 
