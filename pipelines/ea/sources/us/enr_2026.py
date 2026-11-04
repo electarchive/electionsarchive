@@ -85,6 +85,23 @@ SYNONYMS = {"id": "identification", "sell": "sale"}
 TENANT = re.compile(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports")
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
 PLACE_WORDS = {"township", "charter", "village", "public", "schools", "school", "community", "area", "consolidated"}
+SCHOOL_WORDS = {
+    "district",
+    "elementary",
+    "unified",
+    "union",
+    "joint",
+    "unit",
+    "number",
+    "corporation",
+    "metropolitan",
+    "county",
+    "city",
+    "borough",
+    "regional",
+    "independent",
+    "high",
+}
 GENERIC = {
     "an",
     "to",
@@ -273,8 +290,11 @@ def edits(a: str, b: str) -> bool:
     return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
 
 
-def placed(name: list[str], words: set[str], strict: bool) -> bool:
+def placed(name: list[str], words: set[str], strict: bool, whole: bool = False) -> bool:
     found = set(name) & words
+    core = {w for w in name if not w.isdigit()} - SCHOOL_WORDS
+    if strict and whole and core:
+        return core <= words or any(w.isdigit() for w in found)
     if strict:
         return not name or name[0] in words and 2 * len(found) >= len(set(name)) or any(w.isdigit() for w in found)
     return (
@@ -1403,16 +1423,19 @@ def plan(
             for contest in sorted(same, key=lambda id: held[id][1])[:-1]:
                 del published[contest]
         towns: dict[str, list[list[str]]] = {}
-        for owner, text in conn.execute(
-            """select n.entity_id::text, n.text from name n where n.entity_id = any(%s)
+        schools: set[str] = set()
+        for owner, text, scheme in conn.execute(
+            """select n.entity_id::text, n.text, null from name n where n.entity_id = any(%s)
                union all
-               select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
+               select u.code, n.text, u.scheme_code from reporting_unit u join name n on n.entity_id = u.area_id
                where u.scheme_code in ('us.place', 'us.school_district') and u.code = any(%s)""",
             [
                 list({held[contest][0] for contest in published if held[contest][0] is not None}),
                 list({key.split(":")[2] for keys, _ in published.values() for key in keys}),
             ],
         ).fetchall():
+            if scheme == "us.school_district":
+                schools.add(owner)
             towns.setdefault(owner, []).append(
                 [w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | PLACE_WORDS]
             )
@@ -1485,9 +1508,14 @@ def plan(
                     or re.fullmatch(r"\d{7}|\d\d-[a-z0-9-]+", segment)
                     and (names := towns.get(str(held[contest][0]), []) + towns.get(segment, []))
                     and len(people & wanted - {"yes", "no"}) < 2
-                    and not any(placed(name, words, not people & wanted - {"yes", "no"}) for name in names)
+                    and not any(
+                        placed(name, words, not people & wanted - {"yes", "no"}, segment in schools) for name in names
+                    )
                     and not (people & wanted - {"yes", "no"} and named_seat & {w for w in words if w.isdigit()})
-                    and len({w for w in key.split(":")[-1].split("-") if len(w) > 3} & words) < 5
+                    and (
+                        len({w for w in key.split(":")[-1].split("-") if len(w) > 3} & words)
+                        < (6 if segment in schools else 5)
+                    )
                 ):
                     continue
                 if ":measure:public-measure-" in key:
