@@ -870,6 +870,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
+        held = (root.findtext("ElectionDate") or "").strip()
+        if held and datetime.strptime(held, "%m/%d/%Y").date() != DAY:
+            return
         stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
         tenant = TENANT.search(url)
         as_of = (
