@@ -386,6 +386,7 @@ def emit() -> Path:
                 continue
             kept += 1
             polity, area, place, path, code = found[options[0]]
+            code = re.sub(r"^\d{5}(?=:)", row["county"], code)
             election = cs.key("us.election", f"{DAY}:MI:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
