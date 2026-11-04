@@ -1,5 +1,6 @@
 import { chamber } from "#lib/server/pages.js";
 import { memo, part } from "#lib/server/parts.js";
+import { fold } from "#lib/steps.js";
 import type { PageServerLoad } from "./$types";
 
 const shape = memo(
@@ -17,7 +18,8 @@ const shape = memo(
     terms: terms.map(({ steps, ...term }) => term),
     steps: part(
       "chamber.steps",
-      terms.map((term) => term.steps),
+      terms.map((term) => fold(term.steps)),
+      { fetch: "preload" },
     ),
     logos: part("chamber.logos", logos),
   }),

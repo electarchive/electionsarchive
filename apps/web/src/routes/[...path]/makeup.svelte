@@ -99,18 +99,25 @@
   let seated = $state<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const blocs = $derived(
-    new Map<string, { group: string; party: string | null }>(
-      terms.flatMap((term) =>
-        [...term.parties, ...(term.steps ?? []).flatMap((step) => step.parties)]
-          .filter((entry) => entry.group != null)
-          .map((entry) => [
-            `${entry.group}/${entry.party ?? "none"}`,
-            { group: entry.group ?? "", party: entry.party },
-          ]),
-      ),
-    ),
-  );
+  const blocs = $derived.by(() => {
+    const found = new Map<string, { group: string; party: string | null }>();
+    for (const term of terms) {
+      for (const parties of [
+        term.parties,
+        ...(term.steps ?? []).map((step) => step.parties),
+      ]) {
+        for (const entry of parties) {
+          if (entry.group != null) {
+            found.set(`${entry.group}/${entry.party ?? "none"}`, {
+              group: entry.group,
+              party: entry.party,
+            });
+          }
+        }
+      }
+    }
+    return found;
+  });
   const sheets = $derived.by(() => {
     if (blocs.size === 0) {
       return terms;
@@ -236,23 +243,17 @@
     ),
   );
   const order = $derived.by(() => {
-    const held = new Map(
-      Map.groupBy(
-        sheets.flatMap((term) => [
-          ...term.parties,
-          ...(term.steps ?? []).flatMap((step) => step.parties),
-        ]),
-        (entry) => entry.party,
-      )
-        .entries()
-        .map(([party, entries]) => {
-          let sum = 0;
-          for (const entry of entries) {
-            sum += entry.seats;
-          }
-          return [party, sum] as const;
-        }),
-    );
+    const held = new Map<string | null, number>();
+    for (const term of sheets) {
+      for (const parties of [
+        term.parties,
+        ...(term.steps ?? []).map((step) => step.parties),
+      ]) {
+        for (const entry of parties) {
+          held.set(entry.party, (held.get(entry.party) ?? 0) + entry.seats);
+        }
+      }
+    }
     return [...held.keys()].toSorted(
       (a, b) =>
         Number(a == null) - Number(b == null) ||
@@ -543,18 +544,32 @@
         joinsAfter,
       };
     });
+    const held = new Map<string | null, Array<number>>();
+    const spanned = new Map<string | null, Array<number>>();
+    for (const [index, part] of parts.entries()) {
+      for (const [into, layers] of [
+        [held, part.stack],
+        [spanned, part.spans],
+      ] as const) {
+        for (const [party, found] of layers) {
+          if (found.y0 === found.y1) {
+            continue;
+          }
+          const indices = into.get(party);
+          if (indices == null) {
+            into.set(party, [index]);
+          } else {
+            indices.push(index);
+          }
+        }
+      }
+    }
     return [
       ...order.map((party) => ({ party, isGroup: false })),
       ...groups.map((party) => ({ party, isGroup: true })),
     ].map(({ party, isGroup }) => {
       const shown: Array<number> = [];
-      for (const [index, part] of parts.entries()) {
-        const found = isGroup
-          ? part.spans.get(party ?? "")
-          : part.stack.get(party);
-        if (found == null || found.y0 === found.y1) {
-          continue;
-        }
+      for (const index of (isGroup ? spanned : held).get(party) ?? []) {
         for (
           let near = Math.max(index - 1, (shown.at(-1) ?? -1) + 1);
           near <= Math.min(index + 1, parts.length - 1);

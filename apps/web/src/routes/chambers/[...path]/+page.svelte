@@ -13,6 +13,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { era, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { unfold } from "#lib/steps.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -76,7 +77,7 @@
   const meta = $derived(members.data ?? roster);
 
   let chosen = $state<{ term: string; day: string } | null>(null);
-  const history = $derived(peek(data.steps)?.value[selected] ?? []);
+  const history = $derived(unfold(peek(data.steps)?.value[selected] ?? []));
 
   $effect(() => {
     if (chosen != null) {
@@ -553,17 +554,14 @@
       </dl>
 
       {const Stream = $derived(data.Stream)}
-      <Island
-        part={data.steps}
-        when={selected === data.terms.length - 1 ? "interaction" : "eager"}
-      >
+      <Island part={data.steps} when="visible">
         {#snippet children(
           steps: NonNullable<typeof data.steps.loaded>["value"],
         )}
           <Stream
             terms={data.terms.map((entry, index) => ({
               ...entry,
-              steps: steps[index] ?? [],
+              steps: unfold(steps[index] ?? []),
             }))}
             parties={data.parties}
             governments={data.governments}
