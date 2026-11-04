@@ -1592,7 +1592,7 @@ def plan(
                     and crowd
                     and crowd <= wanted
                     and not crowd <= {"yes", "no"}
-                    and (re.match(r"\d|sd", segment) or contest in judicial)
+                    and (re.match(r"\d|sd", segment) or contest in judicial or wide and len(crowd) >= 2)
                 ):
                     overlap = 0.6
                 if overlap >= 0.6:
@@ -1603,7 +1603,7 @@ def plan(
                     scored.append(
                         (
                             round(overlap, 2),
-                            len({w for w in found - GENERIC if len(w) > 1 or w.isdigit()}),
+                            len({w for w in found - GENERIC if len(w) > 1 or w.isdigit() or key.endswith(f"-{w}")}),
                             len(found),
                             contest,
                             key,

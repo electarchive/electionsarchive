@@ -9,7 +9,8 @@ import polars as pl
 from ea.sources.us.enr_2026 import FIPS, table
 
 BASE = "https://apps.npr.org/2026-election-results/data/"
-OFFICES = {"S": "senate", "G": "governor", "H": "house"}
+OFFICES = {"S": "senate", "G": "governor", "H": "house", "A": "state", "SS": "state", "I": "state"}
+COUNTIES = {"S", "G"}
 
 
 def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str], None]) -> None:
@@ -20,7 +21,7 @@ def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str],
         return
     store(f"{BASE}states/{state}.json", response.content, ".json")
     for race in races:
-        if race["office"] == "H":
+        if race["office"] not in COUNTIES:
             continue
         detail = client.get(f"{BASE}counties/{state}-{race['id']}.json")
         if detail.status_code < 400:
@@ -30,11 +31,21 @@ def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str],
 def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
     races = {race["id"]: race for race in json.loads(paths[f"{BASE}states/{state}.json"].read_bytes())["results"]}
     found = []
+    single = sum(race.get("office") == "H" and not race.get("test") for race in races.values()) == 1
     for id, race in races.items():
         if race.get("test") or race.get("office") not in OFFICES:
             continue
         url = f"{BASE}counties/{state}-{id}.json"
-        district = (race.get("seat") or "").removeprefix("District ") if race["office"] == "H" else ""
+        district = (
+            ("0" if single else (race.get("seat") or "").removeprefix("District ")) if race["office"] == "H" else ""
+        )
+        contest = (
+            f"{race.get('officeName')} {race.get('seat') or ''}: {race.get('description') or ''}"
+            if race["office"] == "I"
+            else race.get("officeName") or ""
+            if OFFICES[race["office"]] == "state"
+            else ""
+        )
         towns = (
             [town for town in json.loads(paths[url].read_bytes())["results"] if not town["fips"].endswith("000")]
             if url in paths
@@ -42,7 +53,11 @@ def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
         )
         for town in towns:
             for candidate in town.get("candidates") or []:
-                name = f"{candidate.get('first') or ''} {candidate.get('last') or ''}".strip()
+                name = (
+                    candidate.get("last") or ""
+                    if race["office"] == "I"
+                    else f"{candidate.get('first') or ''} {candidate.get('last') or ''}".strip()
+                )
                 if name == "Other":
                     continue
                 found.append(
@@ -50,10 +65,10 @@ def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
                         "state": state,
                         "page": url if url in paths else f"{BASE}states/{state}.json",
                         "scope": "",
-                        "contest": "",
+                        "contest": contest,
                         "office": OFFICES[race["office"]],
                         "district": district,
-                        "party": candidate.get("party"),
+                        "party": None if race["office"] == "I" else candidate.get("party"),
                         "county": town["fips"],
                         "candidate": name,
                         "write_in": False,
