@@ -39,9 +39,11 @@ EV = {
     "UT": ("electionresults.utah.gov", "utah"),
     "RI": ("electionresults.ri.gov", "RhodeIsland"),
     "WA": ("results.votewa.gov", "washington"),
-    "VA": ("app.enhancedvoting.com", "virginia"),
     "AZ": ("app.enhancedvoting.com", "Arizona"),
     "TN": ("app.enhancedvoting.com", "shelby-county-tn"),
+}
+EV_EXPORTS = {
+    "VA": "https://app.enhancedvoting.com/cdn/results/virginia/export-2026-November-General.zip",
 }
 CLARITY_EIDS = {"SC": ["127300"], "WV": ["127496"]}
 CLARITY = {
@@ -69,7 +71,6 @@ LISTINGS = (
     "/utah",
     "/RhodeIsland",
     "/washington",
-    "/virginia",
     "Multiparish.htm",
     "Elections.json",
     "Version.json",
@@ -379,6 +380,14 @@ def fetch() -> None:
 
 
 def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, bytes, str], None]) -> None:
+    for state, url in EV_EXPORTS.items():
+        if only and state not in only:
+            continue
+        content = get(client, url)
+        if content is None:
+            print(f"{state}: no export")
+        else:
+            store(state, url, content, ".zip")
     for state, (host, jurisdiction) in EV.items():
         if only and state not in only:
             continue
@@ -720,6 +729,45 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_mi
 
         enr_mi.collect(client, store)
+
+
+def ev_export(state: str, path: Path):
+    with zipfile.ZipFile(path) as archive:
+        export = json.loads(archive.read("export.json"))
+    precincts: dict[str, list[int]] = {}
+    for locality in export["localResults"]:
+        for item in locality["ballotItems"]:
+            tally = precincts.setdefault(item["id"], [0, 0])
+            tally[0] += item["precinctsReporting"] or 0
+            tally[1] += item["precinctsParticipating"] or 0
+    for locality in export["localResults"]:
+        county = f"51{locality['id']}" if state == "VA" else locality["name"].removesuffix(" County")
+        for item in locality["ballotItems"]:
+            if EV_LOCAL.match(item["name"]):
+                continue
+            found = EV_OFFICES.fullmatch(office_name(item["name"]))
+            reporting, total = precincts[item["id"]]
+            for option in item["ballotOptions"]:
+                yield {
+                    "office": "other"
+                    if found is None
+                    else "senate"
+                    if found["senate"]
+                    else "governor"
+                    if found["governor"]
+                    else "house",
+                    "contest": item["name"].strip() if found is None else "",
+                    "district": (found["district"] if found else None) or "",
+                    "party": option["politicalParty"] or "",
+                    "county": county,
+                    "candidate": TAGS.sub("", option["name"]).strip(),
+                    "write_in": bool(WRITE_IN.search(option["name"])),
+                    "votes": int(option["voteCount"] or 0),
+                    "as_of": export["createdAt"],
+                    "reporting": reporting,
+                    "total": total,
+                    "scope": (found["party0"] or found["party1"] or "") if found else "",
+                }
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
@@ -1238,6 +1286,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                         "total": contest.get("TotalPrecincts"),
                     }
         return
+    if "/cdn/results/" in url:
+        yield from ev_export(state, path)
+        return
     detail = json.loads(path.read_bytes())
     found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
     seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
@@ -1258,8 +1309,6 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             if locality["locality"] is None
             else town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
             if state == "RI"
-            else f"51{locality['locality']['mapFeatureId']}"
-            if state == "VA"
             else place.removesuffix(" County")
         )
         for option in locality["ballotOptions"]:
