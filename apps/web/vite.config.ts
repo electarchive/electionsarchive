@@ -23,6 +23,21 @@ export default defineConfig(({ command }) => {
         env: { dir: "../.." },
         inspector: { toggleKeyCombo: "control-o" },
       }),
+      {
+        name: "inspector-outside-workers",
+        apply: "serve",
+        enforce: "post",
+        transform: {
+          filter: { id: /\/client\/client\.mjs(?:\?|$)/u },
+          handler: (code) => ({
+            code: code.replace(
+              "\nimport('virtual:svelte-inspector-path:load-inspector.js')",
+              "\nif (typeof document !== 'undefined') import('virtual:svelte-inspector-path:load-inspector.js')",
+            ),
+            map: null,
+          }),
+        },
+      },
       devtoolsJson(),
       codeVersion({
         inputs: ["../../pnpm-lock.yaml", "../../packages/db/migrations"],
