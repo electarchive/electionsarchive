@@ -9360,6 +9360,7 @@ def parse() -> None:
             pending = ""
 
     jurisdiction, contest, seats, unexpired = "", "", 0, False
+    start, partials = len(feeds["MI-26125"]), {}
     for line in text("MI-26125", "-layout").splitlines():
         if not line.strip() or re.match(r"\s*(Updated|Official Candidate List|November 3|Petitions)", line):
             continue
@@ -9376,10 +9377,14 @@ def parse() -> None:
                 else f"{jurisdiction or 'Oakland County'} {found[1]}"
             )
             seats, unexpired = int(found[2]), "Term Ending" in found[3]
+            if contest and unexpired:
+                contest = f"{contest} Unexpired Term" + (
+                    "" if partials.setdefault(contest, found[3]) == found[3] else f" {found[3]}"
+                )
         elif re.fullmatch(r"[A-Z][A-Za-z.'’ -]+", line):
             jurisdiction, contest = line.strip(), ""
         elif contest and (
-            found := re.match(r"(Dem|Rep|Lib|Ust|Grn|Wc|Nlp|Npa)?\s+([A-Z][^,\d]+?)(?:\s{2,}|\s*$)", line)
+            found := re.match(r"(Dem|Rep|Lib|Ust|Grn|Wc|Nlp|Npa)?\s+([A-Z][^,\d]+?(?:, [JS]r\.)?)(?:\s{2,}|\s*$)", line)
         ):
             named, independent = party(
                 {"Dem": "Democratic", "Rep": "Republican", "Lib": "Libertarian", "Grn": "Green"}.get(found[1] or "", "")
@@ -9395,6 +9400,7 @@ def parse() -> None:
                     "unexpired": unexpired,
                 }
             )
+    feeds["MI-26125"][start:] = sorted(feeds["MI-26125"][start:], key=lambda row: row["unexpired"])
 
     section, jurisdiction, contest, seats, unexpired = "", "", "", 0, False
     for line in text("MI-26081", "-layout").splitlines():
@@ -10132,6 +10138,7 @@ def parse() -> None:
 
     for key, county in (("MI-26163", "Wayne"), ("MI-26049", "Genesee")):
         post, seats, unexpired = "", 0, False
+        start, partials = len(feeds[key]), {}
         for line in text(key, "-layout").splitlines():
             if found := re.match(r"\s*(\S.*?) - (\S.*?) - (.*?)\((\d+)\)(?: POSITIONS?)?\s*$", line):
                 post = (
@@ -10139,7 +10146,10 @@ def parse() -> None:
                     if not re.search(r"\d", found[2]) and not re.search(r"JUDGE|JUSTICE|COURT", line)
                     else ""
                 )
-                seats, unexpired = int(found[4]), "PARTIAL" in found[3]
+                seats, unexpired = int(found[4]), "PARTIAL" in found[3].upper()
+                if post and unexpired:
+                    term = found[3].strip().upper()
+                    post = f"{post} Unexpired Term" + ("" if partials.setdefault(post, term) == term else f" {term}")
             elif re.match(r"\s{20,}[A-Z][A-Z0-9 .,'&/()-]+$", line):
                 post = ""
             elif post and re.fullmatch(r"(?i)\s*(?:\S+\s+)?no candidate filed\s*", line):
@@ -10171,6 +10181,7 @@ def parse() -> None:
                         "unexpired": unexpired,
                     }
                 )
+        feeds[key][start:] = sorted(feeds[key][start:], key=lambda row: row["unexpired"])
 
     counts = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
     codes = {"D": "Democratic", "DEM": "Democratic", "R": "Republican", "REP": "Republican", "LIB": "Libertarian"}
@@ -12027,17 +12038,28 @@ def parse() -> None:
                     and row["unexpired"]
                 ):
                     tail = f"{tail}:unexpired"
+                ending = None
+                if (
+                    tail is not None
+                    and tail.endswith(":unexpired")
+                    and used.get(tail, str(row["contest"])) != row["contest"]
+                    and (ending := re.search(r"(?i)\bterm ending \d+/\d+/(\d{4})$", str(row["contest"])))
+                ):
+                    tail = f"{tail}-{ending[1]}"
                 if (
                     tail is not None
                     and template == ""
-                    and tail.removesuffix(":unexpired") in minted
-                    and tail.endswith(":unexpired")
+                    and (stem := re.sub(r":unexpired(-\d{4})?$", "", tail)) in minted
+                    and stem != tail
                 ):
-                    base = minted[tail.removesuffix(":unexpired")]
+                    base = minted[stem]
                     if (", " in base[0] and not (state == "NJ" and base[2].startswith("school:"))) or not base[2]:
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
-                    minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
+                    minted[tail] = (
+                        f"{base[0]} (Unexpired Term{f' Ending {ending[1]}' if ending else ''})",
+                        *base[1:],
+                    )
                 if (
                     state == "IN"
                     and tail is not None
