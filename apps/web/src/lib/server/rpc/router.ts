@@ -15,6 +15,7 @@ import {
 import { bounties, claims } from "#lib/server/rpc/bounties.js";
 import { contributors } from "#lib/server/rpc/contributors.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
+import { cycle } from "#lib/server/rpc/cycle.js";
 import { admin } from "#lib/server/rpc/desk.js";
 import { recentChanges, watches } from "#lib/server/rpc/feeds.js";
 import { find } from "#lib/server/rpc/find.js";
@@ -52,7 +53,7 @@ export const reads = {
   entities,
   histories,
   indices,
-  live: { ...live, find, nation },
+  live: { ...live, cycle, find, nation },
   maps,
   parties,
   people,

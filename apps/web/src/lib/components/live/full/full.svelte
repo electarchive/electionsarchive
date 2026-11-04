@@ -25,6 +25,7 @@
   import type { Ballot } from "#lib/server/live-ballot.js";
   import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import Cycle from "#lib/components/live/cycle.svelte";
   import Dial from "#lib/components/live/dial.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
   import Search from "#lib/components/live/search.svelte";
@@ -2203,6 +2204,16 @@
             isWaiting={false}
           />
         </Withheld>
+      {/if}
+      {#if current.race.isMeasure !== true}
+        <Cycle
+          path={current.race.slug}
+          options={current.race.options}
+          totals={current.totals}
+          total={current.total}
+          counted={current.counted}
+          estimate={forecasts ? current.estimate : null}
+        />
       {/if}
       <CountyList
         {rows}

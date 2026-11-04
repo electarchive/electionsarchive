@@ -8,6 +8,7 @@
   import type { Holder } from "#lib/live/ballot.js";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import Cycle from "#lib/components/live/cycle.svelte";
   import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
   import { bandFor, clock, lead, placeSlug, stamp } from "#lib/live/format.js";
@@ -692,6 +693,20 @@
           </Withheld>
         {/if}
       </section>
+    {/if}
+
+    {#if !race.isMeasure}
+      <Cycle
+        path={race.slug}
+        {options}
+        totals={now.totals}
+        total={now.total}
+        counted={estimate.status === "unavailable"
+          ? null
+          : Math.min(1, estimate.shareIn.mid)}
+        estimate={isModeled && !now.isFinal ? estimate : null}
+        class="bg-background px-4 py-6 sm:px-8"
+      />
     {/if}
 
     <section class="bg-background px-4 py-6 sm:px-8">
