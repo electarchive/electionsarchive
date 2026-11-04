@@ -5161,6 +5161,7 @@
   "night_flip_status_flipped": "Virada",
   "night_flip_status_leading": "Tendência de virada",
   "night_flip_status_held": "Mantida",
+  "night_flip_unit_about": "As listras marcam os lugares onde o partido que lidera é diferente do que liderava na última eleição.",
   "night_flips_party_about": "{party} · Viradas: {flipped} · Tendência de virada: {leading}",
   "night_flips_party_leading": "+{count} à frente",
   "night_flips_count": "Viradas: {flipped} · Tendência de virada: {leading}",
