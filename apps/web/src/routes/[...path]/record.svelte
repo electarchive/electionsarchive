@@ -556,10 +556,9 @@
             <text
               x={run.x + 5}
               y="25"
-              class="pointer-events-none text-[0.6875rem] font-semibold"
+              class="pointer-events-none fill-current text-[0.6875rem] font-semibold ink-on-fill"
               opacity={seated == null ? 1 : 0.4}
-              style:fill={`color(from ${tint(run.party)} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
-              >{run.label}</text
+              style:--fill={tint(run.party)}>{run.label}</text
             >
           {/each}
           {#each timeline.years as year (year.year)}

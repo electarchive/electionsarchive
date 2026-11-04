@@ -308,27 +308,18 @@
   size: "large" | "small",
 )}
   <ol
-    class="grid grid-cols-11 gap-0.5 max-inline-136 data-[size=small]:max-inline-80"
+    class="grid grid-cols-11 gap-0.5 font-figures font-semibold max-inline-136 *:aspect-square *:min-inline-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5625rem] data-[size=small]:max-inline-80 [&>li>*]:grid [&>li>*]:place-items-center [&>li>*]:rounded-xs [&>li>*]:bg-(--fill) [&>li>*]:ink-on-fill [&>li>*]:ring-border/70 [&>li>*]:transition-shadow [&>li>*]:outline-none [&>li>*]:block-full [&>li>*]:inline-full [&>li>*]:ring-inset [&>li>*]:hover:ring-2 [&>li>*]:hover:ring-foreground [&>li>*]:focus-visible:ring-2 [&>li>*]:focus-visible:ring-ring [&>li>:where(:not([data-filled]))]:ring-1"
     data-size={size}
   >
     {#each tiles as tile (tile.code)}
-      <li
-        class="aspect-square min-inline-0"
-        style:grid-column={tile.at[0] + 1}
-        style:grid-row={tile.at[1] + 1}
-      >
+      <li style:grid-column={tile.at[0] + 1} style:grid-row={tile.at[1] + 1}>
         <svelte:element
           this={tile.path == null ? "span" : "a"}
           href={tile.path == null
             ? undefined
             : resolve("/[...path]", { path: tile.path })}
-          class="grid place-items-center rounded-xs font-figures font-semibold tabular-nums ring-1 ring-border/70 transition-shadow outline-none block-full inline-full ring-inset hover:ring-2 hover:ring-foreground focus-visible:ring-2 focus-visible:ring-ring data-filled:ring-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5625rem]"
-          style:background={tile.color ?? undefined}
-          style:color={tile.color == null
-            ? undefined
-            : `color(from ${tile.color} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
+          style:--fill={tile.color}
           data-filled={tile.color == null ? undefined : ""}
-          data-size={size}
           title={tile.text}
           aria-label={tile.text}>{tile.code.toUpperCase()}</svelte:element
         >

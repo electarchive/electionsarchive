@@ -294,11 +294,9 @@
                         "text-muted-foreground/50": cell === 0,
                         "font-semibold": share >= 0.5,
                       },
+                      { "bg-(--fill) ink-on-fill": cell !== 0 },
                     )}
-                    style:background={cell === 0 ? undefined : fill}
-                    style:color={cell === 0
-                      ? undefined
-                      : `color(from ${fill} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
+                    style:--fill={cell === 0 ? undefined : fill}
                     >{cell === 0 ? "·" : count(cell)}</span
                   >
                 </td>

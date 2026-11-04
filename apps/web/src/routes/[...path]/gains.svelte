@@ -199,11 +199,10 @@
                     <button
                       type="button"
                       class={cn(
-                        "grid place-items-end rounded-xs px-2 font-figures text-[0.8125rem] block-7 inline-12 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
+                        "grid place-items-end rounded-xs bg-(--fill) px-2 font-figures text-[0.8125rem] ink-on-fill block-7 inline-12 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
                         { "ring-2 ring-foreground": isPicked },
                       )}
-                      style:background={fill}
-                      style:color={`color(from ${fill} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
+                      style:--fill={fill}
                       aria-pressed={isPicked}
                       aria-label={m.gains_seat({
                         to: row.label,

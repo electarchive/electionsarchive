@@ -927,9 +927,8 @@
         y={name.y}
         dy="0.35em"
         text-anchor="middle"
-        class="pointer-events-none text-[0.6875rem] font-semibold"
-        style:fill={`color(from ${tint(name.party)} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
-        >{name.text}</text
+        class="pointer-events-none fill-current text-[0.6875rem] font-semibold ink-on-fill"
+        style:--fill={tint(name.party)}>{name.text}</text
       >
     {/each}
     <path
