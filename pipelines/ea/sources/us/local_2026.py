@@ -7676,6 +7676,72 @@ NUMBERS = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
 WATERMARK = re.compile(r"^(?:[A-Z]{1,2} )+(?=\S\S)|(?: (?!JR|SR|II|IV)[A-Z]{1,2})+$")
 
 
+MN_HOSPITAL_DISTRICTS = {
+    "Bay Lake Township": "Cuyuna Range Hospital District",
+    "Cuyuna": "Cuyuna Range Hospital District",
+    "Deerwood": "Cuyuna Range Hospital District",
+    "Emily": "Cuyuna Range Hospital District",
+    "Irondale Township": "Cuyuna Range Hospital District",
+    "Ironton": "Cuyuna Range Hospital District",
+    "Perry Lake Township": "Cuyuna Range Hospital District",
+    "Riverton": "Cuyuna Range Hospital District",
+    "Trommald": "Cuyuna Range Hospital District",
+    "Wolford Township": "Cuyuna Range Hospital District",
+    "Big Falls": "Northern Itasca Hospital District",
+    "Bigfork": "Northern Itasca Hospital District",
+    "Carpenter Township": "Northern Itasca Hospital District",
+    "Marcell Township": "Northern Itasca Hospital District",
+    "Pomroy Township": "Northern Itasca Hospital District",
+    "Dawson": "Johnson Memorial Hospital District",
+    "Lac Qui Parle Township": "Johnson Memorial Hospital District",
+    "Maxwell Township": "Johnson Memorial Hospital District",
+    "Providence Township": "Johnson Memorial Hospital District",
+    "Canby": "Canby Community Hospital District",
+    "Dent": "Perham Hospital District",
+    "Dora Township": "Perham Hospital District",
+    "Gorman Township": "Perham Hospital District",
+    "Otter Tail Township": "Perham Hospital District",
+    "Perham": "Perham Hospital District",
+    "Perham Township": "Perham Hospital District",
+    "Pine Lake Township": "Perham Hospital District",
+    "Richville": "Perham Hospital District",
+    "Lida Township": "Pelican Valley Hospital District",
+    "Maplewood Township": "Pelican Valley Hospital District",
+    "Pelican Rapids": "Pelican Valley Hospital District",
+    "Scambler Township": "Pelican Valley Hospital District",
+    "Bruno": "North Pine Area Hospital District",
+    "Clover Township": "North Pine Area Hospital District",
+    "Dell Grove Township": "North Pine Area Hospital District",
+    "Finlayson Township": "North Pine Area Hospital District",
+    "Hinckley": "North Pine Area Hospital District",
+    "Hinckley Township": "North Pine Area Hospital District",
+    "New Dosey Township": "North Pine Area Hospital District",
+    "Ogema Township": "North Pine Area Hospital District",
+    "Partridge Township": "North Pine Area Hospital District",
+    "Willow River": "North Pine Area Hospital District",
+    "Gilchrist Township": "Glacial Ridge Hospital District",
+    "Grove Lake Township": "Glacial Ridge Hospital District",
+    "Leven Township": "Glacial Ridge Hospital District",
+    "Long Beach": "Glacial Ridge Hospital District",
+    "Reno Township": "Glacial Ridge Hospital District",
+    "Sedan": "Glacial Ridge Hospital District",
+    "Westport Township": "Glacial Ridge Hospital District",
+    "Becker Township": "Staples Area Hospital District",
+    "Byron Township": "Staples Area Hospital District",
+    "Goodwill Township": "Staples Area Hospital District",
+    "Moran Township": "Staples Area Hospital District",
+    "Motley Township": "Staples Area Hospital District",
+    "Staples": "Staples Area Hospital District",
+    "Thomastown Township": "Staples Area Hospital District",
+    "Beatty Township": "Cook-Orr Healthcare District",
+    "Camp 5 Township": "Cook-Orr Healthcare District",
+    "Field Township": "Cook-Orr Healthcare District",
+    "Kabetogama Township": "Cook-Orr Healthcare District",
+    "Leiding Township": "Cook-Orr Healthcare District",
+    "Linden Grove Township": "Cook-Orr Healthcare District",
+}
+
+
 def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
     text = re.sub(r"\bat[- ]large\b", " atlarge ", text.lower().replace("&", " and "))
     text = re.sub(r"\b(\d+)(?:st|nd|rd|th)\b", r"\1", text)
@@ -9171,12 +9237,19 @@ def parse() -> None:
             elif key == "MN-county" and (split := re.match(r"County Park Commissioner (District \d+)$", title)):
                 district = "Three Rivers Park District"
                 title = f"Commissioner, {split[1]}"
+            county_name = names.get(cells[1], "") if key == "MN-county" else ""
+            if key == "MN" and (
+                hospital := re.match(r"(?:Special Election for )?Hospital District Board Member \(([^)]+)\)", title)
+            ):
+                district = MN_HOSPITAL_DISTRICTS[hospital[1]]
+                county_name = names.get(subdivision_county.get(cells[5], ""), "")
+                title = f"Board Member, {hospital[1]}"
             magnitude = re.search(r"\(ELECT (\d+)\)", upper)
             feeds[key].append(
                 {
                     **claim,
                     "district": district,
-                    "county": names.get(cells[1], "") if key == "MN-county" else "",
+                    "county": county_name,
                     "contest": f"{district}, {title}"
                     if district
                     else f"{names.get(cells[1], '')} County {title}"
