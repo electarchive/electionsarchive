@@ -5712,6 +5712,13 @@ for key, publisher, title, url, local in (
         "in/597/18065/henry_candidates.pdf",
     ),
     (
+        "IN-18155-townships",
+        "Switzerland County Clerk",
+        "Official sample ballots, 2026 General Election, Switzerland County",
+        "https://www.in.gov/counties/switzerland/files/SWITZERLAND-SAMPLE-BALLOTS-9.30.2026.pdf",
+        "in/597/18155/switzerland_sample_ballots.pdf",
+    ),
+    (
         "IN-18085-townships",
         "Kosciusko County Clerk",
         "Candidate List - Abbreviated, 2026 General Election, Kosciusko County",
