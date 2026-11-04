@@ -4992,7 +4992,7 @@
   "night_chamber_expected": "{party}: {seats} cadeiras esperadas, intervalo de 80% de {low} a {high}",
   "night_chamber_net": "Ganho líquido de {count} para {party}",
   "night_chamber_net_none": "Sem mudança líquida de cadeiras até agora",
-  "night_chamber_note": "Cadeiras listradas não estão em disputa neste ano. Enquanto uma disputa não tiver votos apurados, as probabilidades dão ao partido que ocupa a cadeira {prior} de chance de mantê-la.",
+  "night_chamber_note": "Cadeiras em tom claro não estão em disputa este ano. Enquanto uma disputa não tiver votos apurados, a estimativa dá ao partido que ocupa a cadeira {prior} de chance de mantê-la.",
   "night_chamber_others": "Independentes e outros",
   "night_chamber_not_up": [
     {
@@ -5041,7 +5041,7 @@
   "night_state_now": "Ganhas ou à frente",
   "night_state_seats_up": "Cadeiras em jogo: {count}",
   "night_state_not_up": "Sem eleição este ano",
-  "night_state_striped": "Cadeiras listradas não estão em disputa este ano.",
+  "night_state_striped": "Cadeiras em tom claro não estão em disputa este ano.",
   "night_state_search": "Buscar por distrito ou candidato",
   "night_state_more": "Mostrar todos os {count}",
   "night_state_less": "Mostrar menos",
@@ -5166,6 +5166,18 @@
   "night_flips_count": "Viradas: {flipped} · Tendência de virada: {leading}",
   "night_chamber_flipped": "Viradas: {count}",
   "night_chamber_leading_flip": "Tendência de virada: {count}",
+  "night_chamber_key_not_up": "Fora de disputa este ano",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Virou {count} cadeira",
+        "countPlural=many": "Virou {count} de cadeiras",
+        "countPlural=*": "Virou {count} cadeiras"
+      }
+    }
+  ],
   "night_bar_gained": "Mudando de partido: {count}",
   "night_state_sort": "Ordenar distritos",
   "night_state_sort_district": "Distrito",

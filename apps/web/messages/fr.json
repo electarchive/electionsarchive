@@ -4994,7 +4994,7 @@
   "night_chamber_expected": "{party} : {seats} sièges attendus, intervalle à 80 % de {low} à {high}",
   "night_chamber_net": "Gain net de {count} pour {party}",
   "night_chamber_net_none": "Aucun changement net de sièges à ce stade",
-  "night_chamber_note": "Les sièges rayés ne sont pas en jeu cette année. Tant qu'un scrutin n'a pas fourni de résultats, les probabilités donnent au parti qui détient le siège {prior} de chances de le conserver.",
+  "night_chamber_note": "Les sièges en teinte pâle ne sont pas renouvelés cette année. Tant qu'aucun résultat n'est publié pour un scrutin, les probabilités donnent au parti qui détient le siège {prior} de chances de le conserver.",
   "night_chamber_others": "Indépendants et autres",
   "night_chamber_not_up": [
     {
@@ -5043,7 +5043,7 @@
   "night_state_now": "Gagnés ou en tête",
   "night_state_seats_up": "Sièges en jeu : {count}",
   "night_state_not_up": "Pas en jeu cette année",
-  "night_state_striped": "Les sièges hachurés ne sont pas en jeu cette année.",
+  "night_state_striped": "Les sièges en teinte pâle ne sont pas renouvelés cette année.",
   "night_state_search": "Rechercher un district ou un candidat",
   "night_state_more": "Afficher les {count}",
   "night_state_less": "Afficher moins",
@@ -5168,6 +5168,18 @@
   "night_flips_count": "Basculés : {flipped} · En tête : {leading}",
   "night_chamber_flipped": "Sièges basculés : {count}",
   "night_chamber_leading_flip": "En passe de basculer : {count}",
+  "night_chamber_key_not_up": "Non renouvelé cette année",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} siège basculé",
+        "countPlural=many": "{count} de sièges basculés",
+        "countPlural=*": "{count} sièges basculés"
+      }
+    }
+  ],
   "night_bar_gained": "Changements de camp : {count}",
   "night_state_sort": "Trier les districts",
   "night_state_sort_district": "District",

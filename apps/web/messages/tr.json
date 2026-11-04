@@ -4918,7 +4918,7 @@
   "night_chamber_expected": "{party}: beklenen {seats}, %80 aralığı {low} ile {high} arası",
   "night_chamber_net": "{party}, net {count} sandalye kazandı",
   "night_chamber_net_none": "Şu ana kadar net sandalye değişimi yok",
-  "night_chamber_note": "Çizgili sandalyeler bu yıl seçimde değil. Bir yarıştan oy gelene kadar, sandalyeyi elinde tutan partinin onu koruma olasılığı {prior} sayılır.",
+  "night_chamber_note": "Açık renkli sandalyeler bu yıl seçime gitmiyor. Bir yarışta oylar gelene kadar, sandalyeyi elinde tutan partinin onu koruma olasılığı {prior} sayılır.",
   "night_chamber_others": "Bağımsızlar ve diğerleri",
   "night_chamber_not_up": [
     {
@@ -4965,7 +4965,7 @@
   "night_state_now": "Kazanan veya öndeki",
   "night_state_seats_up": "{count} sandalye seçimde",
   "night_state_not_up": "Bu yıl seçimde olmayan",
-  "night_state_striped": "Çizgili sandalyelerde bu yıl seçim yok.",
+  "night_state_striped": "Açık renkli sandalyeler bu yıl seçime gitmiyor.",
   "night_state_search": "Seçim bölgesi veya aday ara",
   "night_state_more": "Tümünü göster ({count})",
   "night_state_less": "Daha az göster",
@@ -5090,6 +5090,17 @@
   "night_flips_count": "El değiştirdi: {flipped} · Önde: {leading}",
   "night_chamber_flipped": "El değiştirdi: {count}",
   "night_chamber_leading_flip": "El değiştirme yolunda: {count}",
+  "night_chamber_key_not_up": "Bu yıl seçime gitmiyor",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "El değiştiren sandalye: {count}",
+        "countPlural=*": "El değiştiren sandalye: {count}"
+      }
+    }
+  ],
   "night_bar_gained": "El değiştiren: {count}",
   "night_state_sort": "Seçim bölgelerini sırala",
   "night_state_sort_district": "Seçim bölgesi",

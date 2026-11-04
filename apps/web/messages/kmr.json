@@ -4918,7 +4918,7 @@
   "night_chamber_expected": "{party}: {seats} kursî tê hêvîkirin, navbera 80% ji {low} heta {high}",
   "night_chamber_net": "Ji bo {party} qezenca xalis {count} kursî",
   "night_chamber_net_none": "Heta niha di kursiyan de guhertin tune",
-  "night_chamber_note": "Kursiyên xêzxêzî îsal nayên hilbijartin. Heya ku pêşbaziyek deng ragihîne, şansa partiya xwediyê kursiyê ya parastina wê bi {prior} tê hesibandin.",
+  "night_chamber_note": "Kursiyên bi rengê vekirî îsal nayên hilbijartin. Heta ku dengên pêşbaziyekê neyên, şansê ku partiya xwedî kursiyê wê biparêze {prior} tê hesibandin.",
   "night_chamber_others": "Serbixwe û yên din",
   "night_chamber_not_up": [
     {
@@ -4965,7 +4965,7 @@
   "night_state_now": "Serkeftî an pêşeng",
   "night_state_seats_up": "{count} kursiyên dengdanê",
   "night_state_not_up": "Îsal nayên hilbijartin",
-  "night_state_striped": "Ji bo kursiyên xetxetî îsal hilbijartin nayê kirin.",
+  "night_state_striped": "Kursiyên bi rengê vekirî îsal nayên hilbijartin.",
   "night_state_search": "Li gorî herêm an berendam bigere",
   "night_state_more": "Hemû {count} nîşan bide",
   "night_state_less": "Kêmtir nîşan bide",
@@ -5090,6 +5090,17 @@
   "night_flips_count": "Guherî: {flipped} · Pêş e: {leading}",
   "night_chamber_flipped": "Partî guherî: {count}",
   "night_chamber_leading_flip": "Partiyeke din pêş e: {count}",
+  "night_chamber_key_not_up": "Îsal nayê hilbijartin",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} kursî ji hevrikan stend",
+        "countPlural=*": "{count} kursî ji hevrikan stend"
+      }
+    }
+  ],
   "night_bar_gained": "Partî diguhere: {count}",
   "night_state_sort": "Herêman rêz bike",
   "night_state_sort_district": "Herêm",

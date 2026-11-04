@@ -4918,7 +4918,7 @@
   "night_chamber_expected": "{party}: erwartet {seats}, 80-%-Bereich {low} bis {high}",
   "night_chamber_net": "Nettogewinn für {party}: {count}",
   "night_chamber_net_none": "Bisher keine Nettoveränderung bei den Sitzen",
-  "night_chamber_note": "Gestreifte Sitze stehen dieses Jahr nicht zur Wahl. Solange eine Wahl keine Stimmen meldet, hat die Partei, die den Sitz hält, rechnerisch eine Chance von {prior}, ihn zu behalten.",
+  "night_chamber_note": "Blass dargestellte Sitze stehen dieses Jahr nicht zur Wahl. Solange für eine Wahl noch keine Stimmen vorliegen, hat die Partei, die den Sitz hält, in der Berechnung eine Chance von {prior}, ihn zu behalten.",
   "night_chamber_others": "Parteilose und Sonstige",
   "night_chamber_not_up": [
     {
@@ -4965,7 +4965,7 @@
   "night_state_now": "Gewonnen oder vorn",
   "night_state_seats_up": "Sitze zur Wahl: {count}",
   "night_state_not_up": "Dieses Jahr nicht zur Wahl",
-  "night_state_striped": "Gestreifte Sitze stehen dieses Jahr nicht zur Wahl.",
+  "night_state_striped": "Blass dargestellte Sitze stehen dieses Jahr nicht zur Wahl.",
   "night_state_search": "Nach Distrikt oder Kandidat suchen",
   "night_state_more": "Alle {count} anzeigen",
   "night_state_less": "Weniger anzeigen",
@@ -5090,6 +5090,17 @@
   "night_flips_count": "Gekippt: {flipped} · Herausforderer führt: {leading}",
   "night_chamber_flipped": "Gekippte Sitze: {count}",
   "night_chamber_leading_flip": "Herausforderer führt: {count}",
+  "night_chamber_key_not_up": "Dieses Jahr nicht zur Wahl",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} Sitz gekippt",
+        "countPlural=*": "{count} Sitze gekippt"
+      }
+    }
+  ],
   "night_bar_gained": "Sitzwechsel: {count}",
   "night_state_sort": "Distrikte sortieren",
   "night_state_sort_district": "Distrikt",
