@@ -12,32 +12,9 @@ from ea.sources.us.enr_2026 import DAY
 
 HOST = "sos.wyo.gov"
 PAGE = f"https://{HOST}/Elections/Docs/{DAY.year}/{DAY.year}GeneralResults.aspx"
-SUMMARY = re.compile(r"Statewide_(?:\w+_)?Candidates_Summary\.pdf$", re.IGNORECASE)
-COUNTIES = {
-    "Albany",
-    "Big Horn",
-    "Campbell",
-    "Carbon",
-    "Converse",
-    "Crook",
-    "Fremont",
-    "Goshen",
-    "Hot Springs",
-    "Johnson",
-    "Laramie",
-    "Lincoln",
-    "Natrona",
-    "Niobrara",
-    "Park",
-    "Platte",
-    "Sheridan",
-    "Sublette",
-    "Sweetwater",
-    "Teton",
-    "Uinta",
-    "Washakie",
-    "Weston",
-}
+PRECINCTS = re.compile(r"/\d{4}_(\w+?)_County_General_PbP\.pdf$")
+COUNTIES = 23
+STATEWIDE = {"Secretary of State", "State Auditor", "State Treasurer", "Superintendent of Public Instruction"}
 TRAILING = {"write-ins": True, "overvotes": False, "undervotes": False}
 NUMBER = re.compile(r"-|\d{1,3}(?:,\d{3})*")
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
@@ -55,7 +32,7 @@ def collect(client: httpx.Client, get: Callable, store: Callable[[str, bytes, st
         set(re.findall(r"""href=["']([^"']+\.pdf)["']""", listing.decode(errors="replace"), re.IGNORECASE))
     ):
         url = urljoin(PAGE, html.unescape(href))
-        if urlparse(url).hostname != HOST or not SUMMARY.search(url):
+        if urlparse(url).hostname != HOST or PRECINCTS.search(url) is None:
             continue
         content = get(client, url)
         if content is not None and content.startswith(b"%PDF"):
@@ -88,30 +65,27 @@ def lines(words: list[tuple[float, float, float, float, str]]) -> list[list[tupl
 
 
 def contests(path: Path):
-    xml = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
-    for page in PAGE_TAG.findall(xml):
+    done = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=False)
+    if done.returncode != 0:
+        print(f"WY: {path.name}: pdftotext exited {done.returncode}; skipped")
+        return
+    for page in PAGE_TAG.findall(done.stdout):
         words = [(float(a), float(b), float(c), float(d), html.unescape(t)) for a, b, c, d, t in WORD.findall(page)]
         rows = lines(words)
-        dated = next((i for i, line in enumerate(rows) if " Election - " in " ".join(w[4] for w in line)), None)
-        first = next(
-            (
-                i
-                for i, line in enumerate(rows)
-                if " ".join(w[4] for w in line if not NUMBER.fullmatch(w[4])) in COUNTIES
-            ),
-            None,
-        )
-        if dated is None or first is None or first < dated + 2:
+        marked = next((i for i, line in enumerate(rows) if " ".join(w[4] for w in line) == "UNOFFICIAL RESULTS"), None)
+        start = next((i + 1 for i, line in enumerate(rows) if line[0][4] == "Precinct"), None)
+        total = next((line for line in rows if line[0][4] == "Total"), None)
+        if marked is None or start is None or total is None or start <= marked:
             continue
-        height = rows[first][0][3] - rows[first][0][1]
-        heads = [line for line in rows[dated + 1 : first] if abs(line[0][3] - line[0][1] - height) > 0.05 * height]
-        title = re.sub(r",\s*Continued$", "", " ".join(w[4] for w in heads[0])) if heads else ""
-        party = " ".join(w[4] for w in heads[1]) if len(heads) > 1 else ""
+        height = total[0][3] - total[0][1]
+        heads = [line for line in rows[marked + 1 : start] if abs(line[0][3] - line[0][1] - height) > 0.05 * height]
+        title = " ".join(w[4] for w in heads[0]) if heads else ""
         header = [
             w
-            for line in rows[dated + 1 : first]
+            for line in rows[marked + 1 : start]
             if abs(line[0][3] - line[0][1] - height) <= 0.05 * height
             for w in line
+            if w[4] != "Precinct"
         ]
         trailing = [w for w in header if w[4].lower() in TRAILING]
         segments: list[dict] = []
@@ -141,27 +115,21 @@ def contests(path: Path):
                     top=segment["top"],
                 )
         names = [c["text"] for c in sorted(columns, key=lambda c: c["left"])] + [w[4] for w in sorted(trailing)]
-        values: dict[str, list[int | None]] = {}
-        for line in rows[first:]:
-            label = " ".join(w[4] for w in line if not NUMBER.fullmatch(w[4]))
-            if label not in COUNTIES:
-                continue
-            numbers = [w[4] for w in line if NUMBER.fullmatch(w[4])]
-            if len(numbers) != len(names):
-                print(f"WY: {path.name}: {title} {label} has {len(numbers)} values for {len(names)} columns; skipped")
-                values = {}
-                break
-            values[label] = [None if n == "-" else int(n.replace(",", "")) for n in numbers]
-        yield title, party, names, values
+        numbers = [w[4] for w in total[1:]]
+        if len(numbers) != len(names) or not all(NUMBER.fullmatch(n) for n in numbers):
+            print(f"WY: {path.name}: {title} has {len(numbers)} totals for {len(names)} columns; skipped")
+            continue
+        yield title, names, [None if n == "-" else int(n.replace(",", "")) for n in numbers]
 
 
 def rows(url: str, path: Path, urls: dict[str, Path]):
-    if not url.endswith(".pdf"):
+    found = PRECINCTS.search(url)
+    if found is None:
         return
+    county = found[1].replace("_", " ")
+    complete = sum(1 for other in urls if PRECINCTS.search(other)) == COUNTIES
     as_of = stamp(path)
-    for title, party, names, values in contests(path):
-        if party:
-            continue
+    for title, names, counts in contests(path):
         seat = LEGISLATURE.fullmatch(title)
         office, district = (
             ("senate", "")
@@ -172,27 +140,26 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             if title == "Governor"
             else (seat[1].lower(), f"{seat[2]}:g")
             if seat
+            else ("state", "")
+            if title in STATEWIDE
             else (None, "")
         )
-        if office is None:
+        if office is None or (not seat and not complete) or all(n is None for n in counts):
             continue
-        for county, counts in values.items():
-            if all(n is None for n in counts):
+        for name, votes in zip(names, counts, strict=True):
+            if name.lower() in TRAILING and not TRAILING[name.lower()]:
                 continue
-            for name, votes in zip(names, counts, strict=True):
-                if name.lower() in TRAILING and not TRAILING[name.lower()]:
-                    continue
-                label = PARTY.search(name)
-                yield {
-                    "office": office,
-                    "contest": "",
-                    "district": district,
-                    "party": label[1] if label else None,
-                    "county": county,
-                    "candidate": PARTY.sub("", name),
-                    "write_in": name.lower() == "write-ins",
-                    "votes": votes or 0,
-                    "as_of": as_of,
-                    "reporting": 0,
-                    "total": 0,
-                }
+            label = PARTY.search(name)
+            yield {
+                "office": office,
+                "contest": title if office == "state" else "",
+                "district": district,
+                "party": label[1] if label else None,
+                "county": county,
+                "candidate": PARTY.sub("", name),
+                "write_in": name.lower() == "write-ins",
+                "votes": votes or 0,
+                "as_of": as_of,
+                "reporting": 0,
+                "total": 0,
+            }
