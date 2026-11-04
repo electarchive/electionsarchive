@@ -1,12 +1,14 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import type { Shapes } from "#lib/live/board/feed.svelte.js";
+  import Hatches from "#lib/components/live/hatches.svelte";
   import { MUTED } from "#lib/live/board/labels.js";
   import { cn } from "#lib/utils.js";
 
   let {
     shapes,
     fills,
+    flips = {},
     label,
     focus = null,
     marked = null,
@@ -16,6 +18,7 @@
   }: {
     shapes: Shapes;
     fills: Record<string, string>;
+    flips?: Record<string, string>;
     label: string;
     focus?: Set<string> | null;
     marked?: string | null;
@@ -24,7 +27,12 @@
     tip: Snippet<[string]>;
   } = $props();
 
+  const id = $props.id();
+
   let pointer = $state<{ x: number; y: number; isRight: boolean } | null>(null);
+  let rect = $state<DOMRectReadOnly>();
+
+  const stripes = $derived([...new Set(Object.values(flips))]);
 
   const entries = $derived(Object.entries(shapes.areas));
   const view = $derived(`-4 -4 ${shapes.box[2] + 8} ${shapes.box[3] + 8}`);
@@ -52,13 +60,22 @@
     preserveAspectRatio="xMidYMid meet"
     role="img"
     aria-label={label}
+    bind:contentRect={rect}
     onpointerleave={() => {
       hovered = null;
       pointer = null;
     }}
   >
-    {#each entries as [id, d] (id)}
-      {const isDim = $derived(focus != null && !focus.has(id))}
+    <defs>
+      <Hatches
+        {id}
+        {stripes}
+        box={[shapes.box[2] + 8, shapes.box[3] + 8]}
+        {rect}
+      />
+    </defs>
+    {#each entries as [area, d] (area)}
+      {const isDim = $derived(focus != null && !focus.has(area))}
       <path
         {d}
         role="button"
@@ -70,24 +87,31 @@
         )}
         stroke-width="0.6"
         vector-effect="non-scaling-stroke"
-        fill={isDim ? MUTED : (fills[id] ?? MUTED)}
+        fill={isDim ? MUTED : (fills[area] ?? MUTED)}
         opacity={isDim ? 0.55 : 1}
         onpointermove={(event) => {
           if (!isDim) {
-            track(event, id);
+            track(event, area);
           }
         }}
         onclick={() => {
           if (!isDim) {
-            onPick?.(id);
+            onPick?.(area);
           }
         }}
         onkeydown={(event) => {
           if (!isDim && (event.key === "Enter" || event.key === " ")) {
-            onPick?.(id);
+            onPick?.(area);
           }
         }}
       />
+      {#if !isDim && flips[area] != null}
+        <path
+          {d}
+          class="pointer-events-none"
+          fill="url(#{id}-{stripes.indexOf(flips[area] ?? '')})"
+        />
+      {/if}
     {/each}
     {#each outlined as d, index (index)}
       <path

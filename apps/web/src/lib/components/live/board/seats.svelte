@@ -37,6 +37,7 @@
   {#each tiles as summary (summary.race.id)}
     {const isPicked = $derived(desk.selected?.id === summary.race.id)}
     {const isWon = $derived(called(summary) != null)}
+    {const mark = $derived(desk.hatch(summary))}
     <li>
       <button
         type="button"
@@ -46,7 +47,8 @@
           { "text-white": isWon, "text-foreground": !isWon },
           { "outline-2 outline-foreground": isPicked },
         )}
-        style:background-color={strength(summary)}
+        style:background-color={mark?.fill ?? strength(summary)}
+        style:background-image={mark?.stripes}
         title={describe(summary)}
         aria-label={describe(summary)}
         aria-pressed={isPicked}

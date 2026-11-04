@@ -2,6 +2,7 @@
   import type { LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { UnitStanding } from "#lib/live/standing.js";
+  import { unitHatch } from "#lib/components/live/full/model.js";
   import { percent } from "#lib/format.js";
   import { MUTED } from "#lib/live/board/labels.js";
   import { lead, placeName, surname, tone } from "#lib/live/format.js";
@@ -73,11 +74,24 @@
     if (row.leader == null) {
       return "color-mix(in oklab, var(--muted-foreground) 16%, var(--background))";
     }
-    return marginShade(tone(options[row.leader]), marginSafety(row.margin));
+    return (
+      unitHatch(row, options)?.fill ??
+      marginShade(tone(options[row.leader]), marginSafety(row.margin))
+    );
   }
 
   const fills = $derived(
     Object.fromEntries([...byArea].map(([areaId, row]) => [areaId, fill(row)])),
+  );
+  const flips = $derived(
+    mode === "lead"
+      ? Object.fromEntries(
+          [...byArea].flatMap(([areaId, row]) => {
+            const stripe = unitHatch(row, options)?.stripe;
+            return stripe == null ? [] : [[areaId, stripe] as const];
+          }),
+        )
+      : {},
   );
 </script>
 
@@ -128,6 +142,7 @@
   <Atlas
     {shapes}
     {fills}
+    {flips}
     {focus}
     {marked}
     label={race.title}

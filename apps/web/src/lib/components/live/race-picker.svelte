@@ -27,6 +27,7 @@
     search = null,
     onpick = null,
     isCompact = false,
+    hatchOf = null,
   }: {
     summaries: Array<Summary>;
     current?: string | null;
@@ -41,6 +42,9 @@
     search?: Snippet | null;
     onpick?: ((summary: Summary) => void) | null;
     isCompact?: boolean;
+    hatchOf?:
+      | ((summary: Summary) => { fill: string; stripes: string } | null)
+      | null;
   } = $props();
 
   const id = $props.id();
@@ -537,7 +541,8 @@
       {/each}
       {#each entries as entry (entry.summary.race.id)}
         {const summary = $derived(entry.summary)}
-        {const color = $derived(shade(summary))}
+        {const mark = $derived(hatchOf?.(summary) ?? null)}
+        {const color = $derived(mark?.fill ?? shade(summary))}
         {const isCurrent = $derived(summary.race.slug === current)}
         <li>
           {#snippet body()}
@@ -560,7 +565,7 @@
               },
             ),
             `${title(summary.race)}: ${verdict(summary)}`,
-            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? "none" : DOTS}`,
+            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? (mark?.stripes ?? "none") : DOTS}`,
             body,
           )}
         </li>

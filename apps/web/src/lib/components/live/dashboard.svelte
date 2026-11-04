@@ -336,9 +336,9 @@
     if (wanted === "counted") {
       return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
     }
-    const turn = turnOf(summary);
-    if (turn != null) {
-      return hatch(tint(turn.to), turn.flip).fill;
+    const mark = seatHatch(summary);
+    if (mark != null) {
+      return mark.fill;
     }
     if (entry == null || wanted === "lead") {
       return strength(summary);
@@ -361,16 +361,23 @@
       : { flip: found.flip, to: found.to };
   }
 
+  function seatHatch(summary: Summary) {
+    const turn = turnOf(summary);
+    return turn == null || summary.later != null
+      ? null
+      : hatch(tint(turn.to), turn.flip);
+  }
+
   function flipsFor(view: Chamber, mode: Mode) {
-    const found: Record<string, "flipped" | "leading"> = {};
+    const found: Record<string, string> = {};
     if (mode === "counted" || view === "house") {
       return found;
     }
     for (const code of Object.keys(nation?.codes ?? {})) {
       const first = of(code, view)[0];
-      const turn = first == null ? null : turnOf(first);
-      if (turn != null) {
-        found[code] = turn.flip;
+      const stripe = first == null ? null : seatHatch(first)?.stripe;
+      if (stripe != null) {
+        found[code] = stripe;
       }
     }
     return found;
@@ -485,8 +492,8 @@
       ? {}
       : Object.fromEntries(
           [...districts].flatMap(([key, summary]) => {
-            const turn = turnOf(summary);
-            return turn == null ? [] : [[key, turn.flip] as const];
+            const stripe = seatHatch(summary)?.stripe;
+            return stripe == null ? [] : [[key, stripe] as const];
           }),
         ),
   );
@@ -1350,6 +1357,7 @@
                         style:background-color={seat.leader == null
                           ? WAITING
                           : shade(seat, "lead")}
+                        style:background-image={seatHatch(seat)?.stripes}
                         title={seat.race.title}
                         aria-label={seat.race.title}
                         onclick={(event) => event.stopPropagation()}

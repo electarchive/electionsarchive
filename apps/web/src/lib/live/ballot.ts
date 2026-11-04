@@ -11,7 +11,7 @@ import type {
   BallotParty,
   BallotTier,
 } from "#lib/server/live-ballot.js";
-import { shift } from "#lib/live/flips.js";
+import { hatch, shift } from "#lib/live/flips.js";
 import { tone } from "#lib/live/format.js";
 import { summarize } from "#lib/live/summary.js";
 import { side, swatch, UNAFFILIATED } from "#lib/party.js";
@@ -192,6 +192,13 @@ export function turn(entry: Entry): Turn | null {
     flip: found.flip,
     to: { short: pick.party?.short ?? "", color: tone(pick) },
   };
+}
+
+export function entryHatch(entry: Entry) {
+  const found = turn(entry);
+  return found == null || entry.summary.later != null
+    ? null
+    : hatch(found.to.color, found.flip);
 }
 
 export function district(entry: Entry) {

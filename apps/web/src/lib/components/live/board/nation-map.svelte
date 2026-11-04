@@ -32,14 +32,30 @@
       (summary) => summary.race.state,
     ),
   );
+  const marks = $derived(
+    new Map(
+      Object.entries(shapes?.codes ?? {}).flatMap(([code, areaId]) => {
+        const first = office === "house" ? null : byState.get(code)?.[0];
+        const mark = first == null ? null : desk.hatch(first);
+        return mark == null ? [] : [[areaId, mark] as const];
+      }),
+    ),
+  );
   const fills = $derived.by(() => {
     const found: Record<string, string> = {};
     for (const [code, areaId] of Object.entries(shapes?.codes ?? {})) {
       const races = byState.get(code) ?? [];
-      found[areaId] = races.length === 0 ? MUTED : strength(lean(races));
+      found[areaId] =
+        marks.get(areaId)?.fill ??
+        (races.length === 0 ? MUTED : strength(lean(races)));
     }
     return found;
   });
+  const flips = $derived(
+    Object.fromEntries(
+      [...marks].map(([areaId, mark]) => [areaId, mark.stripe]),
+    ),
+  );
   const marked = $derived(
     desk.selected?.office === office
       ? (shapes?.codes[desk.selected.state] ?? null)
@@ -113,6 +129,7 @@
   <Atlas
     {shapes}
     {fills}
+    {flips}
     {marked}
     label={m.board_kind_nation()}
     bind:hovered

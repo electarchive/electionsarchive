@@ -5091,6 +5091,7 @@
   "night_flip_status_flipped": "Flipped",
   "night_flip_status_leading": "Leading to flip",
   "night_flip_status_held": "Held",
+  "night_flip_unit_about": "Stripes mark places where a different party leads than in the last election.",
   "night_flips_party_about": "{party}: {flipped} flipped, {leading} leading to flip",
   "night_flips_party_leading": "+{count} leading",
   "night_flips_count": "Flipped: {flipped} · Leading: {leading}",

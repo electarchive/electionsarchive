@@ -24,11 +24,7 @@ import {
 export type Office = "senate" | "governor" | "house";
 export type Paint = "lead" | "chance" | "counted";
 export type Lens = "lead" | "shift" | "last" | "counted" | "votes";
-export type Fill = {
-  color: string;
-  isLater?: boolean;
-  flip?: "flipped" | "leading";
-};
+export type Fill = { color: string; isLater?: boolean; stripe?: string | null };
 export type Dot = { areaId: string; value: number; color: string };
 export type Swing = {
   areaId: string;
@@ -156,6 +152,19 @@ export function turnOf(entry: Seat | undefined) {
     : { to: found.to, flip: found.flip };
 }
 
+export function seatHatch(
+  summary: Summary,
+  entry: Seat | undefined,
+  paint: Paint,
+  pair: [Family, Family] | null,
+  control: Control | null,
+) {
+  const turn = turnOf(entry);
+  return turn == null || summary.later != null || paint === "counted"
+    ? null
+    : hatch(tint(pair, control, turn.to), turn.flip);
+}
+
 export function shade(
   summary: Summary,
   entry: Seat | undefined,
@@ -169,9 +178,9 @@ export function shade(
   if (paint === "counted") {
     return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
   }
-  const turn = turnOf(entry);
-  if (turn != null) {
-    return hatch(tint(pair, control, turn.to), turn.flip).fill;
+  const mark = seatHatch(summary, entry, paint, pair, control);
+  if (mark != null) {
+    return mark.fill;
   }
   const called = summary.winner ?? summary.projected;
   if (entry == null || paint === "lead") {
@@ -246,8 +255,10 @@ export function stateShade(
   }
   const entry = found.seats.get(first.race.id);
   const color = shade(first, entry, paint, found.pair, control);
-  const turn = paint === "counted" ? null : turnOf(entry);
-  return turn == null ? { color } : { color, flip: turn.flip };
+  return {
+    color,
+    stripe: seatHatch(first, entry, paint, found.pair, control)?.stripe ?? null,
+  };
 }
 
 export function prior(race: LiveRace) {
@@ -315,6 +326,12 @@ export function swingOf(
   };
 }
 
+export function unitHatch(row: UnitStanding, options: Array<LiveOption>) {
+  return row.flip == null || row.leader == null
+    ? null
+    : hatch(tone(options[row.leader]), row.flip);
+}
+
 export function unitFill(
   row: UnitStanding,
   lens: Lens,
@@ -327,7 +344,10 @@ export function unitFill(
       if (row.leader == null) {
         return BLANK;
       }
-      return marginShade(tone(options[row.leader]), marginSafety(row.margin));
+      return (
+        unitHatch(row, options)?.fill ??
+        marginShade(tone(options[row.leader]), marginSafety(row.margin))
+      );
     }
     case "shift": {
       if (row.signed == null || row.baseSigned == null) {

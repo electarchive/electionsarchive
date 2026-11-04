@@ -20,6 +20,7 @@
     districtKey,
     flipped,
     holding,
+    seatHatch,
     seatName,
     shade,
     urgency,
@@ -239,7 +240,9 @@
       <span
         class="rounded-xs ring-1 ring-border/60 block-3.5 inline-3.5"
         style:background-color={color(summary)}
-        style:background-image={summary.later == null ? undefined : DOTS}
+        style:background-image={summary.later == null
+          ? seatHatch(summary, seat, paint, pair, control)?.stripes
+          : DOTS}
       ></span>
       <span class="grid min-inline-0">
         <span class="flex items-center gap-1.5 min-inline-0">
