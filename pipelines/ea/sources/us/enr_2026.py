@@ -78,7 +78,6 @@ LISTINGS = (
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
 EV_DETAILS: dict[str, tuple[str, bytes]] = {}
-LIVE_LAST: dict[str, tuple[str, bytes]] = {}
 LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
@@ -579,12 +578,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         version = ids and get(client, f"{base}{ids[0]}/current_ver.txt")
         content = version and get(client, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip")
         if content:
-            url = f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip"
-            if eid:
-                LIVE_LAST[base] = (url, content)
-            store(state, url, content, ".zip")
-        elif base in LIVE_LAST:
-            store(state, *LIVE_LAST[base], ".zip")
+            store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
         else:
             missing.append(f"{state}/{tenant}")
     if missing:

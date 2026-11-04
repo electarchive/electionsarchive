@@ -16,6 +16,33 @@ from ea.store import DATA, Connection, connect
 FEEDS = Path(__file__).with_name("live_feeds.toml")
 RAW = DATA / "live" / "raw"
 DROP = 0.5
+FAILED = {202, 401, 403, 408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
+
+
+class LastGood(httpx.BaseTransport):
+    def __init__(self) -> None:
+        self.inner = httpx.HTTPTransport()
+        self.kept: dict[tuple[str, str, bytes], tuple[list[tuple[str, str]], bytes]] = {}
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        key = (request.method, str(request.url), request.read())
+        try:
+            response = self.inner.handle_request(request)
+            content = response.read()
+        except httpx.TransportError:
+            if key not in self.kept:
+                raise
+            return self.replay(key, request)
+        headers = [(k, v) for k, v in response.headers.multi_items() if k not in ("content-encoding", "content-length")]
+        if response.status_code == 200 and content:
+            self.kept[key] = (headers, content)
+        elif key in self.kept and (response.status_code in FAILED or response.status_code == 200):
+            return self.replay(key, request)
+        return httpx.Response(response.status_code, headers=headers, content=content, request=request)
+
+    def replay(self, key: tuple[str, str, bytes], request: httpx.Request) -> httpx.Response:
+        headers, content = self.kept[key]
+        return httpx.Response(200, headers=headers, content=content, request=request)
 
 
 def sync() -> str:
@@ -200,7 +227,7 @@ def issue(conn: Connection, feed: str, kind: str, detail: str) -> None:
 
 
 def run(poller: str, once: bool = False) -> None:
-    client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS)
+    client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS, transport=LastGood())
     due: dict[str, float] = {}
     running: dict[str, Future[None]] = {}
     with ThreadPoolExecutor(max_workers=8) as pool, ThreadPoolExecutor(max_workers=6) as fallback:
