@@ -13,9 +13,9 @@ from ea.sources.us.mp_cec_live import pick, words
 from ea.store import Connection
 
 PAGE = "https://vivote.gov/?elections=2026-general-election"
-REPORT = re.compile(r"summary|unofficial|results|zero report", re.IGNORECASE)
+REPORT = re.compile(r"summary|unofficial|results|zero report|early voting", re.IGNORECASE)
 SKIP = re.compile(
-    r"detail|precinct|absentee|provisional|turn ?out|press|write-?in|lots|listing|aspirant|voting center|certification",
+    r"deta(?:il|lied)|precinct|absentee|provisional|turn ?out|press|write-?in|lots|listing|aspirant|voting center|certification",
     re.IGNORECASE,
 )
 CONTESTS = {
@@ -32,6 +32,10 @@ CONTESTS = {
 }
 STAMP = re.compile(r"Election Summary - (\d\d/\d\d/\d{4} \d\d:\d\d[AP]M)")
 DISTRICTS = {"STX": re.compile(r"\bSTX\b|St\.? Croix"), "STT": re.compile(r"\bSTT\b|St\.? Thomas")}
+MODES = {
+    "early": re.compile(r"early", re.IGNORECASE),
+    "day": re.compile(r"election[-_ ]day|/Election-Summary(-\d+)?\.pdf$", re.IGNORECASE),
+}
 ROW = re.compile(r"^(?:[A-Z]{3}\s+)?(.*?\S)\s{2,}([\d,]+)(?:\s|$)")
 OTHER = ("Write-In", "Total Votes", "Ballots Cast", "Overvotes", "Undervotes", "Registered", "Voter Turnout")
 
@@ -85,19 +89,35 @@ def plan(
         """select u.id from reporting_unit u join polity_territory t on t.area_id = u.area_id
            join polity p on p.id = t.polity_id where p.iso_code = 'US-VI' and u.scheme_code = 'us.state'"""
     ).fetchall()[0][0]
-    seen: dict[str, dict[str, tuple[int, str | None, list[tuple[str, int]]]]] = {}
+    found: dict[str, dict[tuple[str, str], tuple[int, str | None, list[tuple[str, int]]]]] = {}
     unmatched = []
-    for path in paths.values():
+    for url, path in paths.items():
         scope, stamp, contests = read(path)
+        mode = next((name for name, pattern in MODES.items() if pattern.search(url)), "")
         for title, rows in contests.items():
             contest_key = CONTESTS.get(" ".join(re.findall(r"[a-z]+", title.lower())))
             if contest_key is None:
                 unmatched.append(f"{title}: no contest mapping")
                 continue
             total = sum(votes for _, votes in rows)
-            scopes = seen.setdefault(contest_key, {})
-            if scope not in scopes or total > scopes[scope][0]:
-                scopes[scope] = (total, stamp, rows)
+            reports = found.setdefault(contest_key, {})
+            if (scope, mode) not in reports or total > reports[(scope, mode)][0]:
+                reports[(scope, mode)] = (total, stamp, rows)
+    seen: dict[str, dict[str, tuple[int, str | None, list[tuple[str, int]]]]] = {}
+    for contest_key, reports in found.items():
+        scopes = seen.setdefault(contest_key, {})
+        for scope in {scope for scope, _ in reports}:
+            best = reports.get((scope, ""), (-1, None, []))
+            if (scope, "early") in reports and (scope, "day") in reports:
+                early, day = reports[(scope, "early")], reports[(scope, "day")]
+                added: dict[str, int] = {}
+                for name, votes in [*early[2], *day[2]]:
+                    added[name] = added.get(name, 0) + votes
+                if early[0] + day[0] > best[0]:
+                    best = (early[0] + day[0], max(filter(None, (early[1], day[1])), default=None), list(added.items()))
+            elif best[0] < 0:
+                best = max((report for (part, _), report in reports.items() if part == scope), key=lambda r: r[0])
+            scopes[scope] = best
     tallies = []
     for contest_key, scopes in seen.items():
         merged: dict[str, int] = {}
