@@ -2244,7 +2244,7 @@ def emit() -> Path:
                join contest_option op on op.id = o.option_id
                join candidacy cy on cy.option_id = op.id and cy.role = 'head'
                where x.scheme = 'us.contest'
-                 and (x.value ~ ('^2026-[0-9-]+:[A-Z]{2}:(' || %(chambers)s || '):(democratic|republican|minnesota-democratic-farmer-labor)$')
+                 and (x.value ~ ('^2026-[0-9-]+:[A-Z]{2}:(' || %(chambers)s || '):(democratic|republican|minnesota-democratic-farmer-labor|dfl)$')
                       and o.kind = 'won'
                       or x.value ~ ('^2026-[0-9-]+:(CA|WA):(' || %(chambers)s || ')$') and o.kind = 'advanced')""",
             {"chambers": chambers},
