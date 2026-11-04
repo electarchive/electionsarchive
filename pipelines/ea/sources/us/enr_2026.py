@@ -75,7 +75,12 @@ LISTINGS = (
 )
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
-LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
+LIVE_COUNTIES = {
+    "48113": ("TX", "Dallas", "127396"),
+    "26125": ("MI", "Oakland", "127284"),
+    "26099": ("MI", "Macomb", "127293"),
+    "26049": ("MI", "Genesee", "127354"),
+}
 COUNTY_FEEDS = {"KY", "MI", "MO", "NJ", "NY", "TN", "WI"}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
@@ -781,7 +786,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_ky.rows(url, path)
         return
-    if state == "MI" and url.startswith("https://app.enhancedvoting.com/"):
+    if state == "MI" and url.startswith(
+        ("https://app.enhancedvoting.com/", "https://michigan.totalvote.com/", "https://electionresults.ewashtenaw.org/")
+    ):
         from ea.sources.us import enr_mi
 
         yield from enr_mi.rows(url, path)
