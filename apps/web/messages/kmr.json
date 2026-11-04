@@ -483,6 +483,7 @@
   "slate_voting": "Dengdan roja {date} didome. Dawîn navendên dengdanê yên eyaletê saet {time} têne girtin, û encam piştî weşandinê dê li vir xuya bibin.",
   "slate_unqualified": "Tu berendam mafdar nebû (tenê dengê bi nivîsandina nav)",
   "slate_unreported": "Dengdan roja {date} pêk hat. Ji bo vê pêşbaziyê hê encam nehatine weşandin.",
+  "slate_unreported_unopposed": "Dengdan roja {date} pêk hat. Ev berendam bê hevrik bû. Ji ber vê yekê jimartina zindî nehat weşandin. Hejmara dengan dê piştî pejirandina encamên fermî li vir xuya bibe.",
   "slate_incumbent": "Wezîfedarê heyî",
   "incumbency_defeated": "Wezîfedarê heyî têk çû",
   "incumbency_open": "Kursiya vekirî",

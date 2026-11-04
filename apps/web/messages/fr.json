@@ -493,6 +493,7 @@
   "slate_voting": "Le vote est en cours le {date}. Les derniers bureaux de vote de l'État ferment à {time}. Les résultats apparaîtront ici dès leur publication.",
   "slate_unqualified": "Aucun candidat qualifié (vote par inscription manuscrite uniquement)",
   "slate_unreported": "Le vote a eu lieu le {date}. Aucun résultat n'est encore publié pour ce scrutin.",
+  "slate_unreported_unopposed": "Le vote a eu lieu le {date}. Ce candidat était seul en lice. Aucun décompte des voix n'a donc été publié en direct. Le total des voix apparaîtra ici une fois les résultats officiels certifiés.",
   "slate_incumbent": "Sortant",
   "incumbency_defeated": "Sortant battu",
   "incumbency_open": "Siège sans sortant",
