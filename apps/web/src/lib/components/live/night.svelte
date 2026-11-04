@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
+  import type { Part } from "svelte-islands";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import type { Holder } from "#lib/live/ballot.js";
   import type { Trail } from "#lib/live/nation.js";
@@ -27,6 +28,7 @@
   }: {
     data: LivePage & {
       trail?: Trail | null;
+      board?: Part | null;
       ballot?: Ballot | null;
       seat?: { held: Holder | null; families: Record<string, string> } | null;
     };
@@ -124,6 +126,7 @@
     nation={data.nation}
     control={data.control}
     trail={data.trail}
+    board={data.board}
     forecasts={data.shown.forecasts}
     {clock}
     {isOffline}

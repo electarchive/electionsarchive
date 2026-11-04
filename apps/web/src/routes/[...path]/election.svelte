@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -15,6 +14,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
   import Disclosure from "#lib/components/disclosure.svelte";
+  import Lazy from "#lib/components/lazy.svelte";
   import Name from "#lib/components/name.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -2606,12 +2606,9 @@
               {/if}
             {/snippet}
             {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= (race.places?.tally.count ?? 0)}
-              {@render held(
-                race.places?.part ?? null,
-                outlined,
-                "wards",
-                false,
-              )}
+              <Lazy part={race.places?.part ?? null} view="wards">
+                {@render outlined()}
+              </Lazy>
             {/if}
             {@render wards(race.wards ?? [], race.anchor, race.lede)}
           {/if}
@@ -2882,7 +2879,9 @@
           {/if}
         {/snippet}
         {#snippet mapped()}
-          {@render held(race.places?.part ?? null, drawn, "map", false)}
+          <Lazy part={race.places?.part ?? null} view="map">
+            {@render drawn()}
+          </Lazy>
         {/snippet}
         {#snippet summary()}
           <div
@@ -3079,7 +3078,9 @@
           {/if}
         {/snippet}
         {#if race.places != null && !race.isTotal}
-          {@render held(race.places.part, tabled, "table", true)}
+          <Lazy part={race.places.part} view="table" defer>
+            {@render tabled()}
+          </Lazy>
         {/if}
       {/if}
       {#if index === regionsAt}
@@ -3689,21 +3690,6 @@
       >
     {/if}
   </div>
-{/snippet}
-
-{#snippet held(
-  part: Part | null,
-  content: Snippet,
-  view: string,
-  isDeferred: boolean,
-)}
-  {#if part == null}
-    {@render content()}
-  {:else}
-    <Island {part} {view} when="visible" defer={isDeferred}>
-      {@render content()}
-    </Island>
-  {/if}
 {/snippet}
 
 {#snippet tally(race: (typeof races)[number], isLead: boolean)}
