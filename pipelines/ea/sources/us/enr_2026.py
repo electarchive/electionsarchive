@@ -78,6 +78,7 @@ LISTINGS = (
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
 EV_DETAILS: dict[str, tuple[str, bytes]] = {}
+LIVE_LAST: dict[str, tuple[str, bytes]] = {}
 LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
@@ -346,7 +347,7 @@ def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -
             continue
         if response.status_code == 404:
             return None
-        if response.status_code < 400:
+        if response.status_code < 400 and response.status_code != 202:
             return response.content
         time.sleep(1 + attempt)
     return None
@@ -578,7 +579,12 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         version = ids and get(client, f"{base}{ids[0]}/current_ver.txt")
         content = version and get(client, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip")
         if content:
-            store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
+            url = f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip"
+            if eid:
+                LIVE_LAST[base] = (url, content)
+            store(state, url, content, ".zip")
+        elif base in LIVE_LAST:
+            store(state, *LIVE_LAST[base], ".zip")
         else:
             missing.append(f"{state}/{tenant}")
     if missing:
@@ -1704,6 +1710,15 @@ def plan(
                 r"\s*(?:constitutional\s+)?(?:amendment|question)\s+(?:no\.?\s*)?(\d+)\s*:", name, re.IGNORECASE
             )
             best, ok = choose(people, words, places, wide, seat, lead[1] if lead else None)
+            if not ok and retention and len(best) > 1:
+                best, ok = choose(
+                    people,
+                    set(terms(name)) - {"retention", "retain", "judicial", "court"},
+                    places,
+                    wide,
+                    seat,
+                    lead[1] if lead else None,
+                )
             if ok:
                 picks.append((best[0], name, places, office))
                 continue
