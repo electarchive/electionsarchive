@@ -934,10 +934,20 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         )
         labels = {
             frozenset(re.sub(r"[,“”\"]", " ", text.split(" / ")[0]).lower().split()): party.split(" / ")[0]
-            for text, party in re.findall(
-                r"\| (?:UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE|GOVERNOR / LIEUTENANT GOVERNOR) \| All \| ([^|]+?) \| ([^|]+?) \| (?=Certified|Withdrawn)",
-                flat,
-            )
+            for text, party in [
+                *re.findall(
+                    r"\| (?:UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE|GOVERNOR / LIEUTENANT GOVERNOR) \| All \| ([^|]+?) \| ([^|]+?) \| (?=Certified|Withdrawn)",
+                    flat,
+                ),
+                *(
+                    (html.unescape(text), party)
+                    for url in OFFICIAL["AK"][2][2:]
+                    for text, party in re.findall(
+                        r"<strong>([^<]+)</strong><br>\s*<small>\(([^)]*)\)\s*\(Certified\)",
+                        raw.cached(SOURCE, url).path.read_text(),
+                    )
+                ),
+            ]
         }
         page = subprocess.run(
             ["pdftotext", "-layout", "-f", "17", "-l", "17", str(path), "-"], capture_output=True, text=True, check=True
@@ -2581,6 +2591,9 @@ def emit() -> Path:
                 if surname(held_text) == last
                 and (" " not in text.strip() or slug(re.sub(r"^\W+", "", held_text))[:1] == first)
             }
+            exact = {person for person, held_text in known.get(key, []) if held_text == text}
+            if len(exact) == 1:
+                pool = exact
             if len(pool) > 1 or not pool:
                 pool = {
                     person

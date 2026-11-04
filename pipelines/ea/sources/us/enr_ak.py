@@ -1,5 +1,6 @@
 import json
 import re
+from collections import Counter
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-URL = "https://www.elections.alaska.gov/results/26GENR/results/statewide.js"
+URL = "https://www.elections.alaska.gov/enr/26GENR/results/statewide.js"
 PARTIES = {
     "REP": "Republican",
     "DEM": "Democratic",
@@ -15,7 +16,6 @@ PARTIES = {
     "NON": "Nonpartisan",
     "UND": "Undeclared",
 }
-NICKNAMES = {"Kreiss-Tomkins": "Kreiss-Tomkins “JKT”"}
 MEASURE = re.compile(r"BM#(\d+)\b")
 SEAT = re.compile(r"(House|Senate) District (\w+)")
 
@@ -37,10 +37,10 @@ def candidate(label: str) -> tuple[str, str, bool]:
     code = party[1].split("/")[0] if party else ""
     if "/" in name:
         ticket = name.split("/")[0]
-        return NICKNAMES.get(ticket, ticket), PARTIES.get(code, ""), False
+        return ticket, PARTIES.get(code, ""), False
     last, _, first = name.partition(", ")
     full = f"{first} {last}".strip() if first else name
-    return full, PARTIES.get(code, ""), not party and name.upper() not in ("YES", "NO")
+    return full, PARTIES.get(code, ""), "write-in" in name.lower()
 
 
 def rows(url: str, path: Path, urls: dict[str, Path]):
@@ -95,5 +95,18 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             elif (seat := SEAT.fullmatch(title)) and seat[1] == "House":
                 yield from tally(entry, f"AK:{seat[2]}", "house", "", f"{seat[2]}:g")
     for entry in data["totals"]:
-        if (seat := SEAT.fullmatch(contests[entry["n"]])) and seat[1] == "Senate":
+        title = contests[entry["n"]]
+        if (seat := SEAT.fullmatch(title)) and seat[1] == "Senate":
             yield from tally(entry, f"AK:{seat[2].lower()}", "senate", "", f"{seat[2].lower()}:g")
+        elif title in data["federalAbsenteeContestNames"] and (kind := classify(title)):
+            parts = [part for district in data["districts"] for part in district["contests"] if part["n"] == entry["n"]]
+            votes = Counter()
+            for part in parts:
+                for result in part["c"]:
+                    votes[result["n"]] += result["t"]
+            absentee = {
+                "r": entry["r"] - sum(part["r"] for part in parts),
+                "p": entry["p"] - sum(part["p"] for part in parts),
+                "c": [{"n": result["n"], "t": result["t"] - votes[result["n"]]} for result in entry["c"]],
+            }
+            yield from tally(absentee, "02", *kind)

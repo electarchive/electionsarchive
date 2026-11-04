@@ -251,6 +251,9 @@ def stem(word: str) -> str:
     return word[:-1] if len(word) > 4 and word.endswith("s") and not word.endswith("ss") else word
 
 
+NICKNAME = re.compile(r"\s*[\"“][^\"”]*[\"”]\s*$")
+
+
 def terms(label: str, joined: bool = True) -> list[str]:
     text = re.sub(r",?\s+(?:M\.?D\.?|Ph\.?D\.?|D\.?D\.?S\.?|Esq\.?)$", "", label.replace("’", "'"))
     if joined:
@@ -259,6 +262,27 @@ def terms(label: str, joined: bool = True) -> list[str]:
         YESNO.get(w, w) for w in re.sub(r"[^a-z ]", " ", slug(text).replace("-", " ")).split() if w not in SUFFIXES
     ]
     return words[:-1] if len(words) > 2 and words[-1] == "i" else words
+
+
+def shared(group: pl.DataFrame, ballots: dict[str, UUID], closeness: dict[str, int]) -> list[tuple[str, str]]:
+    claimed: dict[UUID, list[str]] = {}
+    for name in closeness:
+        claimed.setdefault(ballots[name], []).append(name)
+    held = []
+    for names in claimed.values():
+        if len(names) < 2:
+            continue
+        counted = group.filter(pl.col("candidate").is_in(names) & (pl.col("votes") > 0))
+        places = {name: set(counted.filter(pl.col("candidate") == name)["county"]) for name in names}
+        votes = {name: counted.filter(pl.col("candidate") == name)["votes"].sum() for name in names}
+        kept = max(names, key=lambda name: (closeness[name], votes[name]))
+        words = set(terms(re.sub(r"\([^)]*\)", " ", kept)))
+        for name in names:
+            others = set(terms(re.sub(r"\([^)]*\)", " ", name)))
+            initial = min(len(terms(name)[0]), len(terms(kept)[0])) == 1
+            if name != kept and places[name] & places[kept] and not (words <= others or others <= words or initial):
+                held.append((name, kept))
+    return held
 
 
 def district_words(key: str) -> set[str]:
@@ -276,6 +300,7 @@ OFFICE_TEXT = re.compile(
 
 def person(label: str) -> str:
     label = re.sub(r"\s+jp(?:\s+district)?\s*\d*$", "", re.sub(r"\([^)]*\)", " ", label), flags=re.IGNORECASE)
+    label = NICKNAME.sub("", label)
     label = OFFICE_TEXT.sub("", label)
     words = terms(label)
     if words and words[0] in ("yes", "no"):
@@ -1820,11 +1845,13 @@ def plan(
         named: list[tuple[UUID, list[str]]] = []
         scattered = None
         for option, kind, label in options:
+            label = NICKNAME.sub("", label)
             if kind == "write_in":
                 scattered = option
             elif all(words != terms(label) for _, words in named):
                 named.append((option, terms(label)))
         ballots: dict[str, UUID] = {}
+        closeness: dict[str, int] = {}
         for name, write_in in group.select("candidate", "write_in").unique().iter_rows():
             if re.match(r"(?i)no nomination", name):
                 continue
@@ -1869,8 +1896,12 @@ def plan(
                 == 1
             ):
                 ballots[name] = hits[0][1]
+                closeness[name] = hits[0][0]
             else:
                 unmatched.append(f"{contest_key}: no option for {name}")
+        for name, kept in shared(group, ballots, closeness):
+            del ballots[name]
+            unmatched.append(f"{contest_key}: {name} is on no option; {kept} holds the closest one")
         reporting = (
             group.group_by("piece")
             .agg(pl.col("reporting").max(), pl.col("total").max())

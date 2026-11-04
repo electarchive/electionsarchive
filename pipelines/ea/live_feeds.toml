@@ -352,7 +352,7 @@ adapter = "us.enr_2026"
 params = { state = "AK" }
 poller = "muktedir"
 publisher = "Alaska Division of Elections"
-url = "https://www.elections.alaska.gov/results/26GENR/"
+url = "https://www.elections.alaska.gov/enr/26GENR/"
 
 [[feed]]
 id = "us.enr_2026.hi"
