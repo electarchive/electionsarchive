@@ -2,6 +2,7 @@
 id = "us.enr_2026.ar"
 adapter = "us.enr_2026"
 params = { state = "AR" }
+poller = "muktedir"
 publisher = "Arkansas Secretary of State"
 url = "https://arkansas.tally-enr.com/"
 
@@ -102,6 +103,7 @@ url = "https://enr.indianavoters.in.gov"
 id = "us.enr_2026.ks"
 adapter = "us.enr_2026"
 params = { state = "KS" }
+poller = "muktedir"
 publisher = "Kansas Secretary of State"
 url = "https://sos.ks.gov/elections/election-results.html"
 
@@ -243,6 +245,7 @@ url = "https://app.nassaucountyny.gov/BOE/results/election2.html"
 id = "us.enr_2026.al"
 adapter = "us.enr_2026"
 params = { state = "AL" }
+poller = "muktedir"
 publisher = "Alabama Secretary of State"
 url = "https://www2.alabamavotes.gov/electionnight/statewideresultsbycontest.aspx?ecode=1001305"
 
@@ -250,6 +253,7 @@ url = "https://www2.alabamavotes.gov/electionnight/statewideresultsbycontest.asp
 id = "us.enr_2026.mi"
 adapter = "us.enr_2026"
 params = { state = "MI" }
+poller = "muktedir"
 publisher = "Michigan Board of State Canvassers"
 url = "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=11-3-2026"
 note = "county election sites only; the statewide results sit behind a Cloudflare challenge"
@@ -258,6 +262,7 @@ note = "county election sites only; the statewide results sit behind a Cloudflar
 id = "us.enr_2026.ne"
 adapter = "us.enr_2026"
 params = { state = "NE" }
+poller = "muktedir"
 publisher = "Nebraska Secretary of State"
 url = "https://electionresults.nebraska.gov/"
 
