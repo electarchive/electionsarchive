@@ -501,6 +501,10 @@ SPLIT = {
     },
 }
 TACIT_SOURCES = {
+    "FL": (
+        *OFFICIAL["FL"][:3],
+        "Florida leaves unopposed candidates off the general election ballot and deems each one to have voted for themselves (Fla. Stat. §101.151(7)), so no votes are cast for this seat. The Division of Elections lists this candidate as unopposed, with no write-in candidate qualified.",
+    ),
     "HI": (
         "Hawaii Office of Elections",
         "2026 primary election summary report",
@@ -787,6 +791,14 @@ def cells(text: str) -> list[list[str]]:
 def single_filers(rows: list[tuple[str, int | None, str, str]]) -> list[tuple[str, int | None, str, str]]:
     counts = Counter((office, district, party) for office, district, _, party in rows)
     return [row for row in rows if counts[row[0], row[1], row[3]] == 1 or INDEPENDENT.match(row[3])]
+
+
+def unopposed(path: Path) -> set[str]:
+    return {
+        slug(" ".join(part for part in (row["NameFirst"], row["NameMiddle"], row["NameLast"]) if part))
+        for row in csv.DictReader(io.StringIO(path.read_text(encoding="latin-1")), delimiter="\t")
+        if row["StatusCode"] == "UNO"
+    }
 
 
 def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
@@ -2370,6 +2382,15 @@ def emit() -> Path:
             )
             if key:
                 listed.setdefault(key, []).append(row)
+        alone = unopposed(raw.cached(SOURCE, FL_URL).path)
+        uncontested = {
+            key
+            for key, rows in listed.items()
+            if key.startswith(f"{DAY}:FL:")
+            and len(rows) == 1
+            and rows[0]["url"] == FL_URL
+            and slug(str(rows[0]["name"])) in alone
+        }
 
         def surname(text: str) -> str:
             words = [
@@ -2705,7 +2726,9 @@ def emit() -> Path:
                 else cs.key("us.electoral_system", "block")
                 if chamber != "legislative" and (magnitude or 1) > 1
                 else system,
-                default_result_kind="tacit" if key.split(":", 2)[2] in TACIT.get(state, {}) else result_kind,
+                default_result_kind="tacit"
+                if key.split(":", 2)[2] in TACIT.get(state, {}) or key in uncontested
+                else result_kind,
             )
             counts[chamber if chamber in counts else "statewide"] += 1
             if chamber == "house":
@@ -2827,9 +2850,10 @@ def emit() -> Path:
                     )
                 counts["listed"] += 1
             tacit = TACIT.get(state, {}).get(key.split(":", 2)[2])
+            declared = tacit[2] if tacit is not None else state if key in uncontested else None
             if tacit is not None:
                 entries.append((tacit[0], person_of(state, key, chamber, None, tacit[0]), cs.key("us.party", tacit[1])))
-            elif state in SUPPLEMENTED or key not in listed:
+            elif declared is None and (state in SUPPLEMENTED or key not in listed):
                 entries += [
                     (ballot, person, party_id)
                     for (ballot, person), party_id in sorted(
@@ -2918,14 +2942,15 @@ def emit() -> Path:
                     )
                     if listing is not None:
                         cs.add("citation", entity_id=mate, source_id=sources[listing], locator=None)
-                if tacit is not None:
-                    publisher, title, addresses, context = TACIT_SOURCES[tacit[2]]
-                    if f"tacit:{tacit[2]}" not in sources:
-                        sources[f"tacit:{tacit[2]}"] = cs.source(publisher, title)
-                        if sources[f"tacit:{tacit[2]}"] in cs.minted:
+                if declared is not None:
+                    publisher, title, addresses, context = TACIT_SOURCES[declared]
+                    if f"tacit:{declared}" not in sources:
+                        reused = cs.source(publisher, title) in sources.values()
+                        sources[f"tacit:{declared}"] = cs.source(publisher, title)
+                        if sources[f"tacit:{declared}"] in cs.minted and not reused:
                             cs.add(
                                 "source",
-                                id=sources[f"tacit:{tacit[2]}"],
+                                id=sources[f"tacit:{declared}"],
                                 kind="official_body",
                                 publisher=publisher,
                                 title=title,
@@ -2933,7 +2958,7 @@ def emit() -> Path:
                                 license="Public record",
                             )
                         for address in addresses:
-                            cs.artifact(raw.cached(SOURCE, address), sources[f"tacit:{tacit[2]}"])
+                            cs.artifact(raw.cached(SOURCE, address), sources[f"tacit:{declared}"])
                     result_set = cs.key(f"{SOURCE}.result_set", f"{key}:tacit")
                     cs.add(
                         "result_set",
@@ -2943,13 +2968,13 @@ def emit() -> Path:
                         stage="certified",
                         kind="tacit",
                         status="active",
-                        source_id=sources[f"tacit:{tacit[2]}"],
+                        source_id=sources[f"tacit:{declared}"],
                         is_default=True,
                         completeness=None,
                     )
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
                     cs.add("note", entity_id=result_set, kind="context", body_md=context)
-                    cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{tacit[2]}"], locator=None)
+                    cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{declared}"], locator=None)
             reason = (
                 WITHDRAWN[key][1]
                 if key in WITHDRAWN
