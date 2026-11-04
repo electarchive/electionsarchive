@@ -12,10 +12,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode, rekey, repair
 from ea.store import DATA, connect
 
 SOURCE = "us.clark_nv"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Clark County Election Department"
 HOST = "https://elections.clarkcountynv.gov/electionresultsTV"
@@ -75,7 +76,7 @@ def person(raw_name: str) -> str:
 
 
 def official(code: str) -> list[dict[str, object]]:
-    page = raw.cached(SOURCE, official_url(code)).path.read_text(errors="replace")
+    page = decode(raw.cached(SOURCE, official_url(code)).path.read_bytes())
     contests = []
     for block in BLOCK.split(page)[1:]:
         label = text(block.split("</span>")[0])
@@ -94,9 +95,7 @@ def official(code: str) -> list[dict[str, object]]:
 
 
 def precincts(url: str) -> list[tuple[str, int, int | None]]:
-    lines = list(
-        csv.reader(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig", errors="replace").splitlines())
-    )
+    lines = list(csv.reader(decode(raw.cached(SOURCE, url).path.read_bytes()).splitlines()))
     head = lines[0] if lines else []
     found = []
     if len(head) < 6:
@@ -602,6 +601,12 @@ def emit() -> Path:
             if len(parts) >= 2:
                 people.setdefault((parts[0], parts[-1]), []).append(person_id)
 
+        holders: dict[UUID, UUID] = dict(
+            conn.execute(
+                "select y.id, y.person_id from candidacy y join changeset c on c.id = y.changeset_id where c.pipeline = %s",
+                [SOURCE],
+            ).fetchall()
+        )
         elections: dict[tuple[date, UUID], tuple[UUID, str]] = {}
         owners: dict[tuple[UUID, str], UUID] = {}
         districts: set[str] = set()
@@ -875,6 +880,7 @@ def emit() -> Path:
             raw_names = dict(frame.select("display", "name").unique(subset=["display"]).iter_rows())
             candidacies: dict[str, UUID] = {}
             for position, candidate in enumerate(ordered, start=1):
+                rekey(cs, candidate)
                 option = options[candidate] = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
                 if answers:
                     cs.add(
@@ -911,15 +917,16 @@ def emit() -> Path:
                     if w not in ("jr", "sr", "ii", "iii", "iv")
                 ]
                 matched = people.get((parts[0], parts[-1])) if len(parts) >= 2 else None
-                if matched is not None and len(matched) == 1:
-                    person_id = matched[0]
+                candidacies[candidate] = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
+                held = holders.get(candidacies[candidate])
+                if matched is not None and (held in matched or len(matched) == 1):
+                    person_id = held if held is not None and held in matched else matched[0]
                 else:
                     person_id = cs.key(f"{SOURCE}.person", f"NV:{slug(candidate)}:{key_body}")
                     if person_id in cs.minted and person_id not in made_people:
                         made_people.add(person_id)
                         cs.add("person", id=person_id)
                         name(person_id, candidate)
-                candidacies[candidate] = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
                 cs.add(
                     "candidacy",
                     id=candidacies[candidate],
@@ -1223,6 +1230,7 @@ def emit() -> Path:
                     )
             report["superseded"] = report.get("superseded", 0) + 1
         (PARSED / "supersede-misses.txt").write_text("\n".join(misses))
+        report["renamed people"] = repair(cs)
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))

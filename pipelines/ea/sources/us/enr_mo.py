@@ -16,26 +16,28 @@ FOLDERS = {"St. Louis": "https://extcontent.stlouisco.com/BOE/eResults/"}
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
 LEGISLATURE = re.compile(r"STATE (SENATOR|REPRESENTATIVE) - DISTRICT (\d+)")
 STATEWIDE = re.compile(
-    r"(LIEUTENANT GOVERNOR|SECRETARY OF STATE|STATE TREASURER|ATTORNEY GENERAL|STATE AUDITOR|STATE - .+)"
+    r"(?:FOR )?(LIEUTENANT GOVERNOR|SECRETARY OF STATE|STATE TREASURER|ATTORNEY GENERAL|STATE AUDITOR|STATE - .+|CONSTITUTIONAL AMENDMENT NO\. \d+|PROPOSITION [A-Z])"
 )
 JACKSON = "https://www.livevoterturnout.com/ENR/jacksonmoenr/"
 JACKSON_ELECTION = os.environ.get("EA_JACKSON_ELECTION", "38")
 JACKSON_PAGE = f"{JACKSON}{JACKSON_ELECTION}/en/Index_{JACKSON_ELECTION}.html"
 JACKSON_PARTY = re.compile(r"^(.*?)\s*\(([A-Z ]+)\)$")
+POLLS = re.compile(r"Polls Reporting: (\d+)/(\d+)")
 LISTED = re.compile(r"(\d+/\d+/\d{4} +\d+:\d+ [AP]M) +\d+ <A HREF=\"([^\"]+\.csv)\"", re.IGNORECASE)
 
 
 def collect(client: httpx.Client, get: Callable, store: Callable[[str, bytes, str], None]) -> None:
     for county, base in FOLDERS.items():
-        folder = f"{base}el{DAY:%y%m%d}/"
-        listing = get(client, folder, HEADERS)
-        found = LISTED.search((listing or b"").decode(errors="replace"))
-        content = found and get(client, str(httpx.URL(folder).join(found[2])), HEADERS)
-        if not content:
+        for folder in (f"{base}el{DAY:%y%m%d}/", f"{base}media/"):
+            listing = get(client, folder, HEADERS)
+            found = LISTED.search((listing or b"").decode(errors="replace"))
+            content = found and get(client, str(httpx.URL(folder).join(found[2])), HEADERS)
+            if content:
+                store(folder, listing, ".html")
+                store(f"{folder}CSV.csv", content, ".csv")
+                break
+        else:
             print(f"MO: no {DAY} file for {county}")
-            continue
-        store(folder, listing, ".html")
-        store(f"{folder}CSV.csv", content, ".csv")
     page = get(client, JACKSON_PAGE, HEADERS)
     if page and b"raceHeading_" in page:
         store(JACKSON_PAGE, page, ".html")
@@ -115,7 +117,9 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
     votes: dict[tuple[str, str, str], int] = {}
     precincts: dict[str, set[str]] = {}
     reporting: dict[str, set[str]] = {}
+    polls = None
     for row in csv.DictReader(text.splitlines()):
+        polls = POLLS.fullmatch(row["Precinct Reporting"].strip()) or polls
         title = " ".join(row["Contest Title"].split())
         precincts.setdefault(title, set()).add(row["#Precinct"])
         if row["Precinct Reporting"].strip() == "Reporting":
@@ -143,6 +147,6 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             "write_in": "WRITE-IN" in candidate.upper(),
             "votes": count,
             "as_of": as_of,
-            "reporting": len(reporting.get(title, ())),
-            "total": len(precincts[title]),
+            "reporting": int(polls[1]) if polls else len(reporting.get(title, ())),
+            "total": int(polls[2]) if polls else len(precincts[title]),
         }

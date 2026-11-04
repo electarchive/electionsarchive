@@ -67,6 +67,8 @@ export type LiveRace = {
   } | null;
   seats?: number;
   isMeasure?: boolean;
+  isSpecial?: boolean;
+  needsMajority?: boolean;
   rule?: LiveRule | null;
 };
 

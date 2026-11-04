@@ -22,6 +22,7 @@
   const desk = new Desk(
     feed,
     untrack(() => data.cartogram),
+    untrack(() => data.control),
   );
   const requested = page.url.searchParams.get("race");
   if (requested != null && feed.bySlug.has(requested)) {

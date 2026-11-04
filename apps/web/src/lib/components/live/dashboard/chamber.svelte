@@ -4,6 +4,7 @@
   import type { ChamberView, Family, Seat } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
   import { numbers, percent } from "#lib/format.js";
+  import { hatch, ink, swing } from "#lib/live/flips.js";
   import { pointAt } from "#lib/live/hover.js";
   import { breakdown, odds } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
@@ -11,6 +12,7 @@
   import { cn } from "#lib/utils.js";
   import Called from "./called.svelte";
   import Card from "./card.svelte";
+  import SeatKey from "./seat-key.svelte";
   import Sheet from "./sheet.svelte";
 
   const {
@@ -94,6 +96,7 @@
       view.tallies.right.holdover,
   );
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
+  const changing = $derived(swing(view.order.map((seat) => seat.shift)));
   const families = $derived([
     { family: left, tally: view.tallies.left },
     { family: right, tally: view.tallies.right },
@@ -136,6 +139,23 @@
       ),
   );
 
+  function look(seat: Seat): { fill: string; stripes?: string } {
+    const found = seat.shift;
+    if (found == null || found.flip === "held") {
+      return { fill: shade(seat) };
+    }
+    return hatch(
+      sides.find((family) => family.id === found.to)?.color ?? OTHER,
+      found.flip,
+    );
+  }
+
+  function gained(family: Family) {
+    return (
+      changing.parties.find((party) => party.id === family.id)?.flipped ?? 0
+    );
+  }
+
   function signed(value: number) {
     return value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : "0";
   }
@@ -153,10 +173,9 @@
         <span
           data-cell={index}
           class="rounded-[1px] block-3.5"
-          style:background-image="repeating-linear-gradient(135deg, {cell.family
-            .color}
-          0 1.5px, color-mix(in oklab, {cell.family.color} 30%, var(--background))
-          1.5px 3px)"
+          style:background-color="light-dark(color-mix(in oklab, {cell.family
+            .color} 18%, var(--background)), color-mix(in oklab, {cell.family
+            .color} 38%, var(--background)))"
           aria-hidden="true"
         ></span>
       {:else if isLinked}
@@ -164,13 +183,15 @@
           href={href(cell.seat)}
           data-cell={index}
           class="grid place-items-center rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
-          style:background-color={shade(cell.seat)}
+          style:background-color={look(cell.seat).fill}
+          style:background-image={look(cell.seat).stripes}
           aria-label={label(cell.seat)}>{@render pip(cell.seat)}</a
         >
       {:else}
         <span
           class="grid place-items-center rounded-[1px] block-3.5"
-          style:background-color={shade(cell.seat)}
+          style:background-color={look(cell.seat).fill}
+          style:background-image={look(cell.seat).stripes}
           >{@render pip(cell.seat)}</span
         >
       {/if}
@@ -184,7 +205,10 @@
 
 {#snippet pip(seat: Seat)}
   {#if seat.rating === "projected"}
-    <span class="rounded-full bg-background block-1 inline-1"></span>
+    <span
+      class="rounded-full block-1 inline-1"
+      style:background-color={ink(look(seat).fill)}
+    ></span>
   {/if}
 {/snippet}
 
@@ -302,7 +326,26 @@
     </div>
   {/if}
 
+  {#if gained(left) + gained(right) > 0}
+    <p class="-mbs-1 flex justify-between gap-3 text-xs font-semibold">
+      {#each [left, right] as family (family.id)}
+        <span style:color={family.color}
+          >{gained(family) > 0
+            ? m.night_chamber_side_flipped({ count: gained(family) })
+            : ""}</span
+        >
+      {/each}
+    </p>
+  {/if}
   {@render legend()}
+  <SeatKey
+    sides={families.map((row) => row.family)}
+    {changing}
+    isProjected={view.order.some((seat) => seat.rating === "projected")}
+    notUp={view.tallies.left.holdover +
+      view.tallies.right.holdover +
+      view.tallies.other.holdover}
+  />
   <Called seats={view.order} />
 
   {#if forecasts && isInformed}

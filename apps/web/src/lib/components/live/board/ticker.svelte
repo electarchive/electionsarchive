@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
+  import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import { prefersReducedMotion } from "svelte/motion";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { short } from "#lib/live/board/labels.js";
@@ -20,8 +21,22 @@
       leader: LiveOption | undefined;
       margin: number;
       added: number;
+      isCall: boolean;
     }> = [];
     for (const race of desk.feed.election.races) {
+      const call = race.projected;
+      const called = race.options.find((option) => option.id === call?.option);
+      if (call != null && called != null) {
+        found.push({
+          key: `${race.id}:call`,
+          race,
+          at: call.at,
+          leader: called,
+          margin: 0,
+          added: 0,
+          isCall: true,
+        });
+      }
       let previous = 0;
       for (const frame of race.frames) {
         const total = sum(frame.totals);
@@ -37,6 +52,7 @@
                 (frame.totals[second ?? 1] ?? 0)) /
               total,
             added: total - previous,
+            isCall: false,
           });
         }
         previous = total;
@@ -81,13 +97,25 @@
               style:background-color={tone(entry.leader)}
             ></span>
             <span class="truncate">{surname(entry.leader)}</span>
-            <span class="font-figures text-muted-foreground tabular-nums"
-              >+{lead(entry.margin)}</span
-            >
+            {#if !entry.isCall}
+              <span class="font-figures text-muted-foreground tabular-nums"
+                >+{lead(entry.margin)}</span
+              >
+            {/if}
           </span>
-          <span class="font-figures font-semibold tabular-nums"
-            >+{compact(entry.added)}</span
-          >
+          {#if entry.isCall}
+            <span class="flex items-center gap-1 font-semibold">
+              <CircleDashedCheckIcon
+                class="shrink-0 block-[1.1em] inline-[1.1em]"
+                aria-hidden="true"
+              />
+              {m.night_rating_projected()}
+            </span>
+          {:else}
+            <span class="font-figures font-semibold tabular-nums"
+              >+{compact(entry.added)}</span
+            >
+          {/if}
         </button>
       </li>
     {/each}

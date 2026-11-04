@@ -27,13 +27,21 @@ export function short(race: LiveRace) {
   return race.title;
 }
 
+export function called(summary: Summary | undefined) {
+  return summary?.winner ?? summary?.projected ?? null;
+}
+
+export function ahead(summary: Summary | undefined) {
+  return called(summary) ?? summary?.leader ?? null;
+}
+
 export function strength(summary: Summary | undefined) {
-  const option = summary?.winner ?? summary?.leader;
+  const option = ahead(summary);
   if (summary == null || option == null) {
     return WAITING;
   }
   const share =
-    summary.winner == null
+    called(summary) == null
       ? Math.round(28 + 62 * Math.min(summary.margin / 0.3, 1))
       : 100;
   return `color-mix(in oklab, ${tone(option)} ${share}%, var(--map-low))`;

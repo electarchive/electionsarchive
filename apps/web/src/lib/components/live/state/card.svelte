@@ -1,5 +1,6 @@
 <script lang="ts">
   import CheckIcon from "@lucide/svelte/icons/check";
+  import type { Turn } from "#lib/live/ballot.js";
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Name from "#lib/components/name.svelte";
@@ -13,6 +14,7 @@
     tone,
   } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
+  import { odds } from "#lib/live/nation.js";
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -22,14 +24,14 @@
     summary,
     heading,
     held,
-    isFlip,
+    flip,
     closes = null,
     limit = 3,
   }: {
     summary: Summary;
     heading?: string;
     held: { short: string; color: string } | null;
-    isFlip: boolean;
+    flip: Turn | null;
     closes?: number | null;
     limit?: number;
   } = $props();
@@ -96,7 +98,7 @@
     if (summary.favorite != null && summary.chance != null) {
       return m.night_nation_chance({
         name: surname(summary.favorite),
-        chance: percent(summary.chance, 0),
+        chance: odds(summary.chance),
       });
     }
     const prior = race.options.map((_, index) =>
@@ -122,11 +124,8 @@
       >{heading ?? ""}</span
     >
     <span class="flex shrink-0 items-center gap-1.5 self-center">
-      {#if isFlip}
-        <Flip
-          party={pick?.party?.short ?? ""}
-          color={tone(pick ?? undefined)}
-        />
+      {#if flip != null}
+        <Flip flip={flip.flip} from={held} to={flip.to} />
       {/if}
       <span
         class="flex items-center gap-1 text-xs whitespace-nowrap text-muted-foreground"

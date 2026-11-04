@@ -1,18 +1,30 @@
 <script lang="ts">
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
+  import CircleCheckIcon from "@lucide/svelte/icons/circle-check";
+  import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Family, Rating, Seat } from "#lib/live/nation.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { fits } from "#lib/fits.js";
   import { percent } from "#lib/format.js";
-  import { clock, compact, lead, surname, tone } from "#lib/live/format.js";
+  import { FLIP_ORDER, swing } from "#lib/live/flips.js";
+  import {
+    clock,
+    compact,
+    lead,
+    paint,
+    surname,
+    tone,
+  } from "#lib/live/format.js";
   import { odds } from "#lib/live/nation.js";
+  import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
   import Flip from "./flip.svelte";
+  import Swing from "./swing.svelte";
 
   const {
     seats,
@@ -36,7 +48,14 @@
 
   type Office = "all" | "senate" | "governor" | "house";
   type Focus = "all" | "close" | "flips" | "upsets" | "left";
-  type Key = "race" | "margin" | "counted" | "remaining" | "chance" | "at";
+  type Key =
+    | "race"
+    | "flip"
+    | "margin"
+    | "counted"
+    | "remaining"
+    | "chance"
+    | "at";
 
   const left = $derived(sides[0]);
   const right = $derived(sides[1]);
@@ -67,7 +86,7 @@
       seat.summary.margin < 0.02 &&
       seat.rating !== "won" &&
       seat.rating !== "projected",
-    flips: (seat) => seat.isFlip,
+    flips: (seat) => seat.shift != null && seat.shift.flip !== "held",
     upsets: (seat) => seat.isUpset,
     left: (seat) => (seat.remaining ?? 0) > 0,
   };
@@ -111,6 +130,10 @@
 
   const VALUES: Record<Key, (seat: Seat) => number | string | null> = {
     race: (seat) => label(seat),
+    flip: (seat) =>
+      seat.shift == null
+        ? null
+        : FLIP_ORDER[seat.shift.flip] * 2 - seat.summary.margin,
     margin: (seat) => (seat.summary.total === 0 ? null : seat.summary.margin),
     counted: (seat) => seat.summary.counted ?? null,
     remaining: (seat) => seat.remaining ?? null,
@@ -137,6 +160,7 @@
       return isAscending ? order : -order;
     }),
   );
+  const changing = $derived(swing(byOffice.map((seat) => seat.shift)));
   const windowed = new Windowed(() => ({
     items: sorted,
     key: (seat) => seat.summary.race.id,
@@ -175,7 +199,7 @@
     Array<{ id: Key | null; label: string; isEnd: boolean; width: number }>
   >([
     { id: "race", label: m.night_explorer_race(), isEnd: false, width: 12 },
-    { id: null, label: m.night_explorer_held(), isEnd: false, width: 10 },
+    { id: "flip", label: m.night_explorer_held(), isEnd: false, width: 11 },
     { id: null, label: m.night_explorer_leader(), isEnd: false, width: 11 },
     { id: "margin", label: m.night_explorer_margin(), isEnd: false, width: 10 },
     {
@@ -217,6 +241,10 @@
     isAscending = next === "race" || next === "margin";
   }
 
+  function partyOf(id: string) {
+    return { short: short(id), color: tint(id) };
+  }
+
   function place50(value: number) {
     return 50 - (Math.max(-SCALE, Math.min(SCALE, value)) / SCALE) * 50;
   }
@@ -250,6 +278,9 @@
       size="sm"
       class="max-sm:-mx-4 max-sm:px-4 max-sm:max-inline-[calc(100%+2rem)]"
     />
+    {#if focus === "flips" && changing.parties.length > 0}
+      <Swing swing={changing} party={partyOf} isSmall={true} />
+    {/if}
   </div>
   <div
     class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
@@ -339,8 +370,20 @@
             summary.winner ?? summary.projected ?? summary.leader,
           )}
           {const isLeft = $derived((seat.signed ?? 0) >= 0)}
+          {const band = $derived(bandOf(summary))}
+          {const fill = $derived(
+            band == null
+              ? isLeft
+                ? left.color
+                : right.color
+              : "var(--foreground)",
+          )}
           <tr
-            class="relative border-be border-border hover:highlighter @max-[73rem]:flex @max-[73rem]:flex-wrap @max-[73rem]:items-center @max-[73rem]:gap-x-3 @max-[73rem]:py-2.5 @max-[73rem]:before:order-3 @max-[73rem]:before:basis-full @max-[73rem]:before:content-[''] @max-[73rem]:after:order-6 @max-[73rem]:after:basis-full @max-[73rem]:after:content-['']"
+            class={cn(
+              "relative border-be border-border @max-[73rem]:flex @max-[73rem]:flex-wrap @max-[73rem]:items-center @max-[73rem]:gap-x-3 @max-[73rem]:py-2.5 @max-[73rem]:before:order-3 @max-[73rem]:before:basis-full @max-[73rem]:before:content-[''] @max-[73rem]:after:order-6 @max-[73rem]:after:basis-full @max-[73rem]:after:content-['']",
+              { "hover:highlighter": band == null, band: band != null },
+            )}
+            style:--party={band?.fill}
             {@attach windowed.measure(index)}
           >
             <th
@@ -352,11 +395,10 @@
                 class="grid outline-none after:absolute after:inset-0 hover:underline focus-visible:underline @max-[73rem]:flex @max-[73rem]:items-center @max-[73rem]:gap-x-2"
               >
                 <span
-                  class="flex items-center gap-1.5 font-semibold whitespace-nowrap @max-[73rem]:text-sm"
-                  >{label(seat)}
-                  {#if seat.isFlip}
-                    <Flip party={short(seat.side)} color={tint(seat.side)} />
-                  {/if}
+                  class="flex items-center gap-1.5 font-semibold min-inline-0 @max-[73rem]:text-sm"
+                  ><span class="truncate" title={label(seat)}
+                    >{label(seat)}</span
+                  >
                 </span>
                 <span class="truncate text-xs text-muted-foreground"
                   >{summary.race.office === "house"
@@ -377,11 +419,22 @@
                   <span class="hidden text-muted-foreground @max-[73rem]:inline"
                     >{m.night_explorer_held()}</span
                   >
-                  <span
-                    class="rounded-full block-2 inline-2"
-                    style:background-color={tint(seat.held)}
-                  ></span>
-                  <span class="@max-[73rem]:sr-only">{short(seat.held)}</span>
+                  {#if seat.shift != null && seat.shift.flip !== "held"}
+                    <Flip
+                      flip={seat.shift.flip}
+                      from={partyOf(seat.shift.from)}
+                      to={partyOf(seat.shift.to)}
+                      isInverse={band != null}
+                    />
+                  {:else}
+                    <span
+                      class={cn("shrink-0 rounded-full block-2 inline-2", {
+                        "ring-1 ring-foreground": band != null,
+                      })}
+                      style:background-color={tint(seat.held)}
+                    ></span>
+                    <span class="@max-[73rem]:sr-only">{short(seat.held)}</span>
+                  {/if}
                 </span>
                 <span
                   class="truncate text-xs text-muted-foreground max-inline-36 @max-[73rem]:text-foreground @max-[73rem]:max-inline-none"
@@ -405,7 +458,7 @@
                   <span class="flex items-center gap-1.5">
                     <span
                       class="rounded-full block-2 inline-2"
-                      style:background-color={tone(ahead)}
+                      style:background-color={paint(ahead, band)}
                     ></span>
                     <span
                       class={cn({
@@ -448,7 +501,7 @@
                       style:inline-size="{Math.abs(
                         place50(seat.band.high) - place50(seat.band.low),
                       )}%"
-                      style:background-color={isLeft ? left.color : right.color}
+                      style:background-color={fill}
                     ></span>
                   {/if}
                   {#if seat.signed != null}
@@ -459,13 +512,13 @@
                         place50(seat.signed),
                       )}%"
                       style:inline-size="{Math.abs(place50(seat.signed) - 50)}%"
-                      style:background-color={isLeft ? left.color : right.color}
+                      style:background-color={fill}
                     ></span>
                   {/if}
                 </span>
                 <span
                   class="font-figures tabular-nums @max-[73rem]:text-end @max-[73rem]:font-semibold @max-[73rem]:min-inline-10"
-                  style:color={summary.total === 0
+                  style:color={summary.total === 0 || band != null
                     ? undefined
                     : tone(ahead ?? undefined)}
                   >{summary.total === 0
@@ -523,13 +576,24 @@
               <td
                 class="py-1.5 pe-3 text-end whitespace-nowrap @max-[73rem]:order-5 @max-[73rem]:p-0 @max-[73rem]:pbs-1"
               >
-                {#if seat.rating === "projected"}
+                {#if band != null}
                   <span
-                    class="text-xs font-semibold"
-                    style:color={seat.left >= seat.right
-                      ? left.color
-                      : right.color}>{RATINGS.projected()}</span
+                    class="inline-flex items-center gap-1 text-xs font-semibold"
                   >
+                    {#if band.isProjected}
+                      <CircleDashedCheckIcon
+                        class="shrink-0 block-3.5 inline-3.5"
+                        aria-hidden="true"
+                      />
+                      {RATINGS.projected()}
+                    {:else}
+                      <CircleCheckIcon
+                        class="shrink-0 block-3.5 inline-3.5"
+                        aria-hidden="true"
+                      />
+                      {RATINGS.won()}
+                    {/if}
+                  </span>
                 {:else if seat.rating === "counting" || seat.rating === "waiting" || seat.rating === "later"}
                   <span class="text-muted-foreground"
                     >{RATINGS[seat.rating]()}</span

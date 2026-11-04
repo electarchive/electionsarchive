@@ -10,12 +10,39 @@ from uuid import UUID
 
 import httpx
 
-from ea.sources.us import civicapi, enr_2026, guam_live, mp_cec_live, nyc_enr_live, vi_live
+from ea.sources.us import civicapi, enr_2026, guam_live, mp_cec_live, npr_live, nyc_enr_live, vi_live
 from ea.store import DATA, Connection, connect
 
 FEEDS = Path(__file__).with_name("live_feeds.toml")
 RAW = DATA / "live" / "raw"
 DROP = 0.5
+FAILED = {202, 401, 403, 408, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524}
+
+
+class LastGood(httpx.BaseTransport):
+    def __init__(self) -> None:
+        self.inner = httpx.HTTPTransport()
+        self.kept: dict[tuple[str, str, bytes], tuple[list[tuple[str, str]], bytes]] = {}
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        key = (request.method, str(request.url), request.read())
+        try:
+            response = self.inner.handle_request(request)
+            content = response.read()
+        except httpx.TransportError:
+            if key not in self.kept:
+                raise
+            return self.replay(key, request)
+        headers = [(k, v) for k, v in response.headers.multi_items() if k not in ("content-encoding", "content-length")]
+        if response.status_code == 200 and content:
+            self.kept[key] = (headers, content)
+        elif key in self.kept and (response.status_code in FAILED or response.status_code == 200):
+            return self.replay(key, request)
+        return httpx.Response(response.status_code, headers=headers, content=content, request=request)
+
+    def replay(self, key: tuple[str, str, bytes], request: httpx.Request) -> httpx.Response:
+        headers, content = self.kept[key]
+        return httpx.Response(200, headers=headers, content=content, request=request)
 
 
 def sync() -> str:
@@ -56,6 +83,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         )
     elif adapter == "us.civicapi":
         civicapi.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
+    elif adapter == "us.npr":
+        npr_live.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
     elif adapter == "us.nyc_enr":
         pages = nyc_enr_live.collect(client)
     elif adapter == "us.guam_live":
@@ -95,6 +124,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.enr_2026"
             else enr_2026.plan(conn, civicapi.frame(params["state"], paths), lambda _, __: None)
             if adapter == "us.civicapi"
+            else enr_2026.plan(conn, npr_live.frame(params["state"], paths), lambda _, __: None)
+            if adapter == "us.npr"
             else guam_live.plan(conn, paths)
             if adapter == "us.guam_live"
             else mp_cec_live.plan(conn, paths)
@@ -103,6 +134,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.vi_live"
             else nyc_enr_live.plan(conn, feed, paths)
         )
+        if adapter == "us.enr_2026" and params["state"] in enr_2026.COUNTY_FEEDS:
+            tallies = [tally for tally in tallies if enr_2026.countywide(tally[1])]
         conn.execute(
             """update live.issue set resolved = true
                where feed_id = %s and kind = 'unmatched' and not resolved and detail <> all(%s)""",
@@ -200,7 +233,7 @@ def issue(conn: Connection, feed: str, kind: str, detail: str) -> None:
 
 
 def run(poller: str, once: bool = False) -> None:
-    client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS)
+    client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS, transport=LastGood())
     due: dict[str, float] = {}
     running: dict[str, Future[None]] = {}
     with ThreadPoolExecutor(max_workers=8) as pool, ThreadPoolExecutor(max_workers=6) as fallback:

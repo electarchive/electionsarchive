@@ -13,10 +13,11 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.encoding import GARBLED, repair
 from ea.store import DATA, connect
 
 SOURCE = "us.nj_clerks"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 CLARITY = "https://results.enr.clarityelections.com/NJ/{county}/{election}/{version}/reports/detailxml.zip"
 TITLE = "Election night reporting results"
@@ -307,7 +308,7 @@ def parse() -> None:
                 for choice in node.iter("Choice"):
                     if re.match(r"(?i)\s*no (?:nomination|candidate)", choice.get("text") or ""):
                         continue
-                    label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
+                    label = re.sub(f"^- |{GARBLED}$", "", re.sub(r"\s+", " ", choice.get("text") or "").strip())
                     party = choice.get("party") or ((prefix := PREFIX.match(label)) and prefix[1].upper())
                     party = None if party in {"NON", "NBP", "NP"} else party
                     for kind in choice.iter("VoteType"):
@@ -986,4 +987,5 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        repair(cs)
         return cs.write()

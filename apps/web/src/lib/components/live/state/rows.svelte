@@ -1,11 +1,14 @@
 <script lang="ts">
-  import CheckIcon from "@lucide/svelte/icons/check";
+  import CircleCheckIcon from "@lucide/svelte/icons/circle-check";
+  import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import type { Entry } from "#lib/live/ballot.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
-  import { lead, tone } from "#lib/live/format.js";
+  import { turn } from "#lib/live/ballot.js";
+  import { lead, paint, stamp, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { highlight } from "#lib/live/local.js";
+  import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -27,16 +30,12 @@
 
   function lines(entry: Entry) {
     const { summary } = entry;
-    const winners = new Set(
-      summary.race.certified?.winners ??
-        (summary.winner == null ? [] : [summary.winner.id]),
-    );
     return lineup(
       summary.race,
       summary.totals,
       parties(),
       Math.min(4, entry.contest.seats + 1),
-    ).main.map((line) => ({ ...line, isWinner: winners.has(line.option.id) }));
+    ).main;
   }
 </script>
 
@@ -64,17 +63,30 @@
     {#each entries as entry (entry.contest.id)}
       {const summary = $derived(entry.summary)}
       {const pick = $derived(summary.winner ?? summary.leader)}
+      {const band = $derived(bandOf(entry.summary, entry.contest.seats))}
       <li class="border-be border-border">
         <a
           href={href(entry)}
-          class="grid grid-cols-[4.75rem_minmax(0,1fr)_3.25rem] items-start gap-x-3 py-1.5 outline-none hover:highlighter focus-visible:highlighter sm:grid-cols-[6.5rem_minmax(0,1fr)_3.5rem_4.5rem]"
+          class={cn(
+            "grid grid-cols-[4.75rem_minmax(0,1fr)_3.25rem] items-start gap-x-3 py-1.5 outline-none hover:highlighter focus-visible:highlighter sm:grid-cols-[6.5rem_minmax(0,1fr)_3.5rem_4.5rem]",
+            { "-mx-2 my-px rounded-xs band px-2": band != null },
+          )}
+          style:--party={band?.fill}
         >
           <span class="grid gap-0.5 min-inline-0">
             <span class="leading-snug font-semibold text-pretty"
               >{@render marked(label(entry))}</span
             >
             <span class="flex flex-wrap items-center gap-1">
-              {#if entry.held != null}
+              {const flip = $derived(turn(entry))}
+              {#if flip != null}
+                <Flip
+                  flip={flip.flip}
+                  from={entry.held}
+                  to={flip.to}
+                  isCompact={true}
+                />
+              {:else if entry.held != null}
                 <span
                   class="flex items-center gap-1 text-[0.6875rem] text-muted-foreground"
                   title={m.night_state_held({ party: entry.held.name })}
@@ -85,19 +97,16 @@
                   ></span>{entry.held.short}</span
                 >
               {/if}
-              {#if entry.isFlip && entry.side != null}
-                {const side = $derived(
-                  summary.winner?.party ?? summary.leader?.party ?? null,
-                )}
-                <Flip
-                  party={side?.short ?? ""}
-                  color={tone(pick ?? undefined)}
-                />
-              {/if}
             </span>
           </span>
           <ol class="grid gap-0.5 min-inline-0">
             {#each lines(entry) as line, rank (line.option.id)}
+              {const isDecided = $derived(
+                band?.ids.includes(line.option.id) === true,
+              )}
+              {const isStrong = $derived(
+                band == null ? rank < entry.contest.seats : isDecided,
+              )}
               <li
                 class={cn(
                   "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 font-figures tabular-nums",
@@ -110,12 +119,12 @@
                 <span class="flex items-center gap-1.5 min-inline-0">
                   <span
                     class="shrink-0 rounded-full block-2 inline-2"
-                    style:background-color={tone(line.option)}
+                    style:background-color={paint(line.option, band)}
                   ></span>
                   <span
                     class={cn("truncate font-sans", {
-                      "font-semibold": rank < entry.contest.seats,
-                      "text-muted-foreground": rank >= entry.contest.seats,
+                      "font-semibold": isStrong,
+                      "text-muted-foreground": !isStrong,
                     })}>{@render marked(line.option.label)}</span
                   >
                   {#if line.option.party != null}
@@ -124,8 +133,19 @@
                       >{line.option.party.short}</span
                     >
                   {/if}
-                  {#if line.isWinner}
-                    <CheckIcon
+                  {#if isDecided && band?.isProjected === true}
+                    <CircleDashedCheckIcon
+                      class="shrink-0 block-3.5 inline-3.5"
+                      aria-label={m.night_band_projected()}
+                    >
+                      <title
+                        >{m.night_band_called({
+                          time: stamp(summary.projectedAt),
+                        })}</title
+                      >
+                    </CircleDashedCheckIcon>
+                  {:else if isDecided}
+                    <CircleCheckIcon
                       class="shrink-0 block-3.5 inline-3.5"
                       aria-label={m.night_state_won()}
                     />
@@ -133,8 +153,9 @@
                 </span>
                 <span
                   class={cn({
-                    "font-semibold": rank === 0,
-                    "text-muted-foreground": rank > 0,
+                    "font-semibold": band == null ? rank === 0 : isDecided,
+                    "text-muted-foreground":
+                      band == null ? rank > 0 : !isDecided,
                   })}>{line.share == null ? "" : percent(line.share)}</span
                 >
               </li>
@@ -153,7 +174,7 @@
               "text-xs whitespace-nowrap text-muted-foreground":
                 summary.later != null,
             })}
-            style:color={pick == null || summary.total === 0
+            style:color={band != null || pick == null || summary.total === 0
               ? undefined
               : `color-mix(in oklab, ${tone(pick)} 75%, var(--foreground))`}
             >{summary.later != null

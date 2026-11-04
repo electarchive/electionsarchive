@@ -89,9 +89,10 @@ function tierOf(row: {
   if (row.body === "upper_house") {
     return "upper";
   }
-  return row.body === "lower_house" || row.body === "unicameral"
-    ? "lower"
-    : null;
+  if (row.body === "lower_house" || row.body === "unicameral") {
+    return "lower";
+  }
+  return row.body == null ? null : "statewide";
 }
 
 function clean(title: string, prefix: string | null) {
@@ -505,7 +506,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v9:${election.slug}`, async () => {
+  return remember(`live:ballot:v10:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");

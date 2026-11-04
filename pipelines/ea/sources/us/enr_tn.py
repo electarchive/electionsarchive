@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from ea.sources.us.enr_2026 import DAY, EV_OFFICES
+from ea.sources.us.enr_2026 import DAY, EV_OFFICES, TN_AMENDMENT
 
 DATA = "https://elect2.hamiltontn.gov/results/results/data.js"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
@@ -49,7 +49,7 @@ def rows(url: str, path: Path):
             yield {
                 "office": ("senate" if seat[1] == "Senate" else "house")
                 if seat
-                else "other"
+                else ("state" if TN_AMENDMENT.fullmatch(title) else "other")
                 if office is None
                 else "senate"
                 if office["senate"]

@@ -5,7 +5,7 @@
   import { connect, INSTALL } from "#lib/agents.js";
   import { copy } from "#lib/clipboard.js";
   import AgentsScene from "#lib/components/agents-scene.svelte";
-  import ShareImage from "#lib/components/share-image.svelte";
+  import TextHead from "#lib/components/text-head.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -34,14 +34,12 @@
   }
 </script>
 
-<svelte:head>
-  <title>{m.agents_title()} | {m.wordmark()}</title>
-  <meta name="description" content={lede} />
-  <meta property="og:title" content={m.agents_title()} />
-  <meta property="og:description" content={lede} />
-</svelte:head>
-
-<ShareImage src="{data.origin}/og/agents.png" alt={m.agents_share_alt()} />
+<TextHead
+  title={m.agents_title()}
+  description={lede}
+  type="TechArticle"
+  image={{ src: `${data.origin}/og/agents.png`, alt: m.agents_share_alt() }}
+/>
 
 {#snippet code(text: string, label: string)}
   <div class="grid field grid-cols-[minmax(0,1fr)_auto] items-start">

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/state";
+  import TextHead from "#lib/components/text-head.svelte";
   import { count, numbers, percent } from "#lib/format.js";
   import { lead } from "#lib/live/format.js";
   import methodology from "#lib/live/methodology.json";
@@ -112,11 +112,12 @@
   ];
 </script>
 
-<svelte:head>
-  <title>{m.method_title()} | {m.wordmark()}</title>
-  <meta name="description" content={m.method_lede()} />
-  <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
-</svelte:head>
+<TextHead
+  title={m.method_title()}
+  description={m.method_lede()}
+  type="TechArticle"
+  crumbs={[{ name: m.night_nation_title(), path: "/live" }]}
+/>
 
 <main class="mx-auto grid gap-10 px-4 pbs-8 pbe-20 max-inline-6xl">
   <header class="grid gap-3 max-inline-[68ch]">

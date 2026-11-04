@@ -33,15 +33,15 @@ DAY = date.fromisoformat(os.environ.get("ENR_2026_DAY", "2026-11-03"))
 FIPS = {**COUNTY_FIPS, "AK": "02"}
 ONLY = set(filter(None, os.environ.get("ENR_2026_STATES", "").split(",")))
 HEADERS = {"User-Agent": "electionsarchive.com"}
-EV = {
-    "GA": ("results.sos.ga.gov", "Georgia"),
-    "ID": ("results.voteidaho.gov", "id"),
-    "UT": ("electionresults.utah.gov", "utah"),
-    "RI": ("electionresults.ri.gov", "RhodeIsland"),
-    "WA": ("results.votewa.gov", "washington"),
-    "VA": ("app.enhancedvoting.com", "virginia"),
-    "AZ": ("app.enhancedvoting.com", "Arizona"),
-    "TN": ("app.enhancedvoting.com", "shelby-county-tn"),
+EV_EXPORTS = {
+    "AZ": "https://app.enhancedvoting.com/cdn/results/Arizona/export-110326GeneralElection.zip",
+    "GA": "https://results.sos.ga.gov/cdn/results/Georgia/export-11032026GeneralAndSpecialElection.zip",
+    "ID": "https://results.voteidaho.gov/cdn/results/id/export-nov2026.zip",
+    "RI": "https://electionresults.ri.gov/cdn/results/RhodeIsland/export-2026StatewideGeneralElection.zip",
+    "TN": "https://app.enhancedvoting.com/cdn/results/shelby-county-tn/export-11032026Midtermelections.zip",
+    "UT": "https://electionresults.utah.gov/cdn/results/Utah/export-General11032026.zip",
+    "VA": "https://app.enhancedvoting.com/cdn/results/virginia/export-2026-November-General.zip",
+    "WA": "https://results.votewa.gov/cdn/results/washington/export-20261103.zip",
 }
 CLARITY_EIDS = {"SC": ["127300"], "WV": ["127496"]}
 CLARITY = {
@@ -69,12 +69,19 @@ LISTINGS = (
     "/utah",
     "/RhodeIsland",
     "/washington",
-    "/virginia",
     "Multiparish.htm",
     "Elections.json",
     "Version.json",
 )
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
+TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
+LIVE_COUNTIES = {
+    "48113": ("TX", "Dallas", "127396"),
+    "26125": ("MI", "Oakland", "127284"),
+    "26099": ("MI", "Macomb", "127293"),
+    "26049": ("MI", "Genesee", "127354"),
+}
+COUNTY_FEEDS = {"KY", "MI", "MO", "NJ", "NY", "TN", "WI"}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -83,6 +90,23 @@ SYNONYMS = {"id": "identification", "sell": "sale"}
 TENANT = re.compile(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports")
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
 PLACE_WORDS = {"township", "charter", "village", "public", "schools", "school", "community", "area", "consolidated"}
+SCHOOL_WORDS = {
+    "district",
+    "elementary",
+    "unified",
+    "union",
+    "joint",
+    "unit",
+    "number",
+    "corporation",
+    "metropolitan",
+    "county",
+    "city",
+    "borough",
+    "regional",
+    "independent",
+    "high",
+}
 GENERIC = {
     "an",
     "to",
@@ -240,7 +264,8 @@ def district_words(key: str) -> set[str]:
     parts = key.split(":")
     if len(parts) < 6 or not re.fullmatch(r"\d{5}", parts[2]):
         return set()
-    return set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
+    words = set(parts[4].split("-")) - set(parts[3].split("-")) - STOP
+    return words - {"no"} if any(not w.isdigit() for w in words - {"no"}) else words
 
 
 OFFICE_TEXT = re.compile(
@@ -271,10 +296,25 @@ def edits(a: str, b: str) -> bool:
     return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
 
 
-def placed(name: list[str], words: set[str], strict: bool) -> bool:
+SCHOOL_COUNTIES = {
+    "1737170": {"17043", "17089"},
+    "1740350": {"17043"},
+    "1741980": {"17043"},
+    "0400813": {"04025"},
+}
+
+
+def numbered(word: str) -> bool:
+    return re.fullmatch(r"\d+[a-z]?", word) is not None
+
+
+def placed(name: list[str], words: set[str], strict: bool, whole: bool = False, apart: bool = False) -> bool:
     found = set(name) & words
+    core = {w for w in name if not numbered(w)} - SCHOOL_WORDS
+    if strict and whole and core:
+        return core <= words or not apart and any(numbered(w) for w in found)
     if strict:
-        return not name or name[0] in words and 2 * len(found) >= len(set(name)) or any(w.isdigit() for w in found)
+        return not name or name[0] in words and 2 * len(found) > len(set(name)) or any(numbered(w) for w in found)
     return (
         not name or bool(found) or any(a in b or len(b) > 4 and edits(a, b) for a in name for b in words if len(a) > 4)
     )
@@ -314,7 +354,7 @@ def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -
             continue
         if response.status_code == 404:
             return None
-        if response.status_code < 400:
+        if response.status_code < 400 and response.status_code != 202:
             return response.content
         time.sleep(1 + attempt)
     return None
@@ -348,30 +388,14 @@ def fetch() -> None:
 
 
 def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, bytes, str], None]) -> None:
-    for state, (host, jurisdiction) in EV.items():
+    for state, url in EV_EXPORTS.items():
         if only and state not in only:
             continue
-        listing_url = f"https://{host}/results/public/api/jurisdictions/{jurisdiction}"
-        content = get(client, listing_url)
+        content = get(client, url)
         if content is None:
-            print(f"{state}: no jurisdiction listing")
-            continue
-        store(state, listing_url, content, ".json")
-        ids = [e["publicElectionId"] for e in json.loads(content)["elections"] if e["electionDate"] == DAY.isoformat()]
-        if not ids:
-            print(f"{state}: no election on {DAY}")
-            continue
-        base = f"https://{host}/results/public/api/elections/{jurisdiction}/{ids[0]}/"
-        content = get(client, base + "ballot-items")
-        if content is None:
-            print(f"{state}: no ballot items")
-            continue
-        store(state, base + "ballot-items", content, ".json")
-        for item in json.loads(content)["data"]:
-            if not EV_LOCAL.match(item["name"][0]["text"]):
-                detail = get(client, f"{base}ballot-items/{item['id']}")
-                if detail is not None:
-                    store(state, f"{base}ballot-items/{item['id']}", detail, ".json")
+            print(f"{state}: no export")
+        else:
+            store(state, url, content, ".zip")
     for state, base in CLARITY.items():
         if only and state not in only:
             continue
@@ -509,15 +533,19 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
 
         enr_or.collect(client, get, lambda url, content: store("OR", url, content, ".json"))
     missing: list[str] = []
-    for fips, (tenant, *_) in COUNTIES.items():
-        state = STATES[fips[:2]]
+    for state, tenant, eid in [
+        *((STATES[fips[:2]], tenant, None) for fips, (tenant, *_) in COUNTIES.items()),
+        *LIVE_COUNTIES.values(),
+    ]:
         if only and state not in only:
             continue
         base = f"https://results.enr.clarityelections.com/{state}/{tenant}/"
-        listing = get(client, f"{base}elections.json")
+        listing = None if eid else get(client, f"{base}elections.json")
         ids = (
             [os.environ[f"ENR_2026_EID_{state}_{tenant}"]]
             if f"ENR_2026_EID_{state}_{tenant}" in os.environ
+            else [eid]
+            if eid
             else [
                 e["EID"]
                 for e in json.loads(listing or "[]")
@@ -534,9 +562,12 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
     if missing:
         print(f"county Clarity sites with no {DAY} file: {len(missing)}", ", ".join(missing[:12]))
     if not only or "FL" in only:
-        official = "Y" if DAY < date.today() else "N"
-        url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
-        content = get(client, url)
+        url = f"https://flelectionfiles.floridados.gov/enightfilespublic/{DAY:%Y%m%d}_ElecResultsFL.txt"
+        content = get(client, f"{url}?v={int(time.time())}")
+        if content is None or len(content.splitlines()) < 2:
+            official = "Y" if DAY < date.today() - timedelta(days=7) else "N"
+            url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
+            content = get(client, url)
         if content is None:
             print("FL: no extract")
         else:
@@ -672,6 +703,71 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_tx
 
         enr_tx.collect(client, store)
+    if not only or "MI" in only:
+        from ea.sources.us import enr_mi
+
+        enr_mi.collect(client, store)
+
+
+def ev_seat(state: str, name: str) -> dict[str, str]:
+    name = name.strip()
+    found = EV_OFFICES.fullmatch(office_name(name))
+    seat = TN_LEGISLATURE.fullmatch(name) if state == "TN" else None
+    return {
+        "office": ("senate" if seat[1] == "Senate" else "house")
+        if seat
+        else ("state" if state == "TN" and TN_AMENDMENT.fullmatch(name) else "other")
+        if found is None
+        else "senate"
+        if found["senate"]
+        else "governor"
+        if found["governor"]
+        else "house",
+        "contest": name if found is None and seat is None else "",
+        "district": f"{seat[2]}:g" if seat else (found["district"] if found else None) or "",
+        "scope": (found["party0"] or found["party1"] or "") if found else "",
+    }
+
+
+def ev_export(state: str, path: Path):
+    with zipfile.ZipFile(path) as archive:
+        export = json.loads(archive.read("export.json"))
+    localities = export["localResults"] or [export["results"]]
+    names = {item["id"]: item["name"] for item in (export["results"] or {}).get("ballotItems") or []}
+    precincts: dict[str, list[int]] = {}
+    for locality in localities:
+        for item in locality["ballotItems"]:
+            tally = precincts.setdefault(item["id"], [0, 0])
+            tally[0] += item["precinctsReporting"] or 0
+            tally[1] += item["precinctsParticipating"] or 0
+    for locality in localities:
+        county = (
+            f"51{locality['id']}"
+            if state == "VA"
+            else town_counties("RI").get(
+                plain(re.sub(r"\s+(city|town)$", "", locality["name"].lower())), locality["name"]
+            )
+            if state == "RI"
+            else locality["name"].removesuffix(" County")
+        )
+        for item in locality["ballotItems"]:
+            name = names.get(item["id"], item["name"])
+            if EV_LOCAL.match(name):
+                continue
+            seat = ev_seat(state, name)
+            reporting, total = precincts[item["id"]]
+            for option in item["ballotOptions"]:
+                yield {
+                    **seat,
+                    "party": option["politicalParty"] or "",
+                    "county": county,
+                    "candidate": TAGS.sub("", option["name"]).strip(),
+                    "write_in": bool(WRITE_IN.search(option["name"])),
+                    "votes": int(option["voteCount"] or 0),
+                    "as_of": export["createdAt"],
+                    "reporting": reporting,
+                    "total": total,
+                }
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
@@ -695,7 +791,18 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_ky.rows(url, path)
         return
-    if state == "TX":
+    if state == "MI" and url.startswith(
+        (
+            "https://app.enhancedvoting.com/",
+            "https://michigan.totalvote.com/",
+            "https://electionresults.ewashtenaw.org/",
+        )
+    ):
+        from ea.sources.us import enr_mi
+
+        yield from enr_mi.rows(url, path)
+        return
+    if state == "TX" and not url.endswith("detailxml.zip"):
         from ea.sources.us import enr_tx
 
         yield from enr_tx.rows(url, path, urls)
@@ -763,6 +870,9 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
+        held = (root.findtext("ElectionDate") or "").strip()
+        if held and datetime.strptime(held, "%m/%d/%Y").date() != DAY:
+            return
         stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
         tenant = TENANT.search(url)
         as_of = (
@@ -776,7 +886,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for contest in root.iter("Contest"):
             found = EV_OFFICES.fullmatch(re.sub(r"\s+", " ", contest.get("text") or "").strip())
-            if tenant and found:
+            if tenant and state != "MI" and (found is None if state == "TX" else found is not None):
                 continue
             for choice in contest.iter("Choice"):
                 for kind in choice.iter("VoteType"):
@@ -834,8 +944,16 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                 "office": office or "other",
                 "contest": ""
                 if office
-                else " ".join(part for part in (row["OfficeDesc"], row["Juris1num"], row["Juris2num"]) if part),
-                "district": row["Juris1num"].lstrip("0"),
+                else " ".join(
+                    part
+                    for part in (
+                        row.get("OfficeDesc") or row.get("RaceName"),
+                        row["Juris1num"].strip(),
+                        row["Juris2num"].strip(),
+                    )
+                    if part
+                ),
+                "district": row["Juris1num"].strip().lstrip("0"),
                 "party": row["PartyName"],
                 "county": row["CountyName"],
                 "candidate": " ".join(
@@ -1177,53 +1295,8 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                         "total": contest.get("TotalPrecincts"),
                     }
         return
-    detail = json.loads(path.read_bytes())
-    found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
-    seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
-    if "breakdownResults" not in detail:
-        return
-    status = detail.get("reportingStatus") or {}
-    as_of = status.get("asOf")
-    localities = (
-        [{"locality": {"name": [{"text": "Shelby"}]}, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
-        if state == "TN"
-        else detail["breakdownResults"]
-        or [{"locality": None, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
-    )
-    for locality in localities:
-        place = locality["locality"]["name"][0]["text"] if locality["locality"] else ""
-        county = (
-            FIPS[state]
-            if locality["locality"] is None
-            else town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
-            if state == "RI"
-            else f"51{locality['locality']['mapFeatureId']}"
-            if state == "VA"
-            else place.removesuffix(" County")
-        )
-        for option in locality["ballotOptions"]:
-            yield {
-                "office": ("senate" if seat[1] == "Senate" else "house")
-                if seat
-                else "other"
-                if found is None
-                else "senate"
-                if found["senate"]
-                else "governor"
-                if found["governor"]
-                else "house",
-                "contest": detail["name"][0]["text"].strip() if found is None and seat is None else "",
-                "district": f"{seat[2]}:g" if seat else (found["district"] if found else None) or "",
-                "party": (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()"),
-                "county": county,
-                "candidate": TAGS.sub("", option["name"][0]["text"]).strip(),
-                "write_in": bool(option["isWriteIn"]),
-                "votes": int(option["voteCount"] or 0),
-                "as_of": as_of,
-                "reporting": status.get("reportingUnits"),
-                "total": status.get("totalUnits"),
-                "scope": (found["party0"] or found["party1"] or "") if found else "",
-            }
+    if "/cdn/results/" in url:
+        yield from ev_export(state, path)
 
 
 def parse() -> None:
@@ -1265,6 +1338,11 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
     )
 
 
+def countywide(key: str) -> bool:
+    rest = key.split(":")[2:]
+    return rest[0].isdigit() or rest[-1] == "g" or any("judicial" in part for part in rest)
+
+
 def plan(
     conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None]
 ) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
@@ -1277,7 +1355,19 @@ def plan(
     race = pl.concat_str(
         [pl.col(name).fill_null("") for name in ("state", "office", "contest", "district", "county")], separator="|"
     )
-    frame = frame.filter(~tenant | ~race.is_in(frame.filter(~tenant).select(race).to_series()))
+    frame = (
+        frame.with_columns(key=race, tenant=tenant)
+        .join(
+            frame.with_columns(key=race, tenant=tenant)
+            .group_by("key", "tenant")
+            .agg(pl.col("votes").sum())
+            .sort(["votes", "tenant"], descending=[True, False])
+            .unique("key", keep="first", maintain_order=True)
+            .select("key", "tenant"),
+            on=["key", "tenant"],
+        )
+        .drop("key", "tenant")
+    )
     local = frame.filter(pl.col("office").is_in(["other", "state"]))
     frame = frame.filter(~pl.col("office").is_in(["other", "state"]))
     counties: dict[tuple[str, str], UUID] = {}
@@ -1382,19 +1472,35 @@ def plan(
             for contest in sorted(same, key=lambda id: held[id][1])[:-1]:
                 del published[contest]
         towns: dict[str, list[list[str]]] = {}
-        for owner, text in conn.execute(
-            """select n.entity_id::text, n.text from name n where n.entity_id = any(%s)
+        schools: dict[str, set[str]] = {}
+        for owner, text, scheme in conn.execute(
+            """select n.entity_id::text, n.text, null from name n where n.entity_id = any(%s)
                union all
-               select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
+               select u.code, n.text, u.scheme_code from reporting_unit u join name n on n.entity_id = u.area_id
                where u.scheme_code in ('us.place', 'us.school_district') and u.code = any(%s)""",
             [
                 list({held[contest][0] for contest in published if held[contest][0] is not None}),
                 list({key.split(":")[2] for keys, _ in published.values() for key in keys}),
             ],
         ).fetchall():
+            if scheme == "us.school_district":
+                schools.setdefault(owner, set())
             towns.setdefault(owner, []).append(
-                [w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | PLACE_WORDS]
+                [w for w in slug(text).split("-") if (len(w) > 2 or w.isdigit()) and w not in STOP | PLACE_WORDS]
             )
+        for code, county in conn.execute(
+            """select u.code, c.code from reporting_unit u
+               join area_geometry g on g.area_id = u.area_id and g.valid @> current_date
+               join reporting_unit c on c.scheme_code = 'us.county' and c.code like %s
+               join area_geometry cg on cg.area_id = c.area_id and cg.valid @> current_date and cg.geom && g.geom
+               where u.scheme_code = 'us.school_district' and u.code = any(%s)
+                 and st_area(st_intersection(g.geom, cg.geom)) > 0.02 * st_area(g.geom)""",
+            [FIPS[state] + "%", list(schools)],
+        ).fetchall():
+            schools[code].add(county)
+        for code, county in SCHOOL_COUNTIES.items():
+            if code in schools:
+                schools[code] = set(county)
         races: dict[tuple[str, str, frozenset[str]], list[str]] = {}
         for (office, name, county), group in local.filter(pl.col("state") == state).group_by(
             "office", "contest", "county"
@@ -1464,9 +1570,24 @@ def plan(
                     or re.fullmatch(r"\d{7}|\d\d-[a-z0-9-]+", segment)
                     and (names := towns.get(str(held[contest][0]), []) + towns.get(segment, []))
                     and len(people & wanted - {"yes", "no"}) < 2
-                    and not any(placed(name, words, not people & wanted - {"yes", "no"}) for name in names)
+                    and not any(
+                        placed(
+                            name,
+                            words,
+                            not people & wanted - {"yes", "no"},
+                            segment in schools,
+                            bool(schools.get(segment))
+                            and {codes.get((FIPS[state], plain(place)), place)[:5] for place in places}.isdisjoint(
+                                schools[segment]
+                            ),
+                        )
+                        for name in names
+                    )
                     and not (people & wanted - {"yes", "no"} and named_seat & {w for w in words if w.isdigit()})
-                    and len({w for w in key.split(":")[-1].split("-") if len(w) > 3} & words) < 5
+                    and (
+                        len({w for w in key.split(":")[-1].split("-") if len(w) > 3} & words)
+                        < (6 if segment in schools else 5)
+                    )
                 ):
                     continue
                 if ":measure:public-measure-" in key:
@@ -1482,7 +1603,16 @@ def plan(
                     and crowd
                     and crowd <= wanted
                     and not crowd <= {"yes", "no"}
-                    and (re.match(r"\d|sd", segment) or contest in judicial)
+                    and (
+                        re.match(r"\d|sd", segment)
+                        or contest in judicial
+                        or wide
+                        and len(crowd) >= 2
+                        or segment in ("house", "senate")
+                        and segment in words
+                        and len(key.split(":")) > 3
+                        and key.split(":")[3] in words
+                    )
                 ):
                     overlap = 0.6
                 if overlap >= 0.6:
@@ -1493,7 +1623,7 @@ def plan(
                     scored.append(
                         (
                             round(overlap, 2),
-                            len({w for w in found - GENERIC if len(w) > 1 or w.isdigit()}),
+                            len({w for w in found - GENERIC if len(w) > 1 or w.isdigit() or key.endswith(f"-{w}")}),
                             len(found),
                             contest,
                             key,
@@ -1549,6 +1679,15 @@ def plan(
                 r"\s*(?:constitutional\s+)?(?:amendment|question)\s+(?:no\.?\s*)?(\d+)\s*:", name, re.IGNORECASE
             )
             best, ok = choose(people, words, places, wide, seat, lead[1] if lead else None)
+            if not ok and retention and len(best) > 1:
+                best, ok = choose(
+                    people,
+                    set(terms(name)) - {"retention", "retain", "judicial", "court"},
+                    places,
+                    wide,
+                    seat,
+                    lead[1] if lead else None,
+                )
             if ok:
                 picks.append((best[0], name, places, office))
                 continue

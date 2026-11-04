@@ -20,13 +20,14 @@ import polars as pl
 
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode, rekey, repair
 from ea.offices import Offices
 from ea.sources.us import cog, govmint, ia_districts_2026, ky_ballots, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
 SOURCE = "us.local_2026"
-VERSION = "1"
+VERSION = "2"
 DAY = date(2026, 11, 3)
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
 COUSUB_GAZETTEER = (
@@ -2298,10 +2299,151 @@ for county, url in {
         url,
         f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton', 'St. Lawrence') else 'pdf'}",
     )
+IA_OTHER_COUNTIES = {
+    "Tama": (
+        "tama",
+        "https://www.tamacounty.iowa.gov/files/candidate_list/2026_general_election_18326.pdf",
+        "Tama County Auditor",
+    ),
+    "Appanoose": (
+        "appanoose-legal-notice",
+        "https://appanoosecounty.iowa.gov/wp-content/uploads/2026/10/Legal-Notice-2026.pdf",
+        "Appanoose County Auditor",
+    ),
+    "Jefferson": (
+        "jefferson-notice",
+        "https://jeffersoncounty.iowa.gov/wp-content/uploads/notice-general-2026.pdf",
+        "Jefferson County Auditor",
+    ),
+}
+IA_TOWNSHIP_FILES = {
+    "IA-19039": (
+        "Clarke County Auditor",
+        "https://clarkecounty.iowa.gov/elections/election-info/",
+        "clarke-township.html",
+    ),
+    "IA-19091-beaver": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/202-Beaver%20FOR%20WEBSITE-4.pdf",
+        "humboldt-beaver.pdf",
+    ),
+    "IA-19091-norway": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/605-Norway%20FOR%20WEBSITE-21.pdf",
+        "humboldt-norway.pdf",
+    ),
+    "IA-19091-wacousta": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/403-Wacousta%20FOR%20WEBSITE-10.pdf",
+        "humboldt-wacousta.pdf",
+    ),
+    "IA-19099-lynngrove": (
+        "Jasper County Auditor",
+        "https://jaspercountyelections.iowa.gov/files/sample_ballots/1201_lynn_grove_township_74220.pdf",
+        "jasper-lynn-grove.pdf",
+    ),
+    "IA-19105-candidates": (
+        "Jones County Auditor",
+        "https://www.jonescountyiowa.gov/files/general_candidate_80677.pdf",
+        "jones-candidates.pdf",
+    ),
+    "IA-19123-westdesmoines": (
+        "Mahaska County Auditor",
+        "https://elections.mahaskacountyia.gov/files/sample_ballots/20261103_west_des_moines_township_27582.pdf",
+        "mahaska-west-des-moines.pdf",
+    ),
+    "IA-19125-lakeprairie": (
+        "Marion County Auditor",
+        "https://www.marioncountyiowa.gov/files/sample_ballots/20261103_2026_general_election_lp_twp_21272.pdf",
+        "marion-lake-prairie.pdf",
+    ),
+    "IA-19153-union": (
+        "Polk County Auditor",
+        "https://www.polkcountyiowa.gov/media/5b2d1i3a/sheldahl_1_twp-sample.pdf",
+        "polk-sheldahl-1-twp.pdf",
+    ),
+    "IA-19045": (
+        "Clinton County Auditor",
+        "https://elections.clintoncounty-ia.gov/news/public_notice_of_general_election_november_3rd_2026/",
+        "clinton-notice.html",
+    ),
+    "IA-19155-knox": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-knox.pdf",
+    ),
+    "IA-19155-pleasant": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-pleasant.pdf",
+    ),
+    "IA-19155-boomer": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-boomer.pdf",
+    ),
+    "IA-19155-neola": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-neola.pdf",
+    ),
+    "IA-19155-carson": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-carson.pdf",
+    ),
+    "IA-19053-bloomington": (
+        "Decatur County Auditor",
+        "https://www.decaturcountyiowa.com",
+        "decatur-bloomington.pdf",
+    ),
+    "IA-19053-morgan": (
+        "Decatur County Auditor",
+        "https://www.decaturcountyiowa.com",
+        "decatur-morgan.pdf",
+    ),
+    "IA-19073-franklin": (
+        "Greene County Auditor",
+        "https://www.greenecounty.iowa.gov",
+        "greene-franklin.pdf",
+    ),
+    "IA-19185": (
+        "Wayne County Auditor",
+        "https://waynecountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "wayne-benton.pdf",
+    ),
+    "IA-19185-jefferson": (
+        "Wayne County Auditor",
+        "https://waynecountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "wayne-jefferson.pdf",
+    ),
+    "IA-19195-lincoln": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-lincoln.pdf",
+    ),
+    "IA-19195-brookfield": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-brookfield.pdf",
+    ),
+    "IA-19195-union": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-union.pdf",
+    ),
+}
+for _key, (_publisher, _url, _name) in IA_TOWNSHIP_FILES.items():
+    NE_SOURCES[_key] = (
+        _publisher,
+        "Township sample ballot or candidate list, General Election November 3, 2026",
+        _url,
+        f"ia/counties/{_name}",
+    )
 for _line in Path(__file__).with_name("local_2026_nov3_ia.tsv").read_text().splitlines()[1:]:
     _key, _county = _line.split("\t")[0], _line.split("\t")[5]
-    if _key not in NE_SOURCES and _county in ia_districts_2026.COUNTIES:
-        _stem, _url, _publisher = ia_districts_2026.COUNTIES[_county]
+    if _key not in NE_SOURCES and _county in {**IA_OTHER_COUNTIES, **ia_districts_2026.COUNTIES}:
+        _stem, _url, _publisher = {**IA_OTHER_COUNTIES, **ia_districts_2026.COUNTIES}[_county]
         NE_SOURCES[_key] = (
             _publisher,
             "Candidate list or sample ballot, General Election November 3, 2026",
@@ -5615,6 +5757,13 @@ for key, publisher, title, url, local in (
         "in/597/18065/henry_candidates.pdf",
     ),
     (
+        "IN-18155-townships",
+        "Switzerland County Clerk",
+        "Official sample ballots, 2026 General Election, Switzerland County",
+        "https://www.in.gov/counties/switzerland/files/SWITZERLAND-SAMPLE-BALLOTS-9.30.2026.pdf",
+        "in/597/18155/switzerland_sample_ballots.pdf",
+    ),
+    (
         "IN-18085-townships",
         "Kosciusko County Clerk",
         "Candidate List - Abbreviated, 2026 General Election, Kosciusko County",
@@ -7377,6 +7526,7 @@ KY_BOARD_SEATS = {
     "Campbellsville Independent School District Board of Education": 3,
 }
 NJ_SCHOOL_PINS = {
+    ("26091", "Madison School District (lenawee)"): "2622320",
     ("34023", "Monroe Twp Sch Dist"): "3410500",
     ("34035", "Franklin Twp Sch Dist"): "3405490",
     ("34041", "Franklin Twp Sch Dist"): "3405520",
@@ -7413,6 +7563,15 @@ KY_COMMISSION_CITIES = {
         "Ten Broeck",
     )
 }
+KY_BALLOT_CITY_NAMES = (
+    ("FULTON", "CITY LEGISLATIVE BODY", "FULTON CITY COMMISSION", "Erick", "Flores"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "FULTON CITY COMMISSION", "Jeffrey L.", "Vaughn"),
+    ("FULTON", "MAYOR", "CITY OF HICKMAN", "Gerald", "Mack"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "HICKMAN CITY COMMISSION", "Kyle", "Kimmons"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "HICKMAN CITY COMMISSION", "Samantha", "McClure"),
+    ("HARDIN", "CITY LEGISLATIVE BODY", "SONORA COMMISSIONER", "Kevin Cody", "Philpott"),
+)
+KY_BALLOT_FIRST_NAMES = {("CAMPBELL", "SIZEMORE", "Christopher"): "Chris"}
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -7561,6 +7720,72 @@ PARTIES = {
 }
 NUMBERS = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
 WATERMARK = re.compile(r"^(?:[A-Z]{1,2} )+(?=\S\S)|(?: (?!JR|SR|II|IV)[A-Z]{1,2})+$")
+
+
+MN_HOSPITAL_DISTRICTS = {
+    "Bay Lake Township": "Cuyuna Range Hospital District",
+    "Cuyuna": "Cuyuna Range Hospital District",
+    "Deerwood": "Cuyuna Range Hospital District",
+    "Emily": "Cuyuna Range Hospital District",
+    "Irondale Township": "Cuyuna Range Hospital District",
+    "Ironton": "Cuyuna Range Hospital District",
+    "Perry Lake Township": "Cuyuna Range Hospital District",
+    "Riverton": "Cuyuna Range Hospital District",
+    "Trommald": "Cuyuna Range Hospital District",
+    "Wolford Township": "Cuyuna Range Hospital District",
+    "Big Falls": "Northern Itasca Hospital District",
+    "Bigfork": "Northern Itasca Hospital District",
+    "Carpenter Township": "Northern Itasca Hospital District",
+    "Marcell Township": "Northern Itasca Hospital District",
+    "Pomroy Township": "Northern Itasca Hospital District",
+    "Dawson": "Johnson Memorial Hospital District",
+    "Lac Qui Parle Township": "Johnson Memorial Hospital District",
+    "Maxwell Township": "Johnson Memorial Hospital District",
+    "Providence Township": "Johnson Memorial Hospital District",
+    "Canby": "Canby Community Hospital District",
+    "Dent": "Perham Hospital District",
+    "Dora Township": "Perham Hospital District",
+    "Gorman Township": "Perham Hospital District",
+    "Otter Tail Township": "Perham Hospital District",
+    "Perham": "Perham Hospital District",
+    "Perham Township": "Perham Hospital District",
+    "Pine Lake Township": "Perham Hospital District",
+    "Richville": "Perham Hospital District",
+    "Lida Township": "Pelican Valley Hospital District",
+    "Maplewood Township": "Pelican Valley Hospital District",
+    "Pelican Rapids": "Pelican Valley Hospital District",
+    "Scambler Township": "Pelican Valley Hospital District",
+    "Bruno": "North Pine Area Hospital District",
+    "Clover Township": "North Pine Area Hospital District",
+    "Dell Grove Township": "North Pine Area Hospital District",
+    "Finlayson Township": "North Pine Area Hospital District",
+    "Hinckley": "North Pine Area Hospital District",
+    "Hinckley Township": "North Pine Area Hospital District",
+    "New Dosey Township": "North Pine Area Hospital District",
+    "Ogema Township": "North Pine Area Hospital District",
+    "Partridge Township": "North Pine Area Hospital District",
+    "Willow River": "North Pine Area Hospital District",
+    "Gilchrist Township": "Glacial Ridge Hospital District",
+    "Grove Lake Township": "Glacial Ridge Hospital District",
+    "Leven Township": "Glacial Ridge Hospital District",
+    "Long Beach": "Glacial Ridge Hospital District",
+    "Reno Township": "Glacial Ridge Hospital District",
+    "Sedan": "Glacial Ridge Hospital District",
+    "Westport Township": "Glacial Ridge Hospital District",
+    "Becker Township": "Staples Area Hospital District",
+    "Byron Township": "Staples Area Hospital District",
+    "Goodwill Township": "Staples Area Hospital District",
+    "Moran Township": "Staples Area Hospital District",
+    "Motley Township": "Staples Area Hospital District",
+    "Staples": "Staples Area Hospital District",
+    "Thomastown Township": "Staples Area Hospital District",
+    "Beatty Township": "Cook-Orr Healthcare District",
+    "Camp 5 Township": "Cook-Orr Healthcare District",
+    "Field Township": "Cook-Orr Healthcare District",
+    "Kabetogama Township": "Cook-Orr Healthcare District",
+    "Leiding Township": "Cook-Orr Healthcare District",
+    "Linden Grove Township": "Cook-Orr Healthcare District",
+}
 
 
 def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
@@ -8437,6 +8662,36 @@ def parse() -> None:
             )
         )
     filings = pl.concat([filings.filter(~covered), pl.DataFrame(listed, schema=filings.schema)])
+    filings = pl.concat(
+        [
+            filings.with_columns(
+                pl.struct("County", "Last Name", "First Name")
+                .map_elements(
+                    lambda row: (
+                        KY_BALLOT_FIRST_NAMES.get((row["County"], row["Last Name"], row["First Name"]))
+                        or row["First Name"]
+                    ),
+                    return_dtype=pl.String,
+                )
+                .alias("First Name")
+            ),
+            pl.DataFrame(
+                [
+                    {column: None for column in filings.columns}
+                    | {
+                        "County": county,
+                        "Office": post,
+                        "Office Description": description,
+                        "First Name": first,
+                        "Last Name": last.upper(),
+                        "Party": "NONPARTISAN",
+                    }
+                    for county, post, description, first, last in KY_BALLOT_CITY_NAMES
+                ],
+                schema=filings.schema,
+            ),
+        ]
+    )
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
@@ -8545,15 +8800,25 @@ def parse() -> None:
             .is_duplicated()
             .any()
         ):
-            if not str(contest).startswith("City of") or str(county) not in ballot_text:
+            if str(county) not in ballot_text:
                 continue
-            printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
+            post_district = re.fullmatch(r".* County (Magistrate|Constable) District (\d+)", str(contest))
             named_city = re.match(r"City of (.+?) (?:Mayor|City Council|City Commission)", str(contest))
-            if (
-                named_city is None
-                or len(ky_ballots.letters(named_city[1])) < 5
-                or ky_ballots.letters(named_city[1]) not in printed
+            if post_district is not None:
+                section = re.search(
+                    rf"(?is){post_district[1]},?\s+{post_district[2]}(?:st|nd|rd|th)\s+Magisterial District(.*?)Write-in",
+                    " ".join(ballot_text[str(county)]),
+                )
+                if section is None:
+                    continue
+                printed = ky_ballots.letters(section[1])
+            elif (
+                named_city is not None
+                and len(ky_ballots.letters(named_city[1])) >= 5
+                and ky_ballots.letters(named_city[1]) in ky_ballots.letters(" ".join(ballot_text[str(county)]))
             ):
+                printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
+            else:
                 continue
             group = group.filter(
                 pl.col("Last Name").map_elements(
@@ -8928,9 +9193,7 @@ def parse() -> None:
     subdivisions = list(
         csv.reader(
             io.StringIO(
-                raw.cached(mn_local.SOURCE, mn_local.url(mn_local.COUNTIES, "MCDTbl.txt")).path.read_text(
-                    encoding="utf-8", errors="replace"
-                )
+                decode(raw.cached(mn_local.SOURCE, mn_local.url(mn_local.COUNTIES, "MCDTbl.txt")).path.read_bytes())
             ),
             delimiter=";",
         )
@@ -8940,7 +9203,7 @@ def parse() -> None:
     first_code: dict[tuple[str, str], str] = {}
     for key in ("MN", "MN-county", "MN-school"):
         for cells in csv.reader(
-            io.StringIO(raw.cached(SOURCE, FEEDS[key][0]).path.read_text(encoding="utf-8", errors="replace")),
+            io.StringIO(decode(raw.cached(SOURCE, FEEDS[key][0]).path.read_bytes())),
             delimiter=";",
         ):
             if len(cells) < 11 or cells[10] == "WI" or "QUESTION" in cells[4].upper():
@@ -9011,12 +9274,31 @@ def parse() -> None:
                             + (f", {shown}" if shown else ""),
                         }
                 tail = held and geoid and f"MN:{geoid}:{held}{seat}{special}"
+            district = ""
+            if key == "MN-county" and (
+                split := re.match(r"Soil and Water Supervisor (District \d+) \((East|West|North|South)\)$", title)
+            ):
+                district = f"{split[2]} {names.get(cells[1], '')} Soil and Water Conservation District"
+                title = f"Supervisor, {split[1]}"
+            elif key == "MN-county" and (split := re.match(r"County Park Commissioner (District \d+)$", title)):
+                district = "Three Rivers Park District"
+                title = f"Commissioner, {split[1]}"
+            county_name = names.get(cells[1], "") if key == "MN-county" else ""
+            if key == "MN" and (
+                hospital := re.match(r"(?:Special Election for )?Hospital District Board Member \(([^)]+)\)", title)
+            ):
+                district = MN_HOSPITAL_DISTRICTS[hospital[1]]
+                county_name = names.get(subdivision_county.get(cells[5], ""), "")
+                title = f"Board Member, {hospital[1]}"
             magnitude = re.search(r"\(ELECT (\d+)\)", upper)
             feeds[key].append(
                 {
                     **claim,
-                    "county": names.get(cells[1], "") if key == "MN-county" else "",
-                    "contest": f"{names.get(cells[1], '')} County {title}"
+                    "district": district,
+                    "county": county_name,
+                    "contest": f"{district}, {title}"
+                    if district
+                    else f"{names.get(cells[1], '')} County {title}"
                     if key == "MN-county"
                     else f"{cells[5]} {title}",
                     "seats": int(magnitude[1]) if magnitude else 0,
@@ -9208,7 +9490,8 @@ def parse() -> None:
                 )
             pending = ""
 
-    jurisdiction, contest, seats, unexpired = "", "", 0, False
+    jurisdiction, contest, seats, unexpired, header = "", "", 0, False, ""
+    start, partials = len(feeds["MI-26125"]), {}
     for line in text("MI-26125", "-layout").splitlines():
         if not line.strip() or re.match(r"\s*(Updated|Official Candidate List|November 3|Petitions)", line):
             continue
@@ -9224,11 +9507,15 @@ def parse() -> None:
                 )
                 else f"{jurisdiction or 'Oakland County'} {found[1]}"
             )
-            seats, unexpired = int(found[2]), "Term Ending" in found[3]
+            seats, unexpired, header = int(found[2]), "Term Ending" in found[3], found[3]
+            if contest and unexpired:
+                contest = f"{contest} Unexpired Term" + (
+                    "" if partials.setdefault(contest, found[3]) == found[3] else f" {found[3]}"
+                )
         elif re.fullmatch(r"[A-Z][A-Za-z.'’ -]+", line):
             jurisdiction, contest = line.strip(), ""
         elif contest and (
-            found := re.match(r"(Dem|Rep|Lib|Ust|Grn|Wc|Nlp|Npa)?\s+([A-Z][^,\d]+?)(?:\s{2,}|\s*$)", line)
+            found := re.match(r"(Dem|Rep|Lib|Ust|Grn|Wc|Nlp|Npa)?\s+([A-Z][^,\d]+?(?:, [JS]r\.)?)(?:\s{2,}|\s*$)", line)
         ):
             named, independent = party(
                 {"Dem": "Democratic", "Rep": "Republican", "Lib": "Libertarian", "Grn": "Green"}.get(found[1] or "", "")
@@ -9242,8 +9529,18 @@ def parse() -> None:
                     "party": named,
                     "independent": independent or found[1] == "Npa",
                     "unexpired": unexpired,
+                    "years": term[1] if (term := re.search(r"(\d+) Year Term", header)) else "",
                 }
             )
+    lengths: dict[str, set[str]] = {}
+    for row in feeds["MI-26125"][start:]:
+        if row["years"]:
+            lengths.setdefault(row["contest"], set()).add(row["years"])
+    for row in feeds["MI-26125"][start:]:
+        if len(lengths.get(row["contest"], ())) > 1:
+            row["contest"] = f"{row['contest']} {row['years']} Year Term"
+        del row["years"]
+    feeds["MI-26125"][start:] = sorted(feeds["MI-26125"][start:], key=lambda row: row["unexpired"])
 
     section, jurisdiction, contest, seats, unexpired = "", "", "", 0, False
     for line in text("MI-26081", "-layout").splitlines():
@@ -9940,8 +10237,13 @@ def parse() -> None:
         ("MI-26151", "Sanilac"),
         ("MI-26127", "Oceana"),
     ):
-        post, seats, unexpired = "", 0, False
+        post, seats, unexpired, wrap = "", 0, False, None
         for line in text(key, "-layout").splitlines():
+            if wrap and (found := re.match(rf" {{{wrap[1]}}}([A-Z][a-z][A-Za-z'-]*)(?:\s{{2,}}|$)", line)):
+                wrap[0]["name"] = cased(f"{wrap[2]}{'' if wrap[2].endswith('-') else ' '}{found[1]}")
+                wrap = None
+                continue
+            wrap = None
             if found := re.match(r"([A-Z][A-Z0-9 .,'&/-]*?) \(([A-Z][A-Z .,'&-]+?)\)\s*$", line):
                 title = re.sub(
                     r"^VIL ",
@@ -9978,9 +10280,11 @@ def parse() -> None:
                         "unexpired": unexpired,
                     }
                 )
+                wrap = (feeds[key][-1], found.start(3), found[3])
 
     for key, county in (("MI-26163", "Wayne"), ("MI-26049", "Genesee")):
         post, seats, unexpired = "", 0, False
+        start, partials = len(feeds[key]), {}
         for line in text(key, "-layout").splitlines():
             if found := re.match(r"\s*(\S.*?) - (\S.*?) - (.*?)\((\d+)\)(?: POSITIONS?)?\s*$", line):
                 post = (
@@ -9988,7 +10292,10 @@ def parse() -> None:
                     if not re.search(r"\d", found[2]) and not re.search(r"JUDGE|JUSTICE|COURT", line)
                     else ""
                 )
-                seats, unexpired = int(found[4]), "PARTIAL" in found[3]
+                seats, unexpired = int(found[4]), "PARTIAL" in found[3].upper()
+                if post and unexpired:
+                    term = found[3].strip().upper()
+                    post = f"{post} Unexpired Term" + ("" if partials.setdefault(post, term) == term else f" {term}")
             elif re.match(r"\s{20,}[A-Z][A-Z0-9 .,'&/()-]+$", line):
                 post = ""
             elif post and re.fullmatch(r"(?i)\s*(?:\S+\s+)?no candidate filed\s*", line):
@@ -10020,11 +10327,13 @@ def parse() -> None:
                         "unexpired": unexpired,
                     }
                 )
+        feeds[key][start:] = sorted(feeds[key][start:], key=lambda row: row["unexpired"])
 
     counts = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
     codes = {"D": "Democratic", "DEM": "Democratic", "R": "Republican", "REP": "Republican", "LIB": "Libertarian"}
     for key, county in (("MI-26099", "Macomb"), ("MI-26147", "St. Clair")):
         town = post = ""
+        macomb_partials: dict[str, str] = {}
         seats, unexpired = 0, False
         for whole in text(key, "-layout").splitlines():
             line = whole.strip()
@@ -10034,6 +10343,10 @@ def parse() -> None:
                 town = ""
                 post = "" if re.search(r"(?i)files w|county", found[4]) else f"{found[1]} Board Member"
                 seats, unexpired = counts.get(found[2].lower(), 0), "partial" in found[3].lower()
+                if post and unexpired:
+                    post = f"{post} Unexpired Term" + (
+                        "" if macomb_partials.setdefault(post, found[3]) == found[3] else f" {found[3].strip()}"
+                    )
             elif found := re.match(
                 r"(?i)(\S.*?)\s*\(((?:one|two|three|four|five|six|seven)\b[^)]*)\)", line
             ) or re.match(r"(\S.*?)\s{2,}((?:One|Two|Three|Four|Five|Six|Seven) .*term.*)$", line):
@@ -11009,6 +11322,8 @@ def parse() -> None:
                     ),
                     *unowned.get(state, []),
                 ]:
+                    if kind == "township" and state in ("KS", "NE"):
+                        label = re.sub(r" township$", " Township", label)
                     stem = [
                         "mount" if word == "mt" else word
                         for word in re.findall(
@@ -11516,6 +11831,10 @@ def parse() -> None:
                     fits = exact or fits
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
+                if state == "MI" and len({fit[4] for fit in fits}) > 1:
+                    fits = [
+                        fit for fit in fits if fit[4] in {town[3] for town in towns.get(str(row["fips"]), [])}
+                    ] or fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
@@ -11824,7 +12143,7 @@ def parse() -> None:
                     )
                     and not LOCAL_BODY.search(
                         re.sub(
-                            re.escape(place) if state in ("MD", "LA", "WY") else "^$",
+                            re.escape(place) if state in ("MD", "LA", "MN", "WY") else "^$",
                             "",
                             re.sub(
                                 r"(?i)\bcounty school superintendent\b", "County Superintendent", str(row["contest"])
@@ -11874,17 +12193,28 @@ def parse() -> None:
                     and row["unexpired"]
                 ):
                     tail = f"{tail}:unexpired"
+                ending = None
+                if (
+                    tail is not None
+                    and tail.endswith(":unexpired")
+                    and used.setdefault(tail, str(row["contest"])) != row["contest"]
+                    and (ending := re.search(r"(?i)\bterms? ending \d+/\d+/(\d{4})$", str(row["contest"])))
+                ):
+                    tail = f"{tail}-{ending[1]}"
                 if (
                     tail is not None
                     and template == ""
-                    and tail.removesuffix(":unexpired") in minted
-                    and tail.endswith(":unexpired")
+                    and (stem := re.sub(r":unexpired(-\d{4})?$", "", tail)) in minted
+                    and stem != tail
                 ):
-                    base = minted[tail.removesuffix(":unexpired")]
+                    base = minted[stem]
                     if (", " in base[0] and not (state == "NJ" and base[2].startswith("school:"))) or not base[2]:
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
-                    minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
+                    minted[tail] = (
+                        f"{base[0]} (Unexpired Term{f' Ending {ending[1]}' if ending else ''})",
+                        *base[1:],
+                    )
                 if (
                     state == "IN"
                     and tail is not None
@@ -12084,6 +12414,14 @@ def emit() -> None:
 
 def emit_state(frame: pl.DataFrame, state: str) -> Path:
     NEW_PARTIES_ADDED.clear()
+    only_unexpired = set(frame.group_by("tail").agg(pl.col("unexpired").all()).filter("unexpired")["tail"])
+    doubled = {f"{tail}:unexpired" for tail in only_unexpired} & set(frame["tail"])
+    frame = frame.with_columns(
+        tail=pl.when(pl.col("tail").is_in(doubled)).then(pl.col("tail").str.replace(r":unexpired$", "")).otherwise("tail")
+    ).filter(
+        ~pl.col("tail").is_in({tail.removesuffix(":unexpired") for tail in doubled})
+        | pl.struct("tail", "person").is_first_distinct()
+    )
     tail_set = set(frame["tail"])
     merged = {
         row["tail"]
@@ -12306,6 +12644,23 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     "public-auditor",
                     "justice",
                 )
+                if (
+                    polity not in cs.minted
+                    and polity not in made
+                    and owner.startswith("town:")
+                    and st in ("KS", "NE")
+                    and place.endswith(" Township")
+                ):
+                    made.add(polity)
+                    cs.add("name", entity_id=polity, text=place, lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=cs.area("us.town", owner.split(":")[1]),
+                        text=f"{place}, {st}",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
                 if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:", "town:")):
                     made.add(polity)
                     geoid = owner.split(":")[1]
@@ -12430,7 +12785,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                         else ""
                     )
                     + ("-special" if "special" in tail.split(":")[3:] else "")
-                    + ("-unexpired" if tail.endswith(":unexpired") else "")
+                    + (f"-unexpired{ending[1] or ''}" if (ending := re.search(r":unexpired(-\d{4})?$", tail)) else "")
                     + ("-remainder" if tail.startswith("KY:") and tail.endswith(":remainder") else ""),
                     f"2026 {place} general election",
                     f"{home}/{DAY}-general",
@@ -12494,8 +12849,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 known[tail] = []
             elif template != tail and template in templates:
                 base = list(templates[template])
-                if tail.endswith(":unexpired"):
-                    base[15] = f"{base[15]}-unexpired"
+                if ending := re.search(r":unexpired(-\d{4})?$", tail):
+                    base[15] = f"{base[15]}-unexpired{ending[1] or ''}"
                     known[tail] = known.get(template, [])
                 elif template == f"{tail}:remainder":
                     base[1], base[9] = None, "full"
@@ -12671,11 +13026,15 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 )
             split = bool(group["unexpired"][0]) and (fips, tail) in split_tails
             key = f"{DAY}:{tail}" + (":unexpired" if split else "")
-            try:
-                contest = cs.key("us.contest", key)
-            except ValueError:
-                key = f"{key}:reissued"
-                contest = cs.key("us.contest", key)
+            base = key
+            for attempt in range(1, 10):
+                try:
+                    contest = cs.key("us.contest", key)
+                    break
+                except ValueError:
+                    key = f"{base}:reissued" + (f"-{attempt}" if attempt > 1 else "")
+            else:
+                raise ValueError(f"no free contest key for {base}")
             holder = conn.execute(
                 "select entity_id from slug where path = %s",
                 [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
@@ -12806,10 +13165,12 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     person = next(iter(pool))
                     counts["matched"] += 1
                 else:
-                    person = cs.key(
-                        f"{SOURCE}.person",
-                        f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}",
-                    )
+                    rekey(cs, row["name"])
+                    person_key = f"{template if template == f'{tail}:remainder' else tail}:{slug(row['name'])}"
+                    try:
+                        person = cs.key(f"{SOURCE}.person", person_key)
+                    except ValueError:
+                        person = cs.key(f"{SOURCE}.person", f"{person_key}:2026")
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, row["name"])
@@ -12926,5 +13287,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 print("retiring orphan person", value)
                 cs.add("entity_retirement", entity_id=person, reason="No longer on any official candidate list")
                 counts["orphan people"] += 1
+        counts["renamed people"] = repair(cs)
         print(counts)
         return cs.write()

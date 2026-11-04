@@ -16,6 +16,7 @@ from psycopg.rows import dict_row
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.coverage_tables import tokens
+from ea.encoding import rekey, repair, restorer
 from ea.offices import Offices
 from ea.sources.licenses import UNLICENSED
 from ea.sources.us import cog, enr_clarity
@@ -49,7 +50,7 @@ SYNONYMS = {
     "state-s-attorney": "states-attorney",
     "states-attorney": "states-attorney",
 }
-VERSION = "11"
+VERSION = "12"
 ANSWER = r"(?i)^(?:yes|no)\b"
 PARSED = DATA / "parsed" / SOURCE
 ABBREVIATED = {
@@ -1525,6 +1526,16 @@ def emit() -> Path:
     contests = pl.read_parquet(PARSED / "contests.parquet")
     lines = pl.read_parquet(PARSED / "lines.parquet")
     with connect() as conn:
+        restore = restorer(conn)
+        lines = lines.with_columns(
+            pl.col("candidate").replace(
+                {
+                    text: restore(text)
+                    for text in lines["candidate"].unique().to_list()
+                    if text is not None and restore(text) != text
+                }
+            )
+        )
         polities = {
             (scheme, code): (polity, text, path)
             for scheme, code, polity, text, path in conn.execute(
@@ -2369,6 +2380,8 @@ def emit() -> Path:
                     if full != candidate:
                         surnames.add(f"{state}:{code}:{slug(candidate)}")
                     ballot = title(full) if full.isupper() else full
+                    rekey(cs, candidate)
+                    rekey(cs, full)
                     party_id, independent = (None, False) if token in fused else party(state, label)
                     person_key = (code, slug(full))
                     head = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
@@ -2741,4 +2754,5 @@ def emit() -> Path:
             r"|^(?:circuit clerk|county clerk|sheriff|assessor|constable|mayor) ",
         )
         cs.clear()
+        repair(cs)
         return cs.write()

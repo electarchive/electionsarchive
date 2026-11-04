@@ -7,7 +7,7 @@
   import { basemap } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import { cn } from "#lib/utils.js";
-  import type { Dot, Fill } from "./model.js";
+  import type { Dot, Fill, Swing } from "./model.js";
   import { BLANK, GROUND } from "./model.js";
 
   let {
@@ -18,6 +18,8 @@
     hold = null,
     fills,
     dots = [],
+    swings = [],
+    reach = 0.1,
     labels = [],
     selected = null,
     hovered = $bindable(null),
@@ -43,6 +45,8 @@
     hold?: { tiles: string; k: number; color: string } | null;
     fills: Map<string, Fill>;
     dots?: Array<Dot>;
+    swings?: Array<Swing>;
+    reach?: number;
     labels?: Array<{ areaId: string; text: string; rank: number }>;
     selected?: string | null;
     hovered?: string | null;
@@ -211,13 +215,28 @@
         "source-layer": "areas",
         filter: within,
         paint: {
-          "fill-pattern": "hatch",
+          "fill-pattern": "absent",
           "fill-opacity": [
             "case",
             ["boolean", ["feature-state", "later"], false],
             1,
             0,
           ],
+        },
+      },
+      "fills",
+      { group, rank: 2 },
+    );
+    engine.add(
+      {
+        id: `${group}-flip`,
+        type: "fill",
+        source,
+        "source-layer": "areas",
+        filter: within,
+        paint: {
+          "fill-pattern": "flip",
+          "fill-opacity": ["coalesce", ["feature-state", "flip"], 0],
         },
       },
       "fills",
@@ -498,13 +517,26 @@
         type: "fill",
         ...pieces,
         paint: {
-          "fill-pattern": "hatch",
+          "fill-pattern": "absent",
           "fill-opacity": [
             "case",
             ["boolean", ["feature-state", "later"], false],
             1,
             0,
           ],
+        },
+      },
+      "fills",
+      { group: "seat", rank: 4 },
+    );
+    engine.add(
+      {
+        id: "seat-flip",
+        type: "fill",
+        ...pieces,
+        paint: {
+          "fill-pattern": "flip",
+          "fill-opacity": ["coalesce", ["feature-state", "flip"], 0],
         },
       },
       "fills",
@@ -641,18 +673,23 @@
       source,
       new Map(
         (hold == null ? (seat?.pieces ?? places) : []).flatMap(
-          (place): Array<[number, Record<string, string | boolean>]> => {
+          (
+            place,
+          ): Array<[number, Record<string, string | number | boolean>]> => {
             const fill = fills.get(place.areaId);
-            return fill == null
-              ? []
-              : [
-                  [
-                    place.k,
-                    fill.isLater === true
-                      ? { color: fill.color, later: true }
-                      : { color: fill.color },
-                  ],
-                ];
+            if (fill == null) {
+              return [];
+            }
+            const state: Record<string, string | number | boolean> = {
+              color: fill.color,
+            };
+            if (fill.isLater === true) {
+              state.later = true;
+            }
+            if (fill.flip != null) {
+              state.flip = fill.flip === "flipped" ? 1 : 0.5;
+            }
+            return [[place.k, state]];
           },
         ),
       ),
@@ -781,6 +818,27 @@
     ];
     if (engine.gl != null) {
       untrack(draw);
+    }
+  });
+
+  $effect(() => {
+    const items = swings.flatMap((entry) => {
+      const at = atOf.get(entry.areaId);
+      return at == null
+        ? []
+        : [
+            {
+              at,
+              swing: entry.swing,
+              color: entry.color,
+              weight: entry.weight,
+              isMuted: selected != null && selected !== entry.areaId,
+            },
+          ];
+    });
+    const size = reach;
+    if (engine.gl != null) {
+      untrack(() => engine.arrows(items, size));
     }
   });
 

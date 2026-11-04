@@ -164,9 +164,19 @@ function pattern(shape: string, color: string) {
   if (pen != null) {
     pen.strokeStyle = color;
     pen.fillStyle = color;
-    pen.lineWidth = shape === "absent" ? 2.5 : 1;
+    pen.lineWidth = shape === "absent" ? 2.5 : shape === "flip" ? 1.75 : 1;
     pen.beginPath();
-    if (shape === "hatch" || shape === "cross") {
+    if (shape === "flip") {
+      for (const [x, y, length] of [
+        [-2, 10, 12],
+        [-2, 2, 4],
+        [6, 10, 4],
+      ] as const) {
+        pen.moveTo(x, y);
+        pen.lineTo(x + length, y - length);
+      }
+      pen.stroke();
+    } else if (shape === "hatch" || shape === "cross") {
       pen.moveTo(0, 8);
       pen.lineTo(8, 0);
       pen.stroke();
@@ -578,14 +588,27 @@ export class Engine {
         gl.addImage(shape, pattern(shape, ink));
       }
     }
-    const paper = pattern(
-      "hatch",
-      this.read("color-mix(in oklab, var(--card) 85%, transparent)"),
-    );
-    if (gl.hasImage("runoff")) {
-      gl.updateImage("runoff", paper);
-    } else {
-      gl.addImage("runoff", paper);
+    for (const [name, image] of [
+      [
+        "runoff",
+        pattern(
+          "hatch",
+          this.read("color-mix(in oklab, var(--card) 85%, transparent)"),
+        ),
+      ],
+      [
+        "flip",
+        pattern(
+          "flip",
+          this.read("color-mix(in oklab, var(--foreground) 45%, transparent)"),
+        ),
+      ],
+    ] as const) {
+      if (gl.hasImage(name)) {
+        gl.updateImage(name, image);
+      } else {
+        gl.addImage(name, image);
+      }
     }
   }
 

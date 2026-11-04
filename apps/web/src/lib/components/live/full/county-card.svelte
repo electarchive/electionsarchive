@@ -158,9 +158,14 @@
     <div class="grid gap-0.5 min-inline-0">
       <h2 class="text-xl/6 font-[760] tracking-tight text-balance">{name}</h2>
       {#if race != null}
-        <p class="truncate text-[0.8125rem] text-muted-foreground">
-          {race.title}
-        </p>
+        <a
+          href={toLive(race.slug)}
+          class="flex items-center gap-1 text-[0.8125rem] text-muted-foreground underline decoration-border underline-offset-3 hover:text-foreground hover:decoration-foreground"
+          ><span class="truncate">{race.title}</span><ArrowUpRightIcon
+            class="shrink-0 block-3.5 inline-3.5"
+            aria-hidden="true"
+          /></a
+        >
       {/if}
     </div>
     <button
@@ -343,7 +348,8 @@
                   class="shrink-0 rounded-full block-2 inline-2"
                   style:background-color={tone(option)}
                 ></span>
-                <span class="font-figures text-xs tabular-nums"
+                <span
+                  class="shrink-0 font-figures text-xs whitespace-nowrap tabular-nums"
                   >{surname(option)} +{lead(other.row.margin)}</span
                 >
               {/if}

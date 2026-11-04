@@ -1,17 +1,20 @@
 <script lang="ts">
   import type { LiveRace } from "@ea/analytics/live";
   import type { Snippet } from "svelte";
-  import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import CircleCheckIcon from "@lucide/svelte/icons/circle-check";
+  import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import SearchIcon from "@lucide/svelte/icons/search";
   import XIcon from "@lucide/svelte/icons/x";
+  import { tick } from "svelte";
+  import { prefersReducedMotion } from "svelte/motion";
   import type { Summary } from "#lib/live/summary.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
-  import { HATCH, surname, tone } from "#lib/live/format.js";
+  import { DOTS, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { localize, tokenize } from "#lib/live/local.js";
-  import { shade, tally, verdict } from "#lib/live/summary.js";
+  import { bandOf, shade, tally, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -19,14 +22,23 @@
     summaries,
     current = null,
     label,
-    overview = null,
+    overviews = [],
+    kinds = null,
+    search = null,
     onpick = null,
     isCompact = false,
   }: {
     summaries: Array<Summary>;
     current?: string | null;
     label: string;
-    overview?: { label: string; isCurrent: boolean; onpick: () => void } | null;
+    overviews?: Array<{
+      group: string;
+      label: string;
+      isCurrent: boolean;
+      onpick: () => void;
+    }>;
+    kinds?: Map<string, string> | null;
+    search?: Snippet | null;
     onpick?: ((summary: Summary) => void) | null;
     isCompact?: boolean;
   } = $props();
@@ -61,8 +73,11 @@
   let width = $state(0);
   let probed = $state<string | null>(null);
   let openFor = $state<string | null>(null);
+  let nav = $state<HTMLElement>();
 
-  const isFolded = $derived(isCompact && openFor !== (current ?? ""));
+  const isFolded = $derived(
+    isCompact && current != null && openFor !== current,
+  );
 
   const place = $derived.by(() => {
     const titles = summaries
@@ -100,6 +115,10 @@
 
   function kindOf(summary: Summary) {
     const { race } = summary;
+    const known = kinds?.get(race.slug);
+    if (known != null) {
+      return known;
+    }
     if (race.office === "house") {
       return "house";
     }
@@ -174,13 +193,15 @@
                 Number.parseInt(a.race.district ?? "0", 10) -
                 Number.parseInt(b.race.district ?? "0", 10),
             )
-          : list.toSorted(
-              (a, b) =>
-                (RANK[a.race.office] ?? 2) - (RANK[b.race.office] ?? 2) ||
-                title(a.race).localeCompare(title(b.race), undefined, {
-                  numeric: true,
-                }),
-            );
+          : list.every((summary) => kinds?.has(summary.race.slug) === true)
+            ? list
+            : list.toSorted(
+                (a, b) =>
+                  (RANK[a.race.office] ?? 2) - (RANK[b.race.office] ?? 2) ||
+                  title(a.race).localeCompare(title(b.race), undefined, {
+                    numeric: true,
+                  }),
+              );
       const names = sorted.map((summary) => title(summary.race));
       const prefix =
         kind.value === "statewide" || kind.value === "house" || list.length < 2
@@ -220,7 +241,7 @@
     groups.find((group) =>
       group.entries.some((entry) => entry.summary.race.slug === current),
     )?.key ??
-      (overview?.isCurrent === true ? "house" : null) ??
+      overviews.find((entry) => entry.isCurrent)?.group ??
       groups[0]?.key ??
       "all",
   );
@@ -289,6 +310,14 @@
   function pick(summary: Summary) {
     probed = null;
     onpick?.(summary);
+    if (isCompact) {
+      void tick().then(() =>
+        nav?.scrollIntoView({
+          block: "nearest",
+          behavior: prefersReducedMotion.current ? "auto" : "smooth",
+        }),
+      );
+    }
   }
 </script>
 
@@ -343,29 +372,41 @@
   {const summary = $derived(entry.summary)}
   {const option = $derived(summary.winner ?? summary.leader)}
   {const isCurrent = $derived(summary.race.slug === current)}
-  {const isCalled = $derived(summary.winner != null)}
+  {const band = $derived(bandOf(summary))}
   <li class="border-be border-border">
     {#snippet body()}
       <span
         class={cn("mbs-1.5 shrink-0 rounded-full block-2.5 inline-2.5", {
           "ring-1 ring-muted-foreground/50 ring-inset": option == null,
         })}
-        style:background-color={option == null ? undefined : tone(option)}
-        style:background-image={summary.later == null ? undefined : HATCH}
+        style:background-color={band != null
+          ? "var(--foreground)"
+          : option == null
+            ? undefined
+            : tone(option)}
+        style:background-image={summary.later == null ? undefined : DOTS}
         aria-hidden="true"
       ></span>
-      <span class="grid gap-0.5 min-inline-0">
+      <span class="grid flex-1 grid-cols-[minmax(0,1fr)] gap-0.5">
         <span class="flex items-baseline justify-between gap-3">
           {const cut = $derived(entry.name.indexOf(": "))}
-          <span
-            class="truncate text-[0.8125rem] leading-snug font-semibold min-inline-0"
-            title={summary.race.title}
-            >{#if cut === -1}{entry.name}{:else}{entry.name.slice(0, cut)}<span
-                class="font-normal text-muted-foreground"
+          {const head = $derived(
+            cut === -1 ? entry.name : entry.name.slice(0, cut),
+          )}
+          {const tail = $derived(cut === -1 ? "" : entry.name.slice(cut + 2))}
+          <span class="grid gap-px min-inline-0" title={summary.race.title}>
+            <span
+              class="line-clamp-2 text-[0.8125rem]/snug font-semibold text-pretty wrap-anywhere"
+              >{head}</span
+            >
+            {#if tail !== "" && !tail
+                .toLowerCase()
+                .startsWith(head.toLowerCase())}
+              <span class="truncate text-xs/snug text-muted-foreground"
+                >{tail}</span
               >
-                {entry.name.slice(cut + 2)}</span
-              >{/if}</span
-          >
+            {/if}
+          </span>
           {#if summary.counted != null && summary.later == null}
             <span
               class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
@@ -376,11 +417,14 @@
         <span class="flex items-center justify-between gap-3">
           <span
             class={cn("flex items-center gap-1 truncate text-xs", {
-              "font-semibold text-foreground": isCalled,
-              "text-muted-foreground": !isCalled,
+              "font-semibold text-foreground": band != null,
+              "text-muted-foreground": band == null,
             })}
-            >{#if isCalled}<CheckIcon
-                class="shrink-0 block-3 inline-3"
+            >{#if band?.isProjected === true}<CircleDashedCheckIcon
+                class="shrink-0 block-3.5 inline-3.5"
+                aria-hidden="true"
+              />{:else if band != null}<CircleCheckIcon
+                class="shrink-0 block-3.5 inline-3.5"
                 aria-hidden="true"
               />{/if}<span class="truncate">{verdict(summary)}</span></span
           >
@@ -406,12 +450,32 @@
           "border-foreground bg-secondary": isCurrent,
           "border-transparent hover:bg-secondary": !isCurrent,
         },
+        { band: band != null },
       ),
       null,
-      null,
+      band == null ? null : `--party: ${band.fill}`,
       body,
     )}
   </li>
+{/snippet}
+
+{#snippet overview(
+  entry: { label: string; isCurrent: boolean; onpick: () => void },
+  className: string,
+)}
+  <button
+    type="button"
+    aria-pressed={entry.isCurrent}
+    class={cn(
+      "grid place-items-center rounded-xs px-2 text-xs font-semibold block-8 pointer-coarse:block-10",
+      {
+        "bg-foreground text-background": entry.isCurrent,
+        "ring-1 ring-border hover:bg-secondary": !entry.isCurrent,
+      },
+      className,
+    )}
+    onclick={entry.onpick}>{entry.label}</button
+  >
 {/snippet}
 
 {#snippet house(entries: Array<{ summary: Summary; name: string }>)}
@@ -437,9 +501,7 @@
           <span class="flex items-center gap-1.5 font-semibold">
             {@render swatch(tone(group.option))}
             {group.option.party?.short ?? surname(group.option)}
-            <span class="font-figures tabular-nums"
-              >{group.won + group.leading}</span
-            >
+            <span class="font-figures tabular-nums">{group.seats}</span>
           </span>
         {/each}
         {#if seats.waiting > 0}
@@ -450,7 +512,7 @@
         {/if}
         {#if seats.later > 0}
           <span class="flex items-center gap-1.5 text-muted-foreground">
-            {@render swatch("var(--muted)", HATCH)}
+            {@render swatch("var(--muted)", DOTS)}
             {m.night_races_later({ count: seats.later })}
           </span>
         {/if}
@@ -468,22 +530,11 @@
       class="grid grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))] gap-1"
       onpointerleave={() => (probed = null)}
     >
-      {#if overview != null}
+      {#each overviews.filter((entry) => entry.group === "house") as entry (entry.label)}
         <li class="col-span-3">
-          <button
-            type="button"
-            aria-pressed={overview.isCurrent}
-            class={cn(
-              "grid place-items-center rounded-xs px-2 text-xs font-semibold block-8 inline-full pointer-coarse:block-10",
-              {
-                "bg-foreground text-background": overview.isCurrent,
-                "ring-1 ring-border hover:bg-secondary": !overview.isCurrent,
-              },
-            )}
-            onclick={overview.onpick}>{overview.label}</button
-          >
+          {@render overview(entry, "inline-full")}
         </li>
-      {/if}
+      {/each}
       {#each entries as entry (entry.summary.race.id)}
         {const summary = $derived(entry.summary)}
         {const color = $derived(shade(summary))}
@@ -509,7 +560,7 @@
               },
             ),
             `${title(summary.race)}: ${verdict(summary)}`,
-            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? "none" : HATCH}`,
+            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? "none" : DOTS}`,
             body,
           )}
         </li>
@@ -520,8 +571,9 @@
 
 <nav
   aria-label={label}
-  class="grid grid-cols-[minmax(0,1fr)] gap-3"
+  class="@container grid scroll-mbs-4 grid-cols-[minmax(0,1fr)] gap-3"
   bind:clientWidth={width}
+  bind:this={nav}
 >
   <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
     <div class="grid gap-1.5 min-inline-0">
@@ -555,7 +607,7 @@
           {/if}
           {#if counts.later > 0}
             <span class="flex items-center gap-1.5"
-              >{@render swatch("var(--muted)", HATCH)}{m.night_races_later({
+              >{@render swatch("var(--muted)", DOTS)}{m.night_races_later({
                 count: counts.later,
               })}</span
             >
@@ -575,16 +627,16 @@
           style:flex-grow={counts.counting}
         ></span>
         <span style:flex-grow={counts.waiting}></span>
-        <span style:flex-grow={counts.later} style:background-image={HATCH}
+        <span style:flex-grow={counts.later} style:background-image={DOTS}
         ></span>
       </span>
     </div>
-    {#if isCompact}
+    {#if isCompact && current != null}
       <button
         type="button"
         aria-expanded={!isFolded}
         aria-controls={id}
-        class="inline-flex shrink-0 items-center gap-1 rounded-sm border border-input bg-card ps-3 pe-2 text-[0.8125rem] font-semibold block-9 hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none sm:hidden"
+        class="inline-flex shrink-0 items-center gap-1 rounded-sm border border-input bg-card ps-3 pe-2 text-[0.8125rem] font-semibold block-9 hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none @xl:hidden"
         onclick={() => (openFor = isFolded ? (current ?? "") : null)}
         >{isFolded
           ? m.night_picker_open()
@@ -597,11 +649,19 @@
         /></button
       >
     {/if}
-    {#if isLong}
+    {#if search != null}
+      <div
+        class={cn("@max-xl:inline-full @xl:inline-72", {
+          "@max-xl:hidden": isFolded,
+        })}
+      >
+        {@render search()}
+      </div>
+    {:else if isLong}
       <label
         class={cn(
-          "flex items-center gap-2 rounded-sm border border-input bg-card px-2.5 block-8 focus-within:border-foreground focus-within:ring-2 focus-within:ring-ring/40 sm:inline-56 pointer-coarse:block-10 max-sm:inline-full",
-          { "max-sm:hidden": isFolded },
+          "flex items-center gap-2 rounded-sm border border-input bg-card px-2.5 block-8 focus-within:border-foreground focus-within:ring-2 focus-within:ring-ring/40 @max-xl:inline-full @xl:inline-56 pointer-coarse:block-10",
+          { "@max-xl:hidden": isFolded },
         )}
       >
         <SearchIcon
@@ -639,7 +699,7 @@
     {/if}
   </div>
 
-  <div {id} class={cn("contents", { "max-sm:hidden": isFolded })}>
+  <div {id} class={cn("contents", { "@max-xl:hidden": isFolded })}>
     {#if groups.length > 1 && !isSearching}
       <div
         class="flex flex-wrap gap-x-5 border-be border-border"
@@ -691,6 +751,16 @@
         {#if group.key === "house"}
           {@render house(entries)}
         {:else}
+          {const maps = $derived(
+            overviews.filter((entry) => entry.group === group.key),
+          )}
+          {#if maps.length > 0}
+            <div class="flex flex-wrap gap-1 pbs-1 pbe-1.5">
+              {#each maps as entry (entry.label)}
+                {@render overview(entry, "")}
+              {/each}
+            </div>
+          {/if}
           <ul
             class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-x-4"
           >

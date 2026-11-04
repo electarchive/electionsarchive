@@ -1,11 +1,19 @@
 <script lang="ts">
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
+  import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Hexes from "#lib/components/live/hexes.svelte";
   import { percent } from "#lib/format.js";
-  import { districtKey, short, strength } from "#lib/live/board/labels.js";
+  import {
+    ahead,
+    districtKey,
+    short,
+    strength,
+  } from "#lib/live/board/labels.js";
+  import { hatch } from "#lib/live/flips.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import Mark from "./mark.svelte";
 
   const { desk }: { desk: Desk } = $props();
 
@@ -20,10 +28,31 @@
       ),
     ),
   );
+  const turns = $derived(
+    new Map(
+      [...districts].flatMap(([key, summary]) => {
+        const found = desk.shifts.get(summary.race.id);
+        return found == null || found.flip === "held"
+          ? []
+          : [[key, { flip: found.flip, to: found.to }] as const];
+      }),
+    ),
+  );
   const colors = $derived(
     Object.fromEntries(
-      [...districts].map(([key, summary]) => [key, strength(summary)]),
+      [...districts].map(([key, summary]) => {
+        const turn = turns.get(key);
+        return [
+          key,
+          turn == null
+            ? strength(summary)
+            : hatch(desk.party(turn.to).color, turn.flip).fill,
+        ];
+      }),
     ),
+  );
+  const flips = $derived(
+    Object.fromEntries([...turns].map(([key, turn]) => [key, turn.flip])),
   );
 </script>
 
@@ -32,7 +61,7 @@
   {#if summary == null}
     <span class="font-semibold">{key.toUpperCase()}</span>
   {:else}
-    {const option = $derived(summary.winner ?? summary.leader)}
+    {const option = $derived(ahead(summary))}
     <span class="font-semibold">{short(summary.race)}</span>
     {#if option == null}
       <span class="text-muted-foreground">{m.night_nation_waiting()}</span>
@@ -46,7 +75,19 @@
         <span class="font-figures text-muted-foreground tabular-nums"
           >+{lead(summary.margin)}</span
         >
+        <Mark {summary} />
       </span>
+      {const found = $derived(desk.shifts.get(summary.race.id))}
+      {#if found != null && found.flip !== "held"}
+        <span
+          ><Flip
+            flip={found.flip}
+            from={desk.party(found.from)}
+            to={desk.party(found.to)}
+            isLabeled={true}
+          /></span
+        >
+      {/if}
     {/if}
     {#if summary.counted != null}
       <span class="text-muted-foreground"
@@ -63,6 +104,7 @@
     <Hexes
       cartogram={desk.cartogram}
       {colors}
+      {flips}
       label={m.night_house_hexes_label()}
       bind:hovered
       href={() => null}

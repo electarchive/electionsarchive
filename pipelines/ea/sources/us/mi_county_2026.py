@@ -16,6 +16,8 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 MANUAL = DATA / "inbox" / "manual" / "MF-374"
+MORE = Path(__file__).with_name("mi_county_2026_more.tsv")
+MORE_FILES = DATA / "inbox" / "y26" / "mi" / "proposals"
 COUNTIES = {
     "26081": (
         "https://www.kentcountymi.gov/DocumentCenter/View/8870/November-3-2026-Candidates-and-Proposals-PDF",
@@ -209,7 +211,24 @@ def wayne(county: str, url: str, text: str) -> list[dict[str, str]]:
 PARSERS = {"26125": oakland, "26163": wayne, "26139": ottawa}
 
 
+def more() -> pl.DataFrame:
+    return pl.read_csv(MORE, separator="\t", infer_schema=False)
+
+
 def fetch() -> None:
+    for row in more().unique("url").iter_rows(named=True):
+        try:
+            raw.cached(SOURCE, row["url"])
+        except LookupError:
+            path = MORE_FILES / row["file"]
+            raw.store(
+                SOURCE,
+                row["url"],
+                path.read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
     for url, file, _ in COUNTIES.values():
         try:
             raw.cached(SOURCE, url)
@@ -303,7 +322,10 @@ def parse() -> None:
                 }
             )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows).unique(["jurisdiction", "label"], keep="first", maintain_order=True)
+    extra = more().drop("file")
+    frame = pl.concat([pl.DataFrame(rows).with_columns(pl.lit(None, pl.String).alias("publisher")), extra]).unique(
+        ["jurisdiction", "label"], keep="first", maintain_order=True
+    )
     frame.write_parquet(PARSED / "questions.parquet")
     print(frame.height)
 
@@ -323,10 +345,12 @@ def emit() -> Path:
         slugs = civil.slugs
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
-        for county, (url, _, publisher) in COUNTIES.items():
-            sources[county] = cs.source(publisher, TITLE)
-            cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
-            cs.artifact(raw.cached(SOURCE, url), sources[county])
+        publishers = {url: publisher for url, _, publisher in COUNTIES.values()}
+        publishers.update(dict(frame.select("url", "publisher").drop_nulls().unique().iter_rows()))
+        for url, publisher in publishers.items():
+            sources[url] = cs.source(publisher, TITLE)
+            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[url])
         parent = cs.key("us.election", f"{DAY}:MI")
         elections: set[UUID] = set()
         kept = 0
@@ -362,6 +386,7 @@ def emit() -> Path:
                 continue
             kept += 1
             polity, area, place, path, code = found[options[0]]
+            code = re.sub(r"^\d{5}(?=:)", row["county"], code)
             election = cs.key("us.election", f"{DAY}:MI:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
@@ -423,15 +448,15 @@ def emit() -> Path:
                     ballot_position=position + 1,
                     ballot_label=answer,
                 )
-            cs.add("citation", entity_id=contest, source_id=sources[row["county"]])
+            cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,
                 kind="text",
                 lang="en",
                 body=row["wording"],
-                url=COUNTIES[row["county"]][0],
-                source_id=sources[row["county"]],
+                url=row["url"],
+                source_id=sources[row["url"]],
             )
         print(f"{kept} of {frame.height} propositions")
         return cs.write()

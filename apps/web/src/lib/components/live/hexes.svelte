@@ -5,6 +5,7 @@
     cartogram,
     colors,
     later = [],
+    flips = {},
     label,
     hovered = $bindable(null),
     href,
@@ -19,6 +20,7 @@
     };
     colors: Record<string, string>;
     later?: Array<string>;
+    flips?: Record<string, "flipped" | "leading">;
     label: string;
     hovered?: string | null;
     href: (key: string) => string | null;
@@ -26,7 +28,7 @@
     tip: Snippet<[string]>;
   } = $props();
 
-  const hatch = $props.id();
+  const id = $props.id();
 
   let pointer = $state<{ x: number; y: number } | null>(null);
 
@@ -63,13 +65,21 @@
   >
     <defs>
       <pattern
-        id={hatch}
+        id="{id}-dots"
         width="1.1"
         height="1.1"
         patternUnits="userSpaceOnUse"
+      >
+        <circle cx="0.55" cy="0.55" r="0.16" class="fill-foreground/35" />
+      </pattern>
+      <pattern
+        id="{id}-flip"
+        width="1"
+        height="1"
+        patternUnits="userSpaceOnUse"
         patternTransform="rotate(45)"
       >
-        <line y2="1.1" class="stroke-foreground/30" stroke-width="0.22" />
+        <line y2="1" class="stroke-foreground/45" stroke-width="0.4" />
       </pattern>
     </defs>
     {#each cartogram.districts as district (district.key)}
@@ -77,6 +87,7 @@
       <a
         href={link ?? undefined}
         aria-label={district.key.toUpperCase()}
+        class="outline-none"
         onpointermove={(event) => track(event, district.key)}
         onclick={(event) => {
           if (onPick != null) {
@@ -98,7 +109,15 @@
           <path
             d={district.d}
             class="pointer-events-none"
-            fill="url(#{hatch})"
+            fill="url(#{id}-dots)"
+          />
+        {/if}
+        {#if flips[district.key] != null}
+          <path
+            d={district.d}
+            class="pointer-events-none"
+            fill="url(#{id}-flip)"
+            opacity={flips[district.key] === "flipped" ? 1 : 0.5}
           />
         {/if}
       </a>

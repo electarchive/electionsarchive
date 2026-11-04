@@ -1,5 +1,9 @@
 import { dev } from "$app/env";
-import { AUTH_DATABASE_URL, DATABASE_URL } from "$app/env/private";
+import {
+  AUTH_DATABASE_URL,
+  DATABASE_URL,
+  DB_POOL_MAX,
+} from "$app/env/private";
 import * as schema from "@ea/db/schema";
 import { defineRelations } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -32,9 +36,17 @@ function connect(connectionString: string, max: number, timeout: number) {
   });
 }
 
-export const db = connect(DATABASE_URL, 16, 60_000);
+const reader = DB_POOL_MAX ?? 12;
 
-export const liveDb = connect(DATABASE_URL, 8, 30_000);
+export const pagesPoolMax = Math.max(2, Math.floor(reader / 3));
+
+export const db = connect(DATABASE_URL, Math.ceil((reader * 2) / 3), 60_000);
+
+export const liveDb = connect(
+  DATABASE_URL,
+  reader - Math.ceil((reader * 2) / 3),
+  30_000,
+);
 
 export const authDb =
-  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL, 8, 60_000);
+  AUTH_DATABASE_URL == null ? db : connect(AUTH_DATABASE_URL, 2, 60_000);

@@ -9,11 +9,12 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.encoding import decode, rekey, repair, restage
 from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_elchist"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.sos.state.tx.us/"
 STATEWIDE = re.compile(
@@ -101,7 +102,7 @@ PAGES = (*((election, HOUSE) for election in HOUSES), *((election, LEGISLATURE) 
 
 
 def races(election: int) -> list[tuple[int, str]]:
-    text = raw.cached(SOURCE, f"{SITE}elchist{election}_raceselect.htm").path.read_text(errors="replace")
+    text = decode(raw.cached(SOURCE, f"{SITE}elchist{election}_raceselect.htm").path.read_bytes())
     return [
         (int(found[1]), re.sub(r"\s+", " ", found[2]).strip())
         for found in re.finditer(r'<OPTION value="?(\d+)"?[^>]*>([^<]*)', text, re.IGNORECASE)
@@ -145,7 +146,7 @@ def parse() -> None:
         for race, title in races(election):
             if not STATEWIDE.match(title):
                 continue
-            text = raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_text(errors="replace")
+            text = decode(raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_bytes())
             heading = re.search(r"<H2[^>]*>([^<]+)</H2><H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
             if heading is None:
                 raise ValueError(f"{election} {race}: no heading")
@@ -199,7 +200,7 @@ def parse() -> None:
             district = pattern.match(title)
             if district is None:
                 continue
-            text = raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_text(errors="replace")
+            text = decode(raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_bytes())
             stamp = re.search(r"<H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
             if stamp is None:
                 raise ValueError(f"{election} {race}: no date")
@@ -548,6 +549,7 @@ def emit() -> Path:
                     if candidate in SEPARATE:
                         person = None
                     if person is None:
+                        rekey(cs, candidate)
                         person = cs.key(f"{SOURCE}.person", f"TX:{slug(candidate)}")
                     if person in cs.minted and person not in made:
                         made.add(person)
@@ -668,4 +670,6 @@ def emit() -> Path:
             {"TX": source},
             strict=True,
         )
+        restage(cs, SOURCE)
+        repair(cs)
         return cs.write()

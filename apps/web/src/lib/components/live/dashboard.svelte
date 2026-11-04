@@ -18,6 +18,7 @@
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
   import { dates, numbers, percent } from "#lib/format.js";
+  import { hatch, swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
     compact,
@@ -42,6 +43,7 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
+  import Calls from "./dashboard/calls.svelte";
   import Chambers from "./dashboard/chamber.svelte";
   import Explorer from "./dashboard/explorer.svelte";
   import Flip from "./dashboard/flip.svelte";
@@ -49,10 +51,13 @@
   import Ladder from "./dashboard/ladder.svelte";
   import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
+  import SeatKey from "./dashboard/seat-key.svelte";
+  import Swing from "./dashboard/swing.svelte";
   import Hexes from "./hexes.svelte";
   import LaterKey from "./later-key.svelte";
   import Locals from "./locals.svelte";
   import Nation from "./nation.svelte";
+  import Search from "./search.svelte";
 
   const {
     election,
@@ -78,10 +83,15 @@
 
   const toLive = liveLinks();
 
-  type Mode = "lead" | "chance" | "flips" | "counted";
+  type Mode = "lead" | "chance" | "counted";
 
-  let view = $state<Chamber>("senate");
-  let mode = $state<Mode>("lead");
+  const OFFICES = ["senate", "governor", "house"] as const;
+
+  const modes = $state<Record<Chamber, Mode>>({
+    senate: "lead",
+    governor: "lead",
+    house: "lead",
+  });
   let hovered = $state<string | null>(null);
   let layout = $state<"shapes" | "hexes">("hexes");
   let probe = $state<string | null>(null);
@@ -112,10 +122,6 @@
 
   $effect(() => {
     const path = election.slug;
-    if (view === "house") {
-      void loadHouse(path);
-      return;
-    }
     if ("requestIdleCallback" in window) {
       const id = requestIdleCallback(() => void loadHouse(path), {
         timeout: 4000,
@@ -131,18 +137,11 @@
     governor: m.night_nation_governor,
     house: m.night_nation_house,
   };
-  const VIEWS = $derived<Array<SegmentedOption<Chamber>>>(
-    (["senate", "governor", "house"] as const).map((value) => ({
-      value,
-      label: NAMES[value](),
-    })),
-  );
   const MODES = $derived<Array<SegmentedOption<Mode>>>(
     (
       [
         ["lead", m.night_color_lead],
         ["chance", m.night_color_chance],
-        ["flips", m.night_color_flips],
         ["counted", m.night_color_counted],
       ] as const
     )
@@ -156,7 +155,6 @@
   const LEGENDS: Record<Mode, () => string> = {
     lead: m.night_nation_legend,
     chance: m.night_nation_legend_chance,
-    flips: m.night_nation_legend_flips,
     counted: m.night_nation_legend_reporting,
   };
   const MUTED =
@@ -266,7 +264,7 @@
     }
     return found;
   });
-  const flips = $derived(seats.filter((entry) => entry.isFlip).length);
+  const flips = $derived(swing(seats.map((entry) => entry.shift)));
   const newest = $derived(election.newest);
   const isLive = $derived(counting > 0 && !election.isCertified);
 
@@ -292,6 +290,10 @@
 
   const parties = $derived(reach(election.races));
   provideReach(() => parties);
+
+  function partyOf(id: string) {
+    return { short: short(id), color: tint(id) };
+  }
 
   function short(id: string | null) {
     if (id == null) {
@@ -328,7 +330,7 @@
       : `color-mix(in oklab, var(--foreground) ${Math.round(10 + 78 * share)}%, var(--background))`;
   }
 
-  function shade(summary: Summary, wanted: Mode = mode) {
+  function shade(summary: Summary, wanted: Mode) {
     const entry = seatById.get(summary.race.id);
     if (summary.later != null) {
       return LATER;
@@ -336,14 +338,12 @@
     if (wanted === "counted") {
       return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
     }
+    const turn = turnOf(summary);
+    if (turn != null) {
+      return hatch(tint(turn.to), turn.flip).fill;
+    }
     if (entry == null || wanted === "lead") {
       return strength(summary);
-    }
-    if (wanted === "flips") {
-      if (!entry.isFlip) {
-        return summary.total > 0 ? MUTED : WAITING;
-      }
-      return `color-mix(in oklab, ${tint(entry.side)} ${entry.rating === "won" || entry.rating === "projected" ? 100 : 70}%, var(--background))`;
     }
     if (entry.rating === "waiting" || entry.rating === "counting") {
       return summary.total > 0
@@ -354,6 +354,28 @@
     const sure = Math.abs(entry.left - entry.right);
     const color = pair == null ? WAITING : pair[isLeft ? 0 : 1].color;
     return `color-mix(in oklab, ${color} ${Math.round(18 + 82 * sure)}%, var(--background))`;
+  }
+
+  function turnOf(summary: Summary) {
+    const found = seatById.get(summary.race.id)?.shift;
+    return found == null || found.flip === "held"
+      ? null
+      : { flip: found.flip, to: found.to };
+  }
+
+  function flipsFor(view: Chamber, mode: Mode) {
+    const found: Record<string, "flipped" | "leading"> = {};
+    if (mode === "counted" || view === "house") {
+      return found;
+    }
+    for (const code of Object.keys(nation?.codes ?? {})) {
+      const first = of(code, view)[0];
+      const turn = first == null ? null : turnOf(first);
+      if (turn != null) {
+        found[code] = turn.flip;
+      }
+    }
+    return found;
   }
 
   function seatShade(entry: Seat) {
@@ -384,7 +406,7 @@
     );
   }
 
-  const colors = $derived.by(() => {
+  function colorsFor(view: Chamber, mode: Mode) {
     const found: Record<string, string> = {};
     for (const code of Object.keys(nation?.codes ?? {})) {
       const races = of(code, view);
@@ -403,7 +425,7 @@
         }
         const seats = tally(races, "house");
         const top = seats.groups[0];
-        const share = top == null ? 0 : (top.won + top.leading) / races.length;
+        const share = top == null ? 0 : top.seats / races.length;
         found[code] =
           top == null
             ? WAITING
@@ -411,9 +433,14 @@
         continue;
       }
       const first = races[0];
-      found[code] = first == null ? MUTED : shade(first);
+      found[code] = first == null ? MUTED : shade(first, mode);
     }
     return found;
+  }
+  const colors = $derived({
+    senate: colorsFor("senate", modes.senate),
+    governor: colorsFor("governor", modes.governor),
+    house: colorsFor("house", modes.house),
   });
 
   const districts = $derived(
@@ -430,22 +457,45 @@
       ),
     ),
   );
-  const later = $derived(
-    Object.keys(nation?.codes ?? {}).filter((code) => {
+  function laterFor(view: Chamber) {
+    return Object.keys(nation?.codes ?? {}).filter((code) => {
       const races = of(code, view);
       return (
         races.length > 0 && races.every((summary) => summary.later != null)
       );
-    }),
-  );
+    });
+  }
+  const mapFlips = $derived({
+    senate: flipsFor("senate", modes.senate),
+    governor: flipsFor("governor", modes.governor),
+    house: flipsFor("house", modes.house),
+  });
+  const later = $derived({
+    senate: laterFor("senate"),
+    governor: laterFor("governor"),
+    house: laterFor("house"),
+  });
   const districtLater = $derived(
     [...districts].flatMap(([key, summary]) =>
       summary.later == null ? [] : [key],
     ),
   );
+  const districtFlips = $derived(
+    modes.house === "counted"
+      ? {}
+      : Object.fromEntries(
+          [...districts].flatMap(([key, summary]) => {
+            const turn = turnOf(summary);
+            return turn == null ? [] : [[key, turn.flip] as const];
+          }),
+        ),
+  );
   const districtColors = $derived(
     Object.fromEntries(
-      [...districts].map(([key, summary]) => [key, shade(summary)]),
+      [...districts].map(([key, summary]) => [
+        key,
+        shade(summary, modes.house),
+      ]),
     ),
   );
   const hasShapes = $derived(house?.map != null);
@@ -539,7 +589,9 @@
       summary.winner ?? summary.projected ?? summary.leader,
     )}
     {const entry = $derived(seatById.get(summary.race.id))}
-    <span class="flex items-center gap-1.5 whitespace-nowrap min-inline-0">
+    <span
+      class="flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5 whitespace-nowrap min-inline-0"
+    >
       <span
         class="shrink-0 rounded-full block-2 inline-2"
         style:background-color={tone(option)}
@@ -552,14 +604,19 @@
       <span class="shrink-0 font-figures text-muted-foreground tabular-nums"
         >+{lead(summary.margin)}</span
       >
-      {#if entry?.isFlip === true}
-        <Flip party={short(entry.side)} color={tint(entry.side)} />
+      {#if entry?.shift != null && entry.shift.flip !== "held"}
+        <Flip
+          flip={entry.shift.flip}
+          from={partyOf(entry.shift.from)}
+          to={partyOf(entry.shift.to)}
+          isCompact={true}
+        />
       {/if}
     </span>
   {/if}
 {/snippet}
 
-{#snippet tip(code: string)}
+{#snippet tip(code: string, view: Chamber)}
   {const races = $derived(of(code, view))}
   <span class="text-sm font-semibold">{name(code)}</span>
   {#if races.length === 0}
@@ -574,9 +631,7 @@
             style:background-color={tone(group.option)}
           ></span>{group.option.party?.short ?? surname(group.option)}</span
         >
-        <span class="font-figures tabular-nums"
-          >{group.won + group.leading}</span
-        >
+        <span class="font-figures tabular-nums">{group.seats}</span>
       </span>
     {/each}
     <span class="text-muted-foreground"
@@ -586,8 +641,8 @@
     {#each races.slice(0, 3) as summary (summary.race.id)}
       {const entry = $derived(seatById.get(summary.race.id))}
       <span class="grid gap-0.5">
-        <span class="flex items-center justify-between gap-3">
-          <span>{summary.race.title}</span>
+        <span class="flex items-start justify-between gap-3">
+          <span class="min-inline-0">{summary.race.title}</span>
           {@render chip(summary)}
         </span>
         {#if entry != null}
@@ -690,7 +745,7 @@
   {/if}
 {/snippet}
 
-<article class="grid gap-px bg-border">
+<article class="grid gap-px bg-border" data-sveltekit-preload-data="tap">
   <header class="grid gap-4 bg-background px-4 pbs-6 pbe-5 sm:px-8">
     <p
       class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground"
@@ -742,6 +797,13 @@
         >
       </p>
     </div>
+    <Search
+      path={election.slug}
+      {summaries}
+      {codes}
+      labels={nation?.labels ?? {}}
+      {href}
+    />
     <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
@@ -798,8 +860,8 @@
         {/if}
         <div class="grid">
           <dt class="text-xs text-muted-foreground">{m.night_kpi_flips()}</dt>
-          <dd class="font-figures text-2xl font-[760] tabular-nums">
-            {flips}
+          <dd>
+            <Swing swing={flips} party={partyOf} />
           </dd>
         </div>
       {/if}
@@ -842,7 +904,7 @@
   </header>
 
   <section
-    class="grid gap-5 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[17rem_minmax(0,36rem)] lg:gap-12"
+    class="grid gap-5 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[17rem_minmax(0,36rem)] lg:gap-12 xl:grid-cols-[17rem_minmax(0,36rem)_minmax(16rem,22rem)]"
     aria-labelledby="night-pick"
   >
     <div class="grid content-start gap-2">
@@ -865,11 +927,20 @@
             entry?.held == null
               ? null
               : { short: short(entry.held), color: tint(entry.held) },
-          isFlip: entry?.isFlip ?? false,
+          flip:
+            entry?.shift == null || entry.shift.flip === "held"
+              ? null
+              : { flip: entry.shift.flip, to: partyOf(entry.shift.to) },
         };
       }}
       {href}
     />
+    <aside class="lg:col-span-2 xl:col-span-1" aria-labelledby="night-calls">
+      <Calls
+        {summaries}
+        href={(summary: Summary) => toLive(summary.race.slug)}
+      />
+    </aside>
   </section>
 
   {#if chambers != null && pair != null}
@@ -919,158 +990,213 @@
     {/if}
   {/if}
 
-  <section
-    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:gap-y-8"
-  >
-    <div class="grid content-start gap-3">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <Segmented
-          options={VIEWS}
-          bind:value={view}
-          label={m.night_nation_views()}
-        />
-        <div class="flex flex-wrap items-center gap-2">
-          <Segmented
-            options={MODES}
-            bind:value={mode}
-            label={m.night_color_label()}
-            size="sm"
-          />
-          {#if view === "house" && hasShapes && hasHexes}
-            <Segmented
-              options={LAYOUTS}
-              bind:value={layout}
-              label={m.night_house_layout()}
-              size="sm"
-            />
-          {/if}
-        </div>
-      </div>
-      {#if view === "house" && house != null && (hasShapes || hasHexes)}
-        {#if isHexes && house.cartogram != null}
-          <Hexes
-            cartogram={house.cartogram}
-            colors={districtColors}
-            later={districtLater}
-            label={m.night_house_hexes_label()}
-            bind:hovered={probe}
-            href={districtHref}
-            tip={district}
-          />
-        {:else if house.map != null}
-          <Nation
-            geography={house.map}
-            codes={house.codes}
-            colors={districtColors}
-            later={districtLater}
-            label={m.night_house_map()}
-            bind:hovered={probe}
-            onPick={async (key: string) => {
-              const link = districtHref(key);
-              if (link != null) {
-                await goto(link);
-              }
-            }}
-            tip={district}
-          />
-        {/if}
-      {:else if nation == null}
-        <p
-          class="grid aspect-[1.6] place-items-center rounded-sm border border-dashed border-border p-4 text-center text-sm text-muted-foreground inline-full"
-        >
-          {m.night_nation_map_missing()}
+  {#if chambers != null && pair != null}
+    <section
+      class="grid content-start gap-4 bg-background px-4 py-6 sm:px-8"
+      aria-labelledby="night-ladder"
+    >
+      <div class="grid gap-0.5">
+        <h2 id="night-ladder" class="heading text-lg!">
+          {m.night_ladder_title()}
+        </h2>
+        <p class="max-inline-prose text-xs text-pretty text-muted-foreground">
+          {m.night_ladder_intro({
+            left: pair[0].name,
+            right: pair[1].name,
+            party: pair[0].name,
+          })}
         </p>
-      {:else}
-        <Nation
-          geography={nation.map}
-          codes={nation.codes}
-          {colors}
-          {later}
-          label={m.night_nation_map({ view: NAMES[view]() })}
-          bind:hovered
-          onPick={async (code: string) => goto(href(code))}
-          {tip}
-        />
-      {/if}
-      <p class="text-xs text-muted-foreground">
-        {view === "house" && mode === "lead"
-          ? m.night_house_legend()
-          : LEGENDS[mode]()}
-      </p>
-      {#if (view === "house" ? districtLater : later).length > 0}
-        <LaterKey />
-      {/if}
-    </div>
-
-    <aside class="lg:col-start-2 lg:row-span-2 lg:row-start-1">
-      {#if chambers != null && pair != null}
+      </div>
+      <div class="grid items-start gap-x-12 gap-y-8 lg:grid-cols-2">
         <Ladder
-          view={chambers[view]}
+          view={chambers.senate}
           sides={pair}
           {forecasts}
+          title={NAMES.senate()}
           {label}
           href={seatHref}
           {tint}
+          {short}
+          party={partyOf}
         />
-      {/if}
-    </aside>
-
-    <section class="grid content-start gap-2 lg:col-start-1 lg:row-start-2">
-      <div class="grid gap-0.5">
-        <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
-        {#if closings[0] != null}
-          <p class="text-xs text-muted-foreground">
-            {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
-          </p>
-        {/if}
+        <Ladder
+          view={chambers.house}
+          sides={pair}
+          {forecasts}
+          title={NAMES.house()}
+          {label}
+          href={seatHref}
+          {tint}
+          {short}
+          party={partyOf}
+          limit={20}
+        />
       </div>
-      <ol class="gap-x-10 sm:columns-2">
-        {#each closings as closing (closing.at)}
-          {const isPast = $derived(Date.parse(closing.at) <= clock)}
-          <li
-            class={cn(
-              "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
-              { "text-muted-foreground": isPast },
-            )}
-          >
-            <span class="group relative justify-self-start">
-              <button
-                type="button"
-                aria-describedby="closing-{closing.at}"
-                class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
-                >{clockOf(closing.at)}</button
-              >
-              <span
-                id="closing-{closing.at}"
-                role="tooltip"
-                class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
-              >
-                <span class="font-semibold">{m.night_closings_local()}</span>
-                {#each closing.local as entry (entry.time)}
-                  <span class="flex items-baseline justify-between gap-4">
-                    <span class="uppercase">{entry.codes.join(", ")}</span>
-                    <span
-                      class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
-                      >{entry.time}</span
-                    >
-                  </span>
-                {/each}
-              </span>
-            </span>
-            <span class="flex flex-wrap gap-1">
-              {#each closing.states as code (code)}
-                <a
-                  href={href(code)}
-                  class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
-                  >{code}</a
-                >
+    </section>
+  {/if}
+
+  <section class="grid content-start gap-2 bg-background px-4 py-6 sm:px-8">
+    <div class="grid gap-0.5">
+      <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+      {#if closings[0] != null}
+        <p class="text-xs text-muted-foreground">
+          {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
+        </p>
+      {/if}
+    </div>
+    <ol class="gap-x-10 sm:columns-2 xl:columns-3">
+      {#each closings as closing (closing.at)}
+        {const isPast = $derived(Date.parse(closing.at) <= clock)}
+        <li
+          class={cn(
+            "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
+            { "text-muted-foreground": isPast },
+          )}
+        >
+          <span class="group relative justify-self-start">
+            <button
+              type="button"
+              aria-describedby="closing-{closing.at}"
+              class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+              >{clockOf(closing.at)}</button
+            >
+            <span
+              id="closing-{closing.at}"
+              role="tooltip"
+              class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+            >
+              <span class="font-semibold">{m.night_closings_local()}</span>
+              {#each closing.local as entry (entry.time)}
+                <span class="flex items-baseline justify-between gap-4">
+                  <span class="uppercase">{entry.codes.join(", ")}</span>
+                  <span
+                    class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
+                    >{entry.time}</span
+                  >
+                </span>
               {/each}
             </span>
-          </li>
-        {/each}
-      </ol>
-    </section>
+          </span>
+          <span class="flex flex-wrap gap-1">
+            {#each closing.states as code (code)}
+              <a
+                href={href(code)}
+                class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
+                >{code}</a
+              >
+            {/each}
+          </span>
+        </li>
+      {/each}
+    </ol>
   </section>
+
+  {#each OFFICES as view (view)}
+    {#snippet stateTip(code: string)}
+      {@render tip(code, view)}
+    {/snippet}
+    {const mode = $derived(modes[view])}
+    {const isDistricts = $derived(
+      view === "house" && house != null && (hasShapes || hasHexes),
+    )}
+    <section
+      class="grid bg-background px-4 py-6 sm:px-8"
+      aria-labelledby="night-office-{view}"
+    >
+      <div class="grid content-start gap-3 inline-full max-inline-240">
+        <div
+          class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+        >
+          <h2 id="night-office-{view}" class="heading text-xl!">
+            {NAMES[view]()}
+          </h2>
+          <div class="flex flex-wrap items-center gap-2">
+            <Segmented
+              options={MODES}
+              bind:value={modes[view]}
+              label={m.night_color_label()}
+              size="sm"
+            />
+            {#if view === "house" && hasShapes && hasHexes}
+              <Segmented
+                options={LAYOUTS}
+                bind:value={layout}
+                label={m.night_house_layout()}
+                size="sm"
+              />
+            {/if}
+          </div>
+        </div>
+        {#if isDistricts && house != null}
+          {#if isHexes && house.cartogram != null}
+            <Hexes
+              cartogram={house.cartogram}
+              colors={districtColors}
+              later={districtLater}
+              flips={districtFlips}
+              label={m.night_house_hexes_label()}
+              bind:hovered={probe}
+              href={districtHref}
+              tip={district}
+            />
+          {:else if house.map != null}
+            <Nation
+              geography={house.map}
+              codes={house.codes}
+              colors={districtColors}
+              later={districtLater}
+              flips={districtFlips}
+              label={m.night_house_map()}
+              bind:hovered={probe}
+              onPick={async (key: string) => {
+                const link = districtHref(key);
+                if (link != null) {
+                  await goto(link);
+                }
+              }}
+              tip={district}
+            />
+          {/if}
+        {:else if nation == null}
+          <p
+            class="grid aspect-[1.6] place-items-center rounded-sm border border-dashed border-border p-4 text-center text-sm text-muted-foreground inline-full"
+          >
+            {m.night_nation_map_missing()}
+          </p>
+        {:else}
+          <Nation
+            geography={nation.map}
+            codes={nation.codes}
+            colors={colors[view]}
+            later={later[view]}
+            flips={mapFlips[view]}
+            label={m.night_nation_map({ view: NAMES[view]() })}
+            bind:hovered
+            onPick={async (code: string) => goto(href(code))}
+            tip={stateTip}
+          />
+        {/if}
+        <p class="text-xs text-muted-foreground">
+          {view === "house" && mode === "lead"
+            ? m.night_house_legend()
+            : LEGENDS[mode]()}
+        </p>
+        {#if pair != null && mode !== "counted"}
+          <SeatKey
+            sides={pair}
+            changing={swing(
+              seats
+                .filter((entry) => entry.summary.race.office === view)
+                .map((entry) => entry.shift),
+            )}
+          />
+        {/if}
+        {#if (isDistricts ? districtLater : later[view]).length > 0}
+          <LaterKey />
+        {/if}
+      </div>
+    </section>
+  {/each}
 
   {#if pair != null}
     <Pulse {points} sides={pair} />

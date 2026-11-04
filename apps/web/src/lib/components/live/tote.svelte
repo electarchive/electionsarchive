@@ -254,9 +254,7 @@
               style:inline-size="{Math.min(1, shareIn.mid) * 100}%"
             ></span>
           {:else if !isWaiting}
-            <span
-              class="absolute inset-0 bg-[repeating-linear-gradient(-45deg,var(--border)_0_4px,transparent_4px_8px)]"
-            ></span>
+            <span class="absolute inset-0 bg-border"></span>
           {/if}
         </div>
         <span class="font-figures text-muted-foreground tabular-nums">

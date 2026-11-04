@@ -24,6 +24,7 @@
     ConfirmationStore,
     setConfirmationContext,
   } from "#lib/stores/confirmation.svelte.js";
+  import { TEXT_PAGES } from "#lib/text-pages.js";
   import { cn } from "#lib/utils.js";
   import { localizeZone } from "#lib/zone.svelte.js";
   import type { LayoutData } from "./$types";
@@ -176,7 +177,7 @@
 
 <svelte:head>
   <title>electionsarchive.com</title>
-  {#if !["/", "/[...path]", "/live/[...path]", "/live/map/[...path]", "/people/[slug]", "/parties/[...path]"].includes(page.route.id ?? "")}
+  {#if TEXT_PAGES[page.url.pathname] == null && !["/", "/[...path]", "/live/[...path]", "/live/map/[...path]", "/people/[slug]", "/parties/[...path]"].includes(page.route.id ?? "")}
     <meta
       name="description"
       content="Every election in ten polities, down to the finest reporting unit, with a source for every number."

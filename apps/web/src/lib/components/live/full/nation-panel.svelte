@@ -8,7 +8,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { numbers, percent } from "#lib/format.js";
-  import { HATCH } from "#lib/live/format.js";
+  import { DOTS } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { breakdown, odds } from "#lib/live/nation.js";
   import { closing, verdict } from "#lib/live/summary.js";
@@ -44,7 +44,7 @@
     election: LiveElection;
     found: Board;
     office: Office;
-    paint: "lead" | "chance" | "flips" | "counted";
+    paint: "lead" | "chance" | "counted";
     control: Control | null;
     states: (code: string) => string;
     picked: string | null;
@@ -231,7 +231,7 @@
       <span
         class="rounded-xs ring-1 ring-border/60 block-3.5 inline-3.5"
         style:background-color={color(summary)}
-        style:background-image={summary.later == null ? undefined : HATCH}
+        style:background-image={summary.later == null ? undefined : DOTS}
       ></span>
       <span class="grid min-inline-0">
         <span class="flex items-center gap-1.5 min-inline-0">
@@ -239,7 +239,7 @@
             >{entry.label}</span
           >
           {#if flip != null}
-            <Flip party={flip.party} color={flip.color} />
+            <Flip flip={flip.flip} from={flip.from} to={flip.to} />
           {/if}
         </span>
         <span class="truncate text-xs text-muted-foreground"
@@ -302,8 +302,9 @@
             <span
               class="transition-[flex-basis] duration-700 ease-out motion-reduce:transition-none"
               style:flex-basis="{part.share * 100}%"
-              style:background-color={part.color}
-              style:background-image={part.isHeld === true ? HATCH : undefined}
+              style:background-color={part.isHeld === true
+                ? `color-mix(in oklab, ${part.color} 35%, var(--background))`
+                : part.color}
             ></span>
           {/each}
         </div>

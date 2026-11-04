@@ -1,7 +1,9 @@
 import type { LiveOption } from "@ea/analytics/live";
+import type { Shift } from "#lib/live/flips.js";
 import type { Summary } from "#lib/live/summary.js";
 import type { Control } from "#lib/server/live-board.js";
 import { percent } from "#lib/format.js";
+import { shift } from "#lib/live/flips.js";
 import { m } from "#lib/paraglide/messages.js";
 import { swatch } from "#lib/party.js";
 
@@ -29,9 +31,10 @@ export type Seat = {
   right: number;
   signed: number | null;
   lean: number;
-  band: { low: number; high: number } | null;
+  band: { low: number; mid: number; high: number } | null;
   rating: Rating;
   isFlip: boolean;
+  shift: Shift | null;
   isUpset: boolean;
   remaining: number | null;
 };
@@ -154,11 +157,19 @@ export function seat(
         : family(control, ahead ?? null) === right.id
           ? -1
           : 0;
-    if (sign !== 0) {
+    if (sign !== 0 && Number.isFinite(estimate.margin.mid)) {
       band =
         sign > 0
-          ? { low: estimate.margin.low, high: estimate.margin.high }
-          : { low: -estimate.margin.high, high: -estimate.margin.low };
+          ? {
+              low: estimate.margin.low,
+              mid: estimate.margin.mid,
+              high: estimate.margin.high,
+            }
+          : {
+              low: -estimate.margin.high,
+              mid: -estimate.margin.mid,
+              high: -estimate.margin.low,
+            };
     }
   }
   const pick = called ?? summary.favorite ?? summary.leader;
@@ -187,6 +198,12 @@ export function seat(
   } else if (rating === "counting" && signed != null) {
     lean = Math.max(-0.98, Math.min(0.98, signed / 0.2));
   }
+  const changing = shift({
+    held,
+    to: called == null ? family(control, summary.leader) : side,
+    isCalled: called != null,
+    isCounting: total > 0,
+  });
   return {
     summary,
     held,
@@ -203,7 +220,8 @@ export function seat(
     lean,
     band,
     rating,
-    isFlip: called != null && held != null && side != null && side !== held,
+    isFlip: changing?.flip === "flipped",
+    shift: changing,
     isUpset: trailing,
     remaining:
       isEstimating && summary.race.certified == null

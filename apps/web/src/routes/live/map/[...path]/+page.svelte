@@ -62,6 +62,7 @@
   control={data.control}
   districts={data.districts}
   geography={data.geography}
+  legislature={data.legislature}
   around={data.around}
   nationPath={data.nationPath}
   names={data.names}

@@ -2,6 +2,8 @@ import { PROJECTION_TOKEN } from "$app/env/private";
 import { error, json } from "@sveltejs/kit";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { sum } from "#lib/live/standing.js";
+import { remember } from "#lib/server/cache.js";
+import { control } from "#lib/server/live-board.js";
 import { projections } from "#lib/server/rpc/live.js";
 import type { RequestHandler } from "./$types";
 
@@ -22,7 +24,14 @@ export const GET: RequestHandler = async ({ request, url }) => {
   if (path == null) {
     error(400, "Missing path");
   }
+  const watch = new Set(url.searchParams.get("watch")?.split(","));
   const { election, estimates } = await projections(path);
+  const held = await remember(
+    path.split("/").length === 2
+      ? `live:control:v3:${election.date}`
+      : `live:holders:v3:${election.slug}`,
+    async () => control(election.races, election.date),
+  );
   const races = election.races.flatMap((race) => {
     const found = estimates[race.id];
     const frame = race.frames.at(-1);
@@ -45,9 +54,10 @@ export const GET: RequestHandler = async ({ request, url }) => {
       found?.status === "estimating" ? Math.min(1, found.shareIn.mid) : null;
     const isCalled = race.projected != null;
     if (
-      race.certified != null ||
       total === 0 ||
-      (!isCalled && (chance == null || chance < 0.9))
+      (!watch.has(race.id) &&
+        (race.certified != null ||
+          (!isCalled && (chance == null || chance < 0.9))))
     ) {
       return [];
     }
@@ -63,6 +73,11 @@ export const GET: RequestHandler = async ({ request, url }) => {
       .slice(0, 3);
     const expected =
       found?.status === "estimating" ? found.expectedTotal : null;
+    const holder = held.holders[race.id];
+    const party = holder?.party == null ? null : held.parties[holder.party];
+    const pickId = race.projected?.option ?? leaderId;
+    const pick = race.options.find((option) => option.id === pickId);
+    const pickParty = pick?.party?.id;
     return [
       {
         id: race.id,
@@ -93,9 +108,30 @@ export const GET: RequestHandler = async ({ request, url }) => {
         source: race.source,
         lines,
         called: race.projected ?? null,
+        calledChance:
+          race.projected != null && found?.status === "estimating"
+            ? (found.winProbability[race.projected.option] ?? null)
+            : null,
+        isCertified: race.certified != null,
+        winners: race.certified?.winners ?? null,
         isUncontested,
+        held:
+          holder?.party == null || party == null
+            ? null
+            : {
+                party: party.short,
+                color: party.color ?? "",
+                isVacant: holder.isVacant,
+              },
+        isFlip:
+          holder?.party == null || pick == null
+            ? null
+            : (pickParty == null
+                ? null
+                : (held.families[pickParty] ?? pickParty)) !== holder.party,
         isReady:
           !isCalled &&
+          race.certified == null &&
           chance != null &&
           chance >= RULE.chance &&
           (isUncontested || (counted ?? 0) >= RULE.counted),

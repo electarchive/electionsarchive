@@ -7,6 +7,7 @@
   import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { finder, summon } from "#lib/search.svelte.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Lead from "./lead.svelte";
   import Strata from "./strata.svelte";
@@ -70,6 +71,26 @@
     upcoming[0]?.days != null && upcoming[0].days <= 14 ? upcoming[0] : null,
   );
   const later = $derived(next == null ? upcoming : upcoming.slice(1));
+  const decided = $derived(
+    data.decided.map((election) => {
+      const days = Math.round(
+        (Date.parse(`${data.today}T00:00:00Z`) -
+          Date.parse(`${election.date}T00:00:00Z`)) /
+          DAY,
+      );
+      return {
+        ...election,
+        days,
+        isPending: election.lead == null || election.lead.results.length === 0,
+        isLive:
+          days <= 7 && /^us\/\d{4}-\d{2}-\d{2}-general$/u.test(election.path),
+      };
+    }),
+  );
+  const held = $derived(
+    decided[0] != null && decided[0].days <= 7 ? decided[0] : null,
+  );
+  const earlier = $derived(held == null ? decided : decided.slice(1));
   const places = $derived(
     data.polities
       .flatMap((polity) =>
@@ -103,6 +124,21 @@
       body: m.home_tools_compare_body(),
     },
   ]);
+
+  function since(days: number, value: string) {
+    if (days <= 0) {
+      return m.home_next_today();
+    }
+    if (days === 1) {
+      return m.home_decided_yesterday();
+    }
+    return dates({
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${value}T00:00:00Z`));
+  }
 
   function when(days: number, value: string) {
     if (days <= 0) {
@@ -252,9 +288,9 @@
       </form>
     </div>
 
-    {#if upcoming.length > 0 || data.decided.length > 0}
+    {#if upcoming.length > 0 || decided.length > 0}
       <div class="grid content-start gap-7 lg:border-s lg:ps-8">
-        {#if data.decided.length > 0}
+        {#if decided.length > 0}
           <section
             class="grid content-start gap-3"
             aria-labelledby="decided-title"
@@ -262,43 +298,90 @@
             <h2 id="decided-title" class="text-[0.8125rem] font-bold">
               {m.home_decided()}
             </h2>
-            <ol class="grid border-bs border-border/70">
-              {#each data.decided as election (election.path)}
-                {const isPending = $derived(
-                  election.lead == null || election.lead.results.length === 0,
-                )}
-                <li class="border-be border-border/70">
-                  <a
-                    class="group grid items-baseline gap-x-3 gap-y-1 py-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]"
-                    href={resolve("/[...path]", { path: election.path })}
+            {#if held != null}
+              <div class="grid gap-2 border-be pbe-4">
+                <p
+                  class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-tight"
+                >
+                  <time datetime={held.date}>{since(held.days, held.date)}</time
                   >
-                    <time
-                      class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                      datetime={election.date}>{day(election.date)}</time
+                </p>
+                <a
+                  class="justify-self-start text-lg/tight font-[720] text-balance underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/[...path]", { path: held.path })}
+                  >{held.name}</a
+                >
+                {#if held.isPending}
+                  <p class="text-sm text-muted-foreground">
+                    {m.home_decided_pending()}
+                  </p>
+                {:else}
+                  {#if held.lead?.question == null && held.lead?.name != null && held.lead.name !== held.name}
+                    <p class="line-clamp-1 text-sm text-muted-foreground">
+                      {held.lead.name}
+                    </p>
+                  {/if}
+                  <div class="pbs-1"><Lead race={held.lead} /></div>
+                {/if}
+                <p class="flex flex-wrap gap-x-4 gap-y-1 pbs-1 text-sm">
+                  {#if held.isLive}
+                    <a
+                      class="inline-flex items-center gap-2 rounded-sm bg-primary px-3 font-semibold text-primary-foreground block-9 hover:bg-primary/90"
+                      href={resolve("/live/[...path]", { path: held.path })}
+                      ><span
+                        class="rounded-full bg-marker block-2 inline-2"
+                        aria-hidden="true"
+                      ></span>{m.home_next_live()}</a
                     >
-                    <span class="grid gap-2 min-inline-0">
-                      <span
-                        class="text-sm font-semibold text-pretty underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
-                        >{election.name}</span
+                  {/if}
+                  <a
+                    class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
+                    href={resolve("/[...path]", { path: held.path })}
+                    >{m.home_next_open()}</a
+                  >
+                </p>
+              </div>
+            {/if}
+            {#if earlier.length > 0}
+              <ol
+                class={cn("grid border-border/70", {
+                  "border-bs": held == null,
+                })}
+              >
+                {#each earlier as election (election.path)}
+                  <li class="border-be border-border/70">
+                    <a
+                      class="group grid items-baseline gap-x-3 gap-y-1 py-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]"
+                      href={resolve("/[...path]", { path: election.path })}
+                    >
+                      <time
+                        class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                        datetime={election.date}>{day(election.date)}</time
                       >
-                      {#if isPending}
-                        <span class="text-xs text-muted-foreground"
-                          >{m.home_decided_pending()}</span
+                      <span class="grid gap-2 min-inline-0">
+                        <span
+                          class="text-sm font-semibold text-pretty underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
+                          >{election.name}</span
                         >
-                      {:else}
-                        {#if election.lead?.question == null && election.lead?.name != null && election.lead.name !== election.name}
-                          <span
-                            class="line-clamp-1 text-xs text-muted-foreground"
-                            >{election.lead.name}</span
+                        {#if election.isPending}
+                          <span class="text-xs text-muted-foreground"
+                            >{m.home_decided_pending()}</span
                           >
+                        {:else}
+                          {#if election.lead?.question == null && election.lead?.name != null && election.lead.name !== election.name}
+                            <span
+                              class="line-clamp-1 text-xs text-muted-foreground"
+                              >{election.lead.name}</span
+                            >
+                          {/if}
+                          <Lead race={election.lead} isCompact />
                         {/if}
-                        <Lead race={election.lead} isCompact />
-                      {/if}
-                    </span>
-                  </a>
-                </li>
-              {/each}
-            </ol>
+                      </span>
+                    </a>
+                  </li>
+                {/each}
+              </ol>
+            {/if}
           </section>
         {/if}
         {#if upcoming.length > 0}

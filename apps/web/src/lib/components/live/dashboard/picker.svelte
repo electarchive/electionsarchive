@@ -4,6 +4,7 @@
   import { on } from "svelte/events";
   import { prefersReducedMotion } from "svelte/motion";
   import { fly } from "svelte/transition";
+  import type { Turn } from "#lib/live/ballot.js";
   import type { Summary } from "#lib/live/summary.js";
   import Card from "#lib/components/live/state/card.svelte";
   import Peek from "#lib/components/live/state/peek.svelte";
@@ -32,7 +33,7 @@
     closes: (summary: Summary) => number;
     describe: (summary: Summary) => {
       held: { short: string; color: string } | null;
-      isFlip: boolean;
+      flip: Turn | null;
     };
     href: (code: string) => string;
   } = $props();
@@ -318,7 +319,7 @@
       const hue = describe(summary).held?.color ?? "var(--muted-foreground)";
       return {
         border: `color-mix(in oklab, ${hue} 70%, transparent)`,
-        background: `repeating-linear-gradient(135deg, color-mix(in oklab, ${hue} 35%, transparent) 0 1.5px, transparent 1.5px 4px)`,
+        background: `color-mix(in oklab, ${hue} 14%, transparent)`,
         ink: `color-mix(in oklab, ${hue} 60%, var(--foreground))`,
       };
     }
@@ -353,7 +354,7 @@
             summary={item.summary}
             heading={item.heading}
             held={described.held}
-            isFlip={described.isFlip}
+            flip={described.flip}
           />
         </div>
       {/each}
@@ -497,7 +498,7 @@
         <span class="flex items-center gap-1.5">
           <span
             class={cn("relative rounded-md border block-3.5 inline-4", {
-              "border-muted-foreground bg-[repeating-linear-gradient(135deg,color-mix(in_oklab,var(--muted-foreground)_55%,transparent)_0_1.5px,transparent_1.5px_4px)]":
+              "border-muted-foreground bg-[color-mix(in_oklab,var(--muted-foreground)_18%,transparent)]":
                 item.kind === "held",
               "border-foreground bg-[color-mix(in_oklab,var(--foreground)_22%,var(--card))]":
                 item.kind === "ahead",

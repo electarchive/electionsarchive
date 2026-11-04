@@ -12,14 +12,17 @@
   } from "#lib/live/standing.js";
   import { leadStrength, strengths, swingStrength } from "#lib/atlas/color.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
   import { features, remainder, sum, whole } from "#lib/live/standing.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
-  import { Engine } from "#lib/map/engine.svelte.js";
+  import { Engine, reach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Legend from "./full/legend.svelte";
+  import { BLANK, GROUND, isRightward, swingOf } from "./full/model.js";
   import Scale from "./full/scale.svelte";
   import LaterKey from "./later-key.svelte";
   import MethodLink from "./method-link.svelte";
@@ -106,6 +109,30 @@
     ),
   );
 
+  let isArrows = $state(true);
+  const swings = $derived.by(() => {
+    if (mode !== "shift" || !isArrows || isLater || geography?.pieces != null) {
+      return [];
+    }
+    return places.flatMap((place) => {
+      const row = byArea.get(place.areaId);
+      const swing =
+        row == null ? null : swingOf(place.areaId, row, options, now.pair);
+      return row == null || swing == null
+        ? []
+        : [{ ...swing, at: place.at, unitId: row.unit.id }];
+    });
+  });
+  const swingReach = $derived(reach(swings.map((entry) => entry.swing)));
+  const arrowed = $derived(new Set(swings.map((entry) => entry.areaId)));
+  const arrowSides = $derived.by(() => {
+    const sides = [
+      { name: surname(options[a]), color: toneA },
+      { name: surname(options[b]), color: toneB },
+    ];
+    return isRightward(options, now.pair) ? sides.toReversed() : sides;
+  });
+
   let pointer = $state<{ x: number; y: number } | null>(null);
   let clicked = $state<string | null>(null);
   let frameWidth = $state(0);
@@ -183,6 +210,9 @@
       case "shift": {
         if (row.signed == null || row.baseSigned == null) {
           return muted;
+        }
+        if (arrowed.has(row.unit.areaId ?? "")) {
+          return GROUND;
         }
         const shift = row.signed - row.baseSigned;
         const strength = swingStrength(shift);
@@ -286,7 +316,7 @@
           ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
-            "fill-pattern": "hatch",
+            "fill-pattern": "absent",
             "fill-opacity": [
               "case",
               ["boolean", ["feature-state", "later"], false],
@@ -461,6 +491,16 @@
       source,
       anchor == null ? null : (kOf.get(anchor) ?? null),
     );
+    engine.arrows(
+      swings.map((entry) => ({
+        at: entry.at,
+        swing: entry.swing,
+        color: entry.color,
+        weight: entry.weight,
+        isMuted: selected != null && selected !== entry.unitId,
+      })),
+      swingReach,
+    );
   }
 
   $effect(() => {
@@ -474,6 +514,7 @@
       anchor,
       engine.theme,
       circles,
+      swings,
     ];
     if (engine.isLoaded && geography != null) {
       untrack(draw);
@@ -527,7 +568,9 @@
       case "bubbles":
         return m.night_legend_bubbles();
       case "shift":
-        return m.night_legend_shift();
+        return swings.length > 0
+          ? m.night_legend_arrows()
+          : m.night_legend_shift();
       case "counted":
         return m.night_legend_counted();
       default:
@@ -666,9 +709,27 @@
     {/if}
   </div>
   {#if !isLater && (mode === "lead" || mode === "shift" || mode === "counted")}
-    <div class="max-inline-80">
+    <div class="grid gap-2 max-inline-80">
+      {#if mode === "shift" && geography?.pieces == null}
+        <label
+          class="flex items-center justify-between gap-3 text-xs font-semibold"
+        >
+          {m.map_mode_arrows()}
+          <Switch
+            checked={isArrows}
+            onCheckedChange={(value: boolean) => (isArrows = value)}
+          />
+        </label>
+      {/if}
       {#if mode === "counted"}
         <Scale />
+      {:else if swings.length > 0}
+        <Legend
+          kind="arrows"
+          sides={arrowSides}
+          reach={swingReach}
+          blank={BLANK}
+        />
       {:else}
         <Scale
           sides={[

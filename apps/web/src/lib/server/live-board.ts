@@ -530,6 +530,7 @@ export async function control(
         row.contest,
         {
           party: family(row.party),
+          person: row.person,
           name: people.full.get(row.person) ?? "",
           isVacant: row.vacant,
         },

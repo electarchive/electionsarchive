@@ -15,12 +15,15 @@ import {
 import { bounties, claims } from "#lib/server/rpc/bounties.js";
 import { contributors } from "#lib/server/rpc/contributors.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
+import { cycle } from "#lib/server/rpc/cycle.js";
 import { admin } from "#lib/server/rpc/desk.js";
 import { recentChanges, watches } from "#lib/server/rpc/feeds.js";
+import { find } from "#lib/server/rpc/find.js";
 import { histories } from "#lib/server/rpc/history.js";
 import { indices } from "#lib/server/rpc/indices.js";
 import { live } from "#lib/server/rpc/live.js";
 import { maps } from "#lib/server/rpc/maps.js";
+import { nation } from "#lib/server/rpc/nation.js";
 import { places } from "#lib/server/rpc/places.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
@@ -51,7 +54,7 @@ export const reads = {
   entities,
   histories,
   indices,
-  live,
+  live: { ...live, cycle, find, nation },
   maps,
   parties,
   people,

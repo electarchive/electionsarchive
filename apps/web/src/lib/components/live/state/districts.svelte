@@ -6,6 +6,7 @@
   import Nation from "#lib/components/live/nation.svelte";
   import Card from "#lib/components/live/state/card.svelte";
   import Sheet from "#lib/components/live/state/sheet.svelte";
+  import { turn } from "#lib/live/ballot.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const {
@@ -68,7 +69,7 @@
               : label(entry)
             : undefined}
           held={entry.held}
-          isFlip={entry.isFlip}
+          flip={turn(entry)}
         />
       </div>
     {/each}

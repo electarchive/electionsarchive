@@ -27,6 +27,13 @@ export const variables = defineEnvVars({
     description:
       "PostgreSQL connection string for the persistent procedure cache, a database the nightly restore never replaces",
   },
+  DB_POOL_MAX: {
+    schema: v.optional(
+      v.pipe(v.string(), v.digits(), v.transform(Number), v.minValue(3)),
+    ),
+    description:
+      "Archive connections each web process may hold, split between pages and live results; deploys set it from the reader role's budget",
+  },
   BETTER_AUTH_SECRET: {
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Better Auth secret key",

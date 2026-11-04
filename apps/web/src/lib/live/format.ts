@@ -139,5 +139,5 @@ export function placeSlug(name: string) {
     .replaceAll(/^-|-$/gu, "");
 }
 
-export const HATCH =
-  "repeating-linear-gradient(135deg, color-mix(in oklab, var(--foreground) 32%, transparent) 0 1px, transparent 1px 4px)";
+export const DOTS =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='2' cy='2' r='0.85' fill='%23808080' fill-opacity='0.7'/%3E%3C/svg%3E\")";

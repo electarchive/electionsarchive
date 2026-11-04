@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Any
 
 from ea import portals, raw
+from ea.encoding import decode
 from ea.sources.us import enr_clarity
 
 SOURCE = "us.enr_static"
-VERSION = "1"
+VERSION = "2"
 PLATFORM = "hosted_static"
 HOST = "www.livevoterturnout.com"
 
@@ -46,7 +47,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     index = raw._index(SOURCE)[1]
     for tenant in registry:
         for link in sorted(key for key in index if key.startswith(tenant) and key.endswith(".html")):
-            page = raw.cached(SOURCE, link).path.read_text(errors="replace")
+            page = decode(raw.cached(SOURCE, link).path.read_bytes())
             headings = re.findall(r'class="election-title"[^>]*>(.*?)</h1>', page, re.DOTALL)
             if not headings:
                 print(f"{link}: no election title")

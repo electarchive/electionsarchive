@@ -18,17 +18,31 @@
   import { onMount, untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
+  import type { Entry } from "#lib/live/ballot.js";
   import type { Control } from "#lib/live/nation.js";
   import type { Geography, Pieces, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
+  import type { Ballot } from "#lib/server/live-ballot.js";
   import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import Cycle from "#lib/components/live/cycle.svelte";
+  import Flip from "#lib/components/live/dashboard/flip.svelte";
+  import SeatKey from "#lib/components/live/dashboard/seat-key.svelte";
+  import Dial from "#lib/components/live/dial.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
+  import Search from "#lib/components/live/search.svelte";
   import Also from "#lib/components/live/state/also.svelte";
+  import Bar from "#lib/components/live/state/bar.svelte";
+  import Card from "#lib/components/live/state/card.svelte";
+  import Withheld from "#lib/components/live/withheld.svelte";
   import Monogram from "#lib/components/monogram.svelte";
+  import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Skeleton } from "#lib/components/ui/skeleton/index.js";
-  import { percent } from "#lib/format.js";
+  import { Switch } from "#lib/components/ui/switch/index.js";
+  import { count, percent } from "#lib/format.js";
+  import { entries as entriesOf, seating, turn } from "#lib/live/ballot.js";
+  import { swing } from "#lib/live/flips.js";
   import {
     lead,
     placeName,
@@ -37,6 +51,7 @@
     surname,
     tone,
   } from "#lib/live/format.js";
+  import { history } from "#lib/live/history.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
@@ -47,11 +62,12 @@
     sum,
     whole,
   } from "#lib/live/standing.js";
-  import { closing, describe, verdict } from "#lib/live/summary.js";
+  import { closing, describe, summarize, verdict } from "#lib/live/summary.js";
+  import { reach as arrowReach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import type { Dot, Fill, Lens, Office, Paint } from "./model.js";
+  import type { Dot, Fill, Lens, Office, Paint, Swing } from "./model.js";
   import Canvas from "./canvas.svelte";
   import CountyCard from "./county-card.svelte";
   import CountyList from "./county-list.svelte";
@@ -62,9 +78,12 @@
     board,
     districtKey,
     flipped,
+    GROUND,
     holding,
     INSETS,
+    isRightward,
     LENSES,
+    mix,
     MUTED,
     OFFICES,
     PAINTS,
@@ -72,8 +91,10 @@
     seatName,
     shade,
     stateShade,
+    swingOf,
     tail,
     TERRITORIES,
+    turnOf,
     unitFill,
     urgency,
     WAITING,
@@ -88,6 +109,7 @@
     control,
     districts,
     geography,
+    legislature = null,
     around = null,
     nationPath,
     names,
@@ -107,6 +129,12 @@
     control: Control | null;
     districts: { map: Geography; codes: Record<string, string> } | null;
     geography: Geography | null;
+    legislature?: {
+      chambers: Array<Ballot["chambers"][number] & { map: Geography }>;
+      contests: Ballot["contests"];
+      parties: Ballot["parties"];
+      families: Ballot["families"];
+    } | null;
     around?: {
       tiles: string;
       places: Geography["places"];
@@ -161,7 +189,97 @@
     isNation ? null : (election.slug.split("/")[1] ?? null),
   );
   const found = $derived(board(election, estimates, control));
-  const parties = $derived(reach(election.races));
+  const chambers = $derived(
+    legislature == null || code == null
+      ? []
+      : legislature.chambers
+          .toSorted(
+            (a, b) => Number(a.tier === "lower") - Number(b.tier === "lower"),
+          )
+          .flatMap((entry) => {
+            const list = entriesOf({
+              contests: legislature.contests.flatMap((row) =>
+                row.chamber === entry.id ? [row.contest] : [],
+              ),
+              election,
+              estimates,
+              parties: legislature.parties,
+              families: legislature.families,
+              state: code,
+              tier: entry.tier,
+            }).toSorted((a, b) =>
+              a.contest.title.localeCompare(b.contest.title, undefined, {
+                numeric: true,
+              }),
+            );
+            let up = 0;
+            for (const item of list) {
+              up += item.contest.seats;
+            }
+            return list.length === 0
+              ? []
+              : [
+                  {
+                    ...entry,
+                    entries: list,
+                    up,
+                    areas: Map.groupBy(
+                      list.filter((item) => item.contest.area != null),
+                      (item) => item.contest.area ?? "",
+                    ),
+                    seats: seating(list, entry.holdovers, legislature.parties),
+                  },
+                ];
+          }),
+  );
+  let nationwide = $state<{
+    races: Array<LiveRace>;
+    estimates: Record<string, LiveEstimate>;
+  } | null>(null);
+  let isFetchingNation = false;
+  function loadNation() {
+    if (isNation || nationwide != null || isFetchingNation) {
+      return;
+    }
+    isFetchingNation = true;
+    orpc.live.nation
+      .call({ path: nationPath })
+      .then((result) => {
+        nationwide = result;
+      })
+      .catch(() => {
+        isFetchingNation = false;
+      });
+  }
+  const everyRace = $derived.by(() => {
+    if (isNation || nationwide == null) {
+      return found.summaries;
+    }
+    const { estimates: all } = nationwide;
+    return nationwide.races.map((entry) =>
+      summarize(entry, all[entry.id] ?? null),
+    );
+  });
+  const everyState = $derived(
+    [...new Set(everyRace.map((summary) => summary.race.state))].toSorted(
+      (a, b) => stateName(a).localeCompare(stateName(b)),
+    ),
+  );
+  const chamberOf = $derived(
+    new Map(
+      chambers.flatMap((entry) =>
+        entry.entries.map((item) => [item.contest.slug, entry.tier] as const),
+      ),
+    ),
+  );
+  const parties = $derived(
+    reach([
+      ...election.races,
+      ...chambers.flatMap((entry) =>
+        entry.entries.map((item) => item.summary.race),
+      ),
+    ]),
+  );
   provideReach(() => parties);
   const params = $derived(page.url.searchParams);
 
@@ -254,6 +372,9 @@
   );
   const raceTail = $derived.by(() => {
     const wanted = params.get("race");
+    if (chambers.some((entry) => entry.tier === wanted)) {
+      return wanted ?? "";
+    }
     if (wanted === "house") {
       if (hasOverview) {
         return "house";
@@ -275,11 +396,26 @@
     }
     const first = statewide[0] ?? seats[0];
     if (first == null) {
-      return hasOverview ? "house" : "";
+      return hasOverview ? "house" : (chambers[0]?.tier ?? "");
     }
     return statewide.length === 0 && hasOverview ? "house" : tail(first.race);
   });
   const isOverview = $derived(!isNation && raceTail === "house");
+  const chamber = $derived(
+    isNation
+      ? null
+      : (chambers.find((entry) => entry.tier === raceTail) ?? null),
+  );
+  const pickedSeat = $derived.by(() => {
+    const wanted = params.get("seat");
+    return wanted == null
+      ? null
+      : (chamber?.entries.find((entry) => tail(entry.summary.race) === wanted)
+          ?.contest.area ?? null);
+  });
+  const pickedEntries = $derived(
+    pickedSeat == null ? [] : (chamber?.areas.get(pickedSeat) ?? []),
+  );
   const current = $derived<Summary | null>(
     isNation || isOverview
       ? null
@@ -292,6 +428,28 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
+  const forecast = $derived.by(() => {
+    if (
+      race == null ||
+      current == null ||
+      estimate == null ||
+      estimate.status === "unavailable" ||
+      race.certified != null ||
+      current.projected != null ||
+      current.winner != null ||
+      current.total === 0 ||
+      (race.isMeasure === true &&
+        race.options.filter((option) => !option.isWriteIn).length > 2)
+    ) {
+      return null;
+    }
+    const [a, b] = racePair;
+    return {
+      history: history(race, null),
+      counted:
+        ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total,
+    };
+  });
   const hasVotes = $derived(
     isSpread
       ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
@@ -299,12 +457,14 @@
         ? found.summaries.some(
             (summary) => summary.race.office === office && summary.total > 0,
           )
-        : (current?.total ?? 0) > 0,
+        : chamber != null
+          ? chamber.entries.some((entry) => entry.summary.total > 0)
+          : (current?.total ?? 0) > 0,
   );
   const lens = $derived.by((): Lens => {
     const wanted = params.get("color");
     const match = LENSES.find((entry) => entry === wanted);
-    if (isOverview) {
+    if (isOverview || chamber != null) {
       return match === "counted" ? "counted" : "lead";
     }
     return match != null && (hasVotes || match === "last") ? match : "lead";
@@ -332,7 +492,9 @@
     new Map([...counties.values()].map((entry) => [entry.slug, entry])),
   );
   const county = $derived(
-    isNation ? null : (bySlug.get(params.get("county") ?? "") ?? null),
+    isNation || chamber != null
+      ? null
+      : (bySlug.get(params.get("county") ?? "") ?? null),
   );
 
   const rows = $derived.by(() => {
@@ -579,7 +741,7 @@
           : (nation?.map ?? null)
       : isOverview
         ? (districts?.map ?? null)
-        : geography,
+        : (chamber?.map ?? geography),
   );
   const insetPlaces = $derived(
     isNation
@@ -612,6 +774,42 @@
     );
   }
 
+  function seatFill(summary: Summary, wanted: Paint): Fill {
+    const color = seatShade(summary, wanted);
+    const isLater = summary.later != null;
+    const turn =
+      wanted === "counted" ? null : turnOf(found.seats.get(summary.race.id));
+    return turn == null
+      ? { color, isLater }
+      : { color, isLater, flip: turn.flip };
+  }
+
+  function seatLabel(entry: Entry) {
+    const { title } = entry.contest;
+    const cut = title.lastIndexOf(", ");
+    return cut === -1 ? title : title.slice(cut + 2);
+  }
+
+  function chamberShade(entry: Entry, wanted: Paint) {
+    const { summary } = entry;
+    return wanted === "lead" &&
+      entry.held != null &&
+      summary.later == null &&
+      summary.total === 0
+      ? mix(entry.held.color, 22)
+      : shade(summary, undefined, wanted, null, null);
+  }
+
+  function chamberFill(list: Array<Entry> | undefined, wanted: Paint) {
+    const first = list?.find((entry) => !entry.contest.isSpecial) ?? list?.[0];
+    return first == null
+      ? { color: MUTED }
+      : {
+          color: chamberShade(first, wanted),
+          isLater: first.summary.later != null,
+        };
+  }
+
   const shared = $derived.by(() => {
     const district =
       seatArea == null || raceStanding == null ? null : whole(raceStanding);
@@ -628,7 +826,7 @@
           );
   });
 
-  const fills = $derived.by(() => {
+  const painted = $derived.by(() => {
     const out = new Map<string, Fill>();
     if (isSpreadShown) {
       for (const [areaId, entry] of spreadRows) {
@@ -645,6 +843,16 @@
       }
       return out;
     }
+    if (chamber != null) {
+      const wanted: Paint = lens === "counted" ? "counted" : "lead";
+      for (const place of chamber.map.places) {
+        out.set(
+          place.areaId,
+          chamberFill(chamber.areas.get(place.areaId), wanted),
+        );
+      }
+      return out;
+    }
     if (isHouseMap || isOverview) {
       const wanted: Paint = isOverview
         ? lens === "counted"
@@ -655,12 +863,7 @@
         const summary = found.districts.get(key);
         out.set(
           areaId,
-          summary == null
-            ? { color: MUTED }
-            : {
-                color: seatShade(summary, wanted),
-                isLater: summary.later != null,
-              },
+          summary == null ? { color: MUTED } : seatFill(summary, wanted),
         );
       }
       return out;
@@ -679,6 +882,43 @@
               isLater,
             },
       );
+    }
+    return out;
+  });
+
+  const isArrows = $derived(params.get("arrows") !== "off");
+  const swings = $derived.by((): Array<Swing> => {
+    if (lens !== "shift" || !isArrows) {
+      return [];
+    }
+    if (isSpreadShown) {
+      return [...spreadRows.values()].flatMap(
+        (entry) =>
+          swingOf(entry.areaId, entry.row, entry.race.options, entry.pair) ??
+          [],
+      );
+    }
+    if (isNation || isOverview || chamber != null || race == null) {
+      return [];
+    }
+    return rows.flatMap(
+      (entry) => swingOf(entry.areaId, entry.row, race.options, racePair) ?? [],
+    );
+  });
+  const swingReach = $derived(arrowReach(swings.map((entry) => entry.swing)));
+  const isSwingable = $derived(
+    lens === "shift" &&
+      (isSpreadShown ||
+        (!isNation && !isOverview && chamber == null && race != null)),
+  );
+  const fills = $derived.by(() => {
+    if (swings.length === 0) {
+      return painted;
+    }
+    const arrowed = new Set(swings.map((entry) => entry.areaId));
+    const out = new Map<string, Fill>();
+    for (const [areaId, fill] of painted) {
+      out.set(areaId, arrowed.has(areaId) ? { ...fill, color: GROUND } : fill);
     }
     return out;
   });
@@ -725,6 +965,20 @@
             rank: index,
           }));
     }
+    if (chamber != null) {
+      return chamber.map.places.flatMap((place, index) => {
+        const first = chamber.areas.get(place.areaId)?.[0];
+        return first == null
+          ? []
+          : [
+              {
+                areaId: place.areaId,
+                text: seatLabel(first).replace(/^District /u, ""),
+                rank: index,
+              },
+            ];
+      });
+    }
     if (isOverview) {
       return Object.entries(districtCodes).map(([key, areaId], index) => ({
         areaId,
@@ -751,7 +1005,9 @@
         ? null
         : (areaOfKey[pick] ??
           (pick.includes("-") ? null : (nationCodes[pick] ?? null)))
-      : (county?.areaId ?? null),
+      : chamber != null
+        ? pickedSeat
+        : (county?.areaId ?? null),
   );
 
   function href(path: string, next: Record<string, string | null>) {
@@ -850,6 +1106,8 @@
   function rise() {
     if (isNation) {
       update({ pick: null });
+    } else if (pickedSeat != null) {
+      update({ seat: null });
     } else if (county != null) {
       update({ county: null });
     } else if (up != null) {
@@ -877,9 +1135,11 @@
     void goto(
       href(`${election.slug.split("/")[0] ?? "us"}/${target}/${date}`, {
         race:
-          race?.office === "house" || isOverview
-            ? "house"
-            : (race?.office ?? null),
+          chamber != null
+            ? chamber.tier
+            : race?.office === "house" || isOverview
+              ? "house"
+              : (race?.office ?? null),
         color: params.get("color"),
       }),
       { reset: false },
@@ -929,6 +1189,14 @@
       open(key.split("-")[0] ?? key, key);
       return;
     }
+    if (chamber != null) {
+      const first = chamber.areas.get(areaId)?.[0];
+      update({ seat: first == null ? null : tail(first.summary.race) });
+      if (first != null && !wide.current && detent === "peek") {
+        detent = "half";
+      }
+      return;
+    }
     if (isOverview) {
       const key = keyOfArea.get(areaId);
       const summary = key == null ? null : found.districts.get(key);
@@ -945,7 +1213,38 @@
   }
 
   function pickRace(next: string) {
-    update({ race: next, county: county?.slug ?? null });
+    update({
+      race: next,
+      seat: null,
+      county: chambers.some((entry) => entry.tier === next)
+        ? null
+        : (county?.slug ?? null),
+    });
+  }
+
+  function searchLink(slug: string) {
+    const tier = chamberOf.get(slug);
+    if (
+      tier == null &&
+      !everyRace.some((summary) => summary.race.slug === slug)
+    ) {
+      return toLive(slug);
+    }
+    const parts = slug.split("/");
+    const end = parts.pop() ?? "";
+    return href(
+      parts.join("/"),
+      tier == null ? { race: end } : { race: tier, seat: end },
+    );
+  }
+
+  function pickSummary(summary: Summary) {
+    const tier = chamberOf.get(summary.race.slug);
+    if (tier == null) {
+      pickRace(tail(summary.race));
+    } else {
+      update({ race: tier, seat: tail(summary.race), county: null });
+    }
   }
 
   let seen: { stamp: string; totals: Map<string, number> } | null = null;
@@ -1036,7 +1335,6 @@
     (
       [
         ["lead", m.night_color_lead],
-        ["flips", m.night_color_flips],
         ["counted", m.night_color_counted],
         ["chance", m.night_color_chance],
       ] as const
@@ -1055,13 +1353,20 @@
       ] as const
     )
       .filter(
-        ([value]) => !isOverview || value === "lead" || value === "counted",
+        ([value]) =>
+          (!isOverview && chamber == null) ||
+          value === "lead" ||
+          value === "counted",
       )
       .map(([value, label]) => ({
         value,
         label: label(),
         disabled:
-          !hasVotes && !isOverview && value !== "last" && value !== "lead",
+          !hasVotes &&
+          !isOverview &&
+          chamber == null &&
+          value !== "last" &&
+          value !== "lead",
       })),
   );
   const viewOptions = $derived<Array<SegmentedOption<string>>>([
@@ -1123,7 +1428,7 @@
     wide.current ? Math.min(104, Math.max(56, room * 0.13)) : 58,
   );
   const sides = $derived.by(() => {
-    if (isNation || isOverview) {
+    if (isNation || isOverview || chamber != null) {
       return (found.pair ?? []).map((family) => ({
         name: family.short,
         color: family.color,
@@ -1152,6 +1457,11 @@
           : "ramp";
     },
   );
+  const arrowSides = $derived(
+    race != null && !isSpreadShown && isRightward(race.options, racePair)
+      ? sides.toReversed()
+      : sides,
+  );
   const legendBins = $derived(
     (isNation && !isSpread) || legendKind !== "ramp"
       ? null
@@ -1169,7 +1479,6 @@
       return {
         lead: m.night_nation_legend,
         chance: m.night_nation_legend_chance,
-        flips: m.night_nation_legend_flips,
         counted: m.night_nation_legend_reporting,
       }[paint]();
     }
@@ -1181,6 +1490,15 @@
       votes: m.night_legend_bubbles,
     }[lens]();
   });
+  const changing = $derived(
+    isNation && !isSpread && paint !== "counted"
+      ? swing(
+          [...found.seats.values()]
+            .filter((entry) => entry.summary.race.office === office)
+            .map((entry) => entry.shift),
+        )
+      : null,
+  );
   const isLaterShown = $derived(
     [...fills.values()].some((fill) => fill.isLater === true),
   );
@@ -1384,6 +1702,33 @@
   {:else if neighbor != null}
     <p class="font-semibold">{stateName(neighbor)}</p>
     <p class="text-xs text-muted-foreground">{m.livemap_near_hint()}</p>
+  {:else if chamber != null}
+    {const list = $derived(chamber.areas.get(areaId) ?? [])}
+    {#each list.slice(0, 2) as entry (entry.contest.id)}
+      <p class="font-semibold">
+        {entry.contest.isSpecial ? entry.contest.title : seatLabel(entry)}
+      </p>
+      {@render tipLines(
+        entry.summary.race,
+        entry.summary.totals,
+        prior(entry.summary.race)?.shares ?? null,
+        (
+          entry.summary.winner ??
+          entry.summary.projected ??
+          entry.summary.leader
+        )?.id ?? null,
+      )}
+      <p class="text-xs text-muted-foreground">
+        {verdict(
+          entry.summary,
+        )}{#if entry.held != null && entry.summary.total === 0}<span
+            aria-hidden="true"
+            >,
+          </span>{m.night_state_held({ party: entry.held.short })}{/if}
+      </p>
+    {:else}
+      <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
+    {/each}
   {:else if nationTip != null}
     <p class="font-semibold">{nationTip.title}</p>
     {#if nationTip.lines.length === 0}
@@ -1469,17 +1814,21 @@
     />
   {:else}
     {const target = $derived(
-      county == null
-        ? m.livemap_nation()
-        : race?.office === "house" && race.district != null
-          ? seatName(race, stateName)
-          : here,
+      pickedSeat != null && chamber != null
+        ? chamber.name
+        : county == null
+          ? m.livemap_nation()
+          : race?.office === "house" && race.district != null
+            ? seatName(race, stateName)
+            : here,
     )}
     <button
       type="button"
       class="flex items-center gap-2 rounded-sm bg-card/95 ps-2.5 pe-2 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border backdrop-blur-sm keycap block-9 hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-coarse:block-10"
       aria-label={m.atlas_up({ place: target })}
-      title={county == null ? m.livemap_up_hint() : undefined}
+      title={county == null && pickedSeat == null
+        ? m.livemap_up_hint()
+        : undefined}
       onclick={rise}
     >
       <ArrowLeftIcon
@@ -1502,20 +1851,62 @@
       class={cn({ "inline-full": officeOptions.length <= 4 })}
       onValueChange={(value) => update({ office: value, pick: null })}
     />
-  {:else if !isNation && statewide.length + seats.length > 1}
+  {:else if !isNation && statewide.length + seats.length + chamberOf.size > 1}
     <RacePicker
-      summaries={[...statewide, ...seats]}
-      current={isOverview ? null : (race?.slug ?? null)}
+      summaries={[
+        ...statewide.filter((summary) => !chamberOf.has(summary.race.slug)),
+        ...seats,
+        ...chambers.flatMap((entry) =>
+          entry.entries.map((item) => item.summary),
+        ),
+      ]}
+      current={chamber != null
+        ? (pickedEntries[0]?.contest.slug ?? null)
+        : isOverview
+          ? null
+          : (race?.slug ?? null)}
       label={m.livemap_races()}
-      overview={hasOverview
-        ? {
-            label: m.livemap_overview(),
-            isCurrent: isOverview,
-            onpick: () => pickRace("house"),
-          }
-        : null}
-      onpick={(summary: Summary) => pickRace(tail(summary.race))}
-    />
+      isCompact
+      overviews={[
+        ...(hasOverview
+          ? [
+              {
+                group: "house",
+                label: m.livemap_overview(),
+                isCurrent: isOverview,
+                onpick: () => pickRace("house"),
+              },
+            ]
+          : []),
+        ...chambers.map((entry) => ({
+          group: "legislature",
+          label: entry.name,
+          isCurrent: chamber?.id === entry.id,
+          onpick: () => pickRace(entry.tier),
+        })),
+      ]}
+      kinds={new Map(
+        [...chamberOf.keys()].map((slug) => [slug, "legislature"]),
+      )}
+      onpick={pickSummary}
+    >
+      {#snippet search()}
+        <div class="contents" onfocusin={loadNation}>
+          <Search
+            path={nationPath}
+            summaries={everyRace}
+            codes={everyState}
+            labels={names}
+            href={(target: string) =>
+              href(
+                `${election.slug.split("/")[0] ?? "us"}/${target}/${date}`,
+                {},
+              )}
+            link={searchLink}
+          />
+        </div>
+      {/snippet}
+    </RacePicker>
   {/if}
 {/snippet}
 
@@ -1616,14 +2007,42 @@
 {/snippet}
 
 {#snippet legend()}
-  <Legend
-    kind={legendKind}
-    {sides}
-    bins={legendBins}
-    text={legendText}
-    blank={isNation && !isSpread ? WAITING : BLANK}
-    isLater={isLaterShown}
-  />
+  <div class="grid gap-2">
+    {#if isSwingable}
+      <label
+        class="flex items-center justify-between gap-2 text-xs font-semibold"
+      >
+        {m.map_mode_arrows()}
+        <Switch
+          checked={isArrows}
+          onCheckedChange={(value: boolean) =>
+            update({ arrows: value ? null : "off" }, false)}
+        />
+      </label>
+    {/if}
+    {#if swings.length > 0}
+      <Legend
+        kind="arrows"
+        sides={arrowSides}
+        reach={swingReach}
+        text={m.night_legend_arrows()}
+        blank={BLANK}
+        isLater={isLaterShown}
+      />
+    {:else}
+      <Legend
+        kind={legendKind}
+        {sides}
+        bins={legendBins}
+        text={legendText}
+        blank={isNation && !isSpread ? WAITING : BLANK}
+        isLater={isLaterShown}
+      />
+    {/if}
+    {#if changing != null && found.pair != null}
+      <SeatKey sides={found.pair} {changing} />
+    {/if}
+  </div>
 {/snippet}
 
 {#snippet summaryHead()}
@@ -1654,9 +2073,26 @@
       {/if}
     </div>
   {:else if current != null}
-    <p class="truncate text-[0.9375rem] font-[720]">{current.race.title}</p>
+    <div class="flex items-start justify-between gap-3">
+      <p class="line-clamp-2 text-[0.9375rem]/5 font-[720] text-pretty">
+        {current.race.title}
+      </p>
+      <Button
+        href={toLive(current.race.slug)}
+        size="sm"
+        variant="outline"
+        class="shrink-0">{m.night_state_results()}</Button
+      >
+    </div>
     <p class="line-clamp-2 font-serif text-sm/snug text-pretty">
       {describe(current, closing(election, current.race), clock)}
+    </p>
+  {:else if chamber != null}
+    <p class="text-[0.9375rem] font-[720]">{chamber.name}</p>
+    <p class="font-figures text-sm text-muted-foreground tabular-nums">
+      {m.night_state_seats_up({ count: count(chamber.up) })}
+      <span aria-hidden="true">/</span>
+      {m.night_chamber_majority({ count: count(chamber.seats.majority) })}
     </p>
   {:else}
     <p class="text-[0.9375rem] font-[720]">{m.night_nation_house()}</p>
@@ -1703,6 +2139,94 @@
       onRace={(next) => update({ race: next })}
       onClose={() => update({ county: null })}
     />
+  {:else if chamber != null}
+    <div class="grid grid-cols-[minmax(0,1fr)] gap-6">
+      {#each pickedEntries as entry (entry.contest.id)}
+        <div class="grid gap-3">
+          <div class="flex items-start justify-between gap-3">
+            <p class="text-[0.9375rem]/5 font-[720] text-pretty">
+              {entry.contest.isSpecial ? entry.contest.title : seatLabel(entry)}
+            </p>
+            <Button
+              href={toLive(entry.contest.slug)}
+              size="sm"
+              variant="outline"
+              class="shrink-0">{m.night_state_results()}</Button
+            >
+          </div>
+          <Card
+            summary={entry.summary}
+            held={entry.held}
+            flip={turn(entry)}
+            closes={closing(election, entry.summary.race)}
+            limit={5}
+          />
+        </div>
+      {/each}
+      <Bar seats={chamber.seats} />
+      <section class="grid gap-1.5">
+        <h2 class="text-xs font-semibold text-muted-foreground">
+          {m.night_state_district()}
+        </h2>
+        <ul class="grid">
+          {#each chamber.entries.toSorted((a, b) => (urgency(a.summary, closing(election, a.summary.race))[0] ?? 0) - (urgency(b.summary, closing(election, b.summary.race))[0] ?? 0)) as entry (entry.contest.id)}
+            {const area = $derived(entry.contest.area)}
+            {const called = $derived(
+              entry.summary.winner ?? entry.summary.projected,
+            )}
+            <li>
+              <button
+                type="button"
+                aria-pressed={area != null && area === pickedSeat}
+                class={cn(
+                  "-mx-2 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 rounded-sm px-2 py-1.5 text-start inline-[calc(100%+1rem)] focus-visible:bg-secondary",
+                  {
+                    "bg-secondary": area != null && area === pickedSeat,
+                    "hover:bg-secondary": area == null || area !== pickedSeat,
+                  },
+                )}
+                onclick={() => {
+                  update({ seat: tail(entry.summary.race) });
+                  if (area != null) {
+                    canvas?.focus(area);
+                  }
+                }}
+                onpointerenter={() => (hovered = area)}
+                onpointerleave={() => (hovered = null)}
+              >
+                <span
+                  class="rounded-xs ring-1 ring-border/60 block-3.5 inline-3.5"
+                  style:background-color={chamberShade(entry, "lead")}
+                ></span>
+                <span class="grid min-inline-0">
+                  <span
+                    class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"
+                    ><span class="truncate"
+                      >{entry.contest.isSpecial
+                        ? entry.contest.title
+                        : seatLabel(entry)}</span
+                    >
+                    {#if entry.isFlip && called != null}<span
+                        class="shrink-0 text-[0.6875rem]"
+                        style:color={tone(called)}>{m.night_flip()}</span
+                      >{/if}</span
+                  >
+                  <span class="truncate text-xs text-muted-foreground"
+                    >{verdict(entry.summary)}</span
+                  >
+                </span>
+                <span
+                  class="font-figures text-xs text-muted-foreground tabular-nums"
+                  >{entry.summary.counted != null && entry.summary.total > 0
+                    ? percent(entry.summary.counted, 0)
+                    : ""}</span
+                >
+              </button>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    </div>
   {:else if isOverview}
     <section class="grid gap-1.5">
       <h2 class="text-xs font-semibold text-muted-foreground">
@@ -1730,10 +2254,12 @@
                 <span
                   class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"
                   >{seatName(summary.race, stateName)}
-                  {#if flip != null}<span
-                      class="text-[0.6875rem]"
-                      style:color={flip.color}>{m.night_flip()}</span
-                    >{/if}</span
+                  {#if flip != null}<Flip
+                      flip={flip.flip}
+                      from={flip.from}
+                      to={flip.to}
+                      isCompact={true}
+                    />{/if}</span
                 >
                 <span class="truncate text-xs text-muted-foreground"
                   >{verdict(summary)}</span
@@ -1760,6 +2286,28 @@
         {clock}
         {forecasts}
       />
+      {#if forecast != null}
+        <Withheld isOff={!forecasts}>
+          <Dial
+            options={current.race.options}
+            pair={racePair}
+            {estimate}
+            history={forecast.history}
+            counted={forecast.counted}
+            isWaiting={false}
+          />
+        </Withheld>
+      {/if}
+      {#if current.race.isMeasure !== true}
+        <Cycle
+          path={current.race.slug}
+          options={current.race.options}
+          totals={current.totals}
+          total={current.total}
+          counted={current.counted}
+          estimate={forecasts ? current.estimate : null}
+        />
+      {/if}
       <CountyList
         {rows}
         options={current.race.options}
@@ -1794,7 +2342,7 @@
 {/snippet}
 
 <div
-  class="fixed inset-0 z-40 grid grid-rows-[auto_minmax(0,1fr)] bg-card text-foreground"
+  class="fixed inset-0 z-40 grid grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] bg-card text-foreground"
 >
   <header
     class="relative z-30 flex items-center gap-x-3 border-be bg-card px-3 block-14 md:gap-x-4 md:px-4"
@@ -1902,7 +2450,7 @@
 
   {#if !isMounted}
     <div
-      class="grid min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
+      class="grid grid-cols-[minmax(0,1fr)] min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
       aria-busy="true"
     >
       <div
@@ -1940,6 +2488,7 @@
     <div
       class={cn("grid min-block-0", {
         "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
+        "grid-cols-[minmax(0,1fr)]": !wide.current,
       })}
     >
       <main class="relative min-block-0" bind:clientHeight={room}>
@@ -1955,6 +2504,8 @@
             geography={mapGeography}
             {fills}
             {dots}
+            {swings}
+            reach={swingReach}
             {labels}
             {selected}
             bind:hovered
