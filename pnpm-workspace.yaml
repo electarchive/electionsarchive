@@ -25,7 +25,7 @@ catalog:
   "@fontsource-variable/sofia-sans-semi-condensed": ^5.3.0
   "@fontsource/piazzolla": ^5.3.0
   "@fontsource/sofia-sans-semi-condensed": ^5.3.0
-  "@inlang/paraglide-js": ^2.29.2
+  "@inlang/paraglide-js": ^3.0.0
   "@lucide/svelte": ^1.61.0
   "@modelcontextprotocol/sdk": ^1.32.2
   "@neodrag/svelte": 3.0.0-next.12
