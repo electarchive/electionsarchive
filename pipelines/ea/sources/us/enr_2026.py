@@ -77,6 +77,7 @@ LISTINGS = (
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
 EV_DETAILS: dict[str, tuple[str, bytes]] = {}
+LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -290,11 +291,19 @@ def edits(a: str, b: str) -> bool:
     return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
 
 
-def placed(name: list[str], words: set[str], strict: bool, whole: bool = False) -> bool:
+SCHOOL_COUNTIES = {
+    "1737170": {"17043", "17089"},
+    "1740350": {"17043"},
+    "1741980": {"17043"},
+    "0400813": {"04025"},
+}
+
+
+def placed(name: list[str], words: set[str], strict: bool, whole: bool = False, apart: bool = False) -> bool:
     found = set(name) & words
     core = {w for w in name if not w.isdigit()} - SCHOOL_WORDS
     if strict and whole and core:
-        return core <= words or any(w.isdigit() for w in found)
+        return core <= words or not apart and any(w.isdigit() for w in found)
     if strict:
         return not name or name[0] in words and 2 * len(found) >= len(set(name)) or any(w.isdigit() for w in found)
     return (
@@ -537,15 +546,19 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
 
         enr_or.collect(client, get, lambda url, content: store("OR", url, content, ".json"))
     missing: list[str] = []
-    for fips, (tenant, *_) in COUNTIES.items():
-        state = STATES[fips[:2]]
+    for state, tenant, eid in [
+        *((STATES[fips[:2]], tenant, None) for fips, (tenant, *_) in COUNTIES.items()),
+        *LIVE_COUNTIES.values(),
+    ]:
         if only and state not in only:
             continue
         base = f"https://results.enr.clarityelections.com/{state}/{tenant}/"
-        listing = get(client, f"{base}elections.json")
+        listing = None if eid else get(client, f"{base}elections.json")
         ids = (
             [os.environ[f"ENR_2026_EID_{state}_{tenant}"]]
             if f"ENR_2026_EID_{state}_{tenant}" in os.environ
+            else [eid]
+            if eid
             else [
                 e["EID"]
                 for e in json.loads(listing or "[]")
@@ -726,7 +739,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
 
         yield from enr_ky.rows(url, path)
         return
-    if state == "TX":
+    if state == "TX" and not url.endswith("detailxml.zip"):
         from ea.sources.us import enr_tx
 
         yield from enr_tx.rows(url, path, urls)
@@ -807,7 +820,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for contest in root.iter("Contest"):
             found = EV_OFFICES.fullmatch(re.sub(r"\s+", " ", contest.get("text") or "").strip())
-            if tenant and found:
+            if tenant and (found is None if state == "TX" else found is not None):
                 continue
             for choice in contest.iter("Choice"):
                 for kind in choice.iter("VoteType"):
@@ -1318,7 +1331,19 @@ def plan(
     race = pl.concat_str(
         [pl.col(name).fill_null("") for name in ("state", "office", "contest", "district", "county")], separator="|"
     )
-    frame = frame.filter(~tenant | ~race.is_in(frame.filter(~tenant).select(race).to_series()))
+    frame = (
+        frame.with_columns(key=race, tenant=tenant)
+        .join(
+            frame.with_columns(key=race, tenant=tenant)
+            .group_by("key", "tenant")
+            .agg(pl.col("votes").sum())
+            .sort(["votes", "tenant"], descending=[True, False])
+            .unique("key", keep="first", maintain_order=True)
+            .select("key", "tenant"),
+            on=["key", "tenant"],
+        )
+        .drop("key", "tenant")
+    )
     local = frame.filter(pl.col("office").is_in(["other", "state"]))
     frame = frame.filter(~pl.col("office").is_in(["other", "state"]))
     counties: dict[tuple[str, str], UUID] = {}
@@ -1423,7 +1448,7 @@ def plan(
             for contest in sorted(same, key=lambda id: held[id][1])[:-1]:
                 del published[contest]
         towns: dict[str, list[list[str]]] = {}
-        schools: set[str] = set()
+        schools: dict[str, set[str]] = {}
         for owner, text, scheme in conn.execute(
             """select n.entity_id::text, n.text, null from name n where n.entity_id = any(%s)
                union all
@@ -1435,10 +1460,23 @@ def plan(
             ],
         ).fetchall():
             if scheme == "us.school_district":
-                schools.add(owner)
+                schools.setdefault(owner, set())
             towns.setdefault(owner, []).append(
                 [w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | PLACE_WORDS]
             )
+        for code, county in conn.execute(
+            """select u.code, c.code from reporting_unit u
+               join area_geometry g on g.area_id = u.area_id and g.valid @> current_date
+               join reporting_unit c on c.scheme_code = 'us.county' and c.code like %s
+               join area_geometry cg on cg.area_id = c.area_id and cg.valid @> current_date and cg.geom && g.geom
+               where u.scheme_code = 'us.school_district' and u.code = any(%s)
+                 and st_area(st_intersection(g.geom, cg.geom)) > 0.02 * st_area(g.geom)""",
+            [FIPS[state] + "%", list(schools)],
+        ).fetchall():
+            schools[code].add(county)
+        for code, county in SCHOOL_COUNTIES.items():
+            if code in schools:
+                schools[code] = set(county)
         races: dict[tuple[str, str, frozenset[str]], list[str]] = {}
         for (office, name, county), group in local.filter(pl.col("state") == state).group_by(
             "office", "contest", "county"
@@ -1509,7 +1547,17 @@ def plan(
                     and (names := towns.get(str(held[contest][0]), []) + towns.get(segment, []))
                     and len(people & wanted - {"yes", "no"}) < 2
                     and not any(
-                        placed(name, words, not people & wanted - {"yes", "no"}, segment in schools) for name in names
+                        placed(
+                            name,
+                            words,
+                            not people & wanted - {"yes", "no"},
+                            segment in schools,
+                            bool(schools.get(segment))
+                            and {codes.get((FIPS[state], plain(place)), place)[:5] for place in places}.isdisjoint(
+                                schools[segment]
+                            ),
+                        )
+                        for name in names
                     )
                     and not (people & wanted - {"yes", "no"} and named_seat & {w for w in words if w.isdigit()})
                     and (
