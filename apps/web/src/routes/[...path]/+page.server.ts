@@ -1,4 +1,4 @@
-import type { Part } from "svelte-islands";
+import type { Fetch, Part } from "svelte-islands";
 import { part } from "svelte-islands/server";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -8,15 +8,17 @@ import { tallied } from "./tally.js";
 
 const BOARD = 49;
 const QUESTIONS = 7;
-const CROWD = 200;
+const CROWD = 40;
+const TILED = /^us\/[a-z]{2}\/[^/]+$/u;
 const LEGEND = 8;
 
 function parted<T>(
   name: string,
   value: T | Promise<T>,
+  fetch?: Fetch,
 ): Part<NonNullable<T>> | Promise<Part<NonNullable<T>> | null> | null {
   const wrap = (resolved: T) =>
-    resolved == null ? null : part(name, resolved);
+    resolved == null ? null : part(name, resolved, { fetch });
   return value instanceof Promise ? value.then(wrap) : wrap(value);
 }
 
@@ -106,14 +108,21 @@ export const load: PageServerLoad = async ({ params, url }) => {
     const isSplit = isDeferred && kept.size < ordered.length;
     const rest = ordered.flatMap((race, at) => (kept.has(race) ? [] : [at]));
     const { sections } = data;
-    const { winners } = sections;
+    const { winners, ledger } = sections;
     const isSweep =
       sections.mayoral ||
       (!(winners instanceof Promise) && (winners?.tiers.length ?? 0) > 0);
-    const children = elections.filter((child) => !child.isStage);
-    const isParted = !isSweep && winners != null;
-    const isCrowded = isParted && children.length > CROWD;
-    const listed = isCrowded ? children : null;
+    const rounds = new Set(
+      ledger?.kind === "rounds"
+        ? ledger.rounds.flatMap((round) => round.path ?? [])
+        : [],
+    );
+    const children = elections.filter(
+      (child) => !child.isStage && !rounds.has(child.path ?? ""),
+    );
+    const isCrowded =
+      children.length >= CROWD &&
+      children.some((child) => !TILED.test(child.path ?? ""));
     return {
       ...data,
       sections: {
@@ -124,22 +133,16 @@ export const load: PageServerLoad = async ({ params, url }) => {
             ? part("election.regions", sections.regions)
             : sections.regions,
         counties: parted("election.counties", sections.counties),
-        winners: isParted
-          ? parted(
-              "election.winners",
-              winners instanceof Promise
-                ? winners.then((found) =>
-                    found == null ? null : { ...found, children: listed },
-                  )
-                : { ...winners, children: listed },
-            )
-          : winners,
+        winners: isSweep
+          ? parted("election.sweep", winners, "preload")
+          : parted("election.winners", winners),
       },
       election: {
         ...data.election,
         elections: isCrowded
           ? elections.filter((child) => child.isStage)
           : elections,
+        children: isCrowded ? part("election.children", children) : null,
         contests:
           contests.length === 0 ? null : part("election.contests", contests),
         isCrowded,

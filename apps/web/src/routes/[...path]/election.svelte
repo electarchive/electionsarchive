@@ -3807,7 +3807,7 @@
         </Island>
       {/if}
     {/await}
-  {:else if parts.length >= 40 || election.isCrowded}
+  {:else if election.isCrowded}
     {#await sections.winners}
       <SectionSkeleton shape="table" />
     {:then found}
@@ -3824,14 +3824,14 @@
             >
               <Winners
                 {id}
-                parts={winners.children ?? parts}
+                parts={election.children ?? parts}
                 hasMap={!isSwept}
               />
             </Cached>
           {/snippet}
         </Island>
       {:else}
-        <Winners {id} {parts} hasMap={!isSwept} />
+        <Winners {id} parts={election.children ?? parts} hasMap={!isSwept} />
       {/if}
     {/await}
   {:else if parts.length > 0}
