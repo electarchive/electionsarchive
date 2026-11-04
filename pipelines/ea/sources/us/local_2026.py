@@ -2362,6 +2362,51 @@ IA_TOWNSHIP_FILES = {
         "https://www.polkcountyiowa.gov/media/5b2d1i3a/sheldahl_1_twp-sample.pdf",
         "polk-sheldahl-1-twp.pdf",
     ),
+    "IA-19045": (
+        "Clinton County Auditor",
+        "https://elections.clintoncounty-ia.gov/news/public_notice_of_general_election_november_3rd_2026/",
+        "clinton-notice.html",
+    ),
+    "IA-19155-knox": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-knox.pdf",
+    ),
+    "IA-19155-pleasant": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-pleasant.pdf",
+    ),
+    "IA-19155-boomer": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-boomer.pdf",
+    ),
+    "IA-19155-neola": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-neola.pdf",
+    ),
+    "IA-19155-carson": (
+        "Pottawattamie County Auditor",
+        "https://www.pottcounty-ia.gov",
+        "pottawattamie-carson.pdf",
+    ),
+    "IA-19053-bloomington": (
+        "Decatur County Auditor",
+        "https://www.decaturcountyiowa.com",
+        "decatur-bloomington.pdf",
+    ),
+    "IA-19053-morgan": (
+        "Decatur County Auditor",
+        "https://www.decaturcountyiowa.com",
+        "decatur-morgan.pdf",
+    ),
+    "IA-19073-franklin": (
+        "Greene County Auditor",
+        "https://www.greenecounty.iowa.gov",
+        "greene-franklin.pdf",
+    ),
     "IA-19185": (
         "Wayne County Auditor",
         "https://waynecountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
