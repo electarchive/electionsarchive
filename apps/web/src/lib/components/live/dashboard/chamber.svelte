@@ -4,6 +4,7 @@
   import type { ChamberView, Family, Seat } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
   import { numbers, percent } from "#lib/format.js";
+  import { swing } from "#lib/live/flips.js";
   import { pointAt } from "#lib/live/hover.js";
   import { breakdown, odds } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
@@ -94,6 +95,7 @@
       view.tallies.right.holdover,
   );
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
+  const changing = $derived(swing(view.order.map((seat) => seat.shift)));
   const families = $derived([
     { family: left, tally: view.tallies.left },
     { family: right, tally: view.tallies.right },
@@ -163,13 +165,26 @@
         <a
           href={href(cell.seat)}
           data-cell={index}
-          class="grid place-items-center rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
+          class={cn(
+            "grid place-items-center rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground",
+            {
+              "shadow-[inset_0_0_0_1.5px_var(--foreground)]":
+                cell.seat.shift?.flip === "flipped",
+              "shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--foreground)_55%,transparent)]":
+                cell.seat.shift?.flip === "leading",
+            },
+          )}
           style:background-color={shade(cell.seat)}
           aria-label={label(cell.seat)}>{@render pip(cell.seat)}</a
         >
       {:else}
         <span
-          class="grid place-items-center rounded-[1px] block-3.5"
+          class={cn("grid place-items-center rounded-[1px] block-3.5", {
+            "shadow-[inset_0_0_0_1.5px_var(--foreground)]":
+              cell.seat.shift?.flip === "flipped",
+            "shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--foreground)_55%,transparent)]":
+              cell.seat.shift?.flip === "leading",
+          })}
           style:background-color={shade(cell.seat)}
           >{@render pip(cell.seat)}</span
         >
@@ -303,6 +318,24 @@
   {/if}
 
   {@render legend()}
+  {#if changing.flipped + changing.leading > 0}
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+      <span class="flex items-center gap-1.5"
+        ><span
+          class="rounded-[1px] bg-muted shadow-[inset_0_0_0_1.5px_var(--foreground)] block-3 inline-3"
+        ></span>{m.night_chamber_flipped({ count: changing.flipped })}</span
+      >
+      {#if changing.leading > 0}
+        <span class="flex items-center gap-1.5 text-muted-foreground"
+          ><span
+            class="rounded-[1px] bg-muted shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--foreground)_55%,transparent)] block-3 inline-3"
+          ></span>{m.night_chamber_leading_flip({
+            count: changing.leading,
+          })}</span
+        >
+      {/if}
+    </p>
+  {/if}
   <Called seats={view.order} />
 
   {#if forecasts && isInformed}

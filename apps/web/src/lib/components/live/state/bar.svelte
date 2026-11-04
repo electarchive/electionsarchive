@@ -1,16 +1,33 @@
 <script lang="ts">
   import type { Seating, Side } from "#lib/live/ballot.js";
   import { count } from "#lib/format.js";
+  import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
   const { seats, isSmall = false }: { seats: Seating; isSmall?: boolean } =
     $props();
 
   type Kind = "won" | "ahead" | "holdover" | "waiting";
+  type Part = Kind | "gainedWon" | "gainedAhead";
 
   const WAITING =
     "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
-  const OUTER: Array<Kind> = ["holdover", "won", "ahead", "waiting"];
+  const OUTER: Array<Part> = [
+    "holdover",
+    "won",
+    "gainedWon",
+    "ahead",
+    "gainedAhead",
+    "waiting",
+  ];
+  const BASE: Record<Part, Kind> = {
+    holdover: "holdover",
+    won: "won",
+    gainedWon: "won",
+    ahead: "ahead",
+    gainedAhead: "ahead",
+    waiting: "waiting",
+  };
 
   const segments = $derived.by(() => {
     const found: Array<{
@@ -18,14 +35,21 @@
       size: number;
       color: string;
       kind: Kind;
+      isGain: boolean;
     }> = [];
-    const push = (side: Side, order: Array<Kind>) => {
-      for (const kind of order) {
+    const push = (side: Side, order: Array<Part>) => {
+      for (const part of order) {
         found.push({
-          key: `${side.id}:${kind}`,
-          size: side[kind],
+          key: `${side.id}:${part}`,
+          size:
+            part === "won"
+              ? side.won - side.gainedWon
+              : part === "ahead"
+                ? side.ahead - side.gainedAhead
+                : side[part],
           color: side.color,
-          kind,
+          kind: BASE[part],
+          isGain: part === "gainedWon" || part === "gainedAhead",
         });
       }
     };
@@ -40,11 +64,20 @@
       size: seats.waiting,
       color: "",
       kind: "waiting",
+      isGain: false,
     });
     if (seats.right != null) {
       push(seats.right, OUTER.toReversed());
     }
     return found.filter((segment) => segment.size > 0);
+  });
+
+  const gained = $derived.by(() => {
+    let found = 0;
+    for (const side of [seats.left, ...seats.rest, seats.right]) {
+      found += (side?.gainedWon ?? 0) + (side?.gainedAhead ?? 0);
+    }
+    return found;
   });
 
   function tally(side: Side) {
@@ -82,7 +115,10 @@
   >
     {#each segments as segment (segment.key)}
       <span
-        class="transition-[flex-grow] duration-700 block-full motion-reduce:transition-none"
+        class={cn(
+          "transition-[flex-grow] duration-700 block-full motion-reduce:transition-none",
+          { "shadow-[inset_0_-3px_0_var(--foreground)]": segment.isGain },
+        )}
         style:flex-grow={segment.size}
         style:background-color={segment.kind === "holdover"
           ? undefined
@@ -102,15 +138,22 @@
   {#if !isSmall}
     <div
       class="flex justify-between gap-3 font-figures text-sm font-bold tabular-nums"
-      aria-hidden="true"
     >
       {#if seats.left != null}
-        <span style:color={seats.left.color}
+        <span aria-hidden="true" style:color={seats.left.color}
           >{seats.left.short} {count(tally(seats.left))}</span
         >
       {/if}
+      {#if gained > 0}
+        <span
+          class="flex items-center gap-1.5 self-center font-sans text-xs font-semibold text-muted-foreground"
+          ><span
+            class="bg-muted shadow-[inset_0_-3px_0_var(--foreground)] block-3 inline-4"
+          ></span>{m.night_bar_gained({ count: count(gained) })}</span
+        >
+      {/if}
       {#if seats.right != null}
-        <span style:color={seats.right.color}
+        <span aria-hidden="true" style:color={seats.right.color}
           >{count(tally(seats.right))} {seats.right.short}</span
         >
       {/if}

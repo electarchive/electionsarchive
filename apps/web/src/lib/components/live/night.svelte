@@ -26,7 +26,7 @@
   }: {
     data: LivePage & {
       ballot?: Ballot | null;
-      seat?: { held: Holder | null } | null;
+      seat?: { held: Holder | null; families: Record<string, string> } | null;
     };
     election: LiveElection;
     estimates: Record<string, LiveEstimate>;

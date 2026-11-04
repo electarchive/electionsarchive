@@ -4,12 +4,15 @@ import type {
   LiveOffice,
   LiveRace,
 } from "@ea/analytics/live";
+import type { Shift } from "#lib/live/flips.js";
 import type { Summary } from "#lib/live/summary.js";
 import type {
   BallotContest,
   BallotParty,
   BallotTier,
 } from "#lib/server/live-ballot.js";
+import { shift } from "#lib/live/flips.js";
+import { tone } from "#lib/live/format.js";
 import { summarize } from "#lib/live/summary.js";
 import { side, swatch, UNAFFILIATED } from "#lib/party.js";
 
@@ -22,6 +25,7 @@ export type Entry = {
   side: string | null;
   isLive: boolean;
   isFlip: boolean;
+  shift: Shift | null;
   isUnopposed: boolean;
 };
 
@@ -148,23 +152,46 @@ export function entries({
     const pick = summary.winner ?? summary.leader;
     const side =
       pick?.party == null ? null : (families[pick.party.id] ?? pick.party.id);
+    const changing = contest.isMeasure
+      ? null
+      : shift({
+          held: held?.id ?? null,
+          to: side,
+          isCalled: (summary.winner ?? summary.projected) != null,
+          isCounting: summary.total > 0,
+        });
     return {
       contest,
       summary,
       held,
       isLive: found != null,
       side,
-      isFlip:
-        held != null &&
-        side != null &&
-        (summary.winner ?? summary.projected) != null &&
-        side !== held.id,
+      isFlip: changing?.flip === "flipped",
+      shift: changing,
       isUnopposed:
         !contest.isMeasure &&
         race.options.filter((option) => !option.isWriteIn).length <=
           contest.seats,
     };
   });
+}
+
+export type Turn = {
+  flip: "flipped" | "leading";
+  to: { short: string; color: string };
+};
+
+export function turn(entry: Entry): Turn | null {
+  const found = entry.shift;
+  const { summary } = entry;
+  const pick = summary.winner ?? summary.projected ?? summary.leader;
+  if (found == null || found.flip === "held" || pick == null) {
+    return null;
+  }
+  return {
+    flip: found.flip,
+    to: { short: pick.party?.short ?? "", color: tone(pick) },
+  };
 }
 
 export function district(entry: Entry) {
@@ -178,6 +205,8 @@ export type Side = Holder & {
   ahead: number;
   holdover: number;
   waiting: number;
+  gainedWon: number;
+  gainedAhead: number;
 };
 
 export function seating(
@@ -202,6 +231,8 @@ export function seating(
       ahead: 0,
       holdover: 0,
       waiting: 0,
+      gainedWon: 0,
+      gainedAhead: 0,
     };
     found.set(id, side);
     return side;
@@ -226,10 +257,16 @@ export function seating(
       } else {
         take(entry.held.id).waiting += seats;
       }
-    } else if (entry.summary.winner == null) {
-      take(entry.side).ahead += seats;
     } else {
-      take(entry.side).won += seats;
+      const side = take(entry.side);
+      const isGain = entry.shift != null && entry.shift.flip !== "held";
+      if (entry.summary.winner == null) {
+        side.ahead += seats;
+        side.gainedAhead += isGain ? seats : 0;
+      } else {
+        side.won += seats;
+        side.gainedWon += isGain ? seats : 0;
+      }
     }
   }
   const sides = [...found.values()]

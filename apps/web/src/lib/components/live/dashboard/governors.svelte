@@ -69,7 +69,12 @@
                 isLinked,
             },
             { "text-white": isStrong, "text-foreground": !isStrong },
-            { "shadow-[inset_0_0_0_2px_var(--foreground)]": seat.isFlip },
+            {
+              "shadow-[inset_0_0_0_2px_var(--foreground)]":
+                seat.shift?.flip === "flipped",
+              "outline-1 -outline-offset-3 outline-foreground/60 outline-dashed":
+                seat.shift?.flip === "leading",
+            },
           )}
           style:background-color={shade(seat)}
           aria-label={isLinked ? label(seat) : undefined}

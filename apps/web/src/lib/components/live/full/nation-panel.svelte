@@ -239,7 +239,7 @@
             >{entry.label}</span
           >
           {#if flip != null}
-            <Flip party={flip.party} color={flip.color} />
+            <Flip flip={flip.flip} from={flip.from} to={flip.to} />
           {/if}
         </span>
         <span class="truncate text-xs text-muted-foreground"

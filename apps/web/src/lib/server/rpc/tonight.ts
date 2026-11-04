@@ -144,7 +144,7 @@ function describe(
   };
 }
 
-async function holders(
+export async function holders(
   races: Array<LiveRace>,
   date: string,
   key: string,

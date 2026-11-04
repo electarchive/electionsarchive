@@ -24,7 +24,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
     seat:
       contest == null || contest.isMeasure
         ? null
-        : { held: holder(state?.parties ?? {}, contest.held) },
+        : {
+            held: holder(state?.parties ?? {}, contest.held),
+            families: state?.families ?? {},
+          },
   };
 };
 

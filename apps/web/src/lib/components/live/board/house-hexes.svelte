@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
+  import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Hexes from "#lib/components/live/hexes.svelte";
   import { percent } from "#lib/format.js";
   import {
@@ -54,6 +55,17 @@
         >
         <Mark {summary} />
       </span>
+      {const found = $derived(desk.shifts.get(summary.race.id))}
+      {#if found != null && found.flip !== "held"}
+        <span
+          ><Flip
+            flip={found.flip}
+            from={desk.party(found.from)}
+            to={desk.party(found.to)}
+            isLabeled={true}
+          /></span
+        >
+      {/if}
     {/if}
     {#if summary.counted != null}
       <span class="text-muted-foreground"

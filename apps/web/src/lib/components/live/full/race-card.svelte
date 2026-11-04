@@ -36,7 +36,11 @@
       person: string;
       name: string;
     } | null;
-    flip: { party: string; color: string } | null;
+    flip: {
+      flip: "flipped" | "leading";
+      from: { short: string; color: string };
+      to: { short: string; color: string };
+    } | null;
     closes: number;
     clock: number;
     forecasts: boolean;
@@ -337,7 +341,7 @@
             />)</span
           >
           {#if flip != null}
-            <Flip party={flip.party} color={flip.color} />
+            <Flip flip={flip.flip} from={flip.from} to={flip.to} />
           {/if}
         </dd>
       {/if}

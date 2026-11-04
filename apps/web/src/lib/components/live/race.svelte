@@ -11,7 +11,15 @@
   import Cycle from "#lib/components/live/cycle.svelte";
   import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
-  import { bandFor, clock, lead, placeSlug, stamp } from "#lib/live/format.js";
+  import { shift } from "#lib/live/flips.js";
+  import {
+    bandFor,
+    clock,
+    lead,
+    placeSlug,
+    stamp,
+    tone,
+  } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
   import { liveLinks } from "#lib/live/links.js";
   import { sides } from "#lib/live/local.js";
@@ -22,6 +30,7 @@
   import { cn } from "#lib/utils.js";
   import Answers from "./answers.svelte";
   import BandLabel from "./band-label.svelte";
+  import Flip from "./dashboard/flip.svelte";
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
@@ -52,7 +61,7 @@
     election: LiveElection;
     race: LiveRace;
     geography: Geography | null;
-    seat?: { held: Holder | null } | null;
+    seat?: { held: Holder | null; families: Record<string, string> } | null;
     base?: string | null;
     clock: number;
     at?: string | null;
@@ -187,6 +196,27 @@
     ),
   );
   const opens = $derived(closes - 3_600_000);
+  const flip = $derived.by(() => {
+    const called =
+      projected ??
+      options.find((option) => winners.includes(option.id)) ??
+      null;
+    const ahead =
+      called ?? (now.total > 0 ? (options[now.order[0] ?? -1] ?? null) : null);
+    const party = ahead?.party ?? null;
+    const found = shift({
+      held: seat?.held?.id ?? null,
+      to: party == null ? null : (seat?.families[party.id] ?? party.id),
+      isCalled: called != null,
+      isCounting: now.total > 0,
+    });
+    return ahead == null || found == null || found.flip === "held"
+      ? null
+      : {
+          flip: found.flip,
+          to: { short: party?.short ?? "", color: tone(ahead) },
+        };
+  });
   const isWaiting = $derived(now.total === 0);
   const later = $derived(
     isWaiting &&
@@ -502,6 +532,14 @@
       {/if}
       {#if seat != null}
         <Seat held={seat.held} />
+        {#if flip != null}
+          <Flip
+            flip={flip.flip}
+            from={seat.held}
+            to={flip.to}
+            isLabeled={true}
+          />
+        {/if}
       {/if}
       <BoardLink election={election.slug} race={race.slug} />
       <MapLink election={election.slug} state={race.state} race={race.slug} />

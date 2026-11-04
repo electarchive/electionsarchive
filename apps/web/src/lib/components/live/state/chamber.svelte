@@ -1,10 +1,13 @@
 <script lang="ts">
   import SearchIcon from "@lucide/svelte/icons/search";
   import type { Entry, Seating, Side } from "#lib/live/ballot.js";
+  import type { Flip } from "#lib/live/flips.js";
   import type { Geography } from "#lib/live/standing.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
+  import { district } from "#lib/live/ballot.js";
+  import { FLIP_ORDER } from "#lib/live/flips.js";
   import { fold, tokenize } from "#lib/live/local.js";
   import { m } from "#lib/paraglide/messages.js";
   import Bar from "./bar.svelte";
@@ -32,7 +35,8 @@
   const PAGE = 12;
 
   let query = $state("");
-  let filter = $state<"all" | "flips">("all");
+  let filter = $state<"all" | Flip>("all");
+  let order = $state<"district" | "flips" | "margin">("district");
   let isOpen = $state(false);
 
   const up = $derived.by(() => {
@@ -42,25 +46,11 @@
     }
     return found;
   });
-  const flips = $derived(entries.filter((entry) => entry.isFlip));
   const tokens = $derived(tokenize(query));
-  const matched = $derived(
-    (filter === "flips" ? flips : entries).filter(
-      (entry) =>
-        tokens.length === 0 ||
-        tokens.every((token) =>
-          fold(
-            [
-              label(entry),
-              entry.contest.seat ?? "",
-              ...entry.contest.options.map((option) => option.name),
-            ].join(" "),
-          ).includes(token),
-        ),
-    ),
-  );
-  const shown = $derived(
-    isOpen || tokens.length > 0 ? matched : matched.slice(0, PAGE),
+  const changing = $derived(
+    entries.filter(
+      (entry) => entry.shift != null && entry.shift.flip !== "held",
+    ).length,
   );
   const filters = $derived([
     {
@@ -68,7 +58,62 @@
       label: m.night_local_all(),
       count: entries.length,
     },
-    { value: "flips" as const, label: m.night_flip(), count: flips.length },
+    ...(
+      [
+        ["flipped", m.night_flip_status_flipped],
+        ["leading", m.night_flip_status_leading],
+        ["held", m.night_flip_status_held],
+      ] as const
+    )
+      .map(([value, name]) => ({
+        value,
+        label: name(),
+        count: entries.filter((entry) => entry.shift?.flip === value).length,
+      }))
+      .filter((option) => option.count > 0),
+  ]);
+  const active = $derived(
+    filters.some((option) => option.value === filter) ? filter : "all",
+  );
+  const matched = $derived(
+    entries.filter(
+      (entry) =>
+        (active === "all" || entry.shift?.flip === active) &&
+        (tokens.length === 0 ||
+          tokens.every((token) =>
+            fold(
+              [
+                label(entry),
+                entry.contest.seat ?? "",
+                ...entry.contest.options.map((option) => option.name),
+              ].join(" "),
+            ).includes(token),
+          )),
+    ),
+  );
+  const sorted = $derived(
+    order === "district"
+      ? matched
+      : matched.toSorted((a, b) =>
+          order === "flips"
+            ? flipRank(b) - flipRank(a) ||
+              a.summary.margin - b.summary.margin ||
+              district(a) - district(b)
+            : Number(a.summary.total === 0) - Number(b.summary.total === 0) ||
+              a.summary.margin - b.summary.margin,
+        ),
+  );
+
+  function flipRank(entry: Entry) {
+    return entry.shift == null ? -1 : FLIP_ORDER[entry.shift.flip];
+  }
+  const shown = $derived(
+    isOpen || tokens.length > 0 ? sorted : sorted.slice(0, PAGE),
+  );
+  const orders = $derived([
+    { value: "district" as const, label: m.night_state_sort_district() },
+    { value: "flips" as const, label: m.night_state_sort_flips() },
+    { value: "margin" as const, label: m.night_state_sort_margin() },
   ]);
   const ordered = $derived(
     [seats.left, ...seats.rest, seats.right].filter(
@@ -160,14 +205,20 @@
           aria-label={m.night_state_search()}
         />
       </label>
-      {#if flips.length > 0}
+      {#if changing > 0}
         <Segmented
           options={filters}
-          bind:value={filter}
+          bind:value={() => active, (value: "all" | Flip) => (filter = value)}
           label={m.night_state_filter()}
           size="sm"
         />
       {/if}
+      <Segmented
+        options={orders}
+        bind:value={order}
+        label={m.night_state_sort()}
+        size="sm"
+      />
     </div>
     {#if matched.length === 0}
       <p class="py-3 text-sm text-muted-foreground">

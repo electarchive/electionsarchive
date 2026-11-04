@@ -18,6 +18,7 @@
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
   import { dates, numbers, percent } from "#lib/format.js";
+  import { swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
     compact,
@@ -50,6 +51,7 @@
   import Ladder from "./dashboard/ladder.svelte";
   import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
+  import Swing from "./dashboard/swing.svelte";
   import Hexes from "./hexes.svelte";
   import LaterKey from "./later-key.svelte";
   import Locals from "./locals.svelte";
@@ -263,7 +265,7 @@
     }
     return found;
   });
-  const flips = $derived(seats.filter((entry) => entry.isFlip).length);
+  const flips = $derived(swing(seats.map((entry) => entry.shift)));
   const newest = $derived(election.newest);
   const isLive = $derived(counting > 0 && !election.isCertified);
 
@@ -289,6 +291,10 @@
 
   const parties = $derived(reach(election.races));
   provideReach(() => parties);
+
+  function partyOf(id: string) {
+    return { short: short(id), color: tint(id) };
+  }
 
   function short(id: string | null) {
     if (id == null) {
@@ -337,10 +343,11 @@
       return strength(summary);
     }
     if (wanted === "flips") {
-      if (!entry.isFlip) {
+      const found = entry.shift;
+      if (found == null || found.flip === "held") {
         return summary.total > 0 ? MUTED : WAITING;
       }
-      return `color-mix(in oklab, ${tint(entry.side)} ${entry.rating === "won" || entry.rating === "projected" ? 100 : 70}%, var(--background))`;
+      return `color-mix(in oklab, ${tint(found.to)} ${found.flip === "flipped" ? 100 : 45}%, var(--background))`;
     }
     if (entry.rating === "waiting" || entry.rating === "counting") {
       return summary.total > 0
@@ -562,8 +569,12 @@
       <span class="shrink-0 font-figures text-muted-foreground tabular-nums"
         >+{lead(summary.margin)}</span
       >
-      {#if entry?.isFlip === true}
-        <Flip party={short(entry.side)} color={tint(entry.side)} />
+      {#if entry?.shift != null && entry.shift.flip !== "held"}
+        <Flip
+          flip={entry.shift.flip}
+          from={partyOf(entry.shift.from)}
+          to={partyOf(entry.shift.to)}
+        />
       {/if}
     </span>
   {/if}
@@ -813,8 +824,8 @@
         {/if}
         <div class="grid">
           <dt class="text-xs text-muted-foreground">{m.night_kpi_flips()}</dt>
-          <dd class="font-figures text-2xl font-[760] tabular-nums">
-            {flips}
+          <dd>
+            <Swing swing={flips} party={partyOf} />
           </dd>
         </div>
       {/if}
@@ -880,7 +891,10 @@
             entry?.held == null
               ? null
               : { short: short(entry.held), color: tint(entry.held) },
-          isFlip: entry?.isFlip ?? false,
+          flip:
+            entry?.shift == null || entry.shift.flip === "held"
+              ? null
+              : { flip: entry.shift.flip, to: partyOf(entry.shift.to) },
         };
       }}
       {href}

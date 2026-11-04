@@ -4,7 +4,8 @@
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { paint, tone } from "#lib/live/format.js";
+  import { turn } from "#lib/live/ballot.js";
+  import { paint } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { bandOf } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -18,6 +19,7 @@
   const summary = $derived(entry.summary);
   const race = $derived(summary.race);
   const band = $derived(bandOf(summary));
+  const flip = $derived(turn(entry));
   const reach = useReach();
   const split = $derived(lineup(race, summary.totals, reach(), 4));
 </script>
@@ -37,13 +39,12 @@
   <span class="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
     <span class="heading text-lg! text-pretty">{title}</span>
     <span class="flex items-center gap-1.5 pbs-1">
-      {#if entry.isFlip}
-        {const pick = $derived(
-          summary.winner ?? summary.projected ?? summary.leader,
-        )}
+      {#if flip != null}
         <Flip
-          party={pick?.party?.short ?? ""}
-          color={tone(pick ?? undefined)}
+          flip={flip.flip}
+          from={entry.held}
+          to={flip.to}
+          isInverse={band != null}
         />
       {/if}
       <Seat held={entry.held} isPlain={band != null} />

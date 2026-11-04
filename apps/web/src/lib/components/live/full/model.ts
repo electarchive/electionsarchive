@@ -165,12 +165,13 @@ export function shade(
     );
   }
   if (paint === "flips") {
-    if (!entry.isFlip) {
+    const found = entry.shift;
+    if (found == null || found.flip === "held") {
       return summary.total > 0 ? MUTED : WAITING;
     }
     return mix(
-      tint(pair, control, entry.side),
-      entry.rating === "won" || entry.rating === "projected" ? 100 : 70,
+      tint(pair, control, found.to),
+      found.flip === "flipped" ? 100 : 45,
     );
   }
   if (entry.rating === "waiting" || entry.rating === "counting") {
@@ -370,14 +371,18 @@ export function flipped(
   pair: [Family, Family] | null,
   control: Control | null,
 ) {
-  if (entry?.isFlip !== true || entry.side == null) {
+  const found = entry?.shift;
+  if (found == null || found.flip === "held") {
     return null;
   }
-  const side = pair?.find((family) => family.id === entry.side);
-  return {
-    party: side?.short ?? control?.parties[entry.side]?.short ?? "",
-    color: tint(pair, control, entry.side),
-  };
+  const party = (id: string) => ({
+    short:
+      pair?.find((family) => family.id === id)?.short ??
+      control?.parties[id]?.short ??
+      "",
+    color: tint(pair, control, id),
+  });
+  return { flip: found.flip, from: party(found.from), to: party(found.to) };
 }
 
 export function seatName(race: LiveRace, states: (code: string) => string) {

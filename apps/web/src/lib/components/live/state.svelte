@@ -6,7 +6,14 @@
   import type { Ballot, BallotTier } from "#lib/server/live-ballot.js";
   import ViewLinks from "#lib/components/live/view-links.svelte";
   import { count } from "#lib/format.js";
-  import { district, entries as entriesOf, seating } from "#lib/live/ballot.js";
+  import {
+    district,
+    entries as entriesOf,
+    holder,
+    seating,
+    turn,
+  } from "#lib/live/ballot.js";
+  import { swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
     HATCH,
@@ -19,6 +26,7 @@
   import { standing } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Swing from "./dashboard/swing.svelte";
   import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
   import Bar from "./state/bar.svelte";
@@ -116,7 +124,16 @@
   const counting = $derived(
     everything.filter((entry) => entry.summary.total > 0).length,
   );
-  const flips = $derived(everything.filter((entry) => entry.isFlip).length);
+  const flips = $derived(swing(everything.map((entry) => entry.shift)));
+
+  function partyOf(id: string) {
+    return (
+      holder(ballot.parties, id) ?? {
+        short: "–",
+        color: "var(--muted-foreground)",
+      }
+    );
+  }
   const isLive = $derived(counting > 0 && !election.isCertified);
   const later = $derived(
     election.later?.[ballot.state]?.feed === "none" && counting === 0
@@ -315,7 +332,7 @@
       </div>
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_kpi_flips()}</dt>
-        <dd class="font-figures text-2xl font-[760] tabular-nums">{flips}</dd>
+        <dd><Swing swing={flips} party={partyOf} /></dd>
       </div>
       {#if closes != null}
         <div class="grid">
@@ -535,7 +552,7 @@
                       summary={entry.summary}
                       heading={seatLabel(entry)}
                       held={entry.held}
-                      isFlip={entry.isFlip}
+                      flip={turn(entry)}
                       closes={closes == null ? null : Date.parse(closes)}
                     />
                   {/snippet}
@@ -646,7 +663,7 @@
     <Card
       summary={entry.summary}
       held={entry.held}
-      isFlip={entry.isFlip}
+      flip={turn(entry)}
       closes={closes == null ? null : Date.parse(closes)}
     />
   </Sheet>

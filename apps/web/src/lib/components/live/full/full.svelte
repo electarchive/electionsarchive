@@ -26,6 +26,7 @@
   import { strengths } from "#lib/atlas/color.js";
   import Drawer from "#lib/atlas/drawer.svelte";
   import Cycle from "#lib/components/live/cycle.svelte";
+  import Flip from "#lib/components/live/dashboard/flip.svelte";
   import Dial from "#lib/components/live/dial.svelte";
   import RacePicker from "#lib/components/live/race-picker.svelte";
   import Search from "#lib/components/live/search.svelte";
@@ -39,7 +40,7 @@
   import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
-  import { entries as entriesOf, seating } from "#lib/live/ballot.js";
+  import { entries as entriesOf, seating, turn } from "#lib/live/ballot.js";
   import {
     lead,
     placeName,
@@ -2138,7 +2139,7 @@
           <Card
             summary={entry.summary}
             held={entry.held}
-            isFlip={entry.isFlip}
+            flip={turn(entry)}
             closes={closing(election, entry.summary.race)}
             limit={5}
           />
@@ -2235,10 +2236,12 @@
                 <span
                   class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"
                   >{seatName(summary.race, stateName)}
-                  {#if flip != null}<span
-                      class="text-[0.6875rem]"
-                      style:color={flip.color}>{m.night_flip()}</span
-                    >{/if}</span
+                  {#if flip != null}<Flip
+                      flip={flip.flip}
+                      from={flip.from}
+                      to={flip.to}
+                      isCompact={true}
+                    />{/if}</span
                 >
                 <span class="truncate text-xs text-muted-foreground"
                   >{verdict(summary)}</span

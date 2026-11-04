@@ -4,6 +4,7 @@
   import { on } from "svelte/events";
   import { prefersReducedMotion } from "svelte/motion";
   import { fly } from "svelte/transition";
+  import type { Turn } from "#lib/live/ballot.js";
   import type { Summary } from "#lib/live/summary.js";
   import Card from "#lib/components/live/state/card.svelte";
   import Peek from "#lib/components/live/state/peek.svelte";
@@ -32,7 +33,7 @@
     closes: (summary: Summary) => number;
     describe: (summary: Summary) => {
       held: { short: string; color: string } | null;
-      isFlip: boolean;
+      flip: Turn | null;
     };
     href: (code: string) => string;
   } = $props();
@@ -353,7 +354,7 @@
             summary={item.summary}
             heading={item.heading}
             held={described.held}
-            isFlip={described.isFlip}
+            flip={described.flip}
           />
         </div>
       {/each}

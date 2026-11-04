@@ -2,8 +2,11 @@
   import type { LiveOffice } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
+  import Flip from "#lib/components/live/dashboard/flip.svelte";
+  import Swing from "#lib/components/live/dashboard/swing.svelte";
   import { percent } from "#lib/format.js";
   import { ahead, called, short } from "#lib/live/board/labels.js";
+  import { swing } from "#lib/live/flips.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -28,11 +31,12 @@
       if (kind === "closest" && called(summary) == null) {
         found.push(summary);
       }
+      const changing = desk.shifts.get(summary.race.id);
       if (
         kind === "flips" &&
         option != null &&
-        !option.isIncumbent &&
-        summary.race.options.some((entry) => entry.isIncumbent)
+        changing != null &&
+        changing.flip !== "held"
       ) {
         found.push(summary);
       }
@@ -44,6 +48,11 @@
           b.margin - a.margin,
     );
   });
+  const changing = $derived(
+    kind === "flips"
+      ? swing(rows.map((summary) => desk.shifts.get(summary.race.id) ?? null))
+      : null,
+  );
 </script>
 
 {#if rows.length === 0}
@@ -51,6 +60,15 @@
     {kind === "closest" ? m.board_closest_empty() : m.board_flips_empty()}
   </p>
 {:else}
+  {#if changing != null}
+    <div class="pbe-1 text-[0.8125em]">
+      <Swing
+        swing={changing}
+        party={(id: string) => desk.party(id)}
+        isSmall={true}
+      />
+    </div>
+  {/if}
   <ol class="grid text-[0.8125em]">
     {#each rows as summary (summary.race.id)}
       {const option = $derived(ahead(summary))}
@@ -75,6 +93,15 @@
               >{surname(option ?? undefined)}</span
             >
             <Mark {summary} />
+            {const found = $derived(desk.shifts.get(summary.race.id))}
+            {#if kind === "flips" && found != null && found.flip !== "held"}
+              <Flip
+                flip={found.flip}
+                from={desk.party(found.from)}
+                to={desk.party(found.to)}
+                isCompact={true}
+              />
+            {/if}
           </span>
           <span class="font-figures font-semibold tabular-nums"
             >+{lead(summary.margin)}</span

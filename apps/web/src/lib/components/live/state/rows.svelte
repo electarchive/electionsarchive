@@ -4,6 +4,7 @@
   import type { Entry } from "#lib/live/ballot.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
+  import { turn } from "#lib/live/ballot.js";
   import { lead, paint, stamp, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { highlight } from "#lib/live/local.js";
@@ -77,7 +78,15 @@
               >{@render marked(label(entry))}</span
             >
             <span class="flex flex-wrap items-center gap-1">
-              {#if entry.held != null}
+              {const flip = $derived(turn(entry))}
+              {#if flip != null}
+                <Flip
+                  flip={flip.flip}
+                  from={entry.held}
+                  to={flip.to}
+                  isCompact={true}
+                />
+              {:else if entry.held != null}
                 <span
                   class="flex items-center gap-1 text-[0.6875rem] text-muted-foreground"
                   title={m.night_state_held({ party: entry.held.name })}
@@ -87,15 +96,6 @@
                     style:background-color={entry.held.color}
                   ></span>{entry.held.short}</span
                 >
-              {/if}
-              {#if entry.isFlip && entry.side != null}
-                {const side = $derived(
-                  summary.winner?.party ?? summary.leader?.party ?? null,
-                )}
-                <Flip
-                  party={side?.short ?? ""}
-                  color={tone(pick ?? undefined)}
-                />
               {/if}
             </span>
           </span>

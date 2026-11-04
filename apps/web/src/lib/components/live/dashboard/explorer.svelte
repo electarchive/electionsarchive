@@ -9,6 +9,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { fits } from "#lib/fits.js";
   import { percent } from "#lib/format.js";
+  import { FLIP_ORDER, swing } from "#lib/live/flips.js";
   import {
     clock,
     compact,
@@ -23,6 +24,7 @@
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
   import Flip from "./flip.svelte";
+  import Swing from "./swing.svelte";
 
   const {
     seats,
@@ -46,7 +48,14 @@
 
   type Office = "all" | "senate" | "governor" | "house";
   type Focus = "all" | "close" | "flips" | "upsets" | "left";
-  type Key = "race" | "margin" | "counted" | "remaining" | "chance" | "at";
+  type Key =
+    | "race"
+    | "flip"
+    | "margin"
+    | "counted"
+    | "remaining"
+    | "chance"
+    | "at";
 
   const left = $derived(sides[0]);
   const right = $derived(sides[1]);
@@ -77,7 +86,7 @@
       seat.summary.margin < 0.02 &&
       seat.rating !== "won" &&
       seat.rating !== "projected",
-    flips: (seat) => seat.isFlip,
+    flips: (seat) => seat.shift != null && seat.shift.flip !== "held",
     upsets: (seat) => seat.isUpset,
     left: (seat) => (seat.remaining ?? 0) > 0,
   };
@@ -121,6 +130,10 @@
 
   const VALUES: Record<Key, (seat: Seat) => number | string | null> = {
     race: (seat) => label(seat),
+    flip: (seat) =>
+      seat.shift == null
+        ? null
+        : FLIP_ORDER[seat.shift.flip] * 2 - seat.summary.margin,
     margin: (seat) => (seat.summary.total === 0 ? null : seat.summary.margin),
     counted: (seat) => seat.summary.counted ?? null,
     remaining: (seat) => seat.remaining ?? null,
@@ -147,6 +160,7 @@
       return isAscending ? order : -order;
     }),
   );
+  const changing = $derived(swing(byOffice.map((seat) => seat.shift)));
   const windowed = new Windowed(() => ({
     items: sorted,
     key: (seat) => seat.summary.race.id,
@@ -185,7 +199,7 @@
     Array<{ id: Key | null; label: string; isEnd: boolean; width: number }>
   >([
     { id: "race", label: m.night_explorer_race(), isEnd: false, width: 12 },
-    { id: null, label: m.night_explorer_held(), isEnd: false, width: 10 },
+    { id: "flip", label: m.night_explorer_held(), isEnd: false, width: 11 },
     { id: null, label: m.night_explorer_leader(), isEnd: false, width: 11 },
     { id: "margin", label: m.night_explorer_margin(), isEnd: false, width: 10 },
     {
@@ -227,6 +241,10 @@
     isAscending = next === "race" || next === "margin";
   }
 
+  function partyOf(id: string) {
+    return { short: short(id), color: tint(id) };
+  }
+
   function place50(value: number) {
     return 50 - (Math.max(-SCALE, Math.min(SCALE, value)) / SCALE) * 50;
   }
@@ -260,6 +278,9 @@
       size="sm"
       class="max-sm:-mx-4 max-sm:px-4 max-sm:max-inline-[calc(100%+2rem)]"
     />
+    {#if focus === "flips" && changing.parties.length > 0}
+      <Swing swing={changing} party={partyOf} isSmall={true} />
+    {/if}
   </div>
   <div
     class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
@@ -378,9 +399,6 @@
                   ><span class="truncate" title={label(seat)}
                     >{label(seat)}</span
                   >
-                  {#if seat.isFlip}
-                    <Flip party={short(seat.side)} color={tint(seat.side)} />
-                  {/if}
                 </span>
                 <span class="truncate text-xs text-muted-foreground"
                   >{summary.race.office === "house"
@@ -401,13 +419,22 @@
                   <span class="hidden text-muted-foreground @max-[73rem]:inline"
                     >{m.night_explorer_held()}</span
                   >
-                  <span
-                    class={cn("shrink-0 rounded-full block-2 inline-2", {
-                      "ring-1 ring-foreground": band != null,
-                    })}
-                    style:background-color={tint(seat.held)}
-                  ></span>
-                  <span class="@max-[73rem]:sr-only">{short(seat.held)}</span>
+                  {#if seat.shift != null && seat.shift.flip !== "held"}
+                    <Flip
+                      flip={seat.shift.flip}
+                      from={partyOf(seat.shift.from)}
+                      to={partyOf(seat.shift.to)}
+                      isInverse={band != null}
+                    />
+                  {:else}
+                    <span
+                      class={cn("shrink-0 rounded-full block-2 inline-2", {
+                        "ring-1 ring-foreground": band != null,
+                      })}
+                      style:background-color={tint(seat.held)}
+                    ></span>
+                    <span class="@max-[73rem]:sr-only">{short(seat.held)}</span>
+                  {/if}
                 </span>
                 <span
                   class="truncate text-xs text-muted-foreground max-inline-36 @max-[73rem]:text-foreground @max-[73rem]:max-inline-none"
