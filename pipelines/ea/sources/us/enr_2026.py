@@ -304,13 +304,17 @@ SCHOOL_COUNTIES = {
 }
 
 
+def numbered(word: str) -> bool:
+    return re.fullmatch(r"\d+[a-z]?", word) is not None
+
+
 def placed(name: list[str], words: set[str], strict: bool, whole: bool = False, apart: bool = False) -> bool:
     found = set(name) & words
-    core = {w for w in name if not w.isdigit()} - SCHOOL_WORDS
+    core = {w for w in name if not numbered(w)} - SCHOOL_WORDS
     if strict and whole and core:
-        return core <= words or not apart and any(w.isdigit() for w in found)
+        return core <= words or not apart and any(numbered(w) for w in found)
     if strict:
-        return not name or name[0] in words and 2 * len(found) > len(set(name)) or any(w.isdigit() for w in found)
+        return not name or name[0] in words and 2 * len(found) > len(set(name)) or any(numbered(w) for w in found)
     return (
         not name or bool(found) or any(a in b or len(b) > 4 and edits(a, b) for a in name for b in words if len(a) > 4)
     )
@@ -1475,7 +1479,7 @@ def plan(
             if scheme == "us.school_district":
                 schools.setdefault(owner, set())
             towns.setdefault(owner, []).append(
-                [w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | PLACE_WORDS]
+                [w for w in slug(text).split("-") if (len(w) > 2 or w.isdigit()) and w not in STOP | PLACE_WORDS]
             )
         for code, county in conn.execute(
             """select u.code, c.code from reporting_unit u
