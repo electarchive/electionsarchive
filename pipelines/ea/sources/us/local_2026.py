@@ -10182,8 +10182,13 @@ def parse() -> None:
         ("MI-26151", "Sanilac"),
         ("MI-26127", "Oceana"),
     ):
-        post, seats, unexpired = "", 0, False
+        post, seats, unexpired, wrap = "", 0, False, None
         for line in text(key, "-layout").splitlines():
+            if wrap and (found := re.match(rf" {{{wrap[1]}}}([A-Z][a-z][A-Za-z'-]*)(?:\s{{2,}}|$)", line)):
+                wrap[0]["name"] = cased(f"{wrap[2]}{'' if wrap[2].endswith('-') else ' '}{found[1]}")
+                wrap = None
+                continue
+            wrap = None
             if found := re.match(r"([A-Z][A-Z0-9 .,'&/-]*?) \(([A-Z][A-Z .,'&-]+?)\)\s*$", line):
                 title = re.sub(
                     r"^VIL ",
@@ -10220,6 +10225,7 @@ def parse() -> None:
                         "unexpired": unexpired,
                     }
                 )
+                wrap = (feeds[key][-1], found.start(3), found[3])
 
     for key, county in (("MI-26163", "Wayne"), ("MI-26049", "Genesee")):
         post, seats, unexpired = "", 0, False
