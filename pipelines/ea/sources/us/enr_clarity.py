@@ -20,7 +20,7 @@ import shapefile
 
 from ea import portals, raw
 from ea.changeset import NAMESPACE, Changeset, slug
-from ea.encoding import DOUBLED, repair, restorer
+from ea.encoding import DOUBLED, repair, restorer, sweep
 from ea.offices import Offices
 from ea.store import DATA, connect
 
@@ -3030,4 +3030,5 @@ def emit(
                     reason="a party, ballot-number, or write-in label in the name",
                 )
         repair(cs)
+        sweep(cs, source)
         return cs.write()

@@ -12,7 +12,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.encoding import decode, rekey, repair
+from ea.encoding import decode, rekey, repair, sweep
 from ea.store import DATA, connect
 
 SOURCE = "us.mn_local"
@@ -674,4 +674,5 @@ def emit() -> Path:
             ),
         )
         repair(cs)
+        sweep(cs, SOURCE)
         return cs.write()

@@ -169,3 +169,30 @@ def repair(cs: Changeset, reason: str = REASON) -> int:
             )
         count += 1
     return count
+
+
+def sweep(cs: Changeset, pipeline: str, reason: str = REASON) -> int:
+    retired = {str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])}
+    dropped = {str(row["name_id"]) for row in cs.rows.get("name_drop", [])}
+    count = 0
+    for name_id, entity, text, orphan, clean in cs.conn.execute(
+        """select n.id, n.entity_id, n.text,
+                  e.type = 'person' and not exists (select from candidacy where person_id = e.id),
+                  exists (select from name m where m.entity_id = n.entity_id and m.kind = n.kind
+                            and strpos(m.text, chr(65533)) = 0 and m.id <> n.id)
+           from name n join changeset c on c.id = n.changeset_id join entity e on e.id = n.entity_id
+           where c.pipeline = %s and e.retired_by is null and strpos(n.text, chr(65533)) > 0""",
+        [pipeline],
+    ).fetchall():
+        if str(entity) in retired or str(name_id) in dropped:
+            continue
+        if orphan:
+            retired.add(str(entity))
+            cs.add("entity_retirement", entity_id=entity, reason=reason)
+        elif clean:
+            dropped.add(str(name_id))
+            cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason=reason)
+        else:
+            continue
+        count += 1
+    return count
