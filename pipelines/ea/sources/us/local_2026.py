@@ -9162,12 +9162,24 @@ def parse() -> None:
                             + (f", {shown}" if shown else ""),
                         }
                 tail = held and geoid and f"MN:{geoid}:{held}{seat}{special}"
+            district = ""
+            if key == "MN-county" and (
+                split := re.match(r"Soil and Water Supervisor (District \d+) \((East|West|North|South)\)$", title)
+            ):
+                district = f"{split[2]} {names.get(cells[1], '')} Soil and Water Conservation District"
+                title = f"Supervisor, {split[1]}"
+            elif key == "MN-county" and (split := re.match(r"County Park Commissioner (District \d+)$", title)):
+                district = "Three Rivers Park District"
+                title = f"Commissioner, {split[1]}"
             magnitude = re.search(r"\(ELECT (\d+)\)", upper)
             feeds[key].append(
                 {
                     **claim,
+                    "district": district,
                     "county": names.get(cells[1], "") if key == "MN-county" else "",
-                    "contest": f"{names.get(cells[1], '')} County {title}"
+                    "contest": f"{district}, {title}"
+                    if district
+                    else f"{names.get(cells[1], '')} County {title}"
                     if key == "MN-county"
                     else f"{cells[5]} {title}",
                     "seats": int(magnitude[1]) if magnitude else 0,
