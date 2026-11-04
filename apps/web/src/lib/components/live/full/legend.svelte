@@ -8,15 +8,17 @@
     kind,
     sides,
     bins = null,
-    text,
+    text = null,
     blank,
+    reach = 0.1,
     isLater = false,
   }: {
-    kind: "ramp" | "counted" | "votes" | "waiting";
+    kind: "ramp" | "arrows" | "counted" | "votes" | "waiting";
     sides: Array<{ name: string; color: string }>;
     bins?: Array<{ from: number; to: number | null; strength: number }> | null;
-    text: string;
+    text?: string | null;
     blank: string;
+    reach?: number;
     isLater?: boolean;
   } = $props();
 
@@ -49,6 +51,54 @@
         {/each}
       </div>
     </div>
+  {:else if kind === "arrows" && sides[0] != null && sides[1] != null}
+    <div
+      class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[0.6875rem]/4"
+    >
+      <span class="flex items-center gap-1.5 font-semibold">
+        {#each [sides[0], sides[1]] as side, at (at)}
+          {#if at === 1}
+            <svg
+              class="block-4 inline-6"
+              viewBox="0 0 24 16"
+              fill="none"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style:color={side.color}
+              aria-hidden="true"
+              ><path
+                stroke="currentColor"
+                d="M4.6 13.2 19.4 2.8M13.4 3.2l6-.4-2.4 5.5"
+              /></svg
+            >
+          {/if}
+          <span class="truncate">{side.name}</span>
+          {#if at === 0}
+            <svg
+              class="-scale-x-100 block-4 inline-6"
+              viewBox="0 0 24 16"
+              fill="none"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style:color={side.color}
+              aria-hidden="true"
+              ><path
+                stroke="currentColor"
+                d="M4.6 13.2 19.4 2.8M13.4 3.2l6-.4-2.4 5.5"
+              /></svg
+            >
+          {/if}
+        {/each}
+      </span>
+      <span class="font-figures text-muted-foreground tabular-nums"
+        >{m.map_swing_scale({
+          low: "0",
+          high: String(Math.round(reach * 1000) / 10),
+        })}</span
+      >
+    </div>
   {:else if kind === "counted"}
     <Scale />
   {:else if kind === "waiting"}
@@ -71,7 +121,9 @@
       {/each}
     </div>
   {/if}
-  <p class="text-xs/4 text-pretty text-muted-foreground">{text}</p>
+  {#if text != null}
+    <p class="text-xs/4 text-pretty text-muted-foreground">{text}</p>
+  {/if}
   {#if isLater}
     <p class="flex items-center gap-2 text-xs/4 text-muted-foreground">
       <span

@@ -19,6 +19,12 @@ export type Paint = "lead" | "chance" | "flips" | "counted";
 export type Lens = "lead" | "shift" | "last" | "counted" | "votes";
 export type Fill = { color: string; isLater?: boolean };
 export type Dot = { areaId: string; value: number; color: string };
+export type Swing = {
+  areaId: string;
+  swing: number;
+  color: string;
+  weight: number;
+};
 
 export const OFFICES: Array<Office> = ["senate", "governor", "house"];
 export const PAINTS: Array<Paint> = ["lead", "flips", "counted", "chance"];
@@ -270,6 +276,33 @@ export function lastLeader(row: UnitStanding) {
   return {
     index: first,
     margin: (shares[first] ?? 0) - (shares[order[1] ?? -1] ?? 0),
+  };
+}
+
+export function isRightward(
+  options: Array<LiveOption>,
+  [first, second]: [number, number],
+) {
+  const isRight = (index: number) =>
+    /republican/iu.test(options[index]?.party?.name ?? "");
+  return isRight(first) && !isRight(second);
+}
+
+export function swingOf(
+  areaId: string,
+  row: UnitStanding,
+  options: Array<LiveOption>,
+  pair: [number, number],
+): Swing | null {
+  if (row.total === 0 || row.signed == null || row.baseSigned == null) {
+    return null;
+  }
+  const shift = row.signed - row.baseSigned;
+  return {
+    areaId,
+    swing: isRightward(options, pair) ? shift : -shift,
+    color: tone(options[shift >= 0 ? pair[0] : pair[1]]),
+    weight: row.total,
   };
 }
 

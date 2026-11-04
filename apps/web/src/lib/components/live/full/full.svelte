@@ -37,6 +37,7 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Skeleton } from "#lib/components/ui/skeleton/index.js";
+  import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
   import { entries as entriesOf, seating } from "#lib/live/ballot.js";
   import {
@@ -59,10 +60,11 @@
     whole,
   } from "#lib/live/standing.js";
   import { closing, describe, summarize, verdict } from "#lib/live/summary.js";
+  import { reach as arrowReach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import type { Dot, Fill, Lens, Office, Paint } from "./model.js";
+  import type { Dot, Fill, Lens, Office, Paint, Swing } from "./model.js";
   import Canvas from "./canvas.svelte";
   import CountyCard from "./county-card.svelte";
   import CountyList from "./county-list.svelte";
@@ -73,8 +75,10 @@
     board,
     districtKey,
     flipped,
+    GROUND,
     holding,
     INSETS,
+    isRightward,
     LENSES,
     mix,
     MUTED,
@@ -84,6 +88,7 @@
     seatName,
     shade,
     stateShade,
+    swingOf,
     tail,
     TERRITORIES,
     unitFill,
@@ -807,7 +812,7 @@
           );
   });
 
-  const fills = $derived.by(() => {
+  const painted = $derived.by(() => {
     const out = new Map<string, Fill>();
     if (isSpreadShown) {
       for (const [areaId, entry] of spreadRows) {
@@ -868,6 +873,43 @@
               isLater,
             },
       );
+    }
+    return out;
+  });
+
+  const isArrows = $derived(params.get("arrows") !== "off");
+  const swings = $derived.by((): Array<Swing> => {
+    if (lens !== "shift" || !isArrows) {
+      return [];
+    }
+    if (isSpreadShown) {
+      return [...spreadRows.values()].flatMap(
+        (entry) =>
+          swingOf(entry.areaId, entry.row, entry.race.options, entry.pair) ??
+          [],
+      );
+    }
+    if (isNation || isOverview || chamber != null || race == null) {
+      return [];
+    }
+    return rows.flatMap(
+      (entry) => swingOf(entry.areaId, entry.row, race.options, racePair) ?? [],
+    );
+  });
+  const swingReach = $derived(arrowReach(swings.map((entry) => entry.swing)));
+  const isSwingable = $derived(
+    lens === "shift" &&
+      (isSpreadShown ||
+        (!isNation && !isOverview && chamber == null && race != null)),
+  );
+  const fills = $derived.by(() => {
+    if (swings.length === 0) {
+      return painted;
+    }
+    const arrowed = new Set(swings.map((entry) => entry.areaId));
+    const out = new Map<string, Fill>();
+    for (const [areaId, fill] of painted) {
+      out.set(areaId, arrowed.has(areaId) ? { ...fill, color: GROUND } : fill);
     }
     return out;
   });
@@ -1407,6 +1449,11 @@
           : "ramp";
     },
   );
+  const arrowSides = $derived(
+    race != null && !isSpreadShown && isRightward(race.options, racePair)
+      ? sides.toReversed()
+      : sides,
+  );
   const legendBins = $derived(
     (isNation && !isSpread) || legendKind !== "ramp"
       ? null
@@ -1944,14 +1991,39 @@
 {/snippet}
 
 {#snippet legend()}
-  <Legend
-    kind={legendKind}
-    {sides}
-    bins={legendBins}
-    text={legendText}
-    blank={isNation && !isSpread ? WAITING : BLANK}
-    isLater={isLaterShown}
-  />
+  <div class="grid gap-2">
+    {#if isSwingable}
+      <label
+        class="flex items-center justify-between gap-2 text-xs font-semibold"
+      >
+        {m.map_mode_arrows()}
+        <Switch
+          checked={isArrows}
+          onCheckedChange={(value: boolean) =>
+            update({ arrows: value ? null : "off" }, false)}
+        />
+      </label>
+    {/if}
+    {#if swings.length > 0}
+      <Legend
+        kind="arrows"
+        sides={arrowSides}
+        reach={swingReach}
+        text={m.night_legend_arrows()}
+        blank={BLANK}
+        isLater={isLaterShown}
+      />
+    {:else}
+      <Legend
+        kind={legendKind}
+        {sides}
+        bins={legendBins}
+        text={legendText}
+        blank={isNation && !isSpread ? WAITING : BLANK}
+        isLater={isLaterShown}
+      />
+    {/if}
+  </div>
 {/snippet}
 
 {#snippet summaryHead()}
@@ -2411,6 +2483,8 @@
             geography={mapGeography}
             {fills}
             {dots}
+            {swings}
+            reach={swingReach}
             {labels}
             {selected}
             bind:hovered

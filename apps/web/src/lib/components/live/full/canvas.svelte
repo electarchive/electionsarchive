@@ -7,7 +7,7 @@
   import { basemap } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import { cn } from "#lib/utils.js";
-  import type { Dot, Fill } from "./model.js";
+  import type { Dot, Fill, Swing } from "./model.js";
   import { BLANK, GROUND } from "./model.js";
 
   let {
@@ -18,6 +18,8 @@
     hold = null,
     fills,
     dots = [],
+    swings = [],
+    reach = 0.1,
     labels = [],
     selected = null,
     hovered = $bindable(null),
@@ -43,6 +45,8 @@
     hold?: { tiles: string; k: number; color: string } | null;
     fills: Map<string, Fill>;
     dots?: Array<Dot>;
+    swings?: Array<Swing>;
+    reach?: number;
     labels?: Array<{ areaId: string; text: string; rank: number }>;
     selected?: string | null;
     hovered?: string | null;
@@ -781,6 +785,27 @@
     ];
     if (engine.gl != null) {
       untrack(draw);
+    }
+  });
+
+  $effect(() => {
+    const items = swings.flatMap((entry) => {
+      const at = atOf.get(entry.areaId);
+      return at == null
+        ? []
+        : [
+            {
+              at,
+              swing: entry.swing,
+              color: entry.color,
+              weight: entry.weight,
+              isMuted: selected != null && selected !== entry.areaId,
+            },
+          ];
+    });
+    const size = reach;
+    if (engine.gl != null) {
+      untrack(() => engine.arrows(items, size));
     }
   });
 
