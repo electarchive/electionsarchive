@@ -11,7 +11,6 @@ import type {
 import type { SQL } from "drizzle-orm";
 import { dev } from "$app/env";
 import { getRequestEvent } from "$app/server";
-import { estimate } from "@ea/analytics/live";
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
@@ -30,6 +29,7 @@ import {
   portraits,
   geography as shaped,
 } from "#lib/server/live-board.js";
+import { estimates } from "#lib/server/live-estimates.js";
 import { localizeNames } from "#lib/server/names.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
@@ -1648,12 +1648,7 @@ async function night(
   return {
     election,
     shown,
-    estimates: Object.fromEntries(
-      (shown.forecasts ? built : []).map((race) => {
-        const value = estimate({ race, at: null });
-        return [race.id, kept ? value : { ...value, units: [] }];
-      }),
-    ),
+    estimates: shown.forecasts ? await estimates(built, kept) : {},
   };
 }
 
