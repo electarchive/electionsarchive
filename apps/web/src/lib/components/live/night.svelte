@@ -2,6 +2,7 @@
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import type { Holder } from "#lib/live/ballot.js";
+  import type { Trail } from "#lib/live/nation.js";
   import type { Ballot } from "#lib/server/live-ballot.js";
   import type { LivePage } from "#lib/server/live-page.js";
   import Dashboard from "#lib/components/live/dashboard.svelte";
@@ -25,6 +26,7 @@
     isFinal = $bindable(),
   }: {
     data: LivePage & {
+      trail?: Trail | null;
       ballot?: Ballot | null;
       seat?: { held: Holder | null; families: Record<string, string> } | null;
     };
@@ -121,6 +123,7 @@
     {estimates}
     nation={data.nation}
     control={data.control}
+    trail={data.trail}
     forecasts={data.shown.forecasts}
     {clock}
     {isOffline}

@@ -9,7 +9,7 @@
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
-  import type { Chamber, Control, Seat } from "#lib/live/nation.js";
+  import type { Chamber, Control, Seat, Trail } from "#lib/live/nation.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import type { House } from "#lib/server/live-board.js";
@@ -64,6 +64,7 @@
     estimates,
     nation,
     control,
+    trail = null,
     clock,
     isOffline,
     forecasts = true,
@@ -76,6 +77,7 @@
       labels: Record<string, string>;
     } | null;
     control: Control | null;
+    trail?: Trail | null;
     clock: number;
     isOffline: boolean;
     forecasts?: boolean;
@@ -215,13 +217,14 @@
         },
   );
   const points = $derived(
-    pair == null
-      ? []
-      : pulse(
-          seats.filter((entry) => entry.summary.race.office === "house"),
-          control,
-          pair,
-        ),
+    trail ??
+      (pair == null
+        ? []
+        : pulse(
+            election.races.filter((race) => race.office === "house"),
+            control,
+            pair,
+          )),
   );
 
   const byState = $derived(
