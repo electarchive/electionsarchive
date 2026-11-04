@@ -100,7 +100,7 @@
                 >
                   <Glyph {kind} />
                   <span class="grid gap-0.5 min-inline-0">
-                    <span class="text-[0.8125rem] leading-tight font-semibold"
+                    <span class="text-[0.8125rem]/tight font-semibold"
                       >{KIND_TEXT[kind].name()}</span
                     >
                     <span

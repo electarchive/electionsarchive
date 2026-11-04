@@ -277,20 +277,17 @@ export const tonight = {
             (statuses == null || statuses.includes(row.status)),
         );
       const sort = input?.sort ?? "path";
-      const ordered =
+      const ordered = rows.toSorted(
         sort === "closest"
-          ? rows.toSorted(
-              (a, b) =>
-                (a.margin ?? Infinity) - (b.margin ?? Infinity) ||
-                a.path.localeCompare(b.path),
-            )
+          ? (a, b) =>
+              (a.margin ?? Infinity) - (b.margin ?? Infinity) ||
+              a.path.localeCompare(b.path)
           : sort === "updated"
-            ? rows.toSorted(
-                (a, b) =>
-                  (b.updated ?? "").localeCompare(a.updated ?? "") ||
-                  a.path.localeCompare(b.path),
-              )
-            : rows.toSorted((a, b) => a.path.localeCompare(b.path));
+            ? (a, b) =>
+                (b.updated ?? "").localeCompare(a.updated ?? "") ||
+                a.path.localeCompare(b.path)
+            : (a, b) => a.path.localeCompare(b.path),
+      );
       const limit = input?.limit ?? 50;
       const offset = Math.max(0, Math.trunc(Number(input?.cursor ?? "0")) || 0);
       const page = ordered.slice(offset, offset + limit);

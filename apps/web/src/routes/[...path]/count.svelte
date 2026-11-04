@@ -222,7 +222,7 @@
           </span>
           <span
             class={cn(
-              "truncate text-center font-figures text-xs leading-none tabular-nums",
+              "truncate text-center font-figures text-xs/none tabular-nums",
               { "font-semibold": isShown },
             )}
             aria-hidden="true"

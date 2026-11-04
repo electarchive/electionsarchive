@@ -78,10 +78,9 @@ const rendered = new Map<
 >();
 
 const h = (
-  type: string,
   style: Record<string, string | number>,
   children?: unknown,
-): Node => ({ type, props: { style, children } });
+): Node => ({ type: "div", props: { style, children } });
 
 function picture(svg: string, width: number, height: number): Node {
   return {
@@ -129,7 +128,6 @@ function hue(option: LiveOption | null | undefined, index = 0) {
 
 function line(text: string, style: Record<string, string | number>) {
   return h(
-    "div",
     {
       display: "block",
       overflow: "hidden",
@@ -144,7 +142,6 @@ function line(text: string, style: Record<string, string | number>) {
 function pill(status: Status) {
   const isLive = status === "live";
   return h(
-    "div",
     {
       display: "flex",
       alignItems: "center",
@@ -160,7 +157,7 @@ function pill(status: Status) {
     [
       ...(isLive
         ? [
-            h("div", {
+            h({
               width: 10,
               height: 10,
               borderRadius: 999,
@@ -179,7 +176,6 @@ function pill(status: Status) {
 
 function header(status: Status, newest: string | null, context: string) {
   return h(
-    "div",
     {
       display: "flex",
       alignItems: "center",
@@ -188,7 +184,6 @@ function header(status: Status, newest: string | null, context: string) {
     },
     [
       h(
-        "div",
         {
           display: "flex",
           alignItems: "center",
@@ -207,7 +202,6 @@ function header(status: Status, newest: string | null, context: string) {
         ],
       ),
       h(
-        "div",
         {
           display: "flex",
           alignItems: "center",
@@ -229,7 +223,6 @@ function heading(title: string, headline: string, width: number) {
   const size = title.length > 44 ? 44 : title.length > 26 ? 52 : 60;
   return [
     h(
-      "div",
       {
         display: "flex",
         width,
@@ -242,7 +235,6 @@ function heading(title: string, headline: string, width: number) {
       title,
     ),
     h(
-      "div",
       {
         display: "flex",
         width,
@@ -259,7 +251,6 @@ function heading(title: string, headline: string, width: number) {
 
 function meter(share: number | null) {
   return h(
-    "div",
     {
       display: "flex",
       flexGrow: 1,
@@ -271,7 +262,7 @@ function meter(share: number | null) {
     share == null
       ? []
       : [
-          h("div", {
+          h({
             width: `${Math.min(1, share) * 100}%`,
             height: "100%",
             backgroundColor: INK,
@@ -281,7 +272,7 @@ function meter(share: number | null) {
 }
 
 function segment(amount: number, size: number, color: string) {
-  return h("div", {
+  return h({
     width: `${(amount / size) * 100}%`,
     height: "100%",
     backgroundColor: color,
@@ -330,7 +321,6 @@ function figure(
   isCounting: boolean,
 ) {
   return h(
-    "div",
     {
       display: "flex",
       justifyContent: isEnd ? "flex-end" : "flex-start",
@@ -347,7 +337,6 @@ function figure(
 
 function rowHeader(label: string, detail: string, aside: string) {
   return h(
-    "div",
     {
       display: "flex",
       alignItems: "baseline",
@@ -356,9 +345,8 @@ function rowHeader(label: string, detail: string, aside: string) {
       color: MUTED,
     },
     [
-      h("div", { display: "flex", alignItems: "baseline", gap: 12 }, [
+      h({ display: "flex", alignItems: "baseline", gap: 12 }, [
         h(
-          "div",
           { display: "flex", fontSize: 26, fontWeight: 800, color: INK },
           label,
         ),
@@ -412,26 +400,24 @@ function governorRow(
   const columns = Math.ceil(ordered.length / stack);
   const size = stack === 2 ? 15 : Math.min(26, Math.floor(332 / columns) - 3);
   const tile = (entry: Seat | undefined) =>
-    h("div", {
+    h({
       width: size,
       height: stack === 2 ? size : 26,
       borderRadius: 3,
       backgroundColor: entry == null ? PAPER : tint(entry),
     });
-  return h("div", { display: "flex", flexDirection: "column", gap: 8 }, [
+  return h({ display: "flex", flexDirection: "column", gap: 8 }, [
     rowHeader(
       m.night_nation_governors(),
       m.night_governors_races({ count: count(seats.length) }),
       m.night_tally_not_up({ count: count(notUp) }),
     ),
-    h("div", { display: "flex", alignItems: "center", gap: 14 }, [
+    h({ display: "flex", alignItems: "center", gap: 14 }, [
       figure(totals.left, leftColor, false, totals.isCounting),
       h(
-        "div",
         { display: "flex", flexGrow: 1, justifyContent: "center", gap: 3 },
         Array.from({ length: columns }, (_, column) =>
           h(
-            "div",
             { display: "flex", flexDirection: "column", gap: 3 },
             Array.from({ length: stack }, (_, row) =>
               tile(ordered[column * stack + row]),
@@ -453,58 +439,49 @@ function chamberRow(
 ) {
   const { size } = view;
   const { held, other, isCounting, ...totals } = tally(view, seats, pairing);
-  return h("div", { display: "flex", flexDirection: "column", gap: 8 }, [
+  return h({ display: "flex", flexDirection: "column", gap: 8 }, [
     rowHeader(
       label,
       m.night_state_seats_up({ count: count(seats.length) }),
       m.night_chamber_majority({ count: count(view.majority) }),
     ),
-    h("div", { display: "flex", alignItems: "center", gap: 14 }, [
+    h({ display: "flex", alignItems: "center", gap: 14 }, [
       figure(totals.left, leftColor, false, isCounting),
-      h(
-        "div",
-        { display: "flex", position: "relative", flexGrow: 1, height: 26 },
-        [
-          h(
-            "div",
-            {
-              display: "flex",
-              width: "100%",
-              height: "100%",
-              backgroundColor: FILL,
-              borderRadius: 3,
-              overflow: "hidden",
-            },
-            [
-              segment(view.tallies.left.holdover, size, mix(leftColor, 0.62)),
-              segment(view.tallies.left.won, size, leftColor),
-              segment(view.tallies.left.projected, size, mix(leftColor, 0.85)),
-              segment(view.tallies.left.ahead, size, mix(leftColor, 0.42)),
-              segment(held.left, size, mix(leftColor, 0.16)),
-              h("div", { flexGrow: 1, height: "100%" }),
-              segment(other, size, OTHER),
-              segment(held.right, size, mix(rightColor, 0.16)),
-              segment(view.tallies.right.ahead, size, mix(rightColor, 0.42)),
-              segment(
-                view.tallies.right.projected,
-                size,
-                mix(rightColor, 0.85),
-              ),
-              segment(view.tallies.right.won, size, rightColor),
-              segment(view.tallies.right.holdover, size, mix(rightColor, 0.62)),
-            ],
-          ),
-          h("div", {
-            position: "absolute",
-            left: `${(view.majority / size) * 100}%`,
-            top: -6,
-            width: 2,
-            height: 38,
-            marginLeft: -1,
-            backgroundColor: INK,
-          }),
-        ],
-      ),
+      h({ display: "flex", position: "relative", flexGrow: 1, height: 26 }, [
+        h(
+          {
+            display: "flex",
+            width: "100%",
+            height: "100%",
+            backgroundColor: FILL,
+            borderRadius: 3,
+            overflow: "hidden",
+          },
+          [
+            segment(view.tallies.left.holdover, size, mix(leftColor, 0.62)),
+            segment(view.tallies.left.won, size, leftColor),
+            segment(view.tallies.left.projected, size, mix(leftColor, 0.85)),
+            segment(view.tallies.left.ahead, size, mix(leftColor, 0.42)),
+            segment(held.left, size, mix(leftColor, 0.16)),
+            h({ flexGrow: 1, height: "100%" }),
+            segment(other, size, OTHER),
+            segment(held.right, size, mix(rightColor, 0.16)),
+            segment(view.tallies.right.ahead, size, mix(rightColor, 0.42)),
+            segment(view.tallies.right.projected, size, mix(rightColor, 0.85)),
+            segment(view.tallies.right.won, size, rightColor),
+            segment(view.tallies.right.holdover, size, mix(rightColor, 0.62)),
+          ],
+        ),
+        h({
+          position: "absolute",
+          left: `${(view.majority / size) * 100}%`,
+          top: -6,
+          width: 2,
+          height: 38,
+          marginLeft: -1,
+          backgroundColor: INK,
+        }),
+      ]),
       figure(totals.right, rightColor, true, isCounting),
     ]),
   ]);
@@ -622,22 +599,15 @@ async function nationBody(
     const width = 560;
     const height = Math.round((width * tall) / wide);
     const key = (color: string, text: string) =>
-      h("div", { display: "flex", alignItems: "center", gap: 8 }, [
-        h("div", {
-          width: 14,
-          height: 14,
-          borderRadius: 2,
-          backgroundColor: color,
-        }),
+      h({ display: "flex", alignItems: "center", gap: 8 }, [
+        h({ width: 14, height: 14, borderRadius: 2, backgroundColor: color }),
         text,
       ]);
     map = h(
-      "div",
       { display: "flex", flexDirection: "column", alignItems: "flex-end" },
       [
         picture(svg, width, height),
         h(
-          "div",
           {
             display: "flex",
             gap: 20,
@@ -686,7 +656,6 @@ function candidate(
   const isWinner = option != null && summary.winner?.id === option.id;
   const tag = (text: string, background: string, border: string) =>
     h(
-      "div",
       {
         display: "flex",
         padding: "1px 8px",
@@ -700,7 +669,6 @@ function candidate(
       text,
     );
   return h(
-    "div",
     {
       display: "flex",
       alignItems: "center",
@@ -709,36 +677,31 @@ function candidate(
       borderLeft: `7px solid ${color}`,
     },
     [
-      h(
-        "div",
-        { display: "flex", flexDirection: "column", flexGrow: 1, width: 470 },
-        [
-          h("div", { display: "flex", alignItems: "center", gap: 12 }, [
-            line(option?.label ?? "", {
-              maxWidth: isWinner || option?.isIncumbent === true ? 330 : 470,
-              fontSize: 36,
-              fontWeight: 800,
-              letterSpacing: "-0.015em",
-            }),
-            ...(isWinner ? [tag(m.night_winner(), MARKER, MARKER)] : []),
-            ...(option?.isIncumbent === true && !isWinner
-              ? [tag(m.results_incumbent(), PAPER, RULE)]
-              : []),
-          ]),
-          line(
-            option?.party?.name ??
-              (isCounting
-                ? m.night_votes({ count: count(summary.totals[index] ?? 0) })
-                : ""),
-            { maxWidth: 380, marginTop: 2, fontSize: 21, color: MUTED },
-          ),
-        ],
-      ),
+      h({ display: "flex", flexDirection: "column", flexGrow: 1, width: 470 }, [
+        h({ display: "flex", alignItems: "center", gap: 12 }, [
+          line(option?.label ?? "", {
+            maxWidth: isWinner || option?.isIncumbent === true ? 330 : 470,
+            fontSize: 36,
+            fontWeight: 800,
+            letterSpacing: "-0.015em",
+          }),
+          ...(isWinner ? [tag(m.night_winner(), MARKER, MARKER)] : []),
+          ...(option?.isIncumbent === true && !isWinner
+            ? [tag(m.results_incumbent(), PAPER, RULE)]
+            : []),
+        ]),
+        line(
+          option?.party?.name ??
+            (isCounting
+              ? m.night_votes({ count: count(summary.totals[index] ?? 0) })
+              : ""),
+          { maxWidth: 380, marginTop: 2, fontSize: 21, color: MUTED },
+        ),
+      ]),
       ...(share == null
         ? []
         : [
             h(
-              "div",
               {
                 display: "flex",
                 flexDirection: "column",
@@ -746,7 +709,6 @@ function candidate(
               },
               [
                 h(
-                  "div",
                   {
                     display: "flex",
                     fontSize: isCounting ? 62 : 40,
@@ -758,7 +720,6 @@ function candidate(
                   percent(share),
                 ),
                 h(
-                  "div",
                   { display: "flex", fontSize: 18, color: MUTED },
                   isCounting
                     ? option?.party == null
@@ -799,9 +760,8 @@ function standingsBody(summary: Summary, seats: number, width: number) {
         : race.certified.winners.includes(option.id);
     const votes = totals[index] ?? 0;
     return [
-      h("div", { display: "flex", alignItems: "center", gap: 16, height: 34 }, [
+      h({ display: "flex", alignItems: "center", gap: 16, height: 34 }, [
         h(
-          "div",
           {
             display: "flex",
             justifyContent: "flex-end",
@@ -811,7 +771,7 @@ function standingsBody(summary: Summary, seats: number, width: number) {
           },
           isCounting ? String(rank + 1) : "",
         ),
-        h("div", {
+        h({
           width: 6,
           height: 26,
           backgroundColor: isInside ? hue(option, index) : FILL,
@@ -827,7 +787,6 @@ function standingsBody(summary: Summary, seats: number, width: number) {
           ? []
           : [
               h(
-                "div",
                 {
                   display: "flex",
                   width: 150,
@@ -837,7 +796,7 @@ function standingsBody(summary: Summary, seats: number, width: number) {
                   overflow: "hidden",
                 },
                 [
-                  h("div", {
+                  h({
                     width: `${(votes / top) * 100}%`,
                     height: "100%",
                     backgroundColor: isInside ? hue(option, index) : OTHER,
@@ -845,7 +804,6 @@ function standingsBody(summary: Summary, seats: number, width: number) {
                 ],
               ),
               h(
-                "div",
                 {
                   display: "flex",
                   justifyContent: "flex-end",
@@ -861,13 +819,12 @@ function standingsBody(summary: Summary, seats: number, width: number) {
     ];
   };
   const rule = (label: string) =>
-    h("div", { display: "flex", alignItems: "center", gap: 12, height: 22 }, [
-      h("div", { flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
-      h("div", { display: "flex", fontSize: 16, color: MUTED }, label),
-      h("div", { flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
+    h({ display: "flex", alignItems: "center", gap: 12, height: 22 }, [
+      h({ flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
+      h({ display: "flex", fontSize: 16, color: MUTED }, label),
+      h({ flexGrow: 1, borderTop: `2px dashed ${MUTED}` }),
     ]);
   const gap = h(
-    "div",
     {
       display: "flex",
       paddingLeft: 46,
@@ -877,7 +834,7 @@ function standingsBody(summary: Summary, seats: number, width: number) {
     },
     "…",
   );
-  return h("div", { display: "flex", flexDirection: "column", width }, [
+  return h({ display: "flex", flexDirection: "column", width }, [
     ...ranks.flatMap((rank) =>
       rank == null
         ? [gap]
@@ -891,7 +848,6 @@ function standingsBody(summary: Summary, seats: number, width: number) {
     ...(!isCounting && order.length > ranks.length
       ? [
           h(
-            "div",
             {
               display: "flex",
               paddingLeft: 68,
@@ -940,105 +896,94 @@ function raceBody(summary: Summary, width: number) {
           chance: odds(summary.chance),
         })
       : null;
-  return h(
-    "div",
-    { display: "flex", flexDirection: "column", width, gap: 22 },
-    [
-      ...shown.map((index) => candidate(race, summary, index, prior)),
-      h(
-        "div",
-        {
-          display: "flex",
-          height: 16,
-          backgroundColor: FILL,
-          borderRadius: 3,
-          overflow: "hidden",
-        },
-        sum(base) === 0
+  return h({ display: "flex", flexDirection: "column", width, gap: 22 }, [
+    ...shown.map((index) => candidate(race, summary, index, prior)),
+    h(
+      {
+        display: "flex",
+        height: 16,
+        backgroundColor: FILL,
+        borderRadius: 3,
+        overflow: "hidden",
+      },
+      sum(base) === 0
+        ? []
+        : [
+            h({
+              width: `${shareA * 100}%`,
+              height: "100%",
+              backgroundColor: tint(hue(race.options[a], a)),
+            }),
+            h({
+              width: `${rest * 100}%`,
+              height: "100%",
+              backgroundColor: tint(OTHER),
+            }),
+            h({ flexGrow: 1, height: "100%" }),
+            h({
+              width: `${shareB * 100}%`,
+              height: "100%",
+              backgroundColor: tint(hue(race.options[b], b)),
+            }),
+          ],
+    ),
+    h(
+      {
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+        fontSize: 20,
+        color: MUTED,
+      },
+      summary.winner != null || (isCounting && summary.counted != null)
+        ? [
+            h(
+              { display: "flex", color: INK, fontWeight: 600 },
+              m.night_counted(),
+            ),
+            meter(summary.winner != null ? 1 : summary.counted),
+            h(
+              { display: "flex" },
+              percent(summary.winner != null ? 1 : (summary.counted ?? 0), 0),
+            ),
+            ...(chance == null || summary.winner != null
+              ? []
+              : [
+                  h(
+                    {
+                      display: "flex",
+                      marginLeft: 8,
+                      paddingLeft: 16,
+                      borderLeft: `1px solid ${RULE}`,
+                      color: INK,
+                      fontWeight: 600,
+                    },
+                    chance,
+                  ),
+                ]),
+          ]
+        : isCounting
           ? []
           : [
-              h("div", {
-                width: `${shareA * 100}%`,
-                height: "100%",
-                backgroundColor: tint(hue(race.options[a], a)),
-              }),
-              h("div", {
-                width: `${rest * 100}%`,
-                height: "100%",
-                backgroundColor: tint(OTHER),
-              }),
-              h("div", { flexGrow: 1, height: "100%" }),
-              h("div", {
-                width: `${shareB * 100}%`,
-                height: "100%",
-                backgroundColor: tint(hue(race.options[b], b)),
-              }),
-            ],
-      ),
-      h(
-        "div",
-        {
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          fontSize: 20,
-          color: MUTED,
-        },
-        summary.winner != null || (isCounting && summary.counted != null)
-          ? [
               h(
-                "div",
                 { display: "flex", color: INK, fontWeight: 600 },
-                m.night_counted(),
+                m.night_counted_none(),
               ),
-              meter(summary.winner != null ? 1 : summary.counted),
-              h(
-                "div",
-                { display: "flex" },
-                percent(summary.winner != null ? 1 : (summary.counted ?? 0), 0),
-              ),
-              ...(chance == null || summary.winner != null
+              ...(baseline == null
                 ? []
                 : [
                     h(
-                      "div",
                       {
                         display: "flex",
-                        marginLeft: 8,
                         paddingLeft: 16,
                         borderLeft: `1px solid ${RULE}`,
-                        color: INK,
-                        fontWeight: 600,
                       },
-                      chance,
+                      baseline,
                     ),
                   ]),
-            ]
-          : isCounting
-            ? []
-            : [
-                h(
-                  "div",
-                  { display: "flex", color: INK, fontWeight: 600 },
-                  m.night_counted_none(),
-                ),
-                ...(baseline == null
-                  ? []
-                  : [
-                      h(
-                        "div",
-                        {
-                          display: "flex",
-                          paddingLeft: 16,
-                          borderLeft: `1px solid ${RULE}`,
-                        },
-                        baseline,
-                      ),
-                    ]),
-              ],
-      ),
-    ],
-  );
+            ],
+    ),
+  ]);
 }
 
 async function raceMap(summary: Summary, date: string) {
@@ -1107,7 +1052,6 @@ async function raceMap(summary: Summary, date: string) {
     390 / (drawn.height + 2 * stroke),
   );
   return h(
-    "div",
     {
       display: "flex",
       flexDirection: "column",
@@ -1123,7 +1067,6 @@ async function raceMap(summary: Summary, date: string) {
         Math.round((drawn.height + 2 * stroke) * fit),
       ),
       h(
-        "div",
         { display: "flex", marginTop: 12, fontSize: 18, color: MUTED },
         isCounting ? m.night_map_lead() : m.night_table_base(),
       ),
@@ -1166,13 +1109,11 @@ async function card(path: string, bucket: number) {
       isBefore,
     );
     page = h(
-      "div",
       { display: "flex", justifyContent: "space-between", width: INNER },
       [
-        h("div", { display: "flex", flexDirection: "column", width: 500 }, [
+        h({ display: "flex", flexDirection: "column", width: 500 }, [
           ...heading(election.title, headline, 500),
           h(
-            "div",
             {
               display: "flex",
               flexDirection: "column",
@@ -1186,7 +1127,6 @@ async function card(path: string, bucket: number) {
           ? []
           : [
               h(
-                "div",
                 {
                   display: "flex",
                   flexDirection: "column",
@@ -1227,13 +1167,11 @@ async function card(path: string, bucket: number) {
     const map = await raceMap(summary, election.date);
     const width = map == null ? INNER : 640;
     page = h(
-      "div",
       { display: "flex", justifyContent: "space-between", width: INNER },
       [
-        h("div", { display: "flex", flexDirection: "column", width }, [
+        h({ display: "flex", flexDirection: "column", width }, [
           ...heading(target.title, describe(summary, closes, time), width),
           h(
-            "div",
             {
               display: "flex",
               flexDirection: "column",
@@ -1253,7 +1191,6 @@ async function card(path: string, bucket: number) {
   }
   const svg = await satori(
     h(
-      "div",
       {
         display: "flex",
         flexDirection: "column",
@@ -1271,7 +1208,7 @@ async function card(path: string, bucket: number) {
           election.newest,
           isNation || election.title === path ? "" : election.title,
         ),
-        h("div", { display: "flex", flexGrow: 1, width: INNER }, [page]),
+        h({ display: "flex", flexGrow: 1, width: INNER }, [page]),
       ],
     ) as Parameters<typeof satori>[0],
     { width: WIDTH, height: HEIGHT, fonts: await fonts },

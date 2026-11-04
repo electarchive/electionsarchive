@@ -58,10 +58,9 @@ const fonts = Promise.all(
 );
 
 const h = (
-  type: string,
   style: Record<string, string | number>,
   children?: unknown,
-): Node => ({ type, props: { style, children } });
+): Node => ({ type: "div", props: { style, children } });
 
 const tint = (bar: Bar, index: number) => {
   const sided = side(bar.key);
@@ -230,7 +229,6 @@ const rasterize = (svg: string) =>
 
 const brand = () =>
   h(
-    "div",
     {
       display: "flex",
       alignItems: "center",
@@ -249,7 +247,6 @@ async function agents() {
   const width = 1100;
   const svg = await satori(
     h(
-      "div",
       {
         display: "flex",
         flexDirection: "column",
@@ -262,7 +259,6 @@ async function agents() {
       },
       [
         h(
-          "div",
           {
             display: "flex",
             justifyContent: "space-between",
@@ -271,9 +267,8 @@ async function agents() {
             paddingTop: 40,
           },
           [
-            h("div", { display: "flex", flexDirection: "column" }, [
+            h({ display: "flex", flexDirection: "column" }, [
               h(
-                "div",
                 {
                   display: "flex",
                   fontWeight: 800,
@@ -284,7 +279,6 @@ async function agents() {
                 m.agents_title(),
               ),
               h(
-                "div",
                 { display: "flex", marginTop: 12, fontSize: 30, color: MUTED },
                 "electionsarchive.com/mcp",
               ),
@@ -312,7 +306,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
   const bars = found.bars.slice(0, 3);
   const svg = await satori(
     h(
-      "div",
       {
         display: "flex",
         flexDirection: "column",
@@ -325,9 +318,8 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
         color: INK,
       },
       [
-        h("div", { display: "flex", fontSize: 26, color: MUTED }, found.kicker),
+        h({ display: "flex", fontSize: 26, color: MUTED }, found.kicker),
         h(
-          "div",
           {
             display: "flex",
             width: 1056,
@@ -340,7 +332,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
           found.title,
         ),
         h(
-          "div",
           {
             display: "flex",
             width: 1056,
@@ -352,7 +343,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
           found.line,
         ),
         h(
-          "div",
           {
             display: "flex",
             flexDirection: "column",
@@ -364,7 +354,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
             ? []
             : [
                 h(
-                  "div",
                   {
                     display: "flex",
                     alignItems: "flex-end",
@@ -373,7 +362,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                   },
                   bars.map((bar, index) =>
                     h(
-                      "div",
                       {
                         display: "flex",
                         flexDirection: "column",
@@ -382,7 +370,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                       },
                       [
                         h(
-                          "div",
                           {
                             display: "flex",
                             fontWeight: 800,
@@ -394,7 +381,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                           percent(bar.share),
                         ),
                         h(
-                          "div",
                           {
                             display: "flex",
                             alignItems: "center",
@@ -404,7 +390,7 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                             fontWeight: 600,
                           },
                           [
-                            h("div", {
+                            h({
                               width: 14,
                               height: 14,
                               flexShrink: 0,
@@ -412,7 +398,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                               backgroundColor: tint(bar, index),
                             }),
                             h(
-                              "div",
                               {
                                 display: "block",
                                 overflow: "hidden",
@@ -428,7 +413,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                   ),
                 ),
                 h(
-                  "div",
                   {
                     display: "flex",
                     marginTop: 20,
@@ -436,7 +420,7 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
                     backgroundColor: FILL,
                   },
                   found.bars.map((bar, index) =>
-                    h("div", {
+                    h({
                       width: `${bar.share * 100}%`,
                       height: "100%",
                       borderRight: `2px solid ${PAPER}`,
@@ -447,7 +431,6 @@ async function render(found: Awaited<ReturnType<typeof card>>) {
               ],
         ),
         h(
-          "div",
           {
             display: "flex",
             alignItems: "center",

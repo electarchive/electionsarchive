@@ -73,15 +73,13 @@ const newest = (set: string) =>
 
 export const latest = (set: string) => sql.raw(newest(set));
 
-const held = (contest: string, election: string) =>
-  sql.raw(
-    `case when ${election}.kind = 'indirect' then coalesce((select (rs.as_of at time zone 'UTC')::date from result_set rs where rs.contest_id = ${contest}.id and rs.as_of is not null and ${newest("rs")} order by array_position(${ORDER}, rs.stage) limit 1), ${election}.date_from) else ${election}.date_from end`,
-  );
+const held = sql.raw(
+  `case when e.kind = 'indirect' then coalesce((select (rs.as_of at time zone 'UTC')::date from result_set rs where rs.contest_id = c.id and rs.as_of is not null and ${newest("rs")} order by array_position(${ORDER}, rs.stage) limit 1), e.date_from) else e.date_from end`,
+);
 
-const umbrella = (election: string) =>
-  sql.raw(
-    `(select min(o.parent_id::text)::uuid from election c join election o on o.id = c.rerun_of_id where c.parent_id = ${election}.id having count(distinct o.parent_id) = 1 and count(*) = (select count(*) from election d where d.parent_id = ${election}.id))`,
-  );
+const umbrella = sql.raw(
+  `(select min(o.parent_id::text)::uuid from election c join election o on o.id = c.rerun_of_id where c.parent_id = e.id having count(distinct o.parent_id) = 1 and count(*) = (select count(*) from election d where d.parent_id = e.id))`,
+);
 
 export const coarse = (shape: string) =>
   sql.raw(
@@ -93,10 +91,9 @@ const serial = (contest: string, election: string) =>
     `case when ${contest}.kind = 'ballot_question' then ${contest}.id::text else concat_ws(':', ${contest}.office_id, ${contest}.body_id, ${contest}.kind, case when ${election}.kind = 'indirect' then 'general' else ${election}.kind::text end, case when ${contest}.previous_round_id is null then 1 else 1 + (with recursive back(id, depth) as (select ${contest}.previous_round_id, 1 union all select p.previous_round_id, back.depth + 1 from back join contest p on p.id = back.id where back.depth < 8) select count(*) from back join contest bc on bc.id = back.id join election be on be.id = bc.election_id where be.kind = ${election}.kind) end, ${contest}.party_scope_id) end`,
   );
 
-const reached = (contest: string, election: string) =>
-  sql.raw(
-    `case when ${contest}.district_area_id is null or ${contest}.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = ${election}.polity_id) then (select coalesce(array_agg(a.scheme_code || ':' || a.id::text order by a.scheme_code, a.id), '{}') from polity_territory pt join area_parent ap on ap.parent_id = pt.area_id join area a on a.id = ap.area_id where pt.polity_id = ${election}.polity_id and pt.valid @> ${election}.date_from and a.k in (select x.area_k from result_set rs join result_rollup_sum x on x.result_set_k = rs.k where rs.contest_id = ${contest}.id and rs.is_default)) end`,
-  );
+const reached = sql.raw(
+  `case when c.district_area_id is null or c.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id) then (select coalesce(array_agg(a.scheme_code || ':' || a.id::text order by a.scheme_code, a.id), '{}') from polity_territory pt join area_parent ap on ap.parent_id = pt.area_id join area a on a.id = ap.area_id where pt.polity_id = e.polity_id and pt.valid @> e.date_from and a.k in (select x.area_k from result_set rs join result_rollup_sum x on x.result_set_k = rs.k where rs.contest_id = c.id and rs.is_default)) end`,
+);
 
 const MEASURES = new Map([
   [1, "votes"],
@@ -1674,12 +1671,12 @@ export function separate(
         }
         return { ...fitted, kept: step === 0 && turn === 0 };
       });
-    let best = fixed.has(party)
-      ? candidates.find((candidate) => candidate.kept)
-      : candidates.find(
-          (candidate) =>
+    let best = candidates.find(
+      fixed.has(party)
+        ? (candidate) => candidate.kept
+        : (candidate) =>
             nearest(candidate.at, (distance) => distance < 0.1) >= 0.1,
-        );
+    );
     let far = -Infinity;
     for (const candidate of best == null ? candidates : []) {
       const distance = nearest(candidate.at, (value) => value <= far);
@@ -4750,15 +4747,14 @@ async function tabulate(
       }
     }
     const seated = elects[index]?.held;
-    const seats =
+    const seats = new Map(
       result.length === 0
-        ? new Map(seated)
-        : new Map(
-            result.map((entry, at) => [
-              entry.key,
-              seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
-            ]),
-          );
+        ? seated
+        : result.map((entry, at): [string, number] => [
+            entry.key,
+            seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
+          ]),
+    );
     let before: (typeof result)[number] | null = null;
     for (const entry of result) {
       if (
@@ -5603,8 +5599,9 @@ async function atlas(input: {
           day,
           shown.map((row) => row.k),
         ),
-    group != null
-      ? db.execute<{ id: string; date: string; named: string }>(sql`
+    db.execute<{ id: string; date: string; named: string }>(
+      group != null
+        ? sql`
         with recursive tops(top, id, date) as (
           select e.id, e.id, e.date_from from election e
           where e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
@@ -5626,8 +5623,8 @@ async function atlas(input: {
         having count(*) * 2 >= ${group.ids.length}
         order by tops.date desc
         limit 16
-      `)
-      : db.execute<{ id: string; date: string; named: string }>(sql`
+      `
+        : sql`
         select c.id, e.date_from::text as date, c.id as named
         from contest c
         join election e on e.id = c.election_id
@@ -5640,7 +5637,8 @@ async function atlas(input: {
           and ${serial("c", "e")} = ${contest.series}
         order by e.date_from desc
         limit 16
-      `),
+      `,
+    ),
     branches(day),
     chain.length === 0
       ? undefined
@@ -7733,7 +7731,7 @@ export const contests = {
                         limit 1
                       ) hit
                     )
-                    select r.*, (select ${reached("c", "e")} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
+                    select r.*, (select ${reached} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
                       select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
                         r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
                       from roots r
@@ -7890,15 +7888,15 @@ export const contests = {
         from k
       `);
       const isUnqualified =
-        isRoot && sets.rows.every((row) => row.status !== "active")
-          ? rowsOf(
-              await db.execute<{ found: boolean }>(sql`
+        isRoot &&
+        sets.rows.every((row) => row.status !== "active") &&
+        rowsOf(
+          await db.execute<{ found: boolean }>(sql`
                 select exists (
                   select from label where entity_id = ${contest.id}::uuid and kind = 'ballot' and value = 'no_candidate_qualified'
                 ) as found
               `),
-            )[0]?.found === true
-          : false;
+        )[0]?.found === true;
       const listedNames = await names(
         listed.rows.flatMap((row) =>
           [row.person, row.party].filter((id) => id != null),
@@ -8167,7 +8165,7 @@ export const contests = {
             and exists (select from area_geometry h where h.area_id = g.area_id and lower(h.valid) > upper(g.valid))
         `),
         db.execute<{ reach: Array<string> | null }>(sql`
-          select ${reached("c", "e")} as reach from contest c join election e on e.id = c.election_id
+          select ${reached} as reach from contest c join election e on e.id = c.election_id
           where c.id = ${contest.root}::uuid
         `),
       ]);
@@ -8677,7 +8675,7 @@ export const contests = {
         chain.map((entry) => [entry.id, entry.segment]),
       );
       const reran = await db.execute<{ id: string; root: string | null }>(sql`
-        select e.id, coalesce(e.rerun_of_id, ${umbrella("e")}) as root
+        select e.id, coalesce(e.rerun_of_id, ${umbrella}) as root
         from election e
         where e.id = any(${sql.param(sameRace.map((row) => row.election))}::uuid[])
           and e.status::text <> 'annulled'
@@ -11027,7 +11025,7 @@ export const contests = {
           select c.id from contest c join chain on c.previous_round_id = chain.id
         )
         select c.id, (select s.path from slug s where s.entity_id = c.id and s.is_current) as path,
-          c.round_number as round, e.kind::text as kind, ${held("c", "e")}::text as date
+          c.round_number as round, e.kind::text as kind, ${held}::text as date
         from chain join contest c on c.id = chain.id join election e on e.id = c.election_id
         order by e.date_from, c.round_number
       `);
@@ -11330,14 +11328,14 @@ export const contests = {
       const chain = await descend(contest, input.unit);
       const focus =
         chain.at(-1) ?? (contest.id === contest.root ? null : contest.place);
-      const same = (a: string, b: string) =>
-        sql.raw(`(${b}.office_id = any(array_append(array(select id from twin), ${a}.office_id)) or ${b}.body_id = ${a}.body_id)
-          and ((${a}.office_id is not null and (${b}.office_id = ${a}.office_id
-            or (${b}.office_id in (select id from twin) and ${b}.district_area_id is not distinct from ${a}.district_area_id)))
-          or (${a}.office_id is null and ${b}.office_id is null and ${b}.body_id = ${a}.body_id
-            and ${b}.district_area_id is not distinct from ${a}.district_area_id))
-          and (${a}.seat_id is null or ${b}.seat_id is null or ${b}.seat_id = ${a}.seat_id)
-          and (${a}.term is null or ${b}.term is null or ${b}.term = ${a}.term)`);
+      const same = (a: string) =>
+        sql.raw(`(c.office_id = any(array_append(array(select id from twin), ${a}.office_id)) or c.body_id = ${a}.body_id)
+          and ((${a}.office_id is not null and (c.office_id = ${a}.office_id
+            or (c.office_id in (select id from twin) and c.district_area_id is not distinct from ${a}.district_area_id)))
+          or (${a}.office_id is null and c.office_id is null and c.body_id = ${a}.body_id
+            and c.district_area_id is not distinct from ${a}.district_area_id))
+          and (${a}.seat_id is null or c.seat_id is null or c.seat_id = ${a}.seat_id)
+          and (${a}.term is null or c.term is null or c.term = ${a}.term)`);
       const [stepped, day] = await Promise.all([
         db.execute<{
           id: string;
@@ -11380,7 +11378,7 @@ export const contests = {
                 and c.party_scope_id is null and c.allocation_parent_id is null and c.previous_round_id is null
                 and e.kind not in ('primary', 'caucus', 'runoff', 'indirect')
                 and e.date_from between r.d and r.d + 400 and (r.office_id is not null or r.body_id is not null)
-                and ${same("r", "c")}
+                and ${same("r")}
               order by e.date_from limit 1)
           ),
           prev as materialized (
@@ -11388,7 +11386,7 @@ export const contests = {
             from g cross join contest c join election e on e.id = c.election_id
             where c.party_scope_id is null and c.allocation_parent_id is null and c.previous_round_id is null
               and e.kind not in ('primary', 'caucus', 'runoff', 'indirect')
-              and e.date_from < g.d and e.date_from >= g.d - 400 and ${same("g", "c")}
+              and e.date_from < g.d and e.date_from >= g.d - 400 and ${same("g")}
           ),
           picked as materialized (
             select c.id, c.party_scope_id as party, c.district_area_id as district, e.date_from as d,
@@ -11400,7 +11398,7 @@ export const contests = {
             where c.id <> g.id and (
               c.allocation_parent_id is null and c.previous_round_id is null
               and e.kind in ('primary', 'caucus') and e.date_from > prev.d and e.date_from <= g.d
-              and (g.office_id is not null or g.body_id is not null) and ${same("g", "c")}
+              and (g.office_id is not null or g.body_id is not null) and ${same("g")}
             )
           )
           select p.id, p.party, p.district, p.d::text as date, p."isGeneral", p."isSame",
@@ -13578,7 +13576,7 @@ export async function races(
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         (select p.office_id from contest p where p.id = c.allocation_parent_id and c.kind = 'elector_slate') as elects,
         case when c.kind = 'office' then null else c.body_id end as body,
-        ${held("c", "e")}::text as day, c.round_number as round,
+        ${held}::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", k.stage as "isStage", z.seats as size,
         c.kind = 'office' and exists (
           select from office o where o.id = c.office_id
@@ -16571,7 +16569,7 @@ export const elections = {
         places: Array<string>;
       }>(sql`
         with x as materialized (
-          select coalesce(e.rerun_of_id, ${umbrella("e")}, e.id) as root
+          select coalesce(e.rerun_of_id, ${umbrella}, e.id) as root
           from election e where e.id = ${input.id}::uuid
         )
         select r.id, r.date_from::text as date, r.status::text = 'annulled' as "isAnnulled", false as "isRerun",
@@ -16586,7 +16584,7 @@ export const elections = {
         from x join election r on r.id = x.root
         join election e on e.polity_id = r.polity_id and e.kind = r.kind
           and e.date_from > r.date_from and e.date_from <= r.date_from + 400
-        where ${umbrella("e")} = r.id
+        where ${umbrella} = r.id
       `);
       const found = await db.execute<{
         id: string;
@@ -17472,7 +17470,7 @@ export const elections = {
           where x.id = ${input.id}::uuid
         )
         select e.id, e.date_from::text as date, extract(year from e.date_from)::int as year,
-          e.status::text = 'annulled' as annulled, coalesce(e.rerun_of_id, ${umbrella("e")}) as root
+          e.status::text = 'annulled' as annulled, coalesce(e.rerun_of_id, ${umbrella}) as root
         from sided x
         join sided e on e.side is not distinct from x.side
         left join election p on p.id = e.parent_id

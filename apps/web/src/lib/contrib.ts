@@ -116,11 +116,7 @@ export type Precision = (typeof precisions)[number];
 
 export const dated = (value: string, precision: Precision) =>
   date(
-    precision === "day"
-      ? value
-      : precision === "month"
-        ? value.slice(0, 7)
-        : value.slice(0, 4),
+    precision === "day" ? value : value.slice(0, precision === "month" ? 7 : 4),
   );
 
 export const period = (

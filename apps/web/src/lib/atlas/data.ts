@@ -46,8 +46,8 @@ export function mosaicUrl(contest: string, ask: Ask) {
   return `/api/v1/contests/${contest}/mosaic${query({ vs: ask.vs, group: ask.group })}`;
 }
 
-async function get<T>(url: string, signal?: AbortSignal) {
-  const response = await fetch(url, { signal });
+async function get<T>(url: string) {
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`${response.status} ${url}`);
   }

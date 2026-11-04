@@ -468,7 +468,7 @@
       >
     </th>
     {#if isReach}
-      <td class="@max-[24rem]:hidden"></td>
+      <td class="@max-sm:hidden"></td>
     {/if}
     {#if !isOpen}
       <td
@@ -518,7 +518,7 @@
   >
     <th
       class={cn(
-        "px-2 py-1.5 text-start font-normal [@media(width>=48rem)]:inline-full [@media(width>=48rem)]:max-inline-0",
+        "px-2 py-1.5 text-start font-normal min-md:inline-full min-md:max-inline-0",
         { "shadow-[inset_3px_0_0_var(--party)]": line.mark != null },
       )}
       scope="row"
@@ -557,11 +557,11 @@
             class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
           ></span>
         {/if}
-        <span class="flex-1 min-inline-0 [@media(width>=48rem)]:*:truncate">
+        <span class="flex-1 min-inline-0 min-md:*:truncate">
           <span class="flex flex-wrap items-baseline gap-x-1.5 *:shrink-0">
-            <span class="shrink! min-inline-0 [@media(width>=48rem)]:truncate"
+            <span class="shrink! min-inline-0 min-md:truncate"
               ><Name
-                class="font-semibold text-foreground [@media(width>=48rem)]:inline-block [@media(width>=48rem)]:truncate [@media(width>=48rem)]:align-bottom [@media(width>=48rem)]:max-inline-full"
+                class="font-semibold text-foreground min-md:inline-block min-md:truncate min-md:align-bottom min-md:max-inline-full"
                 label={row.label}
                 color={swatch(row.color, row.key)}
                 hasSwatch={false}
@@ -672,7 +672,7 @@
           {/if}
           {#each line.backers as backer, index (index)}
             <span
-              class="block text-[0.8125rem] text-pretty text-muted-foreground [@media(width>=48rem)]:whitespace-normal!"
+              class="block text-[0.8125rem] text-pretty text-muted-foreground min-md:whitespace-normal!"
               >{backer.head}{#each backer.parts as part, at (at)}{#if part.party == null}{part.text}{:else}<Name
                     class="whitespace-nowrap"
                     label={part.text}
@@ -708,7 +708,7 @@
     </th>
     {#if isReach}
       <td
-        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums @max-[24rem]:hidden"
+        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums @max-sm:hidden"
       >
         {#if page?.person != null}
           {count(page.ballots ?? 0)}
@@ -910,7 +910,7 @@
           </span>
         </th>
         {#if isReach}
-          <td class="@max-[24rem]:hidden"></td>
+          <td class="@max-sm:hidden"></td>
         {/if}
         <td
           class={cn(
@@ -959,7 +959,7 @@
         >
         {#if isReach}
           <th
-            class="px-2 py-1.5 text-end font-medium whitespace-nowrap @max-[24rem]:hidden"
+            class="px-2 py-1.5 text-end font-medium whitespace-nowrap @max-sm:hidden"
             scope="col"
             ><Term
               label={m.col_ballots()}

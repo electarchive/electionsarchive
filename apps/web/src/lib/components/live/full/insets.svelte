@@ -139,7 +139,7 @@
         onpointerleave={() => enter(null)}
       >
         <span
-          class="truncate px-1.5 pbs-1 text-[0.625rem] leading-none font-semibold text-muted-foreground max-inline-(--inline)"
+          class="truncate px-1.5 pbs-1 text-[0.625rem]/none font-semibold text-muted-foreground max-inline-(--inline)"
           style:--inline="{box.inline}px">{box.name}</span
         >
         <svg

@@ -117,7 +117,7 @@
                 >
                 {#if row.option.party != null}
                   <span
-                    class="hidden shrink-0 text-[0.75em] text-muted-foreground @[16rem]:inline"
+                    class="hidden shrink-0 text-[0.75em] text-muted-foreground @3xs:inline"
                     >{row.option.party.short}</span
                   >
                 {/if}
