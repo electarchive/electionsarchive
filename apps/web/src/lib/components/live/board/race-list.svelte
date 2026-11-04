@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveOffice } from "@ea/analytics/live";
+  import { unroll } from "svelte-islands";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Summary } from "#lib/live/summary.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
@@ -48,6 +49,7 @@
           b.margin - a.margin,
     );
   });
+  const shelf = unroll(40);
   const changing = $derived(
     kind === "flips"
       ? swing(rows.map((summary) => desk.shifts.get(summary.race.id) ?? null))
@@ -70,7 +72,7 @@
     </div>
   {/if}
   <ol class="grid text-[0.8125em]">
-    {#each rows as summary (summary.race.id)}
+    {#each rows.slice(0, shelf.limit) as summary (summary.race.id)}
       {const option = $derived(ahead(summary))}
       {const isPicked = $derived(desk.selected?.id === summary.race.id)}
       <li>
@@ -113,5 +115,8 @@
         </button>
       </li>
     {/each}
+    {#if shelf.limit < rows.length}
+      <li {@attach shelf.tail(rows.length)}></li>
+    {/if}
   </ol>
 {/if}

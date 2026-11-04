@@ -1,6 +1,7 @@
 <script lang="ts">
   import CircleCheckIcon from "@lucide/svelte/icons/circle-check";
   import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
+  import { unroll } from "svelte-islands";
   import type { Entry } from "#lib/live/ballot.js";
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
@@ -27,6 +28,7 @@
   } = $props();
 
   const parties = useReach();
+  const shelf = unroll(16);
 
   function lines(entry: Entry) {
     const { summary } = entry;
@@ -60,7 +62,7 @@
     <span class="hidden text-end sm:block">{m.night_state_counted()}</span>
   </div>
   <ol class="grid">
-    {#each entries as entry (entry.contest.id)}
+    {#each entries.slice(0, shelf.limit) as entry (entry.contest.id)}
       {const summary = $derived(entry.summary)}
       {const pick = $derived(summary.winner ?? summary.leader)}
       {const band = $derived(bandOf(entry.summary, entry.contest.seats))}
@@ -207,5 +209,8 @@
         </a>
       </li>
     {/each}
+    {#if shelf.limit < entries.length}
+      <li {@attach shelf.tail(entries.length)}></li>
+    {/if}
   </ol>
 </div>
