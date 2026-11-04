@@ -918,6 +918,12 @@
       : row.label;
   const unfolded = new SvelteSet<string>();
 
+  function warm(folded: Part | null | undefined, anchor: string) {
+    if (folded != null) {
+      void load(folded).catch(() => unfolded.delete(anchor));
+    }
+  }
+
   const built = $derived(
     [
       ...ordered,
@@ -2610,7 +2616,12 @@
                 {@render outlined()}
               </Lazy>
             {/if}
-            {@render wards(race.wards ?? [], race.anchor, race.lede)}
+            {@render wards(
+              race.wards ?? [],
+              race.anchor,
+              race.lede,
+              race.folded,
+            )}
           {/if}
         </section>
       {/if}
@@ -3412,7 +3423,12 @@
   rows: NonNullable<(typeof races)[number]["wards"]>,
   anchor: string,
   text: string | null,
+  folded: (typeof races)[number]["folded"],
 )}
+  {const tail = $derived(folded == null ? null : (peek(folded)?.value ?? null))}
+  {const isOpen = $derived(
+    unfolded.has(anchor) && (folded == null || tail != null),
+  )}
   {const round = (runoff: { date: string; isGeneral: boolean }) => {
     const day = new Intl.DateTimeFormat(getLocale(), {
       month: "long",
@@ -3430,7 +3446,12 @@
     <ol
       class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,19rem),1fr))] gap-x-6 text-sm"
     >
-      {#each unfolded.has(anchor) || rows.length <= 20 ? rows : rows.slice(0, 18) as row, index (index)}
+      {#each isOpen || rows.length <= 20 ? rows : rows.slice(0, 18) as base, index (index)}
+        {const row = $derived(
+          tail == null || index < tail.at
+            ? base
+            : { ...base, ...tail.rows[index - tail.at] },
+        )}
         {const final = $derived(row.runoff?.isWon === true ? row.runoff : null)}
         <li
           class="grid grid-cols-[fit-content(45%)_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 pointer-coarse:py-2"
@@ -3571,15 +3592,19 @@
       <button
         type="button"
         class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
-        aria-expanded={unfolded.has(anchor)}
+        aria-expanded={isOpen}
+        aria-busy={unfolded.has(anchor) && !isOpen}
+        onpointerenter={() => warm(folded, anchor)}
+        onfocus={() => warm(folded, anchor)}
         onclick={() => {
           if (unfolded.has(anchor)) {
             unfolded.delete(anchor);
           } else {
+            warm(folded, anchor);
             unfolded.add(anchor);
           }
         }}
-        >{unfolded.has(anchor)
+        >{isOpen
           ? m.regions_fewer()
           : m.regions_more({ count: count(rows.length) })}</button
       >
