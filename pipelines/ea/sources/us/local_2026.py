@@ -2305,7 +2305,96 @@ IA_OTHER_COUNTIES = {
         "https://www.tamacounty.iowa.gov/files/candidate_list/2026_general_election_18326.pdf",
         "Tama County Auditor",
     ),
+    "Appanoose": (
+        "appanoose-legal-notice",
+        "https://appanoosecounty.iowa.gov/wp-content/uploads/2026/10/Legal-Notice-2026.pdf",
+        "Appanoose County Auditor",
+    ),
+    "Jefferson": (
+        "jefferson-notice",
+        "https://jeffersoncounty.iowa.gov/wp-content/uploads/notice-general-2026.pdf",
+        "Jefferson County Auditor",
+    ),
 }
+IA_TOWNSHIP_FILES = {
+    "IA-19039": (
+        "Clarke County Auditor",
+        "https://clarkecounty.iowa.gov/elections/election-info/",
+        "clarke-township.html",
+    ),
+    "IA-19091-beaver": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/202-Beaver%20FOR%20WEBSITE-4.pdf",
+        "humboldt-beaver.pdf",
+    ),
+    "IA-19091-norway": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/605-Norway%20FOR%20WEBSITE-21.pdf",
+        "humboldt-norway.pdf",
+    ),
+    "IA-19091-wacousta": (
+        "Humboldt County Auditor",
+        "https://www.humboldtcounty.iowa.gov/403-Wacousta%20FOR%20WEBSITE-10.pdf",
+        "humboldt-wacousta.pdf",
+    ),
+    "IA-19099-lynngrove": (
+        "Jasper County Auditor",
+        "https://jaspercountyelections.iowa.gov/files/sample_ballots/1201_lynn_grove_township_74220.pdf",
+        "jasper-lynn-grove.pdf",
+    ),
+    "IA-19105-candidates": (
+        "Jones County Auditor",
+        "https://www.jonescountyiowa.gov/files/general_candidate_80677.pdf",
+        "jones-candidates.pdf",
+    ),
+    "IA-19123-westdesmoines": (
+        "Mahaska County Auditor",
+        "https://elections.mahaskacountyia.gov/files/sample_ballots/20261103_west_des_moines_township_27582.pdf",
+        "mahaska-west-des-moines.pdf",
+    ),
+    "IA-19125-lakeprairie": (
+        "Marion County Auditor",
+        "https://www.marioncountyiowa.gov/files/sample_ballots/20261103_2026_general_election_lp_twp_21272.pdf",
+        "marion-lake-prairie.pdf",
+    ),
+    "IA-19153-union": (
+        "Polk County Auditor",
+        "https://www.polkcountyiowa.gov/media/5b2d1i3a/sheldahl_1_twp-sample.pdf",
+        "polk-sheldahl-1-twp.pdf",
+    ),
+    "IA-19185": (
+        "Wayne County Auditor",
+        "https://waynecountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "wayne-benton.pdf",
+    ),
+    "IA-19185-jefferson": (
+        "Wayne County Auditor",
+        "https://waynecountyelections.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "wayne-jefferson.pdf",
+    ),
+    "IA-19195-lincoln": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-lincoln.pdf",
+    ),
+    "IA-19195-brookfield": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-brookfield.pdf",
+    ),
+    "IA-19195-union": (
+        "Worth County Auditor",
+        "https://elections.worthcountyiowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "worth-union.pdf",
+    ),
+}
+for _key, (_publisher, _url, _name) in IA_TOWNSHIP_FILES.items():
+    NE_SOURCES[_key] = (
+        _publisher,
+        "Township sample ballot or candidate list, General Election November 3, 2026",
+        _url,
+        f"ia/counties/{_name}",
+    )
 for _line in Path(__file__).with_name("local_2026_nov3_ia.tsv").read_text().splitlines()[1:]:
     _key, _county = _line.split("\t")[0], _line.split("\t")[5]
     if _key not in NE_SOURCES and _county in {**IA_OTHER_COUNTIES, **ia_districts_2026.COUNTIES}:
