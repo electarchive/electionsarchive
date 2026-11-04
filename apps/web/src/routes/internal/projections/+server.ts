@@ -2,6 +2,8 @@ import { PROJECTION_TOKEN } from "$app/env/private";
 import { error, json } from "@sveltejs/kit";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { sum } from "#lib/live/standing.js";
+import { remember } from "#lib/server/cache.js";
+import { control } from "#lib/server/live-board.js";
 import { projections } from "#lib/server/rpc/live.js";
 import type { RequestHandler } from "./$types";
 
@@ -24,6 +26,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
   const watch = new Set(url.searchParams.get("watch")?.split(","));
   const { election, estimates } = await projections(path);
+  const held = await remember(
+    path.split("/").length === 2
+      ? `live:control:v3:${election.date}`
+      : `live:holders:v3:${election.slug}`,
+    async () => control(election.races, election.date),
+  );
   const races = election.races.flatMap((race) => {
     const found = estimates[race.id];
     const frame = race.frames.at(-1);
@@ -65,6 +73,11 @@ export const GET: RequestHandler = async ({ request, url }) => {
       .slice(0, 3);
     const expected =
       found?.status === "estimating" ? found.expectedTotal : null;
+    const holder = held.holders[race.id];
+    const party = holder?.party == null ? null : held.parties[holder.party];
+    const pickId = race.projected?.option ?? leaderId;
+    const pick = race.options.find((option) => option.id === pickId);
+    const pickParty = pick?.party?.id;
     return [
       {
         id: race.id,
@@ -102,6 +115,20 @@ export const GET: RequestHandler = async ({ request, url }) => {
         isCertified: race.certified != null,
         winners: race.certified?.winners ?? null,
         isUncontested,
+        held:
+          holder?.party == null || party == null
+            ? null
+            : {
+                party: party.short,
+                color: party.color ?? "",
+                isVacant: holder.isVacant,
+              },
+        isFlip:
+          holder?.party == null || pick == null
+            ? null
+            : (pickParty == null
+                ? null
+                : (held.families[pickParty] ?? pickParty)) !== holder.party,
         isReady:
           !isCalled &&
           race.certified == null &&
