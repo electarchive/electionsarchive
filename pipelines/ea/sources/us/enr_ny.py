@@ -2,20 +2,22 @@ import html
 import json
 import os
 import re
-import subprocess
+import zipfile
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
-import fastexcel
 import httpx
 
 from ea.sources.us.enr_2026 import DAY, EV_OFFICES
 
-API = "https://app.enhancedvoting.com/results/public/api/"
 CDN = "https://app.enhancedvoting.com/cdn/results/"
-COUNTIES = {"Westchester": "westchester-county-ny", "Suffolk": "suffolk-county-ny", "Monroe": "monroe-county-ny"}
+EXPORTS = {
+    "Westchester": "westchester-county-ny/export-2026GeneralElection.zip",
+    "Suffolk": "suffolk-county-ny/export-GE2026_20261028145605.zip",
+    "Monroe": "monroe-county-ny/export-GE2026.zip",
+}
 NASSAU = "https://app.nassaucountyny.gov/BOE/results/election2.html"
 ERIE = "https://erie.resultscaster.com/api/resultscasts"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
@@ -30,9 +32,6 @@ CODE = re.compile(r"^[A-Z]{3} (?=\S+ )")
 NASSAU_LINE = re.compile(r"^\s+(\S.*?)(?:\s*\.)(?:\s+\.)+\s+([\d,]+)\b")
 NASSAU_PRECINCTS = re.compile(r"WITH ([\d,]+) OF ([\d,]+) PRECINCTS")
 NASSAU_PARTY = re.compile(r"\*{4,} \((.+)\) \*{4,}")
-PDF_LINE = re.compile(
-    r"^(?:(?P<code>[A-Z]{3}) )?(?P<name>\S.*?)(?:\s{2,}(?P<party>[A-Za-z][A-Za-z ]*?)\s+|\s{2,})(?P<votes>[\d,]+)$"
-)
 
 
 def classify(title: str) -> tuple[str, str, str]:
@@ -55,39 +54,13 @@ def person(label: str) -> str:
     return re.sub(r"\s*/\s*", " / ", " ".join(label.split()))
 
 
-def pdf_text(content: bytes) -> str:
-    return subprocess.run(
-        ["pdftotext", "-layout", "-", "-"], input=content, capture_output=True, check=True
-    ).stdout.decode(errors="replace")
-
-
 def collect(client: httpx.Client, get: Callable, store: Callable[[str, bytes, str], None]) -> None:
-    for county, slug in COUNTIES.items():
-        listing = get(client, f"{API}jurisdictions/{slug}", HEADERS)
-        found = next(
-            (
-                e["publicElectionId"]
-                for e in json.loads(listing or "{}").get("elections") or []
-                if e["electionDate"][:10] == DAY.isoformat()
-            ),
-            None,
-        )
-        url = f"{API}elections/{slug}/{found}"
-        election = found and get(client, url, HEADERS)
-        if not election:
-            print(f"NY: no {DAY} election for {county}")
-            continue
-        detail = json.loads(election)
-        reports = {r["reportName"]: r["blobName"] for c in detail["publicReportCategories"] for r in c["reports"]}
-        excel = reports.get("All Results Excel")
-        blob = excel or reports.get("Summary Results by Contest with Candidate Totals")
-        content = blob and get(client, f"{CDN}{detail['jurisdictionId']}/{quote(blob)}", HEADERS)
+    for county, export in EXPORTS.items():
+        content = get(client, f"{CDN}{export}", HEADERS)
         if not content:
-            print(f"NY: no results file for {county}")
+            print(f"NY: no export for {county}")
             continue
-        store(f"{API}jurisdictions/{slug}", listing, ".json")
-        store(url, election, ".json")
-        store(f"{url}/report", content, ".xlsx" if excel else ".pdf")
+        store(f"{CDN}{export}", content, ".zip")
     erie(client, get, store)
     page = get(client, NASSAU, HEADERS)
     if page and f"{DAY:%B} {DAY.day}, {DAY.year}".upper() in page.decode(errors="replace").upper():
@@ -162,18 +135,6 @@ def erie_rows(url: str, urls: dict[str, Path]):
             )
 
 
-def reporting(detail: dict) -> tuple[int | None, int | None]:
-    statuses = detail.get("precinctReportingStatus") or []
-    done = sum(
-        s["value"] or 0
-        for s in statuses
-        if s["reportingStatusClientTextKey"]
-        in ("reporting-status-fully-reported", "reporting-status-election-night-complete")
-    )
-    total = sum(s["value"] or 0 for s in statuses)
-    return (done, total) if total else (None, None)
-
-
 def row(county: str, title: str, candidate: str, party: str, votes: int, as_of: str | None, seen: tuple) -> dict:
     office, contest, district = classify(title)
     return {
@@ -198,73 +159,22 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
     if url.startswith(ERIE) and url.endswith("/status"):
         yield from erie_rows(url, urls)
         return
-    found = re.fullmatch(API + r"elections/([^/]+)/[^/]+/report", url)
-    if found is None:
+    county = next((name for name, export in EXPORTS.items() if url == f"{CDN}{export}"), None)
+    if county is None:
         return
-    county = next((name for name, slug in COUNTIES.items() if slug == found[1]), None)
-    election = urls.get(url.removesuffix("/report"))
-    if county is None or election is None:
-        return
-    detail = json.loads(election.read_bytes())
-    stamp = detail.get("asOf") or detail.get("lastUpdated")
-    as_of = datetime.fromisoformat(stamp).isoformat() if stamp else None
-    seen = reporting(detail)
-    if path.suffix == ".xlsx":
-        frame = fastexcel.read_excel(path).load_sheet_by_name("Summary Results", header_row=0).to_polars()
-        votes: dict[tuple[str, str], list] = {}
-        for title, name, party, total in frame.select("Office Name", "Ballot Name", "Party", "Total").iter_rows():
-            title = " ".join(html.unescape(title or "").split())
-            if not title or not name or name.strip().lower() in TOTALS:
-                continue
-            entry = votes.setdefault((title, person(name)), [party or "", 0])
-            entry[1] += int(total or 0)
-        for (title, candidate), (party, count) in votes.items():
-            yield row(county, title, candidate, party, count, as_of, seen)
-        return
-    title = None
-    header = 0
-    candidates: dict[tuple[str, str], list] = {}
-    for line in pdf_text(path.read_bytes()).splitlines():
-        text = line.rstrip()
-        if "Summary Results Report" in text:
-            header = 2
-            continue
-        if not text.strip() or "Last Updated" in text:
-            continue
-        if header:
-            header -= 1
-            continue
-        if text.startswith(("Monroe County", "Vote For")) or re.fullmatch(r"\s*TOTAL\s*", text):
-            continue
-        if re.fullmatch(r"\S.*", text) and not PDF_LINE.match(text):
-            title = " ".join(text.split())
-            continue
-        if title is None:
-            continue
-        match = PDF_LINE.match(text.strip() if text.startswith(" ") else text)
-        if match is None:
-            continue
-        name = match["name"].strip()
-        count = int(match["votes"].replace(",", ""))
-        lowered = name.lower()
-        if lowered in TOTALS:
-            continue
-        if match["party"] == "Total" or name.endswith(" Total"):
-            label = name.removesuffix(" Total").strip()
-            if label:
-                candidates[(title, person(label))] = ["", count]
-            continue
-        if match["code"] or match["party"]:
-            entry = candidates.setdefault(
-                (title, person(f"{match['code'] or ''} {name}".strip())), [match["party"] or "", 0]
-            )
-            entry[1] += count
-        elif lowered.startswith("write-in"):
-            candidates[(title, "Write-in")] = ["", count]
-    for (title, candidate), (party, count) in candidates.items():
+    with zipfile.ZipFile(path) as archive:
+        export = json.loads(archive.read("export.json"))
+    for item in export["results"]["ballotItems"]:
+        title = " ".join(html.unescape(item["name"]).split())
         if title == "Representative in Congress":
             title = f"{title} {MONROE_DISTRICT}"
-        yield row("Monroe", title, candidate, party, count, as_of, seen)
+        seen = (item["precinctsReporting"], item["precinctsParticipating"])
+        votes: dict[str, list] = {}
+        for option in item["ballotOptions"]:
+            entry = votes.setdefault(person(option["name"]), [option["politicalParty"] or "", 0])
+            entry[1] += int(option["voteCount"] or 0)
+        for candidate, (party, count) in votes.items():
+            yield row(county, title, candidate, party, count, export["createdAt"], seen)
 
 
 def nassau(path: Path):
