@@ -10,7 +10,7 @@ from uuid import UUID
 
 import httpx
 
-from ea.sources.us import civicapi, enr_2026, guam_live, mp_cec_live, npr_live, nyc_enr_live, vi_live
+from ea.sources.us import civicapi, dc_boe_live, enr_2026, guam_live, mp_cec_live, npr_live, nyc_enr_live, vi_live
 from ea.store import DATA, Connection, connect
 
 FEEDS = Path(__file__).with_name("live_feeds.toml")
@@ -87,6 +87,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         npr_live.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
     elif adapter == "us.nyc_enr":
         pages = nyc_enr_live.collect(client)
+    elif adapter == "us.dc_boe_live":
+        pages = dc_boe_live.collect(client)
     elif adapter == "us.guam_live":
         pages = guam_live.collect(client)
     elif adapter == "us.mp_cec_live":
@@ -126,6 +128,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.civicapi"
             else enr_2026.plan(conn, npr_live.frame(params["state"], paths), lambda _, __: None)
             if adapter == "us.npr"
+            else dc_boe_live.plan(conn, paths)
+            if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)
             if adapter == "us.guam_live"
             else mp_cec_live.plan(conn, paths)
