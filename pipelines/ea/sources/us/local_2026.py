@@ -2299,10 +2299,17 @@ for county, url in {
         url,
         f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton', 'St. Lawrence') else 'pdf'}",
     )
+IA_OTHER_COUNTIES = {
+    "Tama": (
+        "tama",
+        "https://www.tamacounty.iowa.gov/files/candidate_list/2026_general_election_18326.pdf",
+        "Tama County Auditor",
+    ),
+}
 for _line in Path(__file__).with_name("local_2026_nov3_ia.tsv").read_text().splitlines()[1:]:
     _key, _county = _line.split("\t")[0], _line.split("\t")[5]
-    if _key not in NE_SOURCES and _county in ia_districts_2026.COUNTIES:
-        _stem, _url, _publisher = ia_districts_2026.COUNTIES[_county]
+    if _key not in NE_SOURCES and _county in {**IA_OTHER_COUNTIES, **ia_districts_2026.COUNTIES}:
+        _stem, _url, _publisher = {**IA_OTHER_COUNTIES, **ia_districts_2026.COUNTIES}[_county]
         NE_SOURCES[_key] = (
             _publisher,
             "Candidate list or sample ballot, General Election November 3, 2026",
