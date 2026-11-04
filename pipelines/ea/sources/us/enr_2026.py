@@ -716,6 +716,10 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         from ea.sources.us import enr_tx
 
         enr_tx.collect(client, store)
+    if not only or "MI" in only:
+        from ea.sources.us import enr_mi
+
+        enr_mi.collect(client, store)
 
 
 def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
@@ -738,6 +742,11 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_ky
 
         yield from enr_ky.rows(url, path)
+        return
+    if state == "MI" and url.startswith("https://app.enhancedvoting.com/"):
+        from ea.sources.us import enr_mi
+
+        yield from enr_mi.rows(url, path)
         return
     if state == "TX" and not url.endswith("detailxml.zip"):
         from ea.sources.us import enr_tx
@@ -820,7 +829,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for contest in root.iter("Contest"):
             found = EV_OFFICES.fullmatch(re.sub(r"\s+", " ", contest.get("text") or "").strip())
-            if tenant and (found is None if state == "TX" else found is not None):
+            if tenant and state != "MI" and (found is None if state == "TX" else found is not None):
                 continue
             for choice in contest.iter("Choice"):
                 for kind in choice.iter("VoteType"):
