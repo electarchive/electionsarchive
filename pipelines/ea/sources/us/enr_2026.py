@@ -33,17 +33,15 @@ DAY = date.fromisoformat(os.environ.get("ENR_2026_DAY", "2026-11-03"))
 FIPS = {**COUNTY_FIPS, "AK": "02"}
 ONLY = set(filter(None, os.environ.get("ENR_2026_STATES", "").split(",")))
 HEADERS = {"User-Agent": "electionsarchive.com"}
-EV = {
-    "GA": ("results.sos.ga.gov", "Georgia"),
-    "ID": ("results.voteidaho.gov", "id"),
-    "UT": ("electionresults.utah.gov", "utah"),
-    "RI": ("electionresults.ri.gov", "RhodeIsland"),
-    "WA": ("results.votewa.gov", "washington"),
-}
 EV_EXPORTS = {
     "AZ": "https://app.enhancedvoting.com/cdn/results/Arizona/export-110326GeneralElection.zip",
+    "GA": "https://results.sos.ga.gov/cdn/results/Georgia/export-11032026GeneralAndSpecialElection.zip",
+    "ID": "https://results.voteidaho.gov/cdn/results/id/export-nov2026.zip",
+    "RI": "https://electionresults.ri.gov/cdn/results/RhodeIsland/export-2026StatewideGeneralElection.zip",
     "TN": "https://app.enhancedvoting.com/cdn/results/shelby-county-tn/export-11032026Midtermelections.zip",
+    "UT": "https://electionresults.utah.gov/cdn/results/Utah/export-General11032026.zip",
     "VA": "https://app.enhancedvoting.com/cdn/results/virginia/export-2026-November-General.zip",
+    "WA": "https://results.votewa.gov/cdn/results/washington/export-20261103.zip",
 }
 CLARITY_EIDS = {"SC": ["127300"], "WV": ["127496"]}
 CLARITY = {
@@ -77,7 +75,6 @@ LISTINGS = (
 )
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
-EV_DETAILS: dict[str, tuple[str, bytes]] = {}
 LIVE_COUNTIES = {"48113": ("TX", "Dallas", "127396")}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
@@ -388,36 +385,6 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
             print(f"{state}: no export")
         else:
             store(state, url, content, ".zip")
-    for state, (host, jurisdiction) in EV.items():
-        if only and state not in only:
-            continue
-        listing_url = f"https://{host}/results/public/api/jurisdictions/{jurisdiction}"
-        content = get(client, listing_url)
-        if content is None:
-            print(f"{state}: no jurisdiction listing")
-            continue
-        store(state, listing_url, content, ".json")
-        ids = [e["publicElectionId"] for e in json.loads(content)["elections"] if e["electionDate"] == DAY.isoformat()]
-        if not ids:
-            print(f"{state}: no election on {DAY}")
-            continue
-        base = f"https://{host}/results/public/api/elections/{jurisdiction}/{ids[0]}/"
-        content = get(client, base + "ballot-items")
-        if content is None:
-            print(f"{state}: no ballot items")
-            continue
-        store(state, base + "ballot-items", content, ".json")
-        for item in json.loads(content)["data"]:
-            if not EV_LOCAL.match(item["name"][0]["text"]):
-                url = f"{base}ballot-items/{item['id']}"
-                signature = json.dumps([item.get("voteTotal"), item.get("reportingStatus")], sort_keys=True)
-                cached = EV_DETAILS.get(url)
-                if cached is None or cached[0] != signature:
-                    detail = get(client, url)
-                    if detail is not None:
-                        cached = EV_DETAILS[url] = (signature, detail)
-                if cached is not None:
-                    store(state, url, cached[1], ".json")
     for state, base in CLARITY.items():
         if only and state not in only:
             continue
@@ -755,6 +722,7 @@ def ev_export(state: str, path: Path):
     with zipfile.ZipFile(path) as archive:
         export = json.loads(archive.read("export.json"))
     localities = export["localResults"] or [export["results"]]
+    names = {item["id"]: item["name"] for item in (export["results"] or {}).get("ballotItems") or []}
     precincts: dict[str, list[int]] = {}
     for locality in localities:
         for item in locality["ballotItems"]:
@@ -762,11 +730,20 @@ def ev_export(state: str, path: Path):
             tally[0] += item["precinctsReporting"] or 0
             tally[1] += item["precinctsParticipating"] or 0
     for locality in localities:
-        county = f"51{locality['id']}" if state == "VA" else locality["name"].removesuffix(" County")
+        county = (
+            f"51{locality['id']}"
+            if state == "VA"
+            else town_counties("RI").get(
+                plain(re.sub(r"\s+(city|town)$", "", locality["name"].lower())), locality["name"]
+            )
+            if state == "RI"
+            else locality["name"].removesuffix(" County")
+        )
         for item in locality["ballotItems"]:
-            if EV_LOCAL.match(item["name"]):
+            name = names.get(item["id"], item["name"])
+            if EV_LOCAL.match(name):
                 continue
-            seat = ev_seat(state, item["name"])
+            seat = ev_seat(state, name)
             reporting, total = precincts[item["id"]]
             for option in item["ballotOptions"]:
                 yield {
@@ -1300,37 +1277,6 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         return
     if "/cdn/results/" in url:
         yield from ev_export(state, path)
-        return
-    detail = json.loads(path.read_bytes())
-    if "breakdownResults" not in detail:
-        return
-    seat = ev_seat(state, detail["name"][0]["text"])
-    status = detail.get("reportingStatus") or {}
-    as_of = status.get("asOf")
-    localities = detail["breakdownResults"] or [
-        {"locality": None, "ballotOptions": detail["summaryResults"]["ballotOptions"]}
-    ]
-    for locality in localities:
-        place = locality["locality"]["name"][0]["text"] if locality["locality"] else ""
-        county = (
-            FIPS[state]
-            if locality["locality"] is None
-            else town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
-            if state == "RI"
-            else place.removesuffix(" County")
-        )
-        for option in locality["ballotOptions"]:
-            yield {
-                **seat,
-                "party": (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()"),
-                "county": county,
-                "candidate": TAGS.sub("", option["name"][0]["text"]).strip(),
-                "write_in": bool(option["isWriteIn"]),
-                "votes": int(option["voteCount"] or 0),
-                "as_of": as_of,
-                "reporting": status.get("reportingUnits"),
-                "total": status.get("totalUnits"),
-            }
 
 
 def parse() -> None:
