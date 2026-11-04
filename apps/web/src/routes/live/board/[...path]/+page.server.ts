@@ -1,21 +1,15 @@
-import { call, ORPCError } from "@orpc/server";
-import { error, redirect } from "@sveltejs/kit";
+import { dev } from "$app/env";
+import { redirect } from "@sveltejs/kit";
+import { part } from "svelte-islands/server";
 import { remember } from "#lib/server/cache.js";
 import { house } from "#lib/server/live-board.js";
-import { router } from "#lib/server/rpc/router.js";
+import { night } from "#lib/server/live-page.js";
+import { liveParts } from "#lib/server/live-parts.js";
 import { holders } from "#lib/server/rpc/tonight.js";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
-  const found = await call(router.live.election, { path: params.path }).catch(
-    (error_: unknown) => {
-      if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
-        error(404);
-      }
-      throw error_;
-    },
-  );
-  const { election } = found;
+export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
+  const { election, estimates, shown } = await night(params.path);
   if (election.slug !== params.path) {
     redirect(307, `/live/board/${election.slug}`);
   }
@@ -30,9 +24,18 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
     holders(election.races, election.date, election.slug, isNation),
   ]);
   return {
-    ...found,
+    ...liveParts(
+      election,
+      estimates,
+      isNation ? control : null,
+      dev && url.searchParams.has("rehearsal"),
+    ),
+    shown,
     isNation,
-    cartogram: district?.cartogram ?? null,
-    control,
+    cartogram:
+      district?.cartogram == null
+        ? null
+        : part("live.cartogram", district.cartogram, { fetch: "preload" }),
+    holders: isNation ? null : control,
   };
 };

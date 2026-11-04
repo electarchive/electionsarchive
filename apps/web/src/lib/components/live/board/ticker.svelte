@@ -1,67 +1,28 @@
 <script lang="ts">
-  import type { LiveOption, LiveRace } from "@ea/analytics/live";
   import CircleDashedCheckIcon from "@lucide/svelte/icons/circle-dashed-check";
   import { prefersReducedMotion } from "svelte/motion";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { short } from "#lib/live/board/labels.js";
   import { clock, compact, lead, surname, tone } from "#lib/live/format.js";
-  import { ranked, sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
   const { desk }: { desk: Desk } = $props();
 
-  const LIMIT = 60;
-
-  const entries = $derived.by(() => {
-    const found: Array<{
-      key: string;
-      race: LiveRace;
-      at: string;
-      leader: LiveOption | undefined;
-      margin: number;
-      added: number;
-      isCall: boolean;
-    }> = [];
-    for (const race of desk.feed.election.races) {
-      const call = race.projected;
-      const called = race.options.find((option) => option.id === call?.option);
-      if (call != null && called != null) {
-        found.push({
-          key: `${race.id}:call`,
-          race,
-          at: call.at,
-          leader: called,
-          margin: 0,
-          added: 0,
-          isCall: true,
-        });
-      }
-      let previous = 0;
-      for (const frame of race.frames) {
-        const total = sum(frame.totals);
-        if (total > previous) {
-          const [first, second] = ranked(frame.totals);
-          found.push({
-            key: `${race.id}:${frame.at}`,
-            race,
-            at: frame.at,
-            leader: first == null ? undefined : race.options[first],
-            margin:
-              ((frame.totals[first ?? 0] ?? 0) -
-                (frame.totals[second ?? 1] ?? 0)) /
-              total,
-            added: total - previous,
-            isCall: false,
-          });
-        }
-        previous = total;
-      }
-    }
-    return found
-      .toSorted((a, b) => b.at.localeCompare(a.at) || b.added - a.added)
-      .slice(0, LIMIT);
-  });
+  const entries = $derived(
+    desk.feed.night.updates.flatMap((update) => {
+      const race = desk.feed.bySlug.get(update.race);
+      return race == null
+        ? []
+        : [
+            {
+              ...update,
+              race,
+              leader: race.options.find(({ id }) => id === update.leader),
+            },
+          ];
+    }),
+  );
 
   function flash(_node: Element) {
     return {
@@ -76,7 +37,7 @@
   <p class="text-[0.75em] text-muted-foreground">{m.board_ticker_empty()}</p>
 {:else}
   <ol class="grid text-[0.8125em]">
-    {#each entries as entry (entry.key)}
+    {#each entries as entry (`${entry.race.id}:${entry.at}:${entry.isCall}`)}
       {const isPicked = $derived(desk.selected?.id === entry.race.id)}
       <li in:flash>
         <button

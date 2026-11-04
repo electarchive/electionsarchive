@@ -20,6 +20,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Entry } from "#lib/live/ballot.js";
+  import type { Point } from "#lib/live/history.js";
   import type { Control } from "#lib/live/nation.js";
   import type { Geography, Pieces, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
@@ -50,7 +51,6 @@
     surname,
     tone,
   } from "#lib/live/format.js";
-  import { history } from "#lib/live/history.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
@@ -427,7 +427,7 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
-  const forecast = $derived.by(() => {
+  const counted = $derived.by(() => {
     if (
       race == null ||
       current == null ||
@@ -443,12 +443,32 @@
       return null;
     }
     const [a, b] = racePair;
-    return {
-      history: history(race, null),
-      counted:
-        ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total,
+    return (
+      ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total
+    );
+  });
+  let traced = $state.raw<{ slug: string; points: Array<Point> } | null>(null);
+
+  $effect(() => {
+    const slug = race?.slug;
+    if (slug == null || counted == null) {
+      return;
+    }
+    void race?.frames.at(-1)?.at;
+    let isCurrent = true;
+    fetch(`/live/trend/${slug}`)
+      .then(async (response) => {
+        const points: Array<Point> = response.ok ? await response.json() : [];
+        if (isCurrent) {
+          traced = { slug, points };
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isCurrent = false;
     };
   });
+
   const hasVotes = $derived(
     isSpread
       ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
@@ -2285,14 +2305,14 @@
         {clock}
         {forecasts}
       />
-      {#if forecast != null}
+      {#if counted != null}
         <Withheld isOff={!forecasts}>
           <Dial
             options={current.race.options}
             pair={racePair}
             {estimate}
-            history={forecast.history}
-            counted={forecast.counted}
+            history={traced?.slug === current.race.slug ? traced.points : []}
+            {counted}
             isWaiting={false}
           />
         </Withheld>

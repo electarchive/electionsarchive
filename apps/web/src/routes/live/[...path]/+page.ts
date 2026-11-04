@@ -1,19 +1,20 @@
-import { load as fetched } from "svelte-islands";
-import { join } from "#lib/live/board.js";
+import { opened, optional } from "#lib/live/board.js";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ data }) => {
-  if (data.board == null) {
-    return data;
-  }
-  const { board, ...rest } = data;
-  const [stable, changing] = await Promise.all([
-    fetched(board.stable),
-    fetched(board.changing),
+  const { board, geography, ballot, points, ...rest } = data;
+  const [night, map, listed, trail] = await Promise.all([
+    opened(board),
+    optional(geography),
+    optional(ballot),
+    optional(points),
   ]);
   return {
     ...rest,
-    ...join(board.head, stable, changing),
+    ...night,
+    geography: map,
+    ballot: listed,
+    points: trail ?? [],
     board: board.stable,
   };
 };

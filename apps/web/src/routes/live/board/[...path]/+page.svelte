@@ -16,6 +16,7 @@
       election: data.election,
       estimates: data.estimates,
       shown: data.shown,
+      updates: data.updates,
     })),
     dev && page.url.searchParams.has("rehearsal"),
   );

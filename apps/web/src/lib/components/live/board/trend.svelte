@@ -1,22 +1,31 @@
 <script lang="ts">
   import type { LiveRace } from "@ea/analytics/live";
+  import { Pending } from "svelte-islands";
+  import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { percent } from "#lib/format.js";
   import { clock, surname, tone } from "#lib/live/format.js";
   import { ranked, sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
 
-  const { race }: { race: LiveRace } = $props();
+  const { desk, race }: { desk: Desk; race: LiveRace } = $props();
+
+  $effect(() => {
+    desk.feed.want(race);
+  });
 
   let width = $state(0);
   let height = $state(0);
 
   const PAD = { top: 6, right: 44, bottom: 16, left: 4 };
 
-  const frames = $derived(race.frames.filter((frame) => sum(frame.totals) > 0));
+  const detail = $derived(desk.feed.detail(race).race);
+  const frames = $derived(
+    detail.frames.filter((frame) => sum(frame.totals) > 0),
+  );
   const top = $derived(ranked(frames.at(-1)?.totals ?? []).slice(0, 2));
   const series = $derived(
     top.map((index) => ({
-      option: race.options[index],
+      option: detail.options[index],
       points: frames.map((frame) => ({
         at: Date.parse(frame.at),
         share: (frame.totals[index] ?? 0) / Math.max(1, sum(frame.totals)),
@@ -64,7 +73,13 @@
   bind:clientWidth={width}
   bind:clientHeight={height}
 >
-  {#if frames.length < 2}
+  {#if !desk.feed.hasDetail(race)}
+    <Pending
+      name="live.board.trend"
+      isPending={true}
+      class="[--island-inset:0]"
+    />
+  {:else if frames.length < 2}
     <p class="text-[0.75em] text-muted-foreground">{m.board_trend_empty()}</p>
   {:else if width > 0 && height > 0}
     <svg

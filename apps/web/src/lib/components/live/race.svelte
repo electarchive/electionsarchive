@@ -6,6 +6,7 @@
   } from "@ea/analytics/live";
   import { untrack } from "svelte";
   import type { Holder } from "#lib/live/ballot.js";
+  import type { Point } from "#lib/live/history.js";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import Cycle from "#lib/components/live/cycle.svelte";
@@ -20,7 +21,7 @@
     stamp,
     tone,
   } from "#lib/live/format.js";
-  import { estimateAt, history } from "#lib/live/history.js";
+  import { estimateAt } from "#lib/live/history.js";
   import { liveLinks } from "#lib/live/links.js";
   import { sides } from "#lib/live/local.js";
   import { standing, sum } from "#lib/live/standing.js";
@@ -50,6 +51,7 @@
     election,
     race,
     geography,
+    points: trail,
     seat = null,
     base = null,
     clock: time,
@@ -61,6 +63,7 @@
     election: LiveElection;
     race: LiveRace;
     geography: Geography | null;
+    points: Array<Point>;
     seat?: { held: Holder | null; families: Record<string, string> } | null;
     base?: string | null;
     clock: number;
@@ -147,7 +150,7 @@
           units: [],
         },
   );
-  const points = $derived(isModeled ? history(race, null) : []);
+  const points = $derived(isModeled ? trail : []);
   const isUnestimated = $derived(isModeled && modeled.status === "unavailable");
   const seats = $derived(race.seats ?? 1);
   const isMulti = $derived(
