@@ -31,7 +31,7 @@ export type Seat = {
   right: number;
   signed: number | null;
   lean: number;
-  band: { low: number; high: number } | null;
+  band: { low: number; mid: number; high: number } | null;
   rating: Rating;
   isFlip: boolean;
   shift: Shift | null;
@@ -157,11 +157,19 @@ export function seat(
         : family(control, ahead ?? null) === right.id
           ? -1
           : 0;
-    if (sign !== 0) {
+    if (sign !== 0 && Number.isFinite(estimate.margin.mid)) {
       band =
         sign > 0
-          ? { low: estimate.margin.low, high: estimate.margin.high }
-          : { low: -estimate.margin.high, high: -estimate.margin.low };
+          ? {
+              low: estimate.margin.low,
+              mid: estimate.margin.mid,
+              high: estimate.margin.high,
+            }
+          : {
+              low: -estimate.margin.high,
+              mid: -estimate.margin.mid,
+              high: -estimate.margin.low,
+            };
     }
   }
   const pick = called ?? summary.favorite ?? summary.leader;

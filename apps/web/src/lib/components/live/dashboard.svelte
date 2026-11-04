@@ -954,6 +954,51 @@
     {/if}
   {/if}
 
+  {#if chambers != null && pair != null}
+    <section
+      class="grid content-start gap-4 bg-background px-4 py-6 sm:px-8"
+      aria-labelledby="night-ladder"
+    >
+      <div class="grid gap-0.5">
+        <h2 id="night-ladder" class="heading text-lg!">
+          {m.night_ladder_title()}
+        </h2>
+        <p class="max-inline-prose text-xs text-pretty text-muted-foreground">
+          {m.night_ladder_intro({
+            left: pair[0].name,
+            right: pair[1].name,
+            party: pair[0].name,
+          })}
+        </p>
+      </div>
+      <div class="grid items-start gap-x-12 gap-y-8 lg:grid-cols-2">
+        <Ladder
+          view={chambers.senate}
+          sides={pair}
+          {forecasts}
+          title={NAMES.senate()}
+          {label}
+          href={seatHref}
+          {tint}
+          {short}
+          party={partyOf}
+        />
+        <Ladder
+          view={chambers.house}
+          sides={pair}
+          {forecasts}
+          title={NAMES.house()}
+          {label}
+          href={seatHref}
+          {tint}
+          {short}
+          party={partyOf}
+          limit={20}
+        />
+      </div>
+    </section>
+  {/if}
+
   <section class="grid content-start gap-2 bg-background px-4 py-6 sm:px-8">
     <div class="grid gap-0.5">
       <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
@@ -1019,10 +1064,10 @@
       view === "house" && house != null && (hasShapes || hasHexes),
     )}
     <section
-      class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-x-10"
+      class="grid bg-background px-4 py-6 sm:px-8"
       aria-labelledby="night-office-{view}"
     >
-      <div class="grid content-start gap-3">
+      <div class="grid content-start gap-3 inline-full max-inline-240">
         <div
           class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
         >
@@ -1101,19 +1146,6 @@
           <LaterKey />
         {/if}
       </div>
-
-      {#if chambers != null && pair != null}
-        <aside>
-          <Ladder
-            view={chambers[view]}
-            sides={pair}
-            {forecasts}
-            {label}
-            href={seatHref}
-            {tint}
-          />
-        </aside>
-      {/if}
     </section>
   {/each}
 

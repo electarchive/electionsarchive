@@ -364,8 +364,10 @@ async function jurisdictions(contests: Array<string>) {
     scheme: string | null;
     seats: number | null;
     rules: unknown;
+    special: boolean;
+    majority: boolean;
   }>(sql`
-    select c.id as contest,
+    select c.id as contest, c.term = 'remainder' as special, coalesce(es.rules ->> 'formula' in ('two_round', 'irv'), false) as majority,
       case when p.kind = 'sovereign_state' then coalesce(st.entity_id, p.id) else p.id end as polity,
       case
         when p.kind = 'sovereign_state' and st.entity_id is not null then 'federal_unit'
@@ -1332,6 +1334,8 @@ async function night(
           : { name: titles.full.get(where.polity) ?? "", kind },
       seats: where?.seats ?? 1,
       rule: rule(where?.rules),
+      isSpecial: where?.special === true,
+      needsMajority: where?.majority === true,
       isMeasure:
         own.some((choice) => choice.kind === "answer") &&
         own.every(
