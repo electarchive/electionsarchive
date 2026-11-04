@@ -481,6 +481,7 @@ type Kept<T> = {
   ready?: { key: string; value: T };
   running?: Promise<T>;
   started: number;
+  took: number;
 };
 
 async function settle<T>(
@@ -490,7 +491,7 @@ async function settle<T>(
   compute: () => Promise<T>,
   limit: number,
 ): Promise<T> {
-  const entry = kept.get(slot) ?? { started: 0 };
+  const entry = kept.get(slot) ?? { started: 0, took: 0 };
   kept.delete(slot);
   kept.set(slot, entry);
   if (kept.size > limit) {
@@ -502,7 +503,8 @@ async function settle<T>(
   }
   if (
     entry.running == null &&
-    (ready == null || Date.now() - entry.started >= REFRESH_MS)
+    (ready == null ||
+      Date.now() - entry.started >= Math.max(REFRESH_MS, 4 * entry.took))
   ) {
     const running = compute();
     entry.started = Date.now();
@@ -510,6 +512,7 @@ async function settle<T>(
     running
       .then((value) => {
         entry.ready = { key, value };
+        entry.took = Date.now() - entry.started;
       })
       .catch((error: unknown) => {
         console.error(error);
