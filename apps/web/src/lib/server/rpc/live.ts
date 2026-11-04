@@ -131,6 +131,9 @@ const color = (party: SQL, date: SQL) => sql`
   )
 `;
 
+const tier = (adapter: SQL) =>
+  sql`case ${adapter} when 'us.npr' then 1 when 'us.civicapi' then 2 else 0 end`;
+
 function group(path: string) {
   const seat = path.split("/").at(-1) ?? "";
   if (
@@ -933,14 +936,15 @@ async function night(
         f.reporting, f.expected, d.publisher, d.url
       from live.frame f join live.feed d on d.id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
-        and (d.adapter <> 'us.civicapi' or not exists (
+        and not exists (
           select from live.frame o join live.feed od on od.id = o.feed_id
-          where o.contest_id = f.contest_id and o.status = 'active' and od.adapter <> 'us.civicapi' and od.enabled
+          where o.contest_id = f.contest_id and o.status = 'active' and od.enabled
+            and ${tier(sql.raw("od.adapter"))} < ${tier(sql.raw("d.adapter"))}
             and exists (
               select from live.fetch x where x.feed_id = od.id and x.status <> 'error'
                 and x.fetched_at > now() - interval '20 minutes'
             )
-        ))
+        )
       order by f.as_of
     `),
     remember(
