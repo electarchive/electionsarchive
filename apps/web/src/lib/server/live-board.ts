@@ -103,7 +103,7 @@ export async function geography(
       ) as rings
       from (
         select p.geom, least(sqrt(ST_Area(p.geom)) / 2000, 250) as t from (
-          select ST_Union(ST_SimplifyPreserveTopology(${plane("g.geom", "a.scheme_code")}, 50)) as geom
+          select ST_Union(ST_MakeValid(ST_SimplifyPreserveTopology(${plane("g.geom", "a.scheme_code")}, 50))) as geom
           from area_geometry g join area a on a.id = g.area_id
           where g.area_id = any(${sql.param(region)}::uuid[]) and g.valid @> ${date}::date
         ) p
