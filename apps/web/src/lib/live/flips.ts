@@ -66,3 +66,27 @@ export function swing(shifts: Iterable<Shift | null>): Swing {
       ),
   };
 }
+
+export function stripes(color: string) {
+  return `repeating-linear-gradient(135deg, ${color} 0 1.5px, transparent 1.5px 4px)`;
+}
+
+export function hatch(color: string, flip: "flipped" | "leading") {
+  return flip === "flipped"
+    ? {
+        fill: `color-mix(in oklab, ${color} 84%, black)`,
+        stripes: stripes(
+          `color-mix(in oklab, ${color} 45%, var(--foreground))`,
+        ),
+      }
+    : {
+        fill: `color-mix(in oklab, ${color} 34%, var(--background))`,
+        stripes: stripes(
+          `color-mix(in oklab, ${color} 68%, var(--background))`,
+        ),
+      };
+}
+
+export function ink(fill: string) {
+  return `oklch(from ${fill} clamp(0, (0.7 - l) * 1000, 1) 0 0)`;
+}

@@ -9,6 +9,7 @@
     codes,
     colors,
     later = [],
+    flips = {},
     label,
     hovered = $bindable(null),
     onPick,
@@ -18,6 +19,7 @@
     codes: Record<string, string>;
     colors: Record<string, string>;
     later?: Array<string>;
+    flips?: Record<string, "flipped" | "leading">;
     label: string;
     hovered?: string | null;
     onPick: (code: string) => void;
@@ -151,7 +153,7 @@
           "source-layer": "areas",
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
-            "fill-pattern": "hatch",
+            "fill-pattern": "absent",
             "fill-opacity": [
               "case",
               ["boolean", ["feature-state", "later"], false],
@@ -162,6 +164,21 @@
         },
         "fills",
         { group: "nation-layers", rank: 1 },
+      );
+      engine.add(
+        {
+          id: "nation-flip",
+          type: "fill",
+          source,
+          "source-layer": "areas",
+          filter: ["in", ["id"], ["literal", ks]],
+          paint: {
+            "fill-pattern": "flip",
+            "fill-opacity": ["coalesce", ["feature-state", "flip"], 0],
+          },
+        },
+        "fills",
+        { group: "nation-layers", rank: 2 },
       );
       engine.add(
         {
@@ -203,9 +220,19 @@
       new Map(
         [...byK].flatMap(([k, code]) => {
           const color = colors[code];
+          const flip = flips[code];
           return color == null
             ? []
-            : [[k, { color, later: later.includes(code) }] as const];
+            : [
+                [
+                  k,
+                  {
+                    color,
+                    later: later.includes(code),
+                    flip: flip == null ? 0 : flip === "flipped" ? 1 : 0.5,
+                  },
+                ] as const,
+              ];
         }),
       ),
     );
@@ -217,7 +244,7 @@
   }
 
   $effect(() => {
-    void [colors, later, hovered, engine.theme];
+    void [colors, later, flips, hovered, engine.theme];
     if (engine.isLoaded) {
       untrack(draw);
     }

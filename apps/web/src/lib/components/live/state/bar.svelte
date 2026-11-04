@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Seating, Side } from "#lib/live/ballot.js";
   import { count } from "#lib/format.js";
+  import { hatch } from "#lib/live/flips.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -12,6 +13,7 @@
 
   const WAITING =
     "color-mix(in oklab, var(--muted-foreground) 20%, var(--background))";
+  const SAMPLE = hatch("var(--muted-foreground)", "flipped");
   const OUTER: Array<Part> = [
     "holdover",
     "won",
@@ -35,9 +37,10 @@
       size: number;
       color: string;
       kind: Kind;
-      isGain: boolean;
+      part: Part;
+      isEnd: boolean;
     }> = [];
-    const push = (side: Side, order: Array<Part>) => {
+    const push = (side: Side, order: Array<Part>, isEnd = false) => {
       for (const part of order) {
         found.push({
           key: `${side.id}:${part}`,
@@ -49,7 +52,8 @@
                 : side[part],
           color: side.color,
           kind: BASE[part],
-          isGain: part === "gainedWon" || part === "gainedAhead",
+          part,
+          isEnd,
         });
       }
     };
@@ -64,10 +68,11 @@
       size: seats.waiting,
       color: "",
       kind: "waiting",
-      isGain: false,
+      part: "waiting",
+      isEnd: false,
     });
     if (seats.right != null) {
-      push(seats.right, OUTER.toReversed());
+      push(seats.right, OUTER.toReversed(), true);
     }
     return found.filter((segment) => segment.size > 0);
   });
@@ -86,9 +91,25 @@
       : side.before;
   }
 
+  function look(segment: { color: string; kind: Kind; part: Part }): {
+    fill: string;
+    stripes?: string;
+  } {
+    if (segment.part === "gainedWon" || segment.part === "gainedAhead") {
+      return hatch(
+        segment.color,
+        segment.part === "gainedWon" ? "flipped" : "leading",
+      );
+    }
+    return { fill: fill(segment.color, segment.kind) };
+  }
+
   function fill(color: string, kind: Kind) {
     if (color === "") {
       return WAITING;
+    }
+    if (kind === "holdover") {
+      return `color-mix(in oklab, ${color} 32%, var(--background))`;
     }
     if (kind === "ahead") {
       return `color-mix(in oklab, ${color} 50%, var(--background))`;
@@ -117,15 +138,15 @@
       <span
         class={cn(
           "transition-[flex-grow] duration-700 block-full motion-reduce:transition-none",
-          { "shadow-[inset_0_-3px_0_var(--foreground)]": segment.isGain },
+          {
+            "border-background": segment.kind === "holdover",
+            "border-e-2": segment.kind === "holdover" && !segment.isEnd,
+            "border-s-2": segment.kind === "holdover" && segment.isEnd,
+          },
         )}
         style:flex-grow={segment.size}
-        style:background-color={segment.kind === "holdover"
-          ? undefined
-          : fill(segment.color, segment.kind)}
-        style:background-image={segment.kind === "holdover"
-          ? `repeating-linear-gradient(135deg, ${segment.color} 0 3px, color-mix(in oklab, ${segment.color} 40%, var(--background)) 3px 6px)`
-          : undefined}
+        style:background-color={look(segment).fill}
+        style:background-image={look(segment).stripes}
       ></span>
     {/each}
     <span
@@ -148,7 +169,9 @@
         <span
           class="flex items-center gap-1.5 self-center font-sans text-xs font-semibold text-muted-foreground"
           ><span
-            class="bg-muted shadow-[inset_0_-3px_0_var(--foreground)] block-3 inline-4"
+            class="rounded-[1px] block-3.5 inline-3.5"
+            style:background-color={SAMPLE.fill}
+            style:background-image={SAMPLE.stripes}
           ></span>{m.night_bar_gained({ count: count(gained) })}</span
         >
       {/if}

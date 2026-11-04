@@ -11,7 +11,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
-  import { HATCH, surname, tone } from "#lib/live/format.js";
+  import { DOTS, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { localize, tokenize } from "#lib/live/local.js";
   import { bandOf, shade, tally, verdict } from "#lib/live/summary.js";
@@ -384,7 +384,7 @@
           : option == null
             ? undefined
             : tone(option)}
-        style:background-image={summary.later == null ? undefined : HATCH}
+        style:background-image={summary.later == null ? undefined : DOTS}
         aria-hidden="true"
       ></span>
       <span class="grid flex-1 grid-cols-[minmax(0,1fr)] gap-0.5">
@@ -512,7 +512,7 @@
         {/if}
         {#if seats.later > 0}
           <span class="flex items-center gap-1.5 text-muted-foreground">
-            {@render swatch("var(--muted)", HATCH)}
+            {@render swatch("var(--muted)", DOTS)}
             {m.night_races_later({ count: seats.later })}
           </span>
         {/if}
@@ -560,7 +560,7 @@
               },
             ),
             `${title(summary.race)}: ${verdict(summary)}`,
-            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? "none" : HATCH}`,
+            `background-color: ${color ?? "var(--muted)"}; background-image: ${summary.later == null ? "none" : DOTS}`,
             body,
           )}
         </li>
@@ -607,7 +607,7 @@
           {/if}
           {#if counts.later > 0}
             <span class="flex items-center gap-1.5"
-              >{@render swatch("var(--muted)", HATCH)}{m.night_races_later({
+              >{@render swatch("var(--muted)", DOTS)}{m.night_races_later({
                 count: counts.later,
               })}</span
             >
@@ -627,7 +627,7 @@
           style:flex-grow={counts.counting}
         ></span>
         <span style:flex-grow={counts.waiting}></span>
-        <span style:flex-grow={counts.later} style:background-image={HATCH}
+        <span style:flex-grow={counts.later} style:background-image={DOTS}
         ></span>
       </span>
     </div>

@@ -294,7 +294,7 @@
           aria-hidden="true"
         >
           <span
-            class="absolute inset-y-0 inset-s-0 bg-[repeating-linear-gradient(-45deg,var(--muted-foreground)_0_2px,transparent_2px_5px)] transition-[inline-size] duration-700 motion-reduce:transition-none"
+            class="absolute inset-y-0 inset-s-0 bg-muted-foreground/35 transition-[inline-size] duration-700 motion-reduce:transition-none"
             style:inline-size="{(1 - shareIn) * 100}%"
           ></span>
         </dd>

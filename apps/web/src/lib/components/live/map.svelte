@@ -316,7 +316,7 @@
           ...areas,
           filter: ["in", ["id"], ["literal", ks]],
           paint: {
-            "fill-pattern": "hatch",
+            "fill-pattern": "absent",
             "fill-opacity": [
               "case",
               ["boolean", ["feature-state", "later"], false],

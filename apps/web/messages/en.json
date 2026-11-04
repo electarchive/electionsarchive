@@ -4924,7 +4924,7 @@
   "night_chamber_expected": "{party} expected {seats}, 80% range {low} to {high}",
   "night_chamber_net": "Net gain of {count} for {party}",
   "night_chamber_net_none": "No net change in seats so far",
-  "night_chamber_note": "Striped seats aren't up this year. Until a race reports votes, the odds give the party that holds the seat a {prior} chance of keeping it.",
+  "night_chamber_note": "Pale seats aren't up this year. Until a race reports votes, the odds give the party that holds the seat a {prior} chance of keeping it.",
   "night_chamber_others": "Independents and others",
   "night_chamber_not_up": [
     {
@@ -4971,7 +4971,7 @@
   "night_state_now": "Won or ahead",
   "night_state_seats_up": "{count} seats up",
   "night_state_not_up": "Not up this year",
-  "night_state_striped": "Striped seats aren't up this year.",
+  "night_state_striped": "Pale seats aren't up this year.",
   "night_state_search": "Search by district or candidate",
   "night_state_more": "Show all {count}",
   "night_state_less": "Show fewer",
@@ -5096,6 +5096,17 @@
   "night_flips_count": "Flipped: {flipped} · Leading: {leading}",
   "night_chamber_flipped": "Flipped: {count}",
   "night_chamber_leading_flip": "Leading to flip: {count}",
+  "night_chamber_key_not_up": "Not up this year",
+  "night_chamber_side_flipped": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Flipped {count} seat",
+        "countPlural=*": "Flipped {count} seats"
+      }
+    }
+  ],
   "night_bar_gained": "Changing hands: {count}",
   "night_state_sort": "Sort districts",
   "night_state_sort_district": "District",

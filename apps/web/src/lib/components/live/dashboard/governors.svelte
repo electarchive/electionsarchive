@@ -3,6 +3,7 @@
   import type { Point } from "#lib/live/hover.js";
   import type { ChamberView, Family, Seat } from "#lib/live/nation.js";
   import type { Summary } from "#lib/live/summary.js";
+  import { hatch, ink, swing } from "#lib/live/flips.js";
   import { pointAt } from "#lib/live/hover.js";
   import { breakdown } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
@@ -10,6 +11,7 @@
   import { cn } from "#lib/utils.js";
   import Called from "./called.svelte";
   import Card from "./card.svelte";
+  import SeatKey from "./seat-key.svelte";
   import Sheet from "./sheet.svelte";
 
   const {
@@ -37,7 +39,20 @@
   let point = $state<Point | null>(null);
   let isOpen = $state(false);
   const narrow = $derived(isNarrowLayout());
+  const changing = $derived(swing(view.order.map((seat) => seat.shift)));
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
+
+  function look(seat: Seat): { fill: string; stripes?: string } {
+    const found = seat.shift;
+    if (found == null || found.flip === "held") {
+      return { fill: shade(seat) };
+    }
+    return hatch(
+      sides.find((family) => family.id === found.to)?.color ??
+        "var(--muted-foreground)",
+      found.flip,
+    );
+  }
 
   function signed(value: number) {
     return value > 0 ? `+${value}` : value < 0 ? `−${Math.abs(value)}` : "0";
@@ -55,7 +70,8 @@
     {#each view.order as seat, index (seat.summary.race.id)}
       {const isStrong = $derived(
         ["won", "projected", "solid", "likely"].includes(seat.rating) &&
-          seat.side != null,
+          seat.side != null &&
+          seat.shift?.flip !== "leading",
       )}
       <li class="grid">
         <svelte:element
@@ -69,17 +85,13 @@
                 isLinked,
             },
             { "text-white": isStrong, "text-foreground": !isStrong },
-            {
-              "shadow-[inset_0_0_0_2px_var(--foreground)]":
-                seat.shift?.flip === "flipped",
-              "outline-1 -outline-offset-3 outline-foreground/60 outline-dashed":
-                seat.shift?.flip === "leading",
-            },
           )}
-          style:background-color={shade(seat)}
+          style:background-color={look(seat).fill}
+          style:background-image={look(seat).stripes}
           aria-label={isLinked ? label(seat) : undefined}
           >{seat.summary.race.state}{#if seat.rating === "projected"}<span
-              class="absolute inset-e-1 inset-bs-1 rounded-full bg-background block-1 inline-1"
+              class="absolute inset-e-1 inset-bs-1 rounded-full block-1 inline-1"
+              style:background-color={ink(look(seat).fill)}
             ></span>{/if}</svelte:element
         >
       </li>
@@ -152,6 +164,11 @@
   {/if}
 
   {@render legend()}
+  <SeatKey
+    {sides}
+    {changing}
+    isProjected={view.order.some((seat) => seat.rating === "projected")}
+  />
   <Called seats={view.order} />
 
   <p class="text-xs text-muted-foreground">

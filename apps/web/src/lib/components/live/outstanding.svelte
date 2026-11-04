@@ -158,8 +158,7 @@
               ></span>
               <span
                 class="grow block-full"
-                style:background-image="repeating-linear-gradient(-45deg, {leanTone}
-                0 3px, transparent 3px 6px)"
+                style:background-color="color-mix(in oklab, {leanTone} 40%, var(--background))"
               ></span>
             </span>
             <span class="font-figures text-muted-foreground tabular-nums">
@@ -178,8 +177,7 @@
         ></span>{m.night_left_counted()}</span
       >
       <span class="flex items-center gap-1.5"
-        ><span
-          class="bg-[repeating-linear-gradient(-45deg,var(--muted-foreground)_0_2px,transparent_2px_4px)] block-2 inline-4"
+        ><span class="bg-muted-foreground/40 block-2 inline-4"
         ></span>{m.night_left_remaining()}</span
       >
       <span>{m.night_left_votes({ count: count(Math.round(left)) })}</span>

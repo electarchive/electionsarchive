@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { HATCH } from "#lib/live/format.js";
+  import { DOTS } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { mix } from "./model.js";
   import Scale from "./scale.svelte";
@@ -128,7 +128,7 @@
     <p class="flex items-center gap-2 text-xs/4 text-muted-foreground">
       <span
         class="shrink-0 rounded-xs ring-1 ring-border block-3 inline-4"
-        style:background-image={HATCH}
+        style:background-image={DOTS}
         aria-hidden="true"
       ></span>
       {m.night_later_key()}

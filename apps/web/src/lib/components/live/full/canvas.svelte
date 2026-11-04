@@ -215,7 +215,7 @@
         "source-layer": "areas",
         filter: within,
         paint: {
-          "fill-pattern": "hatch",
+          "fill-pattern": "absent",
           "fill-opacity": [
             "case",
             ["boolean", ["feature-state", "later"], false],
@@ -502,7 +502,7 @@
         type: "fill",
         ...pieces,
         paint: {
-          "fill-pattern": "hatch",
+          "fill-pattern": "absent",
           "fill-opacity": [
             "case",
             ["boolean", ["feature-state", "later"], false],

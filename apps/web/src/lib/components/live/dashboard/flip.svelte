@@ -1,5 +1,6 @@
 <script lang="ts">
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+  import { hatch } from "#lib/live/flips.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -25,6 +26,7 @@
       : m.night_flip_leading_about({ from: from?.short ?? "–", to: to.short }),
   );
   const isFlipped = $derived(flip === "flipped");
+  const mark = $derived(hatch(to.color, flip));
 </script>
 
 {#snippet party(found: { short: string; color: string })}
@@ -49,22 +51,19 @@
 <span
   class={cn(
     "inline-flex shrink-0 items-center gap-0.5 rounded-xs px-1 font-figures text-[11px]/4 font-[760] whitespace-nowrap",
-    { "border border-dashed": !isFlipped },
-    { "border-current/70": !isFlipped && isInverse },
-    { "shadow-[inset_0_0_0_1px_currentColor]": isFlipped && isInverse },
   )}
-  style:border-color={!isFlipped && !isInverse
-    ? `color-mix(in oklab, ${to.color} 70%, var(--background))`
-    : undefined}
   style:background-color={isFlipped && !isInverse
     ? `color-mix(in oklab, ${to.color} 15%, var(--background))`
     : undefined}
-  style:box-shadow={isFlipped && !isInverse
-    ? `inset 0 0 0 1px color-mix(in oklab, ${to.color} 55%, var(--background))`
-    : undefined}
   title={about}
   ><span aria-hidden="true" class="contents"
-    >{#if from != null}{@render party(from)}{/if}<ArrowRightIcon
+    ><span
+      class={cn("me-0.5 shrink-0 rounded-[1px] block-2.5 inline-2.5", {
+        "ring-1 ring-current": isInverse,
+      })}
+      style:background-color={mark.fill}
+      style:background-image={mark.stripes}
+    ></span>{#if from != null}{@render party(from)}{/if}<ArrowRightIcon
       class={cn("shrink-0 block-2.5 inline-2.5", {
         "text-muted-foreground": !isInverse,
       })}

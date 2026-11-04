@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { HATCH, stamp } from "#lib/live/format.js";
+  import { DOTS, stamp } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const {
@@ -14,7 +14,7 @@
 >
   <div
     class="rounded-xs ring-1 ring-border block-3 ring-inset sm:block-auto"
-    style:background-image={HATCH}
+    style:background-image={DOTS}
     aria-hidden="true"
   ></div>
   <div class="grid content-start gap-2">

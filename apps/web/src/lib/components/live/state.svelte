@@ -16,7 +16,7 @@
   import { swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
-    HATCH,
+    DOTS,
     placeSlug,
     stamp,
     tone,
@@ -393,7 +393,7 @@
               style:background-color={shade(entry)}
               style:background-image={entry.summary.later == null
                 ? undefined
-                : HATCH}
+                : DOTS}
             ></span>
           {/each}
         </span>

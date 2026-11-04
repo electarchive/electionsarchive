@@ -18,7 +18,7 @@
   import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
   import { dates, numbers, percent } from "#lib/format.js";
-  import { swing } from "#lib/live/flips.js";
+  import { hatch, swing } from "#lib/live/flips.js";
   import {
     clock as clockOf,
     compact,
@@ -51,6 +51,7 @@
   import Ladder from "./dashboard/ladder.svelte";
   import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
+  import SeatKey from "./dashboard/seat-key.svelte";
   import Swing from "./dashboard/swing.svelte";
   import Hexes from "./hexes.svelte";
   import LaterKey from "./later-key.svelte";
@@ -82,7 +83,7 @@
 
   const toLive = liveLinks();
 
-  type Mode = "lead" | "chance" | "flips" | "counted";
+  type Mode = "lead" | "chance" | "counted";
 
   const OFFICES = ["senate", "governor", "house"] as const;
 
@@ -141,7 +142,6 @@
       [
         ["lead", m.night_color_lead],
         ["chance", m.night_color_chance],
-        ["flips", m.night_color_flips],
         ["counted", m.night_color_counted],
       ] as const
     )
@@ -155,7 +155,6 @@
   const LEGENDS: Record<Mode, () => string> = {
     lead: m.night_nation_legend,
     chance: m.night_nation_legend_chance,
-    flips: m.night_nation_legend_flips,
     counted: m.night_nation_legend_reporting,
   };
   const MUTED =
@@ -339,15 +338,12 @@
     if (wanted === "counted") {
       return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
     }
+    const turn = turnOf(summary);
+    if (turn != null) {
+      return hatch(tint(turn.to), turn.flip).fill;
+    }
     if (entry == null || wanted === "lead") {
       return strength(summary);
-    }
-    if (wanted === "flips") {
-      const found = entry.shift;
-      if (found == null || found.flip === "held") {
-        return summary.total > 0 ? MUTED : WAITING;
-      }
-      return `color-mix(in oklab, ${tint(found.to)} ${found.flip === "flipped" ? 100 : 45}%, var(--background))`;
     }
     if (entry.rating === "waiting" || entry.rating === "counting") {
       return summary.total > 0
@@ -358,6 +354,28 @@
     const sure = Math.abs(entry.left - entry.right);
     const color = pair == null ? WAITING : pair[isLeft ? 0 : 1].color;
     return `color-mix(in oklab, ${color} ${Math.round(18 + 82 * sure)}%, var(--background))`;
+  }
+
+  function turnOf(summary: Summary) {
+    const found = seatById.get(summary.race.id)?.shift;
+    return found == null || found.flip === "held"
+      ? null
+      : { flip: found.flip, to: found.to };
+  }
+
+  function flipsFor(view: Chamber, mode: Mode) {
+    const found: Record<string, "flipped" | "leading"> = {};
+    if (mode === "counted" || view === "house") {
+      return found;
+    }
+    for (const code of Object.keys(nation?.codes ?? {})) {
+      const first = of(code, view)[0];
+      const turn = first == null ? null : turnOf(first);
+      if (turn != null) {
+        found[code] = turn.flip;
+      }
+    }
+    return found;
   }
 
   function seatShade(entry: Seat) {
@@ -447,6 +465,11 @@
       );
     });
   }
+  const mapFlips = $derived({
+    senate: flipsFor("senate", modes.senate),
+    governor: flipsFor("governor", modes.governor),
+    house: flipsFor("house", modes.house),
+  });
   const later = $derived({
     senate: laterFor("senate"),
     governor: laterFor("governor"),
@@ -456,6 +479,16 @@
     [...districts].flatMap(([key, summary]) =>
       summary.later == null ? [] : [key],
     ),
+  );
+  const districtFlips = $derived(
+    modes.house === "counted"
+      ? {}
+      : Object.fromEntries(
+          [...districts].flatMap(([key, summary]) => {
+            const turn = turnOf(summary);
+            return turn == null ? [] : [[key, turn.flip] as const];
+          }),
+        ),
   );
   const districtColors = $derived(
     Object.fromEntries(
@@ -556,7 +589,9 @@
       summary.winner ?? summary.projected ?? summary.leader,
     )}
     {const entry = $derived(seatById.get(summary.race.id))}
-    <span class="flex items-center gap-1.5 whitespace-nowrap min-inline-0">
+    <span
+      class="flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5 whitespace-nowrap min-inline-0"
+    >
       <span
         class="shrink-0 rounded-full block-2 inline-2"
         style:background-color={tone(option)}
@@ -574,6 +609,7 @@
           flip={entry.shift.flip}
           from={partyOf(entry.shift.from)}
           to={partyOf(entry.shift.to)}
+          isCompact={true}
         />
       {/if}
     </span>
@@ -605,8 +641,8 @@
     {#each races.slice(0, 3) as summary (summary.race.id)}
       {const entry = $derived(seatById.get(summary.race.id))}
       <span class="grid gap-0.5">
-        <span class="flex items-center justify-between gap-3">
-          <span>{summary.race.title}</span>
+        <span class="flex items-start justify-between gap-3">
+          <span class="min-inline-0">{summary.race.title}</span>
           {@render chip(summary)}
         </span>
         {#if entry != null}
@@ -1097,6 +1133,7 @@
               cartogram={house.cartogram}
               colors={districtColors}
               later={districtLater}
+              flips={districtFlips}
               label={m.night_house_hexes_label()}
               bind:hovered={probe}
               href={districtHref}
@@ -1108,6 +1145,7 @@
               codes={house.codes}
               colors={districtColors}
               later={districtLater}
+              flips={districtFlips}
               label={m.night_house_map()}
               bind:hovered={probe}
               onPick={async (key: string) => {
@@ -1131,6 +1169,7 @@
             codes={nation.codes}
             colors={colors[view]}
             later={later[view]}
+            flips={mapFlips[view]}
             label={m.night_nation_map({ view: NAMES[view]() })}
             bind:hovered
             onPick={async (code: string) => goto(href(code))}
@@ -1142,6 +1181,16 @@
             ? m.night_house_legend()
             : LEGENDS[mode]()}
         </p>
+        {#if pair != null && mode !== "counted"}
+          <SeatKey
+            sides={pair}
+            changing={swing(
+              seats
+                .filter((entry) => entry.summary.race.office === view)
+                .map((entry) => entry.shift),
+            )}
+          />
+        {/if}
         {#if (isDistricts ? districtLater : later[view]).length > 0}
           <LaterKey />
         {/if}
