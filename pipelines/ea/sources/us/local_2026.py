@@ -7414,6 +7414,15 @@ KY_COMMISSION_CITIES = {
         "Ten Broeck",
     )
 }
+KY_BALLOT_CITY_NAMES = (
+    ("FULTON", "CITY LEGISLATIVE BODY", "FULTON CITY COMMISSION", "Erick", "Flores"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "FULTON CITY COMMISSION", "Jeffrey L.", "Vaughn"),
+    ("FULTON", "MAYOR", "CITY OF HICKMAN", "Gerald", "Mack"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "HICKMAN CITY COMMISSION", "Kyle", "Kimmons"),
+    ("FULTON", "CITY LEGISLATIVE BODY", "HICKMAN CITY COMMISSION", "Samantha", "McClure"),
+    ("HARDIN", "CITY LEGISLATIVE BODY", "SONORA COMMISSIONER", "Kevin Cody", "Philpott"),
+)
+KY_BALLOT_FIRST_NAMES = {("CAMPBELL", "SIZEMORE", "Christopher"): "Chris"}
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -8438,6 +8447,36 @@ def parse() -> None:
             )
         )
     filings = pl.concat([filings.filter(~covered), pl.DataFrame(listed, schema=filings.schema)])
+    filings = pl.concat(
+        [
+            filings.with_columns(
+                pl.struct("County", "Last Name", "First Name")
+                .map_elements(
+                    lambda row: (
+                        KY_BALLOT_FIRST_NAMES.get((row["County"], row["Last Name"], row["First Name"]))
+                        or row["First Name"]
+                    ),
+                    return_dtype=pl.String,
+                )
+                .alias("First Name")
+            ),
+            pl.DataFrame(
+                [
+                    {column: None for column in filings.columns}
+                    | {
+                        "County": county,
+                        "Office": post,
+                        "Office Description": description,
+                        "First Name": first,
+                        "Last Name": last.upper(),
+                        "Party": "NONPARTISAN",
+                    }
+                    for county, post, description, first, last in KY_BALLOT_CITY_NAMES
+                ],
+                schema=filings.schema,
+            ),
+        ]
+    )
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
