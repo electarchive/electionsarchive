@@ -56,7 +56,9 @@ def collect(state: str, client: httpx.Client, get: Callable, store: Callable[[st
                 store(url, content, ".json")
         return
     home = get(client, site, HEADERS)
-    if home is None or f"{DAY:%B} {DAY.day}, {DAY.year}".encode() not in home:
+    if home is None or not any(
+        stamp.encode() in home for stamp in (f"{DAY:%B} {DAY.day}, {DAY.year}", f"{DAY.month}/{DAY.day}/{DAY.year}")
+    ):
         print(f"{state}: results site does not show {DAY}")
         return
     for kind in kinds:
