@@ -225,6 +225,11 @@ LOCAL = {
     ("CA", "Isla Vista Community Services District", "Measure E2026: Utility Users' Tax"): "referendum-ca-two-thirds",
     ("ID", "Highland Joint School District No. 305", "Plant facility levy"): "referendum-id-55",
     ("ID", "Moscow School District No. 281", "School plant facilities reserve fund levy"): "referendum-id-60",
+    (
+        "ID",
+        "Butte County Joint School District No. 111",
+        "School plant facilities reserve fund levy",
+    ): "referendum-id-55",
 }
 
 

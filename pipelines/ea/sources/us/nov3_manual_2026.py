@@ -65,6 +65,13 @@ SCHOOLS = {
     ("ID", "Genesee Joint School District No. 282"): "1601200",
     ("ID", "Highland Joint School District No. 305"): "1601440",
     ("ID", "Moscow School District No. 281"): "1602220",
+    ("ID", "Post Falls School District No. 273"): "1602670",
+    ("ID", "Twin Falls School District No. 411"): "1603240",
+    ("ID", "Idaho Falls School District No. 91"): "1601530",
+    ("ID", "Butte County Joint School District No. 111"): "1600490",
+    ("CO", "Eagle County School District RE50J"): "0803540",
+    ("CO", "Archuleta County School District 50JT"): "0802190",
+    ("CO", "Telluride School District R-1"): "0806870",
     ("AZ", "Prescott Unified School District No. 1"): "0406730",
     ("AZ", "Vail Unified School District No. 20"): "0408850",
     ("AZ", "Amphitheater School District No. 10"): "0400680",
@@ -1191,6 +1198,41 @@ COUNTIES = {
         "https://www.cassia.gov/media/Elections/Candidate%20Filing/Candidate%20Filings%20Archive/Ballot%20Measures/2026_11_03/American%20Falls%20Joint%20School%20District%20No%20381%20Supplemental%20Levy.pdf",
         "N3M-web/id/cassia-americanfalls-381.pdf",
     ),
+    "16083-tf411": (
+        "ID",
+        "https://twinfallscounty.org/wp-content/uploads/Twin-Falls-School-2.pdf",
+        "N3M-web/id/twinfalls-411-sample-ballot.pdf",
+    ),
+    "16055-pf273": (
+        "ID",
+        "https://resources.finalsite.net/images/v1783609718/pfsdcom/c2ul9eaf3ungduoyoymk/Nov2026sampleballot.pdf",
+        "N3M-web/id/postfalls-273-sample-ballot.pdf",
+    ),
+    "16019-if91": (
+        "ID",
+        "https://results.voteidaho.gov/results/public/bonneville-county-id/elections/nov2026/ballot-items/01000000-c793-678f-a861-08df2aee377f",
+        "N3M-web/id/voteidaho-idahofalls-91.html",
+    ),
+    "16023-jsd111": (
+        "ID",
+        "https://results.voteidaho.gov/results/public/butte-county-id/elections/nov2026/ballot-items/01000000-ed5e-4374-a252-08df2631c215",
+        "N3M-web/id/voteidaho-butte-111.html",
+    ),
+    "08037-re50j": (
+        "CO",
+        "https://www.garfieldcountyco.gov/wp-content/uploads/sites/6/2026-Eagle-County-School-District-RE50J-TABOR-Notice.pdf",
+        "N3M-web/co/garfield-eagle-re50j-tabor.pdf",
+    ),
+    "08007-sb": (
+        "CO",
+        "https://www.archuletacounty.gov/wp-content/uploads/2026-Archuleta-County-General-Election-Sample-Ballot.pdf",
+        "N3M-web/co/archuleta-sample-ballot.pdf",
+    ),
+    "08113-r1": (
+        "CO",
+        "https://www.sanmiguelcountyco.gov/DocumentCenter/View/14796/Sample-Ballot-for-the-2026-General-Election-R-1-School-District",
+        "N3M-web/co/sanmiguel-telluride-r1-sample-ballot.pdf",
+    ),
     "16083": (
         "ID",
         "https://www.cassia.gov/media/Elections/Candidate%20Filing/Candidate%20Filings%20Archive/Ballot%20Measures/2026_11_03/Rock%20Creek%20Rural%20Fire%20Protection%20Levy.pdf",
@@ -1370,7 +1412,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, Texas, California, Rhode Island, North Dakota, Washington, Idaho, and Arizona, with official wording",
+            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, Texas, California, Rhode Island, North Dakota, Washington, Idaho, Arizona, and Colorado, with official wording",
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
