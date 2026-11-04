@@ -39,10 +39,10 @@ EV = {
     "UT": ("electionresults.utah.gov", "utah"),
     "RI": ("electionresults.ri.gov", "RhodeIsland"),
     "WA": ("results.votewa.gov", "washington"),
-    "AZ": ("app.enhancedvoting.com", "Arizona"),
-    "TN": ("app.enhancedvoting.com", "shelby-county-tn"),
 }
 EV_EXPORTS = {
+    "AZ": "https://app.enhancedvoting.com/cdn/results/Arizona/export-110326GeneralElection.zip",
+    "TN": "https://app.enhancedvoting.com/cdn/results/shelby-county-tn/export-11032026Midtermelections.zip",
     "VA": "https://app.enhancedvoting.com/cdn/results/virginia/export-2026-November-General.zip",
 }
 CLARITY_EIDS = {"SC": ["127300"], "WV": ["127496"]}
@@ -731,33 +731,46 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         enr_mi.collect(client, store)
 
 
+def ev_seat(state: str, name: str) -> dict[str, str]:
+    name = name.strip()
+    found = EV_OFFICES.fullmatch(office_name(name))
+    seat = TN_LEGISLATURE.fullmatch(name) if state == "TN" else None
+    return {
+        "office": ("senate" if seat[1] == "Senate" else "house")
+        if seat
+        else ("state" if state == "TN" and TN_AMENDMENT.fullmatch(name) else "other")
+        if found is None
+        else "senate"
+        if found["senate"]
+        else "governor"
+        if found["governor"]
+        else "house",
+        "contest": name if found is None and seat is None else "",
+        "district": f"{seat[2]}:g" if seat else (found["district"] if found else None) or "",
+        "scope": (found["party0"] or found["party1"] or "") if found else "",
+    }
+
+
 def ev_export(state: str, path: Path):
     with zipfile.ZipFile(path) as archive:
         export = json.loads(archive.read("export.json"))
+    localities = export["localResults"] or [export["results"]]
     precincts: dict[str, list[int]] = {}
-    for locality in export["localResults"]:
+    for locality in localities:
         for item in locality["ballotItems"]:
             tally = precincts.setdefault(item["id"], [0, 0])
             tally[0] += item["precinctsReporting"] or 0
             tally[1] += item["precinctsParticipating"] or 0
-    for locality in export["localResults"]:
+    for locality in localities:
         county = f"51{locality['id']}" if state == "VA" else locality["name"].removesuffix(" County")
         for item in locality["ballotItems"]:
             if EV_LOCAL.match(item["name"]):
                 continue
-            found = EV_OFFICES.fullmatch(office_name(item["name"]))
+            seat = ev_seat(state, item["name"])
             reporting, total = precincts[item["id"]]
             for option in item["ballotOptions"]:
                 yield {
-                    "office": "other"
-                    if found is None
-                    else "senate"
-                    if found["senate"]
-                    else "governor"
-                    if found["governor"]
-                    else "house",
-                    "contest": item["name"].strip() if found is None else "",
-                    "district": (found["district"] if found else None) or "",
+                    **seat,
                     "party": option["politicalParty"] or "",
                     "county": county,
                     "candidate": TAGS.sub("", option["name"]).strip(),
@@ -766,7 +779,6 @@ def ev_export(state: str, path: Path):
                     "as_of": export["createdAt"],
                     "reporting": reporting,
                     "total": total,
-                    "scope": (found["party0"] or found["party1"] or "") if found else "",
                 }
 
 
@@ -1290,18 +1302,14 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         yield from ev_export(state, path)
         return
     detail = json.loads(path.read_bytes())
-    found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
-    seat = TN_LEGISLATURE.fullmatch(detail["name"][0]["text"].strip()) if state == "TN" else None
     if "breakdownResults" not in detail:
         return
+    seat = ev_seat(state, detail["name"][0]["text"])
     status = detail.get("reportingStatus") or {}
     as_of = status.get("asOf")
-    localities = (
-        [{"locality": {"name": [{"text": "Shelby"}]}, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
-        if state == "TN"
-        else detail["breakdownResults"]
-        or [{"locality": None, "ballotOptions": detail["summaryResults"]["ballotOptions"]}]
-    )
+    localities = detail["breakdownResults"] or [
+        {"locality": None, "ballotOptions": detail["summaryResults"]["ballotOptions"]}
+    ]
     for locality in localities:
         place = locality["locality"]["name"][0]["text"] if locality["locality"] else ""
         county = (
@@ -1313,19 +1321,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         )
         for option in locality["ballotOptions"]:
             yield {
-                "office": ("senate" if seat[1] == "Senate" else "house")
-                if seat
-                else (
-                    "state" if state == "TN" and TN_AMENDMENT.fullmatch(detail["name"][0]["text"].strip()) else "other"
-                )
-                if found is None
-                else "senate"
-                if found["senate"]
-                else "governor"
-                if found["governor"]
-                else "house",
-                "contest": detail["name"][0]["text"].strip() if found is None and seat is None else "",
-                "district": f"{seat[2]}:g" if seat else (found["district"] if found else None) or "",
+                **seat,
                 "party": (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()"),
                 "county": county,
                 "candidate": TAGS.sub("", option["name"][0]["text"]).strip(),
@@ -1334,7 +1330,6 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                 "as_of": as_of,
                 "reporting": status.get("reportingUnits"),
                 "total": status.get("totalUnits"),
-                "scope": (found["party0"] or found["party1"] or "") if found else "",
             }
 
 
