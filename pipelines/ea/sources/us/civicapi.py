@@ -97,7 +97,11 @@ def collect(client: httpx.Client, state: str, store: Callable[[str, bytes, str],
         if cached is None or cached[0] != signature:
             due.append((rank, cached[1] if cached else 0.0, id, signature))
     for _, _, id, signature in sorted(due)[:DETAILS]:
-        response = client.get(f"{BASE}race/{id}", headers=HEADERS)
+        try:
+            response = client.get(f"{BASE}race/{id}", headers=HEADERS, timeout=15)
+        except httpx.TransportError as error:
+            print(f"civicAPI {state}: race {id} failed: {type(error).__name__}")
+            continue
         if response.status_code < 400:
             CACHE[id] = (signature, time.time(), wrap(RACES[state][id], response.json()))
     for id in RACES.get(state, {}):
