@@ -36,6 +36,7 @@ import { Path } from "#lib/server/territory.js";
 
 const TRAITS: Record<string, Array<number>> = counties;
 const STAMP_MS = 5000;
+const REFRESH_MS = 30_000;
 const LAPSE_MS = 3 * 60 * 60 * 1000;
 const stamps = new Map<
   string,
@@ -476,18 +477,56 @@ const STATEWIDE = [
 
 type Shown = { results: boolean; forecasts: boolean };
 
-const done = new Map<
-  string,
-  { key: string; value: Awaited<ReturnType<typeof night>> }
->();
-const held = new Map<
-  string,
-  { key: string; value: Awaited<ReturnType<typeof night>> }
->();
-const pending = new Map<
-  string,
-  { key: string; value: Promise<Awaited<ReturnType<typeof night>>> }
->();
+type Kept<T> = {
+  ready?: { key: string; value: T };
+  running?: Promise<T>;
+  started: number;
+};
+
+async function settle<T>(
+  kept: Map<string, Kept<T>>,
+  slot: string,
+  key: string,
+  compute: () => Promise<T>,
+  limit: number,
+): Promise<T> {
+  const entry = kept.get(slot) ?? { started: 0 };
+  kept.delete(slot);
+  kept.set(slot, entry);
+  if (kept.size > limit) {
+    kept.delete(kept.keys().next().value ?? "");
+  }
+  const { ready } = entry;
+  if (ready?.key === key) {
+    return ready.value;
+  }
+  if (
+    entry.running == null &&
+    (ready == null || Date.now() - entry.started >= REFRESH_MS)
+  ) {
+    const running = compute();
+    entry.started = Date.now();
+    entry.running = running;
+    running
+      .then((value) => {
+        entry.ready = { key, value };
+      })
+      .catch((error: unknown) => {
+        console.error(error);
+      })
+      .finally(() => {
+        if (entry.running === running) {
+          entry.running = undefined;
+        }
+      });
+  }
+  if (ready != null) {
+    return ready.value;
+  }
+  return entry.running ?? compute();
+}
+
+const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
 
 async function stored() {
   const result = await db.execute<Shown>(sql`
@@ -1101,6 +1140,7 @@ async function night(
       (drawnBy.get(row.id) ?? []).map((line) => fold(line.unit)),
     );
     const current = new Map<string, Array<number>>();
+    const members = new Map<string, Set<string>>();
     for (const frame of mine) {
       const totals = own.map(() => 0);
       const byUnit = new Map<string, Array<number>>();
@@ -1123,16 +1163,18 @@ async function night(
       const touched = new Set<string>();
       for (const [unit, votes] of byUnit) {
         current.set(unit, votes);
-        touched.add(fold(unit));
+        const folded = fold(unit);
+        members.set(folded, (members.get(folded) ?? new Set()).add(unit));
+        touched.add(folded);
       }
       for (const unit of touched) {
         seen.add(unit);
         const votes = own.map(() => 0);
-        for (const [member, part] of current) {
-          if (fold(member) === unit) {
-            for (const [position, value] of part.entries()) {
-              votes[position] = (votes[position] ?? 0) + value;
-            }
+        for (const member of members.get(unit) ?? []) {
+          for (const [position, value] of (
+            current.get(member) ?? []
+          ).entries()) {
+            votes[position] = (votes[position] ?? 0) + value;
           }
         }
         const key = votes.join(",");
@@ -1497,10 +1539,7 @@ const SPREAD = {
   house: /^house-(?:\d+|at-large)$/u,
 };
 
-const spread = new Map<
-  string,
-  { key: string; value: Promise<Awaited<ReturnType<typeof spreadOut>>> }
->();
+const spread = new Map<string, Kept<Awaited<ReturnType<typeof spreadOut>>>>();
 
 function countyRace(race: LiveRace): LiveRace {
   const units = race.units.flatMap((unit): Array<LiveUnit> =>
@@ -1792,45 +1831,24 @@ export const live = {
       const key = shown.results
         ? `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`
         : "";
-      const kept =
-        found.rest === "" && found.path.split("/").length <= 3 ? held : done;
-      const ready = kept.get(slot);
-      if (ready?.key === key) {
-        return ready.value;
-      }
-      let running = pending.get(slot);
-      if (running?.key !== key) {
-        const value = night(
-          found,
-          picked,
-          found.rest !== ""
-            ? "race"
-            : found.path.split("/").length === 2
-              ? "national"
-              : "state",
-          shown,
-          called,
-        );
-        running = { key, value };
-        pending.set(slot, running);
-        value
-          .then((result) => {
-            kept.delete(slot);
-            kept.set(slot, { key, value: result });
-            if (kept === done && done.size > 64) {
-              done.delete(done.keys().next().value ?? "");
-            }
-          })
-          .catch((error: unknown) => {
-            console.error(error);
-          })
-          .finally(() => {
-            if (pending.get(slot)?.value === value) {
-              pending.delete(slot);
-            }
-          });
-      }
-      return ready?.value ?? running.value;
+      return settle(
+        nights,
+        slot,
+        key,
+        async () =>
+          night(
+            found,
+            picked,
+            found.rest !== ""
+              ? "race"
+              : found.path.split("/").length === 2
+                ? "national"
+                : "state",
+            shown,
+            called,
+          ),
+        256,
+      );
     }),
   counties: base
     .input(
@@ -1857,18 +1875,13 @@ export const live = {
       ]);
       const slot = `${getLocale()}|${String(shown.results)}|${found.path}|${input.office}`;
       const key = `${stamp.rows[0]?.key ?? ""}|${called.map((row) => `${row.contest}:${row.option}:${row.at}`).join(",")}`;
-      const held = spread.get(slot);
-      if (held?.key === key) {
-        return held.value;
-      }
-      const value = spreadOut(found, picked, input.office, shown, called);
-      spread.set(slot, { key, value });
-      value.catch(() => {
-        if (spread.get(slot)?.value === value) {
-          spread.delete(slot);
-        }
-      });
-      return value;
+      return settle(
+        spread,
+        slot,
+        key,
+        async () => spreadOut(found, picked, input.office, shown, called),
+        64,
+      );
     }),
   stamp: base
     .input(v.object({ path: v.string(), isRehearsal: v.optional(v.boolean()) }))
