@@ -76,6 +76,7 @@ LISTINGS = (
 )
 TN_LEGISLATURE = re.compile(r"(?:Tennessee|TN) (Senate|House of Representatives),? District (\d+)")
 TN_AMENDMENT = re.compile(r"Constitutional Amendment\s*#\s*\d+")
+EV_DETAILS: dict[str, tuple[str, bytes]] = {}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -370,9 +371,15 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         store(state, base + "ballot-items", content, ".json")
         for item in json.loads(content)["data"]:
             if not EV_LOCAL.match(item["name"][0]["text"]):
-                detail = get(client, f"{base}ballot-items/{item['id']}")
-                if detail is not None:
-                    store(state, f"{base}ballot-items/{item['id']}", detail, ".json")
+                url = f"{base}ballot-items/{item['id']}"
+                signature = json.dumps([item.get("voteTotal"), item.get("reportingStatus")], sort_keys=True)
+                cached = EV_DETAILS.get(url)
+                if cached is None or cached[0] != signature:
+                    detail = get(client, url)
+                    if detail is not None:
+                        cached = EV_DETAILS[url] = (signature, detail)
+                if cached is not None:
+                    store(state, url, cached[1], ".json")
     for state, base in CLARITY.items():
         if only and state not in only:
             continue
