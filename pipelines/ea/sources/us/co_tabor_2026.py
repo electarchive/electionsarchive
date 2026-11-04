@@ -63,6 +63,11 @@ COUNTIES = {
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
         "Douglas County Clerk and Recorder",
     ),
+    "08049": (
+        "https://www.co.grand.co.us/DocumentCenter/View/31043/Grand-County-2026-Tabor-Notice?bidId=",
+        None,
+        "Grand County Clerk and Recorder",
+    ),
     "08075": (
         "https://docs.google.com/document/d/11iZB6gUL21rjyAp6nQuHsrJdZ7rFUCDx/export?format=pdf",
         None,
@@ -382,7 +387,34 @@ def notice_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+GRAND_ISSUES = (
+    ("Town of Hot Sulphur Springs", "2A"),
+    ("West Grand School District 1-JT", "5A"),
+    ("Grand County Library District", "6B"),
+    ("Grand County Library District", "6C"),
+    ("East Grand County Fire Protection District No. 4", "6D"),
+)
+
+
+def grand_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    cursor = 0
+    for entity, issue in GRAND_ISSUES:
+        cursor = next(
+            index
+            for index in range(cursor, len(lines))
+            if re.search(rf"Ballot Issue(?: {issue}[:—]|$)", lines[index]) and entity.split(" No.")[0] in lines[index]
+        )
+        start = next(index for index in range(cursor, cursor + 6) if "(Vote Yes/For" in lines[index]) + 1
+        end = next(index for index in range(start, start + 60) if lines[index].rstrip().endswith("?"))
+        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip()))
+        rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
+        cursor = end + 1
+    return rows
+
+
 PARSERS = {
+    "08049": grand_rows,
     "08075": notice_rows,
     "08101": pueblo_rows,
     "08123": weld_rows,
@@ -404,7 +436,10 @@ def parse() -> None:
             pueblo_text(path)
             if county == "08101"
             else subprocess.run(
-                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+                ["pdftotext", *(["-raw"] if county == "08049" else ["-layout"]), str(path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
             ).stdout
         )
         for row in PARSERS[county](text.replace("\f", "\n").split("\n")):
