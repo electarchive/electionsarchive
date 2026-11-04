@@ -129,7 +129,7 @@ id = "us.enr_2026.md"
 adapter = "us.enr_2026"
 params = { state = "MD" }
 publisher = "Maryland State Board of Elections"
-url = "https://elections.maryland.gov/elections/2026/primary_results/"
+url = "https://elections.maryland.gov/elections/2026/general_results/"
 
 [[feed]]
 id = "us.enr_2026.mn"
