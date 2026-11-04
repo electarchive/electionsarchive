@@ -1101,6 +1101,9 @@ WITHHELD = (
     "covering at most {ballots} ballots by its own ballot totals, so each candidate's total may be short by up to that "
     "many votes; no winner is shown unless the leader's margin is larger."
 )
+MANGLED = (
+    "An accented name read with the wrong encoding, replaced by the same candidate with the name decoded correctly"
+)
 EMPTY = "The source lists this primary with zero votes for every candidate, so its returns are missing; the set is withdrawn."
 NYC_SITE = "https://www.vote.nyc"
 NYC_TITLE = "Election Results Summary"
@@ -4504,6 +4507,105 @@ def emit() -> Path:
                 for option, outcome, seats, notes in earlier.get(row[0], []):
                     cs.add("outcome", result_set_id=row[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 cs.add("note", entity_id=row[0], kind="caveat", body_md=EMPTY)
+        mangled = conn.execute(
+            """select o.id, o.k, o.contest_id, o.ballot_label,
+                      exists (select from result_set r join result_value v on v.result_set_k = r.k
+                              where r.contest_id = o.contest_id and v.option_k = o.k)
+                      or exists (select from outcome t where t.option_id = o.id)
+                      or exists (select from candidacy d where d.option_id = o.id)
+               from contest_option o join changeset g on g.id = o.changeset_id
+               where g.pipeline = %s and o.ballot_label like '%%' || chr(65533) || '%%'""",
+            [SOURCE],
+        ).fetchall()
+        fixed: dict[str, list[tuple[str, str]]] = {}
+        for row in cs.rows.get("contest_option", []):
+            fixed.setdefault(str(row["contest_id"]), []).append((str(row["id"]), str(row["ballot_label"])))
+        renamed: dict[str, str] = {}
+        for option, k, contest, label, used in mangled:
+            pattern = re.compile("".join("." if char == "�" else re.escape(char) for char in label))
+            twins = [id for id, text in fixed.get(str(contest), []) if pattern.fullmatch(text) and "�" not in text]
+            if len(twins) != 1:
+                continue
+            renamed[str(option)] = twins[0]
+            if not used:
+                cs.add("option_drop", option_id=option, contest_id=contest, reason=MANGLED)
+        for row in cs.rows.get("outcome", []):
+            row["option_id"] = renamed.get(str(row["option_id"]), row["option_id"])
+        staged = {str(row["id"]) for row in cs.rows.get("result_set", [])}
+        repaired = conn.execute(
+            """select distinct r.id, r.election_id, r.contest_id, r.stage, r.kind, r.status, r.source_id, r.is_default,
+                      r.completeness, r.supersedes_id
+               from result_set r join contest_option o on o.contest_id = r.contest_id
+               where o.id = any(%s::uuid[])
+                 and (exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)
+                      or exists (select from outcome t where t.result_set_id = r.id and t.option_id = o.id))""",
+            [list(renamed)],
+        ).fetchall()
+        for result_set, election, contest, stage, kind, status, source, default, completeness, supersedes in repaired:
+            if str(result_set) in staged:
+                continue
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                status=status,
+                source_id=source,
+                is_default=default,
+                completeness=completeness,
+                supersedes_id=supersedes,
+            )
+            for option, outcome, seats, notes in earlier.get(result_set, []):
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=renamed.get(str(option), option),
+                    kind=outcome,
+                    seats=seats,
+                    notes=notes,
+                )
+        if repaired:
+            cs.frame(
+                "result_value",
+                pl.DataFrame(
+                    conn.execute(
+                        """select r.id::text, u.id::text, o.id::text, v.flags, v.value::bigint, v.channel, v.measure,
+                                  v.count_round
+                           from result_set r join result_value v on v.result_set_k = r.k
+                           join reporting_unit u on u.k = v.unit_k
+                           join contest_option o on o.contest_id = r.contest_id and o.k = v.option_k
+                           where r.id = any(%s::uuid[])""",
+                        [[row[0] for row in repaired]],
+                    ).fetchall(),
+                    schema={
+                        "result_set_id": pl.String,
+                        "unit_id": pl.String,
+                        "option_id": pl.String,
+                        "flags": pl.Int16,
+                        "value": pl.Int64,
+                        "channel": pl.Int16,
+                        "measure": pl.Int16,
+                        "count_round": pl.Int16,
+                    },
+                    orient="row",
+                ).with_columns(pl.col("option_id").replace(renamed)),
+            )
+        for (candidacy,) in conn.execute(
+            "select id from candidacy where option_id = any(%s::uuid[])", [list(renamed)]
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=candidacy, reason=MANGLED)
+        for (person,) in conn.execute(
+            """select p.id from person p join changeset g on g.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               where g.pipeline = %s and n.text like '%%' || chr(65533) || '%%'
+                 and not exists (select from candidacy where person_id = p.id)
+                 and not exists (select from entity e where e.id = p.id and e.retired_by is not null)""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=person, reason=MANGLED)
+        print(f"{len(renamed)} mangled options repointed in {len(repaired)} sets")
         print(f"{len(made)} contests, {skipped} already held")
         retowned = {
             str(result_set)
