@@ -1,4 +1,6 @@
 import type { Fetch, Part } from "svelte-islands";
+import { peek } from "svelte-islands";
+import { shapesOf } from "#lib/map/hexes.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -47,6 +49,7 @@ const lay = memo((races: Election["election"]["races"]) => {
     const isFolded = wards.length > FOLDED;
     const staffed = {
       ...race,
+      shapes: [] as ReturnType<typeof shapesOf>,
       wards: isFolded
         ? wards.map((row, at) =>
             at < FOLD ? row : { ...row, label: "", field: [] },
@@ -235,6 +238,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
         ? asked
         : "",
     );
+    const { value: hexes } = await soon(
+      boarded.some((race) => race.map != null && race.places != null)
+        ? call(router.seats.hexes, {
+            id: data.id,
+            within: data.scope?.id,
+          }).catch(() => null)
+        : Promise.resolve(null),
+    );
     const { sections } = data;
     const { winners, ledger } = sections;
     const isSweep =
@@ -267,7 +278,27 @@ export const load: PageServerLoad = async ({ params, url }) => {
         logos: part("election.logos", data.election.logos),
         isCrowded: crowded.isCrowded,
         unplaced: laid.isDeferred ? [] : unplace(races, contests),
-        races: boarded,
+        races:
+          hexes == null || hexes instanceof Promise
+            ? boarded
+            : boarded.map((race) => {
+                if (race.places == null) {
+                  return race;
+                }
+                const rows = peek(race.places.rows)?.value.rows ?? [];
+                const keys = new Set(
+                  [...rows, ...(race.places.districts ?? [])].map(
+                    (row) => row.k,
+                  ),
+                );
+                return {
+                  ...race,
+                  shapes: shapesOf(hexes, {
+                    has: (k) => keys.has(k),
+                    size: rows.length,
+                  }),
+                };
+              }),
         rest,
       },
     };

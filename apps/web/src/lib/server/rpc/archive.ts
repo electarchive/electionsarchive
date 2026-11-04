@@ -14197,7 +14197,7 @@ export async function races(
             (other[0].kind === "body_seats" ||
               other[0].kind === "list_allocation"),
         );
-      const [map, previous, runoff, seated, asked, wards, field] =
+      const [map, previous, runoff, seated, asked, wards, field, earlier] =
         await Promise.all([
           level == null || isBrief || isThin || isPrimaries
             ? null
@@ -14741,6 +14741,39 @@ export async function races(
                         null),
                 }));
               })(),
+          single == null ||
+          head == null ||
+          level == null ||
+          isBrief ||
+          isThin ||
+          isPrimaries ||
+          head.kind === "ballot_question"
+            ? null
+            : db.execute<{ isComparable: boolean }>(sql`
+              with me as materialized (
+                select h.kind, h.office_id, h.body_id, h.district_area_id, he.date_from, ${serial("h", "he")} as series
+                from contest h
+                join election he on he.id = h.election_id
+                where h.id = ${head.id}::uuid
+              )
+              select exists (
+                select from me
+                cross join lateral (
+                  select * from contest x where x.district_area_id = me.district_area_id
+                  union all
+                  select * from contest x
+                  where me.district_area_id is null and x.district_area_id is null and x.body_id = me.body_id
+                  union all
+                  select * from contest x
+                  where me.district_area_id is null and x.district_area_id is null and me.body_id is null and x.office_id = me.office_id
+                ) c
+                join election e on e.id = c.election_id
+                join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+                where c.kind = me.kind and not c.notional and e.date_from < me.date_from
+                  and e.status not in ('annulled', 'canceled')
+                  and ${serial("c", "e")} = me.series
+              ) as "isComparable"
+            `),
         ]);
       const straddled = Math.max(
         0,
@@ -14860,6 +14893,7 @@ export async function races(
           (before == null && !(isTier && straddled === 0)
             ? null
             : (previous?.rows[0]?.day?.slice(0, 4) ?? null)),
+        isComparable: earlier?.rows[0]?.isComparable === true,
         size,
         straddled,
         unopposed:
@@ -15276,6 +15310,7 @@ export const elections = {
             sample: v.nullable(v.string()),
             deferred: v.nullable(v.string()),
             since: v.nullable(v.string()),
+            isComparable: v.boolean(),
             electors: v.nullable(
               v.object({
                 rows: v.array(

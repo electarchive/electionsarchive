@@ -2862,6 +2862,12 @@
                           )
                         : value;
                   }}
+                  shapes={places.level === race.places.level ? race.shapes : []}
+                  comparing={region == null &&
+                    race.isComparable &&
+                    race.results.length !== 1 &&
+                    places.level === race.places.level &&
+                    swings[slot(index)]?.isPending !== false}
                   span={swing?.span ??
                     (region?.since != null
                       ? {
