@@ -84,5 +84,3 @@ export function compactPlaces<Kind extends string>(raw: {
     })),
   };
 }
-
-export type ComparedPlaces = ReturnType<typeof compactPlaces>;

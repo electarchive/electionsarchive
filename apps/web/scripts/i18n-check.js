@@ -43,6 +43,18 @@ for (const locale of settings.locales) {
     }
   }
 }
+const tagged = keys.filter((key) =>
+  /(?:^|\s)@(?![\p{L}_$])/u.test(
+    typeof english[key] === "string"
+      ? english[key]
+      : JSON.stringify(english[key]),
+  ),
+);
+if (tagged.length > 0) {
+  problems.push(
+    `en: ${tagged.length} with an @ that paraglide's JSDoc reads as a tag (pass the @ in the input instead): ${tagged.join(", ")}`,
+  );
+}
 if (problems.length > 0) {
   process.exitCode = 1;
   console.error(

@@ -12,6 +12,7 @@
   import { untrack } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
+  import { compactPlaces } from "#lib/compare.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { capitalize, count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -145,7 +146,7 @@
       )
       .slice(0, 2)
       .map(({ entry }) => entry);
-    return series.length === 0 ? null : { ...data, series };
+    return series.length === 0 ? null : compactPlaces({ ...data, series });
   });
 
   let filter = $state(page.url.searchParams.get("show") ?? "all");

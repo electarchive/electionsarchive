@@ -11,7 +11,7 @@ import { closing, cut, describe, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
-import { compactPlaces } from "#lib/server/compare.js";
+import { compactPlaces } from "#lib/compare.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";

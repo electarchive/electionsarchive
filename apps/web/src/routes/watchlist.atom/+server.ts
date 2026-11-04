@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
     origin: url.origin,
     self: `/watchlist.atom?token=${url.searchParams.get("token") ?? ""}`,
     page: "/watchlist",
-    title: m.watchlist_feed_title({ handle: owner.handle }),
+    title: m.watchlist_feed_title({ handle: `@${owner.handle}` }),
     subtitle: m.watchlist_lede(),
     entries: atomEntries(
       [...merged.values()].toSorted((a, b) => b.at.localeCompare(a.at)),
