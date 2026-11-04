@@ -1,12 +1,14 @@
 import html
+import itertools
 import json
 import os
 import re
 import zipfile
 from collections.abc import Callable
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import quote
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -27,11 +29,11 @@ LEGISLATURE = re.compile(
 )
 STATEWIDE = re.compile(r"(?:State )?Comptroller|Attorney General", re.IGNORECASE)
 MONROE_DISTRICT = 25
-TOTALS = {"ballots cast", "over votes", "under votes", "total votes cast", "total ballots cast", "blank"}
 CODE = re.compile(r"^[A-Z]{3} (?=\S+ )")
-NASSAU_LINE = re.compile(r"^\s+(\S.*?)(?:\s*\.)(?:\s+\.)+\s+([\d,]+)\b")
-NASSAU_PRECINCTS = re.compile(r"WITH ([\d,]+) OF ([\d,]+) PRECINCTS")
-NASSAU_PARTY = re.compile(r"\*{4,} \((.+)\) \*{4,}")
+NASSAU_TEXT = re.compile(r'<text[^>]*transform="matrix\(1 0 0 -1 ([\d.]+) ([\d.]+)\)"[^>]*>([^<]*)</text>')
+NASSAU_MERGED = re.compile(r"^(\D+?)\s*(\d+)$")
+NASSAU_PRECINCTS = re.compile(r"(\d+) precincts reported out of (\d+) total")
+NEW_YORK = ZoneInfo("America/New_York")
 
 
 def classify(title: str) -> tuple[str, str, str]:
@@ -179,28 +181,39 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
 
 def nassau(path: Path):
     text = path.read_text(errors="replace")
-    stamp = None
-    party = ""
+    tokens = [(float(x), float(y), html.unescape(label)) for x, y, label in NASSAU_TEXT.findall(text)]
+    day = next((label for _, _, label in tokens if re.fullmatch(r"\d{4}-\d\d-\d\d", label)), None)
+    clock = next((label for _, _, label in tokens if re.fullmatch(r"\d\d:\d\d:\d\d", label)), None)
+    stamp = (
+        datetime.fromisoformat(f"{day}T{clock}").replace(tzinfo=NEW_YORK).astimezone(UTC).isoformat()
+        if day and clock
+        else None
+    )
     title = ""
     seen: tuple[int | None, int | None] = (None, None)
-    lines = [html.unescape(line) for line in re.sub(r"</?(?:HTML|PRE)>", "", text, flags=re.IGNORECASE).splitlines()]
-    for n, line in enumerate(lines):
-        if found := NASSAU_PARTY.search(line):
-            party = found[1]
-        elif "(VOTE FOR)" in line:
-            title = next((lines[k].strip() for k in range(n - 1, 0, -1) if lines[k].strip()), "")
-        elif found := NASSAU_PRECINCTS.search(line):
-            seen = (int(found[1].replace(",", "")), int(found[2].replace(",", "")))
-        elif (found := NASSAU_LINE.match(line)) and title and not line.strip().startswith("Total"):
-            candidate = " ".join(found[1].replace("*", "").split())
-            if candidate.lower() in TOTALS:
-                continue
-            yield row(
-                "Nassau",
-                title,
-                "Write-in" if candidate.upper() == "WRITE-IN" else candidate,
-                party,
-                int(found[2].replace(",", "")),
-                stamp,
-                seen,
-            )
+    candidate = ""
+    pending: list[tuple[str, int]] = []
+
+    def flush():
+        if candidate:
+            for party, votes in pending[1:] or pending:
+                yield row("Nassau", title, candidate, party, votes, stamp, seen)
+
+    for _, line in itertools.groupby(tokens, key=lambda token: token[1]):
+        cells = list(line)
+        x, _, label = cells[0]
+        number = next((int(c[2]) for c in cells[1:] if c[0] > 200 and c[2].isdigit()), None)
+        if number is None and (merged := NASSAU_MERGED.match(label)):
+            label, number = merged[1].strip(), int(merged[2])
+        if x == 54:
+            if "(Vote for" in label:
+                yield from flush()
+                title, candidate, pending = label.split(" (Vote for")[0].strip(), "", []
+            elif found := NASSAU_PRECINCTS.match(label):
+                seen = (int(found[1]), int(found[2]))
+        elif x == 72 and number is not None and not label.startswith("Total"):
+            yield from flush()
+            candidate, pending = label, [("", number)]
+        elif x == 87 and number is not None and candidate:
+            pending.append((label, number))
+    yield from flush()
