@@ -4435,6 +4435,7 @@
   "night_legend_lead": "O tom indica o tamanho da vantagem",
   "night_legend_remaining": "Quanto mais escuro, mais votos a apurar",
   "night_legend_shift": "Mudança na margem desde a última eleição",
+  "night_legend_arrows": "Cada seta mostra quanto um lugar mudou desde a última eleição e aponta para o lado que ganhou votos. Setas mais longas indicam mudanças maiores.",
   "night_majority": "Maioria",
   "night_map_bubbles": "Votos",
   "night_map_counted": "Apurado",

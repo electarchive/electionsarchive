@@ -4437,6 +4437,7 @@
   "night_legend_lead": "La teinte indique l'ampleur de l'avance",
   "night_legend_remaining": "Plus la teinte est foncée, plus il reste de votes à dépouiller",
   "night_legend_shift": "Variation de l'écart depuis la dernière élection",
+  "night_legend_arrows": "Chaque flèche montre de combien un lieu a évolué depuis la dernière élection. Elle pointe vers le camp qui a progressé. Plus la flèche est longue, plus l'évolution est forte.",
   "night_majority": "Majorité absolue",
   "night_map_bubbles": "Votes",
   "night_map_counted": "Dépouillement",
