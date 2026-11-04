@@ -97,6 +97,24 @@ QUESTIONS: list[dict[str, str]] = [
         "file": "26-006-West-Lafayette-Community-School-Corporation-Operating-Determination.pdf",
         "text": "Shall West Lafayette Community School Corporation increase property taxes paid to the school corporation for no more than eight (8) years for the purpose of funding academic programming and operating expenditures and sustaining educational and operational stability in response to reductions in property tax revenue by imposing a property tax rate that does not exceed $0.5706 and results in a maximum annual amount that does not exceed $16,100,000? If this operating referendum public question is approved by the voters, for a median residence of $350,000, the property's annual property tax bill would increase by $956 per year. The most recent operating referendum public question proposed by the school corporation was held in 2023 and passed.",
     },
+    {
+        "path": "us/in/southeast-dubois-county-school-corporation",
+        "label": "Operating referendum renewal",
+        "file": "26-008-Southeast-Dubois-County-School-Corporation-Operating-Determination.pdf",
+        "text": "Shall Southeast Dubois County School Corporation continue to increase property taxes paid to the school corporation for no more than eight (8) years for the purpose of funding and maintaining academic and educationally-related programs and opportunities to meet the learning needs of all students, student health and safety initiatives, maintaining class sizes and recruiting and retaining teachers and staff in response to reductions in property tax revenue by imposing a property tax rate that does not exceed $0.19 and results in a maximum annual amount that does not exceed $1,242,788. If this operating referendum public question is NOT approved by the voters, for a median residence of $200,000, the property's annual tax bill would decrease by $164 per year. If this operating referendum public question is approved by the voters, it would be a renewal of the most recent operating referendum public question passed in 2020 with a property tax rate of $0.19.",
+    },
+    {
+        "path": "us/in/tri-creek-school-corporation",
+        "label": "Operating referendum",
+        "file": "26-028-Tri-Creek-School-Corporation-Operating-Determination.pdf",
+        "text": "Shall Tri-Creek School Corporation increase property taxes paid to the school corporation for no more than eight (8) years for the purpose of replacing lost property tax revenue, funding bus transportation, student programs, and school safety by imposing a property tax rate that does not exceed seventeen and thirty-eight hundredths cents ($0.1738) and results in a maximum annual amount that does not exceed three million dollars ($3,000,000)? If this operating referendum public question is approved by the voters, for a median residence of $300,000, the property's annual property tax bill would increase by $245 per year. The most recent operating referendum public question proposed by the school corporation was held in 2023 and failed.",
+    },
+    {
+        "path": "us/in/michigan-city-area-schools",
+        "label": "Operating referendum",
+        "file": "26-035-Michigan-City-Area-Schools-Operating-Determination.pdf",
+        "text": "Shall the Michigan City Area Schools increase property taxes paid to the School Corporation for no more than eight (8) years for the purpose of funding the Maximize Community and Students (MCAS) initiative which will sustain educational and operational funding stability in response to reductions in property tax revenue by recruiting and retaining educators and staff, supporting essential student health and safety initiatives, and maintaining class sizes, academic programs, and opportunities to meet educational needs by imposing a property tax rate that does not exceed $0.2998 and results in a maximum annual amount that does not exceed $10,000,000. If this operating referendum public question is approved by the voters, for a median residence of $200,000, the property's annual property tax bill would increase by $260 per year.",
+    },
 ]
 
 

@@ -63,6 +63,11 @@ COUNTIES = {
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
         "Douglas County Clerk and Recorder",
     ),
+    "08075": (
+        "https://docs.google.com/document/d/11iZB6gUL21rjyAp6nQuHsrJdZ7rFUCDx/export?format=pdf",
+        None,
+        "Buffalo School District RE-4J",
+    ),
 }
 TITLE = "TABOR notices, November 3, 2026 general election"
 ENTITY_END = re.compile(r"\s*(?:«\s*)?NOTICE OF ELECTION")
@@ -362,7 +367,23 @@ def pueblo_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+def notice_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    for index, line in enumerate(lines):
+        match = re.match(r"^\s*(.+?) (REFERRED BALLOT (?:ISSUE|QUESTION)) (\w+)\s*$", line)
+        if match is not None and not match[1].startswith("NOTICE"):
+            rows.append(
+                {
+                    "entity": titled(match[1]),
+                    "label": f"{titled(match[2])} {match[3]}",
+                    "wording": question(lines, index + 1),
+                }
+            )
+    return rows
+
+
 PARSERS = {
+    "08075": notice_rows,
     "08101": pueblo_rows,
     "08123": weld_rows,
     "08001": adams_rows,
@@ -416,7 +437,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Jefferson County, Colorado tax and debt questions on the November 3, 2026 ballot, with official wording",
+            summary="Colorado county and school district tax and debt questions on the November 3, 2026 ballot, with official wording",
             polity="US-CO",
         )
         system = cs.key("us.electoral_system", "referendum")

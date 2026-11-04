@@ -8592,15 +8592,25 @@ def parse() -> None:
             .is_duplicated()
             .any()
         ):
-            if not str(contest).startswith("City of") or str(county) not in ballot_text:
+            if str(county) not in ballot_text:
                 continue
-            printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
+            post_district = re.fullmatch(r".* County (Magistrate|Constable) District (\d+)", str(contest))
             named_city = re.match(r"City of (.+?) (?:Mayor|City Council|City Commission)", str(contest))
-            if (
-                named_city is None
-                or len(ky_ballots.letters(named_city[1])) < 5
-                or ky_ballots.letters(named_city[1]) not in printed
+            if post_district is not None:
+                section = re.search(
+                    rf"(?is){post_district[1]},?\s+{post_district[2]}(?:st|nd|rd|th)\s+Magisterial District(.*?)Write-in",
+                    " ".join(ballot_text[str(county)]),
+                )
+                if section is None:
+                    continue
+                printed = ky_ballots.letters(section[1])
+            elif (
+                named_city is not None
+                and len(ky_ballots.letters(named_city[1])) >= 5
+                and ky_ballots.letters(named_city[1]) in ky_ballots.letters(" ".join(ballot_text[str(county)]))
             ):
+                printed = ky_ballots.letters(" ".join(ballot_text[str(county)]))
+            else:
                 continue
             group = group.filter(
                 pl.col("Last Name").map_elements(
@@ -11869,7 +11879,7 @@ def parse() -> None:
                     )
                     and not LOCAL_BODY.search(
                         re.sub(
-                            re.escape(place) if state in ("MD", "LA", "WY") else "^$",
+                            re.escape(place) if state in ("MD", "LA", "MN", "WY") else "^$",
                             "",
                             re.sub(
                                 r"(?i)\bcounty school superintendent\b", "County Superintendent", str(row["contest"])
