@@ -249,7 +249,7 @@
   }
 </script>
 
-<article class="grid gap-px bg-border">
+<article class="grid gap-px bg-border" data-sveltekit-preload-data="tap">
   <header class="grid gap-4 bg-background px-4 pbs-5 pbe-5 sm:px-8">
     <p
       class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground"
