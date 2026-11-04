@@ -298,7 +298,7 @@ const byline = (
     .filter((part) => part !== "")
     .join(", ");
 
-function negotiate(accept: string | null) {
+export function negotiate(accept: string | null) {
   const weights = { html: 0, json: 0, md: 0 };
   const parts = accept?.split(",") ?? [];
   for (const part of parts) {

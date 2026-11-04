@@ -18,6 +18,7 @@ import { LOCALE, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
+import { shareHandle } from "#lib/server/share.js";
 import { twin } from "#lib/server/twin.js";
 
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -186,6 +187,7 @@ export const init: ServerInit = () => {
 export const handle: Handle = sequence(
   guardHandle,
   csrfHandle,
+  shareHandle,
   islandsHandle,
   edgeHandle,
   refreshHandle,
