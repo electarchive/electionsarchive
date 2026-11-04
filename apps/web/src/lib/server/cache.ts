@@ -5,6 +5,7 @@ import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Buffer } from "node:buffer";
+import { randomUUID } from "node:crypto";
 import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
@@ -21,6 +22,9 @@ const BUDGET = 1024 ** 3;
 const LARGEST = 64 * 1024 ** 2;
 const LIFETIME = 30 * 86_400;
 const CHECK = 5000;
+const LOCK = 75_000;
+const PATIENCE = 70_000;
+const GRACE = 4;
 const GENERATION = codeVersion ?? build;
 const VERSIONS = new Map<string, string>();
 const parsed: unknown = JSON.parse(procedureVersions ?? "{}");
@@ -168,6 +172,47 @@ async function shelve(slot: string, version: string, packed: Buffer) {
   );
 }
 
+async function exclusive(
+  slot: string,
+  isWanted: (found: { version: string; value: unknown }) => boolean,
+  compute: () => Promise<unknown>,
+) {
+  const lock = `lock:${slot}`;
+  const token = randomUUID();
+  const deadline = Date.now() + PATIENCE;
+  for (;;) {
+    const owner = client();
+    if (owner == null || Date.now() >= deadline) {
+      return compute();
+    }
+    const acquired = await owner
+      .set(lock, token, { NX: true, PX: LOCK })
+      .catch(() => "OK");
+    if (acquired != null) {
+      try {
+        return await compute();
+      } finally {
+        void owner
+          .get(lock)
+          .then(async (held) =>
+            held?.toString() === token ? owner.del(lock) : null,
+          )
+          .catch(() => null);
+      }
+    }
+    let idle = 0;
+    while (idle < GRACE && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const found = await recall(slot);
+      if (found != null && isWanted(found)) {
+        return found.value;
+      }
+      const held = await owner.exists(lock).catch(() => 1);
+      idle = held === 0 ? idle + 1 : 0;
+    }
+  }
+}
+
 function keep(slot: string, version: string, value: unknown) {
   try {
     const payload = serialize({ version, value });
@@ -257,7 +302,11 @@ function store<T>(
       recalled = found.size;
       return found.value;
     }
-    return compute();
+    return exclusive(
+      slot,
+      (other) => other.version === entry.version || !isStrict,
+      compute,
+    );
   })();
   void (async () => {
     try {
