@@ -4,6 +4,7 @@
   import { count, percent } from "#lib/format.js";
   import { phi } from "#lib/live/calibrate.js";
   import { compact, lead, surname, tone } from "#lib/live/format.js";
+  import { odds } from "#lib/live/nation.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import MethodLink from "./method-link.svelte";
@@ -265,10 +266,7 @@
         class="grid gap-2"
         role="img"
         aria-label={isLive && favored != null
-          ? m.night_dial_aria({
-              name: favored.label,
-              chance: percent(chance, 0),
-            })
+          ? m.night_dial_aria({ name: favored.label, chance: odds(chance) })
           : idle}
       >
         <div
@@ -300,7 +298,7 @@
                   },
                 )}
                 style:color={isAhead ? side.color : undefined}
-                >{percent(side.value, 0)}</span
+                >{odds(side.value)}</span
               >
             {:else}
               <span

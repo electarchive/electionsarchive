@@ -13,6 +13,7 @@
     tone,
   } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
+  import { odds } from "#lib/live/nation.js";
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -96,7 +97,7 @@
     if (summary.favorite != null && summary.chance != null) {
       return m.night_nation_chance({
         name: surname(summary.favorite),
-        chance: percent(summary.chance, 0),
+        chance: odds(summary.chance),
       });
     }
     const prior = race.options.map((_, index) =>

@@ -9,7 +9,7 @@ import type { ChamberView, Control, Family, Seat } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
 import { count, percent } from "#lib/format.js";
 import { initial, lead, stamp, surname } from "#lib/live/format.js";
-import { chamber, seat, sides, STATES } from "#lib/live/nation.js";
+import { chamber, odds, seat, sides, STATES } from "#lib/live/nation.js";
 import { pair, ranked, standing, sum } from "#lib/live/standing.js";
 import { closing, describe, summarize } from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -937,7 +937,7 @@ function raceBody(summary: Summary, width: number) {
     summary.chance != null && summary.favorite != null
       ? m.night_nation_chance({
           name: surname(summary.favorite),
-          chance: percent(summary.chance, 0),
+          chance: odds(summary.chance),
         })
       : null;
   return h(

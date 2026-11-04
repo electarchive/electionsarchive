@@ -2,8 +2,8 @@
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import MethodLink from "#lib/components/live/method-link.svelte";
-  import { percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
+  import { odds } from "#lib/live/nation.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const { desk, race }: { desk: Desk; race: LiveRace } = $props();
@@ -21,7 +21,7 @@
     first == null ? 0 : (estimate?.winProbability[first.id] ?? 0),
   );
   const favorite = $derived(chance >= 0.5 ? first : second);
-  const odds = $derived(Math.max(chance, 1 - chance));
+  const favored = $derived(Math.max(chance, 1 - chance));
   const band = $derived(estimate?.margin ?? { low: 0, mid: 0, high: 0 });
   const reach = $derived(
     Math.max(0.05, Math.abs(band.low), Math.abs(band.high)) * 1.15,
@@ -64,7 +64,7 @@
     <p class="flex items-baseline gap-2">
       <span
         class="font-figures text-[1.75em] leading-none font-[760] tabular-nums"
-        style:color={tone(favorite)}>{percent(odds, 0)}</span
+        style:color={tone(favorite)}>{odds(favored)}</span
       >
       <span class="truncate font-semibold">{favorite?.label}</span>
       <span class="ms-auto self-center"><MethodLink section="ranges" /></span>

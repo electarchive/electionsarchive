@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from "svelte";
   import { percent } from "#lib/format.js";
+  import { odds } from "#lib/live/nation.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { signed } from "./scale.js";
@@ -296,7 +297,7 @@
             style:color={favored === "D" ? blue : red}
           >
             {favored}
-            {percent(Math.max(now.chance, 1 - now.chance), 0)}
+            {odds(Math.max(now.chance, 1 - now.chance))}
           </dd>
         </div>
       {:else}

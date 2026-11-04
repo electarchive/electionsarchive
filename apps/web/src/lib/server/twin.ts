@@ -41,6 +41,7 @@ import {
 import { caveatLabel, figure, figureLabel } from "#lib/indices.js";
 import { stamp } from "#lib/live/format.js";
 import methodology from "#lib/live/methodology.json";
+import { odds } from "#lib/live/nation.js";
 import { sum } from "#lib/live/standing.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
@@ -4567,7 +4568,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
         ? [
             race.estimate?.chance == null || race.estimate.favorite == null
               ? ""
-              : `${race.estimate.favorite} ${percent(race.estimate.chance, 0)}`,
+              : `${race.estimate.favorite} ${odds(race.estimate.chance)}`,
           ]
         : []),
     ];
@@ -4629,7 +4630,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
                   ? m.live_twin_too_early()
                   : m.live_twin_estimate({
                       name: estimate.favorite,
-                      chance: percent(estimate.chance, 0),
+                      chance: odds(estimate.chance),
                       low: points(estimate.margin.low, 1),
                       high: points(estimate.margin.high, 1),
                       share: percent(estimate.shareIn, 0),
