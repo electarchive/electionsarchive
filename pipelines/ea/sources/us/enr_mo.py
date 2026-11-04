@@ -16,7 +16,7 @@ FOLDERS = {"St. Louis": "https://extcontent.stlouisco.com/BOE/eResults/"}
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; electionsarchive.com)"}
 LEGISLATURE = re.compile(r"STATE (SENATOR|REPRESENTATIVE) - DISTRICT (\d+)")
 STATEWIDE = re.compile(
-    r"(LIEUTENANT GOVERNOR|SECRETARY OF STATE|STATE TREASURER|ATTORNEY GENERAL|STATE AUDITOR|STATE - .+)"
+    r"(?:FOR )?(LIEUTENANT GOVERNOR|SECRETARY OF STATE|STATE TREASURER|ATTORNEY GENERAL|STATE AUDITOR|STATE - .+|CONSTITUTIONAL AMENDMENT NO\. \d+)"
 )
 JACKSON = "https://www.livevoterturnout.com/ENR/jacksonmoenr/"
 JACKSON_ELECTION = os.environ.get("EA_JACKSON_ELECTION", "38")
