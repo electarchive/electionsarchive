@@ -17918,7 +17918,7 @@ export const elections = {
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.id = ${election}::uuid limit 1
           )
-          select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, g.id as group, z.id as shaped
+          select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.shaped_id as shaped
           from election k
           join slug s on s.entity_id = k.id and s.is_current
           left join lateral (
@@ -17927,26 +17927,7 @@ export const elections = {
               (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
                where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
               ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
-              (
-                select json_agg(json_build_array(
-                  coalesce(qm.into_id, q.party_id),
-                  (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-                   where cy.option_id = q.id and cy.role = 'head' order by cy.id limit 1),
-                  t.value
-                ))
-                from (
-                  select y.option_k, sum(y.value)::float8 as value from result_rollup y
-                  where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
-                    and y.count_round = (
-                      select max(z.count_round) from result_rollup z
-                      where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
-                    )
-                  group by y.option_k
-                  offset 0
-                ) t
-                join contest_option q on q.k = t.option_k
-                left join entity_merge qm on qm.entity_id = q.party_id
-              ) as votes
+              tl.votes
             from contest c
             left join unnest(
               ${sql.param(decided.map(([id]) => id))}::uuid[],
@@ -17961,26 +17942,35 @@ export const elections = {
             ) ar
             left join area da on da.id = ar.id
             cross join lateral (
+              select json_agg(json_build_array(
+                  coalesce(qm.into_id, q.party_id),
+                  (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                   where cy.option_id = q.id and cy.role = 'head' order by cy.id limit 1),
+                  t.value
+                )) as votes,
+                (array_agg(q.id order by t.value desc))[1] as top
+              from (
+                select y.option_k, sum(y.value)::float8 as value
+                from (
+                  select r.option_k, r.value, r.count_round, max(r.count_round) over () as last
+                  from result_rollup r
+                  where r.result_set_k = rs.k and r.area_k = da.k and r.measure = 1
+                ) y
+                where y.count_round = y.last and y.option_k <> 0
+                group by y.option_k
+                offset 0
+              ) t
+              join contest_option q on q.k = t.option_k
+              left join entity_merge qm on qm.entity_id = q.party_id
+            ) tl
+            cross join lateral (
               (
                 select x.option_id as id, false as led from outcome x
                 where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
                 order by x.option_id limit 1
               )
               union all
-              (
-                select o.id, true from (
-                  select y.option_k, sum(y.value) as value from result_rollup y
-                  where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
-                    and y.count_round = (
-                      select max(z.count_round) from result_rollup z
-                      where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
-                    )
-                  group by y.option_k
-                  offset 0
-                ) t
-                join contest_option o on o.k = t.option_k
-                order by t.value desc limit 1
-              )
+              (select tl.top, true where tl.top is not null)
               limit 1
             ) pick
             join contest_option o on o.id = pick.id
@@ -17993,26 +17983,23 @@ export const elections = {
               select w.area, 0
               union all
               select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
-              where up.depth < 6 and up.id <> (select id from top) and p.valid @> k.date_from
-            )
-            select up.id from up
-            where exists (
-              select from area_parent p
-              where p.area_id = up.id and p.parent_id = (select id from top) and p.valid @> k.date_from
-            )
-            order by up.depth limit 1
-          ) g on true
-          left join lateral (
-            with recursive up(id, depth) as (
-              select w.area, 0
-              union all
-              select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
               where up.depth < 6 and p.valid @> k.date_from
             )
-            select up.id from up
-            where exists (select from area_geometry ag where ag.area_id = up.id)
-            order by up.depth limit 1
-          ) z on true
+            select
+              (
+                select u.id from up u
+                where exists (
+                  select from area_parent p
+                  where p.area_id = u.id and p.parent_id = (select id from top) and p.valid @> k.date_from
+                )
+                order by u.depth limit 1
+              ) as group_id,
+              (
+                select u.id from up u
+                where exists (select from area_geometry ag where ag.area_id = u.id)
+                order by u.depth limit 1
+              ) as shaped_id
+          ) az on true
           where k.parent_id = ${election}::uuid
         `);
         const segments = new Map(
