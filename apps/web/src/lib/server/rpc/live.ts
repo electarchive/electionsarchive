@@ -1085,6 +1085,7 @@ async function night(
     .digest("base64url");
   const [
     frames,
+    declined,
     { choices, incumbents, settled, prior, drawn, placed },
     feeds,
     polities,
@@ -1100,7 +1101,8 @@ async function night(
     }>(sql`
       with latest as (
         select distinct on (o.feed_id, o.contest_id) o.feed_id, o.contest_id, od.adapter,
-          (select sum(v.votes) from live.value v where v.frame_k = o.k) as votes,
+          (select sum(v.votes) from live.value v join contest_option x on x.id = v.option_id
+            where v.frame_k = o.k and x.kind <> 'none_of_the_above') as votes,
           exists (
             select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
               and x.fetched_at > now() - interval '20 minutes'
@@ -1108,7 +1110,7 @@ async function night(
           exists (
             select from live.value v join contest_option x on x.id = v.option_id
             where v.frame_k = o.k and x.kind = 'none_of_the_above' and v.votes > 0
-          ) as declined
+          ) and (select count(distinct v.unit_id) from live.value v where v.frame_k = o.k) > 1 as declined
         from live.frame o join live.feed od on od.id = o.feed_id
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
@@ -1131,6 +1133,24 @@ async function night(
             )
         )
       order by f.as_of, f.k
+    `),
+    db.execute<{ contest: string; option: string; votes: number }>(sql`
+      with latest as (
+        select distinct on (f.feed_id, f.contest_id) f.k, f.contest_id, f.as_of
+        from live.frame f join live.feed d on d.id = f.feed_id and d.enabled
+        where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
+        order by f.feed_id, f.contest_id, f.as_of desc, f.k desc
+      )
+      select distinct on (t.contest, t.option) t.contest, t.option, t.votes
+      from (
+        select l.contest_id as contest, x.id as option, l.as_of, l.k, sum(v.votes)::float8 as votes
+        from latest l
+        join live.value v on v.frame_k = l.k
+        join contest_option x on x.id = v.option_id and x.kind = 'none_of_the_above'
+        group by 1, 2, 3, 4
+      ) t
+      where t.votes > 0
+      order by t.contest, t.option, t.as_of desc, t.k desc
     `),
     remember(
       `live:fixed:v3:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
@@ -1259,6 +1279,7 @@ async function night(
     }),
   );
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
+  const declinedBy = Map.groupBy(declined.rows, (row) => row.contest);
   const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
@@ -1266,13 +1287,15 @@ async function night(
   const calledBy = new Map(called.map((row) => [row.contest, row]));
   const built = picked.map((row): LiveRace => {
     const mine = byContest.get(row.id) ?? [];
-    const voted = new Set(
-      mine.flatMap((frame) =>
+    const refused = declinedBy.get(row.id) ?? [];
+    const voted = new Set([
+      ...mine.flatMap((frame) =>
         (replayed.get(frame.k)?.totals ?? []).flatMap(([option, votes]) =>
           votes > 0 ? [option] : [],
         ),
       ),
-    );
+      ...refused.map((line) => line.option),
+    ]);
     const own = choices.filter(
       (choice) =>
         choice.contest === row.id &&
@@ -1342,6 +1365,13 @@ async function night(
             expected: null,
           });
         }
+      }
+    }
+    const newest = raceFrames.at(-1);
+    for (const line of refused) {
+      const position = index.get(line.option);
+      if (newest != null && position != null && newest.totals[position] === 0) {
+        newest.totals[position] = line.votes;
       }
     }
     const lines = (priorBy.get(row.id) ?? []).map((line) => ({
