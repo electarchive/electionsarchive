@@ -97,7 +97,7 @@ export const outside = async (
       order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
     ),
     drawn as materialized (
-      select a.k, a.id, a.scheme_code, g.geom, ST_PointOnSurface(g.geom) as point, ST_Area(g.geom) as size, g.valid @> ${day}::date as "isCurrent"
+      select a.k, a.id, a.scheme_code, g.geom, Box2D(g.geom)::geometry as box, ST_PointOnSurface(g.geom) as point, ST_Area(g.geom) as size, g.valid @> ${day}::date as "isCurrent"
       from area a
       cross join lateral (
         select g.geom, g.valid from area_geometry g where g.area_id = a.id
@@ -108,7 +108,7 @@ export const outside = async (
     flagged as (
       select d.*, d."isCurrent" and exists (
         select from drawn o
-        where o.k <> d.k and o."isCurrent" and o.size < d.size and o.point && d.geom and ST_Covers(d.geom, o.point)
+        where o.k <> d.k and o."isCurrent" and o.size < d.size and o.point && d.box and ST_Covers(d.geom, o.point)
       ) as "isOver"
       from drawn d
     )
@@ -127,7 +127,7 @@ export const outside = async (
         (projectionOf(scheme)?.within ?? [])
           .map(
             ([west, south, east, north]) =>
-              `a.geom @ ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+              `a.box @ ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
           )
           .join(" or ") || "false",
       )})
@@ -179,17 +179,20 @@ export const parted = async (
   if (insets.length === 0) {
     return;
   }
-  const [rows, own, held] = await Promise.all([
-    remember(`parted:${scheme}:${day}`, async () => {
+  const [everyDay, own, held] = await Promise.all([
+    remember(`parted:${scheme}`, async () => {
       const found = await db.execute<{
         k: number;
         part: number;
         x: number;
         y: number;
+        from: string | null;
+        until: string | null;
       }>(sql`
-        select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y
+        select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y,
+          lower(g.valid)::text as "from", upper(g.valid)::text as until
         from (
-          select g.area_id, g.geom from area_geometry g
+          select g.area_id, g.geom, g.valid from area_geometry g
           where (${sql.raw(
             insets
               .flatMap((inset) => inset.within)
@@ -198,7 +201,7 @@ export const parted = async (
                   `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
               )
               .join(" or "),
-          )}) and g.valid @> ${day}::date
+          )}) and not isempty(g.valid)
           offset 0
         ) g
         join area a on a.id = g.area_id
@@ -218,6 +221,11 @@ export const parted = async (
   if (own.rows.length === 0) {
     return;
   }
+  const rows = everyDay.filter(
+    (row) =>
+      (row.from == null || row.from <= day) &&
+      (row.until == null || day < row.until),
+  );
   const mine = own.rows[0]?.mine ?? -1;
   const isApart =
     mine === -1 && insets.some((inset) => inset.detached !== true);
