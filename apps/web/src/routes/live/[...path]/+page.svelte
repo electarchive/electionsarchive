@@ -49,9 +49,11 @@
       ? { seats: count(up), count: count(running) }
       : null;
   });
+  const parts = $derived(election.slug.split("/"));
+  const isDistrictedState = $derived(isDistricted(parts[1] ?? ""));
   const description = $derived(
     spot != null
-      ? isDistricted(election.slug.split("/")[1] ?? "")
+      ? isDistrictedState
         ? m.night_place_seo_description_district({
             place: spot,
             title: election.title,
@@ -67,12 +69,16 @@
               time: stamp(election.newest),
             })
         : headline == null
-          ? m.night_seo_nation({ title: election.title })
+          ? parts.length === 3
+            ? (isDistrictedState
+                ? m.night_seo_state_district
+                : m.night_seo_state)({ title: election.title })
+            : m.night_seo_nation({ title: election.title })
           : election.newest == null
-            ? (isDistricted(election.slug.split("/")[1] ?? "")
+            ? (isDistrictedState
                 ? m.night_seo_upcoming_district
                 : m.night_seo_upcoming)({ headline, title: name })
-            : (isDistricted(election.slug.split("/")[1] ?? "")
+            : (isDistrictedState
                 ? m.night_seo_description_district
                 : m.night_seo_description)({
                 headline,
