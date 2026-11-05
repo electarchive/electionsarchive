@@ -52,12 +52,8 @@
       Math.max(limit, (race.seats ?? 1) + 1),
     ),
   );
-  const isUnopposed = $derived(
-    !race.isMeasure &&
-      race.options.filter((option) => !option.isWriteIn).length <=
-        (race.seats ?? 1),
-  );
-  const pick = $derived(summary.winner ?? summary.projected ?? summary.leader);
+  const isUnopposed = $derived(race.unopposed != null);
+  const pick = $derived(summary.settled ?? summary.leader);
   const status = $derived.by(() => {
     if (summary.winner != null && (race.seats ?? 1) === 1) {
       return m.night_head_won({
@@ -165,7 +161,8 @@
                 person={line.option.person}
                 hasSwatch={false}
                 class={cn("truncate", {
-                  "font-semibold": isWinner || isProjected,
+                  "font-semibold":
+                    isWinner || isProjected || summary.unopposed != null,
                 })}
               />
               {#if line.option.party != null}

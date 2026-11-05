@@ -47,6 +47,7 @@
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
   import Trend from "./trend.svelte";
+  import Unopposed from "./unopposed.svelte";
   import Withheld from "./withheld.svelte";
 
   let {
@@ -158,9 +159,6 @@
   const isMulti = $derived(
     seats > 1 && !race.isMeasure && options.length > seats,
   );
-  const isUnopposed = $derived(
-    seats > 1 && !race.isMeasure && options.length <= seats,
-  );
   const isField = $derived.by(() => {
     if (race.isMeasure) {
       return false;
@@ -186,12 +184,19 @@
       ? (options.find((option) => option.id === race.projected?.option) ?? null)
       : null,
   );
+  const lone = $derived(
+    race.certified == null && projected == null ? race.unopposed : null,
+  );
+  const loneOptions = $derived(
+    options.filter((option) => lone?.options.includes(option.id) === true),
+  );
   const band = $derived(
     bandFor(
       options,
-      projected == null ? winners : [projected.id],
+      lone?.options ?? (projected == null ? winners : [projected.id]),
       seats,
       projected != null,
+      lone != null,
     ),
   );
   const closes = $derived(
@@ -205,6 +210,7 @@
     const called =
       projected ??
       options.find((option) => winners.includes(option.id)) ??
+      loneOptions[0] ??
       null;
     const ahead =
       called ?? (now.total > 0 ? (options[now.order[0] ?? -1] ?? null) : null);
@@ -223,8 +229,10 @@
         };
   });
   const isWaiting = $derived(now.total === 0);
+  const isUncounted = $derived(lone != null && isWaiting);
   const later = $derived(
     isWaiting &&
+      lone == null &&
       race.certified == null &&
       (race.feed === "none" || race.feed === "outside")
       ? race.feed
@@ -297,6 +305,9 @@
     if (race.certified != null) {
       return "certified" as const;
     }
+    if (isUncounted) {
+      return "unopposed" as const;
+    }
     if (later != null) {
       return "later" as const;
     }
@@ -324,11 +335,14 @@
         ? m.night_head_seats_filled(values)
         : m.night_head_seats_holding(values);
     }
-    if (isUnopposed && later == null) {
+    if (race.unopposed != null && seats > 1) {
       return m.night_head_seats_unopposed({
         seats: count(seats),
-        count: count(options.length),
+        count: count(race.unopposed.options.length),
       });
+    }
+    if (lone != null) {
+      return m.night_head_unopposed({ name: loneOptions[0]?.label ?? "" });
     }
     if (isPlural && now.total > 0 && later == null && projected == null) {
       const first = ranking[0] ?? 0;
@@ -510,6 +524,7 @@
             "border border-border":
               status === "before" ||
               status === "certified" ||
+              status === "unopposed" ||
               status === "later",
             "bg-(--no) text-background": status === "offline",
           },
@@ -524,6 +539,8 @@
           {m.night_status_before()}
         {:else if status === "certified"}
           {m.night_status_certified()}
+        {:else if status === "unopposed"}
+          {m.night_state_unopposed()}
         {:else if status === "later"}
           {m.night_later()}
         {:else}
@@ -643,15 +660,23 @@
     </section>
   {/if}
 
-  {#if later == null || band == null}
+  {#if isUncounted}
+    <section class="bg-background px-4 py-6 sm:px-8">
+      <Unopposed
+        options={loneOptions}
+        isTacit={lone?.isTacit === true}
+        {seats}
+      />
+    </section>
+  {:else if later == null || band == null}
     {@render result()}
   {/if}
 
-  {#if later == null && isMulti}
+  {#if !isUncounted && later == null && isMulti}
     <section class="bg-background px-4 py-6 sm:px-8">
       <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
     </section>
-  {:else if later == null}
+  {:else if !isUncounted && later == null}
     {#if isLive && !isUnestimated}
       <section
         class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2"
@@ -816,7 +841,7 @@
   <footer
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"
   >
-    {#if later == null}
+    {#if later == null && !isUncounted}
       <p class="max-inline-[80ch]">
         {isDistricted(race.state)
           ? m.night_method_district()

@@ -140,8 +140,7 @@
           .filter(
             (summary) =>
               summary.total > 0 &&
-              summary.winner == null &&
-              summary.projected == null &&
+              summary.settled == null &&
               summary.race.office !== "other",
           )
           .toSorted((a, b) => a.margin - b.margin)
@@ -304,10 +303,7 @@
 
   function status(summary: Summary, band: Band | null) {
     if (band != null) {
-      return {
-        option: summary.projected ?? summary.winner,
-        text: verdict(summary),
-      };
+      return { option: summary.settled, text: verdict(summary) };
     }
     if (summary.leader != null) {
       return {
@@ -377,7 +373,7 @@
     >
       <title>{m.night_band_called({ time: stamp(summary.projectedAt) })}</title>
     </CircleDashedCheckIcon>
-  {:else if band != null}
+  {:else if band != null && !band.isUnopposed}
     <CircleCheckIcon
       class="shrink-0 block-3.5 inline-3.5"
       aria-label={m.night_state_won()}

@@ -4561,7 +4561,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
         ? `${race.winner} (${m.live_elected()})`
         : race.projected != null
           ? `${race.projected.name} (${m.night_band_projected()})`
-          : (race.leader ?? (race.note == null ? "" : m.night_later_key())),
+          : race.unopposed == null
+            ? (race.leader ?? (race.note == null ? "" : m.night_later_key()))
+            : `${race.unopposed} (${m.night_state_unopposed()})`,
       total === 0 ? "" : count(total),
       total === 0 ? "" : points(race.margin, 1).replace(/^[+−]/u, ""),
       ...(data.forecasts
@@ -4584,8 +4586,10 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       `### ${link(race.title, `live/${race.slug}`)}`,
       ...(isRace || race.headline == null ? [] : [`**${race.headline}.**`]),
       total === 0
-        ? (race.note ??
-          (data.at == null ? m.live_waiting() : m.live_no_update()))
+        ? race.unopposed != null
+          ? `**${race.unopposed}**\n\n${race.note ?? ""}`.trim()
+          : (race.note ??
+            (data.at == null ? m.live_waiting() : m.live_no_update()))
         : [
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],
@@ -4594,7 +4598,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
                   ? `${row.label} (${m.live_elected()})`
                   : row.isProjected
                     ? `${row.label} (${m.night_band_projected()})`
-                    : row.label,
+                    : row.isUnopposed
+                      ? `${row.label} (${m.night_state_unopposed()})`
+                      : row.label,
                 row.party,
                 count(row.votes),
                 percent(row.votes / total),
@@ -4669,7 +4675,13 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       : []),
     m.live_twin_note(),
     ...(data.forecasts ? [] : [m.live_twin_forecast_off()]),
-    `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: stamp(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: stamp(election.newest) })}**`,
+    ...(isRace &&
+    data.races[0]?.unopposed != null &&
+    sum(data.races[0].votes) === 0
+      ? []
+      : [
+          `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: stamp(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: stamp(election.newest) })}**`,
+        ]),
     ...(closes.length === 0
       ? []
       : [

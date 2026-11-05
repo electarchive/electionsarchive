@@ -5,10 +5,10 @@
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
   import { turn } from "#lib/live/ballot.js";
-  import { lead, paint, stamp, tone } from "#lib/live/format.js";
+  import { paint, stamp, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { highlight } from "#lib/live/local.js";
-  import { bandOf } from "#lib/live/summary.js";
+  import { bandOf, edge, isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -62,7 +62,9 @@
   <ol class="grid">
     {#each entries as entry (entry.contest.id)}
       {const summary = $derived(entry.summary)}
-      {const pick = $derived(summary.winner ?? summary.leader)}
+      {const pick = $derived(
+        summary.winner ?? summary.unopposed ?? summary.leader,
+      )}
       {const band = $derived(bandOf(entry.summary, entry.contest.seats))}
       <li class="border-be border-border">
         <a
@@ -144,7 +146,7 @@
                         })}</title
                       >
                     </CircleDashedCheckIcon>
-                  {:else if isDecided}
+                  {:else if isDecided && band?.isUnopposed !== true}
                     <CircleCheckIcon
                       class="shrink-0 block-3.5 inline-3.5"
                       aria-label={m.night_state_won()}
@@ -181,11 +183,11 @@
               ? m.night_later()
               : pick == null || summary.total === 0
                 ? "–"
-                : `+${lead(summary.margin)}`}</span
+                : edge(summary)}</span
           >
           <span
             class={cn("hidden items-center justify-end gap-1.5 sm:flex", {
-              invisible: summary.later != null,
+              invisible: summary.later != null || isUncounted(summary),
             })}
           >
             <span

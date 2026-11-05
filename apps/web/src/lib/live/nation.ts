@@ -14,6 +14,7 @@ export type Chamber = "senate" | "house" | "governor";
 export type Rating =
   | "won"
   | "projected"
+  | "unopposed"
   | "solid"
   | "likely"
   | "lean"
@@ -110,6 +111,10 @@ function describeFamily(control: Control, id: string): Family {
   };
 }
 
+export function isSettled(rating: Rating) {
+  return rating === "won" || rating === "projected" || rating === "unopposed";
+}
+
 export function seat(
   summary: Summary,
   control: Control | null,
@@ -133,7 +138,7 @@ export function seat(
   let pLeft = held === left.id ? PRIOR : held === right.id ? 1 - PRIOR : 0.5;
   let pRight = 1 - pLeft;
   let band: Seat["band"] = null;
-  const called = summary.winner ?? summary.projected;
+  const called = summary.settled;
   if (called != null) {
     const id = family(control, called);
     pLeft = id === left.id ? 1 : 0;
@@ -180,6 +185,8 @@ export function seat(
     rating = "won";
   } else if (summary.projected != null) {
     rating = "projected";
+  } else if (summary.unopposed != null) {
+    rating = "unopposed";
   } else if (isEstimating) {
     const top = Math.max(pLeft, pRight);
     rating = RATINGS.find(([, floor]) => top >= floor)?.[0] ?? "tossup";
@@ -192,7 +199,7 @@ export function seat(
       total > 0,
   );
   let lean = pLeft - pRight;
-  if (rating === "won" || rating === "projected") {
+  if (isSettled(rating)) {
     const sure = rating === "won" ? 2 : 1.5;
     lean = side === left.id ? sure : side === right.id ? -sure : 0;
   } else if (rating === "counting" && signed != null) {
@@ -261,17 +268,27 @@ function quantile(pmf: Array<number>, wanted: number) {
 export type Tally = {
   won: number;
   projected: number;
+  unopposed: number;
   ahead: number;
   holdover: number;
   gains: number;
   losses: number;
 };
 
+export function seatsOf(tally: Tally) {
+  return (
+    tally.won + tally.projected + tally.unopposed + tally.ahead + tally.holdover
+  );
+}
+
 export function breakdown(tally: Tally) {
   return [
     tally.won > 0 ? m.night_tally_won({ count: tally.won }) : null,
     tally.projected > 0
       ? m.night_tally_projected({ count: tally.projected })
+      : null,
+    tally.unopposed > 0
+      ? m.night_tally_unopposed({ count: tally.unopposed })
       : null,
     m.night_tally_ahead({ count: tally.ahead }),
     m.night_tally_not_up({ count: tally.holdover }),
@@ -301,6 +318,7 @@ export function chamber(
   const blank = (): Tally => ({
     won: 0,
     projected: 0,
+    unopposed: 0,
     ahead: 0,
     holdover: 0,
     gains: 0,
@@ -317,6 +335,8 @@ export function chamber(
   for (const entry of seats) {
     if (entry.rating === "later") {
       later += 1;
+    } else if (entry.rating === "unopposed") {
+      tallies[key(entry.side)].unopposed += 1;
     } else if (entry.side == null || entry.summary.total === 0) {
       waiting += 1;
     } else if (entry.rating === "won") {

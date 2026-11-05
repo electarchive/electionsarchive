@@ -7,7 +7,8 @@
   import { percent } from "#lib/format.js";
   import { ahead, called, short } from "#lib/live/board/labels.js";
   import { swing } from "#lib/live/flips.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { surname, tone } from "#lib/live/format.js";
+  import { edge } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Mark from "./mark.svelte";
@@ -104,7 +105,7 @@
             {/if}
           </span>
           <span class="font-figures font-semibold tabular-nums"
-            >+{lead(summary.margin)}</span
+            >{edge(summary)}</span
           >
           <span
             class="text-end font-figures text-muted-foreground tabular-nums min-inline-[3.5ch]"

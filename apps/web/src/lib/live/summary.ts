@@ -23,6 +23,8 @@ export type Summary = {
   winner: LiveOption | null;
   projected: LiveOption | null;
   projectedAt: string | null;
+  unopposed: LiveOption | null;
+  settled: LiveOption | null;
   favorite: LiveOption | null;
   chance: number | null;
   at: string | null;
@@ -50,6 +52,12 @@ export function summarize(
     winner == null
       ? (race.options.find((option) => option.id === race.projected?.option) ??
         null)
+      : null;
+  const unopposed =
+    race.certified == null && projected == null
+      ? (race.options.find((option) =>
+          race.unopposed?.options.includes(option.id),
+        ) ?? null)
       : null;
   let counted: number | null = null;
   if (race.certified != null) {
@@ -95,11 +103,14 @@ export function summarize(
     winner,
     projected,
     projectedAt: projected == null ? null : (race.projected?.at ?? null),
+    unopposed,
+    settled: winner ?? projected ?? unopposed,
     favorite,
     chance:
       favorite == null ? null : (estimate?.winProbability[favorite.id] ?? null),
     at: frame?.at ?? null,
     later:
+      unopposed == null &&
       race.certified == null &&
       total === 0 &&
       (race.feed === "none" || race.feed === "outside")
@@ -109,7 +120,16 @@ export function summarize(
 }
 
 export function bandOf(summary: Summary, seats = summary.race.seats ?? 1) {
-  const { race, projected, winner } = summary;
+  const { race, projected, winner, unopposed } = summary;
+  if (unopposed != null) {
+    return bandFor(
+      race.options,
+      race.unopposed?.options ?? [],
+      seats,
+      false,
+      true,
+    );
+  }
   return bandFor(
     race.options,
     projected == null
@@ -118,6 +138,16 @@ export function bandOf(summary: Summary, seats = summary.race.seats ?? 1) {
     seats,
     projected != null,
   );
+}
+
+export function isUncounted(summary: Summary) {
+  return summary.unopposed != null && summary.total === 0;
+}
+
+export function edge(summary: Summary) {
+  return summary.unopposed == null
+    ? `+${lead(summary.margin)}`
+    : m.night_state_unopposed();
 }
 
 export function closing(election: LiveElection, race: LiveRace) {
@@ -156,6 +186,16 @@ export function cut(summary: Summary) {
   };
 }
 
+export function unopposedHead({ race, unopposed }: Summary) {
+  const seats = race.seats ?? 1;
+  return seats > 1
+    ? m.night_head_seats_unopposed({
+        seats: count(seats),
+        count: count(race.unopposed?.options.length ?? 0),
+      })
+    : m.night_head_unopposed({ name: unopposed?.label ?? "" });
+}
+
 export function describe(summary: Summary, closes: number, time: number) {
   const { leader, winner, margin, total, estimate } = summary;
   const line = total > 0 ? cut(summary) : null;
@@ -178,6 +218,9 @@ export function describe(summary: Summary, closes: number, time: number) {
       name: summary.projected.label,
       time: stamp(summary.projectedAt),
     });
+  }
+  if (summary.unopposed != null) {
+    return unopposedHead(summary);
   }
   if (summary.later != null) {
     return m.night_head_later();
@@ -215,6 +258,9 @@ export function verdict(summary: Summary) {
   if (summary.winner == null && summary.projected != null) {
     return m.night_races_projected({ name: surname(summary.projected) });
   }
+  if (summary.unopposed != null) {
+    return m.night_state_unopposed();
+  }
   const option = summary.winner ?? summary.leader;
   if (option == null) {
     return summary.later == null ? m.night_nation_waiting() : m.night_later();
@@ -228,13 +274,16 @@ export function verdict(summary: Summary) {
 }
 
 export function shade(summary: Summary) {
-  const option = summary.winner ?? summary.leader;
+  const option = summary.winner ?? summary.unopposed ?? summary.leader;
   if (option == null) {
     return null;
   }
   return marginShade(
     tone(option),
-    leadSafety(summary.margin, summary.winner != null),
+    leadSafety(
+      summary.margin,
+      summary.winner != null || summary.unopposed != null,
+    ),
   );
 }
 
@@ -249,6 +298,7 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
       option: LiveOption;
       won: number;
       projected: number;
+      unopposed: number;
       leading: number;
       seats: number;
     }
@@ -259,7 +309,7 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
     if (summary.race.office !== office) {
       continue;
     }
-    const option = summary.winner ?? summary.projected ?? summary.leader;
+    const option = summary.settled ?? summary.leader;
     if (option == null) {
       if (summary.later == null) {
         waiting += 1;
@@ -273,15 +323,18 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
       option,
       won: 0,
       projected: 0,
+      unopposed: 0,
       leading: 0,
       seats: 0,
     };
     if (summary.winner != null) {
       group.won += 1;
-    } else if (summary.projected == null) {
+    } else if (summary.projected != null) {
+      group.projected += 1;
+    } else if (summary.unopposed == null) {
       group.leading += 1;
     } else {
-      group.projected += 1;
+      group.unopposed += 1;
     }
     group.seats += 1;
     groups.set(key, group);

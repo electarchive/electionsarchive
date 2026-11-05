@@ -27,8 +27,7 @@ export class Desk {
       if (
         summary.race.office === "house" ||
         summary.total === 0 ||
-        summary.winner != null ||
-        summary.projected != null
+        summary.settled != null
       ) {
         continue;
       }
@@ -73,7 +72,7 @@ export class Desk {
     if (summary.race.isMeasure === true) {
       return null;
     }
-    const called = summary.winner ?? summary.projected;
+    const called = summary.settled;
     const incumbent = summary.race.options.find((option) => option.isIncumbent);
     const holder = this.control?.holders[summary.race.id];
     return shift({

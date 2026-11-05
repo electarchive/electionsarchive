@@ -29,7 +29,7 @@ export function short(race: LiveRace) {
 }
 
 export function called(summary: Summary | undefined) {
-  return summary?.winner ?? summary?.projected ?? null;
+  return summary?.settled ?? null;
 }
 
 export function ahead(summary: Summary | undefined) {

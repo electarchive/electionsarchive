@@ -10,16 +10,9 @@
   import { fits } from "#lib/fits.js";
   import { percent } from "#lib/format.js";
   import { FLIP_ORDER, swing } from "#lib/live/flips.js";
-  import {
-    clock,
-    compact,
-    lead,
-    paint,
-    surname,
-    tone,
-  } from "#lib/live/format.js";
-  import { odds } from "#lib/live/nation.js";
-  import { bandOf } from "#lib/live/summary.js";
+  import { clock, compact, paint, surname, tone } from "#lib/live/format.js";
+  import { isSettled, odds } from "#lib/live/nation.js";
+  import { bandOf, edge } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
@@ -70,6 +63,7 @@
   const RATINGS: Record<Rating, () => string> = {
     won: m.night_rating_won,
     projected: m.night_rating_projected,
+    unopposed: m.night_state_unopposed,
     solid: m.night_rating_solid,
     likely: m.night_rating_likely,
     lean: m.night_rating_lean,
@@ -84,8 +78,7 @@
     close: (seat) =>
       seat.summary.total > 0 &&
       seat.summary.margin < 0.02 &&
-      seat.rating !== "won" &&
-      seat.rating !== "projected",
+      !isSettled(seat.rating),
     flips: (seat) => seat.shift != null && seat.shift.flip !== "held",
     upsets: (seat) => seat.isUpset,
     left: (seat) => (seat.remaining ?? 0) > 0,
@@ -140,7 +133,8 @@
     chance: (seat) =>
       seat.rating === "counting" ||
       seat.rating === "waiting" ||
-      seat.rating === "later"
+      seat.rating === "later" ||
+      seat.rating === "unopposed"
         ? null
         : chance(seat),
     at: (seat) => seat.summary.at ?? null,
@@ -366,9 +360,7 @@
         {/if}
         {#each windowed.entries as { value: seat, index, key: id } (id)}
           {const summary = $derived(seat.summary)}
-          {const ahead = $derived(
-            summary.winner ?? summary.projected ?? summary.leader,
-          )}
+          {const ahead = $derived(summary.settled ?? summary.leader)}
           {const isLeft = $derived((seat.signed ?? 0) >= 0)}
           {const band = $derived(bandOf(summary))}
           {const fill = $derived(
@@ -461,10 +453,8 @@
                       style:background-color={paint(ahead, band)}
                     ></span>
                     <span
-                      class={cn({
-                        "font-semibold":
-                          summary.winner != null || summary.projected != null,
-                      })}>{surname(ahead)}</span
+                      class={cn({ "font-semibold": summary.settled != null })}
+                      >{surname(ahead)}</span
                     >
                     {#if ahead.isIncumbent}
                       <span class="text-xs text-muted-foreground"
@@ -521,9 +511,9 @@
                   style:color={summary.total === 0 || band != null
                     ? undefined
                     : tone(ahead ?? undefined)}
-                  >{summary.total === 0
+                  >{summary.total === 0 && summary.unopposed == null
                     ? "–"
-                    : `+${lead(summary.margin)}`}</span
+                    : edge(summary)}</span
                 >
               </span>
             </td>
@@ -576,7 +566,11 @@
               <td
                 class="py-1.5 pe-3 text-end whitespace-nowrap @max-[73rem]:order-5 @max-[73rem]:p-0 @max-[73rem]:pbs-1"
               >
-                {#if band != null}
+                {#if band?.isUnopposed === true}
+                  <span class="text-xs font-semibold"
+                    >{RATINGS.unopposed()}</span
+                  >
+                {:else if band != null}
                   <span
                     class="inline-flex items-center gap-1 text-xs font-semibold"
                   >

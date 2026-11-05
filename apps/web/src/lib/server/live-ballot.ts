@@ -1,4 +1,4 @@
-import type { LiveRule } from "@ea/analytics/live";
+import type { LiveRule, LiveUnopposed } from "@ea/analytics/live";
 import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
 import { rule } from "#lib/measure.js";
@@ -6,6 +6,7 @@ import { remember } from "#lib/server/cache.js";
 import { liveDb as db } from "#lib/server/db/index.js";
 import { geography, portraits } from "#lib/server/live-board.js";
 import { night } from "#lib/server/live-page.js";
+import { unopposed } from "#lib/server/live-unopposed.js";
 import { names } from "#lib/server/rpc/archive.js";
 
 export type BallotTier =
@@ -47,6 +48,7 @@ export type BallotContest = {
   isMeasure: boolean;
   isSpecial: boolean;
   rule?: LiveRule | null;
+  unopposed?: LiveUnopposed | null;
   options: Array<BallotOption>;
 };
 
@@ -269,8 +271,9 @@ async function statewide(id: string, date: string, stateName: string) {
       ),
     ),
   ];
-  const [options, titles, bodyNames, holdovers] = await Promise.all([
+  const [options, lone, titles, bodyNames, holdovers] = await Promise.all([
     choices(ids, date),
+    unopposed(ids),
     names(ids, date),
     names(bodies, date),
     db.execute<{ body: string; party: string | null; seats: number }>(sql`
@@ -331,6 +334,7 @@ async function statewide(id: string, date: string, stateName: string) {
         isMeasure: row.tier === "measures",
         isSpecial: seat.includes("special"),
         rule: rule(row.rules),
+        unopposed: lone.get(row.id) ?? null,
         options: own.map((option) => ({
           id: option.id,
           name: option.name,
@@ -406,7 +410,7 @@ async function tally(id: string) {
 }
 
 export async function ballotLocals(path: string) {
-  return remember(`live:ballot-locals:v3:${path}`, async () => {
+  return remember(`live:ballot-locals:v4:${path}`, async () => {
     const root = await db.execute<{ id: string; date: string }>(sql`
       select e.id, e.date_from::text as date from slug s join election e on e.id = s.entity_id
       where s.path = ${path} and s.is_current
@@ -436,8 +440,9 @@ export async function ballotLocals(path: string) {
     `);
     const ids = found.rows.map((row) => row.id);
     const polities = [...new Set(found.rows.map((row) => row.polity))];
-    const [options, titles, places] = await Promise.all([
+    const [options, lone, titles, places] = await Promise.all([
       choices(ids, election.date),
+      unopposed(ids),
       names(ids, election.date),
       names(polities, election.date),
     ]);
@@ -475,6 +480,7 @@ export async function ballotLocals(path: string) {
                 isMeasure: row.kind === "ballot_question",
                 isSpecial: /special|unexpired|short-term/u.test(seat),
                 rule: rule(row.rules),
+                unopposed: lone.get(row.id) ?? null,
                 options: (byContest.get(row.id) ?? []).map((option) => ({
                   id: option.id,
                   name: option.name,
@@ -506,7 +512,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v10:${election.slug}`, async () => {
+  return remember(`live:ballot:v11:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");

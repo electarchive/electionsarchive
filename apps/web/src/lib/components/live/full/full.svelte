@@ -61,6 +61,7 @@
   import { history } from "#lib/live/history.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
+  import { seatsOf } from "#lib/live/nation.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
   import {
     pair as pairOf,
@@ -444,8 +445,7 @@
       estimate == null ||
       estimate.status === "unavailable" ||
       race.certified != null ||
-      current.projected != null ||
-      current.winner != null ||
+      current.settled != null ||
       current.total === 0 ||
       (race.isMeasure === true &&
         race.options.filter((option) => !option.isWriteIn).length > 2)
@@ -842,6 +842,7 @@
     return wanted === "lead" &&
       entry.held != null &&
       summary.later == null &&
+      summary.settled == null &&
       summary.total === 0
       ? marginShade(entry.held.color, safety(0.22))
       : shade(summary, undefined, wanted, null, null);
@@ -1770,11 +1771,7 @@
         entry.summary.race,
         entry.summary.totals,
         prior(entry.summary.race)?.shares ?? null,
-        (
-          entry.summary.winner ??
-          entry.summary.projected ??
-          entry.summary.leader
-        )?.id ?? null,
+        (entry.summary.settled ?? entry.summary.leader)?.id ?? null,
       )}
       <p class="text-xs text-muted-foreground">
         {verdict(
@@ -1796,8 +1793,7 @@
         [
           ...Map.groupBy(
             nationTip.lines.flatMap((summary) => {
-              const option =
-                summary.winner ?? summary.projected ?? summary.leader;
+              const option = summary.settled ?? summary.leader;
               return option == null ? [] : [option];
             }),
             (option: LiveOption) => option.party?.short ?? option.label,
@@ -2125,12 +2121,7 @@
               <span class="text-xs font-semibold" style:color={family.color}
                 >{family.short}</span
               >
-              <span class="text-lg font-[760]"
-                >{tally.won +
-                  tally.projected +
-                  tally.ahead +
-                  tally.holdover}</span
-              >
+              <span class="text-lg font-[760]">{seatsOf(tally)}</span>
             </span>
           {/each}
         </p>
@@ -2235,9 +2226,7 @@
         <ul class="grid">
           {#each chamber.entries.toSorted((a, b) => (urgency(a.summary, closing(election, a.summary.race))[0] ?? 0) - (urgency(b.summary, closing(election, b.summary.race))[0] ?? 0)) as entry (entry.contest.id)}
             {const area = $derived(entry.contest.area)}
-            {const called = $derived(
-              entry.summary.winner ?? entry.summary.projected,
-            )}
+            {const called = $derived(entry.summary.settled)}
             <li>
               <button
                 type="button"

@@ -4,14 +4,20 @@ import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
+import { compactPlaces } from "#lib/compare.js";
 import { headline } from "#lib/coverage.js";
 import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
-import { closing, cut, describe, summarize } from "#lib/live/summary.js";
+import {
+  closing,
+  cut,
+  describe,
+  isUncounted,
+  summarize,
+} from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
-import { compactPlaces } from "#lib/compare.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
@@ -2015,7 +2021,7 @@ export async function livePage(path: string, at: string | null) {
         slug: race.slug,
         title: race.title,
         headline:
-          summary.winner == null && summary.projected == null
+          summary.settled == null
             ? null
             : describe(summary, closing(election, race), Date.now()).replace(
                 /\.$/u,
@@ -2034,6 +2040,9 @@ export async function livePage(path: string, at: string | null) {
           isIncumbent: option.isIncumbent,
           isWinner: summary.winner?.id === option.id,
           isProjected: summary.projected?.id === option.id,
+          isUnopposed:
+            summary.unopposed != null &&
+            race.unopposed?.options.includes(option.id) === true,
         })),
         votes: summary.totals,
         at: summary.at,
@@ -2069,7 +2078,20 @@ export async function livePage(path: string, at: string | null) {
           race.feed === "none" || race.feed === "outside"
             ? ("none" as const)
             : ("live" as const),
-        note: summary.later == null ? null : m.live_twin_later(),
+        unopposed:
+          summary.unopposed == null
+            ? null
+            : race.options
+                .filter((option) => race.unopposed?.options.includes(option.id))
+                .map((option) => option.label)
+                .join(", "),
+        note: isUncounted(summary)
+          ? race.unopposed?.isTacit === true
+            ? m.live_twin_unopposed_tacit()
+            : m.live_twin_unopposed()
+          : summary.later == null
+            ? null
+            : m.live_twin_later(),
       };
     }),
   };

@@ -14,6 +14,7 @@ import type {
 import { hatch, shift } from "#lib/live/flips.js";
 import { tone } from "#lib/live/format.js";
 import { summarize } from "#lib/live/summary.js";
+import { m } from "#lib/paraglide/messages.js";
 import { side, swatch, UNAFFILIATED } from "#lib/party.js";
 
 export type Holder = { id: string; short: string; name: string; color: string };
@@ -27,6 +28,7 @@ export type Entry = {
   isFlip: boolean;
   shift: Shift | null;
   isUnopposed: boolean;
+  unopposed: Array<string | null>;
 };
 
 const OFFICES: Partial<Record<BallotTier, LiveOffice>> = {
@@ -112,6 +114,7 @@ export function stub(
     seats: contest.seats,
     isMeasure: contest.isMeasure,
     rule: contest.rule ?? null,
+    unopposed: contest.unopposed ?? null,
   };
 }
 
@@ -149,15 +152,16 @@ export function entries({
       );
     const summary = summarize(race, estimates[race.id] ?? null);
     const held = holder(parties, contest.held);
-    const pick = summary.winner ?? summary.leader;
-    const side =
-      pick?.party == null ? null : (families[pick.party.id] ?? pick.party.id);
+    const familyOf = (party: string | undefined) =>
+      party == null ? null : (families[party] ?? party);
+    const pick = summary.winner ?? summary.unopposed ?? summary.leader;
+    const side = familyOf(pick?.party?.id);
     const changing = contest.isMeasure
       ? null
       : shift({
           held: held?.id ?? null,
           to: side,
-          isCalled: (summary.winner ?? summary.projected) != null,
+          isCalled: summary.settled != null,
           isCounting: summary.total > 0,
         });
     return {
@@ -168,10 +172,13 @@ export function entries({
       side,
       isFlip: changing?.flip === "flipped",
       shift: changing,
-      isUnopposed:
-        !contest.isMeasure &&
-        race.options.filter((option) => !option.isWriteIn).length <=
-          contest.seats,
+      isUnopposed: race.unopposed != null,
+      unopposed:
+        summary.unopposed == null
+          ? []
+          : race.options
+              .filter((option) => race.unopposed?.options.includes(option.id))
+              .map((option) => familyOf(option.party?.id)),
     };
   });
 }
@@ -184,7 +191,7 @@ export type Turn = {
 export function turn(entry: Entry): Turn | null {
   const found = entry.shift;
   const { summary } = entry;
-  const pick = summary.winner ?? summary.projected ?? summary.leader;
+  const pick = summary.settled ?? summary.leader;
   if (found == null || found.flip === "held" || pick == null) {
     return null;
   }
@@ -231,7 +238,7 @@ export function seating(
     const side: Side = {
       id,
       short: party?.short ?? "–",
-      name: party?.name ?? "",
+      name: party?.name ?? (id === "" ? m.night_no_party() : ""),
       color: party?.color ?? swatch(null, `party:${id}`),
       before: 0,
       won: 0,
@@ -258,7 +265,20 @@ export function seating(
     if (entry.held != null) {
       take(entry.held.id).before += seats;
     }
-    if (entry.side == null || entry.summary.total === 0) {
+    if (entry.unopposed.length > 0) {
+      for (const family of entry.unopposed) {
+        const side = take(family ?? "");
+        side.won += 1;
+        side.gainedWon +=
+          entry.held == null || family === entry.held.id ? 0 : 1;
+      }
+      const open = seats - entry.unopposed.length;
+      if (entry.held == null) {
+        waiting += open;
+      } else {
+        take(entry.held.id).waiting += open;
+      }
+    } else if (entry.side == null || entry.summary.total === 0) {
       if (entry.held == null) {
         waiting += seats;
       } else {
@@ -294,7 +314,9 @@ export function seating(
     total,
     majority: Math.floor(total / 2) + 1,
     waiting,
-    isCounting: entries.some((entry) => entry.summary.total > 0),
+    isCounting: entries.some(
+      (entry) => entry.summary.total > 0 || entry.unopposed.length > 0,
+    ),
     left: left ?? null,
     right: right ?? null,
     rest,

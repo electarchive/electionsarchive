@@ -32,12 +32,20 @@
   import { liveLinks } from "#lib/live/links.js";
   import {
     chamber,
+    isSettled,
     pulse,
     seat as seatOf,
     sides as sidesOf,
     STATES,
   } from "#lib/live/nation.js";
-  import { closing, party, summarize, tally } from "#lib/live/summary.js";
+  import {
+    closing,
+    edge,
+    isUncounted,
+    party,
+    summarize,
+    tally,
+  } from "#lib/live/summary.js";
   import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -245,9 +253,15 @@
   const counting = $derived(
     summaries.filter((summary) => summary.total > 0).length,
   );
+  const uncontested = $derived(summaries.filter(isUncounted).length);
   const statesIn = $derived(
     codes.filter((code) =>
       (byState.get(code) ?? []).some((summary) => summary.total > 0),
+    ).length,
+  );
+  const statesOpen = $derived(
+    codes.filter((code) =>
+      (byState.get(code) ?? []).some((summary) => !isUncounted(summary)),
     ).length,
   );
   const houseVotes = $derived(points.at(-1) ?? null);
@@ -310,7 +324,7 @@
     if (summary.later != null) {
       return LATER;
     }
-    const called = summary.winner ?? summary.projected;
+    const called = summary.settled;
     const option = called ?? summary.leader;
     if (option == null) {
       const held = seatById.get(summary.race.id)?.held ?? null;
@@ -384,7 +398,7 @@
   }
 
   function seatShade(entry: Seat) {
-    if (entry.rating === "won" || entry.rating === "projected") {
+    if (isSettled(entry.rating)) {
       return tint(entry.side);
     }
     if (entry.rating === "later") {
@@ -570,11 +584,10 @@
   }
 
   function fullLabel(entry: Seat) {
-    const ahead =
-      entry.summary.winner ?? entry.summary.projected ?? entry.summary.leader;
+    const ahead = entry.summary.settled ?? entry.summary.leader;
     return ahead == null
       ? `${entry.summary.race.title}: ${entry.summary.later == null ? m.night_nation_waiting() : m.night_later()}`
-      : `${entry.summary.race.title}: ${surname(ahead)} +${lead(entry.summary.margin)}`;
+      : `${entry.summary.race.title}: ${surname(ahead)} ${edge(entry.summary)}`;
   }
 
   function seatHref(entry: Seat) {
@@ -585,16 +598,14 @@
 {#snippet chip(summary: Summary | undefined)}
   {#if summary == null}
     <span class="text-muted-foreground">–</span>
-  {:else if summary.leader == null}
+  {:else if summary.settled == null && summary.leader == null}
     <span class="text-muted-foreground"
       >{summary.later == null
         ? m.night_nation_waiting()
         : m.night_later()}</span
     >
   {:else}
-    {const option = $derived(
-      summary.winner ?? summary.projected ?? summary.leader,
-    )}
+    {const option = $derived(summary.settled ?? summary.leader ?? undefined)}
     {const entry = $derived(seatById.get(summary.race.id))}
     <span
       class="flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5 whitespace-nowrap min-inline-0"
@@ -605,11 +616,11 @@
       ></span>
       <span
         class={cn("truncate min-inline-0", {
-          "font-semibold": summary.winner != null || summary.projected != null,
+          "font-semibold": summary.settled != null,
         })}>{surname(option)}</span
       >
       <span class="shrink-0 font-figures text-muted-foreground tabular-nums"
-        >+{lead(summary.margin)}</span
+        >{edge(summary)}</span
       >
       {#if entry?.shift != null && entry.shift.flip !== "held"}
         <Flip
@@ -662,7 +673,7 @@
                 })}</span
               >
             {/if}
-            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
+            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && !isSettled(entry.rating) && pair != null}
               <span class="font-figures tabular-nums"
                 >{entry.left >= entry.right ? pair[0].short : pair[1].short}
                 {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -702,7 +713,7 @@
         })}</span
       >
     {/if}
-    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && entry.rating !== "won" && entry.rating !== "projected" && pair != null}
+    {#if forecasts && entry.rating !== "waiting" && entry.rating !== "later" && entry.rating !== "counting" && !isSettled(entry.rating) && pair != null}
       <span class="font-figures tabular-nums"
         >{entry.left >= entry.right ? pair[0].short : pair[1].short}
         {percent(Math.max(entry.left, entry.right), 0)}</span
@@ -816,7 +827,7 @@
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
         <dd class="font-figures text-2xl font-[760] tabular-nums">
           {statesIn}<span class="text-base font-semibold text-muted-foreground">
-            / {codes.length}</span
+            / {statesOpen}</span
           >
         </dd>
       </div>
@@ -826,9 +837,14 @@
         </dt>
         <dd class="font-figures text-2xl font-[760] tabular-nums">
           {counting}<span class="text-base font-semibold text-muted-foreground">
-            / {summaries.length}</span
+            / {summaries.length - uncontested}</span
           >
         </dd>
+        {#if uncontested > 0}
+          <dd class="text-xs text-muted-foreground">
+            {m.night_nation_unopposed({ count: uncontested })}
+          </dd>
+        {/if}
       </div>
       {#if pair != null}
         <div class="grid">

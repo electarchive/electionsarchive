@@ -41,9 +41,9 @@ The archive launched on November 2, 2026, and is read-only for now: every page, 
 `get_live_results` (`GET /api/v1/live/results`) is the live board for a US general election; it defaults to the nearest one.
 
 - `chambers` holds the Senate, the House, and governorships: seats won and called by each side, seats leading, seats not up, gains, losses, and, once forecasts are shown, the chance each side controls the chamber.
-- `races` lists each race with its status (`won`, `called`, `counting`, `waiting`, or `no_feed`), the share of the expected vote counted, the top candidates with votes and shares, the margin, the winner or projected winner, the favorite's win chance, the party that held the seat, and whether it flipped.
+- `races` lists each race with its status (`won`, `called`, `unopposed`, `counting`, `waiting`, or `no_feed`), the share of the expected vote counted, the top candidates with votes and shares, the margin, the winner or projected winner, the favorite's win chance, the party that held the seat, and whether it flipped.
 - Filter with `office` (`senate`, `house`, `governor`, `other`), `state` (two letters), and `status`; sort with `sort=closest` for the tightest races or `sort=updated` for the latest counts; page with `limit` and `cursor`. `election.pollsClose` gives each state's poll closing time.
 
 `get_live_race` (`GET /api/v1/live/race`) reads one race in full: pass `race`, the `path` from `get_live_results`. It adds every candidate, the turnout estimate with its range, the source, and, with `places=true`, the count in each county.
 
-Counts and calls come from the live feed and change all night, and win chances are model estimates. Say how much of the vote is counted, and never report a race as won before it is called. After certification, the official results are in `get_contest`.
+Counts and calls come from the live feed and change all night, and win chances are model estimates. Say how much of the vote is counted, and never report a race as won before it is called. A race with status `unopposed` has one candidate per seat: `winner` names who takes the seat, `calledAt` stays empty, and its seats count as `unopposed` in `chambers`, not as `won` or `called`. After certification, the official results are in `get_contest`.

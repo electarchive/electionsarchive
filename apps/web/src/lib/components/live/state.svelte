@@ -27,6 +27,7 @@
   import { provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { standing } from "#lib/live/standing.js";
+  import { isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { leadSafety, marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
@@ -128,6 +129,9 @@
   ]);
   const counting = $derived(
     everything.filter((entry) => entry.summary.total > 0).length,
+  );
+  const uncontested = $derived(
+    everything.filter((entry) => isUncounted(entry.summary)).length,
   );
   const flips = $derived(swing(everything.map((entry) => entry.shift)));
 
@@ -245,9 +249,9 @@
     if (mark != null) {
       return mark.fill;
     }
-    const called = summary.winner ?? summary.projected;
+    const called = summary.settled;
     const pick = called ?? summary.leader;
-    if (pick == null || summary.total === 0) {
+    if (pick == null || (called == null && summary.total === 0)) {
       return entry.held == null
         ? WAITING
         : marginShade(entry.held.color, safety(0.22));
@@ -328,9 +332,14 @@
           {count(counting)}<span
             class="text-base font-semibold text-muted-foreground"
           >
-            / {count(everything.length)}</span
+            / {count(everything.length - uncontested)}</span
           >
         </dd>
+        {#if uncontested > 0}
+          <dd class="text-xs text-muted-foreground">
+            {m.night_nation_unopposed({ count: count(uncontested) })}
+          </dd>
+        {/if}
       </div>
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_kpi_flips()}</dt>
@@ -419,7 +428,7 @@
   {/snippet}
 
   {#snippet map(entry: Entry)}
-    {#if geography != null}
+    {#if geography != null && !isUncounted(entry.summary)}
       {const race = $derived(entry.summary.race)}
       {#key race.id}
         <LiveMap

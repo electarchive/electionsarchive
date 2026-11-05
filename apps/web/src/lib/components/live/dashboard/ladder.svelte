@@ -3,7 +3,7 @@
   import { percent } from "#lib/format.js";
   import { isChanging } from "#lib/live/flips.js";
   import { lead } from "#lib/live/format.js";
-  import { odds } from "#lib/live/nation.js";
+  import { isSettled, odds } from "#lib/live/nation.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Flip from "./flip.svelte";
@@ -70,10 +70,9 @@
       ordered
         .map((seat) => ({
           seat,
-          distance:
-            seat.rating === "won" || seat.rating === "projected"
-              ? Number.POSITIVE_INFINITY
-              : Math.abs(seat.lean) + (seat.summary.total === 0 ? 1 : 0),
+          distance: isSettled(seat.rating)
+            ? Number.POSITIVE_INFINITY
+            : Math.abs(seat.lean) + (seat.summary.total === 0 ? 1 : 0),
         }))
         .toSorted((a, b) => a.distance - b.distance)
         .slice(0, limit)
@@ -154,6 +153,9 @@
     }
     if (rating === "projected") {
       return { text: m.night_ladder_projected(), id: seat.side };
+    }
+    if (rating === "unopposed") {
+      return { text: m.night_state_unopposed(), id: seat.side };
     }
     if (rating === "later") {
       return { text: m.night_later(), id: null };
@@ -402,8 +404,7 @@
               <td
                 class={cn("text-end font-figures text-xs tabular-nums", {
                   "text-muted-foreground": call.id == null,
-                  "font-semibold":
-                    seat.rating === "won" || seat.rating === "projected",
+                  "font-semibold": isSettled(seat.rating),
                 })}
                 style:color={call.id == null ? undefined : ink(call.id)}
                 >{call.text}</td

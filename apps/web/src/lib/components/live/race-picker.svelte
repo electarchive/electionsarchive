@@ -268,9 +268,12 @@
     let called = 0;
     let counting = 0;
     let later = 0;
+    let unopposed = 0;
     for (const summary of summaries) {
       if (summary.winner != null || summary.projected != null) {
         called += 1;
+      } else if (summary.unopposed != null) {
+        unopposed += 1;
       } else if (summary.leader != null) {
         counting += 1;
       } else if (summary.later != null) {
@@ -281,7 +284,8 @@
       called,
       counting,
       later,
-      waiting: total - called - counting - later,
+      unopposed,
+      waiting: total - called - counting - later - unopposed,
     };
   });
   const probe = $derived(
@@ -374,7 +378,9 @@
 
 {#snippet row(entry: { summary: Summary; name: string })}
   {const summary = $derived(entry.summary)}
-  {const option = $derived(summary.winner ?? summary.leader)}
+  {const option = $derived(
+    summary.winner ?? summary.unopposed ?? summary.leader,
+  )}
   {const isCurrent = $derived(summary.race.slug === current)}
   {const band = $derived(bandOf(summary))}
   <li class="border-be border-border">
@@ -427,7 +433,7 @@
             >{#if band?.isProjected === true}<CircleDashedCheckIcon
                 class="shrink-0 block-3.5 inline-3.5"
                 aria-hidden="true"
-              />{:else if band != null}<CircleCheckIcon
+              />{:else if band != null && !band.isUnopposed}<CircleCheckIcon
                 class="shrink-0 block-3.5 inline-3.5"
                 aria-hidden="true"
               />{/if}<span class="truncate">{verdict(summary)}</span></span
@@ -556,7 +562,8 @@
               "grid inline-full place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums transition-[background-color,box-shadow] duration-500 outline-none block-8 focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none pointer-coarse:block-10",
               {
                 "text-muted-foreground": color == null,
-                "text-white": summary.winner != null,
+                "text-white":
+                  summary.winner != null || summary.unopposed != null,
               },
               {
                 "ring-2 ring-foreground ring-offset-2 ring-offset-background":
@@ -596,6 +603,13 @@
               })}</span
             >
           {/if}
+          {#if counts.unopposed > 0}
+            <span class="flex items-center gap-1.5"
+              >{@render swatch("var(--foreground)")}{m.night_tally_unopposed({
+                count: counts.unopposed,
+              })}</span
+            >
+          {/if}
           {#if counts.counting > 0}
             <span class="flex items-center gap-1.5"
               >{@render swatch(
@@ -625,7 +639,7 @@
       >
         <span
           class="bg-foreground transition-[flex-grow] duration-700 motion-reduce:transition-none"
-          style:flex-grow={counts.called}
+          style:flex-grow={counts.called + counts.unopposed}
         ></span>
         <span
           class="bg-[color-mix(in_oklab,var(--foreground)_40%,var(--background))] transition-[flex-grow] duration-700 motion-reduce:transition-none"

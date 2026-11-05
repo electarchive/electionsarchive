@@ -49,7 +49,9 @@
                 >{m.board_power_won()}
                 {group.won}{#if group.projected > 0},
                   {m.night_rating_projected().toLocaleLowerCase()}
-                  {group.projected}{/if}, {m
+                  {group.projected}{/if}{#if group.unopposed > 0},
+                  {m.night_state_unopposed().toLocaleLowerCase()}
+                  {group.unopposed}{/if}, {m
                   .board_power_leading()
                   .toLocaleLowerCase()}
                 {group.leading}</span
@@ -66,7 +68,7 @@
       {#each ordered as group (party(group.option))}
         <span
           class="transition-[inline-size] duration-700 motion-reduce:transition-none"
-          style:inline-size="{(group.won / seats) * 100}%"
+          style:inline-size="{((group.won + group.unopposed) / seats) * 100}%"
           style:background-color={tone(group.option)}
         ></span>
         <span
@@ -94,7 +96,7 @@
         ></span>
         <span
           class="transition-[inline-size] duration-700 motion-reduce:transition-none"
-          style:inline-size="{(right.won / seats) * 100}%"
+          style:inline-size="{((right.won + right.unopposed) / seats) * 100}%"
           style:background-color={tone(right.option)}
         ></span>
       {/if}

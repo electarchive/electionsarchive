@@ -9,9 +9,21 @@ import type { ChamberView, Control, Family, Seat } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
 import { count, percent } from "#lib/format.js";
 import { initial, lead, stamp, surname } from "#lib/live/format.js";
-import { chamber, odds, seat, sides, STATES } from "#lib/live/nation.js";
+import {
+  chamber,
+  odds,
+  seat,
+  seatsOf,
+  sides,
+  STATES,
+} from "#lib/live/nation.js";
 import { pair, ranked, standing, sum } from "#lib/live/standing.js";
-import { closing, describe, summarize } from "#lib/live/summary.js";
+import {
+  closing,
+  describe,
+  isUncounted,
+  summarize,
+} from "#lib/live/summary.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 import { side } from "#lib/party.js";
@@ -294,7 +306,10 @@ function tally(
 ) {
   const held = { left: 0, right: 0 };
   for (const entry of seats) {
-    if (entry.side == null || entry.summary.total === 0) {
+    if (
+      entry.rating !== "unopposed" &&
+      (entry.side == null || entry.summary.total === 0)
+    ) {
       if (entry.held === left.id) {
         held.left += 1;
       } else if (entry.held === right.id) {
@@ -302,15 +317,13 @@ function tally(
       }
     }
   }
-  const seated = (group: ChamberView["tallies"]["left"]) =>
-    group.holdover + group.won + group.projected + group.ahead;
   const isCounting = seats.some((entry) => entry.summary.total > 0);
   return {
     held,
     isCounting,
-    other: seated(view.tallies.other),
-    left: seated(view.tallies.left) + (isCounting ? 0 : held.left),
-    right: seated(view.tallies.right) + (isCounting ? 0 : held.right),
+    other: seatsOf(view.tallies.other),
+    left: seatsOf(view.tallies.left) + (isCounting ? 0 : held.left),
+    right: seatsOf(view.tallies.right) + (isCounting ? 0 : held.right),
   };
 }
 
@@ -386,8 +399,11 @@ function governorRow(
     if (color == null) {
       return FILL;
     }
-    if (entry.rating === "won" || entry.rating === "projected") {
-      return mix(color, entry.rating === "won" ? 1 : 0.85);
+    if (entry.rating === "won" || entry.rating === "unopposed") {
+      return mix(color, 1);
+    }
+    if (entry.rating === "projected") {
+      return mix(color, 0.85);
     }
     return mix(
       color,
@@ -567,7 +583,9 @@ async function nationBody(
       const now = side(entry.side);
       const before = side(entry.held);
       let fill = before == null ? FILL : mix(before, 0.2);
-      if (now != null && entry.summary.total > 0) {
+      if (entry.rating === "unopposed" && now != null) {
+        fill = mix(now, 1);
+      } else if (now != null && entry.summary.total > 0) {
         fill = mix(
           now,
           entry.rating === "won"
@@ -1100,7 +1118,7 @@ async function card(path: string, bucket: number) {
       ? m.night_og_first({ time: stamp(opens) })
       : m.night_og_races({
           counting: count(counting),
-          total: count(summaries.length),
+          total: count(summaries.filter((entry) => !isUncounted(entry)).length),
         });
     const body = await nationBody(
       election.slug,
