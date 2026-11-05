@@ -26,6 +26,9 @@
     isDerived: boolean;
   } = $props();
 
+  const CROWDED = 12;
+  const SLIVER = 0.04;
+
   const uid = $props.id();
 
   let pending = $state<{ round: number; href: string } | null>(null);
@@ -53,16 +56,38 @@
       for (const row of count.rows) {
         total += row.votes[step] ?? 0;
       }
+      const rows = count.rows
+        .filter((row) => (row.votes[step] ?? 0) > 0)
+        .map((row) => ({
+          key: row.key,
+          label: row.label,
+          color: swatch(row.color, row.key),
+          share: total === 0 ? 0 : (row.votes[step] ?? 0) / total,
+        }));
+      const bars: typeof rows = [];
+      let rest = 0;
+      for (const row of rows) {
+        if (rows.length <= CROWDED || row.share >= SLIVER) {
+          bars.push(row);
+        } else {
+          rest += row.share;
+        }
+      }
       return {
         round: step + 1,
-        rows: count.rows
-          .filter((row) => (row.votes[step] ?? 0) > 0)
-          .map((row) => ({
-            key: row.key,
-            label: row.label,
-            color: swatch(row.color, row.key),
-            share: total === 0 ? 0 : (row.votes[step] ?? 0) / total,
-          })),
+        rows,
+        bars:
+          rest === 0
+            ? bars
+            : [
+                ...bars,
+                {
+                  key: "rest",
+                  label: "",
+                  color: "var(--muted-foreground)",
+                  share: rest,
+                },
+              ],
       };
     }),
   );
@@ -212,11 +237,11 @@
             })}
             aria-hidden="true"
           >
-            {#each entry.rows as row (row.key)}
+            {#each entry.bars as bar (bar.key)}
               <span
                 class="bg-(--party) min-inline-px"
-                style:--party={row.color}
-                style:flex-grow={row.share}
+                style:--party={bar.color}
+                style:flex-grow={bar.share.toFixed(3)}
               ></span>
             {/each}
           </span>

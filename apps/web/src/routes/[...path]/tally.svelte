@@ -94,7 +94,9 @@
           {/each}
         </tr>
       </thead>
-      <tbody>
+      <tbody
+        class="**:data-bar:ms-auto **:data-bar:mbs-1 **:data-bar:bg-(--party) **:data-bar:block-0.75 [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
+      >
         {#each count.rows as row (row.key)}
           {const reach = $derived(
             row.votes.findLastIndex((value) => value != null) + 1,
@@ -129,28 +131,12 @@
                   ? null
                   : votes / (totals[round - 1] ?? 1),
               )}
-              <td
-                class={cn("px-2 py-1.5 align-top", {
-                  "bg-secondary": round === count.round,
-                })}
-              >
+              <td class={cn({ "bg-secondary": round === count.round })}>
                 {#if share != null}
-                  <span class="grid justify-items-end gap-1">
-                    <span class="grid justify-items-end">
-                      <span class="font-figures tabular-nums"
-                        >{percent(share)}</span
-                      >
-                      <span
-                        class="font-figures text-xs text-muted-foreground tabular-nums"
-                        >{figure(votes ?? 0)}</span
-                      >
-                    </span>
-                    <span
-                      class="bg-(--party) block-0.75"
-                      style:inline-size="{share * 100}%"
-                      aria-hidden="true"
-                    ></span>
-                  </span>
+                  <span>{percent(share)}</span>
+                  <small>{figure(votes ?? 0)}</small>
+                  <span data-bar style:inline-size="{(share * 100).toFixed(1)}%"
+                  ></span>
                 {/if}
               </td>
             {/each}
@@ -168,11 +154,7 @@
               />
             </th>
             {#each count.exhausted as spent, index (index)}
-              <td
-                class={cn("px-2 py-1.5 text-end font-figures tabular-nums", {
-                  "bg-secondary": index + 1 === count.round,
-                })}
-              >
+              <td class={cn({ "bg-secondary": index + 1 === count.round })}>
                 {spent == null ? "" : figure(spent)}
               </td>
             {/each}

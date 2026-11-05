@@ -141,7 +141,9 @@
           {/each}
         </tr>
       </thead>
-      <tbody>
+      <tbody
+        class="**:data-bar:relative **:data-bar:mbs-1 **:data-bar:bg-secondary **:data-bar:block-0.75 [&_[data-bar]>span]:absolute [&_[data-bar]>span]:inset-y-0 [&_[data-bar]>span]:inset-s-0 [&_[data-bar]>span]:bg-(--party) [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
+      >
         {#each rows as row (row.key)}
           <tr class="border-be" style:--party={swatch(row.color, row.key)}>
             <th
@@ -183,47 +185,28 @@
               {const change = $derived(
                 before == null ? null : (votes ?? 0) - before,
               )}
-              <td
-                class={cn("px-2 py-1.5 align-top", {
-                  "bg-secondary": round === count.round,
-                })}
-              >
+              <td class={cn({ "bg-secondary": round === count.round })}>
                 {#if votes != null}
-                  <span class="grid justify-items-end gap-1">
-                    <span class="grid justify-items-end">
-                      <span
-                        class={cn("font-figures tabular-nums", {
-                          "font-semibold": votes >= stv.quota,
-                        })}>{figure(votes)}</span
-                      >
-                      {#if change != null && Math.abs(change) >= 0.0005}
-                        <span
-                          class="font-figures text-xs text-muted-foreground tabular-nums"
-                          >{signed(change)}</span
-                        >
-                      {/if}
-                    </span>
-                    <span
-                      class="relative bg-secondary block-0.75 inline-full"
-                      aria-hidden="true"
-                    >
-                      <span
-                        class="absolute inset-y-0 inset-s-0 bg-(--party)"
-                        style:inline-size="{Math.min(1, votes / stv.quota) *
-                          100}%"
-                      ></span>
-                    </span>
-                    {#if row.elected === round}
-                      <span class="text-xs font-semibold"
-                        >{m.outcome_elected()}</span
-                      >
-                    {/if}
-                  </span>
-                {:else if before != null}
-                  <span
-                    class="block text-end font-figures text-xs text-muted-foreground tabular-nums"
-                    >{signed(-before)}</span
+                  <span class={cn({ "font-semibold": votes >= stv.quota })}
+                    >{figure(votes)}</span
                   >
+                  {#if change != null && Math.abs(change) >= 0.0005}
+                    <small>{signed(change)}</small>
+                  {/if}
+                  <span data-bar>
+                    <span
+                      style:inline-size="{(
+                        Math.min(1, votes / stv.quota) * 100
+                      ).toFixed(1)}%"
+                    ></span>
+                  </span>
+                  {#if row.elected === round}
+                    <span class="mbs-1 text-xs font-semibold"
+                      >{m.outcome_elected()}</span
+                    >
+                  {/if}
+                {:else if before != null}
+                  <small>{signed(-before)}</small>
                 {/if}
               </td>
             {/each}
@@ -240,20 +223,12 @@
             {const prior = $derived(
               index === 0 ? null : count.exhausted[index - 1],
             )}
-            <td
-              class={cn("px-2 py-1.5 text-end align-top", {
-                "bg-secondary": index + 1 === count.round,
-              })}
-            >
+            <td class={cn({ "bg-secondary": index + 1 === count.round })}>
               {#if spent != null}
-                <span class="grid justify-items-end">
-                  <span class="font-figures tabular-nums">{figure(spent)}</span>
-                  {#if prior != null && Math.abs(spent - prior) >= 0.0005}
-                    <span class="font-figures text-xs tabular-nums"
-                      >{signed(spent - prior)}</span
-                    >
-                  {/if}
-                </span>
+                <span>{figure(spent)}</span>
+                {#if prior != null && Math.abs(spent - prior) >= 0.0005}
+                  <small>{signed(spent - prior)}</small>
+                {/if}
               {/if}
             </td>
           {/each}

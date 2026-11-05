@@ -17,11 +17,16 @@ const TILED = /^us\/[a-z]{2}\/[^/]+$/u;
 const LEGEND = 8;
 const FOLD = 18;
 const FOLDED = 20;
+const ROSTER = 24_000;
 
 type Election = Extract<
   Awaited<ReturnType<typeof archive>>,
   { kind: "election" }
 >;
+type Contest = Extract<
+  Awaited<ReturnType<typeof archive>>,
+  { kind: "contest" }
+>["contest"];
 
 function parted<T>(
   name: string,
@@ -33,22 +38,21 @@ function parted<T>(
   return value instanceof Promise ? value.then(wrap) : wrap(value);
 }
 
-const compared = memo(
-  (
-    targets: Extract<
-      Awaited<ReturnType<typeof archive>>,
-      { kind: "contest" }
-    >["contest"]["targets"],
-  ) => {
-    const others = targets.filter((target) => !target.series);
-    return {
-      near: targets.filter((target) => target.series || target.previous),
-      others:
-        others.length === 0
-          ? null
-          : part("contest.targets", others, { fetch: "lazy" }),
-    };
-  },
+const compared = memo((targets: Contest["targets"]) => {
+  const others = targets.filter((target) => !target.series);
+  return {
+    near: targets.filter((target) => target.series || target.previous),
+    others:
+      others.length === 0
+        ? null
+        : part("contest.targets", others, { fetch: "lazy" }),
+  };
+});
+
+const seated = memo((rows: NonNullable<Contest["places"]>["rows"]) =>
+  weigh(rows) > ROSTER
+    ? part("contest.places", rows, { fetch: "preload" })
+    : null,
 );
 
 function isQuestion(race: { kind: string }) {
@@ -248,10 +252,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
         !target.previous &&
         target.value === contest.target?.path,
     );
+    const { places } = contest;
+    const roster = places == null ? null : seated(places.rows);
     return {
       ...data,
+      roster,
       contest: {
         ...contest,
+        places:
+          places == null || roster == null
+            ? places
+            : { ...places, rows: places.rows.slice(0, 0) },
         targets: chosen == null ? near : [...near, chosen],
         others,
       },
