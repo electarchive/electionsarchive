@@ -4735,6 +4735,8 @@
   "night_seo_description": "{headline}. Résultats en direct par comté pour {title}, avec une estimation du résultat final. Mis à jour à {time}.",
   "night_seo_description_district": "{headline}. Résultats en direct par district de la Chambre de l'État pour {title}, avec une estimation du résultat final. Mis à jour à {time}.",
   "night_seo_nation": "Résultats en direct de tous les scrutins pour {title} : État par État, comté par comté, avec une estimation du résultat final de chacun.",
+  "night_seo_state": "Résultats en direct de tous les scrutins pour {title} : comté par comté, avec une estimation du résultat final de chacun.",
+  "night_seo_state_district": "Résultats en direct de tous les scrutins pour {title} : district par district de la Chambre de l'État, avec une estimation du résultat final de chacun.",
   "night_seo_seats": "{headline}. Classement en direct des {count} candidats : {title}. Les {seats} premiers obtiennent un siège. Mis à jour à {time}.",
   "night_seo_seats_upcoming": "{headline}. Classement en direct des {count} candidats : {title}. Les {seats} premiers obtiennent un siège.",
   "night_seo_title": "{title} : résultats en direct",

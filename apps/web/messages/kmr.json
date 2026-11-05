@@ -4659,6 +4659,8 @@
   "night_seo_description": "{headline}. Encamên zindî yên {title} li gorî navçeyan, bi texmîna encama dawî. Nûkirina dawî: {time}.",
   "night_seo_description_district": "{headline}. Encamên zindî yên {title} li gorî herêmên Meclîsa Nûneran a eyaletê, bi texmîna encama dawî. Nûkirina dawî: {time}.",
   "night_seo_nation": "Encamên zindî yên hemû pêşbaziyên {title}, eyalet bi eyalet û navçe bi navçe, bi texmîna encama dawî ya her yekê.",
+  "night_seo_state": "Encamên zindî yên hemû pêşbaziyên {title}, navçe bi navçe, bi texmîna encama dawî ya her yekê.",
+  "night_seo_state_district": "Encamên zindî yên hemû pêşbaziyên {title}, li gorî herêmên Meclîsa Nûneran a eyaletê, bi texmîna encama dawî ya her yekê.",
   "night_seo_seats": "{headline}. Rewşa zindî ya hemû {count} berendamên {title}. {seats} berendamên pêşîn kursî digirin. Nûkirin: {time}.",
   "night_seo_seats_upcoming": "{headline}. Rewşa zindî ya hemû {count} berendamên {title}. {seats} berendamên pêşîn kursî digirin.",
   "night_seo_title": "{title}: encamên zindî",

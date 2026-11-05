@@ -4659,6 +4659,8 @@
   "night_seo_description": "{headline}. {title} için ilçelere göre canlı sonuçlar ve nihai sonuç tahmini. Güncelleme: {time}.",
   "night_seo_description_district": "{headline}. {title} için eyalet meclisi seçim bölgelerine göre canlı sonuçlar ve nihai sonuç tahmini. Güncelleme: {time}.",
   "night_seo_nation": "{title}: Her yarışın canlı sonuçları, eyalet eyalet ve ilçe ilçe. Her yarış için nihai sonuç tahmini de yer alıyor.",
+  "night_seo_state": "{title}: Her yarışın ilçe ilçe canlı sonuçları. Her yarış için nihai sonuç tahmini de yer alıyor.",
+  "night_seo_state_district": "{title}: Her yarışın eyalet meclisi seçim bölgelerine göre canlı sonuçları. Her yarış için nihai sonuç tahmini de yer alıyor.",
   "night_seo_seats": "{headline}. {title}: {count} adayın tümü için canlı sıralama. İlk {seats} aday sandalye kazanır. Güncellendi: {time}.",
   "night_seo_seats_upcoming": "{headline}. {title}: {count} adayın tümü için canlı sıralama. İlk {seats} aday sandalye kazanır.",
   "night_seo_title": "{title}: canlı sonuçlar",

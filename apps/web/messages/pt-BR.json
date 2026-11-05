@@ -4733,6 +4733,8 @@
   "night_seo_description": "{headline}. Resultados ao vivo por condado de {title}, com uma estimativa do resultado final. Atualizado às {time}.",
   "night_seo_description_district": "{headline}. Resultados ao vivo de {title} por distrito da Câmara estadual, com uma estimativa do resultado final. Atualizado às {time}.",
   "night_seo_nation": "Resultados ao vivo de todas as disputas de {title}, estado por estado e condado por condado, com uma estimativa do resultado final.",
+  "night_seo_state": "Resultados ao vivo de todas as disputas de {title}, condado por condado, com uma estimativa do resultado final de cada uma.",
+  "night_seo_state_district": "Resultados ao vivo de todas as disputas de {title}, por distrito da Câmara estadual, com uma estimativa do resultado final de cada uma.",
   "night_seo_seats": "{headline}. Classificação ao vivo dos {count} candidatos de {title}. Os {seats} primeiros são eleitos. Atualizado {time}.",
   "night_seo_seats_upcoming": "{headline}. Classificação ao vivo dos {count} candidatos de {title}. Os {seats} primeiros são eleitos.",
   "night_seo_title": "{title}: resultados ao vivo",
