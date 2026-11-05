@@ -1435,7 +1435,9 @@ def emit() -> Path:
         )
         sources: dict[str, UUID] = {}
         added: set[UUID] = set()
-        for county, publisher in frame.select("county", "publisher").unique("county").iter_rows():
+        for county, publisher in (
+            frame.select("county", "publisher").unique("county", keep="first", maintain_order=True).iter_rows()
+        ):
             _, url, _ = COUNTIES[county]
             sources[county] = cs.source(publisher, TITLE)
             if sources[county] not in added:
