@@ -60,6 +60,7 @@ export type LiveRace = {
   certified: { totals: Array<number>; winners: Array<string> } | null;
   projected?: { option: string; at: string } | null;
   source: { publisher: string; url: string | null };
+  placeSource?: { publisher: string; url: string | null } | null;
   feed?: LiveFeed;
   jurisdiction?: {
     name: string;

@@ -126,6 +126,14 @@ export function zoneName(at: string | number, zone = prefs.zone) {
   );
 }
 
+export function isDistricted(state: string) {
+  return state === "ak";
+}
+
+export function placeScheme(state: string) {
+  return isDistricted(state) ? "us.sldl" : "us.county";
+}
+
 export function placeName(name: string) {
   return name.replace(/, [A-Z]{2}$/u, "");
 }

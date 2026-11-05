@@ -1,5 +1,6 @@
 import type { LiveElection } from "@ea/analytics/live";
 import { error } from "@sveltejs/kit";
+import { placeScheme } from "#lib/live/format.js";
 import { remember } from "#lib/server/cache.js";
 import { liveBallot } from "#lib/server/live-ballot.js";
 import {
@@ -80,7 +81,7 @@ export const load: PageServerLoad = async ({ params }) => {
     ...new Set(
       election.races.flatMap((race) =>
         race.units.flatMap((unit) =>
-          unit.scheme === "us.county" && unit.areaId != null
+          unit.scheme === placeScheme(race.state) && unit.areaId != null
             ? [unit.areaId]
             : [],
         ),
@@ -90,7 +91,7 @@ export const load: PageServerLoad = async ({ params }) => {
   const code = segments[1] ?? "";
   const own = nation?.codes[code];
   const [built, ballot] = await Promise.all([
-    remember(`live:full:v2:${election.slug}`, async () =>
+    remember(`live:full:v3:${election.slug}`, async () =>
       geography(
         areas.length === 0 && own != null ? [own] : areas,
         election.date,

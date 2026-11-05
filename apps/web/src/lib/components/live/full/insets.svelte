@@ -5,11 +5,11 @@
 
   const drawn = new Map<string, Promise<Boxes>>();
 
-  async function draw(tiles: string, ks: Array<number>) {
-    const key = `${tiles}|${ks.join(",")}`;
+  async function draw(sets: Array<{ tiles: string; ks: Array<number> }>) {
+    const key = JSON.stringify(sets);
     let found = drawn.get(key);
     if (found == null) {
-      found = orpc.maps.apart.call({ sets: [{ tiles, ks }] });
+      found = orpc.maps.apart.call({ sets });
       drawn.set(key, found);
       found.catch(() => {
         if (drawn.get(key) === found) {
@@ -27,8 +27,7 @@
   import { MUTED } from "./model.js";
 
   let {
-    tiles,
-    places,
+    sets,
     fills,
     selected,
     hovered = $bindable(null),
@@ -38,8 +37,10 @@
     onPick,
     tip,
   }: {
-    tiles: string;
-    places: Array<{ areaId: string; k: number }>;
+    sets: Array<{
+      tiles: string;
+      places: Array<{ areaId: string; k: number }>;
+    }>;
     fills: Map<string, Fill>;
     selected: string | null;
     hovered?: string | null;
@@ -51,22 +52,36 @@
   } = $props();
 
   const areaOf = $derived(
-    new Map(places.map((place) => [place.k, place.areaId])),
+    new Map(
+      sets.flatMap((set) =>
+        set.places.map((place) => [place.k, place.areaId] as const),
+      ),
+    ),
   );
-  const ks = $derived(places.map((place) => place.k).toSorted((a, b) => a - b));
-  const wanted = $derived(`${tiles}|${ks.join(",")}`);
+  const asked = $derived(
+    sets.flatMap((set) =>
+      set.places.length === 0
+        ? []
+        : [
+            {
+              tiles: set.tiles,
+              ks: set.places.map((place) => place.k).toSorted((a, b) => a - b),
+            },
+          ],
+    ),
+  );
+  const wanted = $derived(JSON.stringify(asked));
 
   let boxes = $state.raw<{ key: string; value: Boxes } | null>(null);
   let lit = $state<string | null>(null);
 
   $effect(() => {
     const key = wanted;
-    const asked = ks;
     if (asked.length === 0) {
       return;
     }
     let isCurrent = true;
-    void draw(tiles, asked).then(
+    void draw(asked).then(
       (value) => {
         if (isCurrent) {
           boxes = { key, value };

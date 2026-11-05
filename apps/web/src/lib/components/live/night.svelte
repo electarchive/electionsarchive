@@ -12,7 +12,12 @@
   import Race from "#lib/components/live/race.svelte";
   import Races from "#lib/components/live/races.svelte";
   import State from "#lib/components/live/state.svelte";
-  import { placeName, placeSlug } from "#lib/live/format.js";
+  import {
+    isDistricted,
+    placeName,
+    placeScheme,
+    placeSlug,
+  } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { remainder, standing } from "#lib/live/standing.js";
   import { summarize } from "#lib/live/summary.js";
@@ -86,7 +91,7 @@
     const now = standing(anchor, { at: null, isFinal: true });
     const estimate = estimates[anchor.id] ?? null;
     return [...now.units.values()]
-      .filter((row) => row.unit.scheme === "us.county")
+      .filter((row) => row.unit.scheme === placeScheme(anchor.state))
       .toSorted(
         (x, y) =>
           (y.baseline?.turnout ?? y.total) - (x.baseline?.turnout ?? x.total),
@@ -143,6 +148,7 @@
   />
 {:else}
   <Races
+    isDistrict={isDistricted(election.slug.split("/")[1] ?? "")}
     summaries={rail}
     current={data.focus}
     {counties}

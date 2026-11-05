@@ -11,10 +11,12 @@
     summaries,
     current = null,
     counties = [],
+    isDistrict = false,
     back,
   }: {
     summaries: Array<Summary>;
     current?: string | null;
+    isDistrict?: boolean;
     counties?: Array<{
       id: string;
       name: string;
@@ -47,7 +49,9 @@
       class="flex items-center gap-2 border-bs border-border pbs-3 sm:flex-wrap max-sm:-mx-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pbe-1"
     >
       <span class="me-2 shrink-0 text-[0.8125rem] font-semibold"
-        >{m.night_races_counties()}</span
+        >{isDistrict
+          ? m.night_races_districts()
+          : m.night_races_counties()}</span
       >
       {#each counties as county (county.id)}
         <a

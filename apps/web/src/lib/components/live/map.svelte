@@ -54,6 +54,7 @@
     anchor = null,
     answers = null,
     isLater = false,
+    isAlone = false,
     href,
     mode = $bindable("lead"),
     selected = $bindable(null),
@@ -70,6 +71,7 @@
     anchor?: string | null;
     answers?: Array<number> | null;
     isLater?: boolean;
+    isAlone?: boolean;
     href?: (unitId: string) => string | null;
     mode?: Mode;
     selected?: string | null;
@@ -570,7 +572,10 @@
     const scheme = geography.scheme;
     const outline = geography.outline;
     const isDetailed = prefs.isBasemap;
-    untrack(() => basemap(engine, scheme, isDetailed, outline));
+    const isShownAlone = isAlone;
+    untrack(() =>
+      basemap(engine, scheme, isDetailed, outline, false, isShownAlone),
+    );
   });
 
   const pinned = $derived(

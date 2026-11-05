@@ -18,6 +18,8 @@
   import {
     clock as clockOf,
     DOTS,
+    isDistricted,
+    placeScheme,
     placeSlug,
     stamp,
     tone,
@@ -29,6 +31,7 @@
   import { leadSafety, marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import Swing from "./dashboard/swing.svelte";
+  import { isOutlying } from "./full/model.js";
   import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
   import Bar from "./state/bar.svelte";
@@ -157,7 +160,9 @@
     top.filter(
       (entry) =>
         entry.isLive &&
-        entry.summary.race.units.some((unit) => unit.scheme === "us.county"),
+        entry.summary.race.units.some(
+          (unit) => unit.scheme === placeScheme(entry.summary.race.state),
+        ),
     ),
   );
   const mapped = $derived(
@@ -168,7 +173,9 @@
     new Map(
       (mapped == null ? mappable : [mapped]).flatMap((entry) =>
         entry.summary.race.units.flatMap((unit) =>
-          unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+          unit.scheme === placeScheme(entry.summary.race.state)
+            ? [[unit.id, unit.name] as const]
+            : [],
         ),
       ),
     ),
@@ -417,11 +424,14 @@
       {#key race.id}
         <LiveMap
           {geography}
+          isAlone={isOutlying(race.state)}
           options={race.options}
           now={standing(race, { at: null, isFinal: true })}
           estimate={estimates[race.id] ?? null}
           modes={["lead", "bubbles", "shift", "counted"]}
-          title={m.night_state_map_title({ race: titleOf(entry) })}
+          title={isDistricted(race.state)
+            ? m.night_state_map_title_district({ race: titleOf(entry) })
+            : m.night_state_map_title({ race: titleOf(entry) })}
           isLater={entry.summary.later != null}
           href={countyHref}
         />

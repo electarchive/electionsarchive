@@ -15,6 +15,7 @@
   import { cn } from "#lib/utils.js";
 
   let {
+    isDistrict = false,
     options,
     now,
     estimate,
@@ -23,6 +24,7 @@
     selected = $bindable(null),
     hovered = $bindable(null),
   }: {
+    isDistrict?: boolean;
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
@@ -50,6 +52,12 @@
   let query = $state("");
   let isAll = $state(false);
 
+  const placeLabel = $derived(
+    isDistrict ? m.night_table_district : m.night_table_county,
+  );
+  const searchLabel = $derived(
+    isDistrict ? m.night_table_search_district() : m.night_table_search(),
+  );
   const a = $derived(now.pair[0]);
   const b = $derived(now.pair[1]);
   const isPlural = $derived(answers != null);
@@ -275,7 +283,9 @@
 <section class="grid content-start gap-5" aria-labelledby="table-title">
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div class="grid gap-1.5">
-      <h2 id="table-title" class="heading text-lg!">{m.night_table_title()}</h2>
+      <h2 id="table-title" class="heading text-lg!">
+        {isDistrict ? m.night_table_title_district() : m.night_table_title()}
+      </h2>
       {#if answers != null}
         <ul
           class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
@@ -323,8 +333,8 @@
       <input
         type="search"
         bind:value={query}
-        placeholder={m.night_table_search()}
-        aria-label={m.night_table_search()}
+        placeholder={searchLabel}
+        aria-label={searchLabel}
         class="rounded-sm border border-border bg-background ps-9 pe-3 text-sm block-9 inline-64 focus-visible:outline-2 focus-visible:outline-foreground"
       />
     </label>
@@ -358,11 +368,7 @@
               : "none"}
           >
             {@render header(
-              {
-                id: "name",
-                label: m.night_table_county,
-                aria: m.night_table_county,
-              },
+              { id: "name", label: placeLabel, aria: placeLabel },
               false,
             )}
           </th>
@@ -562,7 +568,9 @@
     >
       {isAll
         ? m.night_table_fewer()
-        : m.night_table_all({ count: sorted.length })}
+        : isDistrict
+          ? m.night_table_all_district({ count: sorted.length })
+          : m.night_table_all({ count: sorted.length })}
       <ChevronDownIcon
         class={cn("transition-transform block-4 inline-4", {
           "rotate-180": isAll,

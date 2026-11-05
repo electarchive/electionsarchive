@@ -9,6 +9,7 @@
   import { count, percent } from "#lib/format.js";
   import {
     compact,
+    isDistricted,
     lead,
     placeName,
     placeSlug,
@@ -56,7 +57,14 @@
   const base = $derived(desk.feed.statePath(race));
 
   const COLUMNS: Array<{ id: Key; label: () => string; isEnd: boolean }> = [
-    { id: "name", label: m.board_counties_county, isEnd: false },
+    {
+      id: "name",
+      label: () =>
+        isDistricted(race.state)
+          ? m.night_table_district()
+          : m.board_counties_county(),
+      isEnd: false,
+    },
     { id: "margin", label: m.board_counties_margin, isEnd: true },
     { id: "counted", label: m.board_counties_in, isEnd: true },
     { id: "votes", label: m.board_counties_votes, isEnd: true },

@@ -1,6 +1,6 @@
 import { call, ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
-import { placeSlug } from "#lib/live/format.js";
+import { placeScheme, placeSlug } from "#lib/live/format.js";
 import { remember } from "#lib/server/cache.js";
 import { control, geography, pieces, states } from "#lib/server/live-board.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -25,7 +25,7 @@ async function place(path: string, slug: string, at: string | null) {
   const counties = new Map(
     election.races.flatMap((race) =>
       race.units.flatMap((unit) =>
-        unit.scheme === "us.county" && unit.areaId != null
+        unit.scheme === placeScheme(race.state) && unit.areaId != null
           ? [[unit.id, { ...unit, areaId: unit.areaId }] as const]
           : [],
       ),
@@ -107,7 +107,13 @@ export async function livePage(path: string, at: string | null) {
   const units = focus?.units ?? [];
   const reported = new Set(focus?.counts.map((entry) => entry.unitId));
   const scheme =
-    units.find((unit) => reported.has(unit.id))?.scheme ?? units[0]?.scheme;
+    units.find(
+      (unit) =>
+        reported.has(unit.id) &&
+        unit.scheme === placeScheme(focus?.state ?? ""),
+    )?.scheme ??
+    units.find((unit) => reported.has(unit.id))?.scheme ??
+    units[0]?.scheme;
   const areas = [
     ...new Set(
       units.flatMap((unit) =>
@@ -134,7 +140,7 @@ export async function livePage(path: string, at: string | null) {
     isNation || focus == null
       ? null
       : remember(
-          `live:geography:v8:${focus.slug}:${scheme ?? ""}`,
+          `live:geography:v9:${focus.slug}:${scheme ?? ""}`,
           async () => {
             const [found, cut] = await Promise.all([
               geography(areas, election.date, framed),

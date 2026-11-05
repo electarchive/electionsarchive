@@ -17,6 +17,7 @@ import { sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
+import { isDistricted, placeScheme } from "#lib/live/format.js";
 import { rule } from "#lib/measure.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
 import { side, UNAFFILIATED } from "#lib/party.js";
@@ -52,6 +53,9 @@ const LEVELS = new Set([
   "us.nyc_ed",
 ]);
 const TERRITORIES = new Set(["as", "gu", "mp", "pr", "vi"]);
+const LIVE_DISTRICT = sql.raw(
+  "(select d.id from reporting_unit d where d.area_id = u.area_id and d.scheme_code = 'us.sldl' limit 1)",
+);
 const JURISDICTIONS: Record<
   string,
   NonNullable<LiveRace["jurisdiction"]>["kind"]
@@ -555,6 +559,14 @@ function intern(text: string) {
   return text;
 }
 
+function sumOf(values: Array<number>) {
+  let total = 0;
+  for (const value of values) {
+    total += value;
+  }
+  return total;
+}
+
 function leads(head: Array<number>, whole: Array<number>) {
   return head.length <= whole.length && head.every((k, at) => whole[at] === k);
 }
@@ -821,15 +833,27 @@ async function baselines(
   if (pairs.length === 0) {
     return { lines: [], ratios: await scaling };
   }
+  const priorsDistricted = pairs.flatMap((pair) =>
+    wanted.some(
+      (row) =>
+        row.id === pair.contest &&
+        isDistricted(row.path.split("/", 2)[1] ?? ""),
+    )
+      ? [pair.prior]
+      : [],
+  );
   const picked = await db.execute<{ prior: string; k: number }>(sql`
     select p.id as prior, x.k from unnest(${sql.param([...new Set(pairs.map((row) => row.prior))])}::uuid[]) as p(id) cross join lateral (
       select rs.k from result_set rs
       where rs.contest_id = p.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
-        and (select u.scheme_code in ('us.county', 'us.county_part') or u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
+        and ((select u.scheme_code in ('us.county', 'us.county_part') or u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
             or u.scheme_code = 'us.cd' and left(u.code, 2) in ('60', '66', '69', '78')
           from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1)
-      order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part')) desc nulls last,
-        rs.is_default desc, rs.stage = 'certified' desc limit 1
+          or p.id = any(${sql.param(priorsDistricted)}::uuid[]) and exists (
+            select from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and u.scheme_code = 'us.ak_house_district'
+          ))
+      order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part', 'us.ak_house_district')) desc nulls last,
+        rs.is_default desc, rs.stage = 'certified' desc, rs.k limit 1
     ) x
   `);
   const priorOf = new Map(picked.rows.map((row) => [row.k, row.prior]));
@@ -861,10 +885,11 @@ async function baselines(
       left join reach r on r.party_id = line.party_id
       order by top.id, l.votes desc nulls last, r.n desc nulls last
     )
-    select c.k, case when u.scheme_code in ('us.county_part', 'us.cd') then u.parent_id else u.id end as unit,
+    select c.k, case when u.scheme_code in ('us.county_part', 'us.cd') then u.parent_id
+        when u.scheme_code = 'us.ak_house_district' then ${LIVE_DISTRICT} else u.id end as unit,
       coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
     from counted c join reporting_unit u on u.k = c.unit_k
-      and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null
+      and (u.scheme_code in ('us.county', 'us.ak_house_district') or u.scheme_code = 'us.county_part' and u.parent_id is not null
         or (u.scheme_code = 'us.state' and u.code in ('60', '66', '69', '72', '78')
           or u.scheme_code = 'us.cd' and left(u.code, 2) in ('60', '66', '69', '78') and u.parent_id is not null)
           and not exists (select from counted w join reporting_unit y on y.k = w.unit_k where w.k = c.k and y.scheme_code in ('us.county', 'us.county_part')))
@@ -908,16 +933,21 @@ async function load(state: string, midterm: string, presidential: string) {
       select ch.midterm, x.k from chosen ch cross join lateral (
         select rs.k from result_set rs
         where rs.contest_id = ch.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
-          and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
-        order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part')) desc nulls last,
-          rs.is_default desc, rs.stage = 'certified' desc limit 1
+          and ((select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
+            or ${isDistricted(state.split("/", 2)[1] ?? "")}::boolean and exists (
+              select from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and u.scheme_code = 'us.ak_house_district'
+            ))
+        order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part', 'us.ak_house_district')) desc nulls last,
+          rs.is_default desc, rs.stage = 'certified' desc, rs.k limit 1
       ) x
     ), totals as (
       select s.k, s.midterm, u.unit, sum(v.value)::float8 as votes
       from sets s join result_value v on v.result_set_k = s.k and v.measure = 1
       cross join lateral (
-        select case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit from reporting_unit u
-        where u.k = v.unit_k and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+        select case when u.scheme_code = 'us.county' then u.id
+            when u.scheme_code = 'us.ak_house_district' then ${LIVE_DISTRICT} else u.parent_id end as unit
+        from reporting_unit u
+        where u.k = v.unit_k and (u.scheme_code in ('us.county', 'us.ak_house_district') or u.scheme_code = 'us.county_part' and u.parent_id is not null)
         offset 0
       ) u
       group by 1, 2, 3
@@ -987,16 +1017,22 @@ async function geography(
   date: string,
   isWide: boolean,
 ) {
-  const house = contests.filter((row) => /\/house-[^/]+$/u.test(row.path));
-  const statewide = contests.filter(
-    (row) => !house.includes(row) && TOP.test(row.path.split("/").at(-1) ?? ""),
+  const top = contests.filter((row) =>
+    TOP.test(row.path.split("/").at(-1) ?? ""),
+  );
+  const districted = top.filter((row) =>
+    isDistricted(row.path.split("/", 2)[1] ?? ""),
+  );
+  const house = contests.filter(
+    (row) => /\/house-[^/]+$/u.test(row.path) && !districted.includes(row),
+  );
+  const statewide = top.filter(
+    (row) => !house.includes(row) && !districted.includes(row),
   );
   const local = isWide
     ? contests.filter(
         (row) =>
-          !house.includes(row) &&
-          !statewide.includes(row) &&
-          row.district != null,
+          !house.includes(row) && !top.includes(row) && row.district != null,
       )
     : [];
   const wide = [...statewide, ...local].map((row) => row.id);
@@ -1031,6 +1067,9 @@ async function geography(
     union
     select contest, id from near
     where st_area(st_intersection(geom, d)) > least(0.005 * st_area(geom), 0.05 * st_area(d))
+    union
+    select c.id, u.id from unnest(${sql.param(districted.map((row) => row.id))}::uuid[]) as c(id)
+    join reporting_unit u on u.scheme_code = 'us.sldl' and u.code like 'AK:%'
   `);
   return result.rows;
 }
@@ -1098,39 +1137,57 @@ async function night(
       expected: number | null;
       publisher: string;
       url: string | null;
+      isHeadline: boolean;
     }>(sql`
       with latest as (
-        select distinct on (o.feed_id, o.contest_id) o.feed_id, o.contest_id, od.adapter,
-          (select sum(v.votes) from live.value v join contest_option x on x.id = v.option_id
-            where v.frame_k = o.k and x.kind <> 'none_of_the_above') as votes,
+        select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter,
           exists (
             select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
               and x.fetched_at > now() - interval '20 minutes'
-          ) as fresh,
-          exists (
-            select from live.value v join contest_option x on x.id = v.option_id
-            where v.frame_k = o.k and x.kind = 'none_of_the_above' and v.votes > 0
-          ) and (select count(distinct v.unit_id) from live.value v where v.frame_k = o.k) > 1 as declined
+          ) as fresh
         from live.frame o join live.feed od on od.id = o.feed_id
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
       ), ranked as (
-        select l.*, l.votes >= 0.97 * max(l.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
-        from latest l
+        select l.feed_id, l.contest_id, l.adapter, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
+          t.votes >= 0.97 * max(t.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
+        from latest l cross join lateral (
+          select sum(v.votes) filter (where x.kind <> 'none_of_the_above') as votes,
+            count(distinct v.unit_id) as units,
+            coalesce(bool_or(x.kind = 'none_of_the_above' and v.votes > 0), false) as refused
+          from live.value v join contest_option x on x.id = v.option_id
+          where v.frame_k = l.k
+        ) t
+      )
+      , headline as (
+        select distinct on (w.contest_id) w.contest_id, w.feed_id
+        from ranked w
+        where w.fresh and w.complete and not w.split
+          and exists (
+            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+          )
+          and not exists (
+            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+              and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
+          )
+        order by w.contest_id, ${tier(sql.raw("w.adapter"))}
       )
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
-        f.reporting, f.expected, d.publisher, d.url
+        f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline"
       from live.frame f join live.feed d on d.id = f.feed_id
+      left join headline h on h.contest_id = f.contest_id and h.feed_id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
-        and not exists (
-          select from ranked o
-          left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
-          where o.contest_id = f.contest_id and o.fresh and o.complete
-            and (
-              own.complete is not true
-              or (o.declined and not own.declined)
-              or (o.declined = own.declined and ${tier(sql.raw("o.adapter"))} < ${tier(sql.raw("d.adapter"))})
-            )
+        and (
+          h.feed_id is not null
+          or not exists (
+            select from ranked o
+            left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
+            where o.contest_id = f.contest_id and o.fresh and o.complete
+              and (
+                own.complete is not true
+                or (o.declined, o.split, -${tier(sql.raw("o.adapter"))}) > (own.declined, own.split, -${tier(sql.raw("d.adapter"))})
+              )
+          )
         )
       order by f.as_of, f.k
     `),
@@ -1153,7 +1210,7 @@ async function night(
       order by t.contest, t.option, t.as_of desc, t.k desc
     `),
     remember(
-      `live:fixed:v3:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
+      `live:fixed:v4:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
       async () => {
         const [choices, incumbents, settled, prior, drawn, placed] =
           await Promise.all([
@@ -1213,7 +1270,12 @@ async function night(
       lapsed.has(row.state) ? [[row.state, row.id] as const] : [],
     ),
   );
-  const replayed = await replay(frames.rows);
+  const replayed = await replay(
+    frames.rows.map((row) => ({
+      k: row.k,
+      contest: row.isHeadline ? `headline:${row.contest}` : row.contest,
+    })),
+  );
   const unitIds = [
     ...new Set([
       ...replayed
@@ -1259,7 +1321,9 @@ async function night(
       {
         id: row.id,
         areaId: row.area,
-        name: (row.area == null ? null : titles.full.get(row.area)) ?? "",
+        name: (
+          (row.area == null ? null : titles.full.get(row.area)) ?? ""
+        ).replace(/^Alaska House of Representatives, /u, ""),
         scheme: row.scheme,
         parentId: row.parent,
       },
@@ -1310,6 +1374,9 @@ async function night(
     );
     const current = new Map<string, Array<number>>();
     const members = new Map<string, Set<string>>();
+    let front: (typeof mine)[number] | undefined;
+    let place: (typeof mine)[number] | undefined;
+    let lead: (typeof mine)[number] | undefined;
     for (const frame of mine) {
       const entry = replayed.get(frame.k);
       const totals = own.map(() => 0);
@@ -1331,12 +1398,26 @@ async function night(
           byUnit.set(unit, votes);
         }
       }
-      raceFrames.push({
-        at: frame.at,
-        totals,
-        reporting: frame.reporting,
-        expected: frame.expected,
-      });
+      if (frame.isHeadline) {
+        lead = frame;
+      }
+      if (
+        front == null ||
+        front.isHeadline === frame.isHeadline ||
+        sumOf(totals) >= sumOf(raceFrames.at(-1)?.totals ?? [])
+      ) {
+        front = frame;
+        raceFrames.push({
+          at: frame.at,
+          totals,
+          reporting: (lead ?? frame).reporting,
+          expected: (lead ?? frame).expected,
+        });
+      }
+      if (frame.isHeadline) {
+        continue;
+      }
+      place = frame;
       const touched = new Set<string>();
       for (const [unit, votes] of byUnit) {
         current.set(unit, votes);
@@ -1368,6 +1449,10 @@ async function night(
       }
     }
     const newest = raceFrames.at(-1);
+    if (newest != null && lead != null) {
+      newest.reporting = lead.reporting;
+      newest.expected = lead.expected;
+    }
     for (const line of refused) {
       const position = index.get(line.option);
       if (newest != null && position != null && newest.totals[position] === 0) {
@@ -1536,7 +1621,6 @@ async function night(
         return scheme == null ? [] : [scheme];
       }),
     );
-    const source = mine.at(-1);
     const where = placed.get(row.id);
     const kind =
       where == null
@@ -1645,7 +1729,11 @@ async function night(
             return call == null ? null : { option: call.option, at: call.at };
           })()
         : null,
-      source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
+      source: { publisher: front?.publisher ?? "", url: front?.url ?? null },
+      placeSource:
+        place == null || place.publisher === front?.publisher
+          ? null
+          : { publisher: place.publisher, url: place.url },
       feed:
         mine.length > 0 || final.length > 0
           ? "live"
@@ -1722,7 +1810,7 @@ const spread = new Map<string, Kept<Awaited<ReturnType<typeof spreadOut>>>>();
 
 function countyRace(race: LiveRace): LiveRace {
   const units = race.units.flatMap((unit): Array<LiveUnit> =>
-    unit.scheme === "us.county" && unit.areaId != null
+    unit.scheme === placeScheme(race.state) && unit.areaId != null
       ? [{ ...unit, parentId: null }]
       : [],
   );
@@ -1904,33 +1992,36 @@ async function spreadOut(
           })
           .toArray()
       : result.election.races.map((race) => countyRace(race));
-  const areas = [
+  const areasOf = (test: (race: LiveRace) => boolean) => [
     ...new Set(
       kept.flatMap((race) =>
-        race.units.flatMap((unit) =>
-          unit.areaId == null ? [] : [unit.areaId],
-        ),
-      ),
-    ),
-  ];
-  const framed = [
-    ...new Set(
-      kept.flatMap((race) =>
-        TERRITORIES.has(race.state) ||
-        race.state === "ak" ||
-        race.state === "hi"
-          ? []
-          : race.units.flatMap((unit) =>
+        test(race)
+          ? race.units.flatMap((unit) =>
               unit.areaId == null ? [] : [unit.areaId],
-            ),
+            )
+          : [],
       ),
     ),
   ];
-  const map = await remember(
-    `live:spread:v2:${found.date}:${chosen}:${String(areas.length)}`,
-    async () =>
-      shaped(areas, found.date, framed.length > 0 ? framed : areas, false),
+  const areas = areasOf((race) => !isDistricted(race.state));
+  const framed = areasOf(
+    (race) =>
+      !isDistricted(race.state) &&
+      !TERRITORIES.has(race.state) &&
+      race.state !== "hi",
   );
+  const alaska = areasOf((race) => isDistricted(race.state));
+  const [map, districts] = await Promise.all([
+    remember(
+      `live:spread:v3:${found.date}:${chosen}:${String(areas.length)}`,
+      async () =>
+        shaped(areas, found.date, framed.length > 0 ? framed : areas, false),
+    ),
+    remember(
+      `live:spread:districts:v1:${found.date}:${String(alaska.length)}`,
+      async () => shaped(alaska, found.date, alaska, false),
+    ),
+  ]);
   const homes = new Map<string, { tail: string; turnout: number }>();
   if (chosen === "house") {
     for (const race of result.election.races) {
@@ -1951,6 +2042,10 @@ async function spreadOut(
   return {
     races: kept,
     map,
+    districts:
+      districts == null
+        ? null
+        : { tiles: districts.tiles, places: districts.places },
     homes: Object.fromEntries(
       [...homes].map(([areaId, home]) => [areaId, home.tail]),
     ),

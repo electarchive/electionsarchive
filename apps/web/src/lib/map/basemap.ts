@@ -55,7 +55,7 @@ export function basemap(
     },
   ];
   const outside: Maplibre.ExpressionSpecification = isAlone
-    ? ["==", 1, 0]
+    ? ["boolean", false]
     : isFocused
       ? ["!", within]
       : ["has", "out"];

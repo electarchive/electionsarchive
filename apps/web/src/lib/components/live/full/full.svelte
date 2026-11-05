@@ -50,8 +50,10 @@
   } from "#lib/live/ballot.js";
   import { swing } from "#lib/live/flips.js";
   import {
+    isDistricted,
     lead,
     placeName,
+    placeScheme,
     placeSlug,
     stamp,
     surname,
@@ -87,6 +89,7 @@
     GROUND,
     holding,
     INSETS,
+    isOutlying,
     isRightward,
     LENSES,
     MUTED,
@@ -503,7 +506,10 @@
     >();
     for (const summary of found.summaries) {
       for (const unit of summary.race.units) {
-        if (unit.scheme === "us.county" && unit.areaId != null) {
+        if (
+          unit.scheme === placeScheme(summary.race.state) &&
+          unit.areaId != null
+        ) {
           byArea.set(unit.areaId, {
             areaId: unit.areaId,
             name: placeName(unit.name),
@@ -538,7 +544,11 @@
     }> = [];
     for (const unit of race.units) {
       const row = raceStanding.units.get(unit.id);
-      if (row == null || unit.areaId == null || unit.scheme !== "us.county") {
+      if (
+        row == null ||
+        unit.areaId == null ||
+        unit.scheme !== placeScheme(race.state)
+      ) {
         continue;
       }
       const rest = remainder(row, estimate, race.options, racePair);
@@ -650,8 +660,6 @@
           ),
         ),
   );
-  const isOutlying = (state: string | null | undefined) =>
-    state != null && (INSETS.has(state) || TERRITORIES.includes(state));
   const isAlone = $derived(isOutlying(code));
   const nearby = $derived(
     isAlone
@@ -774,11 +782,19 @@
         ? (districts?.map ?? null)
         : (chamber?.map ?? geography),
   );
-  const insetPlaces = $derived(
+  const insetSets = $derived(
     isNation
-      ? (baseGeography?.places ?? []).filter((place) =>
-          INSETS.has(stateOf(place.areaId) ?? ""),
-        )
+      ? [
+          ...(isSpreadShown && spreadData?.districts != null
+            ? [spreadData.districts]
+            : []),
+          ...(baseGeography == null ? [] : [baseGeography]),
+        ].map((set) => ({
+          tiles: set.tiles,
+          places: set.places.filter((place) =>
+            INSETS.has(stateOf(place.areaId) ?? ""),
+          ),
+        }))
       : [],
   );
   const mapGeography = $derived.by((): Geography | null => {
@@ -1997,10 +2013,9 @@
 {/snippet}
 
 {#snippet insetBoxes()}
-  {#if baseGeography != null && insetPlaces.length > 0}
+  {#if insetSets.some((set) => set.places.length > 0)}
     <Insets
-      tiles={baseGeography.tiles}
-      places={insetPlaces}
+      sets={insetSets}
       {fills}
       {selected}
       bind:hovered
@@ -2381,6 +2396,7 @@
       {/if}
       <CountyList
         {rows}
+        isDistrict={isDistricted(current.race.state)}
         options={current.race.options}
         pair={racePair}
         selected={null}

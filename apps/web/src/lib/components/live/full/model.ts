@@ -46,6 +46,10 @@ export const LENSES: Array<Lens> = [
 export const INSETS = new Set(["ak", "hi"]);
 export const TERRITORIES = ["pr", "gu", "vi", "mp", "as"];
 
+export function isOutlying(state: string | null | undefined) {
+  return state != null && (INSETS.has(state) || TERRITORIES.includes(state));
+}
+
 export const MUTED =
   "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
 export const WAITING =

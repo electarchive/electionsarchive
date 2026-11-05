@@ -8,7 +8,7 @@
   import Face from "#lib/components/live/face.svelte";
   import Also from "#lib/components/live/state/also.svelte";
   import { count, percent } from "#lib/format.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { isDistricted, lead, surname, tone } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { remainder } from "#lib/live/standing.js";
@@ -267,7 +267,11 @@
         <thead>
           <tr class="text-xs text-muted-foreground">
             <th scope="col" class="text-start font-normal"
-              ><span class="sr-only">{m.night_table_county()}</span></th
+              ><span class="sr-only"
+                >{race != null && isDistricted(race.state)
+                  ? m.night_table_district()
+                  : m.night_table_county()}</span
+              ></th
             >
             <th scope="col" class="text-end font-normal">{m.livemap_now()}</th>
             <th scope="col" class="text-end font-normal"
@@ -315,7 +319,9 @@
         </p>
       {:else if weight != null}
         <p class="text-xs text-muted-foreground">
-          {m.night_place_lede({ share: percent(weight) })}
+          {race != null && isDistricted(race.state)
+            ? m.night_place_lede_district({ share: percent(weight) })
+            : m.night_place_lede({ share: percent(weight) })}
         </p>
       {/if}
     </div>
