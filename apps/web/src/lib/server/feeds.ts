@@ -1,4 +1,5 @@
 import type { SQL } from "drizzle-orm";
+import { READ_ONLY } from "$app/env/public";
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
@@ -258,12 +259,15 @@ export async function recent(query: RecentQuery) {
   const polity = query.polity == null ? null : await polityAt(query.polity);
   const within = polity == null ? null : tree(sql`select ${polity.id}::uuid`);
   const activity =
-    query.author === "pipeline"
+    READ_ONLY || query.author === "pipeline"
       ? null
       : sql`
         (${within == null} or a.polity_ids && ${within ?? sql`'{}'::uuid[]`})
-        and (${query.author ?? null}::text is null
-             or (${query.author ?? null}::text = 'agent') = (a.agent_key_id is not null))
+        and case ${query.author ?? null}::text
+              when 'agent' then a.agent_key_id is not null
+              when 'person' then a.actor_user_id is not null and a.agent_key_id is null
+              else true
+            end
         and (${query.tier ?? null}::int is null or p.tier = ${query.tier ?? null}::int)
       `;
   const importing =

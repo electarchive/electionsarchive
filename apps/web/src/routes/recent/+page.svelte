@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { page } from "$app/state";
   import FeedList from "#lib/components/contrib/feed-list.svelte";
   import FilterNav from "#lib/components/contrib/filter-nav.svelte";
@@ -38,31 +39,33 @@
   <header class="grid gap-3">
     <h1 class="title">{m.recent_heading()}</h1>
     <p class="max-inline-prose text-sm text-pretty text-muted-foreground">
-      {m.recent_lede()}
+      {READ_ONLY ? m.recent_lede_read_only() : m.recent_lede()}
     </p>
-    <div class="grid gap-1.5">
-      <FilterNav
-        label={m.recent_filter_author()}
-        name="author"
-        options={[
-          { value: null, label: m.recent_filter_all() },
-          { value: "person", label: m.recent_author_person() },
-          { value: "agent", label: m.recent_author_agent() },
-          { value: "pipeline", label: m.recent_author_pipeline() },
-        ]}
-      />
-      <FilterNav
-        label={m.recent_filter_tier()}
-        name="tier"
-        options={[
-          { value: null, label: m.recent_filter_all() },
-          ...[1, 2, 3].map((tier) => ({
-            value: String(tier),
-            label: tierLabel[tier]?.() ?? String(tier),
-          })),
-        ]}
-      />
-    </div>
+    {#if !READ_ONLY}
+      <div class="grid gap-1.5">
+        <FilterNav
+          label={m.recent_filter_author()}
+          name="author"
+          options={[
+            { value: null, label: m.recent_filter_all() },
+            { value: "person", label: m.recent_author_person() },
+            { value: "agent", label: m.recent_author_agent() },
+            { value: "pipeline", label: m.recent_author_pipeline() },
+          ]}
+        />
+        <FilterNav
+          label={m.recent_filter_tier()}
+          name="tier"
+          options={[
+            { value: null, label: m.recent_filter_all() },
+            ...[1, 2, 3].map((tier) => ({
+              value: String(tier),
+              label: tierLabel[tier]?.() ?? String(tier),
+            })),
+          ]}
+        />
+      </div>
+    {/if}
     <p class="flex flex-wrap items-baseline gap-x-4 text-sm">
       {#if data.polity != null}
         <span

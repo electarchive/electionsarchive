@@ -5565,6 +5565,7 @@
   "feed_topic_resolved": "Resolved topic about {record}: {topic}",
   "feed_imported_by": "Imported by {pipeline}",
   "feed_someone": "A contributor",
+  "feed_automated": "Automated",
   "feed_via_agent": "{author} via {agent}",
   "feed_batches": [
     {
@@ -5585,6 +5586,7 @@
   "recent_title": "Recent changes",
   "recent_heading": "Recent changes",
   "recent_lede": "Everything that changed in the archive, newest first: data imports, proposals and their decisions, and discussion. Times are in your time zone; hover over one to see it in UTC.",
+  "recent_lede_read_only": "Every data import in the archive, newest first. Times are in your time zone; hover over one to see it in UTC.",
   "recent_feed_title": "Recent changes on electionsarchive.com",
   "recent_filter_author": "Made by",
   "recent_filter_all": "All",

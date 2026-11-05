@@ -848,6 +848,9 @@ export function byline(entry: FeedEntry) {
   if (entry.kind === "imported") {
     return m.feed_imported_by({ pipeline: entry.pipeline ?? "" });
   }
+  if (entry.kind === "bounty_closed") {
+    return m.feed_automated();
+  }
   const author = entry.author ?? m.feed_someone();
   return entry.agent == null
     ? author
