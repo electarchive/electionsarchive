@@ -68,9 +68,27 @@ class Artifact:
         return f"raw/{self.source}/{self.path.name}"
 
 
+INDEXES: dict[str, tuple[tuple[int, int, int], dict[str, dict[str, str | int | None]]]] = {}
+
+
 def _index(source: str) -> tuple[Path, dict[str, dict[str, str | int | None]]]:
     path = DATA / "raw" / source / "index.json"
     return path, json.loads(path.read_text()) if path.exists() else {}
+
+
+def _read(source: str) -> dict[str, dict[str, str | int | None]]:
+    path = DATA / "raw" / source / "index.json"
+    try:
+        stamp = path.stat()
+    except FileNotFoundError:
+        return {}
+    signature = (stamp.st_ino, stamp.st_size, stamp.st_mtime_ns)
+    hit = INDEXES.get(source)
+    if hit is not None and hit[0] == signature:
+        return hit[1]
+    index = json.loads(path.read_text())
+    INDEXES[source] = (signature, index)
+    return index
 
 
 @contextmanager
@@ -160,11 +178,11 @@ def _key(url: str, body: dict[str, object] | None) -> str:
 
 
 def keys(source: str) -> set[str]:
-    return set(_index(source)[1])
+    return set(_read(source))
 
 
 def cached(source: str, url: str, body: dict[str, object] | None = None) -> Artifact:
-    _, index = _index(source)
+    index = _read(source)
     key = _key(url, body)
     if key not in index:
         raise LookupError(f"{key} is not in the {source} raw cache; run `ea fetch {source}` first")
@@ -190,7 +208,7 @@ def store(source: str, url: str, content: bytes, *, suffix: str, retrieved_at: d
 
 
 def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None = None) -> Artifact:
-    _, index = _index(source)
+    index = _read(source)
     key = _key(url, body)
     if key in index:
         return _artifact(source, key, index[key])
