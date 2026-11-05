@@ -4667,6 +4667,8 @@
   "night_seo_description": "{headline}. Live results by county for the {title}, with an estimate of the final result. Updated {time}.",
   "night_seo_description_district": "{headline}. Live results by state House district for the {title}, with an estimate of the final result. Updated {time}.",
   "night_seo_nation": "Live results for every race in the {title}, state by state and county by county, with an estimate of each final result.",
+  "night_seo_state": "Live results for every race in the {title}, county by county, with an estimate of each final result.",
+  "night_seo_state_district": "Live results for every race in the {title}, by state House district, with an estimate of each final result.",
   "night_seo_seats": "{headline}. Live standings for all {count} candidates for the {title}, where the top {seats} win seats. Updated {time}.",
   "night_seo_seats_upcoming": "{headline}. Live standings for all {count} candidates for the {title}, where the top {seats} win seats.",
   "night_seo_title": "{title}: live results",
