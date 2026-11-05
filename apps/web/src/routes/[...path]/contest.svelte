@@ -6,7 +6,7 @@
   import { page } from "$app/state";
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
-  import { Await, load, peek } from "svelte-islands";
+  import { Await, Island, load, peek } from "svelte-islands";
   import { on } from "svelte/events";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
@@ -1598,6 +1598,14 @@
   />
 </header>
 
+{#snippet roundsTable()}
+  {#if contest.count?.stv != null}
+    <Stv count={contest.count} stv={contest.count.stv} {here} />
+  {:else if contest.count != null}
+    <Tally count={contest.count} {here} />
+  {/if}
+{/snippet}
+
 {#snippet road(isBelow: boolean)}
   <Road
     {isBelow}
@@ -2095,10 +2103,22 @@
   {#if additional != null}
     <Additional {additional} />
   {/if}
-  {#if contest.count?.stv != null}
-    <Stv count={contest.count} stv={contest.count.stv} {here} />
-  {:else if contest.count != null}
-    <Tally count={contest.count} {here} />
+  {#if contest.count != null}
+    <div
+      id="rounds"
+      class="col-span-12 grid min-inline-0"
+      style:min-block-size={contest.table == null
+        ? null
+        : `calc(min(${contest.count.rows.length * 40 + 60}px, 100svh) + 88px)`}
+    >
+      {#if contest.table == null}
+        {@render roundsTable()}
+      {:else}
+        <Island part={contest.table} defer when="visible">
+          {@render roundsTable()}
+        </Island>
+      {/if}
+    </div>
   {/if}
 
   <div

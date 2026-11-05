@@ -19,6 +19,7 @@ const LEGEND = 8;
 const FOLD = 18;
 const FOLDED = 20;
 const ROSTER = 24_000;
+const ROUND_CELLS = 120;
 
 type Election = Extract<
   Awaited<ReturnType<typeof archive>>,
@@ -260,7 +261,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
         !target.previous &&
         target.value === contest.target?.path,
     );
-    const { places } = contest;
+    const { places, count } = contest;
     const roster = places == null ? null : seated(places.rows);
     return {
       ...data,
@@ -273,6 +274,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
             : { ...places, rows: places.rows.slice(0, 0) },
         targets: chosen == null ? near : [...near, chosen],
         others,
+        table:
+          count != null && count.rows.length * count.last >= ROUND_CELLS
+            ? part("contest.rounds", { id: data.id, round: count.round })
+            : null,
       },
       talk: await talkLink(data.id),
     };

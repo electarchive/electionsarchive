@@ -61,8 +61,7 @@
 </script>
 
 <section
-  id="rounds"
-  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
+  class="grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
   aria-labelledby="{uid}-title"
 >
   <div class="grid gap-0.5">
