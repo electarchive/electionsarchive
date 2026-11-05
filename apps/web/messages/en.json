@@ -5613,6 +5613,7 @@
   "recent_filter_tier": "Risk",
   "recent_in_polity": "In {polity} and the places within it",
   "recent_clear_polity": "Show all places",
+  "recent_clear_filters": "Show all recent changes",
   "recent_subscribe": "Subscribe (Atom)",
   "recent_empty": "Nothing matches these filters yet.",
   "recent_older": "Older",

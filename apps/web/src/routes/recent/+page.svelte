@@ -86,6 +86,13 @@
   {#if data.entries.length === 0}
     <p class="mbs-6 border-bs pbs-3 text-sm text-pretty text-muted-foreground">
       {m.recent_empty()}
+      {#if READ_ONLY && (page.url.searchParams.has("author") || page.url.searchParams.has("tier"))}
+        <a
+          class="ms-2 underline underline-offset-2 hover:text-foreground"
+          href="/recent{query({ author: null, tier: null, before: null })}"
+          >{m.recent_clear_filters()}</a
+        >
+      {/if}
     </p>
   {:else}
     <div class="mbs-6">
