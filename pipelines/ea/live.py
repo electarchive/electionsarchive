@@ -132,7 +132,9 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             paths[url] = folder / f"{number:03d}{suffix}"
             paths[url].write_bytes(content)
             index[url] = paths[url].name
-        (folder / "index.json").write_text(json.dumps(index, indent=1))
+        partial = folder / ".index.json.part"
+        partial.write_text(json.dumps(index, indent=1))
+        partial.replace(folder / "index.json")
         tallies, unmatched = (
             enr_2026.plan(conn, enr_2026.table({params["state"]: paths}), lambda _, __: None)
             if adapter == "us.enr_2026"
