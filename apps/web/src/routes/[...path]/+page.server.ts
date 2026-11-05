@@ -33,6 +33,24 @@ function parted<T>(
   return value instanceof Promise ? value.then(wrap) : wrap(value);
 }
 
+const compared = memo(
+  (
+    targets: Extract<
+      Awaited<ReturnType<typeof archive>>,
+      { kind: "contest" }
+    >["contest"]["targets"],
+  ) => {
+    const others = targets.filter((target) => !target.series);
+    return {
+      near: targets.filter((target) => target.series || target.previous),
+      others:
+        others.length === 0
+          ? null
+          : part("contest.targets", others, { fetch: "lazy" }),
+    };
+  },
+);
+
 function isQuestion(race: { kind: string }) {
   return race.kind === "ballot_question";
 }
@@ -222,7 +240,23 @@ async function seed(path: string) {
 export const load: PageServerLoad = async ({ params, url }) => {
   const data = await archive(params.path, url.searchParams);
   if (data.kind === "contest") {
-    return { ...data, talk: await talkLink(data.id) };
+    const { contest } = data;
+    const { near, others } = compared(contest.targets);
+    const chosen = contest.targets.find(
+      (target) =>
+        !target.series &&
+        !target.previous &&
+        target.value === contest.target?.path,
+    );
+    return {
+      ...data,
+      contest: {
+        ...contest,
+        targets: chosen == null ? near : [...near, chosen],
+        others,
+      },
+      talk: await talkLink(data.id),
+    };
   }
   if (data.kind === "election") {
     const { races, contests, elections } = data.election;

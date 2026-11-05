@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { READ_ONLY } from "$app/env/public";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
-  import { Await } from "svelte-islands";
+  import { Await, load, peek } from "svelte-islands";
+  import { on } from "svelte/events";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Disclosure from "#lib/components/disclosure.svelte";
@@ -770,10 +772,34 @@
       (contest.kind in SEATS &&
         contest.rows.filter((row) => (row.current?.seats ?? 0) > 0).length > 1),
   );
+  const targets = $derived.by(() => {
+    const others =
+      browser && contest.others != null ? peek(contest.others) : null;
+    return others == null
+      ? contest.targets
+      : [...contest.targets.filter((target) => target.series), ...others.value];
+  });
+  const warmTargets = (element: HTMLElement) => {
+    const { others } = contest;
+    if (others == null) {
+      return;
+    }
+    const fetchOthers = () => {
+      load(others).catch(() => {});
+    };
+    const offs = (["pointerenter", "pointerdown", "focusin"] as const).map(
+      (type) => on(element, type, fetchOthers),
+    );
+    return () => {
+      for (const off of offs) {
+        off();
+      }
+    };
+  };
   const phrases = $derived.by(() => {
     const mine = contest.name.replace(/^\d{4}\s+/u, "").split(" ");
     return new Map(
-      contest.targets.map((target) => {
+      targets.map((target) => {
         const theirs = target.label.replace(/^\d{4}\s+/u, "").split(" ");
         const shared = Math.min(mine.length, theirs.length);
         let start = 0;
@@ -1042,7 +1068,7 @@
         winner: null,
         annulled: false,
       },
-      ...contest.targets
+      ...targets
         .toSorted((a, b) => Number(b.series) - Number(a.series))
         .map((target) => {
           const winner = target.series
@@ -2080,6 +2106,7 @@
   >
     <div
       class="flex flex-1 basis-80 flex-wrap items-center gap-x-2.5 gap-y-1.5 min-inline-0"
+      {@attach warmTargets}
     >
       <span class="shrink-0 text-sm font-semibold max-sm:basis-full"
         >{m.compare_label()}</span
