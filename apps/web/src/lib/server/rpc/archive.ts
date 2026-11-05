@@ -1212,7 +1212,7 @@ async function gather(
   const linked = isSettled
     ? { rows: [] }
     : await db.execute<{ yes: boolean }>(sql`
-      select exists (select from reporting_unit_area m where m.area_id = any(array[${area.id}::uuid])) as yes
+      select exists (select from reporting_unit_area m where m.area_id = any(array[${area.id}::uuid]) and m.valid @> ${date}::date) as yes
     `);
   const joined = linked.rows[0]?.yes
     ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
@@ -1314,7 +1314,7 @@ async function gather(
           scheme: string;
           parent: string;
         }>(
-          sized.facts < sized.kids
+          sized.facts <= sized.kids
             ? sql`
               select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
               from (
@@ -1322,16 +1322,14 @@ async function gather(
                 where r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
                 union
                 select u.area_k from result_rollup_unit u
-                where u.result_set_k = any(${sql.param(ks)}::int[]) and exists (
-                  select from result_value v
-                  where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
-                )
+                where u.result_set_k = any(${sql.param(ks)}::int[])
               ) r
               join area a on a.k = r.k
               join area_parent p on p.area_id = a.id and p.valid @> ${date}::date
               where p.parent_id = any(${parents})
                 and a.scheme_code in (${level})
                 and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+                and ${counted}
             `
             : sql`
               select a.id, a.k, a.scheme, a.parent from (
