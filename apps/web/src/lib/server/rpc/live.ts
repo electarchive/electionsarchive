@@ -31,6 +31,7 @@ import {
   portraits,
   geography as shaped,
 } from "#lib/server/live-board.js";
+import { unopposed } from "#lib/server/live-unopposed.js";
 import { localizeNames } from "#lib/server/names.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
@@ -1125,7 +1126,7 @@ async function night(
   const [
     frames,
     declined,
-    { choices, incumbents, settled, prior, drawn, placed },
+    { choices, incumbents, settled, prior, drawn, placed, lone },
     feeds,
     polities,
   ] = await Promise.all([
@@ -1164,10 +1165,11 @@ async function night(
       , headline as (
         select distinct on (w.contest_id) w.contest_id, w.feed_id, w.split
         from ranked w
-        where w.fresh and w.complete
+        where w.complete
           and (
             (
-              not w.split
+              w.fresh
+              and not w.split
               and exists (
                 select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
               )
@@ -1231,9 +1233,9 @@ async function night(
       order by t.contest, t.option, t.as_of desc, t.k desc
     `),
     remember(
-      `live:fixed:v4:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
+      `live:fixed:v5:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
       async () => {
-        const [choices, incumbents, settled, prior, drawn, placed] =
+        const [choices, incumbents, settled, prior, drawn, placed, lone] =
           await Promise.all([
             options(contests, found.date),
             db.execute<{ option: string }>(sql`
@@ -1250,8 +1252,10 @@ async function night(
                   detail === "race" || found.path.split("/").length > 3,
                 ),
             jurisdictions(contests),
+            unopposed(contests),
           ]);
         return {
+          lone,
           choices,
           incumbents: incumbents.rows,
           settled,
@@ -1665,6 +1669,7 @@ async function night(
           : { name: titles.full.get(where.polity) ?? "", kind },
       seats: where?.seats ?? 1,
       rule: rule(where?.rules),
+      unopposed: lone.get(row.id) ?? null,
       isSpecial: where?.special === true,
       needsMajority: where?.majority === true,
       isMeasure:
