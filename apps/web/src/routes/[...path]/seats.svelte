@@ -799,6 +799,7 @@
         style={palette}
         role="listbox"
         tabindex={isCompact ? -1 : 0}
+        aria-busy={isMounted ? undefined : "true"}
         aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
         aria-describedby="{uid}-keys"
         aria-activedescendant={active == null
@@ -875,6 +876,7 @@
           )}
           <g
             data-run=""
+            role={isMounted ? "none" : undefined}
             aria-hidden={isMounted ? undefined : "true"}
             class={{ "stroke-foreground": link != null && run.isLocal }}
             style:--delay="{run.delay}ms"
