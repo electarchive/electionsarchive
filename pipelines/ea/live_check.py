@@ -18,6 +18,7 @@ from ea.live import FEEDS
 from ea.sources.us import (
     alameda_rov_live,
     clarity_local_live,
+    county_live,
     enr_2026,
     lavote_live,
     livevoter_live,
@@ -185,6 +186,13 @@ def host(feed: dict[str, object]) -> tuple[bool, str, list[tuple[str, bytes]]]:
                     for url, (content, _) in clarity_local_live.collect(
                         client, params["state"], params["tenant"], params["eid"]
                     ).items()
+                )
+        elif feed["adapter"] == "us.county_live":
+            params = feed["params"]
+            if isinstance(params, dict):
+                pages.extend(
+                    (url, content)
+                    for url, (content, _) in county_live.collect(client, params["kind"], params["url"]).items()
                 )
         elif feed["adapter"] == "us.webb_live":
             pages.extend((url, content) for url, (content, _) in webb_live.collect(client).items())

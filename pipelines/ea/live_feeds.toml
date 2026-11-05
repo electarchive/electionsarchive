@@ -1442,6 +1442,62 @@ publisher = "Nueces County Clerk"
 url = "https://results.enr.clarityelections.com/TX/Nueces/127557/"
 
 [[feed]]
+id = "us.clarity_live.orange_fl"
+adapter = "us.clarity_live"
+interval = 180
+note = "Florida's state site has no county races, so Orange County's mayor and commissioners come from the county Supervisor of Elections' own results."
+params = { state = "FL", tenant = "Orange", eid = "127356" }
+poller = "muktedir"
+publisher = "Orange County Supervisor of Elections"
+url = "https://results.enr.clarityelections.com/FL/Orange/127356/"
+
+[[feed]]
+id = "us.county_live.st_lucie"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Port St. Lucie's mayor comes from the St. Lucie County Supervisor of Elections' results page."
+params = { kind = "electionsfl", state = "FL", county = "St. Lucie", url = "https://enr.electionsfl.org/STL/4089/Summary/" }
+publisher = "St. Lucie County Supervisor of Elections"
+url = "https://enr.electionsfl.org/STL/4089/Summary/"
+
+[[feed]]
+id = "us.county_live.lee"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Cape Coral's, Fort Myers's, and other Lee County city races come from the county Supervisor of Elections' results page."
+params = { kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
+publisher = "Lee County Supervisor of Elections"
+url = "https://enr.electionsfl.org/LEE/4111/Summary/"
+
+[[feed]]
+id = "us.county_live.leon"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Tallahassee's mayor and commissioners come from the Leon County Supervisor of Elections' results page."
+params = { kind = "electionsfl", state = "FL", county = "Leon", url = "https://enr.electionsfl.org/LEO/4072/Summary/" }
+publisher = "Leon County Supervisor of Elections"
+url = "https://enr.electionsfl.org/LEO/4072/Summary/"
+
+[[feed]]
+id = "us.county_live.monterey"
+adapter = "us.county_live"
+interval = 180
+note = "California's state site has no city races, so Salinas's and other Monterey County city races come from the county's election summary report. The report carries no time stamp."
+params = { kind = "summary_xml", state = "CA", county = "Monterey", url = "https://www.countyofmonterey.gov/home/showdocument?id=136040" }
+publisher = "Monterey County Elections"
+url = "https://www.countyofmonterey.gov/government/departments-a-h/elections/election-results"
+
+[[feed]]
+id = "us.county_live.montgomery_tn"
+adapter = "us.county_live"
+interval = 180
+note = "Tennessee's state site has no city races, so Clarksville's mayor and council come from the Montgomery County Election Commission's results page. The file has no precinct count for each race."
+params = { kind = "montgomery_tn", state = "TN", county = "Montgomery", url = "https://election.montgomerytn.gov/assets/data.json" }
+poller = "muktedir"
+publisher = "Montgomery County Election Commission"
+url = "https://election.montgomerytn.gov/"
+
+[[feed]]
 id = "us.webb_live"
 adapter = "us.webb_live"
 interval = 900

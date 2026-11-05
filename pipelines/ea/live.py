@@ -14,6 +14,7 @@ from ea.sources.us import (
     alameda_rov_live,
     civicapi,
     clarity_local_live,
+    county_live,
     dc_boe_live,
     enr_2026,
     guam_live,
@@ -120,6 +121,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = alameda_rov_live.collect(client)
     elif adapter == "us.clarity_live":
         pages = clarity_local_live.collect(client, params["state"], params["tenant"], params["eid"])
+    elif adapter == "us.county_live":
+        pages = county_live.collect(client, params["kind"], params["url"])
     elif adapter == "us.webb_live":
         pages = webb_live.collect(client)
     else:
@@ -169,6 +172,13 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                 conn, clarity_local_live.frame(params["state"], params["tenant"], paths), lambda _, __: None
             )
             if adapter == "us.clarity_live"
+            else enr_2026.plan(
+                conn,
+                county_live.frame(params["kind"], params["state"], params["county"], paths),
+                lambda _, __: None,
+                also=("ceda",) if params["state"] == "CA" else (),
+            )
+            if adapter == "us.county_live"
             else webb_live.plan(conn, paths)
             if adapter == "us.webb_live"
             else dc_boe_live.plan(conn, paths)

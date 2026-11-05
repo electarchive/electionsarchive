@@ -46,6 +46,8 @@ def frame(state: str, county: str, paths: dict[str, Path]) -> pl.DataFrame:
                 continue
             for choice in contest.iter("Choice"):
                 name = re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip()
+                if name.lower() in ("over votes", "under votes"):
+                    continue
                 found.append(
                     {
                         "state": state,
