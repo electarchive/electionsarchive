@@ -342,6 +342,8 @@ def main() -> None:
             for loaded in [loaded for name, loaded in sys.modules.items() if name.startswith("ea.sources.")]:
                 if isinstance(source := getattr(loaded, "SOURCE", None), str):
                     raw.parsed(source)
+            if step == "parse":
+                raw.atomic_parquet()
             result = getattr(module, step)()
             if result is not None:
                 print(result)

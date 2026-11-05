@@ -256,6 +256,27 @@ def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None 
     return _artifact(source, key, entry)
 
 
+def atomic_parquet() -> None:
+    """Make every path-targeted DataFrame.write_parquet in this process replace its file only once fully written."""
+    import polars as pl
+
+    write = pl.DataFrame.write_parquet
+
+    def replace(frame, file, **options) -> None:
+        if not isinstance(file, str | Path) or options.get("partition_by") is not None:
+            write(frame, file, **options)
+            return
+        target = Path(file)
+        temporary = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+        try:
+            write(frame, temporary, **options)
+            temporary.replace(target)
+        finally:
+            temporary.unlink(missing_ok=True)
+
+    pl.DataFrame.write_parquet = replace  # ty: ignore[invalid-assignment]
+
+
 def parsed(source: str) -> Path:
     """Return the source's parse output folder, copying it down from the remote store when the cache lacks it."""
     folder = DATA / "parsed" / source
