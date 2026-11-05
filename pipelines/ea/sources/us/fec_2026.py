@@ -414,6 +414,14 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 NV_PETITIONED = {"Danielle Ford", 'Afzal "Bobby" Khan', 'Steven "Chap" St John', "William Johnson"}
+NV_NOTA_OFFICES = {
+    "governor",
+    "lieutenant-governor",
+    "attorney-general",
+    "secretary-of-state",
+    "treasurer",
+    "controller",
+}
 OFF_BALLOT = {("RI", "REPRESENTATIVE IN GENERAL ASSEMBLY", "59", "Barros")}
 WITHDRAWN = {
     "2026-11-03:GA:senate:47:g": (
@@ -2989,6 +2997,14 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
                     cs.add("note", entity_id=result_set, kind="context", body_md=context)
                     cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{declared}"], locator=None)
+            if state == "NV" and key.split(":", 2)[2] in NV_NOTA_OFFICES:
+                cs.add(
+                    "contest_option",
+                    id=cs.key("us.option", f"{key}:none-of-these-candidates"),
+                    contest_id=contest,
+                    kind="none_of_the_above",
+                    ballot_label="None of These Candidates",
+                )
             reason = (
                 WITHDRAWN[key][1]
                 if key in WITHDRAWN
