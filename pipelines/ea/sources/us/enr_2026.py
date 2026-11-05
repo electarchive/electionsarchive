@@ -727,7 +727,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         if election is None:
             print("PA: no general election id")
         for office in PA_OFFICES if election else ():
-            url = f"{PA_API}GetOfficeData?officeId={office}&methodName=GetOfficeData&{election}"
+            url = f"{PA_API}GetOfficeData?officeId={office}&methodName=GetOfficeDetails&{election}"
             content = get(client, url)
             if not content or content == b'""':
                 continue
