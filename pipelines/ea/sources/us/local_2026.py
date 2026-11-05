@@ -8804,7 +8804,7 @@ def parse() -> None:
     for (county, contest), group in (
         filings.with_columns(pl.Series("Contest", contests, dtype=pl.String))
         .filter(pl.col("Contest").is_not_null())
-        .group_by("County", "Contest")
+        .group_by("County", "Contest", maintain_order=True)
     ):
         if (
             str(contest) not in schools
@@ -12354,6 +12354,10 @@ def parse() -> None:
             .then(pl.col("person").str.replace_all("-", ""))
             .otherwise(pl.col("person"))
         )
+        .filter(
+            (pl.col("fips") != "KY")
+            | (pl.col("person").str.len_chars() == pl.col("person").str.len_chars().max().over("tail", "twin"))
+        )
         .unique(["tail", "twin"], keep="first", maintain_order=True)
         .drop("twin")
         .with_columns(
@@ -12550,7 +12554,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                join external_id ex on ex.entity_id = el.id and ex.scheme = 'us.election'
                join changeset pc on pc.id = co.changeset_id and pc.pipeline not in ('us.fl_primary_2026', 'us.ga_boe_2026')
                where x.scheme = 'us.contest' and regexp_replace(x.value, '^[0-9-]+:', '') = any(%s) and el.date_from < %s
-               order by x.value, el.date_from desc""",
+               order by x.value, el.date_from desc, ex.value""",
             [tails, DAY],
         ).fetchall():
             if row[0] not in templates or row[12] > templates[row[0]][12]:
@@ -13011,7 +13015,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             if scope not in elections:
                 held = conn.execute(
                     "select x.value from slug s join external_id x on x.entity_id = s.entity_id and x.scheme = 'us.election'"
-                    " where s.path = %s",
+                    " where s.path = %s order by x.value",
                     [home],
                 ).fetchone()
                 if held is not None and held[0] != f"{DAY}:{scope}":
