@@ -4,6 +4,7 @@
 >
   import type { Snippet } from "svelte";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
+  import { computeCommandScore } from "bits-ui";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
@@ -40,13 +41,42 @@
     onValueChange?: (value: string | null) => void;
   } = $props();
 
+  const WINDOW = 40;
+
   let open = $state(false);
+  let query = $state("");
+  let shown = $state(WINDOW);
 
   const narrow = $derived(isNarrowLayout());
   const selected = $derived(items.find((item) => item.value === value));
+  const needle = $derived(query.trim());
+  const matches = $derived.by(() => {
+    if (needle === "") {
+      return items;
+    }
+    const scored = items.flatMap((item) => {
+      const score = computeCommandScore(item.value, needle, [
+        item.label,
+        ...(item.detail == null ? [] : [item.detail]),
+        ...(item.keywords ?? []),
+      ]);
+      return score > 0 ? [{ item, score }] : [];
+    });
+    return scored.toSorted((a, b) => b.score - a.score).map(({ item }) => item);
+  });
+  const lifted = $derived(
+    needle === "" && selected != null && items.indexOf(selected) >= WINDOW
+      ? selected
+      : null,
+  );
   const groups = $derived.by(() => {
-    const grouped = new Map<string, Array<Item>>();
-    for (const item of items) {
+    const grouped = new Map<string, Array<Item>>(
+      lifted == null ? [] : [["", [lifted]]],
+    );
+    for (const item of matches.slice(0, shown)) {
+      if (item === lifted) {
+        continue;
+      }
       const group = grouped.get(item.group ?? "");
       if (group == null) {
         grouped.set(item.group ?? "", [item]);
@@ -56,6 +86,29 @@
     }
     return [...grouped];
   });
+
+  const reset = (isOpen: boolean) => {
+    if (isOpen) {
+      query = "";
+      shown = WINDOW;
+    }
+  };
+
+  const growAtEnd = (end: HTMLElement) => {
+    void shown;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting === true) {
+          shown += WINDOW;
+        }
+      },
+      { root: end.closest('[data-slot="command-list"]'), rootMargin: "240px" },
+    );
+    observer.observe(end);
+    return () => {
+      observer.disconnect();
+    };
+  };
 </script>
 
 {#snippet field(props: Record<string, unknown>)}
@@ -85,8 +138,22 @@
 {/snippet}
 
 {#snippet picker()}
-  <Command.Root value={value ?? ""} loop disableInitialScroll>
-    <Command.Input placeholder={search} />
+  <Command.Root
+    value={value ?? ""}
+    loop
+    disableInitialScroll
+    shouldFilter={false}
+  >
+    <Command.Input
+      placeholder={search}
+      bind:value={
+        () => query,
+        (next) => {
+          query = next;
+          shown = WINDOW;
+        }
+      }
+    />
     <Command.List
       class="in-data-[slot=drawer-content]:max-h-[60dvh]"
       {@attach (list) => {
@@ -105,11 +172,6 @@
           {#each entries as item (item.value)}
             <Command.Item
               value={item.value}
-              keywords={[
-                item.label,
-                ...(item.detail == null ? [] : [item.detail]),
-                ...(item.keywords ?? []),
-              ]}
               data-checked={item.value === value}
               onSelect={() => {
                 value = clearable && value === item.value ? null : item.value;
@@ -133,12 +195,15 @@
           {/each}
         </Command.Group>
       {/each}
+      {#if shown < matches.length}
+        <div aria-hidden="true" class="h-px" {@attach growAtEnd}></div>
+      {/if}
     </Command.List>
   </Command.Root>
 {/snippet}
 
 {#if narrow}
-  <Drawer.Root bind:open>
+  <Drawer.Root bind:open onOpenChange={reset}>
     <Drawer.Trigger>
       {#snippet child({ props })}
         {@render (trigger ?? field)(props)}
@@ -154,7 +219,7 @@
     </Drawer.Content>
   </Drawer.Root>
 {:else}
-  <Popover.Root bind:open>
+  <Popover.Root bind:open onOpenChange={reset}>
     <Popover.Trigger>
       {#snippet child({ props })}
         {@render (trigger ?? field)(props)}
