@@ -1465,7 +1465,9 @@ def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float
                     [i for i in row["ids"] if UUID.fullmatch(i)],
                 )
                 for row in coverage.registry()
-                if row["polity"] == "us" and row["grain"] in ("results", "county", "precinct")
+                if row["polity"] == "us"
+                and row["grain"] in ("results", "county", "precinct")
+                and (not row["ids"] or any(UUID.fullmatch(i) for i in row["ids"]))
             ],
         )
         gaps = [list(row) for row in conn.execute(coverage.GAPS_SQL)]

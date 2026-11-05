@@ -6,7 +6,7 @@
   import { numbers, percent } from "#lib/format.js";
   import { hatch, ink, swing } from "#lib/live/flips.js";
   import { pointAt } from "#lib/live/hover.js";
-  import { breakdown, odds } from "#lib/live/nation.js";
+  import { breakdown, isSettled, odds, seatsOf } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -83,28 +83,14 @@
   const rows = $derived(view.size > 200 ? 5 : view.size > 60 ? 2 : 1);
   const columns = $derived(Math.ceil(cells.length / rows));
 
-  const leftSeats = $derived(
-    view.tallies.left.won +
-      view.tallies.left.projected +
-      view.tallies.left.ahead +
-      view.tallies.left.holdover,
-  );
-  const rightSeats = $derived(
-    view.tallies.right.won +
-      view.tallies.right.projected +
-      view.tallies.right.ahead +
-      view.tallies.right.holdover,
-  );
+  const leftSeats = $derived(seatsOf(view.tallies.left));
+  const rightSeats = $derived(seatsOf(view.tallies.right));
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
   const changing = $derived(swing(view.order.map((seat) => seat.shift)));
   const families = $derived([
     { family: left, tally: view.tallies.left },
     { family: right, tally: view.tallies.right },
-    ...(view.tallies.other.won +
-      view.tallies.other.projected +
-      view.tallies.other.ahead +
-      view.tallies.other.holdover >
-    0
+    ...(seatsOf(view.tallies.other) > 0
       ? [{ family: others, tally: view.tallies.other }]
       : []),
   ]);
@@ -133,10 +119,7 @@
         seat.rating !== "counting" &&
         seat.rating !== "waiting" &&
         seat.rating !== "later",
-    ) &&
-      !view.order.every(
-        (seat) => seat.rating === "won" || seat.rating === "projected",
-      ),
+    ) && !view.order.every((seat) => isSettled(seat.rating)),
   );
 
   function look(seat: Seat): { fill: string; stripes?: string } {

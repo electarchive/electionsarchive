@@ -61,7 +61,8 @@
           {#each row.balance.groups as group (party(group.option))}
             <span
               class="transition-[inline-size] duration-700 motion-reduce:transition-none"
-              style:inline-size="{(group.won / row.seats) * 100}%"
+              style:inline-size="{((group.won + group.unopposed) / row.seats) *
+                100}%"
               style:background-color={tone(group.option)}
             ></span>
             <span

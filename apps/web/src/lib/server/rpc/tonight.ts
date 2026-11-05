@@ -13,7 +13,14 @@ import { control } from "#lib/server/live-board.js";
 import { live } from "#lib/server/rpc/live.js";
 
 const OFFICES = ["senate", "house", "governor", "other"] as const;
-const STATUSES = ["won", "called", "counting", "waiting", "no_feed"] as const;
+const STATUSES = [
+  "won",
+  "called",
+  "unopposed",
+  "counting",
+  "waiting",
+  "no_feed",
+] as const;
 
 type Status = (typeof STATUSES)[number];
 
@@ -76,6 +83,9 @@ function status(summary: Summary): Status {
   if (summary.projected != null) {
     return "called";
   }
+  if (summary.unopposed != null) {
+    return "unopposed";
+  }
   if (summary.total > 0) {
     return "counting";
   }
@@ -107,7 +117,6 @@ function describe(
     .toSorted((a, b) => b.votes - a.votes);
   const name = (id: string | null) =>
     id == null ? null : (pairing?.find((side) => side.id === id)?.short ?? id);
-  const called = summary.winner ?? summary.projected;
   return {
     path: race.slug,
     title: race.title,
@@ -134,7 +143,7 @@ function describe(
         isIncumbent: option.isIncumbent,
       })),
     margin: total > 0 ? round(summary.margin) : null,
-    winner: called?.label ?? null,
+    winner: summary.settled?.label ?? null,
     calledAt: summary.winner == null ? summary.projectedAt : null,
     favorite: summary.favorite?.label ?? null,
     chance: summary.chance == null ? null : round(summary.chance, 3),
@@ -228,6 +237,7 @@ export const tonight = {
                   party: name,
                   won: view.tallies[side].won,
                   called: view.tallies[side].projected,
+                  unopposed: view.tallies[side].unopposed,
                   ahead: view.tallies[side].ahead,
                   notUp: view.tallies[side].holdover,
                   gains: view.tallies[side].gains,

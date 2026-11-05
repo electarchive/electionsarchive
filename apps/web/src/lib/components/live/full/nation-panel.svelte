@@ -10,7 +10,7 @@
   import { numbers, percent } from "#lib/format.js";
   import { DOTS } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { breakdown, odds } from "#lib/live/nation.js";
+  import { breakdown, isSettled, odds, seatsOf } from "#lib/live/nation.js";
   import { closing, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { marginShade, safety } from "#lib/shade.js";
@@ -94,9 +94,7 @@
           seat.rating !== "waiting" &&
           seat.rating !== "later",
       ) &&
-      !view.order.every(
-        (seat) => seat.rating === "won" || seat.rating === "projected",
-      ),
+      !view.order.every((seat) => isSettled(seat.rating)),
   );
   const span = $derived.by(() => {
     if (view == null) {
@@ -129,8 +127,7 @@
       seat.rating === "waiting" ||
       seat.rating === "counting" ||
       seat.rating === "later" ||
-      seat.rating === "won" ||
-      seat.rating === "projected"
+      isSettled(seat.rating)
     ) {
       return null;
     }
@@ -178,7 +175,11 @@
     const { left, right, other } = view.tallies;
     const size = view.size;
     const parts = [
-      { key: "lw", count: left.won + left.projected, color: pair[0].color },
+      {
+        key: "lw",
+        count: left.won + left.projected + left.unopposed,
+        color: pair[0].color,
+      },
       {
         key: "la",
         count: left.ahead,
@@ -192,7 +193,7 @@
       },
       {
         key: "o",
-        count: other.won + other.projected + other.ahead + other.holdover,
+        count: seatsOf(other),
         color: marginShade("var(--muted-foreground)", safety(0.55)),
       },
       { key: "w", count: view.waiting + view.later, color: WAITING },
@@ -207,14 +208,18 @@
         count: right.ahead,
         color: marginShade(pair[1].color, safety(0.55)),
       },
-      { key: "rw", count: right.won + right.projected, color: pair[1].color },
+      {
+        key: "rw",
+        count: right.won + right.projected + right.unopposed,
+        color: pair[1].color,
+      },
     ];
     return {
       parts: parts
         .filter((part) => part.count > 0)
         .map((part) => ({ ...part, share: part.count / size })),
-      left: left.won + left.projected + left.ahead + left.holdover,
-      right: right.won + right.projected + right.ahead + right.holdover,
+      left: seatsOf(left),
+      right: seatsOf(right),
       majority: view.majority / size,
     };
   });

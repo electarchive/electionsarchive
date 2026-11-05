@@ -69,7 +69,9 @@
   >
     {#each view.order as seat, index (seat.summary.race.id)}
       {const isStrong = $derived(
-        ["won", "projected", "solid", "likely"].includes(seat.rating) &&
+        ["won", "projected", "unopposed", "solid", "likely"].includes(
+          seat.rating,
+        ) &&
           seat.side != null &&
           seat.shift?.flip !== "leading",
       )}

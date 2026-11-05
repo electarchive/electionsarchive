@@ -19,6 +19,9 @@
   } = $props();
 
   const badge = $derived.by(() => {
+    if (band.isUnopposed) {
+      return m.night_state_unopposed();
+    }
     if (band.isProjected) {
       return isMeasure
         ? m.night_band_projected_answer()
@@ -39,13 +42,14 @@
       "inline-flex items-center gap-1.5 rounded-full py-0.5 ps-1.5 pe-2.5 font-semibold",
       {
         "border border-dashed border-current": band.isProjected,
-        "bg-foreground text-background": !band.isProjected,
+        "border border-current ps-2.5": band.isUnopposed,
+        "bg-foreground text-background": !band.isProjected && !band.isUnopposed,
       },
     )}
   >
     {#if band.isProjected}
       <CircleDashedCheckIcon class="block-4 inline-4" aria-hidden="true" />
-    {:else}
+    {:else if !band.isUnopposed}
       <CircleCheckIcon class="block-4 inline-4" aria-hidden="true" />
     {/if}
     {badge}

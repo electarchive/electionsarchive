@@ -12,7 +12,7 @@
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
-  import { bandOf, describe } from "#lib/live/summary.js";
+  import { bandOf, describe, isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import { prior } from "./model.js";
@@ -245,7 +245,7 @@
     </ol>
     <Also rest={split.rest} total={summary.total} />
 
-    <div class="grid gap-1.5">
+    <div class={cn("grid gap-1.5", { hidden: isUncounted(summary) })}>
       <div
         class="relative overflow-hidden rounded-xs bg-muted block-1"
         aria-hidden="true"

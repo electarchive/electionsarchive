@@ -71,7 +71,10 @@ export type LiveRace = {
   isSpecial?: boolean;
   needsMajority?: boolean;
   rule?: LiveRule | null;
+  unopposed?: LiveUnopposed | null;
 };
+
+export type LiveUnopposed = { options: Array<string>; isTacit: boolean };
 
 export type LiveRule = {
   majority: { share: number; strict: boolean } | null;

@@ -186,7 +186,7 @@ export function shade(
   if (mark != null) {
     return mark.fill;
   }
-  const called = summary.winner ?? summary.projected;
+  const called = summary.settled;
   if (entry == null || paint === "lead") {
     const option = called ?? summary.leader;
     if (option == null) {
@@ -234,7 +234,7 @@ export function stateShade(
     }
     const groups = new Map<string, { option: LiveOption; seats: number }>();
     for (const summary of races) {
-      const option = summary.winner ?? summary.projected ?? summary.leader;
+      const option = summary.settled ?? summary.leader;
       if (option == null) {
         continue;
       }
@@ -429,7 +429,7 @@ export function urgency(summary: Summary, closes: number) {
   if (summary.later != null) {
     return [4, 0];
   }
-  const called = summary.winner ?? summary.projected;
+  const called = summary.settled;
   if (summary.total > 0 && called == null) {
     return [0, summary.margin];
   }

@@ -289,9 +289,7 @@
 
   function brief(summary: Summary) {
     const ahead =
-      summary.winner ??
-      summary.projected ??
-      (summary.total > 0 ? summary.leader : null);
+      summary.settled ?? (summary.total > 0 ? summary.leader : null);
     if (ahead == null) {
       const held = describe(summary).held;
       return {
@@ -313,7 +311,7 @@
   }
 
   function look(summary: Summary) {
-    const called = summary.winner ?? summary.projected;
+    const called = summary.settled;
     const ahead = called ?? (summary.total > 0 ? summary.leader : null);
     if (ahead == null) {
       const hue = describe(summary).held?.color ?? "var(--muted-foreground)";

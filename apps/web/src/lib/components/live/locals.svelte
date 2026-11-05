@@ -16,6 +16,7 @@
     sides,
     tokenize,
   } from "#lib/live/local.js";
+  import { isUncounted } from "#lib/live/summary.js";
   import { clears, line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -148,6 +149,9 @@
         };
       }
       return null;
+    }
+    if (summary.unopposed != null) {
+      return { text: m.night_state_unopposed(), isFinal: true, isYes: null };
     }
     return summary.winner == null
       ? null
@@ -448,7 +452,7 @@
                   <span
                     class="flex flex-wrap gap-x-3 font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
                   >
-                    <span
+                    <span class={cn({ hidden: isUncounted(summary) })}
                       >{summary.later != null
                         ? m.night_later()
                         : summary.counted == null || summary.total === 0

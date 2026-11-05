@@ -2,7 +2,8 @@
   import type { LiveOffice } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { ahead, called, short, strength } from "#lib/live/board/labels.js";
-  import { lead, surname } from "#lib/live/format.js";
+  import { surname } from "#lib/live/format.js";
+  import { edge } from "#lib/live/summary.js";
   import { cn } from "#lib/utils.js";
 
   const { desk, office = "senate" }: { desk: Desk; office?: LiveOffice } =
@@ -24,7 +25,7 @@
     const option = ahead(summary);
     return option == null
       ? short(summary.race)
-      : `${short(summary.race)}: ${surname(option)} +${lead(summary.margin)}`;
+      : `${short(summary.race)}: ${surname(option)} ${edge(summary)}`;
   }
 </script>
 

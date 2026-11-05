@@ -31,6 +31,7 @@ import {
   geography as shaped,
 } from "#lib/server/live-board.js";
 import { estimates } from "#lib/server/live-estimates.js";
+import { unopposed } from "#lib/server/live-unopposed.js";
 import { localizeNames } from "#lib/server/names.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
@@ -1125,7 +1126,7 @@ async function night(
   const [
     frames,
     declined,
-    { choices, incumbents, settled, prior, drawn, placed },
+    { choices, incumbents, settled, prior, drawn, placed, lone },
     feeds,
     polities,
   ] = await Promise.all([
@@ -1138,9 +1139,11 @@ async function night(
       publisher: string;
       url: string | null;
       isHeadline: boolean;
+      headlineByUnit: boolean;
     }>(sql`
       with latest as (
-        select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter,
+        select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter, o.reporting, o.expected,
+          min(o.as_of) over (partition by o.feed_id, o.contest_id) as started,
           exists (
             select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
               and x.fetched_at > now() - interval '20 minutes'
@@ -1149,7 +1152,7 @@ async function night(
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
       ), ranked as (
-        select l.feed_id, l.contest_id, l.adapter, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
+        select l.feed_id, l.contest_id, l.adapter, l.reporting, l.expected, l.started, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
           t.votes >= 0.97 * max(t.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
         from latest l cross join lateral (
           select sum(v.votes) filter (where x.kind <> 'none_of_the_above') as votes,
@@ -1160,20 +1163,40 @@ async function night(
         ) t
       )
       , headline as (
-        select distinct on (w.contest_id) w.contest_id, w.feed_id
+        select distinct on (w.contest_id) w.contest_id, w.feed_id, w.split
         from ranked w
-        where w.fresh and w.complete and not w.split
-          and exists (
-            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-          )
-          and not exists (
-            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-              and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
+        where w.complete
+          and (
+            (
+              w.fresh
+              and not w.split
+              and exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+              )
+              and not exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+                  and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
+                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+              )
+            )
+            or (
+              exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
+                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
+                  and c.started > w.started + interval '12 hours'
+                  and coalesce(w.reporting >= 0.9 * w.expected, true)
+              )
+              and not exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
+                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
+                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+              )
+            )
           )
         order by w.contest_id, ${tier(sql.raw("w.adapter"))}
       )
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
-        f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline"
+        f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline", coalesce(h.split, false) as "headlineByUnit"
       from live.frame f join live.feed d on d.id = f.feed_id
       left join headline h on h.contest_id = f.contest_id and h.feed_id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
@@ -1210,9 +1233,9 @@ async function night(
       order by t.contest, t.option, t.as_of desc, t.k desc
     `),
     remember(
-      `live:fixed:v4:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
+      `live:fixed:v5:${found.path}|${found.rest}|${detail}${slot}|${roster}`,
       async () => {
-        const [choices, incumbents, settled, prior, drawn, placed] =
+        const [choices, incumbents, settled, prior, drawn, placed, lone] =
           await Promise.all([
             options(contests, found.date),
             db.execute<{ option: string }>(sql`
@@ -1229,8 +1252,10 @@ async function night(
                   detail === "race" || found.path.split("/").length > 3,
                 ),
             jurisdictions(contests),
+            unopposed(contests),
           ]);
         return {
+          lone,
           choices,
           incumbents: incumbents.rows,
           settled,
@@ -1414,7 +1439,7 @@ async function night(
           expected: (lead ?? frame).expected,
         });
       }
-      if (frame.isHeadline) {
+      if (frame.isHeadline && !frame.headlineByUnit) {
         continue;
       }
       place = frame;
@@ -1644,6 +1669,7 @@ async function night(
           : { name: titles.full.get(where.polity) ?? "", kind },
       seats: where?.seats ?? 1,
       rule: rule(where?.rules),
+      unopposed: lone.get(row.id) ?? null,
       isSpecial: where?.special === true,
       needsMajority: where?.majority === true,
       isMeasure:

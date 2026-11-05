@@ -3985,7 +3985,7 @@ def emit() -> Path:
         rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS, "SC": SC_DAYS, "AL": AL_DAYS}
         later = {(state, first, day) for state, days in rounds.items() for day, first in days.items() if first}
         contests = {
-            group: rows.sort(["votes", "choice"], descending=[True, False])
+            group: rows.sort(["votes", "choice"], descending=[True, False]).to_dict(as_series=False)
             for group, rows in lines.group_by("state", "day", "office", "code", "party", "choice", "writein")
             .agg(
                 pl.col("label").drop_nulls().first(),
@@ -4006,6 +4006,14 @@ def emit() -> Path:
             .unique()
             .iter_rows()
         }
+        stems: dict[str, str] = {}
+        for value in sorted(keys):
+            stems.setdefault(value, value)
+            for at in range(len(value) - 1, -1, -1):
+                if not (value[at].isalnum() or value[at] == "_"):
+                    break
+                if value[at] == "f":
+                    stems.setdefault(value[:at], value)
         persons: dict[str, UUID] = {}
         options: dict[tuple[str, date, str, str | None, str, str], UUID] = {}
         sets: dict[tuple[str, date, str, str | None, str], UUID] = {}
@@ -4022,15 +4030,18 @@ def emit() -> Path:
             _, word, etype, label = PARTIES[party]
             if code is not None:
                 base = f"{day}:{state}:{office}:{code}:{etype}" + ("runoff" if first else "")
-                taken = re.compile(rf"{re.escape(base)}(f\w*)?")
+                taken = base in stems
             else:
                 base = f"{day}:{state}:{office}" + (f":{word}" if word else "")
-                taken = re.compile(re.escape(base))
-            if any(taken.fullmatch(value) for value in keys):
+                taken = base in keys
+            if taken:
                 skipped += 1
                 continue
             bases.add(base)
-            empty = bool(rows.filter(~pl.col("writein")).height) and rows["votes"].sum() == 0
+            ranked = [at for at, writein in enumerate(rows["writein"]) if writein is False]
+            withheld = max((count for count in rows["withheld"] if count is not None), default=None)
+            total = sum(rows["votes"])
+            empty = bool(ranked) and total == 0
             old = published.get(f"{base}:precinct")
             if empty and old is None:
                 continue
@@ -4044,19 +4055,12 @@ def emit() -> Path:
                         if code is not None
                         else f"{first}:{state}:{office}:{word}"
                     )
-                    previous = next(
-                        (
-                            cs.key("us.contest", value)
-                            for value in sorted(keys)
-                            if re.fullmatch(rf"{re.escape(prior)}(f\w*)?", value)
-                        ),
-                        None,
-                    )
+                    previous = cs.key("us.contest", stems[prior]) if prior in stems else None
             kind = "runoff" if first else "primary"
             stage = f"{'nonpartisan' if state in ('NC', 'NV') and party == '' else label} primary" + (
                 " runoff" if first else ""
             )
-            magnitude: int = rows.select(pl.col("seats").fill_null(1).max()).item()
+            magnitude: int = max(1 if seats is None else seats for seats in rows["seats"])
             district, _, post = (code or "").partition(":")
             remainder = (state == "WA" and day.year % 2 == 1) or (
                 state == "IL" and office == "comptroller" and day.year == 2016
@@ -4171,8 +4175,6 @@ def emit() -> Path:
                 if empty:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
             threshold = 50 if state in ("TX", "FL", "SC", "AL") else 40 if day.year < 2018 else 30
-            total = rows["votes"].sum()
-            ranked = rows.filter(~pl.col("writein"))
             nominated: dict[str, bool] = {}
             shared = [
                 (words[0][0], slug(words[-1]))
@@ -4189,7 +4191,7 @@ def emit() -> Path:
                 )
                 if words
             ]
-            for choice, writein, preference in rows.select("choice", "writein", "label").iter_rows():
+            for choice, writein, preference in zip(rows["choice"], rows["writein"], rows["label"], strict=True):
                 if writein:
                     option = cs.key("us.option", f"{base}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
@@ -4260,8 +4262,8 @@ def emit() -> Path:
                         )
             if empty:
                 continue
-            tallies = ranked["votes"].to_list()
-            names = ranked["choice"].to_list()
+            tallies = [rows["votes"][at] for at in ranked]
+            names = [rows["choice"][at] for at in ranked]
             wins: list[tuple[str, str, str]] = []
             if party == "":
                 if len(tallies) <= 2 or (tallies[1] - tallies[2]) * 100 > total:
@@ -4288,7 +4290,7 @@ def emit() -> Path:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
                     magnitude
-                ] > (rows["withheld"].max() or 0):
+                ] > (withheld or 0):
                     wins = [(choice, "won", WON_LEAD) for choice in names[:magnitude]]
                 elif (
                     tallies[magnitude - 1] > tallies[magnitude]
@@ -4303,14 +4305,9 @@ def emit() -> Path:
                         for later_day in rounds[state]
                     )
                     or any(
-                        re.fullmatch(
-                            rf"{later_day}:{state}:{office}:"
-                            + (f"{code}:{etype}runoff" if code is not None else str(word)),
-                            value,
-                        )
+                        f"{later_day}:{state}:{office}:{f'{code}:{etype}runoff' if code is not None else word}" in keys
                         for later_day in rounds[state]
                         if (state, day, later_day) in later
-                        for value in keys
                     )
                 )
                 clear = len(tallies) == 1 or (tallies[0] - tallies[1]) * 100 > total
@@ -4334,7 +4331,7 @@ def emit() -> Path:
             wanted = {
                 (options[(state, day, office, code, party, choice)], kind, None, notes) for choice, kind, notes in wins
             }
-            if state == "NY" and not parted and ranked.is_empty() and base not in UNDECLARED:
+            if state == "NY" and not parted and not tallies and base not in UNDECLARED:
                 revision = 1
                 while f"{base}:parts:{revision + 1}" in published:
                     revision += 1
@@ -4471,12 +4468,12 @@ def emit() -> Path:
                 + " "
                 + RECOUNT,
             )
-            if rows["withheld"].max():
+            if withheld:
                 cs.add(
                     "note",
                     entity_id=result_set,
                     kind="caveat",
-                    body_md=WITHHELD.format(ballots=rows["withheld"].max()),
+                    body_md=WITHHELD.format(ballots=withheld),
                 )
             if base in UNDECLARED:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=UNDECLARED[base])

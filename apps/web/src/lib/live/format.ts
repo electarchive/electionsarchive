@@ -19,13 +19,19 @@ export function tone(option: LiveOption | undefined) {
   );
 }
 
-export type Band = { ids: Array<string>; isProjected: boolean; fill: string };
+export type Band = {
+  ids: Array<string>;
+  isProjected: boolean;
+  isUnopposed: boolean;
+  fill: string;
+};
 
 export function bandFor(
   options: Array<LiveOption>,
   ids: Array<string>,
   seats: number,
   isProjected: boolean,
+  isUnopposed = false,
 ): Band | null {
   if (ids.length === 0) {
     return null;
@@ -37,6 +43,7 @@ export function bandFor(
   return {
     ids,
     isProjected,
+    isUnopposed,
     fill: fill == null || isNeutral(fill) ? "var(--marker)" : fill,
   };
 }
