@@ -97,8 +97,8 @@
   const growAtEnd = (end: HTMLElement) => {
     void shown;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting === true) {
+      (entries) => {
+        if (entries.at(-1)?.isIntersecting === true) {
           shown += WINDOW;
         }
       },

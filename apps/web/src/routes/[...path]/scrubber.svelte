@@ -27,6 +27,7 @@
     place,
     latest,
     seed,
+    recordSeed,
     isExpected,
   }: {
     id: string;
@@ -34,6 +35,7 @@
     isExpected: boolean;
     latest: { path: string | null; date: string | null } | null;
     seed: Extract<PageData, { kind: "polity" }>["polity"]["scrubber"];
+    recordSeed: Extract<PageData, { kind: "polity" }>["polity"]["record"];
   } = $props();
 
   const uid = $props.id();
@@ -75,6 +77,11 @@
         ? await client.fetchQuery(orpc.elections.states.queryOptions(input))
         : null;
     return { hub, hexes, race, states };
+  }
+  async function loadRecord() {
+    const held = await Promise.resolve(recordSeed).catch(() => null);
+    const seeded = held == null ? null : await unpack(held).catch(() => null);
+    return seeded ?? orpc.polities.record.call({ id });
   }
   const viewOptions = (path: string) =>
     queryOptions({
@@ -163,7 +170,7 @@
     steps[index] ??
       (latest?.path == null ||
       latest.date == null ||
-      (!isRecordSettled && wanted != null)
+      (!isRecordSettled && (wanted != null || isExpected))
         ? null
         : {
             path: latest.path,
@@ -266,7 +273,7 @@
       sync();
       if (!isRecordSettled) {
         client
-          .fetchQuery(recordOptions)
+          .fetchQuery(queryOptions({ ...recordOptions, queryFn: loadRecord }))
           .then(
             (data) => {
               record = data;

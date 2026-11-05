@@ -7,7 +7,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { settle } from "#lib/settle.js";
   import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
@@ -148,9 +147,8 @@
         ),
   )}
   <section
-    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-{at}"
-    {@attach settle}
   >
     {const raw = $derived(regions.data?.[at])}
     {#if raw != null}

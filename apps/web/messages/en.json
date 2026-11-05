@@ -37,6 +37,8 @@
   "polity_kind_school_district": "School districts",
   "title": "Home",
   "skip_to_content": "Skip to content",
+  "noscript_notice": "Some sections and long lists on this page need JavaScript.",
+  "noscript_twin": "Read this page as Markdown",
   "wordmark": "Elections Archive",
   "beta_label": "Beta",
   "beta_definition": "The archive is still being filled in. Pages and numbers can change.",

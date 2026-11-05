@@ -213,6 +213,19 @@
           >{m.skip_to_content()}</a
         >
         <div>
+          <noscript>
+            <p
+              class="hidden border-be border-border bg-card px-3.5 py-2 text-[0.8125rem] [body:has(.island-shell,[data-needs-script])_&]:block"
+            >
+              {m.noscript_notice()}
+              <a
+                class="font-semibold underline"
+                href={resolve("/[...path]", {
+                  path: `${page.url.pathname.slice(1)}.md`,
+                })}>{m.noscript_twin()}</a
+              >
+            </p>
+          </noscript>
           <LanguageBanner />
           <Header />
         </div>

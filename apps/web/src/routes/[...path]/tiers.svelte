@@ -5,7 +5,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { settle } from "#lib/settle.js";
   import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
@@ -332,9 +331,8 @@
 {#if places.length > 0}
   <section
     id="down-the-ballot"
-    class="col-span-12 grid scroll-mbs-4 grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-3.5 pbe-4 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+    class="col-span-12 grid scroll-mbs-4 grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-3.5 pbe-4"
     aria-labelledby="{uid}-title"
-    {@attach settle}
   >
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">

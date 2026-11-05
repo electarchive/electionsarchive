@@ -8,7 +8,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
-  import { reveal } from "#lib/settle.js";
+  import { reveal } from "#lib/reveal.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 

@@ -3356,7 +3356,10 @@
     >
       {#each boarded as other (other.anchor)}
         <li
-          class="grid content-start gap-3 border-bs border-border py-4 [contain-intrinsic-size:auto_9rem] [content-visibility:auto] lg:border-bs-0 lg:[contain-intrinsic-size:auto_12rem] max-lg:first:border-bs-0"
+          class={cn(
+            "grid content-start gap-3 border-bs border-border py-4 [contain-intrinsic-size:auto_9rem] lg:border-bs-0 lg:[contain-intrinsic-size:auto_12rem] max-lg:first:border-bs-0",
+            { "[content-visibility:auto]": listing.isOpen },
+          )}
         >
           <div class="grid content-start gap-1">
             <h3
@@ -3411,7 +3414,8 @@
     {#if !listing.isOpen && (boarded.length < others.length || pending != null)}
       <button
         type="button"
-        class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+        data-needs-script
+        class="mbe-4 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary [@media(scripting:none)]:hidden"
         onpointerenter={prefetch}
         onfocus={prefetch}
         onclick={(event) => {

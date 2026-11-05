@@ -7,7 +7,7 @@
   import { count as figure, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { reveal, settle } from "#lib/settle.js";
+  import { reveal } from "#lib/reveal.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import { runs } from "./runs.js";
@@ -62,9 +62,8 @@
 
 <section
   id="rounds"
-  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 [contain-intrinsic-size:auto_none] min-inline-0 data-settled:[content-visibility:auto]"
+  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
   aria-labelledby="{uid}-title"
-  {@attach settle}
 >
   <div class="grid gap-0.5">
     <h2 id="{uid}-title" class="text-lg font-bold">{m.count_table()}</h2>

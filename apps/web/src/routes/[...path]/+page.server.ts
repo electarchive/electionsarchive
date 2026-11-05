@@ -403,6 +403,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
         record.governments.length > 0
         ? record
         : null,
+      path == null ? undefined : "preload",
     ),
   };
   if (!places.isPartial) {
