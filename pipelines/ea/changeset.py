@@ -1,8 +1,9 @@
 import json
 import re
 import unicodedata
+from array import array
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from datetime import date, datetime
 from pathlib import Path
 from typing import LiteralString, cast
@@ -64,9 +65,40 @@ def bcp47(tag: str) -> str:
     return canonical
 
 
+class Ids:
+    def __init__(self, rows: Iterable[tuple[object, UUID]]) -> None:
+        keys = bytearray()
+        ids = bytearray()
+        self.ends = array("Q", [0])
+        for key, id in rows:
+            keys += str(key).encode("utf-8", "surrogatepass")
+            self.ends.append(len(keys))
+            ids += id.bytes
+        self.keys = bytes(keys)
+        self.ids = bytes(ids)
+        del keys, ids
+        self.mask = (1 << max(4, ((len(self.ends) - 1) * 2).bit_length())) - 1
+        self.slots = array("I", bytes(4 * (self.mask + 1)))
+        for row in range(1, len(self.ends)):
+            encoded = self.keys[self.ends[row - 1] : self.ends[row]]
+            slot = hash(encoded) & self.mask
+            while (held := self.slots[slot]) and self.keys[self.ends[held - 1] : self.ends[held]] != encoded:
+                slot = (slot + 1) & self.mask
+            self.slots[slot] = row
+
+    def get(self, key: str) -> UUID | None:
+        encoded = key.encode("utf-8", "surrogatepass")
+        slot = hash(encoded) & self.mask
+        while held := self.slots[slot]:
+            if self.keys[self.ends[held - 1] : self.ends[held]] == encoded:
+                return UUID(bytes=self.ids[(held - 1) * 16 : held * 16])
+            slot = (slot + 1) & self.mask
+        return None
+
+
 class Snapshot:
     def __init__(self, conn: Connection) -> None:
-        self.tables: dict[str, dict[str, UUID]] = {}
+        self.tables: dict[str, Ids] = {}
         self.survivors: dict[UUID, UUID] = {}
         self.merged: dict[str, list[str]] = {}
         for entity, into in conn.execute("select entity_id, into_id from entity_merge"):
@@ -94,9 +126,10 @@ class Snapshot:
         for (table, column, _), value in zip(constant, values, strict=True):
             self.defaults.setdefault(table, {})[column] = json.dumps(value) if isinstance(value, dict | list) else value
 
-    def table(self, conn: Connection, cache: str, query: LiteralString, params: Sequence[object]) -> dict[str, UUID]:
+    def table(self, conn: Connection, cache: str, query: LiteralString, params: Sequence[object]) -> Ids:
         if cache not in self.tables:
-            self.tables[cache] = {str(k): v for k, v in conn.execute(query, params).fetchall()}
+            with conn.cursor() as cursor:
+                self.tables[cache] = Ids(cursor.stream(query, params, size=10_000))
         return self.tables[cache]
 
 
