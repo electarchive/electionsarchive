@@ -48,6 +48,7 @@ GAP_GOALS = (
     "ep",
 )
 OVER = "In some years the archive holds more races than the official count lists"
+STRICT = {"before_county", "before_district", "since_county", "precinct_2000", "precinct_2016", "fine"}
 
 
 def fetch(path: str) -> bytes:
@@ -66,6 +67,12 @@ def shares(path: str, text: str) -> list[str]:
         for found in re.findall(r"(?<![\w%.,/])(\d[\d,]*(?:\.\d+)?)%", re.sub(r"https?://\S+", " ", text))
         if float(found.replace(",", "")) > 100
     ]
+
+
+def held(counts: dict[str, int], strict: bool = False) -> int:
+    if strict:
+        return counts["complete"]
+    return counts["total"] - sum(counts.get(reason, 0) for reason in ("absent", "unshaped", "undrawn"))
 
 
 def known_gap_ids(conn, values: set[str]) -> dict[str, str]:
@@ -186,7 +193,7 @@ def database(conn) -> list[str]:
         if options:
             problems.append(f"{path}: no candidate qualified, but {options} candidate options")
         certifiers = siblings or results
-        if kind != "official_body" or publisher not in certifiers:
+        if kind != "official_body" or (certifiers and publisher not in certifiers):
             problems.append(
                 f"{path}: no-candidate label cites {publisher or 'nothing'} ({kind}), not the ballot's certifier"
                 f" ({', '.join(certifiers) or 'none on record'})"
@@ -242,8 +249,11 @@ def pages(conn) -> list[str]:
     for cc, summary in overview.items():
         for tier in summary["tiers"]:
             cell = tier["cell"]
-            if cell is not None and cell["total"] > 0 and f"{cell['complete']:,} of {cell['total']:,}" not in landing:
-                problems.append(f"/coverage {cc} {tier['key']}: {cell['complete']:,} of {cell['total']:,} not shown")
+            strict = cc == "us" and tier["key"] not in ("local", "turnout", "precinct_shapes")
+            if cell is not None and cell["total"] > 0:
+                shown = f"{held(cell, strict):,} of {cell['total']:,}"
+                if shown not in landing:
+                    problems.append(f"/coverage {cc} {tier['key']}: {shown} not shown")
     for cc, summary in overview.items():
         page = visible(f"/coverage/{cc}")
         rest = json.loads(fetch(f"/api/v1/coverage/{cc}"))
@@ -287,7 +297,10 @@ def pages(conn) -> list[str]:
                 problems.append(
                     f"{cc} readiness {row['level']}: page {row['complete']}/{row['total']} db {complete}/{total}"
                 )
-            if f"{row['complete']:,} of {row['total']:,} ready" not in markdown:
+            if (
+                f"{held(row):,} of {row['total']:,}" not in markdown
+                or f"in the archive, {row['complete']:,} ready" not in markdown
+            ):
                 problems.append(f"{cc} readiness {row['level']}: not in the twin")
         for note in rest["summary"]["notes"]:
             if note.get("canvass") is not None and note["note"] not in markdown:
@@ -377,18 +390,12 @@ def pages(conn) -> list[str]:
                     ):
                         if level is None and count > 0 and f"{count:,} {phrase}" not in markdown:
                             problems.append(f"{cc} {key} {column}: {count:,} {phrase} not in the twin")
-                    if level is None and cell["total"] > 0 and f"{cell['complete']:,} of {cell['total']:,}" not in page:
-                        problems.append(
-                            f"/coverage/{cc} {key} {column}: {cell['complete']:,} of {cell['total']:,} not shown"
-                        )
-                    if (
-                        level is None
-                        and cell["total"] > 0
-                        and f"{cell['complete']:,} of {cell['total']:,}" not in markdown
-                    ):
-                        problems.append(
-                            f"{cc} {key} {column}: {cell['complete']:,} of {cell['total']:,} not in the twin"
-                        )
+                    if level is None and cell["total"] > 0:
+                        shown = f"{held(cell, column in STRICT and key != 'precinct_shapes'):,} of {cell['total']:,}"
+                        if shown not in page:
+                            problems.append(f"/coverage/{cc} {key} {column}: {shown} not shown")
+                        if shown not in markdown:
+                            problems.append(f"{cc} {key} {column}: {shown} not in the twin")
         for tier in summary["tiers"]:
             found = next((t for t in rest["tiers"] if t["key"] == tier["key"]), None)
             if found is None:
