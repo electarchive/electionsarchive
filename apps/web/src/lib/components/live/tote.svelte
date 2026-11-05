@@ -33,13 +33,15 @@
 
   let isOpen = $state(false);
 
-  const order = $derived<Array<number>>([
-    now.pair[0],
-    now.pair[1],
-    ...now.order.filter(
-      (index) => index !== now.pair[0] && index !== now.pair[1],
-    ),
-  ]);
+  const order = $derived<Array<number>>(
+    [
+      now.pair[0],
+      now.pair[1],
+      ...now.order.filter(
+        (index) => index !== now.pair[0] && index !== now.pair[1],
+      ),
+    ].filter((index) => options[index] != null),
+  );
   const top = $derived(order.slice(0, 2));
   const rest = $derived(order.slice(2));
   const others = $derived.by(() => {

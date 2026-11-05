@@ -6,7 +6,7 @@
   import { count, percent } from "#lib/format.js";
   import { compact, paint } from "#lib/live/format.js";
   import { ranked } from "#lib/live/standing.js";
-  import { bandOf, closing, describe } from "#lib/live/summary.js";
+  import { bandOf, closing, describe, isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -15,7 +15,8 @@
   const summary = $derived(desk.feed.summaries.get(race.id));
   const band = $derived(summary == null ? null : bandOf(summary));
   const seats = $derived(race.seats ?? 1);
-  const last = $derived(prior(race));
+  const isSilent = $derived(summary != null && isUncounted(summary));
+  const last = $derived(isSilent ? null : prior(race));
   const rows = $derived.by(() => {
     if (summary == null) {
       return [];
@@ -128,18 +129,20 @@
                   >
                 {/if}
               </span>
-              <span
-                class="font-figures text-[0.8125em] text-muted-foreground tabular-nums"
-                title={count(row.votes)}>{compact(row.votes)}</span
-              >
-              <span
-                class={cn(
-                  "text-end font-figures font-semibold tabular-nums min-inline-[3.2em]",
-                  { "text-muted-foreground": isDim },
-                )}>{summary.total > 0 ? percent(row.share, 1) : "–"}</span
-              >
+              {#if !isSilent}
+                <span
+                  class="font-figures text-[0.8125em] text-muted-foreground tabular-nums"
+                  title={count(row.votes)}>{compact(row.votes)}</span
+                >
+                <span
+                  class={cn(
+                    "text-end font-figures font-semibold tabular-nums min-inline-[3.2em]",
+                    { "text-muted-foreground": isDim },
+                  )}>{summary.total > 0 ? percent(row.share, 1) : "–"}</span
+                >
+              {/if}
             </span>
-            <span class="relative bg-muted block-1">
+            <span class={cn("relative bg-muted block-1", { hidden: isSilent })}>
               <span
                 class="absolute inset-y-0 inset-s-0 transition-[inline-size] duration-700 motion-reduce:transition-none"
                 style:inline-size="{row.share * 100}%"

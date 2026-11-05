@@ -27,7 +27,7 @@
   import { liveLinks } from "#lib/live/links.js";
   import { sides } from "#lib/live/local.js";
   import { standing, sum } from "#lib/live/standing.js";
-  import { quiet } from "#lib/live/summary.js";
+  import { quiet, seatsUnopposedHead } from "#lib/live/summary.js";
   import { line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -339,10 +339,7 @@
         : m.night_head_seats_holding(values);
     }
     if (race.unopposed != null && seats > 1) {
-      return m.night_head_seats_unopposed({
-        seats: count(seats),
-        count: count(race.unopposed.options.length),
-      });
+      return seatsUnopposedHead(seats, race.unopposed.options.length);
     }
     if (lone != null) {
       return m.night_head_unopposed({ name: loneOptions[0]?.label ?? "" });
@@ -769,7 +766,7 @@
       </section>
     {/if}
 
-    {#if !race.isMeasure}
+    {#if !race.isMeasure && !isUncounted}
       <Cycle
         path={race.slug}
         {options}

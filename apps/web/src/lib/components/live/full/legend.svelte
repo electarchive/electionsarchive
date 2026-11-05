@@ -10,6 +10,7 @@
     sides,
     bins = null,
     text = null,
+    waiting = null,
     blank,
     reach = 0.1,
     isLater = false,
@@ -18,6 +19,7 @@
     sides: Array<{ name: string; color: string }>;
     bins?: Array<{ from: number; to: number | null; safety: Safety }> | null;
     text?: string | null;
+    waiting?: string | null;
     blank: string;
     reach?: number;
     isLater?: boolean;
@@ -109,7 +111,7 @@
         style:background-color={blank}
         aria-hidden="true"
       ></span>
-      {m.livemap_legend_waiting()}
+      {waiting ?? m.livemap_legend_waiting()}
     </p>
   {:else if kind === "votes"}
     <div class="flex items-end gap-2" aria-hidden="true">

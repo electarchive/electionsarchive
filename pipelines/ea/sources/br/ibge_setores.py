@@ -121,23 +121,38 @@ def emit() -> Path:
         missing = sorted(set(frame["municipality"]) - set(municipalities))
         if missing:
             raise ValueError(f"no municipality area for IBGE codes {missing[:10]}")
-        for code, municipality, district, geom, point in frame.sort("code").iter_rows():
-            area = cs.area("br.setor", code)
-            cs.add("area", id=area, scheme_code="br.setor")
-            cs.add("area_code", area_id=area, code=code, valid_from=None)
-            cs.add("area_parent", area_id=area, parent_id=municipalities[municipality], valid_from=None)
-            cs.add(
-                "name", entity_id=area, text=f"{district} {code[-6:]}", lang="pt", kind="official", is_preferred=True
-            )
-            cs.add(
-                "area_geometry",
-                area_id=area,
-                valid_from=None,
-                valid_to=None,
-                geom=geom,
-                label_point=point,
-                quality="official",
-                source_id=source,
-            )
+        frame = frame.sort("code")
+        frame = frame.with_columns(
+            area=pl.Series([str(cs.area("br.setor", code)) for code in frame["code"]], dtype=pl.String),
+            parent=pl.col("municipality").replace_strict({code: str(id) for code, id in municipalities.items()}),
+        )
+        no_date = pl.lit(None).alias("valid_from")
+        cs.frame("area", frame.select(pl.col("area").alias("id"), pl.lit("br.setor").alias("scheme_code")))
+        cs.frame("area_code", frame.select(pl.col("area").alias("area_id"), "code", no_date))
+        cs.frame(
+            "area_parent", frame.select(pl.col("area").alias("area_id"), pl.col("parent").alias("parent_id"), no_date)
+        )
+        cs.frame(
+            "name",
+            frame.select(
+                pl.col("area").alias("entity_id"),
+                pl.concat_str("district", pl.col("code").str.slice(-6), separator=" ").alias("text"),
+                pl.lit("pt").alias("lang"),
+                pl.lit("official").alias("kind"),
+                pl.lit(True).alias("is_preferred"),
+            ),
+        )
+        cs.frame(
+            "area_geometry",
+            frame.select(
+                pl.col("area").alias("area_id"),
+                no_date,
+                pl.lit(None).alias("valid_to"),
+                "geom",
+                pl.col("label_point"),
+                pl.lit("official").alias("quality"),
+                pl.lit(str(source)).alias("source_id"),
+            ),
+        )
         cs.add("boundary_set", scheme_code="br.setor", vintage="2022", valid_from=None, valid_to=None, as_of=ELECTION)
         return cs.write()

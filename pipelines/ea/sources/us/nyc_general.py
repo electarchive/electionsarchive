@@ -3,6 +3,7 @@ import io
 import os
 import re
 import time
+from collections import defaultdict
 from datetime import date, timedelta
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -374,6 +375,20 @@ NOTE_STATE = (
 )
 
 
+def peer_candidacies(conn, year: int) -> dict[tuple[str, str, str], list[tuple[UUID, str, UUID | None]]]:
+    peers = defaultdict(list)
+    for area, office, body, contest, ballot_name, person in conn.execute(
+        """select c.district_area_id, c.office_id, c.body_id, c.id, ca.ballot_name, ca.person_id from candidacy ca
+           join contest_option o on o.id = ca.option_id and ca.role = 'head' and ca.ballot_name <> ''
+           join contest c on c.id = o.contest_id
+           join election e on e.id = c.election_id
+           where extract(year from e.date_from) = %s""",
+        [year],
+    ):
+        peers[str(area), str(office), str(body)].append((contest, ballot_name, person))
+    return peers
+
+
 def emit() -> Path:
     added_offices = set()
     frame = pl.read_parquet(PARSED / "districts.parquet")
@@ -486,6 +501,8 @@ def emit() -> Path:
                 reason="A fusion line stored as a party; its lines are separate parties",
             )
 
+        year_peers_for = None
+        year_peers = {}
         for day_text in sorted(frame["date"].unique()):
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
             day_frame = frame.filter(pl.col("date") == day_text)
@@ -537,13 +554,17 @@ def emit() -> Path:
             places = {
                 code: (area, county)
                 for code, area, county in conn.execute(
-                    """select c.code, c.area_id, u.id from area_code c
-                       join area a on a.id = c.area_id and a.scheme_code = 'us.nyc_ed'
-                       join area_parent p on p.area_id = c.area_id and p.valid @> %s::date
-                       join area_code pc on pc.area_id = p.parent_id
-                       join reporting_unit u on u.scheme_code = 'us.county' and u.code = pc.code
-                       where c.valid @> %s::date""",
+                    """with ed as materialized (
+                         select c.code, c.area_id, p.parent_id from area a
+                         join area_code c on c.area_id = a.id and c.valid @> %s::date
+                         join area_parent p on p.area_id = a.id and p.valid @> %s::date
+                         where a.scheme_code = 'us.nyc_ed'
+                       )
+                       select ed.code, ed.area_id, u.id from ed
+                       join area_code pc on pc.area_id = ed.parent_id
+                       join reporting_unit u on u.scheme_code = 'us.county' and u.code = pc.code""",
                     [day, day],
+                    prepare=False,
                 ).fetchall()
             }
             districts = (
@@ -1173,16 +1194,11 @@ def emit() -> Path:
                         clash.add(token)
                     known[token] = (option_id, person_id, option_value)
                 peers = {}
-                for ballot_name, person_id in conn.execute(
-                    """select ca.ballot_name, ca.person_id from candidacy ca
-                       join contest_option o on o.id = ca.option_id and ca.role = 'head' and ca.ballot_name <> ''
-                       join contest c on c.id = o.contest_id
-                       join election e on e.id = c.election_id
-                       where extract(year from e.date_from) = %s and c.district_area_id is not distinct from %s
-                         and c.office_id is not distinct from %s and c.body_id is not distinct from %s
-                         and c.id <> %s""",
-                    [day.year, area, office, body_id, contest],
-                ).fetchall():
+                if year_peers_for != day.year:
+                    year_peers_for, year_peers = day.year, peer_candidacies(conn, day.year)
+                for peer, ballot_name, person_id in year_peers.get((str(area), str(office), str(body_id)), ()):
+                    if peer == contest:
+                        continue
                     words = [
                         w
                         for w in re.sub(r"[^a-z ]", "", slug(ballot_name).replace("-", " ")).split()

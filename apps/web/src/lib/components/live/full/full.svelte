@@ -70,7 +70,13 @@
     sum,
     whole,
   } from "#lib/live/standing.js";
-  import { closing, describe, summarize, verdict } from "#lib/live/summary.js";
+  import {
+    closing,
+    describe,
+    isUncounted,
+    summarize,
+    verdict,
+  } from "#lib/live/summary.js";
   import { reach as arrowReach } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
@@ -1523,6 +1529,7 @@
         : [{ name: surname(option), color: tone(option) }];
     });
   });
+  const isCurrentUncounted = $derived(current != null && isUncounted(current));
   const legendKind = $derived.by(
     (): "ramp" | "counted" | "votes" | "waiting" => {
       const value = isNation && !isSpread ? paint : lens;
@@ -1552,6 +1559,11 @@
   );
   const legendText = $derived.by(() => {
     if (legendKind === "waiting") {
+      if (isCurrentUncounted) {
+        return current?.race.unopposed?.isTacit === true
+          ? m.night_unopposed_tacit()
+          : m.night_unopposed_counted();
+      }
       return m.livemap_legend_waiting_hint();
     }
     if (isNation && !isSpread) {
@@ -1742,6 +1754,8 @@
   <p class="font-semibold">{name}</p>
   {#if row == null || shown == null}
     <p class="text-xs text-muted-foreground">{m.livemap_not_here()}</p>
+  {:else if isCurrentUncounted}
+    <p class="text-xs text-muted-foreground">{m.night_unopposed_title()}</p>
   {:else}
     {@render tipLines(
       shown,
@@ -2109,6 +2123,7 @@
         {sides}
         bins={legendBins}
         text={legendText}
+        waiting={isCurrentUncounted ? m.night_unopposed_title() : null}
         blank={isNation && !isSpread ? WAITING : BLANK}
         isLater={isLaterShown}
       />
@@ -2373,7 +2388,7 @@
           />
         </Withheld>
       {/if}
-      {#if current.race.isMeasure !== true}
+      {#if current.race.isMeasure !== true && !isCurrentUncounted}
         <Cycle
           path={current.race.slug}
           options={current.race.options}
@@ -2383,18 +2398,20 @@
           estimate={forecasts ? current.estimate : null}
         />
       {/if}
-      <CountyList
-        {rows}
-        isDistrict={isDistricted(current.race.state)}
-        options={current.race.options}
-        pair={racePair}
-        selected={null}
-        onPick={(areaId: string) => {
-          pickArea(areaId);
-          canvas?.focus(areaId);
-        }}
-        onHover={(areaId: string | null) => (hovered = areaId)}
-      />
+      {#if !isCurrentUncounted}
+        <CountyList
+          {rows}
+          isDistrict={isDistricted(current.race.state)}
+          options={current.race.options}
+          pair={racePair}
+          selected={null}
+          onPick={(areaId: string) => {
+            pickArea(areaId);
+            canvas?.focus(areaId);
+          }}
+          onHover={(areaId: string | null) => (hovered = areaId)}
+        />
+      {/if}
     </div>
   {:else}
     <p class="text-sm text-muted-foreground">{m.night_nation_none()}</p>
