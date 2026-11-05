@@ -4659,6 +4659,8 @@
   "night_seo_description": "{headline}. Live-Ergebnisse nach County zu {title}, mit einer Schätzung des Endergebnisses. Aktualisiert um {time}.",
   "night_seo_description_district": "{headline}. Live-Ergebnisse nach Parlamentsdistrikt des Bundesstaats zu {title} mit einer Schätzung des Endergebnisses. Aktualisiert um {time}.",
   "night_seo_nation": "Live-Ergebnisse für jede Wahl bei {title}, nach Bundesstaat und County, mit einer Schätzung des jeweiligen Endergebnisses.",
+  "night_seo_state": "{title}: Live-Ergebnisse aller Wahlen nach County mit einer Schätzung des jeweiligen Endergebnisses.",
+  "night_seo_state_district": "{title}: Live-Ergebnisse aller Wahlen nach Parlamentsdistrikt des Bundesstaats mit einer Schätzung des jeweiligen Endergebnisses.",
   "night_seo_seats": "{headline}. Live-Zwischenstand für alle {count} Kandidaten bei {title}. Die ersten {seats} erhalten Sitze. Stand: {time}.",
   "night_seo_seats_upcoming": "{headline}. Live-Zwischenstand für alle {count} Kandidaten bei {title}. Die ersten {seats} erhalten Sitze.",
   "night_seo_title": "{title}: Live-Ergebnisse",
