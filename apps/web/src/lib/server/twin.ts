@@ -4607,10 +4607,12 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
               ...(race.reporting == null || race.expected == null
                 ? []
                 : [
-                    m.live_twin_precincts({
-                      reporting: count(race.reporting),
-                      expected: count(race.expected),
-                    }),
+                    race.expected === 10_000
+                      ? `${m.live_reporting()}: ${percent(race.reporting / race.expected)}`
+                      : m.live_twin_precincts({
+                          reporting: count(race.reporting),
+                          expected: count(race.expected),
+                        }),
                   ]),
             ]
               .map((line) => `${line}.`)

@@ -1104,7 +1104,11 @@ async function night(
           exists (
             select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
               and x.fetched_at > now() - interval '20 minutes'
-          ) as fresh
+          ) as fresh,
+          exists (
+            select from live.value v join contest_option x on x.id = v.option_id
+            where v.frame_k = o.k and x.kind = 'none_of_the_above' and v.votes > 0
+          ) as declined
         from live.frame o join live.feed od on od.id = o.feed_id
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
@@ -1121,8 +1125,9 @@ async function night(
           left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
           where o.contest_id = f.contest_id and o.fresh and o.complete
             and (
-              ${tier(sql.raw("o.adapter"))} < ${tier(sql.raw("d.adapter"))}
-              or own.complete is not true
+              own.complete is not true
+              or (o.declined and not own.declined)
+              or (o.declined = own.declined and ${tier(sql.raw("o.adapter"))} < ${tier(sql.raw("d.adapter"))})
             )
         )
       order by f.as_of, f.k
@@ -1260,9 +1265,20 @@ async function night(
   const badges = new Map<string, NonNullable<LiveOption["party"]>>();
   const calledBy = new Map(called.map((row) => [row.contest, row]));
   const built = picked.map((row): LiveRace => {
-    const own = choices.filter((choice) => choice.contest === row.id);
-    const index = new Map(own.map((choice, position) => [choice.id, position]));
     const mine = byContest.get(row.id) ?? [];
+    const voted = new Set(
+      mine.flatMap((frame) =>
+        (replayed.get(frame.k)?.totals ?? []).flatMap(([option, votes]) =>
+          votes > 0 ? [option] : [],
+        ),
+      ),
+    );
+    const own = choices.filter(
+      (choice) =>
+        choice.contest === row.id &&
+        (choice.kind !== "none_of_the_above" || voted.has(choice.id)),
+    );
+    const index = new Map(own.map((choice, position) => [choice.id, position]));
     const raceFrames: Array<LiveFrame> = [];
     const counts: Array<LiveUnitCount> = [];
     const last = new Map<string, string>();
