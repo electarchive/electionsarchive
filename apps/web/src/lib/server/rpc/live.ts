@@ -1138,6 +1138,7 @@ async function night(
       publisher: string;
       url: string | null;
       isHeadline: boolean;
+      headlineByUnit: boolean;
     }>(sql`
       with latest as (
         select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter, o.reporting, o.expected,
@@ -1161,21 +1162,39 @@ async function night(
         ) t
       )
       , headline as (
-        select distinct on (w.contest_id) w.contest_id, w.feed_id
+        select distinct on (w.contest_id) w.contest_id, w.feed_id, w.split
         from ranked w
-        where w.fresh and w.complete and not w.split
-          and exists (
-            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-          )
-          and not exists (
-            select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-              and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
-              and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+        where w.fresh and w.complete
+          and (
+            (
+              not w.split
+              and exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+              )
+              and not exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
+                  and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
+                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+              )
+            )
+            or (
+              exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
+                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
+                  and c.started > w.started + interval '12 hours'
+                  and coalesce(w.reporting >= 0.9 * w.expected, true)
+              )
+              and not exists (
+                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
+                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
+                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+              )
+            )
           )
         order by w.contest_id, ${tier(sql.raw("w.adapter"))}
       )
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
-        f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline"
+        f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline", coalesce(h.split, false) as "headlineByUnit"
       from live.frame f join live.feed d on d.id = f.feed_id
       left join headline h on h.contest_id = f.contest_id and h.feed_id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
@@ -1416,7 +1435,7 @@ async function night(
           expected: (lead ?? frame).expected,
         });
       }
-      if (frame.isHeadline) {
+      if (frame.isHeadline && !frame.headlineByUnit) {
         continue;
       }
       place = frame;
