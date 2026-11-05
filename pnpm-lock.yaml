@@ -357,8 +357,8 @@ catalogs:
       specifier: ^4.7.8
       version: 4.7.8
     svelte-islands:
-      specifier: ^0.4.1
-      version: 0.4.1
+      specifier: ^0.4.2
+      version: 0.4.2
     svelte-sonner:
       specifier: ^1.2.3
       version: 1.2.3
@@ -540,7 +540,7 @@ importers:
         version: 0.63.2
       svelte-islands:
         specifier: 'catalog:'
-        version: 0.4.1(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))
+        version: 0.4.2(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))
       valibot:
         specifier: 'catalog:'
         version: 1.5.0(typescript@6.0.3)
@@ -5060,8 +5060,8 @@ packages:
       svelte:
         optional: true
 
-  svelte-islands@0.4.1:
-    resolution: {integrity: sha512-8koY39rNi9OamRw3KGyOKwjFY5UrXaRaP5EQohPeRVN7JzXt1SWIY5preFRQM/rrdsE7B0AN4iZE+hzdq1Fdbg==}
+  svelte-islands@0.4.2:
+    resolution: {integrity: sha512-lPdAVISCFHpat7klzHeEu4DJLOW0SElABdKZx6Vcpeus3fD1uHaRgu/6r6+X346Y8P6rPUwfbg2P3nWYaK2/Kw==}
     peerDependencies:
       '@sveltejs/kit': ^3.0.0
       svelte: ^5.57.0
@@ -9614,7 +9614,7 @@ snapshots:
     optionalDependencies:
       svelte: 5.57.3(@typescript-eslint/types@8.71.2)
 
-  svelte-islands@0.4.1(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2)):
+  svelte-islands@0.4.2(@sveltejs/kit@3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2)):
     dependencies:
       '@sveltejs/kit': 3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
       devalue: 5.9.4

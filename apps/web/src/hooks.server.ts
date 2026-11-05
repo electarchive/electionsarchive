@@ -8,6 +8,7 @@ import { handle as islands } from "svelte-islands/server";
 import {
   cookieName,
   defineCustomServerStrategy,
+  getLocale,
   isLocale,
 } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
@@ -140,6 +141,7 @@ const twinHandle: Handle = async ({ event, resolve }) => {
 };
 
 const islandsHandle = islands({
+  vary: () => getLocale(),
   store: {
     get: async (key) => unstash(`islands:${key}`),
     set: async (key, text) => stash(`islands:${key}`, text),
