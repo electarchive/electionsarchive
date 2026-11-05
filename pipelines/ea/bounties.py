@@ -1,9 +1,12 @@
+from difflib import SequenceMatcher
+
 from psycopg.types.json import Jsonb
 
 from ea import coverage
 from ea.store import connect
 
 FIELDS = ("polity", "state", "level", "stage", "years", "grain")
+SAME_LABEL = 0.6
 
 UPSERT_SQL = """
 insert into bounty (gap_key, polity, state, level, stage, years, grain, ids, label, category, reason, sources, checked)
@@ -32,10 +35,37 @@ select 'bounty_closed', c.id,
              where p.iso_code = upper(c.polity) || case when c.state = '' then '' else '-' || c.state end limit 1),
        format('Bounty %%s closed: %%s', c.number, c.label)
 from closed c
+returning summary
 """
 
 
-def sync() -> dict[str, int]:
+def rekeys(conn, rows: list[dict]) -> list[tuple[str, int, str]]:
+    keys = {row["key"] for row in rows}
+    columns = ("number", "gap_key", "status", "ids", "label", *FIELDS)
+    held = [dict(zip(columns, found)) for found in conn.execute(f"select {', '.join(columns)} from bounty")]
+    known = {bounty["gap_key"] for bounty in held}
+    fresh = [row for row in rows if row["key"] not in known]
+    pairs = sorted(
+        (
+            (SequenceMatcher(None, bounty["label"], row["label"]).ratio(), bounty["number"], bounty, row)
+            for bounty in held
+            if bounty["status"] == "open" and bounty["gap_key"] not in keys
+            for row in fresh
+            if all(bounty[field] == row[field] for field in FIELDS)
+            and (not bounty["ids"] or not row["ids"] or set(bounty["ids"]) & set(row["ids"]))
+        ),
+        key=lambda pair: (-pair[0], pair[1]),
+    )
+    moved: list[tuple[str, int, str]] = []
+    taken: set[str] = set()
+    for score, number, bounty, row in pairs:
+        if score >= SAME_LABEL and bounty["gap_key"] not in taken and row["key"] not in taken:
+            taken |= {bounty["gap_key"], row["key"]}
+            moved.append((row["key"], number, row["label"]))
+    return moved
+
+
+def sync() -> dict[str, int | list[str]]:
     rows = list(
         {
             coverage.gap_key(row): {field: row[field] for field in FIELDS}
@@ -55,7 +85,15 @@ def sync() -> dict[str, int]:
     if not rows:
         raise ValueError("the gap registry is empty, so no bounty would stay open")
     with connect() as conn:
+        moved = rekeys(conn, rows)
+        for key, number, _ in moved:
+            conn.execute("update bounty set gap_key = %s where number = %s", [key, number])
         added = conn.execute(UPSERT_SQL, [Jsonb(rows)]).fetchall()
-        closed = conn.execute(CLOSE_SQL, [[row["key"] for row in rows]]).rowcount
+        closed = conn.execute(CLOSE_SQL, [[row["key"] for row in rows]]).fetchall()
         conn.commit()
-    return {"bounties": len(rows), "added": sum(1 for (new,) in added if new), "closed": closed}
+    return {
+        "bounties": len(rows),
+        "added": sum(1 for (new,) in added if new),
+        "rekeyed": [f"Bounty {number} now: {label}" for _, number, label in moved],
+        "closed": [summary for (summary,) in closed],
+    }
