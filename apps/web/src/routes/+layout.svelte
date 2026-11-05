@@ -10,6 +10,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { ModeWatcher, setMode } from "mode-watcher";
   import { setContext } from "svelte";
+  import { replay } from "svelte-islands";
   import { on } from "svelte/events";
   import Footer from "#lib/components/footer.svelte";
   import Header from "#lib/components/header.svelte";
@@ -39,7 +40,10 @@
   $effect(localizeZone);
 
   $effect(() => {
-    dispatchEvent(new Event("hydrated"));
+    const early = window.takeEarlyClick();
+    if (early?.target.isConnected === true) {
+      replay(early.target, early.event);
+    }
   });
 
   let Overlays = $state<Component | null>(null);

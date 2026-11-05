@@ -63,77 +63,23 @@
     </script>
     <script>
       (() => {
-        const INERT =
-          'button, [role="button"], [role="tab"], [role="switch"], [role="menuitem"], [role="option"]';
-        let isHolding = true;
-        let isReplaying = false;
-        let held = null;
-        let last = null;
-
-        const replay = (target, click) => {
-          isReplaying = true;
-          if (click.detail === 0) target.click();
-          else {
-            const init = {
-              bubbles: true,
-              cancelable: true,
-              composed: true,
-              button: 0,
-              isPrimary: true,
-              clientX: click.clientX,
-              clientY: click.clientY,
-              pointerType:
-                click.pointerType ??
-                (matchMedia("(pointer: coarse)").matches ? "touch" : "mouse"),
-            };
-            for (const [type, extra] of [
-              ["pointerdown", { buttons: 1 }],
-              ["pointerup", {}],
-              ["click", { detail: click.detail }],
-            ])
-              target.dispatchEvent(
-                new PointerEvent(type, { ...init, ...extra }),
-              );
-          }
-          isReplaying = false;
+        let early = null;
+        const hold = (event) => {
+          const target = event.target.closest?.(
+            'button, [role="button"], [role="tab"], [role="switch"], [role="menuitem"], [role="option"]',
+          );
+          if (
+            target &&
+            target.closest("a[href]") == null &&
+            !(target.type === "submit" && target.form != null)
+          )
+            early = { event, target };
         };
-
-        addEventListener(
-          "click",
-          (event) => {
-            if (event.isTrusted || isReplaying) {
-              last = event;
-              const target = isHolding && event.target.closest?.(INERT);
-              if (
-                target &&
-                target.closest("a[href]") == null &&
-                !(target.type === "submit" && target.form != null)
-              )
-                held = { target, event };
-            } else if (last != null && event.target.contains?.(last.target)) {
-              event.stopImmediatePropagation();
-              event.preventDefault();
-              const { target } = event;
-              const click = last;
-              last = null;
-              setTimeout(() => replay(target, click));
-            }
-          },
-          true,
-        );
-
-        addEventListener("click", (event) => {
-          if (event === last) last = null;
-        });
-
-        addEventListener(
-          "hydrated",
-          () => {
-            isHolding = false;
-            if (held?.target.isConnected) replay(held.target, held.event);
-          },
-          { once: true },
-        );
+        addEventListener("click", hold, true);
+        window.takeEarlyClick = () => {
+          removeEventListener("click", hold, true);
+          return early;
+        };
       })();
     </script>
     <script>
