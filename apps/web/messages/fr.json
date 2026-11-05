@@ -5695,6 +5695,7 @@
   "recent_filter_tier": "Risque",
   "recent_in_polity": "Territoire : {polity} et les lieux qui en font partie",
   "recent_clear_polity": "Afficher tous les lieux",
+  "recent_clear_filters": "Afficher toutes les modifications",
   "recent_subscribe": "S'abonner (Atom)",
   "recent_empty": "Rien ne correspond encore à ces filtres.",
   "recent_older": "Plus anciens",

@@ -5607,6 +5607,7 @@
   "recent_filter_tier": "Xetere",
   "recent_in_polity": "Li {polity} û cihên di nav wê de",
   "recent_clear_polity": "Hemû cihan nîşan bide",
+  "recent_clear_filters": "Hemû guhertinên dawî nîşan bide",
   "recent_subscribe": "Abone bibe (Atom)",
   "recent_empty": "Hê tiştek bi van parzûnan re li hev nayê.",
   "recent_older": "Kevintir",

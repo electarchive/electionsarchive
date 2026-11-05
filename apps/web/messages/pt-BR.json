@@ -5693,6 +5693,7 @@
   "recent_filter_tier": "Risco",
   "recent_in_polity": "Em {polity} e nos locais dentro dessa área",
   "recent_clear_polity": "Mostrar todos os locais",
+  "recent_clear_filters": "Mostrar todas as alterações recentes",
   "recent_subscribe": "Assinar (Atom)",
   "recent_empty": "Nenhum item corresponde a esses filtros ainda.",
   "recent_older": "Anteriores",
