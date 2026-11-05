@@ -631,7 +631,7 @@
         )}
         {@attach current?.view == null ? undefined : learn("scrubber.map")}
       >
-        {#if step != null}
+        {#if step != null || isSeries}
           <div
             class="mbe-2 flex touch-pan-y items-center gap-2 min-block-11 lg:hidden"
             role="group"
@@ -665,11 +665,13 @@
               class="flex items-baseline gap-2 min-inline-0"
               aria-live="polite"
             >
-              <span
-                class="font-figures text-4xl/none font-[780] tracking-[-0.02em]"
-                >{step.year}</span
-              >
-              {#if hub != null}
+              {#if step != null}
+                <span
+                  class="font-figures text-4xl/none font-[780] tracking-[-0.02em]"
+                  >{step.year}</span
+                >
+              {/if}
+              {#if hub != null && step != null}
                 <a
                   class="truncate text-[0.8125rem] font-semibold underline decoration-border underline-offset-4"
                   href={resolve("/[...path]", { path: step.path })}
