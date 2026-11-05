@@ -253,15 +253,14 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             None,
         )
         for contest, as_of, sums, reporting in frames:
+            conn.execute(
+                "delete from live.frame where feed_id = %s and contest_id = %s and as_of = %s", [feed, contest, as_of]
+            )
             k = conn.execute(
                 """insert into live.frame (feed_id, contest_id, as_of, fetch_id, reporting, expected)
-                   values (%s, %s, %s, %s, %s, %s)
-                   on conflict (feed_id, contest_id, as_of) do update set fetch_id = excluded.fetch_id,
-                     reporting = excluded.reporting, expected = excluded.expected, status = 'active'
-                   returning k""",
+                   values (%s, %s, %s, %s, %s, %s) returning k""",
                 [feed, contest, as_of, fetch, reporting[0] or None, reporting[1] or None],
             ).fetchall()[0][0]
-            conn.execute("delete from live.value where frame_k = %s", [k])
             with conn.cursor().copy("copy live.value (frame_k, unit_id, option_id, votes) from stdin") as copy:
                 for (unit, option), votes in sums.items():
                     copy.write_row((k, unit, option, votes))
