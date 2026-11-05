@@ -41,6 +41,14 @@ STATES = (
     else None
 )
 GROUPS = None if STATES is None else STATES | ({"ceda"} if "CA" in STATES else set())
+CITED_SEATS = {
+    row["tail"]: row
+    for row in csv.DictReader(
+        Path(__file__).with_name("local_2026_seats.tsv").read_text().splitlines(),
+        delimiter="\t",
+        quoting=csv.QUOTE_NONE,
+    )
+}
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
     "0644000": "https://cityclerk.lacity.org/election/2026_General_Municipal_Election_List_of_Certified_Candidates.pdf",
@@ -8019,6 +8027,9 @@ MD_RESULTS = "https://elections.maryland.gov/elections/2026/general_results/gen_
 
 
 def fetch() -> None:
+    for row in CITED_SEATS.values():
+        if row["suffix"] and (not STATES or row["tail"].split(":")[0] in (GROUPS or ())):
+            raw.fetch(SOURCE, row["url"], suffix=row["suffix"])
     for number in range(1, len(MD_COUNTIES) + 1):
         if not STATES or "MD" in STATES:
             try:
@@ -12561,6 +12572,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             cs.add("entity_retirement", entity_id=contest, reason=reason)
 
         templates: dict[str, tuple] = {}
+        seat_history: dict[str, dict[int, int]] = {}
         for row in conn.execute(
             """select distinct on (x.value) regexp_replace(x.value, '^[0-9-]+:', ''), co.id, co.kind, co.office_id, co.body_id,
                       co.district_area_id, co.seat_id, co.boundary_set_id, co.magnitude, co.term, co.electoral_system_id,
@@ -12581,6 +12593,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
         ).fetchall():
             if row[0] not in templates or row[12] > templates[row[0]][12]:
                 templates[row[0]] = row
+            if row[8] is not None and row[12].year >= DAY.year - 8:
+                seat_history.setdefault(row[0], {})[row[12].year] = row[8]
         known: dict[str, list[tuple[object, str]]] = {}
         for tail, person, text in conn.execute(
             """select regexp_replace(x.value, '^[0-9-]+:', ''), ca.person_id, coalesce(ca.ballot_name, o.ballot_label, pn.text)
@@ -13137,11 +13151,24 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     area = at_large[area][0]
             elif office_id is not None and COUNTY_SCOPE.fullmatch(scope) and countywide(tail):
                 area = cs.area("us.county", scope[3:])
-            if kind == "body_seats" and group["seats"][0]:
+            cited = None if split else CITED_SEATS.get(tail)
+            uncertain = False
+            if cited is not None:
+                magnitude = int(cited["seats"])
+            elif kind == "body_seats" and group["seats"][0]:
                 magnitude = int(group["seats"][0])
             elif kind == "office" and state == "NY" and magnitude is not None:
                 magnitude = max(magnitude, int(group["seats"][0] or 1))
-            if state in ("IN", "MD") and magnitude is not None and system in plurality.values():
+            elif not group["seats"][0] and (magnitude or 1) > 1:
+                past = seat_history.get(tail, {})
+                uncertain = bool(group["unexpired"][0]) or len(past) < 2 or len(set(past.values())) > 1
+                if uncertain and state == "MN":
+                    magnitude, uncertain = 1, False
+            if (
+                (state in ("IN", "MD", "MN") or cited is not None)
+                and magnitude is not None
+                and system in plurality.values()
+            ):
                 system = plurality[magnitude > 1]
             if state == "LA" and magnitude is not None:
                 system = cs.key("us.electoral_system", "two_round") if magnitude == 1 else plurality[True]
@@ -13179,7 +13206,38 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             if tail in created:
                 counts["created"] += 1
                 cs.add("citation", entity_id=contest, source_id=sources[str(group["feed"][0])], locator=None)
-            if tail in in_cited:
+            if cited is not None:
+                source_key = f"seats:{cited['url']}"
+                if source_key not in sources:
+                    sources[source_key] = cs.source(cited["publisher"], cited["title"])
+                    if sources[source_key] in cs.minted:
+                        cs.add(
+                            "source",
+                            id=sources[source_key],
+                            kind=cited["kind"],
+                            publisher=cited["publisher"],
+                            title=cited["title"],
+                            url=cited["url"],
+                            license="Public record",
+                        )
+                    if cited["suffix"]:
+                        cs.artifact(raw.cached(SOURCE, cited["url"]), sources[source_key])
+                cs.add(
+                    "citation",
+                    entity_id=contest,
+                    source_id=sources[source_key],
+                    locator={"field": "seats", "evidence": cited["evidence"]},
+                )
+            if uncertain:
+                cs.add(
+                    "label",
+                    entity_id=contest,
+                    kind="data_quality",
+                    value="seats_unverified",
+                    source_id=sources[str(group["feed"][0])],
+                    valid_from=DAY,
+                )
+            if tail in in_cited and cited is None:
                 if "IN-enr" not in sources:
                     sources["IN-enr"] = cs.source("Indiana Secretary of State", IN_ENR_TITLE)
                     if sources["IN-enr"] in cs.minted:
