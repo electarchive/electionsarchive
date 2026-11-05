@@ -10,8 +10,10 @@
   import MapLink from "#lib/components/live/map-link.svelte";
   import { count, percent } from "#lib/format.js";
   import {
+    isDistricted,
     lead,
     placeName,
+    placeScheme,
     placeSlug,
     stamp,
     surname,
@@ -22,6 +24,7 @@
   import { closing, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import { isOutlying } from "./full/model.js";
   import Locals from "./locals.svelte";
   import LiveMap from "./map.svelte";
 
@@ -121,7 +124,9 @@
     new Map(
       election.races.flatMap((race) =>
         race.units.flatMap((unit) =>
-          unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+          unit.scheme === placeScheme(race.state)
+            ? [[unit.id, unit.name] as const]
+            : [],
         ),
       ),
     ),
@@ -152,6 +157,11 @@
   function scope(race: LiveRace) {
     if (race.office !== "house") {
       return m.night_place_statewide();
+    }
+    if (isDistricted(race.state)) {
+      return isSplit
+        ? m.night_place_part_district()
+        : m.night_place_whole_district();
     }
     return isSplit ? m.night_place_part() : m.night_place_whole();
   }
@@ -208,7 +218,11 @@
     <h1 class="title text-balance">{name}</h1>
     {#if share != null}
       <p class="font-serif text-lg/snug text-pretty max-inline-[72ch]">
-        {m.night_place_lede({ share: percent(share, share < 0.1 ? 1 : 0) })}
+        {anchor != null && isDistricted(anchor.race.state)
+          ? m.night_place_lede_district({
+              share: percent(share, share < 0.1 ? 1 : 0),
+            })
+          : m.night_place_lede({ share: percent(share, share < 0.1 ? 1 : 0) })}
       </p>
     {/if}
   </header>
@@ -219,11 +233,14 @@
     {#if anchor != null}
       <LiveMap
         {geography}
+        isAlone={isOutlying(anchor.race.state)}
         options={anchor.race.options}
         now={anchor.now}
         estimate={estimates[anchor.race.id] ?? null}
         modes={["lead", "shift", "counted"]}
-        title={m.night_place_map({ race: title(anchor.race) })}
+        title={isDistricted(anchor.race.state)
+          ? m.night_place_map_district({ race: title(anchor.race) })
+          : m.night_place_map({ race: title(anchor.race) })}
         anchor={place.areaId}
         {href}
         bind:mode
@@ -344,6 +361,10 @@
   <footer
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"
   >
-    <p class="max-inline-[80ch]">{m.night_method()}</p>
+    <p class="max-inline-[80ch]">
+      {anchor != null && isDistricted(anchor.race.state)
+        ? m.night_method_district()
+        : m.night_method()}
+    </p>
   </footer>
 </article>

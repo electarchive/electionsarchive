@@ -12,12 +12,14 @@
 
   const {
     rows,
+    isDistrict = false,
     options,
     pair,
     selected,
     onPick,
     onHover,
   }: {
+    isDistrict?: boolean;
     rows: Array<{
       areaId: string;
       name: string;
@@ -36,11 +38,17 @@
   let sort = $state<Sort>("votes");
   let isAll = $state(false);
 
+  const searchLabel = $derived(
+    isDistrict ? m.night_table_search_district() : m.night_table_search(),
+  );
   const SORTS = $derived([
     { value: "votes" as const, label: m.night_table_votes() },
     { value: "margin" as const, label: m.night_table_margin() },
     { value: "shift" as const, label: m.night_table_shift() },
-    { value: "name" as const, label: m.night_table_county() },
+    {
+      value: "name" as const,
+      label: isDistrict ? m.night_table_district() : m.night_table_county(),
+    },
   ]);
 
   function shiftOf(row: UnitStanding) {
@@ -85,14 +93,19 @@
   const hasVotes = $derived(rows.some((entry) => entry.row.total > 0));
 </script>
 
-<section class="grid gap-2.5" aria-label={m.night_table_title()}>
+<section
+  class="grid gap-2.5"
+  aria-label={isDistrict
+    ? m.night_table_title_district()
+    : m.night_table_title()}
+>
   <div class="flex items-center justify-between gap-3">
     <h3 class="text-xs font-semibold text-muted-foreground">
-      {m.night_table_title()}
+      {isDistrict ? m.night_table_title_district() : m.night_table_title()}
     </h3>
   </div>
   <label class="relative block">
-    <span class="sr-only">{m.night_table_search()}</span>
+    <span class="sr-only">{searchLabel}</span>
     <SearchIcon
       class="pointer-events-none absolute inset-s-2.5 inset-bs-1/2 -translate-y-1/2 text-muted-foreground block-3.5 inline-3.5"
       aria-hidden="true"
@@ -100,14 +113,14 @@
     <input
       type="search"
       bind:value={query}
-      placeholder={m.night_table_search()}
+      placeholder={searchLabel}
       class="rounded-sm bg-background ps-8 pe-2 text-sm ring-1 ring-input outline-none block-9 inline-full placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
     />
   </label>
   <Segmented
     options={SORTS}
     bind:value={sort}
-    label={m.livemap_sort()}
+    label={isDistrict ? m.livemap_sort_district() : m.livemap_sort()}
     size="sm"
     fill
   />
@@ -188,7 +201,9 @@
       onclick={() => (isAll = !isAll)}
       >{isAll
         ? m.night_table_fewer()
-        : m.night_table_all({ count: matched.length })}</button
+        : isDistrict
+          ? m.night_table_all_district({ count: matched.length })
+          : m.night_table_all({ count: matched.length })}</button
     >
   {/if}
 </section>

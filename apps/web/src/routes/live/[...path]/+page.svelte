@@ -4,7 +4,7 @@
   import { untrack } from "svelte";
   import Night from "#lib/components/live/night.svelte";
   import { count } from "#lib/format.js";
-  import { placeName, stamp } from "#lib/live/format.js";
+  import { isDistricted, placeName, stamp } from "#lib/live/format.js";
   import { localize } from "#lib/live/prefs.svelte.js";
   import { closing, describe, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -51,7 +51,12 @@
   });
   const description = $derived(
     spot != null
-      ? m.night_place_seo_description({ place: spot, title: election.title })
+      ? isDistricted(election.slug.split("/")[1] ?? "")
+        ? m.night_place_seo_description_district({
+            place: spot,
+            title: election.title,
+          })
+        : m.night_place_seo_description({ place: spot, title: election.title })
       : seats != null && headline != null
         ? election.newest == null
           ? m.night_seo_seats_upcoming({ ...seats, headline, title: name })
@@ -64,8 +69,12 @@
         : headline == null
           ? m.night_seo_nation({ title: election.title })
           : election.newest == null
-            ? m.night_seo_upcoming({ headline, title: name })
-            : m.night_seo_description({
+            ? (isDistricted(election.slug.split("/")[1] ?? "")
+                ? m.night_seo_upcoming_district
+                : m.night_seo_upcoming)({ headline, title: name })
+            : (isDistricted(election.slug.split("/")[1] ?? "")
+                ? m.night_seo_description_district
+                : m.night_seo_description)({
                 headline,
                 title: name,
                 time: stamp(election.newest),

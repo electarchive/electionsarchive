@@ -15,7 +15,9 @@
   import {
     bandFor,
     clock,
+    isDistricted,
     lead,
+    placeScheme,
     placeSlug,
     stamp,
     tone,
@@ -34,6 +36,7 @@
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
+  import { isOutlying } from "./full/model.js";
   import Later from "./later.svelte";
   import LiveMap from "./map.svelte";
   import MethodLink from "./method-link.svelte";
@@ -84,7 +87,9 @@
   const counties = $derived(
     new Map(
       race.units.flatMap((unit) =>
-        unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+        unit.scheme === placeScheme(race.state)
+          ? [[unit.id, unit.name] as const]
+          : [],
       ),
     ),
   );
@@ -653,6 +658,7 @@
       >
         <LiveMap
           {geography}
+          isAlone={isOutlying(race.state)}
           {options}
           {now}
           {estimate}
@@ -666,6 +672,7 @@
         <Withheld isOff={!forecasts}>
           <LiveMap
             {geography}
+            isAlone={isOutlying(race.state)}
             {options}
             {now}
             {estimate}
@@ -686,6 +693,7 @@
       >
         <LiveMap
           {geography}
+          isAlone={isOutlying(race.state)}
           {options}
           {now}
           {estimate}
@@ -793,6 +801,7 @@
 
     <section class="bg-background px-4 py-6 sm:px-8">
       <Table
+        isDistrict={isDistricted(race.state)}
         {options}
         {now}
         {estimate}
@@ -808,7 +817,11 @@
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"
   >
     {#if later == null}
-      <p class="max-inline-[80ch]">{m.night_method()}</p>
+      <p class="max-inline-[80ch]">
+        {isDistricted(race.state)
+          ? m.night_method_district()
+          : m.night_method()}
+      </p>
     {/if}
     {#if race.source.publisher !== ""}
       <p>
@@ -821,6 +834,20 @@
           >
         {:else}
           {race.source.publisher}
+        {/if}
+      </p>
+    {/if}
+    {#if race.placeSource != null}
+      <p>
+        {m.night_source_places()}
+        {#if race.placeSource.url != null}
+          <a
+            href={race.placeSource.url}
+            class="underline underline-offset-2"
+            rel="external noopener">{race.placeSource.publisher}</a
+          >
+        {:else}
+          {race.placeSource.publisher}
         {/if}
       </p>
     {/if}
