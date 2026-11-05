@@ -752,10 +752,12 @@ def emit() -> Path:
         }
         foreign_specials = dict(
             conn.execute(
-                """select s.path, substr(x.value, 9) from slug s
+                """select s.path, c.code from slug s
                    join polity p on p.id = s.entity_id and p.kind = 'special_district'
                    join changeset g on g.id = p.changeset_id and g.pipeline <> %s
-                   join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value like 'special:22%%'
+                   join polity_territory t on t.polity_id = p.id
+                   join area_code c on c.area_id = t.area_id
+                   join external_id x on x.entity_id = p.id and x.scheme = 'us.polity' and x.value = 'special:' || c.code
                    where s.path like 'us/la/%%' and s.is_current""",
                 [SOURCE],
             ).fetchall()
@@ -779,7 +781,7 @@ def emit() -> Path:
                 """select p.id, n.text, s.path from polity p
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                    join slug s on s.entity_id = p.id and s.is_current
-                   where p.kind = 'special_district' and s.path like 'us/la/%%'"""
+                   where s.path like 'us/la/%%'"""
             ).fetchall()
         }
         for code, text in special_names.items():
@@ -816,10 +818,15 @@ def emit() -> Path:
         grouped = {key: rows for key, rows in results.group_by("ckey")}
         choices = {key: rows for key, rows in options.group_by("ckey")}
         elections: dict[tuple[date, str], UUID] = {}
+        runoffs = {
+            (day, polities[code][0])
+            for (day, code), rows in contests.group_by("day", "code")
+            if rows["round"].min() == 2
+        }
         kind_of = {
             (day, code): (
                 "runoff"
-                if rows["round"].min() == 2
+                if (day, polities[code][0]) in runoffs
                 else "primary"
                 if rows["closed"].any()
                 else "general"
