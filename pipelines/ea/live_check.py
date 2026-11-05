@@ -81,10 +81,13 @@ STATES = [
 ELECTION = "2026-11-03-general"
 DAY = date(2026, 11, 3)
 BIG_OUTSIDE_COVERAGE = "^us/(dc|ky/louisville)/"
-KENTUCKY_BLOCK = "the State Board of Elections' results site names scraping in its use policy and answers 403"
+KENTUCKY = (
+    "the State Board's live site answers 403 and names scraping in its use policy, "
+    "and its public 2026ElectionReports library at elect.ky.gov has no general election files yet"
+)
 UNFED_MAYORS = {
-    "us/ky/louisville": f"{KENTUCKY_BLOCK}; the Jefferson County Clerk's site also answers 403",
-    "us/ky/lexington-fayette": f"{KENTUCKY_BLOCK}; the Fayette County Clerk has posted no general election file",
+    "us/ky/louisville": f"{KENTUCKY}; the Jefferson County Clerk's site also answers 403",
+    "us/ky/lexington-fayette": f"{KENTUCKY}; the Fayette County Clerk has posted no general election file",
     "us/fl/st-petersburg": "votepinellas.gov answers 403 to automated clients from both hosts; no other official source",
 }
 CLOSE = datetime(2026, 11, 3, 23, 0, tzinfo=UTC)
