@@ -10,6 +10,7 @@
   import { reveal, settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import { runs } from "./runs.js";
 
   const {
     count,
@@ -34,6 +35,20 @@
       return total;
     }),
   );
+  const cellsOf = (votes: Array<number | null>) =>
+    rounds.map((round) => {
+      const value = votes[round - 1];
+      const total = totals[round - 1] ?? 0;
+      const share = value == null || total === 0 ? null : value / total;
+      return {
+        kind: share == null ? ("blank" as const) : ("live" as const),
+        round,
+        now: round === count.round ? "" : undefined,
+        share: share == null ? "" : percent(share),
+        votes: figure(value ?? 0),
+        bar: `${((share ?? 0) * 100).toFixed(1)}%`,
+      };
+    });
   const href = (round: number) => {
     const kept = [...page.url.searchParams].filter(([key]) => key !== "round");
     const query = new URLSearchParams(
@@ -95,7 +110,7 @@
         </tr>
       </thead>
       <tbody
-        class="**:data-bar:ms-auto **:data-bar:mbs-1 **:data-bar:bg-(--party) **:data-bar:block-0.75 [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
+        class="**:data-bar:ms-auto **:data-bar:mbs-1 **:data-bar:bg-(--party) **:data-bar:block-0.75 **:data-now:bg-secondary [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
       >
         {#each count.rows as row (row.key)}
           {const reach = $derived(
@@ -124,21 +139,21 @@
                 {/if}
               </span>
             </th>
-            {#each rounds as round (round)}
-              {const votes = $derived(row.votes[round - 1])}
-              {const share = $derived(
-                votes == null || totals[round - 1] === 0
-                  ? null
-                  : votes / (totals[round - 1] ?? 1),
-              )}
-              <td class={cn({ "bg-secondary": round === count.round })}>
-                {#if share != null}
-                  <span>{percent(share)}</span>
-                  <small>{figure(votes ?? 0)}</small>
-                  <span data-bar style:inline-size="{(share * 100).toFixed(1)}%"
-                  ></span>
-                {/if}
-              </td>
+            {const parts = $derived(runs(cellsOf(row.votes)))}
+            {#each parts as part (part.round)}
+              {#if part.kind === "live"}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}>
+                    <span>{cell.share}</span>
+                    <small>{cell.votes}</small>
+                    <span data-bar style:inline-size={cell.bar}></span>
+                  </td>
+                {/each}
+              {:else}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}></td>
+                {/each}
+              {/if}
             {/each}
           </tr>
         {/each}

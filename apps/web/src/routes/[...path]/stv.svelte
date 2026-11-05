@@ -11,6 +11,7 @@
   import { reveal, settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import { runs } from "./runs.js";
 
   type Count = NonNullable<
     Extract<PageData, { kind: "contest" }>["contest"]["count"]
@@ -81,6 +82,34 @@
   };
   const signed = (value: number) =>
     `${value > 0 ? "+" : "−"}${figure(Math.abs(value))}`;
+  const cellsOf = (row: (typeof rows)[number]) =>
+    rounds.map((round) => {
+      const now = round === count.round ? "" : undefined;
+      const votes = row.votes[round - 1];
+      const before = round === 1 ? null : row.votes[round - 2];
+      const change = before == null ? 0 : (votes ?? 0) - before;
+      const moved = Math.abs(change) >= 0.0005 ? signed(change) : "";
+      if (votes == null) {
+        return {
+          kind: before == null ? ("blank" as const) : ("gone" as const),
+          round,
+          now,
+          moved,
+          won: undefined,
+          votes: "",
+          fill: "",
+        };
+      }
+      return {
+        kind: row.elected === round ? ("seat" as const) : ("live" as const),
+        round,
+        now,
+        moved,
+        won: votes >= stv.quota ? "" : undefined,
+        votes: figure(votes),
+        fill: `${(Math.min(1, votes / stv.quota) * 100).toFixed(1)}%`,
+      };
+    });
 </script>
 
 <section
@@ -142,7 +171,7 @@
         </tr>
       </thead>
       <tbody
-        class="**:data-bar:relative **:data-bar:mbs-1 **:data-bar:bg-secondary **:data-bar:block-0.75 [&_[data-bar]>span]:absolute [&_[data-bar]>span]:inset-y-0 [&_[data-bar]>span]:inset-s-0 [&_[data-bar]>span]:bg-(--party) [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
+        class="**:data-bar:relative **:data-bar:mbs-1 **:data-bar:bg-secondary **:data-bar:block-0.75 **:data-now:bg-secondary **:data-won:font-semibold [&_[data-bar]>span]:absolute [&_[data-bar]>span]:inset-y-0 [&_[data-bar]>span]:inset-s-0 [&_[data-bar]>span]:bg-(--party) [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
       >
         {#each rows as row (row.key)}
           <tr class="border-be" style:--party={swatch(row.color, row.key)}>
@@ -177,38 +206,40 @@
                 {/if}
               </span>
             </th>
-            {#each rounds as round (round)}
-              {const votes = $derived(row.votes[round - 1])}
-              {const before = $derived(
-                round === 1 ? null : row.votes[round - 2],
-              )}
-              {const change = $derived(
-                before == null ? null : (votes ?? 0) - before,
-              )}
-              <td class={cn({ "bg-secondary": round === count.round })}>
-                {#if votes != null}
-                  <span class={cn({ "font-semibold": votes >= stv.quota })}
-                    >{figure(votes)}</span
-                  >
-                  {#if change != null && Math.abs(change) >= 0.0005}
-                    <small>{signed(change)}</small>
-                  {/if}
-                  <span data-bar>
-                    <span
-                      style:inline-size="{(
-                        Math.min(1, votes / stv.quota) * 100
-                      ).toFixed(1)}%"
-                    ></span>
-                  </span>
-                  {#if row.elected === round}
+            {const parts = $derived(runs(cellsOf(row)))}
+            {#each parts as part (part.round)}
+              {#if part.kind === "live"}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}>
+                    <span data-won={cell.won}>{cell.votes}</span>
+                    <small>{cell.moved}</small>
+                    <span data-bar>
+                      <span style:inline-size={cell.fill}></span>
+                    </span>
+                  </td>
+                {/each}
+              {:else if part.kind === "seat"}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}>
+                    <span data-won={cell.won}>{cell.votes}</span>
+                    <small>{cell.moved}</small>
+                    <span data-bar>
+                      <span style:inline-size={cell.fill}></span>
+                    </span>
                     <span class="mbs-1 text-xs font-semibold"
                       >{m.outcome_elected()}</span
                     >
-                  {/if}
-                {:else if before != null}
-                  <small>{signed(-before)}</small>
-                {/if}
-              </td>
+                  </td>
+                {/each}
+              {:else if part.kind === "gone"}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}><small>{cell.moved}</small></td>
+                {/each}
+              {:else}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}></td>
+                {/each}
+              {/if}
             {/each}
           </tr>
         {/each}

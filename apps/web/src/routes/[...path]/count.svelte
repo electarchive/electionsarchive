@@ -56,14 +56,18 @@
       for (const row of count.rows) {
         total += row.votes[step] ?? 0;
       }
-      const rows = count.rows
-        .filter((row) => (row.votes[step] ?? 0) > 0)
-        .map((row) => ({
-          key: row.key,
-          label: row.label,
-          color: swatch(row.color, row.key),
-          share: total === 0 ? 0 : (row.votes[step] ?? 0) / total,
-        }));
+      const rows = count.rows.flatMap((row, at) =>
+        (row.votes[step] ?? 0) > 0
+          ? [
+              {
+                key: row.key,
+                label: row.label,
+                color: `var(--ink-${at})`,
+                share: total === 0 ? 0 : (row.votes[step] ?? 0) / total,
+              },
+            ]
+          : [],
+      );
       const bars: typeof rows = [];
       let rest = 0;
       for (const row of rows) {
@@ -90,6 +94,11 @@
               ],
       };
     }),
+  );
+  const inks = $derived(
+    count.rows
+      .map((row, at) => `--ink-${at}:${swatch(row.color, row.key)}`)
+      .join(";"),
   );
   const standing = $derived(
     count.rows.filter((row) => row.votes[shown - 1] != null),
@@ -183,6 +192,7 @@
   </div>
   <ol
     class="-mx-1 grid auto-cols-[minmax(1.75rem,1fr)] grid-flow-col overflow-x-auto"
+    style={inks}
     {@attach reveal(`:scope > :nth-child(${shown})`)}
   >
     {#each rounds as entry (entry.round)}
@@ -231,16 +241,18 @@
           }}
         >
           <span
-            class={cn("flex gap-px overflow-hidden rounded-[1px]", {
-              "block-2": isShown,
-              "opacity-70 block-1 group-hover:opacity-100": !isShown,
-            })}
+            class={cn(
+              "flex gap-px overflow-hidden rounded-[1px] *:min-inline-px",
+              {
+                "block-2": isShown,
+                "opacity-70 block-1 group-hover:opacity-100": !isShown,
+              },
+            )}
             aria-hidden="true"
           >
             {#each entry.bars as bar (bar.key)}
               <span
-                class="bg-(--party) min-inline-px"
-                style:--party={bar.color}
+                style:background-color={bar.color}
                 style:flex-grow={bar.share.toFixed(3)}
               ></span>
             {/each}
