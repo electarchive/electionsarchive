@@ -1388,3 +1388,129 @@ params = { state = "NV" }
 poller = "muktedir"
 publisher = "The Nevada Independent"
 url = "https://thenevadaindependent.com/elections/2026/general/results/statewide"
+
+[[feed]]
+id = "us.lavote"
+adapter = "us.lavote"
+interval = 120
+note = "The Secretary of State's site has no city, school, or district races, so Los Angeles County's come from the county's own results"
+publisher = "Los Angeles County Registrar-Recorder/County Clerk"
+url = "https://results.lavote.gov/"
+
+[[feed]]
+id = "us.livevoter.orange"
+adapter = "us.livevoter"
+interval = 180
+note = "The county's results page links the current election's address, which changes between elections"
+params = { county = "Orange", url = "https://ocvote.gov/results/current-election-results" }
+publisher = "Orange County Registrar of Voters"
+url = "https://ocvote.gov/results/current-election-results"
+
+[[feed]]
+id = "us.livevoter.san_diego"
+adapter = "us.livevoter"
+interval = 180
+params = { county = "San Diego", url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html" }
+publisher = "San Diego County Registrar of Voters"
+url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html"
+
+[[feed]]
+id = "us.livevoter.san_bernardino"
+adapter = "us.livevoter"
+interval = 180
+note = "The county's results page links the current election's address, which changes between elections"
+params = { county = "San Bernardino", url = "https://elections.sbcounty.gov/elections/2026/1103/results/" }
+publisher = "San Bernardino County Registrar of Voters"
+url = "https://elections.sbcounty.gov/elections/2026/1103/results/"
+
+[[feed]]
+id = "us.alameda_live"
+adapter = "us.alameda_live"
+interval = 180
+note = "Ranked-choice races show first choices, which is all this page reports; the county's tally rounds are on its separate ranked-choice page"
+publisher = "Alameda County Registrar of Voters"
+url = "https://alamedacountyca.gov/rovresults/260/index.htm"
+
+[[feed]]
+id = "us.clarity_live.nueces"
+adapter = "us.clarity_live"
+interval = 180
+note = "The Texas Secretary of State's site has no city races, so Corpus Christi's and Nueces County's come from the county's own results"
+params = { state = "TX", tenant = "Nueces", eid = "127557" }
+poller = "muktedir"
+publisher = "Nueces County Clerk"
+url = "https://results.enr.clarityelections.com/TX/Nueces/127557/"
+
+[[feed]]
+id = "us.clarity_live.orange_fl"
+adapter = "us.clarity_live"
+interval = 180
+note = "Florida's state site has no county races, so Orange County's mayor and commissioners come from the county Supervisor of Elections' own results."
+params = { state = "FL", tenant = "Orange", eid = "127356" }
+poller = "muktedir"
+publisher = "Orange County Supervisor of Elections"
+url = "https://results.enr.clarityelections.com/FL/Orange/127356/"
+
+[[feed]]
+id = "us.county_live.st_lucie"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Port St. Lucie's mayor and District 1 council race come from the St. Lucie County Supervisor of Elections' results page."
+params = { revision = "2026-11-05", kind = "electionsfl", state = "FL", county = "St. Lucie", url = "https://enr.electionsfl.org/STL/4089/Summary/" }
+publisher = "St. Lucie County Supervisor of Elections"
+url = "https://enr.electionsfl.org/STL/4089/Summary/"
+
+[[feed]]
+id = "us.county_live.lee"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Cape Coral's, Fort Myers's, and other Lee County city races come from the county Supervisor of Elections' results page."
+params = { revision = "2026-11-05-2", kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
+publisher = "Lee County Supervisor of Elections"
+url = "https://enr.electionsfl.org/LEE/4111/Summary/"
+
+[[feed]]
+id = "us.county_live.leon"
+adapter = "us.county_live"
+interval = 180
+note = "Florida's state site has no city races, so Tallahassee's mayor and commissioners come from the Leon County Supervisor of Elections' results page."
+params = { kind = "electionsfl", state = "FL", county = "Leon", url = "https://enr.electionsfl.org/LEO/4072/Summary/" }
+publisher = "Leon County Supervisor of Elections"
+url = "https://enr.electionsfl.org/LEO/4072/Summary/"
+
+[[feed]]
+id = "us.county_live.monterey"
+adapter = "us.county_live"
+interval = 180
+note = "California's state site has no city races, so Salinas's and other Monterey County city races come from the county's election summary report. The report carries no time stamp."
+params = { kind = "summary_xml", state = "CA", county = "Monterey", url = "https://www.countyofmonterey.gov/home/showdocument?id=136040" }
+publisher = "Monterey County Elections"
+url = "https://www.countyofmonterey.gov/government/departments-a-h/elections/election-results"
+
+[[feed]]
+id = "us.county_live.montgomery_tn"
+adapter = "us.county_live"
+interval = 180
+note = "Tennessee's state site has no city races, so Clarksville's mayor and council come from the Montgomery County Election Commission's results page. The file has no precinct count for each race."
+params = { revision = "2026-11-05", kind = "montgomery_tn", state = "TN", county = "Montgomery", url = "https://election.montgomerytn.gov/assets/data.json" }
+poller = "muktedir"
+publisher = "Montgomery County Election Commission"
+url = "https://election.montgomerytn.gov/"
+
+[[feed]]
+id = "us.webb_live"
+adapter = "us.webb_live"
+interval = 900
+note = "Laredo's only official count is Webb County's scanned PDF, which no script can read reliably, so the feed serves the checked transcription in us.webb_2026 and errors when the county posts a different file."
+poller = "muktedir"
+publisher = "Webb County Elections Administrator"
+url = "https://www.webbcountytx.gov/DocumentCenter/View/12238"
+
+[[feed]]
+id = "us.as_live"
+adapter = "us.as_live"
+interval = 900
+note = "American Samoa's Election Office doesn't post results on its own site, so this feed reads the unofficial sheet it gave to KHJ News. The feed stops with an error if the file changes, so a person can check the new numbers first."
+poller = "muktedir"
+publisher = "American Samoa Election Office"
+url = "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/594/2026/11/04083335/2026-election-results-congress.pdf"

@@ -249,6 +249,11 @@ def parse() -> None:
             Path(__file__).with_name("census_at_large.tsv"), separator="\t", infer_schema=False
         ).iter_rows()
     }
+
+    def used(name: str, properties: dict[str, str]) -> bool:
+        first, last, number = (int(properties[key]) for key in ("startcong", "endcong", "district"))
+        return number >= 0 and (first <= 107 or (name == "North Carolina" and first <= 117 <= last))
+
     files: list[tuple[str, list[tuple[int, int, int, str, str]]]] = []
     with tarfile.open(raw.cached(SOURCE, LEWIS).path, "r|gz") as archive:
         for member in archive:
@@ -263,7 +268,7 @@ def parse() -> None:
                         (
                             *(int(feature["properties"][key]) for key in ("startcong", "endcong", "district")),
                             str(feature["properties"]["id"])[1:3],
-                            json.dumps(feature["geometry"]),
+                            json.dumps(feature["geometry"]) if used(match[1], feature["properties"]) else "",
                         )
                         for feature in json.load(file)["features"]
                     ],
@@ -277,8 +282,10 @@ def parse() -> None:
         for n in range(first, last + 1)
     }
     historical: list[dict[str, object]] = []
+    files.reverse()
     with connect() as conn:
-        for name, listed in files:
+        while files:
+            name, listed = files.pop()
             features: list[tuple[str, int, int, int, int, bool, str]] = []
             for first, last, number, state, geometry in listed:
                 code = f"{state}{number:02d}"
@@ -342,6 +349,8 @@ def parse() -> None:
                 [geojson for rows in layers.values() for _, geojson in rows],
             ],
         )
+        for rows in layers.values():
+            rows[:] = [(record, "") for record, _ in rows]
         geometry = {
             (layer, code): (geom, point)
             for layer, code, geom, point in conn.execute(

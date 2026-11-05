@@ -55,6 +55,7 @@ export type UnitStanding = {
   lead: number;
   margin: number;
   signed: number | null;
+  isContested: boolean;
   reporting: number | null;
   expected: number | null;
   at: string | null;
@@ -71,6 +72,8 @@ export type Standing = {
   total: number;
   order: Array<number>;
   pair: [number, number];
+  isContested: boolean;
+  isCompared: boolean;
   reporting: number | null;
   expected: number | null;
   units: Map<string, UnitStanding>;
@@ -98,6 +101,40 @@ export function ranked(votes: Array<number>) {
     .map((entry) => entry.index);
 }
 
+export function isContested(race: LiveRace) {
+  return (
+    race.unopposed == null &&
+    race.options.filter((option) => !option.isWriteIn).length > 1
+  );
+}
+
+function priorShares(race: LiveRace) {
+  return race.options.map((_, index) =>
+    sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
+  );
+}
+
+function isApart(first: number | undefined, second: number | undefined) {
+  return (second ?? 0) > 0 && Math.abs((first ?? 0) - (second ?? 0)) > 1e-6;
+}
+
+export function prior(race: LiveRace) {
+  const turnout = sum(race.baseline.map((row) => row.turnout));
+  if (turnout <= 0) {
+    return null;
+  }
+  const shares = priorShares(race).map((value) => value / turnout);
+  const [first, second] = ranked(shares);
+  const a = shares[first ?? -1];
+  const b = shares[second ?? -1];
+  return {
+    turnout,
+    shares,
+    leader: first ?? null,
+    margin: isContested(race) && isApart(a, b) ? (a ?? 0) - (b ?? 0) : null,
+  };
+}
+
 export function pair(race: LiveRace): [number, number] {
   const latest =
     race.certified?.totals ??
@@ -105,9 +142,7 @@ export function pair(race: LiveRace): [number, number] {
     race.options.map(() => 0);
   let source = latest;
   if (sum(latest) === 0) {
-    source = race.options.map((_, index) =>
-      sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
-    );
+    source = priorShares(race);
   }
   const order = ranked(source).filter(
     (index) => race.options[index]?.isWriteIn !== true,
@@ -153,6 +188,8 @@ function tally(
     at: string | null;
   } | null,
   isFinal: boolean,
+  contested: boolean,
+  isCompared: boolean,
 ): UnitStanding {
   const total = sum(votes);
   const order = ranked(votes);
@@ -160,13 +197,14 @@ function tally(
   const lead =
     total > 0 ? (votes[first ?? 0] ?? 0) - (votes[order[1] ?? 1] ?? 0) : 0;
   const signed =
-    total > 0
+    contested && total > 0
       ? signedOf(
           votes.map((value) => value / total),
           two,
         )
       : null;
-  const baseSigned = base == null ? null : signedOf(base.shares, two);
+  const baseSigned =
+    base == null || !isCompared ? null : signedOf(base.shares, two);
   const isTurned =
     base != null &&
     signed != null &&
@@ -189,6 +227,7 @@ function tally(
     lead,
     margin: total > 0 ? lead / total : 0,
     signed,
+    isContested: contested,
     reporting: row?.reporting ?? null,
     expected: row?.expected ?? null,
     at: row?.at ?? null,
@@ -224,11 +263,23 @@ export function whole(now: Standing): UnitStanding | null {
           ),
         }
       : null;
-  return tally(unit, now.totals, base, now.pair, now, now.isFinal);
+  return tally(
+    unit,
+    now.totals,
+    base,
+    now.pair,
+    now,
+    now.isFinal,
+    now.isContested,
+    now.isCompared,
+  );
 }
 
 export function standing(race: LiveRace, view: View): Standing {
   const two = pair(race);
+  const contested = isContested(race);
+  const before = priorShares(race);
+  const isCompared = contested && isApart(before[two[0]], before[two[1]]);
   const isFinal = view.isFinal && race.certified != null;
   const frame = isFinal ? (race.frames.at(-1) ?? null) : frameAt(race, view.at);
   const totals = isFinal
@@ -249,6 +300,8 @@ export function standing(race: LiveRace, view: View): Standing {
         two,
         row,
         isFinal,
+        contested,
+        isCompared,
       ),
     );
   }
@@ -260,6 +313,8 @@ export function standing(race: LiveRace, view: View): Standing {
     total,
     order: ranked(totals),
     pair: two,
+    isContested: contested,
+    isCompared,
     reporting: frame?.reporting ?? null,
     expected: frame?.expected ?? null,
     units,

@@ -4,7 +4,7 @@
   import { untrack } from "svelte";
   import Night from "#lib/components/live/night.svelte";
   import { count } from "#lib/format.js";
-  import { isDistricted, placeName, stamp } from "#lib/live/format.js";
+  import { dated, isDistricted, placeName } from "#lib/live/format.js";
   import { localize } from "#lib/live/prefs.svelte.js";
   import { closing, describe, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -30,7 +30,10 @@
   const headline = $derived(
     race == null || focused == null
       ? null
-      : describe(focused, closing(election, race), clock).replace(/\.$/u, ""),
+      : describe(focused, closing(election, race), clock, dated).replace(
+          /\.$/u,
+          "",
+        ),
   );
   const spot = $derived(data.place == null ? null : placeName(data.place.name));
   const name = $derived(race?.title ?? election.title);
@@ -66,7 +69,7 @@
               ...seats,
               headline,
               title: name,
-              time: stamp(election.newest),
+              time: dated(election.newest),
             })
         : headline == null
           ? parts.length === 3
@@ -83,7 +86,7 @@
                 : m.night_seo_description)({
                 headline,
                 title: name,
-                time: stamp(election.newest),
+                time: dated(election.newest),
               }),
   );
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);

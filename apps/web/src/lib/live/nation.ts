@@ -4,6 +4,7 @@ import type { Summary } from "#lib/live/summary.js";
 import type { Control } from "#lib/server/live-board.js";
 import { percent } from "#lib/format.js";
 import { shift } from "#lib/live/flips.js";
+import { isContested } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
 import { swatch } from "#lib/party.js";
 
@@ -133,7 +134,8 @@ export function seat(
       rightVotes += totals[index] ?? 0;
     }
   }
-  const signed = total > 0 ? (leftVotes - rightVotes) / total : null;
+  const signed =
+    total > 0 && isContested(race) ? (leftVotes - rightVotes) / total : null;
   const isEstimating = estimate?.status === "estimating";
   let pLeft = held === left.id ? PRIOR : held === right.id ? 1 - PRIOR : 0.5;
   let pRight = 1 - pLeft;

@@ -6,7 +6,7 @@ import type {
 } from "@ea/analytics/live";
 import { load, Part } from "svelte-islands";
 import type { Control } from "#lib/live/nation.js";
-import { ranked, sum } from "#lib/live/standing.js";
+import { isContested, ranked, sum } from "#lib/live/standing.js";
 
 type Moving = "frames" | "counts" | "certified" | "projected" | "feed";
 
@@ -38,7 +38,7 @@ export type Update = {
   race: string;
   at: string;
   leader: string | null;
-  margin: number;
+  margin: number | null;
   added: number;
   isCall: boolean;
 };
@@ -121,12 +121,13 @@ export function recent(races: Array<LiveRace>) {
           race: race.slug,
           at: frame.at,
           leader: first == null ? null : (race.options[first]?.id ?? null),
-          margin:
-            trim(
-              ((frame.totals[first ?? 0] ?? 0) -
-                (frame.totals[second ?? 1] ?? 0)) /
-                total,
-            ) ?? 0,
+          margin: isContested(race)
+            ? (trim(
+                ((frame.totals[first ?? 0] ?? 0) -
+                  (frame.totals[second ?? 1] ?? 0)) /
+                  total,
+              ) ?? 0)
+            : null,
           added: total - previous,
           isCall: false,
         });

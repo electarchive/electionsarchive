@@ -11,15 +11,22 @@ from uuid import UUID
 import httpx
 
 from ea.sources.us import (
+    alameda_rov_live,
+    as_live,
     civicapi,
+    clarity_local_live,
+    county_live,
     dc_boe_live,
     enr_2026,
     guam_live,
+    lavote_live,
+    livevoter_live,
     mp_cec_live,
     npr_live,
     nv_independent,
     nyc_enr_live,
     vi_live,
+    webb_live,
 )
 from ea.store import DATA, Connection, connect
 
@@ -107,13 +114,27 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = mp_cec_live.collect(client)
     elif adapter == "us.vi_live":
         pages = vi_live.collect(client)
+    elif adapter == "us.lavote":
+        pages = lavote_live.collect(client)
+    elif adapter == "us.livevoter":
+        pages = livevoter_live.collect(client, params["url"])
+    elif adapter == "us.alameda_live":
+        pages = alameda_rov_live.collect(client)
+    elif adapter == "us.clarity_live":
+        pages = clarity_local_live.collect(client, params["state"], params["tenant"], params["eid"])
+    elif adapter == "us.county_live":
+        pages = county_live.collect(client, params["kind"], params["url"])
+    elif adapter == "us.webb_live":
+        pages = webb_live.collect(client)
+    elif adapter == "us.as_live":
+        pages = as_live.collect(client)
     else:
         raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
         if not any(not url.endswith(enr_2026.LISTINGS) for url in pages):
             record(conn, feed, fetched_at, None, None, None, "unchanged", "waiting: no result pages yet")
             return "waiting: no result pages yet"
-        digest = hashlib.sha256()
+        digest = hashlib.sha256(params.get("revision", "").encode())
         for url in sorted(pages):
             if not url.endswith(enr_2026.LISTINGS):
                 digest.update(url.encode() + b"\0" + pages[url][0])
@@ -132,7 +153,9 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             paths[url] = folder / f"{number:03d}{suffix}"
             paths[url].write_bytes(content)
             index[url] = paths[url].name
-        (folder / "index.json").write_text(json.dumps(index, indent=1))
+        partial = folder / ".index.json.part"
+        partial.write_text(json.dumps(index, indent=1))
+        partial.replace(folder / "index.json")
         tallies, unmatched = (
             enr_2026.plan(conn, enr_2026.table({params["state"]: paths}), lambda _, __: None)
             if adapter == "us.enr_2026"
@@ -142,6 +165,27 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.npr"
             else enr_2026.plan(conn, nv_independent.frame(paths), lambda _, __: None)
             if adapter == "us.nv_independent"
+            else enr_2026.plan(conn, lavote_live.frame(paths), lambda _, __: None, also=("ceda",))
+            if adapter == "us.lavote"
+            else enr_2026.plan(conn, livevoter_live.frame(params["county"], paths), lambda _, __: None, also=("ceda",))
+            if adapter == "us.livevoter"
+            else enr_2026.plan(conn, alameda_rov_live.frame(paths), lambda _, __: None, also=("ceda",))
+            if adapter == "us.alameda_live"
+            else enr_2026.plan(
+                conn, clarity_local_live.frame(params["state"], params["tenant"], paths), lambda _, __: None
+            )
+            if adapter == "us.clarity_live"
+            else enr_2026.plan(
+                conn,
+                county_live.frame(params["kind"], params["state"], params["county"], paths),
+                lambda _, __: None,
+                also=("ceda",) if params["state"] == "CA" else (),
+            )
+            if adapter == "us.county_live"
+            else webb_live.plan(conn, paths)
+            if adapter == "us.webb_live"
+            else as_live.plan(conn, paths)
+            if adapter == "us.as_live"
             else dc_boe_live.plan(conn, paths)
             if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)
@@ -209,15 +253,14 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             None,
         )
         for contest, as_of, sums, reporting in frames:
+            conn.execute(
+                "delete from live.frame where feed_id = %s and contest_id = %s and as_of = %s", [feed, contest, as_of]
+            )
             k = conn.execute(
                 """insert into live.frame (feed_id, contest_id, as_of, fetch_id, reporting, expected)
-                   values (%s, %s, %s, %s, %s, %s)
-                   on conflict (feed_id, contest_id, as_of) do update set fetch_id = excluded.fetch_id,
-                     reporting = excluded.reporting, expected = excluded.expected, status = 'active'
-                   returning k""",
+                   values (%s, %s, %s, %s, %s, %s) returning k""",
                 [feed, contest, as_of, fetch, reporting[0] or None, reporting[1] or None],
             ).fetchall()[0][0]
-            conn.execute("delete from live.value where frame_k = %s", [k])
             with conn.cursor().copy("copy live.value (frame_k, unit_id, option_id, votes) from stdin") as copy:
                 for (unit, option), votes in sums.items():
                     copy.write_row((k, unit, option, votes))

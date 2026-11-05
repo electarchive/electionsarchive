@@ -8,7 +8,7 @@ import satori from "satori";
 import type { ChamberView, Control, Family, Seat } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
 import { count, percent } from "#lib/format.js";
-import { initial, lead, stamp, surname } from "#lib/live/format.js";
+import { dated, initial, lead, surname } from "#lib/live/format.js";
 import {
   chamber,
   odds,
@@ -17,7 +17,13 @@ import {
   sides,
   STATES,
 } from "#lib/live/nation.js";
-import { pair, ranked, standing, sum } from "#lib/live/standing.js";
+import {
+  prior as lastTime,
+  pair,
+  ranked,
+  standing,
+  sum,
+} from "#lib/live/standing.js";
 import {
   closing,
   describe,
@@ -207,7 +213,7 @@ function header(status: Status, newest: string | null, context: string) {
           pill(status),
           ...[
             context,
-            newest == null ? "" : m.night_updated({ time: stamp(newest) }),
+            newest == null ? "" : m.night_updated({ time: dated(newest) }),
           ]
             .filter((part) => part !== "")
             .map((part) => line(part, { maxWidth: 420 })),
@@ -910,15 +916,12 @@ function raceBody(summary: Summary, width: number) {
   const shareB = shown.length > 1 ? (base[b] ?? 0) / total : 0;
   const rest = sum(base) === 0 ? 0 : Math.max(0, 1 - shareA - shareB);
   const tint = (color: string) => (isCounting ? color : mix(color, 0.35));
-  const order = prior
-    .map((votes, index) => ({ votes, option: race.options[index] }))
-    .toSorted((x, y) => y.votes - x.votes);
-  const priorTotal = sum(prior);
-  const top = order[0];
+  const last = isSilent ? null : lastTime(race);
+  const top = last?.leader == null ? null : race.options[last.leader];
   const baseline =
-    priorTotal > 0 && top?.option != null
+    last?.margin != null && top != null
       ? m.night_tip_baseline({
-          margin: `${top.option.party == null ? surname(top.option) : initial(top.option)}+${lead((top.votes - (order[1]?.votes ?? 0)) / priorTotal)}`,
+          margin: `${top.party == null ? surname(top) : initial(top)}+${lead(last.margin)}`,
         })
       : null;
   const chance =
@@ -1140,7 +1143,7 @@ async function card(path: string, bucket: number) {
       status = "before";
     }
     const headline = isBefore
-      ? m.night_og_first({ time: stamp(opens) })
+      ? m.night_og_first({ time: dated(opens) })
       : m.night_og_races({
           counting: count(counting),
           total: count(summaries.filter((entry) => !isUncounted(entry)).length),
@@ -1213,7 +1216,11 @@ async function card(path: string, bucket: number) {
       { display: "flex", justifyContent: "space-between", width: INNER },
       [
         h({ display: "flex", flexDirection: "column", width }, [
-          ...heading(target.title, describe(summary, closes, time), width),
+          ...heading(
+            target.title,
+            describe(summary, closes, time, dated),
+            width,
+          ),
           h(
             {
               display: "flex",

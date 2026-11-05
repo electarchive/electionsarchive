@@ -246,7 +246,7 @@
   );
   const newest = $derived(race.frames.at(-1)?.at ?? null);
   const signed = $derived(
-    now.total > 0
+    now.total > 0 && now.isContested
       ? ((now.totals[pair[0]] ?? 0) - (now.totals[pair[1]] ?? 0)) / now.total
       : null,
   );
@@ -368,10 +368,10 @@
     }
     if (now.isFinal && race.certified != null) {
       const winner = options.find((option) => winners.includes(option.id));
-      return m.night_head_won({
-        name: winner?.label ?? leader?.label ?? "",
-        margin: lead(Math.abs(signed ?? 0)),
-      });
+      const name = winner?.label ?? leader?.label ?? "";
+      return signed == null
+        ? m.night_races_won({ name })
+        : m.night_head_won({ name, margin: lead(Math.abs(signed)) });
     }
     if (projected != null) {
       return m.night_head_projected({
@@ -780,31 +780,33 @@
       />
     {/if}
 
-    <section class="bg-background px-4 py-6 sm:px-8">
-      {#if isPlural}
-        <Shares
-          {options}
-          order={ranking}
-          frames={race.frames}
-          at={view}
-          {opens}
-          onPick={pick}
-        />
-      {:else}
-        <Trend
-          {options}
-          {pair}
-          frames={race.frames}
-          {points}
-          expected={estimate.status === "estimating"
-            ? estimate.expectedTotal.mid
-            : null}
-          at={view}
-          {opens}
-          onPick={pick}
-        />
-      {/if}
-    </section>
+    {#if isPlural || now.isContested}
+      <section class="bg-background px-4 py-6 sm:px-8">
+        {#if isPlural}
+          <Shares
+            {options}
+            order={ranking}
+            frames={race.frames}
+            at={view}
+            {opens}
+            onPick={pick}
+          />
+        {:else}
+          <Trend
+            {options}
+            {pair}
+            frames={race.frames}
+            {points}
+            expected={estimate.status === "estimating"
+              ? estimate.expectedTotal.mid
+              : null}
+            at={view}
+            {opens}
+            onPick={pick}
+          />
+        {/if}
+      </section>
+    {/if}
 
     {#if isLive && !isUnestimated}
       <section

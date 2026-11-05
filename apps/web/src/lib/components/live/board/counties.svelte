@@ -164,9 +164,11 @@
                   class="rounded-full block-2 inline-2"
                   style:background-color={tone(option)}
                 ></span>
-                <span class="font-figures tabular-nums"
-                  >+{lead(row.margin)}</span
-                >
+                {#if row.isContested}
+                  <span class="font-figures tabular-nums"
+                    >+{lead(row.margin)}</span
+                  >
+                {/if}
               </span>
             {/if}
           </td>

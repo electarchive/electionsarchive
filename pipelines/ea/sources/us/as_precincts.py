@@ -32,6 +32,11 @@ ROUND_ONE_ROWS = {
     "d16": (316, 261, 102),
     "d17": (120, 158, 111),
 }
+DAY_2026 = date(2026, 11, 3)
+DELEGATE_2026 = CLOUD + "2026/11/04083335/2026-election-results-congress.pdf"
+KEYWORDS_2026 = ["amata", "lancaster", "chapman", "young", "lefaoseu"]
+AS_OF_2026 = datetime(2026, 11, 4, 17, 43, 55, tzinfo=UTC)
+NOTE_2026 = " This is the Election Office's unofficial sheet from the November 3, 2026 election. The Office gave it to KHJ News, and this copy comes from KHJ's Talanei site, because the Office's own site doesn't post results. The Office will release official results after certification."
 FILES = [
     (
         date(2016, 11, 8),
@@ -69,7 +74,33 @@ FILES = [
         CLOUD + "2024/11/20193857/2024-runoff-election-territorial-summary.pdf",
         ["lemanu", "pula"],
     ),
+    (DAY_2026, "house:0", DELEGATE_2026, KEYWORDS_2026),
 ]
+
+
+def read(path: Path, day: date, keywords: list[str]) -> dict[str, dict[str, int]]:
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True, text=True).stdout
+    districts: dict[str, dict[str, int]] = {}
+    printed: dict[str, int] | None = None
+    for line in text.splitlines():
+        found = re.match(r"^(?:(?P<label>[A-Za-z].*?)\s{2,})?(?P<nums>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", line.strip())
+        if found is None:
+            continue
+        numbers = [int(number.replace(",", "")) for number in found["nums"].split()]
+        if len(numbers) != len(keywords) + 1:
+            continue
+        if (found["label"] or "").startswith("Total"):
+            printed = dict(zip(keywords, numbers[:-1], strict=True))
+            continue
+        district = re.match(r"Dist #(\d+)", found["label"] or "")
+        code = f"{day}:AS:{'d' + district[1].zfill(2) if district else 'central'}"
+        districts[code] = dict(zip(keywords, numbers[:-1], strict=True))
+    if "Island" in text and not any(code.endswith("central") for code in districts):
+        raise ValueError(f"{day} {path}: no central office row")
+    summed = {keyword: sum(votes[keyword] for votes in districts.values()) for keyword in keywords}
+    if printed is not None and printed != summed:
+        raise ValueError(f"{day} {path}: districts sum to {summed}, the sheet prints {printed}")
+    return districts
 
 
 def fetch() -> None:
@@ -92,7 +123,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="American Samoa's governor and delegate elections 2016, 2020, and 2024 by polling district from the Election Office, with the 2024 governor's two rounds",
+            summary="American Samoa's governor and delegate elections 2016, 2020, and 2024, and the 2026 delegate election's unofficial count, by polling district from the Election Office, with the 2024 governor's two rounds",
             polity="US-AS",
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-AS'").fetchone()
@@ -149,9 +180,6 @@ def emit() -> Path:
         results: dict[tuple[date, str], dict[str, dict[str, int]]] = {}
         for day, section, url, keywords in FILES:
             artifact = raw.cached(SOURCE, url)
-            text = subprocess.run(
-                ["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True
-            ).stdout
             title = f"{day.year} {'runoff' if day.month == 11 and day.day == 19 else 'general'} election results by polling district"
             if (day, section) not in sources:
                 sources[(day, section)] = cs.source(PUBLISHER, title + f" ({section})")
@@ -161,24 +189,11 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=PUBLISHER,
                     title=title + f" ({section})",
-                    url="https://aselectionoffice.gov/",
+                    url=url if day == DAY_2026 else "https://aselectionoffice.gov/",
                     license="Public record",
                 )
                 cs.artifact(artifact, sources[(day, section)])
-            for line in text.splitlines():
-                found = re.match(
-                    r"^(?:(?P<label>[A-Za-z].*?)\s{2,})?(?P<nums>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", line.strip()
-                )
-                if found is None:
-                    continue
-                numbers = [int(number.replace(",", "")) for number in found["nums"].split()]
-                if len(numbers) != len(keywords) + 1 or (found["label"] or "").startswith("Total"):
-                    continue
-                district = re.match(r"Dist #(\d+)", found["label"] or "")
-                code = f"{day}:AS:{'d' + district[1].zfill(2) if district else 'central'}"
-                results.setdefault((day, section), {})[code] = dict(zip(keywords, numbers[:-1], strict=True))
-            if "Island" in text and not any(code.endswith("central") for code in results[(day, section)]):
-                raise ValueError(f"{day} {section}: no central office row")
+            results.setdefault((day, section), {}).update(read(artifact.path, day, keywords))
         round_one = cs.key("us.contest", "2024-11-05:AS:governor")
         round_two = cs.key("us.contest", "2024-11-19:AS:governor")
         for contest, election, round_number, previous, slug in (
@@ -293,8 +308,8 @@ def emit() -> Path:
             if existing:
                 for option, outcome_kind, seats in conn.execute(
                     """select o.option_id, o.kind, o.seats from outcome o
-                       join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s and rs.id <> %s""",
-                    [contest, result_set],
+                       join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
+                    [contest],
                 ).fetchall():
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
                 official = conn.execute(
@@ -302,7 +317,7 @@ def emit() -> Path:
                     [contest],
                 ).fetchone()[0]
                 counted = sum(count for votes in districts.values() for count in votes.values())
-                completeness = round(float(counted) / float(official), 4)
+                completeness = 1 if official is None else round(float(counted) / float(official), 4)
             else:
                 if contest == round_two:
                     cs.add("outcome", result_set_id=result_set, option_id=picked[ranked[0]], kind="elected", seats=None)
@@ -312,10 +327,11 @@ def emit() -> Path:
                 id=result_set,
                 election_id=election,
                 contest_id=contest,
-                stage="certified",
+                stage="preliminary" if day == DAY_2026 else "certified",
                 kind="counted",
                 status="active",
                 source_id=sources[(day, section)],
+                as_of=AS_OF_2026 if day == DAY_2026 else None,
                 is_default=True,
                 completeness=completeness,
             )
@@ -327,6 +343,8 @@ def emit() -> Path:
                 + (
                     " The first-round sheet is an image published as the election-night unofficial results; its figures were transcribed by hand and each column sums to the totals the Office certified on November 12, 2024 (reported by Talanei)."
                     if key == "2024-11-05:AS:governor"
+                    else NOTE_2026
+                    if day == DAY_2026
                     else ""
                 ),
             )

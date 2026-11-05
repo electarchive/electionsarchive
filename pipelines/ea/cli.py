@@ -1,6 +1,7 @@
 import argparse
 import atexit
 import importlib
+import os
 import resource
 import subprocess
 import sys
@@ -344,6 +345,13 @@ def main() -> None:
                     raw.parsed(source)
             if step == "parse":
                 raw.atomic_parquet()
+                for partial in (DATA / "parsed" / args.source).rglob(".*.parquet.*.tmp"):
+                    try:
+                        os.kill(int(partial.name.rsplit(".", 2)[1]), 0)
+                    except ProcessLookupError:
+                        partial.unlink(missing_ok=True)
+                    except PermissionError:
+                        pass
             result = getattr(module, step)()
             if result is not None:
                 print(result)

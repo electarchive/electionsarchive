@@ -608,7 +608,7 @@
               </td>
             {/if}
             <td
-              class="py-1.5 text-end font-figures text-muted-foreground tabular-nums @max-[73rem]:order-10 @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs"
+              class="py-1.5 text-end font-figures whitespace-nowrap text-muted-foreground tabular-nums @max-[73rem]:order-10 @max-[73rem]:shrink-0 @max-[73rem]:p-0 @max-[73rem]:pbs-1.5 @max-[73rem]:text-xs"
               >{summary.at == null ? "–" : clock(summary.at)}</td
             >
           </tr>

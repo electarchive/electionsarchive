@@ -1,5 +1,12 @@
 import type { LiveOption } from "@ea/analytics/live";
-import { dates, numbers } from "#lib/format.js";
+import {
+  calendarDay,
+  dateParts,
+  dates,
+  numbers,
+  timeOrDate,
+  today,
+} from "#lib/format.js";
 import { prefs } from "#lib/live/prefs.svelte.js";
 import { isNeutral, side, stance, swatch } from "#lib/party.js";
 
@@ -99,21 +106,80 @@ export function clock(at: string | number | null, zone = prefs.zone) {
   if (at == null) {
     return "";
   }
-  return dates({ hour: "numeric", minute: "2-digit", timeZone: zone }).format(
-    new Date(at),
-  );
+  return timeOrDate(new Date(at), { timeZone: zone });
 }
 
 export function stamp(at: string | number | null, zone = prefs.zone) {
   if (at == null) {
     return "";
   }
+  return timeOrDate(new Date(at), { timeZone: zone, timeZoneName: "short" });
+}
+
+export function dated(at: string | number | null, zone = prefs.zone) {
+  if (at == null) {
+    return "";
+  }
   return dates({
+    year: "numeric",
+    month: "short",
+    day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     timeZone: zone,
     timeZoneName: "short",
   }).format(new Date(at));
+}
+
+const HOUR = 3_600_000;
+const MARK_HOURS = [1, 2, 3, 4, 6, 12, 24];
+
+export function timeMarks(
+  start: number,
+  end: number,
+  plot: number,
+  zone = prefs.zone,
+) {
+  const first = calendarDay(start, zone);
+  const isOneDay = first === calendarDay(end, zone);
+  const isAllToday = isOneDay && first === today(zone);
+  const room = isOneDay ? 72 : 96;
+  const perHour = (Math.max(1, plot) / Math.max(1, end - start)) * HOUR;
+  const step =
+    MARK_HOURS.find((hours) => hours * perHour >= room) ??
+    24 * Math.ceil(room / (24 * perHour));
+  const hourOf = dates({
+    hour: "numeric",
+    hourCycle: "h23",
+    numberingSystem: "latn",
+    timeZone: zone,
+  });
+  const marks: Array<{ at: number; label: string }> = [];
+  let day: string | null = null;
+  let midnights = 0;
+  for (let at = Math.ceil(start / HOUR) * HOUR; at <= end; at += HOUR) {
+    const hour = Number(
+      hourOf.formatToParts(at).find((part) => part.type === "hour")?.value,
+    );
+    if (hour % Math.min(step, 24) !== 0) {
+      continue;
+    }
+    if (step > 24 && midnights++ % (step / 24) !== 0) {
+      continue;
+    }
+    const shown = calendarDay(at, zone);
+    const isNewDay = shown !== day;
+    day = shown;
+    marks.push({
+      at,
+      label: dates({
+        ...(step < 24 && { hour: "numeric", minute: "2-digit" }),
+        ...((step >= 24 || (isNewDay && !isAllToday)) && dateParts(at, zone)),
+        timeZone: zone,
+      }).format(at),
+    });
+  }
+  return marks;
 }
 
 export function day(at: string | number, zone = prefs.zone) {

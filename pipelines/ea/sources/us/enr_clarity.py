@@ -1958,6 +1958,35 @@ def emit(
         def name(entity: UUID, text: str) -> None:
             cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        def contest_name(contest: UUID, text: str) -> None:
+            if (
+                contest in cs.minted
+                or conn.execute(
+                    """select 1 from name n join changeset c on c.id = n.changeset_id
+                       where n.entity_id = %s and n.lang = 'en' and n.is_preferred and c.pipeline <> %s limit 1""",
+                    [contest, source],
+                ).fetchone()
+                is None
+            ):
+                name(contest, text)
+
+        def person_name(person: UUID, text: str) -> None:
+            if (
+                person in cs.minted
+                or conn.execute(
+                    """select 1 from name n join changeset c on c.id = n.changeset_id
+                       where n.entity_id = %s and n.lang = 'en' and n.is_preferred and n.text <> %s
+                         and c.pipeline <> %s
+                         and not exists (
+                           select 1 from name o join changeset oc on oc.id = o.changeset_id
+                           where o.entity_id = n.entity_id and o.lang = 'en' and o.is_preferred and oc.pipeline = %s)
+                       limit 1""",
+                    [person, text, source, source],
+                ).fetchone()
+                is None
+            ):
+                name(person, text)
+
         person_scheme = f"{source}.person"
         person_keys: dict[UUID, str] = dict(
             conn.execute(
@@ -2525,7 +2554,7 @@ def emit(
                     default_result_kind="counted",
                 )
                 cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-                name(
+                contest_name(
                     contest,
                     f"{day.year} {place}: {_title(re.sub(r'\s*\((?:VOTE|Vote) [^)]*\)', '', str(first['text'])))}",
                 )
@@ -2620,7 +2649,7 @@ def emit(
                     default_result_kind="counted",
                     term="remainder" if first["remainder"] else "full",
                 )
-                name(
+                contest_name(
                     contest,
                     (
                         f"{day.year} {office_title} primary"
@@ -2642,7 +2671,7 @@ def emit(
                 f"{source}.result_set", contest_key if contest_key in held_keys or not held_keys else min(held_keys)
             )
             emitted_sets.append(result_set)
-            main = max(carried, key=lambda county: shares.get(county, 0.0))
+            main = max(sorted(carried), key=lambda county: shares.get(county, 0.0))
             cs.add(
                 "result_set",
                 id=result_set,
@@ -2793,7 +2822,7 @@ def emit(
                         persons.add(person)
                         if person in cs.minted:
                             cs.add("person", id=person)
-                        name(person, ballot)
+                        person_name(person, ballot)
                     tag = party or choice_party
                     won = (
                         primary_winners.get(series, {}).get(slug(_title(choice)), set())
@@ -3029,6 +3058,21 @@ def emit(
                     text=text,
                     reason="a party, ballot-number, or write-in label in the name",
                 )
+        for held, contest, held_text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join contest co on co.id = n.entity_id
+               join changeset c on c.id = n.changeset_id and c.pipeline = %s
+               where n.lang = 'en' and n.is_preferred and exists (
+                 select 1 from name o join changeset oc on oc.id = o.changeset_id
+                 where o.entity_id = n.entity_id and o.lang = 'en' and o.is_preferred and oc.pipeline <> %s)""",
+            [source, source],
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=held,
+                entity_id=contest,
+                text=held_text,
+                reason="another pipeline's preferred name stands for this contest",
+            )
         repair(cs)
         sweep(cs, source)
         return cs.write()

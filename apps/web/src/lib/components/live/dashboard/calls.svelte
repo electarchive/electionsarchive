@@ -78,7 +78,8 @@
               </span>
             </span>
             <span class="grid content-center justify-items-end gap-0.5">
-              <span class="font-figures font-semibold tabular-nums"
+              <span
+                class="font-figures font-semibold whitespace-nowrap tabular-nums"
                 >{clock(call.at)}</span
               >
               <span class="text-xs text-muted-foreground"

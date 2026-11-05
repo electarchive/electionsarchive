@@ -56,13 +56,13 @@
       {m.night_closings_zone({ zone: zoneName(waves[0].at) })}
     </p>
   {/if}
-  <ol class="grid gap-1">
+  <ol class="grid grid-cols-[max-content_minmax(0,1fr)] gap-x-2 gap-y-1">
     {#each waves as wave (wave.at)}
       {const isPast = $derived(wave.time <= desk.feed.clock)}
       {const isNext = $derived(next?.at === wave.at)}
       <li
         class={cn(
-          "grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-2 rounded-xs px-1 py-0.5",
+          "col-span-full grid grid-cols-subgrid items-baseline rounded-xs px-1 py-0.5",
           { "text-muted-foreground": isPast },
           { "bg-muted": isNext },
         )}
@@ -71,7 +71,7 @@
           <button
             type="button"
             aria-describedby="board-closing-{wave.at}"
-            class="cursor-help justify-self-start font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+            class="cursor-help justify-self-start font-figures font-semibold whitespace-nowrap tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
             >{clock(wave.at)}</button
           >
           <span class="font-figures text-[0.85em] tabular-nums">

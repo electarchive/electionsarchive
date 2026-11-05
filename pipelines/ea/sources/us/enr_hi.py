@@ -77,7 +77,7 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             if any(int(cell or 0) for cell in row[13:15]):
                 print(f"HI: votes in precinct {row[0]!r}, {title}")
             continue
-        if not (STATE.fullmatch(title) or HOUSE.fullmatch(title) or SEAT.fullmatch(title)):
+        if not (title == "Mayor" or STATE.fullmatch(title) or HOUSE.fullmatch(title) or SEAT.fullmatch(title)):
             continue
         party = row[8].strip()
         key = (place, row[6], title, party, row[10])
@@ -105,11 +105,11 @@ def rows(url: str, path: Path, urls: dict[str, Path]):
             if house
             else (("senate" if seat[1] == "Senator" else "house"), f"{int(seat[2])}:g")
             if seat
-            else ("state", "")
+            else ("other" if title == "Mayor" else "state", "")
         )
         yield {
             "office": office,
-            "contest": title if office == "state" else "",
+            "contest": title if office in ("state", "other") else "",
             "district": district,
             "party": label or "",
             "scope": PARTIES.get(party, "") if party else "",

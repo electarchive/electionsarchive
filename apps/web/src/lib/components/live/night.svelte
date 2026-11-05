@@ -105,7 +105,7 @@
           href: toLive(`${election.slug}/place/${placeSlug(row.unit.name)}`),
           leader:
             row.leader == null ? null : (anchor.options[row.leader] ?? null),
-          margin: row.margin,
+          margin: row.isContested ? row.margin : null,
           counted:
             row.total > 0
               ? Math.min(1, row.total / Math.max(1, rest.expected))

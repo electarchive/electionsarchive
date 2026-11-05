@@ -184,9 +184,9 @@ def emit() -> Path:
                    where u.scheme_code = 'us.state'"""
             ).fetchall()
         }
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "irv")}
         if cs.minted & set(systems.values()):
-            raise ValueError("the fptp and two-round systems must exist")
+            raise ValueError("the fptp, two-round, and instant-runoff systems must exist")
         parties = {label: cs.key("us.party", key) for label, key in PARTIES.items()}
         if cs.minted & set(parties.values()):
             raise ValueError(f"missing parties: {[label for label, party in parties.items() if party in cs.minted]}")
@@ -227,6 +227,22 @@ def emit() -> Path:
                 or placeholders.get(f"{year}:{state}:governor" + (":special" if special else ""))
                 or placeholders.get(f"{day}:{state}:governor")
             )
+            if state == "AK" and year >= 2022 and contest_key in done:
+                columns = (
+                    "id",
+                    "election_id",
+                    "kind",
+                    "office_id",
+                    "district_area_id",
+                    "term",
+                    "magnitude",
+                    "round_number",
+                    "default_result_kind",
+                )
+                row = conn.execute(
+                    f"select {', '.join(columns)} from contest where id = %s", [cs.key("us.contest", contest_key)]
+                ).fetchone()
+                cs.add("contest", **dict(zip(columns, row, strict=True)), electoral_system_id=systems["irv"])
             if (year, state) in DROPPED or (contest_key in official and placeholder is None):
                 continue
             unit, area, state_name = states[state]
@@ -340,7 +356,9 @@ def emit() -> Path:
                     term="remainder" if special else "full",
                     magnitude=1,
                     round_number=2 if kind == "runoff" else 1,
-                    electoral_system_id=systems[SYSTEMS.get(state, "fptp")],
+                    electoral_system_id=systems[
+                        "irv" if state == "AK" and year >= 2022 else SYSTEMS.get(state, "fptp")
+                    ],
                     default_result_kind="counted",
                 )
                 name(

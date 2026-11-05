@@ -435,7 +435,7 @@
             </th>
             {#if answers != null}
               <td class="py-3 ps-5 pe-3">
-                {#if row.leader == null || row.total === 0}
+                {#if row.leader == null || row.total === 0 || !row.isContested}
                   <span class="block text-end text-muted-foreground/60">–</span>
                 {:else if row.margin < 0.0005}
                   <span class="block text-end text-muted-foreground"

@@ -5,7 +5,8 @@
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
   import { ahead, MUTED, short, strength } from "#lib/live/board/labels.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { surname, tone } from "#lib/live/format.js";
+  import { edge } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import Atlas from "./atlas.svelte";
   import Mark from "./mark.svelte";
@@ -106,7 +107,7 @@
           ></span>
           {surname(option)}
           <span class="font-figures text-muted-foreground tabular-nums"
-            >+{lead(summary.margin)}</span
+            >{edge(summary)}</span
           >
           <Mark {summary} />
         </span>

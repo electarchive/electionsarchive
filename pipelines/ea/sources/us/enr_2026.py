@@ -8,7 +8,7 @@ import os
 import re
 import time
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
@@ -1428,7 +1428,7 @@ def countywide(key: str) -> bool:
 
 
 def plan(
-    conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None]
+    conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None], also: Sequence[str] = ()
 ) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
     frame = frame.filter(~pl.col("candidate").fill_null("").str.contains(NOBODY)).with_columns(
         candidate=pl.when(pl.col("party").is_not_null() & pl.col("candidate").str.starts_with(pl.col("party") + " "))
@@ -1509,8 +1509,8 @@ def plan(
                left join body b on b.id = c.body_id
                left join office o on o.id = c.office_id
                join polity p on p.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
-               where x.scheme = 'us.contest' and x.value like %s""",
-            [f"{DAY}:{state}:%"],
+               where x.scheme = 'us.contest' and x.value like any(%s)""",
+            [[f"{DAY}:{group}:%" for group in (state, *also)]],
         ).fetchall():
             if re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
                 federal.setdefault(id, set())
@@ -1651,7 +1651,7 @@ def plan(
                         heads.get(contest, set()) & words
                         and (titles.get(contest, set()) - heads[contest]) & words - GENERIC
                     )
-                    or re.fullmatch(r"\d{7}|\d\d-[a-z0-9-]+", segment)
+                    or re.fullmatch(r"\d{7}|\d{9}|\d\d-[a-z0-9-]+", segment)
                     and (names := towns.get(str(held[contest][0]), []) + towns.get(segment, []))
                     and len(people & wanted - {"yes", "no"}) < 2
                     and not any(
