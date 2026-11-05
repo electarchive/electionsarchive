@@ -626,7 +626,7 @@
       >
         {#if step != null}
           <div
-            class="mbe-2 flex touch-pan-y items-center gap-2 lg:hidden"
+            class="mbe-2 flex touch-pan-y items-center gap-2 min-block-11 lg:hidden"
             role="group"
             aria-label={m.scrubber_slider()}
             onpointerdown={(event) => {
