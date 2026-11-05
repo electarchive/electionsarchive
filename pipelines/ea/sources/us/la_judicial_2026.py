@@ -126,7 +126,7 @@ def emit() -> Path:
             ).fetchall()
         }
         election = cs.key("us.election", "2026-11-03:LA")
-        fptp = cs.key("us.electoral_system", "fptp")
+        two_round = cs.key("us.electoral_system", "two_round")
         made: set[object] = set()
         counts = {"contests": 0, "candidates": 0, "districts": 0, "skipped": 0}
         for race in listing:
@@ -204,7 +204,7 @@ def emit() -> Path:
                 term="full",
                 round_number=1,
                 previous_round_id=None,
-                electoral_system_id=fptp,
+                electoral_system_id=two_round,
                 default_result_kind="counted",
             )
             name(contest, f"2026 {heading} election")
