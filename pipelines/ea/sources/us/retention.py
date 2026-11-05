@@ -1010,10 +1010,8 @@ def merge_parts() -> None:
     merged["names"].write_parquet(PARSED / "names.parquet")
 
 
-def parse() -> None:
-    inputs = [(year, raw.cached(source, url).path) for year, files in FILES.items() for source, url in files]
-    wanted = selected_states()
-    official = pl.DataFrame(
+def official_rows() -> pl.DataFrame:
+    return pl.DataFrame(
         kansas()
         + kansas_scanned()
         + oklahoma()
@@ -1025,6 +1023,11 @@ def parse() -> None:
         + retention_montana.rows(),
         schema=OFFICIAL_SCHEMA,
     ).with_row_index("order")
+
+
+def parse() -> None:
+    inputs = [(year, raw.cached(source, url).path) for year, files in FILES.items() for source, url in files]
+    wanted = selected_states()
     PARSED.mkdir(parents=True, exist_ok=True)
     parts = PARSED / "parts"
     for kind in ("rows", "official", "names"):
@@ -1033,17 +1036,23 @@ def parse() -> None:
         for kind in ("rows", "official", "names"):
             for old in (parts / kind).iterdir():
                 old.unlink()
+        official = official_rows()
         states = sorted(set(official["state"]).union(*(state_codes(path) for _, path in inputs)))
+        shared = parts / "official-input.parquet"
+        official.write_parquet(shared)
         del official
         for state in states:
             subprocess.run(
                 ["systemd-run", "--user", "--scope", "--quiet", "-p", "MemoryMax=2G", "-p", "MemorySwapMax=0"]
                 + [sys.argv[0], "parse", SOURCE],
-                env={**os.environ, "RETENTION_STATES": state},
+                env={**os.environ, "RETENTION_STATES": state, "RETENTION_OFFICIAL": str(shared)},
                 check=True,
             )
+        shared.unlink()
         merge_parts()
         return
+    shared = os.environ.get("RETENTION_OFFICIAL")
+    official = official_rows() if shared is None else pl.read_parquet(shared)
     dropped, answers, count = [], [], 0
     for state in sorted(wanted):
         part = parse_state(state, inputs, official.filter(pl.col("state") == state))
