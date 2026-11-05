@@ -175,6 +175,10 @@ WITHDREW = {
 }
 VA_CLEANUP = {*range(392452, 392456), *range(392585, 392589)}
 SUFFIXES = {"jr": "Jr.", "sr": "Sr."}
+MISSPELLED = {
+    "Jona Kreisstomkins": "Jonathan Kreiss-Tomkins",
+    "Jonathan S. Kreisstomkins": "Jonathan S. Kreiss-Tomkins",
+}
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
     "January",
@@ -502,7 +506,7 @@ def emit() -> Path | str:
             text = " ".join(part for part in parts if part)
             if isinstance(suffix, str):
                 text += f", {SUFFIXES.get(suffix, suffix.upper())}"
-            return initials(text)
+            return MISSPELLED.get(text, initials(text))
 
         days: dict[tuple[str, int, int, int | None, str], tuple[str, date, str]] = {}
         dated = (

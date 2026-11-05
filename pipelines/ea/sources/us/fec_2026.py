@@ -414,6 +414,7 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 NV_PETITIONED = {"Danielle Ford", 'Afzal "Bobby" Khan', 'Steven "Chap" St John', "William Johnson"}
+NV_NOT_QUALIFIED = {"Cornelius D. Jones"}
 NV_NOTA_OFFICES = {
     "governor",
     "lieutenant-governor",
@@ -2537,7 +2538,7 @@ def emit() -> Path:
                join contest_option op on op.contest_id = x.entity_id
                join changeset c on c.id = op.changeset_id and c.pipeline = %s
                left join candidacy cy on cy.option_id = op.id and cy.role is distinct from 'running_mate'
-               where x.scheme = 'us.contest' and x.value like %s
+               where x.scheme = 'us.contest' and x.value like %s and op.kind <> 'none_of_the_above'
                  and not exists (select from entity_retirement r where r.entity_id = op.id)""",
             [SOURCE, f"{DAY}:%"],
         ).fetchall():
@@ -2883,6 +2884,8 @@ def emit() -> Path:
                     )
                 ]
             for ballot, person, party_id in entries:
+                if ballot in NV_NOT_QUALIFIED:
+                    continue
                 person = next(
                     (
                         held_person
