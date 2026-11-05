@@ -5559,6 +5559,7 @@
   "feed_topic_resolved": "Mijara çareserkirî derbarê {record} de: {topic}",
   "feed_imported_by": "Ji aliyê {pipeline} ve hat anîn",
   "feed_someone": "Beşdarvanek",
+  "feed_automated": "Otomatîk",
   "feed_via_agent": "{author} bi riya {agent}",
   "feed_batches": [
     {
@@ -5579,6 +5580,7 @@
   "recent_title": "Guhertinên dawî",
   "recent_heading": "Guhertinên dawî",
   "recent_lede": "Her tiştê ku di arşîvê de guherî, ji nûtirîn ber bi kevntirîn: importên daneyan, pêşniyar û biryarên li ser wan, û gotûbêj. Dem li gorî herêma demjimêra te têne nîşandan; li ser yekê bisekine da ku UTC bibînî.",
+  "recent_lede_read_only": "Hemû importên daneyan ên di arşîvê de, ji nûtirîn ber bi kevntirîn. Dem li gorî herêma demjimêra te têne nîşandan; li ser yekê bisekine da ku wê bi UTC bibînî.",
   "recent_feed_title": "Guhertinên dawî li electionsarchive.com",
   "recent_filter_author": "Çêkirî ji aliyê",
   "recent_filter_all": "Hemû",

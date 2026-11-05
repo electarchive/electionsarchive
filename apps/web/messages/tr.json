@@ -5559,6 +5559,7 @@
   "feed_topic_resolved": "{record} hakkındaki konu çözüldü: {topic}",
   "feed_imported_by": "İçe aktaran: {pipeline}",
   "feed_someone": "Katkıda bulunan biri",
+  "feed_automated": "Otomatik",
   "feed_via_agent": "{author}, {agent} üzerinden",
   "feed_batches": [
     {
@@ -5579,6 +5580,7 @@
   "recent_title": "Son değişiklikler",
   "recent_heading": "Son değişiklikler",
   "recent_lede": "Arşivde değişen her şey, en yeniden eskiye doğru: veri aktarımları, değişiklik önerileri ve bunlara verilen kararlar ile tartışmalar. Saatler sizin saat diliminizdedir. UTC saatini görmek için imleci saatin üzerine getirin.",
+  "recent_lede_read_only": "Arşivdeki tüm veri aktarımları, en yeniden eskiye doğru. Saatler sizin saat diliminizdedir. UTC saatini görmek için imleci saatin üzerine getirin.",
   "recent_feed_title": "electionsarchive.com sitesindeki son değişiklikler",
   "recent_filter_author": "Yapan",
   "recent_filter_all": "Tümü",
