@@ -1455,8 +1455,8 @@ url = "https://results.enr.clarityelections.com/FL/Orange/127356/"
 id = "us.county_live.st_lucie"
 adapter = "us.county_live"
 interval = 180
-note = "Florida's state site has no city races, so Port St. Lucie's mayor comes from the St. Lucie County Supervisor of Elections' results page."
-params = { kind = "electionsfl", state = "FL", county = "St. Lucie", url = "https://enr.electionsfl.org/STL/4089/Summary/" }
+note = "Florida's state site has no city races, so Port St. Lucie's mayor and District 1 council race come from the St. Lucie County Supervisor of Elections' results page."
+params = { revision = "2026-11-05", kind = "electionsfl", state = "FL", county = "St. Lucie", url = "https://enr.electionsfl.org/STL/4089/Summary/" }
 publisher = "St. Lucie County Supervisor of Elections"
 url = "https://enr.electionsfl.org/STL/4089/Summary/"
 

@@ -56,6 +56,9 @@ FILES = {
     "17031c": "https://www.cookcountyclerkil.gov/elections/current-elections/view-all-candidates#GetAllCandidates.json",
 }
 DIFFERENT_PEOPLE = {("TN:4715160:council:ward-7", "John Dewey Robinson", "Jeffrey K. Robinson")}
+DECIDED_AT_PRIMARY = {
+    "FL:1258715:council:district-3": "Jim Norton won this seat outright at the Aug. 18, 2026 primary with 52.26 percent, so it was not on the Nov. 3 ballot (St. Lucie County Supervisor of Elections, https://enr.electionsfl.org/STL/4030/Summary/)"
+}
 FEEDS = {
     "ME": (
         "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/2026%20General%20Candidate%20List%20-%20FINAL.xlsx",
@@ -7117,10 +7120,10 @@ for key, publisher, title, url, local in (
     ),
     (
         "FL-12111-port-st-lucie",
-        "City of Port St. Lucie",
-        "Elections: 2026 Candidates",
-        "https://www.cityofpsl.com/Government/Your-City-Government/Departments/City-Clerk/Elections",
-        "fl/port_st_lucie.html",
+        "St. Lucie County Supervisor of Elections",
+        "2026 General, Summary Results, Election Night Reporting",
+        "https://enr.electionsfl.org/STL/4089/Summary/",
+        "fl/st_lucie_general.html",
     ),
     (
         "CA-06107-tulare",
@@ -12449,6 +12452,10 @@ def emit() -> None:
         raise SystemExit(f"failed states: {','.join(failed)}")
 
 
+def stale_reason(value: str | None, default: str) -> str:
+    return next((why for tail, why in DECIDED_AT_PRIMARY.items() if value is not None and tail in value), default)
+
+
 def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Offices) -> Path:
     NEW_PARTIES_ADDED.clear()
     only_unexpired = set(frame.group_by("tail").agg(pl.col("unexpired").all()).filter("unexpired")["tail"])
@@ -13326,9 +13333,10 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             [SOURCE, DAY, emitted, f"{DAY}:{state}:%"],
         ).fetchall():
             print("dropping stale", value)
+            why = stale_reason(value, reason)
             if candidacy is not None:
-                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
-            cs.add("entity_retirement", entity_id=option, reason=reason)
+                cs.add("entity_retirement", entity_id=candidacy, reason=why)
+            cs.add("entity_retirement", entity_id=option, reason=why)
             counts["dropped"] += 1
         stale: list[UUID] = []
         stale_bodies: set[UUID] = set()
@@ -13346,7 +13354,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             [SOURCE, DAY, emitted, f"{DAY}:{state}:%", SOURCE],
         ).fetchall():
             print("retiring stale contest", value)
-            cs.add("entity_retirement", entity_id=contest, reason=reason)
+            cs.add("entity_retirement", entity_id=contest, reason=stale_reason(value, reason))
             counts["stale contests"] += 1
             stale.append(contest)
             if stale_body is not None:

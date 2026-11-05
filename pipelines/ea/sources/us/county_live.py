@@ -12,7 +12,7 @@ import polars as pl
 
 from ea.sources.us.enr_2026 import table
 
-LOCAL = re.compile(r"(?i)\bmayor\b|^(city|town|village)\b")
+LOCAL = re.compile(r"(?i)\bmayor\b|^(city|town|village)\b|\bcity council\b")
 SUFFIX = {"electionsfl": ".html", "summary_xml": ".xml", "montgomery_tn": ".json"}
 NS = "{ElectionSummaryReportRPT}"
 UPDATED = re.compile(r'id="LastUpdated">\s*\(Website last updated at: ([^)]+)\)')
