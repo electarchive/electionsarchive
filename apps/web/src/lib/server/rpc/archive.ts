@@ -7958,8 +7958,21 @@ export const contests = {
                       union all
                       select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
                     ),
+                    direct as materialized (
+                      select r.id as root from roots r
+                      cross join lateral (
+                        select from result_set rs
+                        cross join lateral (
+                          select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
+                        ) probe
+                        where rs.contest_id = r.id and rs.status <> 'withdrawn' and ${served("rs")}
+                        limit 1
+                      ) hit
+                    ),
                     tallied as materialized (
-                      select distinct grp.root from grp
+                      select root from direct
+                      union
+                      select grp.root from grp
                       cross join lateral (
                         select from result_set rs
                         cross join lateral (
@@ -7968,6 +7981,7 @@ export const contests = {
                         where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
                         limit 1
                       ) hit
+                      where grp.root not in (select root from direct)
                     ),
                     decided as materialized (
                       select distinct grp.root from grp
@@ -7978,6 +7992,7 @@ export const contests = {
                         where o.contest_id = grp.id
                         limit 1
                       ) hit
+                      where grp.root not in (select root from tallied)
                     )
                     select r.*, (select ${reached} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
                       select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
