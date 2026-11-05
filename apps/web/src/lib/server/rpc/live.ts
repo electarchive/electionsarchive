@@ -134,7 +134,7 @@ const color = (party: SQL, date: SQL) => sql`
 `;
 
 const tier = (adapter: SQL) =>
-  sql`case ${adapter} when 'us.npr' then 1 when 'us.civicapi' then 2 else 0 end`;
+  sql`case ${adapter} when 'us.npr' then 1 when 'us.civicapi' then 2 when 'us.nv_independent' then 3 else 0 end`;
 
 function group(path: string) {
   const seat = path.split("/").at(-1) ?? "";

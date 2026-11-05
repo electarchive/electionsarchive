@@ -62,6 +62,7 @@ EV_OFFICES = re.compile(
 )
 LISTINGS = (
     "elections.json",
+    "json/sum.json",
     "cid=arkansas",
     "/ballot-items",
     "Georgia",
@@ -264,7 +265,7 @@ def terms(label: str, joined: bool = True) -> list[str]:
     return words[:-1] if len(words) > 2 and words[-1] == "i" else words
 
 
-def shared(group: pl.DataFrame, ballots: dict[str, UUID], closeness: dict[str, int]) -> list[tuple[str, str]]:
+def shared(group: pl.DataFrame, ballots: dict[str, UUID], closeness: dict[str, int]) -> list[tuple[str, str, bool]]:
     claimed: dict[UUID, list[str]] = {}
     for name in closeness:
         claimed.setdefault(ballots[name], []).append(name)
@@ -281,7 +282,7 @@ def shared(group: pl.DataFrame, ballots: dict[str, UUID], closeness: dict[str, i
             others = set(terms(re.sub(r"\([^)]*\)", " ", name)))
             initial = min(len(terms(name)[0]), len(terms(kept)[0])) == 1
             if name != kept and places[name] & places[kept] and not (words <= others or others <= words or initial):
-                held.append((name, kept))
+                held.append((name, kept, votes[name] * 100 < votes[kept]))
     return held
 
 
@@ -445,11 +446,21 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
             print(f"{state}: no election on {DAY}")
             continue
         version = get(client, f"{base}{ids[0]}/current_ver.txt")
-        content = version and get(client, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip")
-        if content is None:
+        if not version:
+            print(f"{state}: no current version")
+            continue
+        root = f"{base}{ids[0]}/{version.decode().strip()}"
+        content = get(client, f"{root}/reports/detailxml.zip")
+        if content is not None:
+            store(state, f"{root}/reports/detailxml.zip", content, ".zip")
+            continue
+        summary = get(client, f"{root}/json/sum.json")
+        details = get(client, f"{root}/json/details.json")
+        if summary is None or details is None:
             print(f"{state}: no detail file")
-        else:
-            store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
+            continue
+        store(state, f"{root}/json/sum.json", summary, ".json")
+        store(state, f"{root}/json/details.json", details, ".json")
     if not only or "OK" in only:
         login = client.put(
             f"{OK_BASE}login/",
@@ -893,6 +904,39 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
         from ea.sources.us import enr_ny
 
         yield from enr_ny.rows(url, path, urls)
+        return
+    if url.endswith("json/details.json"):
+        summary = json.loads(urls[url.removesuffix("details.json") + "sum.json"].read_bytes())
+        heads = {contest["K"]: contest for contest in summary["Contests"]}
+        for contest in json.loads(path.read_bytes())["Contests"]:
+            head = heads.get(contest["K"])
+            if head is None:
+                continue
+            title = re.sub(r"\s+", " ", head["C"]).strip()
+            found = EV_OFFICES.fullmatch(title)
+            counts = (sum(contest["PX"]), sum(contest["PY"]))
+            for county, votes in zip(contest["P"], contest["V"], strict=True):
+                for candidate, party, count in zip(head["CH"], head["P"], votes, strict=True):
+                    yield {
+                        "office": "other"
+                        if found is None
+                        else "senate"
+                        if found["senate"]
+                        else "governor"
+                        if found["governor"]
+                        else "house",
+                        "contest": title if found is None else "",
+                        "district": (found["district"] if found else None) or "",
+                        "party": party,
+                        "county": county.removesuffix(" County"),
+                        "candidate": re.sub(r"\s*(\(I\)|\*)$", "", candidate).strip(),
+                        "write_in": "write-in" in candidate.lower(),
+                        "votes": count,
+                        "as_of": None,
+                        "reporting": min(counts),
+                        "total": max(counts),
+                        "scope": (found["party0"] or found["party1"] or "") if found else "",
+                    }
         return
     if url.endswith("detailxml.zip"):
         with zipfile.ZipFile(path) as archive:
@@ -1372,6 +1416,10 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
             "total": pl.Int64,
         },
     )
+
+
+def county_only(state: str, paths: dict[str, Path]) -> bool:
+    return state in COUNTY_FEEDS or (state == "IL" and not any("elections.il.gov" in url for url in paths))
 
 
 def countywide(key: str) -> bool:
@@ -1899,9 +1947,10 @@ def plan(
                 closeness[name] = hits[0][0]
             else:
                 unmatched.append(f"{contest_key}: no option for {name}")
-        for name, kept in shared(group, ballots, closeness):
+        for name, kept, trace in shared(group, ballots, closeness):
             del ballots[name]
-            unmatched.append(f"{contest_key}: {name} is on no option; {kept} holds the closest one")
+            if not trace:
+                unmatched.append(f"{contest_key}: {name} is on no option; {kept} holds the closest one")
         reporting = (
             group.group_by("piece")
             .agg(pl.col("reporting").max(), pl.col("total").max())
