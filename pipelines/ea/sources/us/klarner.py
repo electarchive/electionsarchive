@@ -633,10 +633,10 @@ def emit() -> Path | str:
 
         systems = {
             key: cs.key("us.electoral_system", key)
-            for key in ("fptp", "top_two", "two_round", "two_round_40", "two_round_45", "block", "cumulative")
+            for key in ("fptp", "top_two", "two_round", "two_round_40", "two_round_45", "block", "cumulative", "irv")
         }
         if cs.minted & (set(systems.values()) - {systems["cumulative"]}):
-            raise ValueError("the fptp, top-two, two-round, and block systems must exist")
+            raise ValueError("the fptp, top-two, two-round, block, and instant-runoff systems must exist")
         if systems["cumulative"] in cs.minted:
             cs.add(
                 "electoral_system",
@@ -718,6 +718,8 @@ def emit() -> Path | str:
                 previous = match[0]
             if etype == "ttp" or blanket:
                 system = "top_two"
+            elif sab == "AK" and general and year >= 2022:
+                system = "irv"
             elif sab in ("VT", "NH") and general and (first_round or runoff):
                 system = "fptp" if runoff or magnitude == 1 else "block"
             elif (

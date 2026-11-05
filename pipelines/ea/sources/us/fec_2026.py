@@ -635,7 +635,7 @@ TACIT = {
         "senate:48:g": ("Nikki Nice", "democratic-party", "OK-filing"),
     },
 }
-SYSTEM_OVERRIDES = {"AK": "top_four", "LA": "fptp", "LA:house": "two_round"}
+SYSTEM_OVERRIDES = {"AK": "irv", "LA": "fptp", "LA:house": "two_round"}
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 TRANSCRIBED = {
     "2026GeneralElectionStateCertificationofRepublicanCandidates.pdf": [
@@ -2745,7 +2745,7 @@ def emit() -> Path:
                 term="remainder" if special else term,
                 round_number=1,
                 electoral_system_id=systems[SYSTEM_OVERRIDES.get(f"{state}:{chamber}", SYSTEM_OVERRIDES[state])]
-                if state in SYSTEM_OVERRIDES and chamber in ("house", "senate")
+                if state == "AK" or (state in SYSTEM_OVERRIDES and chamber in ("house", "senate"))
                 else cs.key("us.electoral_system", "block")
                 if chamber != "legislative" and (magnitude or 1) > 1
                 else system,
