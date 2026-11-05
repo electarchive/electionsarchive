@@ -1465,7 +1465,7 @@ id = "us.county_live.lee"
 adapter = "us.county_live"
 interval = 180
 note = "Florida's state site has no city races, so Cape Coral's, Fort Myers's, and other Lee County city races come from the county Supervisor of Elections' results page."
-params = { kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
+params = { revision = "2026-11-05", kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
 publisher = "Lee County Supervisor of Elections"
 url = "https://enr.electionsfl.org/LEE/4111/Summary/"
 
@@ -1492,7 +1492,7 @@ id = "us.county_live.montgomery_tn"
 adapter = "us.county_live"
 interval = 180
 note = "Tennessee's state site has no city races, so Clarksville's mayor and council come from the Montgomery County Election Commission's results page. The file has no precinct count for each race."
-params = { kind = "montgomery_tn", state = "TN", county = "Montgomery", url = "https://election.montgomerytn.gov/assets/data.json" }
+params = { revision = "2026-11-05", kind = "montgomery_tn", state = "TN", county = "Montgomery", url = "https://election.montgomerytn.gov/assets/data.json" }
 poller = "muktedir"
 publisher = "Montgomery County Election Commission"
 url = "https://election.montgomerytn.gov/"
