@@ -577,7 +577,6 @@ def parse() -> None:
     frame.with_columns(
         round=pl.Series(rounds, dtype=pl.Int16),
         previous=pl.Series(previous_keys, dtype=pl.String),
-        runoff=pl.col("ckey").is_in(list(runs)),
     ).write_parquet(PARSED / "contests.parquet")
     pl.DataFrame(list(options.values()), infer_schema_length=None).write_parquet(PARSED / "options.parquet")
     pl.DataFrame(results, infer_schema_length=None).write_parquet(PARSED / "results.parquet")
@@ -734,7 +733,6 @@ def emit() -> Path:
                 valid_from=None,
             )
         systems = {
-            "fptp": cs.key("us.electoral_system", "fptp"),
             "block": cs.key("us.electoral_system", "block"),
             "referendum": cs.key("us.electoral_system", "referendum"),
             "two_round": cs.key("us.electoral_system", "two_round"),
@@ -967,9 +965,7 @@ def emit() -> Path:
                 party_scope_id=parties.get(row["scope"]),
                 electoral_system_id=systems["referendum"]
                 if question
-                else systems["two_round"]
-                if (row["runoff"] or row["round"] == 2) and magnitude == 1
-                else systems["block" if magnitude > 1 else "fptp"],
+                else systems["block" if magnitude > 1 else "two_round"],
                 default_result_kind="counted",
                 term=None if question else "remainder" if row["remainder"] else "full",
             )
