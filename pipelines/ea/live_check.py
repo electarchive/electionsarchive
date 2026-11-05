@@ -15,7 +15,7 @@ import httpx
 from psycopg import Connection
 
 from ea.live import FEEDS
-from ea.sources.us import enr_2026, nyc_enr_live
+from ea.sources.us import enr_2026, lavote_live, livevoter_live, nyc_enr_live
 from ea.store import connect
 
 STATES = [
@@ -149,6 +149,14 @@ def host(feed: dict[str, object]) -> tuple[bool, str, list[tuple[str, bytes]]]:
     try:
         if feed["adapter"] == "us.nyc_enr":
             pages.extend((url, content) for url, (content, _) in nyc_enr_live.collect(client).items())
+        elif feed["adapter"] == "us.lavote":
+            pages.extend((url, content) for url, (content, _) in lavote_live.collect(client).items())
+        elif feed["adapter"] == "us.livevoter":
+            params = feed["params"]
+            if isinstance(params, dict):
+                pages.extend(
+                    (url, content) for url, (content, _) in livevoter_live.collect(client, params["url"]).items()
+                )
         else:
             params = feed.get("params")
             enr_2026.collect(client, {params["state"] if isinstance(params, dict) else ""}, store)

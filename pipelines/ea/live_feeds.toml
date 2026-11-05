@@ -1388,3 +1388,28 @@ params = { state = "NV" }
 poller = "muktedir"
 publisher = "The Nevada Independent"
 url = "https://thenevadaindependent.com/elections/2026/general/results/statewide"
+
+[[feed]]
+id = "us.lavote"
+adapter = "us.lavote"
+interval = 120
+note = "The Secretary of State's site has no city, school, or district races, so Los Angeles County's come from the county's own results"
+publisher = "Los Angeles County Registrar-Recorder/County Clerk"
+url = "https://results.lavote.gov/"
+
+[[feed]]
+id = "us.livevoter.orange"
+adapter = "us.livevoter"
+interval = 180
+note = "The county's results page links the current election's address, which changes between elections"
+params = { county = "Orange", url = "https://ocvote.gov/results/current-election-results" }
+publisher = "Orange County Registrar of Voters"
+url = "https://ocvote.gov/results/current-election-results"
+
+[[feed]]
+id = "us.livevoter.san_diego"
+adapter = "us.livevoter"
+interval = 180
+params = { county = "San Diego", url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html" }
+publisher = "San Diego County Registrar of Voters"
+url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html"

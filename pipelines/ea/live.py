@@ -15,6 +15,8 @@ from ea.sources.us import (
     dc_boe_live,
     enr_2026,
     guam_live,
+    lavote_live,
+    livevoter_live,
     mp_cec_live,
     npr_live,
     nv_independent,
@@ -107,6 +109,10 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = mp_cec_live.collect(client)
     elif adapter == "us.vi_live":
         pages = vi_live.collect(client)
+    elif adapter == "us.lavote":
+        pages = lavote_live.collect(client)
+    elif adapter == "us.livevoter":
+        pages = livevoter_live.collect(client, params["url"])
     else:
         raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
@@ -144,6 +150,10 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.npr"
             else enr_2026.plan(conn, nv_independent.frame(paths), lambda _, __: None)
             if adapter == "us.nv_independent"
+            else enr_2026.plan(conn, lavote_live.frame(paths), lambda _, __: None, also=("ceda",))
+            if adapter == "us.lavote"
+            else enr_2026.plan(conn, livevoter_live.frame(params["county"], paths), lambda _, __: None, also=("ceda",))
+            if adapter == "us.livevoter"
             else dc_boe_live.plan(conn, paths)
             if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)
