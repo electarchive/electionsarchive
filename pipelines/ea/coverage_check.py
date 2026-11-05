@@ -68,6 +68,30 @@ def shares(path: str, text: str) -> list[str]:
     ]
 
 
+def known_gap_ids(conn, values: set[str]) -> dict[str, str]:
+    uuids = [value for value in values if "-" in value]
+    codes = [value for value in values if "-" not in value]
+    return {
+        **{
+            str(entity): kind
+            for entity, kind in conn.execute(
+                "select id, type::text from entity where id = any(%s::uuid[]) and type in ('contest', 'polity')",
+                [uuids],
+            )
+        },
+        **{
+            code: "county"
+            for (code,) in conn.execute(
+                "select code from reporting_unit where scheme_code = 'us.county' and code = any(%s)", [codes]
+            )
+        },
+        **{
+            code: "government"
+            for (code,) in conn.execute("select id from coverage_government where id = any(%s)", [codes])
+        },
+    }
+
+
 def database(conn) -> list[str]:
     problems = []
     for polity, goal, level, state, year, total, complete, low in conn.execute(
@@ -101,6 +125,7 @@ def database(conn) -> list[str]:
             ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: no county {county}")
     polities = {"us", *coverage_countries.countries()}
+    gap_ids = known_gap_ids(conn, {value for row in coverage.registry() for value in row["ids"]})
     for row in coverage.registry():
         where = f"coverage-gaps.tsv {row['polity']} {row['state']} {row['level']} {row['years']} {row['grain']}"
         if (
@@ -113,9 +138,12 @@ def database(conn) -> list[str]:
             problems.append(f"{where}: needs a reason, the sources tried, and the date checked")
         if row["from"] > row["to"]:
             problems.append(f"{where}: years run backward")
-        for contest in row["ids"]:
-            if not conn.execute("select 1 from contest where id::text = %s", [contest]).fetchone():
-                problems.append(f"{where}: no contest {contest}")
+        for value in row["ids"]:
+            kind = gap_ids.get(value)
+            if kind is None:
+                problems.append(f"{where}: {value} is not a contest, polity, county, or government")
+            elif kind != "contest" and row["grain"] != "candidates" and (kind, row["grain"]) != ("county", "results"):
+                problems.append(f"{where}: a {kind} id can't scope a {row['grain']} gap")
     for polity, goal, level, state, year in conn.execute(
         "select polity, goal, level, state, year from coverage_goal where known_gap < 0 or blocked < 0 or inapplicable < 0"
     ):

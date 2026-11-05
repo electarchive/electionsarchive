@@ -652,6 +652,9 @@ def target(st: str, level: str, year: int) -> str:
     return "total"
 
 
+GAP_ID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d{5}|\d{14}")
+
+
 def registry() -> list[dict]:
     if not GAPS.exists():
         return []
@@ -665,6 +668,8 @@ def registry() -> list[dict]:
             if row["grain"] not in GRAINS
             else f"checked {row['checked']!r} is not a YYYY-MM-DD date"
             if re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["checked"] or "") is None
+            else f"ids {row['ids']!r} are not all uuids, county FIPS codes, or government codes"
+            if not all(GAP_ID.fullmatch(value) for value in row["ids"].split())
             else None
         )
         if problem is not None:
