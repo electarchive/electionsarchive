@@ -81,7 +81,7 @@ LIVE_COUNTIES = {
     "26099": ("MI", "Macomb", "127293"),
     "26049": ("MI", "Genesee", "127354"),
 }
-COUNTY_FEEDS = {"KY", "MI", "MO", "NJ", "NY", "TN", "WI"}
+COUNTY_FEEDS = {"KY", "MI", "MO", "NJ", "NV", "NY", "TN", "WI"}
 EV_LOCAL = re.compile(r"[A-Z][\w .'-]{1,30}: ")
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
