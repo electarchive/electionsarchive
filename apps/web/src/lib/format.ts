@@ -1,3 +1,4 @@
+import { createSubscriber } from "svelte/reactivity";
 import { localNouns } from "#lib/nouns.js";
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale } from "#lib/paraglide/runtime.js";
@@ -32,6 +33,44 @@ export function dates(options: Intl.DateTimeFormatOptions) {
   const made = new Intl.DateTimeFormat(locale, options);
   dateFormats.set(key, made);
   return made;
+}
+
+const everyMinute = createSubscriber((update) => {
+  const timer = setInterval(update, 60_000);
+  return () => {
+    clearInterval(timer);
+  };
+});
+
+export function calendarDay(at: Date | number, timeZone: string) {
+  return dates({ dateStyle: "short", timeZone }).format(at);
+}
+
+export function today(timeZone: string) {
+  everyMinute();
+  return calendarDay(Date.now(), timeZone);
+}
+
+export function dateParts(at: Date | number, timeZone: string) {
+  const year = dates({ year: "numeric", timeZone });
+  return {
+    month: "short",
+    day: "numeric",
+    ...(year.format(at) !== year.format(Date.now()) && { year: "numeric" }),
+  } satisfies Intl.DateTimeFormatOptions;
+}
+
+export function timeOrDate(
+  at: Date,
+  options: { timeZone: string; timeZoneName?: "short" },
+) {
+  return dates({
+    ...(calendarDay(at, options.timeZone) !== today(options.timeZone) &&
+      dateParts(at, options.timeZone)),
+    hour: "numeric",
+    minute: "2-digit",
+    ...options,
+  }).format(at);
 }
 
 export function count(value: number) {

@@ -8,7 +8,7 @@ import satori from "satori";
 import type { ChamberView, Control, Family, Seat } from "#lib/live/nation.js";
 import type { Summary } from "#lib/live/summary.js";
 import { count, percent } from "#lib/format.js";
-import { initial, lead, stamp, surname } from "#lib/live/format.js";
+import { dated, initial, lead, surname } from "#lib/live/format.js";
 import {
   chamber,
   odds,
@@ -207,7 +207,7 @@ function header(status: Status, newest: string | null, context: string) {
           pill(status),
           ...[
             context,
-            newest == null ? "" : m.night_updated({ time: stamp(newest) }),
+            newest == null ? "" : m.night_updated({ time: dated(newest) }),
           ]
             .filter((part) => part !== "")
             .map((part) => line(part, { maxWidth: 420 })),
@@ -1140,7 +1140,7 @@ async function card(path: string, bucket: number) {
       status = "before";
     }
     const headline = isBefore
-      ? m.night_og_first({ time: stamp(opens) })
+      ? m.night_og_first({ time: dated(opens) })
       : m.night_og_races({
           counting: count(counting),
           total: count(summaries.filter((entry) => !isUncounted(entry)).length),
@@ -1213,7 +1213,11 @@ async function card(path: string, bucket: number) {
       { display: "flex", justifyContent: "space-between", width: INNER },
       [
         h({ display: "flex", flexDirection: "column", width }, [
-          ...heading(target.title, describe(summary, closes, time), width),
+          ...heading(
+            target.title,
+            describe(summary, closes, time, dated),
+            width,
+          ),
           h(
             {
               display: "flex",

@@ -6,6 +6,7 @@ import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
 import { compactPlaces } from "#lib/compare.js";
 import { headline } from "#lib/coverage.js";
+import { dated } from "#lib/live/format.js";
 import { estimateAt } from "#lib/live/history.js";
 import { toward } from "#lib/live/standing.js";
 import {
@@ -2023,10 +2024,12 @@ export async function livePage(path: string, at: string | null) {
         headline:
           summary.settled == null
             ? null
-            : describe(summary, closing(election, race), Date.now()).replace(
-                /\.$/u,
-                "",
-              ),
+            : describe(
+                summary,
+                closing(election, race),
+                Date.now(),
+                dated,
+              ).replace(/\.$/u, ""),
         office: race.office,
         state: race.state,
         district: race.district,

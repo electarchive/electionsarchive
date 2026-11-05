@@ -7,9 +7,10 @@
   import { Input } from "#lib/components/ui/input/index.js";
   import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { tierLabel } from "#lib/contrib.js";
+  import { timeOrDate } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
+  import { instant, zone } from "#lib/zone.svelte.js";
   import type { Session } from "./session.svelte.js";
   import Divider from "./divider.svelte";
 
@@ -67,9 +68,7 @@
   let inspectorWidth = $state(352);
 
   const clock = (value: string) =>
-    new Intl.DateTimeFormat(getLocale(), { timeStyle: "short" }).format(
-      new Date(value.replace(" ", "T").replace(/([+-]\d{2})$/u, "$1:00")),
-    );
+    timeOrDate(instant(value), { timeZone: zone.name });
 
   function onkeydowncapture(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {

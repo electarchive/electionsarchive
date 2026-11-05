@@ -54,6 +54,9 @@
   });
   const shown = $derived(isAll ? entries : entries.slice(0, LIMIT));
   const latest = $derived(entries[0]?.at ?? null);
+  const whenWidth = $derived(
+    `${Math.max(0, ...shown.map((entry) => clock(entry.at).length))}ch`,
+  );
 </script>
 
 <section class="grid content-start gap-4" aria-labelledby="feed-title">
@@ -67,7 +70,7 @@
       {m.night_feed_none()}
     </p>
   {:else}
-    <ol class="grid border-bs border-foreground/80">
+    <ol class="grid border-bs border-foreground/80" style:--when={whenWidth}>
       {#each shown as entry (entry.at)}
         {const isChosen = $derived(
           at === entry.at || (at == null && entry.at === latest),
@@ -77,14 +80,14 @@
           <button
             type="button"
             class={cn(
-              "grid grid-cols-[4.25rem_minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border px-1.5 py-2 text-start text-[0.8125rem] inline-full hover:highlighter",
+              "grid grid-cols-[minmax(4.25rem,var(--when))_minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border px-1.5 py-2 text-start text-[0.8125rem] inline-full hover:highlighter",
               { highlighter: isChosen },
             )}
             aria-current={isChosen ? "time" : undefined}
             onclick={() => onPick(entry.at === latest ? null : entry.at)}
           >
             <span
-              class={cn("font-figures tabular-nums", {
+              class={cn("font-figures whitespace-nowrap tabular-nums", {
                 "font-semibold": isChosen,
                 "text-muted-foreground": !isChosen,
               })}>{clock(entry.at)}</span

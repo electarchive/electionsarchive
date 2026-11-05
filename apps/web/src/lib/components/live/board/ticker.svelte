@@ -70,24 +70,29 @@
         `background-color: color-mix(in oklab, var(--accent) ${Math.round((1 - t) * 70)}%, transparent)`,
     };
   }
+
+  const whenWidth = $derived(
+    `${Math.max(0, ...entries.map((entry) => clock(entry.at).length))}ch`,
+  );
 </script>
 
 {#if entries.length === 0}
   <p class="text-[0.75em] text-muted-foreground">{m.board_ticker_empty()}</p>
 {:else}
-  <ol class="grid text-[0.8125em]">
+  <ol class="grid text-[0.8125em]" style:--when={whenWidth}>
     {#each entries as entry (entry.key)}
       {const isPicked = $derived(desk.selected?.id === entry.race.id)}
       <li in:flash>
         <button
           type="button"
           class={cn(
-            "grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 border-be border-border/60 p-1  text-start inline-full",
+            "grid grid-cols-[var(--when)_minmax(0,1fr)_auto] items-center gap-x-2 border-be border-border/60 p-1 text-start inline-full",
             { "bg-accent": isPicked, "hover:bg-muted": !isPicked },
           )}
           onclick={() => desk.select(entry.race.slug)}
         >
-          <span class="font-figures text-muted-foreground tabular-nums"
+          <span
+            class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
             >{clock(entry.at)}</span
           >
           <span class="flex items-center gap-1.5 min-inline-0">

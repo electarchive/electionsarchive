@@ -39,7 +39,7 @@ import {
   points,
 } from "#lib/format.js";
 import { caveatLabel, figure, figureLabel } from "#lib/indices.js";
-import { stamp } from "#lib/live/format.js";
+import { dated } from "#lib/live/format.js";
 import methodology from "#lib/live/methodology.json";
 import { odds } from "#lib/live/nation.js";
 import { sum } from "#lib/live/standing.js";
@@ -4529,7 +4529,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
   const isRace = data.path !== election.slug;
   const moment = (at: string) =>
     link(
-      at === "final" ? m.live_certified_count() : stamp(at),
+      at === "final" ? m.live_certified_count() : dated(at),
       `live/${data.path}?at=${at}`,
     );
   const closes = [
@@ -4680,7 +4680,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
     sum(data.races[0].votes) === 0
       ? []
       : [
-          `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: stamp(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: stamp(election.newest) })}**`,
+          `**${data.at === "final" ? m.live_certified_count() : data.at != null ? m.live_as_of({ time: dated(data.at) }) : election.newest == null ? m.live_waiting() : m.live_as_of({ time: dated(election.newest) })}**`,
         ]),
     ...(closes.length === 0
       ? []
@@ -4688,7 +4688,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
           closes
             .map(
               ([at, entries]) =>
-                `- ${m.live_twin_polls_close({ time: stamp(at) })}${isNation ? `: ${entries.map((entry) => entry.state.toUpperCase()).join(", ")}` : ""}`,
+                `- ${m.live_twin_polls_close({ time: dated(at) })}${isNation ? `: ${entries.map((entry) => entry.state.toUpperCase()).join(", ")}` : ""}`,
             )
             .join("\n"),
         ]),

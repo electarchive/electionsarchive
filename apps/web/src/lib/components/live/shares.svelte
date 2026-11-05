@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LiveFrame, LiveOption } from "@ea/analytics/live";
   import { count, percent } from "#lib/format.js";
-  import { clock, tone } from "#lib/live/format.js";
+  import { clock, timeMarks, tone } from "#lib/live/format.js";
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -126,14 +126,7 @@
     }
     return list;
   });
-  const hours = $derived.by(() => {
-    const marks: Array<number> = [];
-    const step = end - start > 10 * 3_600_000 ? 2 * 3_600_000 : 3_600_000;
-    for (let time = Math.ceil(start / step) * step; time <= end; time += step) {
-      marks.push(time);
-    }
-    return marks;
-  });
+  const marks = $derived(timeMarks(start, end, width - LEFT - RIGHT));
 
   const chosenIndex = $derived(
     at == null
@@ -245,21 +238,21 @@
           stroke="var(--foreground)"
           stroke-opacity="0.55"
         />
-        {#each hours as time (time)}
+        {#each marks as mark (mark.at)}
           <line
-            x1={x(time)}
-            x2={x(time)}
+            x1={x(mark.at)}
+            x2={x(mark.at)}
             y1={y(0)}
             y2={y(0) + 4}
             stroke="var(--foreground)"
             stroke-opacity="0.55"
           />
           <text
-            x={x(time)}
+            x={x(mark.at)}
             y={y(0) + 17}
             text-anchor="middle"
             class="fill-muted-foreground font-figures text-[11px] tabular-nums"
-            >{clock(time)}</text
+            >{mark.label}</text
           >
         {/each}
 

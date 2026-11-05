@@ -202,7 +202,12 @@ export function unopposedHead({ race, unopposed }: Summary) {
     : m.night_head_unopposed({ name: unopposed?.label ?? "" });
 }
 
-export function describe(summary: Summary, closes: number, time: number) {
+export function describe(
+  summary: Summary,
+  closes: number,
+  time: number,
+  when = stamp,
+) {
   const { leader, winner, margin, total, estimate } = summary;
   const line = total > 0 ? cut(summary) : null;
   if (line != null) {
@@ -222,7 +227,7 @@ export function describe(summary: Summary, closes: number, time: number) {
   if (summary.projected != null) {
     return m.night_head_projected({
       name: summary.projected.label,
-      time: stamp(summary.projectedAt),
+      time: when(summary.projectedAt),
     });
   }
   if (summary.unopposed != null) {
@@ -233,7 +238,7 @@ export function describe(summary: Summary, closes: number, time: number) {
   }
   if (total === 0 || leader == null) {
     return time < closes
-      ? m.night_head_before({ time: stamp(closes) })
+      ? m.night_head_before({ time: when(closes) })
       : m.night_head_waiting();
   }
   if (margin < 0.0005) {

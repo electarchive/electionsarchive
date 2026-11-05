@@ -1085,7 +1085,7 @@
         {const isPast = $derived(Date.parse(closing.at) <= clock)}
         <li
           class={cn(
-            "grid break-inside-avoid grid-cols-[5rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
+            "grid break-inside-avoid grid-cols-[7rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
             { "text-muted-foreground": isPast },
           )}
         >
@@ -1093,7 +1093,7 @@
             <button
               type="button"
               aria-describedby="closing-{closing.at}"
-              class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+              class="cursor-help font-figures font-semibold whitespace-nowrap tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
               >{clockOf(closing.at)}</button
             >
             <span
@@ -1400,7 +1400,7 @@
                 {/if}
               </td>
               <td
-                class="py-1.5 pe-1 text-end font-figures text-muted-foreground tabular-nums @max-[60rem]:order-3 @max-[60rem]:p-0 @max-[60rem]:text-xs"
+                class="py-1.5 pe-1 text-end font-figures whitespace-nowrap text-muted-foreground tabular-nums @max-[60rem]:order-3 @max-[60rem]:p-0 @max-[60rem]:text-xs"
                 >{latest === "" ? "–" : clockOf(latest)}</td
               >
             </tr>
