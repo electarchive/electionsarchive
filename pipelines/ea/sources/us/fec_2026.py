@@ -413,6 +413,7 @@ REDRAWN_LOADED = {"AL", "CA", "FL", "LA", "NC", "OH", "TN", "TX", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
+NV_PETITIONED = {"Danielle Ford", 'Afzal "Bobby" Khan', 'Steven "Chap" St John', "William Johnson"}
 OFF_BALLOT = {("RI", "REPRESENTATIVE IN GENERAL ASSEMBLY", "59", "Barros")}
 WITHDRAWN = {
     "2026-11-03:GA:senate:47:g": (
@@ -1424,7 +1425,7 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
             text = " ".join(part for part in (given.replace(", ", " "), last, suffix) if part) if given else last
             party = re.sub(r"(?<!Political) Party( of Nevada)?$", "", row["Party or Nonpartisan Office"])
             rows.append((office, int(house[1]) if house else None, text, party))
-        return single_filers(rows)
+        return [row for row in rows if row in single_filers(rows) or row[2] in NV_PETITIONED]
     if state == "MN":
         race = ""
         for row in cells(path.read_text(errors="replace")):
