@@ -19,7 +19,7 @@ import httpx
 import polars as pl
 
 from ea import coverage, coverage_tables, raw
-from ea.changeset import Changeset, slug
+from ea.changeset import Changeset, Snapshot, slug
 from ea.encoding import decode, rekey, repair
 from ea.offices import Offices
 from ea.sources.us import cog, govmint, ia_districts_2026, ky_ballots, mn_local
@@ -7875,11 +7875,13 @@ def ca_school_variants(label: str) -> list[list[str]]:
     ]
 
 
-def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
-    pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
-    for tail, text in conn.execute(
-        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named)
-                  regexp_replace(x.value, '^[0-9-]+:', ''), n.text
+def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
+    rows: dict[str, list[tuple[str, str]]] = {state: [] for state in states}
+    if not states:
+        return rows
+    for home, tail, text in conn.execute(
+        """select distinct on (k.home, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named)
+                  k.home, regexp_replace(x.value, '^[0-9-]+:', ''), n.text
            from contest c
            join election e on e.id = c.election_id
            join entity t on t.id = c.id and t.retired_by is null
@@ -7890,32 +7892,42 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            left join body b on b.id = c.body_id
            join polity op on op.id = coalesce(f.polity_id, b.polity_id, e.polity_id)
            cross join lateral (
+               select m[1] as home from regexp_matches(x.value, %s, 'g') m
+               union
+               select 'CA' where %s and x.value ~ '^ceda:'
+           ) k
+           cross join lateral (
                select case when c.seat_id is null and seg !~ '\\d|at-large|(^|-)[a-z]($|-)' then seg end as named
                from substring(x.value from '^[0-9-]+:[^:]+:[^:]+:[^:]+:([^:]+)') seg
-           ) k
-           where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
+           ) s
+           where e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, e.date_from desc, x.value ~ 'at-large', x.value""",
-        [f"(^|:){state}:", "^ceda:" if state == "CA" else "^$", DAY],
+           order by k.home, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named, e.date_from desc, x.value ~ 'at-large', x.value""",
+        [f"(?:^|:)({'|'.join(sorted(states))})(?=:)", "CA" in states, DAY],
     ):
+        rows[home].append((tail, text))
+    for tail in sorted(SHADOWED_TAILS):
+        state = tail.split(":")[0]
+        if state in states:
+            rows[state] += conn.execute(
+                """select %s, n.text from contest c
+                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                   join name n on n.entity_id = c.id and n.is_preferred and n.lang = 'en'
+                   join election e on e.id = c.election_id
+                   where x.value ~ %s order by e.date_from desc limit 1""",
+                [tail, f"^[0-9-]+:{tail}$"],
+            ).fetchall()
+    return rows
+
+
+def resolve(
+    state: str, wanted: set[tuple[str, str]], rows: list[tuple[str, str]]
+) -> dict[tuple[str, str], tuple[str, str]]:
+    pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
+    for tail, text in rows:
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
         pool[county[1] if county else ""].append((tail, *words(f"{text} {tail.split(':', 2)[-1].replace('-', ' ')}")))
-    for tail in sorted(SHADOWED_TAILS):
-        if not tail.startswith(f"{state}:"):
-            continue
-        for (text,) in conn.execute(
-            """select n.text from contest c
-               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
-               join name n on n.entity_id = c.id and n.is_preferred and n.lang = 'en'
-               join election e on e.id = c.election_id
-               where x.value ~ %s order by e.date_from desc limit 1""",
-            [f"^[0-9-]+:{tail}$"],
-        ):
-            county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
-            pool[county[1] if county else ""].append(
-                (tail, *words(f"{text} {tail.split(':', 2)[-1].replace('-', ' ')}"))
-            )
     found = {}
     scores: dict[tuple[str, str], float] = {}
     for county, contest in wanted:
@@ -11239,6 +11251,9 @@ def parse() -> None:
                         "township",
                     )
                 )
+        state_rows = contest_rows(
+            conn, {key.split("-")[0] for key in feeds if STATES is None or key.split("-")[0] in STATES}
+        )
         for key, found in feeds.items():
             state = key.split("-")[0]
             if STATES is not None and state not in STATES:
@@ -11272,13 +11287,13 @@ def parse() -> None:
                         "",
                     )
             tails = resolve(
-                conn,
                 state,
                 {
                     (str(row["fips"]), str(row["contest"]))
                     for row in found
                     if row.get("tail") is None and not row.get("mint")
                 },
+                state_rows[state],
             )
             used: dict[str, str] = {}
             missed: set[str] = set()
@@ -12401,9 +12416,12 @@ def emit() -> None:
     groups = whole["tail"].str.split(":").list.first()
     present = set(groups)
     failed = []
+    with connect() as conn:
+        snapshot = Snapshot(conn)
+        offices = Offices(conn)
     for state in sorted(present if GROUPS is None else present & GROUPS):
         try:
-            print(f"changeset {state} {emit_state(whole.filter(groups == state), state)}")
+            print(f"changeset {state} {emit_state(whole.filter(groups == state), state, snapshot, offices)}")
         except Exception as error:
             failed.append(state)
             traceback.print_exc()
@@ -12412,7 +12430,7 @@ def emit() -> None:
         raise SystemExit(f"failed states: {','.join(failed)}")
 
 
-def emit_state(frame: pl.DataFrame, state: str) -> Path:
+def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Offices) -> Path:
     NEW_PARTIES_ADDED.clear()
     only_unexpired = set(frame.group_by("tail").agg(pl.col("unexpired").all()).filter("unexpired")["tail"])
     doubled = {f"{tail}:unexpired" for tail in only_unexpired} & set(frame["tail"])
@@ -12492,6 +12510,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             version=VERSION,
             summary=f"{state}: local contests on the 2026-11-03 ballot, with candidates from official candidate lists and sample ballots: statewide candidate files (North Carolina), each contest matched to the same office's last contest in the archive; Los Angeles city runoffs, Cook County offices, Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, Maricopa County's clerk, justices of the peace, and constables, and the New York City Council District 3 special",
             polity="US",
+            snapshot=snapshot,
         )
         cs.manifest["scope"] = {"polity": "US", "state": state}
 
@@ -12570,7 +12589,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         created: set[str] = set()
         made: set[object] = set()
         seen_contests: set[UUID] = set()
-        offices = Offices(conn)
         at_large: dict[object, tuple | None] = {}
         homes: dict[str, str] = {}
         homeless: set[str] = set()

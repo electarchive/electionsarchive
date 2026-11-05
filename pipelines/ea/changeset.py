@@ -64,29 +64,9 @@ def bcp47(tag: str) -> str:
     return canonical
 
 
-class Changeset:
-    def __init__(
-        self, conn: Connection, *, pipeline: str, version: str, summary: str, polity: str | None, kind: str = "import"
-    ) -> None:
-        self.id = uuid7()
-        self.conn = conn
-        self.manifest: dict[str, object] = {
-            "id": str(self.id),
-            "author_kind": "pipeline",
-            "pipeline": pipeline,
-            "pipeline_version": version,
-            "kind": kind,
-            "summary": summary,
-            "scope": {"polity": polity},
-        }
-        self.rows: dict[str, list[dict[str, object]]] = {}
-        self.frames: dict[str, list[pl.DataFrame]] = {}
-        self.chunks: dict[str, list[pl.DataFrame]] = {}
-        self.minted: set[UUID] = set()
-        self.artifacts: set[UUID] = set()
-        self._known: dict[str, dict[str, UUID]] = {}
-        self._keyed: set[tuple[str, str]] = set()
-        self.renamed: dict[str, str] = {}
+class Snapshot:
+    def __init__(self, conn: Connection) -> None:
+        self.tables: dict[str, dict[str, UUID]] = {}
         self.survivors: dict[UUID, UUID] = {}
         self.merged: dict[str, list[str]] = {}
         for entity, into in conn.execute("select entity_id, into_id from entity_merge"):
@@ -113,6 +93,54 @@ class Changeset:
         self.defaults: dict[str, dict[str, object]] = {}
         for (table, column, _), value in zip(constant, values, strict=True):
             self.defaults.setdefault(table, {})[column] = json.dumps(value) if isinstance(value, dict | list) else value
+
+    def table(self, conn: Connection, cache: str, query: LiteralString, params: Sequence[object]) -> dict[str, UUID]:
+        if cache not in self.tables:
+            self.tables[cache] = {str(k): v for k, v in conn.execute(query, params).fetchall()}
+        return self.tables[cache]
+
+
+class Changeset:
+    def __init__(
+        self,
+        conn: Connection,
+        *,
+        pipeline: str,
+        version: str,
+        summary: str,
+        polity: str | None,
+        kind: str = "import",
+        snapshot: Snapshot | None = None,
+    ) -> None:
+        self.id = uuid7()
+        self.conn = conn
+        self.manifest: dict[str, object] = {
+            "id": str(self.id),
+            "author_kind": "pipeline",
+            "pipeline": pipeline,
+            "pipeline_version": version,
+            "kind": kind,
+            "summary": summary,
+            "scope": {"polity": polity},
+        }
+        self.rows: dict[str, list[dict[str, object]]] = {}
+        self.frames: dict[str, list[pl.DataFrame]] = {}
+        self.chunks: dict[str, list[pl.DataFrame]] = {}
+        self.minted: set[UUID] = set()
+        self.artifacts: set[UUID] = set()
+        self._known: dict[str, dict[str, UUID]] = {}
+        self._scoped: dict[str, dict[str, UUID]] = {}
+        self._keyed: set[tuple[str, str]] = set()
+        self.renamed: dict[str, str] = {}
+        self.snapshot = Snapshot(conn) if snapshot is None else snapshot
+        self.survivors = self.snapshot.survivors if snapshot is None else dict(snapshot.survivors)
+        self.merged = (
+            self.snapshot.merged
+            if snapshot is None
+            else {into: [*entities] for into, entities in snapshot.merged.items()}
+        )
+        self.retired = self.snapshot.retired
+        self.defaults = self.snapshot.defaults
 
     def add(self, table: str, **row: object) -> None:
         rows = self.rows.setdefault(table, [])
@@ -155,25 +183,35 @@ class Changeset:
         self.frames.setdefault(table, []).append(frame)
 
     def _resolve(self, cache: str, key: str, query: LiteralString, params: Sequence[object] = ()) -> UUID:
-        if cache not in self._known:
-            self._known[cache] = {str(k): v for k, v in self.conn.execute(query, params).fetchall()}
-        known = self._known[cache]
-        if key not in known:
-            known[key] = uuid5(NAMESPACE, f"{cache}\x1f{key}")
-            if known[key] in self.retired:
-                raise ValueError(f"{cache} {key} is {known[key]}, retired by changeset {self.retired[known[key]]}")
-            self.minted.add(known[key])
-        return self.survivors.get(known[key], known[key])
+        known = self._known.setdefault(cache, {})
+        id = known.get(key)
+        if id is None:
+            table = self._scoped.get(cache)
+            id = (self.snapshot.table(self.conn, cache, query, params) if table is None else table).get(key)
+            if id is not None:
+                known[key] = id
+            else:
+                id = known[key] = uuid5(NAMESPACE, f"{cache}\x1f{key}")
+                if id in self.retired:
+                    raise ValueError(f"{cache} {key} is {id}, retired by changeset {self.retired[id]}")
+                self.minted.add(id)
+        return self.survivors.get(id, id)
 
     def key(self, scheme: str, value: str) -> UUID:
         cache = f"external_id:{scheme}"
         id = self._resolve(cache, value, "select value, entity_id from external_id where scheme = %s", [scheme])
         if id in self.minted and (scheme, value) not in self._keyed:
             merged = [(new, old) for new in UUID_TEXT.findall(value) for old in self.merged.get(new, ())]
+            known = self._known[cache]
+            table = self.snapshot.tables[cache]
             for new, old in [*self.renamed.items(), *merged]:
-                if new in value and (previous := self._known[cache].get(value.replace(new, old))) is not None:
+                if new not in value:
+                    continue
+                prior = value.replace(new, old)
+                previous = known[prior] if prior in known else table.get(prior)
+                if previous is not None:
                     self.minted.discard(id)
-                    id = self._known[cache][value] = previous
+                    id = known[value] = previous
                     break
             self._keyed.add((scheme, value))
             self.add("external_id", entity_id=self.survivors.get(id, id), scheme=scheme, value=value)
@@ -215,7 +253,8 @@ class Changeset:
         )
 
     def scope_units(self, scheme: str, like: str) -> None:
-        self._known[f"unit:{scheme}@None"] = {
+        self._known.pop(f"unit:{scheme}@None", None)
+        self._scoped[f"unit:{scheme}@None"] = {
             str(code): id
             for code, id in self.conn.execute(
                 "select code, id from reporting_unit where scheme_code = %s and code like %s", [scheme, like]
