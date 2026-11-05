@@ -1505,3 +1505,12 @@ note = "Laredo's only official count is Webb County's scanned PDF, which no scri
 poller = "muktedir"
 publisher = "Webb County Elections Administrator"
 url = "https://www.webbcountytx.gov/DocumentCenter/View/12238"
+
+[[feed]]
+id = "us.as_live"
+adapter = "us.as_live"
+interval = 900
+note = "American Samoa's Election Office doesn't post results on its own site, so this feed reads the unofficial sheet it gave to KHJ News. The feed stops with an error if the file changes, so a person can check the new numbers first."
+poller = "muktedir"
+publisher = "American Samoa Election Office"
+url = "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/594/2026/11/04083335/2026-election-results-congress.pdf"

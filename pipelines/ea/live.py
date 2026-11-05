@@ -12,6 +12,7 @@ import httpx
 
 from ea.sources.us import (
     alameda_rov_live,
+    as_live,
     civicapi,
     clarity_local_live,
     county_live,
@@ -125,6 +126,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = county_live.collect(client, params["kind"], params["url"])
     elif adapter == "us.webb_live":
         pages = webb_live.collect(client)
+    elif adapter == "us.as_live":
+        pages = as_live.collect(client)
     else:
         raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
@@ -181,6 +184,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.county_live"
             else webb_live.plan(conn, paths)
             if adapter == "us.webb_live"
+            else as_live.plan(conn, paths)
+            if adapter == "us.as_live"
             else dc_boe_live.plan(conn, paths)
             if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)
