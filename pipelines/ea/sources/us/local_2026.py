@@ -13136,6 +13136,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 magnitude = max(magnitude, int(group["seats"][0] or 1))
             if state in ("IN", "MD") and magnitude is not None and system in plurality.values():
                 system = plurality[magnitude > 1]
+            if state == "LA" and magnitude is not None:
+                system = cs.key("us.electoral_system", "two_round") if magnitude == 1 else plurality[True]
             cs.add(
                 "contest",
                 id=contest,
