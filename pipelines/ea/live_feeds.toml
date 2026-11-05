@@ -1465,7 +1465,7 @@ id = "us.county_live.lee"
 adapter = "us.county_live"
 interval = 180
 note = "Florida's state site has no city races, so Cape Coral's, Fort Myers's, and other Lee County city races come from the county Supervisor of Elections' results page."
-params = { revision = "2026-11-05", kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
+params = { revision = "2026-11-05-2", kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
 publisher = "Lee County Supervisor of Elections"
 url = "https://enr.electionsfl.org/LEE/4111/Summary/"
 
