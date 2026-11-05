@@ -1140,7 +1140,8 @@ async function night(
       isHeadline: boolean;
     }>(sql`
       with latest as (
-        select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter,
+        select distinct on (o.feed_id, o.contest_id) o.k, o.feed_id, o.contest_id, od.adapter, o.reporting, o.expected,
+          min(o.as_of) over (partition by o.feed_id, o.contest_id) as started,
           exists (
             select from live.fetch x where x.feed_id = o.feed_id and x.status <> 'error'
               and x.fetched_at > now() - interval '20 minutes'
@@ -1149,7 +1150,7 @@ async function night(
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
       ), ranked as (
-        select l.feed_id, l.contest_id, l.adapter, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
+        select l.feed_id, l.contest_id, l.adapter, l.reporting, l.expected, l.started, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
           t.votes >= 0.97 * max(t.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
         from latest l cross join lateral (
           select sum(v.votes) filter (where x.kind <> 'none_of_the_above') as votes,
@@ -1169,6 +1170,7 @@ async function night(
           and not exists (
             select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
               and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
+              and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
           )
         order by w.contest_id, ${tier(sql.raw("w.adapter"))}
       )
