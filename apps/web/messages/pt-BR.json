@@ -5644,6 +5644,7 @@
   "feed_topic_resolved": "Tópico resolvido sobre {record}: {topic}",
   "feed_imported_by": "Importado por {pipeline}",
   "feed_someone": "Um colaborador",
+  "feed_automated": "Automático",
   "feed_via_agent": "{author} via {agent}",
   "feed_batches": [
     {
@@ -5665,6 +5666,7 @@
   "recent_title": "Alterações recentes",
   "recent_heading": "Alterações recentes",
   "recent_lede": "Tudo o que mudou no arquivo, do mais recente para o mais antigo: importações de dados, propostas e suas decisões, e discussões. Os horários aparecem no seu fuso horário; passe o cursor sobre um deles para ver em UTC.",
+  "recent_lede_read_only": "Todas as importações de dados do arquivo, da mais recente para a mais antiga. Os horários aparecem no seu fuso horário; passe o cursor sobre um deles para ver em UTC.",
   "recent_feed_title": "Alterações recentes em electionsarchive.com",
   "recent_filter_author": "Feito por",
   "recent_filter_all": "Todos",
