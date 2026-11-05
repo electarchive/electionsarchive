@@ -1413,3 +1413,30 @@ interval = 180
 params = { county = "San Diego", url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html" }
 publisher = "San Diego County Registrar of Voters"
 url = "https://www.livevoterturnout.com/ENR/sandiegocaenr/25/en/Index_25.html"
+
+[[feed]]
+id = "us.livevoter.san_bernardino"
+adapter = "us.livevoter"
+interval = 180
+note = "The county's results page links the current election's address, which changes between elections"
+params = { county = "San Bernardino", url = "https://elections.sbcounty.gov/elections/2026/1103/results/" }
+publisher = "San Bernardino County Registrar of Voters"
+url = "https://elections.sbcounty.gov/elections/2026/1103/results/"
+
+[[feed]]
+id = "us.alameda_live"
+adapter = "us.alameda_live"
+interval = 180
+note = "Ranked-choice races show first choices, which is all this page reports; the county's tally rounds are on its separate ranked-choice page"
+publisher = "Alameda County Registrar of Voters"
+url = "https://alamedacountyca.gov/rovresults/260/index.htm"
+
+[[feed]]
+id = "us.clarity_live.nueces"
+adapter = "us.clarity_live"
+interval = 180
+note = "The Texas Secretary of State's site has no city races, so Corpus Christi's and Nueces County's come from the county's own results"
+params = { state = "TX", tenant = "Nueces", eid = "127557" }
+poller = "muktedir"
+publisher = "Nueces County Clerk"
+url = "https://results.enr.clarityelections.com/TX/Nueces/127557/"
