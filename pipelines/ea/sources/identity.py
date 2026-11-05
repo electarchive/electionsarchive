@@ -1690,7 +1690,14 @@ def emit() -> Path:
                  select n.*, row_number() over (
                    partition by n.entity_id, n.lang, n.script
                    order by c.pipeline = o.pipeline desc, n.recorded_from, n.id) as rank
-                 from name n join changeset c on c.id = n.changeset_id
+                 from (
+                   select entity_id, lang, script from name
+                   where is_preferred and valid_from is null and valid_to is null
+                   group by entity_id, lang, script having count(*) > 1
+                 ) tied
+                 join name n on n.entity_id = tied.entity_id and n.lang = tied.lang
+                   and n.script is not distinct from tied.script
+                 join changeset c on c.id = n.changeset_id
                  join entity e on e.id = n.entity_id join changeset o on o.id = e.changeset_id
                  where n.is_preferred and n.valid_from is null and n.valid_to is null
                    and not exists (select from entity_merge m where m.entity_id = n.entity_id)
