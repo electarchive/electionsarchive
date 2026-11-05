@@ -55,6 +55,7 @@ FILES = {
     "04013": "https://elections.maricopa.gov/asset/jcr:1673a1e7-bbed-4d76-94fe-ae0ccc1ce9d5/2026%20General%20Election%20Maricopa%20County%20Candidates%20On%20Ballot%20-%20Remediated.pdf",
     "17031c": "https://www.cookcountyclerkil.gov/elections/current-elections/view-all-candidates#GetAllCandidates.json",
 }
+DIFFERENT_PEOPLE = {("TN:4715160:council:ward-7", "John Dewey Robinson", "Jeffrey K. Robinson")}
 FEEDS = {
     "ME": (
         "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/2026%20General%20Candidate%20List%20-%20FINAL.xlsx",
@@ -13213,6 +13214,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     person
                     for person, held_text in known.get(tail, [])
                     if held_text
+                    and (tail, row["name"], held_text) not in DIFFERENT_PEOPLE
                     and (
                         held := [
                             token
