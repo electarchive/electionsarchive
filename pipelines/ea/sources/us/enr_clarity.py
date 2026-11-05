@@ -1970,6 +1970,23 @@ def emit(
             ):
                 name(contest, text)
 
+        def person_name(person: UUID, text: str) -> None:
+            if (
+                person in cs.minted
+                or conn.execute(
+                    """select 1 from name n join changeset c on c.id = n.changeset_id
+                       where n.entity_id = %s and n.lang = 'en' and n.is_preferred and n.text <> %s
+                         and c.pipeline <> %s
+                         and not exists (
+                           select 1 from name o join changeset oc on oc.id = o.changeset_id
+                           where o.entity_id = n.entity_id and o.lang = 'en' and o.is_preferred and oc.pipeline = %s)
+                       limit 1""",
+                    [person, text, source, source],
+                ).fetchone()
+                is None
+            ):
+                name(person, text)
+
         person_scheme = f"{source}.person"
         person_keys: dict[UUID, str] = dict(
             conn.execute(
@@ -2805,7 +2822,7 @@ def emit(
                         persons.add(person)
                         if person in cs.minted:
                             cs.add("person", id=person)
-                        name(person, ballot)
+                        person_name(person, ballot)
                     tag = party or choice_party
                     won = (
                         primary_winners.get(series, {}).get(slug(_title(choice)), set())
