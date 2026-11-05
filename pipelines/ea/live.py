@@ -10,7 +10,17 @@ from uuid import UUID
 
 import httpx
 
-from ea.sources.us import civicapi, dc_boe_live, enr_2026, guam_live, mp_cec_live, npr_live, nyc_enr_live, vi_live
+from ea.sources.us import (
+    civicapi,
+    dc_boe_live,
+    enr_2026,
+    guam_live,
+    mp_cec_live,
+    npr_live,
+    nv_independent,
+    nyc_enr_live,
+    vi_live,
+)
 from ea.store import DATA, Connection, connect
 
 FEEDS = Path(__file__).with_name("live_feeds.toml")
@@ -85,6 +95,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         civicapi.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
     elif adapter == "us.npr":
         npr_live.collect(client, params["state"], lambda url, content, suffix: pages.update({url: (content, suffix)}))
+    elif adapter == "us.nv_independent":
+        nv_independent.collect(client, lambda url, content, suffix: pages.update({url: (content, suffix)}))
     elif adapter == "us.nyc_enr":
         pages = nyc_enr_live.collect(client)
     elif adapter == "us.dc_boe_live":
@@ -128,6 +140,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.civicapi"
             else enr_2026.plan(conn, npr_live.frame(params["state"], paths), lambda _, __: None)
             if adapter == "us.npr"
+            else enr_2026.plan(conn, nv_independent.frame(paths), lambda _, __: None)
+            if adapter == "us.nv_independent"
             else dc_boe_live.plan(conn, paths)
             if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)
@@ -138,7 +152,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.vi_live"
             else nyc_enr_live.plan(conn, feed, paths)
         )
-        if adapter == "us.enr_2026" and params["state"] in enr_2026.COUNTY_FEEDS:
+        if adapter == "us.enr_2026" and enr_2026.county_only(params["state"], paths):
             tallies = [tally for tally in tallies if enr_2026.countywide(tally[1])]
         conn.execute(
             """update live.issue set resolved = true

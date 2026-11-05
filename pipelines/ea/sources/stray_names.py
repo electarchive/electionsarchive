@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "6"
+VERSION = "7"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
@@ -44,6 +44,14 @@ PERSON_NAMES = [
     ),
     ("c121ae31-3594-5b7b-8e3d-00c50773f615", "W/I", "the write-in ballot label derived as a short name"),
 ]
+RENAMES = [
+    (
+        "3288b3ba-c33b-594d-a618-3a6afebef543",
+        "Kreisstomkins",
+        "Kreiss-Tomkins",
+        "Klarner's data dropped the hyphen from the surname",
+    ),
+]
 PEOPLE = [
     (
         "us.thea.person",
@@ -60,7 +68,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Drop names that sit on the wrong entity, keeping the entity",
+            summary="Drop or repair names that are wrong on their entity, keeping the entity",
             polity=None,
             kind="correction",
         )
@@ -82,6 +90,21 @@ def emit() -> Path:
                 [entity, text],
             ).fetchall():
                 cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
+                print(f"person {entity}: {text}")
+        for entity, old, new, reason in RENAMES:
+            for name, text, lang, kind, preferred in conn.execute(
+                "select id, text, lang, kind, is_preferred from name where entity_id = %s and text like %s",
+                [entity, f"%{old}%"],
+            ).fetchall():
+                cs.add("name_drop", name_id=name, entity_id=entity, text=text, reason=reason)
+                cs.add(
+                    "name",
+                    entity_id=entity,
+                    text=text.replace(old, new),
+                    lang=lang,
+                    kind=kind,
+                    is_preferred=preferred,
+                )
                 print(f"person {entity}: {text}")
         for scheme, pattern, reason in PEOPLE:
             for name, entity, text in conn.execute(

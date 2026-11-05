@@ -414,6 +414,15 @@ CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
 NV_PETITIONED = {"Danielle Ford", 'Afzal "Bobby" Khan', 'Steven "Chap" St John', "William Johnson"}
+NV_NOT_QUALIFIED = {"Cornelius D. Jones"}
+NV_NOTA_OFFICES = {
+    "governor",
+    "lieutenant-governor",
+    "attorney-general",
+    "secretary-of-state",
+    "treasurer",
+    "controller",
+}
 OFF_BALLOT = {("RI", "REPRESENTATIVE IN GENERAL ASSEMBLY", "59", "Barros")}
 WITHDRAWN = {
     "2026-11-03:GA:senate:47:g": (
@@ -2529,7 +2538,7 @@ def emit() -> Path:
                join contest_option op on op.contest_id = x.entity_id
                join changeset c on c.id = op.changeset_id and c.pipeline = %s
                left join candidacy cy on cy.option_id = op.id and cy.role is distinct from 'running_mate'
-               where x.scheme = 'us.contest' and x.value like %s
+               where x.scheme = 'us.contest' and x.value like %s and op.kind <> 'none_of_the_above'
                  and not exists (select from entity_retirement r where r.entity_id = op.id)""",
             [SOURCE, f"{DAY}:%"],
         ).fetchall():
@@ -2875,6 +2884,8 @@ def emit() -> Path:
                     )
                 ]
             for ballot, person, party_id in entries:
+                if ballot in NV_NOT_QUALIFIED:
+                    continue
                 person = next(
                     (
                         held_person
@@ -2989,6 +3000,14 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
                     cs.add("note", entity_id=result_set, kind="context", body_md=context)
                     cs.add("citation", entity_id=candidacy, source_id=sources[f"tacit:{declared}"], locator=None)
+            if state == "NV" and key.split(":", 2)[2] in NV_NOTA_OFFICES:
+                cs.add(
+                    "contest_option",
+                    id=cs.key("us.option", f"{key}:none-of-these-candidates"),
+                    contest_id=contest,
+                    kind="none_of_the_above",
+                    ballot_label="None of These Candidates",
+                )
             reason = (
                 WITHDRAWN[key][1]
                 if key in WITHDRAWN
