@@ -391,7 +391,6 @@ def peer_candidacies(conn, year: int) -> dict[tuple[str, str, str], list[tuple[U
 
 def emit() -> Path:
     added_offices = set()
-    frame = pl.read_parquet(PARSED / "districts.parquet")
     contests = pl.read_parquet(PARSED / "contests.parquet").filter(pl.col("ok"))
     contests = contests.filter(
         pl.col("office").str.contains(OFFICES.pattern)
@@ -407,8 +406,14 @@ def emit() -> Path:
     )
     if DATES:
         contests = contests.filter(pl.col("date").is_in(DATES.split(",")))
-    frame = frame.join(contests.select("file", "office", "body", "district", "vote_for"), on="file").with_columns(
-        pl.col("unit").str.replace_all(r"\s+", " ")
+    frame = (
+        pl.scan_parquet(PARSED / "districts.parquet")
+        .join(
+            contests.lazy().select("file", "office", "body", "district", "vote_for"), on="file", maintain_order="left"
+        )
+        .drop("file")
+        .with_columns(pl.col("unit").str.replace_all(r"\s+", " "))
+        .collect(engine="streaming")
     )
     with connect() as conn:
         cs = Changeset(
