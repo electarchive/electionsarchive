@@ -13695,6 +13695,15 @@ function naming(
   return { titled, named: (isTitled ? titled : single.id) ?? head?.id ?? "" };
 }
 
+function levelOf(
+  head: { isExecutive: boolean; isSpecial: boolean } | undefined,
+): "executive" | "general" | "special" {
+  if (head?.isExecutive === true) {
+    return "executive";
+  }
+  return head?.isSpecial === true ? "special" : "general";
+}
+
 function standing(
   head:
     | { isExecutive: boolean; isOffice: boolean; isHome: boolean }
@@ -13800,6 +13809,7 @@ export async function races(
       isOffice: boolean;
       isStage: boolean;
       isExecutive: boolean;
+      isSpecial: boolean;
       isHome: boolean;
       size: number | null;
       isCounted: boolean;
@@ -13855,6 +13865,7 @@ export async function races(
           select from office o where o.id = c.office_id
             and o.kind in ('governor', 'head_of_state', 'head_of_government', 'mayor')
         ) as "isExecutive",
+        e.polity in ('school_district', 'special_district') as "isSpecial",
         exists (select from body b where b.id = c.body_id and b.polity_id = ${polity}::uuid) as "isHome",
         (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
           select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
@@ -13869,7 +13880,7 @@ export async function races(
         ) then 'alliance' else 'party' end as grouping
       from kept k
       join contest c on c.id = k.id
-      cross join lateral (select x.kind, x.date_from from election x where x.id = c.election_id offset 0) e
+      cross join lateral (select x.kind, x.date_from, y.kind as polity from election x join polity y on y.id = x.polity_id where x.id = c.election_id offset 0) e
       left join seat st on st.id = c.seat_id
       left join area a on a.id = c.district_area_id
       left join scheme sc on sc.code = a.scheme_code
@@ -15125,7 +15136,12 @@ export async function races(
         quorum: asked.quorum,
         contest: single?.id ?? null,
         anchor: segment(labels.full.get(head?.owner ?? head?.id ?? "") ?? ""),
-        name: labels.short.get(named) ?? labels.full.get(named) ?? "",
+        name:
+          (head?.isOffice === true && !head.isOwn
+            ? null
+            : labels.short.get(named)) ??
+          labels.full.get(named) ??
+          "",
         scope:
           labels.short.get(head?.party ?? "") ??
           labels.full.get(head?.party ?? "") ??
@@ -15133,6 +15149,7 @@ export async function races(
         path: slugs.get(single?.id ?? allot ?? "") ?? null,
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
+        level: levelOf(head),
         isRemainder: head?.isRemainder ?? false,
         body: head?.body ?? null,
         isStage: head?.isStage ?? false,
@@ -15573,6 +15590,7 @@ export const elections = {
             ),
             quorum: v.nullable(v.number()),
             isOffice: v.boolean(),
+            level: v.picklist(["executive", "general", "special"]),
             isRemainder: v.boolean(),
             isPrimaries: v.boolean(),
             scope: v.nullable(v.string()),

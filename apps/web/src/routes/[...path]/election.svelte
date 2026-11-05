@@ -9,8 +9,17 @@
     createQuery,
     useQueryClient,
   } from "@tanstack/svelte-query";
-  import { flushSync, tick, untrack } from "svelte";
-  import { Await, Island, load, Part, peek, unroll } from "svelte-islands";
+  import { flushSync, onMount, tick, untrack } from "svelte";
+  import {
+    Await,
+    Island,
+    load,
+    loadNow,
+    Part,
+    peek,
+    unroll,
+    whenWanted,
+  } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import { compose, partyOn, stand } from "#lib/caucus.js";
   import Disclosure from "#lib/components/disclosure.svelte";
@@ -221,6 +230,21 @@
       fetched = { hash: rest.part.hash, ...value };
     });
   };
+  onMount(() =>
+    whenWanted((want) => {
+      listing.isOpen = true;
+      if (want === "find") {
+        more();
+        return;
+      }
+      const rest = pending;
+      const found = rest == null ? null : loadNow(rest.part);
+      if (rest != null && found != null) {
+        fetched = { hash: rest.part.hash, ...found.value };
+      }
+      flushSync();
+    }),
+  );
   const materialized = $derived(
     every.map((race) => {
       const staffed = {

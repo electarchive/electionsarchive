@@ -12,6 +12,7 @@ const BOARD = 49;
 const FLOOR = 12;
 const WEIGHT = 64_000;
 const QUESTIONS = 7;
+const PULL = { executive: 4, general: 1, special: 0.25 };
 const CROWD = 40;
 const TILED = /^us\/[a-z]{2}\/[^/]+$/u;
 const LEGEND = 8;
@@ -144,11 +145,18 @@ const lay = memo((races: Election["election"]["races"]) => {
     }
     return picked;
   };
+  const pull = (race: (typeof ordered)[number]) =>
+    (race.valid ?? 0) * PULL[race.level];
+  const ranked = ordered.toSorted(
+    (a, b) =>
+      Number(b.results.length !== 1) - Number(a.results.length !== 1) ||
+      pull(b) - pull(a),
+  );
   const board = new Set(
     isDeferred
       ? [
-          ...pick(ordered.filter((race) => !isQuestion(race))),
-          ...ordered.filter((race) => isQuestion(race)).slice(0, QUESTIONS),
+          ...pick(ranked.filter((race) => !isQuestion(race))),
+          ...ranked.filter((race) => isQuestion(race)).slice(0, QUESTIONS),
         ]
       : pick(ordered),
   );
