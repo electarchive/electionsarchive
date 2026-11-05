@@ -2,10 +2,9 @@
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import BandLabel from "#lib/components/live/band-label.svelte";
-  import { prior } from "#lib/components/live/full/model.js";
   import { count, percent } from "#lib/format.js";
   import { compact, paint } from "#lib/live/format.js";
-  import { ranked } from "#lib/live/standing.js";
+  import { prior, ranked } from "#lib/live/standing.js";
   import { bandOf, closing, describe, isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";

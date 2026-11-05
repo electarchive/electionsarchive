@@ -22,7 +22,7 @@
       name: string;
       href: string;
       leader: LiveOption | null;
-      margin: number;
+      margin: number | null;
       counted: number | null;
     }>;
     back: { href: string; label: string };
@@ -68,7 +68,8 @@
           {#if county.leader != null}
             <span
               class="font-figures text-xs text-muted-foreground tabular-nums"
-              >{surname(county.leader)} +{lead(county.margin)}</span
+              >{surname(county.leader)}{#if county.margin != null}
+                +{lead(county.margin)}{/if}</span
             >
           {/if}
           <span

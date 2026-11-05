@@ -65,6 +65,7 @@
   import { prefs } from "#lib/live/prefs.svelte.js";
   import {
     pair as pairOf,
+    prior,
     remainder,
     standing,
     sum,
@@ -102,7 +103,6 @@
     MUTED,
     OFFICES,
     PAINTS,
-    prior,
     seatHatch,
     seatName,
     shade,

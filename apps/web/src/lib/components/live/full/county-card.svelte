@@ -356,7 +356,8 @@
                 ></span>
                 <span
                   class="shrink-0 font-figures text-xs whitespace-nowrap tabular-nums"
-                  >{surname(option)} +{lead(other.row.margin)}</span
+                  >{surname(option)}{#if other.row.isContested}
+                    +{lead(other.row.margin)}{/if}</span
                 >
               {/if}
             </button>

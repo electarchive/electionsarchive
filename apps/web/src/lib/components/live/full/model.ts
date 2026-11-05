@@ -265,31 +265,6 @@ export function stateShade(
   };
 }
 
-export function prior(race: LiveRace) {
-  const totals = race.options.map(() => 0);
-  let turnout = 0;
-  for (const row of race.baseline) {
-    turnout += row.turnout;
-    for (const [index, share] of row.shares.entries()) {
-      totals[index] = (totals[index] ?? 0) + share * row.turnout;
-    }
-  }
-  if (turnout <= 0) {
-    return null;
-  }
-  const shares = totals.map((value) => value / turnout);
-  const order = ranked(shares);
-  const first = order[0];
-  const second = order[1];
-  return {
-    turnout,
-    shares,
-    leader: first ?? null,
-    margin:
-      first == null ? 0 : (shares[first] ?? 0) - (shares[second ?? -1] ?? 0),
-  };
-}
-
 export function lastLeader(row: UnitStanding) {
   const shares = row.baseline?.shares ?? [];
   const order = ranked(shares);

@@ -4565,7 +4565,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
             ? (race.leader ?? (race.note == null ? "" : m.night_later_key()))
             : `${race.unopposed} (${m.night_state_unopposed()})`,
       total === 0 ? "" : count(total),
-      total === 0 ? "" : points(race.margin, 1).replace(/^[+−]/u, ""),
+      total === 0 || race.margin == null
+        ? ""
+        : points(race.margin, 1).replace(/^[+−]/u, ""),
       ...(data.forecasts
         ? [
             race.estimate?.chance == null || race.estimate.favorite == null

@@ -4,6 +4,7 @@
   import { isChanging } from "#lib/live/flips.js";
   import { lead } from "#lib/live/format.js";
   import { isSettled, odds } from "#lib/live/nation.js";
+  import { isContested } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Flip from "./flip.svelte";
@@ -190,7 +191,7 @@
         isEstimate: true,
       };
     }
-    if (seat.summary.total === 0) {
+    if (seat.summary.total === 0 || !isContested(seat.summary.race)) {
       return null;
     }
     if (

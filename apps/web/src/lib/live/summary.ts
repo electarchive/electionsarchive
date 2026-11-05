@@ -7,7 +7,7 @@ import type {
 } from "@ea/analytics/live";
 import { count, percent } from "#lib/format.js";
 import { bandFor, lead, stamp, surname, tone } from "#lib/live/format.js";
-import { ranked, sum } from "#lib/live/standing.js";
+import { isContested, ranked, sum } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
 import { leadSafety, marginShade } from "#lib/shade.js";
 
@@ -145,7 +145,7 @@ export function isUncounted(summary: Summary) {
 }
 
 export function edge(summary: Summary) {
-  return summary.unopposed == null
+  return isContested(summary.race)
     ? `+${lead(summary.margin)}`
     : m.night_state_unopposed();
 }
@@ -222,7 +222,9 @@ export function describe(
       : m.night_head_seats_filled(values);
   }
   if (winner != null) {
-    return m.night_head_won({ name: winner.label, margin: lead(margin) });
+    return isContested(summary.race)
+      ? m.night_head_won({ name: winner.label, margin: lead(margin) })
+      : m.night_races_won({ name: winner.label });
   }
   if (summary.projected != null) {
     return m.night_head_projected({

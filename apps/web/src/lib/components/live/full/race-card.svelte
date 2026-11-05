@@ -12,10 +12,10 @@
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { odds } from "#lib/live/nation.js";
+  import { prior } from "#lib/live/standing.js";
   import { bandOf, describe, isUncounted } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
-  import { prior } from "./model.js";
 
   const {
     summary,
@@ -90,7 +90,7 @@
   });
   const lastMargin = $derived.by(() => {
     const option = last?.leader == null ? null : race.options[last.leader];
-    return last == null || option == null
+    return last?.margin == null || option == null
       ? null
       : `${surname(option)} +${lead(last.margin)}`;
   });

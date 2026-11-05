@@ -160,7 +160,8 @@
             >
               {#if leader != null}
                 <span style:color={tone(leader)} class="font-semibold"
-                  >{surname(leader)} +{lead(row.margin)}</span
+                  >{surname(leader)}{#if row.isContested}
+                    +{lead(row.margin)}{/if}</span
                 >
               {:else if row.baseSigned != null}
                 {m.night_tip_baseline({

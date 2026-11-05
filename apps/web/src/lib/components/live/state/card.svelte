@@ -15,7 +15,7 @@
   } from "#lib/live/format.js";
   import { lineup, useReach } from "#lib/live/lineup.js";
   import { odds } from "#lib/live/nation.js";
-  import { sum } from "#lib/live/standing.js";
+  import { isContested, prior } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Also from "./also.svelte";
@@ -56,10 +56,12 @@
   const pick = $derived(summary.settled ?? summary.leader);
   const status = $derived.by(() => {
     if (summary.winner != null && (race.seats ?? 1) === 1) {
-      return m.night_head_won({
-        name: surname(summary.winner),
-        margin: lead(summary.margin),
-      });
+      return isContested(race)
+        ? m.night_head_won({
+            name: surname(summary.winner),
+            margin: lead(summary.margin),
+          })
+        : m.night_races_won({ name: surname(summary.winner) });
     }
     if (summary.projected != null) {
       return m.night_card_projected({ time: stamp(summary.projectedAt) });
@@ -97,19 +99,13 @@
         chance: odds(summary.chance),
       });
     }
-    const prior = race.options.map((_, index) =>
-      sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
-    );
-    const total = sum(prior);
-    const order = prior
-      .map((votes, index) => ({ votes, option: race.options[index] }))
-      .toSorted((a, b) => b.votes - a.votes);
-    const first = order[0];
-    if (total <= 0 || first?.option?.party == null) {
+    const last = prior(race);
+    const option = last?.leader == null ? null : race.options[last.leader];
+    if (last?.margin == null || option?.party == null) {
       return null;
     }
     return m.night_tip_baseline({
-      margin: `${initial(first.option)}+${lead((first.votes - (order[1]?.votes ?? 0)) / total)}`,
+      margin: `${initial(option)}+${lead(last.margin)}`,
     });
   });
 </script>

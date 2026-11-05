@@ -5,7 +5,7 @@
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { short } from "#lib/live/board/labels.js";
   import { clock, compact, lead, surname, tone } from "#lib/live/format.js";
-  import { ranked, sum } from "#lib/live/standing.js";
+  import { isContested, ranked, sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
 
@@ -19,7 +19,7 @@
       race: LiveRace;
       at: string;
       leader: LiveOption | undefined;
-      margin: number;
+      margin: number | null;
       added: number;
       isCall: boolean;
     }> = [];
@@ -47,10 +47,11 @@
             race,
             at: frame.at,
             leader: first == null ? undefined : race.options[first],
-            margin:
-              ((frame.totals[first ?? 0] ?? 0) -
-                (frame.totals[second ?? 1] ?? 0)) /
-              total,
+            margin: isContested(race)
+              ? ((frame.totals[first ?? 0] ?? 0) -
+                  (frame.totals[second ?? 1] ?? 0)) /
+                total
+              : null,
             added: total - previous,
             isCall: false,
           });
@@ -102,7 +103,7 @@
               style:background-color={tone(entry.leader)}
             ></span>
             <span class="truncate">{surname(entry.leader)}</span>
-            {#if !entry.isCall}
+            {#if !entry.isCall && entry.margin != null}
               <span class="font-figures text-muted-foreground tabular-nums"
                 >+{lead(entry.margin)}</span
               >

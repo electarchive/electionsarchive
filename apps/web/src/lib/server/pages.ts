@@ -8,7 +8,7 @@ import { compactPlaces } from "#lib/compare.js";
 import { headline } from "#lib/coverage.js";
 import { dated } from "#lib/live/format.js";
 import { estimateAt } from "#lib/live/history.js";
-import { toward } from "#lib/live/standing.js";
+import { isContested, toward } from "#lib/live/standing.js";
 import {
   closing,
   cut,
@@ -2052,7 +2052,7 @@ export async function livePage(path: string, at: string | null) {
         reporting: frame?.reporting ?? null,
         expected: frame?.expected ?? null,
         leader: summary.leader?.label ?? null,
-        margin: summary.margin,
+        margin: isContested(race) ? summary.margin : null,
         seat: line == null ? null : { name: line.last.label, lead: line.lead },
         winner: summary.winner?.label ?? null,
         projected:

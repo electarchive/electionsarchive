@@ -108,9 +108,11 @@
           style:background-color={tone(options[row.leader])}
         ></span>
         {surname(options[row.leader])}
-        <span class="font-figures text-muted-foreground tabular-nums"
-          >+{lead(row.margin)}</span
-        >
+        {#if row.isContested}
+          <span class="font-figures text-muted-foreground tabular-nums"
+            >+{lead(row.margin)}</span
+          >
+        {/if}
       </span>
       {#if row.signed != null && row.baseSigned != null}
         {const shift = $derived(row.signed - row.baseSigned)}
