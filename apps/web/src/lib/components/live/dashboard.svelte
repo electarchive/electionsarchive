@@ -237,8 +237,10 @@
     Map.groupBy(summaries, (summary) => summary.race.state),
   );
   const codes = $derived(
-    [...byState.keys()].toSorted((a, b) =>
-      (nation?.labels[a] ?? a).localeCompare(nation?.labels[b] ?? b),
+    [...byState.keys()].toSorted(
+      (a, b) =>
+        Number(STATES.has(b)) - Number(STATES.has(a)) ||
+        (nation?.labels[a] ?? a).localeCompare(nation?.labels[b] ?? b),
     ),
   );
   const states = new Windowed(() => ({
@@ -254,15 +256,19 @@
     summaries.filter((summary) => summary.total > 0).length,
   );
   const uncontested = $derived(summaries.filter(isUncounted).length);
-  const statesIn = $derived(
-    codes.filter((code) =>
-      (byState.get(code) ?? []).some((summary) => summary.total > 0),
-    ).length,
-  );
-  const statesOpen = $derived(
-    codes.filter((code) =>
-      (byState.get(code) ?? []).some((summary) => !isUncounted(summary)),
-    ).length,
+  function placesIn(places: Array<string>) {
+    return {
+      count: places.filter((code) =>
+        (byState.get(code) ?? []).some((summary) => summary.total > 0),
+      ).length,
+      total: places.filter((code) =>
+        (byState.get(code) ?? []).some((summary) => !isUncounted(summary)),
+      ).length,
+    };
+  }
+  const statesIn = $derived(placesIn(codes.filter((code) => STATES.has(code))));
+  const territoriesIn = $derived(
+    placesIn(codes.filter((code) => !STATES.has(code))),
   );
   const houseVotes = $derived(points.at(-1) ?? null);
   const houseTotal = $derived(
@@ -826,10 +832,17 @@
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
         <dd class="font-figures text-2xl font-[760] tabular-nums">
-          {statesIn}<span class="text-base font-semibold text-muted-foreground">
-            / {statesOpen}</span
+          {statesIn.count}<span
+            class="text-base font-semibold text-muted-foreground"
+          >
+            / {statesIn.total}</span
           >
         </dd>
+        {#if territoriesIn.total > 0}
+          <dd class="text-xs text-muted-foreground">
+            {m.night_nation_territories(territoriesIn)}
+          </dd>
+        {/if}
       </div>
       <div class="grid">
         <dt class="text-xs text-muted-foreground">
@@ -1294,6 +1307,10 @@
               class={cn(
                 "cursor-pointer border-be border-border hover:highlighter @max-[60rem]:flex @max-[60rem]:flex-wrap @max-[60rem]:items-center @max-[60rem]:gap-x-4 @max-[60rem]:py-2.5 @max-[60rem]:before:order-4 @max-[60rem]:before:basis-full @max-[60rem]:before:content-[''] @max-[60rem]:after:order-7 @max-[60rem]:after:basis-full @max-[60rem]:after:content-['']",
                 { highlighter: hovered === code },
+                {
+                  "border-bs-2":
+                    !STATES.has(code) && STATES.has(codes[index - 1] ?? ""),
+                },
               )}
               {@attach states.measure(index)}
               onpointerenter={(event) => {

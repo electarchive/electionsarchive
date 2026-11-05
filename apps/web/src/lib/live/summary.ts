@@ -186,13 +186,19 @@ export function cut(summary: Summary) {
   };
 }
 
+export function seatsUnopposedHead(seats: number, candidates: number) {
+  return candidates === 1
+    ? m.night_head_seats_unopposed_one({ seats: count(seats) })
+    : m.night_head_seats_unopposed({
+        seats: count(seats),
+        count: count(candidates),
+      });
+}
+
 export function unopposedHead({ race, unopposed }: Summary) {
   const seats = race.seats ?? 1;
   return seats > 1
-    ? m.night_head_seats_unopposed({
-        seats: count(seats),
-        count: count(race.unopposed?.options.length ?? 0),
-      })
+    ? seatsUnopposedHead(seats, race.unopposed?.options.length ?? 0)
     : m.night_head_unopposed({ name: unopposed?.label ?? "" });
 }
 

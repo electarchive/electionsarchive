@@ -873,21 +873,35 @@ function standingsBody(summary: Summary, seats: number, width: number) {
               fontSize: 21,
               color: MUTED,
             },
-            m.night_og_seats_more({
-              count: count(order.length - ranks.length),
-            }),
+            moreCandidates(order.length - ranks.length),
           ),
         ]
       : []),
   ]);
 }
 
+function moreCandidates(hidden: number) {
+  return hidden === 1
+    ? m.night_og_seats_more_one()
+    : m.night_og_seats_more({ count: count(hidden) });
+}
+
 function raceBody(summary: Summary, width: number) {
   const { race } = summary;
   const [a, b] = pair(race);
-  const shown = race.options.length > 1 ? [a, b] : [a];
+  const isSilent = isUncounted(summary);
+  const named = race.options.flatMap((option, index) =>
+    race.unopposed?.options.includes(option.id) === true ? [index] : [],
+  );
+  const shown = isSilent
+    ? named.slice(0, 3)
+    : race.options.length > 1
+      ? [a, b]
+      : [a];
   const prior = race.options.map((_, index) =>
-    sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
+    isSilent
+      ? 0
+      : sum(race.baseline.map((row) => (row.shares[index] ?? 0) * row.turnout)),
   );
   const isCounting = summary.total > 0;
   const base = isCounting ? summary.totals : prior;
@@ -916,35 +930,46 @@ function raceBody(summary: Summary, width: number) {
       : null;
   return h({ display: "flex", flexDirection: "column", width, gap: 22 }, [
     ...shown.map((index) => candidate(race, summary, index, prior)),
-    h(
-      {
-        display: "flex",
-        height: 16,
-        backgroundColor: FILL,
-        borderRadius: 3,
-        overflow: "hidden",
-      },
-      sum(base) === 0
-        ? []
-        : [
-            h({
-              width: `${shareA * 100}%`,
-              height: "100%",
-              backgroundColor: tint(hue(race.options[a], a)),
-            }),
-            h({
-              width: `${rest * 100}%`,
-              height: "100%",
-              backgroundColor: tint(OTHER),
-            }),
-            h({ flexGrow: 1, height: "100%" }),
-            h({
-              width: `${shareB * 100}%`,
-              height: "100%",
-              backgroundColor: tint(hue(race.options[b], b)),
-            }),
-          ],
-    ),
+    ...(isSilent
+      ? named.length > shown.length
+        ? [
+            h(
+              { display: "flex", fontSize: 20, color: MUTED },
+              moreCandidates(named.length - shown.length),
+            ),
+          ]
+        : []
+      : [
+          h(
+            {
+              display: "flex",
+              height: 16,
+              backgroundColor: FILL,
+              borderRadius: 3,
+              overflow: "hidden",
+            },
+            sum(base) === 0
+              ? []
+              : [
+                  h({
+                    width: `${shareA * 100}%`,
+                    height: "100%",
+                    backgroundColor: tint(hue(race.options[a], a)),
+                  }),
+                  h({
+                    width: `${rest * 100}%`,
+                    height: "100%",
+                    backgroundColor: tint(OTHER),
+                  }),
+                  h({ flexGrow: 1, height: "100%" }),
+                  h({
+                    width: `${shareB * 100}%`,
+                    height: "100%",
+                    backgroundColor: tint(hue(race.options[b], b)),
+                  }),
+                ],
+          ),
+        ]),
     h(
       {
         display: "flex",
@@ -985,7 +1010,7 @@ function raceBody(summary: Summary, width: number) {
           : [
               h(
                 { display: "flex", color: INK, fontWeight: 600 },
-                m.night_counted_none(),
+                isSilent ? m.night_unopposed_title() : m.night_counted_none(),
               ),
               ...(baseline == null
                 ? []

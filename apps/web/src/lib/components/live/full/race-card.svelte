@@ -52,7 +52,7 @@
   const toLive = liveLinks();
 
   const race = $derived(summary.race);
-  const last = $derived(prior(race));
+  const last = $derived(isUncounted(summary) ? null : prior(race));
   const headline = $derived(describe(summary, closes, clock));
   const band = $derived(bandOf(summary));
   const reach = useReach();
