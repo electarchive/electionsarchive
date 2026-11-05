@@ -23,7 +23,6 @@ LINE = re.compile(
 )
 PRECINCTS = re.compile(r'numPrecinctsReported">(\d+)<.*?numPrecinctsParticipating">(\d+)<', re.DOTALL)
 REPORTED = re.compile(r"Precincts Reported: (\d+) of (\d+)")
-FILED_UNDER_MEMPHIS = {"City Council Ward 1", "City Council Ward 7"}
 Race = tuple[str, list[tuple[str, int]], tuple[int, int]]
 
 
@@ -90,7 +89,6 @@ def montgomery_tn(path: Path) -> tuple[list[Race], str | None]:
             (0, 0),
         )
         for office in data["Offices"].values()
-        if office["Name"].strip() not in FILED_UNDER_MEMPHIS
     ], stamp
 
 
