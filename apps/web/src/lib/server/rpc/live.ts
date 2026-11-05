@@ -1,6 +1,7 @@
 import type {
   LiveBaseline,
   LiveElection,
+  LiveEstimate,
   LiveFrame,
   LiveOffice,
   LiveOption,
@@ -16,6 +17,7 @@ import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
+import { setImmediate } from "node:timers/promises";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
 import { isDistricted, placeScheme } from "#lib/live/format.js";
@@ -536,6 +538,28 @@ async function settle<T>(
 }
 
 const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
+
+const ESTIMATES_KEPT = 32_768;
+
+const estimated = new Map<string, { digest: string; value: LiveEstimate }>();
+
+async function latestEstimate(race: LiveRace) {
+  const digest = createHash("sha256")
+    .update(JSON.stringify(race))
+    .digest("base64url");
+  const held = estimated.get(race.id);
+  if (held?.digest === digest) {
+    return held.value;
+  }
+  await setImmediate();
+  const value = estimate({ race, at: null });
+  estimated.delete(race.id);
+  estimated.set(race.id, { digest, value });
+  if (estimated.size > ESTIMATES_KEPT) {
+    estimated.delete(estimated.keys().next().value ?? "");
+  }
+  return value;
+}
 
 type Replayed = {
   totals: Array<[string, number]>;
@@ -1152,7 +1176,7 @@ async function night(
         where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.status = 'active' and od.enabled
         order by o.feed_id, o.contest_id, o.as_of desc, o.k desc
       ), ranked as (
-        select l.feed_id, l.contest_id, l.adapter, l.reporting, l.expected, l.started, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
+        select l.feed_id, l.contest_id, ${tier(sql.raw("l.adapter"))} as tier, l.reporting, l.expected, l.started, l.fresh, t.units > 1 as split, t.units > 1 and t.refused as declined,
           t.votes >= 0.97 * max(t.votes) filter (where l.fresh) over (partition by l.contest_id) as complete
         from latest l cross join lateral (
           select sum(v.votes) filter (where x.kind <> 'none_of_the_above') as votes,
@@ -1162,55 +1186,51 @@ async function night(
           where v.frame_k = l.k
         ) t
       )
+      , best as (
+        select distinct on (contest_id) contest_id, declined, split, tier
+        from ranked
+        where fresh and complete
+        order by contest_id, declined desc, split desc, tier
+      )
       , headline as (
         select distinct on (w.contest_id) w.contest_id, w.feed_id, w.split
-        from ranked w
+        from ranked w join ranked c on c.contest_id = w.contest_id and c.fresh and c.complete
         where w.complete
-          and (
-            (
-              w.fresh
-              and not w.split
-              and exists (
-                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-              )
-              and not exists (
-                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete and c.split
-                  and ${tier(sql.raw("c.adapter"))} <= ${tier(sql.raw("w.adapter"))}
-                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
-              )
-            )
-            or (
-              exists (
-                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
-                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
-                  and c.started > w.started + interval '12 hours'
-                  and coalesce(w.reporting >= 0.9 * w.expected, true)
-              )
-              and not exists (
-                select from ranked c where c.contest_id = w.contest_id and c.fresh and c.complete
-                  and (c.declined, c.split, -${tier(sql.raw("c.adapter"))}) > (w.declined, w.split, -${tier(sql.raw("w.adapter"))})
-                  and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
-              )
-            )
+        group by w.contest_id, w.feed_id, w.split, w.fresh, w.tier
+        having (
+            w.fresh
+            and not w.split
+            and count(*) filter (where c.split) > 0
+            and count(*) filter (
+              where c.split
+                and c.tier <= w.tier
+                and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+            ) = 0
           )
-        order by w.contest_id, ${tier(sql.raw("w.adapter"))}
+          or (
+            count(*) filter (
+              where (c.declined, c.split, -c.tier) > (w.declined, w.split, -w.tier)
+                and c.started > w.started + interval '12 hours'
+                and coalesce(w.reporting >= 0.9 * w.expected, true)
+            ) > 0
+            and count(*) filter (
+              where (c.declined, c.split, -c.tier) > (w.declined, w.split, -w.tier)
+                and (c.started <= w.started + interval '12 hours' or w.reporting < 0.9 * w.expected)
+            ) = 0
+          )
+        order by w.contest_id, w.tier
       )
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
         f.reporting, f.expected, d.publisher, d.url, h.feed_id is not null as "isHeadline", coalesce(h.split, false) as "headlineByUnit"
       from live.frame f join live.feed d on d.id = f.feed_id
       left join headline h on h.contest_id = f.contest_id and h.feed_id = f.feed_id
+      left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
+      left join best b on b.contest_id = f.contest_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
         and (
           h.feed_id is not null
-          or not exists (
-            select from ranked o
-            left join ranked own on own.feed_id = f.feed_id and own.contest_id = f.contest_id
-            where o.contest_id = f.contest_id and o.fresh and o.complete
-              and (
-                own.complete is not true
-                or (o.declined, o.split, -${tier(sql.raw("o.adapter"))}) > (own.declined, own.split, -${tier(sql.raw("d.adapter"))})
-              )
-          )
+          or b.contest_id is null
+          or (own.complete and (b.declined, b.split, -b.tier) <= (own.declined, own.split, -own.tier))
         )
       order by f.as_of, f.k
     `),
@@ -1819,16 +1839,12 @@ async function night(
       kept ? race : { ...race, units: [], counts: [], baseline: [] },
     ),
   };
-  return {
-    election,
-    shown,
-    estimates: Object.fromEntries(
-      (shown.forecasts ? built : []).map((race) => {
-        const value = estimate({ race, at: null });
-        return [race.id, kept ? value : { ...value, units: [] }];
-      }),
-    ),
-  };
+  const estimates: Record<string, LiveEstimate> = {};
+  for (const race of shown.forecasts ? built : []) {
+    const value = await latestEstimate(race);
+    estimates[race.id] = kept ? value : { ...value, units: [] };
+  }
+  return { election, shown, estimates };
 }
 
 const SPREAD = {
