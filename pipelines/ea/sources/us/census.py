@@ -249,7 +249,7 @@ def parse() -> None:
             Path(__file__).with_name("census_at_large.tsv"), separator="\t", infer_schema=False
         ).iter_rows()
     }
-    files: list[tuple[str, list[tuple[int, int, int, str, object]]]] = []
+    files: list[tuple[str, list[tuple[int, int, int, str, str]]]] = []
     with tarfile.open(raw.cached(SOURCE, LEWIS).path, "r|gz") as archive:
         for member in archive:
             match = re.search(r"/GeoJson/(.+)_(\d{3})_to_(\d{3})\.geojson$", member.name)
@@ -263,7 +263,7 @@ def parse() -> None:
                         (
                             *(int(feature["properties"][key]) for key in ("startcong", "endcong", "district")),
                             str(feature["properties"]["id"])[1:3],
-                            feature["geometry"],
+                            json.dumps(feature["geometry"]),
                         )
                         for feature in json.load(file)["features"]
                     ],
@@ -295,7 +295,7 @@ def parse() -> None:
                     }
                     for start in sorted(n for n in held if n - 1 not in held):
                         end = next(n for n in range(start, high + 2) if n not in held) - 1
-                        features.append((code, first, last, start, end, number == 0, json.dumps(geometry)))
+                        features.append((code, first, last, start, end, number == 0, geometry))
             if not features:
                 continue
             historical.extend(
