@@ -1440,3 +1440,12 @@ params = { state = "TX", tenant = "Nueces", eid = "127557" }
 poller = "muktedir"
 publisher = "Nueces County Clerk"
 url = "https://results.enr.clarityelections.com/TX/Nueces/127557/"
+
+[[feed]]
+id = "us.webb_live"
+adapter = "us.webb_live"
+interval = 900
+note = "Laredo's only official count is Webb County's scanned PDF, which no script can read reliably, so the feed serves the checked transcription in us.webb_2026 and errors when the county posts a different file."
+poller = "muktedir"
+publisher = "Webb County Elections Administrator"
+url = "https://www.webbcountytx.gov/DocumentCenter/View/12238"

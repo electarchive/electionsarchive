@@ -24,6 +24,7 @@ from ea.sources.us import (
     nv_independent,
     nyc_enr_live,
     vi_live,
+    webb_live,
 )
 from ea.store import DATA, Connection, connect
 
@@ -119,6 +120,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         pages = alameda_rov_live.collect(client)
     elif adapter == "us.clarity_live":
         pages = clarity_local_live.collect(client, params["state"], params["tenant"], params["eid"])
+    elif adapter == "us.webb_live":
+        pages = webb_live.collect(client)
     else:
         raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
@@ -166,6 +169,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                 conn, clarity_local_live.frame(params["state"], params["tenant"], paths), lambda _, __: None
             )
             if adapter == "us.clarity_live"
+            else webb_live.plan(conn, paths)
+            if adapter == "us.webb_live"
             else dc_boe_live.plan(conn, paths)
             if adapter == "us.dc_boe_live"
             else guam_live.plan(conn, paths)

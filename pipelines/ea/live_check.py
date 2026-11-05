@@ -15,7 +15,15 @@ import httpx
 from psycopg import Connection
 
 from ea.live import FEEDS
-from ea.sources.us import alameda_rov_live, clarity_local_live, enr_2026, lavote_live, livevoter_live, nyc_enr_live
+from ea.sources.us import (
+    alameda_rov_live,
+    clarity_local_live,
+    enr_2026,
+    lavote_live,
+    livevoter_live,
+    nyc_enr_live,
+    webb_live,
+)
 from ea.store import connect
 
 STATES = [
@@ -72,6 +80,13 @@ STATES = [
 ]
 ELECTION = "2026-11-03-general"
 DAY = date(2026, 11, 3)
+BIG_OUTSIDE_COVERAGE = "^us/(dc|ky/louisville)/"
+KENTUCKY_BLOCK = "the State Board of Elections' results site names scraping in its use policy and answers 403"
+UNFED_MAYORS = {
+    "us/ky/louisville": f"{KENTUCKY_BLOCK}; the Jefferson County Clerk's site also answers 403",
+    "us/ky/lexington-fayette": f"{KENTUCKY_BLOCK}; the Fayette County Clerk has posted no general election file",
+    "us/fl/st-petersburg": "votepinellas.gov answers 403 to automated clients from both hosts; no other official source",
+}
 CLOSE = datetime(2026, 11, 3, 23, 0, tzinfo=UTC)
 FALL = (date(2026, 10, 1), date(2026, 12, 31))
 WEBS = [
@@ -168,6 +183,8 @@ def host(feed: dict[str, object]) -> tuple[bool, str, list[tuple[str, bytes]]]:
                         client, params["state"], params["tenant"], params["eid"]
                     ).items()
                 )
+        elif feed["adapter"] == "us.webb_live":
+            pages.extend((url, content) for url, (content, _) in webb_live.collect(client).items())
         else:
             params = feed.get("params")
             enr_2026.collect(client, {params["state"] if isinstance(params, dict) else ""}, store)
@@ -251,6 +268,33 @@ def origin(web: str, paths: list[tuple[str, str]]) -> list[tuple[str, str, str]]
     return rows
 
 
+def mayors(conn: Connection) -> list[tuple[str, str, str]]:
+    found = conn.execute(
+        """with big as (
+             select polity_id from coverage_government
+             where active and kind = 'municipality' and population is not null order by population desc limit 100
+           )
+           select split_part(cs.path, '/2026', 1), exists (
+             select from live.frame f join live.feed d on d.id = f.feed_id and d.enabled
+             where f.contest_id = c.id and f.status = 'active'
+           )
+           from election e join contest c on c.election_id = e.id join slug cs on cs.entity_id = c.id and cs.is_current
+           where e.date_from = %s and cs.path ~ '/mayor(-[a-z0-9-]+)?$'
+             and (e.polity_id in (select polity_id from big) or cs.path ~ %s)""",
+        [DAY, BIG_OUTSIDE_COVERAGE],
+    ).fetchall()
+    rows = [
+        ("yellow", f"mayor {path}", UNFED_MAYORS[path])
+        if path in UNFED_MAYORS
+        else ("red", f"mayor {path}", "no live count: wire a feed, or name the reason in UNFED_MAYORS")
+        for path, fed in found
+        if not fed
+    ]
+    counted = sum(1 for _, fed in found if fed)
+    rows.append(("green", "big-city mayors", f"{counted} of {len(found)} top-100 races have a live count"))
+    return rows
+
+
 def hubs(conn: Connection) -> tuple[list[tuple[str, str]], str]:
     found = conn.execute(
         """with fed as (select distinct contest_id from live.frame where status = 'active')
@@ -329,6 +373,7 @@ def run() -> int:
         )
         switches = conn.execute("select name, shown, changed_at from live.switch order by name").fetchall()
         local, sampled = hubs(conn)
+        big_mayors = mayors(conn)
 
     paths = [("page national", f"/live/us/{ELECTION}")]
     paths += [(f"page {state}", f"/live/us/{state.lower()}/{ELECTION}") for state in STATES]
@@ -424,6 +469,7 @@ def run() -> int:
         )
 
     rows += served
+    rows += big_mayors
     rows.append(("info", "hubs", sampled))
     rows += [
         ("info", f"switch {name}", f"{'on' if shown else 'off'} since {changed:%Y-%m-%d %H:%M %Z}")
