@@ -12067,8 +12067,9 @@ def parse() -> None:
                     ):
                         seat = " ".join(rest[: rest.index("board")]).title()
                     if role is not None:
-                        code = owner.split(":", 1)[1]
-                        template, tail = "", f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
+                        code = owner.split(":", 1)[1].replace(":", "-")
+                        tail = f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
+                        template = templated.get(tail, "")
                         minted[tail] = (
                             {
                                 "mayor": "mayoral",
@@ -12415,6 +12416,19 @@ def drop_external_ids(cs: Changeset, entity: UUID, value: str | None = None) -> 
         cs.rows.pop("external_id", None)
 
 
+def live_key(cs: Changeset, scheme: str, value: str) -> tuple[UUID, str]:
+    key = value
+    for attempt in range(1, 10):
+        try:
+            entity = cs.key(scheme, key)
+        except ValueError:
+            entity = None
+        if entity is not None and entity not in cs.retired:
+            return entity, key
+        key = f"{value}:reissued" + (f"-{attempt}" if attempt > 1 else "")
+    raise ValueError(f"no free {scheme} key for {value}")
+
+
 def emit() -> None:
     whole = pl.read_parquet(PARSED / "candidates.parquet")
     groups = whole["tail"].str.split(":").list.first()
@@ -12577,7 +12591,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             if state == "IN" and (PARSED / "seats_IN.json").exists()
             else {}
         )
-        elections = {}
+        elections: dict[tuple[str, UUID], UUID] = {}
+        owners: dict[str, UUID] = {}
         counts = {
             "contests": 0,
             "chained": 0,
@@ -12594,7 +12609,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
         made: set[object] = set()
         seen_contests: set[UUID] = set()
         at_large: dict[object, tuple | None] = {}
-        homes: dict[str, str] = {}
+        homes: dict[str, UUID] = {}
         homeless: set[str] = set()
         special_slugs: dict[str, dict[str, UUID]] = {}
         split_tails = {
@@ -12741,7 +12756,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     print(f"no territory: {tail} {owner}")
                     continue
                 holder = (
-                    cs.key("us.body", f"{st}:{code}:{role}")
+                    live_key(cs, "us.body", f"{st}:{code}:{role}")[0]
                     if body
                     else offices.key(
                         cs,
@@ -12780,6 +12795,14 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                         cs.add("area_parent", area_id=area, parent_id=whole[0], valid_from=None)
                         name(area, f"{place} {title.split(',')[0]}, {seat}")
                 known_size = bool(group["seats"][0]) or not body or ", " in title
+                standing = conn.execute(
+                    """select regexp_replace(s.path, '/[^/]+$', '') from external_id x
+                       join election el on el.id = x.entity_id and el.polity_id = %s
+                       join slug s on s.entity_id = el.id and s.is_current
+                       where x.scheme = 'us.election' and x.value = %s""",
+                    [polity, f"{DAY}:{st}:{code}"],
+                ).fetchone()
+                home = standing[0] if standing else home
                 templates[tail] = (
                     tail,
                     None,
@@ -12832,7 +12855,9 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 seat = title.split(", ", 1)[1] if group["pinned"][0] else None
                 holder = tail.rsplit(":", 1)[0] if seat else tail
                 held = f"{place} {(title if seats == 1 and seat is None else title.split(', ')[0]).removeprefix('County ')}"
-                office = offices.key(cs, holder, polity, "other", held) if seats == 1 else cs.key("us.body", holder)
+                office = (
+                    offices.key(cs, holder, polity, "other", held) if seats == 1 else live_key(cs, "us.body", holder)[0]
+                )
                 if office in cs.minted and office not in made:
                     made.add(office)
                     if seats == 1:
@@ -12901,7 +12926,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     continue
                 label = COUNTIES[county[1]]
                 polity = cs.key("us.polity", f"county:{county[1]}")
-                body = cs.key("us.body", f"CA:{county[1]}:board-of-supervisors")
+                body = live_key(cs, "us.body", f"CA:{county[1]}:board-of-supervisors")[0]
                 if body in cs.minted:
                     cs.add("body", id=body, polity_id=polity, kind="council")
                     name(body, f"{label} Board of Supervisors")
@@ -13010,23 +13035,31 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                         cs.artifact(raw.cached(SOURCE, FEEDS[feed][0] if feed in FEEDS else FILES[feed]), source)
                     sources[feed] = source
             home = re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path)
-            if scope not in elections and home in homes:
-                elections[scope] = elections[homes[home]]
-            if scope not in elections:
+            claim = (scope, polity)
+            if claim not in elections and home in homes:
+                elections[claim] = homes[home]
+            if claim not in elections:
                 held = conn.execute(
-                    "select x.value from slug s join external_id x on x.entity_id = s.entity_id and x.scheme = 'us.election'"
-                    " where s.path = %s order by x.value",
-                    [home],
+                    """select x.value from slug s join election el on el.id = s.entity_id
+                       join external_id x on x.entity_id = s.entity_id and x.scheme = 'us.election'
+                       where s.path = %s and (s.is_current or el.polity_id = %s) order by x.value""",
+                    [home, polity],
                 ).fetchone()
                 if held is not None and held[0] != f"{DAY}:{scope}":
-                    elections[scope] = elections.get(held[0][11:]) or cs.key("us.election", held[0])
-                    homes[home] = scope
-            if scope not in elections:
-                homes[home] = scope
-                elections[scope] = cs.key("us.election", f"{DAY}:{scope}")
+                    elections[claim] = homes[home] = cs.key("us.election", held[0])
+            if claim not in elections:
+                if scope not in owners:
+                    standing = conn.execute(
+                        """select el.polity_id from external_id x join election el on el.id = x.entity_id
+                           where x.scheme = 'us.election' and x.value = %s""",
+                        [f"{DAY}:{scope}"],
+                    ).fetchone()
+                    owners[scope] = standing[0] if standing else polity
+                row_key = scope if owners[scope] == polity else f"{scope}-{home.split('/')[-2]}"
+                elections[claim] = homes[home] = live_key(cs, "us.election", f"{DAY}:{row_key}")[0]
                 cs.add(
                     "election",
-                    id=elections[scope],
+                    id=elections[claim],
                     polity_id=polity,
                     parent_id=cs.key("us.election", f"{DAY}:{publisher_state}"),
                     kind="general",
@@ -13034,13 +13067,33 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     date_to=DAY,
                     status="scheduled",
                 )
-                name(
-                    elections[scope],
-                    re.sub(r"^\d{4} (.+?) \w+ elections?$", r"2026 \1 general election", election_title),
-                )
-                cs.add(
-                    "slug", path=re.sub(r"/[0-9-]+-\w+$", f"/{DAY}-general", election_path), entity_id=elections[scope]
-                )
+                row_name = re.sub(r"^\d{4} (.+?) \w+ elections?$", r"2026 \1 general election", election_title)
+                name(elections[claim], row_name)
+                cs.add("slug", path=home, entity_id=elections[claim])
+                if row_key != scope:
+                    for owner_row, wrong, owner_name in conn.execute(
+                        """select el.id, n.id, pn.text from external_id x join election el on el.id = x.entity_id
+                           join name n on n.entity_id = el.id and n.lang = 'en' and n.is_preferred and n.text = %s
+                           join changeset c on c.id = n.changeset_id and c.pipeline = %s
+                           join name pn on pn.entity_id = el.polity_id and pn.lang = 'en' and pn.is_preferred
+                           where x.scheme = 'us.election' and x.value = %s""",
+                        [row_name, SOURCE, f"{DAY}:{scope}"],
+                    ).fetchall():
+                        cs.add(
+                            "name",
+                            entity_id=owner_row,
+                            text=f"2026 {owner_name} general election",
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
+                        cs.add(
+                            "name_drop",
+                            name_id=wrong,
+                            entity_id=owner_row,
+                            text=row_name,
+                            reason="This name belongs to another polity's election",
+                        )
             chained = previous is not None and held_on.year == DAY.year
             if str(group["feed"][0]).endswith("-rcv"):
                 system = cs.key(
@@ -13049,16 +13102,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     + ("stv" if int(group["seats"][0] or 1) > 1 else "irv"),
                 )
             split = bool(group["unexpired"][0]) and (fips, tail) in split_tails
-            key = f"{DAY}:{tail}" + (":unexpired" if split else "")
-            base = key
-            for attempt in range(1, 10):
-                try:
-                    contest = cs.key("us.contest", key)
-                    break
-                except ValueError:
-                    key = f"{base}:reissued" + (f"-{attempt}" if attempt > 1 else "")
-            else:
-                raise ValueError(f"no free contest key for {base}")
+            contest, key = live_key(cs, "us.contest", f"{DAY}:{tail}" + (":unexpired" if split else ""))
             holder = conn.execute(
                 "select entity_id from slug where path = %s",
                 [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
@@ -13094,7 +13138,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             cs.add(
                 "contest",
                 id=contest,
-                election_id=elections[scope],
+                election_id=elections[claim],
                 kind=kind,
                 office_id=office_id,
                 body_id=body_id,
@@ -13282,8 +13326,10 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 cs.add("entity_retirement", entity_id=candidacy, reason=reason)
             cs.add("entity_retirement", entity_id=option, reason=reason)
             counts["dropped"] += 1
-        for contest, value in conn.execute(
-            """select co.id, x.value from contest co join entity e on e.id = co.id and e.retired_by is null
+        stale: list[UUID] = []
+        stale_bodies: set[UUID] = set()
+        for contest, value, stale_body in conn.execute(
+            """select co.id, x.value, co.body_id from contest co join entity e on e.id = co.id and e.retired_by is null
                join election el on el.id = co.election_id
                join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
                join changeset c on c.id = x.changeset_id
@@ -13298,14 +13344,54 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
             counts["stale contests"] += 1
+            stale.append(contest)
+            if stale_body is not None:
+                stale_bodies.add(stale_body)
+        contests = cs.rows.get("contest", [])
+        kept = emitted + [str(contest) for contest in stale]
+        for election, value in conn.execute(
+            """select el.id, x.value from election el join entity e on e.id = el.id and e.retired_by is null
+               join external_id x on x.entity_id = el.id and x.scheme = 'us.election'
+               join changeset c on c.id = x.changeset_id
+               where c.pipeline = %s and el.date_from = %s and x.value like %s and el.id <> all(%s::uuid[])
+                 and not exists (select from election child where child.parent_id = el.id)
+                 and not exists (
+                     select from contest co join entity ce on ce.id = co.id and ce.retired_by is null
+                     where co.election_id = el.id and co.id <> all(%s::uuid[])
+                 )""",
+            [SOURCE, DAY, f"{DAY}:{state}:%", [str(row["election_id"]) for row in contests], kept],
+        ).fetchall():
+            print("retiring empty election", value)
+            cs.add("entity_retirement", entity_id=election, reason="No contest on this ballot remains on this election")
+            counts["empty elections"] = counts.get("empty elections", 0) + 1
+        for body, value in conn.execute(
+            """select b.id, x.value from body b join entity e on e.id = b.id and e.retired_by is null
+               join external_id x on x.entity_id = b.id and x.scheme = 'us.body'
+               join changeset c on c.id = x.changeset_id
+               where c.pipeline = %s and b.id = any(%s::uuid[]) and b.id <> all(%s::uuid[])
+                 and not exists (
+                     select from contest co join entity ce on ce.id = co.id and ce.retired_by is null
+                     where co.body_id = b.id and co.id <> all(%s::uuid[])
+                 )""",
+            [
+                SOURCE,
+                [str(body) for body in stale_bodies],
+                [str(row["body_id"]) for row in contests if row["body_id"] is not None],
+                kept,
+            ],
+        ).fetchall():
+            print("retiring empty body", value)
+            cs.add("entity_retirement", entity_id=body, reason="No contest on this ballot remains on this body")
+            counts["empty bodies"] = counts.get("empty bodies", 0) + 1
         used = {str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
+        retiring = [str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])]
         for person, value in conn.execute(
             """select p.id, x.value from person p join entity e on e.id = p.id and e.retired_by is null
                join external_id x on x.entity_id = p.id and x.scheme = %s
                join changeset c on c.id = x.changeset_id
                where c.pipeline = %s and x.value like %s
-                 and not exists (select from candidacy ca where ca.person_id = p.id)""",
-            [f"{SOURCE}.person", SOURCE, f"{state}:%"],
+                 and not exists (select from candidacy ca where ca.person_id = p.id and ca.id <> all(%s::uuid[]))""",
+            [f"{SOURCE}.person", SOURCE, f"{state}:%", retiring],
         ).fetchall():
             if str(person) not in used:
                 print("retiring orphan person", value)
