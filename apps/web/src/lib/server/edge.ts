@@ -9,7 +9,7 @@ const BUILD = "build";
 
 export const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
-const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/))(?:\/|$)/u;
+const PERSONAL = /^\/(?:api\/auth|mcp)(?:\/|$)/u;
 
 export const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 
@@ -57,10 +57,13 @@ async function settled(response: Response, isMoved: boolean) {
 export async function mark(event: RequestEvent, response: Response) {
   const isLive = LIVE.test(event.url.pathname);
   const isOpen = isShareable(event, response);
+  const isRead = isOpen && !isLive && event.url.pathname.startsWith("/rpc/");
   const data =
     isOpen && event.isDataRequest && !isLive
       ? await settled(response, event.url.pathname.startsWith("/id/"))
-      : undefined;
+      : isRead
+        ? await response.clone().text()
+        : undefined;
   if (!isOpen || data === null) {
     if (isLive) {
       response.headers.set("cache-control", "no-store");

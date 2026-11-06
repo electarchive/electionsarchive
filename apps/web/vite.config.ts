@@ -8,6 +8,7 @@ import { hostname } from "node:os";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { codeVersion } from "./code-version.ts";
+import { viewPreloads } from "./view-preloads.ts";
 
 export default defineConfig(({ command }) => {
   if (command === "serve") {
@@ -39,6 +40,14 @@ export default defineConfig(({ command }) => {
         },
       },
       devtoolsJson(),
+      viewPreloads({
+        views: {
+          contest: "src/routes/[...path]/contest.svelte",
+          day: "src/routes/[...path]/day.svelte",
+          election: "src/routes/[...path]/election.svelte",
+          polity: "src/routes/[...path]/polity.svelte",
+        },
+      }),
       codeVersion({
         inputs: ["../../packages/db/migrations"],
         lockfile: "../../pnpm-lock.yaml",

@@ -14,6 +14,7 @@ declare global {
     interface Locals {
       user: User | null;
       session: Session["session"] | null;
+      view?: "contest" | "day" | "election" | "polity";
     }
     interface PageData {
       user: { name: string; email: string } | null;

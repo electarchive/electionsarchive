@@ -5,6 +5,7 @@ import { READ_ONLY } from "$app/env/public";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { handle as islands } from "svelte-islands/server";
+import { preloads } from "virtual:view-preloads";
 import {
   cookieName,
   defineCustomServerStrategy,
@@ -52,6 +53,20 @@ const FORM_TYPES = new Set([
 ]);
 
 const ONE_CLICK = /^\/unsubscribe\/[0-9a-f]{64}$/u;
+
+function preloaded(html: string, view: App.Locals["view"]) {
+  const files = view == null ? undefined : preloads[view];
+  if (files == null || !html.includes("</head>")) {
+    return html;
+  }
+  const links = files
+    .filter((file) => !html.includes(file.slice(1)))
+    .map(
+      (file) => `<link fetchpriority="low" href="${file}" rel="modulepreload">`,
+    )
+    .join("");
+  return html.replace("</head>", () => `${links}</head>`);
+}
 
 const PRELOADED =
   /\/sofia-sans-semi-condensed-latin-wght-normal\.[\w-]+\.woff2$/u;
@@ -101,7 +116,10 @@ const paraglideHandle: Handle = async ({ event, resolve }) =>
         { ...event, request: localizedRequest },
         {
           transformPageChunk: ({ html }) =>
-            html.replace("%lang%", () => locale),
+            preloaded(
+              html.replace("%lang%", () => locale),
+              event.locals.view,
+            ),
           preload: ({ type, path }) =>
             type === "js" ||
             type === "css" ||
