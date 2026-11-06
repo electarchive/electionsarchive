@@ -1178,6 +1178,15 @@ export const seats = {
           ),
           prior: v.object({ name: v.string(), path: v.nullable(v.string()) }),
           alliance: v.nullable(v.string()),
+          caucus: v.optional(
+            v.nullable(
+              v.object({
+                isHold: v.boolean(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+              }),
+            ),
+          ),
           vacated: v.optional(
             v.nullable(
               v.object({ name: v.string(), via: v.nullable(v.string()) }),
@@ -1222,6 +1231,8 @@ export const seats = {
         member: string | null;
         via: string | null;
         isOther: boolean;
+        caucusNow: string | null;
+        caucusBefore: string | null;
       }>(sql`
         with this as materialized (
           select c.id, c.body_id as body, c.district_area_id as area, e.date_from as day, e.kind, coalesce(c.magnitude, 1) as magnitude,
@@ -1393,7 +1404,8 @@ export const seats = {
             ) order by n.recorded_from desc, n.id limit 1) as alliance,
           v.person as member, v.via,
           (w.party is null or exists (select from party x where x.id::text = w.party and x.kind = 'independent_group'))
-            and (b.party is null or exists (select from party x where x.id::text = b.party and x.kind = 'independent_group')) as "isOther"
+            and (b.party is null or exists (select from party x where x.id::text = b.party and x.kind = 'independent_group')) as "isOther",
+          gc.now as "caucusNow", gc.before as "caucusBefore"
         from paired p
         join contest pc on pc.id = p.prior
         left join lateral (
@@ -1412,6 +1424,15 @@ export const seats = {
         ) v on true
         left join lateral (select x.party from won x where x.contest = p.id order by x.k limit 1) w on true
         left join lateral (select x.party from won x where x.contest = p.prior order by x.k limit 1) b on true
+        left join lateral (
+          select max(g.party) filter (where t.contest_id = p.id) as now, max(g.party) filter (where t.contest_id = p.prior) as before
+          from tenure t
+          join tenure_affiliation ta on ta.tenure_id = t.id and ta.kind = 'parliamentary_group' and ta.party_id is not null and ta.valid @> t.from_date
+          left join entity_merge gm on gm.entity_id = ta.party_id
+          left join party_affiliation gb on gb.party_id = coalesce(gm.into_id, ta.party_id) and gb.kind = 'regional_branch' and gb.valid @> t.from_date
+          cross join lateral (select coalesce(gb.parent_party_id, gm.into_id, ta.party_id)::text as party) g
+          where t.contest_id in (p.id, p.prior)
+        ) gc on true
         where p.prior is not null
       `);
       const row = found.rows[0];
@@ -1424,9 +1445,24 @@ export const seats = {
       ) {
         return null;
       }
+      const isSingle = row.now.length === 1;
+      const side = {
+        now: isSingle ? (row.caucusNow ?? now) : now,
+        before: isSingle ? (row.caucusBefore ?? before) : before,
+      };
+      const isCaucusHold =
+        isSingle && now !== before && side.now === side.before;
+      const caucusKey = isCaucusHold
+        ? side.now
+        : isSingle && row.caucusNow != null && row.caucusNow !== now
+          ? row.caucusNow
+          : null;
       const [current, colored, labels, slugs] = await Promise.all([
         refs(
-          row.now.filter((key) => !key.startsWith("person:")),
+          [
+            ...row.now.filter((key) => !key.startsWith("person:")),
+            ...(caucusKey == null ? [] : [caucusKey]),
+          ],
           row.day,
         ),
         refs(
@@ -1461,10 +1497,23 @@ export const seats = {
       }
       return {
         since: Number(row.since.slice(0, 4)),
-        isGain: row.alliance == null && gained.length > 0 && !row.isOther,
+        isGain:
+          row.alliance == null &&
+          gained.length > 0 &&
+          !row.isOther &&
+          !isCaucusHold,
         isOther:
           row.isOther &&
+          !isCaucusHold &&
           (party(now)?.label ?? null) !== (party(before, true)?.label ?? null),
+        caucus:
+          caucusKey == null || row.alliance != null
+            ? null
+            : {
+                isHold: isCaucusHold,
+                label: current.get(caucusKey)?.label ?? "",
+                short: current.get(caucusKey)?.short ?? null,
+              },
         lead: row.isUs ? "margin" : "majority",
         basis: row.basis,
         party: party(now),

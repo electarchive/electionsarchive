@@ -517,6 +517,8 @@ export function chamber(
     needs,
     tiebreak:
       tiebreak === left.id ? "left" : tiebreak === right.id ? "right" : null,
+    isTiebreakPending:
+      tied != null && name === "senate" && control?.tiebreak.isPending === true,
     tallies,
     blocs,
     waiting,

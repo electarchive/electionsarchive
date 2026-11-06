@@ -4969,15 +4969,24 @@ function contestMarkdown(
     top?.current != null && next?.current != null && top.current.votes > 0
       ? count(top.current.votes - next.current.votes)
       : null;
-  const [gain, hold, allied, other] =
+  const [gain, hold, allied, other, caucused] =
     handover?.lead === "margin"
       ? [
           m.change_gain_margin,
           m.change_hold_margin,
           m.change_allied_margin,
           m.change_other_margin,
+          m.change_caucus_margin,
         ]
-      : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
+      : [
+          m.change_gain,
+          m.change_hold,
+          m.change_allied,
+          m.change_other,
+          m.change_caucus,
+        ];
+  const caucus = handover?.caucus;
+  const side = caucus?.short ?? caucus?.label ?? "";
   const won = contest.rows
     .filter((row) => (row.current?.seats ?? 0) > 0)
     .toSorted((a, b) => (b.current?.seats ?? 0) - (a.current?.seats ?? 0));
@@ -5050,18 +5059,26 @@ function contestMarkdown(
                 ? majority == null
                   ? m.change_allied_bare({ party, label })
                   : allied({ party, label, majority })
-                : majority == null
-                  ? handover.isGain
-                    ? m.change_gain_bare({ party, from })
-                    : handover.isOther
-                      ? m.change_other_bare({ party, from })
-                      : m.change_hold_bare({ party })
-                  : handover.isGain
-                    ? gain({ party, from, majority })
-                    : handover.isOther
-                      ? other({ party, from, majority })
-                      : hold({ party, majority })
-          }${handover.basis === "same" ? "" : "*"}`,
+                : caucus?.isHold === true
+                  ? majority == null
+                    ? m.change_caucus_bare({ party: side, from, label })
+                    : caucused({ party: side, from, label, majority })
+                  : majority == null
+                    ? handover.isGain
+                      ? m.change_gain_bare({ party, from })
+                      : handover.isOther
+                        ? m.change_other_bare({ party, from })
+                        : m.change_hold_bare({ party })
+                    : handover.isGain
+                      ? gain({ party, from, majority })
+                      : handover.isOther
+                        ? other({ party, from, majority })
+                        : hold({ party, majority })
+          }${handover.basis === "same" ? "" : "*"}${
+            caucus == null || caucus.isHold || handover.alliance != null
+              ? ""
+              : ` ${m.change_caucus_joins({ party: caucus.label })}`
+          }`,
           ...(handover.basis === "same"
             ? []
             : [
