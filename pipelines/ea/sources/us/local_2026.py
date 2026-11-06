@@ -13426,6 +13426,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                join changeset c on c.id = x.changeset_id
                where c.pipeline = %s and el.date_from = %s and x.value like %s and el.id <> all(%s::uuid[])
                  and not exists (select from election child where child.parent_id = el.id)
+                 and not exists (select from entity_merge m where m.into_id = el.id)
                  and not exists (
                      select from contest co join entity ce on ce.id = co.id and ce.retired_by is null
                      where co.election_id = el.id and co.id <> all(%s::uuid[])
