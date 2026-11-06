@@ -16,7 +16,7 @@
     view: string;
     when?: Strategy;
     ssr?: boolean;
-    defer?: boolean;
+    defer?: boolean | Strategy;
     class?: string;
     children: Snippet;
   } = $props();

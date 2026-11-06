@@ -3079,7 +3079,11 @@
           {/if}
         {/snippet}
         {#if race.places != null && !race.isTotal}
-          <Lazy part={race.places.part} view="table" defer>
+          <Lazy
+            part={race.places.part}
+            view="table"
+            defer={index === head ? "eager" : true}
+          >
             {@render tabled()}
           </Lazy>
         {/if}
