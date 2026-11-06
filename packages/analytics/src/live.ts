@@ -70,6 +70,7 @@ export type LiveRace = {
   isMeasure?: boolean;
   isSpecial?: boolean;
   needsMajority?: boolean;
+  isRanked?: boolean;
   rule?: LiveRule | null;
   unopposed?: LiveUnopposed | null;
 };
@@ -103,7 +104,13 @@ export type LiveElection = {
 export type Band = { low: number; mid: number; high: number };
 
 export type LiveEstimate = {
-  status: "waiting" | "unavailable" | "too-early" | "estimating" | "settled";
+  status:
+    | "waiting"
+    | "unavailable"
+    | "too-early"
+    | "estimating"
+    | "ranked"
+    | "settled";
   at: string;
   counted: number;
   expectedTotal: Band;
@@ -990,22 +997,30 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const shareInBand = band(shareIn);
   const chance = averaged(centers, spreads);
   const reportedUnits = found.filter((unit) => unit.total > 0).length;
+  const firsts = shown.at(-1)?.totals ?? [];
   const status =
     shareInBand.mid < 0.1 || reportedUnits < Math.min(3, found.length)
       ? "too-early"
-      : "estimating";
+      : race.isRanked === true && Math.max(0, ...firsts) <= sum(firsts) / 2
+        ? "ranked"
+        : "estimating";
+  const isModeled = status !== "ranked";
   return {
     status,
     at: stamp,
     counted,
     expectedTotal: band(finalTotals),
     shareIn: shareInBand,
-    margin: flip
-      ? { low: -margin.high, mid: -margin.mid, high: -margin.low }
-      : margin,
+    margin: !isModeled
+      ? { low: 0, mid: 0, high: 0 }
+      : flip
+        ? { low: -margin.high, mid: -margin.mid, high: -margin.low }
+        : margin,
     leader: leader.id,
     runnerUp: runnerUp.id,
-    winProbability: { [optionA.id]: chance, [optionB.id]: 1 - chance },
+    winProbability: isModeled
+      ? { [optionA.id]: chance, [optionB.id]: 1 - chance }
+      : {},
     units: found.map((unit, index) => {
       const projected = band(perUnit[index]!.margins);
       return {

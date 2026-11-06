@@ -69,7 +69,7 @@ export class Desk {
   }
 
   #shift(summary: Summary) {
-    if (summary.race.isMeasure === true) {
+    if (summary.race.isMeasure === true || summary.isShort) {
       return null;
     }
     const called = summary.settled;

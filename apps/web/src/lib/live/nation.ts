@@ -207,12 +207,14 @@ export function seat(
   } else if (rating === "counting" && signed != null) {
     lean = Math.max(-0.98, Math.min(0.98, signed / 0.2));
   }
-  const changing = shift({
-    held,
-    to: called == null ? family(control, summary.leader) : side,
-    isCalled: called != null,
-    isCounting: total > 0,
-  });
+  const changing = summary.isShort
+    ? null
+    : shift({
+        held,
+        to: called == null ? family(control, summary.leader) : side,
+        isCalled: called != null,
+        isCounting: total > 0,
+      });
   return {
     summary,
     held,
@@ -339,7 +341,11 @@ export function chamber(
       later += 1;
     } else if (entry.rating === "unopposed") {
       tallies[key(entry.side)].unopposed += 1;
-    } else if (entry.side == null || entry.summary.total === 0) {
+    } else if (
+      entry.side == null ||
+      entry.summary.total === 0 ||
+      entry.summary.isShort
+    ) {
       waiting += 1;
     } else if (entry.rating === "won") {
       tallies[key(entry.side)].won += 1;

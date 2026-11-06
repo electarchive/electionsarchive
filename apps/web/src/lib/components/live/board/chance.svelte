@@ -56,6 +56,10 @@
     >
       {m.board_forecast_off()}
     </p>
+  {:else if estimate?.status === "ranked"}
+    <p class="text-[0.75em] text-pretty text-muted-foreground">
+      {m.board_chance_ranked()}
+    </p>
   {:else if !isReady || first == null || second == null}
     <p class="text-[0.75em] text-muted-foreground">
       {m.board_chance_waiting()}

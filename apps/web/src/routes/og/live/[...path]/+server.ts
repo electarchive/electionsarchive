@@ -314,7 +314,7 @@ function tally(
   for (const entry of seats) {
     if (
       entry.rating !== "unopposed" &&
-      (entry.side == null || entry.summary.total === 0)
+      (entry.side == null || entry.summary.total === 0 || entry.summary.isShort)
     ) {
       if (entry.held === left.id) {
         held.left += 1;

@@ -164,6 +164,9 @@
     if (rating === "waiting") {
       return { text: m.night_ladder_waiting(), id: null };
     }
+    if (summary.isShort) {
+      return { text: m.night_ladder_ranked(), id: null };
+    }
     if (rating === "counting" || !forecasts) {
       return { text: m.night_ladder_counting(), id: null };
     }
@@ -216,8 +219,15 @@
     ...(shown.some((seat) => seat.summary.race.isSpecial === true)
       ? [`† ${m.night_ladder_special()}`]
       : []),
-    ...(shown.some((seat) => seat.summary.race.needsMajority === true)
+    ...(shown.some(
+      (seat) =>
+        seat.summary.race.needsMajority === true &&
+        seat.summary.race.isRanked !== true,
+    )
       ? [`* ${m.night_ladder_majority()}`]
+      : []),
+    ...(shown.some((seat) => seat.summary.race.isRanked === true)
+      ? [`‡ ${m.night_ladder_ranked_note()}`]
       : []),
     ...(shown.some((seat) => isChanging(seat.shift))
       ? [m.night_ladder_flip_note()]
@@ -377,7 +387,10 @@
                     >{label(seat)}{#if race.isSpecial === true}<sup
                         class="ms-px font-normal"
                         title={m.night_ladder_special()}>†</sup
-                      >{/if}{#if race.needsMajority === true}<sup
+                      >{/if}{#if race.isRanked === true}<sup
+                        class="ms-px font-normal"
+                        title={m.night_ladder_ranked_note()}>‡</sup
+                      >{:else if race.needsMajority === true}<sup
                         class="ms-px font-normal"
                         title={m.night_ladder_majority()}>*</sup
                       >{/if}</a
