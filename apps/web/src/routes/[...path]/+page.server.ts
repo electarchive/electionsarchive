@@ -256,6 +256,7 @@ export const load: PageServerLoad = async ({
   url,
   request,
   setHeaders,
+  isDataRequest,
 }) => {
   const data = await archive(params.path, url.searchParams);
   if (data.kind === "contest") {
@@ -296,7 +297,11 @@ export const load: PageServerLoad = async ({
           crowned: data.crowned,
         },
         {
-          budget: isCrawler(request.headers.get("user-agent")) ? Infinity : 150,
+          budget: isCrawler(request.headers.get("user-agent"))
+            ? Infinity
+            : isDataRequest
+              ? 0
+              : 150,
         },
       ),
       talkLink(data.id),
