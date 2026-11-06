@@ -4,15 +4,17 @@
     LiveEstimate,
     LiveOffice,
   } from "@ea/analytics/live";
+  import type { Part } from "svelte-islands";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
-  import type { Chamber, Control, Seat } from "#lib/live/nation.js";
+  import type { Chamber, Control, Seat, Trail } from "#lib/live/nation.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import type { House } from "#lib/server/live-board.js";
+  import Lazy from "#lib/components/lazy.svelte";
   import ViewLinks from "#lib/components/live/view-links.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isHover } from "#lib/explain.svelte.js";
@@ -73,6 +75,8 @@
     estimates,
     nation,
     control,
+    trail = null,
+    board = null,
     clock,
     isOffline,
     forecasts = true,
@@ -85,6 +89,8 @@
       labels: Record<string, string>;
     } | null;
     control: Control | null;
+    trail?: Trail | null;
+    board?: Part | null;
     clock: number;
     isOffline: boolean;
     forecasts?: boolean;
@@ -224,13 +230,14 @@
         },
   );
   const points = $derived(
-    pair == null
-      ? []
-      : pulse(
-          seats.filter((entry) => entry.summary.race.office === "house"),
-          control,
-          pair,
-        ),
+    trail ??
+      (pair == null
+        ? []
+        : pulse(
+            election.races.filter((race) => race.office === "house"),
+            control,
+            pair,
+          )),
   );
 
   const byState = $derived(
@@ -980,43 +987,45 @@
   </section>
 
   {#if chambers != null && pair != null}
-    <div class="grid gap-px bg-border lg:grid-cols-3">
-      <Chambers
-        view={chambers.senate}
-        sides={pair}
-        title={NAMES.senate()}
-        {forecasts}
-        label={fullLabel}
-        name={label}
-        href={seatHref}
-        shade={seatShade}
-        detail={seatTip}
-        line={chip}
-      />
-      <Chambers
-        view={chambers.house}
-        sides={pair}
-        title={NAMES.house()}
-        {forecasts}
-        label={fullLabel}
-        name={label}
-        href={seatHref}
-        shade={seatShade}
-        detail={seatTip}
-        line={chip}
-      />
-      <Governors
-        view={chambers.governor}
-        sides={pair}
-        title={m.night_nation_governors()}
-        label={fullLabel}
-        name={label}
-        href={seatHref}
-        shade={seatShade}
-        detail={seatTip}
-        line={chip}
-      />
-    </div>
+    <Lazy part={board} view="chambers" ssr={false}>
+      <div class="grid gap-px bg-border lg:grid-cols-3">
+        <Chambers
+          view={chambers.senate}
+          sides={pair}
+          title={NAMES.senate()}
+          {forecasts}
+          label={fullLabel}
+          name={label}
+          href={seatHref}
+          shade={seatShade}
+          detail={seatTip}
+          line={chip}
+        />
+        <Chambers
+          view={chambers.house}
+          sides={pair}
+          title={NAMES.house()}
+          {forecasts}
+          label={fullLabel}
+          name={label}
+          href={seatHref}
+          shade={seatShade}
+          detail={seatTip}
+          line={chip}
+        />
+        <Governors
+          view={chambers.governor}
+          sides={pair}
+          title={m.night_nation_governors()}
+          label={fullLabel}
+          name={label}
+          href={seatHref}
+          shade={seatShade}
+          detail={seatTip}
+          line={chip}
+        />
+      </div>
+    </Lazy>
     {#if forecasts}
       <p
         class="bg-background px-4 py-2 text-xs text-pretty text-muted-foreground sm:px-8"
@@ -1027,105 +1036,109 @@
   {/if}
 
   {#if chambers != null && pair != null}
-    <section
-      class="grid content-start gap-4 bg-background px-4 py-6 sm:px-8"
-      aria-labelledby="night-ladder"
-    >
-      <div class="grid gap-0.5">
-        <h2 id="night-ladder" class="heading text-lg!">
-          {m.night_ladder_title()}
-        </h2>
-        <p class="max-inline-prose text-xs text-pretty text-muted-foreground">
-          {m.night_ladder_intro({
-            left: pair[0].name,
-            right: pair[1].name,
-            party: pair[0].name,
-          })}
-        </p>
-      </div>
-      <div class="grid items-start gap-x-12 gap-y-8 lg:grid-cols-2">
-        <Ladder
-          view={chambers.senate}
-          sides={pair}
-          {forecasts}
-          title={NAMES.senate()}
-          {label}
-          href={seatHref}
-          {tint}
-          {short}
-          party={partyOf}
-        />
-        <Ladder
-          view={chambers.house}
-          sides={pair}
-          {forecasts}
-          title={NAMES.house()}
-          {label}
-          href={seatHref}
-          {tint}
-          {short}
-          party={partyOf}
-          limit={20}
-        />
-      </div>
-    </section>
+    <Lazy part={board} view="ladder" ssr={false}>
+      <section
+        class="grid content-start gap-4 bg-background px-4 py-6 sm:px-8"
+        aria-labelledby="night-ladder"
+      >
+        <div class="grid gap-0.5">
+          <h2 id="night-ladder" class="heading text-lg!">
+            {m.night_ladder_title()}
+          </h2>
+          <p class="max-inline-prose text-xs text-pretty text-muted-foreground">
+            {m.night_ladder_intro({
+              left: pair[0].name,
+              right: pair[1].name,
+              party: pair[0].name,
+            })}
+          </p>
+        </div>
+        <div class="grid items-start gap-x-12 gap-y-8 lg:grid-cols-2">
+          <Ladder
+            view={chambers.senate}
+            sides={pair}
+            {forecasts}
+            title={NAMES.senate()}
+            {label}
+            href={seatHref}
+            {tint}
+            {short}
+            party={partyOf}
+          />
+          <Ladder
+            view={chambers.house}
+            sides={pair}
+            {forecasts}
+            title={NAMES.house()}
+            {label}
+            href={seatHref}
+            {tint}
+            {short}
+            party={partyOf}
+            limit={20}
+          />
+        </div>
+      </section>
+    </Lazy>
   {/if}
 
-  <section class="grid content-start gap-2 bg-background px-4 py-6 sm:px-8">
-    <div class="grid gap-0.5">
-      <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
-      {#if closings[0] != null}
-        <p class="text-xs text-muted-foreground">
-          {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
-        </p>
-      {/if}
-    </div>
-    <ol class="gap-x-10 sm:columns-2 xl:columns-3">
-      {#each closings as closing (closing.at)}
-        {const isPast = $derived(Date.parse(closing.at) <= clock)}
-        <li
-          class={cn(
-            "grid break-inside-avoid grid-cols-[7rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
-            { "text-muted-foreground": isPast },
-          )}
-        >
-          <span class="group relative justify-self-start">
-            <button
-              type="button"
-              aria-describedby="closing-{closing.at}"
-              class="cursor-help font-figures font-semibold whitespace-nowrap tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
-              >{clockOf(closing.at)}</button
-            >
-            <span
-              id="closing-{closing.at}"
-              role="tooltip"
-              class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
-            >
-              <span class="font-semibold">{m.night_closings_local()}</span>
-              {#each closing.local as entry (entry.time)}
-                <span class="flex items-baseline justify-between gap-4">
-                  <span class="uppercase">{entry.codes.join(", ")}</span>
-                  <span
-                    class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
-                    >{entry.time}</span
-                  >
-                </span>
+  <Lazy part={board} view="closings" ssr={false}>
+    <section class="grid content-start gap-2 bg-background px-4 py-6 sm:px-8">
+      <div class="grid gap-0.5">
+        <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+        {#if closings[0] != null}
+          <p class="text-xs text-muted-foreground">
+            {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
+          </p>
+        {/if}
+      </div>
+      <ol class="gap-x-10 sm:columns-2 xl:columns-3">
+        {#each closings as closing (closing.at)}
+          {const isPast = $derived(Date.parse(closing.at) <= clock)}
+          <li
+            class={cn(
+              "grid break-inside-avoid grid-cols-[7rem_1fr] items-baseline gap-2 pbe-1.5 text-[0.8125rem]",
+              { "text-muted-foreground": isPast },
+            )}
+          >
+            <span class="group relative justify-self-start">
+              <button
+                type="button"
+                aria-describedby="closing-{closing.at}"
+                class="cursor-help font-figures font-semibold whitespace-nowrap tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+                >{clockOf(closing.at)}</button
+              >
+              <span
+                id="closing-{closing.at}"
+                role="tooltip"
+                class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+              >
+                <span class="font-semibold">{m.night_closings_local()}</span>
+                {#each closing.local as entry (entry.time)}
+                  <span class="flex items-baseline justify-between gap-4">
+                    <span class="uppercase">{entry.codes.join(", ")}</span>
+                    <span
+                      class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
+                      >{entry.time}</span
+                    >
+                  </span>
+                {/each}
+              </span>
+            </span>
+            <span class="flex flex-wrap gap-1">
+              {#each closing.states as code (code)}
+                <a
+                  href={href(code)}
+                  class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
+                  >{code}</a
+                >
               {/each}
             </span>
-          </span>
-          <span class="flex flex-wrap gap-1">
-            {#each closing.states as code (code)}
-              <a
-                href={href(code)}
-                class="rounded-xs border border-border px-1.5 py-0.5 text-xs font-semibold uppercase hover:highlighter"
-                >{code}</a
-              >
-            {/each}
-          </span>
-        </li>
-      {/each}
-    </ol>
-  </section>
+          </li>
+        {/each}
+      </ol>
+    </section>
+  </Lazy>
 
   {#each OFFICES as view (view)}
     {#snippet stateTip(code: string)}
@@ -1235,208 +1248,216 @@
   {/each}
 
   {#if pair != null}
-    <Pulse {points} sides={pair} />
+    <Lazy part={board} view="pulse" ssr={false}>
+      <Pulse {points} sides={pair} />
+    </Lazy>
   {/if}
 
-  <section
-    class="@container grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
-  >
-    <h2 class="heading text-lg!">{m.night_nation_table()}</h2>
-    <div
-      class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
-      {@attach fits}
+  <Lazy part={board} view="states" ssr={false}>
+    <section
+      class="@container grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
     >
-      <table
-        class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-240 @max-[60rem]:block @max-[60rem]:shadow-[inset_0_1px_0_var(--color-foreground)] @max-[60rem]:min-inline-0"
+      <h2 class="heading text-lg!">{m.night_nation_table()}</h2>
+      <div
+        class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 data-fits:overflow-visible"
+        {@attach fits}
       >
-        <colgroup class="@max-[60rem]:hidden">
-          <col class="inline-40" />
-          <col class="inline-32" />
-          <col />
-          <col />
-          <col class="inline-[27%]" />
-          <col class="inline-20" />
-        </colgroup>
-        <thead
-          class="sticky inset-bs-0 z-2 bg-background @max-[60rem]:sr-only [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
+        <table
+          class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-240 @max-[60rem]:block @max-[60rem]:shadow-[inset_0_1px_0_var(--color-foreground)] @max-[60rem]:min-inline-0"
         >
-          <tr class="text-start">
-            <th scope="col" class="py-1.5 ps-1 text-start font-semibold"
-              >{m.night_nation_state()}</th
-            >
-            <th scope="col" class="py-1.5 text-start font-semibold"
-              >{m.night_nation_reporting()}</th
-            >
-            <th scope="col" class="py-1.5 text-start font-semibold"
-              >{m.night_nation_senate()}</th
-            >
-            <th scope="col" class="py-1.5 text-start font-semibold"
-              >{m.night_nation_governor()}</th
-            >
-            <th scope="col" class="py-1.5 text-start font-semibold"
-              >{m.night_nation_house()}</th
-            >
-            <th scope="col" class="py-1.5 pe-1 text-end font-semibold"
-              >{m.night_nation_latest()}</th
-            >
-          </tr>
-        </thead>
-        <tbody class="@max-[60rem]:block" {@attach states.anchor}>
-          {#if states.before > 0}
-            <tr aria-hidden="true" class="@max-[60rem]:block">
-              <td
-                class="p-0 @max-[60rem]:block"
-                colspan="6"
-                style:block-size="{states.before}px"
-              ></td>
+          <colgroup class="@max-[60rem]:hidden">
+            <col class="inline-40" />
+            <col class="inline-32" />
+            <col />
+            <col />
+            <col class="inline-[27%]" />
+            <col class="inline-20" />
+          </colgroup>
+          <thead
+            class="sticky inset-bs-0 z-2 bg-background @max-[60rem]:sr-only [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
+          >
+            <tr class="text-start">
+              <th scope="col" class="py-1.5 ps-1 text-start font-semibold"
+                >{m.night_nation_state()}</th
+              >
+              <th scope="col" class="py-1.5 text-start font-semibold"
+                >{m.night_nation_reporting()}</th
+              >
+              <th scope="col" class="py-1.5 text-start font-semibold"
+                >{m.night_nation_senate()}</th
+              >
+              <th scope="col" class="py-1.5 text-start font-semibold"
+                >{m.night_nation_governor()}</th
+              >
+              <th scope="col" class="py-1.5 text-start font-semibold"
+                >{m.night_nation_house()}</th
+              >
+              <th scope="col" class="py-1.5 pe-1 text-end font-semibold"
+                >{m.night_nation_latest()}</th
+              >
             </tr>
-          {/if}
-          {#each states.entries as { value: code, index, key } (key)}
-            {const all = $derived(byState.get(code) ?? [])}
-            {const share = $derived(reported(code))}
-            {const senate = $derived(of(code, "senate")[0])}
-            {const governor = $derived(of(code, "governor")[0])}
-            {const house = $derived(of(code, "house"))}
-            {const latest = $derived(
-              all
-                .map((summary) => summary.at ?? "")
-                .toSorted()
-                .at(-1) ?? "",
-            )}
-            <tr
-              class={cn(
-                "cursor-pointer border-be border-border hover:highlighter @max-[60rem]:flex @max-[60rem]:flex-wrap @max-[60rem]:items-center @max-[60rem]:gap-x-4 @max-[60rem]:py-2.5 @max-[60rem]:before:order-4 @max-[60rem]:before:basis-full @max-[60rem]:before:content-[''] @max-[60rem]:after:order-7 @max-[60rem]:after:basis-full @max-[60rem]:after:content-['']",
-                { highlighter: hovered === code },
-                {
-                  "border-bs-2":
-                    !STATES.has(code) && STATES.has(codes[index - 1] ?? ""),
-                },
+          </thead>
+          <tbody class="@max-[60rem]:block" {@attach states.anchor}>
+            {#if states.before > 0}
+              <tr aria-hidden="true" class="@max-[60rem]:block">
+                <td
+                  class="p-0 @max-[60rem]:block"
+                  colspan="6"
+                  style:block-size="{states.before}px"
+                ></td>
+              </tr>
+            {/if}
+            {#each states.entries as { value: code, index, key } (key)}
+              {const all = $derived(byState.get(code) ?? [])}
+              {const share = $derived(reported(code))}
+              {const senate = $derived(of(code, "senate")[0])}
+              {const governor = $derived(of(code, "governor")[0])}
+              {const house = $derived(of(code, "house"))}
+              {const latest = $derived(
+                all
+                  .map((summary) => summary.at ?? "")
+                  .toSorted()
+                  .at(-1) ?? "",
               )}
-              {@attach states.measure(index)}
-              onpointerenter={(event) => {
-                if (isHover(event)) hovered = code;
-              }}
-              onpointerleave={() => (hovered = null)}
-              onclick={async () => goto(href(code))}
-            >
-              <th
-                scope="row"
-                class="truncate py-1.5 ps-1 pe-3 text-start font-semibold @max-[60rem]:order-1 @max-[60rem]:flex-1 @max-[60rem]:p-0 @max-[60rem]:text-sm @max-[60rem]:min-inline-0"
-                ><a href={href(code)} class="hover:underline">{name(code)}</a
-                ></th
+              <tr
+                class={cn(
+                  "cursor-pointer border-be border-border hover:highlighter @max-[60rem]:flex @max-[60rem]:flex-wrap @max-[60rem]:items-center @max-[60rem]:gap-x-4 @max-[60rem]:py-2.5 @max-[60rem]:before:order-4 @max-[60rem]:before:basis-full @max-[60rem]:before:content-[''] @max-[60rem]:after:order-7 @max-[60rem]:after:basis-full @max-[60rem]:after:content-['']",
+                  { highlighter: hovered === code },
+                  {
+                    "border-bs-2":
+                      !STATES.has(code) && STATES.has(codes[index - 1] ?? ""),
+                  },
+                )}
+                {@attach states.measure(index)}
+                onpointerenter={(event) => {
+                  if (isHover(event)) hovered = code;
+                }}
+                onpointerleave={() => (hovered = null)}
+                onclick={async () => goto(href(code))}
               >
-              <td class="py-1.5 @max-[60rem]:order-2 @max-[60rem]:p-0">
-                <span class="flex items-center gap-2">
-                  <span
-                    class="relative overflow-hidden rounded-xs bg-muted block-1.5 inline-16"
-                    aria-hidden="true"
-                  >
+                <th
+                  scope="row"
+                  class="truncate py-1.5 ps-1 pe-3 text-start font-semibold @max-[60rem]:order-1 @max-[60rem]:flex-1 @max-[60rem]:p-0 @max-[60rem]:text-sm @max-[60rem]:min-inline-0"
+                  ><a href={href(code)} class="hover:underline">{name(code)}</a
+                  ></th
+                >
+                <td class="py-1.5 @max-[60rem]:order-2 @max-[60rem]:p-0">
+                  <span class="flex items-center gap-2">
                     <span
-                      class="absolute inset-y-0 inset-s-0 bg-foreground"
-                      style:inline-size="{(share ?? 0) * 100}%"
-                    ></span>
+                      class="relative overflow-hidden rounded-xs bg-muted block-1.5 inline-16"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="absolute inset-y-0 inset-s-0 bg-foreground"
+                        style:inline-size="{(share ?? 0) * 100}%"
+                      ></span>
+                    </span>
+                    <span
+                      class="text-end font-figures text-muted-foreground tabular-nums inline-12"
+                      >{share == null ? "–" : percent(share, 0)}</span
+                    >
                   </span>
+                </td>
+                <td
+                  class={cn(
+                    "py-1.5 pe-4 @max-[60rem]:order-5 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
+                    { "@max-[60rem]:hidden": senate == null },
+                  )}
+                >
                   <span
-                    class="text-end font-figures text-muted-foreground tabular-nums inline-12"
-                    >{share == null ? "–" : percent(share, 0)}</span
+                    class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
+                    >{m.night_nation_senate()}</span
                   >
-                </span>
-              </td>
-              <td
-                class={cn(
-                  "py-1.5 pe-4 @max-[60rem]:order-5 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
-                  { "@max-[60rem]:hidden": senate == null },
-                )}
-              >
-                <span
-                  class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
-                  >{m.night_nation_senate()}</span
+                  {@render chip(senate)}
+                </td>
+                <td
+                  class={cn(
+                    "py-1.5 pe-4 @max-[60rem]:order-6 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
+                    { "@max-[60rem]:hidden": governor == null },
+                  )}
                 >
-                {@render chip(senate)}
-              </td>
-              <td
-                class={cn(
-                  "py-1.5 pe-4 @max-[60rem]:order-6 @max-[60rem]:flex @max-[60rem]:items-center @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5 @max-[60rem]:min-inline-0",
-                  { "@max-[60rem]:hidden": governor == null },
-                )}
-              >
-                <span
-                  class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
-                  >{m.night_nation_governor()}</span
-                >
-                {@render chip(governor)}
-              </td>
-              <td
-                class={cn(
-                  "py-1.5 @max-[60rem]:order-8 @max-[60rem]:flex @max-[60rem]:basis-full @max-[60rem]:items-baseline @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5",
-                  { "@max-[60rem]:hidden": house.length === 0 },
-                )}
-              >
-                <span
-                  class="hidden shrink-0 text-xs text-muted-foreground @max-[60rem]:inline"
-                  >{m.night_nation_house()}</span
-                >
-                {#if house.length === 0}
-                  <span class="text-muted-foreground">–</span>
-                {:else}
                   <span
-                    class="flex flex-wrap gap-px"
-                    aria-label={m.night_nation_seats({ count: house.length })}
+                    class="hidden text-xs text-muted-foreground @max-[60rem]:inline"
+                    >{m.night_nation_governor()}</span
                   >
-                    {#each house.toSorted((x, y) => Number.parseInt(x.race.district ?? "0", 10) - Number.parseInt(y.race.district ?? "0", 10)) as seat (seat.race.id)}
-                      <a
-                        href={toLive(seat.race.slug)}
-                        class="rounded-[1px] block-2.5 inline-2.5 hover:outline-1 hover:outline-foreground"
-                        style:background-color={seat.leader == null
-                          ? WAITING
-                          : shade(seat, "lead")}
-                        style:background-image={seatHatch(seat)?.stripes}
-                        title={seat.race.title}
-                        aria-label={seat.race.title}
-                        onclick={(event) => event.stopPropagation()}
-                      ></a>
-                    {/each}
-                  </span>
-                {/if}
-              </td>
-              <td
-                class="py-1.5 pe-1 text-end font-figures whitespace-nowrap text-muted-foreground tabular-nums @max-[60rem]:order-3 @max-[60rem]:p-0 @max-[60rem]:text-xs"
-                >{latest === "" ? "–" : clockOf(latest)}</td
-              >
-            </tr>
-          {/each}
-          {#if states.after > 0}
-            <tr aria-hidden="true" class="@max-[60rem]:block">
-              <td
-                class="p-0 @max-[60rem]:block"
-                colspan="6"
-                style:block-size="{states.after}px"
-              ></td>
-            </tr>
-          {/if}
-        </tbody>
-      </table>
-    </div>
-  </section>
+                  {@render chip(governor)}
+                </td>
+                <td
+                  class={cn(
+                    "py-1.5 @max-[60rem]:order-8 @max-[60rem]:flex @max-[60rem]:basis-full @max-[60rem]:items-baseline @max-[60rem]:gap-1.5 @max-[60rem]:p-0 @max-[60rem]:pbs-1.5",
+                    { "@max-[60rem]:hidden": house.length === 0 },
+                  )}
+                >
+                  <span
+                    class="hidden shrink-0 text-xs text-muted-foreground @max-[60rem]:inline"
+                    >{m.night_nation_house()}</span
+                  >
+                  {#if house.length === 0}
+                    <span class="text-muted-foreground">–</span>
+                  {:else}
+                    <span
+                      class="flex flex-wrap gap-px"
+                      aria-label={m.night_nation_seats({ count: house.length })}
+                    >
+                      {#each house.toSorted((x, y) => Number.parseInt(x.race.district ?? "0", 10) - Number.parseInt(y.race.district ?? "0", 10)) as seat (seat.race.id)}
+                        <a
+                          href={toLive(seat.race.slug)}
+                          class="rounded-[1px] block-2.5 inline-2.5 hover:outline-1 hover:outline-foreground"
+                          style:background-color={seat.leader == null
+                            ? WAITING
+                            : shade(seat, "lead")}
+                          style:background-image={seatHatch(seat)?.stripes}
+                          title={seat.race.title}
+                          aria-label={seat.race.title}
+                          onclick={(event) => event.stopPropagation()}
+                        ></a>
+                      {/each}
+                    </span>
+                  {/if}
+                </td>
+                <td
+                  class="py-1.5 pe-1 text-end font-figures whitespace-nowrap text-muted-foreground tabular-nums @max-[60rem]:order-3 @max-[60rem]:p-0 @max-[60rem]:text-xs"
+                  >{latest === "" ? "–" : clockOf(latest)}</td
+                >
+              </tr>
+            {/each}
+            {#if states.after > 0}
+              <tr aria-hidden="true" class="@max-[60rem]:block">
+                <td
+                  class="p-0 @max-[60rem]:block"
+                  colspan="6"
+                  style:block-size="{states.after}px"
+                ></td>
+              </tr>
+            {/if}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </Lazy>
 
   {#if pair != null}
-    <Explorer
-      {seats}
-      sides={pair}
-      {forecasts}
-      {label}
-      href={seatHref}
-      {tint}
-      {short}
-      place={name}
-    />
+    <Lazy part={board} view="explorer" ssr={false}>
+      <Explorer
+        {seats}
+        sides={pair}
+        {forecasts}
+        {label}
+        href={seatHref}
+        {tint}
+        {short}
+        place={name}
+      />
+    </Lazy>
   {/if}
 
   {#if locals.length > 0}
-    <Locals
-      summaries={locals}
-      labels={nation?.labels}
-      isNation={nation != null}
-    />
+    <Lazy part={board} view="locals" ssr={false}>
+      <Locals
+        summaries={locals}
+        labels={nation?.labels}
+        isNation={nation != null}
+      />
+    </Lazy>
   {/if}
 </article>

@@ -62,6 +62,27 @@
       );
     </script>
     <script>
+      (() => {
+        let early = null;
+        const hold = (event) => {
+          const target = event.target.closest?.(
+            'button, [role="button"], [role="tab"], [role="switch"], [role="menuitem"], [role="option"]',
+          );
+          if (
+            target &&
+            target.closest("a[href]") == null &&
+            !(target.type === "submit" && target.form != null)
+          )
+            early = { event, target };
+        };
+        addEventListener("click", hold, true);
+        window.takeEarlyClick = () => {
+          removeEventListener("click", hold, true);
+          return early;
+        };
+      })();
+    </script>
+    <script>
       try {
         document.documentElement.dataset.mode =
           localStorage.getItem("mode-watcher-mode") ?? "system";

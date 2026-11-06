@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
+  import { Await } from "svelte-islands";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { idle } from "#lib/idle.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -253,36 +254,32 @@
         {m.versus_mismatch()}
       </p>
     {:else if sides.length === 2}
-      {#await Promise.all([data.body, preload(sides[0]?.type)])}
-        <div
-          class="col-span-12 grid gap-px"
-          role="status"
-          aria-label={m.versus_loading()}
-        >
-          <div class="bg-card block-44 motion-safe:animate-pulse"></div>
-          <div class="bg-card block-56 motion-safe:animate-pulse"></div>
-          <div class="bg-card block-80 motion-safe:animate-pulse"></div>
-        </div>
-      {:then [body]}
-        {#if body.people != null}
-          {#await import("./people.svelte") then view}
-            <view.default people={body.people} />
-          {/await}
-        {:else if body.places != null}
-          {#await import("./places.svelte") then view}
-            <view.default data={body.places} />
-          {/await}
-          {#await import("./system.svelte") then system}
-            <system.default
-              sides={sides.map(({ id, name }) => ({ id, name }))}
-            />
-          {/await}
-        {:else if body.parties != null}
-          {#await import("./parties.svelte") then view}
-            <view.default data={body.parties} first={sides[0]} />
-          {/await}
-        {/if}
-      {/await}
+      <Await
+        promise={Promise.all([data.body, preload(sides[0]?.type)])}
+        name="compare.{sides[0]?.type ?? 'body'}"
+        reserve="30rem"
+      >
+        {#snippet children([body]: [Awaited<PageData["body"]>, unknown])}
+          {#if body.people != null}
+            {#await import("./people.svelte") then view}
+              <view.default people={body.people} />
+            {/await}
+          {:else if body.places != null}
+            {#await import("./places.svelte") then view}
+              <view.default data={body.places} />
+            {/await}
+            {#await import("./system.svelte") then system}
+              <system.default
+                sides={sides.map(({ id, name }) => ({ id, name }))}
+              />
+            {/await}
+          {:else if body.parties != null}
+            {#await import("./parties.svelte") then view}
+              <view.default data={body.parties} first={sides[0]} />
+            {/await}
+          {/if}
+        {/snippet}
+      </Await>
     {/if}
   </article>
 </main>

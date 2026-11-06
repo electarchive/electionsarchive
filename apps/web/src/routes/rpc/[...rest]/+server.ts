@@ -5,7 +5,7 @@ import type { RequestHandler } from "./$types";
 const handler = new RPCHandler(served, {
   allowMethods: (method, _procedure, path) =>
     method === "GET"
-      ? path.join(".") === "live.stamp"
+      ? path[0] === "live"
       : ["POST", "PUT", "PATCH", "DELETE"].includes(method),
 });
 

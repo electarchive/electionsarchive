@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { arrange, ARRIVALS, DEPARTURES } from "#lib/caucus.js";
+  import { arrange, ARRIVALS, DEPARTURES, isUnplaced } from "#lib/caucus.js";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
@@ -99,18 +99,25 @@
   let seated = $state<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const blocs = $derived(
-    new Map<string, { group: string; party: string | null }>(
-      terms.flatMap((term) =>
-        [...term.parties, ...(term.steps ?? []).flatMap((step) => step.parties)]
-          .filter((entry) => entry.group != null)
-          .map((entry) => [
-            `${entry.group}/${entry.party ?? "none"}`,
-            { group: entry.group ?? "", party: entry.party },
-          ]),
-      ),
-    ),
-  );
+  const blocs = $derived.by(() => {
+    const found = new Map<string, { group: string; party: string | null }>();
+    for (const term of terms) {
+      for (const parties of [
+        term.parties,
+        ...(term.steps ?? []).map((step) => step.parties),
+      ]) {
+        for (const entry of parties) {
+          if (entry.group != null) {
+            found.set(`${entry.group}/${entry.party ?? "none"}`, {
+              group: entry.group,
+              party: entry.party,
+            });
+          }
+        }
+      }
+    }
+    return found;
+  });
   const sheets = $derived.by(() => {
     if (blocs.size === 0) {
       return terms;
@@ -236,23 +243,17 @@
     ),
   );
   const order = $derived.by(() => {
-    const held = new Map(
-      Map.groupBy(
-        sheets.flatMap((term) => [
-          ...term.parties,
-          ...(term.steps ?? []).flatMap((step) => step.parties),
-        ]),
-        (entry) => entry.party,
-      )
-        .entries()
-        .map(([party, entries]) => {
-          let sum = 0;
-          for (const entry of entries) {
-            sum += entry.seats;
-          }
-          return [party, sum] as const;
-        }),
-    );
+    const held = new Map<string | null, number>();
+    for (const term of sheets) {
+      for (const parties of [
+        term.parties,
+        ...(term.steps ?? []).map((step) => step.parties),
+      ]) {
+        for (const entry of parties) {
+          held.set(entry.party, (held.get(entry.party) ?? 0) + entry.seats);
+        }
+      }
+    }
     return [...held.keys()].toSorted(
       (a, b) =>
         Number(a == null) - Number(b == null) ||
@@ -272,6 +273,21 @@
     const across = width - 2 * PAD.side;
     const place = (value: number) =>
       PAD.side + ((value - from) / span) * across;
+    const leans = new Map<string, number | null>();
+    let lowest: number | null = null;
+    for (const party of ranked) {
+      const lean = known.get(party ?? "")?.lean ?? null;
+      if (!leans.has(party ?? "none")) {
+        leans.set(party ?? "none", lean);
+      }
+      if (lean != null && (lowest == null || lean < lowest)) {
+        lowest = lean;
+      }
+    }
+    const members = Map.groupBy(
+      ranked.filter((party) => grouped.has(party ?? "")),
+      (party) => grouped.get(party ?? "")?.group ?? "",
+    );
     return sheets.map((term, index) => {
       const x0 = place(Date.parse(term.start));
       const x1 = place(Date.parse(term.end ?? today));
@@ -297,29 +313,74 @@
           near: party == null ? null : (near[party] ?? null),
           seats: seats.get(party) ?? 0,
         });
+        const present = arrange(
+          [...seats.keys()].map(entry).filter((item) => item.seats > 0),
+        );
         let below = 0;
         const layers = new Map<string | null, { y0: number; y1: number }>();
-        for (const { party, seats: value } of arrange(
-          [...seats.keys()].map(entry).filter((item) => item.seats > 0),
-        )) {
+        for (const { party, seats: value } of present) {
           layers.set(party, {
             y0: PAD.top + depth - below * unit,
             y1: PAD.top + depth - (below + value) * unit,
           });
           below += value;
         }
-        let top = PAD.top + depth - below * unit;
-        for (const { party } of arrange(ranked.map(entry)).toReversed()) {
-          const at = layers.get(party);
-          if (at == null) {
-            layers.set(party, { y0: top, y1: top });
-          } else {
-            top = at.y0;
+        const top = PAD.top + depth - below * unit;
+        const leaned = present
+          .filter((item) => item.lean != null)
+          .toSorted((a, b) => (a.lean ?? 0) - (b.lean ?? 0));
+        let rest = 0;
+        for (const item of leaned) {
+          rest += item.seats;
+        }
+        rest /= 2;
+        let middle = lowest;
+        for (const item of leaned) {
+          rest -= item.seats;
+          if (rest <= 0) {
+            middle = item.lean;
+            break;
           }
         }
-        return { layers, below };
+        const spot = (item: ReturnType<typeof entry>) =>
+          item.lean ??
+          (isUnplaced(item)
+            ? ((item.near == null ? null : leans.get(item.near)) ??
+                middle ??
+                Infinity) + 0.005
+            : Infinity);
+        const above = present
+          .map((item) => ({ ...item, spot: spot(item) }))
+          .toSorted(
+            (a, b) =>
+              a.spot - b.spot ||
+              b.seats - a.seats ||
+              a.key.localeCompare(b.key),
+          );
+        const slot = (party: string | null) => {
+          const found = layers.get(party);
+          if (found != null) {
+            return found;
+          }
+          const at = spot(entry(party));
+          let start = 0;
+          let end = above.length;
+          while (start < end) {
+            const mid = (start + end) >> 1;
+            if ((above[mid]?.spot ?? Infinity) > at) {
+              end = mid;
+            } else {
+              start = mid + 1;
+            }
+          }
+          const next = above[start];
+          const y = next == null ? top : (layers.get(next.party)?.y0 ?? top);
+          return { y0: y, y1: y };
+        };
+        return { layers, below, slot };
       };
-      const { below } = stack(term.parties, term.near);
+      const opened = stack(term.parties, term.near);
+      const { below } = opened;
       const opening = {
         from: term.start,
         parties: term.parties,
@@ -339,23 +400,22 @@
       ];
       const parts = marks.map((part, at) => {
         const after = marks[at + 1];
-        const { layers, below: seated } = stack(part.parties, part.near);
+        const {
+          layers,
+          below: seated,
+          slot,
+        } = at === 0 ? opened : stack(part.parties, part.near);
         const spans = new Map(
-          Map.groupBy(
-            [...layers].filter(([key]) => grouped.has(key ?? "")),
-            ([key]) => grouped.get(key ?? "")?.group ?? "",
-          )
-            .entries()
-            .map(
-              ([group, entries]) =>
-                [
-                  group,
-                  {
-                    y0: Math.max(...entries.map(([, at]) => at.y0)),
-                    y1: Math.min(...entries.map(([, at]) => at.y1)),
-                  },
-                ] as const,
-            ),
+          members.entries().map(([group, keys]) => {
+            let y0 = -Infinity;
+            let y1 = Infinity;
+            for (const key of keys) {
+              const found = slot(key);
+              y0 = Math.max(y0, found.y0);
+              y1 = Math.min(y1, found.y1);
+            }
+            return [group, { y0, y1 }] as const;
+          }),
         );
         const open =
           term.isSeated && full != null
@@ -368,6 +428,7 @@
           x1: after == null ? x1 : place(Date.parse(after.from)),
           to: after?.from ?? term.end,
           stack: layers,
+          slot,
           spans,
           empty: open - late,
           late,
@@ -462,50 +523,87 @@
   const bands = $derived.by(() => {
     const parts = drawn;
     const laid = columns;
+    const frames = parts.map((part, index) => {
+      const before = parts[index - 1];
+      const after = parts[index + 1];
+      const column = laid[part.column];
+      const ease = Math.min(
+        5,
+        ((column?.x1 ?? 0) - (column?.x0 ?? 0)) * 0.22,
+        (part.x1 - part.x0) / 2,
+      );
+      const isInBefore = before?.column === part.column;
+      const isInAfter = after?.column === part.column;
+      const joinsBefore =
+        before != null && (isInBefore || part.x0 - before.x1 < 1);
+      const joinsAfter = after != null && (isInAfter || after.x0 - part.x1 < 1);
+      return {
+        a: part.x0 + (joinsBefore && !isInBefore ? ease : 0),
+        b: part.x1 - (joinsAfter && !isInAfter ? ease : 0),
+        edge: part.x1,
+        joinsAfter,
+      };
+    });
+    const held = new Map<string | null, Array<number>>();
+    const spanned = new Map<string | null, Array<number>>();
+    for (const [index, part] of parts.entries()) {
+      for (const [into, layers] of [
+        [held, part.stack],
+        [spanned, part.spans],
+      ] as const) {
+        for (const [party, found] of layers) {
+          if (found.y0 === found.y1) {
+            continue;
+          }
+          const indices = into.get(party);
+          if (indices == null) {
+            into.set(party, [index]);
+          } else {
+            indices.push(index);
+          }
+        }
+      }
+    }
     return [
       ...order.map((party) => ({ party, isGroup: false })),
       ...groups.map((party) => ({ party, isGroup: true })),
     ].map(({ party, isGroup }) => {
-      const runs = parts.map((part, index) => {
-        const before = parts[index - 1];
-        const after = parts[index + 1];
-        const column = laid[part.column];
-        const ease = Math.min(
-          5,
-          ((column?.x1 ?? 0) - (column?.x0 ?? 0)) * 0.22,
-          (part.x1 - part.x0) / 2,
-        );
-        const isInBefore = before?.column === part.column;
-        const isInAfter = after?.column === part.column;
-        const joinsBefore =
-          before != null && (isInBefore || part.x0 - before.x1 < 1);
-        const joinsAfter =
-          after != null && (isInAfter || after.x0 - part.x1 < 1);
-        return {
-          a: part.x0 + (joinsBefore && !isInBefore ? ease : 0),
-          b: part.x1 - (joinsAfter && !isInAfter ? ease : 0),
-          edge: part.x1,
-          joinsAfter,
-          ...((isGroup
-            ? part.spans.get(party ?? "")
-            : part.stack.get(party)) ?? { y0: 0, y1: 0 }),
-        };
-      });
-      const joined: Array<typeof runs> = [];
-      let isOpen = false;
-      for (const [index, run] of runs.entries()) {
-        const near = [runs[index - 1], run, runs[index + 1]];
-        if (near.every((entry) => entry == null || entry.y0 === entry.y1)) {
-          isOpen = false;
+      const shown: Array<number> = [];
+      for (const index of (isGroup ? spanned : held).get(party) ?? []) {
+        for (
+          let near = Math.max(index - 1, (shown.at(-1) ?? -1) + 1);
+          near <= Math.min(index + 1, parts.length - 1);
+          near += 1
+        ) {
+          shown.push(near);
+        }
+      }
+      const joined: Array<
+        Array<(typeof frames)[number] & { y0: number; y1: number }>
+      > = [];
+      for (const [position, index] of shown.entries()) {
+        const part = parts[index];
+        const frame = frames[index];
+        if (part == null || frame == null) {
           continue;
         }
+        const run = {
+          ...frame,
+          ...((isGroup ? part.spans.get(party ?? "") : part.slot(party)) ?? {
+            y0: 0,
+            y1: 0,
+          }),
+        };
         const group = joined.at(-1);
-        if (!isOpen || group == null || group.at(-1)?.joinsAfter !== true) {
+        if (
+          shown[position - 1] !== index - 1 ||
+          group == null ||
+          group.at(-1)?.joinsAfter !== true
+        ) {
           joined.push([run]);
         } else {
           group.push(run);
         }
-        isOpen = true;
       }
       let d = "";
       for (const group of joined) {
@@ -548,36 +646,50 @@
   const names = $derived.by(() => {
     const parts = slices;
     const laid = columns;
-    const placed: Array<{ party: string; x: number; y: number; text: string }> =
-      [];
-    for (const party of [...groups, ...order]) {
-      if (party == null || blocs.has(party)) {
-        continue;
-      }
-      let best: { x: number; y: number; room: number; text: string } | null =
-        null;
-      for (const part of parts) {
-        const text = label(party, laid[part.column]?.term.names);
+    const wanted = [...groups, ...order].filter(
+      (party): party is string => party != null && !blocs.has(party),
+    );
+    const allowed = new Set(wanted);
+    const best = new Map<
+      string,
+      { x: number; y: number; room: number; text: string }
+    >();
+    for (const part of parts) {
+      const wide = part.x1 - part.x0;
+      for (const party of new Set([
+        ...part.spans.keys(),
+        ...part.stack.keys(),
+      ])) {
+        if (party == null || !allowed.has(party)) {
+          continue;
+        }
         const at = part.spans.get(party) ?? part.stack.get(party);
         const thick = at == null ? 0 : at.y0 - at.y1;
-        const wide = part.x1 - part.x0;
-        if (at != null && thick >= 15 && wide >= text.length * 6.6 + 12) {
-          const room = thick * Math.min(wide, 220);
-          if (best == null || room > best.room) {
-            best = {
-              x: (part.x0 + part.x1) / 2,
-              y: (at.y0 + at.y1) / 2,
-              room,
-              text,
-            };
-          }
+        if (at == null || thick < 15) {
+          continue;
+        }
+        const text = label(party, laid[part.column]?.term.names);
+        const room = thick * Math.min(wide, 220);
+        const found = best.get(party);
+        if (
+          wide >= text.length * 6.6 + 12 &&
+          (found == null || room > found.room)
+        ) {
+          best.set(party, {
+            x: (part.x0 + part.x1) / 2,
+            y: (at.y0 + at.y1) / 2,
+            room,
+            text,
+          });
         }
       }
-      if (best != null) {
-        placed.push({ party, x: best.x, y: best.y, text: best.text });
-      }
     }
-    return placed;
+    return wanted.flatMap((party) => {
+      const found = best.get(party);
+      return found == null
+        ? []
+        : [{ party, x: found.x, y: found.y, text: found.text }];
+    });
   });
   const years = $derived.by(() => {
     const first = new Date(low).getUTCFullYear();
@@ -611,7 +723,7 @@
           ];
     }),
   );
-  const lit = $derived(columns[hovered ?? -1] ?? null);
+  const lit = $derived(hovered == null ? null : (columns[hovered] ?? null));
   const part = $derived(
     lit == null
       ? null
@@ -654,7 +766,7 @@
       .values()
       .toArray(),
   );
-  const current = $derived(selected ?? hovered ?? columns.length - 1);
+  const current = $derived(selected ?? hovered ?? sheets.length - 1);
   const pick = (index: number) => {
     if (selected != null) {
       onselect?.(index);
@@ -668,7 +780,7 @@
   const sitting = $derived(
     cabinets.find((cabinet) => cabinet.from === seated) ?? null,
   );
-  const shown = $derived((lit ?? columns[current])?.term.names);
+  const shown = $derived((lit?.term ?? sheets[current])?.names);
   const legend = $derived(
     [...groups, ...order.filter((party) => !blocs.has(party ?? ""))]
       .filter(
@@ -927,9 +1039,8 @@
         y={name.y}
         dy="0.35em"
         text-anchor="middle"
-        class="pointer-events-none text-[0.6875rem] font-semibold"
-        style:fill={`color(from ${tint(name.party)} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
-        >{name.text}</text
+        class="pointer-events-none fill-current text-[0.6875rem] font-semibold ink-on-fill"
+        style:--fill={tint(name.party)}>{name.text}</text
       >
     {/each}
     <path

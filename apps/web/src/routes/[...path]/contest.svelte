@@ -1,12 +1,16 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { READ_ONLY } from "$app/env/public";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
+  import { Await, Island, load, peek } from "svelte-islands";
+  import { on } from "svelte/events";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
@@ -44,7 +48,6 @@
   import Crowns from "./crowns.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
-  import FiguresSkeleton from "./figures-skeleton.svelte";
   import Lead from "./lead.svelte";
   import Ledger from "./ledger.svelte";
   import Lists from "./lists.svelte";
@@ -769,10 +772,34 @@
       (contest.kind in SEATS &&
         contest.rows.filter((row) => (row.current?.seats ?? 0) > 0).length > 1),
   );
+  const targets = $derived.by(() => {
+    const others =
+      browser && contest.others != null ? peek(contest.others) : null;
+    return others == null
+      ? contest.targets
+      : [...contest.targets.filter((target) => target.series), ...others.value];
+  });
+  const warmTargets = (element: HTMLElement) => {
+    const { others } = contest;
+    if (others == null) {
+      return;
+    }
+    const fetchOthers = () => {
+      load(others).catch(() => {});
+    };
+    const offs = (["pointerenter", "pointerdown", "focusin"] as const).map(
+      (type) => on(element, type, fetchOthers),
+    );
+    return () => {
+      for (const off of offs) {
+        off();
+      }
+    };
+  };
   const phrases = $derived.by(() => {
     const mine = contest.name.replace(/^\d{4}\s+/u, "").split(" ");
     return new Map(
-      contest.targets.map((target) => {
+      targets.map((target) => {
         const theirs = target.label.replace(/^\d{4}\s+/u, "").split(" ");
         const shared = Math.min(mine.length, theirs.length);
         let start = 0;
@@ -1041,7 +1068,7 @@
         winner: null,
         annulled: false,
       },
-      ...contest.targets
+      ...targets
         .toSorted((a, b) => Number(b.series) - Number(a.series))
         .map((target) => {
           const winner = target.series
@@ -1571,6 +1598,14 @@
   />
 </header>
 
+{#snippet roundsTable()}
+  {#if contest.count?.stv != null}
+    <Stv count={contest.count} stv={contest.count.stv} {here} />
+  {:else if contest.count != null}
+    <Tally count={contest.count} {here} />
+  {/if}
+{/snippet}
+
 {#snippet road(isBelow: boolean)}
   <Road
     {isBelow}
@@ -1586,15 +1621,17 @@
   >
     {#snippet more()}
       {#if cycle.others.length > 0}
-        <details class="text-[0.8125rem]">
-          <summary
-            class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-          >
-            {m.cycle_others()}
-            <span class="font-figures tabular-nums"
-              >{count(cycle.others.length)}</span
+        <Disclosure class="text-[0.8125rem]">
+          {#snippet summary()}
+            <summary
+              class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
             >
-          </summary>
+              {m.cycle_others()}
+              <span class="font-figures tabular-nums"
+                >{count(cycle.others.length)}</span
+              >
+            </summary>
+          {/snippet}
           <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
             {#each cycle.others as other (other.party.id)}
               <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
@@ -1620,7 +1657,7 @@
               </li>
             {/each}
           </ul>
-        </details>
+        </Disclosure>
       {/if}
     {/snippet}
   </Road>
@@ -1977,24 +2014,24 @@
     </div>
   {/snippet}
   {#snippet crowns()}
-    {#await crowned}
-      <div
-        class="aspect-3/2 rounded-sm bg-muted ring-1 ring-border inline-full max-block-[min(38rem,70svh)] motion-safe:animate-pulse"
-        role="status"
-        aria-busy="true"
-        aria-label={m.preview_loading()}
-      ></div>
-    {:then found}
-      {#if found == null}
-        {@render missing()}
-      {:else}
-        <Crowns
-          maps={found.maps}
-          since={found.since}
-          year={contest.election.date?.slice(0, 4) ?? ""}
-        />
-      {/if}
-    {/await}
+    <Await
+      promise={crowned}
+      name="contest.crowns"
+      reserve="min(38rem,70svh)"
+      class="[--island-inset:0]"
+    >
+      {#snippet children(found)}
+        {#if found == null}
+          {@render missing()}
+        {:else}
+          <Crowns
+            maps={found.maps}
+            since={found.since}
+            year={contest.election.date?.slice(0, 4) ?? ""}
+          />
+        {/if}
+      {/snippet}
+    </Await>
   {/snippet}
   {#snippet hemicycle()}
     <Seats
@@ -2009,11 +2046,11 @@
       {change}
     />
     {#if contest.kind === "list_allocation"}
-      {#await import("./figures.svelte")}
-        <FiguresSkeleton />
-      {:then figures}
-        <figures.default {id} body={null} />
-      {/await}
+      <Await promise={import("./figures.svelte")} name="figures">
+        {#snippet children(figures)}
+          <figures.default {id} body={null} />
+        {/snippet}
+      </Await>
     {/if}
   {/snippet}
   <Lead
@@ -2066,10 +2103,22 @@
   {#if additional != null}
     <Additional {additional} />
   {/if}
-  {#if contest.count?.stv != null}
-    <Stv count={contest.count} stv={contest.count.stv} {here} />
-  {:else if contest.count != null}
-    <Tally count={contest.count} {here} />
+  {#if contest.count != null}
+    <div
+      id="rounds"
+      class="col-span-12 grid min-inline-0"
+      style:min-block-size={contest.table == null
+        ? null
+        : `calc(min(${contest.count.rows.length * 40 + 60}px, 100svh) + 88px)`}
+    >
+      {#if contest.table == null}
+        {@render roundsTable()}
+      {:else}
+        <Island part={contest.table} defer when="visible">
+          {@render roundsTable()}
+        </Island>
+      {/if}
+    </div>
   {/if}
 
   <div
@@ -2077,6 +2126,7 @@
   >
     <div
       class="flex flex-1 basis-80 flex-wrap items-center gap-x-2.5 gap-y-1.5 min-inline-0"
+      {@attach warmTargets}
     >
       <span class="shrink-0 text-sm font-semibold max-sm:basis-full"
         >{m.compare_label()}</span
@@ -2619,11 +2669,13 @@
         <ul class="grid gap-1.5 text-sm/snug">
           {#each checks as check (check.code)}
             <li>
-              <details class="group">
-                <summary
-                  class="cursor-pointer marker:text-muted-foreground hover:highlighter"
-                  >{check.summary}</summary
-                >
+              <Disclosure class="group">
+                {#snippet summary()}
+                  <summary
+                    class="cursor-pointer marker:text-muted-foreground hover:highlighter"
+                    >{check.summary}</summary
+                  >
+                {/snippet}
                 <ul
                   class="mbs-1.5 grid gap-1 overflow-y-auto border-s ps-3 text-[0.8125rem] text-muted-foreground max-block-64"
                 >
@@ -2631,7 +2683,7 @@
                     <li>{unit}</li>
                   {/each}
                 </ul>
-              </details>
+              </Disclosure>
             </li>
           {/each}
         </ul>

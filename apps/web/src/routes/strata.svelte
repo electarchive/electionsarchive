@@ -1,12 +1,15 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import type { home } from "#lib/server/pages.js";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
 
-  const { strata, today }: { strata: PageData["strata"]; today: string } =
+  const {
+    strata,
+    today,
+  }: { strata: Awaited<ReturnType<typeof home>>["strata"]; today: string } =
     $props();
 
   let at = $state<number | null>(null);
@@ -19,9 +22,6 @@
     const start = Date.UTC(year, 0, 1);
     return year + (time - start) / (Date.UTC(year + 1, 0, 1) - start);
   };
-  const round = (value: number, places = 100) =>
-    Math.round(value * places) / places;
-
   const now = $derived(toYear(today));
   const from = $derived(
     Math.floor(
@@ -49,20 +49,20 @@
       const shapes = new Map<number, string>();
       let seams = "";
       for (const [index, column] of columns.entries()) {
-        const x = round(column.x0 - from);
-        const w = round(Math.max(0.05, column.x1 - column.x0));
+        const x = Math.round((column.x0 - from) * 100);
+        const w = Math.max(5, Math.round((column.x1 - from) * 100) - x);
         if (index > 0) {
-          seams += `M${x} 0V100`;
+          seams += `M${x} 0V1000`;
         }
         let below = 0;
         for (const [key, seats] of column.seats) {
-          const y = round(100 - ((below + seats) / column.total) * 100, 10);
-          const h = round((seats / column.total) * 100, 10);
+          const bottom = Math.round(1000 - (below / column.total) * 1000);
+          below += seats;
+          const top = Math.round(1000 - (below / column.total) * 1000);
           shapes.set(
             key,
-            `${shapes.get(key) ?? ""}M${x} ${y}h${w}v${h}h${-w}z`,
+            `${shapes.get(key) ?? ""}M${x} ${top}h${w}v${bottom - top}h${-w}`,
           );
-          below += seats;
         }
       }
       return { ...row, columns, shapes: [...shapes], seams };
@@ -194,37 +194,30 @@
         aria-hidden="true"
       ></span>
       <svg
-        class="sweep absolute inset-0 block block-full inline-full [&_a]:outline-none"
-        viewBox="0 0 {round(span)} 100"
+        class="absolute inset-0 block animate-[sweep_1600ms_cubic-bezier(0.45,0.1,0.25,1)_both] block-full inline-full motion-reduce:animate-none"
+        viewBox="0 0 {Math.round(span * 100)} 1000"
         preserveAspectRatio="none"
+        shape-rendering="crispEdges"
         aria-hidden="true"
       >
         {#each row.shapes as [key, d] (key)}
-          <path {d} fill={tint(key)} shape-rendering="crispEdges" />
+          <path {d} fill={tint(key)} />
         {/each}
         <path
           d={row.seams}
           class="stroke-card max-sm:hidden"
           stroke-width="1"
           vector-effect="non-scaling-stroke"
-          shape-rendering="crispEdges"
         />
-        {#each row.columns as entry (entry.path)}
-          <a
-            href={resolve("/[...path]", { path: entry.path })}
-            tabindex="-1"
-            aria-label={entry.date.slice(0, 4)}
-          >
-            <rect
-              x={round(entry.x0 - from)}
-              y="0"
-              width={round(Math.max(0.05, entry.x1 - entry.x0))}
-              height="100"
-              fill="transparent"
-            />
-          </a>
-        {/each}
       </svg>
+      <a
+        class="absolute inset-0 outline-none"
+        href={column == null
+          ? undefined
+          : resolve("/[...path]", { path: column.path })}
+        tabindex="-1"
+        aria-hidden="true"
+      ></a>
       {#if column != null && at != null}
         <span
           class="pointer-events-none absolute inset-y-0 bg-foreground/10"
@@ -335,24 +328,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .sweep {
-    animation: strata-sweep 1600ms cubic-bezier(0.45, 0.1, 0.25, 1) both;
-  }
-
-  @keyframes strata-sweep {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .sweep {
-      animation: none;
-    }
-  }
-</style>

@@ -26,6 +26,8 @@
     href,
     select,
     contests,
+    pending = null,
+    more,
   }: {
     class?: string;
     sections: Array<{
@@ -42,9 +44,12 @@
     href: (anchor: string | null) => string;
     select: (anchor: string | null) => void;
     contests: Array<{ name: string; path: string }>;
+    pending?: { races: number; questions: number } | null;
+    more?: () => void;
   } = $props();
 
   const LIMIT = 6;
+  const SQUARES = 60;
   const OVERVIEW = "#overview";
   const ELSEWHERE = "path:";
 
@@ -83,7 +88,15 @@
             ],
       );
       const races = rows.flatMap((row) => row.item ?? []);
-      const isOpen = opened.has(section.key) || races.length <= LIMIT + 1;
+      const unloaded =
+        pending == null
+          ? 0
+          : section.key === "questions"
+            ? pending.questions
+            : pending.races;
+      const isOpen =
+        opened.has(section.key) ||
+        (races.length <= LIMIT + 1 && unloaded === 0);
       const kept = new Set(
         races
           .filter(
@@ -103,6 +116,7 @@
           row.item == null ? groups.has(row.group) : kept.has(row.item.anchor),
         ),
         hidden: races.filter((item) => !kept.has(item.anchor)),
+        unloaded,
       };
     }),
   );
@@ -112,7 +126,7 @@
       .flatMap((group) => [
         ...(group.head == null ? [] : [group.head]),
         ...group.items,
-      ]).length,
+      ]).length + (pending == null ? 0 : pending.races + pending.questions),
   );
 
   const items = $derived([
@@ -246,6 +260,8 @@
         <button
           {...props}
           type="button"
+          onpointerenter={more}
+          onfocusin={more}
           class="flex shrink-0 items-center gap-1.5 rounded-sm border border-input bg-card ps-2.5 pe-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7.5 hover:bg-secondary"
           aria-label={m.election_nav_all_label({ count: count(total) })}
           >{m.series_all({ count: count(total) })}<ChevronsUpDownIcon
@@ -359,26 +375,31 @@
               {/if}
             </li>
           {/each}
-          {#if section.hidden.length > 0}
+          {#if section.hidden.length + section.unloaded > 0}
             <li class="col-span-full grid grid-cols-subgrid">
               <button
                 type="button"
                 class="col-span-full grid grid-cols-subgrid py-2.5 text-start -outline-offset-2 keycap hover:bg-secondary"
                 aria-label={m.election_nav_more_label({
-                  count: count(section.hidden.length),
+                  count: count(section.hidden.length + section.unloaded),
                 })}
-                onclick={() => opened.add(section.key)}
+                aria-busy={opened.has(section.key) && section.unloaded > 0}
+                onpointerenter={more}
+                onclick={() => {
+                  opened.add(section.key);
+                  more?.();
+                }}
               >
                 <span
                   class="col-start-2 -col-end-2 flex items-center gap-3 text-[0.8125rem] font-semibold"
                 >
                   <span class="shrink-0"
                     >{m.election_nav_more({
-                      count: count(section.hidden.length),
+                      count: count(section.hidden.length + section.unloaded),
                     })}</span
                   >
                   <span class="flex flex-wrap gap-0.5" aria-hidden="true">
-                    {#each section.hidden as item (item.anchor)}
+                    {#each section.hidden.slice(0, SQUARES) as item (item.anchor)}
                       <span
                         class="rounded-[1px] bg-muted block-2.5 inline-2.5"
                         style:background={item.tint}

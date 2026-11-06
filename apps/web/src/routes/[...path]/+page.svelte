@@ -6,6 +6,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
   import type { PageData } from "./$types";
+  import PreviewHost from "./preview-host.svelte";
   import Preview from "./preview.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -19,9 +20,10 @@
     }
     const rest = visible.pathname.slice(data.path.length + 2);
     return visible.pathname.startsWith(`/${data.path}/`) &&
-      data.election.races.some(
-        (race) => race.anchor === rest.replace(/-total$/u, ""),
-      )
+      (data.election.rest != null ||
+        data.election.races.some(
+          (race) => race.anchor === rest.replace(/-total$/u, ""),
+        ))
       ? rest
       : null;
   });
@@ -93,9 +95,12 @@
   const years = $derived(
     data.kind === "polity"
       ? [
-          ...data.polity.elections.flatMap((entry) =>
-            entry.year == null ? [] : [entry.year],
-          ),
+          ...(data.polity.calendar.first == null
+            ? []
+            : [data.polity.calendar.first]),
+          ...(data.polity.calendar.last == null
+            ? []
+            : [data.polity.calendar.last]),
           ...data.polity.years,
         ]
       : [],
@@ -204,6 +209,7 @@
 </svelte:head>
 
 <ShareImage src="{page.url.origin}/og{page.url.pathname}.png" alt={title} />
+<PreviewHost />
 
 <main class="pbe-16">
   <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">

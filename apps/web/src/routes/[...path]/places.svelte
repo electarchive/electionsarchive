@@ -17,7 +17,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
-  import { settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
@@ -569,10 +568,9 @@
 {/snippet}
 
 <section
-  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-2 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-2"
   aria-labelledby="{uid}-title"
   data-places
-  {@attach settle}
 >
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">
     <h2 id="{uid}-title" class="heading">

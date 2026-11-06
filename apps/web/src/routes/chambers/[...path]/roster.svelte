@@ -4,6 +4,7 @@
   import { on } from "svelte/events";
   import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date, natural } from "#lib/format.js";
@@ -299,6 +300,11 @@
   const limit = $derived(
     isAll ? feed.length : isWide.current ? (fit ?? feed.length) : 8,
   );
+  const changeRows = new Windowed(() => ({
+    items: isAll ? feed : feed.slice(0, isWide.current ? 40 : limit),
+    key: (_, index) => String(index),
+    size: 33,
+  }));
 
   $effect(() => {
     void feed.length;
@@ -379,10 +385,18 @@
           <ol
             class="grid content-start overflow-hidden rounded-sm text-[0.8125rem] ring-1 ring-border"
             style:max-block-size={clip == null ? null : `${clip}px`}
+            {@attach changeRows.anchor}
           >
-            {#each feed.slice(0, isWide.current ? feed.length : limit) as event, index (index)}
+            {#if changeRows.before > 0}
+              <li
+                aria-hidden="true"
+                style:block-size="{changeRows.before}px"
+              ></li>
+            {/if}
+            {#each changeRows.entries as { value: event, index, key } (key)}
               <li
                 inert={index >= limit}
+                {@attach changeRows.measure(index)}
                 class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
               >
                 <span
@@ -418,13 +432,15 @@
                       {/if}
                     </span>
                     {#if event.move.members.length > 1}
-                      <details class="group">
-                        <summary
-                          class="cursor-pointer font-semibold marker:text-muted-foreground"
-                          >{m.chamber_step_members({
-                            count: event.move.members.length,
-                          })}</summary
-                        >
+                      <Disclosure class="group">
+                        {#snippet summary()}
+                          <summary
+                            class="cursor-pointer font-semibold marker:text-muted-foreground"
+                            >{m.chamber_step_members({
+                              count: event.move.members.length,
+                            })}</summary
+                          >
+                        {/snippet}
                         <ul class="grid gap-0.5 ps-3.5 pbs-1">
                           {#each event.move.members as member (member.person)}
                             <li class="flex items-baseline gap-1.5 truncate">
@@ -441,7 +457,7 @@
                             </li>
                           {/each}
                         </ul>
-                      </details>
+                      </Disclosure>
                     {/if}
                   </span>
                   <span class="text-xs font-semibold whitespace-nowrap"
@@ -484,6 +500,12 @@
                 {/if}
               </li>
             {/each}
+            {#if changeRows.after > 0}
+              <li
+                aria-hidden="true"
+                style:block-size="{changeRows.after}px"
+              ></li>
+            {/if}
           </ol>
           {#if limit < feed.length}
             <button

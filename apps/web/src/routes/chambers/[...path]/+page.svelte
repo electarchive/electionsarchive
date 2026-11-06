@@ -1,15 +1,19 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import { Island, load, peek } from "svelte-islands";
+  import { on as listen } from "svelte/events";
   import { partyOn, segments, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
   import { count, date, definite, natural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { era, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { unfold } from "#lib/steps.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -43,9 +47,14 @@
           last: to == null ? m.governments_present() : year(to),
         });
 
+  const isLatest = $derived(selected === data.terms.length - 1);
+  const roster = $derived(isLatest ? data.members : null);
+
   const members = createQuery(() => {
     const at = term;
-    const isLatest = selected === data.terms.length - 1;
+    const own = roster;
+    const rows =
+      browser && own != null ? (peek(own.members)?.value ?? null) : null;
     return {
       ...orpc.bodies.members.queryOptions({
         input: {
@@ -54,101 +63,48 @@
           until: at?.end ?? undefined,
         },
       }),
-      enabled: at != null,
-      initialData: isLatest ? (data.members ?? undefined) : undefined,
-      placeholderData: keepPreviousData,
+      ...(own == null
+        ? {}
+        : {
+            queryFn: async () => ({ ...own, members: await load(own.members) }),
+          }),
+      enabled: at != null && (own == null || rows != null),
+      initialData:
+        own == null || rows == null ? undefined : { ...own, members: rows },
+      placeholderData: own == null ? keepPreviousData : undefined,
     };
   });
+  const meta = $derived(members.data ?? roster);
 
   let chosen = $state<{ term: string; day: string } | null>(null);
-  const first = $derived(members.data?.start ?? term?.start ?? "");
+  const history = $derived(unfold(peek(data.steps)?.value[selected] ?? []));
+
+  $effect(() => {
+    if (chosen != null) {
+      void load(data.steps).catch(() => null);
+      if (roster != null) {
+        void load(roster.members).catch(() => null);
+      }
+    }
+  });
+  const first = $derived(meta?.start ?? term?.start ?? "");
   const on = $derived(
     chosen != null && chosen.term === term?.start ? chosen.day : first,
   );
   const DAY = 864e5;
   const renames = $derived(new Set(data.renames));
-  const roll = $derived(
-    (members.data?.members ?? []).map((member) => ({
-      ...member,
-      party: partyOn(member, on),
-      segments: segments(
-        member,
-        first,
-        members.data?.end ?? new Date().toISOString().slice(0, 10),
-        renames,
-      ),
-    })),
-  );
-  const crew = $derived(
-    stand(
-      roll.flatMap((member) => [
-        member.party,
-        ...member.segments.map((segment) => segment.party),
-      ]),
-      (members.data?.parties ?? []).map((party) => ({
-        ...party,
-        color: info.get(party.id)?.color ?? party.color,
-      })),
-    ),
-  );
   const range = $derived.by(() => {
     const today = Math.floor(Date.now() / DAY);
     const open = Date.parse(term?.start ?? first) / DAY;
-    const close = Date.parse(term?.end ?? members.data?.end ?? "") / DAY;
+    const close = Date.parse(term?.end ?? meta?.end ?? "") / DAY;
     const high = Math.min(Number.isNaN(close) ? today : close - 1, today);
     return {
       low: Math.min(Math.max(Date.parse(first) / DAY, open), high),
       high,
     };
   });
-  const sitting = $derived.by(() => {
-    if (members.data == null) {
-      return [];
-    }
-    const present = roll.filter(
-      (member) =>
-        member.isVoting &&
-        (!members.data.isSeated ||
-          ((member.from ?? "") <= on && (member.to == null || member.to > on))),
-    );
-    const held = new Set(present.map((member) => member.seat));
-    const late =
-      on === first && members.data.isSeated
-        ? Map.groupBy(
-            roll
-              .filter(
-                (member) =>
-                  member.isVoting &&
-                  (member.seat == null
-                    ? member.acquired === "elected"
-                    : !held.has(member.seat)) &&
-                  member.from != null &&
-                  member.from > on &&
-                  Date.parse(member.from) - Date.parse(on) < 30 * DAY,
-              )
-              .toSorted((a, b) => (a.from ?? "").localeCompare(b.from ?? "")),
-            (member) => member.seat ?? member.person,
-          )
-            .values()
-            .flatMap((group) => group.slice(0, 1))
-            .toArray()
-        : [];
-    present.push(...late);
-    return members.data.apportionment.length === 0
-      ? present
-      : Map.groupBy(present, (member) => member.seat ?? member.person)
-          .values()
-          .map(
-            (group) =>
-              group.toSorted((a, b) =>
-                (b.from ?? "").localeCompare(a.from ?? ""),
-              )[0],
-          )
-          .filter((member) => member != null)
-          .toArray();
-  });
   const open = $derived(
-    (members.data?.apportionment ?? []).filter(
+    (meta?.apportionment ?? []).filter(
       (row) => row.from <= on && (row.to == null || row.to > on),
     ),
   );
@@ -159,18 +115,15 @@
     }
     return total;
   });
-  const isCounted = $derived(
-    members.data?.isSeated === true && (open.length > 0 || on !== first),
-  );
-  const own = $derived(new Map(crew.map((party) => [party.id, party])));
   const called = (
     party: string | null,
+    own: Map<string, ReturnType<typeof stand>[number]>,
     names?: Record<string, { label: string; short: string | null }>,
   ) => {
     const found = info.get(party ?? "") ?? own.get(party ?? "");
     const dated =
       names == null
-        ? (era(members.data?.eras ?? [], party, on) ?? term?.names[party ?? ""])
+        ? (era(meta?.eras ?? [], party, on) ?? term?.names[party ?? ""])
         : names[party ?? ""];
     return {
       label: dated?.label ?? found?.label ?? "",
@@ -183,111 +136,15 @@
   };
   const label = (
     party: string | null,
+    own: Map<string, ReturnType<typeof stand>[number]>,
     names?: Record<string, { label: string; short: string | null }>,
   ) => {
-    const found = called(party, names);
+    const found = called(party, own, names);
     return party == null ? m.record_none() : (found.short ?? found.label);
   };
-  const places = $derived(
-    [
-      ...new Map(
-        sitting.flatMap((member) =>
-          member.place == null
-            ? []
-            : [[member.place, { name: member.place, path: member.path }]],
-        ),
-      ).values(),
-    ].toSorted((a, b) => natural(a.name, b.name)),
-  );
-  const hemicycle = $derived.by(() => {
-    const near =
-      term?.steps.findLast((step) => step.date <= on)?.near ?? term?.near ?? {};
-    const keys = new Set((term?.parties ?? []).map((entry) => entry.party));
-    const home = (party: string | null) => {
-      const root = party == null ? null : (data.kin[party] ?? party);
-      return root == null || keys.has(root)
-        ? root
-        : (own.get(root)?.parent ?? root);
-    };
-    const seated = Map.groupBy(
-      sitting.toSorted(
-        (a, b) =>
-          natural(a.place ?? "", b.place ?? "") || a.name.localeCompare(b.name),
-      ),
-      (member) => home(member.party),
-    );
-    const rows = isCounted
-      ? seated
-          .entries()
-          .map(([party, list]) => ({ party, seats: list.length }))
-          .toArray()
-      : (term?.parties ?? []);
-    return rows.map((entry) => {
-      const party =
-        entry.party == null
-          ? null
-          : (info.get(entry.party) ?? own.get(entry.party));
-      const name = called(entry.party);
-      return {
-        key: entry.party ?? "none",
-        label: name.label === "" ? m.record_none() : name.label,
-        short: name.short,
-        color: party?.color ?? null,
-        lean: party?.lean ?? null,
-        near: entry.party == null ? null : (near[entry.party] ?? null),
-        seats: entry.seats,
-        here: 0,
-        members: (seated.get(entry.party) ?? []).map((member) => ({
-          place: places.findIndex((place) => place.name === member.place),
-          name: member.name,
-          position: null,
-          person: member.person,
-          party: member.party,
-          affiliation:
-            member.party == null || member.party === entry.party
-              ? null
-              : (own.get(member.party)?.label ?? null),
-        })),
-      };
-    });
-  });
-  const held = $derived.by(() => {
-    let total = 0;
-    for (const party of hemicycle) {
-      total += party.seats;
-    }
-    return total;
-  });
-  const seceded = $derived.by(() => {
-    const taken = Map.groupBy(sitting, (member) => member.region);
-    let total = 0;
-    for (const row of open) {
-      if (
-        row.gaps.some(
-          (gap) => gap.from <= on && (gap.to == null || gap.to > on),
-        )
-      ) {
-        total += Math.max(0, row.seats - (taken.get(row.area)?.length ?? 0));
-      }
-    }
-    return total;
-  });
-  const change = $derived.by(() => {
-    if (previous == null) {
-      return null;
-    }
-    const before = new Map(
-      previous.parties.map((entry) => [entry.party ?? "none", entry.seats]),
-    );
-    return Object.fromEntries(
-      hemicycle.flatMap((entry) => {
-        const was = before.get(entry.key);
-        return was == null ? [] : [[entry.key, entry.seats - was]];
-      }),
-    );
-  });
   const lead = (
     parties: Array<{ party: string | null; seats: number }>,
+    own: Map<string, ReturnType<typeof stand>[number]>,
     names: Record<string, { label: string; short: string | null }>,
   ) =>
     Map.groupBy(
@@ -317,30 +174,221 @@
                 : (rows[0]?.party ?? null)
               : null,
           name: caucus
-            ? label(key, names)
-            : rows.map((row) => label(row.party, names)).join("/"),
+            ? label(key, own, names)
+            : rows.map((row) => label(row.party, own, names)).join("/"),
           full:
             !caucus && rows.length === 1 && rows[0]?.party != null
-              ? called(rows[0].party, names).label
+              ? called(rows[0].party, own).label
               : null,
           seats,
         };
       })
       .toArray()
       .toSorted((a, b) => b.seats - a.seats)[0] ?? null;
-  const leader = $derived(
-    lead(
+
+  const seat = (list: NonNullable<typeof members.data>["members"]) => {
+    const roll = list.map((member) => ({
+      ...member,
+      party: partyOn(member, on),
+      segments: segments(
+        member,
+        first,
+        meta?.end ?? new Date().toISOString().slice(0, 10),
+        renames,
+      ),
+    }));
+    const crew = stand(
+      roll.flatMap((member) => [
+        member.party,
+        ...member.segments.map((segment) => segment.party),
+      ]),
+      (meta?.parties ?? []).map((party) => ({
+        ...party,
+        color: info.get(party.id)?.color ?? party.color,
+      })),
+    );
+    const own = new Map(crew.map((party) => [party.id, party]));
+    const isSeated = meta?.isSeated === true;
+    const present = roll.filter(
+      (member) =>
+        member.isVoting &&
+        (!isSeated ||
+          ((member.from ?? "") <= on && (member.to == null || member.to > on))),
+    );
+    const taken = new Set(present.map((member) => member.seat));
+    const late =
+      on === first && isSeated
+        ? Map.groupBy(
+            roll
+              .filter(
+                (member) =>
+                  member.isVoting &&
+                  (member.seat == null
+                    ? member.acquired === "elected"
+                    : !taken.has(member.seat)) &&
+                  member.from != null &&
+                  member.from > on &&
+                  Date.parse(member.from) - Date.parse(on) < 30 * DAY,
+              )
+              .toSorted((a, b) => (a.from ?? "").localeCompare(b.from ?? "")),
+            (member) => member.seat ?? member.person,
+          )
+            .values()
+            .flatMap((group) => group.slice(0, 1))
+            .toArray()
+        : [];
+    present.push(...late);
+    const sitting =
+      list.length === 0
+        ? []
+        : (meta?.apportionment.length ?? 0) === 0
+          ? present
+          : Map.groupBy(present, (member) => member.seat ?? member.person)
+              .values()
+              .map(
+                (group) =>
+                  group.toSorted((a, b) =>
+                    (b.from ?? "").localeCompare(a.from ?? ""),
+                  )[0],
+              )
+              .filter((member) => member != null)
+              .toArray();
+    const isCounted =
+      list.length > 0 && isSeated && (open.length > 0 || on !== first);
+    const places = [
+      ...new Map(
+        sitting.flatMap((member) =>
+          member.place == null
+            ? []
+            : [[member.place, { name: member.place, path: member.path }]],
+        ),
+      ).values(),
+    ].toSorted((a, b) => natural(a.name, b.name));
+    const near =
+      history.findLast((step) => step.date <= on)?.near ?? term?.near ?? {};
+    const keys = new Set((term?.parties ?? []).map((entry) => entry.party));
+    const home = (party: string | null) => {
+      const root = party == null ? null : (data.kin[party] ?? party);
+      return root == null || keys.has(root)
+        ? root
+        : (own.get(root)?.parent ?? root);
+    };
+    const seated = Map.groupBy(
+      sitting.toSorted(
+        (a, b) =>
+          natural(a.place ?? "", b.place ?? "") || a.name.localeCompare(b.name),
+      ),
+      (member) => home(member.party),
+    );
+    const rows = isCounted
+      ? seated
+          .entries()
+          .map(([party, group]) => ({ party, seats: group.length }))
+          .toArray()
+      : (term?.parties ?? []);
+    const hemicycle = rows.map((entry) => {
+      const party =
+        entry.party == null
+          ? null
+          : (info.get(entry.party) ?? own.get(entry.party));
+      const name = called(entry.party, own);
+      return {
+        key: entry.party ?? "none",
+        label: name.label === "" ? m.record_none() : name.label,
+        short: name.short,
+        color: party?.color ?? null,
+        lean: party?.lean ?? null,
+        near: entry.party == null ? null : (near[entry.party] ?? null),
+        seats: entry.seats,
+        here: 0,
+        members: (seated.get(entry.party) ?? []).map((member) => ({
+          place: places.findIndex((place) => place.name === member.place),
+          name: member.name,
+          position: null,
+          person: member.person,
+          party: member.party,
+          affiliation:
+            member.party == null || member.party === entry.party
+              ? null
+              : (own.get(member.party)?.label ?? null),
+        })),
+      };
+    });
+    let held = 0;
+    for (const party of hemicycle) {
+      held += party.seats;
+    }
+    const filled = Map.groupBy(sitting, (member) => member.region);
+    let seceded = 0;
+    for (const row of open) {
+      if (
+        row.gaps.some(
+          (gap) => gap.from <= on && (gap.to == null || gap.to > on),
+        )
+      ) {
+        seceded += Math.max(0, row.seats - (filled.get(row.area)?.length ?? 0));
+      }
+    }
+    const before =
+      previous == null
+        ? null
+        : new Map(
+            previous.parties.map((entry) => [
+              entry.party ?? "none",
+              entry.seats,
+            ]),
+          );
+    const change =
+      before == null
+        ? null
+        : Object.fromEntries(
+            hemicycle.flatMap((entry) => {
+              const was = before.get(entry.key);
+              return was == null ? [] : [[entry.key, entry.seats - was]];
+            }),
+          );
+    const leader = lead(
       hemicycle.map((entry) => ({
         party: entry.key === "none" ? null : entry.key,
         seats: entry.seats,
       })),
+      own,
       term?.names ?? {},
-    ),
-  );
+    );
+    return {
+      roll,
+      crew,
+      own,
+      sitting,
+      places,
+      hemicycle,
+      held,
+      seceded,
+      change,
+      leader,
+    };
+  };
+  const live = $derived(seat(members.data?.members ?? []));
+  const wake = (node: HTMLElement) => {
+    const start = () => {
+      if (roster != null) {
+        void load(roster.members).catch(() => null);
+      }
+    };
+    const stops = [
+      listen(node, "pointerenter", start),
+      listen(node, "focusin", start),
+    ];
+    return () => {
+      for (const stop of stops) {
+        stop();
+      }
+    };
+  };
   const largest = $derived(
-    selected === data.terms.length - 1 && members.data != null
-      ? leader
-      : lead(latest?.parties ?? [], latest?.names ?? {}),
+    isLatest && members.data != null
+      ? live.leader
+      : lead(latest?.parties ?? [], live.own, latest?.names ?? {}),
   );
   const whole = $derived(term == null ? 0 : (term.size ?? term.total));
   const cabinets = $derived(
@@ -506,15 +554,24 @@
       </dl>
 
       {const Stream = $derived(data.Stream)}
-      <Stream
-        terms={data.terms}
-        parties={data.parties}
-        governments={data.governments}
-        interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
-        eras={data.eras}
-        basis={data.basis}
-        bind:selected
-      />
+      <Island part={data.steps} when="visible">
+        {#snippet children(
+          steps: NonNullable<typeof data.steps.loaded>["value"],
+        )}
+          <Stream
+            terms={data.terms.map((entry, index) => ({
+              ...entry,
+              steps: unfold(steps[index] ?? []),
+            }))}
+            parties={data.parties}
+            governments={data.governments}
+            interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
+            eras={data.eras}
+            basis={data.basis}
+            bind:selected
+          />
+        {/snippet}
+      </Island>
     {/if}
 
     {#if term != null && isParty}
@@ -588,7 +645,7 @@
         </p>
       </div>
 
-      {#if members.data?.isSeated === true && range.high > range.low}
+      {#if meta?.isSeated === true && range.high > range.low}
         <div
           class="col-span-12 flex flex-wrap items-center gap-x-4 gap-y-2 bg-card px-3.5 py-2.5"
         >
@@ -624,31 +681,31 @@
         </div>
       {/if}
 
-      <div class="col-span-12 grid lg:col-span-4">
+      <div class="col-span-12 grid lg:col-span-4" {@attach wake}>
         {const Seats = $derived(data.Seats)}
         {#key term.start}
           <Seats
             isLinked
-            parties={hemicycle}
-            {places}
+            parties={live.hemicycle}
+            places={live.places}
             here={null}
             place={body.name}
             link={null}
             body={data.id}
             size={open.length > 0
               ? apportioned
-              : term.size != null && held <= term.size
+              : term.size != null && live.held <= term.size
                 ? term.size
                 : null}
             vacant={open.length > 0
-              ? Math.max(0, apportioned - held - seceded)
+              ? Math.max(0, apportioned - live.held - live.seceded)
               : term.size == null || !term.isSeated
                 ? 0
-                : Math.max(0, term.size - held)}
-            {seceded}
-            official={seceded > 0 && term.size != null ? term.size : null}
+                : Math.max(0, term.size - live.held)}
+            seceded={live.seceded}
+            official={live.seceded > 0 && term.size != null ? term.size : null}
             isComplete={!term.isPartial}
-            {change}
+            change={live.change}
             partners={body.partners}
           />
         {/key}
@@ -657,7 +714,8 @@
       <section
         class="col-span-12 grid content-start gap-4 bg-card p-3.5 lg:col-span-8 lg:flex lg:flex-col"
       >
-        {#if leader != null}
+        {#if live.leader != null}
+          {const leader = $derived(live.leader)}
           <p
             class="font-serif text-[1.375rem]/snug font-[560] tracking-[-0.005em] text-pretty max-inline-[44ch]"
           >
@@ -727,39 +785,54 @@
             </ol>
           </div>
         {/if}
-        {#if members.data?.isSeated === true}
-          {const Roster = $derived(data.Roster)}
-          <Roster
-            mode="changes"
-            members={roll}
-            parties={crew}
-            start={members.data.start}
-            end={members.data.end}
-            day={on}
-            eras={members.data.eras}
-            ends={members.data.ends}
-          />
+        {#if meta?.isSeated === true}
+          {@render listed("changes")}
         {/if}
       </section>
 
-      {#if roll.length > 0 && council == null}
-        {const Roster = $derived(data.Roster)}
-        <Roster
-          mode="all"
-          members={roll}
-          parties={crew}
-          present={members.data?.isSeated === true ? new Set(sitting) : null}
-          start={members.data?.start ?? null}
-          end={members.data?.end ?? null}
-          day={on}
-          eras={members.data?.eras ?? []}
-          ends={members.data?.ends ?? []}
-          title={members.data?.isSeated === true
-            ? m.chamber_members_title({ span: span(term.start, term.end) })
-            : m.chamber_members_returned({ span: span(term.start, term.end) })}
-        />
+      {#if council == null && (roster != null || live.roll.length > 0)}
+        {@render listed("all")}
       {/if}
     {/if}
+    {#snippet listed(mode: "all" | "changes")}
+      {#if roster == null}
+        {@render rostered(mode, live)}
+      {:else}
+        <Island
+          part={roster.members}
+          view={mode}
+          when={chosen == null ? "interaction" : "eager"}
+          defer={mode === "all"}
+        >
+          {#snippet children(rows: NonNullable<typeof members.data>["members"])}
+            {const view = $derived(seat(rows))}
+            {@render rostered(mode, view)}
+          {/snippet}
+        </Island>
+      {/if}
+    {/snippet}
+
+    {#snippet rostered(mode: "all" | "changes", view: typeof live)}
+      {const Roster = $derived(data.Roster)}
+      {const isSeated = $derived(meta?.isSeated === true)}
+      <Roster
+        {mode}
+        members={view.roll}
+        parties={view.crew}
+        present={mode === "all" && isSeated ? new Set(view.sitting) : null}
+        start={meta?.start ?? null}
+        end={meta?.end ?? null}
+        day={on}
+        eras={meta?.eras ?? []}
+        ends={meta?.ends ?? []}
+        title={mode === "changes" || term == null
+          ? ""
+          : isSeated
+            ? m.chamber_members_title({ span: span(term.start, term.end) })
+            : m.chamber_members_returned({ span: span(term.start, term.end) })}
+      />
+    {/snippet}
+
     {#if council != null}
       {const Council = $derived(data.Council)}
       <Council {council} hasTenures={body.tenures > 0} name={body.name} />

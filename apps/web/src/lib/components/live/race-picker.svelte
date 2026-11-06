@@ -66,6 +66,8 @@
   const JUDICIAL = /\b(?:judge|justice|court|magistrate|surrogate)\b/iu;
   const LEGISLATURE =
     /\b(?:house|senate|assembly|legislat\w*|delegates?)\b.+\bdistrict\b/iu;
+  const NARROW = 6;
+  const WIDE = 12;
   const RANK: Partial<Record<LiveRace["office"], number>> = {
     senate: 0,
     governor: 1,
@@ -74,7 +76,6 @@
   let tab = $state<string | null>(null);
   let isAll = $state(false);
   let query = $state("");
-  let width = $state(0);
   let probed = $state<string | null>(null);
   let openFor = $state<string | null>(null);
   let nav = $state<HTMLElement>();
@@ -235,11 +236,9 @@
       count: group.entries.length,
     })),
   ]);
-  const columns = $derived(Math.max(1, Math.floor(width / 272)));
-  const limit = $derived(columns === 1 ? 6 : columns * 3);
   const isLong = $derived(
     groups.some((group) => group.key !== "house" && group.entries.length > 1) &&
-      total > limit,
+      total > WIDE,
   );
   const home = $derived(
     groups.find((group) =>
@@ -292,21 +291,18 @@
     summaries.find((summary) => summary.race.slug === probed) ?? null,
   );
 
+  const isClipping = $derived(!isAll && !isSearching && chosen !== "all");
+
   function clip<T extends { summary: Summary }>(entries: Array<T>) {
-    if (
-      isAll ||
-      isSearching ||
-      chosen === "all" ||
-      entries.length <= limit + 1
-    ) {
+    if (!isClipping || entries.length <= WIDE + 1) {
       return entries;
     }
     const at = entries.findIndex(
       (entry) => entry.summary.race.slug === current,
     );
-    const head = entries.slice(0, at >= limit ? limit - 1 : limit);
+    const head = entries.slice(0, at >= WIDE ? WIDE - 1 : WIDE);
     const found = entries[at];
-    return at >= limit && found != null ? [...head, found] : head;
+    return at >= WIDE && found != null ? [...head, found] : head;
   }
 
   function choose(key: string) {
@@ -376,14 +372,18 @@
   {/if}
 {/snippet}
 
-{#snippet row(entry: { summary: Summary; name: string })}
+{#snippet row(entry: { summary: Summary; name: string }, isSpare: boolean)}
   {const summary = $derived(entry.summary)}
   {const option = $derived(
     summary.winner ?? summary.unopposed ?? summary.leader,
   )}
   {const isCurrent = $derived(summary.race.slug === current)}
   {const band = $derived(bandOf(summary))}
-  <li class="border-be border-border">
+  <li
+    class={cn("border-be border-border", {
+      "@max-[50rem]:hidden": isSpare && !isCurrent,
+    })}
+  >
     {#snippet body()}
       <span
         class={cn("mbs-1.5 shrink-0 rounded-full block-2.5 inline-2.5", {
@@ -584,7 +584,6 @@
 <nav
   aria-label={label}
   class="@container grid scroll-mbs-4 grid-cols-[minmax(0,1fr)] gap-3"
-  bind:clientWidth={width}
   bind:this={nav}
 >
   <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
@@ -783,14 +782,20 @@
           <ul
             class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-x-4"
           >
-            {#each entries as entry (entry.summary.race.id)}
-              {@render row(entry)}
+            {#each entries as entry, at (entry.summary.race.id)}
+              {@render row(
+                entry,
+                isClipping && group.entries.length > NARROW + 1 && at >= NARROW,
+              )}
             {/each}
           </ul>
-          {#if entries.length < group.entries.length || (isAll && group.entries.length > limit + 1)}
+          {#if group.entries.length > NARROW + 1 && (isClipping || isAll)}
             <button
               type="button"
-              class="justify-self-start rounded-xs py-1.5 text-xs font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2.5"
+              class={cn(
+                "justify-self-start rounded-xs py-1.5 text-xs font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2.5",
+                { "@min-[50rem]:hidden": group.entries.length <= WIDE + 1 },
+              )}
               onclick={() => (isAll = !isAll)}
               >{isAll
                 ? m.night_picker_less()

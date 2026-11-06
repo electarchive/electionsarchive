@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
+  import { Pending } from "svelte-islands";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
@@ -84,11 +85,11 @@
 </script>
 
 {#if !desk.feed.hasDetail(race)}
-  <p
-    class="animate-pulse text-[0.75em] text-muted-foreground motion-reduce:animate-none"
-  >
-    {m.board_loading()}
-  </p>
+  <Pending
+    name="live.board.counties"
+    isPending={true}
+    class="[--island-inset:0]"
+  />
 {:else}
   <table class="border-collapse text-[0.8125em] inline-full">
     <thead class="sticky inset-bs-0 z-10 bg-background">

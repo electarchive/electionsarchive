@@ -5,6 +5,7 @@
   import { page } from "$app/state";
   import { CheckIcon } from "@lucide/svelte";
   import { onMount } from "svelte";
+  import { Pending } from "svelte-islands";
   import type { Latest } from "#lib/server/notifications.js";
   import Moment from "#lib/components/moment.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -193,19 +194,8 @@
       >
     </div>
   {:else if latest == null}
-    <ul class="grid" aria-busy="true">
-      <li class="sr-only">{m.notifications_menu_loading()}</li>
-      {#each [0, 1, 2] as row (row)}
-        <li class="grid gap-2 border-be px-4 py-3 last:border-be-0">
-          <span
-            class="rounded-sm bg-foreground/12 block-3.5 inline-4/5 motion-safe:animate-pulse"
-          ></span>
-          <span
-            class="rounded-sm bg-foreground/12 block-2.5 inline-2/5 motion-safe:animate-pulse"
-          ></span>
-        </li>
-      {/each}
-    </ul>
+    <p class="sr-only">{m.notifications_menu_loading()}</p>
+    <Pending name="notifications" isPending={true} />
   {:else if latest.entries.length === 0}
     <p class="px-4 py-5 text-sm text-pretty text-muted-foreground">
       {m.notifications_menu_empty()}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
+  import { load, Part, peek } from "svelte-islands";
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -17,7 +18,11 @@
     hasMap = true,
   }: {
     id: string;
-    parts: Array<{ path: string | null; place: string | null; name: string }>;
+    parts:
+      | Array<{ path: string | null; place: string | null; name: string }>
+      | Part<
+          Array<{ path: string | null; place: string | null; name: string }>
+        >;
     hasMap?: boolean;
   } = $props();
 
@@ -34,8 +39,17 @@
     meta: { quiet: true },
   }));
 
+  $effect(() => {
+    if (parts instanceof Part) {
+      void load(parts).catch(() => null);
+    }
+  });
+
+  const named = $derived(
+    parts instanceof Part ? (peek(parts)?.value ?? null) : parts,
+  );
   const places = $derived(
-    new Map(parts.map((part) => [part.path, part.place ?? part.name])),
+    new Map((named ?? []).map((part) => [part.path, part.place ?? part.name])),
   );
   const maps = $derived(winners.data?.maps ?? []);
   const shape = $derived(
@@ -56,7 +70,9 @@
   );
   const groups = $derived(
     Map.groupBy(
-      (winners.data?.rows ?? []).filter((row) => row.group != null),
+      (named == null ? [] : (winners.data?.rows ?? [])).filter(
+        (row) => row.group != null,
+      ),
       (row) =>
         finer != null && row.at != null && finer.has(row.at)
           ? `k:${row.at}`

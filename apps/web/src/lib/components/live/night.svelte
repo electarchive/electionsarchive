@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
+  import type { Part } from "svelte-islands";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import type { Holder } from "#lib/live/ballot.js";
+  import type { Point } from "#lib/live/history.js";
+  import type { Trail } from "#lib/live/nation.js";
   import type { Ballot } from "#lib/server/live-ballot.js";
   import type { LivePage } from "#lib/server/live-page.js";
   import Dashboard from "#lib/components/live/dashboard.svelte";
@@ -30,6 +33,9 @@
     isFinal = $bindable(),
   }: {
     data: LivePage & {
+      trail?: Trail | null;
+      points: Array<Point>;
+      board?: Part | null;
       ballot?: Ballot | null;
       seat?: { held: Holder | null; families: Record<string, string> } | null;
     };
@@ -126,6 +132,8 @@
     {estimates}
     nation={data.nation}
     control={data.control}
+    trail={data.trail}
+    board={data.board}
     forecasts={data.shown.forecasts}
     {clock}
     {isOffline}
@@ -152,6 +160,7 @@
         {election}
         {race}
         geography={data.geography}
+        points={data.points}
         seat={data.seat ?? null}
         base={election.slug}
         {clock}

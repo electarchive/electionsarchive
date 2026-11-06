@@ -10,6 +10,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { ModeWatcher, setMode } from "mode-watcher";
   import { setContext } from "svelte";
+  import { replay } from "svelte-islands";
   import { on } from "svelte/events";
   import Footer from "#lib/components/footer.svelte";
   import Header from "#lib/components/header.svelte";
@@ -37,6 +38,13 @@
   setContext("figures", new Set<string>());
 
   $effect(localizeZone);
+
+  $effect(() => {
+    const early = window.takeEarlyClick();
+    if (early?.target.isConnected === true) {
+      replay(early.target, early.event);
+    }
+  });
 
   let Overlays = $state<Component | null>(null);
   let isInteractive = $state(false);
@@ -205,6 +213,19 @@
           >{m.skip_to_content()}</a
         >
         <div>
+          <noscript>
+            <p
+              class="hidden border-be border-border bg-card px-3.5 py-2 text-[0.8125rem] [body:has(.island-shell,[data-needs-script])_&]:block"
+            >
+              {m.noscript_notice()}
+              <a
+                class="font-semibold underline"
+                href={resolve("/[...path]", {
+                  path: `${page.url.pathname.slice(1)}.md`,
+                })}>{m.noscript_twin()}</a
+              >
+            </p>
+          </noscript>
           <LanguageBanner />
           <Header />
         </div>

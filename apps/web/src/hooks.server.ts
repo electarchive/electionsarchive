@@ -8,6 +8,7 @@ import { handle as islands } from "svelte-islands/server";
 import {
   cookieName,
   defineCustomServerStrategy,
+  getLocale,
   isLocale,
 } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
@@ -18,6 +19,7 @@ import { LOCALE, mark, skewed } from "#lib/server/edge.js";
 import { guardHandle } from "#lib/server/guard.js";
 import { timing } from "#lib/server/pages.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
+import { shareHandle } from "#lib/server/share.js";
 import { twin } from "#lib/server/twin.js";
 
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -139,6 +141,7 @@ const twinHandle: Handle = async ({ event, resolve }) => {
 };
 
 const islandsHandle = islands({
+  vary: () => getLocale(),
   store: {
     get: async (key) => unstash(`islands:${key}`),
     set: async (key, text) => stash(`islands:${key}`, text),
@@ -186,6 +189,7 @@ export const init: ServerInit = () => {
 export const handle: Handle = sequence(
   guardHandle,
   csrfHandle,
+  shareHandle,
   islandsHandle,
   edgeHandle,
   refreshHandle,

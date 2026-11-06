@@ -387,7 +387,7 @@
     {:else if race != null && panel.kind === "chance"}
       <Chance {desk} {race} />
     {:else if race != null && panel.kind === "trend"}
-      <Trend {race} />
+      <Trend {desk} {race} />
     {:else if race != null && panel.kind === "counties"}
       <Counties {desk} {race} />
     {:else if panel.kind === "nation"}

@@ -1,6 +1,8 @@
 import type { LiveElection, LiveEstimate, LiveRace } from "@ea/analytics/live";
 import { SvelteMap } from "svelte/reactivity";
+import type { Update } from "#lib/live/board.js";
 import type { Summary } from "#lib/live/summary.js";
+import { latest, opened, recent } from "#lib/live/board.js";
 import { forecast, rehearse } from "#lib/live/board/rehearse.js";
 import { summarize } from "#lib/live/summary.js";
 import { orpc } from "#lib/rpc.js";
@@ -9,6 +11,7 @@ export type Night = {
   election: LiveElection;
   estimates: Record<string, LiveEstimate>;
   shown: { results: boolean; forecasts: boolean };
+  updates: Array<Update>;
 };
 
 export type Shapes = {
@@ -77,6 +80,7 @@ export class Feed {
         ? forecast(election, this.#started, this.#quantum)
         : {},
       shown: night.shown,
+      updates: recent(election.races),
     };
   }
 
@@ -120,10 +124,15 @@ export class Feed {
     void this.#fetchState(race.state, this.statePath(race));
   }
 
+  async #fetchNight(path: string): Promise<Night> {
+    const { shown, updates, ...parts } = await latest(path);
+    const { election, estimates } = await opened(parts);
+    return { election, estimates, shown, updates };
+  }
+
   async #fetchState(state: string, path: string) {
     try {
-      const found = await orpc.live.election.call({ path });
-      this.#states.set(state, found);
+      this.#states.set(state, await this.#fetchNight(path));
     } catch {
       this.#asked.delete(`state:${state}`);
     }
@@ -163,7 +172,7 @@ export class Feed {
     ) {
       return;
     }
-    this.#base = await orpc.live.election.call({ path });
+    this.#base = await this.#fetchNight(path);
     const [country, date] = path.split("/", 2);
     await Promise.all(
       [...this.#states.keys()].map(async (state) =>

@@ -1,4 +1,5 @@
 <script lang="ts" module>
+  import { Pending } from "svelte-islands";
   let handoff: { path: string; image: string } | null = null;
   const warmed: Record<string, boolean> = {};
 </script>
@@ -32,7 +33,6 @@
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import {
     count,
@@ -96,6 +96,7 @@
     levels,
     home = null,
     span,
+    comparing = false,
     only = $bindable(null),
     focus = $bindable(null),
     shade = "winner",
@@ -108,6 +109,7 @@
     up = null,
     tallies = null,
     hexes = null,
+    shapes = [],
     onopen,
   }: {
     places: Places;
@@ -156,6 +158,7 @@
     }>;
     home?: string | null;
     span: { from: string; to: string; forward: boolean } | null;
+    comparing?: boolean;
     only?: number | string | null;
     focus?: number | null;
     shade?: (typeof MODES)[number] | number;
@@ -171,6 +174,7 @@
       | null;
     up?: { name: string; path: string } | null;
     tallies?: Array<number | null> | null;
+    shapes?: Array<"cartogram" | "hexes">;
     hexes?: Array<{
       cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
@@ -821,12 +825,16 @@
       regions: "",
     };
   });
-  const views = $derived([
-    ...(drawn == null ? [] : [{ name: "cartogram" as const, grid: drawn }]),
-    ...(tiled == null ? [] : [{ name: "hexes" as const, grid: tiled }]),
-  ]);
+  const views = $derived(
+    hexes == null
+      ? shapes
+      : [
+          ...(drawn == null ? [] : ["cartogram" as const]),
+          ...(tiled == null ? [] : ["hexes" as const]),
+        ],
+  );
   const grid = $derived(
-    views.find((choice) => choice.name === shape)?.grid ?? null,
+    shape === "cartogram" ? drawn : shape === "hexes" ? tiled : null,
   );
   const isSummary = $derived(grid != null);
   const heading = $derived(
@@ -1453,6 +1461,7 @@
     span != null &&
       places.rows.some((row) => row.earlier != null || row.redrawn != null),
   );
+  const hasCompare = $derived(isCompared || comparing);
   const changes = $derived(
     new Map(
       places.rows.flatMap((row) => {
@@ -1507,6 +1516,9 @@
       ),
     ),
   );
+  const hasSurge = $derived(
+    surges.size > 0 || (comparing && turnouts.size > 0),
+  );
   const isProportional = $derived(
     proportional(
       places.rows.flatMap((row) => (row.leader == null ? [] : [row.held])),
@@ -1524,6 +1536,7 @@
       ? "winner"
       : shading,
   );
+  const pressed = $derived(comparing ? shading : view);
   const isBanded = $derived(
     view === "split" || (view === "winner" && !isProportional),
   );
@@ -2689,11 +2702,11 @@
             {#if turnouts.size > 0}
               <Select.Item value="turnout" label={m.map_mode_turnout()} />
             {/if}
-            {#if isCompared}
+            {#if hasCompare}
               <Select.Item value="swing" label={m.map_mode_swing()} />
               <Select.Item value="arrows" label={m.map_mode_arrows()} />
               <Select.Item value="flips" label={m.map_mode_flips()} />
-              {#if surges.size > 0}
+              {#if hasSurge}
                 <Select.Item
                   value="turnout_change"
                   label={m.map_mode_turnout_change()}
@@ -2705,7 +2718,7 @@
         <div
           class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 @max-xl:hidden"
         >
-          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), ...options.map( (option) => ({ value: option.index, label: option.name }) ), ...(extras.length > 0 ? [{ value: "more" as const, label: extra?.name ?? more }] : []), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), ...options.map( (option) => ({ value: option.index, label: option.name }) ), ...(extras.length > 0 ? [{ value: "more" as const, label: extra?.name ?? more }] : []), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], hasCompare ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(hasSurge ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
               <div class="scroll-fade-x flex max-inline-full">
                 {#each group as choice (choice.value)}
@@ -2755,7 +2768,7 @@
                         "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                         {
                           "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                            view === choice.value,
+                            pressed === choice.value,
                         },
                         {
                           "max-inline-44 xl:max-inline-none":
@@ -2765,7 +2778,7 @@
                       title={typeof choice.value === "number"
                         ? choice.label
                         : undefined}
-                      aria-pressed={view === choice.value}
+                      aria-pressed={pressed === choice.value}
                       onclick={() => (shading = choice.value)}
                       ><span class="truncate">{choice.label}</span></button
                     >
@@ -2839,7 +2852,7 @@
           role="group"
           aria-label={m.map_shape()}
         >
-          {#each [null, ...views.map((choice) => choice.name)] as choice (choice)}
+          {#each [null, ...views] as choice (choice)}
             {const isOn = $derived(shape === choice)}
             <button
               type="button"
@@ -3670,16 +3683,12 @@
       transition:fade={{ duration: calm ? 0 : 150 }}
     >
       {#if lenses.length === 0}
-        {#each [1.2, 0.9, 1.2] as ratio, at (at)}
-          <div class="grid shrink-0 gap-1.5" aria-hidden="true">
-            <Skeleton class="rounded-sm block-[1.21875rem] inline-24" />
-            <Skeleton
-              class="rounded-sm"
-              style="inline-size: {lensHeight *
-                ratio}px; block-size: {lensHeight}px"
-            />
-          </div>
-        {/each}
+        <Pending
+          name="map.zooms"
+          isPending={true}
+          reserve="{lensHeight + 26}px"
+          class="[--island-inset:0]"
+        />
       {/if}
       {#each lenses as lens (lens.index)}
         <figure

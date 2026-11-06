@@ -14,19 +14,22 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { settle } from "#lib/settle.js";
   import Makeup from "./makeup.svelte";
 
-  const { id, isExpected = false }: { id: string; isExpected?: boolean } =
-    $props();
+  const {
+    id,
+    record,
+    isExpected = false,
+  }: {
+    id: string;
+    record: Awaited<ReturnType<typeof orpc.polities.record.call>>;
+    isExpected?: boolean;
+  } = $props();
 
   const uid = $props.id();
   const PAD = { top: 8, bottom: 22, side: 2 };
   const coarse = new MediaQuery("pointer: coarse");
 
-  const record = createQuery(() =>
-    orpc.polities.record.queryOptions({ input: { id } }),
-  );
   const known = createQuery(() => ({
     ...orpc.coverage.known.queryOptions({ input: { id } }),
     enabled: isExpected,
@@ -41,7 +44,7 @@
   let seated = $state<string | null>(null);
 
   const series = $derived(
-    (record.data?.series ?? []).filter((entry) =>
+    (record.series ?? []).filter((entry) =>
       entry.points.some((point) =>
         point.parties.some((party) => party.party != null),
       ),
@@ -88,7 +91,7 @@
     current?.isOffice === true &&
       current.points.every((point) => point.filled === 1),
   );
-  const cabinets = $derived(record.data?.governments ?? []);
+  const cabinets = $derived(record.governments ?? []);
   const sessions = $derived.by(() => {
     let last = 0;
     return (current?.points ?? []).filter((point) => {
@@ -233,7 +236,7 @@
     ];
   });
   const roster = $derived.by(() => {
-    const listed = record.data?.parties ?? [];
+    const listed = record.parties ?? [];
     if (makeupTerms == null) {
       return listed;
     }
@@ -452,28 +455,11 @@
       : (parties.get(party)?.short ?? parties.get(party)?.label ?? "");
 </script>
 
-{#if record.isPending && isExpected}
+{#if current != null || cabinets.length > 0}
   <section
-    class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
-    aria-busy="true"
-  >
-    <h2 class="heading">
-      {m.record_title()}
-    </h2>
-    <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-      {m.record_lede()}
-    </p>
-    <div
-      class="animate-pulse rounded-sm bg-muted block-65.5 motion-reduce:animate-none"
-    ></div>
-    <div class="block-10"></div>
-  </section>
-{:else if current != null || cabinets.length > 0}
-  <section
-    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-title"
     data-export
-    {@attach settle}
   >
     <Export name="record" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
@@ -568,10 +554,9 @@
             <text
               x={run.x + 5}
               y="25"
-              class="pointer-events-none text-[0.6875rem] font-semibold"
+              class="pointer-events-none fill-current text-[0.6875rem] font-semibold ink-on-fill"
               opacity={seated == null ? 1 : 0.4}
-              style:fill={`color(from ${tint(run.party)} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
-              >{run.label}</text
+              style:--fill={tint(run.party)}>{run.label}</text
             >
           {/each}
           {#each timeline.years as year (year.year)}
@@ -601,9 +586,9 @@
           const path = terms[index]?.election?.path;
           return path == null || coarse.current
             ? null
-            : record.data?.scope == null
+            : record.scope == null
               ? path
-              : `${path}?in=${record.data.scope}`;
+              : `${path}?in=${record.scope}`;
         }}
       />
     {:else}
@@ -626,9 +611,9 @@
                 ? undefined
                 : resolve("/[...path]", {
                     path:
-                      record.data?.scope == null
+                      record.scope == null
                         ? column.path
-                        : `${column.path}?in=${record.data.scope}`,
+                        : `${column.path}?in=${record.scope}`,
                   })}
               aria-label={column.name}
               onpointerenter={() => (hovered = column.index)}
@@ -766,9 +751,9 @@
                       ? undefined
                       : resolve("/[...path]", {
                           path:
-                            record.data?.scope == null
+                            record.scope == null
                               ? entry.path
-                              : `${entry.path}?in=${record.data.scope}`,
+                              : `${entry.path}?in=${record.scope}`,
                         })}
                     aria-label={isSingle
                       ? m.record_list_winner({

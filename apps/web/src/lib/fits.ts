@@ -4,7 +4,6 @@ export const fits: Attachment<HTMLElement> = (node) => {
   const update = () => {
     node.toggleAttribute("data-fits", node.scrollWidth <= node.clientWidth + 1);
   };
-  update();
   const observer = new ResizeObserver(update);
   observer.observe(node);
   for (const child of node.children) {

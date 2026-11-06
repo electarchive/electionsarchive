@@ -7,11 +7,11 @@ export const LOCALE = "x-locale";
 
 const BUILD = "build";
 
-const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
+export const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
 
-const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/stamp$))(?:\/|$)/u;
+const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/))(?:\/|$)/u;
 
-const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
+export const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 
 function isShareable(
   { cookies, isDataRequest, locals, request, url }: RequestEvent,

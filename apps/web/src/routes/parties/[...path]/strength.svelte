@@ -4,6 +4,7 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { useQueryClient } from "@tanstack/svelte-query";
+  import { Pending } from "svelte-islands";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -143,9 +144,12 @@
     </div>
     {#if found != null}
       {#if found.map.tiles != null && Places == null}
-        <div
-          class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
-        ></div>
+        <Pending
+          name="party.strength.map"
+          isPending={true}
+          reserve="min(32rem,60svh)"
+          class="[--island-inset:0]"
+        />
       {:else if found.map.tiles != null && Places != null}
         {#key chosen.id}
           <Places
@@ -178,9 +182,12 @@
         </p>
       {/if}
     {:else if isPending}
-      <div
-        class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
-      ></div>
+      <Pending
+        name="party.strength.map"
+        isPending={true}
+        reserve="min(32rem,60svh)"
+        class="[--island-inset:0]"
+      />
     {/if}
   </section>
 {/if}

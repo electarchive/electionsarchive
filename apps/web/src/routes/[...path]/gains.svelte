@@ -7,7 +7,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { settle } from "#lib/settle.js";
   import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
@@ -108,9 +107,8 @@
 
 {#if sheet != null && sheet.changed > 0}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-title"
-    {@attach settle}
   >
     <div class="grid gap-0.5">
       <h2 id="{uid}-title" class="heading">{m.gains_title()}</h2>
@@ -203,11 +201,10 @@
                     <button
                       type="button"
                       class={cn(
-                        "grid place-items-end rounded-xs px-2 font-figures text-[0.8125rem] block-7 inline-12 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
+                        "grid place-items-end rounded-xs bg-(--fill) px-2 font-figures text-[0.8125rem] ink-on-fill block-7 inline-12 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-foreground",
                         { "ring-2 ring-foreground": isPicked },
                       )}
-                      style:background={fill}
-                      style:color={`color(from ${fill} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
+                      style:--fill={fill}
                       aria-pressed={isPicked}
                       aria-label={m.gains_seat({
                         to: row.label,

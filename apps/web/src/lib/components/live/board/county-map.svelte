@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveRace } from "@ea/analytics/live";
+  import { Pending } from "svelte-islands";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { UnitStanding } from "#lib/live/standing.js";
   import { unitHatch } from "#lib/components/live/full/model.js";
@@ -135,11 +136,12 @@
 {/snippet}
 
 {#if shapes == null || !desk.feed.hasDetail(race)}
-  <div
-    class="grid animate-pulse place-items-center rounded-xs bg-muted text-[0.75em] text-muted-foreground block-full motion-reduce:animate-none"
-  >
-    {m.board_loading()}
-  </div>
+  <Pending
+    name="live.board.county"
+    isPending={true}
+    reserve="100%"
+    class="[--island-inset:0]"
+  />
 {:else}
   <Atlas
     {shapes}

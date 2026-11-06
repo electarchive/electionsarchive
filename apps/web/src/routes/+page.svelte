@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import SearchIcon from "@lucide/svelte/icons/search";
+  import { Island } from "svelte-islands";
   import { MediaQuery } from "svelte/reactivity";
   import ShareImage from "#lib/components/share-image.svelte";
   import { date, dates } from "#lib/format.js";
@@ -474,7 +475,7 @@
     {/if}
   </header>
 
-  {#if data.strata.rows.length > 0}
+  {#if data.strata != null}
     <section
       class="grid gap-5 border-be px-3.5 pbs-8 pbe-8"
       aria-labelledby="strata-title"
@@ -487,7 +488,11 @@
           {m.home_strata_lede()}
         </p>
       </div>
-      <Strata strata={data.strata} today={data.today} />
+      <Island part={data.strata} view="strata" when="visible">
+        {#snippet children(strata)}
+          <Strata {strata} today={data.today} />
+        {/snippet}
+      </Island>
     </section>
   {/if}
 

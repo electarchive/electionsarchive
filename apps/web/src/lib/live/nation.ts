@@ -1,4 +1,4 @@
-import type { LiveOption } from "@ea/analytics/live";
+import type { LiveOption, LiveRace } from "@ea/analytics/live";
 import type { Shift } from "#lib/live/flips.js";
 import type { Summary } from "#lib/live/summary.js";
 import type { Control } from "#lib/server/live-board.js";
@@ -406,14 +406,19 @@ export function chamber(
 
 export type ChamberView = ReturnType<typeof chamber>;
 
+export type Trail = Array<{
+  at: number;
+  left: number;
+  right: number;
+  other: number;
+}>;
+
 export function pulse(
-  seats: Array<Seat>,
+  all: Array<LiveRace>,
   control: Control | null,
   [left, right]: [Family, Family],
-) {
-  const races = seats
-    .map((entry) => entry.summary.race)
-    .filter((race) => race.frames.length > 0);
+): Trail {
+  const races = all.filter((race) => race.frames.length > 0);
   const times = races.flatMap((race) =>
     race.frames.map((frame) => Date.parse(frame.at)),
   );
@@ -433,12 +438,7 @@ export function pulse(
     }),
   );
   const cursors = races.map(() => -1);
-  const points: Array<{
-    at: number;
-    left: number;
-    right: number;
-    other: number;
-  }> = [];
+  const points: Trail = [];
   for (let at = start; at <= end + step - 1; at += step) {
     const moment = Math.min(at, end);
     const sums = [0, 0, 0];

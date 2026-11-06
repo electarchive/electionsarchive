@@ -7,7 +7,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { settle } from "#lib/settle.js";
   import { marginShade, safety } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
 
@@ -148,9 +147,8 @@
         ),
   )}
   <section
-    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3 [contain-intrinsic-size:auto_none] data-settled:[content-visibility:auto]"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-{at}"
-    {@attach settle}
   >
     {const raw = $derived(regions.data?.[at])}
     {#if raw != null}
@@ -299,11 +297,9 @@
                         "text-muted-foreground/50": cell === 0,
                         "font-semibold": share >= 0.5,
                       },
+                      { "bg-(--fill) ink-on-fill": cell !== 0 },
                     )}
-                    style:background={cell === 0 ? undefined : fill}
-                    style:color={cell === 0
-                      ? undefined
-                      : `color(from ${fill} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
+                    style:--fill={cell === 0 ? undefined : fill}
                     >{cell === 0 ? "·" : count(cell)}</span
                   >
                 </td>

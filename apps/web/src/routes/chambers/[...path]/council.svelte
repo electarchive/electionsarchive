@@ -2,6 +2,7 @@
   import type PlaceMap from "#routes/[...path]/map.svelte";
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
+  import { Pending } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -185,9 +186,12 @@
       {m.council_map_title({ election: regular[0]?.name ?? "" })}
     </h2>
     {#if mapped.map.tiles != null && Places == null}
-      <div
-        class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
-      ></div>
+      <Pending
+        name="chamber.map"
+        isPending={true}
+        reserve="min(32rem,60svh)"
+        class="[--island-inset:0]"
+      />
     {:else if mapped.map.tiles != null && Places != null}
       <Places
         places={mapped.places}

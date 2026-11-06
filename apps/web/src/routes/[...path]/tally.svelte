@@ -7,9 +7,10 @@
   import { count as figure, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { reveal, settle } from "#lib/settle.js";
+  import { reveal } from "#lib/reveal.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import { runs } from "./runs.js";
 
   const {
     count,
@@ -34,6 +35,20 @@
       return total;
     }),
   );
+  const cellsOf = (votes: Array<number | null>) =>
+    rounds.map((round) => {
+      const value = votes[round - 1];
+      const total = totals[round - 1] ?? 0;
+      const share = value == null || total === 0 ? null : value / total;
+      return {
+        kind: share == null ? ("blank" as const) : ("live" as const),
+        round,
+        now: round === count.round ? "" : undefined,
+        share: share == null ? "" : percent(share),
+        votes: figure(value ?? 0),
+        bar: `${((share ?? 0) * 100).toFixed(1)}%`,
+      };
+    });
   const href = (round: number) => {
     const kept = [...page.url.searchParams].filter(([key]) => key !== "round");
     const query = new URLSearchParams(
@@ -46,10 +61,8 @@
 </script>
 
 <section
-  id="rounds"
-  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 [contain-intrinsic-size:auto_none] min-inline-0 data-settled:[content-visibility:auto]"
+  class="grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
   aria-labelledby="{uid}-title"
-  {@attach settle}
 >
   <div class="grid gap-0.5">
     <h2 id="{uid}-title" class="text-lg font-bold">{m.count_table()}</h2>
@@ -94,7 +107,9 @@
           {/each}
         </tr>
       </thead>
-      <tbody>
+      <tbody
+        class="**:data-bar:ms-auto **:data-bar:mbs-1 **:data-bar:bg-(--party) **:data-bar:block-0.75 **:data-now:bg-secondary [&_small]:block [&_small]:text-xs [&_small]:text-muted-foreground [&_td]:px-2 [&_td]:py-1.5 [&_td]:text-end [&_td]:align-top [&_td]:font-figures [&_td]:tabular-nums [&_td>span]:block"
+      >
         {#each count.rows as row (row.key)}
           {const reach = $derived(
             row.votes.findLastIndex((value) => value != null) + 1,
@@ -122,37 +137,21 @@
                 {/if}
               </span>
             </th>
-            {#each rounds as round (round)}
-              {const votes = $derived(row.votes[round - 1])}
-              {const share = $derived(
-                votes == null || totals[round - 1] === 0
-                  ? null
-                  : votes / (totals[round - 1] ?? 1),
-              )}
-              <td
-                class={cn("px-2 py-1.5 align-top", {
-                  "bg-secondary": round === count.round,
-                })}
-              >
-                {#if share != null}
-                  <span class="grid justify-items-end gap-1">
-                    <span class="grid justify-items-end">
-                      <span class="font-figures tabular-nums"
-                        >{percent(share)}</span
-                      >
-                      <span
-                        class="font-figures text-xs text-muted-foreground tabular-nums"
-                        >{figure(votes ?? 0)}</span
-                      >
-                    </span>
-                    <span
-                      class="bg-(--party) block-0.75"
-                      style:inline-size="{share * 100}%"
-                      aria-hidden="true"
-                    ></span>
-                  </span>
-                {/if}
-              </td>
+            {const parts = $derived(runs(cellsOf(row.votes)))}
+            {#each parts as part (part.round)}
+              {#if part.kind === "live"}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}>
+                    <span>{cell.share}</span>
+                    <small>{cell.votes}</small>
+                    <span data-bar style:inline-size={cell.bar}></span>
+                  </td>
+                {/each}
+              {:else}
+                {#each part.cells as cell (cell.round)}
+                  <td data-now={cell.now}></td>
+                {/each}
+              {/if}
             {/each}
           </tr>
         {/each}
@@ -168,11 +167,7 @@
               />
             </th>
             {#each count.exhausted as spent, index (index)}
-              <td
-                class={cn("px-2 py-1.5 text-end font-figures tabular-nums", {
-                  "bg-secondary": index + 1 === count.round,
-                })}
-              >
+              <td class={cn({ "bg-secondary": index + 1 === count.round })}>
                 {spent == null ? "" : figure(spent)}
               </td>
             {/each}

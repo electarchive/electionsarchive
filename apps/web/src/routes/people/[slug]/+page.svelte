@@ -7,6 +7,7 @@
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
+  import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import ShareImage from "#lib/components/share-image.svelte";
   import Term from "#lib/components/term.svelte";
@@ -701,13 +702,15 @@
                     ? group.year
                     : ""}</span
                 >
-                <details class="group text-[0.8125rem]">
-                  <summary
-                    class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-                    >{m.person_scattered({
-                      count: group.strays.length,
-                    })}</summary
-                  >
+                <Disclosure class="group text-[0.8125rem]">
+                  {#snippet summary()}
+                    <summary
+                      class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
+                      >{m.person_scattered({
+                        count: group.strays.length,
+                      })}</summary
+                    >
+                  {/snippet}
                   <ul class="grid gap-1 pbs-1.5">
                     {#each group.strays as row, at (at)}
                       <li class="flex items-baseline justify-between gap-3">
@@ -727,7 +730,7 @@
                       </li>
                     {/each}
                   </ul>
-                </details>
+                </Disclosure>
               </li>
             {/if}
           {/each}

@@ -9,6 +9,8 @@
 :root {
   --island-bone: var(--muted);
   --island-radius: 0.125rem;
+  --island-surface: var(--card);
+  --island-inset: 0.875rem;
 }
 
 @font-face {
@@ -278,6 +280,14 @@
   color: oklch(from var(--party) clamp(0, (0.7 - l) * 1000, 1) 0 0);
 }
 
+@utility ink-on-fill {
+  color: color(
+    from var(--fill) xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1))
+      clamp(0, (0.179 - y) * 1e6, 1)
+      calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1))
+  );
+}
+
 @utility band {
   --background: var(--party);
   --card: var(--party);
@@ -522,7 +532,7 @@
 @utility animate-seat {
   transform-box: fill-box;
   transform-origin: center;
-  animation: seat 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: seat 420ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay, 0ms) both;
 }
 
 ::view-transition-old(root),

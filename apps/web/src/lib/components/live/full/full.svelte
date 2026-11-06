@@ -16,9 +16,11 @@
   import ScanIcon from "@lucide/svelte/icons/scan";
   import XIcon from "@lucide/svelte/icons/x";
   import { onMount, untrack } from "svelte";
+  import { Pending } from "svelte-islands";
   import { MediaQuery } from "svelte/reactivity";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Entry } from "#lib/live/ballot.js";
+  import type { Point } from "#lib/live/history.js";
   import type { Control } from "#lib/live/nation.js";
   import type { Geography, Pieces, UnitStanding } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
@@ -38,7 +40,6 @@
   import Monogram from "#lib/components/monogram.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { Skeleton } from "#lib/components/ui/skeleton/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
   import {
@@ -58,7 +59,6 @@
     surname,
     tone,
   } from "#lib/live/format.js";
-  import { history } from "#lib/live/history.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { seatsOf } from "#lib/live/nation.js";
@@ -444,7 +444,7 @@
     race == null ? [0, 1] : pairOf(race),
   );
   const estimate = $derived(race == null ? null : (estimates[race.id] ?? null));
-  const forecast = $derived.by(() => {
+  const counted = $derived.by(() => {
     if (
       race == null ||
       current == null ||
@@ -459,12 +459,32 @@
       return null;
     }
     const [a, b] = racePair;
-    return {
-      history: history(race, null),
-      counted:
-        ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total,
+    return (
+      ((current.totals[a] ?? 0) - (current.totals[b] ?? 0)) / current.total
+    );
+  });
+  let traced = $state.raw<{ slug: string; points: Array<Point> } | null>(null);
+
+  $effect(() => {
+    const slug = race?.slug;
+    if (slug == null || counted == null) {
+      return;
+    }
+    void race?.frames.at(-1)?.at;
+    let isCurrent = true;
+    fetch(`/live/trend/${slug}`)
+      .then(async (response) => {
+        const points: Array<Point> = response.ok ? await response.json() : [];
+        if (isCurrent) {
+          traced = { slug, points };
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isCurrent = false;
     };
   });
+
   const hasVotes = $derived(
     isSpread
       ? (spreadData?.races.some((entry) => entry.counts.length > 0) ?? false)
@@ -2356,14 +2376,14 @@
         {clock}
         {forecasts}
       />
-      {#if forecast != null}
+      {#if counted != null}
         <Withheld isOff={!forecasts}>
           <Dial
             options={current.race.options}
             pair={racePair}
             {estimate}
-            history={forecast.history}
-            counted={forecast.counted}
+            history={traced?.slug === current.race.slug ? traced.points : []}
+            {counted}
             isWaiting={false}
           />
         </Withheld>
@@ -2521,43 +2541,12 @@
     >
   </header>
 
-  {#if !isMounted}
-    <div
-      class="grid grid-cols-[minmax(0,1fr)] min-block-0 md:grid-cols-[minmax(0,1fr)_min(25rem,36vw)]"
-      aria-busy="true"
-    >
-      <div
-        class="relative animate-pulse bg-muted min-block-0 motion-reduce:animate-none"
-      >
-        <Skeleton
-          class="absolute inset-s-3 inset-bs-3 rounded-sm bg-card block-9 inline-40"
-        />
-        <div
-          class="absolute inset-x-0 inset-be-0 grid gap-3 rounded-t-lg bg-card px-4 pbs-3 pbe-6 shadow-menu ring-1 ring-border md:hidden"
-        >
-          <Skeleton class="mx-auto rounded-full block-1 inline-9" />
-          <Skeleton class="rounded-sm block-9" />
-          <Skeleton class="rounded-xs block-5 inline-2/3" />
-          <Skeleton class="rounded-xs block-4 inline-5/6" />
-        </div>
-      </div>
-      <div class="grid content-start gap-4 border-s bg-card p-4 max-md:hidden">
-        <Skeleton class="rounded-sm block-9" />
-        <Skeleton class="rounded-xs block-5 inline-2/3" />
-        <Skeleton class="rounded-xs block-4 inline-5/6" />
-        <div class="grid gap-3 pbs-2">
-          {#each [0, 1, 2] as row (row)}
-            <div class="grid grid-cols-[1fr_auto] items-center gap-3">
-              <Skeleton class="rounded-xs block-4" />
-              <Skeleton class="rounded-xs block-4 inline-12" />
-            </div>
-            <Skeleton class="rounded-xs block-2" />
-          {/each}
-        </div>
-        <Skeleton class="rounded-sm block-32" />
-      </div>
-    </div>
-  {:else}
+  <Pending
+    name="live.full"
+    isPending={!isMounted}
+    reserve="100%"
+    class="[--island-inset:0]"
+  >
     <div
       class={cn("grid min-block-0", {
         "grid-cols-[minmax(0,1fr)_min(25rem,36vw)]": wide.current,
@@ -2779,5 +2768,5 @@
         </aside>
       {/if}
     </div>
-  {/if}
+  </Pending>
 </div>

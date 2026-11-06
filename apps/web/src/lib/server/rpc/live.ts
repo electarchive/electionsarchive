@@ -1,7 +1,6 @@
 import type {
   LiveBaseline,
   LiveElection,
-  LiveEstimate,
   LiveFrame,
   LiveOffice,
   LiveOption,
@@ -12,12 +11,10 @@ import type {
 import type { SQL } from "drizzle-orm";
 import { dev } from "$app/env";
 import { getRequestEvent } from "$app/server";
-import { estimate } from "@ea/analytics/live";
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
-import { setImmediate } from "node:timers/promises";
 import * as v from "valibot";
 import { CLOSES, eastern } from "#lib/live/closes.js";
 import { isDistricted, placeScheme } from "#lib/live/format.js";
@@ -33,6 +30,7 @@ import {
   portraits,
   geography as shaped,
 } from "#lib/server/live-board.js";
+import { estimates } from "#lib/server/live-estimates.js";
 import { unopposed } from "#lib/server/live-unopposed.js";
 import { localizeNames } from "#lib/server/names.js";
 import { names } from "#lib/server/rpc/archive.js";
@@ -538,28 +536,6 @@ async function settle<T>(
 }
 
 const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
-
-const ESTIMATES_KEPT = 32_768;
-
-const estimated = new Map<string, { digest: string; value: LiveEstimate }>();
-
-async function latestEstimate(race: LiveRace) {
-  const digest = createHash("sha256")
-    .update(JSON.stringify(race))
-    .digest("base64url");
-  const held = estimated.get(race.id);
-  if (held?.digest === digest) {
-    return held.value;
-  }
-  await setImmediate();
-  const value = estimate({ race, at: null });
-  estimated.delete(race.id);
-  estimated.set(race.id, { digest, value });
-  if (estimated.size > ESTIMATES_KEPT) {
-    estimated.delete(estimated.keys().next().value ?? "");
-  }
-  return value;
-}
 
 type Replayed = {
   totals: Array<[string, number]>;
@@ -1839,12 +1815,11 @@ async function night(
       kept ? race : { ...race, units: [], counts: [], baseline: [] },
     ),
   };
-  const estimates: Record<string, LiveEstimate> = {};
-  for (const race of shown.forecasts ? built : []) {
-    const value = await latestEstimate(race);
-    estimates[race.id] = kept ? value : { ...value, units: [] };
-  }
-  return { election, shown, estimates };
+  return {
+    election,
+    shown,
+    estimates: shown.forecasts ? await estimates(built, kept) : {},
+  };
 }
 
 const SPREAD = {

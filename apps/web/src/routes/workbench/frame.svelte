@@ -5,6 +5,7 @@
   import GripVerticalIcon from "@lucide/svelte/icons/grip-vertical";
   import { Draggable } from "@neodrag/svelte";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import { Pending } from "svelte-islands";
   import { toast } from "svelte-sonner";
   import { on } from "svelte/events";
   import Note from "#lib/components/live/board/note.svelte";
@@ -372,12 +373,11 @@
           {m.workbench_panel_error()}
         </p>
       {:else}
-        <div class="grid gap-1.5" aria-hidden="true">
-          <span class="animate-pulse rounded-xs bg-muted block-3 inline-2/3"
-          ></span>
-          <span class="animate-pulse rounded-xs bg-muted block-3 inline-1/2"
-          ></span>
-        </div>
+        <Pending
+          name="workbench.panel"
+          isPending={true}
+          class="[--island-inset:0]"
+        />
       {/if}
     {:else if kind === "summary"}
       <Summary {contest} />

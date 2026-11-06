@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
+  import { Pending } from "svelte-islands";
   import Measured from "#lib/components/measured.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { caveatLabel, figure } from "#lib/indices.js";
@@ -241,229 +242,231 @@
       />
     </div>
   </div>
-  {#if current == null}
-    <div
-      class="animate-pulse rounded-sm bg-muted motion-reduce:animate-none"
-      style:block-size="{HEIGHT}px"
-      aria-busy="true"
-    ></div>
-  {:else}
-    <ul
-      class="flex flex-wrap gap-x-4 gap-y-1 text-xs min-block-4"
-      aria-hidden="true"
-    >
-      {#if view === "effective"}
-        {#each lines as line (line.key)}
-          <li class="flex items-center gap-1.5">
-            <svg width="18" height="6" class="overflow-visible">
-              <line
-                x1="0"
-                x2="18"
-                y1="3"
-                y2="3"
-                stroke-width="2"
-                stroke-dasharray={line.dash}
-                class={line.dash == null
-                  ? "stroke-foreground"
-                  : "stroke-muted-foreground"}
-              />
-            </svg>
-            {line.label}
-          </li>
-        {/each}
-      {/if}
-    </ul>
-    <Measured
-      bind:width
-      class="relative min-inline-0 pointer-coarse:hidden"
-      reserve="{HEIGHT}px"
-    >
-      <svg
-        class="block overflow-visible max-inline-full"
-        viewBox="0 0 {width} {HEIGHT}"
-        {width}
-        height={HEIGHT}
-        role="group"
-        aria-label={m.indices_series_chart({
-          name:
-            viewOptions.find((option) => option.value === view)?.label ?? "",
-          chamber: current.name,
-        })}
+  <Pending
+    name="polity.system.chart"
+    isPending={current == null}
+    reserve="{HEIGHT}px"
+    class="[--island-inset:0]"
+  >
+    {#if current != null}
+      <ul
+        class="flex flex-wrap gap-x-4 gap-y-1 text-xs min-block-4"
+        aria-hidden="true"
       >
-        {#each chart.ticks as tick (tick)}
-          <line
-            x1={PAD.start}
-            x2={PAD.start + chart.inner.w}
-            y1={chart.y(tick)}
-            y2={chart.y(tick)}
-            class={tick === 0 ? "stroke-muted-foreground" : "stroke-border"}
-            stroke-width="1"
-          />
-          <text
-            x={PAD.start - 6}
-            y={chart.y(tick) + 3.5}
-            text-anchor="end"
-            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
-            >{tick}</text
-          >
-        {/each}
-        {#each chart.years as year (year.year)}
-          <text
-            x={year.x}
-            y={HEIGHT - 6}
-            text-anchor="middle"
-            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
-            >{year.year}</text
-          >
-        {/each}
-        {#if lit != null}
-          <line
-            x1={lit.x}
-            x2={lit.x}
-            y1={PAD.top}
-            y2={PAD.top + chart.inner.h}
-            class="stroke-muted-foreground"
-            stroke-width="1"
-          />
-        {/if}
-        {#each chart.paths as path (path.key)}
-          <path
-            d={path.d}
-            fill="none"
-            stroke-width="2"
-            stroke-linejoin="round"
-            stroke-linecap="round"
-            stroke-dasharray={path.dash}
-            class={path.dash == null
-              ? "stroke-foreground"
-              : "stroke-muted-foreground"}
-          />
-          {#each chart.columns as column (column.index)}
-            {const value = $derived(column.point[path.key])}
-            {#if value != null && (points.length <= 40 || hovered === column.index)}
-              <circle
-                cx={column.x}
-                cy={chart.y(value)}
-                r={hovered === column.index ? 4 : 2.5}
-                class={path.dash == null
-                  ? "fill-foreground"
-                  : "fill-muted-foreground"}
-                stroke-width="2"
-                stroke="var(--card)"
-              />
-            {/if}
-          {/each}
-        {/each}
-        {#each labels as label (label.key)}
-          {const end = $derived(
-            chart.paths.find((path) => path.key === label.key)?.end,
-          )}
-          {#if end != null && view === "effective"}
-            <text
-              x={end.x + 8}
-              y={label.y + 3.5}
-              class="fill-foreground text-[0.6875rem]">{label.label}</text
-            >
-          {/if}
-        {/each}
-        {#each chart.columns as column (column.index)}
-          <a
-            href={column.point.path == null
-              ? undefined
-              : resolve("/[...path]", { path: column.point.path })}
-            aria-label="{column.point.name}: {lines
-              .map((line) => {
-                const value = column.point[line.key];
-                return value == null
-                  ? null
-                  : `${line.label} ${figure(line.key, value)}`;
-              })
-              .filter((part) => part != null)
-              .join(', ')}"
-            class="outline-none"
-            onpointerenter={() => (hovered = column.index)}
-            onpointerleave={() => (hovered = null)}
-            onfocus={() => (hovered = column.index)}
-            onblur={() => (hovered = null)}
-          >
-            <rect
-              x={column.from}
-              y={PAD.top}
-              width={column.w}
-              height={chart.inner.h}
-              fill="transparent"
-            />
-          </a>
-        {/each}
-      </svg>
-      {#if lit != null}
-        <div
-          class="pointer-events-none absolute grid gap-1 rounded-sm bg-card/95 px-2.5 py-2 text-xs shadow-menu ring-1 ring-border inline-60"
-          style:inset-inline-start="{lit.x + 252 > width
-            ? Math.max(0, lit.x - 252)
-            : lit.x + 12}px"
-          style:inset-block-start="{PAD.top}px"
-        >
-          <span class="text-[0.8125rem] font-semibold">{lit.point.name}</span>
+        {#if view === "effective"}
           {#each lines as line (line.key)}
-            {const value = $derived(lit.point[line.key])}
-            {#if value != null}
-              <span class="flex justify-between gap-3">
-                <span class="text-muted-foreground">{line.label}</span>
-                <span class="font-figures font-medium tabular-nums"
-                  >{figure(line.key, value)}</span
-                >
-              </span>
+            <li class="flex items-center gap-1.5">
+              <svg width="18" height="6" class="overflow-visible">
+                <line
+                  x1="0"
+                  x2="18"
+                  y1="3"
+                  y2="3"
+                  stroke-width="2"
+                  stroke-dasharray={line.dash}
+                  class={line.dash == null
+                    ? "stroke-foreground"
+                    : "stroke-muted-foreground"}
+                />
+              </svg>
+              {line.label}
+            </li>
+          {/each}
+        {/if}
+      </ul>
+      <Measured
+        bind:width
+        class="relative min-inline-0 pointer-coarse:hidden"
+        reserve="{HEIGHT}px"
+      >
+        <svg
+          class="block overflow-visible max-inline-full"
+          viewBox="0 0 {width} {HEIGHT}"
+          {width}
+          height={HEIGHT}
+          role="group"
+          aria-label={m.indices_series_chart({
+            name:
+              viewOptions.find((option) => option.value === view)?.label ?? "",
+            chamber: current.name,
+          })}
+        >
+          {#each chart.ticks as tick (tick)}
+            <line
+              x1={PAD.start}
+              x2={PAD.start + chart.inner.w}
+              y1={chart.y(tick)}
+              y2={chart.y(tick)}
+              class={tick === 0 ? "stroke-muted-foreground" : "stroke-border"}
+              stroke-width="1"
+            />
+            <text
+              x={PAD.start - 6}
+              y={chart.y(tick) + 3.5}
+              text-anchor="end"
+              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+              >{tick}</text
+            >
+          {/each}
+          {#each chart.years as year (year.year)}
+            <text
+              x={year.x}
+              y={HEIGHT - 6}
+              text-anchor="middle"
+              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+              >{year.year}</text
+            >
+          {/each}
+          {#if lit != null}
+            <line
+              x1={lit.x}
+              x2={lit.x}
+              y1={PAD.top}
+              y2={PAD.top + chart.inner.h}
+              class="stroke-muted-foreground"
+              stroke-width="1"
+            />
+          {/if}
+          {#each chart.paths as path (path.key)}
+            <path
+              d={path.d}
+              fill="none"
+              stroke-width="2"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-dasharray={path.dash}
+              class={path.dash == null
+                ? "stroke-foreground"
+                : "stroke-muted-foreground"}
+            />
+            {#each chart.columns as column (column.index)}
+              {const value = $derived(column.point[path.key])}
+              {#if value != null && (points.length <= 40 || hovered === column.index)}
+                <circle
+                  cx={column.x}
+                  cy={chart.y(value)}
+                  r={hovered === column.index ? 4 : 2.5}
+                  class={path.dash == null
+                    ? "fill-foreground"
+                    : "fill-muted-foreground"}
+                  stroke-width="2"
+                  stroke="var(--card)"
+                />
+              {/if}
+            {/each}
+          {/each}
+          {#each labels as label (label.key)}
+            {const end = $derived(
+              chart.paths.find((path) => path.key === label.key)?.end,
+            )}
+            {#if end != null && view === "effective"}
+              <text
+                x={end.x + 8}
+                y={label.y + 3.5}
+                class="fill-foreground text-[0.6875rem]">{label.label}</text
+              >
             {/if}
           {/each}
-          {#each lit.point.caveats.filter((caveat) => caveat !== "pooled_independents") as caveat (caveat)}
-            <span class="text-pretty text-muted-foreground"
-              >{caveatLabel(caveat)}</span
+          {#each chart.columns as column (column.index)}
+            <a
+              href={column.point.path == null
+                ? undefined
+                : resolve("/[...path]", { path: column.point.path })}
+              aria-label="{column.point.name}: {lines
+                .map((line) => {
+                  const value = column.point[line.key];
+                  return value == null
+                    ? null
+                    : `${line.label} ${figure(line.key, value)}`;
+                })
+                .filter((part) => part != null)
+                .join(', ')}"
+              class="outline-none"
+              onpointerenter={() => (hovered = column.index)}
+              onpointerleave={() => (hovered = null)}
+              onfocus={() => (hovered = column.index)}
+              onblur={() => (hovered = null)}
             >
+              <rect
+                x={column.from}
+                y={PAD.top}
+                width={column.w}
+                height={chart.inner.h}
+                fill="transparent"
+              />
+            </a>
           {/each}
-        </div>
-      {/if}
-    </Measured>
-    <div class="hidden overflow-y-auto max-block-80 pointer-coarse:block">
-      <table class="text-sm inline-full">
-        <thead>
-          <tr class="border-be border-border text-xs text-muted-foreground">
-            <th class="py-1.5 text-start font-normal">{m.indices_election()}</th
-            >
+        </svg>
+        {#if lit != null}
+          <div
+            class="pointer-events-none absolute grid gap-1 rounded-sm bg-card/95 px-2.5 py-2 text-xs shadow-menu ring-1 ring-border inline-60"
+            style:inset-inline-start="{lit.x + 252 > width
+              ? Math.max(0, lit.x - 252)
+              : lit.x + 12}px"
+            style:inset-block-start="{PAD.top}px"
+          >
+            <span class="text-[0.8125rem] font-semibold">{lit.point.name}</span>
             {#each lines as line (line.key)}
-              <th class="py-1.5 text-end font-normal">{line.label}</th>
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          {#each recent as point (point.date)}
-            <tr class="border-be border-border/60 last:border-be-0">
-              <td class="py-1">
-                {#if point.path == null}
-                  <span class="font-figures tabular-nums">{point.year}</span>
-                {:else}
-                  <a
-                    class="inline-flex items-center font-figures tabular-nums underline decoration-border underline-offset-4 min-block-11"
-                    href={resolve("/[...path]", { path: point.path })}
-                    aria-label={point.name}>{point.year}</a
+              {const value = $derived(lit.point[line.key])}
+              {#if value != null}
+                <span class="flex justify-between gap-3">
+                  <span class="text-muted-foreground">{line.label}</span>
+                  <span class="font-figures font-medium tabular-nums"
+                    >{figure(line.key, value)}</span
                   >
-                {/if}
-              </td>
+                </span>
+              {/if}
+            {/each}
+            {#each lit.point.caveats.filter((caveat) => caveat !== "pooled_independents") as caveat (caveat)}
+              <span class="text-pretty text-muted-foreground"
+                >{caveatLabel(caveat)}</span
+              >
+            {/each}
+          </div>
+        {/if}
+      </Measured>
+      <div class="hidden overflow-y-auto max-block-80 pointer-coarse:block">
+        <table class="text-sm inline-full">
+          <thead>
+            <tr class="border-be border-border text-xs text-muted-foreground">
+              <th class="py-1.5 text-start font-normal"
+                >{m.indices_election()}</th
+              >
               {#each lines as line (line.key)}
-                {const value = $derived(point[line.key])}
-                <td class="py-1 text-end font-figures tabular-nums"
-                  >{value == null ? "" : figure(line.key, value)}</td
-                >
+                <th class="py-1.5 text-end font-normal">{line.label}</th>
               {/each}
             </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-    <p
-      class="text-xs/relaxed text-pretty text-muted-foreground max-inline-[70ch]"
-    >
-      {reading}
-    </p>
-  {/if}
+          </thead>
+          <tbody>
+            {#each recent as point (point.date)}
+              <tr class="border-be border-border/60 last:border-be-0">
+                <td class="py-1">
+                  {#if point.path == null}
+                    <span class="font-figures tabular-nums">{point.year}</span>
+                  {:else}
+                    <a
+                      class="inline-flex items-center font-figures tabular-nums underline decoration-border underline-offset-4 min-block-11"
+                      href={resolve("/[...path]", { path: point.path })}
+                      aria-label={point.name}>{point.year}</a
+                    >
+                  {/if}
+                </td>
+                {#each lines as line (line.key)}
+                  {const value = $derived(point[line.key])}
+                  <td class="py-1 text-end font-figures tabular-nums"
+                    >{value == null ? "" : figure(line.key, value)}</td
+                  >
+                {/each}
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+      <p
+        class="text-xs/relaxed text-pretty text-muted-foreground max-inline-[70ch]"
+      >
+        {reading}
+      </p>
+    {/if}
+  </Pending>
 </section>

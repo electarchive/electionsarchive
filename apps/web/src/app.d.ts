@@ -6,6 +6,9 @@ import type { Session, User } from "#lib/auth-client.js";
 
 // for information about these interfaces
 declare global {
+  interface Window {
+    takeEarlyClick: () => { event: MouseEvent; target: HTMLElement } | null;
+  }
   namespace App {
     // interface Error {}
     interface Locals {
