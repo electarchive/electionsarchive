@@ -1,4 +1,40 @@
-import type { RangeResponse, Source } from "pmtiles";
+import type { Header, RangeResponse, Source } from "pmtiles";
+import { SharedPromiseCache } from "pmtiles";
+
+export function isAborted(error: unknown) {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+export class ForgivingCache extends SharedPromiseCache {
+  override async getHeader(source: Source) {
+    try {
+      return await super.getHeader(source);
+    } catch (error) {
+      this.cache.delete(source.getKey());
+      throw error;
+    }
+  }
+
+  override async getDirectory(
+    source: Source,
+    offset: number,
+    length: number,
+    header: Header,
+    signal?: AbortSignal,
+  ) {
+    try {
+      return await super.getDirectory(source, offset, length, header, signal);
+    } catch (error) {
+      if (!isAborted(error)) {
+        // Must match the key SharedPromiseCache builds, which keeps a rejected read forever.
+        const key = `${source.getKey()}|${header.etag ?? ""}|${offset}|${length}`;
+        this.cache.delete(key);
+        this.pendingFetches.delete(key);
+      }
+      throw error;
+    }
+  }
+}
 
 export function sharedReads(source: Source): Source {
   const reads = new Map<

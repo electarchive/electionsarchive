@@ -3,6 +3,7 @@
   import { untrack } from "svelte";
   import type { Geography } from "#lib/live/standing.js";
   import { Engine } from "#lib/map/engine.svelte.js";
+  import Gaps from "#lib/map/gaps.svelte";
 
   let {
     geography,
@@ -245,6 +246,7 @@
     aria-label={label}
     {@attach engine.mount}
   ></div>
+  <Gaps {engine} overlay="bottom" />
   {#if hovered != null && pointer != null}
     <div
       class="pointer-events-none absolute z-10 grid gap-1 rounded-sm bg-popover/95 px-3 py-2 text-xs shadow-menu ring-1 ring-border min-inline-48"

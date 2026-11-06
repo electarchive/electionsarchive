@@ -18,6 +18,7 @@
   import { features, remainder, sum, whole } from "#lib/live/standing.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine, reach } from "#lib/map/engine.svelte.js";
+  import Gaps from "#lib/map/gaps.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import {
     bands,
@@ -712,6 +713,7 @@
           <MapIcon class="block-4 inline-4" />
         </button>
       {/if}
+      <Gaps {engine} overlay="bottom" />
     </div>
     {#if pinned != null}
       {const link = $derived(href?.(pinned.unit.id) ?? null)}

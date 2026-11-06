@@ -6,6 +6,7 @@
   import { features } from "#lib/live/standing.js";
   import { basemap } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
+  import Gaps from "#lib/map/gaps.svelte";
   import { cn } from "#lib/utils.js";
   import type { Dot, Fill, Swing } from "./model.js";
   import { BLANK, GROUND } from "./model.js";
@@ -935,6 +936,7 @@
     aria-label={label}
     {@attach engine.mount}
   ></div>
+  <Gaps {engine} overlay="under-controls" />
   {#each rings as ring (ring.key)}
     <span
       class="pointer-events-none absolute z-10 -translate-1/2 rounded-full block-3 inline-3"

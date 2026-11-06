@@ -51,6 +51,7 @@
     radius,
     reach,
   } from "#lib/map/engine.svelte.js";
+  import Gaps from "#lib/map/gaps.svelte";
   import { covering } from "#lib/map/hexes.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -4220,6 +4221,9 @@
       </span>
     {/if}
   </div>
+  {#if !isSummary}
+    <Gaps {engine} />
+  {/if}
   {#if credited.length > 0 || approximate.length > 0}
     {const notices = $derived(
       credited.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),

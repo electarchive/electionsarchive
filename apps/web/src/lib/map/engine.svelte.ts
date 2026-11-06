@@ -7,7 +7,8 @@ import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
 import { STRIPE } from "#lib/live/flips.js";
 import { Mosaic, sampled } from "#lib/map/mosaic.js";
-import { sharedReads } from "#lib/map/reads.js";
+import { ForgivingCache, isAborted, sharedReads } from "#lib/map/reads.js";
+import { Retries } from "#lib/map/retries.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
 export type Arrow = {
@@ -119,6 +120,15 @@ type Kit = { maplibre: typeof Maplibre; archive: (key: string) => PMTiles };
 let library: Promise<Kit> | null = null;
 let kit: Kit | null = null;
 
+type Failed = {
+  aborted: boolean;
+  state: string;
+  tileID: { canonical: { z: number; x: number; y: number } };
+};
+
+const tileName = (sourceId: string, { tileID: { canonical } }: Failed) =>
+  `Map source ${sourceId} tile ${canonical.z}/${canonical.x}/${canonical.y}`;
+
 const attach = (
   gl: Maplibre.Map,
   id: string,
@@ -148,7 +158,10 @@ async function load() {
         if (known != null) {
           return known;
         }
-        const made = new PMTiles(sharedReads(new FetchSource(url)));
+        const made = new PMTiles(
+          sharedReads(new FetchSource(url)),
+          new ForgivingCache(),
+        );
         protocol.add(made);
         return made;
       },
@@ -365,6 +378,7 @@ export function largest(
 
 export class Engine {
   isLoaded = $state(false);
+  hasGaps = $state(false);
   credits = $state<Array<string>>([]);
   theme = $state(0);
   gl = $state.raw<Maplibre.Map | null>(null);
@@ -395,6 +409,7 @@ export class Engine {
   #slots = new Map<string, Slot>();
   #rasterKeys: Array<string> = [];
   #mosaic: Mosaic | null = null;
+  #retries: Retries | null = null;
   #probe: HTMLElement | null = null;
   #cache = new Map<string, string>();
   #canvas: CanvasRenderingContext2D | null = null;
@@ -415,6 +430,10 @@ export class Engine {
   mount = (host: HTMLElement) => {
     let isGone = false;
     const offs: Array<() => void> = [];
+    const retries = new Retries((hasGaps) => {
+      this.hasGaps = hasGaps;
+    });
+    this.#retries = retries;
     this.#probe = document.createElement("span");
     this.#probe.hidden = true;
     host.append(this.#probe);
@@ -472,6 +491,21 @@ export class Engine {
       canvas.removeAttribute("role");
       canvas.removeAttribute("aria-label");
       canvas.tabIndex = -1;
+      gl.on(
+        "error",
+        (event: Maplibre.ErrorEvent & { sourceId?: string; tile?: Failed }) =>
+          this.#failed(gl, retries, event),
+      );
+      gl.on("sourcedata", (event) => {
+        if (retries.isEmpty) {
+          return;
+        }
+        if (event.sourceDataType === "metadata") {
+          retries.worked(`Map source ${event.sourceId}`);
+        } else if (event.tile != null) {
+          retries.worked(tileName(event.sourceId, event.tile as Failed));
+        }
+      });
       gl.on("movestart", (event) => {
         if (event.originalEvent == null) {
           return;
@@ -502,6 +536,7 @@ export class Engine {
           frame: this.#frame,
         });
         this.#options.onMoveEnd?.();
+        retries.wake();
       });
       this.#stripeTile = 128 * Math.ceil(gl.getPixelRatio());
       gl.on("zoomend", () => this.#fitStripes(gl));
@@ -559,12 +594,20 @@ export class Engine {
     offs.push(
       () => observer.disconnect(),
       on(matchMedia("(prefers-color-scheme: dark)"), "change", bump),
+      on(globalThis, "online", () => retries.wake()),
+      on(document, "visibilitychange", () => {
+        if (!document.hidden) {
+          retries.wake();
+        }
+      }),
     );
     return () => {
       isGone = true;
       for (const off of offs) {
         off();
       }
+      retries.stop();
+      this.#retries = null;
       this.#probe?.remove();
       this.#overlay?.remove();
       this.gl?.remove();
@@ -573,6 +616,49 @@ export class Engine {
       this.isLoaded = false;
     };
   };
+
+  #failed(
+    gl: Maplibre.Map,
+    retries: Retries,
+    {
+      error,
+      sourceId,
+      tile,
+    }: Maplibre.ErrorEvent & { sourceId?: string; tile?: Failed },
+  ) {
+    if (isAborted(error)) {
+      return;
+    }
+    if (sourceId == null || this.#sources.get(sourceId)?.isVector !== true) {
+      console.error(error);
+      return;
+    }
+    if (tile == null) {
+      const name = `Map source ${sourceId}`;
+      retries.failed(name, error, () => {
+        const source = gl.getSource<Maplibre.VectorTileSource>(sourceId);
+        if (source?.url == null) {
+          retries.forget(name);
+        } else {
+          source.setUrl(source.url);
+        }
+      });
+      return;
+    }
+    const name = tileName(sourceId, tile);
+    retries.failed(name, error, () => {
+      if (tile.aborted || gl.getSource(sourceId) == null) {
+        retries.forget(name);
+      } else if (tile.state === "errored") {
+        const { z, x, y } = tile.tileID.canonical;
+        gl.refreshTiles(sourceId, [{ z, x, y }]);
+      }
+    });
+  }
+
+  retry() {
+    this.#retries?.wake();
+  }
 
   read(css: string) {
     const known = this.#cache.get(css);
@@ -1124,7 +1210,17 @@ export class Engine {
     });
     this.#sources.set(id, { group, isVector: true });
     if (archive != null) {
-      void archive.getMetadata().then((meta) => {
+      this.#credit(archive, key);
+    }
+    return id;
+  }
+
+  #credit(archive: PMTiles, key: string) {
+    const name = `Map credits ${key}`;
+    void archive
+      .getMetadata()
+      .then((meta) => {
+        this.#retries?.worked(name);
         const text = String(
           (meta as { attribution?: unknown } | null)?.attribution ?? "",
         )
@@ -1140,9 +1236,10 @@ export class Engine {
         this.credits = [...credits].filter(
           (credit) => !credits.has(`© ${credit}`),
         );
+      })
+      .catch((error: unknown) => {
+        this.#retries?.failed(name, error, () => this.#credit(archive, key));
       });
-    }
-    return id;
   }
 
   points(
@@ -1547,10 +1644,11 @@ export class Engine {
   drape(keys: Array<string>, group = "") {
     const gl = this.gl;
     const { archive } = kit ?? {};
-    if (gl == null || archive == null) {
+    const retries = this.#retries;
+    if (gl == null || archive == null || retries == null) {
       return;
     }
-    this.#mosaic ??= new Mosaic(gl, archive);
+    this.#mosaic ??= new Mosaic(gl, archive, retries);
     this.#rasterKeys = keys;
     for (const key of keys) {
       for (const isFocus of [false, true]) {
