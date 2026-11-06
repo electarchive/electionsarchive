@@ -11,7 +11,9 @@ import { shown } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
-type Page = Extract<Awaited<ReturnType<typeof archive>>, { kind: "contest" }>;
+type Page = Awaited<
+  Extract<Awaited<ReturnType<typeof archive>>, { kind: "contest" }>["body"]
+>;
 
 const named = (row: {
   label: string;

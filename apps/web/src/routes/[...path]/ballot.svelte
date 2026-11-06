@@ -1,7 +1,7 @@
 <script lang="ts">
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import Balance from "./balance.svelte";
   import Preview from "./preview.svelte";
 
@@ -9,7 +9,7 @@
     ballot,
     place,
   }: {
-    ballot: Awaited<Extract<PageData, { kind: "contest" }>["ballot"]>;
+    ballot: Awaited<Extract<PageServerData, { kind: "contest" }>["ballot"]>;
     place: string;
   } = $props();
 

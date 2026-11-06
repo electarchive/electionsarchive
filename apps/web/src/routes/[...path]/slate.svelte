@@ -5,7 +5,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { slateLine } from "#lib/slate.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import Balance from "./balance.svelte";
 
   const {
@@ -14,9 +14,13 @@
     held,
   }: {
     slate: NonNullable<
-      Extract<PageData, { kind: "contest" }>["contest"]["slate"]
+      Awaited<
+        Extract<PageServerData, { kind: "contest" }>["body"]
+      >["contest"]["slate"]
     >;
-    last: Extract<PageData, { kind: "contest" }>["contest"]["last"];
+    last: Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["contest"]["last"];
     held: string | null;
   } = $props();
 

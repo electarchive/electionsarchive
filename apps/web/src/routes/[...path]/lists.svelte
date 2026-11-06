@@ -6,12 +6,15 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
 
   const {
     lists,
-  }: { lists: NonNullable<Extract<PageData, { kind: "contest" }>["lists"]> } =
-    $props();
+  }: {
+    lists: NonNullable<
+      Awaited<Extract<PageServerData, { kind: "contest" }>["body"]>["lists"]
+    >;
+  } = $props();
 
   const REASONS: Record<string, () => string> = {
     resigned: m.lists_reason_resigned,

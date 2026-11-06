@@ -1,6 +1,8 @@
 import type { Fetch, Part } from "svelte-islands";
 import { peek } from "svelte-islands";
+import { stream } from "svelte-islands/server";
 import { shapesOf } from "#lib/map/hexes.js";
+import { isCrawler } from "#lib/server/guard.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -25,9 +27,8 @@ type Election = Extract<
   Awaited<ReturnType<typeof archive>>,
   { kind: "election" }
 >;
-type Contest = Extract<
-  Awaited<ReturnType<typeof archive>>,
-  { kind: "contest" }
+type Contest = Awaited<
+  Extract<Awaited<ReturnType<typeof archive>>, { kind: "contest" }>["body"]
 >["contest"];
 
 function parted<T>(
@@ -250,37 +251,65 @@ async function seed(path: string) {
   return { path, located, hub, hexes };
 }
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({
+  params,
+  url,
+  request,
+  setHeaders,
+  isDataRequest,
+}) => {
   const data = await archive(params.path, url.searchParams);
   if (data.kind === "contest") {
-    const { contest } = data;
-    const { near, others } = compared(contest.targets);
-    const chosen = contest.targets.find(
-      (target) =>
-        !target.series &&
-        !target.previous &&
-        target.value === contest.target?.path,
-    );
-    const { places, count } = contest;
-    const roster = places == null ? null : seated(places.rows);
-    return {
-      ...data,
-      roster,
-      contest: {
-        ...contest,
-        places:
-          places == null || roster == null
-            ? places
-            : { ...places, rows: places.rows.slice(0, 0) },
-        targets: chosen == null ? near : [...near, chosen],
-        others,
-        table:
-          count != null && count.rows.length * count.last >= ROUND_CELLS
-            ? part("contest.rounds", { id: data.id, round: count.round })
-            : null,
-      },
-      talk: await talkLink(data.id),
-    };
+    const body = data.body.then(({ contest, ...rest }) => {
+      const { near, others } = compared(contest.targets);
+      const chosen = contest.targets.find(
+        (target) =>
+          !target.series &&
+          !target.previous &&
+          target.value === contest.target?.path,
+      );
+      const { places, count } = contest;
+      const roster = places == null ? null : seated(places.rows);
+      return {
+        ...rest,
+        roster,
+        contest: {
+          ...contest,
+          places:
+            places == null || roster == null
+              ? places
+              : { ...places, rows: places.rows.slice(0, 0) },
+          targets: chosen == null ? near : [...near, chosen],
+          others,
+          table:
+            count != null && count.rows.length * count.last >= ROUND_CELLS
+              ? part("contest.rounds", { id: data.id, round: count.round })
+              : null,
+        },
+      };
+    });
+    const [streamed, talk] = await Promise.all([
+      stream(
+        {
+          body,
+          ballot: data.ballot,
+          standing: data.standing,
+          crowned: data.crowned,
+        },
+        {
+          budget: isCrawler(request.headers.get("user-agent"))
+            ? Infinity
+            : isDataRequest
+              ? 0
+              : 150,
+        },
+      ),
+      talkLink(data.id),
+    ]);
+    if (Object.values(streamed).some((value) => value instanceof Promise)) {
+      setHeaders({ "cache-control": "private, no-cache" });
+    }
+    return { ...data, ...streamed, talk };
   }
   if (data.kind === "election") {
     const { races, contests, elections } = data.election;

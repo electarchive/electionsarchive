@@ -1540,6 +1540,164 @@ const ABROAD: Record<string, string> = {
   tr: "Yurt dışı",
 };
 
+type Ancestor = {
+  id: string;
+  area: string | null;
+  scheme: string | null;
+  noun: string | null;
+  kind: string;
+};
+
+async function contestAncestors(contest: string) {
+  return db.execute<Ancestor>(sql`
+    with recursive up(id, parent, depth) as (
+      select id, allocation_parent_id, 0 from contest where id = ${contest}::uuid
+      union all
+      select c.id, c.allocation_parent_id, up.depth + 1 from contest c join up on c.id = up.parent
+    )
+    select up.id, a.id as area, a.scheme_code as scheme, sc.noun, c.kind::text as kind
+    from up
+    join contest c on c.id = up.id
+    join election e on e.id = c.election_id
+    left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+    left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+    left join scheme sc on sc.code = a.scheme_code
+    order by up.depth desc
+  `);
+}
+
+async function contestHome(area: string | undefined, polity: string) {
+  return db.execute<{ path: string }>(sql`
+    select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
+    where t.area_id = ${area}::uuid and t.polity_id <> ${polity}::uuid
+    order by upper(t.valid) desc nulls first limit 1
+  `);
+}
+
+async function contestFrame({
+  contest,
+  chain,
+  ancestors,
+  labels,
+  slugs,
+  crumbs,
+  home,
+}: {
+  contest: Found;
+  chain: Awaited<ReturnType<typeof descend>>;
+  ancestors: Array<Ancestor>;
+  labels: Awaited<ReturnType<typeof names>>;
+  slugs: Map<string, string>;
+  crumbs: Awaited<ReturnType<typeof breadcrumbs>>;
+  home: string | null;
+}) {
+  const scoped = chain.at(-1);
+  const isRoot = scoped == null;
+  const unit = chain.map((entry) => entry.segment);
+  const path = slugs.get(contest.id) ?? null;
+  const stops = [
+    ...ancestors.map((row) => row.area),
+    ...chain.map((entry) => entry.id),
+  ];
+  const away = new Set(
+    rowsOf(
+      await db.execute<{ id: string }>(sql`
+        select a.id from area a
+        where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
+          and (
+            a.scheme_code = 'world.country'
+            or (
+              exists (select from reporting_unit_area m where m.area_id = any(array[a.id]))
+              and not exists (
+                select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
+                where m.area_id = any(array[a.id]) and r.kind <> 'abroad_mission'
+              )
+            )
+          )
+      `),
+    ).map((row) => row.id),
+  );
+  const trail: Array<{
+    name: string;
+    path: string | null;
+    query?: string;
+    siblings: {
+      contest: string;
+      unit: string | null;
+      level: string;
+      noun: string;
+    } | null;
+  }> = [
+    ...ancestors.map((row, index) => {
+      const parent = ancestors[index - 1];
+      return {
+        name: labels.full.get(row.area ?? row.id) ?? "",
+        path: slugs.get(row.id) ?? null,
+        siblings:
+          parent == null || row.scheme == null
+            ? null
+            : {
+                contest: parent.id,
+                unit: null,
+                level: row.scheme,
+                noun: row.noun ?? "",
+              },
+      };
+    }),
+    ...chain.map((entry, index) => ({
+      name: entry.name,
+      path:
+        path == null ? null : `${path}/${unit.slice(0, index + 1).join("/")}`,
+      siblings: {
+        contest: contest.id,
+        unit: index === 0 ? null : unit.slice(0, index).join("/"),
+        level: entry.scheme,
+        noun: entry.noun,
+      },
+    })),
+  ];
+  const entered = stops.findIndex((id) => id != null && away.has(id));
+  if (entered !== -1) {
+    const before = trail[entered - 1];
+    trail.splice(entered, 0, {
+      name: m.abroad_crumb(),
+      path: before?.path ?? null,
+      ...(before?.path != null &&
+        chain[entered - ancestors.length] != null && {
+          query: `by=${chain[entered - ancestors.length]?.scheme}`,
+        }),
+      siblings: null,
+    });
+  }
+  const abroad = away.has(stops.at(-1) ?? "")
+    ? { electorate: ABROAD[crumbs[0]?.path?.split("/", 1)[0] ?? ""] ?? null }
+    : null;
+  return {
+    name: labels.full.get(contest.id) ?? "",
+    kind: contest.kind,
+    path,
+    breadcrumbs: crumbs,
+    election: {
+      name: labels.full.get(contest.election) ?? "",
+      path: slugs.get(contest.election) ?? null,
+      date: contest.date,
+      year: contest.year,
+      status: contest.status,
+    },
+    area: labels.full.get(contest.place?.id ?? "") ?? "",
+    scope: {
+      name: trail.at(-1)?.name ?? "",
+      noun: scoped?.noun ?? null,
+      isFine: scoped?.kind === "precinct" || scoped?.kind === "synthetic",
+      parent: isRoot ? null : (trail.at(-2)?.name ?? null),
+      home,
+      abroad,
+      trail,
+    },
+    isScoped: contest.isScoped,
+  };
+}
+
 export const unaffiliated = (id: string) =>
   UNAFFILIATED[Number.parseInt(id.slice(-4), 16) % UNAFFILIATED.length] ?? "";
 
@@ -5555,6 +5713,45 @@ async function pick(
   };
 }
 
+const Frame = {
+  name: v.string(),
+  kind: v.string(),
+  path: v.nullable(v.string()),
+  breadcrumbs: v.array(Link),
+  election: v.object({
+    name: v.string(),
+    path: v.nullable(v.string()),
+    date: v.nullable(v.string()),
+    year: v.nullable(v.number()),
+    status: v.string(),
+  }),
+  area: v.string(),
+  scope: v.object({
+    name: v.string(),
+    noun: v.nullable(v.string()),
+    isFine: v.boolean(),
+    parent: v.nullable(v.string()),
+    home: v.nullable(v.string()),
+    abroad: v.nullable(v.object({ electorate: v.nullable(v.string()) })),
+    trail: v.array(
+      v.object({
+        name: v.string(),
+        path: v.nullable(v.string()),
+        query: v.optional(v.string()),
+        siblings: v.nullable(
+          v.object({
+            contest: v.string(),
+            unit: v.nullable(v.string()),
+            level: v.string(),
+            noun: v.string(),
+          }),
+        ),
+      }),
+    ),
+  }),
+  isScoped: v.boolean(),
+};
+
 const Input = v.object({
   id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
   unit: v.optional(v.string()),
@@ -6963,6 +7160,55 @@ export const contests = {
       }
       return row;
     }),
+  head: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/head",
+        summary:
+          "Get a contest's name, election, and breadcrumbs, and the trail of places down to a unit within it, without its results",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        unit: v.optional(v.string()),
+      }),
+    )
+    .output(v.object(Frame))
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const [ancestors, home, crumbs] = await Promise.all([
+        contestAncestors(contest.id),
+        contestHome((chain.at(-1) ?? contest.place)?.id, contest.polity),
+        breadcrumbs(contest.polity, contest.election),
+      ]);
+      const [labels, slugs] = await Promise.all([
+        names(
+          [
+            contest.id,
+            contest.election,
+            ...ancestors.rows.map((row) => row.area).filter((id) => id != null),
+          ],
+          contest.date,
+        ),
+        paths([
+          contest.id,
+          contest.election,
+          ...ancestors.rows.map((row) => row.id),
+        ]),
+      ]);
+      return contestFrame({
+        contest,
+        chain,
+        ancestors: ancestors.rows,
+        labels,
+        slugs,
+        crumbs,
+        home: home.rows[0]?.path ?? null,
+      });
+    }),
   get: os
     .meta(
       openapi({
@@ -6975,42 +7221,7 @@ export const contests = {
     .input(Input)
     .output(
       v.object({
-        name: v.string(),
-        kind: v.string(),
-        path: v.nullable(v.string()),
-        breadcrumbs: v.array(Link),
-        election: v.object({
-          name: v.string(),
-          path: v.nullable(v.string()),
-          date: v.nullable(v.string()),
-          year: v.nullable(v.number()),
-          status: v.string(),
-        }),
-        area: v.string(),
-        scope: v.object({
-          name: v.string(),
-          noun: v.nullable(v.string()),
-          isFine: v.boolean(),
-          parent: v.nullable(v.string()),
-          home: v.nullable(v.string()),
-          abroad: v.nullable(v.object({ electorate: v.nullable(v.string()) })),
-          trail: v.array(
-            v.object({
-              name: v.string(),
-              path: v.nullable(v.string()),
-              query: v.optional(v.string()),
-              siblings: v.nullable(
-                v.object({
-                  contest: v.string(),
-                  unit: v.nullable(v.string()),
-                  level: v.string(),
-                  noun: v.string(),
-                }),
-              ),
-            }),
-          ),
-        }),
-        isScoped: v.boolean(),
+        ...Frame,
         series: v.array(
           v.object({
             date: v.nullable(v.string()),
@@ -7479,27 +7690,7 @@ export const contests = {
         db.execute<{ id: string }>(sql`
           select id from contest where allocation_parent_id = ${contest.id}::uuid
         `),
-        db.execute<{
-          id: string;
-          area: string | null;
-          scheme: string | null;
-          noun: string | null;
-          kind: string;
-        }>(sql`
-          with recursive up(id, parent, depth) as (
-            select id, allocation_parent_id, 0 from contest where id = ${contest.id}::uuid
-            union all
-            select c.id, c.allocation_parent_id, up.depth + 1 from contest c join up on c.id = up.parent
-          )
-          select up.id, a.id as area, a.scheme_code as scheme, sc.noun, c.kind::text as kind
-          from up
-          join contest c on c.id = up.id
-          join election e on e.id = c.election_id
-          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-          left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
-          left join scheme sc on sc.code = a.scheme_code
-          order by up.depth desc
-        `),
+        contestAncestors(contest.id),
         db.execute<{
           publisher: string;
           title: string;
@@ -7519,11 +7710,7 @@ export const contests = {
           )
           order by s.publisher, s.title
         `),
-        db.execute<{ path: string }>(sql`
-          select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
-          where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
-          order by upper(t.valid) desc nulls first limit 1
-        `),
+        contestHome(area?.id, contest.polity),
         poll(contest.id, area?.k ?? null),
         db.execute<{ held: number; of: number }>(sql`
           select count(*) filter (
@@ -8167,110 +8354,16 @@ export const contests = {
         contest.date,
       );
       const scopePath = path == null ? null : [path, ...unit].join("/");
-      const stops = [
-        ...ancestors.rows.map((row) => row.area),
-        ...chain.map((entry) => entry.id),
-      ];
-      const away = new Set(
-        rowsOf(
-          await db.execute<{ id: string }>(sql`
-            select a.id from area a
-            where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
-              and (
-                a.scheme_code = 'world.country'
-                or (
-                  exists (select from reporting_unit_area m where m.area_id = any(array[a.id]))
-                  and not exists (
-                    select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
-                    where m.area_id = any(array[a.id]) and r.kind <> 'abroad_mission'
-                  )
-                )
-              )
-          `),
-        ).map((row) => row.id),
-      );
-      const trail: Array<{
-        name: string;
-        path: string | null;
-        query?: string;
-        siblings: {
-          contest: string;
-          unit: string | null;
-          level: string;
-          noun: string;
-        } | null;
-      }> = [
-        ...ancestors.rows.map((row, index) => {
-          const parent = ancestors.rows[index - 1];
-          return {
-            name: labels.full.get(row.area ?? row.id) ?? "",
-            path: slugs.get(row.id) ?? null,
-            siblings:
-              parent == null || row.scheme == null
-                ? null
-                : {
-                    contest: parent.id,
-                    unit: null,
-                    level: row.scheme,
-                    noun: row.noun ?? "",
-                  },
-          };
-        }),
-        ...chain.map((entry, index) => ({
-          name: entry.name,
-          path:
-            path == null
-              ? null
-              : `${path}/${unit.slice(0, index + 1).join("/")}`,
-          siblings: {
-            contest: contest.id,
-            unit: index === 0 ? null : unit.slice(0, index).join("/"),
-            level: entry.scheme,
-            noun: entry.noun,
-          },
-        })),
-      ];
-      const entered = stops.findIndex((id) => id != null && away.has(id));
-      if (entered !== -1) {
-        const before = trail[entered - 1];
-        trail.splice(entered, 0, {
-          name: m.abroad_crumb(),
-          path: before?.path ?? null,
-          ...(before?.path != null &&
-            chain[entered - ancestors.rows.length] != null && {
-              query: `by=${chain[entered - ancestors.rows.length]?.scheme}`,
-            }),
-          siblings: null,
-        });
-      }
-      const abroad = away.has(stops.at(-1) ?? "")
-        ? {
-            electorate: ABROAD[crumbs[0]?.path?.split("/", 1)[0] ?? ""] ?? null,
-          }
-        : null;
       const page = {
-        name: labels.full.get(contest.id) ?? "",
-        kind: contest.kind,
-        path,
-        breadcrumbs: crumbs,
-        election: {
-          name: labels.full.get(contest.election) ?? "",
-          path: slugs.get(contest.election) ?? null,
-          date: contest.date,
-          year: contest.year,
-          status: contest.status,
-        },
-        area: labels.full.get(contest.place?.id ?? "") ?? "",
-        scope: {
-          name: trail.at(-1)?.name ?? "",
-          noun: scoped?.noun ?? null,
-          isFine: scoped?.kind === "precinct" || scoped?.kind === "synthetic",
-          parent: isRoot ? null : (trail.at(-2)?.name ?? null),
+        ...(await contestFrame({
+          contest,
+          chain,
+          ancestors: ancestors.rows,
+          labels,
+          slugs,
+          crumbs,
           home: home.rows[0]?.path ?? null,
-          abroad,
-          trail,
-        },
-        isScoped: contest.isScoped,
+        })),
         series: [],
         notes: notes.rows.map(({ kind, body }) => ({ kind, body })),
         wording: wording.rows.filter(

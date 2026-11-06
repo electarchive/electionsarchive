@@ -147,7 +147,7 @@ async function card(segments: Array<string>, search: URLSearchParams) {
       bars: data.election.races[0]?.results ?? [],
     };
   }
-  const { contest } = data;
+  const { contest } = await data.body;
   return {
     kicker: [
       ...contest.breadcrumbs.map((crumb) => crumb.name),

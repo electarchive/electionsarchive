@@ -15,7 +15,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import ElectionRow from "./election-row.svelte";
 
   const {
@@ -24,7 +24,9 @@
     all = m.series_all_label,
     isScoped = false,
   }: {
-    series: Extract<PageData, { kind: "contest" }>["contest"]["series"];
+    series: Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["contest"]["series"];
     label?: string;
     all?: (input: { count: number }) => string;
     isScoped?: boolean;

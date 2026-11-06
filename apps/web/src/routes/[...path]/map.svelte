@@ -70,11 +70,13 @@
     swingSafety,
   } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageData, PageServerData } from "./$types";
   import { MODES, unit } from "./unit.js";
 
   type Places = NonNullable<
-    Extract<PageData, { kind: "contest" }>["contest"]["places"]
+    Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["contest"]["places"]
   >;
 
   let {
@@ -1974,15 +1976,17 @@
     setTimeout(moved, 1200);
     engine.fit(box, moved);
     void preloadData(href).then(
-      (result) => {
+      async (result) => {
         const data: Partial<Extract<PageData, { kind: "contest" }>> =
           result.type === "loaded" ? result.data : {};
-        exact =
+        const opened =
           data.kind === "contest"
-            ? (data.boundaries?.find(
-                (entry) => entry.k != null && entry.frame != null,
-              )?.frame ?? null)
+            ? await Promise.resolve(data.body).catch(() => null)
             : null;
+        exact =
+          opened?.boundaries.find(
+            (entry) => entry.k != null && entry.frame != null,
+          )?.frame ?? null;
         settle();
       },
       () => {

@@ -8,13 +8,15 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
 
   const {
     additional,
   }: {
     additional: NonNullable<
-      Extract<PageData, { kind: "contest" }>["additional"]
+      Awaited<
+        Extract<PageServerData, { kind: "contest" }>["body"]
+      >["additional"]
     >;
   } = $props();
 

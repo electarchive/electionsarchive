@@ -1,6 +1,16 @@
 import type { Part } from "svelte-islands";
 import { load as fetched } from "svelte-islands";
-import type { PageLoad } from "./$types";
+import type { PageLoad, PageServerData } from "./$types";
+
+async function seat(
+  body: Awaited<Extract<PageServerData, { kind: "contest" }>["body"]>,
+) {
+  const { contest, roster } = body;
+  const rows = roster == null ? null : await fetched(roster).catch(() => null);
+  return rows == null || contest.places == null
+    ? body
+    : { ...body, contest: { ...contest, places: { ...contest.places, rows } } };
+}
 
 async function early<T>(found: Part<T> | null) {
   return found?.name === "election.sweep" ? fetched(found) : found;
@@ -8,19 +18,13 @@ async function early<T>(found: Part<T> | null) {
 
 export const load: PageLoad = async ({ data }) => {
   if (data.kind === "contest") {
-    const { contest, roster } = data;
-    const [View, rows] = await Promise.all([
-      import("./contest.svelte"),
-      roster == null ? null : fetched(roster).catch(() => null),
-    ]);
-    return {
-      ...data,
-      contest:
-        rows == null || contest.places == null
-          ? contest
-          : { ...contest, places: { ...contest.places, rows } },
-      View: View.default,
-    };
+    const { body } = data;
+    const view = import("./contest.svelte");
+    if (body instanceof Promise) {
+      return { ...data, body: body.then(seat), View: (await view).default };
+    }
+    const [View, ready] = await Promise.all([view, seat(body)]);
+    return { ...data, body: ready, View: View.default };
   }
   if (data.kind === "election") {
     const { winners } = data.sections;

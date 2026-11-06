@@ -318,6 +318,33 @@ export function negotiate(accept: string | null) {
 }
 
 async function settle(data: Awaited<ReturnType<typeof archive>>) {
+  if (data.kind === "contest") {
+    const [body, ballot, standing] = await Promise.all([
+      data.body,
+      data.ballot,
+      data.standing,
+    ]);
+    return {
+      kind: data.kind,
+      id: data.id,
+      unit: data.unit,
+      contest: body.contest,
+      lists: body.lists,
+      rounds: body.rounds,
+      ballot,
+      cycle: body.cycle,
+      handover: body.handover,
+      additional: body.additional,
+      successors: body.successors,
+      statutes: body.statutes,
+      boundaries: body.boundaries,
+      surround: body.surround,
+      match: data.match,
+      within: data.within,
+      standing,
+      sameDay: body.sameDay,
+    };
+  }
   if (data.kind !== "election") {
     return data;
   }
@@ -507,12 +534,8 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     };
   }
   if (found.kind === "contest") {
-    const [ballot, standing, known] = await Promise.all([
-      found.ballot,
-      found.standing,
-      call(router.coverage.known, { id: found.id }),
-    ]);
-    return { ...found, ballot, standing, known };
+    const known = await call(router.coverage.known, { id: found.id });
+    return { ...found, known };
   }
   if (found.kind !== "polity") {
     return found;
@@ -623,9 +646,7 @@ export async function twin(
       const plain =
         data.kind === "election"
           ? { ...data, sections: { ...data.sections, winners: undefined } }
-          : data.kind === "contest"
-            ? { ...data, crowned: undefined }
-            : data;
+          : data;
       return Response.json(
         jsonPage(
           ledger?.places != null

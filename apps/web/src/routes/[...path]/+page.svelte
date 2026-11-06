@@ -38,13 +38,13 @@
   const crumbs = $derived(
     data.kind === "contest"
       ? [
-          ...data.contest.breadcrumbs,
-          ...(data.contest.election.path == null
+          ...data.head.breadcrumbs,
+          ...(data.head.election.path == null
             ? []
             : [
                 {
-                  name: data.contest.election.name,
-                  path: data.contest.election.path,
+                  name: data.head.election.name,
+                  path: data.head.election.path,
                 },
               ]),
         ]
@@ -78,13 +78,13 @@
         : data.polity.name;
     }
     const name =
-      data.contest.scope.noun == null
-        ? data.contest.name
-        : `${data.contest.scope.abroad == null ? data.contest.scope.name : m.scope_abroad_title({ place: data.contest.scope.name })}, ${data.contest.name}`;
-    const tail = /, [^,]+$/u.exec(data.contest.election.name)?.[0];
+      data.head.scope.noun == null
+        ? data.head.name
+        : `${data.head.scope.abroad == null ? data.head.scope.name : m.scope_abroad_title({ place: data.head.scope.name })}, ${data.head.name}`;
+    const tail = /, [^,]+$/u.exec(data.head.election.name)?.[0];
     return /\b\d{4}\b/u.test(name)
       ? name
-      : `${tail != null && name.endsWith(tail) ? name.slice(0, -tail.length) : name}, ${data.contest.election.name}`;
+      : `${tail != null && name.endsWith(tail) ? name.slice(0, -tail.length) : name}, ${data.head.election.name}`;
   });
   const query = $derived(
     data.kind === "election" && data.scope != null
@@ -107,7 +107,7 @@
   );
   const description = $derived(
     data.kind === "contest"
-      ? m.meta_contest({ name: title, date: date(data.contest.election.date) })
+      ? m.meta_contest({ name: title, date: date(data.head.election.date) })
       : data.kind === "election"
         ? chosen == null
           ? m.meta_election({
@@ -143,7 +143,7 @@
       "@type": "Place",
       name:
         data.kind === "contest"
-          ? data.contest.scope.name
+          ? data.head.scope.name
           : data.kind === "election"
             ? (data.election.breadcrumbs.at(-1)?.name ?? data.election.name)
             : data.kind === "day"
@@ -152,7 +152,7 @@
     },
     temporalCoverage:
       data.kind === "contest"
-        ? data.contest.election.date
+        ? data.head.election.date
         : data.kind === "election"
           ? data.election.date
           : data.kind === "day"
@@ -162,9 +162,11 @@
               : `${Math.min(...years)}/${Math.max(...years)}`,
     isBasedOn:
       data.kind === "contest"
-        ? data.contest.sets.flatMap(({ source }) =>
-            source.url == null ? [] : [source.url],
-          )
+        ? data.body instanceof Promise
+          ? undefined
+          : data.body.contest.sets.flatMap(({ source }) =>
+              source.url == null ? [] : [source.url],
+            )
         : undefined,
     distribution: [
       ["application/json", "json"],
@@ -200,7 +202,7 @@
     type="text/markdown"
     href="{page.url.origin}{visible.pathname}.md{query}"
   />
-  {#if data.kind === "contest" && data.contest.scope.isFine}
+  {#if data.kind === "contest" && data.head.scope.isFine}
     <meta name="robots" content="noindex" />
   {/if}
   <svelte:element this={"script"} type="application/ld+json"
@@ -238,21 +240,12 @@
         id={data.id}
         talk={data.talk}
         unit={data.unit}
-        contest={data.contest}
-        lists={data.lists}
-        rounds={data.rounds}
+        head={data.head}
+        body={data.body}
         ballot={data.ballot}
-        cycle={data.cycle}
-        handover={data.handover}
-        additional={data.additional}
-        successors={data.successors}
-        statutes={data.statutes}
-        boundaries={data.boundaries}
-        crowned={data.crowned}
-        sameDay={data.sameDay}
-        surround={data.surround}
-        match={data.match}
         standing={data.standing}
+        crowned={data.crowned}
+        match={data.match}
       />
     {:else if data.kind === "election"}
       {#key `${data.id}${query}`}

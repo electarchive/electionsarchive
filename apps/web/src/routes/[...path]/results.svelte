@@ -23,7 +23,7 @@
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import Preview from "./preview.svelte";
 
   const {
@@ -38,7 +38,9 @@
     isTally = false,
     facts = null,
   }: {
-    rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
+    rows: Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["contest"]["rows"];
     span: {
       from: string;
       to: string;
