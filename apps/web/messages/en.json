@@ -1690,6 +1690,8 @@
   "map_view_map": "Map",
   "map_hex_seat": "{name}, won by {winner}",
   "map_label": "Map of results by {noun}",
+  "map_gaps": "Part of this map didn't load, so a blank area may not mean there are no results.",
+  "map_gaps_retry": "Try again",
   "map_hint": "Use arrow keys to move between places and Enter to open one.",
   "map_zoom_in": "Zoom in",
   "map_zoom_out": "Zoom out",

@@ -50,6 +50,7 @@
   import { count, date, plural } from "#lib/format.js";
   import { basemap } from "#lib/map/basemap.js";
   import { Engine, proportional, reach } from "#lib/map/engine.svelte.js";
+  import Gaps from "#lib/map/gaps.svelte";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -2047,6 +2048,7 @@
       >
         <div class="block-full inline-full" {@attach engine.mount}></div>
       </div>
+      <Gaps {engine} overlay="top" />
       {#if lasso != null && lasso.points.length > 1}
         {const shape = $derived(
           lasso.isBox ? corners(lasso.points) : lasso.points,

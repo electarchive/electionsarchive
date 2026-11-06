@@ -1,5 +1,6 @@
 import type * as Maplibre from "maplibre-gl";
 import type { PMTiles } from "pmtiles";
+import type { Retries } from "#lib/map/retries.js";
 
 type Raster = { ids: Uint32Array; index: Uint8Array | Uint16Array };
 type Fade = number | ReadonlyArray<unknown>;
@@ -115,9 +116,9 @@ async function fetchTile(
         loaded.set(name, tile);
         return tile;
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         decoding.delete(name);
-        return null;
+        throw error;
       });
     decoding.set(name, pending);
     if (decoding.size > KEPT) {
@@ -198,10 +199,18 @@ export class Mosaic {
   #version = 1;
   #spotted = 0;
   #frame = 0;
+  #retries: Retries;
+  #asking = new Set<string>();
+  #waiting = new Set<string>();
 
-  constructor(map: Maplibre.Map, open: (key: string) => PMTiles) {
+  constructor(
+    map: Maplibre.Map,
+    open: (key: string) => PMTiles,
+    retries: Retries,
+  ) {
     this.#map = map;
     this.#open = open;
+    this.#retries = retries;
   }
 
   get tints() {
@@ -401,9 +410,7 @@ export class Mosaic {
     const want = (tz: number, tx: number, ty: number) => {
       const found = ready(tz, tx, ty);
       if (found == null) {
-        void fetchTile(archive, `${key}/${tz}/${tx}/${ty}`, tz, tx, ty).then(
-          () => map.triggerRepaint(),
-        );
+        this.#ask(archive, `${key}/${tz}/${tx}/${ty}`, tz, tx, ty);
       }
       return found;
     };
@@ -476,6 +483,33 @@ export class Mosaic {
       }
     }
     return draws;
+  }
+
+  #ask(archive: PMTiles, name: string, z: number, x: number, y: number) {
+    if (this.#asking.has(name) || this.#waiting.has(name)) {
+      return;
+    }
+    this.#asking.add(name);
+    const label = `Map mosaic tile ${name}`;
+    const map = this.#map;
+    void fetchTile(archive, name, z, x, y)
+      .then(() => this.#retries.worked(label))
+      .catch((error: unknown) => {
+        this.#waiting.add(name);
+        this.#retries.failed(label, error, () => {
+          this.#waiting.delete(name);
+          map.triggerRepaint();
+          map.once("render", () => {
+            if (!this.#asking.has(name)) {
+              this.#retries.forget(label);
+            }
+          });
+        });
+      })
+      .finally(() => {
+        this.#asking.delete(name);
+        map.triggerRepaint();
+      });
   }
 
   #render(key: string, isFocus: boolean, matrix: Iterable<number>) {
