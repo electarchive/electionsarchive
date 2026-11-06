@@ -308,6 +308,47 @@ async function reads(id: string, polity: Parameters<typeof sourceOf>[0]) {
   return found.flat();
 }
 
+async function contested(
+  id: string,
+  unit: string,
+  match: string,
+  search: URLSearchParams,
+  contest: Contest,
+): Promise<Primed> {
+  const { places } = contest;
+  const isLedgered =
+    places != null &&
+    !places.level.startsWith("unit:") &&
+    !(places.rows.length > 0 && places.rows.every((row) => row.valid === 0));
+  const ledger = {
+    id,
+    unit: unit === "" ? undefined : unit,
+    level: places?.level ?? undefined,
+    match: match === "person" || match === "family" ? match : "party",
+    group: search.get("group") ?? undefined,
+    round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
+  } as const;
+  const found = await Promise.all([
+    within(
+      call(router.coverage.known, { id })
+        .then((data) => [
+          { key: orpc.coverage.known.queryKey({ input: { id } }), data },
+        ])
+        .catch(() => []),
+    ),
+    isLedgered
+      ? within(
+          call(router.contests.ledger, ledger)
+            .then((data) => [
+              { key: orpc.contests.ledger.queryKey({ input: ledger }), data },
+            ])
+            .catch(() => []),
+        )
+      : [],
+  ]);
+  return found.flat();
+}
+
 async function seed(path: string) {
   const located = await call(router.elections.locate, { path });
   const [hub, hexes] = await Promise.all([
@@ -361,10 +402,30 @@ export const load: PageServerLoad = async ({
         },
       };
     });
+    const primed =
+      budget === Infinity
+        ? null
+        : parted(
+            "contest.primed",
+            data.body
+              .then(async ({ contest }) =>
+                contested(
+                  data.id,
+                  data.unit,
+                  data.match,
+                  url.searchParams,
+                  contest,
+                ),
+              )
+              .then((found) => (found.length === 0 ? null : found))
+              .catch(() => null),
+            "preload",
+          );
     const [streamed, talk] = await Promise.all([
       stream(
         {
           body,
+          primed,
           ballot: data.ballot,
           standing: data.standing,
           crowned: data.crowned,

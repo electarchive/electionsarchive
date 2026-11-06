@@ -1,10 +1,14 @@
 <script lang="ts">
   import { READ_ONLY } from "$app/env/public";
   import { invalidateAll } from "$app/navigation";
+  import { useQueryClient } from "@tanstack/svelte-query";
+  import { untrack } from "svelte";
   import { Await } from "svelte-islands";
+  import type { Primed } from "#lib/primed.js";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import { m } from "#lib/paraglide/messages.js";
+  import { prime } from "#lib/primed.js";
   import type { PageServerData } from "./$types";
   import ContestBody from "./contest-body.svelte";
   import ContestTitle from "./contest-title.svelte";
@@ -15,6 +19,7 @@
     unit,
     head,
     body,
+    primed,
     ballot,
     standing,
     crowned,
@@ -25,11 +30,32 @@
     unit: string;
     head: Extract<PageServerData, { kind: "contest" }>["head"];
     body: Extract<PageServerData, { kind: "contest" }>["body"];
+    primed: Primed | Promise<Primed>;
     ballot: Extract<PageServerData, { kind: "contest" }>["ballot"];
     standing: Extract<PageServerData, { kind: "contest" }>["standing"];
     crowned: Extract<PageServerData, { kind: "contest" }>["crowned"];
     match: string;
   } = $props();
+
+  const client = useQueryClient();
+
+  function seed(found: Primed | Promise<Primed>) {
+    if (found instanceof Promise) {
+      void found.then((ready) => {
+        prime(client, ready);
+      });
+    } else {
+      prime(client, found);
+    }
+  }
+
+  untrack(() => {
+    seed(primed);
+  });
+
+  $effect.pre(() => {
+    seed(primed);
+  });
 
   const shape = $derived(
     unit === "" ? "whole" : head.scope.isFine ? "fine" : "unit",

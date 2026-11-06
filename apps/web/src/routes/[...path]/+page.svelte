@@ -244,6 +244,7 @@
         unit={data.unit}
         head={data.head}
         body={data.body}
+        primed={data.primed}
         ballot={data.ballot}
         standing={data.standing}
         crowned={data.crowned}

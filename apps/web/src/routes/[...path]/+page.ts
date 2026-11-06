@@ -24,12 +24,26 @@ async function unpacked(found: Part<Primed> | null): Promise<Primed> {
 export const load: PageLoad = async ({ data }) => {
   if (data.kind === "contest") {
     const { body } = data;
+    const primed =
+      data.primed instanceof Promise
+        ? data.primed.then(unpacked)
+        : unpacked(data.primed);
     const view = import("./contest.svelte");
     if (body instanceof Promise) {
-      return { ...data, body: body.then(seat), View: (await view).default };
+      return {
+        ...data,
+        body: body.then(seat),
+        primed: data.primed instanceof Promise ? primed : await primed,
+        View: (await view).default,
+      };
     }
     const [View, ready] = await Promise.all([view, seat(body)]);
-    return { ...data, body: ready, View: View.default };
+    return {
+      ...data,
+      body: ready,
+      primed: data.primed instanceof Promise ? primed : await primed,
+      View: View.default,
+    };
   }
   if (data.kind === "election") {
     const { winners } = data.sections;
