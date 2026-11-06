@@ -63,7 +63,10 @@ FILES = {
     "04013": "https://elections.maricopa.gov/asset/jcr:1673a1e7-bbed-4d76-94fe-ae0ccc1ce9d5/2026%20General%20Election%20Maricopa%20County%20Candidates%20On%20Ballot%20-%20Remediated.pdf",
     "17031c": "https://www.cookcountyclerkil.gov/elections/current-elections/view-all-candidates#GetAllCandidates.json",
 }
-DIFFERENT_PEOPLE = {("TN:4715160:council:ward-7", "John Dewey Robinson", "Jeffrey K. Robinson")}
+DIFFERENT_PEOPLE = {
+    ("TN:4715160:council:ward-7", "John Dewey Robinson", "Jeffrey K. Robinson"),
+    ("FL:1243900:council", "Lizelh Rodriguez", "Lourdes Rodriguez"),
+}
 DECIDED_AT_PRIMARY = {
     "FL:1258715:council:district-3": "Jim Norton won this seat outright at the Aug. 18, 2026 primary with 52.26 percent, so it was not on the Nov. 3 ballot (St. Lucie County Supervisor of Elections, https://enr.electionsfl.org/STL/4030/Summary/)"
 }
@@ -7887,6 +7890,17 @@ def ca_school_variants(label: str) -> list[list[str]]:
     ]
 
 
+def place_words(conn) -> dict[str, frozenset[str]]:
+    return {
+        code: words(text)[0] - CLASH_NOISE
+        for code, text in conn.execute(
+            """select substr(x.value, 7), n.text from external_id x
+               join name n on n.entity_id = x.entity_id and n.kind = 'official' and n.is_preferred
+               where x.scheme = 'us.polity' and x.value like 'place:%'"""
+        )
+    }
+
+
 def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
     rows: dict[str, list[tuple[str, str]]] = {state: [] for state in states}
     if not states:
@@ -7934,7 +7948,7 @@ def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
 
 
 def resolve(
-    state: str, wanted: set[tuple[str, str]], rows: list[tuple[str, str]]
+    state: str, wanted: set[tuple[str, str]], rows: list[tuple[str, str]], places: dict[str, frozenset[str]]
 ) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in rows:
@@ -7966,7 +7980,16 @@ def resolve(
             ),
             reverse=True,
         )
-        if scored and scored[0][0] >= 0.6 and (len(scored) == 1 or scored[1][0] < scored[0][0]):
+        if (
+            scored
+            and scored[0][0] >= 0.6
+            and (len(scored) == 1 or scored[1][0] < scored[0][0])
+            and not (
+                (code := re.match(rf"{state}:(\d{{7}}):", scored[0][1]))
+                and not {"education", "school"} & mine
+                and not places.get(code[1], frozenset()) <= mine
+            )
+        ):
             found[(county, contest)] = (scored[0][1], scored[0][1])
             scores[(county, contest)] = scored[0][0]
             continue
@@ -11269,6 +11292,7 @@ def parse() -> None:
         state_rows = contest_rows(
             conn, {key.split("-")[0] for key in feeds if STATES is None or key.split("-")[0] in STATES}
         )
+        places_named = place_words(conn)
         for key, found in feeds.items():
             state = key.split("-")[0]
             if STATES is not None and state not in STATES:
@@ -11309,6 +11333,7 @@ def parse() -> None:
                     if row.get("tail") is None and not row.get("mint")
                 },
                 state_rows[state],
+                places_named,
             )
             used: dict[str, str] = {}
             missed: set[str] = set()
@@ -11545,6 +11570,8 @@ def parse() -> None:
                         ),
                     )
                 ]
+                if state == "FL":
+                    tokens = re.sub(r"^panama city beach\b", "panama beach", " ".join(tokens)).split()
                 if state == "CA":
                     tokens = re.sub(
                         r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
@@ -13287,11 +13314,16 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     for token in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", row["name"])).split("-")
                     if token not in ("jr", "sr", "ii", "iii", "iv")
                 ]
+                barred = {
+                    person
+                    for person, held_text in known.get(tail, [])
+                    if (tail, row["name"], held_text) in DIFFERENT_PEOPLE
+                }
                 pool = {
                     person
                     for person, held_text in known.get(tail, [])
                     if held_text
-                    and (tail, row["name"], held_text) not in DIFFERENT_PEOPLE
+                    and person not in barred
                     and (
                         held := [
                             token
