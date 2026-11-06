@@ -5,6 +5,7 @@
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
+  import { Settled } from "#lib/settled.svelte.js";
   import type { PageData } from "./$types";
   import PreviewHost from "./preview-host.svelte";
   import Preview from "./preview.svelte";
@@ -14,14 +15,18 @@
   setContext(WITHIN, () => data.within);
 
   const visible = $derived(page.shallow?.url ?? page.url);
+  const opened = $derived(
+    data.kind === "election" ? new Settled(data.body) : null,
+  );
   const picked = $derived.by(() => {
-    if (data.kind !== "election") {
+    const election = opened?.value?.election;
+    if (data.kind !== "election" || election == null) {
       return null;
     }
     const rest = visible.pathname.slice(data.path.length + 2);
     return visible.pathname.startsWith(`/${data.path}/`) &&
-      (data.election.rest != null ||
-        data.election.races.some(
+      (election.rest != null ||
+        election.races.some(
           (race) => race.anchor === rest.replace(/-total$/u, ""),
         ))
       ? rest
@@ -29,7 +34,7 @@
   });
   const chosen = $derived(
     data.kind === "election" && picked != null
-      ? (data.election.races.find(
+      ? (opened?.value?.election.races.find(
           (race) => race.anchor === picked.replace(/-total$/u, ""),
         )?.name ?? null)
       : null,
@@ -50,11 +55,11 @@
         ]
       : data.kind === "election"
         ? [
-            ...data.election.breadcrumbs,
-            ...(data.election.parent == null ? [] : [data.election.parent]),
+            ...data.head.breadcrumbs,
+            ...(data.head.parent == null ? [] : [data.head.parent]),
             ...(chosen == null
               ? []
-              : [{ name: data.election.name, path: data.path }]),
+              : [{ name: data.head.name, path: data.path }]),
           ]
         : data.kind === "day"
           ? data.local.breadcrumbs
@@ -70,11 +75,8 @@
     if (data.kind !== "contest") {
       return data.kind === "election"
         ? chosen == null
-          ? data.election.name
-          : m.election_race_title({
-              race: chosen,
-              election: data.election.name,
-            })
+          ? data.head.name
+          : m.election_race_title({ race: chosen, election: data.head.name })
         : data.polity.name;
     }
     const name =
@@ -111,13 +113,13 @@
       : data.kind === "election"
         ? chosen == null
           ? m.meta_election({
-              name: data.election.name,
-              date: date(data.election.date),
+              name: data.head.name,
+              date: date(data.head.date),
             })
           : m.election_race_meta({
               race: chosen,
-              election: data.election.name,
-              date: date(data.election.date),
+              election: data.head.name,
+              date: date(data.head.date),
             })
         : data.kind === "day"
           ? m.local_meta({ place: data.local.name, date: date(data.date) })
@@ -145,7 +147,7 @@
         data.kind === "contest"
           ? data.head.scope.name
           : data.kind === "election"
-            ? (data.election.breadcrumbs.at(-1)?.name ?? data.election.name)
+            ? (data.head.breadcrumbs.at(-1)?.name ?? data.head.name)
             : data.kind === "day"
               ? data.local.name
               : data.polity.name,
@@ -154,7 +156,7 @@
       data.kind === "contest"
         ? data.head.election.date
         : data.kind === "election"
-          ? data.election.date
+          ? data.head.date
           : data.kind === "day"
             ? data.date
             : years.length === 0
@@ -255,9 +257,8 @@
           {query}
           chosen={picked}
           scope={data.scope}
-          election={data.election}
-          cycle={data.cycle}
-          series={data.series}
+          head={data.head}
+          body={data.body}
           sameDay={data.sameDay}
           sections={data.sections}
         />

@@ -15573,6 +15573,87 @@ export async function races(
     );
 }
 
+async function electionRoot(input: { id: string; within?: string }) {
+  const found = await db.execute<{
+    polity: string;
+    parent: string | null;
+    date: string | null;
+    status: string;
+    kind: string;
+    isIndirect: boolean;
+  }>(sql`
+    select polity_id as polity, parent_id as parent, date_from::text as date, status::text as status,
+      kind::text as kind, kind = 'indirect' as "isIndirect"
+    from election where id = ${input.id}::uuid
+  `);
+  const election = found.rows[0];
+  if (election == null) {
+    throw new ORPCError("NOT_FOUND");
+  }
+  const within = input.within ?? null;
+  if (within != null) {
+    const checked = await db.execute<{ ok: boolean }>(sql`
+      with recursive up(id) as (
+        select pp.parent_id from polity_parent pp where pp.polity_id = ${within}::uuid
+        union
+        select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id
+      )
+      select exists (select from up where id = ${election.polity}::uuid)
+        and exists (select from polity p where p.id = ${within}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (
+          select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca'
+          where pp.polity_id = p.id
+        ))))
+        and exists (
+          select from polity_territory t
+          where t.polity_id = ${within}::uuid and t.valid @> ${election.date ?? "infinity"}::date
+        ) as ok
+    `);
+    if (checked.rows[0]?.ok !== true) {
+      throw new ORPCError("NOT_FOUND");
+    }
+  }
+  return { election, within, home: within ?? election.polity };
+}
+
+function electionHeader({
+  id,
+  election,
+  within,
+  labels,
+  slugs,
+  crumbs,
+}: {
+  id: string;
+  election: Awaited<ReturnType<typeof electionRoot>>["election"];
+  within: string | null;
+  labels: Awaited<ReturnType<typeof names>>;
+  slugs: Map<string, string>;
+  crumbs: Awaited<ReturnType<typeof breadcrumbs>>;
+}) {
+  return {
+    name:
+      within == null
+        ? (labels.full.get(id) ?? "")
+        : m.election_within({
+            name: labels.full.get(id) ?? "",
+            place: labels.full.get(within) ?? "",
+          }),
+    date: election.date,
+    status: election.status,
+    isIndirect: election.isIndirect,
+    breadcrumbs: crumbs,
+    parent:
+      within != null
+        ? { name: labels.full.get(id) ?? "", path: slugs.get(id) ?? null }
+        : election.parent == null
+          ? null
+          : {
+              name: labels.full.get(election.parent) ?? "",
+              path: slugs.get(election.parent) ?? null,
+            },
+  };
+}
+
 export const elections = {
   locate: os
     .meta(
@@ -15595,6 +15676,56 @@ export const elections = {
         throw new ORPCError("NOT_FOUND");
       }
       return row;
+    }),
+  head: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/head",
+        summary:
+          "Get an election's name, date, status, and breadcrumbs, without its contests",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        within: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+      }),
+    )
+    .output(
+      v.object({
+        name: v.string(),
+        date: v.nullable(v.string()),
+        status: v.string(),
+        kind: v.string(),
+        isIndirect: v.boolean(),
+        breadcrumbs: v.array(Link),
+        parent: v.nullable(Link),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const { election, within, home } = await electionRoot(input);
+      const ids = [
+        input.id,
+        home,
+        ...(election.parent == null ? [] : [election.parent]),
+      ];
+      const [crumbs, labels, slugs] = await Promise.all([
+        breadcrumbs(home, input.id),
+        names(ids),
+        paths(ids),
+      ]);
+      return {
+        ...electionHeader({
+          id: input.id,
+          election,
+          within,
+          labels,
+          slugs,
+          crumbs,
+        }),
+        kind: election.kind,
+      };
     }),
   get: os
     .meta(
@@ -15973,44 +16104,7 @@ export const elections = {
       }),
     )
     .handler(async ({ input }) => {
-      const found = await db.execute<{
-        polity: string;
-        parent: string | null;
-        date: string | null;
-        status: string;
-        isIndirect: boolean;
-      }>(sql`
-        select polity_id as polity, parent_id as parent, date_from::text as date, status::text as status,
-          kind = 'indirect' as "isIndirect"
-        from election where id = ${input.id}::uuid
-      `);
-      const election = found.rows[0];
-      if (election == null) {
-        throw new ORPCError("NOT_FOUND");
-      }
-      const within = input.within ?? null;
-      if (within != null) {
-        const checked = await db.execute<{ ok: boolean }>(sql`
-          with recursive up(id) as (
-            select pp.parent_id from polity_parent pp where pp.polity_id = ${within}::uuid
-            union
-            select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id
-          )
-          select exists (select from up where id = ${election.polity}::uuid)
-            and exists (select from polity p where p.id = ${within}::uuid and (p.kind = 'region' or (p.kind = 'federal_unit' and exists (
-              select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca'
-              where pp.polity_id = p.id
-            ))))
-            and exists (
-              select from polity_territory t
-              where t.polity_id = ${within}::uuid and t.valid @> ${election.date ?? "infinity"}::date
-            ) as ok
-        `);
-        if (checked.rows[0]?.ok !== true) {
-          throw new ORPCError("NOT_FOUND");
-        }
-      }
-      const home = within ?? election.polity;
+      const { election, within, home } = await electionRoot(input);
       const [
         contestRows,
         electionRows,
@@ -16677,29 +16771,14 @@ export const elections = {
       }
       return withLogos(
         {
-          name:
-            within == null
-              ? (labels.full.get(input.id) ?? "")
-              : m.election_within({
-                  name: labels.full.get(input.id) ?? "",
-                  place: labels.full.get(within) ?? "",
-                }),
-          date: election.date,
-          status: election.status,
-          isIndirect: election.isIndirect,
-          breadcrumbs: crumbs,
-          parent:
-            within != null
-              ? {
-                  name: labels.full.get(input.id) ?? "",
-                  path: slugs.get(input.id) ?? null,
-                }
-              : election.parent == null
-                ? null
-                : {
-                    name: labels.full.get(election.parent) ?? "",
-                    path: slugs.get(election.parent) ?? null,
-                  },
+          ...electionHeader({
+            id: input.id,
+            election,
+            within,
+            labels,
+            slugs,
+            crumbs,
+          }),
           notes: notes.rows,
           control:
             councils.length === 1 ? (standings[0]?.control ?? null) : null,

@@ -140,11 +140,12 @@ async function card(segments: Array<string>, search: URLSearchParams) {
     };
   }
   if (data.kind === "election") {
+    const { election } = await data.body;
     return {
-      kicker: data.election.breadcrumbs.map((crumb) => crumb.name).join(" / "),
-      title: data.election.name,
-      line: date(data.election.date),
-      bars: data.election.races[0]?.results ?? [],
+      kicker: election.breadcrumbs.map((crumb) => crumb.name).join(" / "),
+      title: election.name,
+      line: date(election.date),
+      bars: election.races[0]?.results ?? [],
     };
   }
   const { contest } = await data.body;
