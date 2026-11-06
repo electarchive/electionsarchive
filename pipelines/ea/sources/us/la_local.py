@@ -1055,7 +1055,6 @@ def emit() -> Path:
                     if person not in persons:
                         persons[person] = candidate
                         cs.add("person", id=person)
-                        name(person, candidate)
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     cs.add(
                         "contest_option",
@@ -1110,6 +1109,22 @@ def emit() -> Path:
                     flags=0,
                     value=votes,
                 )
+        named_elsewhere: dict[UUID, set[str]] = {}
+        for person, text in conn.execute(
+            """select n.entity_id, n.text from name n
+               join changeset c on c.id = n.changeset_id and c.pipeline <> %(source)s
+               where n.entity_id = any(%(persons)s::uuid[]) and n.lang = 'en' and n.is_preferred
+                 and not exists (
+                   select from name o join changeset oc on oc.id = o.changeset_id
+                   where o.entity_id = n.entity_id and o.lang = 'en' and o.is_preferred
+                     and oc.pipeline = %(source)s)""",
+            {"source": SOURCE, "persons": list(persons)},
+        ).fetchall():
+            named_elsewhere.setdefault(person, set()).add(text)
+        for person, text in persons.items():
+            if person in cs.minted or not named_elsewhere.get(person, set()) - {text}:
+                name(person, text)
+
         emitted = {row["id"] for row in cs.rows.get("contest", [])}
         questions = {
             (key[:10], found[1]): contest
