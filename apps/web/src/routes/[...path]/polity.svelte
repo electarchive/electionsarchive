@@ -1,5 +1,6 @@
 <script lang="ts">
   import Versus from "#routes/compare/places.svelte";
+  import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
@@ -43,9 +44,11 @@
     $props();
 
   const client = useQueryClient();
-  untrack(() => {
-    prime(client, polity.primed);
-  });
+  if (!browser) {
+    untrack(() => {
+      prime(client, polity.primed);
+    });
+  }
 
   const former = $derived(formerly(polity.former, getLocale()));
 

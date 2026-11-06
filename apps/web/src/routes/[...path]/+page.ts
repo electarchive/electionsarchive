@@ -1,6 +1,9 @@
 import type { Part } from "svelte-islands";
+import { browser } from "$app/env";
 import { load as fetched } from "svelte-islands";
 import type { Primed } from "#lib/primed.js";
+import { prime } from "#lib/primed.js";
+import { makeQueryClient } from "#lib/query-client.js";
 import type { PageLoad, PageServerData } from "./$types";
 
 async function seat(
@@ -21,13 +24,20 @@ async function unpacked(found: Part<Primed> | null): Promise<Primed> {
   return found == null ? [] : fetched(found).catch(() => []);
 }
 
+async function unfolded(
+  found: Part<Primed> | Promise<Part<Primed> | null> | null,
+): Promise<Primed> {
+  const primed = await unpacked(await found);
+  if (browser) {
+    prime(makeQueryClient(), primed);
+  }
+  return primed;
+}
+
 export const load: PageLoad = async ({ data }) => {
   if (data.kind === "contest") {
     const { body } = data;
-    const primed =
-      data.primed instanceof Promise
-        ? data.primed.then(unpacked)
-        : unpacked(data.primed);
+    const primed = unfolded(data.primed);
     const view = import("./contest.svelte");
     if (body instanceof Promise) {
       return {
@@ -49,6 +59,7 @@ export const load: PageLoad = async ({ data }) => {
     const { winners } = data.sections;
     const isStreamed = winners instanceof Promise;
     const settled = isStreamed ? winners.then(early) : early(winners);
+    const primed = unfolded(data.primed);
     const [View, ready] = await Promise.all([
       import("./election.svelte"),
       isStreamed ? null : settled,
@@ -56,13 +67,14 @@ export const load: PageLoad = async ({ data }) => {
     return {
       ...data,
       sections: { ...data.sections, winners: isStreamed ? settled : ready },
+      primed: data.primed instanceof Promise ? primed : await primed,
       View: View.default,
     };
   }
   if (data.kind === "day") {
     return { ...data, View: (await import("./day.svelte")).default };
   }
-  const primed = Promise.resolve(data.polity.primed).then(unpacked);
+  const primed = unfolded(data.polity.primed);
   const View = await import("./polity.svelte");
   return {
     ...data,

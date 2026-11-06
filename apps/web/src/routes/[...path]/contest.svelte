@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { READ_ONLY } from "$app/env/public";
   import { invalidateAll } from "$app/navigation";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -37,25 +38,11 @@
     match: string;
   } = $props();
 
-  const client = useQueryClient();
-
-  function seed(found: Primed | Promise<Primed>) {
-    if (found instanceof Promise) {
-      void found.then((ready) => {
-        prime(client, ready);
-      });
-    } else {
-      prime(client, found);
-    }
+  if (!browser) {
+    untrack(() => {
+      prime(useQueryClient(), primed);
+    });
   }
-
-  untrack(() => {
-    seed(primed);
-  });
-
-  $effect.pre(() => {
-    seed(primed);
-  });
 
   const shape = $derived(
     unit === "" ? "whole" : head.scope.isFine ? "fine" : "unit",

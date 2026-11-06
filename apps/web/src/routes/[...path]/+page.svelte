@@ -260,6 +260,7 @@
           scope={data.scope}
           head={data.head}
           body={data.body}
+          primed={data.primed}
           sameDay={data.sameDay}
           sections={data.sections}
         />
