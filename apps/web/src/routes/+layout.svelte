@@ -80,6 +80,7 @@
     /^[a-z]+(?:-\d+)?$/.exec(page.url.searchParams.get("embed") ?? "")?.[0] ??
       null,
   );
+  const herePath = $derived(page.url.pathname.replace(/^\/+|\/+$/gu, ""));
 
   $effect(() => {
     if (embed == null || window.parent === window) {
@@ -220,9 +221,8 @@
               {m.noscript_notice()}
               <a
                 class="font-semibold underline"
-                href={resolve("/[...path]", {
-                  path: `${page.url.pathname.slice(1)}.md`,
-                })}>{m.noscript_twin()}</a
+                href={resolve("/[...path]", { path: `${herePath}.md` })}
+                >{m.noscript_twin()}</a
               >
             </p>
           </noscript>
@@ -248,8 +248,7 @@
       </div>
       <a
         class="block px-3.5 pbe-2 text-xs font-semibold text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
-        href={resolve("/[...path]", { path: page.url.pathname.slice(1) })}
-        >{m.embed_credit()}</a
+        href={resolve("/[...path]", { path: herePath })}>{m.embed_credit()}</a
       >
     {/if}
   </Tooltip.Provider>
