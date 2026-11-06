@@ -12605,6 +12605,15 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             [tails],
         ).fetchall():
             known.setdefault(tail, []).append((person, text))
+        identity_names = {
+            entity: text
+            for entity, text in conn.execute(
+                """select n.entity_id, n.text from name n
+                   join changeset c on c.id = n.changeset_id and c.pipeline = 'identity'
+                   join contest co on co.id = n.entity_id
+                   where n.is_preferred and n.lang = 'en'"""
+            ).fetchall()
+        }
 
         sources = {}
         plurality = {False: cs.key("us.electoral_system", "fptp"), True: cs.key("us.electoral_system", "block")}
@@ -13196,7 +13205,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 text = text.replace(
                     " election", " general municipal election" if fips == "0644000" else " runoff election", 1
                 )
-            cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+            if identity_names.get(contest, text) == text:
+                cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
             cs.add(
                 "slug",
                 path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else ""),
