@@ -2106,7 +2106,7 @@
   {#if contest.count != null}
     <div
       id="rounds"
-      class="col-span-12 grid min-inline-0"
+      class="col-span-12 grid [--island-item:0px] min-inline-0"
       style:min-block-size={contest.table == null
         ? null
         : `calc(min(${contest.count.rows.length * 40 + 60}px, 100svh) + 88px)`}
