@@ -256,8 +256,10 @@ export const load: PageServerLoad = async ({
   request,
   setHeaders,
   isDataRequest,
+  locals,
 }) => {
   const data = await archive(params.path, url.searchParams);
+  locals.view = data.kind;
   const budget = isCrawler(request.headers.get("user-agent"))
     ? Infinity
     : isDataRequest
