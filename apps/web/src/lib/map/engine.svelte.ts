@@ -1,5 +1,5 @@
 import type * as Maplibre from "maplibre-gl";
-import type { PMTiles, Protocol } from "pmtiles";
+import type { PMTiles } from "pmtiles";
 import { dev } from "$app/env";
 import earcut from "earcut";
 import { untrack } from "svelte";
@@ -7,6 +7,7 @@ import { on } from "svelte/events";
 import { isHover, isTouch } from "#lib/explain.svelte.js";
 import { STRIPE } from "#lib/live/flips.js";
 import { Mosaic, sampled } from "#lib/map/mosaic.js";
+import { sharedReads } from "#lib/map/reads.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
 export type Arrow = {
@@ -113,13 +114,10 @@ const SIZE = 512;
 const FIT = 13;
 const CHECKED = { validate: dev };
 
-let library: Promise<{
-  maplibre: typeof Maplibre;
-  PMTiles: typeof PMTiles;
-  protocol: Protocol;
-}> | null = null;
-const archives = new Map<string, PMTiles>();
-let kit: { maplibre: typeof Maplibre; PMTiles: typeof PMTiles } | null = null;
+type Kit = { maplibre: typeof Maplibre; archive: (key: string) => PMTiles };
+
+let library: Promise<Kit> | null = null;
+let kit: Kit | null = null;
 
 const attach = (
   gl: Maplibre.Map,
@@ -132,27 +130,30 @@ const attach = (
 
 const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const archive = (make: typeof PMTiles, key: string) => {
-  let found = archives.get(key);
-  if (found == null) {
-    found = new make(`${location.origin}/tiles/${key}.pmtiles`);
-    archives.set(key, found);
-  }
-  return found;
-};
-
 async function load() {
   library ??= Promise.all([
     import("maplibre-gl"),
     import("pmtiles"),
     import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
     import("maplibre-gl/dist/maplibre-gl.css"),
-  ]).then(([maplibre, { Protocol, PMTiles }, worker]) => {
+  ]).then(([maplibre, { FetchSource, PMTiles, Protocol }, worker]) => {
     maplibre.setWorkerUrl(worker.default);
     const protocol = new Protocol();
     maplibre.addProtocol("pmtiles", protocol.tile);
-    kit = { maplibre, PMTiles };
-    return { maplibre, PMTiles, protocol };
+    kit = {
+      maplibre,
+      archive: (key) => {
+        const url = `${location.origin}/tiles/${key}.pmtiles`;
+        const known = protocol.get(url);
+        if (known != null) {
+          return known;
+        }
+        const made = new PMTiles(sharedReads(new FetchSource(url)));
+        protocol.add(made);
+        return made;
+      },
+    };
+    return kit;
   });
   return library;
 }
@@ -1116,32 +1117,30 @@ export class Engine {
     if (gl == null || gl.getSource(id) != null) {
       return id;
     }
+    const archive = kit?.archive(key);
     attach(gl, id, {
       type: "vector",
       url: `pmtiles://${location.origin}/tiles/${key}.pmtiles`,
     });
     this.#sources.set(id, { group, isVector: true });
-    const { PMTiles } = kit ?? {};
-    if (PMTiles != null) {
-      void archive(PMTiles, key)
-        .getMetadata()
-        .then((meta) => {
-          const text = String(
-            (meta as { attribution?: unknown } | null)?.attribution ?? "",
-          )
-            .replace(/(?:Coastlines|Map data) © OpenStreetMap[^\n]*/u, "")
-            .trim();
-          const credits = new Set([
-            ...this.credits,
-            ...text
-              .split(text.includes("\n") ? "\n" : "; ")
-              .map((part) => part.trim())
-              .filter((part) => part !== ""),
-          ]);
-          this.credits = [...credits].filter(
-            (credit) => !credits.has(`© ${credit}`),
-          );
-        });
+    if (archive != null) {
+      void archive.getMetadata().then((meta) => {
+        const text = String(
+          (meta as { attribution?: unknown } | null)?.attribution ?? "",
+        )
+          .replace(/(?:Coastlines|Map data) © OpenStreetMap[^\n]*/u, "")
+          .trim();
+        const credits = new Set([
+          ...this.credits,
+          ...text
+            .split(text.includes("\n") ? "\n" : "; ")
+            .map((part) => part.trim())
+            .filter((part) => part !== ""),
+        ]);
+        this.credits = [...credits].filter(
+          (credit) => !credits.has(`© ${credit}`),
+        );
+      });
     }
     return id;
   }
@@ -1547,11 +1546,11 @@ export class Engine {
 
   drape(keys: Array<string>, group = "") {
     const gl = this.gl;
-    const { PMTiles } = kit ?? {};
-    if (gl == null || PMTiles == null) {
+    const { archive } = kit ?? {};
+    if (gl == null || archive == null) {
       return;
     }
-    this.#mosaic ??= new Mosaic(gl, (key) => archive(PMTiles, key));
+    this.#mosaic ??= new Mosaic(gl, archive);
     this.#rasterKeys = keys;
     for (const key of keys) {
       for (const isFocus of [false, true]) {
