@@ -3090,6 +3090,7 @@
   "live_twin_estimate": "Schätzung: {name} gewinnt mit einer Wahrscheinlichkeit von {chance}. Der Endvorsprung liegt zwischen {low} und {high} Prozentpunkten. Etwa {share} der erwarteten Stimmen sind ausgezählt.",
   "live_twin_too_early": "Schätzung: Es sind noch zu wenige Stimmen ausgezählt, um das Ergebnis zu schätzen.",
   "live_twin_no_estimate": "Schätzung: keine, weil für diese Wahl kein früheres Ergebnis zum Vergleich vorliegt.",
+  "live_twin_ranked": "Schätzung: keine Siegchance und kein Endvorsprung, weil niemand mehr als die Hälfte der Erstpräferenzen hat. Es folgt die Auszählung per Rangfolgewahl. Etwa {share} der erwarteten Stimmen sind ausgezählt.",
   "live_twin_settled": "Schätzung: {name} hat laut amtlich festgestelltem Ergebnis gewonnen.",
   "live_twin_polls_close": "Wahlschluss: {time}",
   "live_twin_precincts": "{reporting} von {expected} Wahlbezirken ausgezählt",
@@ -4333,6 +4334,7 @@
   "night_dial_none_body": "Für diese Wahl liegt kein früheres Ergebnis vor, mit dem sich die Auszählung vergleichen ließe. Daher lassen sich weder die Siegchance noch der endgültige Vorsprung schätzen. Sobald Ergebnisse eingehen, wird der Auszählungsstand hier aktualisiert.",
   "night_head_estimating": "{name} liegt mit {margin} Punkten Vorsprung vorn, etwa {share} der erwarteten Stimmen sind ausgezählt",
   "night_head_tied": "Gleichstand bei {count} ausgezählten Stimmen",
+  "night_head_ranked": "{name} führt mit {share} der Erstpräferenzen und {margin} Punkten Vorsprung. Niemand hat mehr als die Hälfte. Darum entscheidet die Auszählung per Rangfolgewahl.",
   "night_head_waiting": "Warten auf die ersten Stimmen",
   "night_later": "Ergebnisse später",
   "night_later_title": "Ergebnisse folgen später",
@@ -4528,6 +4530,7 @@
   "night_races_districts": "Größte Distrikte",
   "night_races_house": "Repräsentantenhaus, {count} Distrikte",
   "night_races_leads": "{name} führt mit {margin} Vorsprung",
+  "night_races_ranked": "{name} führt bei den Erstpräferenzen mit {margin} Vorsprung",
   "night_races_waiting": "{count} ausstehend",
   "night_races_won": "{name} gewann",
   "night_races_projected": "{name} gewinnt laut Hochrechnung",
@@ -4789,11 +4792,12 @@
   "board_race_at_large": "{state} gesamt",
   "board_power_won": "Gewonnen",
   "board_power_leading": "Führend",
-  "board_power_waiting": "Noch nicht ausgezählt: {count}",
+  "board_power_waiting": "Noch offen: {count}",
   "board_power_seats": "Sitze zur Wahl: {count}",
   "board_power_empty": "Keine Wahlen für dieses Amt.",
   "board_forecast_off": "Prognosen sind derzeit ausgeschaltet.",
   "board_chance_waiting": "Die Prognose beginnt, sobald die ersten Stimmen gemeldet werden.",
+  "board_chance_ranked": "Die Siegchance wird nicht angezeigt: Niemand hat die Hälfte der Erstpräferenzen. Darum entscheidet die Auszählung per Rangfolgewahl.",
   "board_chance_margin": "Erwarteter Vorsprung",
   "board_chance_range": "{low} bis {high}",
   "board_trend_empty": "Die Linie beginnt mit der ersten Auszählung.",
@@ -4957,6 +4961,42 @@
   "night_chamber_net_none": "Bisher keine Nettoveränderung bei den Sitzen",
   "night_chamber_note": "Blass dargestellte Sitze stehen dieses Jahr nicht zur Wahl. Solange für eine Wahl noch keine Stimmen vorliegen, hat die Partei, die den Sitz hält, in der Berechnung eine Chance von {prior}, ihn zu behalten.",
   "night_chamber_others": "Parteilose und Sonstige",
+  "night_chamber_caucus": "Fraktion {party}",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Davon parteilos: {count}",
+        "countPlural=*": "Davon parteilos: {count}"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Davon aus anderer Partei: {count}",
+        "countPlural=*": "Davon aus anderen Parteien: {count}"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Parteiloser in der Fraktion {party}",
+        "countPlural=*": "Parteilose in der Fraktion {party}"
+      }
+    }
+  ],
+  "night_caucus_party": "{party} in der Fraktion {caucus}",
+  "night_chamber_tiebreak": "Bei einem Patt von {count}:{count} gibt der Vizepräsident den Ausschlag für {party}",
+  "night_chamber_key_caucus": "Gehört zur Fraktion {party}",
+  "night_ladder_caucus_side": "Fraktion {party} führt oder hat gewonnen",
+  "night_ladder_caucus": "Gezählt wird nach Fraktionen. Zur Fraktion {party} zählen auch: {names}.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
@@ -5083,6 +5123,16 @@
   "night_ladder_holdovers": "Die Summen der Parteien enthalten auch Sitze, die dieses Jahr nicht zur Wahl stehen.",
   "night_ladder_special": "Sonderwahl für den Rest einer Amtszeit.",
   "night_ladder_majority": "Für einen direkten Sieg ist die absolute Mehrheit nötig. Sonst folgt eine Stichwahl oder eine Auszählung per Rangfolgewahl.",
+  "night_rank_note": "Das sind Erstpräferenzen. Ein Kandidat mit mehr als der Hälfte davon gewinnt direkt. Erreicht das niemand, folgt die Auszählung per Rangfolgewahl.",
+  "night_rank_note_ak": "Das sind Erstpräferenzen. Ein Kandidat mit mehr als der Hälfte davon gewinnt direkt. Erreicht das niemand, folgt die Auszählung per Rangfolgewahl. Die Alaska Division of Elections führte sie etwa zwei Wochen nach den Wahlen 2022 und 2024 durch.",
+  "night_rank_title": "Auszählung per Rangfolgewahl",
+  "night_rank_body": "Kein Kandidat hat mehr als die Hälfte der Erstpräferenzen. Darum stehen auf dieser Seite keine Siegchance und kein geschätzter Endvorsprung. Das Modell des Archivs schätzt nicht, wie Stimmzettel zwischen Kandidaten übertragen werden.",
+  "night_rank_short": "{name} fehlen {gap} Punkte bis zur Hälfte.",
+  "night_rank_trailing": "{names} kommen zusammen auf {share} der Erstpräferenzen. Scheiden Kandidaten aus, zählen ihre Stimmzettel für die jeweils nächste Präferenz.",
+  "night_rank_trailing_one": "{name} hat {share} der Erstpräferenzen. Bei einem Ausscheiden zählen diese Stimmzettel für die jeweils nächste Präferenz.",
+  "night_rank_line": "Die Linie markiert die Hälfte der Erstpräferenzen.",
+  "night_ladder_ranked": "Rangfolge-Auszählung",
+  "night_ladder_ranked_note": "Rangfolgewahl: Die Zahlen zeigen Erstpräferenzen. Kommt niemand über 50 %, entscheidet die Auszählung per Rangfolgewahl. Bis dahin gelten diese Sitze als noch offen.",
   "night_ladder_count_note": "Bei Wahlen ohne Schätzung zeigt ein grauer Vorsprung den bisherigen Auszählungsstand.",
   "night_ladder_flip_note": "Ein Pfeil wie R → D zeigt einen Sitz, der die Partei wechselt. Ein gefülltes Kästchen bedeutet: Der Sitz hat gewechselt. Ein gestricheltes Kästchen bedeutet: Der Herausforderer führt.",
   "night_ladder_closest": "Die {count} knappsten von {total} Wahlen",

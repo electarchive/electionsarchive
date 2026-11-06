@@ -3090,6 +3090,7 @@
   "live_twin_estimate": "Tahmin: {name} için kazanma olasılığı {chance}. Son farkın {low} ile {high} puan arasında olması bekleniyor. Beklenen oyun yaklaşık {share} kadarı sayıldı.",
   "live_twin_too_early": "Tahmin: sonuç için henüz yeterli oy sayılmadı.",
   "live_twin_no_estimate": "Tahmin yok, çünkü bu yarışta karşılaştırılacak daha önceki bir sonuç yok.",
+  "live_twin_ranked": "Tahmin: kazanma olasılığı ve son fark verilmiyor. Kimse birinci tercihlerin yarısını geçmedi ve yarış sıralı tercih sayımına gidiyor. Beklenen oyun yaklaşık {share} kadarı sayıldı.",
   "live_twin_settled": "Tahmin: {name}, kesinleşmiş sayımda kazandı.",
   "live_twin_polls_close": "Sandık kapanışı: {time}",
   "live_twin_precincts": "Açılan sandık: {reporting} / {expected}",
@@ -4333,6 +4334,7 @@
   "night_dial_none_body": "Bu yarışta sayımla karşılaştırılacak daha önceki bir sonuç yok, bu yüzden kazanma ihtimali ve son fark tahmin edilemiyor. Sayım, sonuçlar geldikçe burada güncellenir.",
   "night_head_estimating": "{name} {margin} puan önde, beklenen oyun yaklaşık {share} kadarı sayıldı",
   "night_head_tied": "{count} oy sayıldı, yarış berabere",
+  "night_head_ranked": "{name}, birinci tercihlerde {share} oy oranıyla {margin} puan önde. Kimse yarıyı geçmedi, bu yüzden sonucu sıralı tercih sayımı belirleyecek.",
   "night_head_waiting": "İlk oylar bekleniyor",
   "night_later": "Sonuçlar daha sonra",
   "night_later_title": "Sonuçlar daha sonra gelecek",
@@ -4528,6 +4530,7 @@
   "night_races_districts": "En büyük seçim bölgeleri",
   "night_races_house": "Temsilciler: {count} seçim bölgesi",
   "night_races_leads": "{name}, {margin} farkla önde",
+  "night_races_ranked": "{name}, birinci tercihlerde {margin} farkla önde",
   "night_races_waiting": "Bekliyor: {count}",
   "night_races_won": "{name} kazandı",
   "night_races_projected": "Tahmini kazanan: {name}",
@@ -4789,11 +4792,12 @@
   "board_race_at_large": "{state} eyalet geneli",
   "board_power_won": "Kazandı",
   "board_power_leading": "Önde",
-  "board_power_waiting": "{count} tanesinde sayım başlamadı",
+  "board_power_waiting": "{count} sandalye belirsiz",
   "board_power_seats": "{count} sandalye yarışta",
   "board_power_empty": "Bu makam için yarış yok.",
   "board_forecast_off": "Tahminler şu anda kapalı.",
   "board_chance_waiting": "Tahmin, ilk oylar geldikten sonra başlar.",
+  "board_chance_ranked": "Kazanma olasılığı gösterilmiyor: kimse birinci tercihlerin yarısına ulaşmadı. Sonucu sıralı tercih sayımı belirleyecek.",
   "board_chance_margin": "Tahmini fark",
   "board_chance_range": "{low} ile {high} arası",
   "board_trend_empty": "Çizgi, ilk sayım sonucuyla başlar.",
@@ -4957,6 +4961,42 @@
   "night_chamber_net_none": "Şu ana kadar net sandalye değişimi yok",
   "night_chamber_note": "Açık renkli sandalyeler bu yıl seçime gitmiyor. Bir yarışta oylar gelene kadar, sandalyeyi elinde tutan partinin onu koruma olasılığı {prior} sayılır.",
   "night_chamber_others": "Bağımsızlar ve diğerleri",
+  "night_chamber_caucus": "{party} grubu",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} bağımsız üye dahil",
+        "countPlural=*": "{count} bağımsız üye dahil"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Başka partiden {count} üye dahil",
+        "countPlural=*": "Başka partilerden {count} üye dahil"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{party} grubunda yer alan bağımsız üye",
+        "countPlural=*": "{party} grubunda yer alan bağımsız üyeler"
+      }
+    }
+  ],
+  "night_caucus_party": "{caucus} grubunda yer alan {party}",
+  "night_chamber_tiebreak": "Başkan yardımcısı, {count}–{count} eşitliğini {party} lehine bozar",
+  "night_chamber_key_caucus": "{party} grubunda yer alıyor",
+  "night_ladder_caucus_side": "{party} grubu: önde veya kazandı",
+  "night_ladder_caucus": "Toplamlar meclis gruplarına göre sayılır: {names}, {party} grubunda yer alıyor.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
@@ -5083,6 +5123,16 @@
   "night_ladder_holdovers": "Parti toplamlarına bu yıl seçime girmeyen sandalyeler de dahil.",
   "night_ladder_special": "Görev süresini tamamlamak için yapılan özel seçim.",
   "night_ladder_majority": "Doğrudan kazanmak için salt çoğunluk gerekir. Aksi halde yarış ikinci tura ya da sıralı tercih sayımına gider.",
+  "night_rank_note": "Bu rakamlar birinci tercihleri gösterir. Yarıdan fazlasını alan aday doğrudan kazanır. Kimse yarıyı geçemezse yarış sıralı tercih sayımına gider.",
+  "night_rank_note_ak": "Bu rakamlar birinci tercihleri gösterir. Yarıdan fazlasını alan aday doğrudan kazanır. Kimse yarıyı geçemezse yarış sıralı tercih sayımına gider. Alaska Seçim Dairesi bu sayımı 2022 ve 2024 seçimlerinden yaklaşık iki hafta sonra yaptı.",
+  "night_rank_title": "Sıralı tercih sayımı",
+  "night_rank_body": "Hiçbir aday birinci tercihlerin yarısını geçmedi. Bu yüzden bu sayfada kazanma olasılığı veya tahmini son fark gösterilmiyor. Arşivin modeli, oy pusulalarının adaylar arasında nasıl aktarılacağını tahmin etmiyor.",
+  "night_rank_short": "{name}, oyların yarısına {gap} puan uzakta.",
+  "night_rank_trailing": "{names}, birinci tercihlerde toplam {share} oy aldı. Adaylar elendikçe oy pusulaları her seçmenin bir sonraki tercihine geçer.",
+  "night_rank_trailing_one": "{name}, birinci tercihlerde {share} oy aldı. Elenirse bu oy pusulaları her seçmenin bir sonraki tercihine geçer.",
+  "night_rank_line": "Çizgi, birinci tercihlerin yarısını gösterir.",
+  "night_ladder_ranked": "Sıralı tercih sayımı",
+  "night_ladder_ranked_note": "Sıralı tercihli yarış: rakamlar birinci tercihleri gösterir. Kimse %50'yi geçmezse sonucu sıralı tercih sayımı belirler. O zamana kadar bu sandalyeler belirsiz sayılır.",
   "night_ladder_count_note": "Gri farklar, henüz tahmini olmayan yarışlarda o ana kadarki sayımı gösterir.",
   "night_ladder_flip_note": "R → D gibi bir ok, el değiştiren bir sandalyeyi işaret eder. Dolu kutu: sandalye el değiştirdi. Kesik çizgili kutu: rakip önde.",
   "night_ladder_closest": "{total} yarış içinden en çekişmeli {count} yarış",

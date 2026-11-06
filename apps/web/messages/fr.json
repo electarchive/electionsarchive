@@ -3141,6 +3141,7 @@
   "live_twin_estimate": "Estimation : {name} a {chance} de chances de l'emporter, avec un écart final compris entre {low} et {high} points. Environ {share} des votes attendus sont dépouillés.",
   "live_twin_too_early": "Estimation : trop peu de bulletins sont dépouillés pour estimer le résultat.",
   "live_twin_no_estimate": "Estimation : aucune, car ce scrutin n'a pas de résultat antérieur auquel se comparer.",
+  "live_twin_ranked": "Estimation : ni probabilité de victoire ni écart final. Personne n'a plus de la moitié des premiers choix et le scrutin passe au dépouillement par vote alternatif. Environ {share} des votes attendus sont dépouillés.",
   "live_twin_settled": "Estimation : {name} l'a emporté dans le décompte certifié.",
   "live_twin_polls_close": "Clôture des bureaux à {time}",
   "live_twin_precincts": "{reporting} bureaux de vote sur {expected} dépouillés",
@@ -4409,6 +4410,7 @@
   "night_dial_none_body": "Cette course n'a aucun résultat antérieur auquel comparer le dépouillement. Il est donc impossible d'estimer la probabilité de victoire ou l'écart final. Les chiffres du dépouillement sont mis à jour ici à mesure que les résultats arrivent.",
   "night_head_estimating": "{name} est en tête de {margin} points avec environ {share} des votes attendus dépouillés",
   "night_head_tied": "Égalité avec {count} bulletins dépouillés",
+  "night_head_ranked": "{name} est en tête avec {share} des premiers choix et {margin} points d'avance. Personne n'a plus de la moitié. Le dépouillement par vote alternatif décidera.",
   "night_head_waiting": "En attente des premiers votes",
   "night_later": "Résultats plus tard",
   "night_later_title": "Résultats à venir",
@@ -4604,6 +4606,7 @@
   "night_races_districts": "Districts les plus peuplés",
   "night_races_house": "Chambre, {count} districts",
   "night_races_leads": "{name} mène de {margin}",
+  "night_races_ranked": "{name} est en tête des premiers choix avec {margin} d'avance",
   "night_races_waiting": "En attente : {count}",
   "night_races_won": "{name} l'emporte",
   "night_races_projected": "Projection : {name} l'emporte",
@@ -4865,11 +4868,12 @@
   "board_race_at_large": "{state} (district unique)",
   "board_power_won": "Gagnés",
   "board_power_leading": "En tête",
-  "board_power_waiting": "Pas encore dépouillés : {count}",
+  "board_power_waiting": "Non attribués : {count}",
   "board_power_seats": "Sièges en jeu : {count}",
   "board_power_empty": "Aucun scrutin pour cette fonction.",
   "board_forecast_off": "Les prévisions sont désactivées pour le moment.",
   "board_chance_waiting": "La prévision démarre dès l'arrivée des premiers résultats.",
+  "board_chance_ranked": "Probabilité de victoire non affichée : personne n'a la moitié des premiers choix. Le dépouillement par vote alternatif décidera.",
   "board_chance_margin": "Écart projeté",
   "board_chance_range": "{low} à {high}",
   "board_trend_empty": "La courbe commence dès le premier décompte.",
@@ -5033,6 +5037,45 @@
   "night_chamber_net_none": "Aucun changement net de sièges à ce stade",
   "night_chamber_note": "Les sièges en teinte pâle ne sont pas renouvelés cette année. Tant qu'aucun résultat n'est publié pour un scrutin, les probabilités donnent au parti qui détient le siège {prior} de chances de le conserver.",
   "night_chamber_others": "Indépendants et autres",
+  "night_chamber_caucus": "Groupe {party}",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Dont {count} indépendant",
+        "countPlural=many": "Dont {count} d'indépendants",
+        "countPlural=*": "Dont {count} indépendants"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Dont {count} membre d'un autre parti",
+        "countPlural=many": "Dont {count} de membres d'autres partis",
+        "countPlural=*": "Dont {count} membres d'autres partis"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Indépendant rattaché au groupe {party}",
+        "countPlural=many": "Indépendants rattachés au groupe {party}",
+        "countPlural=*": "Indépendants rattachés au groupe {party}"
+      }
+    }
+  ],
+  "night_caucus_party": "{party} dans le groupe {caucus}",
+  "night_chamber_tiebreak": "Le vice-président tranche l'égalité à {count}–{count} pour {party}",
+  "night_chamber_key_caucus": "Rattaché au groupe {party}",
+  "night_ladder_caucus_side": "Groupe {party} en tête ou vainqueur",
+  "night_ladder_caucus": "Totaux par groupe. Dans le groupe {party} : {names}.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
@@ -5161,6 +5204,16 @@
   "night_ladder_holdovers": "Les totaux des partis incluent les sièges qui ne sont pas renouvelés cette année.",
   "night_ladder_special": "Élection spéciale pour achever un mandat.",
   "night_ladder_majority": "Il faut la majorité absolue pour l'emporter d'emblée. Sinon, le scrutin passe à un second tour ou à un dépouillement par vote alternatif.",
+  "night_rank_note": "Ces chiffres correspondent aux premiers choix. Un candidat qui en obtient plus de la moitié l'emporte d'emblée. Sinon, le scrutin passe au dépouillement par vote alternatif.",
+  "night_rank_note_ak": "Ces chiffres correspondent aux premiers choix. Un candidat qui en obtient plus de la moitié l'emporte d'emblée. Sinon, le scrutin passe au dépouillement par vote alternatif. L'Alaska Division of Elections l'a effectué environ deux semaines après les élections de 2022 et de 2024.",
+  "night_rank_title": "Décompte par vote alternatif",
+  "night_rank_body": "Aucun candidat n'a plus de la moitié des premiers choix. Cette page n'affiche donc ni probabilité de victoire ni écart final estimé. Le modèle des archives n'estime pas les transferts de bulletins entre candidats.",
+  "night_rank_short": "Il manque {gap} points à {name} pour atteindre la moitié.",
+  "night_rank_trailing": "{names} totalisent {share} des premiers choix. Quand un candidat est éliminé, ses bulletins passent au choix suivant de chaque électeur.",
+  "night_rank_trailing_one": "{name} a {share} des premiers choix. En cas d'élimination, ces bulletins passent au choix suivant de chaque électeur.",
+  "night_rank_line": "La ligne marque la moitié des premiers choix.",
+  "night_ladder_ranked": "Vote alternatif",
+  "night_ladder_ranked_note": "Scrutin au vote alternatif : les chiffres correspondent aux premiers choix. Si personne ne dépasse 50 %, le dépouillement par vote alternatif décide. D'ici là, ces sièges comptent comme non attribués.",
   "night_ladder_count_note": "Pour les scrutins encore sans estimation, les écarts en gris sont ceux du dépouillement en cours.",
   "night_ladder_flip_note": "Une flèche telle que R → D signale un siège qui change de parti. Un cadre plein indique que le siège a basculé ; un cadre en pointillés indique que le challenger est en tête.",
   "night_ladder_closest": "Les {count} scrutins les plus serrés sur {total}",

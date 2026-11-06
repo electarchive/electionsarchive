@@ -3090,6 +3090,7 @@
   "live_twin_estimate": "Texmîn: şansê serkeftinê yê {name} {chance} e, cudahiya dawîn dê di navbera {low} û {high} xalan de be û nêzîkî {share} ya dengên çaverêkirî hatine jimartin.",
   "live_twin_too_early": "Texmîn: ji bo texmînkirina encamê hê têra xwe deng nehatine jimartin.",
   "live_twin_no_estimate": "Texmîn: tune, ji ber ku ji bo vê pêşbaziyê encameke berê ya ji bo berhevdanê tune ye.",
+  "live_twin_ranked": "Texmîn: şansê serkeftinê û cudahiya dengan a dawîn tune. Kesî ji nîvê tercîhên yekem bêtir negirtiye û pêşbazî diçe jimartina bi rêzkirina tercîhan. Nêzîkî {share} ji dengên çaverêkirî hatine jimartin.",
   "live_twin_settled": "Texmîn: {name} di jimartina pejirandî de bi ser ket.",
   "live_twin_polls_close": "Dengdan di {time} de diqede",
   "live_twin_precincts": "Ji {expected} herêmên dengdanê {reporting} encam ragihandine",
@@ -4333,6 +4334,7 @@
   "night_dial_none_body": "Ji bo vê pêşbaziyê encameke berê tune ye ku jimartin pê re were berawirdkirin. Ji ber vê yekê şansê serkeftinê an cudahiya dawî ya dengan nayê texmînkirin. Gava encam tên, jimartin li vir tê nûkirin.",
   "night_head_estimating": "{name} bi {margin} xalî pêş e; nêzîkî {share} ji dengên çaverêkirî hatine jimartin",
   "night_head_tied": "Wekhev e, {count} deng hatine jimartin",
+  "night_head_ranked": "{name} bi {share} ji tercîhên yekem pêş e. Cudahî {margin} xal e. Kesî ji nîvî bêtir negirtiye. Ji ber vê yekê dê jimartina bi rêzkirina tercîhan encamê diyar bike.",
   "night_head_waiting": "Li benda dengên pêşîn e",
   "night_later": "Encam paşê tên",
   "night_later_title": "Encam paşê tên",
@@ -4528,6 +4530,7 @@
   "night_races_districts": "Herêmên herî mezin",
   "night_races_house": "Meclîsa Nûneran, {count} herêm",
   "night_races_leads": "{name} bi {margin} li pêş e",
+  "night_races_ranked": "{name} di tercîhên yekem de bi {margin} pêş e",
   "night_races_waiting": "{count} li bendê ne",
   "night_races_won": "{name} bi ser ket",
   "night_races_projected": "Pêşbînî: {name} bi ser dikeve",
@@ -4789,11 +4792,12 @@
   "board_race_at_large": "{state} bi giştî",
   "board_power_won": "Serkeftî",
   "board_power_leading": "Pêşeng",
-  "board_power_waiting": "{count} hê nehatine jimartin",
+  "board_power_waiting": "{count} hêj ne diyar",
   "board_power_seats": "{count} kursî pêşbazî ne",
   "board_power_empty": "Ji bo vê wezîfeyê pêşbazî tune.",
   "board_forecast_off": "Pêşbînî niha neçalak in.",
   "board_chance_waiting": "Pêşbînî piştî gihîştina dengên pêşîn dest pê dike.",
+  "board_chance_ranked": "Şansê serkeftinê nayê nîşandan. Kes negihîştiye nîvê tercîhên yekem. Ji ber vê yekê jimartina bi rêzkirina tercîhan encamê diyar dike.",
   "board_chance_margin": "Cudahiya pêşbînîkirî",
   "board_chance_range": "{low} heta {high}",
   "board_trend_empty": "Xêz bi jimartina yekem dest pê dike.",
@@ -4957,6 +4961,42 @@
   "night_chamber_net_none": "Heta niha di kursiyan de guhertin tune",
   "night_chamber_note": "Kursiyên bi rengê vekirî îsal nayên hilbijartin. Heta ku dengên pêşbaziyekê neyên, şansê ku partiya xwedî kursiyê wê biparêze {prior} tê hesibandin.",
   "night_chamber_others": "Serbixwe û yên din",
+  "night_chamber_caucus": "Koma {party}",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} serbixwe jî tê de ye",
+        "countPlural=*": "{count} serbixwe jî tê de ne"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} endamê partiyeke din jî tê de ye",
+        "countPlural=*": "{count} endamên partiyên din jî tê de ne"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Serbixweyê di koma {party} de",
+        "countPlural=*": "Serbixweyên di koma {party} de"
+      }
+    }
+  ],
+  "night_caucus_party": "{party} di koma {caucus} de",
+  "night_chamber_tiebreak": "Cîgirê serok wekheviya {count}–{count} bi dengê xwe ji bo {party} çareser dike",
+  "night_chamber_key_caucus": "Di koma {party} de",
+  "night_ladder_caucus_side": "Koma {party} pêş e an bi ser ket",
+  "night_ladder_caucus": "Tevahiya kursiyan li gorî koman tê hesibandin. {names} di koma {party} de ne.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
@@ -5083,6 +5123,16 @@
   "night_ladder_holdovers": "Di tevahiya kursiyên partiyan de kursiyên ku îsal nayên hilbijartin jî hene.",
   "night_ladder_special": "Hilbijartina taybet a ji bo temamkirina heyama wezîfeyê.",
   "night_ladder_majority": "Ji bo serkeftina rasterast piraniya mutleq lazim e. An na, pêşbazî diçe dora duyem an jî jimartina bi rêzkirina tercîhan.",
+  "night_rank_note": "Ev tercîhên yekem in. Berendamê ku ji nîvî bêtir ji wan bigire rasterast bi ser dikeve. Heke tu kes negihîje wê rêjeyê, pêşbazî diçe jimartina bi rêzkirina tercîhan.",
+  "night_rank_note_ak": "Ev tercîhên yekem in. Berendamê ku ji nîvî bêtir ji wan bigire rasterast bi ser dikeve. Heke tu kes negihîje wê rêjeyê, pêşbazî diçe jimartina bi rêzkirina tercîhan. Alaska Division of Elections ev jimartin nêzîkî du hefte piştî hilbijartinên 2022 û 2024an kir.",
+  "night_rank_title": "Jimartina tercîhan",
+  "night_rank_body": "Tu berendamî ji nîvê tercîhên yekem bêtir negirtiye. Ji ber vê yekê li vê rûpelê şansê serkeftinê û cudahiya dawîn a texmînkirî nayên nîşandan. Modela arşîvê texmîn nake ka pusula di navbera berendaman de çawa diçin.",
+  "night_rank_short": "{name} bi {gap} xalî di bin nîvî de ye.",
+  "night_rank_trailing": "{names} bi hev re {share} ji tercîhên yekem girtiye. Dema berendam werin derxistin, pusulayên wan diçin tercîha din a her dengderî.",
+  "night_rank_trailing_one": "{name} {share} ji tercîhên yekem girtiye. Heke were derxistin, ev pusula diçin tercîha din a her dengderî.",
+  "night_rank_line": "Xêz nîvê tercîhên yekem nîşan dide.",
+  "night_ladder_ranked": "Jimartina tercîhan",
+  "night_ladder_ranked_note": "Pêşbaziya bi rêzkirina tercîhan: hejmar tercîhên yekem nîşan didin. Heke kes ji 50% derbas nebe, jimartina bi rêzkirina tercîhan encamê diyar dike. Ev kursî heta wê demê wekî ne diyar tên hesibandin.",
   "night_ladder_count_note": "Cudahiyên gewr encama jimartina heta niha ne. Ew li pêşbaziyên ku hêj texmîna wan tune xuya dikin.",
   "night_ladder_flip_note": "Tîra wekî R → D nîşan dide ku kursî derbasî partiyeke din dibe. Qutiya tijî tê wê wateyê ku kursî derbasî partiyeke din bûye. Qutiya bi xêza qutqutî tê wê wateyê ku hevrik pêş e.",
   "night_ladder_closest": "Ji {total} pêşbaziyan {count} yên herî nêzîk",

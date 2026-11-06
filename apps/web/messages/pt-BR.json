@@ -3139,6 +3139,7 @@
   "live_twin_estimate": "Estimativa: {name} tem {chance} de chance de vencer, com margem final entre {low} e {high} pontos percentuais e cerca de {share} dos votos esperados apurados.",
   "live_twin_too_early": "Estimativa: ainda há poucos votos apurados para estimar o resultado.",
   "live_twin_no_estimate": "Estimativa: nenhuma, porque esta disputa não tem resultado anterior para comparar.",
+  "live_twin_ranked": "Estimativa: chance de vitória e margem final não calculadas, porque ninguém tem mais da metade das primeiras escolhas e a disputa vai à contagem por voto ranqueado. Cerca de {share} dos votos esperados foram apurados.",
   "live_twin_settled": "Estimativa: {name} venceu na contagem homologada.",
   "live_twin_polls_close": "Urnas fecham às {time}",
   "live_twin_precincts": "{reporting} de {expected} precintos apurados",
@@ -4407,6 +4408,7 @@
   "night_dial_none_body": "Não há resultado anterior desta disputa para comparar com a apuração. Por isso, não é possível estimar a chance de vitória nem a margem final. A apuração é atualizada aqui conforme os resultados chegam.",
   "night_head_estimating": "{name} lidera por {margin} pontos, com cerca de {share} dos votos esperados apurados",
   "night_head_tied": "Empate, com {count} votos apurados",
+  "night_head_ranked": "{name} lidera com {share} das primeiras escolhas e {margin} pontos de vantagem. Ninguém tem mais da metade, então a contagem por voto ranqueado vai decidir.",
   "night_head_waiting": "Aguardando os primeiros votos",
   "night_later": "Resultados mais tarde",
   "night_later_title": "Resultados saem mais tarde",
@@ -4602,6 +4604,7 @@
   "night_races_districts": "Maiores distritos",
   "night_races_house": "Câmara, {count} distritos",
   "night_races_leads": "{name} lidera por {margin}",
+  "night_races_ranked": "{name} lidera nas primeiras escolhas por {margin}",
   "night_races_waiting": "Aguardando: {count}",
   "night_races_won": "{name} venceu",
   "night_races_projected": "{name} tem vitória projetada",
@@ -4863,11 +4866,12 @@
   "board_race_at_large": "{state}, distrito único",
   "board_power_won": "Vencidas",
   "board_power_leading": "Liderando",
-  "board_power_waiting": "Ainda sem apuração: {count}",
+  "board_power_waiting": "Indefinidas: {count}",
   "board_power_seats": "Cadeiras em jogo: {count}",
   "board_power_empty": "Nenhuma disputa para este cargo.",
   "board_forecast_off": "As previsões estão desativadas por enquanto.",
   "board_chance_waiting": "A previsão começa quando chegam os primeiros votos.",
+  "board_chance_ranked": "Chance de vitória não exibida: ninguém tem metade das primeiras escolhas, então a contagem por voto ranqueado decide a disputa.",
   "board_chance_margin": "Margem projetada",
   "board_chance_range": "{low} a {high}",
   "board_trend_empty": "A linha começa na primeira contagem.",
@@ -5031,6 +5035,45 @@
   "night_chamber_net_none": "Sem mudança líquida de cadeiras até agora",
   "night_chamber_note": "Cadeiras em tom claro não estão em disputa este ano. Enquanto uma disputa não tiver votos apurados, a estimativa dá ao partido que ocupa a cadeira {prior} de chance de mantê-la.",
   "night_chamber_others": "Independentes e outros",
+  "night_chamber_caucus": "Bancada de {party}",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Inclui {count} independente",
+        "countPlural=many": "Inclui {count} independentes",
+        "countPlural=*": "Inclui {count} independentes"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Inclui {count} membro de outro partido",
+        "countPlural=many": "Inclui {count} membros de outros partidos",
+        "countPlural=*": "Inclui {count} membros de outros partidos"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Independente na bancada de {party}",
+        "countPlural=many": "Independentes na bancada de {party}",
+        "countPlural=*": "Independentes na bancada de {party}"
+      }
+    }
+  ],
+  "night_caucus_party": "{party} na bancada de {caucus}",
+  "night_chamber_tiebreak": "O vice-presidente desfaz o empate de {count} a {count} em favor de {party}",
+  "night_chamber_key_caucus": "Integra a bancada de {party}",
+  "night_ladder_caucus_side": "Bancada de {party} lidera ou venceu",
+  "night_ladder_caucus": "Os totais são contados por bancada. A bancada de {party} inclui {names}.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
@@ -5159,6 +5202,16 @@
   "night_ladder_holdovers": "Os totais dos partidos incluem cadeiras que não estão em disputa neste ano.",
   "night_ladder_special": "Eleição especial para completar um mandato.",
   "night_ladder_majority": "Exige maioria absoluta para vencer. Sem ela, a disputa vai ao segundo turno ou a uma contagem por voto ranqueado.",
+  "night_rank_note": "Estes números mostram as primeiras escolhas. O candidato com mais da metade delas vence de imediato. Se ninguém conseguir, a disputa vai à contagem por voto ranqueado.",
+  "night_rank_note_ak": "Estes números mostram as primeiras escolhas. O candidato com mais da metade delas vence de imediato. Se ninguém conseguir, a disputa vai à contagem por voto ranqueado. A Alaska Division of Elections fez essa contagem cerca de duas semanas após as eleições de 2022 e 2024.",
+  "night_rank_title": "Contagem por voto ranqueado",
+  "night_rank_body": "Nenhum candidato tem mais da metade das primeiras escolhas. Por isso, esta página não mostra chance de vitória nem margem final estimada. O modelo do arquivo não estima como as cédulas passam de um candidato a outro.",
+  "night_rank_short": "Faltam {gap} pontos para {name} chegar à metade.",
+  "night_rank_trailing": "{names} somam {share} das primeiras escolhas. Quando um candidato é eliminado, as cédulas dele vão para a próxima escolha de cada eleitor.",
+  "night_rank_trailing_one": "{name} tem {share} das primeiras escolhas. Em caso de eliminação, essas cédulas vão para a próxima escolha de cada eleitor.",
+  "night_rank_line": "A linha marca a metade das primeiras escolhas.",
+  "night_ladder_ranked": "Voto ranqueado",
+  "night_ladder_ranked_note": "Disputa com voto ranqueado: os números mostram as primeiras escolhas. Se ninguém passar de 50%, a contagem por voto ranqueado decide. Até lá, estas cadeiras contam como indefinidas.",
   "night_ladder_count_note": "Margens em cinza mostram a apuração até agora nas disputas que ainda não têm estimativa.",
   "night_ladder_flip_note": "Uma seta como R → D indica uma cadeira que muda de partido. Uma caixa preenchida indica que a cadeira já virou. Uma caixa tracejada indica que o desafiante está à frente.",
   "night_ladder_closest": "As {count} disputas mais apertadas entre {total}",
