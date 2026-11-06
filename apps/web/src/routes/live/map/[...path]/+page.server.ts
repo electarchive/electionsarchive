@@ -161,6 +161,7 @@ export const load: PageServerLoad = async ({ params }) => {
             ),
             parties: ballot.parties,
             families: ballot.families,
+            caucuses: ballot.caucuses,
           },
     around:
       nation == null || OUTLYING.has(code)

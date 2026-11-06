@@ -162,6 +162,11 @@
               ></span>
               <span class="truncate">{side.name || side.short}</span>
             </span>
+            {#if side.makeup != null}
+              <span class="block ps-4 text-xs font-normal text-muted-foreground"
+                >{side.makeup}</span
+              >
+            {/if}
           </th>
           <td class="py-1 text-end">{count(side.before)}</td>
           <td class="py-1 text-end text-muted-foreground"
