@@ -3533,91 +3533,93 @@
       </div>
     {/if}
     {#if overview != null && context != null}
-      {#key `${nook.isTop}:${nook.isEnd}:${context.k}`}
-        <button
-          type="button"
-          class={cn(
-            "group absolute grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border transition-opacity duration-150 hover:bg-secondary motion-reduce:transition-none",
-            { "pointer-events-none opacity-0": !nook.isPlaced },
-          )}
-          style:inset-inline-start={nook.isEnd ? null : "8px"}
-          style:inset-inline-end={nook.isEnd ? "8px" : null}
-          style:inset-block-start={nook.isTop
-            ? `${8 + (nook.isEnd || up == null ? 0 : upHeight + 8)}px`
-            : null}
-          style:inset-block-end={nook.isTop ? null : "8px"}
-          aria-label={m.map_context({ place: context.name })}
-          title={m.map_context({ place: context.name })}
-          onclick={() => {
-            if (context != null) {
-              engine.fit(context.frame);
-            }
-          }}
-          {@attach (node) => {
-            inset = node;
-            untrack(() => {
-              nestle();
-              engine.gl?.once("idle", nestle);
-            });
-          }}
-          transition:fade|global={{ duration: calm ? 0 : 160 }}
-          data-export-skip
-        >
-          <svg
+      <div transition:fade={{ duration: calm ? 0 : 160 }}>
+        {#key `${nook.isTop}:${nook.isEnd}:${context.k}`}
+          <button
+            type="button"
             class={cn(
-              "transition-[inline-size,max-block-size] duration-200 ease-out motion-reduce:transition-none",
-              {
-                "inline-28 max-block-24 max-sm:inline-20 max-sm:max-block-16":
-                  !nook.isCompact,
-              },
-              {
-                "inline-12 max-block-10 group-hover:inline-28 group-hover:max-block-24 group-focus-visible:inline-28 group-focus-visible:max-block-24":
-                  nook.isCompact,
-              },
+              "group absolute grid justify-items-center gap-1 rounded-sm bg-card/95 p-1.5 shadow-menu ring-1 ring-border transition-opacity duration-150 hover:bg-secondary motion-reduce:transition-none",
+              { "pointer-events-none opacity-0": !nook.isPlaced },
             )}
-            viewBox="{context.extent.x} {context.extent.y} {context.extent
-              .width} {context.extent.height}"
-            aria-hidden="true"
+            style:inset-inline-start={nook.isEnd ? null : "8px"}
+            style:inset-inline-end={nook.isEnd ? "8px" : null}
+            style:inset-block-start={nook.isTop
+              ? `${8 + (nook.isEnd || up == null ? 0 : upHeight + 8)}px`
+              : null}
+            style:inset-block-end={nook.isTop ? null : "8px"}
+            aria-label={m.map_context({ place: context.name })}
+            title={m.map_context({ place: context.name })}
+            onclick={() => {
+              if (context != null) {
+                engine.fit(context.frame);
+              }
+            }}
+            {@attach (node) => {
+              inset = node;
+              untrack(() => {
+                nestle();
+                engine.gl?.once("idle", nestle);
+              });
+            }}
+            transition:fade={{ duration: calm ? 0 : 160 }}
+            data-export-skip
           >
-            <path
-              d={context.outline}
-              class="fill-muted-foreground/25 stroke-muted-foreground"
-              stroke-width="1"
-              stroke-linejoin="round"
-              vector-effect="non-scaling-stroke"
-            />
-            {#if overview.isDot}
-              <circle
-                cx={overview.cx}
-                cy={overview.cy}
-                r={overview.r}
-                class="fill-foreground stroke-card"
-                stroke-width="1.5"
+            <svg
+              class={cn(
+                "transition-[inline-size,max-block-size] duration-200 ease-out motion-reduce:transition-none",
+                {
+                  "inline-28 max-block-24 max-sm:inline-20 max-sm:max-block-16":
+                    !nook.isCompact,
+                },
+                {
+                  "inline-12 max-block-10 group-hover:inline-28 group-hover:max-block-24 group-focus-visible:inline-28 group-focus-visible:max-block-24":
+                    nook.isCompact,
+                },
+              )}
+              viewBox="{context.extent.x} {context.extent.y} {context.extent
+                .width} {context.extent.height}"
+              aria-hidden="true"
+            >
+              <path
+                d={context.outline}
+                class="fill-muted-foreground/25 stroke-muted-foreground"
+                stroke-width="1"
+                stroke-linejoin="round"
                 vector-effect="non-scaling-stroke"
               />
-            {:else}
-              <rect
-                x={overview.x}
-                y={overview.y}
-                width={overview.width}
-                height={overview.height}
-                class="fill-foreground/15 stroke-foreground"
-                stroke-width="1.5"
-                vector-effect="non-scaling-stroke"
-              />
-            {/if}
-          </svg>
-          <span
-            class={cn(
-              "truncate text-[0.6875rem]/none text-muted-foreground max-inline-28 max-sm:max-inline-20",
-              {
-                "hidden group-hover:block group-focus-visible:block":
-                  nook.isCompact,
-              },
-            )}>{context.name}</span
-          >
-        </button>
-      {/key}
+              {#if overview.isDot}
+                <circle
+                  cx={overview.cx}
+                  cy={overview.cy}
+                  r={overview.r}
+                  class="fill-foreground stroke-card"
+                  stroke-width="1.5"
+                  vector-effect="non-scaling-stroke"
+                />
+              {:else}
+                <rect
+                  x={overview.x}
+                  y={overview.y}
+                  width={overview.width}
+                  height={overview.height}
+                  class="fill-foreground/15 stroke-foreground"
+                  stroke-width="1.5"
+                  vector-effect="non-scaling-stroke"
+                />
+              {/if}
+            </svg>
+            <span
+              class={cn(
+                "truncate text-[0.6875rem]/none text-muted-foreground max-inline-28 max-sm:max-inline-20",
+                {
+                  "hidden group-hover:block group-focus-visible:block":
+                    nook.isCompact,
+                },
+              )}>{context.name}</span
+            >
+          </button>
+        {/key}
+      </div>
     {/if}
     {#if up != null}
       <a
