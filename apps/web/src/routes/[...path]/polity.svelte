@@ -3,7 +3,11 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
-  import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import {
+    createQuery,
+    keepPreviousData,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import { Await, Island } from "svelte-islands";
   import { SvelteSet } from "svelte/reactivity";
@@ -15,6 +19,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { prime } from "#lib/primed.js";
   import { formerly } from "#lib/relations.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
@@ -26,6 +31,7 @@
   import Known from "./known.svelte";
   import PlaceMap from "./map.svelte";
   import Offices from "./offices.svelte";
+  import { isLocalOf, isNationalOf, sourceOf, upOf } from "./polity-source.js";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
   import Scrubber from "./scrubber.svelte";
@@ -36,22 +42,15 @@
   }: { id: string; polity: Extract<PageData, { kind: "polity" }>["polity"] } =
     $props();
 
+  const client = useQueryClient();
+  untrack(() => {
+    prime(client, polity.primed);
+  });
+
   const former = $derived(formerly(polity.former, getLocale()));
 
   const uid = $props.id();
-  const isLocal = $derived(
-    polity.parent != null &&
-      polity.results.length > 0 &&
-      (polity.calendar.count === 0 ||
-        !["sovereign_state", "supranational", "federal_unit"].includes(
-          polity.kind,
-        )) &&
-      !(
-        polity.kind === "region" &&
-        polity.latest != null &&
-        polity.latest.scope == null
-      ),
-  );
+  const isLocal = $derived(isLocalOf(polity));
   const above = $derived(polity.breadcrumbs.at(-1)?.name ?? "");
   const isState = $derived(
     polity.kind === "federal_unit" && polity.breadcrumbs.at(-1)?.path === "us",
@@ -226,34 +225,14 @@
       .toSorted((a, b) => b[1] - a[1])[0]?.[0];
     return usual == null ? null : { usual, isMixed: tally.size > 1 };
   });
-  const isNational = $derived(
-    ["sovereign_state", "supranational"].includes(polity.kind),
-  );
+  const isNational = $derived(isNationalOf(polity));
   const headline = $derived(
     isNational
       ? null
       : (polity.latest?.races.find((race) => race.contest != null) ?? null),
   );
 
-  const source = $derived.by(() => {
-    const race = isLocal
-      ? (polity.results
-          .flatMap((entry) => entry.races)
-          .find((entry) => entry.id === polity.local) ??
-        polity.results[0]?.races[0])
-      : undefined;
-    if (race?.path != null) {
-      return {
-        key: `${race.id}/${race.path}`,
-        id: race.id,
-        unit: race.unit ?? undefined,
-      };
-    }
-    const contest = isNational ? null : (polity.mapped ?? headline?.contest);
-    return contest == null
-      ? null
-      : { key: contest, id: contest, unit: undefined };
-  });
+  const source = $derived(sourceOf(polity));
 
   let loaded = $state<{
     id: string;
@@ -274,39 +253,41 @@
     const stop = new AbortController();
     void (async () => {
       try {
-        const steps = wanted.unit?.split("/") ?? [];
-        const up = steps.length > 1 ? steps.slice(0, -1).join("/") : undefined;
+        const up = upOf(wanted.unit);
+        const place = async (unit: string | undefined) =>
+          client.fetchQuery({
+            ...orpc.contests.get.queryOptions({
+              input: { id: wanted.id, unit },
+            }),
+            meta: { quiet: true },
+          });
+        const bounded = async (
+          unit: string | undefined,
+          level: string | undefined,
+        ) =>
+          client.fetchQuery({
+            ...orpc.contests.boundaries.queryOptions({
+              input: { id: wanted.id, unit, level },
+            }),
+            meta: { quiet: true },
+          });
         const [[contest, bounds], wider] = await Promise.all([
           (async () => {
-            const own = await orpc.contests.get.call({
-              id: wanted.id,
-              unit: wanted.unit,
-            });
+            const own = await place(wanted.unit);
             return [
               own,
-              await orpc.contests.boundaries.call({
-                id: wanted.id,
-                unit: wanted.unit,
-                level: own.places?.level,
-              }),
+              await bounded(wanted.unit, own.places?.level),
             ] as const;
           })(),
           wanted.unit == null
             ? null
             : (async () => {
-                const whole = await orpc.contests.get.call({
-                  id: wanted.id,
-                  unit: up,
-                });
+                const whole = await place(up);
                 return whole.places == null
                   ? null
                   : {
                       contest: whole,
-                      bounds: await orpc.contests.boundaries.call({
-                        id: wanted.id,
-                        unit: up,
-                        level: whole.places.level,
-                      }),
+                      bounds: await bounded(up, whole.places.level),
                     };
               })(),
         ]);

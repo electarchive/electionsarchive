@@ -1,5 +1,6 @@
 import type { Part } from "svelte-islands";
 import { load as fetched } from "svelte-islands";
+import type { Primed } from "#lib/primed.js";
 import type { PageLoad, PageServerData } from "./$types";
 
 async function seat(
@@ -14,6 +15,10 @@ async function seat(
 
 async function early<T>(found: Part<T> | null) {
   return found?.name === "election.sweep" ? fetched(found) : found;
+}
+
+async function unpacked(found: Part<Primed> | null): Promise<Primed> {
+  return found == null ? [] : fetched(found).catch(() => []);
 }
 
 export const load: PageLoad = async ({ data }) => {
@@ -43,5 +48,11 @@ export const load: PageLoad = async ({ data }) => {
   if (data.kind === "day") {
     return { ...data, View: (await import("./day.svelte")).default };
   }
-  return { ...data, View: (await import("./polity.svelte")).default };
+  const primed = Promise.resolve(data.polity.primed).then(unpacked);
+  const View = await import("./polity.svelte");
+  return {
+    ...data,
+    polity: { ...data.polity, primed: await primed },
+    View: View.default,
+  };
 };

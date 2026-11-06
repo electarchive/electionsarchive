@@ -1,13 +1,16 @@
 import type { Fetch, Part } from "svelte-islands";
 import { peek } from "svelte-islands";
 import { stream } from "svelte-islands/server";
+import type { Primed } from "#lib/primed.js";
 import { shapesOf } from "#lib/map/hexes.js";
+import { orpc } from "#lib/rpc.js";
 import { isCrawler } from "#lib/server/guard.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
 import { router } from "#lib/server/rpc/router.js";
 import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
+import { isLocalOf, sourceOf, upOf, UPPER } from "./polity-source.js";
 import { tallied } from "./tally.js";
 
 const BOARD = 49;
@@ -22,6 +25,7 @@ const FOLD = 18;
 const FOLDED = 20;
 const ROSTER = 24_000;
 const ROUND_CELLS = 120;
+const PRIMING = 400;
 
 type Election = Awaited<
   Extract<Awaited<ReturnType<typeof archive>>, { kind: "election" }>["body"]
@@ -241,6 +245,69 @@ const scrub = memo(
   ) => ({ path, located, hub, hexes }),
 );
 
+async function within<T>(promise: Promise<Array<T>>) {
+  return Promise.race([
+    promise,
+    new Promise<Array<T>>((done) => {
+      setTimeout(done, PRIMING, []);
+    }),
+  ]);
+}
+
+async function drawn(polity: Parameters<typeof sourceOf>[0]) {
+  const source = sourceOf(polity);
+  if (source == null) {
+    return [];
+  }
+  const up = upOf(source.unit);
+  const place = async (unit: string | undefined, isWider: boolean) => {
+    const input = { id: source.id, unit };
+    const contest = await call(router.contests.get, input);
+    if (isWider && contest.places == null) {
+      return [{ key: orpc.contests.get.queryKey({ input }), data: contest }];
+    }
+    const bounded = { ...input, level: contest.places?.level };
+    const bounds = await call(router.contests.boundaries, bounded);
+    return [
+      { key: orpc.contests.get.queryKey({ input }), data: contest },
+      {
+        key: orpc.contests.boundaries.queryKey({ input: bounded }),
+        data: bounds,
+      },
+    ];
+  };
+  const found = await Promise.all([
+    place(source.unit, false),
+    source.unit == null ? [] : place(up, true),
+  ]);
+  return found.flat();
+}
+
+async function reads(id: string, polity: Parameters<typeof sourceOf>[0]) {
+  const found = await Promise.all([
+    within(drawn(polity).catch(() => [])),
+    UPPER.includes(polity.kind)
+      ? []
+      : within(
+          call(router.polities.holders, { id })
+            .then((data) => [
+              { key: orpc.polities.holders.queryKey({ input: { id } }), data },
+            ])
+            .catch(() => []),
+        ),
+    isLocalOf(polity)
+      ? within(
+          (async () => {
+            const input = { a: id, b: polity.parent ?? id };
+            const data = await call(router.polities.compare, input);
+            return [{ key: orpc.polities.compare.queryKey({ input }), data }];
+          })().catch(() => []),
+        )
+      : [],
+  ]);
+  return found.flat();
+}
+
 async function seed(path: string) {
   const located = await call(router.elections.locate, { path });
   const [hub, hexes] = await Promise.all([
@@ -410,7 +477,7 @@ export const load: PageServerLoad = async ({
   const path = ["sovereign_state", "supranational"].includes(data.polity.kind)
     ? data.polity.latest?.path
     : null;
-  const [{ value: scrubber }, { value: record }] = await Promise.all([
+  const [{ value: scrubber }, { value: record }, map] = await Promise.all([
     path == null
       ? { value: null }
       : soon(
@@ -429,7 +496,24 @@ export const load: PageServerLoad = async ({
     soon(
       capped(call(router.polities.record, { id: data.id }).catch(() => null)),
     ),
+    budget === Infinity
+      ? []
+      : reads(data.id, {
+          ...data.polity,
+          calendar: { count: elections.length },
+        }),
   ]);
+  const primed: Primed = [
+    ...(record == null || record instanceof Promise
+      ? []
+      : [
+          {
+            key: orpc.polities.record.queryKey({ input: { id: data.id } }),
+            data: record,
+          },
+        ]),
+    ...map,
+  ];
   const groups = Map.groupBy(polities, (child) => child.kind);
   const places = {
     total: polities.length,
@@ -450,6 +534,11 @@ export const load: PageServerLoad = async ({
     calendar,
     places,
     scrubber,
+    primed: parted(
+      "polity.primed",
+      primed.length === 0 ? null : primed,
+      "preload",
+    ),
     record: parted(
       "polity.record",
       record == null ||
