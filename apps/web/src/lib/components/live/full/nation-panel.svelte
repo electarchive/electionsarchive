@@ -10,7 +10,14 @@
   import { numbers, percent } from "#lib/format.js";
   import { DOTS } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { breakdown, isSettled, odds, seatsOf } from "#lib/live/nation.js";
+  import {
+    allied,
+    breakdown,
+    caucusNote,
+    isSettled,
+    odds,
+    seatsOf,
+  } from "#lib/live/nation.js";
   import { closing, verdict } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { marginShade, safety } from "#lib/shade.js";
@@ -110,8 +117,8 @@
     }
     const pad = Math.max(2, Math.round((high - low) * 0.15));
     return {
-      low: Math.max(0, Math.min(low, view.majority - 1) - pad),
-      high: Math.min(view.size, Math.max(high, view.majority) + pad),
+      low: Math.max(0, Math.min(low, view.needs.left - 1) - pad),
+      high: Math.min(view.size, Math.max(high, view.needs.left) + pad),
     };
   });
   const peak = $derived(
@@ -174,6 +181,14 @@
     }
     const { left, right, other } = view.tallies;
     const size = view.size;
+    let leftAllies = 0;
+    for (const bloc of allied(view.blocs, "left")) {
+      leftAllies += bloc.tally.holdover;
+    }
+    let rightAllies = 0;
+    for (const bloc of allied(view.blocs, "right")) {
+      rightAllies += bloc.tally.holdover;
+    }
     const parts = [
       {
         key: "lw",
@@ -187,19 +202,26 @@
       },
       {
         key: "lh",
-        count: left.holdover,
+        count: left.holdover - leftAllies,
         color: marginShade(pair[0].color, safety(0.3)),
         isHeld: true,
       },
+      { key: "lc", count: leftAllies, color: pair[0].color, isAlly: true },
       {
         key: "o",
         count: seatsOf(other),
         color: marginShade("var(--muted-foreground)", safety(0.55)),
       },
+      {
+        key: "t",
+        count: view.tossups,
+        color: marginShade("var(--muted-foreground)", safety(0.3)),
+      },
       { key: "w", count: view.waiting + view.later, color: WAITING },
+      { key: "rc", count: rightAllies, color: pair[1].color, isAlly: true },
       {
         key: "rh",
-        count: right.holdover,
+        count: right.holdover - rightAllies,
         color: marginShade(pair[1].color, safety(0.3)),
         isHeld: true,
       },
@@ -220,7 +242,18 @@
         .map((part) => ({ ...part, share: part.count / size })),
       left: seatsOf(left),
       right: seatsOf(right),
-      majority: view.majority / size,
+      majority: (view.needs.left - 0.5) / size,
+      heads: [0, 1].map((index) => {
+        const side = index === 0 ? "left" : "right";
+        const family = pair[index] ?? pair[0];
+        return {
+          label:
+            allied(view.blocs, side).length > 0
+              ? m.night_chamber_caucus({ party: family.short })
+              : family.short,
+          note: caucusNote(view.blocs, side),
+        };
+      }),
     };
   });
 </script>
@@ -289,24 +322,43 @@
       <div class="flex items-end justify-between gap-3">
         <span class="grid">
           <span class="text-xs font-semibold" style:color={pair[0].color}
-            >{pair[0].short}</span
+            >{bar.heads[0]?.label}</span
           >
           <span class="font-figures text-[1.75rem]/8 font-[760] tabular-nums"
             >{bar.left}</span
           >
+          {#if bar.heads[0]?.note != null}
+            <span class="text-[0.6875rem]/4 text-muted-foreground"
+              >{bar.heads[0].note}</span
+            >
+          {/if}
         </span>
         {#if office !== "governor"}
-          <span class="pbe-1 text-center text-xs text-muted-foreground"
-            >{m.night_chamber_majority({ count: view.majority })}</span
-          >
+          <span class="grid pbe-1 text-center text-xs text-muted-foreground">
+            {#if view.tossups > 0}
+              <span
+                ><span
+                  class="font-figures font-semibold text-foreground tabular-nums"
+                  >{view.tossups}</span
+                >
+                {m.night_ladder_tossup()}</span
+              >
+            {/if}
+            <span>{m.night_chamber_majority({ count: view.majority })}</span>
+          </span>
         {/if}
-        <span class="grid justify-items-end">
+        <span class="grid justify-items-end text-end">
           <span class="text-xs font-semibold" style:color={pair[1].color}
-            >{pair[1].short}</span
+            >{bar.heads[1]?.label}</span
           >
           <span class="font-figures text-[1.75rem]/8 font-[760] tabular-nums"
             >{bar.right}</span
           >
+          {#if bar.heads[1]?.note != null}
+            <span class="text-[0.6875rem]/4 text-muted-foreground"
+              >{bar.heads[1].note}</span
+            >
+          {/if}
         </span>
       </div>
       <div class="relative">
@@ -318,9 +370,14 @@
             <span
               class="transition-[flex-basis] duration-700 ease-out motion-reduce:transition-none"
               style:flex-basis="{part.share * 100}%"
-              style:background-color={part.isHeld === true
-                ? `color-mix(in oklab, ${part.color} 35%, var(--background))`
-                : part.color}
+              style:background-color={part.isAlly === true
+                ? "color-mix(in oklab, var(--muted-foreground) 22%, var(--background))"
+                : part.isHeld === true
+                  ? `color-mix(in oklab, ${part.color} 35%, var(--background))`
+                  : part.color}
+              style:box-shadow={part.isAlly === true
+                ? `inset 0 0 0 1.5px ${part.color}`
+                : undefined}
             ></span>
           {/each}
         </div>
@@ -338,6 +395,14 @@
         <span>{breakdown(view.tallies.left)}</span>
         <span class="text-end">{breakdown(view.tallies.right)}</span>
       </div>
+      {#if view.tiebreak != null}
+        <p class="text-[0.6875rem]/4 text-muted-foreground">
+          {m.night_chamber_tiebreak({
+            count: view.size / 2,
+            party: (view.tiebreak === "left" ? pair[0] : pair[1]).name,
+          })}
+        </p>
+      {/if}
       {#if forecasts && isInformed && office !== "governor"}
         <div class="grid gap-1.5 border-bs border-border pbs-3">
           <div
@@ -377,9 +442,9 @@
                 y={40 - (value / peak) * 38}
                 width="0.84"
                 height={(value / peak) * 38}
-                fill={count >= view.majority
+                fill={count >= view.needs.left
                   ? pair[0].color
-                  : view.size - count >= view.majority
+                  : view.size - count >= view.needs.right
                     ? pair[1].color
                     : "var(--muted-foreground)"}
                 opacity={count >= view.range[0] && count <= view.range[1]
@@ -390,8 +455,8 @@
               </rect>
             {/each}
             <line
-              x1={view.majority - 0.5}
-              x2={view.majority - 0.5}
+              x1={view.needs.left - 0.5}
+              x2={view.needs.left - 0.5}
               y1="-2"
               y2="40"
               stroke="var(--foreground)"

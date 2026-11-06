@@ -204,7 +204,7 @@
                 STATES.has(entry.summary.race.state),
             ),
             "senate",
-            control?.holdovers.senate ?? {},
+            control,
             pair,
           ),
           house: chamber(
@@ -214,7 +214,7 @@
                 STATES.has(entry.summary.race.state),
             ),
             "house",
-            {},
+            control,
             pair,
           ),
           governor: chamber(
@@ -224,7 +224,7 @@
                 STATES.has(entry.summary.race.state),
             ),
             "governor",
-            control?.holdovers.governor ?? {},
+            control,
             pair,
           ),
         },

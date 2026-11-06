@@ -6,11 +6,13 @@
   const {
     sides,
     changing,
+    caucuses = [],
     isProjected = false,
     notUp = 0,
   }: {
     sides: Array<{ id: string; short: string; color: string }>;
     changing: Swing;
+    caucuses?: Array<{ id: string; name: string; color: string }>;
     isProjected?: boolean;
     notUp?: number;
   } = $props();
@@ -18,6 +20,8 @@
   const SOLID = "oklch(0.42 0 0)";
   const NOT_UP =
     "light-dark(color-mix(in oklab, var(--muted-foreground) 22%, var(--background)), color-mix(in oklab, var(--muted-foreground) 42%, var(--background)))";
+  const ALLY =
+    "light-dark(color-mix(in oklab, var(--muted-foreground) 14%, var(--background)), color-mix(in oklab, var(--muted-foreground) 30%, var(--background)))";
   const leading = $derived(hatch("var(--muted-foreground)", "leading"));
   const shown = $derived(
     sides.filter((side) =>
@@ -36,7 +40,7 @@
   ></span>
 {/snippet}
 
-{#if isProjected || notUp > 0 || shown.length > 0 || changing.leading > 0}
+{#if isProjected || notUp > 0 || shown.length > 0 || changing.leading > 0 || caucuses.length > 0}
   <ul
     class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground"
   >
@@ -68,6 +72,15 @@
         >{m.night_rating_projected()}
       </li>
     {/if}
+    {#each caucuses as caucus (caucus.id)}
+      <li class="flex items-center gap-1.5">
+        <span
+          class="shrink-0 rounded-[1px] block-3.5 inline-3.5"
+          style:background-color={ALLY}
+          style:box-shadow="inset 0 0 0 1.5px {caucus.color}"
+        ></span>{m.night_chamber_key_caucus({ party: caucus.name })}
+      </li>
+    {/each}
     {#if notUp > 0}
       <li class="flex items-center gap-1.5">
         {@render swatch(NOT_UP)}{m.night_chamber_key_not_up()}

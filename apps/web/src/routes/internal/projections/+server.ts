@@ -28,8 +28,8 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const { election, estimates } = await projections(path);
   const held = await remember(
     path.split("/").length === 2
-      ? `live:control:v3:${election.date}`
-      : `live:holders:v3:${election.slug}`,
+      ? `live:control:v4:${election.date}`
+      : `live:holders:v4:${election.slug}`,
     async () => control(election.races, election.date),
   );
   const races = election.races.flatMap((race) => {

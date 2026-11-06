@@ -4963,6 +4963,42 @@
   "night_chamber_net_none": "No net change in seats so far",
   "night_chamber_note": "Pale seats aren't up this year. Until a race reports votes, the odds give the party that holds the seat a {prior} chance of keeping it.",
   "night_chamber_others": "Independents and others",
+  "night_chamber_caucus": "{party} caucus",
+  "night_caucus_includes": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Includes {count} independent",
+        "countPlural=*": "Includes {count} independents"
+      }
+    }
+  ],
+  "night_caucus_includes_others": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Includes {count} member of another party",
+        "countPlural=*": "Includes {count} members of other parties"
+      }
+    }
+  ],
+  "night_caucus_independents": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Independent caucusing with the {party}",
+        "countPlural=*": "Independents caucusing with the {party}"
+      }
+    }
+  ],
+  "night_caucus_party": "{party} caucusing with the {caucus}",
+  "night_chamber_tiebreak": "The vice president breaks a {count}–{count} tie for the {party}",
+  "night_chamber_key_caucus": "Caucuses with the {party}",
+  "night_ladder_caucus_side": "{party} caucus leading or won",
+  "night_ladder_caucus": "Totals count by caucus: {names} caucus with the {party}.",
   "night_chamber_not_up": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],

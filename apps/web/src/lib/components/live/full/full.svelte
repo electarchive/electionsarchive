@@ -61,7 +61,7 @@
   } from "#lib/live/format.js";
   import { lineup, provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
-  import { seatsOf } from "#lib/live/nation.js";
+  import { allied, seatsOf } from "#lib/live/nation.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
   import {
     pair as pairOf,
@@ -2154,7 +2154,9 @@
             )}
             <span class="flex items-baseline gap-1">
               <span class="text-xs font-semibold" style:color={family.color}
-                >{family.short}</span
+                >{allied(view.blocs, side === 0 ? "left" : "right").length > 0
+                  ? m.night_chamber_caucus({ party: family.short })
+                  : family.short}</span
               >
               <span class="text-lg font-[760]">{seatsOf(tally)}</span>
             </span>

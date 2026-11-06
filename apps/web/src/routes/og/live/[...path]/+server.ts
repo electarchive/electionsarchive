@@ -537,12 +537,12 @@ async function nationBody(
   const rows = [
     ...(
       [
-        ["senate", m.night_nation_senate(), control.holdovers.senate],
-        ["house", m.night_nation_house(), {}],
+        ["senate", m.night_nation_senate()],
+        ["house", m.night_nation_house()],
       ] as const
-    ).map(([office, label, holdovers]) =>
+    ).map(([office, label]) =>
       chamberRow(
-        chamber(pick(office), office, holdovers, pairing),
+        chamber(pick(office), office, control, pairing),
         pick(office),
         label,
         pairing,
@@ -550,12 +550,7 @@ async function nationBody(
       ),
     ),
     governorRow(
-      chamber(
-        pick("governor"),
-        "governor",
-        control.holdovers.governor,
-        pairing,
-      ),
+      chamber(pick("governor"), "governor", control, pairing),
       pick("governor"),
       pairing,
       colors,

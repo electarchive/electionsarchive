@@ -133,7 +133,7 @@ export async function livePage(path: string, at: string | null) {
         )
       : null,
     isNation
-      ? remember(`live:control:v3:${election.date}`, async () =>
+      ? remember(`live:control:v4:${election.date}`, async () =>
           control(election.races, election.date),
         )
       : null,

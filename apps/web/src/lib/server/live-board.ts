@@ -413,12 +413,14 @@ export async function control(
   const ids = races
     .filter((race) => SIDES.has(race.office))
     .map((race) => race.id);
-  const [held, kept] = await Promise.all([
+  const [held, kept, head] = await Promise.all([
     db.execute<{
       contest: string;
       person: string;
       vacant: boolean;
       party: string | null;
+      grouped: boolean;
+      caucus: string | null;
     }>(sql`
       with up as materialized (
         select c.id, c.seat_id, c.office_id, c.body_id, c.district_area_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
@@ -449,14 +451,29 @@ export async function control(
         ) m
         order by m.contest, m.to_date is null or m.to_date > ${date}::date desc, m.from_date desc
       )
-      select h.contest, h.person, h.vacant, coalesce(
-        (select ta.party_id from tenure_affiliation ta where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
-        (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = h.person and o.party_id is not null
-          order by (o.contest_id = h.won) desc nulls last, o.contest_id desc limit 1)
-      ) as party
+      select h.contest, h.person, h.vacant,
+        case when pa.found then pa.party_id else (
+          select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = h.person and o.party_id is not null
+          order by (o.contest_id = h.won) desc nulls last, o.contest_id desc limit 1
+        ) end as party,
+        coalesce(gr.found, false) as grouped, gr.party_id as caucus
       from held h
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date order by ta.party_id is null limit 1
+      ) pa on true
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = h.tenure and ta.kind = 'parliamentary_group' and ta.valid @> ${date}::date limit 1
+      ) gr on true
     `),
-    db.execute<{ office: string; person: string; party: string | null }>(sql`
+    db.execute<{
+      office: string;
+      person: string;
+      party: string | null;
+      grouped: boolean;
+      caucus: string | null;
+    }>(sql`
       with up as (
         select c.seat_id, c.office_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
       ),
@@ -473,24 +490,52 @@ export async function control(
             or (o.kind = 'governor' and op.iso_code ~ '^US-[A-Z]{2}$' and op.iso_code not in ('US-AS', 'US-DC', 'US-GU', 'US-MP', 'US-PR', 'US-VI') and t.office_id not in (select office_id from up where office_id is not null)))
         order by coalesce(t.seat_id, t.office_id), t.from_date desc
       )
-      select s.office, s.person_id as person, coalesce(
-        (select ta.party_id from tenure_affiliation ta where ta.tenure_id = s.id and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
-        (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = s.person_id and o.party_id is not null
-          order by (o.contest_id = s.contest_id) desc nulls last, o.contest_id desc limit 1)
-      ) as party
+      select s.office, s.person_id as person,
+        case when pa.found then pa.party_id else (
+          select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = s.person_id and o.party_id is not null
+          order by (o.contest_id = s.contest_id) desc nulls last, o.contest_id desc limit 1
+        ) end as party,
+        coalesce(gr.found, false) as grouped, gr.party_id as caucus
       from sitting s
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = s.id and ta.kind = 'party' and ta.valid @> ${date}::date order by ta.party_id is null limit 1
+      ) pa on true
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = s.id and ta.kind = 'parliamentary_group' and ta.valid @> ${date}::date limit 1
+      ) gr on true
+    `),
+    db.execute<{ party: string | null }>(sql`
+      select case when pa.found then pa.party_id else (
+        select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = t.person_id and o.party_id is not null
+        order by (o.contest_id = t.contest_id) desc nulls last, o.contest_id desc limit 1
+      ) end as party
+      from tenure t
+      join office o on o.id = t.office_id
+      join polity p on p.id = o.polity_id
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = t.id and ta.kind = 'party' and ta.valid @> ${date}::date order by ta.party_id is null limit 1
+      ) pa on true
+      where o.kind = 'head_of_state' and p.iso_code = 'US'
+        and t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+      order by t.from_date desc limit 1
     `),
   ]);
   const parties = [
-    ...new Set([
-      ...held.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
-      ...kept.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
-      ...races.flatMap((race) =>
-        race.options.flatMap((option) =>
-          option.party == null ? [] : [option.party.id],
+    ...new Set(
+      [
+        ...[...held.rows, ...kept.rows].flatMap((row) => [
+          row.party,
+          row.caucus,
+        ]),
+        ...head.rows.map((row) => row.party),
+        ...races.flatMap((race) =>
+          race.options.map((option) => option.party?.id ?? null),
         ),
-      ),
-    ]),
+      ].filter((id) => id != null),
+    ),
   ];
   const parents = await db.execute<{ party: string; parent: string }>(sql`
     select party_id as party, parent_party_id as parent from party_affiliation
@@ -514,29 +559,71 @@ export async function control(
     `),
   ]);
   const tint = new Map(colors.rows.map((row) => [row.party, row.color]));
-  const holdovers = {
-    senate: {} as Record<string, number>,
-    governor: {} as Record<string, number>,
+  const sitter = (row: {
+    person: string;
+    party: string | null;
+    grouped: boolean;
+    caucus: string | null;
+  }) => {
+    const member = family(row.party);
+    return {
+      member,
+      caucus: row.grouped ? family(row.caucus) : member,
+      name: people.full.get(row.person) ?? "",
+    };
   };
+  const holdovers: Record<"senate" | "governor", Array<Holdover>> = {
+    senate: [],
+    governor: [],
+  };
+  const caucuses: Record<string, string> = {};
+  for (const row of [...held.rows, ...kept.rows]) {
+    const { member, caucus } = sitter(row);
+    if (caucus != null && caucus !== member) {
+      caucuses[row.person] = caucus;
+    }
+  }
   for (const row of kept.rows) {
-    const side =
+    const { member, caucus, name } = sitter(row);
+    const list =
       row.office === "senate" ? holdovers.senate : holdovers.governor;
-    const key = family(row.party) ?? "";
-    side[key] = (side[key] ?? 0) + 1;
+    const found = list.find(
+      (entry) =>
+        entry.caucus === (caucus ?? "") && entry.party === (member ?? ""),
+    );
+    const entry = found ?? {
+      caucus: caucus ?? "",
+      party: member ?? "",
+      count: 0,
+      names: [],
+    };
+    entry.count += 1;
+    if (caucus !== member) {
+      entry.names.push(name);
+    }
+    if (found == null) {
+      list.push(entry);
+    }
   }
   return {
     holders: Object.fromEntries(
-      held.rows.map((row) => [
-        row.contest,
-        {
-          party: family(row.party),
-          person: row.person,
-          name: people.full.get(row.person) ?? "",
-          isVacant: row.vacant,
-        },
-      ]),
+      held.rows.map((row) => {
+        const { member, caucus, name } = sitter(row);
+        return [
+          row.contest,
+          {
+            party: caucus,
+            member,
+            person: row.person,
+            name,
+            isVacant: row.vacant,
+          },
+        ];
+      }),
     ),
     holdovers,
+    caucuses,
+    tiebreak: { senate: family(head.rows[0]?.party ?? null) },
     families,
     parties: Object.fromEntries(
       roots.map((root) => [
@@ -550,6 +637,13 @@ export async function control(
     ),
   };
 }
+
+type Holdover = {
+  caucus: string;
+  party: string;
+  count: number;
+  names: Array<string>;
+};
 
 export type Control = Awaited<ReturnType<typeof control>>;
 export type House = Awaited<ReturnType<typeof house>>;

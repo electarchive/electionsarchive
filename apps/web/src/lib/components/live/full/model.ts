@@ -114,19 +114,9 @@ export function board(
     pair == null
       ? null
       : {
-          senate: chamber(
-            of("senate"),
-            "senate",
-            control?.holdovers.senate ?? {},
-            pair,
-          ),
-          house: chamber(of("house"), "house", {}, pair),
-          governor: chamber(
-            of("governor"),
-            "governor",
-            control?.holdovers.governor ?? {},
-            pair,
-          ),
+          senate: chamber(of("senate"), "senate", control, pair),
+          house: chamber(of("house"), "house", control, pair),
+          governor: chamber(of("governor"), "governor", control, pair),
         };
   return { summaries, pair, seats, byState, districts, chambers };
 }

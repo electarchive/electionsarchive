@@ -5264,10 +5264,13 @@ async function tabulate(
       order by x.seats desc nulls last, o.k limit 1
     ) w on true
     left join lateral (
-      select coalesce(pm.into_id, ta.party_id) as party
-      from tenure t
-      join tenure_affiliation ta on ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
-      left join entity_merge pm on pm.entity_id = ta.party_id
+      select s.party from tenure t
+      join lateral (
+        select coalesce(pm.into_id, ta.party_id) as party from tenure_affiliation ta
+        left join entity_merge pm on pm.entity_id = ta.party_id
+        where ta.tenure_id = t.id and ta.kind = 'party'
+        order by lower(ta.valid) nulls first, ta.party_id is null limit 1
+      ) s on true
       where t.contest_id = c.id and w.party is null and w.person is null
       group by 1 order by count(*) desc, 1 limit 1
     ) h on true
@@ -14855,8 +14858,8 @@ export async function races(
                           select distinct on (coalesce(tm.into_id, t.person_id)) (
                             select coalesce(am.into_id, ta.party_id) from tenure_affiliation ta
                             left join entity_merge am on am.entity_id = ta.party_id
-                            where ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
-                            order by lower(ta.valid) nulls first limit 1
+                            where ta.tenure_id = t.id and ta.kind = 'party'
+                            order by lower(ta.valid) nulls first, ta.party_id is null limit 1
                           ) as party
                           from tenure t
                           left join entity_merge tm on tm.entity_id = t.person_id
@@ -14876,8 +14879,8 @@ export async function races(
                           select coalesce(tm.into_id, t.person_id) as person, (
                             select coalesce(am.into_id, ta.party_id) from tenure_affiliation ta
                             left join entity_merge am on am.entity_id = ta.party_id
-                            where ta.tenure_id = t.id and ta.kind = 'party' and ta.party_id is not null
-                            order by lower(ta.valid) nulls first limit 1
+                            where ta.tenure_id = t.id and ta.kind = 'party'
+                            order by lower(ta.valid) nulls first, ta.party_id is null limit 1
                           ) as party
                           from tenure t
                           left join entity_merge tm on tm.entity_id = t.person_id

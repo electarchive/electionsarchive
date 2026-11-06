@@ -6,9 +6,19 @@
   import { numbers, percent } from "#lib/format.js";
   import { hatch, ink, swing } from "#lib/live/flips.js";
   import { pointAt } from "#lib/live/hover.js";
-  import { breakdown, isSettled, odds, seatsOf } from "#lib/live/nation.js";
+  import {
+    allied,
+    blocName,
+    breakdown,
+    caucusNote,
+    isSettled,
+    lane,
+    odds,
+    seatsOf,
+  } from "#lib/live/nation.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import Called from "./called.svelte";
   import Card from "./card.svelte";
@@ -56,17 +66,54 @@
   });
 
   type Cell =
-    | { kind: "hold"; family: Family; count: number; key: string }
+    | {
+        kind: "hold";
+        family: Family;
+        count: number;
+        key: string;
+        ally: { name: string; names: Array<string> } | null;
+      }
     | { kind: "race"; seat: Seat; key: string };
 
   const cells = $derived.by(() => {
     const found: Array<Cell> = [];
-    const hold = (count: number, family: Family, prefix: string) => {
+    const hold = (
+      count: number,
+      family: Family,
+      prefix: string,
+      ally: { name: string; names: Array<string> } | null = null,
+    ) => {
       for (let index = 0; index < count; index += 1) {
-        found.push({ kind: "hold", family, count, key: `${prefix}${index}` });
+        found.push({
+          kind: "hold",
+          family,
+          count,
+          key: `${prefix}${index}`,
+          ally,
+        });
       }
     };
-    hold(view.tallies.left.holdover, left, "l");
+    const allies = (side: "left" | "right", family: Family) =>
+      allied(view.blocs, side).map((bloc, index) => ({
+        count: bloc.tally.holdover,
+        family,
+        prefix: `${side}${index}-`,
+        ally: { name: blocName(bloc, family), names: bloc.names },
+      }));
+    const leftAllies = allies("left", left);
+    const rightAllies = allies("right", right);
+    let leftOwn = view.tallies.left.holdover;
+    for (const entry of leftAllies) {
+      leftOwn -= entry.count;
+    }
+    let rightOwn = view.tallies.right.holdover;
+    for (const entry of rightAllies) {
+      rightOwn -= entry.count;
+    }
+    hold(leftOwn, left, "l");
+    for (const entry of leftAllies) {
+      hold(entry.count, entry.family, entry.prefix, entry.ally);
+    }
     const leaning = view.order.filter((seat) => seat.lean >= 0);
     const trailing = view.order.filter((seat) => seat.lean < 0);
     for (const seat of leaning) {
@@ -76,15 +123,23 @@
     for (const seat of trailing) {
       found.push({ kind: "race", seat, key: seat.summary.race.id });
     }
-    hold(view.tallies.right.holdover, right, "r");
+    for (const entry of rightAllies.toReversed()) {
+      hold(entry.count, entry.family, entry.prefix, entry.ally);
+    }
+    hold(rightOwn, right, "r");
     return found;
   });
 
-  const rows = $derived(view.size > 200 ? 5 : view.size > 60 ? 2 : 1);
-  const columns = $derived(Math.ceil(cells.length / rows));
+  const ALLY =
+    "light-dark(color-mix(in oklab, var(--muted-foreground) 14%, var(--background)), color-mix(in oklab, var(--muted-foreground) 30%, var(--background)))";
 
-  const leftSeats = $derived(seatsOf(view.tallies.left));
-  const rightSeats = $derived(seatsOf(view.tallies.right));
+  function ring(color: string) {
+    return `inset 0 0 0 1.5px ${color}`;
+  }
+
+  const lines = $derived(view.size > 200 ? 5 : view.size > 60 ? 2 : 1);
+  const columns = $derived(Math.ceil(cells.length / lines));
+
   const net = $derived(view.tallies.left.gains - view.tallies.left.losses);
   const changing = $derived(swing(view.order.map((seat) => seat.shift)));
   const families = $derived([
@@ -94,6 +149,92 @@
       ? [{ family: others, tally: view.tallies.other }]
       : []),
   ]);
+  const caucuses = $derived(
+    [left, right].filter(
+      (family, index) =>
+        allied(view.blocs, index === 0 ? "left" : "right").length > 0,
+    ),
+  );
+  const headings = $derived(
+    [left, right].map((family, index) => {
+      const side = index === 0 ? "left" : "right";
+      return {
+        family,
+        label:
+          allied(view.blocs, side).length > 0
+            ? m.night_chamber_caucus({ party: family.short })
+            : family.short,
+        note: caucusNote(view.blocs, side),
+        seats: seatsOf(view.tallies[side]),
+      };
+    }),
+  );
+  const rows = $derived.by(() => {
+    const out: Array<{
+      key: string;
+      name: string;
+      names: Array<string>;
+      color: string;
+      isAllied: boolean;
+      text: string;
+      net: number | null;
+    }> = [];
+    for (const [side, family] of [
+      ["left", left],
+      ["right", right],
+    ] as const) {
+      const own = view.blocs.filter(
+        (bloc) => bloc.side === side && !bloc.isAllied,
+      );
+      const tally = { ...view.tallies[side] };
+      for (const bloc of allied(view.blocs, side)) {
+        for (const field of [
+          "won",
+          "projected",
+          "unopposed",
+          "ahead",
+          "holdover",
+        ] as const) {
+          tally[field] -= bloc.tally[field];
+        }
+      }
+      out.push({
+        key: side,
+        name: own[0]?.label ?? family.name,
+        names: [],
+        color: family.color,
+        isAllied: false,
+        text: breakdown(tally),
+        net: tally.gains - tally.losses,
+      });
+      for (const [index, bloc] of allied(view.blocs, side).entries()) {
+        out.push({
+          key: `${side}-ally-${index}`,
+          name: blocName(bloc, family),
+          names: bloc.names,
+          color: family.color,
+          isAllied: true,
+          text: breakdown(bloc.tally),
+          net: null,
+        });
+      }
+    }
+    if (seatsOf(view.tallies.other) > 0) {
+      out.push({
+        key: "other",
+        name: others.name,
+        names: [],
+        color: others.color,
+        isAllied: false,
+        text: breakdown(view.tallies.other),
+        net: view.tallies.other.gains - view.tallies.other.losses,
+      });
+    }
+    return out;
+  });
+  const tossups = $derived(
+    view.order.filter((seat) => lane(seat, sides) === "tossup"),
+  );
 
   const span = $derived.by(() => {
     let low = view.pmf.length - 1;
@@ -106,8 +247,8 @@
     }
     const pad = Math.max(2, Math.round((high - low) * 0.15));
     return {
-      low: Math.max(0, Math.min(low, view.majority - 1) - pad),
-      high: Math.min(view.size, Math.max(high, view.majority) + pad),
+      low: Math.max(0, Math.min(low, view.needs.left - 1) - pad),
+      high: Math.min(view.size, Math.max(high, view.needs.left) + pad),
     };
   });
   const peak = $derived(
@@ -133,9 +274,21 @@
     );
   }
 
+  function edge(seat: Seat) {
+    return seat.ally == null
+      ? undefined
+      : ring(sides.find((family) => family.id === seat.side)?.color ?? OTHER);
+  }
+
   function gained(family: Family) {
     return (
       changing.parties.find((party) => party.id === family.id)?.flipped ?? 0
+    );
+  }
+
+  function list(names: Array<string>) {
+    return new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+      names,
     );
   }
 
@@ -147,7 +300,7 @@
 {#snippet grid(isLinked: boolean)}
   <div
     class="grid gap-px"
-    style:grid-template-rows="repeat({rows}, minmax(0, 1fr))"
+    style:grid-template-rows="repeat({lines}, minmax(0, 1fr))"
     style:grid-template-columns="repeat({columns}, minmax(0, 1fr))"
     style:grid-auto-flow="column"
   >
@@ -156,9 +309,12 @@
         <span
           data-cell={index}
           class="rounded-[1px] block-3.5"
-          style:background-color="light-dark(color-mix(in oklab, {cell.family
-            .color} 18%, var(--background)), color-mix(in oklab, {cell.family
-            .color} 38%, var(--background)))"
+          style:background-color={cell.ally == null
+            ? `light-dark(color-mix(in oklab, ${cell.family.color} 18%, var(--background)), color-mix(in oklab, ${cell.family.color} 38%, var(--background)))`
+            : ALLY}
+          style:box-shadow={cell.ally == null
+            ? undefined
+            : ring(cell.family.color)}
           aria-hidden="true"
         ></span>
       {:else if isLinked}
@@ -168,6 +324,7 @@
           class="grid place-items-center rounded-[1px] block-3.5 hover:outline-1 hover:outline-offset-1 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground"
           style:background-color={look(cell.seat).fill}
           style:background-image={look(cell.seat).stripes}
+          style:box-shadow={edge(cell.seat)}
           aria-label={label(cell.seat)}>{@render pip(cell.seat)}</a
         >
       {:else}
@@ -175,7 +332,7 @@
           class="grid place-items-center rounded-[1px] block-3.5"
           style:background-color={look(cell.seat).fill}
           style:background-image={look(cell.seat).stripes}
-          >{@render pip(cell.seat)}</span
+          style:box-shadow={edge(cell.seat)}>{@render pip(cell.seat)}</span
         >
       {/if}
     {/each}
@@ -196,74 +353,99 @@
 {/snippet}
 
 {#snippet legend()}
-  <dl class="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-0.5 text-xs">
-    {#each families as row (row.family.id)}
-      <dt class="flex items-center gap-1.5">
+  <dl class="grid grid-cols-[1fr_auto_auto] gap-x-4 gap-y-1 text-xs">
+    {#each rows as row (row.key)}
+      <dt class="flex items-start gap-1.5">
         <span
-          class="rounded-full block-2 inline-2"
-          style:background-color={row.family.color}
-        ></span>{row.family.name}
+          class="mbs-1 shrink-0 rounded-full block-2 inline-2"
+          style:background-color={row.isAllied ? ALLY : row.color}
+          style:box-shadow={row.isAllied ? ring(row.color) : undefined}
+        ></span>
+        <span class="grid">
+          <span>{row.name}</span>
+          {#if row.names.length > 0}
+            <span class="text-muted-foreground">{list(row.names)}</span>
+          {/if}
+        </span>
       </dt>
       <dd class="font-figures text-muted-foreground tabular-nums">
-        {breakdown(row.tally)}
+        {row.text}
       </dd>
       <dd
         class={cn("text-end font-figures font-semibold tabular-nums", {
-          "text-muted-foreground": row.tally.gains === row.tally.losses,
+          "text-muted-foreground": row.net === 0,
         })}
       >
-        {signed(row.tally.gains - row.tally.losses)}
+        {row.net == null ? "" : signed(row.net)}
       </dd>
     {/each}
+    {#if tossups.length > 0}
+      <dt class="flex items-start gap-1.5">
+        <span
+          class="mbs-1 shrink-0 rounded-full block-2 inline-2"
+          style:background-color={OTHER}
+        ></span>{m.night_ladder_tossup()}
+      </dt>
+      <dd class="text-muted-foreground">
+        {list(tossups.map((seat) => name(seat)))}
+      </dd>
+      <dd></dd>
+    {/if}
   </dl>
 {/snippet}
 
 <section class="grid content-start gap-3 bg-background px-4 py-5 sm:px-6">
   <header class="flex items-baseline justify-between gap-3">
     <h2 class="heading text-lg!">{title}</h2>
-    <p class="text-xs text-muted-foreground">
-      {m.night_chamber_majority({ count: view.majority })}
+    <p class="grid justify-items-end text-end text-xs text-muted-foreground">
+      <span>{m.night_chamber_majority({ count: view.majority })}</span>
+      {#if view.tiebreak != null}
+        {const breaker = $derived(view.tiebreak === "left" ? left : right)}
+        <span class="text-pretty"
+          >{m.night_chamber_tiebreak({
+            count: view.size / 2,
+            party: breaker.name,
+          })}</span
+        >
+      {/if}
     </p>
   </header>
 
-  <div class="flex items-end justify-between gap-3">
-    <p class="grid">
-      <span class="text-xs font-semibold" style:color={left.color}
-        >{left.short}</span
+  <div class="grid grid-cols-[1fr_auto_1fr] items-end gap-3">
+    {#each headings as heading, index (heading.family.id)}
+      <p
+        class={cn("grid", {
+          "col-start-1 justify-items-start": index === 0,
+          "col-start-3 row-start-1 justify-items-end text-end": index === 1,
+        })}
       >
-      <span
-        class="font-figures text-4xl leading-none font-[780] tabular-nums"
-        style:color={left.color}>{leftSeats}</span
-      >
-    </p>
-    <p class="grid justify-items-center pbe-0.5 text-center">
-      {#if view.waiting > 0}
+        <span class="text-xs font-semibold" style:color={heading.family.color}
+          >{heading.label}</span
+        >
         <span
-          class="font-figures text-lg leading-none font-semibold tabular-nums"
-          >{view.waiting}</span
+          class="font-figures text-4xl leading-none font-[780] tabular-nums"
+          style:color={heading.family.color}>{heading.seats}</span
         >
-        <span class="text-xs text-muted-foreground"
-          >{m.night_nation_waiting()}</span
-        >
-      {/if}
-      {#if view.later > 0}
-        <span
-          class={cn(
-            "font-figures text-sm leading-none font-semibold tabular-nums",
-            { "mbs-1.5": view.waiting > 0 },
-          )}>{view.later}</span
-        >
-        <span class="text-xs text-muted-foreground">{m.night_later_key()}</span>
-      {/if}
-    </p>
-    <p class="grid justify-items-end">
-      <span class="text-xs font-semibold" style:color={right.color}
-        >{right.short}</span
-      >
-      <span
-        class="font-figures text-4xl leading-none font-[780] tabular-nums"
-        style:color={right.color}>{rightSeats}</span
-      >
+        {#if heading.note != null}
+          <span class="mbs-1 text-xs text-muted-foreground">{heading.note}</span
+          >
+        {/if}
+      </p>
+    {/each}
+    <p
+      class="col-start-2 row-start-1 grid justify-items-center gap-1.5 self-center text-center"
+    >
+      {#each [{ key: "tossup", count: tossups.length, text: m.night_ladder_tossup() }, { key: "waiting", count: view.waiting, text: m.night_nation_waiting() }, { key: "later", count: view.later, text: m.night_later_key() }].filter((entry) => entry.count > 0) as entry, index (entry.key)}
+        <span class="grid">
+          <span
+            class={cn("font-figures leading-none font-semibold tabular-nums", {
+              "text-lg": index === 0,
+              "text-sm": index > 0,
+            })}>{entry.count}</span
+          >
+          <span class="text-xs text-muted-foreground">{entry.text}</span>
+        </span>
+      {/each}
     </p>
   </div>
 
@@ -297,6 +479,12 @@
           <Card {point}>
             {#if cell.kind === "race"}
               {@render detail(cell.seat)}
+            {:else if cell.ally != null}
+              <span class="text-sm font-semibold">{list(cell.ally.names)}</span>
+              <span>{cell.ally.name}</span>
+              <span class="text-muted-foreground"
+                >{m.night_chamber_not_up({ count: cell.count })}</span
+              >
             {:else}
               <span class="text-sm font-semibold">{cell.family.name}</span>
               <span class="text-muted-foreground"
@@ -324,6 +512,7 @@
   <SeatKey
     sides={families.map((row) => row.family)}
     {changing}
+    {caucuses}
     isProjected={view.order.some((seat) => seat.rating === "projected")}
     notUp={view.tallies.left.holdover +
       view.tallies.right.holdover +
@@ -366,9 +555,9 @@
             y={40 - (value / peak) * 38}
             width="0.84"
             height={(value / peak) * 38}
-            fill={count >= view.majority
+            fill={count >= view.needs.left
               ? left.color
-              : view.size - count >= view.majority
+              : view.size - count >= view.needs.right
                 ? right.color
                 : "var(--muted-foreground)"}
             opacity={count >= view.range[0] && count <= view.range[1] ? 1 : 0.4}
@@ -377,8 +566,8 @@
           </rect>
         {/each}
         <line
-          x1={view.majority - 0.5}
-          x2={view.majority - 0.5}
+          x1={view.needs.left - 0.5}
+          x2={view.needs.left - 0.5}
           y1="-2"
           y2="40"
           stroke="var(--foreground)"

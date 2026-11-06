@@ -27,6 +27,8 @@ export type Rating =
 export type Seat = {
   summary: Summary;
   held: string | null;
+  party: string | null;
+  ally: string | null;
   holder: string;
   side: string | null;
   left: number;
@@ -64,6 +66,12 @@ const RATINGS: Array<[Rating, number]> = [
 ];
 
 export function family(control: Control | null, option: LiveOption | null) {
+  const caucus =
+    option?.person == null ? undefined : control?.caucuses[option.person];
+  return caucus ?? membership(control, option);
+}
+
+function membership(control: Control | null, option: LiveOption | null) {
   const id = option?.party?.id;
   return id == null ? null : (control?.families[id] ?? id);
 }
@@ -81,10 +89,11 @@ export function sides(control: Control | null): [Family, Family] | null {
   for (const holder of Object.values(control.holders)) {
     add(holder.party);
   }
-  for (const side of [control.holdovers.senate, control.holdovers.governor]) {
-    for (const [id, amount] of Object.entries(side)) {
-      add(id, amount);
-    }
+  for (const entry of [
+    ...control.holdovers.senate,
+    ...control.holdovers.governor,
+  ]) {
+    add(entry.caucus, entry.count);
   }
   const top = [...weight]
     .toSorted((a, b) => b[1] - a[1])
@@ -216,6 +225,11 @@ export function seat(
   return {
     summary,
     held,
+    party: membership(control, pick),
+    ally:
+      side != null && side !== membership(control, pick)
+        ? (pick?.label ?? null)
+        : null,
     holder:
       holder == null
         ? ""
@@ -284,7 +298,7 @@ export function seatsOf(tally: Tally) {
 }
 
 export function breakdown(tally: Tally) {
-  return [
+  const parts = [
     tally.won > 0 ? m.night_tally_won({ count: tally.won }) : null,
     tally.projected > 0
       ? m.night_tally_projected({ count: tally.projected })
@@ -292,11 +306,12 @@ export function breakdown(tally: Tally) {
     tally.unopposed > 0
       ? m.night_tally_unopposed({ count: tally.unopposed })
       : null,
-    m.night_tally_ahead({ count: tally.ahead }),
-    m.night_tally_not_up({ count: tally.holdover }),
-  ]
-    .filter((part) => part != null)
-    .join(", ");
+    tally.ahead > 0 ? m.night_tally_ahead({ count: tally.ahead }) : null,
+    tally.holdover > 0 ? m.night_tally_not_up({ count: tally.holdover }) : null,
+  ].filter((part) => part != null);
+  return parts.length > 0
+    ? parts.join(", ")
+    : m.night_tally_ahead({ count: 0 });
 }
 
 export function latestCall(seats: Array<Seat>) {
@@ -310,13 +325,71 @@ export function latestCall(seats: Array<Seat>) {
   return latest;
 }
 
+export type Lane = "left" | "right" | "other" | "tossup" | "waiting" | "later";
+
+export function lane(seat: Seat, [left, right]: [Family, Family]): Lane {
+  if (seat.rating === "later") {
+    return "later";
+  }
+  const side =
+    seat.side === left.id ? "left" : seat.side === right.id ? "right" : "other";
+  if (isSettled(seat.rating)) {
+    return side;
+  }
+  if (seat.summary.total === 0 || seat.summary.leader == null) {
+    return "waiting";
+  }
+  return seat.rating === "tossup" ? "tossup" : side;
+}
+
+export type Bloc = {
+  side: "left" | "right" | "other";
+  party: string;
+  label: string | null;
+  isAllied: boolean;
+  names: Array<string>;
+  tally: Tally;
+};
+
+export function allied(blocs: Array<Bloc>, side: Bloc["side"]) {
+  return blocs.filter((bloc) => bloc.side === side && bloc.isAllied);
+}
+
+export function caucusNote(blocs: Array<Bloc>, side: Bloc["side"]) {
+  const found = allied(blocs, side);
+  let count = 0;
+  for (const bloc of found) {
+    count += seatsOf(bloc.tally);
+  }
+  if (count === 0) {
+    return null;
+  }
+  return found.every((bloc) => bloc.label == null)
+    ? m.night_caucus_includes({ count })
+    : m.night_caucus_includes_others({ count });
+}
+
+export function blocName(bloc: Bloc, caucus: Family) {
+  if (!bloc.isAllied) {
+    return bloc.label ?? m.night_chamber_others();
+  }
+  return bloc.label == null
+    ? m.night_caucus_independents({
+        count: Math.max(1, bloc.names.length),
+        party: caucus.name,
+      })
+    : m.night_caucus_party({ party: bloc.label, caucus: caucus.name });
+}
+
 export function chamber(
   seats: Array<Seat>,
   name: Chamber,
-  holdovers: Record<string, number>,
-  [left, right]: [Family, Family],
+  control: Control | null,
+  pair: [Family, Family],
 ) {
+  const [left, right] = pair;
   const { seats: size, majority } = CHAMBERS[name];
+  const holdovers = name === "house" ? [] : (control?.holdovers[name] ?? []);
   const blank = (): Tally => ({
     won: 0,
     projected: 0,
@@ -329,30 +402,77 @@ export function chamber(
   const tallies = { left: blank(), right: blank(), other: blank() };
   const key = (id: string | null) =>
     id === left.id ? "left" : id === right.id ? "right" : "other";
-  for (const [id, amount] of Object.entries(holdovers)) {
-    tallies[key(id === "" ? null : id)].holdover += amount;
+  const blocs: Array<Bloc> = [];
+  const bloc = (side: Bloc["side"], party: string | null) => {
+    const id = party ?? "";
+    const found = blocs.find(
+      (entry) => entry.side === side && entry.party === id,
+    );
+    if (found != null) {
+      return found;
+    }
+    const sideId = side === "left" ? left.id : side === "right" ? right.id : "";
+    const made: Bloc = {
+      side,
+      party: id,
+      label:
+        id === ""
+          ? null
+          : (control?.parties[id]?.name ??
+            (id === left.id ? left.name : id === right.id ? right.name : null)),
+      isAllied: side !== "other" && id !== sideId,
+      names: [],
+      tally: blank(),
+    };
+    blocs.push(made);
+    return made;
+  };
+  for (const entry of holdovers) {
+    const side = key(entry.caucus === "" ? null : entry.caucus);
+    tallies[side].holdover += entry.count;
+    const found = bloc(side, side === "other" ? "" : entry.party);
+    found.tally.holdover += entry.count;
+    found.names.push(...entry.names);
   }
   let waiting = 0;
   let later = 0;
+  let tossups = 0;
   for (const entry of seats) {
-    if (entry.rating === "later") {
+    const where = lane(entry, pair);
+    if (where === "later") {
       later += 1;
-    } else if (entry.rating === "unopposed") {
-      tallies[key(entry.side)].unopposed += 1;
-    } else if (entry.side == null || entry.summary.total === 0) {
+    } else if (where === "waiting") {
       waiting += 1;
-    } else if (entry.rating === "won") {
-      tallies[key(entry.side)].won += 1;
-    } else if (entry.rating === "projected") {
-      tallies[key(entry.side)].projected += 1;
+    } else if (where === "tossup") {
+      tossups += 1;
     } else {
-      tallies[key(entry.side)].ahead += 1;
+      const field =
+        entry.rating === "won" ||
+        entry.rating === "projected" ||
+        entry.rating === "unopposed"
+          ? entry.rating
+          : "ahead";
+      tallies[where][field] += 1;
+      const found = bloc(where, where === "other" ? "" : entry.party);
+      found.tally[field] += 1;
+      if (entry.ally != null) {
+        found.names.push(entry.ally);
+      }
     }
     if (entry.isFlip) {
       tallies[key(entry.side)].gains += 1;
       tallies[key(entry.held)].losses += 1;
     }
   }
+  const tied = size % 2 === 0 ? size / 2 : null;
+  const tiebreak =
+    tied == null || name !== "senate"
+      ? null
+      : (control?.tiebreak.senate ?? null);
+  const needs = {
+    left: tiebreak === left.id && tied != null ? tied : majority,
+    right: tiebreak === right.id && tied != null ? tied : majority,
+  };
   const leftPmf = convolve(
     seats.map((entry) => entry.left),
     tallies.left.holdover,
@@ -363,10 +483,10 @@ export function chamber(
     tallies.right.holdover,
     size,
   );
-  const above = (pmf: Array<number>) => {
+  const above = (pmf: Array<number>, floor: number) => {
     let found = 0;
     for (const [index, value] of pmf.entries()) {
-      if (index >= majority) {
+      if (index >= floor) {
         found += value;
       }
     }
@@ -381,25 +501,30 @@ export function chamber(
   const order = seats.toSorted(
     (a, b) => b.lean - a.lean || (b.signed ?? 0) - (a.signed ?? 0),
   );
-  const needed = majority - tallies.left.holdover;
+  const needed = needs.left - tallies.left.holdover;
+  const leftControl = above(leftPmf, needs.left);
+  const rightControl = above(rightPmf, needs.right);
   return {
     name,
     size,
     majority,
+    needs,
+    tiebreak:
+      tiebreak === left.id ? "left" : tiebreak === right.id ? "right" : null,
     tallies,
+    blocs,
     waiting,
     later,
+    tossups,
     pmf: leftPmf,
     range: [quantile(leftPmf, 0.1), quantile(leftPmf, 0.9)] as const,
     expected: { left: expectedLeft, right: expectedRight },
     control: {
-      left: above(leftPmf),
-      right: above(rightPmf),
-      none: Math.max(0, 1 - above(leftPmf) - above(rightPmf)),
+      left: leftControl,
+      right: rightControl,
+      none: Math.max(0, 1 - leftControl - rightControl),
     },
     order,
-    tipping:
-      needed > 0 && needed <= order.length ? (order[needed - 1] ?? null) : null,
     needed,
   };
 }

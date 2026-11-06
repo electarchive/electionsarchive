@@ -3,9 +3,10 @@
   import { percent } from "#lib/format.js";
   import { isChanging } from "#lib/live/flips.js";
   import { lead } from "#lib/live/format.js";
-  import { isSettled, odds } from "#lib/live/nation.js";
+  import { allied, isSettled, lane, odds, seatsOf } from "#lib/live/nation.js";
   import { isContested } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import Flip from "./flip.svelte";
 
@@ -41,15 +42,8 @@
   const GROUPS = ["left", "middle", "right"] as const;
 
   function groupOf(seat: Seat) {
-    if (seat.rating !== "tossup") {
-      if (seat.side === left.id) {
-        return "left";
-      }
-      if (seat.side === right.id) {
-        return "right";
-      }
-    }
-    return "middle";
+    const where = lane(seat, sides);
+    return where === "left" || where === "right" ? where : "middle";
   }
 
   const ordered = $derived(
@@ -93,12 +87,14 @@
       if (groupOf(seat) !== "middle") {
         continue;
       }
-      if (seat.rating === "tossup") {
+      const where = lane(seat, sides);
+      if (where === "tossup") {
         tossups += 1;
-      } else if (seat.side == null) {
-        waiting += 1;
+      } else if (where === "other") {
+        const id = seat.side ?? seat.party ?? "";
+        others.set(id, (others.get(id) ?? 0) + 1);
       } else {
-        others.set(seat.side, (others.get(seat.side) ?? 0) + 1);
+        waiting += 1;
       }
     }
     return [
@@ -124,11 +120,10 @@
         rows,
         side,
         count:
-          group === "left"
-            ? view.tallies.left.holdover + total
-            : group === "right"
-              ? view.tallies.right.holdover + total
-              : 0,
+          group === "left" || group === "right"
+            ? seatsOf(view.tallies[group])
+            : 0,
+        isCaucus: group !== "middle" && allied(view.blocs, group).length > 0,
         span:
           Math.max(1, rows.length) +
           (tipping != null && rows.includes(tipping) ? 1 : 0),
@@ -213,6 +208,19 @@
     ...(view.tallies.left.holdover + view.tallies.right.holdover > 0
       ? [m.night_ladder_holdovers()]
       : []),
+    ...(["left", "right"] as const).flatMap((group) => {
+      const names = allied(view.blocs, group).flatMap((bloc) => bloc.names);
+      return names.length === 0
+        ? []
+        : [
+            m.night_ladder_caucus({
+              names: new Intl.ListFormat(getLocale(), {
+                type: "conjunction",
+              }).format(names),
+              party: (group === "left" ? left : right).name,
+            }),
+          ];
+    }),
     ...(shown.some((seat) => seat.summary.race.isSpecial === true)
       ? [`† ${m.night_ladder_special()}`]
       : []),
@@ -334,7 +342,9 @@
                   >
                   <span
                     class="text-[0.6875rem]/tight text-pretty text-muted-foreground"
-                    >{m.night_ladder_side({ party: block.side.short })}</span
+                    >{block.isCaucus
+                      ? m.night_ladder_caucus_side({ party: block.side.short })
+                      : m.night_ladder_side({ party: block.side.short })}</span
                   >
                 </span>
               {/if}
