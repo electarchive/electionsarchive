@@ -634,6 +634,8 @@
   "scope_below": "Ir um nível abaixo, por {noun}",
   "series_label": "Esta disputa em outros anos",
   "contest_county": "Fica dentro de {county}",
+  "contest_body_failed": "Não foi possível carregar os resultados desta disputa.",
+  "contest_body_retry": "Tentar novamente",
   "origins_one": "Novos limites para {year}, traçados quase inteiramente a partir de {seat}, como era de {from} a {to}.",
   "origins_many": "Novos limites para {year}. Por área, esta cadeira veio de {seats}.",
   "origins_item": "{name} ({share})",

@@ -624,6 +624,8 @@
   "scope_below": "{noun} düzeyine in",
   "series_label": "Bu yarış diğer yıllarda",
   "contest_county": "{county} içinde yer alıyor",
+  "contest_body_failed": "Bu yarışın sonuçları yüklenemedi.",
+  "contest_body_retry": "Yeniden dene",
   "origins_one": "Yeni sınırlar {year} için çizildi. Neredeyse tamamı şu sandalyeden geliyor: {seat} ({from}–{to} arasındaki hali).",
   "origins_many": "Yeni sınırlar {year} için çizildi. Alana göre bu sandalye şu yerlerden oluşuyor: {seats}.",
   "origins_item": "{name} ({share})",

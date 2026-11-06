@@ -624,6 +624,8 @@
   "scope_below": "Eine Ebene tiefer, nach {noun}",
   "series_label": "Diese Wahl in anderen Jahren",
   "contest_county": "Liegt in {county}",
+  "contest_body_failed": "Die Ergebnisse dieser Wahl konnten nicht geladen werden.",
+  "contest_body_retry": "Erneut versuchen",
   "origins_one": "Neue Grenzen für {year}, fast vollständig aus {seat} in den Grenzen von {from} bis {to} gebildet.",
   "origins_many": "Neue Grenzen für {year}. Nach Fläche stammt dieser Sitz aus {seats}.",
   "origins_item": "{name} ({share})",
