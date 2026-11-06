@@ -350,6 +350,7 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
   }
   const { sections } = data;
   const [
+    body,
     governments,
     regions,
     tiers,
@@ -359,6 +360,7 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
     counties,
     winners,
   ] = await Promise.all([
+    data.body,
     sections.governments,
     sections.regions,
     sections.tiers,
@@ -369,10 +371,16 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
     sections.winners,
   ]);
   return {
-    ...data,
+    kind: data.kind,
+    id: data.id,
+    path: data.path,
+    race: data.race,
+    scope: data.scope,
+    election: body.election,
+    cycle: body.cycle,
+    series: body.series,
     sameDay,
     sections: {
-      ...sections,
       governments,
       regions,
       tiers,
@@ -381,7 +389,9 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
       counties,
       winners,
       mayoral: undefined,
+      ledger: body.ledger,
     },
+    within: data.within,
   };
 }
 

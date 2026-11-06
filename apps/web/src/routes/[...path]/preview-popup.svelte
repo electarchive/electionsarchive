@@ -152,22 +152,26 @@
     {:else if data.kind === "election"}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">
-          {data.election.name}
+          {data.head.name}
         </p>
-        {#if data.election.date != null}
+        {#if data.head.date != null}
           <p class="text-[0.8125rem] text-muted-foreground">
-            {date(data.election.date)}
+            {date(data.head.date)}
           </p>
         {/if}
       </div>
-      {const contests = $derived(
-        data.election.contests == null
-          ? []
-          : (peek(data.election.contests)?.value ?? []),
-      )}
-      {#if contests.length > 0}
-        {@render list(m.election_contests(), contests)}
-      {/if}
+      <Await promise={data.body} name="preview.election" key={data.id}>
+        {#snippet children(opened)}
+          {const contests = $derived(
+            opened.election.contests == null
+              ? []
+              : (peek(opened.election.contests)?.value ?? []),
+          )}
+          {#if contests.length > 0}
+            {@render list(m.election_contests(), contests)}
+          {/if}
+        {/snippet}
+      </Await>
     {:else if data.kind === "polity"}
       <div class="px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">

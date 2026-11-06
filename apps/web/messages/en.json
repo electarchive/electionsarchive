@@ -629,6 +629,7 @@
   "contest_county": "Lies within {county}",
   "contest_body_failed": "The results for this contest didn't load.",
   "contest_body_retry": "Try again",
+  "election_body_failed": "The results for this election didn't load.",
   "origins_one": "New boundaries for {year}, drawn almost entirely from {seat} as it stood from {from} to {to}.",
   "origins_many": "New boundaries for {year}. By area, this seat came from {seats}.",
   "origins_item": "{name} ({share})",

@@ -23,9 +23,8 @@ const FOLDED = 20;
 const ROSTER = 24_000;
 const ROUND_CELLS = 120;
 
-type Election = Extract<
-  Awaited<ReturnType<typeof archive>>,
-  { kind: "election" }
+type Election = Awaited<
+  Extract<Awaited<ReturnType<typeof archive>>, { kind: "election" }>["body"]
 >;
 type Contest = Awaited<
   Extract<Awaited<ReturnType<typeof archive>>, { kind: "contest" }>["body"]
@@ -210,7 +209,7 @@ const unplace = memo(
 const crowd = memo(
   (
     elections: Election["election"]["elections"],
-    ledger: Election["sections"]["ledger"],
+    ledger: Election["ledger"],
   ) => {
     const rounds = new Set(
       ledger?.kind === "rounds"
@@ -259,6 +258,11 @@ export const load: PageServerLoad = async ({
   isDataRequest,
 }) => {
   const data = await archive(params.path, url.searchParams);
+  const budget = isCrawler(request.headers.get("user-agent"))
+    ? Infinity
+    : isDataRequest
+      ? 0
+      : 150;
   if (data.kind === "contest") {
     const body = data.body.then(({ contest, ...rest }) => {
       const { near, others } = compared(contest.targets);
@@ -296,13 +300,7 @@ export const load: PageServerLoad = async ({
           standing: data.standing,
           crowned: data.crowned,
         },
-        {
-          budget: isCrawler(request.headers.get("user-agent"))
-            ? Infinity
-            : isDataRequest
-              ? 0
-              : 150,
-        },
+        { budget },
       ),
       talkLink(data.id),
     ]);
@@ -312,35 +310,83 @@ export const load: PageServerLoad = async ({
     return { ...data, ...streamed, talk };
   }
   if (data.kind === "election") {
-    const { races, contests, elections } = data.election;
-    const laid = lay(races);
     const asked = params.path
       .slice(data.path.length + 1)
       .replace(/-total$/u, "");
-    const { races: boarded, rest } = split(
-      laid,
-      laid.ordered.some(
-        (race) => race.anchor === asked && !laid.board.has(race),
-      )
-        ? asked
-        : "",
+    const body = data.body.then(async (opened) => {
+      const { races, contests, elections } = opened.election;
+      const laid = lay(races);
+      const { races: boarded, rest } = split(
+        laid,
+        laid.ordered.some(
+          (race) => race.anchor === asked && !laid.board.has(race),
+        )
+          ? asked
+          : "",
+      );
+      const { value: hexes } = await soon(
+        boarded.some((race) => race.map != null && race.places != null)
+          ? call(router.seats.hexes, {
+              id: data.id,
+              within: data.scope?.id,
+            }).catch(() => null)
+          : Promise.resolve(null),
+      );
+      const crowded = crowd(elections, opened.ledger);
+      return {
+        ...opened,
+        election: {
+          ...opened.election,
+          elections: crowded.elections,
+          children:
+            crowded.children == null
+              ? null
+              : part("election.children", crowded.children),
+          contests:
+            contests.length === 0 ? null : part("election.contests", contests),
+          logos: part("election.logos", opened.election.logos),
+          isCrowded: crowded.isCrowded,
+          unplaced: laid.isDeferred ? [] : unplace(races, contests),
+          races:
+            hexes == null || hexes instanceof Promise
+              ? boarded
+              : boarded.map((race) => {
+                  if (race.places == null) {
+                    return race;
+                  }
+                  const rows = peek(race.places.rows)?.value.rows ?? [];
+                  const keys = new Set(
+                    [...rows, ...(race.places.districts ?? [])].map(
+                      (row) => row.k,
+                    ),
+                  );
+                  return {
+                    ...race,
+                    shapes: shapesOf(hexes, {
+                      has: (k) => keys.has(k),
+                      size: rows.length,
+                    }),
+                  };
+                }),
+          rest,
+        },
+      };
+    });
+    const streamed = await stream(
+      { body },
+      { budget: data.race == null ? budget : Infinity },
     );
-    const { value: hexes } = await soon(
-      boarded.some((race) => race.map != null && race.places != null)
-        ? call(router.seats.hexes, {
-            id: data.id,
-            within: data.scope?.id,
-          }).catch(() => null)
-        : Promise.resolve(null),
-    );
+    if (streamed.body instanceof Promise) {
+      setHeaders({ "cache-control": "private, no-cache" });
+    }
     const { sections } = data;
-    const { winners, ledger } = sections;
+    const { winners } = sections;
     const isSweep =
       sections.mayoral ||
       (!(winners instanceof Promise) && (winners?.tiers.length ?? 0) > 0);
-    const crowded = crowd(elections, ledger);
     return {
       ...data,
+      ...streamed,
       sections: {
         ...sections,
         tiers: parted("election.tiers", sections.tiers),
@@ -352,41 +398,6 @@ export const load: PageServerLoad = async ({
         winners: isSweep
           ? parted("election.sweep", winners, "preload")
           : parted("election.winners", winners),
-      },
-      election: {
-        ...data.election,
-        elections: crowded.elections,
-        children:
-          crowded.children == null
-            ? null
-            : part("election.children", crowded.children),
-        contests:
-          contests.length === 0 ? null : part("election.contests", contests),
-        logos: part("election.logos", data.election.logos),
-        isCrowded: crowded.isCrowded,
-        unplaced: laid.isDeferred ? [] : unplace(races, contests),
-        races:
-          hexes == null || hexes instanceof Promise
-            ? boarded
-            : boarded.map((race) => {
-                if (race.places == null) {
-                  return race;
-                }
-                const rows = peek(race.places.rows)?.value.rows ?? [];
-                const keys = new Set(
-                  [...rows, ...(race.places.districts ?? [])].map(
-                    (row) => row.k,
-                  ),
-                );
-                return {
-                  ...race,
-                  shapes: shapesOf(hexes, {
-                    has: (k) => keys.has(k),
-                    size: rows.length,
-                  }),
-                };
-              }),
-        rest,
       },
     };
   }

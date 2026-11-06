@@ -1503,33 +1503,40 @@ export async function archive(path: string, search: URLSearchParams) {
           : capped(call(router.elections.winners, input).catch(() => null)),
       ),
     ]);
-    const [election, cycle, series, mayoral, ledger] = await found(
-      Promise.all([
-        call(router.elections.get, { ...input, within: scope?.id }),
-        call(router.elections.cycle, input),
-        call(router.elections.series, input),
-        scope != null || day?.isLocal !== true
-          ? false
-          : rows(`mayoral:v1:${slug.entity_id}`, async () =>
-              db.execute<{ isMayoral: boolean }>(sql`
-                select count(*) filter (
-                  where exists (
-                    select from contest c join office f on f.id = c.office_id
-                    where c.election_id = k.id and c.kind = 'office' and f.kind = 'mayor'
-                  )
-                ) * 10 >= count(*) * 9 as "isMayoral"
-                from election k where k.parent_id = ${slug.entity_id}::uuid
-              `),
-            ).then((flags) => flags[0]?.isMayoral === true),
-        scope == null
-          ? call(router.elections.ledger, input).catch(() => null)
-          : null,
-      ]),
-    );
+    const body = Promise.all([
+      call(router.elections.get, { ...input, within: scope?.id }),
+      call(router.elections.cycle, input),
+      call(router.elections.series, input),
+      scope == null
+        ? call(router.elections.ledger, input).catch(() => null)
+        : null,
+    ]).then(([election, cycle, series, ledger]) => ({
+      election,
+      cycle,
+      series,
+      ledger,
+    }));
+    void body.catch(() => null);
+    const [head, mayoral] = await Promise.all([
+      found(call(router.elections.head, { ...input, within: scope?.id })),
+      scope != null || day?.isLocal !== true
+        ? false
+        : rows(`mayoral:v1:${slug.entity_id}`, async () =>
+            db.execute<{ isMayoral: boolean }>(sql`
+              select count(*) filter (
+                where exists (
+                  select from contest c join office f on f.id = c.office_id
+                  where c.election_id = k.id and c.kind = 'office' and f.kind = 'mayor'
+                )
+              ) * 10 >= count(*) * 9 as "isMayoral"
+              from election k where k.parent_id = ${slug.entity_id}::uuid
+            `),
+          ).then((flags) => flags[0]?.isMayoral === true),
+    ]);
     const race = unit === "" ? null : unit;
     if (
       race != null &&
-      election.races.every(
+      (await body).election.races.every(
         (entry) => entry.anchor !== race.replace(/-total$/u, ""),
       )
     ) {
@@ -1551,9 +1558,8 @@ export async function archive(path: string, search: URLSearchParams) {
       path: slug.path,
       race,
       scope,
-      election,
-      cycle,
-      series,
+      head,
+      body,
       sameDay,
       sections: {
         governments,
@@ -1564,7 +1570,6 @@ export async function archive(path: string, search: URLSearchParams) {
         counties,
         winners,
         mayoral,
-        ledger,
       },
       within,
     };

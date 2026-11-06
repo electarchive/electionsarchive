@@ -7,12 +7,14 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { Windowed } from "#lib/windowed.svelte.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
 
   const {
     councils,
   }: {
-    councils: Extract<PageData, { kind: "election" }>["election"]["councils"];
+    councils: Awaited<
+      Extract<PageServerData, { kind: "election" }>["body"]
+    >["election"]["councils"];
   } = $props();
 
   const uid = $props.id();
