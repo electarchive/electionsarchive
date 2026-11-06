@@ -256,19 +256,21 @@
     <span
       class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground"
     >
-      <span class="flex items-center gap-1.5">
-        <svg viewBox="0 0 20 6" class="block-1.5 inline-5" aria-hidden="true"
-          ><line
-            x1="0"
-            x2="20"
-            y1="3"
-            y2="3"
-            stroke="currentColor"
-            stroke-width="2.5"
-          /></svg
-        >
-        {m.night_trend_estimate()}
-      </span>
+      {#if live.length > 0}
+        <span class="flex items-center gap-1.5">
+          <svg viewBox="0 0 20 6" class="block-1.5 inline-5" aria-hidden="true"
+            ><line
+              x1="0"
+              x2="20"
+              y1="3"
+              y2="3"
+              stroke="currentColor"
+              stroke-width="2.5"
+            /></svg
+          >
+          {m.night_trend_estimate()}
+        </span>
+      {/if}
       <span class="flex items-center gap-1.5">
         <svg viewBox="0 0 20 6" class="block-1.5 inline-5" aria-hidden="true"
           ><line
@@ -284,14 +286,16 @@
         >
         {m.night_trend_counted()}
       </span>
-      <span class="flex items-center gap-1.5">
-        <span
-          class="rounded-xs block-2.5 inline-5"
-          style:background="linear-gradient(to bottom, color-mix(in oklab, {toneA}
-          28%, transparent) 50%, color-mix(in oklab, {toneB} 28%, transparent) 50%)"
-        ></span>
-        {m.night_trend_band()}
-      </span>
+      {#if live.length > 0}
+        <span class="flex items-center gap-1.5">
+          <span
+            class="rounded-xs block-2.5 inline-5"
+            style:background="linear-gradient(to bottom, color-mix(in oklab, {toneA}
+            28%, transparent) 50%, color-mix(in oklab, {toneB} 28%, transparent) 50%)"
+          ></span>
+          {m.night_trend_band()}
+        </span>
+      {/if}
     </span>
   </figcaption>
   <div class="relative" bind:clientWidth={width}>

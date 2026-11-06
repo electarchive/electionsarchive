@@ -226,7 +226,7 @@
       isCalled: called != null,
       isCounting: now.total > 0,
     });
-    return ahead == null || found == null || found.flip === "held"
+    return ahead == null || found == null || found.flip === "held" || isShort
       ? null
       : {
           flip: found.flip,

@@ -50,6 +50,11 @@
       <Seat held={entry.held} isPlain={band != null} />
     </span>
   </span>
+  {#if summary.isShort}
+    <span class="text-xs text-pretty text-muted-foreground"
+      >{m.night_ladder_ranked_note()}</span
+    >
+  {/if}
   {#if band != null}
     <BandLabel
       {band}

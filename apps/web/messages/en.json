@@ -4798,7 +4798,7 @@
   "board_race_at_large": "{state} at-large",
   "board_power_won": "Won",
   "board_power_leading": "Leading",
-  "board_power_waiting": "{count} not counting yet",
+  "board_power_waiting": "{count} undecided",
   "board_power_seats": "{count} seats up",
   "board_power_empty": "No races for this office.",
   "board_forecast_off": "Forecasts are off for now.",
