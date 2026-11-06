@@ -12,6 +12,9 @@ ${TRAINING.map((name) => `User-agent: ${name}`).join("\n")}
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
+User-agent: Epochal-Search
+Disallow: /
+
 Sitemap: ${url.origin}/sitemap.xml
 `,
     { headers: { "content-type": "text/plain; charset=utf-8" } },
