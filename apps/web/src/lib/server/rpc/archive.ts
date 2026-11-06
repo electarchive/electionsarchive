@@ -6085,13 +6085,18 @@ async function atlas(input: {
       `,
     ),
     branches(day),
-    chain.length === 0
+    chain.length === 0 || input.isLean === true
       ? undefined
       : parted(own.rows[0]?.scheme ?? "", area.id, day),
   ]);
   const [boxed, boxedParts] = await Promise.all([
-    level?.tiles == null ? undefined : parted(level.code, area.id, day),
-    federal == null || federal === level?.code || parts.length === 0
+    level?.tiles == null || input.isLean === true
+      ? undefined
+      : parted(level.code, area.id, day),
+    federal == null ||
+    federal === level?.code ||
+    parts.length === 0 ||
+    input.isLean === true
       ? undefined
       : parted(federal, area.id, day),
   ]);
@@ -6352,7 +6357,7 @@ async function atlas(input: {
     rows.every((row) => row.name.endsWith(tail));
   const path = slugs.get(group == null ? contest.id : contest.election) ?? null;
   const statuses =
-    level?.code === "world.country"
+    level?.code === "world.country" && input.isLean !== true
       ? new Map(
           rowsOf(
             await db.execute<{ k: number; body: string }>(sql`
@@ -11561,7 +11566,7 @@ export const contests = {
         kept.map((row) => row.id),
         contest.date,
       );
-      const build = async (row: (typeof kept)[number]) => {
+      const locate = async (row: (typeof kept)[number]) => {
         const other = await find(row.id);
         if (other.place == null) {
           return null;
@@ -11581,56 +11586,57 @@ export const contests = {
           other.place.k === area.k
             ? ""
             : kids.find((kid) => kid.k === area.k)?.segment;
-        if (unit == null) {
-          return null;
-        }
-        const [totals, lineage] = await Promise.all([
-          load([row.id], [area.k], day, [row.id]),
-          branches(day),
-        ]);
-        const loaded = totals.get(area.k);
-        return {
-          id: row.id,
-          name: labels.full.get(row.id) ?? "",
-          path: [row.path, unit].filter((part) => part !== "").join("/"),
-          leaders:
-            loaded == null
-              ? []
-              : compare(loaded.side, null, lineage, "party")
-                  .flatMap((entry) =>
-                    entry.current == null
-                      ? []
-                      : [
-                          {
-                            key: entry.key,
-                            label: entry.label,
-                            color: entry.color,
-                            person: entry.current.person,
-                            party: entry.current.party,
-                            votes: entry.current.votes,
-                            share: entry.current.share,
-                          },
-                        ],
-                  )
-                  .toSorted((a, b) => b.votes - a.votes)
-                  .slice(0, 2),
-        };
+        return unit == null ? null : { row, unit };
       };
       const lanes = Map.groupBy(kept, (_row, index) => index % 4)
         .values()
         .toArray();
-      const built = await Promise.all(
-        lanes.map(async (lane) => {
-          const done: Array<Awaited<ReturnType<typeof build>>> = [];
-          for (const row of lane) {
-            done.push(await build(row));
-          }
-          return done;
-        }),
+      const [located, lineage] = await Promise.all([
+        Promise.all(
+          lanes.map(async (lane) => {
+            const done: Array<Awaited<ReturnType<typeof locate>>> = [];
+            for (const row of lane) {
+              done.push(await locate(row));
+            }
+            return done;
+          }),
+        ),
+        branches(day),
+      ]);
+      const ready = located.flat().filter((entry) => entry != null);
+      const totals = await Promise.all(
+        ready.map(async ({ row }) => load([row.id], [area.k], day, [row.id])),
       );
-      return built
-        .flat()
-        .filter((entry) => entry != null)
+      return ready
+        .map(({ row, unit }, index) => {
+          const loaded = totals[index]?.get(area.k);
+          return {
+            id: row.id,
+            name: labels.full.get(row.id) ?? "",
+            path: [row.path, unit].filter((part) => part !== "").join("/"),
+            leaders:
+              loaded == null
+                ? []
+                : compare(loaded.side, null, lineage, "party")
+                    .flatMap((entry) =>
+                      entry.current == null
+                        ? []
+                        : [
+                            {
+                              key: entry.key,
+                              label: entry.label,
+                              color: entry.color,
+                              person: entry.current.person,
+                              party: entry.current.party,
+                              votes: entry.current.votes,
+                              share: entry.current.share,
+                            },
+                          ],
+                    )
+                    .toSorted((a, b) => b.votes - a.votes)
+                    .slice(0, 2),
+          };
+        })
         .toSorted((a, b) => natural(a.name, b.name));
     }),
   cycle: os
@@ -12841,7 +12847,7 @@ async function redrawn(
         frame as (
           select a, b from versions where id = ${scope}::uuid and differs
         ),
-        paired as (
+        paired as materialized (
           select v.k,
             case when f.a is null then v.a else ST_CollectionExtract(ST_Intersection(v.a, f.a, 0.00001), 3) end as a,
             case when f.a is null then v.b else ST_CollectionExtract(ST_Intersection(v.b, f.b, 0.00001), 3) end as b
