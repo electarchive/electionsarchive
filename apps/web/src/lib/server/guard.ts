@@ -97,6 +97,13 @@ const FREE =
 
 const MACHINE = /^\/(?:api\/|mcp(?:\/|$)|rpc\/)|\.(?:md|json)$/u;
 
+const DECLARED = /(?:^|[\s(;])\+?https?:\/\//u;
+
+const BROWSER =
+  /\b(Chrome|Firefox)\/(\d+)|\bVersion\/(\d+)(?:\.\d+)* (?:Mobile\/\S+ )?Safari\//u;
+
+const FETCHING = { Chrome: 80, Firefox: 90, Safari: 17 } as const;
+
 const PRIVATE = new BlockList();
 PRIVATE.addSubnet("127.0.0.0", 8, "ipv4");
 PRIVATE.addSubnet("10.0.0.0", 8, "ipv4");
@@ -123,6 +130,9 @@ const REMEMBER_LIMIT = 50_000;
 const REFRESH = 12 * 3_600_000;
 const STORED = "guard:lists:v1";
 const VERIFIED = 300_000;
+const REPORTED = 600_000;
+const REPORT_LIMIT = 5000;
+const REPORT_LINES = 25;
 
 const FORBIDDEN =
   "This site admits only verified search crawlers. Scripts and agents can read any page as Markdown or JSON by adding .md or .json to its URL.";
@@ -226,10 +236,70 @@ function sweep() {
   }
 }
 
+const reports = new Map<string, { count: number; path: string }>();
+
+function suspect(request: Request, agent: string, pathname: string) {
+  if (DECLARED.test(agent) && !isTraining(agent)) {
+    return "declared";
+  }
+  if (MACHINE.test(pathname) || request.headers.has("sec-fetch-mode")) {
+    return null;
+  }
+  const match = BROWSER.exec(agent);
+  if (match == null) {
+    return null;
+  }
+  const engine =
+    match[1] === "Firefox" ? "Firefox" : match[1] == null ? "Safari" : "Chrome";
+  return Number(match[2] ?? match[3]) >= FETCHING[engine] ? "headerless" : null;
+}
+
+function report(
+  rule: string,
+  agent: string,
+  address: string,
+  family: 4 | 6,
+  pathname: string,
+) {
+  const network =
+    family === 4
+      ? `${address.split(".", 2).join(".")}.0.0/16`
+      : `${bucket(address, 6).split(":", 2).join(":")}::/32`;
+  const key = `${rule}\t${network}\t${agent.slice(0, 160)}`;
+  const known = reports.get(key);
+  if (known != null) {
+    known.count++;
+  } else if (reports.size < REPORT_LIMIT) {
+    reports.set(key, { count: 1, path: pathname.slice(0, 120) });
+  }
+}
+
+function flush() {
+  if (reports.size === 0) {
+    return;
+  }
+  const ranked = [...reports].toSorted((a, b) => b[1].count - a[1].count);
+  let total = 0;
+  for (const [, entry] of ranked) {
+    total += entry.count;
+  }
+  console.warn(
+    `guard report-only: ${total} requests in ${reports.size} groups would be refused in the last ${REPORTED / 60_000} minutes`,
+  );
+  for (const [key, entry] of ranked.slice(0, REPORT_LINES)) {
+    const [rule, network, agent] = key.split("\t", 3);
+    console.warn(
+      `guard report-only: ${rule} ${entry.count} from ${network} path ${entry.path} agent ${agent}`,
+    );
+  }
+  reports.clear();
+}
+
 if (!building) {
   void load();
   setInterval(() => void load(), REFRESH).unref();
   setInterval(sweep, 60_000).unref();
+  setInterval(flush, REPORTED).unref();
 }
 
 async function resolves(address: string, hosts: Array<string>) {
@@ -467,6 +537,10 @@ async function admit(request: Request, pathname: string) {
       !/markdown|json/u.test(accept))
   ) {
     return { status: 403 } as const;
+  }
+  const rule = suspect(request, agent, pathname);
+  if (rule != null) {
+    report(rule, agent, address, version, pathname);
   }
   const key = await keyed(request.headers);
   const scale = key == null ? 1 : KEYED;
