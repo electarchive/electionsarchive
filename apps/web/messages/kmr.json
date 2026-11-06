@@ -626,6 +626,7 @@
   "contest_county": "Di nav {county} de ye",
   "contest_body_failed": "Encamên vê pêşbaziyê nehatin barkirin.",
   "contest_body_retry": "Dîsa biceribîne",
+  "election_body_failed": "Encamên vê hilbijartinê nehatin barkirin.",
   "origins_one": "Sînorên nû ji bo {year}, hema hema bi temamî ji {seat} hatine xêzkirin, wekî ku ji {from} heta {to} bû.",
   "origins_many": "Sînorên nû ji bo {year}. Li gorî rûbarê, ev kursî ji {seats} hatiye.",
   "origins_item": "{name} ({share})",

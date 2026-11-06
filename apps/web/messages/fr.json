@@ -637,6 +637,7 @@
   "contest_county": "Se situe dans {county}",
   "contest_body_failed": "Impossible de charger les résultats de ce scrutin.",
   "contest_body_retry": "Réessayer",
+  "election_body_failed": "Impossible de charger les résultats de cette élection.",
   "origins_one": "Nouveau découpage pour {year}, issu presque entièrement de {seat}, dans sa configuration de {from} à {to}.",
   "origins_many": "Nouveau découpage pour {year}. En superficie, ce siège est issu de {seats}.",
   "origins_item": "{name} ({share})",

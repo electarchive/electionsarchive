@@ -636,6 +636,7 @@
   "contest_county": "Fica dentro de {county}",
   "contest_body_failed": "Não foi possível carregar os resultados desta disputa.",
   "contest_body_retry": "Tentar novamente",
+  "election_body_failed": "Não foi possível carregar os resultados desta eleição.",
   "origins_one": "Novos limites para {year}, traçados quase inteiramente a partir de {seat}, como era de {from} a {to}.",
   "origins_many": "Novos limites para {year}. Por área, esta cadeira veio de {seats}.",
   "origins_item": "{name} ({share})",
