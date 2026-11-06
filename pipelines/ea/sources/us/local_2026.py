@@ -13201,7 +13201,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 if uncertain and state == "MN":
                     magnitude, uncertain = 1, False
             if (
-                (state in ("IN", "MD", "MN") or cited is not None)
+                (state in ("IN", "MD", "MN") or cited is not None or magnitude == 1)
                 and magnitude is not None
                 and system in plurality.values()
             ):
