@@ -1687,6 +1687,8 @@
   "map_view_map": "Harita",
   "map_hex_seat": "{name}, kazanan: {winner}",
   "map_label": "{noun} düzeyinde sonuç haritası",
+  "map_gaps": "Haritanın bir bölümü yüklenemedi, bu yüzden boş görünen alanlarda da sonuç olabilir.",
+  "map_gaps_retry": "Yeniden dene",
   "map_hint": "Yerler arasında geçmek için ok tuşlarını, birini açmak için Enter tuşunu kullanın.",
   "map_zoom_in": "Yakınlaştır",
   "map_zoom_out": "Uzaklaştır",

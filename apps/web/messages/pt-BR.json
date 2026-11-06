@@ -1725,6 +1725,8 @@
   "map_view_map": "Mapa",
   "map_hex_seat": "{name}, vitória de {winner}",
   "map_label": "Mapa de resultados por {noun}",
+  "map_gaps": "Parte deste mapa não carregou. Uma área em branco pode não indicar ausência de resultados.",
+  "map_gaps_retry": "Tentar novamente",
   "map_hint": "Use as setas do teclado para se mover entre os lugares e Enter para abrir um.",
   "map_zoom_in": "Aproximar",
   "map_zoom_out": "Afastar",

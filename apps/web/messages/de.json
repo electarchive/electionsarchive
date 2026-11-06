@@ -1687,6 +1687,8 @@
   "map_view_map": "Karte",
   "map_hex_seat": "{name}, gewonnen von {winner}",
   "map_label": "Karte der Ergebnisse nach {noun}",
+  "map_gaps": "Ein Teil dieser Karte konnte nicht geladen werden. Leere Flächen bedeuten daher nicht unbedingt, dass es keine Ergebnisse gibt.",
+  "map_gaps_retry": "Erneut versuchen",
   "map_hint": "Mit den Pfeiltasten wechseln Sie zwischen Orten, mit der Eingabetaste öffnen Sie einen Ort.",
   "map_zoom_in": "Hineinzoomen",
   "map_zoom_out": "Herauszoomen",

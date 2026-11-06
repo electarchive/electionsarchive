@@ -1726,6 +1726,8 @@
   "map_view_map": "Carte",
   "map_hex_seat": "{name}, siège remporté par {winner}",
   "map_label": "Carte des résultats par {noun}",
+  "map_gaps": "Une partie de cette carte n'a pas pu être chargée. Une zone vide ne signifie donc pas forcément une absence de résultats.",
+  "map_gaps_retry": "Réessayer",
   "map_hint": "Utilisez les touches fléchées pour passer d'un lieu à l'autre et Entrée pour en ouvrir un.",
   "map_zoom_in": "Zoom avant",
   "map_zoom_out": "Zoom arrière",

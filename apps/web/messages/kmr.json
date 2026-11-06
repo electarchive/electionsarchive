@@ -1687,6 +1687,8 @@
   "map_view_map": "Nexşe",
   "map_hex_seat": "{name}, {winner} bi dest xist",
   "map_label": "Nexşeya encaman li gorî {noun}",
+  "map_gaps": "Beşek ji vê nexşeyê bar nebû. Dibe ku li qadeke vala jî encam hebin.",
+  "map_gaps_retry": "Dîsa biceribîne",
   "map_hint": "Bi bişkojkên tîran di navbera cihan de bigere, bi Enter yekê veke.",
   "map_zoom_in": "Nêzik bike",
   "map_zoom_out": "Dûr bike",
