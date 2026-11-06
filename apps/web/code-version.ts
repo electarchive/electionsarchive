@@ -1,6 +1,7 @@
 import type { Plugin, ResolveFn } from "vite";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { isBuiltin } from "node:module";
 import path from "node:path";
 import { parseAst } from "vite";
 
@@ -94,6 +95,61 @@ function keyName(node: Node) {
   return typeof node.key.value === "string" ? node.key.value : null;
 }
 
+function snapshots(text: string) {
+  const found = new Map<string, Array<string>>();
+  let isInside = false;
+  let current: Array<string> | null = null;
+  let isListing = false;
+  const unquote = (value: string) => value.replace(/^'(.*)'$/u, "$1");
+  for (const line of text.split("\n")) {
+    if (line === "") {
+      continue;
+    }
+    if (!line.startsWith(" ")) {
+      isInside = line === "snapshots:";
+      current = null;
+      continue;
+    }
+    if (!isInside) {
+      continue;
+    }
+    const entry = /^ {2}(\S.*?):(?: \{\})?$/u.exec(line);
+    if (entry?.[1] != null) {
+      current = [];
+      found.set(unquote(entry[1]), current);
+      continue;
+    }
+    const section = /^ {4}(\w+):$/u.exec(line);
+    if (section?.[1] != null) {
+      isListing =
+        section[1] === "dependencies" || section[1] === "optionalDependencies";
+      continue;
+    }
+    const dependency = /^ {6}(\S+): (\S+)$/u.exec(line);
+    if (
+      isListing &&
+      current != null &&
+      dependency?.[1] != null &&
+      dependency[2] != null &&
+      !dependency[2].startsWith("link:")
+    ) {
+      current.push(`${unquote(dependency[1])}@${unquote(dependency[2])}`);
+    }
+  }
+  return found;
+}
+
+function packageOf(id: string) {
+  const marker = "/node_modules/";
+  const at = id.lastIndexOf(marker);
+  const tail =
+    at === -1 ? id.replace(/^external:/u, "") : id.slice(at + marker.length);
+  const parts = tail.split("/");
+  return tail.startsWith("@")
+    ? parts.slice(0, 2).join("/")
+    : (parts[0] ?? tail);
+}
+
 function collect(
   code: string,
   object: Node,
@@ -118,9 +174,11 @@ function collect(
 
 export function codeVersion({
   inputs,
+  lockfile,
   procedures,
 }: {
   inputs: Array<string>;
+  lockfile: string;
   procedures: string;
 }): Plugin {
   const sources = new Map<string, string>();
@@ -133,6 +191,35 @@ export function codeVersion({
   let isServe = false;
   let manifest = "";
   let resolver: ResolveFn | null = null;
+  let locked = new Map<string, Array<string>>();
+  const packages = new Map<string, string>();
+  const packaged = (id: string) => {
+    const name = packageOf(id);
+    if (isBuiltin(name)) {
+      return "builtin";
+    }
+    let found = packages.get(name);
+    if (found == null) {
+      const queue = [...locked.keys()].filter(
+        (key) => key.slice(0, key.indexOf("@", 1)) === name,
+      );
+      const seen = new Set(queue);
+      while (queue.length > 0) {
+        for (const next of locked.get(queue.pop() ?? "") ?? []) {
+          if (!seen.has(next)) {
+            seen.add(next);
+            queue.push(next);
+          }
+        }
+      }
+      found =
+        seen.size === 0
+          ? "unlocked"
+          : `locked:${digest([...seen].toSorted((a, b) => a.localeCompare(b, "en")).join("\n")).slice(0, 16)}`;
+      packages.set(name, found);
+    }
+    return found;
+  };
   return {
     name: "code-version",
     enforce: "post",
@@ -142,6 +229,8 @@ export function codeVersion({
       isServe = config.command === "serve";
       resolver = config.createResolver();
       folder = path.resolve(root, procedures);
+      locked = snapshots(readFileSync(path.resolve(root, lockfile), "utf8"));
+      packages.clear();
       files = new Set(
         readdirSync(folder).map((file) => file.replace(/\.ts$/u, "")),
       );
@@ -320,7 +409,7 @@ export function codeVersion({
       };
       const reach = (starts: Array<string>, skip = "") =>
         walk(starts, skip).map(
-          (id) => `${name(id)} ${sources.get(id) ?? "external"}`,
+          (id) => `${name(id)} ${sources.get(id) ?? packaged(id)}`,
         );
       const modules = new Map<string, string>();
       const closure = (id: string, skip: string) => {

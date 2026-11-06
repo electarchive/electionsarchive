@@ -40,7 +40,8 @@ export default defineConfig(({ command }) => {
       },
       devtoolsJson(),
       codeVersion({
-        inputs: ["../../pnpm-lock.yaml", "../../packages/db/migrations"],
+        inputs: ["../../packages/db/migrations"],
+        lockfile: "../../pnpm-lock.yaml",
         procedures: "src/lib/server/rpc",
       }),
       command === "build" &&
