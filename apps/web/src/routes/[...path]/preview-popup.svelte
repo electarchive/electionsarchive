@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { peek } from "svelte-islands";
+  import { Await, peek } from "svelte-islands";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { LOST, MEASURES, OUTCOMES } from "#lib/outcomes.js";
@@ -66,79 +66,89 @@
         {failed ? m.preview_failed() : m.preview_loading()}
       </p>
     {:else if data.kind === "contest"}
-      {const contest = $derived(data.contest)}
-      {const rows = $derived(
-        contest.rows
-          .filter((row) => row.current != null)
-          .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0))
-          .slice(0, 3),
-      )}
+      {const head = $derived(data.head)}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">
-          {contest.scope.noun == null
-            ? contest.name
-            : contest.scope.abroad == null
-              ? contest.scope.name
-              : m.scope_abroad_title({ place: contest.scope.name })}
+          {head.scope.noun == null
+            ? head.name
+            : head.scope.abroad == null
+              ? head.scope.name
+              : m.scope_abroad_title({ place: head.scope.name })}
         </p>
         <p class="text-[0.8125rem] text-muted-foreground">
-          {contest.scope.noun == null
-            ? date(contest.election.date)
-            : contest.name}
+          {head.scope.noun == null ? date(head.election.date) : head.name}
         </p>
       </div>
-      {#if rows.length > 0}
-        <ol class="grid gap-2 border-bs px-3 py-2.5">
-          {#each rows as row (row.key)}
-            <li
-              class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-1 text-[0.8125rem]"
-              style:--party={swatch(row.color, row.key)}
-            >
-              <span class="flex items-baseline gap-1.5 min-inline-0">
-                <span
-                  class="shrink-0 self-center rounded-xs bg-(--party) chip block-2 inline-2"
-                ></span>
-                <span class="truncate font-semibold">{row.label}</span>
-                {#if row.current?.outcome != null}
-                  <span
-                    class={cn("shrink-0 px-1 text-[0.6875rem] font-semibold", {
-                      highlighter: !LOST.has(row.current.outcome),
-                      "text-muted-foreground": LOST.has(row.current.outcome),
-                    })}
-                    >{OUTCOMES[row.current.outcome]?.() ??
-                      row.current.outcome}</span
+      <Await promise={data.body} name="preview.contest" key={data.id}>
+        {#snippet children(opened)}
+          {const contest = $derived(opened.contest)}
+          {const rows = $derived(
+            contest.rows
+              .filter((row) => row.current != null)
+              .toSorted(
+                (a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0),
+              )
+              .slice(0, 3),
+          )}
+          {#if rows.length > 0}
+            <ol class="grid gap-2 border-bs px-3 py-2.5">
+              {#each rows as row (row.key)}
+                <li
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-1 text-[0.8125rem]"
+                  style:--party={swatch(row.color, row.key)}
+                >
+                  <span class="flex items-baseline gap-1.5 min-inline-0">
+                    <span
+                      class="shrink-0 self-center rounded-xs bg-(--party) chip block-2 inline-2"
+                    ></span>
+                    <span class="truncate font-semibold">{row.label}</span>
+                    {#if row.current?.outcome != null}
+                      <span
+                        class={cn(
+                          "shrink-0 px-1 text-[0.6875rem] font-semibold",
+                          {
+                            highlighter: !LOST.has(row.current.outcome),
+                            "text-muted-foreground": LOST.has(
+                              row.current.outcome,
+                            ),
+                          },
+                        )}
+                        >{OUTCOMES[row.current.outcome]?.() ??
+                          row.current.outcome}</span
+                      >
+                    {/if}
+                  </span>
+                  <span class="font-figures text-xs tabular-nums"
+                    >{contest.current?.isTally === true
+                      ? count(row.current?.votes ?? 0)
+                      : percent(row.current?.share ?? 0)}</span
                   >
-                {/if}
-              </span>
-              <span class="font-figures text-xs tabular-nums"
-                >{contest.current?.isTally === true
-                  ? count(row.current?.votes ?? 0)
-                  : percent(row.current?.share ?? 0)}</span
-              >
+                  <span
+                    class="col-span-2 flex overflow-hidden rounded-full bg-muted block-1"
+                    aria-hidden="true"
+                  >
+                    <span
+                      class="bg-(--party)"
+                      style:inline-size="{(row.current?.share ?? 0) * 100}%"
+                    ></span>
+                  </span>
+                </li>
+              {/each}
+            </ol>
+          {/if}
+          {#if contest.current != null}
+            <p
+              class="flex items-baseline justify-between gap-3 border-bs px-3 py-2 text-xs text-muted-foreground"
+            >
+              {MEASURES[contest.current.measure]?.() ?? m.stat_valid()}
               <span
-                class="col-span-2 flex overflow-hidden rounded-full bg-muted block-1"
-                aria-hidden="true"
+                class="font-figures text-[0.8125rem] text-foreground tabular-nums"
+                >{count(contest.current.valid)}</span
               >
-                <span
-                  class="bg-(--party)"
-                  style:inline-size="{(row.current?.share ?? 0) * 100}%"
-                ></span>
-              </span>
-            </li>
-          {/each}
-        </ol>
-      {/if}
-      {#if contest.current != null}
-        <p
-          class="flex items-baseline justify-between gap-3 border-bs px-3 py-2 text-xs text-muted-foreground"
-        >
-          {MEASURES[contest.current.measure]?.() ?? m.stat_valid()}
-          <span
-            class="font-figures text-[0.8125rem] text-foreground tabular-nums"
-            >{count(contest.current.valid)}</span
-          >
-        </p>
-      {/if}
+            </p>
+          {/if}
+        {/snippet}
+      </Await>
     {:else if data.kind === "election"}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
         <p class="text-[1.0625rem]/tight font-[720] text-balance">

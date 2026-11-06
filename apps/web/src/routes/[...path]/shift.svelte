@@ -5,7 +5,7 @@
   import { count, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
 
   let {
     places,
@@ -16,7 +16,9 @@
     focus = $bindable(null),
   }: {
     places: NonNullable<
-      Extract<PageData, { kind: "contest" }>["contest"]["places"]
+      Awaited<
+        Extract<PageServerData, { kind: "contest" }>["body"]
+      >["contest"]["places"]
     >;
     span: { from: string; to: string; forward: boolean };
     colors: Array<string>;

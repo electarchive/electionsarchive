@@ -1283,30 +1283,26 @@ export async function archive(path: string, search: URLSearchParams) {
       group: search.get("group") ?? undefined,
     } as const;
     const got = call(router.contests.get, input);
-    const ballot = eager(
-      got
-        .then(async () =>
-          call(router.contests.ballot, { id: slug.entity_id, unit }),
-        )
-        .catch(() => []),
-    );
-    const standing = eager(
-      (async () => {
-        if (unit === "") {
-          return null;
-        }
-        try {
-          await got;
-          return await call(router.contests.lean, {
-            id: slug.entity_id,
-            unit,
-            group: search.get("group") === "alliance" ? "alliance" : undefined,
-          });
-        } catch {
-          return null;
-        }
-      })(),
-    );
+    const ballot = got
+      .then(async () =>
+        call(router.contests.ballot, { id: slug.entity_id, unit }),
+      )
+      .catch(() => []);
+    const standing = (async () => {
+      if (unit === "") {
+        return null;
+      }
+      try {
+        await got;
+        return await call(router.contests.lean, {
+          id: slug.entity_id,
+          unit,
+          group: search.get("group") === "alliance" ? "alliance" : undefined,
+        });
+      } catch {
+        return null;
+      }
+    })();
     const around = (async () => {
       const head = await got;
       const siblings = head.scope.trail.at(-1)?.siblings;
@@ -1327,18 +1323,23 @@ export async function archive(path: string, search: URLSearchParams) {
       ]);
       return { places, bounds };
     })().catch(() => null);
-    const [
-      contest,
-      boundaries,
-      lists,
-      rounds,
-      cycle,
-      handover,
-      additional,
-      successors,
-      statutes,
-    ] = await found(
-      Promise.all([
+    const parent = rows(`parent:v1:${slug.entity_id}`, async () =>
+      db.execute<{ id: string }>(
+        sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
+      ),
+    ).then((found) => found[0]?.id);
+    const body = (async () => {
+      const [
+        contest,
+        boundaries,
+        lists,
+        rounds,
+        cycle,
+        handover,
+        additional,
+        successors,
+        statutes,
+      ] = await Promise.all([
         got,
         (async () =>
           call(router.contests.boundaries, {
@@ -1353,82 +1354,90 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.seats.additional, { id: slug.entity_id }),
         call(router.seats.successors, { id: slug.entity_id }),
         call(router.seats.statutes, { id: slug.entity_id }),
-      ]),
-    );
-    const level = boundaries.find(
-      (entry) => entry.scheme === contest.places?.level,
-    );
-    const own = boundaries.find(
-      (entry) => entry.k != null && entry.scheme !== contest.places?.level,
-    );
-    const surround =
-      own != null && level?.tiles != null && own.frame != null
-        ? null
-        : await around;
-    ahead(contest.count, input.round, async (round) =>
-      call(router.contests.get, { ...input, round }),
-    );
-    const parent = (
-      await rows(`parent:v1:${slug.entity_id}`, async () =>
-        db.execute<{ id: string }>(
-          sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
-        ),
-      )
-    )[0]?.id;
-    const [{ value: crowned }, sameDay] =
-      parent == null
-        ? [{ value: null }, null]
-        : await Promise.all([
-            soon(
-              contest.kind === "body_seats" &&
-                unit === "" &&
-                (contest.places?.rows.length ?? 0) === 0
-                ? capped(
-                    call(router.elections.winners, {
-                      id: parent,
-                      contest: slug.entity_id,
-                    })
-                      .then((found) =>
-                        found.maps.length === 0
-                          ? null
-                          : {
-                              maps: found.maps,
-                              since: found.before?.date.slice(0, 4) ?? null,
-                            },
-                      )
-                      .catch(() => null),
-                  )
-                : Promise.resolve(null),
-            ),
-            call(router.elections.races, {
-              id: parent,
+      ]);
+      const level = boundaries.find(
+        (entry) => entry.scheme === contest.places?.level,
+      );
+      const own = boundaries.find(
+        (entry) => entry.k != null && entry.scheme !== contest.places?.level,
+      );
+      ahead(contest.count, input.round, async (round) =>
+        call(router.contests.get, { ...input, round }),
+      );
+      const election = await parent;
+      const [surround, sameDay, isMerged] = await Promise.all([
+        own != null && level?.tiles != null && own.frame != null
+          ? null
+          : around,
+        election == null
+          ? null
+          : call(router.elections.races, {
+              id: election,
               contest: slug.entity_id,
               unit,
             }).catch(() => null),
-          ]);
+        merged.then((found) => found != null),
+      ]);
+      return {
+        contest: isMerged
+          ? { ...contest, election: { ...contest.election, path: null } }
+          : contest,
+        lists,
+        rounds,
+        cycle,
+        handover,
+        additional,
+        successors,
+        statutes,
+        boundaries,
+        surround,
+        sameDay,
+      };
+    })();
+    const crowned = body
+      .then(async ({ contest }) => {
+        const election = await parent;
+        if (
+          election == null ||
+          contest.kind !== "body_seats" ||
+          unit !== "" ||
+          (contest.places?.rows.length ?? 0) > 0
+        ) {
+          return null;
+        }
+        return capped(
+          call(router.elections.winners, {
+            id: election,
+            contest: slug.entity_id,
+          }).then((found) =>
+            found.maps.length === 0
+              ? null
+              : {
+                  maps: found.maps,
+                  since: found.before?.date.slice(0, 4) ?? null,
+                },
+          ),
+        );
+      })
+      .catch(() => null);
+    void body.catch(() => null);
+    const [head, isMerged] = await Promise.all([
+      found(call(router.contests.head, { id: slug.entity_id, unit })),
+      merged.then((found) => found != null),
+    ]);
     return {
       kind: "contest" as const,
       id: slug.entity_id,
       unit,
-      contest:
-        (await merged) == null
-          ? contest
-          : { ...contest, election: { ...contest.election, path: null } },
-      lists,
-      rounds,
-      ballot: ballot(),
-      cycle,
-      handover,
-      additional,
-      successors,
-      statutes,
-      boundaries,
-      surround,
+      head: isMerged
+        ? { ...head, election: { ...head.election, path: null } }
+        : head,
       match,
       within,
-      standing: standing(),
+      body,
+      ballot,
+      standing,
       crowned,
-      sameDay,
     };
   }
   if (slug.type === "election") {

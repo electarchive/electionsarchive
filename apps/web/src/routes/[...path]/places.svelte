@@ -19,7 +19,7 @@
   import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
   import { Windowed } from "#lib/windowed.svelte.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import Preview from "./preview.svelte";
   import { unit } from "./unit.js";
 
@@ -38,7 +38,9 @@
     focus = $bindable(null),
   }: {
     places: NonNullable<
-      Extract<PageData, { kind: "contest" }>["contest"]["places"]
+      Awaited<
+        Extract<PageServerData, { kind: "contest" }>["body"]
+      >["contest"]["places"]
     >;
     span: {
       from: string;

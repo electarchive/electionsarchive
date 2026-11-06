@@ -3,7 +3,7 @@
   import { capitalize, plural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import PlaceMap from "./map.svelte";
 
   let {
@@ -14,7 +14,7 @@
     focus = $bindable(null),
   }: {
     maps: NonNullable<
-      Awaited<Extract<PageData, { kind: "contest" }>["crowned"]>
+      Awaited<Extract<PageServerData, { kind: "contest" }>["crowned"]>
     >["maps"];
     hexes?: ComponentProps<typeof PlaceMap>["hexes"];
     since: string | null;

@@ -275,6 +275,12 @@ async function genuine(operator: Operator, address: string, family: 4 | 6) {
   return isGenuine;
 }
 
+export function isCrawler(agent: string | null) {
+  return (
+    agent != null && OPERATORS.some((operator) => operator.agent.test(agent))
+  );
+}
+
 export function bucket(address: string, family: 4 | 6) {
   if (family === 4) {
     return address;

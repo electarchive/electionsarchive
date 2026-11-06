@@ -10,11 +10,13 @@
   import { swatch } from "#lib/party.js";
   import { reveal } from "#lib/reveal.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import { runs } from "./runs.js";
 
   type Count = NonNullable<
-    Extract<PageData, { kind: "contest" }>["contest"]["count"]
+    Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["contest"]["count"]
   >;
 
   const {

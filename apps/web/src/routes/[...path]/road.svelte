@@ -6,10 +6,12 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
   import Preview from "./preview.svelte";
 
-  type Cycle = Extract<PageData, { kind: "contest" }>["cycle"];
+  type Cycle = Awaited<
+    Extract<PageServerData, { kind: "contest" }>["body"]
+  >["cycle"];
 
   const {
     rounds,
@@ -19,7 +21,9 @@
     more,
     isBelow = false,
   }: {
-    rounds: Extract<PageData, { kind: "contest" }>["rounds"];
+    rounds: Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
+    >["rounds"];
     cycle: Pick<Cycle, "primaries" | "general">;
     after?: Array<{
       id: string;

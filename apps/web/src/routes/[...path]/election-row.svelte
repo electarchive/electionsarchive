@@ -3,7 +3,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { PageServerData } from "./$types";
 
   const {
     year,
@@ -14,9 +14,8 @@
     isScoped = false,
   }: {
     year: string;
-    winner: Extract<
-      PageData,
-      { kind: "contest" }
+    winner: Awaited<
+      Extract<PageServerData, { kind: "contest" }>["body"]
     >["contest"]["series"][number]["winner"];
     phrase: string;
     when: string;
