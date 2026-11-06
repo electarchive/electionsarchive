@@ -216,12 +216,14 @@ export function seat(
   } else if (rating === "counting" && signed != null) {
     lean = Math.max(-0.98, Math.min(0.98, signed / 0.2));
   }
-  const changing = shift({
-    held,
-    to: called == null ? family(control, summary.leader) : side,
-    isCalled: called != null,
-    isCounting: total > 0,
-  });
+  const changing = summary.isShort
+    ? null
+    : shift({
+        held,
+        to: called == null ? family(control, summary.leader) : side,
+        isCalled: called != null,
+        isCounting: total > 0,
+      });
   return {
     summary,
     held,
@@ -336,7 +338,11 @@ export function lane(seat: Seat, [left, right]: [Family, Family]): Lane {
   if (isSettled(seat.rating)) {
     return side;
   }
-  if (seat.summary.total === 0 || seat.summary.leader == null) {
+  if (
+    seat.summary.total === 0 ||
+    seat.summary.leader == null ||
+    seat.summary.isShort
+  ) {
     return "waiting";
   }
   return seat.rating === "tossup" ? "tossup" : side;

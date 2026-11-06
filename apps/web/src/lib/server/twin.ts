@@ -4624,7 +4624,11 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
         : race.projected != null
           ? `${race.projected.name} (${m.night_band_projected()})`
           : race.unopposed == null
-            ? (race.leader ?? (race.note == null ? "" : m.night_later_key()))
+            ? race.leader == null
+              ? race.note == null
+                ? ""
+                : m.night_later_key()
+              : `${race.leader}${race.isRanked ? " ‡" : ""}`
             : `${race.unopposed} (${m.night_state_unopposed()})`,
       total === 0 ? "" : count(total),
       total === 0 || race.margin == null
@@ -4687,6 +4691,13 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
             ]
               .map((line) => `${line}.`)
               .join(" "),
+            ...(race.isRanked && data.at !== "final"
+              ? [
+                  race.state === "ak"
+                    ? m.night_rank_note_ak()
+                    : m.night_rank_note(),
+                ]
+              : []),
           ].join("\n\n"),
       ...(estimate == null
         ? []
@@ -4695,18 +4706,20 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
               ? m.live_twin_settled({ name: race.winner ?? race.leader ?? "" })
               : estimate.status === "unavailable"
                 ? m.live_twin_no_estimate()
-                : estimate.status === "too-early" ||
-                    estimate.favorite == null ||
-                    estimate.chance == null ||
-                    estimate.margin == null
-                  ? m.live_twin_too_early()
-                  : m.live_twin_estimate({
-                      name: estimate.favorite,
-                      chance: odds(estimate.chance),
-                      low: points(estimate.margin.low, 1),
-                      high: points(estimate.margin.high, 1),
-                      share: percent(estimate.shareIn, 0),
-                    }),
+                : estimate.status === "ranked"
+                  ? m.live_twin_ranked({ share: percent(estimate.shareIn, 0) })
+                  : estimate.status === "too-early" ||
+                      estimate.favorite == null ||
+                      estimate.chance == null ||
+                      estimate.margin == null
+                    ? m.live_twin_too_early()
+                    : m.live_twin_estimate({
+                        name: estimate.favorite,
+                        chance: odds(estimate.chance),
+                        low: points(estimate.margin.low, 1),
+                        high: points(estimate.margin.high, 1),
+                        share: percent(estimate.shareIn, 0),
+                      }),
           ]),
     ];
   };
@@ -4776,6 +4789,11 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
                       ],
                       races.map((race) => brief(race)),
                     ),
+                    ...(races.some(
+                      (race) => race.isRanked && race.winner == null,
+                    )
+                      ? [`‡ ${m.night_ladder_ranked_note()}`]
+                      : []),
                   ]),
             ],
     ),

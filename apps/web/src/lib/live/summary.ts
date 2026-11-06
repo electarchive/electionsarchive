@@ -29,6 +29,7 @@ export type Summary = {
   chance: number | null;
   at: string | null;
   later: "none" | "outside" | null;
+  isShort: boolean;
 };
 
 export function summarize(
@@ -64,7 +65,9 @@ export function summarize(
     counted = 1;
   } else if (
     estimate != null &&
-    (estimate.status === "estimating" || estimate.status === "too-early")
+    (estimate.status === "estimating" ||
+      estimate.status === "too-early" ||
+      estimate.status === "ranked")
   ) {
     counted = Math.min(0.99, estimate.shareIn.mid);
   } else if (
@@ -116,6 +119,13 @@ export function summarize(
       (race.feed === "none" || race.feed === "outside")
         ? race.feed
         : null,
+    isShort:
+      race.isRanked === true &&
+      race.certified == null &&
+      projected == null &&
+      unopposed == null &&
+      total > 0 &&
+      (totals[first ?? 0] ?? 0) <= total / 2,
   };
 }
 
@@ -246,6 +256,15 @@ export function describe(
   if (margin < 0.0005) {
     return m.night_head_tied({ count: count(total) });
   }
+  if (summary.isShort) {
+    return m.night_head_ranked({
+      name: leader.label,
+      margin: lead(margin),
+      share: percent(
+        (summary.totals[summary.race.options.indexOf(leader)] ?? 0) / total,
+      ),
+    });
+  }
   if (estimate?.status === "estimating") {
     return m.night_head_estimating({
       name: leader.label,
@@ -277,6 +296,12 @@ export function verdict(summary: Summary) {
   const option = summary.winner ?? summary.leader;
   if (option == null) {
     return summary.later == null ? m.night_nation_waiting() : m.night_later();
+  }
+  if (summary.isShort) {
+    return m.night_races_ranked({
+      name: surname(option),
+      margin: lead(summary.margin),
+    });
   }
   return summary.winner == null
     ? m.night_races_leads({
@@ -323,7 +348,7 @@ export function tally(summaries: Array<Summary>, office: LiveOffice) {
       continue;
     }
     const option = summary.settled ?? summary.leader;
-    if (option == null) {
+    if (option == null || summary.isShort) {
       if (summary.later == null) {
         waiting += 1;
       } else {

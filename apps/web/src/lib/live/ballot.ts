@@ -156,14 +156,15 @@ export function entries({
       party == null ? null : (families[party] ?? party);
     const pick = summary.winner ?? summary.unopposed ?? summary.leader;
     const side = familyOf(pick?.party?.id);
-    const changing = contest.isMeasure
-      ? null
-      : shift({
-          held: held?.id ?? null,
-          to: side,
-          isCalled: summary.settled != null,
-          isCounting: summary.total > 0,
-        });
+    const changing =
+      contest.isMeasure || summary.isShort
+        ? null
+        : shift({
+            held: held?.id ?? null,
+            to: side,
+            isCalled: summary.settled != null,
+            isCounting: summary.total > 0,
+          });
     return {
       contest,
       summary,
@@ -278,7 +279,11 @@ export function seating(
       } else {
         take(entry.held.id).waiting += open;
       }
-    } else if (entry.side == null || entry.summary.total === 0) {
+    } else if (
+      entry.side == null ||
+      entry.summary.total === 0 ||
+      entry.summary.isShort
+    ) {
       if (entry.held == null) {
         waiting += seats;
       } else {

@@ -66,6 +66,12 @@
     if (summary.projected != null) {
       return m.night_card_projected({ time: stamp(summary.projectedAt) });
     }
+    if (summary.isShort && summary.leader != null) {
+      return m.night_races_ranked({
+        name: surname(summary.leader),
+        margin: lead(summary.margin),
+      });
+    }
     if (summary.total > 0) {
       return summary.counted == null
         ? null

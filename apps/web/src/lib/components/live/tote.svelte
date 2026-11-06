@@ -72,7 +72,9 @@
     };
   });
   const isProjected = $derived(
-    estimate?.status === "estimating" || estimate?.status === "settled",
+    estimate?.status === "estimating" ||
+      estimate?.status === "ranked" ||
+      estimate?.status === "settled",
   );
 </script>
 

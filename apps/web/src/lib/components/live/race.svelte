@@ -42,6 +42,7 @@
   import LiveMap from "./map.svelte";
   import MethodLink from "./method-link.svelte";
   import Outstanding from "./outstanding.svelte";
+  import Ranked from "./ranked.svelte";
   import Seats from "./seats.svelte";
   import Shares from "./shares.svelte";
   import Seat from "./state/seat.svelte";
@@ -162,8 +163,9 @@
   const isMulti = $derived(
     seats > 1 && !race.isMeasure && options.length > seats,
   );
+  const isRanked = $derived(race.isRanked === true && !race.isMeasure);
   const isField = $derived.by(() => {
-    if (race.isMeasure) {
+    if (race.isMeasure || (isRanked && seats === 1)) {
       return false;
     }
     if (seats > 1) {
@@ -224,13 +226,21 @@
       isCalled: called != null,
       isCounting: now.total > 0,
     });
-    return ahead == null || found == null || found.flip === "held"
+    return ahead == null || found == null || found.flip === "held" || isShort
       ? null
       : {
           flip: found.flip,
           to: { short: party?.short ?? "", color: tone(ahead) },
         };
   });
+  const isShort = $derived(
+    isRanked &&
+      race.certified == null &&
+      projected == null &&
+      lone == null &&
+      now.total > 0 &&
+      (now.totals[now.order[0] ?? 0] ?? 0) <= now.total / 2,
+  );
   const isWaiting = $derived(now.total === 0);
   const isUncounted = $derived(lone != null && isWaiting);
   const later = $derived(
@@ -391,6 +401,13 @@
     if (Math.abs(signed ?? 0) < 0.0005) {
       return m.night_head_tied({ count: count(now.total) });
     }
+    if (isShort) {
+      return m.night_head_ranked({
+        name,
+        margin: lead(Math.abs(signed ?? 0)),
+        share: percent((now.totals[now.order[0] ?? 0] ?? 0) / now.total),
+      });
+    }
     if (estimate.status === "estimating") {
       return m.night_head_estimating({
         name,
@@ -490,6 +507,14 @@
       } else if (limit == null && Math.abs(signed ?? 1) <= 0.005) {
         list.push({ id: "close", text: m.night_note_close(), isAlert: true });
       }
+    }
+    if (isRanked && race.certified == null && later == null) {
+      list.push({
+        id: "ranked",
+        text:
+          race.state === "ak" ? m.night_rank_note_ak() : m.night_rank_note(),
+        isAlert: false,
+      });
     }
     if (race.certified != null && !now.isFinal) {
       list.push({
@@ -634,7 +659,7 @@
             {isWaiting}
             isLater={later != null}
             {mark}
-            needs={terms(race.rule)}
+            needs={isRanked ? [m.night_rank_line()] : terms(race.rule)}
           />
         {/if}
       </div>
@@ -734,7 +759,11 @@
       </section>
     {/if}
 
-    {#if isUnestimated && (race.certified == null || !now.isFinal)}
+    {#if isShort}
+      <section class="bg-background px-4 py-6 sm:px-8">
+        <Ranked {options} {now} />
+      </section>
+    {:else if isUnestimated && (race.certified == null || !now.isFinal)}
       <section class="grid gap-1 bg-background px-4 py-5 sm:px-8">
         <div class="flex items-center gap-1">
           <h2 class="text-[0.8125rem] font-semibold">

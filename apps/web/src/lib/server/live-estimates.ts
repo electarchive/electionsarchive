@@ -107,7 +107,9 @@ function pointAt(
     mid: rounded(found.margin.mid * flip),
     high: rounded(Math.max(low, high)),
     share:
-      found.status === "estimating" || found.status === "too-early"
+      found.status === "estimating" ||
+      found.status === "too-early" ||
+      found.status === "ranked"
         ? rounded(Math.min(0.99, found.shareIn.mid))
         : null,
     isLive: found.status === "estimating",

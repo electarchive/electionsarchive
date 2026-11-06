@@ -101,6 +101,13 @@
                   ></span>{entry.held.short}</span
                 >
               {/if}
+              {#if summary.isShort}
+                <span
+                  class="rounded-xs border border-border px-1 text-[0.6875rem] text-muted-foreground"
+                  title={m.night_ladder_ranked_note()}
+                  >{m.night_ladder_ranked()}</span
+                >
+              {/if}
             </span>
           </span>
           <ol class="grid gap-0.5 min-inline-0">
