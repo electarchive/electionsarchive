@@ -13420,7 +13420,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
         contests = cs.rows.get("contest", [])
         kept = emitted + [str(contest) for contest in stale]
         for election, value in conn.execute(
-            """select el.id, x.value from election el join entity e on e.id = el.id and e.retired_by is null
+            """select distinct on (el.id) el.id, x.value
+               from election el join entity e on e.id = el.id and e.retired_by is null
                join external_id x on x.entity_id = el.id and x.scheme = 'us.election'
                join changeset c on c.id = x.changeset_id
                where c.pipeline = %s and el.date_from = %s and x.value like %s and el.id <> all(%s::uuid[])
