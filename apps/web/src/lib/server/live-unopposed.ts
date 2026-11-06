@@ -21,6 +21,10 @@ export async function unopposed(contests: Array<string>) {
     select n.contest, n.options::text[] as options, n.tacit
     from named n
     where cardinality(n.options) <= n.seats
+      and (cardinality(n.options) = 1 or not exists (
+        select from label l
+        where l.entity_id = n.contest and l.kind = 'data_quality' and l.value = 'seats_unverified'
+      ))
       and not exists (
         select from contest_option o
         where o.contest_id = n.contest and o.parent_option_id is null and (
