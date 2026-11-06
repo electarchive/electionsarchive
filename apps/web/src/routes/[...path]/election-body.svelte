@@ -70,9 +70,11 @@
   import SameDay from "./same-day.svelte";
   import Seated from "./seated.svelte";
   import Seatflow from "./seatflow.svelte";
+  import { isCaucused, seatingOf } from "./seating.js";
   import Series from "./series.svelte";
   import States from "./states.svelte";
   import Sweep from "./sweep.svelte";
+  import { isSwung, swingKey, swung } from "./swing.js";
   import { led, tallied } from "./tally.js";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
@@ -652,13 +654,8 @@
       const by = race.places?.level;
       const year = election.date?.slice(0, 4);
       return {
-        queryKey: ["swing", race.path ?? race.anchor, by],
-        enabled:
-          race.path != null &&
-          race.count === 1 &&
-          race.map != null &&
-          race.places != null &&
-          race.results.length !== 1,
+        queryKey: swingKey(race, by),
+        enabled: isSwung(race),
         staleTime: Infinity,
         queryFn: async () => {
           const found = await orpc.contests.locate.call({ path });
@@ -667,19 +664,7 @@
             vs: "previous",
             by,
           });
-          return compared.places == null ||
-            compared.target?.year == null ||
-            year == null ||
-            !compared.places.rows.some((row) => row.earlier != null)
-            ? null
-            : {
-                places: compared.places,
-                span: {
-                  from: String(compared.target.year),
-                  to: year,
-                  forward: false,
-                },
-              };
+          return swung(compared, year);
         },
       };
     }),
@@ -796,25 +781,11 @@
     new Map(
       bodies.flatMap((body, index) => {
         const data = sitting[index]?.data;
-        const held = Date.parse(election.date ?? "");
-        const term = data?.makeup.find(
-          (entry) =>
-            Date.parse(entry.start) >= held &&
-            Date.parse(entry.start) - held < 1.2e10,
-        );
-        if (data == null || term == null) {
-          return [];
-        }
-        let next: string | undefined;
-        for (const entry of data.makeup) {
-          if (
-            entry.start > term.start &&
-            (next == null || entry.start < next)
-          ) {
-            next = entry.start;
-          }
-        }
-        return [[body, { data, term, next }] as const];
+        const found =
+          data == null ? null : seatingOf(data.makeup, election.date);
+        return data == null || found == null
+          ? []
+          : [[body, { data, ...found }] as const];
       }),
     ),
   );
@@ -829,19 +800,7 @@
             until: seating?.next,
           },
         }),
-        enabled:
-          seating?.term.parties.some((entry) => entry.caucus != null) ===
-            true &&
-          ordered.some(
-            (race) =>
-              race.body === body &&
-              race.results.some(
-                (row) =>
-                  (row.seats ?? 0) > 0 &&
-                  row.party == null &&
-                  row.isIndependent === true,
-              ),
-          ),
+        enabled: seating != null && isCaucused(seating.term, body, ordered),
         staleTime: Infinity,
         meta: { quiet: true },
       };
@@ -3120,7 +3079,11 @@
           {/if}
         {/snippet}
         {#if race.places != null && !race.isTotal}
-          <Lazy part={race.places.part} view="table" defer>
+          <Lazy
+            part={race.places.part}
+            view="table"
+            defer={index === head ? "eager" : true}
+          >
             {@render tabled()}
           </Lazy>
         {/if}

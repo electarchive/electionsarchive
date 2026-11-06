@@ -7,7 +7,17 @@ import {
 } from "@tanstack/svelte-query";
 import { toast } from "svelte-sonner";
 
+let shared: QueryClient | null = null;
+
 export function makeQueryClient() {
+  if (!browser) {
+    return created();
+  }
+  shared ??= created();
+  return shared;
+}
+
+function created() {
   return new QueryClient({
     defaultOptions: {
       queries: {

@@ -1,13 +1,19 @@
+import type { QueryKey } from "@tanstack/svelte-query";
 import type { Fetch, Part } from "svelte-islands";
 import { peek } from "svelte-islands";
 import { stream } from "svelte-islands/server";
+import type { Primed } from "#lib/primed.js";
 import { shapesOf } from "#lib/map/hexes.js";
+import { orpc } from "#lib/rpc.js";
 import { isCrawler } from "#lib/server/guard.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
 import { router } from "#lib/server/rpc/router.js";
 import { talkLink } from "#lib/server/talk.js";
 import type { PageServerLoad } from "./$types";
+import { isLocalOf, sourceOf, upOf, UPPER } from "./polity-source.js";
+import { isCaucused, seatingOf } from "./seating.js";
+import { isSwung, swingKey, swung } from "./swing.js";
 import { tallied } from "./tally.js";
 
 const BOARD = 49;
@@ -22,6 +28,8 @@ const FOLD = 18;
 const FOLDED = 20;
 const ROSTER = 24_000;
 const ROUND_CELLS = 120;
+const PRIMING = 400;
+const HEAVY = 600_000;
 
 type Election = Awaited<
   Extract<Awaited<ReturnType<typeof archive>>, { kind: "election" }>["body"]
@@ -241,6 +249,239 @@ const scrub = memo(
   ) => ({ path, located, hub, hexes }),
 );
 
+async function within(promise: Promise<Primed>) {
+  return Promise.race([
+    promise.catch((): Primed => []),
+    new Promise<Primed>((done) => {
+      setTimeout(done, PRIMING, []);
+    }),
+  ]);
+}
+
+async function keyed(key: QueryKey, promise: Promise<unknown>) {
+  return within(
+    promise.then((data) => (weigh(data) > HEAVY ? [] : [{ key, data }])),
+  );
+}
+
+async function drawn(polity: Parameters<typeof sourceOf>[0]) {
+  const source = sourceOf(polity);
+  if (source == null) {
+    return [];
+  }
+  const up = upOf(source.unit);
+  const place = async (unit: string | undefined, isWider: boolean) => {
+    const input = { id: source.id, unit };
+    const contest = await call(router.contests.get, input);
+    if (isWider && contest.places == null) {
+      return [{ key: orpc.contests.get.queryKey({ input }), data: contest }];
+    }
+    const bounded = { ...input, level: contest.places?.level };
+    const bounds = await call(router.contests.boundaries, bounded);
+    return [
+      { key: orpc.contests.get.queryKey({ input }), data: contest },
+      {
+        key: orpc.contests.boundaries.queryKey({ input: bounded }),
+        data: bounds,
+      },
+    ];
+  };
+  const found = await Promise.all([
+    place(source.unit, false),
+    source.unit == null ? [] : place(up, true),
+  ]);
+  return found.flat();
+}
+
+async function reads(id: string, polity: Parameters<typeof sourceOf>[0]) {
+  const compare = { a: id, b: polity.parent ?? id };
+  const found = await Promise.all([
+    within(drawn(polity)),
+    UPPER.includes(polity.kind)
+      ? []
+      : keyed(
+          orpc.polities.holders.queryKey({ input: { id } }),
+          call(router.polities.holders, { id }),
+        ),
+    isLocalOf(polity)
+      ? keyed(
+          orpc.polities.compare.queryKey({ input: compare }),
+          call(router.polities.compare, compare),
+        )
+      : [],
+  ]);
+  return found.flat();
+}
+
+async function contested(
+  id: string,
+  unit: string,
+  match: string,
+  search: URLSearchParams,
+  contest: Contest,
+) {
+  const { places } = contest;
+  const isLedgered =
+    places != null &&
+    !places.level.startsWith("unit:") &&
+    !(places.rows.length > 0 && places.rows.every((row) => row.valid === 0));
+  const ledger = {
+    id,
+    unit: unit === "" ? undefined : unit,
+    level: places?.level ?? undefined,
+    match: match === "person" || match === "family" ? match : "party",
+    group: search.get("group") ?? undefined,
+    round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
+  } as const;
+  const found = await Promise.all([
+    keyed(
+      orpc.coverage.known.queryKey({ input: { id } }),
+      call(router.coverage.known, { id }),
+    ),
+    isLedgered
+      ? keyed(
+          orpc.contests.ledger.queryKey({ input: ledger }),
+          call(router.contests.ledger, ledger),
+        )
+      : [],
+  ]);
+  return found.flat();
+}
+
+async function elected({
+  id,
+  scope,
+  date,
+  races,
+  asked,
+  hexing,
+}: {
+  id: string;
+  scope: string | undefined;
+  date: string | null;
+  races: Array<
+    Parameters<typeof isSwung>[0] & {
+      anchor: string;
+      body: string | null;
+      results: Parameters<typeof isCaucused>[2][number]["results"];
+      deferred: string | null;
+      sample: string | null;
+      isTier?: boolean;
+      places: { level: string } | null;
+    }
+  >;
+  asked: string;
+  hexing: Promise<unknown> | null;
+}) {
+  const chosen = races.find((race) => race.anchor === asked);
+  const lead = races.find((race) => race.results.length !== 1) ?? races[0];
+  const active =
+    chosen == null
+      ? races.length > 2
+        ? lead == null
+          ? []
+          : [lead]
+        : races
+      : [chosen];
+  const head = active[0];
+  const bodies = new Set(
+    races.flatMap((race) =>
+      race.deferred == null && race.body != null ? [race.body] : [],
+    ),
+  );
+  const year = date?.slice(0, 4);
+  const seats = { id, within: scope };
+  const found = await Promise.all([
+    keyed(
+      orpc.coverage.known.queryKey({ input: { id } }),
+      call(router.coverage.known, { id }),
+    ),
+    keyed(
+      orpc.seats.gains.queryKey({ input: seats }),
+      call(router.seats.gains, seats),
+    ),
+    keyed(
+      orpc.seats.byElections.queryKey({ input: seats }),
+      call(router.seats.byElections, seats),
+    ),
+    hexing == null
+      ? []
+      : within(
+          hexing.then((data) =>
+            data == null
+              ? []
+              : [{ key: orpc.seats.hexes.queryKey({ input: seats }), data }],
+          ),
+        ),
+    scope == null && head?.body != null && head.isTier !== true
+      ? keyed(
+          orpc.indices.election.queryKey({ input: { id } }),
+          call(router.indices.election, { id }),
+        )
+      : [],
+    ...[...bodies].flatMap((body) => {
+      const got = call(router.bodies.get, { id: body });
+      return [
+        keyed(orpc.bodies.get.queryKey({ input: { id: body } }), got),
+        within(
+          got.then(async (data): Promise<Primed> => {
+            const seating = seatingOf(data.makeup, date);
+            if (seating == null || !isCaucused(seating.term, body, races)) {
+              return [];
+            }
+            const input = {
+              id: body,
+              from: seating.term.start,
+              until: seating.next,
+            };
+            return [
+              {
+                key: orpc.bodies.members.queryKey({ input }),
+                data: await call(router.bodies.members, input),
+              },
+            ];
+          }),
+        ),
+      ];
+    }),
+    ...active.flatMap((race) => {
+      if (
+        scope != null ||
+        race.sample == null ||
+        race.map == null ||
+        race.places == null
+      ) {
+        return [];
+      }
+      const input = { id, contest: race.sample };
+      return [
+        keyed(
+          orpc.elections.regional.queryKey({ input }),
+          call(router.elections.regional, input),
+        ),
+      ];
+    }),
+    ...active.filter(isSwung).map(async (race) => {
+      const by = race.places?.level;
+      return keyed(
+        swingKey(race, by),
+        call(router.contests.locate, { path: race.path ?? "" }).then(
+          async (found) =>
+            swung(
+              await call(router.contests.get, {
+                id: found.id,
+                vs: "previous",
+                by,
+              }),
+              year,
+            ),
+        ),
+      );
+    }),
+  ]);
+  return found.flat();
+}
+
 async function seed(path: string) {
   const located = await call(router.elections.locate, { path });
   const [hub, hexes] = await Promise.all([
@@ -294,10 +535,30 @@ export const load: PageServerLoad = async ({
         },
       };
     });
+    const primed =
+      budget === Infinity
+        ? null
+        : parted(
+            "contest.primed",
+            data.body
+              .then(async ({ contest }) =>
+                contested(
+                  data.id,
+                  data.unit,
+                  data.match,
+                  url.searchParams,
+                  contest,
+                ),
+              )
+              .then((found) => (found.length === 0 ? null : found))
+              .catch(() => null),
+            "preload",
+          );
     const [streamed, talk] = await Promise.all([
       stream(
         {
           body,
+          primed,
           ballot: data.ballot,
           standing: data.standing,
           crowned: data.crowned,
@@ -315,6 +576,7 @@ export const load: PageServerLoad = async ({
     const asked = params.path
       .slice(data.path.length + 1)
       .replace(/-total$/u, "");
+    const priming = Promise.withResolvers<Primed>();
     const body = data.body.then(async (opened) => {
       const { races, contests, elections } = opened.election;
       const laid = lay(races);
@@ -326,14 +588,27 @@ export const load: PageServerLoad = async ({
           ? asked
           : "",
       );
-      const { value: hexes } = await soon(
-        boarded.some((race) => race.map != null && race.places != null)
-          ? call(router.seats.hexes, {
+      const hexing = boarded.some(
+        (race) => race.map != null && race.places != null,
+      )
+        ? call(router.seats.hexes, {
+            id: data.id,
+            within: data.scope?.id,
+          }).catch(() => null)
+        : null;
+      priming.resolve(
+        budget === Infinity
+          ? []
+          : elected({
               id: data.id,
-              within: data.scope?.id,
-            }).catch(() => null)
-          : Promise.resolve(null),
+              scope: data.scope?.id,
+              date: opened.election.date,
+              races: boarded,
+              asked,
+              hexing,
+            }),
       );
+      const { value: hexes } = await soon(hexing ?? Promise.resolve(null));
       const crowded = crowd(elections, opened.ledger);
       return {
         ...opened,
@@ -374,10 +649,27 @@ export const load: PageServerLoad = async ({
         },
       };
     });
-    const streamed = await stream(
-      { body },
-      { budget: data.race == null ? budget : Infinity },
-    );
+    void body.catch(() => {
+      priming.resolve([]);
+    });
+    const [streamed, early] = await Promise.all([
+      stream({ body }, { budget: data.race == null ? budget : Infinity }),
+      stream(
+        {
+          primed:
+            budget === Infinity
+              ? null
+              : parted(
+                  "election.primed",
+                  priming.promise.then((found) =>
+                    found.length === 0 ? null : found,
+                  ),
+                  "preload",
+                ),
+        },
+        { budget },
+      ),
+    ]);
     if (streamed.body instanceof Promise) {
       setHeaders({ "cache-control": "private, no-cache" });
     }
@@ -389,6 +681,7 @@ export const load: PageServerLoad = async ({
     return {
       ...data,
       ...streamed,
+      ...early,
       sections: {
         ...sections,
         tiers: parted("election.tiers", sections.tiers),
@@ -410,7 +703,7 @@ export const load: PageServerLoad = async ({
   const path = ["sovereign_state", "supranational"].includes(data.polity.kind)
     ? data.polity.latest?.path
     : null;
-  const [{ value: scrubber }, { value: record }] = await Promise.all([
+  const [{ value: scrubber }, { value: record }, map] = await Promise.all([
     path == null
       ? { value: null }
       : soon(
@@ -429,7 +722,24 @@ export const load: PageServerLoad = async ({
     soon(
       capped(call(router.polities.record, { id: data.id }).catch(() => null)),
     ),
+    budget === Infinity
+      ? []
+      : reads(data.id, {
+          ...data.polity,
+          calendar: { count: elections.length },
+        }),
   ]);
+  const primed: Primed = [
+    ...(record == null || record instanceof Promise
+      ? []
+      : [
+          {
+            key: orpc.polities.record.queryKey({ input: { id: data.id } }),
+            data: record,
+          },
+        ]),
+    ...map,
+  ];
   const groups = Map.groupBy(polities, (child) => child.kind);
   const places = {
     total: polities.length,
@@ -450,6 +760,11 @@ export const load: PageServerLoad = async ({
     calendar,
     places,
     scrubber,
+    primed: parted(
+      "polity.primed",
+      primed.length === 0 ? null : primed,
+      "preload",
+    ),
     record: parted(
       "polity.record",
       record == null ||
