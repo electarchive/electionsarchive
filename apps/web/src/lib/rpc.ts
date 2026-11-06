@@ -1,15 +1,17 @@
 import type { RouterClient } from "@orpc/server";
-import { browser } from "$app/env";
+import { browser, version } from "$app/env";
 import { BASE_URL } from "$app/env/public";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { Router } from "#lib/server/rpc/router.js";
+import { isRead } from "#lib/rpc-reads.js";
 
 const client: RouterClient<Router> = createORPCClient(
   new RPCLink({
-    url: "/rpc",
-    method: (_options, path) => (path[0] === "live" ? "GET" : "POST"),
+    url: `/rpc?build=${version}`,
+    method: (_options, path) => (isRead(path[0]) ? "GET" : "POST"),
+    maxUrlLength: 8000,
     origin: browser ? location.origin : BASE_URL,
     ...(!browser && { fetch: async () => new Promise<Response>(() => {}) }),
   }),

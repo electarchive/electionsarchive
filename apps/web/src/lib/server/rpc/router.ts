@@ -1,5 +1,6 @@
 import { READ_ONLY } from "$app/env/public";
 import { ORPCError, os } from "@orpc/server";
+import type { Read } from "#lib/rpc-reads.js";
 import { label } from "#lib/server/cache.js";
 import { agents } from "#lib/server/rpc/agents.js";
 import {
@@ -63,7 +64,7 @@ export const reads = {
   search,
   seats,
   tonight,
-};
+} satisfies Record<Read, unknown>;
 
 export const router = { ...reads, ...contributions };
 

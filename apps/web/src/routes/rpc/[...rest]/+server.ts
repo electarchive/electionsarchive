@@ -1,11 +1,12 @@
 import { RPCHandler } from "@orpc/server/fetch";
+import { isRead } from "#lib/rpc-reads.js";
 import { served } from "#lib/server/rpc/router.js";
 import type { RequestHandler } from "./$types";
 
 const handler = new RPCHandler(served, {
   allowMethods: (method, _procedure, path) =>
     method === "GET"
-      ? path[0] === "live"
+      ? isRead(path[0])
       : ["POST", "PUT", "PATCH", "DELETE"].includes(method),
 });
 
