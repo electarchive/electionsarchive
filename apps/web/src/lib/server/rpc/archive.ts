@@ -20846,7 +20846,7 @@ export async function record(input: { id: string; body?: string }) {
     ),
     roots as materialized (
       select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
-        c.kind = 'list_allocation' as "isList",
+        c.kind = 'list_allocation' as "isList", coalesce(c.term = 'remainder', false) as "isRemainder",
         coalesce((select bp.kind = 'supranational' from body b join polity bp on bp.id = b.polity_id where b.id = c.body_id), false) as "isAbroad",
         e.date_from as date, ${CYCLE} as year, a.k as area,
         case when g.polity_id = ${input.id}::uuid and g.id <> e.id and exists (
@@ -21033,7 +21033,7 @@ export async function record(input: { id: string; body?: string }) {
         w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
         case when count(distinct r.id) = 1 then (array_agg(w.person order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as winner,
         case when count(distinct r.id) = 1 then (array_agg(w.contest order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as decider,
-        bool_or(w.contest <> w.root) as runoff,
+        bool_or(w.contest <> w.root) as runoff, bool_and(r."isRemainder") as remainder,
         coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
       from roots r
       join won w on w.root = r.id
@@ -21041,7 +21041,7 @@ export async function record(input: { id: string; body?: string }) {
       group by r.seat, coalesce(r.link::text, r.year::text), w.party
     ),
     sized as (
-      select t.*, sum(t.seats) over b as total, sum(t.listed) over b as lists,
+      select t.*, sum(t.seats) over b as total, sum(t.listed) over b as lists, bool_and(t.remainder) over b as "isBy",
         case when (select yes from bare) then sum(t.seats) over b else (select z.seats from body_size z
           where z.body_id = t.seat and (z.valid @> t.day or lower(z.valid) between t.day and t.day + 400)
           order by lower(z.valid) desc limit 1) end as size
@@ -21056,6 +21056,7 @@ export async function record(input: { id: string; body?: string }) {
       case when "isMixed" then listed else seats end as seats, size::int as size
     from flagged
     where not ("isMixed" and listed = 0)
+      and ("isOffice" or not coalesce("isBy", false))
       and not exists (
         select from election e
         join polity ep on ep.id = e.polity_id and ep.kind = 'supranational'
