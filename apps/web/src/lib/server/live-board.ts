@@ -506,11 +506,45 @@ export async function control(
         where ta.tenure_id = s.id and ta.kind = 'parliamentary_group' and ta.valid @> ${date}::date limit 1
       ) gr on true
     `),
-    db.execute<{ party: string | null }>(sql`
+    db.execute<{ party: string | null; isPending: boolean }>(sql`
+      with race as (
+        select c.id from contest c
+        join election e on e.id = c.election_id
+        join office o on o.id = c.office_id
+        join polity p on p.id = o.polity_id
+        where o.kind = 'head_of_state' and p.iso_code = 'US' and e.kind = 'general'
+          and e.date_from = ${date}::date and c.party_scope_id is null
+        limit 1
+      ), chosen as (
+        select coalesce(cy.member_of_party_id, x.party_id) as party, 0 as rank
+        from contest n
+        join election ne on ne.id = n.election_id
+        join office o on o.id = n.office_id
+        join polity p on p.id = o.polity_id
+        join result_set rs on rs.contest_id = n.id and rs.is_default
+        join outcome oc on oc.result_set_id = rs.id and oc.kind = 'elected'
+        join contest_option x on x.id = oc.option_id
+        left join candidacy cy on cy.option_id = x.id and cy.role = 'head'
+        where exists (select from race) and o.kind = 'head_of_state' and p.iso_code = 'US' and ne.kind = 'indirect'
+          and ne.date_from > ${date}::date and ne.date_from <= ${date}::date + 75
+        union all
+        select x.party_id, 1
+        from race r
+        join result_set rs on rs.contest_id = r.id and rs.is_default
+        join outcome oc on oc.result_set_id = rs.id and oc.kind = 'won' and oc.seats > 0
+        join contest_option x on x.id = oc.option_id
+        where oc.seats * 2 > (
+          select sum(ox.seats) from outcome ox where ox.result_set_id = rs.id and ox.kind = 'won'
+        )
+      )
+      select party, false as "isPending" from (select party from chosen where party is not null order by rank limit 1) w
+      union all
+      select null, true where exists (select from race) and not exists (select from chosen where party is not null)
+      union all
       select case when pa.found then pa.party_id else (
         select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = t.person_id and o.party_id is not null
         order by (o.contest_id = t.contest_id) desc nulls last, o.contest_id desc limit 1
-      ) end as party
+      ) end, false
       from tenure t
       join office o on o.id = t.office_id
       join polity p on p.id = o.polity_id
@@ -518,9 +552,9 @@ export async function control(
         select ta.party_id, true as found from tenure_affiliation ta
         where ta.tenure_id = t.id and ta.kind = 'party' and ta.valid @> ${date}::date order by ta.party_id is null limit 1
       ) pa on true
-      where o.kind = 'head_of_state' and p.iso_code = 'US'
+      where o.kind = 'head_of_state' and p.iso_code = 'US' and not exists (select from race)
         and t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
-      order by t.from_date desc limit 1
+      order by 1 nulls last limit 1
     `),
   ]);
   const parties = [
@@ -623,7 +657,10 @@ export async function control(
     ),
     holdovers,
     caucuses,
-    tiebreak: { senate: family(head.rows[0]?.party ?? null) },
+    tiebreak: {
+      senate: family(head.rows[0]?.party ?? null),
+      isPending: head.rows[0]?.isPending === true,
+    },
     families,
     parties: Object.fromEntries(
       roots.map((root) => [

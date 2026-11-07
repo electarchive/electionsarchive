@@ -172,7 +172,7 @@ export const tonight = {
         method: "GET",
         path: "/live/results",
         summary:
-          "Election night results, compact: for a national election, who controls the Senate, House, and governorships (seats won, called, and ahead for each side, counted by caucus with the members of other parties or independents who caucus with each side named, seats not up, races too close to call, the seats each side needs for control after any tiebreak, and the chance of control), then each race's two leading candidates with votes and shares, the share of the expected vote counted, the call or projection, the favorite's win chance, the party holding the seat, and whether it flips. Leave election empty for the nearest US general election, or pass an election path such as us/2026-11-03-general or a state's, such as us/ga/2026-11-03-general. Narrow races with office, state, and status, sort them, and page with limit and cursor; get_live_race has one race in full",
+          "Election night results, compact: for a national election, who controls the Senate, House, and governorships (seats won, called, and ahead for each side, counted by caucus with the members of other parties or independents who caucus with each side named, seats not up, races too close to call, the seats each side needs for control after any tiebreak (the vice president's party, or \"presidential winner\" in a presidential year until the winner is declared), and the chance of control), then each race's two leading candidates with votes and shares, the share of the expected vote counted, the call or projection, the favorite's win chance, the party holding the seat, and whether it flips. Leave election empty for the nearest US general election, or pass an election path such as us/2026-11-03-general or a state's, such as us/ga/2026-11-03-general. Narrow races with office, state, and status, sort them, and page with limit and cursor; get_live_race has one race in full",
       }),
     )
     .input(
@@ -262,7 +262,9 @@ export const tonight = {
                     },
                     tiebreak:
                       view.tiebreak == null
-                        ? null
+                        ? view.isTiebreakPending
+                          ? "presidential winner"
+                          : null
                         : pairing[view.tiebreak === "left" ? 0 : 1].short,
                     up: picked.length,
                     tooClose: view.tossups,

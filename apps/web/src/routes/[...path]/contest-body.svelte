@@ -1032,19 +1032,36 @@
       top?.current != null && next?.current != null && top.current.votes > 0
         ? count(top.current.votes - next.current.votes)
         : null;
-    const [gain, hold, allied, other] =
+    const [gain, hold, allied, other, caucused] =
       handover.lead === "margin"
         ? [
             m.change_gain_margin,
             m.change_hold_margin,
             m.change_allied_margin,
             m.change_other_margin,
+            m.change_caucus_margin,
           ]
-        : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
+        : [
+            m.change_gain,
+            m.change_hold,
+            m.change_allied,
+            m.change_other,
+            m.change_caucus,
+          ];
     const party = handover.alliance ?? label;
+    const mark = handover.basis === "same" ? "" : "*";
     if (handover.alliance != null) {
-      return `${majority == null ? m.change_allied_bare({ party, label }) : allied({ party, label, majority })}${handover.basis === "same" ? "" : "*"}`;
+      return `${majority == null ? m.change_allied_bare({ party, label }) : allied({ party, label, majority })}${mark}`;
     }
+    const caucus = handover.caucus;
+    if (caucus?.isHold === true) {
+      const side = caucus.short ?? caucus.label;
+      return `${majority == null ? m.change_caucus_bare({ party: side, from, label }) : caucused({ party: side, from, label, majority })}${mark}`;
+    }
+    const joins =
+      caucus == null
+        ? ""
+        : ` ${m.change_caucus_joins({ party: caucus.label })}`;
     return `${
       majority == null
         ? handover.isGain
@@ -1057,7 +1074,7 @@
           : handover.isOther
             ? other({ party, from, majority })
             : hold({ party, majority })
-    }${handover.basis === "same" ? "" : "*"}`;
+    }${mark}${joins}`;
   });
   const vacancy = $derived(
     handover?.vacated == null ||
