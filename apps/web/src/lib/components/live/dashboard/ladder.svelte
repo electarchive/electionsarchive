@@ -83,6 +83,7 @@
     const others = new Map<string, number>();
     let tossups = 0;
     let waiting = 0;
+    let ranked = 0;
     for (const seat of ordered) {
       if (groupOf(seat) !== "middle") {
         continue;
@@ -93,6 +94,8 @@
       } else if (where === "other") {
         const id = seat.side ?? seat.party ?? "";
         others.set(id, (others.get(id) ?? 0) + 1);
+      } else if (seat.summary.isShort) {
+        ranked += 1;
       } else {
         waiting += 1;
       }
@@ -104,6 +107,9 @@
         count,
         text: m.night_ladder_side({ party: short(id) }),
       })),
+      ...(ranked > 0
+        ? [{ key: "ranked", count: ranked, text: m.night_ladder_ranked() }]
+        : []),
       ...(waiting > 0
         ? [{ key: "waiting", count: waiting, text: m.night_ladder_waiting() }]
         : []),
@@ -194,6 +200,7 @@
     }
     if (
       seat.signed != null &&
+      seat.summary.race.isRanked !== true &&
       (seat.side === left.id || seat.side === right.id)
     ) {
       return {
@@ -334,6 +341,7 @@
                         "text-base font-semibold": index > 0,
                       })}
                       style:color={entry.key === "tossup" ||
+                      entry.key === "ranked" ||
                       entry.key === "waiting"
                         ? undefined
                         : ink(entry.key)}>{entry.count}</span

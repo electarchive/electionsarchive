@@ -226,6 +226,7 @@
   "home_next_open": "Open the election",
   "home_decided": "Recent elections",
   "home_decided_pending": "Results to come",
+  "home_decided_counting": "Votes are still being counted.",
   "home_decided_yesterday": "Yesterday",
   "home_next_live": "Follow the count live",
   "home_agents": "Connect your agent",
@@ -1425,6 +1426,9 @@
   "polity_latest": "Latest election",
   "polity_latest_local": "Latest local election",
   "polity_next": "Up next",
+  "polity_counting": "Counting now",
+  "polity_counting_body": "Votes are still being counted. Until the results are certified, follow the live count; the archive adds the certified results here when they are published.",
+  "polity_counting_short": "Counting",
   "polity_next_races": [
     {
       "declarations": [

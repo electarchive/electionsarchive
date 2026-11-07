@@ -24,6 +24,7 @@ import { Rule, rule } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
+import { counting } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
 import {
@@ -20884,7 +20885,7 @@ export async function record(input: { id: string; body?: string }) {
           and not exists (
             select from contest n join election ne on ne.id = n.election_id
             where coalesce(n.office_id, n.body_id) = coalesce(c.office_id, c.body_id) and n.seat_id is not distinct from c.seat_id
-              and ne.kind in ('general', 'local', 'runoff') and ne.date_from > e.date_from and ne.date_from < e.date_from + 365
+              and ne.kind in ('general', 'local', 'runoff', 'special') and ne.date_from > e.date_from and ne.date_from < e.date_from + 365
           )
           and exists (select from result_set rs join outcome o on o.result_set_id = rs.id where rs.contest_id = c.id and o.kind = 'elected')
         )) and c.kind in ('body_seats', 'list_allocation', 'office')
@@ -22596,18 +22597,29 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
-      if (input.body == null) {
-        const stored = await db.execute<{
-          record: Awaited<ReturnType<typeof record>>;
-        }>(sql`
-          select record from polity_record where polity_id = ${input.id}::uuid and built_at > (select coalesce(max(published_at), '-infinity') from changeset)
-        `);
-        const row = stored.rows[0];
-        if (row != null) {
-          return row.record;
-        }
-      }
-      return record(input);
+      const [found, now] = await Promise.all([
+        (async () => {
+          if (input.body != null) {
+            return record(input);
+          }
+          const stored = await db.execute<{
+            record: Awaited<ReturnType<typeof record>>;
+          }>(sql`
+            select record from polity_record where polity_id = ${input.id}::uuid and built_at > (select coalesce(max(published_at), '-infinity') from changeset)
+          `);
+          return stored.rows[0]?.record ?? record(input);
+        })(),
+        counting(),
+      ]);
+      return {
+        ...found,
+        series: found.series.flatMap((series) => {
+          const points = series.points.filter(
+            (point) => point.path == null || !now.paths.has(point.path),
+          );
+          return points.length === 0 ? [] : [{ ...series, points }];
+        }),
+      };
     }),
   holders: os
     .meta(

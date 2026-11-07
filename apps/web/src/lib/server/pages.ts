@@ -19,6 +19,7 @@ import {
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
+import { counting, liveOf } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
@@ -316,12 +317,25 @@ export async function home() {
   const now = Date.now();
   const today = new Date(now).toISOString().slice(0, 10);
   const ended = new Date(now - 12 * 3_600_000).toISOString().slice(0, 10);
-  return remember(`home:v7:${today}:${ended}`, async () =>
-    welcome(today, ended),
+  const since = new Date(now - 21 * 86_400_000).toISOString().slice(0, 10);
+  const lit = await counting();
+  const live = [
+    ...lit.elections
+      .entries()
+      .filter(
+        ([, election]) =>
+          election.date >= since &&
+          election.path.split("/").length === 2 &&
+          liveOf(lit, election.path) != null,
+      )
+      .map(([id]) => id),
+  ].toSorted((a, b) => a.localeCompare(b));
+  return remember(`home:v8:${today}:${ended}:${live.join(",")}`, async () =>
+    welcome(today, ended, live),
   );
 }
 
-async function welcome(today: string, ended: string) {
+async function welcome(today: string, ended: string, live: Array<string>) {
   const [polities, layers, dated] = await Promise.all([
     call(router.polities.list, {
       kinds: ["sovereign_state", "supranational"],
@@ -359,7 +373,7 @@ async function welcome(today: string, ended: string) {
           from election e join polity y on y.id = e.polity_id
           where e.parent_id is null and e.date_from < ${ended}::date and e.date_from >= ${ended}::date - 30
             and not exists (select from entity_merge m where m.entity_id = e.id)
-          order by e.date_from desc, y.kind in ('sovereign_state', 'supranational') desc, (e.kind = 'general') desc limit 8)
+          order by e.id = any(${sql.param(live)}::uuid[]) desc, e.date_from desc, y.kind in ('sovereign_state', 'supranational') desc, (e.kind = 'general') desc limit 8)
         union all
         (select t.id, t.date_from, t.kind, t.polity_id, 'today'
           from (
@@ -420,9 +434,12 @@ async function welcome(today: string, ended: string) {
   const decided = (
     await lead(elections.filter((election) => election.when === "decided"))
   )
+    .map((election) => ({ ...election, isLive: live.includes(election.id) }))
     .filter(
       (election) =>
-        election.date >= week || (election.lead?.results.length ?? 0) > 0,
+        election.isLive ||
+        election.date >= week ||
+        (election.lead?.results.length ?? 0) > 0,
     )
     .slice(0, 4);
   const shown = new Set(decided.map((election) => election.id));

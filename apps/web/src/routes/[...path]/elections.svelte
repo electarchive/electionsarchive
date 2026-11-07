@@ -137,12 +137,25 @@
                       path: election.path,
                     })}?in={election.scope}">{label}</a
                   >
+                {:else if election.isCounting}
+                  <a
+                    class="hover:highlighter"
+                    href={resolve("/live/[...path]", { path: election.path })}
+                    >{label}</a
+                  >
+                  <span
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive"
+                    ><span
+                      class="rounded-full bg-destructive block-1.5 inline-1.5"
+                      aria-hidden="true"
+                    ></span>{m.polity_counting_short()}</span
+                  >
                 {:else}
                   <Preview class="hover:highlighter" path={election.path}
                     >{label}</Preview
                   >
                 {/if}
-                {#if STATUSES[election.status] != null}
+                {#if !election.isCounting && STATUSES[election.status] != null}
                   <span class="highlighter px-1 text-xs font-semibold"
                     >{STATUSES[election.status]?.()}</span
                   >

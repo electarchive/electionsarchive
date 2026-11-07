@@ -83,13 +83,13 @@
         ...election,
         days,
         isPending: election.lead == null || election.lead.results.length === 0,
-        isLive:
-          days <= 7 && /^us\/\d{4}-\d{2}-\d{2}-general$/u.test(election.path),
       };
     }),
   );
   const held = $derived(
-    decided[0] != null && decided[0].days <= 7 ? decided[0] : null,
+    decided[0] != null && (decided[0].isLive || decided[0].days <= 7)
+      ? decided[0]
+      : null,
   );
   const earlier = $derived(held == null ? decided : decided.slice(1));
   const places = $derived(
@@ -309,10 +309,15 @@
                 </p>
                 <a
                   class="justify-self-start text-lg/tight font-[720] text-balance underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href={resolve("/[...path]", { path: held.path })}
-                  >{held.name}</a
+                  href={held.isLive
+                    ? resolve("/live/[...path]", { path: held.path })
+                    : resolve("/[...path]", { path: held.path })}>{held.name}</a
                 >
-                {#if held.isPending}
+                {#if held.isLive}
+                  <p class="text-sm text-muted-foreground">
+                    {m.home_decided_counting()}
+                  </p>
+                {:else if held.isPending}
                   <p class="text-sm text-muted-foreground">
                     {m.home_decided_pending()}
                   </p>
@@ -334,12 +339,13 @@
                         aria-hidden="true"
                       ></span>{m.home_next_live()}</a
                     >
+                  {:else}
+                    <a
+                      class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
+                      href={resolve("/[...path]", { path: held.path })}
+                      >{m.home_next_open()}</a
+                    >
                   {/if}
-                  <a
-                    class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
-                    href={resolve("/[...path]", { path: held.path })}
-                    >{m.home_next_open()}</a
-                  >
                 </p>
               </div>
             {/if}
@@ -353,7 +359,9 @@
                   <li class="border-be border-border/70">
                     <a
                       class="group grid items-baseline gap-x-3 gap-y-1 py-3 sm:grid-cols-[7.5rem_minmax(0,1fr)]"
-                      href={resolve("/[...path]", { path: election.path })}
+                      href={election.isLive
+                        ? resolve("/live/[...path]", { path: election.path })
+                        : resolve("/[...path]", { path: election.path })}
                     >
                       <time
                         class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
@@ -364,7 +372,11 @@
                           class="text-sm font-semibold text-pretty underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
                           >{election.name}</span
                         >
-                        {#if election.isPending}
+                        {#if election.isLive}
+                          <span class="text-xs text-muted-foreground"
+                            >{m.home_decided_counting()}</span
+                          >
+                        {:else if election.isPending}
                           <span class="text-xs text-muted-foreground"
                             >{m.home_decided_pending()}</span
                           >
