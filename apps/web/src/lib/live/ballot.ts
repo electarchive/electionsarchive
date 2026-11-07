@@ -245,7 +245,7 @@ export function seating(
     const party = holder(parties, id);
     const side: Side = {
       id,
-      short: party?.short ?? "–",
+      short: party?.short ?? (id === "" ? m.night_state_independent() : "–"),
       name: party?.name ?? (id === "" ? m.night_no_party() : ""),
       color: party?.color ?? swatch(null, `party:${id}`),
       members: new Map(),
