@@ -226,6 +226,7 @@
   "home_next_open": "Wahl öffnen",
   "home_decided": "Jüngste Wahlen",
   "home_decided_pending": "Ergebnisse folgen",
+  "home_decided_counting": "Die Stimmen werden noch ausgezählt.",
   "home_decided_yesterday": "Gestern",
   "home_next_live": "Auszählung live verfolgen",
   "home_agents": "Agenten verbinden",
@@ -1422,6 +1423,9 @@
   "polity_latest": "Jüngste Wahl",
   "polity_latest_local": "Jüngste Kommunalwahl",
   "polity_next": "Als Nächstes",
+  "polity_counting": "Auszählung läuft",
+  "polity_counting_body": "Die Stimmen werden noch ausgezählt. Bis die Ergebnisse amtlich festgestellt sind, verfolgen Sie die Auszählung live. Das Archiv ergänzt die amtlich festgestellten Ergebnisse hier, sobald sie veröffentlicht sind.",
+  "polity_counting_short": "Auszählung läuft",
   "polity_next_races": [
     {
       "declarations": [

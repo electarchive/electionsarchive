@@ -228,6 +228,7 @@
   "home_next_open": "Abrir a eleição",
   "home_decided": "Eleições recentes",
   "home_decided_pending": "Resultados pendentes",
+  "home_decided_counting": "Os votos ainda estão em apuração.",
   "home_decided_yesterday": "Ontem",
   "home_next_live": "Acompanhar a apuração ao vivo",
   "home_agents": "Conectar seu agente",
@@ -1453,6 +1454,9 @@
   "polity_latest": "Última eleição",
   "polity_latest_local": "Última eleição local",
   "polity_next": "Próxima eleição",
+  "polity_counting": "Apuração em andamento",
+  "polity_counting_body": "Os votos ainda estão em apuração. Enquanto os resultados não forem homologados, acompanhe a apuração ao vivo. O arquivo adiciona aqui os resultados homologados quando forem publicados.",
+  "polity_counting_short": "Em apuração",
   "polity_next_races": [
     {
       "declarations": [

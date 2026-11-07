@@ -226,6 +226,7 @@
   "home_next_open": "Seçimi aç",
   "home_decided": "Son seçimler",
   "home_decided_pending": "Sonuçlar bekleniyor",
+  "home_decided_counting": "Oylar hâlâ sayılıyor.",
   "home_decided_yesterday": "Dün",
   "home_next_live": "Sayımı canlı izle",
   "home_agents": "Yapay zekâ ajanını bağla",
@@ -1422,6 +1423,9 @@
   "polity_latest": "Son seçim",
   "polity_latest_local": "Son yerel seçim",
   "polity_next": "Sıradaki seçim",
+  "polity_counting": "Şu anda sayım sürüyor",
+  "polity_counting_body": "Oylar hâlâ sayılıyor. Sonuçlar onaylanana kadar canlı sayımı izleyin. Arşiv, onaylanmış sonuçları yayımlandıklarında buraya ekler.",
+  "polity_counting_short": "Sayım sürüyor",
   "polity_next_races": [
     {
       "declarations": [

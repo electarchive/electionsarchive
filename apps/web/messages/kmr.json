@@ -226,6 +226,7 @@
   "home_next_open": "Hilbijartinê veke",
   "home_decided": "Hilbijartinên dawî",
   "home_decided_pending": "Encam li bendê ne",
+  "home_decided_counting": "Deng hê jî tên jimartin.",
   "home_decided_yesterday": "Duh",
   "home_next_live": "Jimartinê rasterast bişopîne",
   "home_agents": "Ajanê xwe girê bide",
@@ -1422,6 +1423,9 @@
   "polity_latest": "Hilbijartina herî dawî",
   "polity_latest_local": "Hilbijartina herêmî ya herî dawî",
   "polity_next": "Ya li pêş",
+  "polity_counting": "Niha tê jimartin",
+  "polity_counting_body": "Deng hê jî tên jimartin. Heta ku encam bên pejirandin, jimartinê rasterast bişopîne. Dema encamên pejirandî bên weşandin, arşîv wan li vir zêde dike.",
+  "polity_counting_short": "Tê jimartin",
   "polity_next_races": [
     {
       "declarations": [

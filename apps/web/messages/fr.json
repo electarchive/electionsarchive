@@ -228,6 +228,7 @@
   "home_next_open": "Ouvrir l'élection",
   "home_decided": "Élections récentes",
   "home_decided_pending": "Résultats à venir",
+  "home_decided_counting": "Le dépouillement est toujours en cours.",
   "home_decided_yesterday": "Hier",
   "home_next_live": "Suivre le dépouillement en direct",
   "home_agents": "Connecter votre agent",
@@ -1454,6 +1455,9 @@
   "polity_latest": "Dernière élection",
   "polity_latest_local": "Dernière élection locale",
   "polity_next": "À venir",
+  "polity_counting": "Dépouillement en cours",
+  "polity_counting_body": "Le dépouillement est toujours en cours. Jusqu'à la certification des résultats, suivez le dépouillement en direct. Les résultats certifiés seront ajoutés ici dès leur publication.",
+  "polity_counting_short": "Dépouillement",
   "polity_next_races": [
     {
       "declarations": [
