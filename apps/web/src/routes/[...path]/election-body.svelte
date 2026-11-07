@@ -1840,6 +1840,14 @@
       };
     }),
   );
+  $effect(() => {
+    for (const view of views) {
+      const part = view.partner?.places?.part;
+      if (part != null && peek(part) == null) {
+        void load(part);
+      }
+    }
+  });
   const seatflowAt = $derived(
     ledger == null ? -1 : races.findIndex((race) => race.body === ledger.body),
   );
@@ -2687,8 +2695,19 @@
             {#if view?.partner?.map != null && view.partner.places != null}
               {const other = $derived(view.partner)}
               {#if other.map?.tiles != null && other.places != null}
+                {const arrived = $derived(
+                  other.places.part == null
+                    ? null
+                    : (peek(other.places.part)?.value ?? null),
+                )}
                 <PlaceMap
-                  places={other.places}
+                  places={arrived == null
+                    ? other.places
+                    : {
+                        ...other.places,
+                        rows: arrived.rows,
+                        legend: arrived.legend ?? other.places.legend,
+                      }}
                   colors={other.tones}
                   tiles={other.map.tiles}
                   hexes={hexes.data ?? null}
