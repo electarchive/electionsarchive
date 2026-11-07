@@ -14,10 +14,12 @@
   import { count, percent } from "#lib/format.js";
   import { shift } from "#lib/live/flips.js";
   import {
+    apart,
     bandFor,
     clock,
     isDistricted,
     lead,
+    places,
     placeScheme,
     placeSlug,
     stamp,
@@ -134,6 +136,26 @@
     const sided = race.isMeasure === true && !isPlural ? sides(race) : null;
     const yes = sided == null ? null : options[sided.yes];
     return yes == null ? null : { share: line(race.rule), only: yes.id };
+  });
+  const close = $derived.by(() => {
+    const share = (index: number | undefined) =>
+      index == null || now.total === 0
+        ? 0
+        : (now.totals[index] ?? 0) / now.total;
+    const top = Math.max(0, seats - 1);
+    const gaps = [share(ranking[top]) - share(ranking[top + 1])];
+    if (rule != null) {
+      const index =
+        rule.only == null
+          ? ranking[0]
+          : options.findIndex((option) => option.id === rule.only);
+      gaps.push(share(index) - rule.share);
+    }
+    const digits = places(gaps);
+    return {
+      digits,
+      margin: apart(share(ranking[0]), share(ranking[1]), digits),
+    };
   });
   const modeled = $derived(
     now.isFinal
@@ -348,7 +370,7 @@
       const values = {
         name: options[first]?.label ?? "",
         next: options[second]?.label ?? "",
-        margin: lead(gap),
+        margin: lead(close.margin, close.digits),
       };
       if (now.isFinal && race.certified != null) {
         return m.night_head_answers_won({
@@ -358,7 +380,7 @@
             values.name,
         });
       }
-      return gap < 0.0005
+      return gap <= 0
         ? m.night_head_tied({ count: count(now.total) })
         : m.night_head_answers({ ...values, count: count(now.total) });
     }
@@ -367,7 +389,7 @@
       const name = winner?.label ?? leader?.label ?? "";
       return signed == null
         ? m.night_races_won({ name })
-        : m.night_head_won({ name, margin: lead(Math.abs(signed)) });
+        : m.night_head_won({ name, margin: lead(close.margin, close.digits) });
     }
     if (projected != null) {
       return m.night_head_projected({
@@ -384,26 +406,29 @@
         : m.night_head_waiting();
     }
     const name = leader?.label ?? "";
-    if (Math.abs(signed ?? 0) < 0.0005) {
+    if (signed == null || votesLead === 0) {
       return m.night_head_tied({ count: count(now.total) });
     }
     if (isShort) {
       return m.night_head_ranked({
         name,
-        margin: lead(Math.abs(signed ?? 0)),
-        share: percent((now.totals[now.order[0] ?? 0] ?? 0) / now.total),
+        margin: lead(close.margin, close.digits),
+        share: percent(
+          (now.totals[now.order[0] ?? 0] ?? 0) / now.total,
+          close.digits,
+        ),
       });
     }
     if (estimate.status === "estimating") {
       return m.night_head_estimating({
         name,
-        margin: lead(Math.abs(signed ?? 0)),
+        margin: lead(close.margin, close.digits),
         share: percent(Math.min(0.99, estimate.shareIn.mid), 0),
       });
     }
     return m.night_head_counting({
       name,
-      margin: lead(Math.abs(signed ?? 0)),
+      margin: lead(close.margin, close.digits),
       count: count(now.total),
     });
   });
@@ -618,6 +643,7 @@
           {now}
           isMeasure={race.isMeasure ?? false}
           at={race.projected?.at ?? null}
+          digits={close.digits}
         />
       {/if}
       <div class="px-4 py-5 sm:px-8">
@@ -632,6 +658,7 @@
           {isRanked}
           updated={newest == null ? null : stamp(view ?? newest)}
           {rule}
+          digits={close.digits}
           needs={isRanked ? [m.night_rank_line()] : terms(race.rule)}
         />
       </div>
@@ -733,7 +760,7 @@
 
     {#if isShort}
       <section class="bg-background px-4 py-6 sm:px-8">
-        <Ranked {options} {now} />
+        <Ranked {options} {now} digits={close.digits} />
       </section>
     {:else if isUnestimated && (race.certified == null || !now.isFinal)}
       <section class="grid gap-1 bg-background px-4 py-5 sm:px-8">

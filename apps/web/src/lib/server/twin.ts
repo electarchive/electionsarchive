@@ -37,6 +37,7 @@ import {
   percent,
   plural,
   points,
+  precision,
 } from "#lib/format.js";
 import { caveatLabel, figure, figureLabel } from "#lib/indices.js";
 import { dated } from "#lib/live/format.js";
@@ -4633,7 +4634,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       total === 0 ? "" : count(total),
       total === 0 || race.margin == null
         ? ""
-        : points(race.margin, 1).replace(/^[+−]/u, ""),
+        : points(race.margin).replace(/^[+−]/u, ""),
       ...(data.forecasts
         ? [
             race.estimate?.chance == null || race.estimate.favorite == null
@@ -4649,6 +4650,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       .map((option, index) => ({ ...option, votes: race.votes[index] ?? 0 }))
       .filter((row) => !row.isWriteIn || row.votes > 0)
       .toSorted((a, b) => b.votes - a.votes);
+    const digits = precision(
+      ((rows[0]?.votes ?? 0) - (rows[1]?.votes ?? 0)) / Math.max(1, total),
+    );
     const { estimate } = race;
     return [
       `### ${link(race.title, `live/${race.slug}`)}`,
@@ -4675,7 +4679,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
                         : name,
                   row.party,
                   count(row.votes),
-                  percent(row.votes / total),
+                  percent(row.votes / total, digits),
                 ];
               }),
             ),

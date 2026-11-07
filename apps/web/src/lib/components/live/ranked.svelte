@@ -3,12 +3,15 @@
   import type { Standing } from "#lib/live/standing.js";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { lead, surname, tone } from "#lib/live/format.js";
+  import { apart, lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
 
-  const { options, now }: { options: Array<LiveOption>; now: Standing } =
-    $props();
+  const {
+    options,
+    now,
+    digits = 1,
+  }: { options: Array<LiveOption>; now: Standing; digits?: number } = $props();
 
   const rows = $derived(
     now.order.flatMap((index) => {
@@ -25,6 +28,7 @@
     }),
   );
   const first = $derived(rows[0]);
+  const short = $derived(first == null ? 0 : apart(0.5, first.share, digits));
   const trailing = $derived(rows.slice(2));
   const trailingShare = $derived.by(() => {
     let total = 0;
@@ -74,17 +78,17 @@
           ></span>
         </span>
         <span class="text-end font-figures tabular-nums min-inline-24">
-          <span class="font-semibold">{percent(row.share)}</span>
+          <span class="font-semibold">{percent(row.share, digits)}</span>
           <span class="text-xs text-muted-foreground">{count(row.votes)}</span>
         </span>
       </li>
     {/each}
   </ol>
   <p class="text-[0.8125rem] text-pretty max-inline-[64ch]">
-    {#if first != null}
+    {#if first != null && short > 0}
       {m.night_rank_short({
         name: surname(first.option),
-        gap: lead(Math.max(0, 0.5 - first.share)),
+        gap: lead(short, digits),
       })}
     {/if}
     {#if trailing.length === 1}
