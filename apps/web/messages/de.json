@@ -4665,7 +4665,6 @@
   "night_list_title": "Ergebnisse",
   "night_list_first": "Erstpräferenzen",
   "night_list_total": "Insgesamt ausgezählt",
-  "night_list_points": "{points} Prozentpunkte",
   "night_list_more": "Alle {count} anzeigen",
   "night_list_fewer": "Weniger anzeigen",
   "night_answers_lead": "{margin} Punkte Vorsprung ({votes} Stimmen)",

@@ -4665,7 +4665,6 @@
   "night_list_title": "Sonuçlar",
   "night_list_first": "Birinci tercih",
   "night_list_total": "Toplam sayılan oy",
-  "night_list_points": "{points} puan",
   "night_list_more": "Tümünü göster ({count})",
   "night_list_fewer": "Daha az göster",
   "night_answers_lead": "{margin} puan farkla önde ({votes} oy)",
