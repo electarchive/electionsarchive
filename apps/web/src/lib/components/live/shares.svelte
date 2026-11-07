@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { LiveFrame, LiveOption } from "@ea/analytics/live";
   import { count, percent } from "#lib/format.js";
-  import { clock, timeMarks, tone } from "#lib/live/format.js";
+  import { clock, placesOf, timeMarks, tone } from "#lib/live/format.js";
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -13,6 +13,7 @@
     at,
     opens,
     onPick,
+    digits = 1,
   }: {
     options: Array<LiveOption>;
     order: Array<number>;
@@ -20,6 +21,7 @@
     at: string | null;
     opens: number;
     onPick: (at: string | null) => void;
+    digits?: number;
   } = $props();
 
   let width = $state(720);
@@ -42,6 +44,7 @@
               time: Date.parse(frame.at),
               total,
               shares: frame.totals.map((value) => value / total),
+              digits: Math.max(digits, placesOf(frame.totals)),
             },
           ]
         : [];
@@ -284,7 +287,7 @@
               dominant-baseline="middle"
               class="font-figures text-[12px] tabular-nums"
               font-weight={label.index === order[0] ? 700 : 500}
-              style:fill={color}>{percent(label.value)}</text
+              style:fill={color}>{percent(label.value, tail.digits)}</text
             >
           {/each}
         {/if}
@@ -353,7 +356,7 @@
               <span
                 class={cn("text-end font-figures tabular-nums", {
                   "font-semibold": rank === 0,
-                })}>{percent(focus.shares[index] ?? 0)}</span
+                })}>{percent(focus.shares[index] ?? 0, focus.digits)}</span
               >
             {/each}
             <span></span>

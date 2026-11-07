@@ -9,7 +9,7 @@
   import type { Standing } from "#lib/live/standing.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
-  import { compact, lead, surname, tone } from "#lib/live/format.js";
+  import { compact, lead, placesOf, surname, tone } from "#lib/live/format.js";
   import { remainder } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -244,7 +244,7 @@
 {#snippet margin(value: number | null, isMuted: boolean)}
   {#if value == null}
     <span class="text-muted-foreground/60">–</span>
-  {:else if Math.abs(value) < 0.0005}
+  {:else if value === 0}
     <span class="text-muted-foreground">{m.night_dial_tie()}</span>
   {:else}
     <span
@@ -437,7 +437,7 @@
               <td class="py-3 ps-5 pe-3">
                 {#if row.leader == null || row.total === 0 || !row.isContested}
                   <span class="block text-end text-muted-foreground/60">–</span>
-                {:else if row.margin < 0.0005}
+                {:else if row.margin <= 0}
                   <span class="block text-end text-muted-foreground"
                     >{m.night_dial_tie()}</span
                   >
@@ -463,7 +463,7 @@
                     aria-label={answers
                       .map(
                         (index) =>
-                          `${options[index]?.label ?? ""} ${percent((row.votes[index] ?? 0) / row.total)}`,
+                          `${options[index]?.label ?? ""} ${percent((row.votes[index] ?? 0) / row.total, placesOf(row.votes))}`,
                       )
                       .join(", ")}
                   >

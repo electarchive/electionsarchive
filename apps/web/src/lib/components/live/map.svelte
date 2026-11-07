@@ -13,7 +13,14 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, percent } from "#lib/format.js";
-  import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
+  import {
+    compact,
+    lead,
+    placeName,
+    placesOf,
+    surname,
+    tone,
+  } from "#lib/live/format.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
   import { features, remainder, sum, whole } from "#lib/live/standing.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
@@ -823,6 +830,7 @@
 {#snippet detail(row: UnitStanding, limit: number)}
   {const total = $derived(row.total)}
   {const rest = $derived(remainder(row, estimate, options, now.pair))}
+  {const digits = $derived(placesOf(row.votes))}
   {#if total > 0}
     {#each row.order.slice(0, limit) as index (index)}
       {const share = $derived((row.votes[index] ?? 0) / total)}
@@ -841,7 +849,7 @@
             >{count(row.votes[index] ?? 0)}</span
           >
           <span class="text-end font-semibold min-inline-11"
-            >{percent(share)}</span
+            >{percent(share, digits)}</span
           >
         </span>
         {#if limit > 3}

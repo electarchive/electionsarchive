@@ -3,7 +3,7 @@
   import { prefersReducedMotion, Spring } from "svelte/motion";
   import { count, percent } from "#lib/format.js";
   import { phi } from "#lib/live/calibrate.js";
-  import { compact, lead, surname, tone } from "#lib/live/format.js";
+  import { compact, ends, lead, surname, tone } from "#lib/live/format.js";
   import { odds } from "#lib/live/nation.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -196,7 +196,11 @@
       const near = Math.min(Math.abs(low), Math.abs(high));
       const far = Math.max(Math.abs(low), Math.abs(high));
       const side = high <= 0 ? -1 : 1;
-      return { low: signed(side * near), high: signed(side * far) };
+      const shown = ends(near, far);
+      return {
+        low: `${name(side)} +${shown.low}`,
+        high: `${name(side)} +${shown.high}`,
+      };
     }
     return { low: signed(low), high: signed(high) };
   };
