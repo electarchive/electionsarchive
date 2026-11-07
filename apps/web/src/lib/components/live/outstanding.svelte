@@ -46,7 +46,12 @@
         if (row == null) {
           return [];
         }
-        const left = Math.max(0, unit.expectedTotal.mid - row.total);
+        const left = Math.round(
+          Math.max(0, unit.expectedTotal.mid - row.total),
+        );
+        if (left === 0) {
+          return [];
+        }
         return [
           {
             row,
@@ -173,7 +178,10 @@
             <span class="font-figures text-muted-foreground tabular-nums">
               {m.night_left_row({
                 count: compact(entry.left),
-                lean: `${surname(options[entry.lean >= 0 ? a : b])} +${Math.abs(entry.lean) < 0.005 ? lead(entry.lean) : lead(entry.lean, 0)}`,
+                lean:
+                  entry.lean === 0
+                    ? m.outcome_tied()
+                    : `${surname(options[entry.lean > 0 ? a : b])} +${Math.abs(entry.lean) < 0.005 ? lead(entry.lean) : lead(entry.lean, 0)}`,
               })}
             </span>
           </svelte:element>
@@ -189,7 +197,7 @@
         ><span class="bg-muted-foreground/40 block-2 inline-4"
         ></span>{m.night_left_remaining()}</span
       >
-      <span>{m.night_left_votes({ count: count(Math.round(left)) })}</span>
+      <span>{m.night_left_votes({ count: count(left) })}</span>
     </p>
   {/if}
 </section>

@@ -144,7 +144,7 @@ export function compact(value: number) {
   return numbers({
     notation: "compact",
     maximumFractionDigits: value >= 1e6 ? 2 : 1,
-  }).format(value);
+  }).format(Math.round(value));
 }
 
 export function clock(at: string | number | null, zone = prefs.zone) {
