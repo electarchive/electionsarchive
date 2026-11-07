@@ -150,6 +150,7 @@
       contests: Ballot["contests"];
       parties: Ballot["parties"];
       families: Ballot["families"];
+      caucuses: Ballot["caucuses"];
     } | null;
     around?: {
       tiles: string;
@@ -243,7 +244,12 @@
                       list.filter((item) => item.contest.area != null),
                       (item) => item.contest.area ?? "",
                     ),
-                    seats: seating(list, entry.holdovers, legislature.parties),
+                    seats: seating(
+                      list,
+                      entry.holdovers,
+                      legislature.parties,
+                      legislature.caucuses,
+                    ),
                   },
                 ];
           }),

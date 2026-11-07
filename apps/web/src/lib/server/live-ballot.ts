@@ -44,6 +44,7 @@ export type BallotContest = {
   seat: string | null;
   seats: number;
   held: string | null;
+  sitting: Array<{ party: string; caucus: string }>;
   area: string | null;
   isMeasure: boolean;
   isSpecial: boolean;
@@ -53,6 +54,8 @@ export type BallotContest = {
 };
 
 export type BallotParty = { name: string; short: string; color: string | null };
+
+export type BallotHoldover = { party: string; caucus: string; seats: number };
 
 const JUDICIAL = /justice|judge|court|magistrate/u;
 
@@ -225,9 +228,11 @@ async function statewide(id: string, date: string, stateName: string) {
     seats: number | null;
     held: string | null;
     area: string | null;
+    codes: Array<string> | null;
     rules: unknown;
   }>(sql`
-    select c.id, s.path, c.district_area_id as area, c.kind::text as kind, o.kind::text as office, b.kind::text as body, bp.kind::text as scope,
+    select c.id, s.path, c.district_area_id as area,
+      (select array_agg(ac.code) from area_code ac where ac.area_id = c.district_area_id) as codes, c.kind::text as kind, o.kind::text as office, b.kind::text as body, bp.kind::text as scope,
       coalesce(c.body_id, o.body_id) as chamber, c.magnitude as seats, prior.party as held,
       case when c.kind = 'ballot_question' then es.rules || coalesce(c.rules_override, '{}') end as rules
     from contest c
@@ -271,33 +276,81 @@ async function statewide(id: string, date: string, stateName: string) {
       ),
     ),
   ];
-  const [options, lone, titles, bodyNames, holdovers] = await Promise.all([
+  const [options, lone, titles, bodyNames, seated] = await Promise.all([
     choices(ids, date),
     unopposed(ids),
     names(ids, date),
     names(bodies, date),
-    db.execute<{ body: string; party: string | null; seats: number }>(sql`
-      with up as (
-        select c.body_id as body, c.district_area_id as area from contest c
-        where c.election_id = ${id}::uuid and c.body_id = any(${sql.param(bodies)}::uuid[])
-      ), recent as (
-        select distinct on (p.body_id, p.district_area_id) p.body_id as body, p.district_area_id as area, p.id
-        from contest p join election e on e.id = p.election_id
-        where p.body_id = any(${sql.param(bodies)}::uuid[]) and p.district_area_id is not null and p.party_scope_id is null
-          and e.kind <> 'primary' and e.date_from < ${date}::date and e.date_from > ${date}::date - 1500
-        order by p.body_id, p.district_area_id, e.date_from desc
-      )
-      select r.body, coalesce(a.parent_party_id, x.party_id) as party, count(*)::int as seats
-      from recent r
-      join result_set rs on rs.contest_id = r.id and rs.is_default
-      join outcome oc on oc.result_set_id = rs.id and oc.kind in ('elected', 'won')
-      join contest_option x on x.id = oc.option_id
-      left join party_affiliation a on a.party_id = x.party_id and a.kind = 'regional_branch' and a.valid @> ${date}::date
-      where not exists (select from up where up.body = r.body and up.area = r.area)
-      group by 1, 2
+    db.execute<{
+      body: string;
+      person: string;
+      since: string | null;
+      codes: Array<string> | null;
+      party: string | null;
+      caucus: string | null;
+    }>(sql`
+      select distinct on (t.body_id, t.person_id) t.body_id as body, t.person_id as person, t.from_date::text as since,
+        (select array_agg(ac.code) from area_code ac where ac.area_id = coalesce(st.district_area_id, w.district_area_id)) as codes,
+        coalesce(pb.parent_party_id, pa.party) as party,
+        case when gr.found then coalesce(gb.parent_party_id, gr.party_id) else coalesce(pb.parent_party_id, pa.party) end as caucus
+      from tenure t
+      left join seat st on st.id = t.seat_id
+      left join contest w on w.id = t.contest_id
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = t.id and ta.kind = 'party' and ta.valid @> ${date}::date order by ta.party_id is null limit 1
+      ) sp on true
+      cross join lateral (
+        select case when sp.found then sp.party_id else (
+          select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = t.person_id and o.party_id is not null
+          order by (o.contest_id = t.contest_id) desc nulls last, o.contest_id desc limit 1
+        ) end as party
+      ) pa
+      left join lateral (
+        select ta.party_id, true as found from tenure_affiliation ta
+        where ta.tenure_id = t.id and ta.kind = 'parliamentary_group' and ta.valid @> ${date}::date limit 1
+      ) gr on true
+      left join party_affiliation pb on pb.party_id = pa.party and pb.kind = 'regional_branch' and pb.valid @> ${date}::date
+      left join party_affiliation gb on gb.party_id = gr.party_id and gb.kind = 'regional_branch' and gb.valid @> ${date}::date
+      where t.body_id = any(${sql.param(bodies)}::uuid[])
+        and (t.from_date is null or t.from_date <= ${date}::date) and (t.to_date is null or t.to_date > ${date}::date)
+      order by t.body_id, t.person_id, t.from_date desc nulls last
     `),
   ]);
   const byContest = Map.groupBy(options, (option) => option.contest);
+  const sitters = seated.rows
+    .map((row) => ({
+      ...row,
+      party: row.party ?? "",
+      caucus: row.caucus ?? "",
+      codes: new Set(row.codes),
+    }))
+    .toSorted((a, b) => (b.since ?? "").localeCompare(a.since ?? ""));
+  const placed = new Set<string>();
+  const sittingOf = new Map(
+    rows.flatMap((row) => {
+      if ((row.tier !== "upper" && row.tier !== "lower") || row.codes == null) {
+        return [];
+      }
+      const codes = row.codes;
+      const found = sitters
+        .filter(
+          (sitter) =>
+            sitter.body === row.chamber &&
+            !placed.has(sitter.person) &&
+            codes.some((code) => sitter.codes.has(code)),
+        )
+        .slice(0, row.seats ?? 1);
+      for (const sitter of found) {
+        placed.add(sitter.person);
+      }
+      return [[row.id, found] as const];
+    }),
+  );
+  const kept = Map.groupBy(
+    sitters.filter((sitter) => !placed.has(sitter.person)),
+    (sitter) => sitter.body,
+  );
   const parties = await partiesOf(
     [
       ...options.flatMap((option) =>
@@ -306,8 +359,10 @@ async function statewide(id: string, date: string, stateName: string) {
       ...rows.flatMap((row) =>
         row.held == null ? [] : [{ family: row.held, raw: null }],
       ),
-      ...holdovers.rows.flatMap((row) =>
-        row.party == null ? [] : [{ family: row.party, raw: null }],
+      ...sitters.flatMap((sitter) =>
+        [sitter.party, sitter.caucus].flatMap((family) =>
+          family === "" ? [] : [{ family, raw: null }],
+        ),
       ),
     ],
     date,
@@ -320,6 +375,7 @@ async function statewide(id: string, date: string, stateName: string) {
           null)
         : null;
     const own = byContest.get(row.id) ?? [];
+    const sitting = sittingOf.get(row.id) ?? [];
     return {
       tier: row.tier,
       chamber: row.chamber,
@@ -329,7 +385,16 @@ async function statewide(id: string, date: string, stateName: string) {
         title: clean(titles.full.get(row.id) ?? seat, stateName),
         seat: district,
         seats: row.seats ?? 1,
-        held: row.held,
+        held:
+          sitting[0] == null
+            ? row.held
+            : sitting[0].party === ""
+              ? null
+              : sitting[0].party,
+        sitting: sitting.map((sitter) => ({
+          party: sitter.party,
+          caucus: sitter.caucus,
+        })),
         area: district == null ? null : row.area,
         isMeasure: row.tier === "measures",
         isSpecial: seat.includes("special"),
@@ -347,7 +412,6 @@ async function statewide(id: string, date: string, stateName: string) {
       } satisfies BallotContest,
     };
   });
-  const kept = Map.groupBy(holdovers.rows, (row) => row.body);
   return {
     contests,
     chambers: bodies.map((body) => {
@@ -359,11 +423,23 @@ async function statewide(id: string, date: string, stateName: string) {
         id: body,
         tier,
         name: bodyNames.full.get(body) ?? "",
-        holdovers: Object.fromEntries(
-          (kept.get(body) ?? []).map((row) => [row.party ?? "", row.seats]),
-        ),
+        holdovers: [
+          ...Map.groupBy(
+            kept.get(body) ?? [],
+            (sitter) => `${sitter.caucus}:${sitter.party}`,
+          ).values(),
+        ].map((group): BallotHoldover => ({
+          party: group[0]?.party ?? "",
+          caucus: group[0]?.caucus ?? "",
+          seats: group.length,
+        })),
       };
     }),
+    caucuses: Object.fromEntries(
+      sitters.flatMap((sitter) =>
+        sitter.caucus === sitter.party ? [] : [[sitter.person, sitter.caucus]],
+      ),
+    ),
     parties,
     families: familiesOf(options),
   };
@@ -476,6 +552,7 @@ export async function ballotLocals(path: string) {
                 seat: null,
                 seats: row.seats ?? 1,
                 held: null,
+                sitting: [],
                 area: null,
                 isMeasure: row.kind === "ballot_question",
                 isSpecial: /special|unexpired|short-term/u.test(seat),
@@ -512,7 +589,7 @@ export async function liveBallot(path: string) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v11:${election.slug}`, async () => {
+  return remember(`live:ballot:v12:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");

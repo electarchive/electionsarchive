@@ -5053,6 +5053,8 @@
   "night_state_now": "Won or ahead",
   "night_state_seats_up": "{count} seats up",
   "night_state_not_up": "Not up this year",
+  "night_state_independent": "Independent",
+  "night_state_caucus_member": "{party}: {count}",
   "night_state_striped": "Pale seats aren't up this year.",
   "night_state_search": "Search by district or candidate",
   "night_state_more": "Show all {count}",

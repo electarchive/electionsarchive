@@ -107,7 +107,12 @@
         return {
           ...chamber,
           entries,
-          seats: seating(entries, chamber.holdovers, ballot.parties),
+          seats: seating(
+            entries,
+            chamber.holdovers,
+            ballot.parties,
+            ballot.caucuses,
+          ),
         };
       })
       .filter((chamber) => chamber.entries.length > 0),
@@ -184,7 +189,7 @@
       ),
     ),
   );
-  const houseSeats = $derived(seating(house, {}, ballot.parties));
+  const houseSeats = $derived(seating(house, [], ballot.parties));
 
   const parties = $derived(
     reach(everything.map((entry) => entry.summary.race)),

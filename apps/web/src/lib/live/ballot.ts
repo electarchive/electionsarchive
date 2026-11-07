@@ -8,6 +8,7 @@ import type { Shift } from "#lib/live/flips.js";
 import type { Summary } from "#lib/live/summary.js";
 import type {
   BallotContest,
+  BallotHoldover,
   BallotParty,
   BallotTier,
 } from "#lib/server/live-ballot.js";
@@ -29,6 +30,7 @@ export type Entry = {
   shift: Shift | null;
   isUnopposed: boolean;
   unopposed: Array<string | null>;
+  people: Array<string | null>;
 };
 
 const OFFICES: Partial<Record<BallotTier, LiveOffice>> = {
@@ -155,6 +157,12 @@ export function entries({
     const familyOf = (party: string | undefined) =>
       party == null ? null : (families[party] ?? party);
     const pick = summary.winner ?? summary.unopposed ?? summary.leader;
+    const unopposed =
+      summary.unopposed == null
+        ? []
+        : race.options.filter((option) =>
+            race.unopposed?.options.includes(option.id),
+          );
     const side = familyOf(pick?.party?.id);
     const changing =
       contest.isMeasure || summary.isShort
@@ -174,12 +182,8 @@ export function entries({
       isFlip: changing?.flip === "flipped",
       shift: changing,
       isUnopposed: race.unopposed != null,
-      unopposed:
-        summary.unopposed == null
-          ? []
-          : race.options
-              .filter((option) => race.unopposed?.options.includes(option.id))
-              .map((option) => familyOf(option.party?.id)),
+      unopposed: unopposed.map((option) => familyOf(option.party?.id)),
+      people: unopposed.map((option) => option.person),
     };
   });
 }
@@ -215,6 +219,8 @@ export function district(entry: Entry) {
 }
 
 export type Side = Holder & {
+  members: Map<string, number>;
+  makeup: string | null;
   before: number;
   won: number;
   ahead: number;
@@ -226,8 +232,9 @@ export type Side = Holder & {
 
 export function seating(
   entries: Array<Entry>,
-  holdovers: Record<string, number>,
+  holdovers: Array<BallotHoldover>,
   parties: Record<string, BallotParty>,
+  caucuses: Record<string, string> = {},
 ) {
   const found = new Map<string, Side>();
   const take = (id: string) => {
@@ -241,6 +248,8 @@ export function seating(
       short: party?.short ?? "–",
       name: party?.name ?? (id === "" ? m.night_no_party() : ""),
       color: party?.color ?? swatch(null, `party:${id}`),
+      members: new Map(),
+      makeup: null,
       before: 0,
       won: 0,
       ahead: 0,
@@ -252,45 +261,58 @@ export function seating(
     found.set(id, side);
     return side;
   };
+  const sit = (caucus: string, party: string, count: number) => {
+    const side = take(caucus);
+    side.before += count;
+    side.members.set(party, (side.members.get(party) ?? 0) + count);
+    return side;
+  };
+  const isSeated =
+    holdovers.length > 0 ||
+    entries.some((entry) => entry.contest.sitting.length > 0);
+  const blocOf = (person: string | null | undefined, family: string | null) =>
+    (person == null ? null : caucuses[person]) ?? family;
   let total = 0;
   let waiting = 0;
-  for (const [id, count] of Object.entries(holdovers)) {
-    const side = take(id);
-    side.holdover += count;
-    side.before += count;
-    total += count;
+  for (const holdover of holdovers) {
+    sit(holdover.caucus, holdover.party, holdover.seats).holdover +=
+      holdover.seats;
+    total += holdover.seats;
   }
   for (const entry of entries) {
     const seats = entry.contest.seats;
     total += seats;
-    if (entry.held != null) {
-      take(entry.held.id).before += seats;
+    for (const sitter of entry.contest.sitting) {
+      sit(sitter.caucus, sitter.party, 1);
     }
-    if (entry.unopposed.length > 0) {
-      for (const family of entry.unopposed) {
-        const side = take(family ?? "");
-        side.won += 1;
-        side.gainedWon +=
-          entry.held == null || family === entry.held.id ? 0 : 1;
-      }
-      const open = seats - entry.unopposed.length;
-      if (entry.held == null) {
-        waiting += open;
+    if (!isSeated && entry.held != null) {
+      sit(entry.held.id, entry.held.id, seats);
+    }
+    const held = entry.contest.sitting[0]?.caucus ?? entry.held?.id ?? null;
+    const hold = (count: number) => {
+      if (held == null) {
+        waiting += count;
       } else {
-        take(entry.held.id).waiting += open;
+        take(held).waiting += count;
       }
+    };
+    if (entry.unopposed.length > 0) {
+      for (const [index, family] of entry.unopposed.entries()) {
+        const bloc = blocOf(entry.people[index], family) ?? "";
+        const side = take(bloc);
+        side.won += 1;
+        side.gainedWon += held == null || bloc === held ? 0 : 1;
+      }
+      hold(seats - entry.unopposed.length);
     } else if (
       entry.side == null ||
       entry.summary.total === 0 ||
       entry.summary.isShort
     ) {
-      if (entry.held == null) {
-        waiting += seats;
-      } else {
-        take(entry.held.id).waiting += seats;
-      }
+      hold(seats);
     } else {
-      const side = take(entry.side);
+      const pick = entry.summary.winner ?? entry.summary.leader;
+      const side = take(blocOf(pick?.person, entry.side) ?? entry.side);
       const isGain = entry.shift != null && entry.shift.flip !== "held";
       if (entry.summary.winner == null) {
         side.ahead += seats;
@@ -300,6 +322,9 @@ export function seating(
         side.gainedWon += isGain ? seats : 0;
       }
     }
+  }
+  for (const side of found.values()) {
+    side.makeup = makeup(side, parties);
   }
   const sides = [...found.values()]
     .filter((side) => side.before + side.won + side.ahead > 0)
@@ -326,6 +351,34 @@ export function seating(
     right: right ?? null,
     rest,
   };
+}
+
+function makeup(side: Side, parties: Record<string, BallotParty>) {
+  const others = [...side.members].filter(([party]) => party !== side.id);
+  if (others.length === 0) {
+    return null;
+  }
+  if (side.members.has(side.id)) {
+    let count = 0;
+    for (const [, seats] of others) {
+      count += seats;
+    }
+    return others.every(([party]) => party === "")
+      ? m.night_caucus_includes({ count })
+      : m.night_caucus_includes_others({ count });
+  }
+  return [...side.members]
+    .toSorted((a, b) => b[1] - a[1])
+    .map(([party, count]) =>
+      m.night_state_caucus_member({
+        party:
+          party === ""
+            ? m.night_state_independent()
+            : (parties[party]?.short ?? ""),
+        count,
+      }),
+    )
+    .join(" · ");
 }
 
 export type Seating = ReturnType<typeof seating>;
