@@ -402,6 +402,10 @@
             party: (view.tiebreak === "left" ? pair[0] : pair[1]).name,
           })}
         </p>
+      {:else if view.isTiebreakPending}
+        <p class="text-[0.6875rem]/4 text-muted-foreground">
+          {m.night_chamber_tiebreak_pending({ count: view.size / 2 })}
+        </p>
       {/if}
       {#if forecasts && isInformed && office !== "governor"}
         <div class="grid gap-1.5 border-bs border-border pbs-3">

@@ -37,6 +37,7 @@ import {
   percent,
   plural,
   points,
+  precision,
 } from "#lib/format.js";
 import { caveatLabel, figure, figureLabel } from "#lib/indices.js";
 import { dated } from "#lib/live/format.js";
@@ -4633,7 +4634,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       total === 0 ? "" : count(total),
       total === 0 || race.margin == null
         ? ""
-        : points(race.margin, 1).replace(/^[+−]/u, ""),
+        : points(race.margin).replace(/^[+−]/u, ""),
       ...(data.forecasts
         ? [
             race.estimate?.chance == null || race.estimate.favorite == null
@@ -4649,6 +4650,9 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       .map((option, index) => ({ ...option, votes: race.votes[index] ?? 0 }))
       .filter((row) => !row.isWriteIn || row.votes > 0)
       .toSorted((a, b) => b.votes - a.votes);
+    const digits = precision(
+      ((rows[0]?.votes ?? 0) - (rows[1]?.votes ?? 0)) / Math.max(1, total),
+    );
     const { estimate } = race;
     return [
       `### ${link(race.title, `live/${race.slug}`)}`,
@@ -4661,18 +4665,23 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
         : [
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],
-              rows.map((row) => [
-                row.isWinner
-                  ? `${row.label} (${m.live_elected()})`
-                  : row.isProjected
-                    ? `${row.label} (${m.night_band_projected()})`
-                    : row.isUnopposed
-                      ? `${row.label} (${m.night_state_unopposed()})`
-                      : row.label,
-                row.party,
-                count(row.votes),
-                percent(row.votes / total),
-              ]),
+              rows.map((row) => {
+                const name = row.isIncumbent
+                  ? m.results_incumbent_twin({ name: row.label })
+                  : row.label;
+                return [
+                  row.isWinner
+                    ? `${name} (${m.live_elected()})`
+                    : row.isProjected
+                      ? `${name} (${m.night_band_projected()})`
+                      : row.isUnopposed
+                        ? `${name} (${m.night_state_unopposed()})`
+                        : name,
+                  row.party,
+                  count(row.votes),
+                  percent(row.votes / total, digits),
+                ];
+              }),
             ),
             [
               data.at === "final"
@@ -4969,15 +4978,24 @@ function contestMarkdown(
     top?.current != null && next?.current != null && top.current.votes > 0
       ? count(top.current.votes - next.current.votes)
       : null;
-  const [gain, hold, allied, other] =
+  const [gain, hold, allied, other, caucused] =
     handover?.lead === "margin"
       ? [
           m.change_gain_margin,
           m.change_hold_margin,
           m.change_allied_margin,
           m.change_other_margin,
+          m.change_caucus_margin,
         ]
-      : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
+      : [
+          m.change_gain,
+          m.change_hold,
+          m.change_allied,
+          m.change_other,
+          m.change_caucus,
+        ];
+  const caucus = handover?.caucus;
+  const side = caucus?.short ?? caucus?.label ?? "";
   const won = contest.rows
     .filter((row) => (row.current?.seats ?? 0) > 0)
     .toSorted((a, b) => (b.current?.seats ?? 0) - (a.current?.seats ?? 0));
@@ -5050,18 +5068,26 @@ function contestMarkdown(
                 ? majority == null
                   ? m.change_allied_bare({ party, label })
                   : allied({ party, label, majority })
-                : majority == null
-                  ? handover.isGain
-                    ? m.change_gain_bare({ party, from })
-                    : handover.isOther
-                      ? m.change_other_bare({ party, from })
-                      : m.change_hold_bare({ party })
-                  : handover.isGain
-                    ? gain({ party, from, majority })
-                    : handover.isOther
-                      ? other({ party, from, majority })
-                      : hold({ party, majority })
-          }${handover.basis === "same" ? "" : "*"}`,
+                : caucus?.isHold === true
+                  ? majority == null
+                    ? m.change_caucus_bare({ party: side, from, label })
+                    : caucused({ party: side, from, label, majority })
+                  : majority == null
+                    ? handover.isGain
+                      ? m.change_gain_bare({ party, from })
+                      : handover.isOther
+                        ? m.change_other_bare({ party, from })
+                        : m.change_hold_bare({ party })
+                    : handover.isGain
+                      ? gain({ party, from, majority })
+                      : handover.isOther
+                        ? other({ party, from, majority })
+                        : hold({ party, majority })
+          }${handover.basis === "same" ? "" : "*"}${
+            caucus == null || caucus.isHold || handover.alliance != null
+              ? ""
+              : ` ${m.change_caucus_joins({ party: caucus.label })}`
+          }`,
           ...(handover.basis === "same"
             ? []
             : [

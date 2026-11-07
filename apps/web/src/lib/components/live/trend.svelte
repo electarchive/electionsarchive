@@ -2,7 +2,16 @@
   import type { LiveFrame, LiveOption } from "@ea/analytics/live";
   import type { Point } from "#lib/live/history.js";
   import { count, percent } from "#lib/format.js";
-  import { clock, lead, surname, timeMarks, tone } from "#lib/live/format.js";
+  import {
+    apart,
+    clock,
+    ends,
+    lead,
+    places,
+    surname,
+    timeMarks,
+    tone,
+  } from "#lib/live/format.js";
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -17,6 +26,7 @@
     at,
     opens,
     onPick,
+    digits = 1,
   }: {
     options: Array<LiveOption>;
     pair: [number, number];
@@ -26,6 +36,7 @@
     at: string | null;
     opens: number;
     onPick: (at: string | null) => void;
+    digits?: number;
   } = $props();
 
   let width = $state(720);
@@ -51,6 +62,9 @@
     frames.map((frame, index) => {
       const total = sum(frame.totals);
       const found = estimates[index];
+      const first = total > 0 ? (frame.totals[pair[0]] ?? 0) / total : 0;
+      const second = total > 0 ? (frame.totals[pair[1]] ?? 0) / total : 0;
+      const shown = Math.max(digits, places([first - second]));
       return {
         at: frame.at,
         time: Date.parse(frame.at),
@@ -60,6 +74,7 @@
             ? ((frame.totals[pair[0]] ?? 0) - (frame.totals[pair[1]] ?? 0)) /
               total
             : null,
+        counted: total > 0 ? lead(apart(first, second, shown), shown) : null,
         share:
           found?.share ??
           (expected != null && expected > 0
@@ -200,7 +215,7 @@
         id: "counted",
         text: m.night_trend_end_counted({
           name: name(tail.signed),
-          margin: lead(tail.signed),
+          margin: tail.counted ?? "",
         }),
         value: tail.signed,
         y: y(tail.signed),
@@ -641,9 +656,10 @@
             <span
               class="text-end font-figures text-muted-foreground tabular-nums"
             >
+              {const shown = $derived(ends(focus.band.low, focus.band.high))}
               {m.night_field_range({
-                low: `${focus.band.low >= 0 ? "+" : "−"}${lead(focus.band.low)}`,
-                high: `${focus.band.high >= 0 ? "+" : "−"}${lead(focus.band.high)}`,
+                low: `${focus.band.low >= 0 ? "+" : "−"}${shown.low}`,
+                high: `${focus.band.high >= 0 ? "+" : "−"}${shown.high}`,
               })}
             </span>
           {/if}
@@ -652,7 +668,7 @@
             <span
               class="text-end font-figures tabular-nums"
               style:color={ink(focus.signed)}
-              >{name(focus.signed)} +{lead(focus.signed)}</span
+              >{name(focus.signed)} +{focus.counted}</span
             >
           {/if}
           <span class="text-muted-foreground">{m.night_trend_votes()}</span>

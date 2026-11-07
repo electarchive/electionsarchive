@@ -1,7 +1,12 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { invalidateAll } from "$app/navigation";
+  import { useQueryClient } from "@tanstack/svelte-query";
+  import { untrack } from "svelte";
   import { Await } from "svelte-islands";
+  import type { Primed } from "#lib/primed.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { prime } from "#lib/primed.js";
   import type { PageData, PageServerData } from "./$types";
   import ElectionBody from "./election-body.svelte";
   import ElectionTitle from "./election-title.svelte";
@@ -14,6 +19,7 @@
     scope,
     head,
     body,
+    primed,
     sameDay,
     sections,
   }: {
@@ -24,9 +30,16 @@
     scope: { id: string; path: string } | null;
     head: Extract<PageServerData, { kind: "election" }>["head"];
     body: Extract<PageServerData, { kind: "election" }>["body"];
+    primed: Primed | Promise<Primed>;
     sameDay: Extract<PageServerData, { kind: "election" }>["sameDay"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
+
+  if (!browser) {
+    untrack(() => {
+      prime(useQueryClient(), primed);
+    });
+  }
 </script>
 
 <Await

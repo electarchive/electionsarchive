@@ -407,6 +407,10 @@
             party: breaker.name,
           })}</span
         >
+      {:else if view.isTiebreakPending}
+        <span class="text-pretty"
+          >{m.night_chamber_tiebreak_pending({ count: view.size / 2 })}</span
+        >
       {/if}
     </p>
   </header>

@@ -3,7 +3,14 @@
   import type { Standing } from "#lib/live/standing.js";
   import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
-  import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
+  import {
+    compact,
+    lead,
+    placeName,
+    places,
+    surname,
+    tone,
+  } from "#lib/live/format.js";
   import { sum, toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -39,7 +46,12 @@
         if (row == null) {
           return [];
         }
-        const left = Math.max(0, unit.expectedTotal.mid - row.total);
+        const left = Math.round(
+          Math.max(0, unit.expectedTotal.mid - row.total),
+        );
+        if (left === 0) {
+          return [];
+        }
         return [
           {
             row,
@@ -88,14 +100,16 @@
   </header>
   {#if path != null}
     {const name = $derived(surname(options[path.trailer]))}
+    {const pace = $derived(Math.max(0, Math.min(1, path.trailerShare)))}
+    {const digits = $derived(places([path.needed - pace]))}
     <p class="font-serif text-[1.0625rem] leading-snug text-pretty">
       {#if path.isOut}
         {m.night_left_out({ name })}
       {:else}
         {m.night_left_needs({
           name,
-          needed: percent(path.needed),
-          pace: percent(Math.max(0, Math.min(1, path.trailerShare))),
+          needed: percent(path.needed, digits),
+          pace: percent(pace, digits),
         })}
       {/if}
     </p>
@@ -164,7 +178,10 @@
             <span class="font-figures text-muted-foreground tabular-nums">
               {m.night_left_row({
                 count: compact(entry.left),
-                lean: `${surname(options[entry.lean >= 0 ? a : b])} +${lead(entry.lean, 0)}`,
+                lean:
+                  entry.lean === 0
+                    ? m.outcome_tied()
+                    : `${surname(options[entry.lean > 0 ? a : b])} +${Math.abs(entry.lean) < 0.005 ? lead(entry.lean) : lead(entry.lean, 0)}`,
               })}
             </span>
           </svelte:element>
@@ -180,7 +197,7 @@
         ><span class="bg-muted-foreground/40 block-2 inline-4"
         ></span>{m.night_left_remaining()}</span
       >
-      <span>{m.night_left_votes({ count: count(Math.round(left)) })}</span>
+      <span>{m.night_left_votes({ count: count(left) })}</span>
     </p>
   {/if}
 </section>
