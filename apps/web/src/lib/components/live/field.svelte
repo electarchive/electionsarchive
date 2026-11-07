@@ -4,7 +4,7 @@
   import type { Standing } from "#lib/live/standing.js";
   import Name from "#lib/components/name.svelte";
   import { percent } from "#lib/format.js";
-  import { tone } from "#lib/live/format.js";
+  import { across, places, tone } from "#lib/live/format.js";
   import { toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -15,11 +15,13 @@
     now,
     estimate,
     winners,
+    digits = 1,
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
     winners: Array<string>;
+    digits?: number;
   } = $props();
 
   const isLive = $derived(estimate?.status === "estimating" && !now.isFinal);
@@ -59,6 +61,20 @@
     });
     return found;
   });
+
+  const estimated = $derived(
+    places([(finals.get(a)?.mid ?? 0) - (finals.get(b)?.mid ?? 0)]),
+  );
+  const middle = (index: number, mid: number) => {
+    const other = finals.get(index === a ? b : a)?.mid;
+    if (other == null || mid >= other) {
+      return mid;
+    }
+    const scale = 10 ** (estimated + 2);
+    return (
+      (Math.round(other * scale) - Math.round((other - mid) * scale)) / scale
+    );
+  };
 
   const rows = $derived(
     (now.total > 0
@@ -177,7 +193,7 @@
             class={cn("pe-4 text-end font-figures tabular-nums", {
               "py-2 text-base": isPair,
               "py-1": !isPair,
-            })}>{share == null ? "–" : percent(share)}</td
+            })}>{share == null ? "–" : percent(share, digits)}</td
           >
           <td
             class={cn("pe-4 text-end font-figures tabular-nums", {
@@ -188,14 +204,15 @@
             {#if final == null}
               <span class="text-muted-foreground">–</span>
             {:else}
+              {const width = $derived(across(final.low, final.high))}
               <span class="block text-base font-[760]" style:color
-                >{percent(final.mid)}</span
+                >{percent(middle(index, final.mid), estimated)}</span
               >
               <span
                 class="block text-[0.6875rem] font-normal text-muted-foreground"
                 >{m.night_field_range({
-                  low: percent(final.low, 0),
-                  high: percent(final.high, 0),
+                  low: percent(final.low, width),
+                  high: percent(final.high, width),
                 })}</span
               >
             {/if}

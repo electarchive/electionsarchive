@@ -788,7 +788,7 @@
         </Withheld>
         {#if isLive}
           <Withheld isOff={!forecasts}>
-            <Field {options} {now} {estimate} {winners} />
+            <Field {options} {now} {estimate} {winners} digits={close.digits} />
           </Withheld>
         {/if}
       </section>
@@ -818,6 +818,7 @@
             at={view}
             {opens}
             onPick={pick}
+            digits={close.digits}
           />
         {:else}
           <Trend
@@ -831,6 +832,7 @@
             at={view}
             {opens}
             onPick={pick}
+            digits={close.digits}
           />
         {/if}
       </section>
