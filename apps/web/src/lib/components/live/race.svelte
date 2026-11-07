@@ -31,8 +31,7 @@
   import { line, terms } from "#lib/measure.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
-  import Answers from "./answers.svelte";
-  import BandLabel from "./band-label.svelte";
+  import Call from "./call.svelte";
   import Flip from "./dashboard/flip.svelte";
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
@@ -43,11 +42,10 @@
   import MethodLink from "./method-link.svelte";
   import Outstanding from "./outstanding.svelte";
   import Ranked from "./ranked.svelte";
-  import Seats from "./seats.svelte";
   import Shares from "./shares.svelte";
   import Seat from "./state/seat.svelte";
   import Table from "./table.svelte";
-  import Tote from "./tote.svelte";
+  import Tally from "./tally.svelte";
   import Trend from "./trend.svelte";
   import Unopposed from "./unopposed.svelte";
   import Withheld from "./withheld.svelte";
@@ -129,12 +127,13 @@
       : options.flatMap((option, index) => (option.isWriteIn ? [] : [index])),
   );
   const pair = $derived(now.pair);
-  const mark = $derived.by(() => {
-    const sided = race.isMeasure === true ? sides(race) : null;
-    if (sided == null || race.rule == null) {
-      return 0.5;
+  const rule = $derived.by(() => {
+    if (isRanked) {
+      return { share: 0.5, only: null };
     }
-    return sided.yes === pair[0] ? line(race.rule) : 1 - line(race.rule);
+    const sided = race.isMeasure === true && !isPlural ? sides(race) : null;
+    const yes = sided == null ? null : options[sided.yes];
+    return yes == null ? null : { share: line(race.rule), only: yes.id };
   });
   const modeled = $derived(
     now.isFinal
@@ -164,20 +163,6 @@
     seats > 1 && !race.isMeasure && options.length > seats,
   );
   const isRanked = $derived(race.isRanked === true && !race.isMeasure);
-  const isField = $derived.by(() => {
-    if (race.isMeasure || (isRanked && seats === 1)) {
-      return false;
-    }
-    if (seats > 1) {
-      return true;
-    }
-    const third = now.order[2];
-    return (
-      third != null &&
-      now.total > 0 &&
-      (now.totals[third] ?? 0) / now.total >= 0.1
-    );
-  });
   const upto = $derived(
     view == null ? points : points.filter((point) => point.at <= view),
   );
@@ -251,6 +236,7 @@
       ? race.feed
       : null,
   );
+  const isListed = $derived(!isUncounted && (later == null || band != null));
   const isLive = $derived(
     !isPlural && modeled.status === "estimating" && !now.isFinal,
   );
@@ -572,7 +558,7 @@
           {m.night_status_offline()}
         {/if}
       </span>
-      {#if newest != null}
+      {#if newest != null && !isListed}
         <span class="font-figures tabular-nums"
           >{m.night_updated({ time: stamp(view ?? newest) })}</span
         >
@@ -624,44 +610,30 @@
   </header>
 
   {#snippet result()}
-    <section class="bg-background" style:--party={band?.fill}>
-      <div
-        class={cn(
-          "grid gap-5 px-4 py-5 transition-colors duration-700 motion-reduce:transition-none sm:px-8",
-          { band: band != null },
-        )}
-      >
-        {#if band != null}
-          <BandLabel
-            {band}
-            isMeasure={race.isMeasure ?? false}
-            at={race.projected?.at ?? null}
-            class="text-[0.8125rem]"
-          />
-        {/if}
-        {#if isField}
-          <Seats {options} {now} {seats} {band} />
-        {:else if isPlural}
-          <Answers
-            {options}
-            {now}
-            {estimate}
-            {band}
-            {isWaiting}
-            isLater={later != null}
-          />
-        {:else}
-          <Tote
-            {options}
-            {now}
-            {estimate}
-            {band}
-            {isWaiting}
-            isLater={later != null}
-            {mark}
-            needs={isRanked ? [m.night_rank_line()] : terms(race.rule)}
-          />
-        {/if}
+    <section class="bg-background">
+      {#if band != null}
+        <Call
+          {band}
+          {options}
+          {now}
+          isMeasure={race.isMeasure ?? false}
+          at={race.projected?.at ?? null}
+        />
+      {/if}
+      <div class="px-4 py-5 sm:px-8">
+        <Tally
+          {options}
+          {now}
+          {estimate}
+          {band}
+          {seats}
+          {isWaiting}
+          isLater={later != null}
+          {isRanked}
+          updated={newest == null ? null : stamp(view ?? newest)}
+          {rule}
+          needs={isRanked ? [m.night_rank_line()] : terms(race.rule)}
+        />
       </div>
     </section>
   {/snippet}

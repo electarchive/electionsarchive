@@ -4661,18 +4661,23 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
         : [
             table(
               [m.col_candidate(), m.col_party(), m.col_votes(), m.col_share()],
-              rows.map((row) => [
-                row.isWinner
-                  ? `${row.label} (${m.live_elected()})`
-                  : row.isProjected
-                    ? `${row.label} (${m.night_band_projected()})`
-                    : row.isUnopposed
-                      ? `${row.label} (${m.night_state_unopposed()})`
-                      : row.label,
-                row.party,
-                count(row.votes),
-                percent(row.votes / total),
-              ]),
+              rows.map((row) => {
+                const name = row.isIncumbent
+                  ? m.results_incumbent_twin({ name: row.label })
+                  : row.label;
+                return [
+                  row.isWinner
+                    ? `${name} (${m.live_elected()})`
+                    : row.isProjected
+                      ? `${name} (${m.night_band_projected()})`
+                      : row.isUnopposed
+                        ? `${name} (${m.night_state_unopposed()})`
+                        : name,
+                  row.party,
+                  count(row.votes),
+                  percent(row.votes / total),
+                ];
+              }),
             ),
             [
               data.at === "final"
