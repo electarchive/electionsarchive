@@ -4,6 +4,7 @@ import { READ_ONLY } from "$app/env/public";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
+import type { Counting } from "#lib/server/counting.js";
 import { partyOn, segments, stand } from "#lib/caucus.js";
 import {
   CATEGORY_LABELS,
@@ -52,6 +53,7 @@ import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 import { era } from "#lib/party.js";
 import { AFFILIATIONS, formerly, RELATIONS } from "#lib/relations.js";
+import { counting, liveOf } from "#lib/server/counting.js";
 import {
   archive,
   atlasPage,
@@ -619,6 +621,14 @@ export async function twin(
   if (asked == null) {
     headers["cache-control"] = "private, no-cache";
   }
+  const now = format === "md" ? await counting() : null;
+  const live = now == null ? null : liveOf(now, pathname.slice(1));
+  if (live != null) {
+    return new Response(null, {
+      status: 307,
+      headers: { location: `/${live}.md${url.search}`, vary: varies },
+    });
+  }
   try {
     const data = await load(
       pathname.split("/").filter((segment) => segment !== ""),
@@ -679,7 +689,7 @@ export async function twin(
       return `[${name}](${url.origin}/${route}.md${query == null ? "" : `?${query}`})`;
     };
     const pages = markdownPages(
-      markdown(data, link, url.origin, ledger, winners),
+      markdown(data, link, url.origin, now, ledger, winners),
     );
     const at = Number(url.searchParams.get("page") ?? 1);
     const text = Number.isSafeInteger(at) ? pages[at - 1] : undefined;
@@ -750,6 +760,7 @@ function markdown(
   data: Data,
   link: Link,
   origin: string,
+  now: Counting | null,
   ledger: Ledger = null,
   winners: Winners | null = null,
 ) {
@@ -837,7 +848,7 @@ function markdown(
     }
     case "polity": {
       return [
-        ...polityMarkdown(data.polity, data.record, data.holders, link),
+        ...polityMarkdown(data.polity, data.record, data.holders, link, now),
         ...(data.indices == null ? [] : seriesMarkdown(data.indices, link)),
         ...knownMarkdown(data.known, link, true),
       ];
@@ -1811,7 +1822,14 @@ function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
     m.home_headline(),
     m.home_lede(),
     ...(data.decided.length === 0 ? [] : [`## ${m.home_decided()}`]),
-    ...data.decided.flatMap((election) => standing(election)),
+    ...data.decided.flatMap((election) =>
+      election.isLive
+        ? [
+            `### ${link(election.name, `live/${election.path}`)}, ${date(election.date)}`,
+            m.home_decided_counting(),
+          ]
+        : standing(election),
+    ),
     ...(data.upcoming.length === 0
       ? []
       : [
@@ -2398,6 +2416,7 @@ function polityMarkdown(
   record: Extract<Data, { kind: "polity" }>["record"],
   holders: Extract<Data, { kind: "polity" }>["holders"],
   link: Link,
+  now: Counting | null,
 ) {
   const latest = polity.latest;
   const labels = new Map(
@@ -2687,7 +2706,11 @@ function polityMarkdown(
           [m.col_date(), m.col_election()],
           polity.elections.map((election) => [
             election.date == null ? election.year : date(election.date),
-            link(election.name, election.path),
+            link(
+              election.name,
+              (now == null ? null : liveOf(now, election.path)) ??
+                election.path,
+            ),
           ]),
         ),
     ...(polity.results.length === 0

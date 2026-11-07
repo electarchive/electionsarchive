@@ -1,10 +1,12 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Fetch, Part } from "svelte-islands";
+import { redirect } from "@sveltejs/kit";
 import { peek } from "svelte-islands";
 import { stream } from "svelte-islands/server";
 import type { Primed } from "#lib/primed.js";
 import { shapesOf } from "#lib/map/hexes.js";
 import { orpc } from "#lib/rpc.js";
+import { counting, liveFor, liveOf } from "#lib/server/counting.js";
 import { isCrawler } from "#lib/server/guard.js";
 import { archive, call, capped, soon } from "#lib/server/pages.js";
 import { memo, part, weigh } from "#lib/server/parts.js";
@@ -499,6 +501,10 @@ export const load: PageServerLoad = async ({
   isDataRequest,
   locals,
 }) => {
+  const counted = await liveFor(params.path);
+  if (counted != null) {
+    redirect(307, `/${counted}${url.search}`);
+  }
   const data = await archive(params.path, url.searchParams);
   locals.view = data.kind;
   const budget = isCrawler(request.headers.get("user-agent"))
@@ -699,7 +705,19 @@ export const load: PageServerLoad = async ({
   if (data.kind !== "polity") {
     return data;
   }
-  const { polities, elections } = data.polity;
+  const now = await counting();
+  const elections = data.polity.elections.map((election) => ({
+    ...election,
+    isCounting: liveOf(now, election.path) != null,
+  }));
+  const { polities } = data.polity;
+  const live =
+    elections
+      .filter((election) => election.isCounting)
+      .toSorted(
+        (a, b) =>
+          (a.path ?? "").split("/").length - (b.path ?? "").split("/").length,
+      )[0] ?? null;
   const path = ["sovereign_state", "supranational"].includes(data.polity.kind)
     ? data.polity.latest?.path
     : null;
@@ -757,6 +775,10 @@ export const load: PageServerLoad = async ({
   const polity = {
     ...data.polity,
     elections: part("polity.elections", elections),
+    counting:
+      live?.path == null
+        ? null
+        : { name: live.name, date: live.date, path: live.path },
     calendar,
     places,
     scrubber,

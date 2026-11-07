@@ -446,6 +446,51 @@
   {/if}
 </header>
 
+{#if polity.counting != null}
+  {const counted = $derived(polity.counting)}
+  {const href = $derived(resolve("/live/[...path]", { path: counted.path }))}
+  <section
+    class="col-span-12 grid items-center gap-x-8 gap-y-3 bg-card px-3.5 pbs-3 pbe-3.5 sm:grid-cols-[minmax(0,1fr)_auto]"
+    aria-labelledby="{uid}-counting"
+  >
+    <div class="grid gap-1.5 min-inline-0">
+      <p class="flex flex-wrap items-center gap-x-2 text-[0.8125rem]">
+        <span
+          class="relative grid place-items-center block-2 inline-2"
+          aria-hidden="true"
+        >
+          <span
+            class="absolute inset-0 animate-ping rounded-full bg-destructive/60 motion-reduce:animate-none"
+          ></span>
+          <span class="relative rounded-full bg-destructive block-2 inline-2"
+          ></span>
+        </span>
+        <span class="font-bold">{m.polity_counting()}</span>
+        <time class="text-muted-foreground" datetime={counted.date}
+          >{date(counted.date)}</time
+        >
+      </p>
+      <h2 id="{uid}-counting" class="heading text-pretty">
+        <a
+          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+          {href}>{counted.name}</a
+        >
+      </h2>
+      <p
+        class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+      >
+        {m.polity_counting_body()}
+      </p>
+    </div>
+    <a
+      class="inline-flex items-center gap-2 justify-self-start rounded-sm bg-primary px-3 text-sm font-semibold text-primary-foreground block-9 hover:bg-primary/90"
+      {href}
+      ><span class="rounded-full bg-marker block-2 inline-2" aria-hidden="true"
+      ></span>{m.home_next_live()}</a
+    >
+  </section>
+{/if}
+
 {#if isMapped}
   <div
     class={cn(
