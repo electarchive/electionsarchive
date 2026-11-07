@@ -1,5 +1,6 @@
 import gzip
 import html
+import json
 import re
 import tarfile
 import unicodedata
@@ -23,7 +24,10 @@ LANDING = f"https://github.com/openstates/people/tree/{COMMIT}"
 NCSL = "https://www.ncsl.org/about-state-legislatures/state-partisan-composition"
 SENATE_MAJORITY = "https://alaskasenate.org/"
 HOUSE_MAJORITY = "https://web.archive.org/web/20260625220223id_/https://alaskahousemajority.com/members/"
+VERMONT = "https://legislature.vermont.gov/people/loadAll/2026"
 SESSION = date(2025, 1, 21)
+AS_OF = date(2026, 11, 5)
+RUN = timedelta(days=4 * 365 + 60)
 CAUCUSES = {
     "AK:senate-majority": (
         "AK:senate",
@@ -50,7 +54,9 @@ PARTIES = {
     "Republican": "republican-party",
     "Democratic-Farmer-Labor": "MN:minnesota-democratic-farmer-labor-party",
     "Forward": "forward-party",
+    "Progressive": "VT:progressive-party",
 }
+VERMONT_PARTIES = {"D": "Democratic", "R": "Republican", "P": "Progressive", "I": "Independent"}
 LABELS = {
     "house": "House",
     "senate": "Senate",
@@ -95,6 +101,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, NCSL, suffix=".html")
     raw.fetch(SOURCE, SENATE_MAJORITY, suffix=".html")
     raw.fetch(SOURCE, HOUSE_MAJORITY, suffix=".html")
+    raw.fetch(SOURCE, VERMONT, suffix=".json")
 
 
 def fold(text: str) -> str:
@@ -144,6 +151,10 @@ def text(path: Path) -> str:
     )
 
 
+def current(spell: dict[str, object]) -> bool:
+    return spell.get("end_date") is None or date.fromisoformat(str(spell["end_date"])) > AS_OF
+
+
 def members() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     with tarfile.open(raw.cached(SOURCE, ARCHIVE).path) as archive:
@@ -156,7 +167,7 @@ def members() -> list[dict[str, object]]:
                 continue
             person = yaml.load(file.read(), Loader=yaml.CSafeLoader)
             for role in person.get("roles", []):
-                if role.get("end_date") is not None or role["type"] not in ("upper", "lower", "legislature"):
+                if not current(role) or role["type"] not in ("upper", "lower", "legislature"):
                     continue
                 if re.search(r"Tribe|Band|Nation", role["district"]):
                     continue
@@ -168,7 +179,7 @@ def members() -> list[dict[str, object]]:
                     if role["type"] == "upper"
                     else LOWER.get(state, "house")
                 )
-                parties = [party["name"] for party in person.get("party", []) if party.get("end_date") is None]
+                parties = [party["name"] for party in person.get("party", []) if current(party)]
                 if len(parties) != 1:
                     raise ValueError(f"{person['id']} has {len(parties)} current parties")
                 found.append(
@@ -187,6 +198,16 @@ def members() -> list[dict[str, object]]:
                         "wikidata": person.get("ids", {}).get("wikidata"),
                     }
                 )
+    return found
+
+
+def vermont() -> dict[tuple[str, str, str], str]:
+    found: dict[tuple[str, str, str], str] = {}
+    for person in json.loads(raw.cached(SOURCE, VERMONT).path.read_bytes())["data"]:
+        if person["TerminationReason"].strip():
+            continue
+        chamber = "senate" if person["PersonTypeID"] == "S" else "house"
+        found[(chamber, fold(person["LastName"]), fold(person["FirstName"]))] = VERMONT_PARTIES[person["PartyID"][0]]
     return found
 
 
@@ -216,6 +237,26 @@ def composition() -> dict[tuple[str, str], tuple[int, int, int, int, int]]:
 
 def emit() -> Path:
     sitting = members()
+    clerk = vermont()
+    for member in sitting:
+        if member["state"] != "VT":
+            continue
+        family, given = fold(str(member["family"])), fold(str(member["given"]))
+        same = [
+            (first, party)
+            for (chamber, last, first), party in clerk.items()
+            if chamber == member["chamber"] and f" {family} " in f" {last} "
+        ]
+        if len(same) > 1:
+            same = [
+                (first, party)
+                for first, party in same
+                if f" {given} " in f" {first} " or first.startswith(given) or given.startswith(first)
+            ] or [(first, party) for first, party in same if first[:1] == given[:1]]
+        listed = [party for _, party in same]
+        if len(listed) != 1:
+            raise ValueError(f"{member['name']} is not on the Vermont Legislature's roster once")
+        member["party"] = listed[0]
     printed = composition()
     counts: dict[tuple[str, str], list[int]] = {}
     for member in sitting:
@@ -263,9 +304,10 @@ def emit() -> Path:
             [list(bodies)],
         ).fetchall():
             areas[(value, found)] = area
-        winners: dict[tuple[str, str], list[tuple[date, UUID, UUID, str]]] = {}
+        winners: dict[tuple[str, str], list[tuple[date, UUID, UUID, tuple[str, ...]]]] = {}
+        history: dict[tuple[str, UUID], set[tuple[date, UUID]]] = {}
         for value, found, day, contest, person, names in conn.execute(
-            """select x.value, ac.code, e.date_from, c.id, cd.person_id, string_agg(distinct n.text, ' | ')
+            """select x.value, ac.code, e.date_from, c.id, cd.person_id, array_agg(distinct n.text)
                from contest c join election e on e.id = c.election_id and e.kind <> 'primary' and e.date_from >= '2004-01-01'
                join external_id x on x.entity_id = c.body_id and x.scheme = 'us.body' and x.value = any(%s)
                join result_set r on r.contest_id = c.id and r.is_default
@@ -276,7 +318,16 @@ def emit() -> Path:
                group by 1, 2, 3, 4, 5""",
             [list(bodies)],
         ).fetchall():
-            winners.setdefault((value, found), []).append((day, contest, person, fold(names)))
+            winners.setdefault((value, found), []).append((day, contest, person, tuple(fold(name) for name in names)))
+            history.setdefault((value, person), set()).add((day, contest))
+        ours = {
+            person
+            for (person,) in conn.execute(
+                """select p.id from person p join changeset c on c.id = p.changeset_id
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         known = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'openstates.person'").fetchall()
         )
@@ -317,6 +368,17 @@ def emit() -> Path:
             license=UNLICENSED,
         )
         cs.artifact(raw.cached(SOURCE, NCSL), conference)
+        legislature = cs.source("Vermont General Assembly", "Legislators 2025-2026")
+        cs.add(
+            "source",
+            id=legislature,
+            kind="official_body",
+            publisher="Vermont General Assembly",
+            title="Legislators 2025-2026",
+            url="https://legislature.vermont.gov/people/",
+            license=UNLICENSED,
+        )
+        cs.artifact(raw.cached(SOURCE, VERMONT), legislature)
         parties = {key: cs.key("us.party", key) for key in PARTIES.values()}
         if any(party in cs.minted for party in parties.values()):
             raise ValueError("the parties must already exist")
@@ -353,6 +415,8 @@ def emit() -> Path:
         seated: set[UUID] = set()
         unmatched: list[str] = []
         unplaced: list[str] = []
+        taken: dict[str, set[UUID]] = {}
+        merged = 0
         grouped: dict[str, int] = {key: 0 for key in CAUCUSES}
         for member in sorted(sitting, key=lambda entry: str(entry["id"])):
             state, chamber, district = str(member["state"]), str(member["chamber"]), str(member["district"])
@@ -366,19 +430,39 @@ def emit() -> Path:
             family, given = fold(str(member["family"])), fold(str(member["given"]))
             ocd = str(member["id"])
             start = member["start"] if isinstance(member["start"], date) else None
-            candidates = [
+            pool = [
                 entry
                 for entry in winners.get((body_key, str(member["code"])), [])
-                if re.search(rf"\b{re.escape(family)}\b", entry[3])
+                if entry[2] not in taken.get(body_key, set())
             ]
-            people = {entry[2] for entry in candidates}
-            if len(people) > 1:
-                narrowed = [entry for entry in candidates if re.search(rf"\b{re.escape(given)}\b", entry[3])]
-                if len({entry[2] for entry in narrowed}) == 1:
-                    candidates = narrowed
+            candidates = [
+                entry for entry in pool if any(re.search(rf"\b{re.escape(family)}\b", name) for name in entry[3])
+            ]
+            if not candidates:
+                bare = family.replace(" ", "")
+                candidates = [entry for entry in pool if any(bare in name.replace(" ", "") for name in entry[3])]
+            candidates = [
+                entry
+                for entry in candidates
+                if any(given.replace(" ", "") in name.replace(" ", "") or name[:1] == given[:1] for name in entry[3])
+            ]
+            if len({entry[2] for entry in candidates}) > 1:
+                narrowed = [
+                    entry
+                    for entry in candidates
+                    if any(re.search(rf"\b{re.escape(given)}\b", name) for name in entry[3])
+                ]
+                candidates = narrowed or candidates
+            cutoff = (start or AS_OF) + timedelta(days=90)
+            before = [entry for entry in candidates if entry[0] <= cutoff]
+            matched = max(before)[2] if before else min(candidates)[2] if candidates else None
             person = known.get(ocd)
-            if person is None and len({entry[2] for entry in candidates}) == 1:
-                person = candidates[0][2]
+            if person is not None and matched is not None and person != matched and person in ours:
+                cs.merge(person, matched)
+                merged += 1
+                person = matched
+            if person is None:
+                person = matched
             if person is None and member["wikidata"] is not None:
                 person = wikidata.get(str(member["wikidata"]))
             if person is None:
@@ -406,11 +490,16 @@ def emit() -> Path:
             ):
                 cs.add("external_id", entity_id=person, scheme="wikidata", value=str(member["wikidata"]))
                 identified.add(("wikidata", person))
-            won = sorted(
-                (day, contest)
-                for day, contest, found, _ in candidates
-                if found == person and (start is None or day <= start + timedelta(days=90))
-            )
+            taken.setdefault(body_key, set()).add(person)
+            won = sorted(entry for entry in history.get((body_key, person), set()) if entry[0] <= cutoff)
+            precision = "day"
+            if start is None and won:
+                run = won[-1]
+                for entry in reversed(won[:-1]):
+                    if run[0] - entry[0] > RUN:
+                        break
+                    run = entry
+                start, precision, won = run[0], "unknown", [run]
             seat = cs.key("us.seat", f"{body_key}:{str(member['code']).split(':', 1)[1]}")
             if seat not in seated:
                 seated.add(seat)
@@ -433,7 +522,7 @@ def emit() -> Path:
                 body_id=body,
                 seat_id=seat,
                 from_date=start,
-                from_precision="day",
+                from_precision=precision,
                 to_date=None,
                 to_precision="day",
                 acquired_via="elected" if won or start is None or start.month not in range(3, 11) else "appointed",
@@ -450,7 +539,7 @@ def emit() -> Path:
                     kind="party",
                     party_id=parties[PARTIES[party]] if party in PARTIES else None,
                     valid_from=start,
-                    valid_from_precision="day",
+                    valid_from_precision=precision,
                     valid_to=None,
                     valid_to_precision="day",
                 )
@@ -470,7 +559,9 @@ def emit() -> Path:
         for key, count in grouped.items():
             if count != len(CAUCUSES[key][5]):
                 raise ValueError(f"{key}: {count} sitting members matched, the roster lists {len(CAUCUSES[key][5])}")
-        print(f"{len(unmatched)} legislators matched no winner in the archive and were minted")
+        print(
+            f"{len(unmatched)} legislators matched no winner in the archive and were minted; {merged} earlier mints merged"
+        )
         if unplaced:
             raise ValueError(f"{len(unplaced)} districts have no area: {unplaced[:10]}")
         return cs.write()
