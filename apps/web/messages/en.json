@@ -4671,7 +4671,6 @@
   "night_list_title": "Results",
   "night_list_first": "First choices",
   "night_list_total": "Total counted",
-  "night_list_points": "{points} pts",
   "night_list_more": "Show all {count}",
   "night_list_fewer": "Show fewer",
   "night_answers_lead": "Ahead by {margin} points ({votes} votes)",

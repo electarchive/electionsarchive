@@ -253,7 +253,7 @@ export function describe(
       ? m.night_head_before({ time: when(closes) })
       : m.night_head_waiting();
   }
-  if (margin < 0.0005) {
+  if (margin <= 0) {
     return m.night_head_tied({ count: count(total) });
   }
   if (summary.isShort) {

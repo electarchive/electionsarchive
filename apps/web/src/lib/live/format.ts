@@ -4,6 +4,7 @@ import {
   dateParts,
   dates,
   numbers,
+  precision,
   timeOrDate,
   today,
 } from "#lib/format.js";
@@ -88,11 +89,24 @@ export function initial(option: LiveOption | undefined) {
   return (party === "" ? surname(option) : party).slice(0, 1).toUpperCase();
 }
 
-export function lead(value: number, digits = 1) {
+export function lead(value: number, digits = precision(value)) {
   return numbers({
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(Math.abs(value) * 100);
+}
+
+export function places(gaps: Array<number>) {
+  let most = 1;
+  for (const gap of gaps) {
+    most = Math.max(most, precision(gap));
+  }
+  return most;
+}
+
+export function apart(first: number, second: number, digits: number) {
+  const scale = 10 ** (digits + 2);
+  return (Math.round(first * scale) - Math.round(second * scale)) / scale;
 }
 
 export function compact(value: number) {

@@ -15,12 +15,14 @@
     now,
     isMeasure,
     at,
+    digits = 1,
   }: {
     band: Band;
     options: Array<LiveOption>;
     now: Standing;
     isMeasure: boolean;
     at: string | null;
+    digits?: number;
   } = $props();
 
   const called = $derived(
@@ -89,7 +91,7 @@
         >
           <span
             class="text-[clamp(1.5rem,1.2rem+1vw,2rem)] leading-none font-[780] tracking-tight"
-            >{percent(entry.share)}</span
+            >{percent(entry.share, digits)}</span
           >
           <span class="text-[0.8125rem] text-muted-foreground"
             >{m.night_votes({ count: count(entry.votes) })}</span

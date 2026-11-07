@@ -6,7 +6,7 @@
   import type { Standing } from "#lib/live/standing.js";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
-  import { lead, tone } from "#lib/live/format.js";
+  import { apart, lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Counter from "./counter.svelte";
@@ -25,6 +25,7 @@
     isRanked = false,
     updated = null,
     rule = null,
+    digits = 1,
     needs = [],
   }: {
     options: Array<LiveOption>;
@@ -37,6 +38,7 @@
     isRanked?: boolean;
     updated?: string | null;
     rule?: { share: number; only: string | null } | null;
+    digits?: number;
     needs?: Array<string>;
   } = $props();
 
@@ -96,8 +98,11 @@
     if (isWaiting || seats > 1 || first == null || second == null) {
       return null;
     }
-    const votes = first.votes - second.votes;
-    return votes > 0 ? { votes, margin: votes / now.total } : null;
+    return {
+      option: first.option,
+      votes: first.votes - second.votes,
+      margin: apart(first.share, second.share, digits),
+    };
   });
   const shareIn = $derived(
     estimate?.status === "estimating" ||
@@ -132,17 +137,29 @@
   aria-label={m.night_list_title()}
 >
   <div
-    class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 text-[0.8125rem] text-muted-foreground"
+    class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 text-[0.8125rem] text-muted-foreground"
   >
-    {#if updated != null}
-      <p class="font-figures tabular-nums">
-        {m.night_updated({ time: updated })}
+    {#if gap != null}
+      <p class="grid gap-1 font-figures tabular-nums">
+        {#if gap.votes > 0}
+          <span
+            class="text-[clamp(1.5rem,1.25rem+1vw,2rem)]/none font-[780] tracking-tight"
+            style:color={tone(gap.option)}
+            >{surname(gap.option)} +{lead(gap.margin, digits)}</span
+          >
+          <span>{m.night_votes({ count: count(gap.votes) })}</span>
+        {:else}
+          <span
+            class="text-[clamp(1.5rem,1.25rem+1vw,2rem)]/none font-[780] tracking-tight text-foreground"
+            >{m.outcome_tied()}</span
+          >
+        {/if}
       </p>
     {/if}
-    {#if !isLater}
-      <div
-        class="ms-auto grid justify-items-end gap-0.5 font-figures tabular-nums"
-      >
+    <div
+      class="ms-auto grid justify-items-end gap-0.5 font-figures tabular-nums"
+    >
+      {#if !isLater}
         <span class="flex items-center gap-3">
           {#if shareIn != null}
             <span
@@ -167,16 +184,19 @@
             {/if}
           </span>
         </span>
-        {#if hasPrecincts}
-          <span class="text-xs">
-            {m.night_precincts({
-              reporting: count(now.reporting ?? 0),
-              expected: count(now.expected ?? 0),
-            })}
-          </span>
-        {/if}
-      </div>
-    {/if}
+      {/if}
+      {#if !isLater && hasPrecincts}
+        <span class="text-xs">
+          {m.night_precincts({
+            reporting: count(now.reporting ?? 0),
+            expected: count(now.expected ?? 0),
+          })}
+        </span>
+      {/if}
+      {#if updated != null}
+        <span class="text-xs">{m.night_updated({ time: updated })}</span>
+      {/if}
+    </div>
   </div>
 
   <div class="border-bs-2 border-foreground">
@@ -273,7 +293,7 @@
             />
             <Counter
               value={row.share}
-              format={(value: number) => percent(value)}
+              format={(value: number) => percent(value, digits)}
               class={cn(
                 "self-center text-end text-lg/tight tracking-tight [grid-area:share]",
                 { "font-[780]": row.isAhead, "font-semibold": !row.isAhead },
@@ -321,23 +341,6 @@
             {count(now.total)}
           </dd>
         </div>
-        {#if gap != null}
-          <div
-            class={cn("sheet py-1.5", { faced: hasFaces, flat: !isPartisan })}
-          >
-            <dt class="[grid-area:name]">{m.col_margin()}</dt>
-            <dd
-              class="text-end font-figures text-foreground tabular-nums [grid-area:votes]"
-            >
-              {count(gap.votes)}
-            </dd>
-            <dd
-              class="text-end font-figures font-semibold text-foreground tabular-nums [grid-area:share]"
-            >
-              {m.night_list_points({ points: lead(gap.margin) })}
-            </dd>
-          </div>
-        {/if}
       </dl>
     {/if}
   </div>
