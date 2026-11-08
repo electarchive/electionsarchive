@@ -1,7 +1,7 @@
 <script lang="ts">
   import { refreshAll, replaceState } from "$app/navigation";
   import { page } from "$app/state";
-  import { untrack } from "svelte";
+  import { onMount, untrack } from "svelte";
   import Night from "#lib/components/live/night.svelte";
   import { count } from "#lib/format.js";
   import { dated, isDistricted, placeName } from "#lib/live/format.js";
@@ -151,24 +151,27 @@
     );
   });
 
-  $effect(() => {
-    const path = data.place == null ? (page.params.path ?? "") : election.slug;
+  const check = async () => {
+    const { stamp } = data;
+    try {
+      const probe = await orpc.live.stamp.call({ path: stamp.path });
+      isOffline = false;
+      if (
+        probe.newest !== stamp.newest ||
+        probe.isCertified !== stamp.isCertified
+      ) {
+        await refreshAll();
+      }
+    } catch {
+      isOffline = true;
+    }
+  };
+
+  onMount(() => {
+    void check();
     const timer = setInterval(() => {
       clock = Date.now();
-      void (async () => {
-        try {
-          const probe = await orpc.live.stamp.call({ path });
-          isOffline = false;
-          if (
-            probe.newest > (election.newest ?? "") ||
-            probe.isCertified !== election.isCertified
-          ) {
-            await refreshAll();
-          }
-        } catch {
-          isOffline = true;
-        }
-      })();
+      void check();
     }, 30_000);
     return () => clearInterval(timer);
   });

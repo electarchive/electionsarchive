@@ -6,7 +6,7 @@ import { holder } from "#lib/live/ballot.js";
 import { pulse, sides } from "#lib/live/nation.js";
 import { liveBallot } from "#lib/server/live-ballot.js";
 import { trend } from "#lib/server/live-estimates.js";
-import { livePage } from "#lib/server/live-page.js";
+import { livePage, stamped } from "#lib/server/live-page.js";
 import { liveParts } from "#lib/server/live-parts.js";
 import type { PageServerLoad } from "./$types";
 
@@ -29,12 +29,13 @@ const slims = new WeakMap<
 
 export const load: PageServerLoad = async ({ params, url }) => {
   const segments = params.path.split("/");
-  const [page, ballot, state] = await Promise.all([
+  const [page, ballot, state, stamp] = await Promise.all([
     livePage(params.path, url.searchParams.get("at")),
     liveBallot(params.path),
     segments.length === 4
       ? liveBallot(segments.slice(0, 3).join("/"))
       : Promise.resolve(null),
+    stamped(params.path),
   ]);
   const { election, estimates, control, geography, ...rest } = page;
   const isSingle = page.isRace && page.place == null;
@@ -50,6 +51,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
           ?.contest ?? null);
   return {
     ...rest,
+    stamp,
     trail: page.nation == null ? null : trail(election, control),
     board: liveParts(night.election, night.estimates, control).board,
     geography:

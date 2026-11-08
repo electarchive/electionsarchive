@@ -18,6 +18,7 @@
       shown: data.shown,
       updates: data.updates,
     })),
+    untrack(() => data.stamp),
     dev && page.url.searchParams.has("rehearsal"),
   );
   const desk = new Desk(

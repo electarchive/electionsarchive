@@ -10,7 +10,7 @@ import {
   house,
   states,
 } from "#lib/server/live-board.js";
-import { night } from "#lib/server/live-page.js";
+import { night, stamped } from "#lib/server/live-page.js";
 import type { PageServerLoad } from "./$types";
 
 const OUTLYING = new Set(["ak", "hi", "pr", "vi", "gu", "mp", "as"]);
@@ -20,7 +20,10 @@ export const load: PageServerLoad = async ({ params }) => {
   if (segments[0] !== "us" || segments.length < 2 || segments.length > 3) {
     error(404);
   }
-  const found = await night(params.path);
+  const [found, stamp] = await Promise.all([
+    night(params.path),
+    stamped(params.path),
+  ]);
   const { election } = found;
   if (election.slug !== params.path) {
     error(404);
@@ -62,6 +65,7 @@ export const load: PageServerLoad = async ({ params }) => {
   if (segments.length === 2) {
     return {
       ...found,
+      stamp,
       nationPath,
       nation,
       names: nation?.labels ?? {},
@@ -113,6 +117,7 @@ export const load: PageServerLoad = async ({ params }) => {
   );
   return {
     ...found,
+    stamp,
     nationPath,
     nation: null,
     names: nation?.labels ?? {},

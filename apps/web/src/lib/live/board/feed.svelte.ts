@@ -1,4 +1,5 @@
 import type { LiveElection, LiveEstimate, LiveRace } from "@ea/analytics/live";
+import { untrack } from "svelte";
 import { SvelteMap } from "svelte/reactivity";
 import type { Update } from "#lib/live/board.js";
 import type { Summary } from "#lib/live/summary.js";
@@ -26,6 +27,7 @@ export class Feed {
   readonly isNation: boolean;
   readonly #started: number | null;
   #base: Night;
+  #stamp: { newest: string; isCertified: boolean };
   readonly #states = new SvelteMap<string, Night>();
   readonly #shapes = new SvelteMap<string, Shapes>();
   readonly #asked = new Set<string>();
@@ -47,8 +49,13 @@ export class Feed {
     new Map(this.night.election.races.map((race) => [race.slug, race])),
   );
 
-  constructor(night: Night, isRehearsal: boolean) {
+  constructor(
+    night: Night,
+    stamp: { newest: string; isCertified: boolean },
+    isRehearsal: boolean,
+  ) {
     this.#base = $state.raw(night);
+    this.#stamp = stamp;
     this.isNation = night.election.slug.split("/").length === 2;
     this.#started = isRehearsal ? Date.now() : null;
   }
@@ -167,12 +174,13 @@ export class Feed {
     const probe = await orpc.live.stamp.call({ path });
     this.isOffline = false;
     if (
-      probe.newest <= (this.#base.election.newest ?? "") &&
-      probe.isCertified === this.#base.election.isCertified
+      probe.newest === this.#stamp.newest &&
+      probe.isCertified === this.#stamp.isCertified
     ) {
       return;
     }
     this.#base = await this.#fetchNight(path);
+    this.#stamp = probe;
     const [country, date] = path.split("/", 2);
     await Promise.all(
       [...this.#states.keys()].map(async (state) =>
@@ -185,14 +193,16 @@ export class Feed {
     const tick = setInterval(() => {
       this.clock = Date.now();
     }, 1000);
-    const poll = setInterval(() => {
+    const check = () => {
       if (this.#started != null) {
         return;
       }
       this.#refresh().catch(() => {
         this.isOffline = true;
       });
-    }, 30_000);
+    };
+    untrack(check);
+    const poll = setInterval(check, 30_000);
     return () => {
       clearInterval(tick);
       clearInterval(poll);

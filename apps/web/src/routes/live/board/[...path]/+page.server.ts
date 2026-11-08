@@ -3,13 +3,16 @@ import { redirect } from "@sveltejs/kit";
 import { part } from "svelte-islands/server";
 import { remember } from "#lib/server/cache.js";
 import { house } from "#lib/server/live-board.js";
-import { night } from "#lib/server/live-page.js";
+import { night, stamped } from "#lib/server/live-page.js";
 import { liveParts } from "#lib/server/live-parts.js";
 import { holders } from "#lib/server/rpc/tonight.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
-  const { election, estimates, shown } = await night(params.path);
+  const [{ election, estimates, shown }, stamp] = await Promise.all([
+    night(params.path),
+    stamped(params.path),
+  ]);
   if (election.slug !== params.path) {
     redirect(307, `/live/board/${election.slug}`);
   }
@@ -31,6 +34,7 @@ export const load: PageServerLoad = async ({ params, setHeaders, url }) => {
       dev && url.searchParams.has("rehearsal"),
     ),
     shown,
+    stamp,
     isNation,
     cartogram:
       district?.cartogram == null

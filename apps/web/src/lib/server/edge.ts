@@ -13,6 +13,13 @@ const PERSONAL = /^\/(?:api\/auth|mcp)(?:\/|$)/u;
 
 export const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 
+function isCounting(response: Response) {
+  return (
+    [307, 308].includes(response.status) &&
+    LIVE.test(response.headers.get("location") ?? "")
+  );
+}
+
 function isShareable(
   { cookies, isDataRequest, locals, request, url }: RequestEvent,
   response: Response,
@@ -22,7 +29,8 @@ function isShareable(
     (response.status !== 200 &&
       !(
         url.pathname.startsWith("/id/") && [307, 308].includes(response.status)
-      )) ||
+      ) &&
+      !isCounting(response)) ||
     (response.headers.has("cache-control") && !isDataRequest) ||
     response.headers.has("set-cookie") ||
     locals.user != null ||
@@ -55,7 +63,7 @@ async function settled(response: Response, isMoved: boolean) {
 }
 
 export async function mark(event: RequestEvent, response: Response) {
-  const isLive = LIVE.test(event.url.pathname);
+  const isLive = LIVE.test(event.url.pathname) || isCounting(response);
   const isOpen = isShareable(event, response);
   const isRead = isOpen && !isLive && event.url.pathname.startsWith("/rpc/");
   const data =
@@ -91,10 +99,13 @@ export async function mark(event: RequestEvent, response: Response) {
       `"${createHash("sha1").update(data).digest("base64url")}"`,
     );
   }
+  const isPage =
+    response.headers.get("content-type")?.startsWith("text/html") === true ||
+    isCounting(response);
   response.headers.set(
     "cloudflare-cdn-cache-control",
     isLive
-      ? "public, max-age=5, stale-while-revalidate=10, stale-if-error=3600"
+      ? `public, max-age=5, stale-while-revalidate=${isPage ? 300 : 10}, stale-if-error=3600`
       : "public, max-age=300, stale-while-revalidate=604800, stale-if-error=604800",
   );
   return response;

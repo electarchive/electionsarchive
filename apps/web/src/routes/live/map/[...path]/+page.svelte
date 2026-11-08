@@ -1,6 +1,7 @@
 <script lang="ts">
   import { refreshAll } from "$app/navigation";
   import { page } from "$app/state";
+  import { onMount } from "svelte";
   import Full from "#lib/components/live/full/full.svelte";
   import { localize } from "#lib/live/prefs.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -19,24 +20,27 @@
   );
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
 
-  $effect(() => {
-    const path = page.params.path ?? "";
+  const check = async () => {
+    const { stamp } = data;
+    try {
+      const probe = await orpc.live.stamp.call({ path: stamp.path });
+      isOffline = false;
+      if (
+        probe.newest !== stamp.newest ||
+        probe.isCertified !== stamp.isCertified
+      ) {
+        await refreshAll();
+      }
+    } catch {
+      isOffline = true;
+    }
+  };
+
+  onMount(() => {
+    void check();
     const timer = setInterval(() => {
       clock = Date.now();
-      void (async () => {
-        try {
-          const probe = await orpc.live.stamp.call({ path });
-          isOffline = false;
-          if (
-            probe.newest > (election.newest ?? "") ||
-            probe.isCertified !== election.isCertified
-          ) {
-            await refreshAll();
-          }
-        } catch {
-          isOffline = true;
-        }
-      })();
+      void check();
     }, 30_000);
     return () => clearInterval(timer);
   });

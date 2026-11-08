@@ -16,6 +16,11 @@ export async function night(path: string) {
   }
 }
 
+export async function stamped(path: string) {
+  const probe = /^(.+)\/place\/[a-z0-9-]+$/u.exec(path)?.[1] ?? path;
+  return { path: probe, ...(await call(router.live.stamp, { path: probe })) };
+}
+
 async function place(path: string, slug: string, at: string | null) {
   const found = await night(path);
   if (found.election.slug !== path || path.split("/").length !== 3) {
