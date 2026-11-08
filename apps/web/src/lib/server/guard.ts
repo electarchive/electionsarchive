@@ -82,7 +82,9 @@ const OPERATORS: Array<Operator> = [
 ];
 
 const PREVIEW =
-  /facebookexternalhit|Twitterbot|Slackbot|LinkedInBot|Discordbot|TelegramBot|redditbot|Pinterestbot|SkypeUriPreview|Embedly|Iframely/iu;
+  /facebookexternalhit|Twitterbot|Slackbot|LinkedInBot|Discordbot|TelegramBot|redditbot|Pinterestbot|SkypeUriPreview|Embedly|Iframely|HatchFeed|meta-webindexer|Slack-ImgProxy/iu;
+
+const REFUSED = /Epochal-Search/iu;
 
 const BOT =
   /(?:^|[\s;(+,])[\w.-]*?(?:bot|spider|crawler|slurp|scrapy|archiver)(?=[\s/;)+,_-]|$)|HeadlessChrome|PhantomJS|Puppeteer|Playwright|Selenium/iu;
@@ -239,10 +241,21 @@ function sweep() {
 const reports = new Map<string, { count: number; path: string }>();
 
 function suspect(request: Request, agent: string, pathname: string) {
-  if (DECLARED.test(agent) && !isTraining(agent)) {
+  if (REFUSED.test(agent)) {
+    return "named";
+  }
+  if (isTraining(agent)) {
+    return null;
+  }
+  if (DECLARED.test(agent)) {
     return "declared";
   }
-  if (MACHINE.test(pathname) || request.headers.has("sec-fetch-mode")) {
+  if (
+    MACHINE.test(pathname) ||
+    request.headers.has("sec-fetch-mode") ||
+    request.headers.has("if-none-match") ||
+    request.headers.has("if-modified-since")
+  ) {
     return null;
   }
   const match = BROWSER.exec(agent);
@@ -284,12 +297,12 @@ function flush() {
     total += entry.count;
   }
   console.warn(
-    `guard report-only: ${total} requests in ${reports.size} groups would be refused in the last ${REPORTED / 60_000} minutes`,
+    `guard flagged: ${total} requests in ${reports.size} groups in the last ${REPORTED / 60_000} minutes; named and headerless were refused, declared is report-only`,
   );
   for (const [key, entry] of ranked.slice(0, REPORT_LINES)) {
     const [rule, network, agent] = key.split("\t", 3);
     console.warn(
-      `guard report-only: ${rule} ${entry.count} from ${network} path ${entry.path} agent ${agent}`,
+      `guard flagged: ${rule} ${entry.count} from ${network} path ${entry.path} agent ${agent}`,
     );
   }
   reports.clear();
@@ -541,6 +554,9 @@ async function admit(request: Request, pathname: string) {
   const rule = suspect(request, agent, pathname);
   if (rule != null) {
     report(rule, agent, address, version, pathname);
+    if (rule !== "declared") {
+      return { status: 403 } as const;
+    }
   }
   const key = await keyed(request.headers);
   const scale = key == null ? 1 : KEYED;
