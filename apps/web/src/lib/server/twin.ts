@@ -6834,9 +6834,13 @@ function chamberMarkdown(
             ? []
             : [
                 `## ${m.council_sizes_title()}`,
-                m.council_sizes_lede({
-                  year: year(council.sizes[0]?.from ?? null),
-                }),
+                ...(council.isCounted
+                  ? [
+                      m.council_sizes_lede({
+                        year: year(council.sizes[0]?.from ?? null),
+                      }),
+                    ]
+                  : []),
                 council.sizes
                   .map(
                     (size) =>
