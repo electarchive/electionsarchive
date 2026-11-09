@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+from collections import Counter
 from datetime import date, datetime, timedelta
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -945,12 +946,6 @@ def emit(
                     skipped.append(f"{label}: no single default set to compare with")
                     continue
                 completeness = round(min(mine / float(prior[0][1]), 1), 4)
-                if (completeness < 0.995 and not is_state) or (
-                    mine > float(prior[0][1]) * 1.005 and not fuller and grain == "ad"
-                ):
-                    skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
-                    continue
-                whole = completeness >= 0.999 and (inside or not is_state)
             elif is_state and not inside:
                 skipped.append(f"{label}: not in the archive and not wholly inside the city")
                 continue
@@ -983,9 +978,6 @@ def emit(
                     f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}",
                 )
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
-            covers = whole
-            if grain == "ed" and attach:
-                whole = False
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
                 pl.col("name").str.replace_all(r"\s+", " ").alias("name")
             )
@@ -1015,7 +1007,7 @@ def emit(
                             clash.add(token)
                         known[token] = option_id
 
-            def lookup(candidate: str) -> UUID | None:
+            def lookup(candidate: str, loose: bool = True) -> UUID | None:
                 words = [
                     w
                     for w in re.sub(r"[^a-z ]", " ", candidate.lower().split("/")[0]).split()
@@ -1027,6 +1019,8 @@ def emit(
                 for token in ((words[0], words[-1]), (words[0][0], words[-1]), (words[0], rest), (words[0][0], rest)):
                     if token in known and token not in clash:
                         return known[token]
+                if not loose:
+                    return None
                 found = {
                     option for (first, last), option in known.items() if words[-1] in (first, last) or rest == last
                 }
@@ -1042,9 +1036,53 @@ def emit(
                     return close[0][1]
                 return None
 
-            if attach and strict and (unmatched := [c for c in ranked["name"] if lookup(c.title()) is None]):
+            assigned: dict[str, UUID] = {}
+            if attach:
+                assigned = {c: option for c in ranked["name"] if (option := lookup(c.title())) is not None}
+                hits = Counter(assigned.values())
+                assigned = {
+                    c: option
+                    for c, option in assigned.items()
+                    if hits[option] == 1 or lookup(c.title(), loose=False) is not None
+                }
+            if attach and strict and (unmatched := [c for c in ranked["name"] if c not in assigned]):
                 skipped.append(f"{label}: {unmatched} do not match the contest's options {sorted(known)}")
                 continue
+            if attach:
+                covered = (
+                    not is_state
+                    and area is not None
+                    and set(known.values()) <= set(assigned.values())
+                    and bool(
+                        (
+                            conn.execute(
+                                """select coalesce(sum(st_area(st_intersection(g.geom, st_buffer(c.geom, -0.002)))), 0) / st_area(g.geom) <= 0.01
+                                   from area_geometry g
+                                   left join area_geometry c on c.area_id = any(%s) and c.valid @> %s::date
+                                   where g.area_id = %s and g.valid @> %s::date
+                                   group by g.geom""",
+                                [
+                                    [county_areas[county] for county in county_areas if county not in counties],
+                                    day,
+                                    area,
+                                    day,
+                                ],
+                            ).fetchone()
+                            or [False]
+                        )[0]
+                    )
+                )
+                if covered:
+                    completeness = 1
+                elif (completeness < 0.995 and not is_state) or (
+                    mine > float(prior[0][1]) * 1.005 and not fuller and grain == "ad"
+                ):
+                    skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
+                    continue
+                whole = completeness >= 0.999 and (inside or not is_state)
+            covers = whole
+            if grain == "ed" and attach:
+                whole = False
             source_title = f"{TITLE}, {kind} {day}"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
@@ -1129,7 +1167,7 @@ def emit(
                     for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split()
                     if w not in ("jr", "sr", "ii", "iii")
                 ]
-                if attach and (existing := lookup(label_text)) is not None:
+                if (existing := assigned.get(candidate)) is not None:
                     roots[candidate] = existing
                     if whole and declared:
                         cs.add(
