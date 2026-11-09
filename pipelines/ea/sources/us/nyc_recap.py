@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_recap"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://www.vote.nyc"
 YEARS = range(2005, 2014)
@@ -443,6 +443,30 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
     return None
 
 
+def _words(text: str) -> list[str]:
+    return [
+        w for w in re.sub(r"[^a-z ]", " ", text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")
+    ]
+
+
+def _fits(first: str, other: str) -> bool:
+    return first == other or min(len(first), len(other)) == 1 and first[0] == other[0]
+
+
+def _keys(text: str) -> list[tuple[str | tuple[str, ...], ...]]:
+    words = re.sub(r"[^a-z ]", " ", text.lower().split("/")[0]).split()
+    suffixes = tuple(w for w in words if w in ("jr", "sr", "ii", "iii"))
+    core = [w for w in words if w not in suffixes]
+    if len(core) < 2:
+        return []
+    return [
+        tuple(words),
+        (core[0], *(w[0] for w in core[1:-1]), core[-1], suffixes),
+        (core[0], core[-1], suffixes),
+        (core[0], core[-1]),
+    ]
+
+
 def emit(
     pipeline: str = SOURCE,
     parsed: Path = PARSED,
@@ -589,16 +613,24 @@ def emit(
                     )
             return unit_cache[key]
 
-        people: dict[tuple[str, str], list[UUID]] = {}
-        for person_id, label in conn.execute(
-            """select distinct p.id, n.text from person p join name n on n.entity_id = p.id and n.is_preferred
+        people: dict[tuple[str | tuple[str, ...], ...], set[UUID]] = {}
+        held: dict[UUID, UUID] = {}
+        ran: dict[UUID, set[tuple[UUID, int]]] = {}
+        called: dict[UUID, list[str]] = {}
+        for candidacy_id, person_id, label, ballot, district, year, own in conn.execute(
+            """select y.id, p.id, n.text, y.ballot_name, k.district_area_id, extract(year from e.date_from)::int, h.pipeline = %s
+               from person p join name n on n.entity_id = p.id and n.is_preferred
                join candidacy y on y.person_id = p.id join contest_option o on o.id = y.option_id
-               join contest k on k.id = o.contest_id join election e on e.id = k.election_id where e.polity_id = %s""",
-            [city],
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               join changeset h on h.id = y.changeset_id where e.polity_id = %s or h.pipeline = %s""",
+            [pipeline, city, pipeline],
         ).fetchall():
-            parts = [w for w in re.sub(r"[^a-z ]", " ", label.lower()).split() if w not in ("jr", "sr", "ii", "iii")]
-            if len(parts) >= 2:
-                people.setdefault((parts[0], parts[-1]), []).append(person_id)
+            held[candidacy_id] = person_id
+            called[person_id] = _words(label)
+            if district is not None and not own:
+                ran.setdefault(person_id, set()).add((district, year))
+            for key in {*_keys(label), *_keys(ballot or "")}:
+                people.setdefault(key, set()).add(person_id)
         made: set[UUID] = set()
         values = []
         skipped = []
@@ -978,15 +1010,6 @@ def emit(
                     f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}",
                 )
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
-            real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
-                pl.col("name").str.replace_all(r"\s+", " ").alias("name")
-            )
-            ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
-            margin = (
-                magnitude > 0
-                and ranked.height > magnitude
-                and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
-            )
             roots: dict[str, UUID] = {}
             tickets: dict[tuple[str, str | None], UUID] = {}
             known: dict[tuple[str, str], UUID] = {}
@@ -997,22 +1020,14 @@ def emit(
                        where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
                     [contest],
                 ).fetchall():
-                    words = [
-                        w
-                        for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split()
-                        if w not in ("jr", "sr", "ii", "iii")
-                    ]
+                    words = _words(ballot_name)
                     for token in {(words[0], words[-1]), (words[0][0], words[-1])}:
                         if token in known:
                             clash.add(token)
                         known[token] = option_id
 
             def lookup(candidate: str, loose: bool = True) -> UUID | None:
-                words = [
-                    w
-                    for w in re.sub(r"[^a-z ]", " ", candidate.lower().split("/")[0]).split()
-                    if w not in ("jr", "sr", "ii", "iii")
-                ]
+                words = _words(candidate)
                 if len(words) < 2:
                     return None
                 rest = "".join(words[1:])
@@ -1036,16 +1051,53 @@ def emit(
                     return close[0][1]
                 return None
 
+            if attach:
+                spaced = pl.col("name").str.replace_all(r"\s+", " ")
+                listed = {
+                    option
+                    for c in rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).select(spaced)[
+                        "name"
+                    ]
+                    if (option := lookup(c.title())) is not None
+                }
+                written = {
+                    c
+                    for c in rows.filter(pl.col("party") == "WRITE-IN").select(spaced)["name"].unique()
+                    if (option := lookup(c.title(), loose=False)) is not None and option not in listed
+                }
+                rows = rows.with_columns(
+                    pl.when((pl.col("party") == "WRITE-IN") & spaced.is_in(list(written)))
+                    .then(None)
+                    .otherwise(pl.col("party"))
+                    .alias("party")
+                )
+            real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
+                pl.col("name").str.replace_all(r"\s+", " ").alias("name")
+            )
+            ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
+            margin = (
+                magnitude > 0
+                and ranked.height > magnitude
+                and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
+            )
             assigned: dict[str, UUID] = {}
+            given: dict[UUID, set[str]] = {}
             if attach:
                 assigned = {c: option for c in ranked["name"] if (option := lookup(c.title())) is not None}
                 hits = Counter(assigned.values())
+                for c, option in assigned.items():
+                    if lookup(c.title(), loose=False) is not None:
+                        given.setdefault(option, set()).add(_words(c)[0])
                 assigned = {
                     c: option
                     for c, option in assigned.items()
-                    if hits[option] == 1 or lookup(c.title(), loose=False) is not None
+                    if hits[option] == 1 or any(_fits(first, _words(c)[0]) for first in given.get(option, ()))
                 }
-            if attach and strict and (unmatched := [c for c in ranked["name"] if c not in assigned]):
+            if (
+                attach
+                and strict
+                and (unmatched := [c for c in ranked["name"] if c not in assigned and lookup(c.title()) not in given])
+            ):
                 skipped.append(f"{label}: {unmatched} do not match the contest's options {sorted(known)}")
                 continue
             if attach:
@@ -1162,11 +1214,6 @@ def emit(
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
-                words = [
-                    w
-                    for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split()
-                    if w not in ("jr", "sr", "ii", "iii")
-                ]
                 if (existing := assigned.get(candidate)) is not None:
                     roots[candidate] = existing
                     if whole and declared:
@@ -1194,9 +1241,27 @@ def emit(
                             kind="advanced" if rank < magnitude else "lost",
                         )
                     continue
-                matched = people.get((words[0], words[-1])) if len(words) >= 2 else None
-                if matched is not None and len(matched) == 1:
-                    person = matched[0]
+                head = cs.key("us.candidacy", f"{root_key}:head")
+                matched = next((people[key] for key in _keys(label_text) if key in people), set())
+                spelled = _words(label_text)
+                pool = {
+                    p
+                    for key in _keys(label_text)
+                    for p in people.get(key, ())
+                    if len(called[p]) < 3 or len(spelled) < 3 or called[p][1][0] == spelled[1][0]
+                }
+                same = {p for p in pool if (area, day.year) in ran.get(p, ())}
+                near = {p for p in pool if any(where == area for where, _ in ran.get(p, ()))}
+                if len(same) == 1:
+                    (person,) = same
+                elif held.get(head) in near:
+                    person = held[head]
+                elif len(near) == 1:
+                    (person,) = near
+                elif len(matched) == 1:
+                    (person,) = matched
+                elif held.get(head) in matched:
+                    person = held[head]
                 else:
                     person = cs.key(f"{pipeline}.person", f"NY:{slug(label_text)}")
                     if person in cs.minted and person not in made:
@@ -1211,7 +1276,6 @@ def emit(
                     party_id=party,
                     ballot_label=label_text,
                 )
-                head = cs.key("us.candidacy", f"{root_key}:head")
                 cs.add(
                     "candidacy",
                     id=head,

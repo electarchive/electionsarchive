@@ -12,7 +12,7 @@ from ea.store import DATA
 
 SOURCE = "us.nyc_recap_wayback"
 PARSED = DATA / "parsed" / SOURCE
-VERSION = "1"
+VERSION = "2"
 NOTE = (
     "Returns from the Board of Elections' certified Statement and Return recaps, read from archived copies of the Board's "
     "own results pages. Assembly district returns are one line per ballot line as New York's fusion ballot prints them, "
