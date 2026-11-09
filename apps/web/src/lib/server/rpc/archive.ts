@@ -20850,6 +20850,7 @@ export async function record(input: { id: string; body?: string }) {
     decider: string | null;
     isRunoff: boolean;
     size: number | null;
+    areas: Array<number> | null;
   }>(sql`
     with recursive later as materialized (
       select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
@@ -21057,7 +21058,8 @@ export async function record(input: { id: string; body?: string }) {
         case when count(distinct r.id) = 1 then (array_agg(w.person order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as winner,
         case when count(distinct r.id) = 1 then (array_agg(w.contest order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as decider,
         bool_or(w.contest <> w.root) as runoff, bool_and(r."isRemainder") as remainder,
-        coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
+        coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed,
+        array_agg(distinct r.area) filter (where r.area is not null) as areas
       from roots r
       join won w on w.root = r.id
       left join shares sh on sh.root = r.id
@@ -21076,7 +21078,7 @@ export async function record(input: { id: string; body?: string }) {
     select seat, "isOffice", "isAbroad", bucket, link, day::text as date, year, races, party, share, winner,
       decider, coalesce(runoff, false) as "isRunoff",
       party is null and independent as "isIndependent",
-      case when "isMixed" then listed else seats end as seats, size::int as size
+      case when "isMixed" then listed else seats end as seats, size::int as size, areas
     from flagged
     where not ("isMixed" and listed = 0)
       and ("isOffice" or not coalesce("isBy", false))
@@ -21313,6 +21315,7 @@ export async function record(input: { id: string; body?: string }) {
                 races: Math.max(...group.map((row) => row.races)),
                 filled,
                 size: first?.size ?? null,
+                areas: new Set(group.flatMap((row) => row.areas ?? [])),
                 share:
                   group.length === 1 &&
                   first?.isOffice === true &&
@@ -21381,10 +21384,12 @@ export async function record(input: { id: string; body?: string }) {
               if (
                 next != null &&
                 next.year - point.year <= 1 &&
-                point.filled * 2 < next.filled
+                point.filled * 2 < next.filled &&
+                (point.areas.size === 0 || !point.areas.isSubsetOf(next.areas))
               ) {
                 next.races += point.races;
                 next.filled += point.filled;
+                next.areas = next.areas.union(point.areas);
                 next.share = null;
                 next.winner = null;
                 next.contest = null;
@@ -21416,7 +21421,8 @@ export async function record(input: { id: string; body?: string }) {
                 return [];
               }
               return [point];
-            }),
+            })
+            .map(({ areas: _areas, ...point }) => point),
         };
       })
       .filter((entry) => entry.points.length > (input.body == null ? 1 : 0))
