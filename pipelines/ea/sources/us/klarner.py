@@ -179,6 +179,7 @@ MISSPELLED = {
     "Jona Kreisstomkins": "Jonathan Kreiss-Tomkins",
     "Jonathan S. Kreisstomkins": "Jonathan S. Kreiss-Tomkins",
 }
+PERSONS = {("177293", year): "José E. Serrano" for year in range(1974, 1989)}
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
     "January",
@@ -646,11 +647,22 @@ def emit() -> Path | str:
                 rules_version=1,
             )
             name(systems["cumulative"], "Cumulative vote")
+        lines = lines.join(
+            pl.DataFrame(
+                [(candid, year, f"{candid}:{slug(text)}") for (candid, year), text in PERSONS.items()],
+                schema={"candid": pl.String, "year": pl.Int32, "person": pl.String},
+                orient="row",
+            ),
+            on=["candid", "year"],
+            how="left",
+            maintain_order="left",
+        ).with_columns(person=pl.coalesce("person", "candid"))
         persons: dict[str, UUID] = {}
-        for candid, group in lines.filter(pl.col("cand") != "scattering").group_by("candid"):
-            persons[str(candid[0])] = cs.key(f"{SOURCE}.person", str(candid[0]))
-            cs.add("person", id=persons[str(candid[0])])
-            name(persons[str(candid[0])], person_name(group.row(-1, named=True)))
+        for (key,), group in lines.filter(pl.col("cand") != "scattering").group_by("person"):
+            persons[key] = cs.key(f"{SOURCE}.person", key)
+            cs.add("person", id=persons[key])
+            last = group.row(-1, named=True)
+            name(persons[key], PERSONS.get((last["candid"], last["year"])) or person_name(last))
 
         contests: dict[tuple[object, ...], tuple[UUID, date]] = {}
         values: list[tuple[str, str, str, int]] = []
@@ -849,7 +861,7 @@ def emit() -> Path | str:
                     cs.add(
                         "candidacy",
                         id=candidacy,
-                        person_id=persons[str(candid[0])],
+                        person_id=persons[row["person"]],
                         option_id=root,
                         role="head",
                         ballot_name=ballot,
