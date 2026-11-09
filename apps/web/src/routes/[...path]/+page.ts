@@ -16,6 +16,23 @@ async function seat(
     : { ...body, contest: { ...contest, places: { ...contest.places, rows } } };
 }
 
+async function due<T>(promise: Promise<T>) {
+  if (!browser) {
+    return promise;
+  }
+  return new Promise<T>((done, fail) => {
+    const timer = setTimeout(
+      fail,
+      120_000,
+      new Error("The results timed out."),
+    );
+    void promise
+      .then(done)
+      .catch(fail)
+      .finally(() => clearTimeout(timer));
+  });
+}
+
 async function early<T>(found: Part<T> | null) {
   return found?.name === "election.sweep" ? fetched(found) : found;
 }
@@ -42,7 +59,7 @@ export const load: PageLoad = async ({ data }) => {
     if (body instanceof Promise) {
       return {
         ...data,
-        body: body.then(seat),
+        body: due(body.then(seat)),
         primed: data.primed instanceof Promise ? primed : await primed,
         View: (await view).default,
       };

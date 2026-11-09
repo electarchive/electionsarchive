@@ -1,11 +1,14 @@
 <script lang="ts">
   import { browser } from "$app/env";
   import { READ_ONLY } from "$app/env/public";
-  import { invalidateAll } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
+  import { page } from "$app/state";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import { Await } from "svelte-islands";
+  import { toast } from "svelte-sonner";
   import type { Primed } from "#lib/primed.js";
+  import { arrive } from "#lib/arrive.js";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import { m } from "#lib/paraglide/messages.js";
@@ -44,13 +47,73 @@
     });
   }
 
+  const staying = { reset: false, replace: true } as const;
+  let landed: { key: string; url: URL } | null = null;
+
+  function offer(missed: URL) {
+    toast.error(m.contest_view_failed(), {
+      action: {
+        label: m.contest_body_retry(),
+        onClick: () => {
+          const from = page.url.href;
+          void arrive(
+            missed,
+            async () => goto(missed, staying),
+            () => page.url.href === from,
+          ).then((isReady) => {
+            if (!isReady) {
+              offer(missed);
+            }
+          });
+        },
+      },
+    });
+  }
+
+  function settle<T>(value: T, key: string, url: URL) {
+    landed = { key, url };
+    return value;
+  }
+
+  async function guard<T>(promise: Promise<T>, key: string, url: URL) {
+    try {
+      return settle(await promise, key, url);
+    } catch (error) {
+      const last = landed;
+      if (
+        last == null ||
+        last.key !== key ||
+        last.url.href === url.href ||
+        page.url.href !== url.href
+      ) {
+        throw error;
+      }
+      void arrive(
+        last.url,
+        async () => goto(last.url, staying),
+        () => page.url.href === url.href,
+      ).then(() => {
+        offer(url);
+      });
+      return new Promise<never>(() => {});
+    }
+  }
+
+  const shown = $derived.by((): typeof body => {
+    const key = `${id}:${unit}`;
+    const url = untrack(() => new URL(page.url.href));
+    return body instanceof Promise
+      ? guard(body, key, url)
+      : settle(body, key, url);
+  });
+
   const shape = $derived(
     unit === "" ? "whole" : head.scope.isFine ? "fine" : "unit",
   );
 </script>
 
 <Await
-  promise={body}
+  promise={shown}
   name="contest.body:{head.kind}:{shape}"
   key="{id}:{unit}"
   reserve="60rem"

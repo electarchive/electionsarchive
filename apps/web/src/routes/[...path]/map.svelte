@@ -6,7 +6,12 @@
 
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
-  import { afterNavigate, goto, preloadData } from "$app/navigation";
+  import {
+    afterNavigate,
+    beforeNavigate,
+    goto,
+    preloadData,
+  } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
@@ -28,6 +33,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import { fade, fly } from "svelte/transition";
   import type { Box } from "#lib/map/engine.svelte.js";
+  import { arrive } from "#lib/arrive.js";
   import Export from "#lib/components/export.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
@@ -1895,28 +1901,31 @@
     };
   });
 
-  async function arrived(url: URL) {
-    const result = await preloadData(url.href);
-    if (result.type === "error") {
-      return false;
-    }
-    const data: Partial<Extract<PageData, { kind: "contest" }>> =
-      result.type === "loaded" ? result.data : {};
-    if (data.kind !== "contest") {
-      return true;
-    }
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const isOpened = await Promise.race([
-      Promise.resolve(data.body).then(
-        () => true,
-        () => false,
-      ),
-      new Promise<false>((done) => {
-        timer = setTimeout(done, 120_000, false);
-      }),
-    ]);
-    clearTimeout(timer);
-    return isOpened;
+  function head(url: URL, code: string, go: () => unknown) {
+    const ticket = ++trip;
+    const from = page.url.href;
+    going = code;
+    failed = null;
+    isSlow = false;
+    const slow = setTimeout(() => {
+      if (ticket === trip) {
+        isSlow = true;
+      }
+    }, 1500);
+    const isWanted = () => ticket === trip && page.url.href === from;
+    void arrive(url, go, isWanted)
+      .then((isReady) => {
+        if (!isReady && isWanted()) {
+          failed = code;
+        }
+      })
+      .finally(() => {
+        clearTimeout(slow);
+        if (ticket === trip) {
+          going = null;
+          isSlow = false;
+        }
+      });
   }
 
   function travel(event: MouseEvent, level: (typeof levels)[number]) {
@@ -1941,36 +1950,48 @@
       }
     }
     url.pathname = resolve("/[...path]", { path: level.path });
-    const ticket = ++trip;
-    const from = page.url.href;
-    going = level.code;
-    failed = null;
-    isSlow = false;
-    const slow = setTimeout(() => {
-      if (ticket === trip) {
-        isSlow = true;
-      }
-    }, 1500);
-    void arrived(url)
-      .then(async (isReady) => {
-        if (ticket !== trip || page.url.href !== from) {
-          return;
-        }
-        if (isReady) {
-          await goto(url, { reset: false });
-          return;
-        }
-        void preloadData(from);
-        failed = level.code;
-      })
-      .finally(() => {
-        clearTimeout(slow);
-        if (ticket === trip) {
-          going = null;
-          isSlow = false;
-        }
-      });
+    head(url, level.code, async () => goto(url, { reset: false }));
   }
+
+  let replaying: string | null = null;
+  beforeNavigate((navigation) => {
+    if (navigation.type !== "popstate" || pick != null) {
+      return;
+    }
+    const { to, delta, cancel } = navigation;
+    if (to == null) {
+      return;
+    }
+    if (replaying === to.url.href) {
+      replaying = null;
+      return;
+    }
+    const [here, there] = [page.url, to.url].map((url) => {
+      const rest = new URLSearchParams(url.search);
+      rest.delete("by");
+      rest.sort();
+      return `${url.pathname}?${rest}`;
+    });
+    const code = to.url.searchParams.get("by") ?? "";
+    if (
+      here !== there ||
+      code === (page.url.searchParams.get("by") ?? "") ||
+      tiers.length < 2
+    ) {
+      return;
+    }
+    cancel();
+    const url = new URL(to.url);
+    head(url, code, async () => {
+      if (location.href === url.href) {
+        await new Promise((done) => {
+          on(window, "popstate", done, { once: true });
+        });
+      }
+      replaying = url.href;
+      history.go(delta);
+    });
+  });
 
   function open(k: number, path = rows.get(k)?.path, layer = tiles) {
     if (onopen != null) {
