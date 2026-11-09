@@ -15,6 +15,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.names import compatible, tokens
+from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
 
 SOURCE = "us.council_rosters"
@@ -241,6 +242,47 @@ def fetch() -> None:
                 raw.fetch(SOURCE, WIKIPEDIA.format(locator["title"], locator["oldid"]), suffix=".txt")
     for positions in POSITIONS.values():
         raw.fetch(SOURCE, _sparql(positions), suffix=".json")
+
+
+def _number(text: str | None) -> int | None:
+    found = re.search(r"(\d+)\s*$", text or "")
+    return None if found is None else int(found[1])
+
+
+def _given(words: list[str]) -> set[str]:
+    return {
+        words[0],
+        *NICKNAMES.get(words[0], "").split(),
+        *(full for full, short in NICKNAMES.items() if words[0] in short.split()),
+    }
+
+
+def _same(name: str, text: str) -> bool:
+    if compatible(name, text):
+        return True
+    mine, other = tokens(name), tokens(text)
+    if mine is None or other is None or mine[0][-1] != other[0][-1]:
+        return False
+    left, right = mine[0][:-1], other[0][:-1]
+    return bool(
+        _given(left) & set(right)
+        or _given(right) & set(left)
+        or (min(len(left[0]), len(right[0])) >= 3 and (left[0].startswith(right[0]) or right[0].startswith(left[0])))
+    )
+
+
+def _alike(name: str, texts: set[str]) -> bool:
+    parts = tokens(name)
+    return any(
+        compatible(name, text)
+        or (
+            parts is not None
+            and (other := tokens(text)) is not None
+            and other[0][-1] == parts[0][-1]
+            and other[0][0][:1] == parts[0][0][:1]
+        )
+        for text in texts
+    )
 
 
 def _day(text: str) -> date:
@@ -482,7 +524,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="City council members' terms from each clerk's official roster (Los Angeles, New York City, "
-            "and Houston), with Wikidata where it dates a term more finely, linked to the elections they won",
+            "and Houston), with Wikidata where it dates a term more finely, linked to the elections they won. Where "
+            "sources recorded one member's elections in the same district under two people, those two are joined "
+            "into one.",
             polity="US",
         )
         sources: dict[str, UUID] = {}
@@ -557,6 +601,9 @@ def emit() -> Path:
             for value, entity in conn.execute("select value, entity_id from external_id where scheme = 'wikidata'")
         }
         tagged = set(known.values())
+        minted: dict[str, UUID] = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
         ran: dict[UUID, dict[UUID, set[str]]] = defaultdict(lambda: defaultdict(set))
         won: dict[UUID, list[tuple[date, UUID, UUID, str | None]]] = defaultdict(list)
         for body, day, contest, person, ballot, preferred, elected, area in conn.execute(
@@ -582,6 +629,27 @@ def emit() -> Path:
         created: set[UUID] = set()
         seated: set[UUID] = set()
         linked: set[UUID] = set()
+        merged = 0
+
+        def join(one: UUID, other: UUID) -> UUID | None:
+            nonlocal merged
+            if conn.execute(
+                """select from external_id a join external_id b on b.scheme = a.scheme and b.value <> a.value
+                   where a.entity_id = %s and b.entity_id = %s and a.scheme in ('wikidata', 'bioguide')""",
+                [one, other],
+            ).fetchone():
+                return None
+            counts = dict(
+                conn.execute(
+                    "select person_id, count(*) from candidacy where person_id = any(%s) group by person_id",
+                    [[one, other]],
+                ).fetchall()
+            )
+            survivor = max((one, other), key=lambda found: counts.get(found, 0))
+            cs.merge(other if survivor == one else one, survivor)
+            merged += 1
+            return survivor
+
         tenures: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in frame.iter_rows(named=True):
             council, name, start = row["council"], row["name"], row["start"]
@@ -593,23 +661,37 @@ def emit() -> Path:
             body = bodies[council]
             parts = tokens(name)
             key = row["person_key"] or f"{council}:{' '.join(parts[0]) if parts else name}"
+            number = _number(row["seat"])
+            nearby = [
+                (day, contest, cs.survivors.get(winner, winner), area)
+                for day, contest, winner, area in won[body]
+                if timedelta(0) <= start - day <= WINDOW
+                and row["acquired_via"] == "elected"
+                and number is not None
+                and _number(area) == number
+                and bool(ran[body][winner])
+                and all(_same(name, text) for text in ran[body][winner])
+            ]
             person = resolved.get(key)
+            if person is not None:
+                person = cs.survivors.get(person, person)
             if person is None:
-                hits = {found for found, texts in ran[body].items() if any(compatible(name, text) for text in texts)}
-                recent = {winner for day, _, winner, _ in won[body] if timedelta(0) <= start - day <= WINDOW}
+                hits = {
+                    cs.survivors.get(found, found)
+                    for found, texts in ran[body].items()
+                    if any(compatible(name, text) for text in texts)
+                }
+                recent = {
+                    cs.survivors.get(winner, winner)
+                    for day, _, winner, _ in won[body]
+                    if timedelta(0) <= start - day <= WINDOW
+                }
                 if len(hits) > 1:
                     hits &= recent
+                if not hits & recent and nearby:
+                    hits = {winner for _, _, winner, _ in nearby}
                 if not hits and parts is not None:
-                    hits = {
-                        winner
-                        for winner in recent
-                        if any(
-                            (other := tokens(text)) is not None
-                            and other[0][-1] == parts[0][-1]
-                            and other[0][0][:1] == parts[0][0][:1]
-                            for text in ran[body][winner]
-                        )
-                    }
+                    hits = {winner for winner in recent if _alike(name, ran[body][winner])}
                 if len(hits) > 1:
                     unmatched.append((council, name, str(start), "ambiguous"))
                     continue
@@ -636,20 +718,33 @@ def emit() -> Path:
                 )
             contest, area = None, None
             if row["acquired_via"] == "elected":
-                contest, area = max(
+                _, contest, winner, area = max(
                     (
-                        (day, found, label)
-                        for day, found, winner, label in won[body]
-                        if winner == person and timedelta(0) <= start - day <= WINDOW and found not in linked
+                        entry
+                        for entry in [
+                            *(
+                                (day, found, person, label)
+                                for day, found, winner, label in won[body]
+                                if cs.survivors.get(winner, winner) == person and timedelta(0) <= start - day <= WINDOW
+                            ),
+                            *(nearby if person not in cs.minted else []),
+                        ]
+                        if entry[1] not in linked
                     ),
-                    default=(None, None, None),
+                    default=(None, None, None, None),
                     key=lambda entry: entry[0] or date.min,
-                )[1:]
+                )
+                if winner is not None and winner != person:
+                    if (survivor := join(person, winner)) is None:
+                        contest, area = None, None
+                    else:
+                        person = resolved[key] = survivor
+                        named.setdefault(person, name)
             if contest is not None:
                 linked.add(contest)
             seat = row["seat"]
-            if seat is None and council == "new-york-city" and area and (number := re.search(r"(\d+)\s*$", area)):
-                seat = f"District {int(number[1])}"
+            if seat is None and council == "new-york-city" and (found := _number(area)) is not None:
+                seat = f"District {found}"
             seat_id = None
             if seat is not None:
                 seat_id = cs.key("us.seat", f"{body}:{seat}")
@@ -670,6 +765,15 @@ def emit() -> Path:
                     "citations": citations,
                 }
             )
+        for key, person in resolved.items():
+            earlier = minted.get(key)
+            if earlier is not None and earlier not in cs.survivors and earlier != cs.survivors.get(person, person):
+                join(cs.survivors.get(person, person), earlier)
+        for entries in tenures.values():
+            for entry in entries:
+                entry["person"] = cs.survivors.get(entry["person"], entry["person"])
+        known = {value: cs.survivors.get(entity, entity) for value, entity in known.items()}
+        tagged = {cs.survivors.get(entity, entity) for entity in tagged}
         refined = 0
         for statement in statements.iter_rows(named=True):
             entries = [
@@ -781,7 +885,7 @@ def emit() -> Path:
                 )
         LOG.write_text("council\tname\tstart\treason\n" + "".join("\t".join(row) + "\n" for row in sorted(unmatched)))
         print(
-            f"{count} tenures, {len(created)} new people, {len(linked)} won contests linked, {overlaps} seat overlaps settled, "
+            f"{count} tenures, {len(created)} new people, {len(linked)} won contests linked, {merged} people merged, {overlaps} seat overlaps settled, "
             f"{refined} Wikidata statements used; {len(unmatched)} terms unmatched, logged to {LOG}"
         )
         return cs.write()
