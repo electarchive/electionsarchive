@@ -1218,7 +1218,7 @@
   let lit = $state<number | null>(null);
   let isZooming = $state(false);
   const asking = $derived(
-    nested == null && places.rows.length >= 24
+    nested == null && places.rows.length >= 24 && places.rows.length <= 5000
       ? `${tiles} ${places.rows.length}`
       : null,
   );
