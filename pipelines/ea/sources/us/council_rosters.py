@@ -24,6 +24,8 @@ LOG = DATA / "logs" / "council_rosters-unmatched.tsv"
 CHRONOLA = "https://cityclerk.lacity.org/chronola/index.cfm?fuseaction=app.OrganizationActive"
 NYC = "https://data.cityofnewyork.us/resource/uvw5-9znb.json?$limit=50000"
 HOUSTON = "https://www.houstontx.gov/citysec/mayors.pdf"
+WIKIPEDIA = "https://en.wikipedia.org/w/index.php?title={}&oldid={}&action=raw"
+GREEN_BOOK = "https://a856-gbol.nyc.gov/GBOLWebsite/GreenBook/Details?orgId=16"
 QUERY = """SELECT ?statement ?person ?label ?start ?startPrecision ?end ?endPrecision ?causeLabel WHERE {{
   VALUES ?position {{ {positions} }}
   ?person p:P39 ?statement . ?statement ps:P39 ?position .
@@ -155,6 +157,32 @@ HOUSTON_SPLITS: dict[
         ("Mary Nan Huffman", "elected", (date(2022, 2, 2), "day"), None, None),
     ],
 }
+ABSENT: list[tuple[str, str, date, str, list[tuple[str, dict[str, object]]]]] = [
+    (
+        "District 4",
+        "Andrew Eristoff",
+        date(1999, 7, 1),
+        "day",
+        [("wikipedia", {"title": "Andrew_Sidamon-Eristoff", "oldid": 1364411888})],
+    ),
+    (
+        "District 15",
+        "José Rivera",
+        date(2000, 12, 31),
+        "day",
+        [("wikipedia", {"title": "Jose_Rivera_(politician)", "oldid": 1372549516})],
+    ),
+    (
+        "District 51",
+        "Stephen Fiala",
+        date(2001, 6, 1),
+        "month",
+        [
+            ("wikipedia", {"title": "Stephen_Fiala", "oldid": 1384594722}),
+            ("green-book", {"organization": "Richmond County Clerk", "appointed": "2001-06-20"}),
+        ],
+    ),
+]
 NOTES = {
     "chronola": "Every term of every member of the Los Angeles City Council as the City Clerk's ChronoLA database "
     "lists it, election by election since 1850: the date each member was elected, reelected, appointed, or sworn "
@@ -164,6 +192,11 @@ NOTES = {
     "houston": "The City Secretary's list of Houston's mayors, council members, and controllers by term since 1958, "
     "with the appointments, deaths, resignations, and special elections it notes. Terms start and end with the "
     "year printed; dated changes are transcribed from the list's notes.",
+    "wikipedia": "Wikipedia articles on New York City Council members missing from the Council's open data for the "
+    "1998–2001 term, each read at a fixed revision to find the member's district and the date the member left the "
+    "Council.",
+    "green-book": "The City of New York's official directory, which lists the date each official in it was appointed. "
+    "It gives the date of Stephen Fiala's appointment as Richmond County Clerk, which ended his council term.",
     "wikidata": "Council members' terms as recorded in Wikidata (position held, P39), with start and end dates and "
     "end causes from the statement's qualifiers, used where they date a roster term more finely or give its end "
     "cause.",
@@ -201,6 +234,11 @@ def fetch() -> None:
             )
     raw.fetch(SOURCE, NYC, suffix=".json")
     raw.fetch(SOURCE, HOUSTON, suffix=".pdf")
+    raw.fetch(SOURCE, GREEN_BOOK, suffix=".html")
+    for *_, citations in ABSENT:
+        for name, locator in citations:
+            if name == "wikipedia":
+                raw.fetch(SOURCE, WIKIPEDIA.format(locator["title"], locator["oldid"]), suffix=".txt")
     for positions in POSITIONS.values():
         raw.fetch(SOURCE, _sparql(positions), suffix=".json")
 
@@ -363,7 +401,27 @@ def _houston() -> tuple[list[dict[str, object]], list[tuple[int, int]]]:
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     houston, sizes = _houston()
-    rows = [row | {"name": RENAMED.get(str(row["name"]), row["name"])} for row in [*_chronola(), *_socrata(), *houston]]
+    absent = [
+        {
+            "council": "new-york-city",
+            "seat": seat,
+            "person_key": None,
+            "name": name,
+            "start": date(1998, 1, 1),
+            "start_precision": "day",
+            "end": end,
+            "end_precision": precision,
+            "acquired_via": "elected",
+            "ended_via": "resigned",
+            "locator": json.dumps(citations[0][1]),
+            "citations": json.dumps(citations),
+        }
+        for seat, name, end, precision, citations in ABSENT
+    ]
+    rows = [
+        row | {"name": RENAMED.get(str(row["name"]), row["name"])}
+        for row in [*_chronola(), *_socrata(), *houston, *absent]
+    ]
     pl.DataFrame(rows, schema_overrides={"start": pl.Date, "end": pl.Date}, infer_schema_length=None).sort(
         "council", "seat", "start", "name"
     ).write_parquet(PARSED / "roster.parquet")
@@ -373,6 +431,7 @@ def parse() -> None:
     runs: dict[str, list[tuple[str, str, int]]] = {
         "houston": [],
         "los-angeles": [(str(districted["start"].min()), "day", districted["seat"].n_unique())],
+        "new-york-city": [(str(date(1983, 6, 1)), "month", 35), (str(date(1992, 1, 1)), "day", 51)],
     }
     for year, seats in sizes:
         if not runs["houston"] or runs["houston"][-1][2] != seats:
@@ -453,6 +512,37 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources["los-angeles"])
         cs.artifact(raw.cached(SOURCE, NYC), sources["new-york-city"])
         cs.artifact(raw.cached(SOURCE, HOUSTON), sources["houston"])
+        sources["wikipedia"] = cs.source("Wikipedia", "Members of the New York City Council")
+        cs.add(
+            "source",
+            id=sources["wikipedia"],
+            kind="community",
+            publisher="Wikipedia",
+            title="Members of the New York City Council",
+            url="https://en.wikipedia.org/wiki/New_York_City_Council",
+            license="CC BY-SA 4.0",
+            notes=NOTES["wikipedia"],
+        )
+        sources["green-book"] = cs.source(
+            "City of New York, Department of Citywide Administrative Services",
+            "The Green Book: Official Directory of the City of New York",
+        )
+        cs.add(
+            "source",
+            id=sources["green-book"],
+            kind="official_body",
+            publisher="City of New York, Department of Citywide Administrative Services",
+            title="The Green Book: Official Directory of the City of New York",
+            url=GREEN_BOOK,
+            notes=NOTES["green-book"],
+        )
+        cs.artifact(raw.cached(SOURCE, GREEN_BOOK), sources["green-book"])
+        for *_, citations in ABSENT:
+            for name, locator in citations:
+                if name == "wikipedia":
+                    cs.artifact(
+                        raw.cached(SOURCE, WIKIPEDIA.format(locator["title"], locator["oldid"])), sources["wikipedia"]
+                    )
         for positions in POSITIONS.values():
             cs.artifact(raw.cached(SOURCE, _sparql(positions)), wikidata)
         bodies: dict[str, UUID] = {}
@@ -495,6 +585,11 @@ def emit() -> Path:
         tenures: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in frame.iter_rows(named=True):
             council, name, start = row["council"], row["name"], row["start"]
+            citations = (
+                [(sources[source], locator) for source, locator in json.loads(row["citations"])]
+                if row["citations"]
+                else [(sources[council], json.loads(row["locator"]))]
+            )
             body = bodies[council]
             parts = tokens(name)
             key = row["person_key"] or f"{council}:{' '.join(parts[0]) if parts else name}"
@@ -537,7 +632,7 @@ def emit() -> Path:
                     lang="en",
                     kind="official",
                     is_preferred=True,
-                    source_id=sources[council],
+                    source_id=citations[0][0],
                 )
             contest, area = None, None
             if row["acquired_via"] == "elected":
@@ -572,7 +667,7 @@ def emit() -> Path:
                     "contest": contest,
                     "end": None if future else row["end"],
                     "ended_via": None if future else row["ended_via"],
-                    "citations": [(sources[council], json.loads(row["locator"]))],
+                    "citations": citations,
                 }
             )
         refined = 0
