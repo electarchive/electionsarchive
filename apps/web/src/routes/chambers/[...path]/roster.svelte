@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import { on } from "svelte/events";
   import { MediaQuery } from "svelte/reactivity";
-  import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
+  import { ARRIVALS, departure } from "#lib/caucus.js";
   import Disclosure from "#lib/components/disclosure.svelte";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
@@ -233,7 +233,7 @@
                 member,
                 on: member.to ?? "",
                 isJoin: false,
-                why: DEPARTURES[member.ended ?? ""]?.() ?? null,
+                why: departure(member.ended, page.params.path),
               },
             ]
           : []),
@@ -645,7 +645,9 @@
           {const change = $derived(
             isEarly(member)
               ? {
-                  why: DEPARTURES[member.ended ?? ""]?.() ?? m.chamber_left(),
+                  why:
+                    departure(member.ended, page.params.path) ??
+                    m.chamber_left(),
                   party: null,
                   isSwitch: false,
                   on: member.to,

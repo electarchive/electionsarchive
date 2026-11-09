@@ -11,7 +11,7 @@ export const ARRIVALS: Record<string, () => string> = {
   trustee: m.chamber_via_trustee,
   acting: m.chamber_via_acting,
 };
-export const DEPARTURES: Record<string, () => string> = {
+const DEPARTURES: Record<string, () => string> = {
   resigned: m.chamber_end_resigned,
   died: m.chamber_end_died,
   removed: m.chamber_end_removed,
@@ -25,6 +25,13 @@ export const DEPARTURES: Record<string, () => string> = {
   withdrew: m.chamber_end_withdrew,
   term_end: m.chamber_end_term_end,
 };
+const PEERAGE = new Set(["gb"]);
+
+export function departure(cause: string | null, path: string | undefined) {
+  return cause === "elevated" && PEERAGE.has(path?.split("/", 1)[0] ?? "")
+    ? m.chamber_end_peerage()
+    : (DEPARTURES[cause ?? ""]?.() ?? null);
+}
 
 type Party = {
   id: string;

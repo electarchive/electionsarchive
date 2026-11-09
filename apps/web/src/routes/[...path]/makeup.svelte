@@ -1,7 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { arrange, ARRIVALS, DEPARTURES, isUnplaced } from "#lib/caucus.js";
+  import { page } from "$app/state";
+  import { arrange, ARRIVALS, departure, isUnplaced } from "#lib/caucus.js";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
@@ -1193,12 +1194,10 @@
                 >
                 {#if move.kind !== "switch"}
                   <span class="truncate text-muted-foreground"
-                    >{(move.kind === "in"
-                      ? ARRIVALS[move.cause ?? ""]
-                      : DEPARTURES[move.cause ?? ""])?.() ??
-                      (move.kind === "in"
-                        ? m.chamber_joined()
-                        : m.chamber_left())}</span
+                    >{move.kind === "in"
+                      ? (ARRIVALS[move.cause ?? ""]?.() ?? m.chamber_joined())
+                      : (departure(move.cause, page.params.path) ??
+                        m.chamber_left())}</span
                   >
                 {/if}
               </span>
