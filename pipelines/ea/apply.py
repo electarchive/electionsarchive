@@ -73,6 +73,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
             "external_id",
             "slug",
             "entity_merge",
+            "entity_merge_drop",
             "entity_retirement",
             "entity_subtype_drop",
             "name_drop",
@@ -603,7 +604,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
                where c.contype = 'f' and c.connamespace = 'public'::regnamespace
                  and c.confrelid::regclass::text = any(%s) and a.attname <> 'id'
-                 and c.conrelid::regclass::text <> 'search_document'
+                 and c.conrelid::regclass::text not in ('search_document', 'entity_merge_drop')
                  and (c.conrelid::regclass::text, a.attname) <> ('entity_merge', 'entity_id')""",
             [["entity", *types]],
         ).fetchall():
@@ -833,7 +834,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                      and c.confrelid::regclass::text = any(%s)
                      and c.conrelid::regclass::text not in
                        ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement',
-                        'name_drop', 'external_id_drop', 'note_drop', 'entity_subtype_drop', 'unit_area_drop')
+                        'name_drop', 'external_id_drop', 'note_drop', 'entity_subtype_drop', 'unit_area_drop',
+                        'entity_merge_drop')
                      and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')
                      and (c.conrelid::regclass::text, c.confrelid::regclass::text)
                        <> ('candidacy_nomination', 'candidacy')""",
@@ -958,12 +960,15 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 and not conn.execute(
                     "select 1 from public.name where entity_id = %s and id <> %s", [entity, name]
                 ).fetchone()
-                and not (
-                    "name" in stage.tables
+                and not any(
+                    table in stage.tables
                     and conn.execute(
-                        sql.SQL("select 1 from {} where entity_id = %s and is_preferred").format(stage.staged("name")),
+                        sql.SQL("select 1 from {} where entity_id = %s{}").format(
+                            stage.staged(table), sql.SQL(" and is_preferred" if table == "name" else "")
+                        ),
                         [entity],
                     ).fetchone()
+                    for table in ("name", "entity_merge")
                 )
             ):
                 raise ValueError(f"name {name} ({text!r}) is the only name of {entity}")
@@ -1547,11 +1552,191 @@ REVIEWED = (
 )
 
 
+def _matching(alias: str, key: list[str], column: str, owner: sql.Composable) -> sql.Composable:
+    return sql.SQL(" and ").join(
+        sql.SQL("{}.{} = {}").format(sql.Identifier(alias), sql.Identifier(name), owner)
+        if name == column
+        else sql.SQL("{0}.{1} is not distinct from h.{1}").format(sql.Identifier(alias), sql.Identifier(name))
+        for name in key
+    )
+
+
+def _unmerge(conn: Connection, stage: Stage) -> None:
+    refused = {"election", "contest", "contest_option", "candidacy", "reporting_unit"} | {
+        parent for _, _, parent in checks.references(conn)
+    }
+    for entity, kind, merge, writer, at in conn.execute(
+        sql.SQL(
+            """select s.entity_id, e.type::text, m.changeset_id, c.pipeline, c.published_at
+               from {} s join entity e on e.id = s.entity_id
+               left join entity_merge m on m.entity_id = s.entity_id left join changeset c on c.id = m.changeset_id"""
+        ).format(stage.staged("entity_merge_drop"))
+    ).fetchall():
+        if merge is None:
+            raise ValueError(f"{entity} is not merged")
+        if writer != stage.pipeline:
+            raise ValueError(f"{entity} was merged by {merge} of {writer}, so only {writer} can undo that merge")
+        if kind in refused:
+            raise ValueError(
+                f"{entity} is a {kind}, whose merge deleted or rekeyed rows that an unmerge cannot restore"
+            )
+        versions = conn.execute(
+            """select into_id, recorded_from = %(at)s from entity_merge where entity_id = %(entity)s
+               union all select into_id, lower(recorded) = %(at)s from entity_merge_history
+               where entity_id = %(entity)s and changeset_id = %(merge)s""",
+            {"entity": entity, "merge": merge, "at": at},
+        ).fetchall()
+        bound = {
+            "entity": entity,
+            "merge": merge,
+            "at": at,
+            "pipeline": stage.pipeline,
+            "chain": [into for into, _ in versions],
+            "first": next((into for into, first in versions if first), None),
+        }
+        conn.execute("select set_config('ea.repointing', 'on', true)")
+        for relation, column in conn.execute(
+            """select c.conrelid::regclass::text, a.attname from pg_constraint c
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+               where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+                 and c.confrelid::regclass::text = any(%s) and a.attname <> 'id'
+                 and c.conrelid::regclass::text not in ('search_document', 'entity_merge_drop')
+                 and (c.conrelid::regclass::text, a.attname) <> ('entity_merge', 'entity_id')""",
+            [["entity", kind]],
+        ).fetchall():
+            keys: list[tuple[bool, list[str]]] = conn.execute(
+                """select c.conperiod, array_agg(a.attname order by k.ordinality) from pg_constraint c
+                   cross join lateral unnest(c.conkey) with ordinality k(attnum, ordinality)
+                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+                   where c.conrelid = %s::regclass and c.contype in ('p', 'u')
+                   group by c.oid, c.contype, c.conperiod order by c.contype = 'p' desc, c.conperiod""",
+                [f"public.{relation}"],
+            ).fetchall()
+            target, history, moved = (
+                sql.Identifier(relation),
+                sql.Identifier(f"{relation}_history"),
+                sql.Identifier(column),
+            )
+            if not keys:
+                raise ValueError(f"{relation} has no key to restore {column} by")
+            identity = keys[0][1]
+            moving = _matching("t", identity, column, sql.SQL("any(%(chain)s)"))
+            repointed = sql.SQL(
+                """(exists (select from public.{target} t where {moving} and t.recorded_from = %(at)s)
+                    or exists (select from {history} t where {moving} and t.recorded_from = %(at)s))"""
+            ).format(target=target, history=history, moving=moving)
+            pre = sql.SQL(
+                """(select distinct on ({ids}) h.* from {history} h
+                    where h.superseded_by = %(merge)s and h.{moved} = %(entity)s and {repointed}
+                    order by {ids}, lower(h.recorded) desc) h"""
+            ).format(
+                ids=sql.SQL(", ").join(sql.SQL("h.{}").format(sql.Identifier(name)) for name in identity),
+                history=history,
+                moved=moved,
+                repointed=repointed,
+            )
+            conn.execute(
+                sql.SQL(
+                    """update public.{target} t set {moved} = h.{moved}{extra} from {pre}
+                       where {moving} and t.{moved} = any(%(chain)s)
+                         and (t.changeset_id = h.changeset_id
+                              or exists (select from changeset w where w.id = t.changeset_id and w.pipeline = %(pipeline)s))"""
+                ).format(
+                    target=target,
+                    moved=moved,
+                    extra=sql.SQL(
+                        ", is_preferred = h.is_preferred"
+                        if relation == "name"
+                        else ", is_current = h.is_current"
+                        if relation == "slug"
+                        else ""
+                    ),
+                    pre=pre,
+                    moving=moving,
+                ),
+                bound,
+            )
+            for (left,) in conn.execute(
+                sql.SQL("select count(*) from {} join public.{} t on {} and t.{} = any(%(chain)s)").format(
+                    pre, target, moving, moved
+                ),
+                bound,
+            ).fetchall():
+                if left:
+                    print(f"unmerge {entity}: {relation}.{column} keeps {left} rows that later changesets rewrote")
+            fields = [
+                sql.Identifier(name)
+                for (name,) in conn.execute(
+                    """select attname from pg_attribute
+                       where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
+                         and attname not in ('changeset_id', 'recorded_from') order by attnum""",
+                    [f"public.{relation}"],
+                ).fetchall()
+            ]
+            for period, key in keys:
+                if period or column not in key:
+                    continue
+                conn.execute(
+                    sql.SQL(
+                        """insert into public.{target} ({listed}) overriding system value
+                           select distinct on ({ids}) {kept} from {history} h
+                           where h.superseded_by = %(merge)s and h.{moved} = %(entity)s and not {repointed}
+                             and not exists (select from public.{target} t where {mine})
+                             and exists (select from public.{target} t where {theirs})
+                           order by {ids}, lower(h.recorded) desc"""
+                    ).format(
+                        target=target,
+                        listed=sql.SQL(", ").join(fields),
+                        ids=sql.SQL(", ").join(sql.SQL("h.{}").format(sql.Identifier(name)) for name in key),
+                        kept=sql.SQL(", ").join(sql.SQL("h.{}").format(field) for field in fields),
+                        history=history,
+                        moved=moved,
+                        repointed=repointed,
+                        mine=_matching("t", identity, column, sql.SQL("%(entity)s")),
+                        theirs=_matching("t", key, column, sql.SQL("any(%(chain)s)")),
+                    ),
+                    bound,
+                )
+        conn.execute("select set_config('ea.repointing', 'off', true)")
+        filled = [
+            sql.Identifier(attribute)
+            for (attribute,) in conn.execute(
+                """select attname from pg_attribute
+                   where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
+                     and attidentity = '' and attname not in ('id', 'changeset_id', 'recorded_from')""",
+                [f"public.{kind}"],
+            ).fetchall()
+        ]
+        if filled:
+            conn.execute(
+                sql.SQL(
+                    """update public.{kind} p set ({columns}) = row({restored})
+                       from (select distinct on (id) * from {history} where id = %(first)s and superseded_by = %(merge)s
+                             order by id, lower(recorded) desc) b, public.{kind} l
+                       where p.id = b.id and l.id = %(entity)s and p.recorded_from = %(at)s
+                         and ({current}) is distinct from ({restored})"""
+                ).format(
+                    kind=sql.Identifier(kind),
+                    history=sql.Identifier(f"{kind}_history"),
+                    columns=sql.SQL(", ").join(filled),
+                    current=sql.SQL(", ").join(sql.SQL("p.{}").format(column) for column in filled),
+                    restored=sql.SQL(", ").join(
+                        sql.SQL(
+                            "case when b.{0} is null and p.{0} is not distinct from l.{0} then null else p.{0} end"
+                        ).format(column)
+                        for column in filled
+                    ),
+                ),
+                bound,
+            )
+        conn.execute("delete from entity_merge where entity_id = %s", [entity])
+
+
 def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
-        if "entity_merge" in stage.tables or "entity_retirement" in stage.tables:
+        if any(table in stage.tables for table in ("entity_merge", "entity_merge_drop", "entity_retirement")):
             for _ in range(240):
                 taken = conn.execute(
                     "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)",
@@ -1565,6 +1750,8 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                 conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
         else:
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
+        if "entity_merge_drop" in stage.tables:
+            _unmerge(conn, stage)
         conn.execute(
             """create temporary table survivor on commit drop as
                with recursive chain (entity_id, into_id) as (

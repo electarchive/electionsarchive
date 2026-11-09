@@ -265,6 +265,19 @@ class Changeset:
                 self.survivors[UUID(earlier)] = into
         self.merged.setdefault(str(into), []).extend([*absorbed, str(entity)])
 
+    def unmerge(self, entity: UUID, reason: str) -> None:
+        if self.survivors.pop(entity, None) is None:
+            return
+        self.add("entity_merge_drop", entity_id=entity, reason=reason)
+        for absorbed in self.merged.values():
+            if str(entity) in absorbed:
+                absorbed.remove(str(entity))
+        below = [*self.merged.get(str(entity), [])]
+        while below:
+            child = below.pop()
+            self.survivors[UUID(child)] = entity
+            below += self.merged.get(child, [])
+
     def polity(self, iso: str) -> UUID:
         return self._resolve("polity", iso, "select iso_code, id from polity where iso_code is not null")
 

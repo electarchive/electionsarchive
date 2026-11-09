@@ -50,7 +50,7 @@ Postgres gives new rows a UUIDv7 through the `uuidv7()` default. When a pipeline
 
 Each entity also has a public ID in the form `{prefix}_{crockford-base32(uuid)}`. The prefix names the type: `pl` for polity, `ar` for area, `ru` for reporting unit, `el` for election, `ct` for contest, `op` for option, `rs` for result set, `pt` for party, and `pe` for person, among others. Public IDs are permanent and are served at `/id/{public_id}`. The `ea_public_id` function computes one, and `ea_resolve` reverses it. Public IDs are computed, not stored in a column.
 
-A duplicate entity is merged, never deleted. An `entity_merge` row points the duplicate at its survivor, and the old public ID redirects there. An entity that was never real, and that nothing references, is retired with an `entity_retirement` row that gives the reason. Its public ID then answers with HTTP 410, and its ID is never reused.
+A duplicate entity is merged, never deleted. An `entity_merge` row points the duplicate at its survivor, and the old public ID redirects there. A wrong merge is undone with an `entity_merge_drop` row that gives the reason. Publishing it moves the rows that the merge re-pointed back to the duplicate, and the duplicate then has its own public ID again. An entity that was never real, and that nothing references, is retired with an `entity_retirement` row that gives the reason. Its public ID then answers with HTTP 410, and its ID is never reused.
 
 Other corrections have their own tables, each with a reason: `entity_subtype_drop`, `external_id_drop`, `name_drop`, `membership_drop`, `unit_area_drop`, `note_drop`, `option_drop`, and `row_drop`. A correction removes a row only when the pipeline that wrote it is the one withdrawing it.
 
