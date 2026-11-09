@@ -413,8 +413,8 @@ const abbreviate = (party: SQL, date: SQL) => sql`
     left join lateral (
       select f.text, f.is_preferred, f.valid from name f
       where f.entity_id = a.entity_id and f.kind in ('official', 'english')
-      order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc,
-        coalesce(f.valid @> coalesce(${date}, current_date) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc,
+      order by coalesce(f.valid @> coalesce(${date}, (select name_day())), false) desc,
+        coalesce(f.valid @> coalesce(${date}, (select name_day())) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc,
         ${nearest(sql`f`, date)} nulls first, f.is_preferred desc,
         (f.lang = a.lang) desc, (f.kind = 'official') desc, f.recorded_from desc, f.id
       limit 1
@@ -425,7 +425,7 @@ const abbreviate = (party: SQL, date: SQL) => sql`
         and exists (select from name p where p.entity_id = a.entity_id and p.kind in ('official', 'english') and p.is_preferred)
       )
       and (f.valid is null or (lower_inf(a.valid) and upper_inf(a.valid)) or (lower_inf(f.valid) and upper_inf(f.valid)) or a.valid && f.valid)
-    order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
+    order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, (select name_day())), false) desc,
       (lower_inf(a.valid) and upper_inf(a.valid)), a.is_preferred desc, (a.lang = 'en') desc,
       coalesce(
         upper(array_to_string(array(
@@ -981,8 +981,8 @@ const datedTogether = together(
           and (c.kind in ('official', 'english')
             or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
         left join l on l.entity_id = p.entity_id
-        order by p.entity_id, p.on_date, coalesce(c.valid @> coalesce(p.on_date, current_date), false) desc,
-          coalesce(c.valid @> coalesce(p.on_date, current_date) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
+        order by p.entity_id, p.on_date, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
+          coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
           ${nearest(sql`c`, sql`p.on_date`)} nulls first,
           coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
           c.lang = l.lang desc nulls last,

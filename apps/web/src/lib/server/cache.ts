@@ -25,6 +25,7 @@ const CHECK = 5000;
 const LOCK = 75_000;
 const PATIENCE = 70_000;
 const GRACE = 4;
+const UNDATED = "-undated";
 const GENERATION = codeVersion ?? build;
 const VERSIONS = new Map<string, string>();
 const parsed: unknown = JSON.parse(procedureVersions ?? "{}");
@@ -50,17 +51,18 @@ type Entry = {
 export const refreshing = new AsyncLocalStorage<boolean>();
 
 export function dataVersion() {
-  return state.version;
+  return `${state.version}:${state.today}`;
 }
 
 const entries = new Map<string, Entry>();
 const names = new WeakMap<object, string>();
 const state: {
   version: string;
+  today: string;
   checked: number;
   checking: Promise<void> | null;
   size: number;
-} = { version: "", checked: 0, checking: null, size: 0 };
+} = { version: "", today: "", checked: 0, checking: null, size: 0 };
 
 let shared: ReturnType<typeof connect> | null = null;
 
@@ -249,12 +251,14 @@ export async function unstash(slot: string) {
 
 async function refresh() {
   try {
-    const result = await db.execute<{ version: string }>(sql`
-      select concat_ws(':', current_date, count(*) filter (where status = 'published'), max(published_at),
-        count(*) filter (where status = 'rejected'), (select built_at from coverage_build)) as version
+    const result = await db.execute<{ version: string; today: string }>(sql`
+      select concat_ws(':', count(*) filter (where status = 'published'), max(published_at),
+        count(*) filter (where status = 'rejected'), (select built_at from coverage_build), (select name_day())) as version,
+        current_date::text as today
       from changeset
     `);
     state.version = result.rows[0]?.version ?? "";
+    state.today = result.rows[0]?.today ?? "";
     state.checked = Date.now();
   } finally {
     state.checking = null;
@@ -292,10 +296,11 @@ function store<T>(
   slot: string,
   compute: () => Promise<T>,
   isStrict: boolean,
+  current: () => string,
 ) {
   const entry: Entry = {
     value: Promise.resolve(),
-    version: state.version,
+    version: current(),
     size: 0,
     isSettled: false,
     isRenewing: false,
@@ -317,7 +322,7 @@ function store<T>(
   void (async () => {
     try {
       const value = await entry.value;
-      const isFresh = entry.version === state.version;
+      const isFresh = entry.version === current();
       const size =
         isFresh && recalled === 0 ? keep(slot, entry.version, value) : recalled;
       entry.isSettled = true;
@@ -328,7 +333,7 @@ function store<T>(
       state.size += size;
       evict();
       if (!isFresh) {
-        renew(key, slot, entry, compute);
+        renew(key, slot, entry, compute, current);
       }
     } catch {
       if (entries.get(key) === entry) {
@@ -363,10 +368,11 @@ function renew(
   slot: string,
   hit: Entry,
   compute: () => Promise<unknown>,
+  current: () => string,
 ) {
   hit.isRenewing = true;
   waiting.push(async () => {
-    const version = state.version;
+    const version = current();
     try {
       const value = await compute();
       const next: Entry = {
@@ -398,6 +404,9 @@ export async function remember<T>(
   const isBase = isNeutral || locale === baseLocale;
   const key = isBase ? shared : `${locale}|${shared}`;
   const slot = `c:${generation}:${key}`;
+  const current = generation.endsWith(UNDATED)
+    ? () => state.version
+    : () => `${state.version}:${state.today}`;
   const run = isBase
     ? compute
     : async () => localizeNames(await compute(), locale);
@@ -409,17 +418,18 @@ export async function remember<T>(
   if (hit != null) {
     entries.delete(key);
     entries.set(key, hit);
-    if (isRefresh && hit.version !== state.version) {
-      const next = store(key, slot, run, true);
+    const version = current();
+    if (isRefresh && hit.version !== version) {
+      const next = store(key, slot, run, true, current);
       put(key, next);
       return next.value as Promise<T>;
     }
-    if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
-      renew(key, slot, hit, run);
+    if (hit.version !== version && hit.isSettled && !hit.isRenewing) {
+      renew(key, slot, hit, run, current);
     }
     return hit.value as Promise<T>;
   }
-  const entry = store(key, slot, run, isRefresh);
+  const entry = store(key, slot, run, isRefresh, current);
   put(key, entry);
   return entry.value as Promise<T>;
 }

@@ -52,6 +52,7 @@ export default defineConfig(({ command }) => {
         inputs: ["../../packages/db/migrations"],
         lockfile: "../../pnpm-lock.yaml",
         procedures: "src/lib/server/rpc",
+        stamps: ["../../packages/db/src/schema.ts"],
       }),
       command === "build" &&
         paraglideVitePlugin({

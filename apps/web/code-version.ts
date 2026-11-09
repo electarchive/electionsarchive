@@ -10,6 +10,9 @@ const RESOLVED = `\0${ID}`;
 const PLACEHOLDER = "code-version-placeholder-6c1f0e";
 const PROCEDURES = "procedure-versions-placeholder-9a4d27";
 const SITE = "remember-version-placeholder-5b0c2e-";
+const UNDATED = "-undated";
+const DATED =
+  /current_date|current_timestamp|localtimestamp|clock_timestamp|(?<!performance\.)\bnow\(|\bage\(|'(?:now|today|tomorrow|yesterday)'|new Date\(\)|Temporal\.Now/iu;
 
 const digest = (text: string) =>
   createHash("sha256").update(text).digest("hex");
@@ -260,6 +263,11 @@ function packageOf(id: string) {
     : (parts[0] ?? tail);
 }
 
+const isOwn = (id: string) =>
+  path.isAbsolute(id) && !id.includes("/node_modules/");
+
+const isAnalyzed = (id: string) => isOwn(id) && /\.[jt]s$/u.test(id);
+
 function collect(
   code: string,
   object: Node,
@@ -286,17 +294,20 @@ export function codeVersion({
   inputs,
   lockfile,
   procedures,
+  stamps,
 }: {
   inputs: Array<string>;
   lockfile: string;
   procedures: string;
+  stamps: Array<string>;
 }): Plugin {
   const sources = new Map<string, string>();
+  const dated = new Set<string>();
+  let clocked = new Set<string>();
   const imports = new Map<string, Array<string>>();
   const analyses = new Map<string, Analysis>();
   const wanted = new Map<string, Map<string, Set<string>>>();
   let folder = "";
-  let files = new Set<string>();
   let root = "";
   let isServe = false;
   let manifest = "";
@@ -342,9 +353,7 @@ export function codeVersion({
       folder = path.resolve(root, procedures);
       locked = snapshots(readFileSync(path.resolve(root, lockfile), "utf8"));
       packages.clear();
-      files = new Set(
-        readdirSync(folder).map((file) => file.replace(/\.ts$/u, "")),
-      );
+      clocked = new Set(stamps.map((stamp) => path.resolve(root, stamp)));
     },
     resolveId(id) {
       return id === ID ? RESOLVED : null;
@@ -362,17 +371,17 @@ export function codeVersion({
         return;
       }
       sources.set(id, digest(code));
+      if (isOwn(id) && !clocked.has(id) && DATED.test(code)) {
+        dated.add(id);
+      }
       if (id.includes("?")) {
         return;
       }
       const program: Node = { ...parseAst(code) };
       const into = new Map<string, Set<string>>();
       const want = async (source: string, names: Array<string>) => {
-        if (!files.has(path.basename(source).replace(/\.[jt]s$/u, ""))) {
-          return;
-        }
         const target = await resolver?.(source, id, false, true);
-        if (target == null || path.dirname(target) !== folder) {
+        if (target == null || !isAnalyzed(target)) {
           return;
         }
         const found = into.get(target) ?? new Set();
@@ -413,7 +422,7 @@ export function codeVersion({
         await want(load, ["*"]);
       }
       wanted.set(id, into);
-      if (path.dirname(id) !== folder) {
+      if (!isAnalyzed(id)) {
         return;
       }
       const analysis: Analysis = {
@@ -465,6 +474,7 @@ export function codeVersion({
               }
             }
             if (
+              path.dirname(id) === folder &&
               node.type === "ExportNamedDeclaration" &&
               isNode(declarator.init) &&
               declarator.init.type === "ObjectExpression"
@@ -596,15 +606,6 @@ export function codeVersion({
         walk(starts, skip).map(
           (id) => `${name(id)} ${sources.get(id) ?? packaged(id)}`,
         );
-      const modules = new Map<string, string>();
-      const closure = (id: string, skip: string) => {
-        let found = modules.get(`${skip}|${id}`);
-        if (found == null) {
-          found = digest(reach([id], skip).join("\n"));
-          modules.set(`${skip}|${id}`, found);
-        }
-        return found;
-      };
       const importers = new Map<string, Array<string>>();
       for (const [id, targets] of imports) {
         for (const target of targets) {
@@ -612,6 +613,35 @@ export function codeVersion({
         }
       }
       const users = importers.get(RESOLVED) ?? [];
+      const reads = (id: string, skip: string) => {
+        const queue = isOwn(id) ? [id] : [];
+        const seen = new Set([...queue, skip, ...users]);
+        while (queue.length > 0) {
+          const next = queue.pop() ?? "";
+          if (dated.has(next)) {
+            return true;
+          }
+          for (const target of imports.get(next) ?? []) {
+            if (!seen.has(target) && isOwn(target)) {
+              seen.add(target);
+              queue.push(target);
+            }
+          }
+        }
+        return false;
+      };
+      const modules = new Map<string, { hashed: string; isDated: boolean }>();
+      const closure = (id: string, skip: string) => {
+        let found = modules.get(`${skip}|${id}`);
+        if (found == null) {
+          found = {
+            hashed: digest(reach([id], skip).join("\n")),
+            isDated: reads(id, skip),
+          };
+          modules.set(`${skip}|${id}`, found);
+        }
+        return found;
+      };
       const lines: Array<string> = [];
       for (const input of inputs) {
         const full = path.resolve(root, input);
@@ -642,6 +672,7 @@ export function codeVersion({
         const seen = new Set<string>();
         const visited = new Set<string>();
         const touched = new Set<string>();
+        let isDated = false;
         const enqueue = (file: string, names: Iterable<string>) => {
           for (const reference of names) {
             const key = `${file}\0${reference}`;
@@ -657,7 +688,9 @@ export function codeVersion({
             return;
           }
           visited.add(key);
-          parts.add(`${name(target)} ${closure(target, file)}`);
+          const found = closure(target, file);
+          isDated ||= found.isDated;
+          parts.add(`${name(target)} ${found.hashed}`);
           for (const id of walk([target], file)) {
             const names = wanted.get(id)?.get(file);
             if (names != null) {
@@ -672,12 +705,15 @@ export function codeVersion({
         };
         const take = (file: string, found: Declaration) => {
           const analysis = analyses.get(file);
+          const isClocked = clocked.has(file) || users.includes(file);
           if (!touched.has(file)) {
             touched.add(file);
             for (const text of analysis?.loose ?? []) {
+              isDated ||= !isClocked && DATED.test(text);
               parts.add(`${name(file)}\n${text}`);
             }
           }
+          isDated ||= !isClocked && DATED.test(found.text);
           parts.add(`${name(file)}\n${found.text}`);
           for (const source of found.loads) {
             visit(file, analysis?.loaded.get(source) ?? `external:${source}`);
@@ -701,9 +737,10 @@ export function codeVersion({
             visit(file, imported.target);
           }
         }
-        return digest(
+        const hashed = digest(
           [...parts].toSorted((a, b) => a.localeCompare(b, "en")).join("\n"),
         ).slice(0, 16);
+        return isDated ? hashed : `${hashed}${UNDATED}`;
       };
       const versions = new Map<string, string>();
       const doubled = new Set<string>();
