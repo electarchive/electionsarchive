@@ -1776,6 +1776,7 @@
   "atlas_search": "Rechercher un lieu",
   "atlas_compare": "Comparaison avec une élection antérieure",
   "atlas_compare_none": "Aucune comparaison",
+  "atlas_compare_dated": "{label} ({when})",
   "atlas_compare_with": "Comparaison avec {year}",
   "atlas_results": "Résultats",
   "atlas_close": "Fermer la carte",

@@ -1737,6 +1737,7 @@
   "atlas_search": "Orte suchen",
   "atlas_compare": "Vergleich mit früherer Wahl",
   "atlas_compare_none": "Kein Vergleich",
+  "atlas_compare_dated": "{label} ({when})",
   "atlas_compare_with": "Vergleich mit {year}",
   "atlas_results": "Ergebnisse",
   "atlas_close": "Karte schließen",

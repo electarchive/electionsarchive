@@ -1737,6 +1737,7 @@
   "atlas_search": "Li cihan bigere",
   "atlas_compare": "Berhevdana bi hilbijartina berê re",
   "atlas_compare_none": "Bê berhevdan",
+  "atlas_compare_dated": "{label} ({when})",
   "atlas_compare_with": "Bi {year} re hatiye berhevdan",
   "atlas_results": "Encam",
   "atlas_close": "Nexşeyê bigire",

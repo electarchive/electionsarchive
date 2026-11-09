@@ -1737,6 +1737,7 @@
   "atlas_search": "Yer ara",
   "atlas_compare": "Önceki seçimle karşılaştırma",
   "atlas_compare_none": "Karşılaştırma yok",
+  "atlas_compare_dated": "{label} ({when})",
   "atlas_compare_with": "{year} ile karşılaştırma",
   "atlas_results": "Sonuçlar",
   "atlas_close": "Haritayı kapat",
