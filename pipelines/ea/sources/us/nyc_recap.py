@@ -417,7 +417,7 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
             "party": party[1] if party else None,
             "county": matched[2].title(),
         }
-    matched = re.match(r"^MEMBER OF THE CITY COUNCIL \((\d+)(?: COUNCIL DISTRICT)?\)", bare)
+    matched = re.match(r"^MEMBER OF THE CITY COUNCIL \((\d+)(?:ST|ND|RD|TH)?(?: COUNCIL DISTRICT)?\)", bare)
     if matched:
         return {"seat": "council", "number": int(matched[1]), "party": party[1] if party else None, "county": None}
     matched = re.match(r"^JUSTICE OF THE SUPREME COURT \((\d+)(?:ST|ND|RD|TH)? JUDICIAL DISTRICT\)", bare)
