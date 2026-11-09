@@ -976,6 +976,9 @@ PEOPLE = {
     "Simcha Felder, New York City Council candidate": (
         ("us.alged.person", "35436"),
         ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-44:simcha-felder"),
+        ("wikidata", "Q7517469"),
+        ("us.klarner.person", "316360"),
+        ("us.nyc_recap_wayback.person", "NY:simcha-felder"),
     ),
     "Stylo Sapaskis, New York City Council candidate": (
         ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-11:stylo-sapaskis"),
@@ -988,6 +991,41 @@ PEOPLE = {
     "Yu-Ching James Pai, New York City Council candidate": (
         ("us.alged.person", "35551"),
         ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-20:yu-ching-james-pai"),
+    ),
+    "Pedro Espada Jr., New York State senator": (
+        ("us.alged.person", "35319"),
+        ("us.klarner.person", "166126"),
+        ("wikidata", "Q7159561"),
+    ),
+    "Pedro G. Espada, New York City Council member": (
+        ("us.alged.person", "35319:pedro-g-espada"),
+        ("us.klarner.person", "177465"),
+    ),
+    "Paul Vallone, New York City Council member": (
+        ("us.alged.person", "35346:paul-vallone"),
+        ("us.nyc_general.person", "2021-11-02:new-york-city:civil-court-district-3-queens:paul-a-vallone"),
+    ),
+    "Peter F. Vallone Jr., New York City Council member": (
+        ("us.alged.person", "35346:peter-f-vallone-jr"),
+        ("us.nyc_recap.person", "NY:peter-f-vallone-jr"),
+        ("us.nyc_general.person", "2015-11-03:new-york-city:civil-court-district-3-queens:peter-f-vallone-jr"),
+    ),
+    "Peter F. Vallone, Speaker of the New York City Council": (
+        ("us.alged.person", "35346"),
+        ("us.algara.person", "NY:peter-f-vallone"),
+        ("us.nyc_recap_wayback.person", "NY:peter-f-vallone"),
+    ),
+    "D. Janele Hyer-Spencer, New York State Assembly member": (
+        ("us.klarner.person", "266027"),
+        ("us.nyc_recap.person", "NY:d-janele-hyer-spencer"),
+    ),
+    "Helen Marshall, New York City Council member and Queens Borough President": (
+        ("us.alged.person", "35005"),
+        ("us.nyc_recap.person", "NY:helen-m-marshall"),
+    ),
+    "Kevin Brawley, New York City Council and Bronx Borough President candidate": (
+        ("us.alged.person", "35146"),
+        ("us.nyc_cfb.person", "kevin-brawley"),
     ),
     'James "Jamie" Davis Jr., Tensas Parish police juror, 2023 Louisiana House 21 candidate, and 2026 Senate nominee': (
         ("us.sld_specials.person", "LA:james-jamie-davis-jr"),
