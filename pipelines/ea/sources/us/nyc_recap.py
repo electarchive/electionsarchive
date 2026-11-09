@@ -631,9 +631,8 @@ def emit(
         ran: dict[UUID, set[tuple[UUID, int]]] = {}
         called: dict[UUID, list[str]] = {}
         minted: set[UUID] = set()
-        for candidacy_id, person_id, label, ballot, district, year, own, mine in conn.execute(
-            """select y.id, p.id, n.text, y.ballot_name, k.district_area_id, extract(year from e.date_from)::int, h.pipeline = %s,
-                      hp.pipeline = %s
+        for candidacy_id, person_id, label, ballot, mine in conn.execute(
+            """select y.id, p.id, n.text, y.ballot_name, hp.pipeline = %s
                from person p join name n on n.entity_id = p.id and n.is_preferred
                join changeset hp on hp.id = p.changeset_id
                join candidacy y on y.person_id = p.id join contest_option o on o.id = y.option_id
@@ -641,16 +640,23 @@ def emit(
                join changeset h on h.id = y.changeset_id
                where e.polity_id = %s or h.pipeline = %s
                   or k.id in (select rs.contest_id from result_set rs join changeset g on g.id = rs.changeset_id where g.pipeline = %s)""",
-            [pipeline, pipeline, city, pipeline, pipeline],
+            [pipeline, city, pipeline, pipeline],
         ).fetchall():
             held[candidacy_id] = person_id
             called[person_id] = _words(label)
             if mine:
                 minted.add(person_id)
-            if district is not None and not own:
-                ran.setdefault(person_id, set()).add((district, year))
             for key in {*_keys(label), *_keys(ballot or "")}:
                 people.setdefault(key, set()).add(person_id)
+        for person_id, district, year in conn.execute(
+            """select y.person_id, k.district_area_id, extract(year from e.date_from)::int
+               from candidacy y join contest_option o on o.id = y.option_id
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               join changeset h on h.id = y.changeset_id
+               where y.person_id = any(%s) and k.district_area_id is not null and h.pipeline <> %s""",
+            [list(called), pipeline],
+        ).fetchall():
+            ran.setdefault(person_id, set()).add((district, year))
         made: set[UUID] = set()
         values = []
         skipped = []
