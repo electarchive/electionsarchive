@@ -1085,6 +1085,11 @@ PEOPLE = {
         ("bioguide", "S000248"),
         ("us.klarner.person", "177293:jose-e-serrano"),
     ),
+    "Daniel J. O'Donnell, New York State Assembly member": (
+        ("us.klarner.person", "176905"),
+        ("us.state_primaries.person", "NY:assembly:69:DEM:daniel-j-o-donnell"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:daniel-j-o-donnell"),
+    ),
     "Elizabeth Crowley, New York City Council member": (
         ("us.alged.person", "34904"),
         ("us.nyc_boe.person", "elizabeth-s-crowley"),
