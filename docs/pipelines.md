@@ -61,7 +61,7 @@ The main steps take a registry name, except `apply`, `publish`, and `revert`, wh
 - `uv run ea cartograms` rebuilds the cartogram and tile map of every US House election since 1788, every UK general election since 1832, every French legislative election since 2012, and every Turkish general election since 1923 from the district and province shapes, then runs `ea hexes`. It takes several hours.
 - `uv run ea rasters [scheme]` builds a raster archive of area IDs for each boundary set of 1,000 or more areas.
 - `uv run ea basemap {br,ca,ch,de,fr,gb,ie,it,tr,us}` builds a polity's planar basemap.
-- `uv run ea search` rebuilds the search index from names and slugs. Run it after any changeset that adds or renames entities.
+- `uv run ea search` rebuilds the whole search index from names and slugs and recomputes every entity's rank. Publishing a changeset already refreshes the search documents of the entities it adds, renames, merges, unmerges, or retires, so run this command when ranks need updating, for example after a large import changes how many candidacies people have.
 - `uv run ea scans {prepare,run,status,emit,layout,statewide} [name]` drives the batch vision pipeline for scanned tables. See the digitization section below.
 
 ## Worked example: Canadian federal elections
@@ -192,7 +192,5 @@ def emit() -> Path:
 8. **Record the source and its citations.** Every fact must trace to a source and a changeset. Cite each cached file through `cs.artifact`. If the source publishes a Wikipedia page, fetch the page with its revision pinned.
 
 9. **Check the cache.** Run `uv run ea raw verify xx.example` to confirm that every indexed file matches its hash, and `uv run ea raw license xx.example` to stamp the license on each entry.
-
-10. **Rebuild the search index after entities change.** Run `uv run ea search` after any changeset that adds or renames entities.
 
 Keep each pipeline small. A source that needs entity matching, such as a people or party matcher, belongs in its own module, which runs after the source publishes.

@@ -10,7 +10,7 @@ import polars as pl
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ea import checks, coverage_tables, touched
+from ea import checks, coverage_tables, search, touched
 from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
@@ -1749,6 +1749,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                 conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
                 conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
         else:
+            conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
         if "entity_merge_drop" in stage.tables:
             _unmerge(conn, stage)
@@ -1967,6 +1968,8 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                         )
                     )
         touched.recorded(conn, changeset_id)
+        search.scope(conn, [changeset_id])
+        search.refresh(conn)
         conn.execute(
             f"update changeset set status = 'published', published_at = now(), {REVIEWED} where id = %s",
             [reviewer, reviewer, changeset_id],
@@ -2197,6 +2200,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
         raise ValueError(f"{changeset_id} has later changesets built on it: {', '.join(row for (row,) in dependents)}")
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+        search.scope(conn, [changeset_id])
         conn.execute(
             """delete from search_document where entity_id in (select id from entity where changeset_id = %(id)s)
                or polity_id in (select id from polity where changeset_id = %(id)s)""",
@@ -2338,6 +2342,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
                 sql.SQL("delete from {} where superseded_by = %s").format(sql.Identifier(f"{table}_history")),
                 [changeset_id],
             )
+        search.refresh(conn)
         conn.execute(
             f"update changeset set status = 'rejected', rationale = %s, {REVIEWED} where id = %s",
             [f"Reverted: {reason}", reviewer, reviewer, changeset_id],
