@@ -6,7 +6,7 @@ import { sql } from "drizzle-orm";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
-import { promisify } from "node:util";
+import { isDeepStrictEqual, promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
 import pg from "pg";
@@ -570,7 +570,7 @@ function holds(
 
 function same(left: unknown, right: unknown) {
   try {
-    return serialize(left).equals(serialize(right));
+    return isDeepStrictEqual(left, right);
   } catch {
     return false;
   }
