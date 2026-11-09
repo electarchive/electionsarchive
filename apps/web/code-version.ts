@@ -9,6 +9,7 @@ const ID = "virtual:code-version";
 const RESOLVED = `\0${ID}`;
 const PLACEHOLDER = "code-version-placeholder-6c1f0e";
 const PROCEDURES = "procedure-versions-placeholder-9a4d27";
+const SITE = "remember-version-placeholder-5b0c2e-";
 
 const digest = (text: string) =>
   createHash("sha256").update(text).digest("hex");
@@ -18,14 +19,22 @@ type Node = { type: string; start: number; end: number } & Record<
   unknown
 >;
 
-type Declaration = { text: string; names: Set<string>; loads: Set<string> };
+type Declaration = {
+  text: string;
+  names: Set<string>;
+  loads: Set<string>;
+  start: number;
+  end: number;
+};
 
 type Analysis = {
   declarations: Map<string, Declaration>;
-  imported: Map<string, string>;
+  exported: Set<string>;
+  imported: Map<string, { target: string; name: string | null }>;
   loaded: Map<string, string>;
   loose: Array<string>;
   procedures: Map<string, Declaration>;
+  sites: Map<number, { unit: string; leaf: Declaration }>;
 };
 
 const isNode = (value: unknown): value is Node =>
@@ -36,8 +45,101 @@ const isNode = (value: unknown): value is Node =>
 
 const KEYED = new Set(["Property", "MethodDefinition", "PropertyDefinition"]);
 
-function scan(node: Node, found: Declaration) {
-  if (node.type === "Identifier" && typeof node.name === "string") {
+const FUNCTIONS = new Set([
+  "ArrowFunctionExpression",
+  "FunctionDeclaration",
+  "FunctionExpression",
+]);
+
+const BLOCKS = new Set(["BlockStatement", "Program", "StaticBlock"]);
+
+const LOOPS = new Set(["ForInStatement", "ForOfStatement", "ForStatement"]);
+
+function patternNames(node: unknown): Array<string> {
+  const found: Array<string> = [];
+  const stack = [node].flat();
+  while (stack.length > 0) {
+    const next = stack.pop();
+    if (!isNode(next)) {
+      continue;
+    }
+    if (next.type === "Identifier" && typeof next.name === "string") {
+      found.push(next.name);
+    } else if (next.type === "AssignmentPattern") {
+      stack.push(next.left);
+    } else if (next.type === "RestElement") {
+      stack.push(next.argument);
+    } else if (next.type === "Property") {
+      stack.push(next.value);
+    } else if (next.type === "ArrayPattern") {
+      stack.push(...[next.elements].flat());
+    } else if (next.type === "ObjectPattern") {
+      stack.push(...[next.properties].flat());
+    }
+  }
+  return found;
+}
+
+function declared(statements: Array<unknown>) {
+  const found: Array<string> = [];
+  for (const statement of statements) {
+    if (!isNode(statement)) {
+      continue;
+    }
+    if (statement.type === "VariableDeclaration") {
+      for (const declarator of [statement.declarations].flat()) {
+        if (isNode(declarator)) {
+          found.push(...patternNames(declarator.id));
+        }
+      }
+    } else if (
+      statement.type === "FunctionDeclaration" ||
+      statement.type === "ClassDeclaration"
+    ) {
+      found.push(...patternNames(statement.id));
+    }
+  }
+  return found;
+}
+
+function scope(node: Node, bound: ReadonlySet<string>) {
+  const names: Array<string> = [];
+  if (FUNCTIONS.has(node.type)) {
+    names.push(...patternNames(node.params));
+    if (node.type === "FunctionExpression") {
+      names.push(...patternNames(node.id));
+    }
+  } else if (node.type === "ClassExpression") {
+    names.push(...patternNames(node.id));
+  } else if (BLOCKS.has(node.type)) {
+    names.push(...declared([node.body].flat()));
+  } else if (node.type === "SwitchStatement") {
+    names.push(
+      ...declared(
+        [node.cases]
+          .flat()
+          .flatMap((entry) => (isNode(entry) ? [entry.consequent].flat() : [])),
+      ),
+    );
+  } else if (LOOPS.has(node.type)) {
+    names.push(...declared([node.init ?? node.left]));
+  } else if (node.type === "CatchClause") {
+    names.push(...patternNames(node.param));
+  }
+  return names.length === 0 ? bound : new Set([...bound, ...names]);
+}
+
+function scan(
+  node: Node,
+  found: Declaration,
+  outer: ReadonlySet<string> = new Set(),
+) {
+  const bound = scope(node, outer);
+  if (
+    node.type === "Identifier" &&
+    typeof node.name === "string" &&
+    !bound.has(node.name)
+  ) {
     found.names.add(node.name);
   }
   if (
@@ -57,7 +159,7 @@ function scan(node: Node, found: Declaration) {
     }
     for (const child of [value].flat()) {
       if (isNode(child)) {
-        scan(child, found);
+        scan(child, found, bound);
       }
     }
   }
@@ -68,21 +170,29 @@ function declare(code: string, node: Node) {
     text: code.slice(node.start, node.end),
     names: new Set(),
     loads: new Set(),
+    start: node.start,
+    end: node.end,
   };
   scan(node, found);
   return found;
 }
 
-function bindings(node: unknown): Array<string> {
-  if (!isNode(node)) {
-    return [];
+function calls(node: Node, into: Array<Node>) {
+  if (
+    node.type === "CallExpression" &&
+    isNode(node.callee) &&
+    node.callee.type === "Identifier" &&
+    node.callee.name === "remember"
+  ) {
+    into.push(node);
   }
-  if (node.type === "Identifier" && typeof node.name === "string") {
-    return [node.name];
+  for (const value of Object.values(node)) {
+    for (const child of [value].flat()) {
+      if (isNode(child)) {
+        calls(child, into);
+      }
+    }
   }
-  const found: Declaration = { text: "", names: new Set(), loads: new Set() };
-  scan(node, found);
-  return [...found.names];
 }
 
 function keyName(node: Node) {
@@ -190,6 +300,7 @@ export function codeVersion({
   let root = "";
   let isServe = false;
   let manifest = "";
+  let site = 0;
   let resolver: ResolveFn | null = null;
   let locked = new Map<string, Array<string>>();
   const packages = new Map<string, string>();
@@ -307,10 +418,12 @@ export function codeVersion({
       }
       const analysis: Analysis = {
         declarations: new Map(),
+        exported: new Set(),
         imported: new Map(),
         loaded: new Map(),
         loose: [],
         procedures: new Map(),
+        sites: new Map(),
       };
       const resolve = async (source: string) =>
         (await resolver?.(source, id, false, true)) ?? `external:${source}`;
@@ -330,8 +443,12 @@ export function codeVersion({
           const target = await resolve(inner.source.value);
           for (const specifier of [inner.specifiers].flat()) {
             if (isNode(specifier) && isNode(specifier.local)) {
-              for (const name of bindings(specifier.local)) {
-                analysis.imported.set(name, target);
+              const imported =
+                specifier.type === "ImportSpecifier"
+                  ? keyName({ ...specifier, key: specifier.imported })
+                  : null;
+              for (const name of patternNames(specifier.local)) {
+                analysis.imported.set(name, { target, name: imported });
               }
             }
           }
@@ -341,8 +458,11 @@ export function codeVersion({
               continue;
             }
             const found = declare(code, declarator);
-            for (const name of bindings(declarator.id)) {
+            for (const name of patternNames(declarator.id)) {
               analysis.declarations.set(name, found);
+              if (node.type === "ExportNamedDeclaration") {
+                analysis.exported.add(name);
+              }
             }
             if (
               node.type === "ExportNamedDeclaration" &&
@@ -352,7 +472,7 @@ export function codeVersion({
               collect(
                 code,
                 declarator.init,
-                bindings(declarator.id),
+                patternNames(declarator.id),
                 analysis.procedures,
               );
             }
@@ -362,8 +482,11 @@ export function codeVersion({
             inner.type === "ClassDeclaration") &&
           isNode(inner.id)
         ) {
-          for (const name of bindings(inner.id)) {
+          for (const name of patternNames(inner.id)) {
             analysis.declarations.set(name, declare(code, inner));
+            if (node.type === "ExportNamedDeclaration") {
+              analysis.exported.add(name);
+            }
           }
         } else {
           analysis.loose.push(code.slice(node.start, node.end));
@@ -382,6 +505,68 @@ export function codeVersion({
         analysis.loaded.set(load, await resolve(load));
       }
       analyses.set(id, analysis);
+      if (!analysis.imported.has("remember")) {
+        return;
+      }
+      const units = [...analysis.declarations, ...analysis.procedures].map(
+        ([unit, leaf]) => ({ unit, leaf }),
+      );
+      const found: Array<Node> = [];
+      calls(program, found);
+      const inserts: Array<{ start: number; end: number; text: string }> = [];
+      for (const call of found) {
+        const args = [call.arguments].flat().filter(isNode);
+        const last = args.at(-1);
+        const compute = args[1]?.type;
+        const generation = args[3];
+        const owner = units
+          .filter(
+            ({ leaf }) => leaf.start <= call.start && call.end <= leaf.end,
+          )
+          .toSorted(
+            (a, b) => a.leaf.end - a.leaf.start - (b.leaf.end - b.leaf.start),
+          )[0];
+        if (
+          owner == null ||
+          last == null ||
+          args.length < 2 ||
+          args.length > 5 ||
+          (generation != null &&
+            (generation.type !== "Identifier" ||
+              generation.name !== "undefined")) ||
+          args.some((arg) => arg.type === "SpreadElement") ||
+          (compute !== "ArrowFunctionExpression" &&
+            compute !== "FunctionExpression")
+        ) {
+          continue;
+        }
+        analysis.sites.set(site, owner);
+        const placeholder = JSON.stringify(`${SITE}${String(site)}`);
+        inserts.push(
+          generation == null
+            ? {
+                start: last.end,
+                end: last.end,
+                text: `${args.length === 2 ? ", false" : ""}, ${placeholder}`,
+              }
+            : {
+                start: generation.start,
+                end: generation.end,
+                text: placeholder,
+              },
+        );
+        site += 1;
+      }
+      if (inserts.length === 0) {
+        return;
+      }
+      let edited = code;
+      for (const { start, end, text } of inserts.toSorted(
+        (a, b) => b.start - a.start,
+      )) {
+        edited = `${edited.slice(0, start)}${text}${edited.slice(end)}`;
+      }
+      return { code: edited, map: null };
     },
     moduleParsed(info) {
       imports.set(info.id, [
@@ -451,65 +636,92 @@ export function codeVersion({
         ]),
       );
       const version = digest(lines.join("\n")).slice(0, 16);
-      const versions = new Map<string, string>();
-      const doubled = new Set<string>();
-      for (const [file, analysis] of analyses) {
-        for (const [procedure, leaf] of analysis.procedures) {
-          const parts = new Set([base, ...analysis.loose, leaf.text]);
-          const queue: Array<string> = [];
-          const seen = new Set<string>();
-          const visited = new Set<string>();
-          const enqueue = (names: Iterable<string>) => {
-            for (const reference of names) {
-              if (!seen.has(reference)) {
-                seen.add(reference);
-                queue.push(reference);
-              }
-            }
-          };
-          const visit = (target: string) => {
-            if (visited.has(target)) {
-              return;
-            }
-            visited.add(target);
-            parts.add(`${name(target)} ${closure(target, file)}`);
-            for (const id of walk([target], file)) {
-              const names = wanted.get(id)?.get(file);
-              if (names != null) {
-                enqueue(names.has("*") ? analysis.declarations.keys() : names);
-              }
-            }
-          };
-          const load = (sources: Iterable<string>) => {
-            for (const source of sources) {
-              visit(analysis.loaded.get(source) ?? `external:${source}`);
-            }
-          };
-          enqueue(leaf.names);
-          load(leaf.loads);
-          while (queue.length > 0) {
-            const next = queue.pop() ?? "";
-            const local = analysis.declarations.get(next);
-            const target = analysis.imported.get(next);
-            if (local != null) {
-              parts.add(local.text);
-              load(local.loads);
-              enqueue(local.names);
-            } else if (target != null) {
-              visit(target);
+      const hash = (origin: string, leaf: Declaration) => {
+        const parts = new Set([base]);
+        const queue: Array<[string, string]> = [];
+        const seen = new Set<string>();
+        const visited = new Set<string>();
+        const touched = new Set<string>();
+        const enqueue = (file: string, names: Iterable<string>) => {
+          for (const reference of names) {
+            const key = `${file}\0${reference}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              queue.push([file, reference]);
             }
           }
+        };
+        const visit = (file: string, target: string) => {
+          const key = `${file}\0${target}`;
+          if (visited.has(key)) {
+            return;
+          }
+          visited.add(key);
+          parts.add(`${name(target)} ${closure(target, file)}`);
+          for (const id of walk([target], file)) {
+            const names = wanted.get(id)?.get(file);
+            if (names != null) {
+              enqueue(
+                file,
+                names.has("*")
+                  ? (analyses.get(file)?.declarations.keys() ?? [])
+                  : names,
+              );
+            }
+          }
+        };
+        const take = (file: string, found: Declaration) => {
+          const analysis = analyses.get(file);
+          if (!touched.has(file)) {
+            touched.add(file);
+            for (const text of analysis?.loose ?? []) {
+              parts.add(`${name(file)}\n${text}`);
+            }
+          }
+          parts.add(`${name(file)}\n${found.text}`);
+          for (const source of found.loads) {
+            visit(file, analysis?.loaded.get(source) ?? `external:${source}`);
+          }
+          enqueue(file, found.names);
+        };
+        take(origin, leaf);
+        while (queue.length > 0) {
+          const [file, next] = queue.pop() ?? ["", ""];
+          const analysis = analyses.get(file);
+          const local = analysis?.declarations.get(next);
+          const imported = analysis?.imported.get(next);
+          if (local != null) {
+            take(file, local);
+          } else if (
+            imported?.name != null &&
+            analyses.get(imported.target)?.exported.has(imported.name) === true
+          ) {
+            enqueue(imported.target, [imported.name]);
+          } else if (imported != null) {
+            visit(file, imported.target);
+          }
+        }
+        return digest(
+          [...parts].toSorted((a, b) => a.localeCompare(b, "en")).join("\n"),
+        ).slice(0, 16);
+      };
+      const versions = new Map<string, string>();
+      const doubled = new Set<string>();
+      const sites = new Map<number, string>();
+      const remembered = new Set<string>();
+      for (const [file, analysis] of analyses) {
+        for (const [procedure, leaf] of analysis.procedures) {
           if (versions.has(procedure)) {
             doubled.add(procedure);
           }
-          versions.set(
-            procedure,
-            digest(
-              [...parts]
-                .toSorted((a, b) => a.localeCompare(b, "en"))
-                .join("\n"),
-            ).slice(0, 16),
-          );
+          versions.set(procedure, hash(file, leaf));
+        }
+        const owners = new Map<Declaration, string>();
+        for (const [id, { unit, leaf }] of analysis.sites) {
+          const found = owners.get(leaf) ?? hash(file, leaf);
+          owners.set(leaf, found);
+          sites.set(id, found);
+          remembered.add(`remember ${name(file)} ${unit} ${found}\n`);
         }
       }
       for (const procedure of doubled) {
@@ -519,16 +731,23 @@ export function codeVersion({
         [...versions].toSorted(([a], [b]) => a.localeCompare(b, "en")),
       );
       const encoded = JSON.stringify(JSON.stringify(table)).slice(1, -1);
+      const placed = new RegExp(String.raw`${SITE}(\d+)`, "gu");
       for (const chunk of Object.values(bundle)) {
-        if (chunk.type === "chunk" && chunk.code.includes(PLACEHOLDER)) {
+        if (chunk.type === "chunk") {
           chunk.code = chunk.code
             .replaceAll(PLACEHOLDER, () => version)
-            .replaceAll(PROCEDURES, () => encoded);
+            .replaceAll(PROCEDURES, () => encoded)
+            .replaceAll(
+              placed,
+              (_match, id: string) => sites.get(Number(id)) ?? version,
+            );
         }
       }
       manifest = `${version}\n${lines.join("\n")}\n${Object.entries(table)
-        .map(([procedure, hash]) => `procedure ${procedure} ${hash}\n`)
-        .join("")}`;
+        .map(([procedure, found]) => `procedure ${procedure} ${found}\n`)
+        .join(
+          "",
+        )}${[...remembered].toSorted((a, b) => a.localeCompare(b, "en")).join("")}`;
     },
     writeBundle(options) {
       if (options.dir != null) {
