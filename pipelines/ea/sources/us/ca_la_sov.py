@@ -10,6 +10,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import ca_la_svc
+from ea.sources.us.ceda import surname
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_la_sov"
@@ -67,6 +68,7 @@ SEATS = ' The seat count is the Registrar\'s own "Vote for no more than" line fo
 NO_SEATS = " No seat count is stated for this at-large contest, so no outcomes are recorded."
 PARTIAL = " The jurisdiction extends beyond Los Angeles County; these are the county's precincts only."
 RETYPED = "A city treasurer, clerk, or controller race that an earlier parse read as a ballot measure; the race is now its own office contest"
+STALE = "An earlier run of this pipeline wrote this contest, and the current run no longer emits it: another pipeline holds the race, or an earlier parse filed it under the wrong city"
 
 CITIES = {
     "AVALON": "Avalon",
@@ -716,8 +718,8 @@ def emit() -> Path:
                 if row["type"] == "measure":
                     present = re.search(rf"\b(?:measure )?{re.escape(row['code'].lower())}\b", names_known) is not None
                 else:
-                    surnames = {c.split()[-1].lower() for c in sums["candidate"] if c.upper() not in ("YES", "NO")}
-                    present = any(label.split()[-1] in surnames for label in labels_known if label.split())
+                    surnames = {surname(c) for c in sums["candidate"] if c.upper() not in ("YES", "NO")}
+                    present = any(surname(label) in surnames for label in labels_known if label.strip())
                 if present:
                     report["exists"] = report.get("exists", 0) + 1
                     continue
@@ -1047,6 +1049,16 @@ def emit() -> Path:
                 )
             )
             report["new"] = report.get("new", 0) + 1
+        for (contest,) in conn.execute(
+            """select k.id from contest k join entity e on e.id = k.id and e.retired_by is null
+               where k.changeset_id in (select id from changeset where pipeline = %s)
+                 and not exists (select from external_id x where x.entity_id = k.id and x.scheme = 'us.contest'
+                                   and x.value = any(%s))""",
+            [SOURCE, sorted(seen)],
+        ).fetchall():
+            if contest not in retyped:
+                cs.add("entity_retirement", entity_id=contest, reason=STALE)
+                report["stale"] = report.get("stale", 0) + 1
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
