@@ -1819,6 +1819,43 @@
   "atlas_estimated": "Estimated",
   "atlas_verdict": "{name} led by {points} points",
   "atlas_verdict_then": "{name} led by {points} in {year}",
+  "atlas_electors_pledged": "{count} pledged",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} elector voted against their pledge.",
+        "countPlural=*": "{countText} electors voted against their pledge."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} elector did not vote.",
+        "countPlural=*": "{countText} electors did not vote."
+      }
+    }
+  ],
+  "atlas_electors_house": "No candidate won a majority, so the House of Representatives chose {name} on {date}.",
+  "atlas_electors_house_tie": "{first} and {second} tied, so the House of Representatives chose {name} on {date}.",
+  "atlas_electors_two": "Each elector cast two votes. The winner became president and the runner-up vice president.",
+  "atlas_electors_president": "President",
+  "atlas_electors_vice": "Vice president",
+  "atlas_electors_state": "{count} electors",
+  "atlas_electors_elected": "Elected",
+  "atlas_electors_pledged_col": "Pledged electors",
   "atlas_votes_more": "{percent} more votes than in {year}",
   "atlas_votes_fewer": "{percent} fewer votes than in {year}",
   "atlas_largest": "Largest {places} by votes",

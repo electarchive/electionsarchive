@@ -59,6 +59,16 @@ export const load: PageServerLoad = async ({ params, url }) => {
   }
   const search = new URLSearchParams(url.searchParams);
   search.delete("level");
-  const { contest, whole, path, atlas } = await atlasPage(params.path, search);
-  return { contest, whole, path, shell: shell(atlas), query: url.search };
+  const { contest, whole, path, atlas, electors } = await atlasPage(
+    params.path,
+    search,
+  );
+  return {
+    contest,
+    whole,
+    path,
+    shell: shell(atlas),
+    electors,
+    query: url.search,
+  };
 };

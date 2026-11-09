@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import XIcon from "@lucide/svelte/icons/x";
   import { count, numbers, percent, points, precision } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -11,6 +12,7 @@
     actions = [],
     layout = "full",
     isApart = false,
+    opening,
   }: {
     summary: {
       name: string;
@@ -45,6 +47,7 @@
     actions?: Array<{ label: string; href?: string; onclick?: () => void }>;
     layout?: "full" | "peek" | "head" | "body";
     isApart?: boolean;
+    opening?: Snippet;
   } = $props();
 
   function gap(margin: number) {
@@ -105,6 +108,10 @@
         {/if}
       </p>
     </header>
+  {/if}
+
+  {#if opening != null && (layout === "full" || layout === "body")}
+    {@render opening()}
   {/if}
 
   {#if summary.verdict != null && (layout === "full" || layout === "body")}

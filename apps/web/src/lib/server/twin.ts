@@ -5,6 +5,7 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
 import type { Counting } from "#lib/server/counting.js";
+import { tally } from "#lib/atlas/electors.js";
 import { ending, partyOn, segments, stand } from "#lib/caucus.js";
 import {
   CATEGORY_LABELS,
@@ -4874,6 +4875,15 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
   });
   const others = atlas.levels.filter((entry) => entry.code !== atlas.level);
   const heading = capitalize(plural(level?.noun ?? ""));
+  const ballot =
+    data.electors == null ? null : tally(data.electors, atlas.scope.k);
+  const roles = {
+    president: m.atlas_electors_president,
+    vice: m.atlas_electors_vice,
+    elected: m.atlas_electors_elected,
+  };
+  const isPledged = ballot?.rows.some((row) => row.pledged != null) === true;
+  const hasRoles = ballot?.rows.some((row) => row.role != null) === true;
   return [
     `# ${atlas.scope.unit === "" ? m.atlas_page_title_plain({ title: atlas.title }) : m.atlas_page_title({ title: atlas.title, place: atlas.scope.name })}`,
     byline(
@@ -4912,6 +4922,68 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
               )
               .join(", "),
           }),
+        ]),
+    ...(data.electors == null || ballot == null || ballot.rows.length === 0
+      ? []
+      : [
+          `## ${m.electors_title()}`,
+          [
+            ballot.isNational
+              ? `${m.electors_majority({ count: count(data.electors.majority) })}.`
+              : `${m.atlas_electors_state({ count: count(ballot.appointed) })}.`,
+            ...(ballot.isNational && ballot.isPaired
+              ? [m.atlas_electors_two()]
+              : []),
+            ...(ballot.faithless > 0
+              ? [m.atlas_electors_faithless({ count: ballot.faithless })]
+              : []),
+            ...(ballot.absent > 0
+              ? [m.atlas_electors_absent({ count: ballot.absent })]
+              : []),
+            ...(ballot.house == null
+              ? []
+              : [
+                  link(
+                    ballot.house.tie == null
+                      ? m.atlas_electors_house({
+                          name: ballot.house.label ?? "",
+                          date: date(ballot.house.date),
+                        })
+                      : m.atlas_electors_house_tie({
+                          ...ballot.house.tie,
+                          name: ballot.house.label ?? "",
+                          date: date(ballot.house.date),
+                        }),
+                    ballot.house.path,
+                  ),
+                ]),
+            ...(ballot.isNational && data.electors.path != null
+              ? [
+                  link(
+                    m.electors_cast({ date: date(data.electors.date) }),
+                    data.electors.path,
+                  ),
+                ]
+              : []),
+          ].join(" "),
+          table(
+            [
+              m.col_candidate(),
+              m.col_party(),
+              ...(hasRoles ? [m.col_role()] : []),
+              m.electors_title(),
+              ...(isPledged ? [m.atlas_electors_pledged_col()] : []),
+            ],
+            ballot.rows.map((row) => [
+              row.label,
+              row.short,
+              ...(hasRoles
+                ? [row.role == null ? null : roles[row.role]()]
+                : []),
+              count(row.votes),
+              ...(isPledged ? [count(row.pledged ?? 0)] : []),
+            ]),
+          ),
         ]),
     `## ${atlas.isLed ? m.atlas_led() : m.atlas_won()}`,
     table(

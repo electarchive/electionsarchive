@@ -6,6 +6,7 @@ type Raw = Outputs["contests"]["mosaic"];
 
 export type Sheet = Outputs["contests"]["atlas"];
 export type Shell = Omit<Sheet, "places">;
+export type Electors = NonNullable<Outputs["contests"]["electors"]>;
 export type Ask = {
   unit?: string | null;
   level?: string | null;
