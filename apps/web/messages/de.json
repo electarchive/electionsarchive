@@ -1813,6 +1813,43 @@
   "atlas_estimated": "Geschätzt",
   "atlas_verdict": "{name} führte mit {points} Punkten",
   "atlas_verdict_then": "{name} führte {year} mit {points} Punkten",
+  "atlas_electors_pledged": "{count} zugesichert",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} Wahlmann stimmte entgegen seiner Zusage ab.",
+        "countPlural=*": "{countText} Wahlleute stimmten entgegen ihrer Zusage ab."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} Wahlmann gab keine Stimme ab.",
+        "countPlural=*": "{countText} Wahlleute gaben keine Stimme ab."
+      }
+    }
+  ],
+  "atlas_electors_house": "Kein Kandidat erreichte die Mehrheit. Das Repräsentantenhaus wählte daher am {date} {name}.",
+  "atlas_electors_house_tie": "{first} und {second} erhielten gleich viele Stimmen. Das Repräsentantenhaus wählte daher am {date} {name}.",
+  "atlas_electors_two": "Jeder Wahlmann gab zwei Stimmen ab. Der Sieger wurde Präsident und der Zweitplatzierte Vizepräsident.",
+  "atlas_electors_president": "Präsident",
+  "atlas_electors_vice": "Vizepräsident",
+  "atlas_electors_state": "{count} Wahlleute",
+  "atlas_electors_elected": "Gewählt",
+  "atlas_electors_pledged_col": "Zugesicherte Wahlleute",
   "atlas_votes_more": "{percent} mehr Stimmen als {year}",
   "atlas_votes_fewer": "{percent} weniger Stimmen als {year}",
   "atlas_largest": "Größte {places} nach Stimmen",

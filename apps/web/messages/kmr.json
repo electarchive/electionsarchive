@@ -1813,6 +1813,43 @@
   "atlas_estimated": "Texmînî",
   "atlas_verdict": "{name} bi {points} xalan li pêş bû",
   "atlas_verdict_then": "{name} di sala {year} de bi {points} li pêş bû",
+  "atlas_electors_pledged": "{count} sozdayî",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} hilbijêrê kolejê li dijî soza xwe deng da.",
+        "countPlural=*": "{countText} hilbijêrên kolejê li dijî soza xwe deng da."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} hilbijêrê kolejê deng neda.",
+        "countPlural=*": "{countText} hilbijêrên kolejê deng neda."
+      }
+    }
+  ],
+  "atlas_electors_house": "Tu berendamî piraniya mutleq bi dest nexist. Loma Meclîsa Nûneran di {date} de {name} hilbijart.",
+  "atlas_electors_house_tie": "Dengên {first} û {second} wekhev bûn. Loma Meclîsa Nûneran di {date} de {name} hilbijart.",
+  "atlas_electors_two": "Her hilbijêrekî kolejê du deng dan. Berendamê herî zêde deng girt bû serok. Yê duyem bû cîgirê serok.",
+  "atlas_electors_president": "Serok",
+  "atlas_electors_vice": "Cîgirê serok",
+  "atlas_electors_state": "{count} hilbijêrên kolejê",
+  "atlas_electors_elected": "Hilbijartî",
+  "atlas_electors_pledged_col": "Hilbijêrên sozdayî",
   "atlas_votes_more": "Li gorî sala {year}, {percent} deng zêdetir",
   "atlas_votes_fewer": "Li gorî sala {year}, {percent} deng kêmtir",
   "atlas_largest": "{places} yên herî mezin li gorî dengan",

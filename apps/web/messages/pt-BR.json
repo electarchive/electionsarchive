@@ -1851,6 +1851,45 @@
   "atlas_estimated": "Estimado",
   "atlas_verdict": "{name} liderou por {points} pontos",
   "atlas_verdict_then": "{name} liderou por {points} em {year}",
+  "atlas_electors_pledged": "{count} comprometidos",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} grande eleitor votou contra o compromisso assumido.",
+        "countPlural=many": "{countText} grandes eleitores votaram contra o compromisso assumido.",
+        "countPlural=*": "{countText} grandes eleitores votaram contra o compromisso assumido."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} grande eleitor não votou.",
+        "countPlural=many": "{countText} grandes eleitores não votaram.",
+        "countPlural=*": "{countText} grandes eleitores não votaram."
+      }
+    }
+  ],
+  "atlas_electors_house": "Nenhum candidato obteve maioria absoluta. Por isso, a Câmara dos Representantes escolheu {name} em {date}.",
+  "atlas_electors_house_tie": "{first} e {second} empataram. Por isso, a Câmara dos Representantes escolheu {name} em {date}.",
+  "atlas_electors_two": "Cada grande eleitor deu dois votos. O mais votado se tornou presidente. O segundo colocado se tornou vice-presidente.",
+  "atlas_electors_president": "Presidente",
+  "atlas_electors_vice": "Vice-presidente",
+  "atlas_electors_state": "{count} grandes eleitores",
+  "atlas_electors_elected": "Eleito",
+  "atlas_electors_pledged_col": "Votos comprometidos",
   "atlas_votes_more": "{percent} mais votos do que em {year}",
   "atlas_votes_fewer": "{percent} menos votos do que em {year}",
   "atlas_largest": "Maiores {places} por votos",

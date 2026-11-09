@@ -1813,6 +1813,43 @@
   "atlas_estimated": "Tahmini",
   "atlas_verdict": "{name} {points} puan farkla öndeydi",
   "atlas_verdict_then": "{year} seçiminde {name} {points} puan öndeydi",
+  "atlas_electors_pledged": "Taahhüt veren: {count}",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seçici, taahhüdüne aykırı oy kullandı.",
+        "countPlural=*": "{countText} seçici, taahhüdüne aykırı oy kullandı."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} seçici oy kullanmadı.",
+        "countPlural=*": "{countText} seçici oy kullanmadı."
+      }
+    }
+  ],
+  "atlas_electors_house": "Hiçbir aday salt çoğunluğu alamadı. Bu yüzden Temsilciler Meclisi {date} tarihinde {name} adayını seçti.",
+  "atlas_electors_house_tie": "{first} ile {second} eşit oy aldı. Bu yüzden Temsilciler Meclisi {date} tarihinde {name} adayını seçti.",
+  "atlas_electors_two": "Her seçici iki oy kullandı. En çok oyu alan başkan, ikinci olan başkan yardımcısı oldu.",
+  "atlas_electors_president": "Başkan",
+  "atlas_electors_vice": "Başkan yardımcısı",
+  "atlas_electors_state": "{count} seçici",
+  "atlas_electors_elected": "Seçildi",
+  "atlas_electors_pledged_col": "Taahhüt veren seçiciler",
   "atlas_votes_more": "{year} seçimine göre {percent} daha fazla oy",
   "atlas_votes_fewer": "{year} seçimine göre {percent} daha az oy",
   "atlas_largest": "Oya göre en büyük {places}",

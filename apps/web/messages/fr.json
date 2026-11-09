@@ -1853,6 +1853,45 @@
   "atlas_estimated": "Estimation",
   "atlas_verdict": "{name} en tête avec {points} points d'avance",
   "atlas_verdict_then": "{name} en tête avec {points} d'avance en {year}",
+  "atlas_electors_pledged": "{count} engagés",
+  "atlas_electors_faithless": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} grand électeur n'a pas respecté son engagement.",
+        "countPlural=many": "{countText} grands électeurs n'ont pas respecté leur engagement.",
+        "countPlural=*": "{countText} grands électeurs n'ont pas respecté leur engagement."
+      }
+    }
+  ],
+  "atlas_electors_absent": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} grand électeur n'a pas voté.",
+        "countPlural=many": "{countText} grands électeurs n'ont pas voté.",
+        "countPlural=*": "{countText} grands électeurs n'ont pas voté."
+      }
+    }
+  ],
+  "atlas_electors_house": "Aucun candidat n'a obtenu la majorité absolue. La Chambre des représentants a choisi {name} le {date}.",
+  "atlas_electors_house_tie": "{first} et {second} étaient à égalité. La Chambre des représentants a choisi {name} le {date}.",
+  "atlas_electors_two": "Chaque grand électeur disposait de deux voix. Le candidat arrivé en tête devenait président. Le deuxième devenait vice-président.",
+  "atlas_electors_president": "Président",
+  "atlas_electors_vice": "Vice-président",
+  "atlas_electors_state": "{count} grands électeurs",
+  "atlas_electors_elected": "Élu",
+  "atlas_electors_pledged_col": "Grands électeurs engagés",
   "atlas_votes_more": "{percent} de votes en plus qu'en {year}",
   "atlas_votes_fewer": "{percent} de votes en moins qu'en {year}",
   "atlas_largest": "Plus grand nombre de voix : {places}",
