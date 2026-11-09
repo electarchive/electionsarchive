@@ -7,13 +7,13 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import NAMESPACE, Changeset
 from ea.names import compatible, tokens
 from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
@@ -631,6 +631,14 @@ def emit() -> Path:
                 "select p.id from person p join changeset h on h.id = p.changeset_id where h.pipeline = %s", [SOURCE]
             )
         }
+        joined: dict[UUID, tuple[UUID, UUID]] = {
+            entity: (into, merge)
+            for entity, into, merge in conn.execute(
+                """select m.entity_id, m.into_id, m.changeset_id from entity_merge m
+                   join changeset h on h.id = m.changeset_id where h.pipeline = %s""",
+                [SOURCE],
+            )
+        }
         ran: dict[UUID, dict[UUID, set[str]]] = defaultdict(lambda: defaultdict(set))
         won: dict[UUID, list[tuple[date, UUID, UUID, str | None]]] = defaultdict(list)
         for body, day, contest, person, ballot, preferred, elected, area in conn.execute(
@@ -799,6 +807,19 @@ def emit() -> Path:
         for key, person in resolved.items():
             earlier = minted.get(key)
             person = cs.survivors.get(person, person)
+            origin = uuid5(NAMESPACE, f"external_id:{SOURCE}.person\x1f{key}")
+            if origin in own and origin in joined and origin != person and cs.survivors.get(origin) != person:
+                into, merge = joined[origin]
+                reason = f"Roster record {key} belongs to {person}, so the merge into {into} is undone"
+                cs.unmerge(origin, reason)
+                for name, text in conn.execute(
+                    """select n.id, n.text from name n join name_history h on h.id = n.id and h.entity_id = %s
+                       join changeset c on c.id = n.changeset_id
+                       where h.superseded_by = %s and c.pipeline = %s""",
+                    [origin, merge, SOURCE],
+                ):
+                    cs.add("name_drop", name_id=name, entity_id=origin, text=text, reason=reason)
+                cs.merge(origin, person)
             if earlier is None or earlier in cs.survivors or earlier == person:
                 continue
             if earlier in own and all(found != earlier for other, found in resolved.items() if other != key):
