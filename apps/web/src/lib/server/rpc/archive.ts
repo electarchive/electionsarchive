@@ -13691,6 +13691,7 @@ async function universe(
       ) holder
       join area_parent p on p.parent_id = holder.id and p.valid @> ${day}::date
       join area a on a.id = p.area_id and a.scheme_code = ${level}
+      where not exists (select from entity_merge m where m.entity_id = a.id)
     )
     select distinct candidate.id, candidate.k, candidate.held, false as outside,
       not candidate.held and (select b.party_scope_id is not null and b.kind <> 'indirect' from base b) as pending
@@ -13724,6 +13725,7 @@ async function universe(
               select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
               join area a on a.id = p.area_id
               where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
+                and not exists (select from entity_merge m where m.entity_id = a.id)
             )
             select distinct id, k, true as held, false as outside, false as pending from down
             where depth > 0 and scheme = ${level}
