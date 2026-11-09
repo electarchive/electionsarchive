@@ -1984,12 +1984,8 @@ export async function atlasPage(path: string, search: URLSearchParams) {
       `/map/${[slug.current, unit].filter((part) => part !== "").join("/")}${search.size > 0 ? `?${search}` : ""}`,
     );
   }
-  return {
-    kind: "map" as const,
-    contest: slug.entity_id,
-    whole,
-    path: slug.is_current ? slug.path : (slug.current ?? slug.path),
-    atlas: await found(
+  const [atlas, electors] = await Promise.all([
+    found(
       call(router.contests.atlas, {
         id: slug.entity_id,
         unit: unit === "" ? undefined : unit,
@@ -2014,6 +2010,15 @@ export async function atlasPage(path: string, search: URLSearchParams) {
         throw error_;
       }),
     ),
+    call(router.contests.electors, { id: slug.entity_id }),
+  ]);
+  return {
+    kind: "map" as const,
+    contest: slug.entity_id,
+    whole,
+    path: slug.is_current ? slug.path : (slug.current ?? slug.path),
+    atlas,
+    electors,
   };
 }
 

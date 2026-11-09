@@ -27,6 +27,7 @@
     path={data.path}
     whole={data.whole}
     shell={data.shell}
+    electors={data.electors}
     scheme={data.path.split("/")[0] ?? ""}
     query={data.query}
   />

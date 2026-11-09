@@ -510,6 +510,7 @@ def emit() -> Path:
 
         year_peers_for = None
         year_peers = {}
+        fresh: dict[tuple[str, str, str], dict[tuple[str, ...], UUID | None]] = defaultdict(dict)
         for day_text in sorted(frame["date"].unique()):
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
             day_frame = frame.filter(pl.col("date") == day_text)
@@ -1209,7 +1210,9 @@ def emit() -> Path:
                 outside: dict[tuple[str, ...], UUID | None] = {}
                 if year_peers_for != day.year:
                     year_peers_for, year_peers = day.year, peer_candidacies(conn, day.year)
-                for peer, ballot_name, person_id, ours in year_peers.get((str(area), str(office), str(body_id)), ()):
+                    fresh.clear()
+                seat = (str(area), str(office), str(body_id))
+                for peer, ballot_name, person_id, ours in year_peers.get(seat, ()):
                     if peer == contest:
                         continue
                     words = [
@@ -1222,6 +1225,8 @@ def emit() -> Path:
                         peers[token] = None
                     if not ours and outside.setdefault(token, person_id) != person_id:
                         outside[token] = None
+                for token, person_id in fresh[seat].items():
+                    peers.setdefault(token, person_id)
 
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 for prior in conn.execute(
@@ -1330,6 +1335,8 @@ def emit() -> Path:
                                     cs.add("person", id=person)
                                 if person in cs.minted or " / " in candidate:
                                     name(person, candidate.split(" / ")[0])
+                            if fresh[seat].setdefault(token, person) != person:
+                                fresh[seat][token] = None
                             head_key = f"{root_key}:head"
                             if conn.execute(
                                 "select 1 from entity where id = %s and retired_by is not null",

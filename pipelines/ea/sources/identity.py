@@ -1530,6 +1530,238 @@ PEOPLE = {
         ("fec.candidate", "S6LA00615"),
         ("us.la_local.person", "22107:jamie-lil-stump-davis"),
     ),
+    "Adina Sash, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:adina-sash"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:adina-sash"),
+    ),
+    "Alice Tam Tien, 2024 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-2-new-york-democratic:alice-tam-tien"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-2-new-york:alice-tam-tien"),
+    ),
+    "Anthony Alexis, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:anthony-alexis"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:anthony-alexis"),
+    ),
+    "Anthony Catalano, 2018 Richmond County Surrogate candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-conservative:anthony-catalano"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-democratic:anthony-catalano"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-reform:anthony-catalano"),
+    ),
+    "Cenceria P. Edwards, Brooklyn Assembly and Kings County Civil Court candidate": (
+        ("us.nyc_recap.person", "NY:cenceria-p-edwards"),
+        (
+            "us.nyc_general.person",
+            "2014-09-09:new-york-city:civil-court-district-2-kings-democratic:cenceria-p-edwards",
+        ),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-2-kings:cenceria-p-edwards"),
+    ),
+    "Dawn Simmons, 2017 Harlem City Council and State Senate special election candidate": (
+        ("us.nyc_general.person", "2017-02-14:new-york-city:council-district-9:dawn-simmons"),
+        ("us.nyc_general.person", "2017-05-23:NY:senate:30:special:dawn-simmons"),
+    ),
+    "Eric Schumacher, 2020 New York County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2020-06-23:new-york-city:civil-court-district-1-new-york-democratic:eric-schumacher",
+        ),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-new-york:eric-schumacher"),
+    ),
+    "Eve Cho Guillergan, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-2-queens-democratic:eve-cho-guillergan",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-2-queens:eve-cho-guillergan"),
+    ),
+    "Gina Levy, 2018 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-district-8-kings-democratic:gina-levy"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:civil-court-district-8-kings:gina-levy"),
+    ),
+    "Harold E. Bahr, 2024 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-2-new-york-democratic:harold-bahr"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-new-york:harold-e-bahr"),
+    ),
+    "Ingrid Joseph, Kings County Civil Court judge and Supreme Court justice": (
+        ("us.nyc_recap.person", "NY:ingrid-joseph"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-kings-democratic:ingrid-joseph"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:supreme-court-2-kings:ingrid-joseph"),
+    ),
+    "Janice Robinson, 2024 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-6-kings-democratic:janice-robinson"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-6-kings:janice-robinson"),
+    ),
+    "John Zhuo Wang, 2020 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-1-new-york-democratic:john-zhuo-wang"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-1-new-york:john-zhuo-wang"),
+    ),
+    "Jovia A. Radix, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:jovia-a-radix"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:jovia-a-radix"),
+    ),
+    "Juliette-Noor Haji, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-1-queens-democratic:juliette-noor-haji",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-1-queens:juliette-noor-haji"),
+    ),
+    "L. Rickie Tulloch, Brooklyn Assembly and City Council candidate": (
+        ("us.klarner.person", "330623"),
+        ("us.nyc_recap.person", "NY:l-rickie-tulloch"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:l-rickie-tulloch"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:l-rickie-tulloch"),
+    ),
+    "Leigh K. Cheng, 2020 Queens County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-6-queens-democratic:leigh-k-cheng"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-6-queens:leigh-k-cheng"),
+    ),
+    "Maria Aragona, 2020 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-3-kings-democratic:maria-aragona"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-3-kings:maria-aragona"),
+    ),
+    "Michael Gerstein, 2015 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2015-09-10:new-york-city:civil-court-district-6-kings-democratic:michael-gerstein"),
+        ("us.nyc_general.person", "2015-11-03:new-york-city:civil-court-district-6-kings:michael-gerstein"),
+    ),
+    "Monique Allen-Davy, 2022 New York State Assembly candidate": (
+        ("us.klarner.person", "415244"),
+        ("us.nyc_general.person", "2022-05-24:NY:assembly:58:special:monique-allen-davy"),
+        ("us.nyc_general.person", "2022-11-08:NY:assembly:58:g:monique-allen-davy"),
+    ),
+    "Monique Chandler-Waterman, New York State Assembly member": (
+        ("wikidata", "Q114397290"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:monique-chandler-waterman"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:monique-chandler-waterman"),
+    ),
+    "Morton M. Avigdor, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-5-kings-democratic:morton-m-avigdor"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-5-kings:morton-m-avigdor"),
+    ),
+    "Pamela Stewart-Martinez, Bronx Assembly and State Senate candidate": (
+        ("us.klarner.person", "387085"),
+        ("us.state_primaries.person", "NY:assembly:87:DEM:pamela-stewart-martinez"),
+        ("us.nyc_general.person", "2018-04-24:NY:senate:32:special:pamela-stewart-martinez"),
+        ("us.nyc_general.person", "2018-11-06:NY:senate:32:g:pamela-stewart-martinez"),
+    ),
+    "Rachel E. Freier, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-5-kings-democratic:rachel-e-freier"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-5-kings:rachel-e-freier"),
+    ),
+    "Ronald Castorina Jr., New York State Assembly member and 2018 Richmond County Surrogate candidate": (
+        ("us.klarner.person", "371365"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-reform:ronald-castorina-jr"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-conservative:ronald-castorina-jr"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:surrogate-richmond:ronald-castorina-jr"),
+    ),
+    "Sabrina B. Kraus, New York County Civil Court candidate": (
+        ("us.nyc_recap.person", "NY:sabrina-b-kraus"),
+        (
+            "us.nyc_general.person",
+            "2016-09-13:new-york-city:civil-court-district-6-new-york-democratic:sabrina-b-kraus",
+        ),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-6-new-york:sabrina-b-kraus"),
+    ),
+    "Sharon Clarke, 2014 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2014-09-09:new-york-city:civil-court-district-6-kings-democratic:sharon-clarke"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-6-kings:sharon-clarke"),
+    ),
+    "Susan Quirk, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-3-kings-democratic:susan-quirk"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-3-kings:susan-quirk"),
+    ),
+    "Thomas G. Wright-Fernandez, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-1-queens-democratic:thomas-g-wright-fernandez",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-2-queens:thomas-g-wright-fernandez"),
+    ),
+    "Victor A. Jordan, Brooklyn Assembly and City Council candidate": (
+        ("us.klarner.person", "330622"),
+        ("us.nyc_boe.person", "victor-jordan"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:victor-jordan"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:victor-jordan"),
+    ),
+    "Wanda Y. Negron, 2020 Bronx County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-2-bronx-democratic:wanda-y-negron"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-2-bronx:wanda-y-negron"),
+    ),
+    "Wendy C. Li, 2018 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-district-2-new-york-democratic:wendy-c-li"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:civil-court-district-2-new-york:wendy-c-li"),
+    ),
+    "Wyatt N. Gibbons, Queens County Civil Court judge and Supreme Court justice": (
+        ("us.nyc_general.person", "2019-06-25:new-york-city:civil-court-queens-democratic:wyatt-n-gibbons"),
+        ("us.nyc_general.person", "2019-11-05:new-york-city:supreme-court-11-queens:wyatt-n-gibbons"),
+    ),
+    "Xamayla Rose, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:xamayla-rose"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:xamayla-rose"),
+    ),
+    "Yuh-Line Niou, New York State Assembly member": (
+        ("fec.candidate", "H2NY10241"),
+        ("us.klarner.person", "371388"),
+        ("us.nyc_general.person", "2016-04-19:NY:assembly:65:special:yuh-line-niou"),
+        ("us.nyc_general.person", "2016-09-13:NY:assembly:65:dp:yuh-line-niou"),
+        ("us.nyc_general.person", "2016-11-08:NY:assembly:65:g:yuh-line-niou"),
+    ),
+    "Heshy Tischler, Brooklyn City Council candidate": (
+        ("us.alged.person", "35013"),
+        ("us.nyc_boe.person", "heshy-tischler"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-44:heshy-tischler"),
+    ),
+    "Clifford A. Hagen, 2025 New York City Council District 51 candidate": (
+        ("us.nyc_boe.person", "clifford-a-hagen"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-51:clifford-a-hagen"),
+    ),
+    "Scott M. Stringer, Assembly member, Manhattan Borough President, and New York City Comptroller": (
+        ("us.klarner.person", "176753"),
+        ("us.nyc_recap.person", "NY:scott-m-stringer"),
+        ("us.nyc_recap_wayback.person", "NY:scott-m-stringer"),
+        ("us.nyc_cfb.person", "scott-m-stringer"),
+    ),
+    "Curtis Sliwa, 2021 and 2025 Republican nominee for mayor of New York City": (
+        ("us.alged.person", "35566"),
+        ("us.nyc_boe.person", "curtis-a-sliwa"),
+    ),
+    "Michael Blake, Bronx Assembly member and 2019 Public Advocate and 2025 mayoral candidate": (
+        ("fec.candidate", "H0NY15194"),
+        ("us.klarner.person", "330764"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:michael-a-blake"),
+        ("us.nyc_boe.person", "michael-blake"),
+    ),
+    "Anthony L. Herbert, Brooklyn City Council, Assembly, State Senate, and Public Advocate candidate": (
+        ("us.klarner.person", "265644"),
+        ("us.alged.person", "34707"),
+        ("us.nyc_recap.person", "NY:anthony-l-herbert"),
+        ("us.nyc_boe.person", "anthony-l-herbert"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:anthony-tony-herbert"),
+    ),
+    "Jose A. Padilla Jr., Bronx City Council District 15 candidate": (
+        ("us.nyc_boe.person", "jose-a-padilla-jr"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-15:jose-a-padilla-jr"),
+    ),
+    "Cordell Cleare, New York State Senate member": (
+        ("wikidata", "Q28536831"),
+        ("us.nyc_boe.person", "cordell-cleare"),
+    ),
+    "Yudelka Tapia, New York State Assembly member": (
+        ("wikidata", "Q109920524"),
+        ("us.nyc_boe.person", "yudelka-tapia"),
+    ),
+    "Soma S. Syed, Queens Civil Court judge and Supreme Court justice": (
+        ("us.nyc_general.person", "2021-11-02:new-york-city:civil-court-queens:soma-s-syed"),
+        ("us.nyc_boe.person", "soma-s-syed"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:supreme-court-11-queens:soma-s-syed"),
+    ),
+    "Robert D. Siano, Bronx lawyer and New York City Board of Elections commissioner": (
+        ("us.alged.person", "30591:robert-siano"),
+        ("us.nyc_recap.person", "NY:robert-d-siano"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-2-bronx:robert-siano"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-bronx:robert-d-siano"),
+        ("us.fec.person", "NY:robert-siano"),
+        ("us.state_primaries.person", "NY:senate:12:NY:Reform:robert-siano"),
+    ),
 }
 HONORIFICS = re.compile(
     r"^(?:(?:the\s+)?(?:rt\.?\s+hon\.?|right\s+honou?rable|honou?rable|very\s+rev(?:erend|d)?\.?|rev(?:erend|d)?\.?)\s+"

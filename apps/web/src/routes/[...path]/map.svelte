@@ -104,6 +104,7 @@
     focus = $bindable(null),
     shade = "winner",
     isLinked = false,
+    isFixed = false,
     pick,
     onshade,
     sources = null,
@@ -166,6 +167,7 @@
     focus?: number | null;
     shade?: (typeof MODES)[number] | number;
     isLinked?: boolean;
+    isFixed?: boolean;
     pick?: (code: string) => void;
     onshade?: (shade: (typeof MODES)[number] | number) => void;
     sources?: Array<string> | null;
@@ -2647,7 +2649,7 @@
     class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
     data-export-skip
   >
-    {#if !isDeclared}
+    {#if !isDeclared && !isFixed}
       <div
         class="flex items-center gap-2.5 min-inline-0"
         role="group"

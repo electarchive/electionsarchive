@@ -7073,6 +7073,200 @@ export async function rebuildMosaics(only?: Array<string>) {
   return `mosaics: ${counts.built} built, ${counts.kept} unchanged, ${counts.dropped} dropped in ${Math.round((Date.now() - started) / 1000)} s`;
 }
 
+async function electors(id: string) {
+  const found = await db.execute<{
+    popular: string;
+    contest: string;
+    election: string;
+    date: string;
+    set: string;
+    k: number;
+    house: string | null;
+    day: string | null;
+    chosen: string | null;
+  }>(sql`
+    select x.id as popular, ec.id as contest, ec.election, ec.date::text as date, rs.id as set, rs.k,
+      h.id as house, h.date::text as day, h.person as chosen
+    from contest x
+    join election xe on xe.id = x.election_id
+    join body b on b.id = x.body_id and b.kind = 'electoral_college'
+    cross join lateral (
+      select c.id, e.id as election, e.date_from as date from contest c
+      join election e on e.id = c.election_id
+      where c.office_id = x.office_id and c.body_id = x.body_id and e.polity_id = xe.polity_id
+        and e.kind = 'indirect' and c.kind = 'office' and c.allocation_parent_id is null and c.round_number = 1
+        and e.date_from between xe.date_from and xe.date_from + 200
+      order by e.date_from limit 1
+    ) ec
+    cross join lateral (
+      select rs.id, rs.k from result_set rs where rs.contest_id = ec.id and ${latest("rs")} limit 1
+    ) rs
+    left join lateral (
+      select h.id, he.date_from as date, coalesce(m.into_id, cy.person_id) as person
+      from contest h
+      join election he on he.id = h.election_id
+      join result_set hs on hs.contest_id = h.id and ${latest("hs")}
+      join outcome oc on oc.result_set_id = hs.id and oc.kind in ('elected', 'won')
+      join candidacy cy on cy.option_id = oc.option_id and cy.role = 'head'
+      left join entity_merge m on m.entity_id = cy.person_id
+      where h.previous_round_id = ec.id
+      limit 1
+    ) h on true
+    where x.id = ${id}::uuid and x.kind = 'office' and x.office_id is not null
+      and x.allocation_parent_id is null and x.round_number = 1
+  `);
+  const held = found.rows[0];
+  if (held == null) {
+    return null;
+  }
+  const [values, options, pledges] = await Promise.all([
+    db.execute<{ k: number; option: number; measure: number; value: number }>(
+      sql`
+        select r.area_k as k, r.option_k as option, r.measure::int as measure, sum(r.value)::float8 as value
+        from result_rollup r
+        where r.result_set_k = ${held.k} and r.measure in (2, 11)
+        group by 1, 2, 3
+      `,
+    ),
+    db.execute<{
+      k: number;
+      person: string | null;
+      party: string | null;
+      color: string | null;
+      outcomes: Array<string> | null;
+    }>(sql`
+      select o.k, coalesce(pm.into_id, cy.person_id) as person, p.party,
+        ${paint(sql`p.party`, sql`${held.election}::uuid`, sql`${held.date}::date`)} as color,
+        (select array_agg(distinct oc.kind::text) from outcome oc where oc.result_set_id = ${held.set}::uuid and oc.option_id = o.id) as outcomes
+      from contest_option o
+      left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+      left join entity_merge pm on pm.entity_id = cy.person_id
+      left join entity_merge om on om.entity_id = o.party_id
+      left join party_affiliation br on br.party_id = coalesce(om.into_id, o.party_id)
+        and br.kind = 'regional_branch' and br.valid @> ${held.date}::date
+      left join entity_merge bm on bm.entity_id = br.parent_party_id
+      cross join lateral (select coalesce(bm.into_id, br.parent_party_id, om.into_id, o.party_id) as party) p
+      where o.contest_id = ${held.contest}::uuid
+    `),
+    held.popular === held.contest
+      ? null
+      : db.execute<{ person: string; seats: number }>(sql`
+        select coalesce(m.into_id, cy.person_id) as person, sum(oc.seats)::int as seats
+        from result_set rs
+        join outcome oc on oc.result_set_id = rs.id and oc.kind in ('won', 'elected') and oc.seats > 0 and oc.candidacy_id is null
+        join candidacy cy on cy.option_id = oc.option_id and cy.role = 'head'
+        left join entity_merge m on m.entity_id = cy.person_id
+        where rs.contest_id = ${held.popular}::uuid and ${latest("rs")}
+        group by 1
+      `),
+  ]);
+  const totals = new Map<number, number>();
+  for (const row of values.rows) {
+    if (row.measure === 11) {
+      totals.set(row.k, (totals.get(row.k) ?? 0) + row.value);
+    }
+  }
+  const root = totals
+    .entries()
+    .toArray()
+    .toSorted(([, a], [, b]) => b - a)[0]?.[0];
+  if (root == null) {
+    return null;
+  }
+  const cast = (k: number, option: number) =>
+    values.rows.find(
+      (row) => row.k === k && row.option === option && row.measure === 11,
+    )?.value ?? 0;
+  const seats = (k: number) => {
+    let sum = 0;
+    for (const row of values.rows) {
+      if (row.k === k && row.measure === 2) {
+        sum += row.value;
+      }
+    }
+    return sum > 0 ? sum : null;
+  };
+  const pledged = new Map(
+    (pledges?.rows ?? []).map((row) => [row.person, row.seats]),
+  );
+  const kept = options.rows
+    .map((option) => ({ ...option, votes: cast(root, option.k) }))
+    .filter((option) => option.votes > 0)
+    .toSorted((a, b) => b.votes - a.votes);
+  const [labels, slugs] = await Promise.all([
+    names(
+      kept.flatMap((option) => [
+        ...(option.person == null ? [] : [option.person]),
+        ...(option.party == null ? [] : [option.party]),
+      ]),
+      held.date,
+    ),
+    paths([held.contest, ...(held.house == null ? [] : [held.house])]),
+  ]);
+  const appointed = seats(root) ?? totals.get(root) ?? 0;
+  let promised = 0;
+  for (const seated of pledged.values()) {
+    promised += seated;
+  }
+  const isPledged = promised === appointed;
+  return {
+    path: slugs.get(held.contest) ?? null,
+    date: held.date,
+    k: root,
+    appointed,
+    ballots: Math.max(1, Math.round((totals.get(root) ?? 0) / appointed)),
+    majority: Math.floor(appointed / 2) + 1,
+    rows: kept.map((option) => ({
+      key: option.person ?? `option:${option.k}`,
+      label:
+        (option.person == null ? null : labels.full.get(option.person)) ??
+        (option.party == null ? null : labels.full.get(option.party)) ??
+        "",
+      short:
+        option.party == null
+          ? null
+          : (labels.short.get(option.party) ??
+            labels.full.get(option.party) ??
+            null),
+      color:
+        held.popular === held.contest || pledged.has(option.person ?? "")
+          ? option.color
+          : null,
+      person: option.person,
+      party: option.party,
+      votes: option.votes,
+      pledged: isPledged ? (pledged.get(option.person ?? "") ?? 0) : null,
+      isElected:
+        (held.chosen != null && option.person === held.chosen) ||
+        (option.outcomes ?? []).some(
+          (kind) => kind === "elected" || kind === "won",
+        ),
+      isTied: (option.outcomes ?? []).includes("tied"),
+    })),
+    house:
+      held.house == null || held.day == null
+        ? null
+        : {
+            path: slugs.get(held.house) ?? null,
+            date: held.day,
+            person: held.chosen,
+            label:
+              held.chosen == null
+                ? null
+                : (labels.full.get(held.chosen) ?? null),
+          },
+    places: totals
+      .keys()
+      .filter((k) => k !== root)
+      .map((k) => ({
+        k,
+        appointed: seats(k),
+        votes: kept.map((option) => cast(k, option.k)),
+      }))
+      .toArray(),
+  };
+}
+
 export const contests = {
   trace: os
     .meta(
@@ -11292,6 +11486,7 @@ export const contests = {
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
             then: v.nullable(v.string()),
+            person: v.optional(v.nullable(v.string())),
           }),
         ),
         places: v.object({
@@ -11340,6 +11535,7 @@ export const contests = {
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
             then: v.optional(v.nullable(v.string())),
+            person: v.optional(v.nullable(v.string())),
           }),
         ),
         layers: v.array(
@@ -11411,6 +11607,58 @@ export const contests = {
       }
       return built as Awaited<ReturnType<typeof mosaic>>;
     }),
+  electors: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/electors",
+        summary:
+          "The declared electoral college vote for a presidential contest: votes per recipient nationally and per state, electors appointed, pledged electors from the popular vote, and any contingent election in the House",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
+    .output(
+      v.nullable(
+        v.object({
+          path: v.nullable(v.string()),
+          date: v.string(),
+          k: v.number(),
+          appointed: v.number(),
+          ballots: v.number(),
+          majority: v.number(),
+          rows: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              person: v.nullable(v.string()),
+              party: v.nullable(v.string()),
+              votes: v.number(),
+              pledged: v.nullable(v.number()),
+              isElected: v.boolean(),
+              isTied: v.boolean(),
+            }),
+          ),
+          house: v.nullable(
+            v.object({
+              path: v.nullable(v.string()),
+              date: v.string(),
+              person: v.nullable(v.string()),
+              label: v.nullable(v.string()),
+            }),
+          ),
+          places: v.array(
+            v.object({
+              k: v.number(),
+              appointed: v.nullable(v.number()),
+              votes: v.array(v.number()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => electors(input.id)),
   lean: os
     .meta(
       openapi({
@@ -13443,6 +13691,7 @@ async function universe(
       ) holder
       join area_parent p on p.parent_id = holder.id and p.valid @> ${day}::date
       join area a on a.id = p.area_id and a.scheme_code = ${level}
+      where not exists (select from entity_merge m where m.entity_id = a.id)
     )
     select distinct candidate.id, candidate.k, candidate.held, false as outside,
       not candidate.held and (select b.party_scope_id is not null and b.kind <> 'indirect' from base b) as pending
@@ -13476,6 +13725,7 @@ async function universe(
               select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
               join area a on a.id = p.area_id
               where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
+                and not exists (select from entity_merge m where m.entity_id = a.id)
             )
             select distinct id, k, true as held, false as outside, false as pending from down
             where depth > 0 and scheme = ${level}

@@ -17,13 +17,15 @@
   import { MediaQuery } from "svelte/reactivity";
   import { fade } from "svelte/transition";
   import type { Lens } from "#lib/atlas/color.js";
-  import type { Mosaic, Sheet, Shell } from "#lib/atlas/data.js";
+  import type { Electors, Mosaic, Sheet, Shell } from "#lib/atlas/data.js";
   import type { Hit } from "#lib/atlas/stage.svelte.js";
   import type { Tier } from "#lib/atlas/tiers.js";
   import Analysis from "#lib/atlas/analysis.svelte";
   import { admits, hue, read, share, was } from "#lib/atlas/color.js";
   import { layered, load, loadMosaic } from "#lib/atlas/data.js";
   import Drawer from "#lib/atlas/drawer.svelte";
+  import { tally } from "#lib/atlas/electors.js";
+  import Electoral from "#lib/atlas/electors.svelte";
   import Hover from "#lib/atlas/hover.svelte";
   import Insets from "#lib/atlas/insets.svelte";
   import Key from "#lib/atlas/key.svelte";
@@ -64,6 +66,7 @@
     path,
     whole,
     shell,
+    electors = null,
     scheme,
     query,
   }: {
@@ -71,6 +74,7 @@
     path: string;
     whole: string | null;
     shell: Shell;
+    electors?: Electors | null;
     scheme: string;
     query: string;
   } = $props();
@@ -964,6 +968,23 @@
       isCombined: picked.length > 1,
     };
   });
+  const electoral = $derived.by(() => {
+    if (electors == null || picked.length > 1) {
+      return null;
+    }
+    const one = picked[0];
+    const k = one == null ? head.scope.k : one.set.places.k[one.i];
+    return k == null ? null : tally(electors, k);
+  });
+  function voter(row: Electors["rows"][number]) {
+    const item =
+      row.person == null
+        ? null
+        : legend.find((entry) => entry.person === row.person);
+    return item == null
+      ? swatch(row.color, row.key)
+      : (tones.get(item.key) ?? swatch(item.color, item.key));
+  }
   const glance = $derived.by(() => {
     void named;
     const hit = hovered;
@@ -1890,7 +1911,19 @@
     {layout}
     isApart={listed != null && listed.title == null}
     onclear={view.picked.length > 0 ? () => (view.picked = []) : null}
+    opening={electoral == null ? undefined : opening}
+    headline={electoral?.isNational === true ? headline : undefined}
   />
+  {#snippet opening()}
+    {#if electors != null && electoral != null}
+      <Electoral {electors} held={electoral} tone={voter} />
+    {/if}
+  {/snippet}
+  {#snippet headline()}
+    {#if electors != null && electoral != null}
+      <Electoral {electors} held={electoral} tone={voter} isCompact />
+    {/if}
+  {/snippet}
   {#if layout === "full" || layout === "body"}
     {#if picked.length > 1 && picked.length <= 6}
       <div class="grid grid-cols-[minmax(0,1fr)]">

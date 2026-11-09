@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import XIcon from "@lucide/svelte/icons/x";
   import { count, numbers, percent, points, precision } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -11,6 +12,8 @@
     actions = [],
     layout = "full",
     isApart = false,
+    opening,
+    headline,
   }: {
     summary: {
       name: string;
@@ -45,6 +48,8 @@
     actions?: Array<{ label: string; href?: string; onclick?: () => void }>;
     layout?: "full" | "peek" | "head" | "body";
     isApart?: boolean;
+    opening?: Snippet;
+    headline?: Snippet;
   } = $props();
 
   function gap(margin: number) {
@@ -107,6 +112,10 @@
     </header>
   {/if}
 
+  {#if opening != null && (layout === "full" || layout === "body")}
+    {@render opening()}
+  {/if}
+
   {#if summary.verdict != null && (layout === "full" || layout === "body")}
     {const verdict = $derived(summary.verdict)}
     <div class="grid gap-1 border-s-3 ps-2.5" style:border-color={verdict.tone}>
@@ -143,7 +152,9 @@
   {/if}
 
   {#if summary.rows.length > 0 && layout !== "head" && !(isApart && layout !== "peek")}
-    {#if layout === "peek"}
+    {#if layout === "peek" && headline != null}
+      {@render headline()}
+    {:else if layout === "peek"}
       {const leader = $derived(summary.rows[0])}
       {#if leader != null}
         <p class="flex items-center gap-2 text-[0.9375rem]">

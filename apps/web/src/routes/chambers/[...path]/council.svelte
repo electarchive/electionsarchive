@@ -210,6 +210,7 @@
         names={kinds.map((kind) => kind.label)}
         levels={[]}
         span={null}
+        isFixed
       />
     {:else}
       <p
