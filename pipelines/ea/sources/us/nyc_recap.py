@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_recap"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://www.vote.nyc"
 YEARS = range(2005, 2014)
@@ -52,6 +52,8 @@ SKIP = re.compile(
     re.IGNORECASE,
 )
 LINE = re.compile(r"^\s+(.+?)\s{2,}\(?([\d,]+)\)?\s*$")
+ROW = re.compile(r"^\s*(\d+|Total)\s{2,}(?=[\d,])")
+BALLOT_COLUMNS = {"PUBLIC COUNTER", "ABS/MIL", "FED", "PRES", "AFF", "EMERG"}
 HEADER = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9 .&-]*?) - (\d\d/\d\d/\d{4})\s*$", re.MULTILINE)
 ELECTION = re.compile(
     r"(General|Primary Runoff|Presidential Primary|Primary|Special|Runoff)[A-Za-z ]*Election(?: \d{4})? - (\d\d/\d\d/\d{4})",
@@ -188,8 +190,71 @@ def pdf_text(path: Path) -> str:
     return subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
 
 
+def columns(lines: list[str], start: int) -> tuple[list[str], list[tuple[str, list[int]]]]:
+    head = []
+    at = start + 1
+    while at < len(lines) and not ROW.match(lines[at]):
+        if lines[at].strip():
+            head.append(lines[at])
+        at += 1
+    rows = []
+    middles: list[float] = []
+    for line in lines[at:]:
+        matched = ROW.match(line)
+        if matched is None:
+            if line.strip():
+                break
+            continue
+        cells = list(re.finditer(r"[\d,]+", line[matched.end() :]))
+        rows.append((matched[1], [num(cell[0]) for cell in cells]))
+        if matched[1] == "Total":
+            middles = [matched.end() + (cell.start() + cell.end()) / 2 for cell in cells]
+    names: list[list[str]] = [[] for _ in middles]
+    for line in head:
+        for part in re.finditer(r"\S+(?: \S+)*", line):
+            middle = (part.start() + part.end()) / 2
+            names[min(range(len(middles)), key=lambda k: abs(middles[k] - middle))].append(part[0])
+    return [" ".join(words) for words in names], rows
+
+
+def read_columns(page: list[str]) -> tuple[list[tuple[object, ...]], list[tuple[object, ...]]] | None:
+    title = next((m for line in page if (m := re.search(r"FOR THE OFFICE OF (?:THE )?(.+?)\s*$", line))), None)
+    elected = next((line.strip() for line in page if "NO. OF CANDIDATES TO BE ELECTED" in line), None)
+    county = next((m[1] for line in page if (m := re.fullmatch(rf"\s*({COUNTIES}) County\s*", line))), None)
+    tables = [columns(page, at) for at, line in enumerate(page) if re.fullmatch(r"\s*AD\s*", line)]
+    if title is None or elected is None or county is None or not tables:
+        return None
+    office = f"{title[1]} {elected}"
+    names, rows = tables[0]
+    if not {"WRITE-INS", "UNRECORDED", "OFFICE VOTE TOTAL"} <= set(names):
+        return None
+    written = dict(tables[1][1]) if len(tables) > 1 else {}
+    writers = tables[1][0][:-1] if len(tables) > 1 else []
+    entries = []
+    totals = []
+    for label, cells in rows:
+        if len(cells) != len(names):
+            return None
+        cell = dict(zip(names, cells, strict=True))
+        block = ("total", f"{county} County") if label == "Total" else ("ad", label)
+        totals.append((office, *block, cell["OFFICE VOTE TOTAL"] - cell["UNRECORDED"]))
+        if label == "Total":
+            continue
+        for name, votes in cell.items():
+            split = re.fullmatch(r"(.*?) \((.*)\)", name)
+            if name not in BALLOT_COLUMNS and split:
+                entries.append((office, *block, split[1].upper(), split[2].upper(), votes))
+        named = written.get(label, [0] * (len(writers) + 1))
+        if len(named) == len(writers) + 1 and named[-1] == cell["WRITE-INS"] and sum(named[:-1]) == named[-1]:
+            entries.extend((office, *block, w, "WRITE-IN", v) for w, v in zip(writers, named, strict=False) if v)
+        elif cell["WRITE-INS"]:
+            entries.append((office, *block, "UNATTRIBUTABLE WRITE-IN", "WRITE-IN", cell["WRITE-INS"]))
+    return entries, totals
+
+
 def read(path: Path) -> dict[str, object] | None:
-    lines = pdf_text(path).splitlines()
+    text = pdf_text(path)
+    lines = text.splitlines()
     found = ELECTION.search("\n".join(lines[:25]))
     if found is None:
         found = HEADER.search("\n".join(lines[:25]))
@@ -214,6 +279,19 @@ def read(path: Path) -> dict[str, object] | None:
         )
         if matched:
             scope = (matched[1], matched[2])
+    if any("OFFICE VOTE" in line for line in lines[:30]):
+        found_columns = read_columns(text.split("\f")[0].splitlines())
+        if found_columns is None:
+            return None
+        county = found_columns[1][-1][2].removesuffix(" County")
+        return {
+            "day": datetime.strptime(found[2], "%m/%d/%Y").date(),
+            "kind": found[1],
+            "scope": (county, next((line.strip() for line in lines[:12] if "Parties" in line), "")),
+            "entries": found_columns[0],
+            "totals": found_columns[1],
+            "ballots": [],
+        }
     office = None
     block = None
     expecting = False
