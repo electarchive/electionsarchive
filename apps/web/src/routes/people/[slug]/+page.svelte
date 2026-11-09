@@ -5,6 +5,7 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import { ending } from "#lib/caucus.js";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import Disclosure from "#lib/components/disclosure.svelte";
@@ -122,18 +123,6 @@
       .filter((entry) => entry.outcome != null || entry.date < today)
       .map((entry) => entry.year),
   );
-  const endings: Record<string, () => string> = {
-    died: m.person_ended_died,
-    resigned: m.person_ended_resigned,
-    elevated: m.person_ended_elevated,
-    appointed: m.person_ended_appointed,
-    annulled: m.person_ended_annulled,
-    disqualified: m.person_ended_disqualified,
-    expelled: m.person_ended_expelled,
-    removed: m.person_ended_removed,
-    withdrew: m.person_ended_withdrew,
-    lost_seat: m.person_ended_lost_seat,
-  };
   const end = $derived(
     person.isGone
       ? (person.died ??
@@ -370,13 +359,13 @@
                             from: seat.from?.slice(0, 4) ?? "",
                             to: seat.to.slice(0, 4),
                           });
-                  const reason = endings[seat.ended ?? ""];
+                  const reason = ending(seat.ended, spell.path);
                   return reason == null
                     ? m.person_seat({ place: seat.name, span })
                     : m.person_seat_ended({
                         place: seat.name,
                         span,
-                        reason: reason().replace(/^\p{Lu}/u, (letter) =>
+                        reason: reason.replace(/^\p{Lu}/u, (letter) =>
                           letter.toLowerCase(),
                         ),
                       });

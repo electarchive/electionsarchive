@@ -5,7 +5,7 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
 import type { Counting } from "#lib/server/counting.js";
-import { partyOn, segments, stand } from "#lib/caucus.js";
+import { ending, partyOn, segments, stand } from "#lib/caucus.js";
 import {
   CATEGORY_LABELS,
   COLUMN_LABELS,
@@ -1941,18 +1941,6 @@ function personMarkdown(
     office: m.person_parties_office,
     group: m.person_parties_group,
   };
-  const endings: Record<string, (() => string) | undefined> = {
-    died: m.person_ended_died,
-    resigned: m.person_ended_resigned,
-    elevated: m.person_ended_elevated,
-    appointed: m.person_ended_appointed,
-    annulled: m.person_ended_annulled,
-    disqualified: m.person_ended_disqualified,
-    expelled: m.person_ended_expelled,
-    removed: m.person_ended_removed,
-    withdrew: m.person_ended_withdrew,
-    lost_seat: m.person_ended_lost_seat,
-  };
   const ways = {
     nominated: m.person_parties_nominated,
     line: m.person_parties_line,
@@ -2025,7 +2013,7 @@ function personMarkdown(
                           [
                             seat.name,
                             years(seat.from, seat.to),
-                            endings[seat.ended ?? ""]?.().replace(
+                            ending(seat.ended, spell.path)?.replace(
                               /^\p{Lu}/u,
                               (letter) => letter.toLowerCase(),
                             ) ?? null,

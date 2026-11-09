@@ -22,15 +22,42 @@ const DEPARTURES: Record<string, () => string> = {
   disqualified: m.chamber_end_disqualified,
   elevated: m.chamber_end_elevated,
   appointed: m.chamber_end_appointed,
+  chose_another_seat: m.chamber_end_chose_another_seat,
   withdrew: m.chamber_end_withdrew,
   term_end: m.chamber_end_term_end,
 };
+const ENDINGS: Record<string, () => string> = {
+  died: m.person_ended_died,
+  resigned: m.person_ended_resigned,
+  elevated: m.person_ended_elevated,
+  appointed: m.person_ended_appointed,
+  annulled: m.person_ended_annulled,
+  disqualified: m.person_ended_disqualified,
+  expelled: m.person_ended_expelled,
+  removed: m.person_ended_removed,
+  withdrew: m.person_ended_withdrew,
+  lost_seat: m.person_ended_lost_seat,
+  chose_another_seat: m.person_ended_chose_another_seat,
+};
 const PEERAGE = new Set(["gb"]);
 
+function isPeerage(cause: string | null, path: string | null | undefined) {
+  return (
+    cause === "elevated" &&
+    PEERAGE.has(path?.replace(/^chambers\//u, "").split("/", 1)[0] ?? "")
+  );
+}
+
 export function departure(cause: string | null, path: string | undefined) {
-  return cause === "elevated" && PEERAGE.has(path?.split("/", 1)[0] ?? "")
+  return isPeerage(cause, path)
     ? m.chamber_end_peerage()
     : (DEPARTURES[cause ?? ""]?.() ?? null);
+}
+
+export function ending(cause: string | null, path: string | null) {
+  return isPeerage(cause, path)
+    ? m.person_ended_peerage()
+    : (ENDINGS[cause ?? ""]?.() ?? null);
 }
 
 type Party = {
