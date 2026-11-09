@@ -23,7 +23,7 @@ import { pollsClose } from "#lib/live/closes.js";
 import { Rule, rule } from "#lib/measure.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent, side as sideOf, UNAFFILIATED } from "#lib/party.js";
-import { os, remember } from "#lib/server/cache.js";
+import { dataVersion, os, remember } from "#lib/server/cache.js";
 import { counting } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -908,6 +908,11 @@ export async function names(
   return { full, short };
 }
 
+const datedMemo = {
+  version: "",
+  entries: new Map<string, { label: string; short: string | null }>(),
+};
+
 const datedTogether = together(
   async (
     asks: Array<{
@@ -917,13 +922,33 @@ const datedTogether = together(
     }>,
     { common, historical },
   ) => {
-    const unique = new Map(
-      asks
-        .flatMap((ask) => ask.pairs)
-        .map((pair) => [`${pair.id}|${pair.on ?? ""}`, pair]),
-    )
-      .values()
-      .toArray();
+    const version = dataVersion();
+    if (version !== datedMemo.version) {
+      datedMemo.version = version;
+      datedMemo.entries.clear();
+    }
+    const scope = `${historical}|${common.join(",")}|`;
+    const found = new Map<string, { label: string; short: string | null }>();
+    const lookup = (id: string, on: string | null) =>
+      found.get(`${id}|${on ?? ""}`) ?? { label: "", short: null };
+    const unique: Array<{ id: string; on: string | null }> = [];
+    for (const pair of asks.flatMap((ask) => ask.pairs)) {
+      const key = `${pair.id}|${pair.on ?? ""}`;
+      if (found.has(key)) {
+        continue;
+      }
+      const hit =
+        version === "" ? undefined : datedMemo.entries.get(scope + key);
+      if (hit == null) {
+        found.set(key, { label: "", short: null });
+        unique.push(pair);
+      } else {
+        found.set(key, hit);
+      }
+    }
+    if (unique.length === 0) {
+      return () => lookup;
+    }
     const ids = [...new Set(unique.map((pair) => pair.id))];
     const result = await db.execute<{
       entity_id: string;
@@ -985,7 +1010,6 @@ const datedTogether = together(
       where p.entity_id = any(array(select entity_id from name where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('short', 'abbreviation')))
         and short.text is not null
     `);
-    const found = new Map<string, { label: string; short: string | null }>();
     for (const row of result.rows) {
       const key = `${row.entity_id}|${row.on ?? ""}`;
       const entry = found.get(key) ?? { label: "", short: null };
@@ -996,8 +1020,21 @@ const datedTogether = together(
       }
       found.set(key, entry);
     }
-    const lookup = (id: string, on: string | null) =>
-      found.get(`${id}|${on ?? ""}`) ?? { label: "", short: null };
+    if (version !== "" && version === datedMemo.version) {
+      for (const pair of unique) {
+        const key = `${pair.id}|${pair.on ?? ""}`;
+        const entry = found.get(key);
+        if (entry != null) {
+          datedMemo.entries.set(scope + key, entry);
+        }
+      }
+      for (const oldest of datedMemo.entries.keys()) {
+        if (datedMemo.entries.size <= 100_000) {
+          break;
+        }
+        datedMemo.entries.delete(oldest);
+      }
+    }
     return () => lookup;
   },
   {
@@ -8198,7 +8235,7 @@ export const contests = {
                         where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
                         limit 1
                       ) hit
-                      where grp.root not in (select root from direct)
+                      where grp.id <> grp.root and not (grp.root = any(array(select root from direct)))
                     ),
                     decided as materialized (
                       select distinct grp.root from grp
@@ -8209,15 +8246,15 @@ export const contests = {
                         where o.contest_id = grp.id
                         limit 1
                       ) hit
-                      where grp.root not in (select root from tallied)
+                      where not (grp.root = any(array(select root from tallied)))
                     )
                     select r.*, (select ${reached} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
                       select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-                        r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
+                        r."isRemainder", r.id = any(array(select root from tallied)) as counted, r.own, r.lineage, r.notional, r.date_from
                       from roots r
                       where r.id <> ${contest.root}::uuid
                     ) r
-                    where r.counted or (r.id in (select root from decided)
+                    where r.counted or (r.id = any(array(select root from decided))
                       and not (r.own and ${contest.place?.id ?? null}::uuid not in (select id from anc)))
                     order by r.date_from desc nulls last, r.id
                   `),

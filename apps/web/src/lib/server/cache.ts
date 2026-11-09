@@ -49,6 +49,10 @@ type Entry = {
 
 export const refreshing = new AsyncLocalStorage<boolean>();
 
+export function dataVersion() {
+  return state.version;
+}
+
 const entries = new Map<string, Entry>();
 const names = new WeakMap<object, string>();
 const state: {
