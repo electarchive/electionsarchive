@@ -617,20 +617,27 @@ def emit(
         held: dict[UUID, UUID] = {}
         ran: dict[UUID, set[tuple[UUID, int]]] = {}
         called: dict[UUID, list[str]] = {}
-        for candidacy_id, person_id, label, ballot, district, year, own in conn.execute(
-            """select y.id, p.id, n.text, y.ballot_name, k.district_area_id, extract(year from e.date_from)::int, h.pipeline = %s
+        for candidacy_id, person_id, label, ballot in conn.execute(
+            """select y.id, p.id, n.text, y.ballot_name
                from person p join name n on n.entity_id = p.id and n.is_preferred
                join candidacy y on y.person_id = p.id join contest_option o on o.id = y.option_id
                join contest k on k.id = o.contest_id join election e on e.id = k.election_id
                join changeset h on h.id = y.changeset_id where e.polity_id = %s or h.pipeline = %s""",
-            [pipeline, city, pipeline],
+            [city, pipeline],
         ).fetchall():
             held[candidacy_id] = person_id
             called[person_id] = _words(label)
-            if district is not None and not own:
-                ran.setdefault(person_id, set()).add((district, year))
             for key in {*_keys(label), *_keys(ballot or "")}:
                 people.setdefault(key, set()).add(person_id)
+        for person_id, district, year in conn.execute(
+            """select y.person_id, k.district_area_id, extract(year from e.date_from)::int
+               from candidacy y join contest_option o on o.id = y.option_id
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               join changeset h on h.id = y.changeset_id
+               where y.person_id = any(%s) and k.district_area_id is not null and h.pipeline <> %s""",
+            [list(called), pipeline],
+        ).fetchall():
+            ran.setdefault(person_id, set()).add((district, year))
         made: set[UUID] = set()
         values = []
         skipped = []
