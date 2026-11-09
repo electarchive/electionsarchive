@@ -190,6 +190,7 @@ BOROUGHS = {
 WRITE_INS = "Write-ins"
 WRITTEN = ("Write-ins", "WriteIn", "Undeclared Write-ins")
 INACTIVE = "Inactive ballots"
+SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 PERSONS = {
     "Andrew Yang": ("fec.candidate", "P00006486"),
     "Andrew M. Cuomo": ("wikidata", "Q11673"),
@@ -446,6 +447,11 @@ def parse() -> None:
     ).write_parquet(PARSED / "special_eds.parquet")
 
 
+def words(label: str) -> tuple[str, str] | None:
+    found = [word for word in slug(label).split("-") if word.isalpha() and word not in SUFFIXES]
+    return (found[0], found[-1]) if found else None
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "rounds.parquet")
     with connect() as conn:
@@ -549,6 +555,34 @@ def emit() -> Path:
             if slug(label) in known and (own := cs.key(f"{SOURCE}.person", slug(label))) != persons[label]:
                 cs.merge(own, persons[label])
 
+        def pick(label: str, day: date, area: UUID, office: UUID | None, body: UUID | None) -> UUID:
+            if label in persons:
+                return persons[label]
+            if slug(label) not in known and (token := words(label)) is not None:
+                found = {
+                    person
+                    for person, ballot_name in conn.execute(
+                        """select ca.person_id, ca.ballot_name from candidacy ca
+                           join contest_option o on o.id = ca.option_id
+                           join contest c on c.id = o.contest_id
+                           join election e on e.id = c.election_id
+                           join changeset h on h.id = ca.changeset_id
+                           where ca.role = 'head' and h.pipeline <> %s and extract(year from e.date_from) = %s
+                             and c.district_area_id = %s and c.office_id is not distinct from %s
+                             and c.body_id is not distinct from %s""",
+                        [SOURCE, day.year, area, office, body],
+                    ).fetchall()
+                    if ballot_name is not None and words(ballot_name) == token
+                }
+                if len(found) == 1:
+                    persons[label] = found.pop()
+                    return persons[label]
+            person = cs.key(f"{SOURCE}.person", slug(label))
+            if person in cs.minted:
+                cs.add("person", id=person)
+                name(person, label)
+            return person
+
         for (day,) in frame.select("date").unique().sort("date").iter_rows():
             election = cs.key("us.election", f"{day}:new-york-city:primary")
             cs.add("election", id=election, polity_id=city, kind="primary", date_from=day, date_to=day, status="held")
@@ -643,13 +677,7 @@ def emit() -> Path:
                     )
                     if label in WRITTEN:
                         continue
-                    if label in persons:
-                        person = persons[label]
-                    else:
-                        person = cs.key(f"{SOURCE}.person", slug(label))
-                        if person in cs.minted:
-                            cs.add("person", id=person)
-                            name(person, label)
+                    person = pick(label, day, district_area, owner, council if office == "council" else None)
                     cs.add(
                         "candidacy",
                         id=cs.key("us.candidacy", f"{option_key}:head"),
@@ -779,10 +807,7 @@ def emit() -> Path:
                     )
                     if label in WRITTEN:
                         continue
-                    person = persons.get(label) or cs.key(f"{SOURCE}.person", slug(label))
-                    if person in cs.minted:
-                        cs.add("person", id=person)
-                        name(person, label)
+                    person = pick(label, day, district_area, None, council)
                     cs.add(
                         "candidacy",
                         id=cs.key("us.candidacy", f"{option_key}:head"),
