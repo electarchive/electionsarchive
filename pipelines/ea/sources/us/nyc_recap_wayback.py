@@ -219,11 +219,29 @@ def read_page(page: str) -> dict[str, object] | None:
                 columns[k][row_index].append(found_code)
             continue
         if code_row is None:
+
+            def nearest(end: int) -> int:
+                return min(range(len(candidates)), key=lambda k: abs(candidates[k][1] + 1.5 - end))
+
             for m in re.finditer(r"\S+(?: \S+)*", line):
-                if m.end() >= candidates[0][1] - 8:
-                    columns[min(range(len(candidates)), key=lambda k: abs(candidates[k][1] + 1.5 - m.end()))][
-                        row_index
-                    ].append(m.group())
+                if m.end() < candidates[0][1] - 8:
+                    continue
+                pieces = [[]]
+                for word in re.finditer(r"\S+", m.group()):
+                    end = m.start() + word.end()
+                    pieces[-1].append(word.group())
+                    if (
+                        end < m.end()
+                        and abs(candidates[nearest(end)][1] + 1.5 - end) <= 1.5
+                        and nearest(end) != nearest(m.end())
+                    ):
+                        pieces.append([])
+                start = m.start()
+                for piece in pieces:
+                    text = " ".join(piece)
+                    start = line.index(text, start)
+                    columns[nearest(start + len(text))][row_index].append(text)
+                    start += len(text)
             continue
         for k, run in enumerate(
             align(

@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import unicodedata
 from collections import Counter
 from datetime import date, datetime, timedelta
 from difflib import SequenceMatcher
@@ -443,18 +444,26 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
     return None
 
 
+def _plain(text: str) -> list[str]:
+    folded = "".join(c for c in unicodedata.normalize("NFKD", text.lower()) if not unicodedata.combining(c))
+    return re.sub(r"[^a-z ]", " ", folded.split("/")[0]).split()
+
+
 def _words(text: str) -> list[str]:
-    return [
-        w for w in re.sub(r"[^a-z ]", " ", text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")
-    ]
+    return [w for w in _plain(text) if w not in ("jr", "sr", "ii", "iii")]
 
 
 def _fits(first: str, other: str) -> bool:
     return first == other or min(len(first), len(other)) == 1 and first[0] == other[0]
 
 
+def _agree(one: list[str], other: list[str]) -> bool:
+    first, second = [w[0] for w in one[1:-1]], [w[0] for w in other[1:-1]]
+    return not first or not second or first == second
+
+
 def _keys(text: str) -> list[tuple[str | tuple[str, ...], ...]]:
-    words = re.sub(r"[^a-z ]", " ", text.lower().split("/")[0]).split()
+    words = _plain(text)
     suffixes = tuple(w for w in words if w in ("jr", "sr", "ii", "iii"))
     core = [w for w in words if w not in suffixes]
     if len(core) < 2:
@@ -481,6 +490,10 @@ def emit(
     entries = pl.read_parquet(parsed / "entries.parquet")
     totals = pl.read_parquet(parsed / "totals.parquet")
     ballots = pl.read_parquet(parsed / "ballots.parquet")
+    sections: dict[tuple[str, str], set[str]] = {}
+    for day_text, kind, county in entries.select("day", "kind", "county").unique().iter_rows():
+        if county is not None:
+            sections.setdefault((day_text, kind), set()).add(county)
     keys = []
     for office, county in entries.select("office", "county").unique().iter_rows():
         found = classify(office, county)
@@ -617,16 +630,23 @@ def emit(
         held: dict[UUID, UUID] = {}
         ran: dict[UUID, set[tuple[UUID, int]]] = {}
         called: dict[UUID, list[str]] = {}
-        for candidacy_id, person_id, label, ballot, district, year, own in conn.execute(
-            """select y.id, p.id, n.text, y.ballot_name, k.district_area_id, extract(year from e.date_from)::int, h.pipeline = %s
+        minted: set[UUID] = set()
+        for candidacy_id, person_id, label, ballot, district, year, own, mine in conn.execute(
+            """select y.id, p.id, n.text, y.ballot_name, k.district_area_id, extract(year from e.date_from)::int, h.pipeline = %s,
+                      hp.pipeline = %s
                from person p join name n on n.entity_id = p.id and n.is_preferred
+               join changeset hp on hp.id = p.changeset_id
                join candidacy y on y.person_id = p.id join contest_option o on o.id = y.option_id
                join contest k on k.id = o.contest_id join election e on e.id = k.election_id
-               join changeset h on h.id = y.changeset_id where e.polity_id = %s or h.pipeline = %s""",
-            [pipeline, city, pipeline],
+               join changeset h on h.id = y.changeset_id
+               where e.polity_id = %s or h.pipeline = %s
+                  or k.id in (select rs.contest_id from result_set rs join changeset g on g.id = rs.changeset_id where g.pipeline = %s)""",
+            [pipeline, pipeline, city, pipeline, pipeline],
         ).fetchall():
             held[candidacy_id] = person_id
             called[person_id] = _words(label)
+            if mine:
+                minted.add(person_id)
             if district is not None and not own:
                 ran.setdefault(person_id, set()).add((district, year))
             for key in {*_keys(label), *_keys(ballot or "")}:
@@ -705,6 +725,21 @@ def emit(
                 skipped.append(f"{label}: {grain} lines do not sum to the report's total")
                 continue
             rows = pl.concat(parts)
+            spoken = pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")
+            families: dict[tuple[str | tuple[str, ...], ...], list[str]] = {}
+            for c in rows.filter(spoken)["name"].unique().sort():
+                if len(found_keys := _keys(c)) > 2:
+                    families.setdefault(found_keys[2], []).append(c)
+            alias = {}
+            for family in families.values():
+                longest = max(family, key=lambda c: (len(_words(c)), c))
+                middle = [w[0] for w in _words(longest)[1:-1]]
+                if all([w[0] for w in _words(c)[1:-1]] in ([], middle) for c in family):
+                    alias |= {c: longest for c in family if c != longest}
+            if alias:
+                rows = rows.with_columns(
+                    pl.when(spoken).then(pl.col("name").replace(alias)).otherwise(pl.col("name")).alias("name")
+                )
             era = "2002" if day_text < "2012-01-01" else "2012"
             if is_state:
                 state_kind = (
@@ -952,13 +987,15 @@ def emit(
             magnitude = int(rows["size"][0])
             attach = bool(found)
             inside = False
+            beyond = 0.0 if not is_state else 1.0
             if is_state and area is not None:
                 outside = conn.execute(
                     """select st_area(st_difference(g.geom, st_buffer(n.geom, 0.002))) / st_area(g.geom)
                        from area_geometry g, area_geometry n where g.area_id = %s and g.valid @> %s::date and n.area_id = %s""",
                     [area, day, place],
                 ).fetchone()
-                inside = outside is not None and outside[0] <= (0.1 if fuller else 0.01)
+                beyond = 1.0 if outside is None else float(outside[0])
+                inside = beyond <= (0.1 if fuller else 0.01)
             if attach:
                 contest = found[0][0]
                 contest_key = conn.execute(
@@ -970,7 +1007,7 @@ def emit(
                        join result_value v on v.result_set_k = rs.k and v.measure = 1
                        join contest_option o on o.k = v.option_k
                        where rs.contest_id = %s and rs.is_default
-                         and not exists (select 1 from contest_option ch where ch.parent_option_id = o.id)
+                         and not exists (select 1 from contest_option ch join result_value w on w.result_set_k = rs.k and w.option_k = ch.k and w.measure = 1 where ch.parent_option_id = o.id)
                        group by rs.id""",
                     [contest],
                 ).fetchall()
@@ -1013,14 +1050,18 @@ def emit(
             roots: dict[str, UUID] = {}
             tickets: dict[tuple[str, str | None], UUID] = {}
             known: dict[tuple[str, str], UUID] = {}
+            spellings: dict[UUID, list[str]] = {}
             clash: set[tuple[str, str]] = set()
             if attach:
                 for option_id, ballot_name in conn.execute(
                     """select o.id, ca.ballot_name from contest_option o join candidacy ca on ca.option_id = o.id and ca.role = 'head'
-                       where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
-                    [contest],
+                       join changeset h on h.id = o.changeset_id
+                       where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')
+                         and h.pipeline <> %s""",
+                    [contest, pipeline],
                 ).fetchall():
                     words = _words(ballot_name)
+                    spellings[option_id] = words
                     for token in {(words[0], words[-1]), (words[0][0], words[-1])}:
                         if token in known:
                             clash.add(token)
@@ -1038,6 +1079,27 @@ def emit(
                     return None
                 found = {
                     option for (first, last), option in known.items() if words[-1] in (first, last) or rest == last
+                }
+                if len(found) == 1:
+                    return found.pop()
+                found = {
+                    option
+                    for (first, last), option in known.items()
+                    if first == words[0] and len(first) > 1 and SequenceMatcher(None, words[-1], last).ratio() >= 0.8
+                }
+                if len(found) == 1:
+                    return found.pop()
+                found = {
+                    option
+                    for option, other in spellings.items()
+                    if other[0] == words[0]
+                    and len(words[0]) > 1
+                    and (
+                        words[-1] in other[1:]
+                        or other[-1] in words[1:]
+                        or min(len(words[-1]), len(other[-1])) >= 4
+                        and (words[-1].endswith(other[-1]) or other[-1].endswith(words[-1]))
+                    )
                 }
                 if len(found) == 1:
                     return found.pop()
@@ -1093,19 +1155,19 @@ def emit(
                     for c, option in assigned.items()
                     if hits[option] == 1 or any(_fits(first, _words(c)[0]) for first in given.get(option, ()))
                 }
+            full = set(known.values()) <= set(assigned.values())
             if (
                 attach
                 and strict
+                and not full
                 and (unmatched := [c for c in ranked["name"] if c not in assigned and lookup(c.title()) not in given])
             ):
                 skipped.append(f"{label}: {unmatched} do not match the contest's options {sorted(known)}")
                 continue
             if attach:
-                covered = (
-                    not is_state
-                    and area is not None
-                    and set(known.values()) <= set(assigned.values())
-                    and bool(
+
+                def within(present: set[str]) -> bool:
+                    return bool(
                         (
                             conn.execute(
                                 """select coalesce(sum(st_area(st_intersection(g.geom, st_buffer(c.geom, -0.002)))), 0) / st_area(g.geom) <= 0.01
@@ -1114,7 +1176,7 @@ def emit(
                                    where g.area_id = %s and g.valid @> %s::date
                                    group by g.geom""",
                                 [
-                                    [county_areas[county] for county in county_areas if county not in counties],
+                                    [county_areas[county] for county in county_areas if county not in present],
                                     day,
                                     area,
                                     day,
@@ -1123,7 +1185,27 @@ def emit(
                             or [False]
                         )[0]
                     )
-                )
+
+                covered = False
+                if full and area is not None and beyond <= 0.01:
+                    covered = within(set(counties))
+                    if (
+                        not covered
+                        and sections[(day_text, kind)] > set(counties)
+                        and within(sections[(day_text, kind)])
+                    ):
+                        others = conn.execute(
+                            """select max(t.total) from (
+                                 select sum(v.value) total from result_set rs
+                                 join changeset h on h.id = rs.changeset_id
+                                 join result_value v on v.result_set_k = rs.k and v.measure = 1
+                                 join contest_option o on o.k = v.option_k
+                                 where rs.contest_id = %s and rs.status = 'active' and h.pipeline <> %s
+                                   and not exists (select 1 from contest_option ch join result_value w on w.result_set_k = rs.k and w.option_k = ch.k and w.measure = 1 where ch.parent_option_id = o.id)
+                                 group by rs.id) t""",
+                            [contest, pipeline],
+                        ).fetchone()
+                        covered = others is not None and others[0] is not None and mine >= float(others[0]) * 0.995
                 if covered:
                     completeness = 1
                 elif (completeness < 0.995 and not is_state) or (
@@ -1242,8 +1324,12 @@ def emit(
                         )
                     continue
                 head = cs.key("us.candidacy", f"{root_key}:head")
-                matched = next((people[key] for key in _keys(label_text) if key in people), set())
                 spelled = _words(label_text)
+                matched = {
+                    p
+                    for p in next((people[key] for key in _keys(label_text) if key in people), set())
+                    if p not in minted or _agree(called[p], spelled)
+                }
                 pool = {
                     p
                     for key in _keys(label_text)
