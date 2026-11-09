@@ -180,6 +180,12 @@ MISSPELLED = {
     "Jonathan S. Kreisstomkins": "Jonathan S. Kreiss-Tomkins",
 }
 PERSONS = {("177293", year): "José E. Serrano" for year in range(1974, 1989)}
+IRISH = re.compile(
+    r"\bO(Boyle|Brian|Brien|Bryan|Callaghan|Connell|Connor|Day|Donnell|Donoghue|Donovan|Driscoll|Dwyer|Flaherty|"
+    r"Gorman|Grady|Halloran|Hara|Hare|Kane|Keefe|Keeffe|Leary|Loughlin|Malley|Mara|Meara|Neil|Neill|Reilly|Rourke|"
+    r"Shea|Sullivan|Toole)\b",
+    re.IGNORECASE,
+)
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
     "January",
@@ -485,7 +491,8 @@ def emit() -> Path | str:
             return id, False
 
         def title(text: str) -> str:
-            return re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text.title())
+            text = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text.title())
+            return IRISH.sub(lambda match: "O'" + match[1].capitalize(), text)
 
         def person_name(row: dict[str, object]) -> str:
             first, middle, last, suffix = (row[column] for column in ("first", "middle", "last", "suffix"))
