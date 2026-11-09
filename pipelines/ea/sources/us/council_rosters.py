@@ -15,6 +15,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.names import compatible, tokens
+from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
 
 SOURCE = "us.council_rosters"
@@ -24,6 +25,8 @@ LOG = DATA / "logs" / "council_rosters-unmatched.tsv"
 CHRONOLA = "https://cityclerk.lacity.org/chronola/index.cfm?fuseaction=app.OrganizationActive"
 NYC = "https://data.cityofnewyork.us/resource/uvw5-9znb.json?$limit=50000"
 HOUSTON = "https://www.houstontx.gov/citysec/mayors.pdf"
+WIKIPEDIA = "https://en.wikipedia.org/w/index.php?title={}&oldid={}&action=raw"
+GREEN_BOOK = "https://a856-gbol.nyc.gov/GBOLWebsite/GreenBook/Details?orgId=16"
 QUERY = """SELECT ?statement ?person ?label ?start ?startPrecision ?end ?endPrecision ?causeLabel WHERE {{
   VALUES ?position {{ {positions} }}
   ?person p:P39 ?statement . ?statement ps:P39 ?position .
@@ -155,6 +158,32 @@ HOUSTON_SPLITS: dict[
         ("Mary Nan Huffman", "elected", (date(2022, 2, 2), "day"), None, None),
     ],
 }
+ABSENT: list[tuple[str, str, date, str, list[tuple[str, dict[str, object]]]]] = [
+    (
+        "District 4",
+        "Andrew Eristoff",
+        date(1999, 7, 1),
+        "day",
+        [("wikipedia", {"title": "Andrew_Sidamon-Eristoff", "oldid": 1364411888})],
+    ),
+    (
+        "District 15",
+        "José Rivera",
+        date(2000, 12, 31),
+        "day",
+        [("wikipedia", {"title": "Jose_Rivera_(politician)", "oldid": 1372549516})],
+    ),
+    (
+        "District 51",
+        "Stephen Fiala",
+        date(2001, 6, 1),
+        "month",
+        [
+            ("wikipedia", {"title": "Stephen_Fiala", "oldid": 1384594722}),
+            ("green-book", {"organization": "Richmond County Clerk", "appointed": "2001-06-20"}),
+        ],
+    ),
+]
 NOTES = {
     "chronola": "Every term of every member of the Los Angeles City Council as the City Clerk's ChronoLA database "
     "lists it, election by election since 1850: the date each member was elected, reelected, appointed, or sworn "
@@ -164,6 +193,11 @@ NOTES = {
     "houston": "The City Secretary's list of Houston's mayors, council members, and controllers by term since 1958, "
     "with the appointments, deaths, resignations, and special elections it notes. Terms start and end with the "
     "year printed; dated changes are transcribed from the list's notes.",
+    "wikipedia": "Wikipedia articles on New York City Council members missing from the Council's open data for the "
+    "1998–2001 term, each read at a fixed revision to find the member's district and the date the member left the "
+    "Council.",
+    "green-book": "The City of New York's official directory, which lists the date each official in it was appointed. "
+    "It gives the date of Stephen Fiala's appointment as Richmond County Clerk, which ended his council term.",
     "wikidata": "Council members' terms as recorded in Wikidata (position held, P39), with start and end dates and "
     "end causes from the statement's qualifiers, used where they date a roster term more finely or give its end "
     "cause.",
@@ -201,8 +235,57 @@ def fetch() -> None:
             )
     raw.fetch(SOURCE, NYC, suffix=".json")
     raw.fetch(SOURCE, HOUSTON, suffix=".pdf")
+    raw.fetch(SOURCE, GREEN_BOOK, suffix=".html")
+    for *_, citations in ABSENT:
+        for name, locator in citations:
+            if name == "wikipedia":
+                raw.fetch(SOURCE, WIKIPEDIA.format(locator["title"], locator["oldid"]), suffix=".txt")
     for positions in POSITIONS.values():
         raw.fetch(SOURCE, _sparql(positions), suffix=".json")
+
+
+def _number(text: str | None) -> int | None:
+    found = re.search(r"(\d+)\s*$", text or "")
+    return None if found is None else int(found[1])
+
+
+def _given(words: list[str]) -> set[str]:
+    return {
+        words[0],
+        *NICKNAMES.get(words[0], "").split(),
+        *(full for full, short in NICKNAMES.items() if words[0] in short.split()),
+    }
+
+
+def _same(name: str, text: str) -> bool:
+    if compatible(name, text):
+        return True
+    mine, other = tokens(name), tokens(text)
+    if mine is None or other is None:
+        return False
+    (left, _), (right, _) = mine, other
+    if left[-1] != right[-1] and left[-1] not in right[1:] and right[-1] not in left[1:]:
+        return False
+    left, right = left[:-1], right[:-1]
+    return bool(
+        _given(left) & set(right)
+        or _given(right) & set(left)
+        or (min(len(left[0]), len(right[0])) >= 3 and (left[0].startswith(right[0]) or right[0].startswith(left[0])))
+    )
+
+
+def _alike(name: str, texts: set[str]) -> bool:
+    parts = tokens(name)
+    return any(
+        compatible(name, text)
+        or (
+            parts is not None
+            and (other := tokens(text)) is not None
+            and other[0][-1] == parts[0][-1]
+            and other[0][0][:1] == parts[0][0][:1]
+        )
+        for text in texts
+    )
 
 
 def _day(text: str) -> date:
@@ -273,16 +356,34 @@ def _chronola() -> list[dict[str, object]]:
 
 
 def _socrata() -> list[dict[str, object]]:
-    rows = []
+    rows: list[dict[str, object]] = []
     records = json.loads(raw.cached(SOURCE, NYC).path.read_text())
     districts: dict[str, set[str]] = defaultdict(set)
     for record in records:
         if "district" in record:
             districts[record["council_member_id"]].add(record["district"])
+    spans: list[tuple[dict[str, str], date, date, str | None]] = []
     for record in records:
         start, end = date.fromisoformat(record["term_start"][:10]), date.fromisoformat(record["term_end"][:10])
         known = districts[record["council_member_id"]]
-        district = record.get("district") or (next(iter(known)) if len(known) == 1 else None)
+        spans.append((record, start, end, record.get("district") or (next(iter(known)) if len(known) == 1 else None)))
+    starts = {
+        (record["council_member_id"], district, start): index
+        for index, (record, start, _, district) in enumerate(spans)
+    }
+    absorbed: set[int] = set()
+    for index, (record, start, end, district) in enumerate(spans):
+        if index in absorbed:
+            continue
+        while (end.month, end.day) != (12, 31) and (
+            following := starts.get((record["council_member_id"], district, end + timedelta(days=1)))
+        ) is not None:
+            absorbed.add(following)
+            end = spans[following][2]
+        spans[index] = (record, start, end, district)
+    for index, (record, start, end, district) in enumerate(spans):
+        if index in absorbed:
+            continue
         rows.append(
             {
                 "council": "new-york-city",
@@ -363,7 +464,27 @@ def _houston() -> tuple[list[dict[str, object]], list[tuple[int, int]]]:
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     houston, sizes = _houston()
-    rows = [row | {"name": RENAMED.get(str(row["name"]), row["name"])} for row in [*_chronola(), *_socrata(), *houston]]
+    absent = [
+        {
+            "council": "new-york-city",
+            "seat": seat,
+            "person_key": None,
+            "name": name,
+            "start": date(1998, 1, 1),
+            "start_precision": "day",
+            "end": end,
+            "end_precision": precision,
+            "acquired_via": "elected",
+            "ended_via": "resigned",
+            "locator": json.dumps(citations[0][1]),
+            "citations": json.dumps(citations),
+        }
+        for seat, name, end, precision, citations in ABSENT
+    ]
+    rows = [
+        row | {"name": RENAMED.get(str(row["name"]), row["name"])}
+        for row in [*_chronola(), *_socrata(), *houston, *absent]
+    ]
     pl.DataFrame(rows, schema_overrides={"start": pl.Date, "end": pl.Date}, infer_schema_length=None).sort(
         "council", "seat", "start", "name"
     ).write_parquet(PARSED / "roster.parquet")
@@ -373,6 +494,7 @@ def parse() -> None:
     runs: dict[str, list[tuple[str, str, int]]] = {
         "houston": [],
         "los-angeles": [(str(districted["start"].min()), "day", districted["seat"].n_unique())],
+        "new-york-city": [(str(date(1983, 6, 1)), "month", 35), (str(date(1992, 1, 1)), "day", 51)],
     }
     for year, seats in sizes:
         if not runs["houston"] or runs["houston"][-1][2] != seats:
@@ -423,7 +545,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="City council members' terms from each clerk's official roster (Los Angeles, New York City, "
-            "and Houston), with Wikidata where it dates a term more finely, linked to the elections they won",
+            "and Houston), with Wikidata where it dates a term more finely, linked to the elections they won. Where "
+            "sources recorded one member's elections in the same district under two people, those two are joined "
+            "into one.",
             polity="US",
         )
         sources: dict[str, UUID] = {}
@@ -453,6 +577,37 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources["los-angeles"])
         cs.artifact(raw.cached(SOURCE, NYC), sources["new-york-city"])
         cs.artifact(raw.cached(SOURCE, HOUSTON), sources["houston"])
+        sources["wikipedia"] = cs.source("Wikipedia", "Members of the New York City Council")
+        cs.add(
+            "source",
+            id=sources["wikipedia"],
+            kind="community",
+            publisher="Wikipedia",
+            title="Members of the New York City Council",
+            url="https://en.wikipedia.org/wiki/New_York_City_Council",
+            license="CC BY-SA 4.0",
+            notes=NOTES["wikipedia"],
+        )
+        sources["green-book"] = cs.source(
+            "City of New York, Department of Citywide Administrative Services",
+            "The Green Book: Official Directory of the City of New York",
+        )
+        cs.add(
+            "source",
+            id=sources["green-book"],
+            kind="official_body",
+            publisher="City of New York, Department of Citywide Administrative Services",
+            title="The Green Book: Official Directory of the City of New York",
+            url=GREEN_BOOK,
+            notes=NOTES["green-book"],
+        )
+        cs.artifact(raw.cached(SOURCE, GREEN_BOOK), sources["green-book"])
+        for *_, citations in ABSENT:
+            for name, locator in citations:
+                if name == "wikipedia":
+                    cs.artifact(
+                        raw.cached(SOURCE, WIKIPEDIA.format(locator["title"], locator["oldid"])), sources["wikipedia"]
+                    )
         for positions in POSITIONS.values():
             cs.artifact(raw.cached(SOURCE, _sparql(positions)), wikidata)
         bodies: dict[str, UUID] = {}
@@ -467,6 +622,15 @@ def emit() -> Path:
             for value, entity in conn.execute("select value, entity_id from external_id where scheme = 'wikidata'")
         }
         tagged = set(known.values())
+        minted: dict[str, UUID] = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
+        own = {
+            person
+            for (person,) in conn.execute(
+                "select p.id from person p join changeset h on h.id = p.changeset_id where h.pipeline = %s", [SOURCE]
+            )
+        }
         ran: dict[UUID, dict[UUID, set[str]]] = defaultdict(lambda: defaultdict(set))
         won: dict[UUID, list[tuple[date, UUID, UUID, str | None]]] = defaultdict(list)
         for body, day, contest, person, ballot, preferred, elected, area in conn.execute(
@@ -491,30 +655,74 @@ def emit() -> Path:
         named: dict[UUID, str] = {}
         created: set[UUID] = set()
         seated: set[UUID] = set()
-        linked: set[UUID] = set()
+        linked: dict[UUID, UUID] = {}
+        merged = 0
+
+        def join(one: UUID, other: UUID) -> UUID | None:
+            nonlocal merged
+            if conn.execute(
+                """select from external_id a join external_id b on b.scheme = a.scheme and b.value <> a.value
+                   where a.entity_id = %s and b.entity_id = %s and a.scheme in ('wikidata', 'bioguide')""",
+                [one, other],
+            ).fetchone():
+                return None
+            counts = dict(
+                conn.execute(
+                    "select person_id, count(*) from candidacy where person_id = any(%s) group by person_id",
+                    [[one, other]],
+                ).fetchall()
+            )
+            survivor = max((one, other), key=lambda found: counts.get(found, 0))
+            cs.merge(other if survivor == one else one, survivor)
+            merged += 1
+            return survivor
+
+        def owner(contest: UUID) -> UUID | None:
+            found = linked.get(contest)
+            return None if found is None else cs.survivors.get(found, found)
+
         tenures: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in frame.iter_rows(named=True):
             council, name, start = row["council"], row["name"], row["start"]
+            citations = (
+                [(sources[source], locator) for source, locator in json.loads(row["citations"])]
+                if row["citations"]
+                else [(sources[council], json.loads(row["locator"]))]
+            )
             body = bodies[council]
             parts = tokens(name)
             key = row["person_key"] or f"{council}:{' '.join(parts[0]) if parts else name}"
+            number = _number(row["seat"])
+            nearby = [
+                (day, contest, cs.survivors.get(winner, winner), area)
+                for day, contest, winner, area in won[body]
+                if timedelta(0) <= start - day <= WINDOW
+                and row["acquired_via"] == "elected"
+                and number is not None
+                and _number(area) == number
+                and bool(ran[body][winner])
+                and all(_same(name, text) for text in ran[body][winner])
+            ]
             person = resolved.get(key)
+            if person is not None:
+                person = cs.survivors.get(person, person)
             if person is None:
-                hits = {found for found, texts in ran[body].items() if any(compatible(name, text) for text in texts)}
-                recent = {winner for day, _, winner, _ in won[body] if timedelta(0) <= start - day <= WINDOW}
+                hits = {
+                    cs.survivors.get(found, found)
+                    for found, texts in ran[body].items()
+                    if any(compatible(name, text) for text in texts)
+                }
+                recent = {
+                    cs.survivors.get(winner, winner)
+                    for day, _, winner, _ in won[body]
+                    if timedelta(0) <= start - day <= WINDOW
+                }
                 if len(hits) > 1:
                     hits &= recent
+                if not hits & recent and nearby:
+                    hits = {winner for _, _, winner, _ in nearby}
                 if not hits and parts is not None:
-                    hits = {
-                        winner
-                        for winner in recent
-                        if any(
-                            (other := tokens(text)) is not None
-                            and other[0][-1] == parts[0][-1]
-                            and other[0][0][:1] == parts[0][0][:1]
-                            for text in ran[body][winner]
-                        )
-                    }
+                    hits = {winner for winner in recent if _alike(name, ran[body][winner])}
                 if len(hits) > 1:
                     unmatched.append((council, name, str(start), "ambiguous"))
                     continue
@@ -537,24 +745,37 @@ def emit() -> Path:
                     lang="en",
                     kind="official",
                     is_preferred=True,
-                    source_id=sources[council],
+                    source_id=citations[0][0],
                 )
             contest, area = None, None
             if row["acquired_via"] == "elected":
-                contest, area = max(
+                _, contest, winner, area = max(
                     (
-                        (day, found, label)
-                        for day, found, winner, label in won[body]
-                        if winner == person and timedelta(0) <= start - day <= WINDOW and found not in linked
+                        entry
+                        for entry in [
+                            *(
+                                (day, found, person, label)
+                                for day, found, winner, label in won[body]
+                                if cs.survivors.get(winner, winner) == person and timedelta(0) <= start - day <= WINDOW
+                            ),
+                            *(nearby if person not in cs.minted else []),
+                        ]
+                        if owner(entry[1]) in (None, person)
                     ),
-                    default=(None, None, None),
+                    default=(None, None, None, None),
                     key=lambda entry: entry[0] or date.min,
-                )[1:]
+                )
+                if winner is not None and winner != person:
+                    if (survivor := join(person, winner)) is None:
+                        contest, area = None, None
+                    else:
+                        person = resolved[key] = survivor
+                        named.setdefault(person, name)
             if contest is not None:
-                linked.add(contest)
+                linked[contest] = person
             seat = row["seat"]
-            if seat is None and council == "new-york-city" and area and (number := re.search(r"(\d+)\s*$", area)):
-                seat = f"District {int(number[1])}"
+            if seat is None and council == "new-york-city" and (found := _number(area)) is not None:
+                seat = f"District {found}"
             seat_id = None
             if seat is not None:
                 seat_id = cs.key("us.seat", f"{body}:{seat}")
@@ -572,9 +793,23 @@ def emit() -> Path:
                     "contest": contest,
                     "end": None if future else row["end"],
                     "ended_via": None if future else row["ended_via"],
-                    "citations": [(sources[council], json.loads(row["locator"]))],
+                    "citations": citations,
                 }
             )
+        for key, person in resolved.items():
+            earlier = minted.get(key)
+            person = cs.survivors.get(person, person)
+            if earlier is None or earlier in cs.survivors or earlier == person:
+                continue
+            if earlier in own and all(found != earlier for other, found in resolved.items() if other != key):
+                join(person, earlier)
+            elif earlier not in own:
+                cs.add("external_id", entity_id=person, scheme=f"{SOURCE}.person", value=key)
+        for entries in tenures.values():
+            for entry in entries:
+                entry["person"] = cs.survivors.get(entry["person"], entry["person"])
+        known = {value: cs.survivors.get(entity, entity) for value, entity in known.items()}
+        tagged = {cs.survivors.get(entity, entity) for entity in tagged}
         refined = 0
         for statement in statements.iter_rows(named=True):
             entries = [
@@ -634,6 +869,7 @@ def emit() -> Path:
                 if entry["seat_id"]:
                     held[entry["seat_id"]] = entry
         count = 0
+        emitted: set[UUID] = set()
         for council, entries in tenures.items():
             previous: dict[UUID, UUID] = {}
             removed: dict[UUID, UUID] = {}
@@ -641,6 +877,7 @@ def emit() -> Path:
                 if entry.get("drop"):
                     continue
                 tenure = cs.key(f"{SOURCE}.tenure", entry["key"])
+                emitted.add(tenure)
                 cs.add(
                     "tenure",
                     id=tenure,
@@ -673,6 +910,25 @@ def emit() -> Path:
                 if entry["ended_via"] == "removed":
                     removed[entry["person"]] = tenure
                 count += 1
+        stale = sorted(
+            {
+                entity
+                for (entity,) in conn.execute(
+                    """select x.entity_id from external_id x join entity e on e.id = x.entity_id and e.retired_by is null
+                       join tenure t on t.id = x.entity_id where x.scheme = %s""",
+                    [f"{SOURCE}.tenure"],
+                )
+            }
+            - emitted,
+            key=str,
+        )
+        for tenure in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=tenure,
+                reason="A council term this pipeline no longer emits: a roster record now joined to the record "
+                "that continues it, or a term that duplicates another record of the same member and seat",
+            )
         for council, runs in sizes.items():
             for index, (since, precision, seats) in enumerate(runs):
                 cs.add(
@@ -686,7 +942,7 @@ def emit() -> Path:
                 )
         LOG.write_text("council\tname\tstart\treason\n" + "".join("\t".join(row) + "\n" for row in sorted(unmatched)))
         print(
-            f"{count} tenures, {len(created)} new people, {len(linked)} won contests linked, {overlaps} seat overlaps settled, "
-            f"{refined} Wikidata statements used; {len(unmatched)} terms unmatched, logged to {LOG}"
+            f"{count} tenures, {len(created)} new people, {len(linked)} won contests linked, {merged} people merged, {overlaps} seat overlaps settled, "
+            f"{refined} Wikidata statements used, {len(stale)} tenures retired; {len(unmatched)} terms unmatched, logged to {LOG}"
         )
         return cs.write()

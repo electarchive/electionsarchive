@@ -417,6 +417,7 @@ export const seats = {
               to: v.nullable(v.string()),
             }),
           ),
+          isCounted: v.boolean(),
         }),
       ),
     )
@@ -748,12 +749,23 @@ export const seats = {
           4 * 3.156e10) * 1.25;
       const newest = Date.parse(regular.at(-1)?.date ?? "");
       const start = Date.parse(regular[0]?.date ?? "") + window / 1.25 - 3.9e9;
+      const recorded = await db.execute<{
+        seats: number;
+        from: string;
+        to: string | null;
+      }>(sql`
+        select seats, lower(valid)::text as from, upper(valid)::text as to
+        from body_size where body_id = ${id}::uuid and not lower_inf(valid)
+        order by lower(valid)
+      `);
+      const isCounted =
+        (recorded.rows[0]?.from ?? "9999") > (regular[0]?.date ?? "");
       const sizes: Array<{ seats: number; from: string; to: string | null }> =
-        [];
+        isCounted ? [] : recorded.rows;
       const days = new Set(regular.map((entry) => entry.date));
       for (const day of days) {
         const at = Date.parse(day);
-        if (at < start) {
+        if (!isCounted || at < start) {
           continue;
         }
         let alive = 0;
@@ -805,6 +817,7 @@ export const seats = {
           .toArray()
           .toSorted((a, b) => b.date.localeCompare(a.date)),
         sizes,
+        isCounted,
       };
     }),
   gains: os

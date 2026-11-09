@@ -442,11 +442,13 @@
     <h2 id="{uid}-sizes" class="text-lg/tight font-[740] tracking-[-0.012em]">
       {m.council_sizes_title()}
     </h2>
-    <p
-      class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
-    >
-      {m.council_sizes_lede({ year: year(council.sizes[0]?.from ?? null) })}
-    </p>
+    {#if council.isCounted}
+      <p
+        class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[64ch]"
+      >
+        {m.council_sizes_lede({ year: year(council.sizes[0]?.from ?? null) })}
+      </p>
+    {/if}
     <ol class="flex flex-wrap gap-x-6 gap-y-1 text-sm">
       {#each council.sizes as size (size.from)}
         <li class="font-figures tabular-nums">
