@@ -1022,8 +1022,14 @@ def emit(
                 continue
             if not found and is_state:
                 found = conn.execute(
-                    "select entity_id from external_id where scheme = 'us.contest' and value = %s",
-                    [f"{day}:NY:{path.replace('-', ':')}" + (f":{slug(scope)}" if scope else "")],
+                    """select x.entity_id from external_id x join contest c on c.id = x.entity_id
+                       where x.scheme = 'us.contest' and x.value = %s
+                       and (%s or c.changeset_id not in (select id from changeset where pipeline = %s))""",
+                    [
+                        f"{day}:NY:{path.replace('-', ':')}" + (f":{slug(scope)}" if scope else ""),
+                        grain == "ed",
+                        pipeline,
+                    ],
                 ).fetchall()
             part = None
             if is_party:
