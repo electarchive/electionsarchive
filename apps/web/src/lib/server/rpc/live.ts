@@ -729,7 +729,10 @@ async function listRaces(found: {
             select c.id from tree t join contest c on c.election_id = t.id
             join slug s on s.entity_id = c.id and s.is_current
             where t.depth = ${isNational ? 1 : 0}
-              and (${isLocal}::boolean or (s.path ~ '^[a-z]+/[a-z]{2}/[^/]+/[^/]+$' and split_part(s.path, '/', 4) ~ ${TOP.source}))
+              and (${isLocal}::boolean or (s.path ~ '^[a-z]+/[a-z]{2}/[^/]+/[^/]+$' and split_part(s.path, '/', 4) ~ ${TOP.source})
+                or (not ${isNational}::boolean and exists (
+                  select from body b join election e on e.id = c.election_id
+                  where b.id = c.body_id and b.kind = 'council' and b.polity_id = e.polity_id)))
           ),
           fed as (
             select distinct f.contest_id as id from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
