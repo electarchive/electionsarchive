@@ -5,6 +5,7 @@ import re
 import zipfile
 from collections import defaultdict
 from datetime import date
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID, uuid5
 
@@ -13,11 +14,13 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import tokens
 from ea.offices import Offices
+from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
@@ -50,6 +53,21 @@ POSTS = {
     "4837000",
     "sd4808940",
     "49035",
+}
+SAME = {
+    frozenset(pair)
+    for pair in [
+        ("kostas", "konstantinos"),
+        ("gwan", "gunawan"),
+        ("jorge", "george"),
+        ("mike", "michiel"),
+        ("meg", "mary"),
+        ("shiela", "shelia"),
+    ]
+}
+PERSONS = {
+    **dict.fromkeys([("35319", 1997), ("35319", 2003)], "Pedro G. Espada"),
+    **dict.fromkeys([("35346", year) for year in (2001, 2003, 2005, 2009)], "Peter F. Vallone Jr."),
 }
 TITLES = {
     (DC, "mayor"): "Mayor of the District of Columbia",
@@ -247,8 +265,84 @@ def _surname(name: str) -> str:
     return slug(words[-1]) if words else ""
 
 
+def _edits(a: str, b: str) -> int:
+    rows = [list(range(len(b) + 1))]
+    for i, x in enumerate(a, 1):
+        row = [i]
+        for j, y in enumerate(b, 1):
+            row.append(min(rows[-1][j] + 1, row[j - 1] + 1, rows[-1][j - 1] + (x != y)))
+            if i > 1 and j > 1 and x == b[j - 2] and a[i - 2] == y:
+                row[j] = min(row[j], rows[-2][j - 2] + 1)
+        rows.append(row)
+    return rows[-1][-1]
+
+
+def _near(a: str, b: str) -> bool:
+    shortest = min(len(a), len(b))
+    return _edits(a, b) <= (2 if shortest >= 7 else 1 if shortest >= 3 else 0)
+
+
+def _alike(a: str, b: str) -> bool:
+    if a == b or frozenset((a, b)) in SAME or b in NICKNAMES.get(a, "").split() or a in NICKNAMES.get(b, "").split():
+        return True
+    if min(len(a), len(b)) <= 2:
+        return a[0] == b[0]
+    return a[:3] == b[:3] or (min(len(a), len(b)) == 3 and a[:2] == b[:2]) or _near(a, b)
+
+
+def _given(text: str, words: list[str]) -> set[str]:
+    quoted = re.findall(r"[a-z]+", " ".join(re.findall(r'"[^"]*"|“[^”]*”|\([^)]*\)', text.lower())))
+    given = words[:-1]
+    return {*given, *(m + n for m, n in pairwise(given)), *quoted}
+
+
+def _same(a: str, b: str) -> bool:
+    x, y = tokens(a), tokens(b)
+    if x is None or y is None:
+        return True
+    (left, _), (right, _) = x, y
+    p, q = left[-1], right[-1]
+    if not (
+        p in right[1:]
+        or q in left[1:]
+        or (
+            min(len(p), len(q)) >= 4
+            and (p.startswith(q) or q.startswith(p) or "".join(left).endswith(q) or "".join(right).endswith(p))
+        )
+        or _near(p, q)
+    ):
+        return False
+    return any(_alike(m, n) for m in _given(a, left) for n in _given(b, right))
+
+
+def _people(frame: pl.DataFrame) -> dict[tuple[str, str, int], tuple[str, str | None]]:
+    people: dict[tuple[str, str, int], tuple[str, str | None]] = {}
+    for candidate, names, years in frame.group_by("candidate").agg("full_name", "year").iter_rows():
+        seen = sorted({*zip(names, years)}, key=lambda pair: (pair[1], pair[0]))
+        distinct = list(dict.fromkeys(text for text, _ in seen))
+        group = {text: text for text in distinct}
+        for i, a in enumerate(distinct):
+            for b in distinct[i + 1 :]:
+                if group[a] != group[b] and _same(a, b):
+                    joined = group[a]
+                    group = {text: group[b] if root == joined else root for text, root in group.items()}
+        first: dict[str, str] = {}
+        for text in distinct:
+            first.setdefault(group[text], text)
+        base = group[distinct[0]]
+        for text, year in seen:
+            if (override := PERSONS.get((candidate, year))) is not None:
+                people[candidate, text, year] = (f"{candidate}:{slug(override)}", override)
+            elif group[text] == base:
+                people[candidate, text, year] = (candidate, None)
+            else:
+                people[candidate, text, year] = (f"{candidate}:{slug(first[group[text]])}", None)
+    return people
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
+    people = _people(frame)
     here = Path(__file__)
     tagged = {
         code: {
@@ -788,10 +882,11 @@ def emit() -> Path:
                         ballot_label="Others" if pooled[1] else "Write-ins",
                     )
                 else:
-                    person = cs.key(f"{SOURCE}.person", candidate_id)
+                    split, curated = people[candidate_id, full_name, year]
+                    person = cs.key(f"{SOURCE}.person", split)
                     if person in cs.minted and person not in persons:
                         cs.add("person", id=person)
-                        name(person, ballot)
+                        name(person, curated or ballot)
                     persons.add(person)
                     label = parties[candidate_id]
                     cs.add(

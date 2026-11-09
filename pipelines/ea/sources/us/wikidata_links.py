@@ -67,6 +67,7 @@ NICKNAMES = {
     "jennifer": "jenny jen",
     "rebecca": "becky",
     "cynthia": "cindy",
+    "theodore": "ted teddy",
 }
 POSITIONS = """SELECT ?item ?posLabel ?start ?end WHERE {{ VALUES ?item {{ {items} }}
 {{ ?item p:P39 ?s . ?s ps:P39 ?pos . OPTIONAL {{ ?s pq:P580 ?start }} OPTIONAL {{ ?s pq:P582 ?end }} }}
