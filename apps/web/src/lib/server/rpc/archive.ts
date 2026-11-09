@@ -161,6 +161,21 @@ const POOL = sql`
     select from reporting_unit c where c.parent_id = u.id and c.kind = 'abroad_mission'
   ) then 'abroad_aggregate' else u.kind::text end
 `;
+const unlocated = async () =>
+  remember("unlocated.pooled", async () =>
+    Object.fromEntries(
+      rowsOf(
+        await db.execute<{ polity: string; units: Array<number> }>(sql`
+          with recursive up(k, id) as (
+            select u.k, u.polity_id from reporting_unit u where u.area_id is null and ${POOLED}
+            union
+            select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
+          )
+          select id::text as polity, array_agg(k order by k) as units from up group by id
+        `),
+      ).map((row) => [row.polity, row.units]),
+    ),
+  );
 const FACTS = {
   area: (set: SQL, area: SQL, _units?: SQL, round: number | null = null) =>
     sql`
@@ -3023,23 +3038,7 @@ async function load(
     facts,
     isFirst,
     only,
-    units:
-      facts === "pool"
-        ? await remember("unlocated", async () =>
-            Object.fromEntries(
-              rowsOf(
-                await db.execute<{ polity: string; units: Array<number> }>(sql`
-                  with recursive up(k, id) as (
-                    select u.k, u.polity_id from reporting_unit u where u.area_id is null
-                    union
-                    select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
-                  )
-                  select id::text as polity, array_agg(k order by k) as units from up group by id
-                `),
-              ).map((row) => [row.polity, row.units]),
-            ),
-          )
-        : {},
+    units: facts === "pool" ? await unlocated() : {},
   };
   return assembleLoad(
     step == null && only == null
@@ -4441,8 +4440,17 @@ async function places(
           sets as materialized (
             select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active' and ${served("rs")}
           ),
+          loose as materialized (
+            select u.id, u.k, u.kind
+            from jsonb_array_elements_text(${JSON.stringify(
+              await unlocated(),
+            )}::jsonb -> (
+              select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
+            )) as uk(k)
+            join reporting_unit u on u.k = uk.k::int
+          ),
           short as materialized (
-            select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and (
+            select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and exists (select from loose) and (
               select sum(r.value) from sets cross join lateral (
                 select r.value from result_rollup r
                 where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
@@ -4458,57 +4466,15 @@ async function places(
             select ${POOL} as pool, false as "isPlaced", null::int as unit, null::text as label, (
               select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
             ) as channel
-            from jsonb_array_elements_text(${JSON.stringify(
-              await remember("unlocated", async () =>
-                Object.fromEntries(
-                  rowsOf(
-                    await db.execute<{
-                      polity: string;
-                      units: Array<number>;
-                    }>(sql`
-                      with recursive up(k, id) as (
-                        select u.k, u.polity_id from reporting_unit u where u.area_id is null
-                        union
-                        select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
-                      )
-                      select id::text as polity, array_agg(k order by k) as units from up group by id
-                    `),
-                  ).map((row) => [row.polity, row.units]),
-                ),
-              ),
-            )}::jsonb -> (
-              select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
-            )) as uk(k)
-            join reporting_unit u on u.k = uk.k::int
-            where (select "isShort" from short) and ${POOLED} and u.kind <> 'standard'
+            from loose u
+            where (select "isShort" from short) and u.kind <> 'standard'
               and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
             union all
             select ${POOL}, false, u.k, (
               select n.text from name n where n.entity_id = u.id order by n.is_preferred desc, (n.lang = 'en') desc, n.text limit 1
             ), null::int
-            from jsonb_array_elements_text(${JSON.stringify(
-              await remember("unlocated", async () =>
-                Object.fromEntries(
-                  rowsOf(
-                    await db.execute<{
-                      polity: string;
-                      units: Array<number>;
-                    }>(sql`
-                      with recursive up(k, id) as (
-                        select u.k, u.polity_id from reporting_unit u where u.area_id is null
-                        union
-                        select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
-                      )
-                      select id::text as polity, array_agg(k order by k) as units from up group by id
-                    `),
-                  ).map((row) => [row.polity, row.units]),
-                ),
-              ),
-            )}::jsonb -> (
-              select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
-            )) as uk(k)
-            join reporting_unit u on u.k = uk.k::int
-            where (select "isShort" from short) and ${POOLED} and u.kind = 'standard'
+            from loose u
+            where (select "isShort" from short) and u.kind = 'standard'
               and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
             union all
             select ${POOL}, true, null::int, null::text, (
@@ -8252,10 +8218,8 @@ export const contests = {
       const covers =
         area == null
           ? null
-          : across(
-              last > 1,
-              () =>
-                `covering:${area.id}:${contest.place?.id ?? ""}:${contest.root}:${path?.split("/").at(-1) ?? ""}:${area.k}`,
+          : remember(
+              `covering:${area.id}:${contest.place?.id ?? ""}:${contest.root}:${path?.split("/").at(-1) ?? ""}:${area.k}`,
               async () =>
                 rowsOf(
                   await db.execute<{
@@ -8519,6 +8483,7 @@ export const contests = {
                     order by r.date_from desc nulls last, r.id
                   `),
                 ),
+              true,
             );
       covers?.catch(() => null);
       const declaredParties = [
