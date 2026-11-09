@@ -87,6 +87,15 @@ METHOD = (
     "returns; write-in votes are not included. The database prints names in lowercase, so the capitalization shown "
     "is the archive's. Party, gender, and race in the database are statistical estimates and are not recorded here."
 )
+LABELED = {
+    "48201": "Party labels come instead from the Harris County Clerk's canvass reports.",
+    "42077": "Party labels come instead from Lehigh County's official returns.",
+    "3651000": (
+        "Party labels come instead from the New York City Campaign Finance Board's post-election reports, which list "
+        "each candidate's ballot lines. A candidate on several lines is labeled with the Democratic or Republican one, "
+        "and a candidate on both lines is labeled with the party they ran for in the primary or in their other races."
+    ),
+}
 TACIT = "The database records no vote count for this race, which had a single candidate or was otherwise uncontested."
 SKIPPED = {
     "667000_2007_9_san francisco_CA_City Council_4_1",
@@ -240,17 +249,23 @@ def _surname(name: str) -> str:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
-    harris = {
-        (int(day[:4]), *_short(candidate)): party
-        for day, candidate, party in pl.read_csv(Path(__file__).with_name("alged_harris_party.csv"))
-        .filter(pl.col("party").is_in(["democratic", "republican", "libertarian", "green"]))
-        .select("date", "candidate", "party")
-        .iter_rows()
+    here = Path(__file__)
+    tagged = {
+        code: {
+            (int(day[:4]), *_short(candidate)): f"{party}-party"
+            for day, candidate, party in pl.read_csv(here.with_name(file))
+            .filter(pl.col("party").is_in(["democratic", "republican", "libertarian", "green"]))
+            .select("date", "candidate", "party")
+            .iter_rows()
+        }
+        for code, file in [("48201", "alged_harris_party.csv"), ("42077", "alged_lehigh_party.csv")]
     }
-    lehigh = {
-        (int(day[:4]), *_short(candidate)): party
-        for day, candidate, party in pl.read_csv(Path(__file__).with_name("alged_lehigh_party.csv"))
-        .select("date", "candidate", "party")
+    nyc = {
+        (contest, candidate): party
+        for contest, candidate, party in pl.read_csv(
+            here.with_name("alged_nyc_party.csv"), schema_overrides={"alged": pl.String}
+        )
+        .select("contest", "alged", "party")
         .iter_rows()
     }
     places = pl.read_parquet(PARSED / "places.parquet")
@@ -745,7 +760,18 @@ def emit() -> Path:
                 is_default=True,
                 completeness=None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=TACIT if tacit else METHOD)
+            parties = {
+                candidate_id: nyc.get((contest_id, candidate_id))
+                if code == "3651000"
+                else tagged.get(code, {}).get((year, *_short(full_name)))
+                for candidate_id, full_name in rows.select("candidate", "full_name").iter_rows()
+            }
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=TACIT if tacit else f"{METHOD} {LABELED[code]}" if any(parties.values()) else METHOD,
+            )
             for candidate_id, full_name, votes, won in rows.select(
                 "candidate", "full_name", "votes", "won"
             ).iter_rows():
@@ -767,13 +793,13 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, ballot)
                     persons.add(person)
-                    label = {"48201": harris, "42077": lehigh}.get(code, {}).get((year, *_short(ballot)))
+                    label = parties[candidate_id]
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
-                        party_id=None if label is None else cs.key("us.party", f"{label}-party"),
+                        party_id=None if label is None else cs.key("us.party", label),
                         ballot_label=ballot,
                     )
                     cs.add(
