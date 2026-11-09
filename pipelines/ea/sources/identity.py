@@ -1681,6 +1681,7 @@ PEOPLE = {
         ("us.nyc_boe.person", "victor-jordan"),
         ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:victor-jordan"),
         ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:victor-jordan"),
+        ("us.nyc_general.person", "2016-09-13:NY:assembly:42:dp:victor-a-jordan"),
     ),
     "Wanda Y. Negron, 2020 Bronx County Civil Court candidate": (
         ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-2-bronx-democratic:wanda-y-negron"),
@@ -1704,6 +1705,8 @@ PEOPLE = {
         ("us.nyc_general.person", "2016-04-19:NY:assembly:65:special:yuh-line-niou"),
         ("us.nyc_general.person", "2016-09-13:NY:assembly:65:dp:yuh-line-niou"),
         ("us.nyc_general.person", "2016-11-08:NY:assembly:65:g:yuh-line-niou"),
+        ("us.state_primaries.person", "NY:assembly:65:DEM:yuh-line-niou"),
+        ("us.nyc_general.person", "2020-11-03:NY:assembly:65:g:yuh-line-niou"),
     ),
     "Heshy Tischler, Brooklyn City Council candidate": (
         ("us.alged.person", "35013"),
@@ -1762,6 +1765,154 @@ PEOPLE = {
         ("us.fec.person", "NY:robert-siano"),
         ("us.state_primaries.person", "NY:senate:12:NY:Reform:robert-siano"),
     ),
+    "Andrew M. Cuomo, Governor of New York": (
+        ("wikidata", "Q11673"),
+        ("us.nyc_general.person", "2018-11-06:NY:governor:andrew-m-cuomo-kathy-c-hochul"),
+    ),
+    "Kathy Hochul, Governor of New York": (
+        ("wikidata", "Q45956"),
+        ("us.nyc_general.person", "2022-11-08:NY:governor:kathy-c-hochul-antonio-delgado"),
+    ),
+    "Kenneth Schaeffer, 2002 and 2014 Kings County Supreme Court candidate": (
+        ("us.nyc_recap_wayback.person", "NY:kenneth-schaeffer"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:supreme-court-2-kings:kenneth-schaeffer"),
+    ),
+    "Carolyn E. Wade, Kings County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:carolyn-e-wade"),
+        ("us.nyc_general.person", "2017-11-07:new-york-city:civil-court-kings:carolyn-e-wade"),
+    ),
+    "Jacqueline D. Williams, Kings County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:jacqueline-d-williams"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-kings:jacqueline-d-williams"),
+    ),
+    "John D'Emic, 2000 and 2002 Kings County Civil Court candidate": (
+        ("us.nyc_recap_wayback.person", "NY:john-d-emic"),
+        ("us.nyc_recap_wayback.person", "NY:john-demic"),
+    ),
+    "Robin K. Sheares, Kings County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:robin-k-sheares"),
+        ("us.nyc_general.person", "2017-11-07:new-york-city:civil-court-kings:robin-k-sheares"),
+    ),
+    "Sharen D. Hudson, Kings County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:sharen-d-hudson"),
+        ("us.nyc_general.person", "2021-11-02:new-york-city:civil-court-kings:sharen-d-hudson"),
+    ),
+    "David Rosado, Bronx Assembly member and 1993 City Council District 17 candidate": (
+        ("us.klarner.person", "166123"),
+        ("us.nyc_cfb.person", "david-rosado"),
+    ),
+    "Jon Del Giorno, 1991 New York City Council District 50 candidate": (
+        ("us.alged.person", "35064"),
+        ("us.nyc_cfb.person", "jon-del-giorno"),
+    ),
+    "Mujib U. Rahman, Queens City Council District 24 candidate": (
+        ("us.alged.person", "35277:mujib-rahman"),
+        ("us.nyc_boe.person", "mujib-u-rahman"),
+    ),
+    "Richard Soto, 1997 New York City Council District 14 candidate": (
+        ("us.alged.person", "35409"),
+        ("us.nyc_cfb.person", "richard-soto"),
+    ),
+    "Robert Miller, Brooklyn City Council District 44 candidate": (
+        ("us.alged.person", "35396"),
+        ("us.nyc_cfb.person", "robert-miller"),
+    ),
+    "Sergio Villaverde, Bronx City Council District 14 candidate": (
+        ("us.alged.person", "35477"),
+        ("us.nyc_cfb.person", "sergio-villaverde"),
+    ),
+    "Ann E. O'Shea, New York County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:ann-e-o-shea"),
+        ("us.nyc_recap_wayback.person", "NY:ann-e-oshea"),
+    ),
+    "Geoffrey A. Davis, Brooklyn Assembly District 43 candidate": (
+        ("us.alged.person", "34970"),
+        ("us.nyc_general.person", "2015-05-05:NY:assembly:43:special:geoffrey-a-davis"),
+    ),
+    "Hector R. Ramirez, Queens Assembly District 86 candidate": (
+        ("us.klarner.person", "177245"),
+        ("us.nyc_general.person", "2016-09-13:NY:assembly:86:dp:hector-r-ramirez"),
+    ),
+    "Illapa Sairitupac, Manhattan Assembly District 65 candidate": (
+        ("wikidata", "Q140365972"),
+        ("us.nyc_general.person", "2022-06-28:NY:assembly:65:dp:illapa-sairitupac"),
+    ),
+    "Jessica González-Rojas, New York State Assembly member": (
+        ("openstates.person", "ocd-person/5a115673-aa3c-4518-94bc-b2a5dadeb8af"),
+        ("us.nyc_general.person", "2022-11-08:NY:assembly:34:g:jessica-gonzalez-rojas"),
+    ),
+    "Lucretia Regina-Potter, Brooklyn Assembly District 46 and City Council District 43 candidate": (
+        ("us.nyc_general.person", "2014-09-09:NY:assembly:46:rp:lucretia-regina-potter"),
+        ("us.nyc_general.person", "2015-11-03:NY:assembly:46:lucretia-regina-potter"),
+        ("us.nyc_general.person", "2016-11-08:NY:assembly:46:g:lucretia-regina-potter"),
+        ("us.nyc_general.person", "2017-09-12:new-york-city:council-district-43-republican:lucretia-regina-potter"),
+    ),
+    "Maritza Davila, New York State Assembly member": (
+        ("openstates.person", "ocd-person/6dfd759c-edcb-45d9-ac9a-9064a69d5f4a"),
+        ("us.alged.person", "35225"),
+    ),
+    "Mathylde Frontus, New York State Assembly member": (
+        ("us.klarner.person", "386488"),
+        ("us.nyc_general.person", "2018-09-13:NY:assembly:46:dp:mathylde-frontus"),
+    ),
+    "Michael G. Miller, New York State Assembly member": (
+        ("us.klarner.person", "302625"),
+        ("us.nyc_general.person", "2020-06-23:NY:assembly:38:dp:michael-g-miller"),
+    ),
+    "Michele N. Adolphe, Brooklyn Assembly District 42 candidate": (
+        ("us.klarner.person", "330620"),
+        ("us.nyc_recap.person", "NY:michele-n-adolphe"),
+    ),
+    "Richard Taylor, Brooklyn Assembly District 56 candidate": (
+        ("us.klarner.person", "175876"),
+        ("us.alged.person", "35413"),
+    ),
+    "J. Machelle Sweeting, New York County Civil Court judge": (
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-10-new-york:j-machelle-sweeting"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-10-new-york:j-machelle-sweeting"),
+    ),
+    "Joseph Esposito, Queens County Civil Court judge": (
+        ("us.nyc_recap_wayback.person", "NY:joseph-esposito"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-1-queens:joseph-esposito"),
+    ),
+    "Lizbeth Gonzalez, Bronx County Civil Court judge": (
+        ("us.nyc_recap_wayback.person", "NY:lizbeth-gonzalez"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-2-bronx:lizbeth-gonzalez"),
+    ),
+    "Lola Waterman, Kings County Civil Court judge": (
+        ("us.nyc_general.person", "2021-06-22:new-york-city:civil-court-district-2-kings-democratic:lola-waterman"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:civil-court-district-2-kings:lola-waterman"),
+    ),
+    "Rachel Amy Adams, Kings County Civil Court judge": (
+        ("us.nyc_recap_wayback.person", "NY:rachel-amy-adams"),
+        ("us.nyc_recap.person", "NY:rachel-amy-adams"),
+    ),
+    "Isiris Isela Isaac, Kings County Civil Court judge": (
+        (
+            "us.nyc_general.person",
+            "2014-09-09:new-york-city:civil-court-district-6-kings-democratic:isiris-isela-isaac",
+        ),
+        (
+            "us.nyc_general.person",
+            "2015-09-10:new-york-city:civil-court-district-6-kings-democratic:isiris-isela-isaac",
+        ),
+    ),
+    "Betty Williams, Kings County Civil Court judge": (
+        ("us.nyc_recap_wayback.person", "NY:betty-williams"),
+        ("us.nyc_recap.person", "NY:betty-williams"),
+    ),
+    "Jose A. Padilla Jr., New York County Civil Court judge": (
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-8-new-york:jose-a-padilla-jr"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-8-new-york:jose-a-padilla-jr"),
+    ),
+    "Lisa S. Headley, New York County Civil Court judge": (
+        ("us.nyc_general.person", "2015-11-03:new-york-city:civil-court-district-8-new-york:lisa-s-headley"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-8-new-york:lisa-s-headley"),
+    ),
+    "Gerald Lebovits, New York County Civil Court judge": (
+        ("us.nyc_recap.person", "NY:gerald-lebovits"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-9-new-york:gerald-lebovits"),
+    ),
 }
 HONORIFICS = re.compile(
     r"^(?:(?:the\s+)?(?:rt\.?\s+hon\.?|right\s+honou?rable|honou?rable|very\s+rev(?:erend|d)?\.?|rev(?:erend|d)?\.?)\s+"
@@ -1811,6 +1962,15 @@ def emit() -> Path:
                  on true
                where not exists (select from entity_merge m where m.entity_id = cy.person_id)"""
         ).fetchall()
+        sole: set[UUID] = {
+            office
+            for (office,) in conn.execute(
+                """select k.office_id from contest k join office f on f.id = k.office_id
+                   join entity e on e.id = k.id and e.retired_by is null
+                   where k.district_area_id is null and f.kind <> 'head_of_state'
+                   group by k.office_id having count(*) = count(distinct (k.election_id, k.party_scope_id))"""
+            ).fetchall()
+        }
         held: dict[UUID, dict[str, set[str]]] = defaultdict(dict)
         for person, scheme, value in conn.execute(
             """select entity_id, scheme, value from external_id
@@ -1835,7 +1995,7 @@ def emit() -> Path:
                 "People recorded once per source or per race joined into one person where the same printed name "
                 "(ignoring case, accents, middle initials, and a common nickname such as Bill for William, or a first "
                 "name printed as its initial when one person on the race line fits it) ran for the same office or body in the same "
-                "district within 12 years, and nothing tells them apart (no race for another seat within 60 days, and no "
+                "district (or, for an office elected without one, the same office) within 12 years, and nothing tells them apart (no race for another seat within 60 days, and no "
                 "first name on either record that the other's names cannot be), and party labels of one state or country "
                 "that sources spelled apart joined by hand"
             ),
@@ -1858,6 +2018,8 @@ def emit() -> Path:
         for person, text, area, office, body, day, pipeline in rows:
             dates[person].append(day)
             pipelines[person].add(pipeline)
+            if area is None and office in sole:
+                area = office
             if text is None or area is None or (office is None and body is None) or pipeline.startswith(MATCHED):
                 continue
             named = words(text)
@@ -2544,6 +2706,33 @@ def emit() -> Path:
             fuller.add(row[1])
             accented += 1
         print(f"{accented} preferred names take a same-polity source's accents")
+        hyphenated = 0
+        for row in conn.execute(
+            """select p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id, array_agg(distinct f.text)
+               from name p join entity e on e.id = p.entity_id and e.type = 'person'
+               join name f on f.entity_id = p.entity_id and f.id <> p.id and f.lang = p.lang and not f.is_preferred
+                 and f.script is not distinct from p.script and f.valid_from is null and f.valid_to is null
+                 and f.text ~ '-' and lower(regexp_replace(f.text, '[-'']', '', 'g')) = lower(p.text)
+               where p.is_preferred and p.valid_from is null and p.valid_to is null and p.text !~ '[-''"]'
+                 and not exists (select from entity_merge m where m.entity_id = p.entity_id)
+               group by p.id""",
+        ).fetchall():
+            spellings = {
+                text
+                for text in row[7]
+                if text != text.upper() and re.search(r"-(?![A-Z])|\"|'(?<!\bO')|'(?![A-Z])", text) is None
+            }
+            if row[1] in fuller or row[0] in staged or len(spellings) != 1:
+                continue
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add(
+                "name",
+                **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": spellings.pop()},
+                is_preferred=True,
+            )
+            fuller.add(row[1])
+            hyphenated += 1
+        print(f"{hyphenated} preferred names take back the hyphen a source dropped")
         recased = 0
         for row in conn.execute(
             """select p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,

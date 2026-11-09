@@ -93,7 +93,7 @@ def listing() -> list[dict[str, str]]:
             day = held[1] if held.lastindex == 2 else f"{held[3]}{int(held[1]):02d}{held[2]}"
             event = held[2] if held.lastindex == 2 else held[4]
             name = match[3]
-            if day == "20190625" and "45th Council District" in name:
+            if day == "20190625" and name == "Kings Member of the City Council 45th Council District":
                 day, event = "20190514", "Special Election"
             found.append(
                 {"date": day, "event": event, "code": match[2], "name": name, "url": SITE + quote(path, safe="/")}
@@ -592,6 +592,13 @@ def emit() -> Path:
                 ]
             ).sort("code")
             units = {code: cs.unit("us.nyc_ed", code, day) for code in districts["code"]}
+            linked = set(
+                conn.execute(
+                    """select ra.unit_id, ra.area_id from reporting_unit_area ra join changeset h on h.id = ra.changeset_id
+                       where h.pipeline <> %s and ra.valid @> %s::date and ra.unit_id = any(%s)""",
+                    [SOURCE, day, list(units.values())],
+                ).fetchall()
+            )
             unmapped = 0
             for code, county, combined, most in districts.iter_rows():
                 area, parent = places.get(code, (None, counties[county]))
@@ -610,33 +617,37 @@ def emit() -> Path:
                     valid_from=day,
                     valid_to=day + timedelta(days=1),
                 )
-                cs.add(
-                    "reporting_unit_area",
-                    unit_id=units[code],
-                    area_id=place,
-                    valid_from=day,
-                    valid_to=day + timedelta(days=1),
-                )
+                if (units[code], place) not in linked:
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=units[code],
+                        area_id=place,
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
             for office_text, district, code in (
                 day_frame.filter(pl.col("office").is_in(["Member of the City Council", *list(STATE)[-3:]]))
                 .select("office", "district", "code")
                 .unique()
                 .iter_rows()
             ):
+                linkage = cs.area(
+                    *{
+                        "Member of the City Council": (
+                            "us.local_district",
+                            f"36:3651000:council:district-{int(district)}",
+                        ),
+                        "Representative in Congress": ("us.cd", f"36{int(district):02d}"),
+                        "State Senator": ("us.sldu", f"NY:{int(district)}"),
+                        "Member of the Assembly": ("us.sldl", f"NY:{int(district)}"),
+                    }[office_text]
+                )
+                if (units[code], linkage) in linked:
+                    continue
                 cs.add(
                     "reporting_unit_area",
                     unit_id=units[code],
-                    area_id=cs.area(
-                        *{
-                            "Member of the City Council": (
-                                "us.local_district",
-                                f"36:3651000:council:district-{int(district)}",
-                            ),
-                            "Representative in Congress": ("us.cd", f"36{int(district):02d}"),
-                            "State Senator": ("us.sldu", f"NY:{int(district)}"),
-                            "Member of the Assembly": ("us.sldl", f"NY:{int(district)}"),
-                        }[office_text]
-                    ),
+                    area_id=linkage,
                     valid_from=day,
                     valid_to=day + timedelta(days=1),
                     method="source_code",
@@ -865,6 +876,18 @@ def emit() -> Path:
                             entity_id=stale[0],
                             reason="A special election held on 2019-05-14, filed by the Board of Elections under the June 25 primary",
                         )
+                if day == date(2019, 6, 25) and seat_path == "council-district-45-democratic":
+                    stale = conn.execute(
+                        """select x.entity_id from external_id x join entity e on e.id = x.entity_id
+                           where x.scheme = 'us.contest' and x.value = %s and e.retired_by is null""",
+                        [f"2019-05-14:new-york-city:{seat_path}"],
+                    ).fetchone()
+                    if stale is not None:
+                        cs.add(
+                            "entity_retirement",
+                            entity_id=stale[0],
+                            reason="The June 25 Democratic primary, dated by mistake as the May 14 special election",
+                        )
 
                 existing = (
                     [(cs.key("us.contest", proposal),)]
@@ -925,6 +948,8 @@ def emit() -> Path:
                         + (f":{slug(body)}" if body else "")
                         + (":special" if state_kind == "special" else "")
                     )
+                    if contest_key == "2019-06-25:new-york-city:council-district-45-democratic":
+                        contest_key += ":refiled"
                     contest = cs.key("us.contest", contest_key)
                     cs.add(
                         "contest",
