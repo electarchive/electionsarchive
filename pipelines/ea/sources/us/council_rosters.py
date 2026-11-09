@@ -261,9 +261,12 @@ def _same(name: str, text: str) -> bool:
     if compatible(name, text):
         return True
     mine, other = tokens(name), tokens(text)
-    if mine is None or other is None or mine[0][-1] != other[0][-1]:
+    if mine is None or other is None:
         return False
-    left, right = mine[0][:-1], other[0][:-1]
+    (left, _), (right, _) = mine, other
+    if left[-1] != right[-1] and left[-1] not in right[1:] and right[-1] not in left[1:]:
+        return False
+    left, right = left[:-1], right[:-1]
     return bool(
         _given(left) & set(right)
         or _given(right) & set(left)
@@ -353,16 +356,34 @@ def _chronola() -> list[dict[str, object]]:
 
 
 def _socrata() -> list[dict[str, object]]:
-    rows = []
+    rows: list[dict[str, object]] = []
     records = json.loads(raw.cached(SOURCE, NYC).path.read_text())
     districts: dict[str, set[str]] = defaultdict(set)
     for record in records:
         if "district" in record:
             districts[record["council_member_id"]].add(record["district"])
+    spans: list[tuple[dict[str, str], date, date, str | None]] = []
     for record in records:
         start, end = date.fromisoformat(record["term_start"][:10]), date.fromisoformat(record["term_end"][:10])
         known = districts[record["council_member_id"]]
-        district = record.get("district") or (next(iter(known)) if len(known) == 1 else None)
+        spans.append((record, start, end, record.get("district") or (next(iter(known)) if len(known) == 1 else None)))
+    starts = {
+        (record["council_member_id"], district, start): index
+        for index, (record, start, _, district) in enumerate(spans)
+    }
+    absorbed: set[int] = set()
+    for index, (record, start, end, district) in enumerate(spans):
+        if index in absorbed:
+            continue
+        while (end.month, end.day) != (12, 31) and (
+            following := starts.get((record["council_member_id"], district, end + timedelta(days=1)))
+        ) is not None:
+            absorbed.add(following)
+            end = spans[following][2]
+        spans[index] = (record, start, end, district)
+    for index, (record, start, end, district) in enumerate(spans):
+        if index in absorbed:
+            continue
         rows.append(
             {
                 "council": "new-york-city",
@@ -604,6 +625,12 @@ def emit() -> Path:
         minted: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
         )
+        own = {
+            person
+            for (person,) in conn.execute(
+                "select p.id from person p join changeset h on h.id = p.changeset_id where h.pipeline = %s", [SOURCE]
+            )
+        }
         ran: dict[UUID, dict[UUID, set[str]]] = defaultdict(lambda: defaultdict(set))
         won: dict[UUID, list[tuple[date, UUID, UUID, str | None]]] = defaultdict(list)
         for body, day, contest, person, ballot, preferred, elected, area in conn.execute(
@@ -628,7 +655,7 @@ def emit() -> Path:
         named: dict[UUID, str] = {}
         created: set[UUID] = set()
         seated: set[UUID] = set()
-        linked: set[UUID] = set()
+        linked: dict[UUID, UUID] = {}
         merged = 0
 
         def join(one: UUID, other: UUID) -> UUID | None:
@@ -649,6 +676,10 @@ def emit() -> Path:
             cs.merge(other if survivor == one else one, survivor)
             merged += 1
             return survivor
+
+        def owner(contest: UUID) -> UUID | None:
+            found = linked.get(contest)
+            return None if found is None else cs.survivors.get(found, found)
 
         tenures: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in frame.iter_rows(named=True):
@@ -729,7 +760,7 @@ def emit() -> Path:
                             ),
                             *(nearby if person not in cs.minted else []),
                         ]
-                        if entry[1] not in linked
+                        if owner(entry[1]) in (None, person)
                     ),
                     default=(None, None, None, None),
                     key=lambda entry: entry[0] or date.min,
@@ -741,7 +772,7 @@ def emit() -> Path:
                         person = resolved[key] = survivor
                         named.setdefault(person, name)
             if contest is not None:
-                linked.add(contest)
+                linked[contest] = person
             seat = row["seat"]
             if seat is None and council == "new-york-city" and (found := _number(area)) is not None:
                 seat = f"District {found}"
@@ -767,8 +798,13 @@ def emit() -> Path:
             )
         for key, person in resolved.items():
             earlier = minted.get(key)
-            if earlier is not None and earlier not in cs.survivors and earlier != cs.survivors.get(person, person):
-                join(cs.survivors.get(person, person), earlier)
+            person = cs.survivors.get(person, person)
+            if earlier is None or earlier in cs.survivors or earlier == person:
+                continue
+            if earlier in own and all(found != earlier for other, found in resolved.items() if other != key):
+                join(person, earlier)
+            elif earlier not in own:
+                cs.add("external_id", entity_id=person, scheme=f"{SOURCE}.person", value=key)
         for entries in tenures.values():
             for entry in entries:
                 entry["person"] = cs.survivors.get(entry["person"], entry["person"])
@@ -833,6 +869,7 @@ def emit() -> Path:
                 if entry["seat_id"]:
                     held[entry["seat_id"]] = entry
         count = 0
+        emitted: set[UUID] = set()
         for council, entries in tenures.items():
             previous: dict[UUID, UUID] = {}
             removed: dict[UUID, UUID] = {}
@@ -840,6 +877,7 @@ def emit() -> Path:
                 if entry.get("drop"):
                     continue
                 tenure = cs.key(f"{SOURCE}.tenure", entry["key"])
+                emitted.add(tenure)
                 cs.add(
                     "tenure",
                     id=tenure,
@@ -872,6 +910,25 @@ def emit() -> Path:
                 if entry["ended_via"] == "removed":
                     removed[entry["person"]] = tenure
                 count += 1
+        stale = sorted(
+            {
+                entity
+                for (entity,) in conn.execute(
+                    """select x.entity_id from external_id x join entity e on e.id = x.entity_id and e.retired_by is null
+                       join tenure t on t.id = x.entity_id where x.scheme = %s""",
+                    [f"{SOURCE}.tenure"],
+                )
+            }
+            - emitted,
+            key=str,
+        )
+        for tenure in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=tenure,
+                reason="A council term this pipeline no longer emits: a roster record now joined to the record "
+                "that continues it, or a term that duplicates another record of the same member and seat",
+            )
         for council, runs in sizes.items():
             for index, (since, precision, seats) in enumerate(runs):
                 cs.add(
@@ -886,6 +943,6 @@ def emit() -> Path:
         LOG.write_text("council\tname\tstart\treason\n" + "".join("\t".join(row) + "\n" for row in sorted(unmatched)))
         print(
             f"{count} tenures, {len(created)} new people, {len(linked)} won contests linked, {merged} people merged, {overlaps} seat overlaps settled, "
-            f"{refined} Wikidata statements used; {len(unmatched)} terms unmatched, logged to {LOG}"
+            f"{refined} Wikidata statements used, {len(stale)} tenures retired; {len(unmatched)} terms unmatched, logged to {LOG}"
         )
         return cs.write()
