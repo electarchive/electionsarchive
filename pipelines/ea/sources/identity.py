@@ -976,6 +976,9 @@ PEOPLE = {
     "Simcha Felder, New York City Council candidate": (
         ("us.alged.person", "35436"),
         ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-44:simcha-felder"),
+        ("wikidata", "Q7517469"),
+        ("us.klarner.person", "316360"),
+        ("us.nyc_recap_wayback.person", "NY:simcha-felder"),
     ),
     "Stylo Sapaskis, New York City Council candidate": (
         ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-11:stylo-sapaskis"),
@@ -989,10 +992,775 @@ PEOPLE = {
         ("us.alged.person", "35551"),
         ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-20:yu-ching-james-pai"),
     ),
+    "Pedro Espada Jr., New York State senator": (
+        ("us.alged.person", "35319"),
+        ("us.klarner.person", "166126"),
+        ("wikidata", "Q7159561"),
+    ),
+    "Pedro G. Espada, New York City Council member": (
+        ("us.alged.person", "35319:pedro-g-espada"),
+        ("us.klarner.person", "177465"),
+    ),
+    "Paul Vallone, New York City Council member": (
+        ("us.alged.person", "35346:paul-vallone"),
+        ("us.nyc_general.person", "2021-11-02:new-york-city:civil-court-district-3-queens:paul-a-vallone"),
+    ),
+    "Peter F. Vallone Jr., New York City Council member": (
+        ("us.alged.person", "35346:peter-f-vallone-jr"),
+        ("us.nyc_recap.person", "NY:peter-f-vallone-jr"),
+        ("us.nyc_general.person", "2015-11-03:new-york-city:civil-court-district-3-queens:peter-f-vallone-jr"),
+    ),
+    "Peter F. Vallone, Speaker of the New York City Council": (
+        ("us.alged.person", "35346"),
+        ("us.algara.person", "NY:peter-f-vallone"),
+        ("us.nyc_recap_wayback.person", "NY:peter-f-vallone"),
+    ),
+    "D. Janele Hyer-Spencer, New York State Assembly member": (
+        ("us.klarner.person", "266027"),
+        ("us.nyc_recap.person", "NY:d-janele-hyer-spencer"),
+    ),
+    "Helen Marshall, New York City Council member and Queens Borough President": (
+        ("us.alged.person", "35005"),
+        ("us.nyc_recap.person", "NY:helen-m-marshall"),
+        ("us.nyc_cfb.person", "helen-marshall"),
+        ("us.klarner.person", "174270"),
+    ),
+    "Kevin Brawley, New York City Council and Bronx Borough President candidate": (
+        ("us.alged.person", "35146"),
+        ("us.nyc_cfb.person", "kevin-brawley"),
+    ),
+    "Vincent Gentile, New York City Council member": (
+        ("us.alged.person", "35508"),
+        ("us.elstats_specials.person", "NY:vincent-j-gentile"),
+        ("us.alged.person", "31760"),
+    ),
+    "Robert Jackson, New York City Council member": (
+        ("wikidata", "Q16730113"),
+        ("us.alged.person", "35382"),
+        ("us.nyc_general.person", "2016-09-13:NY:senate:31:dp:robert-jackson"),
+    ),
+    "Jumaane Williams, New York City Council member": (
+        ("us.alged.person", "35139"),
+        ("us.nyc_boe.person", "jumaane-d-williams"),
+    ),
+    "Kalman Yeger, New York City Council member": (
+        ("us.alged.person", "35169"),
+        ("openstates.person", "ocd-person/ad60765d-3d3c-4523-9c75-0a81af0e85e9"),
+    ),
+    "Rafael Espinal, New York City Council member": (
+        ("us.alged.person", "35368"),
+        ("us.klarner.person", "316748"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:rafael-l-espinal-jr"),
+        ("us.nyc_recap.person", "NY:rafael-l-espinal-jr"),
+    ),
+    "Fernando Cabrera, New York City Council member": (
+        ("us.alged.person", "34938"),
+        ("us.nyc_general.person", "2016-09-13:NY:senate:33:dp:fernando-cabrera"),
+        ("us.klarner.person", "330327"),
+    ),
+    "Steven Matteo, New York City Council member": (
+        ("us.alged.person", "35459"),
+        ("us.nyc_boe.person", "steven-matteo"),
+    ),
+    "Jerome X. O'Donovan, New York City Council member": (
+        ("us.alged.person", "35104"),
+        ("fec.candidate", "H8NY14083"),
+    ),
+    "John Sabini, New York City Council member": (
+        ("us.alged.person", "35120"),
+        ("us.nyc_cfb.person", "john-sabini"),
+        ("us.klarner.person", "164623"),
+    ),
+    "Letitia James, New York City Council member": (
+        ("wikidata", "Q6533414"),
+        ("us.alged.person", "35183"),
+        ("us.nyc_recap.person", "NY:letitia-james"),
+    ),
+    "José M. Serrano, New York City Council member": (
+        ("wikidata", "Q6292921"),
+        ("us.alged.person", "35126"),
+        ("us.nyc_recap.person", "NY:jose-m-serrano"),
+    ),
+    "José E. Serrano, U.S. Representative": (
+        ("bioguide", "S000248"),
+        ("us.klarner.person", "177293:jose-e-serrano"),
+    ),
+    "Daniel J. O'Donnell, New York State Assembly member": (
+        ("us.klarner.person", "176905"),
+        ("us.state_primaries.person", "NY:assembly:69:DEM:daniel-j-o-donnell"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:daniel-j-o-donnell"),
+    ),
+    "Elizabeth Crowley, New York City Council member": (
+        ("us.alged.person", "34904"),
+        ("us.nyc_boe.person", "elizabeth-s-crowley"),
+        ("fec.candidate", "H2NY06124"),
+        ("us.state_primaries.person", "NY:senate:59:DEM:elizabeth-s-crowley"),
+    ),
+    "David Weprin, New York City Council member": (
+        ("us.alged.person", "34894"),
+        ("us.klarner.person", "302575"),
+        ("us.nyc_boe.person", "david-i-weprin"),
+        ("us.nyc_recap.person", "NY:david-i-weprin"),
+        ("us.wikipedia_house_specials.person", "NY:david-weprin"),
+    ),
+    "Kenneth K. Fisher, New York City Council member": (
+        ("us.alged.person", "35150"),
+        ("us.nyc_recap_wayback.person", "NY:kenneth-k-fisher"),
+    ),
+    "Thomas Ognibene, New York City Council member": (
+        ("us.alged.person", "35492"),
+        ("fec.candidate", "H6NY09103"),
+        ("us.klarner.person", "164656"),
+    ),
+    "Kathryn Freed, New York City Council member": (
+        ("us.alged.person", "35152"),
+        ("us.nyc_recap.person", "NY:kathryn-e-freed"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:supreme-court-1-new-york:kathryn-e-freed"),
+        ("us.nyc_recap_wayback.person", "NY:kathryn-e-freed"),
+    ),
+    "Erik Martin Dilan, New York City Council member": (
+        ("us.alged.person", "34907"),
+        ("us.klarner.person", "330671"),
+        ("fec.candidate", "H2NY12148"),
+        ("us.nyc_general.person", "2026-06-23:NY:assembly:54:democratic:erik-martin-dilan"),
+        ("us.nyc_general.person", "2018-11-06:NY:assembly:54:g:erik-martin-dilan"),
+    ),
+    "Joann Ariola, New York City Council member": (
+        ("wikidata", "Q109373922"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:borough-president-queens:joann-ariola"),
+    ),
+    "Tracy Boyland, New York City Council member": (
+        ("us.alged.person", "35484"),
+        ("fec.candidate", "H4NY11104"),
+    ),
+    "Mark Weprin, New York City Council member": (
+        ("us.alged.person", "35291"),
+        ("us.klarner.person", "173385"),
+    ),
+    "Vickie Paladino, New York City Council member": (
+        ("wikidata", "Q118525516"),
+        ("us.klarner.person", "387001"),
+    ),
+    "Alicka Ampry-Samuel, New York City Council member": (
+        ("us.alged.person", "34679"),
+        ("us.nyc_boe.person", "alicka-tani-ampry-samuel"),
+    ),
+    "David Yassky, New York City Council member": (
+        ("us.alged.person", "34897"),
+        ("fec.candidate", "H6NY11117"),
+        ("us.state_primaries.person", "NY:senate:26:DEM:david-yassky"),
+    ),
+    "Bill de Blasio, New York City Council member": (
+        ("wikidata", "Q4911497"),
+        ("fec.candidate", "H2NY10282"),
+    ),
+    "Victor Robles, New York City Council member": (
+        ("us.alged.person", "35514"),
+        ("us.klarner.person", "175718"),
+    ),
+    "James Oddo, New York City Council member": (
+        ("us.alged.person", "35103"),
+        ("us.nyc_recap.person", "NY:james-s-oddo"),
+    ),
+    "James Gennaro, New York City Council member": (
+        ("us.alged.person", "35063"),
+        ("us.klarner.person", "289036"),
+    ),
+    "Mark Gjonaj, New York City Council member": (
+        ("us.alged.person", "35240"),
+        ("us.klarner.person", "316827"),
+    ),
+    "Guillermo Linares, New York City Council member": (
+        ("us.alged.person", "34977"),
+        ("us.klarner.person", "302770"),
+        ("us.nyc_general.person", "2016-09-13:NY:assembly:72:dp:guillermo-linares"),
+        ("us.nyc_cfb.person", "guillermo-linares"),
+        ("fec.candidate", "H6NY13162"),
+    ),
+    "Melinda Katz, New York City Council member": (
+        ("us.alged.person", "35250"),
+        ("fec.candidate", "H8NY09117"),
+        ("us.klarner.person", "173745"),
+        ("us.nyc_general.person", "2019-11-05:new-york-city:district-attorney-queens:melinda-katz"),
+        ("us.nyc_recap.person", "NY:melinda-katz"),
+    ),
+    "Thomas White Jr., New York City Council member": (
+        ("us.alged.person", "35501"),
+        ("us.nyc_cfb.person", "thomas-white-jr"),
+        ("us.nyc_cfb.person", "jr-thomas-white"),
+    ),
+    "Anthony Como, New York City Council member": (
+        ("us.alged.person", "34693"),
+        ("us.klarner.person", "302181"),
+    ),
+    "Donovan Richards, New York City Council member": (
+        ("us.alged.person", "34882"),
+        ("us.nyc_boe.person", "donovan-j-richards-jr"),
+    ),
+    "Inez Barron, New York City Council member": (
+        ("us.alged.person", "35016"),
+        ("us.klarner.person", "289385"),
+    ),
+    "Margaret Chin, New York City Council member": (
+        ("us.alged.person", "35222"),
+        ("us.nyc_cfb.person", "margaret-chin"),
+    ),
+    "James Sanders Jr., New York City Council member": (
+        ("wikidata", "Q6142750"),
+        ("us.alged.person", "35123"),
+    ),
+    "Charles Barron, New York City Council member": (
+        ("us.alged.person", "34788"),
+        ("fec.candidate", "H6NY00060"),
+        ("us.klarner.person", "330693"),
+        ("us.cage.person", "NY:charles-barron"),
+        ("us.nyc_cfb.person", "charles-barron"),
+    ),
+    "José Rivera, New York City Council member": (
+        ("us.alged.person", "35117"),
+        ("us.klarner.person", "177566"),
+        ("us.nyc_recap.person", "NY:jose-rivera"),
+        ("us.nyc_cfb.person", "jose-rivera"),
+    ),
+    "Jimmy Van Bramer, New York City Council member": (
+        ("us.alged.person", "35036"),
+        ("us.nyc_recap_wayback.person", "NY:james-g-van-bramer"),
+        ("us.nyc_boe.person", "james-g-van-bramer"),
+        ("us.nyc_recap.person", "NY:james-g-van-bramer"),
+    ),
+    "Annette Robinson, New York City Council member": (
+        ("us.alged.person", "34740"),
+        ("us.nyc_cfb.person", "annette-robinson"),
+        ("us.klarner.person", "175884"),
+        ("us.nyc_recap_wayback.person", "NY:annette-m-robinson"),
+    ),
+    "Hiram Monserrate, New York City Council member": (
+        ("us.alged.person", "35007"),
+        ("us.nyc_general.person", "2026-06-23:NY:senate:13:democratic:hiram-monserrate"),
+        ("us.klarner.person", "289045"),
+        ("us.nyc_general.person", "2024-06-25:NY:assembly:35:democratic:hiram-monserrate"),
+    ),
+    "Robert Cornegy Jr., New York City Council member": (
+        ("us.alged.person", "35360"),
+        ("us.nyc_boe.person", "robert-e-cornegy-jr"),
+    ),
+    "Joseph Addabbo Jr., New York City Council member": (
+        ("wikidata", "Q6280908"),
+        ("us.klarner.person", "289049"),
+        ("us.nyc_cfb.person", "jr-joseph-addabbo"),
+    ),
+    "Costa Constantinides, New York City Council member": (
+        ("us.alged.person", "34795"),
+        ("us.nyc_general.person", "2020-06-23:new-york-city:borough-president-queens-democratic:costa-constantinides"),
+    ),
+    "Chaim Deutsch, New York City Council member": (
+        ("us.alged.person", "34798"),
+        ("fec.candidate", "H0NY09114"),
+    ),
+    "Una Clarke, New York City Council member": (
+        ("us.alged.person", "35502"),
+        ("fec.candidate", "H0NY11045"),
+        ("us.nyc_cfb.person", "una-clarke"),
+    ),
+    "James E. Davis, New York City Council member": (
+        ("wikidata", "Q139655"),
+        ("us.klarner.person", "174868"),
+    ),
+    "Yvette Clarke, New York City Council member": (
+        ("bioguide", "C001067"),
+        ("us.alged.person", "35545"),
+    ),
+    "John Liu, New York City Council member": (
+        ("wikidata", "Q6244999"),
+        ("us.alged.person", "35085"),
+    ),
+    "Andrew Cohen, New York City Council member": (
+        ("us.alged.person", "34692"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:supreme-court-12-bronx:andrew-j-cohen"),
+    ),
+    "Adolfo Carrión Jr., New York City Council member": (
+        ("us.alged.person", "34688"),
+        ("us.nyc_cfb.person", "jr-adolfo-carrion"),
+        ("us.nyc_recap_wayback.person", "NY:adolfo-carrion"),
+        ("us.nyc_recap.person", "NY:adolfo-carrion-jr"),
+    ),
+    "Julie Won, New York City Council member": (
+        ("wikidata", "Q107598267"),
+        ("us.oe_primaries_2026.person", "NY:julie-won"),
+    ),
+    "Eric Ulrich, New York City Council member": (
+        ("us.alged.person", "34933"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:eric-a-ulrich"),
+        ("us.klarner.person", "316350"),
+    ),
+    "Darlene Mealy, New York City Council member": (
+        ("us.alged.person", "34875"),
+        ("us.state_primaries.person", "NY:assembly:55:DEM:darlene-mealy"),
+    ),
+    "Michael McMahon, New York City Council member": (
+        ("bioguide", "M001174"),
+        ("us.alged.person", "35263"),
+        ("us.alged.person", "33238"),
+        ("us.nyc_recap.person", "NY:michael-e-mcmahon"),
+    ),
+    "Carlina Rivera, New York City Council member": (
+        ("wikidata", "Q47008996"),
+        ("fec.candidate", "H2NY10324"),
+    ),
+    "Ritchie Torres, New York City Council member": (
+        ("bioguide", "T000486"),
+        ("us.alged.person", "35414"),
+    ),
+    "Keith Powers, New York City Council member": (
+        ("wikidata", "Q48742847"),
+        ("us.nyc_boe.person", "keith-powers"),
+        ("openstates.person", "ocd-person/c99b7832-4dae-4ad3-b94a-41b50f99fd8f"),
+    ),
+    "Inez Dickens, New York City Council member": (
+        ("us.alged.person", "35017"),
+        ("us.klarner.person", "371409"),
+    ),
+    "Martin Malavé Dilan, New York City Council member": (
+        ("us.klarner.person", "164882"),
+        ("us.alged.person", "35227"),
+        ("us.state_primaries.person", "NY:senate:18:DEM:martin-m-dilan"),
+    ),
+    "Ydanis Rodriguez, New York City Council member": (
+        ("us.alged.person", "35552"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:ydanis-rodriguez"),
+        ("fec.candidate", "H0NY15269"),
+    ),
+    "Andrew Eristoff, New York City Council member": (
+        ("us.alged.person", "34698"),
+        ("us.klarner.person", "165613"),
+    ),
+    "Vincent Ignizio, New York City Council member": (
+        ("us.alged.person", "35510"),
+        ("us.klarner.person", "266038"),
+    ),
+    "Mathieu Eugene, New York City Council member": (
+        ("us.alged.person", "35230"),
+        ("us.nyc_boe.person", "mathieu-eugene"),
+    ),
+    "Antonio Reynoso, New York City Council member": (
+        ("us.alged.person", "34738"),
+        ("us.nyc_boe.person", "antonio-reynoso"),
+        ("us.oe_primaries_2026.person", "NY:antonio-reynoso"),
+    ),
+    "G. Oliver Koppell, New York City Council member": (
+        ("us.alged.person", "34976"),
+        ("us.klarner.person", "177849"),
+    ),
+    "Ben Kallos, New York City Council member": (
+        ("us.alged.person", "34775"),
+        ("us.nyc_boe.person", "ben-kallos"),
+    ),
+    "Rubén Díaz Sr., New York City Council member": (
+        ("us.alged.person", "35365"),
+        ("us.klarner.person", "166131"),
+        ("fec.candidate", "H0NY15186"),
+    ),
+    "Rubén Díaz Jr., Bronx Borough President": (
+        ("us.klarner.person", "177391"),
+        ("us.nyc_general.person", "2017-11-07:new-york-city:borough-president-bronx:ruben-diaz-jr"),
+    ),
+    "Tony Avella, New York City Council member": (
+        ("us.alged.person", "35483"),
+        ("us.klarner.person", "302156"),
+        ("us.nyc_cfb.person", "anthony-avella-jr"),
+    ),
+    "Bill Perkins, New York City Council member": (
+        ("wikidata", "Q4910470"),
+        ("us.alged.person", "34784"),
+    ),
+    "Erik Bottcher, New York City Council member": (
+        ("wikidata", "Q107565790"),
+        ("openstates.person", "ocd-person/d55adf3d-ba23-47c8-a844-ee28227983c0"),
+    ),
+    "Carmen De La Rosa, New York City Council member": (
+        ("us.alged.person", "34832"),
+        ("us.nyc_general.person", "2020-11-03:NY:assembly:72:g:carmen-de-la-rosa"),
+    ),
+    "Mercedes Narcisse, New York City Council member": (
+        ("us.alged.person", "35267"),
+        ("us.state_primaries.person", "NY:senate:19:DEM:mercedes-narcisse"),
+    ),
+    "Joe Borelli, New York City Council member": (
+        ("wikidata", "Q6281611"),
+        ("us.klarner.person", "316770"),
+        ("us.nyc_general.person", "2019-11-05:new-york-city:public-advocate:joseph-c-borelli"),
+    ),
+    "Lawrence Warden, New York City Council member": (
+        ("us.alged.person", "35205"),
+        ("us.state_primaries.person", "NY:senate:36:DEM:lawrence-d-warden"),
+    ),
+    "Helen Sears, New York City Council member": (
+        ("us.alged.person", "35010"),
+        ("us.nyc_cfb.person", "helen-sears"),
+        ("us.nyc_recap.person", "NY:helen-sears"),
+    ),
+    "Leroy Comrie, New York City Council member": (
+        ("us.alged.person", "35173"),
+        ("us.klarner.person", "330248"),
+    ),
+    "Noach Dear, New York City Council member": (
+        ("wikidata", "Q7045291"),
+        ("fec.candidate", "H8NY09109"),
+        ("us.klarner.person", "165218"),
+        ("us.nyc_general.person", "2015-11-03:new-york-city:supreme-court-2-kings:noach-dear"),
+        ("us.nyc_recap.person", "NY:noach-dear"),
+    ),
+    "Nantasha Williams, New York City Council member": (
+        ("us.alged.person", "35305"),
+        ("us.state_primaries.person", "NY:assembly:33:DEM:nantasha-williams"),
+    ),
+    "Howard Lasher, New York City Council member": (
+        ("us.alged.person", "35004"),
+        ("us.klarner.person", "175108"),
+    ),
+    "Domenic Recchia, New York City Council member": (
+        ("us.alged.person", "34879"),
+        ("fec.candidate", "H8NY13069"),
+    ),
+    "Vanessa Gibson, New York City Council member": (
+        ("wikidata", "Q7914648"),
+        ("us.nyc_recap.person", "NY:vanessa-l-gibson"),
+        ("us.klarner.person", "302794"),
+        ("us.nyc_boe.person", "vanessa-l-gibson"),
+    ),
+    "Albert Vann, New York City Council member": (
+        ("us.alged.person", "34756"),
+        ("us.klarner.person", "175877"),
+    ),
+    "Anthony Weiner, New York City Council member": (
+        ("bioguide", "W000792"),
+        ("us.nyc_recap.person", "NY:anthony-d-weiner"),
+        ("us.nyc_boe.person", "anthony-d-weiner"),
+        ("us.alged.person", "34759"),
+    ),
+    "Francisco Moya, New York City Council member": (
+        ("us.alged.person", "34951"),
+        ("us.klarner.person", "302629"),
+    ),
+    "Peter Koo, New York City Council member": (
+        ("us.alged.person", "35329"),
+        ("us.klarner.person", "289054"),
+    ),
+    "Justin Brannan, New York City Council member": (
+        ("wikidata", "Q3811588"),
+        ("us.nyc_boe.person", "justin-brannan"),
+    ),
+    "Melissa Mark-Viverito, New York City Council member": (
+        ("wikidata", "Q6812788"),
+        ("fec.candidate", "H0NY15244"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:melissa-mark-viverito"),
+    ),
+    "Thomas K. Duane, New York City Council member": (
+        ("us.alged.person", "35488"),
+        ("us.klarner.person", "165679"),
+        ("fec.candidate", "H4NY08027"),
+    ),
+    "Diana Ayala, New York City Council member": (
+        ("us.alged.person", "34842"),
+        ("us.nyc_general.person", "2026-06-23:NY:assembly:68:democratic:diana-i-ayala"),
+    ),
+    "Larry Seabrook, New York City Council member": (
+        ("us.alged.person", "35197"),
+        ("fec.candidate", "H4NY17069"),
+        ("us.klarner.person", "166198"),
+    ),
+    "Julia Harrison, New York City Council member": (
+        ("us.alged.person", "35070"),
+        ("us.nyc_cfb.person", "julia-harrison"),
+        ("us.klarner.person", "164581"),
+    ),
+    "Alan Maisel, New York City Council member": (
+        ("us.alged.person", "34720"),
+        ("us.klarner.person", "277656"),
+    ),
+    "Rory Lancman, New York City Council member": (
+        ("us.alged.person", "35387"),
+        ("fec.candidate", "H2NY09102"),
+        ("us.klarner.person", "164489"),
+    ),
+    "Kendall Stewart, New York City Council member": (
+        ("us.alged.person", "35166"),
+        ("us.nyc_cfb.person", "kendall-stewart"),
+    ),
+    "Allan W. Jennings Jr., New York City Council member": (
+        ("us.alged.person", "34709"),
+        ("us.nyc_cfb.person", "allan-jennings"),
+        ("us.nyc_cfb.person", "jr-allan-jennings"),
+        ("us.nyc_recap.person", "NY:allan-w-jennings-jr"),
+        ("us.nyc_recap.person", "NY:allan-w-jennings"),
+        ("fec.candidate", "H2NY05084"),
+    ),
+    "Andrew Lanza, New York City Council member": (
+        ("wikidata", "Q4757702"),
+        ("us.klarner.person", "277304"),
+    ),
+    "Chris Banks, New York City Council member": (
+        ("wikidata", "Q128304273"),
+        ("us.nyc_recap.person", "NY:christopher-w-banks"),
+        ("us.nyc_recap.person", "NY:christopher-banks"),
+        ("us.klarner.person", "330692"),
+    ),
+    "Martin Golden, New York City Council member": (
+        ("us.alged.person", "35241"),
+        ("us.klarner.person", "165294"),
+    ),
+    "Dan Halloran, New York City Council member": (
+        ("us.alged.person", "34867"),
+        ("fec.candidate", "H2NY06157"),
+    ),
+    "Harvey Epstein, New York City Council member": (
+        ("us.nyc_boe.person", "harvey-d-epstein"),
+        ("us.klarner.person", "386572"),
+    ),
+    "Corey Johnson, New York City Council member": (
+        ("us.alged.person", "34814:corey-johnson"),
+        ("us.nyc_boe.person", "corey-d-johnson"),
+    ),
+    "Gifford Miller, New York City Council member": (
+        ("us.alged.person", "34724"),
+        ("us.nyc_recap.person", "NY:gifford-miller"),
+    ),
     'James "Jamie" Davis Jr., Tensas Parish police juror, 2023 Louisiana House 21 candidate, and 2026 Senate nominee': (
         ("us.sld_specials.person", "LA:james-jamie-davis-jr"),
         ("fec.candidate", "S6LA00615"),
         ("us.la_local.person", "22107:jamie-lil-stump-davis"),
+    ),
+    "Adina Sash, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:adina-sash"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:adina-sash"),
+    ),
+    "Alice Tam Tien, 2024 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-2-new-york-democratic:alice-tam-tien"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-2-new-york:alice-tam-tien"),
+    ),
+    "Anthony Alexis, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:anthony-alexis"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:anthony-alexis"),
+    ),
+    "Anthony Catalano, 2018 Richmond County Surrogate candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-conservative:anthony-catalano"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-democratic:anthony-catalano"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-reform:anthony-catalano"),
+    ),
+    "Cenceria P. Edwards, Brooklyn Assembly and Kings County Civil Court candidate": (
+        ("us.nyc_recap.person", "NY:cenceria-p-edwards"),
+        (
+            "us.nyc_general.person",
+            "2014-09-09:new-york-city:civil-court-district-2-kings-democratic:cenceria-p-edwards",
+        ),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-2-kings:cenceria-p-edwards"),
+    ),
+    "Dawn Simmons, 2017 Harlem City Council and State Senate special election candidate": (
+        ("us.nyc_general.person", "2017-02-14:new-york-city:council-district-9:dawn-simmons"),
+        ("us.nyc_general.person", "2017-05-23:NY:senate:30:special:dawn-simmons"),
+    ),
+    "Eric Schumacher, 2020 New York County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2020-06-23:new-york-city:civil-court-district-1-new-york-democratic:eric-schumacher",
+        ),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-new-york:eric-schumacher"),
+    ),
+    "Eve Cho Guillergan, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-2-queens-democratic:eve-cho-guillergan",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-2-queens:eve-cho-guillergan"),
+    ),
+    "Gina Levy, 2018 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-district-8-kings-democratic:gina-levy"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:civil-court-district-8-kings:gina-levy"),
+    ),
+    "Harold E. Bahr, 2024 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-2-new-york-democratic:harold-bahr"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-new-york:harold-e-bahr"),
+    ),
+    "Ingrid Joseph, Kings County Civil Court judge and Supreme Court justice": (
+        ("us.nyc_recap.person", "NY:ingrid-joseph"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-kings-democratic:ingrid-joseph"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:supreme-court-2-kings:ingrid-joseph"),
+    ),
+    "Janice Robinson, 2024 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2024-06-25:new-york-city:civil-court-district-6-kings-democratic:janice-robinson"),
+        ("us.nyc_general.person", "2024-11-05:new-york-city:civil-court-district-6-kings:janice-robinson"),
+    ),
+    "John Zhuo Wang, 2020 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-1-new-york-democratic:john-zhuo-wang"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-1-new-york:john-zhuo-wang"),
+    ),
+    "Jovia A. Radix, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:jovia-a-radix"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:jovia-a-radix"),
+    ),
+    "Juliette-Noor Haji, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-1-queens-democratic:juliette-noor-haji",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-1-queens:juliette-noor-haji"),
+    ),
+    "L. Rickie Tulloch, Brooklyn Assembly and City Council candidate": (
+        ("us.klarner.person", "330623"),
+        ("us.nyc_recap.person", "NY:l-rickie-tulloch"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:l-rickie-tulloch"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:l-rickie-tulloch"),
+    ),
+    "Leigh K. Cheng, 2020 Queens County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-6-queens-democratic:leigh-k-cheng"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-6-queens:leigh-k-cheng"),
+    ),
+    "Maria Aragona, 2020 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-3-kings-democratic:maria-aragona"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-3-kings:maria-aragona"),
+    ),
+    "Michael Gerstein, 2015 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2015-09-10:new-york-city:civil-court-district-6-kings-democratic:michael-gerstein"),
+        ("us.nyc_general.person", "2015-11-03:new-york-city:civil-court-district-6-kings:michael-gerstein"),
+    ),
+    "Monique Allen-Davy, 2022 New York State Assembly candidate": (
+        ("us.klarner.person", "415244"),
+        ("us.nyc_general.person", "2022-05-24:NY:assembly:58:special:monique-allen-davy"),
+        ("us.nyc_general.person", "2022-11-08:NY:assembly:58:g:monique-allen-davy"),
+    ),
+    "Monique Chandler-Waterman, New York State Assembly member": (
+        ("wikidata", "Q114397290"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:monique-chandler-waterman"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:monique-chandler-waterman"),
+    ),
+    "Morton M. Avigdor, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-5-kings-democratic:morton-m-avigdor"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-5-kings:morton-m-avigdor"),
+    ),
+    "Pamela Stewart-Martinez, Bronx Assembly and State Senate candidate": (
+        ("us.klarner.person", "387085"),
+        ("us.state_primaries.person", "NY:assembly:87:DEM:pamela-stewart-martinez"),
+        ("us.nyc_general.person", "2018-04-24:NY:senate:32:special:pamela-stewart-martinez"),
+        ("us.nyc_general.person", "2018-11-06:NY:senate:32:g:pamela-stewart-martinez"),
+    ),
+    "Rachel E. Freier, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-5-kings-democratic:rachel-e-freier"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-5-kings:rachel-e-freier"),
+    ),
+    "Ronald Castorina Jr., New York State Assembly member and 2018 Richmond County Surrogate candidate": (
+        ("us.klarner.person", "371365"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-reform:ronald-castorina-jr"),
+        ("us.nyc_general.person", "2018-09-13:new-york-city:surrogate-richmond-conservative:ronald-castorina-jr"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:surrogate-richmond:ronald-castorina-jr"),
+    ),
+    "Sabrina B. Kraus, New York County Civil Court candidate": (
+        ("us.nyc_recap.person", "NY:sabrina-b-kraus"),
+        (
+            "us.nyc_general.person",
+            "2016-09-13:new-york-city:civil-court-district-6-new-york-democratic:sabrina-b-kraus",
+        ),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-6-new-york:sabrina-b-kraus"),
+    ),
+    "Sharon Clarke, 2014 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2014-09-09:new-york-city:civil-court-district-6-kings-democratic:sharon-clarke"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-6-kings:sharon-clarke"),
+    ),
+    "Susan Quirk, 2016 Kings County Civil Court candidate": (
+        ("us.nyc_general.person", "2016-09-13:new-york-city:civil-court-district-3-kings-democratic:susan-quirk"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-district-3-kings:susan-quirk"),
+    ),
+    "Thomas G. Wright-Fernandez, 2025 Queens County Civil Court candidate": (
+        (
+            "us.nyc_general.person",
+            "2025-06-24:new-york-city:civil-court-district-1-queens-democratic:thomas-g-wright-fernandez",
+        ),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:civil-court-district-2-queens:thomas-g-wright-fernandez"),
+    ),
+    "Victor A. Jordan, Brooklyn Assembly and City Council candidate": (
+        ("us.klarner.person", "330622"),
+        ("us.nyc_boe.person", "victor-jordan"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:victor-jordan"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:victor-jordan"),
+    ),
+    "Wanda Y. Negron, 2020 Bronx County Civil Court candidate": (
+        ("us.nyc_general.person", "2020-06-23:new-york-city:civil-court-district-2-bronx-democratic:wanda-y-negron"),
+        ("us.nyc_general.person", "2020-11-03:new-york-city:civil-court-district-2-bronx:wanda-y-negron"),
+    ),
+    "Wendy C. Li, 2018 New York County Civil Court candidate": (
+        ("us.nyc_general.person", "2018-09-13:new-york-city:civil-court-district-2-new-york-democratic:wendy-c-li"),
+        ("us.nyc_general.person", "2018-11-06:new-york-city:civil-court-district-2-new-york:wendy-c-li"),
+    ),
+    "Wyatt N. Gibbons, Queens County Civil Court judge and Supreme Court justice": (
+        ("us.nyc_general.person", "2019-06-25:new-york-city:civil-court-queens-democratic:wyatt-n-gibbons"),
+        ("us.nyc_general.person", "2019-11-05:new-york-city:supreme-court-11-queens:wyatt-n-gibbons"),
+    ),
+    "Xamayla Rose, 2019 New York City Council District 45 candidate": (
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45:xamayla-rose"),
+        ("us.nyc_general.person", "2019-05-14:new-york-city:council-district-45-democratic:xamayla-rose"),
+    ),
+    "Yuh-Line Niou, New York State Assembly member": (
+        ("fec.candidate", "H2NY10241"),
+        ("us.klarner.person", "371388"),
+        ("us.nyc_general.person", "2016-04-19:NY:assembly:65:special:yuh-line-niou"),
+        ("us.nyc_general.person", "2016-09-13:NY:assembly:65:dp:yuh-line-niou"),
+        ("us.nyc_general.person", "2016-11-08:NY:assembly:65:g:yuh-line-niou"),
+    ),
+    "Heshy Tischler, Brooklyn City Council candidate": (
+        ("us.alged.person", "35013"),
+        ("us.nyc_boe.person", "heshy-tischler"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-44:heshy-tischler"),
+    ),
+    "Clifford A. Hagen, 2025 New York City Council District 51 candidate": (
+        ("us.nyc_boe.person", "clifford-a-hagen"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:council-district-51:clifford-a-hagen"),
+    ),
+    "Scott M. Stringer, Assembly member, Manhattan Borough President, and New York City Comptroller": (
+        ("us.klarner.person", "176753"),
+        ("us.nyc_recap.person", "NY:scott-m-stringer"),
+        ("us.nyc_recap_wayback.person", "NY:scott-m-stringer"),
+        ("us.nyc_cfb.person", "scott-m-stringer"),
+    ),
+    "Curtis Sliwa, 2021 and 2025 Republican nominee for mayor of New York City": (
+        ("us.alged.person", "35566"),
+        ("us.nyc_boe.person", "curtis-a-sliwa"),
+    ),
+    "Michael Blake, Bronx Assembly member and 2019 Public Advocate and 2025 mayoral candidate": (
+        ("fec.candidate", "H0NY15194"),
+        ("us.klarner.person", "330764"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:michael-a-blake"),
+        ("us.nyc_boe.person", "michael-blake"),
+    ),
+    "Anthony L. Herbert, Brooklyn City Council, Assembly, State Senate, and Public Advocate candidate": (
+        ("us.klarner.person", "265644"),
+        ("us.alged.person", "34707"),
+        ("us.nyc_recap.person", "NY:anthony-l-herbert"),
+        ("us.nyc_boe.person", "anthony-l-herbert"),
+        ("us.nyc_general.person", "2019-02-26:new-york-city:public-advocate:anthony-tony-herbert"),
+    ),
+    "Jose A. Padilla Jr., Bronx City Council District 15 candidate": (
+        ("us.nyc_boe.person", "jose-a-padilla-jr"),
+        ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-15:jose-a-padilla-jr"),
+    ),
+    "Cordell Cleare, New York State Senate member": (
+        ("wikidata", "Q28536831"),
+        ("us.nyc_boe.person", "cordell-cleare"),
+    ),
+    "Yudelka Tapia, New York State Assembly member": (
+        ("wikidata", "Q109920524"),
+        ("us.nyc_boe.person", "yudelka-tapia"),
+    ),
+    "Soma S. Syed, Queens Civil Court judge and Supreme Court justice": (
+        ("us.nyc_general.person", "2021-11-02:new-york-city:civil-court-queens:soma-s-syed"),
+        ("us.nyc_boe.person", "soma-s-syed"),
+        ("us.nyc_general.person", "2025-11-04:new-york-city:supreme-court-11-queens:soma-s-syed"),
+    ),
+    "Robert D. Siano, Bronx lawyer and New York City Board of Elections commissioner": (
+        ("us.alged.person", "30591:robert-siano"),
+        ("us.nyc_recap.person", "NY:robert-d-siano"),
+        ("us.nyc_general.person", "2014-11-04:new-york-city:civil-court-district-2-bronx:robert-siano"),
+        ("us.nyc_general.person", "2016-11-08:new-york-city:civil-court-bronx:robert-d-siano"),
+        ("us.fec.person", "NY:robert-siano"),
+        ("us.state_primaries.person", "NY:senate:12:NY:Reform:robert-siano"),
     ),
 }
 HONORIFICS = re.compile(

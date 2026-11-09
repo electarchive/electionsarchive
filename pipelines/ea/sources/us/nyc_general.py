@@ -375,17 +375,19 @@ NOTE_STATE = (
 )
 
 
-def peer_candidacies(conn, year: int) -> dict[tuple[str, str, str], list[tuple[UUID, str, UUID | None]]]:
+def peer_candidacies(conn, year: int) -> dict[tuple[str, str, str], list[tuple[UUID, str, UUID | None, bool]]]:
     peers = defaultdict(list)
-    for area, office, body, contest, ballot_name, person in conn.execute(
-        """select c.district_area_id, c.office_id, c.body_id, c.id, ca.ballot_name, ca.person_id from candidacy ca
+    for area, office, body, contest, ballot_name, person, ours in conn.execute(
+        """select c.district_area_id, c.office_id, c.body_id, c.id, ca.ballot_name, ca.person_id, h.pipeline = %s
+           from candidacy ca
            join contest_option o on o.id = ca.option_id and ca.role = 'head' and ca.ballot_name <> ''
            join contest c on c.id = o.contest_id
            join election e on e.id = c.election_id
+           join changeset h on h.id = ca.changeset_id
            where extract(year from e.date_from) = %s""",
-        [year],
+        [SOURCE, year],
     ):
-        peers[str(area), str(office), str(body)].append((contest, ballot_name, person))
+        peers[str(area), str(office), str(body)].append((contest, ballot_name, person, ours))
     return peers
 
 
@@ -508,6 +510,7 @@ def emit() -> Path:
 
         year_peers_for = None
         year_peers = {}
+        fresh: dict[tuple[str, str, str], dict[tuple[str, ...], UUID | None]] = defaultdict(dict)
         for day_text in sorted(frame["date"].unique()):
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
             day_frame = frame.filter(pl.col("date") == day_text)
@@ -1179,14 +1182,17 @@ def emit() -> Path:
                 known = {}
                 clash = set()
                 roots = conn.execute(
-                    """select o.id, ca.ballot_name, ca.person_id, x.value from contest_option o
+                    """select o.id, ca.ballot_name, ca.person_id, x.value, ca.id, ca.is_independent, h.pipeline = %s
+                       from contest_option o
                        join candidacy ca on ca.option_id = o.id
+                       join changeset h on h.id = ca.changeset_id
                        left join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
                        where o.contest_id = %s and o.parent_option_id is null and ca.role = 'head'
                          and o.kind in ('candidate', 'ticket', 'write_in')""",
-                    [contest],
+                    [SOURCE, contest],
                 ).fetchall()
-                for option_id, ballot_name, person_id, option_value in roots:
+                held: dict[UUID, tuple[UUID, str, bool]] = {}
+                for option_id, ballot_name, person_id, option_value, candidacy_id, independent, ours in roots:
                     if not ballot_name:
                         continue
                     words = [
@@ -1198,10 +1204,15 @@ def emit() -> Path:
                     if token in known:
                         clash.add(token)
                     known[token] = (option_id, person_id, option_value)
+                    if ours:
+                        held[option_id] = (candidacy_id, ballot_name, independent)
                 peers = {}
+                outside: dict[tuple[str, ...], UUID | None] = {}
                 if year_peers_for != day.year:
                     year_peers_for, year_peers = day.year, peer_candidacies(conn, day.year)
-                for peer, ballot_name, person_id in year_peers.get((str(area), str(office), str(body_id)), ()):
+                    fresh.clear()
+                seat = (str(area), str(office), str(body_id))
+                for peer, ballot_name, person_id, ours in year_peers.get(seat, ()):
                     if peer == contest:
                         continue
                     words = [
@@ -1212,6 +1223,10 @@ def emit() -> Path:
                     token = (words[0], words[-1])
                     if peers.setdefault(token, person_id) != person_id:
                         peers[token] = None
+                    if not ours and outside.setdefault(token, person_id) != person_id:
+                        outside[token] = None
+                for token, person_id in fresh[seat].items():
+                    peers.setdefault(token, person_id)
 
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 for prior in conn.execute(
@@ -1279,6 +1294,23 @@ def emit() -> Path:
                         root_key = match[2]
                         if root_key is None:
                             raise ValueError(f"{contest_key}: option for {candidate} has no key")
+                        if (
+                            position is None
+                            and candidate not in PERSONS
+                            and match[0] in held
+                            and (peer := outside.get(token)) is not None
+                            and peer != match[1]
+                        ):
+                            candidacy_id, ballot_name, independent = held[match[0]]
+                            cs.add(
+                                "candidacy",
+                                id=candidacy_id,
+                                person_id=peer,
+                                option_id=match[0],
+                                role="head",
+                                ballot_name=ballot_name,
+                                is_independent=independent,
+                            )
                     else:
                         root_key = f"{contest_key}:{slug(candidate)}"
                         option_ids[candidate] = cs.key("us.option", root_key)
@@ -1303,6 +1335,8 @@ def emit() -> Path:
                                     cs.add("person", id=person)
                                 if person in cs.minted or " / " in candidate:
                                     name(person, candidate.split(" / ")[0])
+                            if fresh[seat].setdefault(token, person) != person:
+                                fresh[seat][token] = None
                             head_key = f"{root_key}:head"
                             if conn.execute(
                                 "select 1 from entity where id = %s and retired_by is not null",
