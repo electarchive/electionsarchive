@@ -415,7 +415,7 @@ export class Stage {
       }
     }
     const keys = mosaic.layers.map((layer) => layer.tiles);
-    this.#engine.drape(keys, GROUP);
+    this.#engine.drape(keys, GROUP, tier + 0.5);
     const appear = this.#locked == null ? fade(range.start) : 1;
     for (const key of keys) {
       this.#engine.style(`ids:${key}`, "raster-opacity", appear);

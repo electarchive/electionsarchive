@@ -1,6 +1,6 @@
 import type { SQL } from "drizzle-orm";
 import { openapi } from "@orpc/openapi";
-import { call, ORPCError } from "@orpc/server";
+import { os as base, call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
@@ -409,6 +409,42 @@ export const maps = {
           )
           .toSorted((a, b) => a.name.localeCompare(b.name)),
       };
+    }),
+  names: base
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/maps/names/{id}",
+        summary:
+          "Name places of a contest's map by their area keys, as of the contest's date, in the order asked, for the finest places a map draws before their names have loaded",
+      }),
+    )
+    .input(
+      v.object({
+        id: Id,
+        k: v.pipe(
+          v.array(v.pipe(v.number(), v.integer(), v.minValue(1))),
+          v.maxLength(40_000),
+        ),
+      }),
+    )
+    .output(v.array(v.string()))
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        k: number;
+        date: string | null;
+      }>(sql`
+        select a.id, a.k, (
+          select e.date_from::text from contest c join election e on e.id = c.election_id
+          where c.id = ${input.id}::uuid
+        ) as date
+        from area a where a.k = any(${sql.param(input.k)}::int[])
+      `);
+      const date = found.rows[0]?.date ?? null;
+      const ids = new Map(found.rows.map((row) => [row.k, row.id]));
+      const { full } = await names([...ids.values()], date);
+      return input.k.map((k) => full.get(ids.get(k) ?? "") ?? "");
     }),
   places: os
     .meta(

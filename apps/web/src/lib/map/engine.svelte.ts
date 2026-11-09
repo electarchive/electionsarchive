@@ -1641,7 +1641,7 @@ export class Engine {
     this.#marks.set(key, { source, k });
   }
 
-  drape(keys: Array<string>, group = "") {
+  drape(keys: Array<string>, group = "", rank = 0.5) {
     const gl = this.gl;
     const { archive } = kit ?? {};
     const retries = this.#retries;
@@ -1656,7 +1656,7 @@ export class Engine {
         this.add(
           this.#mosaic.layer(id, key, isFocus),
           isFocus ? "focus" : "fills",
-          { group, rank: isFocus ? -1 : 0.5 },
+          { group, rank: isFocus ? -1 : rank },
         );
       }
     }

@@ -98,6 +98,12 @@
     let measured = 0;
     let places = 0;
     for (const set of sets) {
+      const keys = set.legend.map(
+        (item) =>
+          legend.find(
+            (entry) => entry.key === item.key || entry.label === item.label,
+          )?.key,
+      );
       for (const [i] of set.places.k.entries()) {
         const reading = read(set, i, lens);
         if (reading.leader == null) {
@@ -105,14 +111,18 @@
         }
         places += 1;
         const owner =
-          reading.held != null && !lens.isBanded
+          reading.held != null && !lens.isBanded && lens.mode !== "flips"
             ? (largest(
                 reading.held,
                 (index) => set.places.shares[index]?.[i] ?? 0,
               ) ?? reading.leader)
             : reading.leader;
-        const key = set.legend[owner]?.key;
-        if (key != null && !(lens.isBanded && reading.held != null)) {
+        const key = keys[owner];
+        if (
+          key != null &&
+          !(lens.isBanded && reading.held != null) &&
+          (lens.mode !== "flips" || reading.isFlip)
+        ) {
           won.set(key, (won.get(key) ?? 0) + 1);
         }
         if (admits(set, reading, lens)) {
@@ -138,7 +148,6 @@
           item: legend.find((entry) => entry.key === key),
           won: value,
         }))
-        .filter((entry) => entry.item != null)
         .toSorted((a, b) => b.won - a.won),
       bars: tally.map((tallied, index) => {
         const middle = low + (index + 0.5) * span.step;

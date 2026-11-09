@@ -109,7 +109,8 @@ export function active(
 ) {
   let found = 0;
   for (const [index, start] of begins.entries()) {
-    const slack = last == null ? 0 : (FADE / 2) * (index > last ? 1 : -1);
+    const slack =
+      FADE / 2 + (last == null ? 0 : (FADE / 8) * (index > last ? 1 : -1));
     if (zoom >= start + slack) {
       found = index;
     }

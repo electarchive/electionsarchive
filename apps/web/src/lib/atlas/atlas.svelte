@@ -402,41 +402,46 @@
 
   function name(hit: Hit) {
     const held = mosaic;
-    const from = base;
-    if (
-      held == null ||
-      from == null ||
-      hit.set !== held.set ||
-      held.set.places.name[hit.i] !== ""
-    ) {
+    if (held == null || hit.set.places.name[hit.i] !== "") {
       return;
     }
-    const part = from.parts[held.part[hit.i] ?? -1];
-    const layer = held.layers[held.layer[hit.i] ?? 0];
-    if (part == null || layer == null) {
+    const sets = [held.set, ...layered(held)];
+    const at = held.set.places.k.indexOf(hit.set.places.k[hit.i] ?? 0);
+    if (!sets.includes(hit.set) || at < 0) {
       return;
     }
-    const key = `${held.key}|${part.unit}|${layer.code}`;
+    const part = held.part[at] ?? -1;
+    const layer = held.layer[at] ?? 0;
+    const key = `${held.key}|${part}|${layer}`;
     if (asked.has(key)) {
       return;
     }
     asked.add(key);
-    const index = hit.tier;
-    void load(contest, {
-      unit: part.unit,
-      level: layer.code,
-      vs: view.vs,
-      group: view.group,
-      round: view.round,
-    }).then((set) => {
-      for (const [j, k] of set.places.k.entries()) {
-        const found = stage.hit(index, k);
-        if (found?.set === held.set) {
-          held.set.places.name[found.i] = set.places.name[j] ?? "";
-        }
+    const ks: Array<number> = [];
+    for (const [i, k] of held.set.places.k.entries()) {
+      if (
+        (held.part[i] ?? -1) === part &&
+        (held.layer[i] ?? 0) === layer &&
+        held.set.places.name[i] === ""
+      ) {
+        ks.push(k);
       }
-      named += 1;
-    });
+    }
+    orpc.maps.names
+      .call({ id: contest, k: ks })
+      .then((found) => {
+        const names = new Map(ks.map((k, j) => [k, found[j] ?? ""]));
+        for (const set of sets) {
+          for (const [i, k] of set.places.k.entries()) {
+            const text = names.get(k);
+            if (text != null) {
+              set.places.name[i] = text;
+            }
+          }
+        }
+        named += 1;
+      })
+      .catch(() => asked.delete(key));
   }
 
   function fetch(
@@ -1539,11 +1544,17 @@
       const tiled = new Set(
         list.flatMap((entry) => (entry.kind === "level" ? [entry.tiles] : [])),
       );
+      const shown = new Set<string | null>();
       for (const [index, entry] of list.entries()) {
         if (entry.kind === "mosaic" && held != null) {
           stage.drape(held, index);
           for (const set of layered(held)) {
-            stage.show(set, index, SHARP);
+            const tiles = set.levels.find(
+              (level) => level.code === set.level,
+            )?.tiles;
+            if (tiles == null || !tiled.has(tiles) || shown.has(tiles)) {
+              stage.show(set, index, SHARP);
+            }
           }
         } else if (entry.kind === "parts") {
           for (const set of Object.values(pieces)) {
@@ -1554,12 +1565,10 @@
               stage.show(set, index);
             }
           }
-        } else if (entry.code === from.level) {
-          stage.show(from, index);
         } else {
-          const set = loaded[entry.code];
-          if (set != null) {
-            stage.show(set, index);
+          const set = entry.code === from.level ? from : loaded[entry.code];
+          if (set != null && stage.show(set, index)) {
+            shown.add(entry.tiles);
           }
         }
       }
