@@ -50,6 +50,8 @@ type Entry = {
   version: string;
   mark: number | null;
   day: string;
+  born: number;
+  origin: "renew" | "store";
   size: number;
   isSettled: boolean;
   isRenewing: boolean;
@@ -574,6 +576,44 @@ function same(left: unknown, right: unknown) {
   }
 }
 
+function differ(before: string, after: string) {
+  let at = 0;
+  while (at < before.length && before[at] === after[at]) {
+    at++;
+  }
+  return at;
+}
+
+function sample(old: unknown, value: unknown) {
+  try {
+    const before = JSON.stringify(old) ?? "undefined";
+    const after = JSON.stringify(value) ?? "undefined";
+    if (before !== after) {
+      const at = differ(before, after);
+      const from = Math.max(0, at - 80);
+      return {
+        json: [before.length, after.length],
+        at,
+        old: before.slice(from, at + 160),
+        new: after.slice(from, at + 160),
+      };
+    }
+    const left = serialize(old).toString("hex");
+    const right = serialize(value).toString("hex");
+    const at = differ(left, right);
+    const from = Math.max(0, at - 40);
+    return {
+      json: "equal",
+      v8: [left.length / 2, right.length / 2],
+      at: at / 2,
+      old: left.slice(from, at + 80),
+      new: right.slice(from, at + 80),
+    };
+  } catch (error) {
+    return { error: String(error).slice(0, 200) };
+  }
+}
+
 function report() {
   if (Date.now() - shadow.reported < REPORT) {
     return;
@@ -618,8 +658,17 @@ async function verify(
   }
   tally.missOwn++;
   tally.missBelow += Number(keptBelow);
+  const old = await hit.value;
   console.warn(
-    `cache shadow miss: ${JSON.stringify({ key: key.slice(0, 300), deps: deps.length, below: keptBelow })}`,
+    `cache shadow miss: ${JSON.stringify({
+      key: key.slice(0, 300),
+      deps: deps.length,
+      below: keptBelow,
+      origin: hit.origin,
+      age: Math.round((Date.now() - hit.born) / 1000),
+      marked: [hit.mark, shadow.seq],
+      ...sample(old, value),
+    })}`,
   );
 }
 
@@ -663,6 +712,8 @@ function store(
     version: current(),
     mark: shadow.seq,
     day: state.today,
+    born: Date.now(),
+    origin: "store",
     size: 0,
     isSettled: false,
     isRenewing: false,
@@ -760,6 +811,8 @@ function renew(
         version,
         mark,
         day,
+        born: Date.now(),
+        origin: "renew",
         size: keep(slot, version, traced.value, deps),
         isSettled: true,
         isRenewing: false,
