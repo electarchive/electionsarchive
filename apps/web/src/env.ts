@@ -34,6 +34,11 @@ export const variables = defineEnvVars({
     description:
       "Archive connections each web process may hold, split between pages and live results; deploys set it from the reader role's budget",
   },
+  CACHE_SHADOW: {
+    schema: (value) => value === "1" || value === "true",
+    description:
+      "Record what each cached result read and log, on each renewal, whether per-polity versions would have kept it correctly",
+  },
   BETTER_AUTH_SECRET: {
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Better Auth secret key",

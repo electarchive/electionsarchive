@@ -5,6 +5,7 @@ import { defineRelations } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { PROJECT } from "#lib/constants.js";
+import { watch } from "#lib/server/reads.js";
 
 function connect(connectionString: string, max: number, timeout: number) {
   const pool = new pg.Pool({
@@ -18,6 +19,7 @@ function connect(connectionString: string, max: number, timeout: number) {
   pool.on("error", (error) => {
     console.error("An idle database connection failed:", error);
   });
+  watch(pool);
   return drizzle({
     client: pool,
     relations: defineRelations(schema, (r) => ({
