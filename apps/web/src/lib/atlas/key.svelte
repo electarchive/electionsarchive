@@ -9,7 +9,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
-  import { count, percent } from "#lib/format.js";
+  import { count, date, percent } from "#lib/format.js";
   import { largest } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { marginShade } from "#lib/shade.js";
@@ -48,6 +48,29 @@
   const compared = $derived(
     view.vs === "previous" ? (targets[0]?.id ?? null) : view.vs,
   );
+  const choices = $derived.by(() => {
+    const labels = new Map<string, number>();
+    const years = new Map<string, number>();
+    for (const target of targets) {
+      labels.set(target.label, (labels.get(target.label) ?? 0) + 1);
+      const key = `${target.label}|${target.date.slice(0, 4)}`;
+      years.set(key, (years.get(key) ?? 0) + 1);
+    }
+    return targets.map((target) => {
+      const year = target.date.slice(0, 4);
+      if ((labels.get(target.label) ?? 0) < 2) {
+        return { id: target.id, label: target.label };
+      }
+      const isShared = (years.get(`${target.label}|${year}`) ?? 0) > 1;
+      return {
+        id: target.id,
+        label: m.atlas_compare_dated({
+          label: target.label,
+          when: isShared ? date(target.date) : year,
+        }),
+      };
+    });
+  });
   const picks = $derived(legend.slice(0, 3));
   const extras = $derived(legend.slice(3));
   const extra = $derived(
@@ -308,13 +331,13 @@
         }}
       >
         <Select.Trigger class="inline-full">
-          {targets.find((target) => target.id === compared)?.label ??
+          {choices.find((choice) => choice.id === compared)?.label ??
             m.atlas_compare_none()}
         </Select.Trigger>
         <Select.Content>
           <Select.Item value="" label={m.atlas_compare_none()} />
-          {#each targets as target (target.id)}
-            <Select.Item value={target.id} label={target.label} />
+          {#each choices as choice (choice.id)}
+            <Select.Item value={choice.id} label={choice.label} />
           {/each}
         </Select.Content>
       </Select.Root>

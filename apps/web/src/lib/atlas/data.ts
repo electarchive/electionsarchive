@@ -122,7 +122,7 @@ function decode(key: string, raw: Raw, base: Sheet): Mosaic | null {
       ...base,
       scope: { ...base.scope, name: "" },
       target: raw.target,
-      legend: raw.legend,
+      legend: raw.legend.map((item) => ({ ...item, then: item.then ?? null })),
       places: {
         k,
         name: raw.places.name,

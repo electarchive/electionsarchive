@@ -142,7 +142,9 @@
   } | null>(null);
   let built = "";
   let isQueued = false;
+  let baseAsk = "";
   const asked = new Set<string>();
+  const fetched = new Set<string>();
 
   const head = $derived<Shell | Sheet>(base ?? shell);
   const isNational = $derived(base?.apart != null && zoom < fit + 1.5);
@@ -200,11 +202,20 @@
   );
   const legend = $derived(
     (base?.legend ?? []).map((item) =>
-      whole == null ? item : { ...item, label: item.short ?? item.label },
+      whole == null
+        ? item
+        : {
+            ...item,
+            label: item.short ?? item.label,
+            then: item.short ?? item.then,
+          },
     ),
   );
   const labels = $derived(
     new Map(legend.map((item) => [item.key, item.label])),
+  );
+  const pasts = $derived(
+    new Map(legend.map((item) => [item.key, item.then ?? item.label])),
   );
   const baseline = $derived.by(() => {
     const [one, two] = base?.legend ?? [];
@@ -433,14 +444,14 @@
     run: () => Promise<Sheet>,
     done: (set: Sheet) => void,
   ) {
-    if (asked.has(key)) {
+    if (fetched.has(key)) {
       return;
     }
-    asked.add(key);
+    fetched.add(key);
     pending += 1;
     void run()
       .then(done)
-      .catch(() => asked.delete(key))
+      .catch(() => fetched.delete(key))
       .finally(() => {
         pending -= 1;
       });
@@ -449,10 +460,10 @@
   function deepen() {
     const from = base;
     const gl = engine.gl;
-    if (from == null || gl == null) {
+    const scope = JSON.stringify(ask);
+    if (from == null || gl == null || baseAsk !== scope) {
       return;
     }
-    const scope = JSON.stringify(ask);
     for (const [index, entry] of tiers.entries()) {
       const start = begins[index] ?? -Infinity;
       const isNear = locked != null || zoom >= start - 1.2;
@@ -511,6 +522,9 @@
 
   function grab(part: { unit: string }) {
     const scope = JSON.stringify(ask);
+    if (baseAsk !== scope) {
+      return;
+    }
     fetch(
       `${scope}|part|${part.unit}`,
       async () =>
@@ -601,7 +615,13 @@
     );
     const totals = new Map<
       string,
-      { label: string; votes: number; then: number; isThen: boolean }
+      {
+        label: string;
+        past: string;
+        votes: number;
+        then: number;
+        isThen: boolean;
+      }
     >();
     let valid = 0;
     let previous = 0;
@@ -620,6 +640,7 @@
         }
         const entry = totals.get(item.key) ?? {
           label: labels.get(item.key) ?? item.label,
+          past: pasts.get(item.key) ?? item.then ?? item.label,
           votes: 0,
           then: 0,
           isThen: false,
@@ -640,6 +661,7 @@
       .map(([key, entry]) => ({
         key,
         label: entry.label,
+        past: entry.past,
         tone: lens.tone(key),
         share: valid === 0 ? 0 : entry.votes / valid,
         votes: isCounted ? entry.votes : null,
@@ -676,7 +698,7 @@
                 was == null || runner == null
                   ? null
                   : {
-                      label: was.label,
+                      label: was.past,
                       tone: was.tone,
                       margin: (was.then ?? 0) - (runner.then ?? 0),
                       isFlipped: was.key !== first.key,
@@ -1326,6 +1348,8 @@
     void load(contest, wanted)
       .then((set) => {
         if (!isStale) {
+          baseAsk = JSON.stringify(wanted);
+          fetched.clear();
           base = set;
           extras = {};
           parts = {};

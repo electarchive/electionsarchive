@@ -1740,6 +1740,7 @@
   "atlas_search": "Search places",
   "atlas_compare": "Compare with earlier election",
   "atlas_compare_none": "No comparison",
+  "atlas_compare_dated": "{label} ({when})",
   "atlas_compare_with": "Compared with {year}",
   "atlas_results": "Results",
   "atlas_close": "Close map",

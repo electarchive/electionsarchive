@@ -4847,6 +4847,7 @@ async function tabulate(
       votes: number;
       lead: boolean;
       people: Set<string>;
+      past: Set<string>;
     }
   >();
   const sources = new Set<string>();
@@ -5182,10 +5183,14 @@ async function tabulate(
         votes: 0,
         lead: false,
         people: new Set<string>(),
+        past: new Set<string>(),
       };
       const person = entry.current?.person;
       if (person != null) {
         item.people.add(person);
+      }
+      if (entry.earlier != null) {
+        item.past.add(entry.earlier.label);
       }
       item.person ??= (entry.current ?? entry.earlier)?.person ?? null;
       item.party ??= (entry.current ?? entry.earlier)?.party ?? null;
@@ -5302,6 +5307,7 @@ async function tabulate(
           votes: 0,
           lead: true,
           people: new Set<string>(),
+          past: new Set<string>(),
         });
       }
       const key = [
@@ -5461,18 +5467,25 @@ async function tabulate(
           ),
         ),
     ),
-    legend: kept.map((item) => ({
-      key: item.key,
-      label: item.label,
-      short: item.key.startsWith("person:") ? null : item.short,
-      color: relit.get(item.key) ?? item.color,
-      person:
-        item.key.startsWith("person:") ||
-        (item.people.size === 1 && rows.every((row) => !row.isContest))
-          ? item.person
-          : null,
-      party: item.party,
-    })),
+    legend: kept.map((item) => {
+      const then =
+        item.past.size > 1
+          ? (item.short ?? item.label)
+          : (item.past.values().next().value ?? item.label);
+      return {
+        key: item.key,
+        label: item.label,
+        short: item.key.startsWith("person:") ? null : item.short,
+        color: relit.get(item.key) ?? item.color,
+        person:
+          item.key.startsWith("person:") ||
+          (item.people.size === 1 && rows.every((row) => !row.isContest))
+            ? item.person
+            : null,
+        party: item.party,
+        then: then === item.label ? null : then,
+      };
+    }),
     rows: compared.map(
       ({
         row,
@@ -6286,6 +6299,7 @@ async function atlas(input: {
             label: parties?.full.get(party) ?? item.label,
             short: parties?.short.get(party) ?? null,
             person: null,
+            then: null,
           },
     );
     return merged.length - 1;
@@ -6447,6 +6461,7 @@ async function atlas(input: {
           : item.label,
       short: item.short,
       color: item.color,
+      then: item.then,
     })),
     places: {
       k: rows.map((row) => row.k),
@@ -11167,6 +11182,7 @@ export const contests = {
             label: v.string(),
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
+            then: v.nullable(v.string()),
           }),
         ),
         places: v.object({
@@ -11214,6 +11230,7 @@ export const contests = {
             label: v.string(),
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
+            then: v.optional(v.nullable(v.string())),
           }),
         ),
         layers: v.array(

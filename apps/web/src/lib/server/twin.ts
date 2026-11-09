@@ -4852,6 +4852,10 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
     const item = index == null ? null : atlas.legend[index];
     return item == null ? "" : (item.short ?? item.label);
   };
+  const past = (index: number | null) => {
+    const item = index == null ? null : atlas.legend[index];
+    return item == null ? "" : (item.short ?? item.then ?? item.label);
+  };
   const won = new Map<number, number>();
   for (const leader of atlas.places.leader) {
     if (leader != null) {
@@ -4875,8 +4879,8 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
         ? []
         : [
             prior === leader || prior == null
-              ? name(prior)
-              : `${name(prior)} (${m.map_flipped()})`,
+              ? past(prior)
+              : `${past(prior)} (${m.map_flipped()})`,
           ]),
     ];
   });
@@ -4900,7 +4904,11 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
     ...(target == null
       ? []
       : [
-          m.twin_map_compared({ name: target.label }),
+          m.twin_map_compared({
+            name: target.label.includes(year)
+              ? target.label
+              : m.atlas_compare_dated({ label: target.label, when: year }),
+          }),
           ...(atlas.estimated ? [m.atlas_estimated_note({ year })] : []),
         ]),
     ...(others.length === 0
