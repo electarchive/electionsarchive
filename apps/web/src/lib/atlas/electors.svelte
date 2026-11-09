@@ -11,10 +11,12 @@
     electors,
     held,
     tone,
+    isCompact = false,
   }: {
     electors: Electors;
     held: NonNullable<ReturnType<typeof tally>>;
     tone: (row: Electors["rows"][number]) => string;
+    isCompact?: boolean;
   } = $props();
 
   const rows = $derived(held.rows.map((row) => ({ ...row, color: tone(row) })));
@@ -47,7 +49,35 @@
   {/if}
 {/snippet}
 
-{#if rows.length > 0}
+{#if isCompact}
+  {const winner = $derived(rows.find((row) => row.role != null) ?? rows[0])}
+  {const rival = $derived(rows.find((row) => row !== winner))}
+  {#if winner != null}
+    <p class="flex items-center gap-2 text-[0.9375rem]">
+      <span
+        class="shrink-0 rounded-xs block-3 inline-3"
+        style:background={winner.color}
+      ></span>
+      <span class="truncate font-semibold">{winner.label}</span>
+      {@render badge(winner.role, winner.color)}
+      <span
+        class="font-figures font-semibold tabular-nums"
+        style:color={winner.color}>{count(winner.votes)}</span
+      >
+      {#if rival != null}
+        <span
+          class="flex shrink-4 items-center gap-1.5 text-[0.8125rem] text-muted-foreground min-inline-0"
+        >
+          <span
+            class="font-figures font-semibold tabular-nums"
+            style:color={rival.color}>{count(rival.votes)}</span
+          >
+          <span class="truncate">{rival.label}</span>
+        </span>
+      {/if}
+    </p>
+  {/if}
+{:else if rows.length > 0}
   <section class="grid grid-cols-[minmax(0,1fr)] gap-2.5">
     <header class="flex items-baseline justify-between gap-3 text-[0.8125rem]">
       <h3 class="font-semibold">{m.electors_title()}</h3>

@@ -13,6 +13,7 @@
     layout = "full",
     isApart = false,
     opening,
+    headline,
   }: {
     summary: {
       name: string;
@@ -48,6 +49,7 @@
     layout?: "full" | "peek" | "head" | "body";
     isApart?: boolean;
     opening?: Snippet;
+    headline?: Snippet;
   } = $props();
 
   function gap(margin: number) {
@@ -150,7 +152,9 @@
   {/if}
 
   {#if summary.rows.length > 0 && layout !== "head" && !(isApart && layout !== "peek")}
-    {#if layout === "peek"}
+    {#if layout === "peek" && headline != null}
+      {@render headline()}
+    {:else if layout === "peek"}
       {const leader = $derived(summary.rows[0])}
       {#if leader != null}
         <p class="flex items-center gap-2 text-[0.9375rem]">

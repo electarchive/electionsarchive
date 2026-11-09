@@ -24,8 +24,8 @@
   import { admits, hue, read, share, was } from "#lib/atlas/color.js";
   import { layered, load, loadMosaic } from "#lib/atlas/data.js";
   import Drawer from "#lib/atlas/drawer.svelte";
-  import Electoral from "#lib/atlas/electors.svelte";
   import { tally } from "#lib/atlas/electors.js";
+  import Electoral from "#lib/atlas/electors.svelte";
   import Hover from "#lib/atlas/hover.svelte";
   import Insets from "#lib/atlas/insets.svelte";
   import Key from "#lib/atlas/key.svelte";
@@ -1912,10 +1912,16 @@
     isApart={listed != null && listed.title == null}
     onclear={view.picked.length > 0 ? () => (view.picked = []) : null}
     opening={electoral == null ? undefined : opening}
+    headline={electoral?.isNational === true ? headline : undefined}
   />
   {#snippet opening()}
     {#if electors != null && electoral != null}
       <Electoral {electors} held={electoral} tone={voter} />
+    {/if}
+  {/snippet}
+  {#snippet headline()}
+    {#if electors != null && electoral != null}
+      <Electoral {electors} held={electoral} tone={voter} isCompact />
     {/if}
   {/snippet}
   {#if layout === "full" || layout === "body"}
