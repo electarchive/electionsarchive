@@ -11,6 +11,7 @@ import {
   coarse,
   inside,
   latest,
+  lined,
   names,
   paths,
   refs,
@@ -457,10 +458,7 @@ export const seats = {
         select cs.id::text as contest, cs.election_id::text as election, cs.date_from::text as date, cs."when", cs.special as "isSpecial",
           cs.primary as "isPrimary", o.kind::text as kind, cs.round_number as round, cs.previous_round_id::text as prior, cs.district_area_id::text as area, cs.wide as "isWide",
           coalesce(cs.segment, '') as segment, ca.person_id::text as person, coalesce(ca.ballot_name, o.ballot_label) as label,
-          coalesce(o.party_id, ca.member_of_party_id, (
-            select k.party_id from contest_option k where k.parent_option_id = o.id and k.party_id is not null
-            order by k.ballot_position nulls last, k.k limit 1
-          ))::text as party,
+          coalesce(o.party_id, ca.member_of_party_id, ${lined(sql`o.id`, sql`cs.id`)})::text as party,
           w.kind::text as outcome, t.votes
         from cs
         join contest_option o on o.contest_id = cs.id and o.parent_option_id is null
@@ -686,6 +684,7 @@ export const seats = {
         if (before != null && isSame) {
           election.held += 1;
           before.wins += 1;
+          before.party = entry.winner.party ?? before.party;
         } else {
           if (before != null) {
             before.until = entry.decidedOn;

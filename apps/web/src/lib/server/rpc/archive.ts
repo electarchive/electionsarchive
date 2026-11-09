@@ -232,6 +232,12 @@ const fused = (option: SQL, contest: SQL) => sql`
     limit 1
   )
 `;
+export const lined = (option: SQL, contest: SQL) => sql`
+  (
+    select coalesce(m.into_id, l.party) from (select ${fused(option, contest)} as party) l
+    left join entity_merge m on m.entity_id = l.party
+  )
+`;
 const pooled = (list: SQL) => sql`
   exists (
     select from contest_option pl
@@ -23970,7 +23976,8 @@ export const bodies = {
             ) r where r.rank <= r.cap
           ),
           fallback as materialized (
-            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id) as party,
+            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id,
+                ${lined(sql`o.id`, sql`o.contest_id`)}) as party,
               cd.is_independent as independent
             from t
             join contest_option o on o.contest_id = t.contest_id
@@ -24076,7 +24083,8 @@ export const bodies = {
           fallback as materialized (
             select t.id, t.from_date, t.to_date, x.party, coalesce(x.independent, false) as independent
             from t left join lateral (
-              select coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id) as party,
+              select coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id,
+                  ${lined(sql`o.id`, sql`o.contest_id`)}) as party,
                 cd.is_independent as independent
               from candidacy cd join contest_option o on o.id = cd.option_id
               left join contest_option po on po.id = o.parent_option_id
@@ -24481,7 +24489,8 @@ export const bodies = {
                   from tenure_affiliation g left join entity_merge pm on pm.entity_id = g.party_id
                   where g.tenure_id = t.id and g.kind = 'parliamentary_group' and g.party_id is not null) as caucuses,
                 case when a.found then a.party else
-                  (select coalesce(pm.into_id, o.party_id, po.party_id, cd.member_of_party_id) from contest_option o
+                  (select coalesce(pm.into_id, o.party_id, po.party_id, cd.member_of_party_id,
+                      ${lined(sql`o.id`, sql`o.contest_id`)}) from contest_option o
                     join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
                     left join contest_option po on po.id = o.parent_option_id
                     left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id, cd.member_of_party_id)
@@ -24584,7 +24593,8 @@ export const bodies = {
                   and e.kind in ('general', 'local')
               )
               select distinct on (cd.person_id) cd.person_id as person, c.id as contest,
-                coalesce(pm.into_id, o.party_id, po.party_id) as party, coalesce(cd.is_independent, false) as "isIndependent",
+                coalesce(pm.into_id, o.party_id, po.party_id, ${lined(sql`o.id`, sql`o.contest_id`)}) as party,
+                coalesce(cd.is_independent, false) as "isIndependent",
                 coalesce(c.district_area_id, pc.district_area_id) as place
               from picked c
               left join contest pc on pc.id = c.allocation_parent_id
