@@ -6311,39 +6311,98 @@ async function atlas(input: {
     targets.rows.map((row) => row.named),
     null,
   );
+  const isStray = (item: (typeof tabulated.legend)[number]) =>
+    group != null && item.key.startsWith("person:") && item.party != null;
   const strays = tabulated.legend.flatMap((item) =>
-    group != null && item.key.startsWith("person:") && item.party != null
-      ? [item.party]
-      : [],
+    isStray(item) && item.party != null ? [item.party] : [],
   );
+  const raw = tabulated.legend.map(() => 0);
+  for (const row of tabulated.rows) {
+    for (const [index, share] of row.shares.entries()) {
+      raw[index] = (raw[index] ?? 0) + share * row.valid;
+    }
+  }
+  const candidates = new Map(
+    Map.groupBy(
+      tabulated.legend
+        .entries()
+        .filter(([, item]) => item.person != null && !isStray(item)),
+      ([, item]) => item.person ?? "",
+    )
+      .entries()
+      .flatMap(([person, members]) => {
+        const [top, ...rest] = members
+          .toSorted(([a], [b]) => (raw[b] ?? 0) - (raw[a] ?? 0))
+          .map(([, item]) => item);
+        if (top == null || rest.length === 0) {
+          return [];
+        }
+        const ranked = [top, ...rest];
+        const head =
+          ranked.find((item) => item.key.startsWith("party:")) ?? top;
+        const own = ranked.find((item) => item.key.startsWith("person:"));
+        return [
+          [
+            person,
+            {
+              ...top,
+              key: head.key,
+              label: own?.label ?? top.label,
+              party: head.key.startsWith("party:")
+                ? head.key.slice(6)
+                : top.party,
+            },
+          ] as const,
+        ];
+      }),
+  );
+  const fused = candidates
+    .values()
+    .flatMap((item) =>
+      item.key.startsWith("party:") ? [item.key.slice(6)] : [],
+    )
+    .toArray();
   const parties =
-    strays.length === 0 ? null : await names(strays, contest.date);
+    strays.length === 0 && fused.length === 0
+      ? null
+      : await names([...strays, ...fused], contest.date);
   const merged: typeof tabulated.legend = [];
   const joined = tabulated.legend.map((item) => {
-    const party =
-      parties == null || !item.key.startsWith("person:") ? null : item.party;
+    const party = isStray(item) ? item.party : null;
+    const fusion =
+      party != null || item.person == null
+        ? undefined
+        : candidates.get(item.person);
     const key =
-      party == null
+      fusion?.key ??
+      (party == null
         ? item.key
         : (tabulated.legend.find(
             (other) =>
               !other.key.startsWith("person:") && other.party === party,
-          )?.key ?? `party:${party}`);
+          )?.key ?? `party:${party}`));
     const at = merged.findIndex((other) => other.key === key);
     if (at !== -1) {
       return at;
     }
     merged.push(
-      party == null
-        ? item
-        : {
-            ...item,
-            key,
-            label: parties?.full.get(party) ?? item.label,
-            short: parties?.short.get(party) ?? null,
-            person: null,
-            then: null,
-          },
+      fusion != null
+        ? {
+            ...fusion,
+            short: fusion.key.startsWith("party:")
+              ? (parties?.short.get(fusion.key.slice(6)) ?? fusion.short)
+              : null,
+          }
+        : party == null
+          ? item
+          : {
+              ...item,
+              key,
+              label: parties?.full.get(party) ?? item.label,
+              short: parties?.short.get(party) ?? null,
+              person: null,
+              then: null,
+            },
     );
     return merged.length - 1;
   });
@@ -6358,7 +6417,9 @@ async function atlas(input: {
     .keys()
     .toArray()
     .toSorted((a, b) =>
-      parties == null ? a - b : (weight[b] ?? 0) - (weight[a] ?? 0),
+      parties == null && candidates.size === 0
+        ? a - b
+        : (weight[b] ?? 0) - (weight[a] ?? 0),
     );
   const legend = order.flatMap((index) => merged[index] ?? []);
   const fold = joined.map((index) => order.indexOf(index));
@@ -6505,6 +6566,7 @@ async function atlas(input: {
       short: item.short,
       color: item.color,
       then: item.then,
+      person: item.person,
     })),
     places: {
       k: rows.map((row) => row.k),
@@ -6660,7 +6722,11 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       layers.findIndex((entry) => entry.code === set.level),
     );
     const at = set.legend.map((item) => {
-      const index = legend.findIndex((entry) => entry.key === item.key);
+      const index = legend.findIndex(
+        (entry) =>
+          entry.key === item.key ||
+          (item.person != null && entry.person === item.person),
+      );
       if (index !== -1) {
         return index;
       }
@@ -6959,7 +7025,7 @@ export async function rebuildMosaics(only?: Array<string>) {
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select md5(concat_ws('|', 'parts-noun', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
+      select md5(concat_ws('|', 'parts-noun-person', string_agg(concat_ws(':', rs.k, rs.changeset_id, rs.status, rs.is_default), ',' order by rs.k),
         ${rasters.toSorted(byCode).join(",")}::text)) as stamp
       from grp join result_set rs on rs.contest_id = grp.id
     `);
@@ -11310,6 +11376,7 @@ export const contests = {
           };
           if (
             held.sheet.layers.every((layer) => layer.noun != null) &&
+            held.sheet.legend.every((item) => "person" in item) &&
             ["previous", held.sheet.target, held.path].some(
               (value) => value?.toLowerCase() === vs,
             )
@@ -11332,7 +11399,8 @@ export const contests = {
       if (
         held?.places?.part != null &&
         held.target !== undefined &&
-        held.layers?.every((layer) => layer.noun != null) === true
+        held.layers?.every((layer) => layer.noun != null) === true &&
+        held.legend?.every((item) => "person" in item) === true
       ) {
         return held as Awaited<ReturnType<typeof mosaic>>;
       }
