@@ -1081,6 +1081,10 @@ PEOPLE = {
         ("us.alged.person", "35126"),
         ("us.nyc_recap.person", "NY:jose-m-serrano"),
     ),
+    "José E. Serrano, U.S. Representative": (
+        ("bioguide", "S000248"),
+        ("us.klarner.person", "177293:jose-e-serrano"),
+    ),
     "Elizabeth Crowley, New York City Council member": (
         ("us.alged.person", "34904"),
         ("us.nyc_boe.person", "elizabeth-s-crowley"),
