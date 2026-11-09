@@ -1929,6 +1929,8 @@
   "map_share_key": "{name} share",
   "map_bubbles_key": "Circles sized by {votes}, colored by winner",
   "map_level": "Level",
+  "map_level_failed": "This level didn't load.",
+  "map_level_loading": "Loading this level. Large maps can take a minute.",
   "key_places": "Key places",
   "key_closest": "Closest",
   "key_largest": "Largest",

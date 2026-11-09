@@ -6,7 +6,7 @@
 
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
-  import { goto, preloadData } from "$app/navigation";
+  import { afterNavigate, goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
@@ -19,6 +19,7 @@
   import Maximize2Icon from "@lucide/svelte/icons/maximize-2";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import RotateCwIcon from "@lucide/svelte/icons/rotate-cw";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import ShapesIcon from "@lucide/svelte/icons/shapes";
   import XIcon from "@lucide/svelte/icons/x";
@@ -213,6 +214,12 @@
   const uid = $props.id();
   let opening = $state<number | null>(null);
   let going = $state<string | null>(null);
+  let failed = $state<string | null>(null);
+  let isSlow = $state(false);
+  let trip = 0;
+  afterNavigate(() => {
+    failed = null;
+  });
   let listing = $state<string | null>(null);
   let territories = $state.raw<
     Record<string, Awaited<ReturnType<typeof orpc.maps.detached.call>>>
@@ -1888,19 +1895,44 @@
     };
   });
 
+  async function arrived(url: URL) {
+    const result = await preloadData(url.href);
+    if (result.type === "error") {
+      return false;
+    }
+    const data: Partial<Extract<PageData, { kind: "contest" }>> =
+      result.type === "loaded" ? result.data : {};
+    if (data.kind !== "contest") {
+      return true;
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const isOpened = await Promise.race([
+      Promise.resolve(data.body).then(
+        () => true,
+        () => false,
+      ),
+      new Promise<false>((done) => {
+        timer = setTimeout(done, 120_000, false);
+      }),
+    ]);
+    clearTimeout(timer);
+    return isOpened;
+  }
+
   function travel(event: MouseEvent, level: (typeof levels)[number]) {
     if (
       event.metaKey ||
       event.ctrlKey ||
       event.shiftKey ||
       event.altKey ||
-      event.button !== 0 ||
-      level.isCurrent ||
-      going != null
+      event.button !== 0
     ) {
       return;
     }
     event.preventDefault();
+    if (level.isCurrent || going === level.code) {
+      return;
+    }
     const url = new URL(location.href);
     const asked = new URLSearchParams(level.query);
     for (const [key, value] of asked) {
@@ -1909,10 +1941,35 @@
       }
     }
     url.pathname = resolve("/[...path]", { path: level.path });
+    const ticket = ++trip;
+    const from = page.url.href;
     going = level.code;
-    void goto(url, { reset: false }).finally(() => {
-      going = null;
-    });
+    failed = null;
+    isSlow = false;
+    const slow = setTimeout(() => {
+      if (ticket === trip) {
+        isSlow = true;
+      }
+    }, 1500);
+    void arrived(url)
+      .then(async (isReady) => {
+        if (ticket !== trip || page.url.href !== from) {
+          return;
+        }
+        if (isReady) {
+          await goto(url, { reset: false });
+          return;
+        }
+        void preloadData(from);
+        failed = level.code;
+      })
+      .finally(() => {
+        clearTimeout(slow);
+        if (ticket === trip) {
+          going = null;
+          isSlow = false;
+        }
+      });
   }
 
   function open(k: number, path = rows.get(k)?.path, layer = tiles) {
@@ -2842,6 +2899,8 @@
                 class="animate-spin rounded-full border-2 border-current/30 border-bs-current block-3 inline-3 motion-reduce:animate-none"
                 aria-hidden="true"
               ></span>
+            {:else if failed === level.code}
+              <RotateCwIcon class="block-3 inline-3" aria-hidden="true" />
             {:else}
               <span
                 class="font-figures text-[0.6875rem] font-normal tabular-nums"
@@ -2851,6 +2910,27 @@
           >
         {/each}
       </div>
+      {const retried = $derived(tiers.find((level) => level.code === failed))}
+      <p
+        class={cn(
+          "flex items-baseline gap-x-2 text-[0.8125rem] text-muted-foreground",
+          { "sr-only": retried == null && !isSlow },
+        )}
+        role="status"
+      >
+        {#if retried != null}
+          {m.map_level_failed()}
+          <button
+            class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            type="button"
+            onclick={(event: MouseEvent) => {
+              travel(event, retried);
+            }}>{m.contest_body_retry()}</button
+          >
+        {:else if isSlow}
+          {m.map_level_loading()}
+        {/if}
+      </p>
     {/if}
     <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
       {#if views.length > 0}
