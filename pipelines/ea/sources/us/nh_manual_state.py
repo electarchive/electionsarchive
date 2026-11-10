@@ -7,6 +7,7 @@ import re
 import subprocess
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import polars as pl
 
@@ -14,6 +15,7 @@ from ea.changeset import slug
 from ea.sources.us import nh_manual
 from ea.sources.us.nh_sos_county import COLUMNS
 from ea.store import DATA
+from ea.typed import one
 
 SOURCE = "us.nh_manual_state"
 VERSION = "1"
@@ -179,7 +181,7 @@ def pending(frame: pl.DataFrame) -> pl.DataFrame:
     return frame.filter(pl.col("agrees").is_null() | ~pl.col("agrees"))
 
 
-def cached_reply(key: str) -> dict[str, object] | None:
+def cached_reply(key: str) -> dict[str, Any] | None:
     from ea import raw
 
     try:
@@ -385,7 +387,7 @@ def read_names() -> str:
         listing = "\n".join(
             f"Line {row['index']}: {row['name']}, {row['town'] or ''}" for row in rows.iter_rows(named=True)
         )
-        content: list[dict[str, object]] = [
+        content: list[dict[str, Any]] = [
             {
                 "type": "image",
                 "source": {
@@ -1611,7 +1613,7 @@ def emit():
                 if len(units) != 1:
                     report.setdefault("general has more than one unit", []).append(tag)
                     continue
-                unit = conn.execute("select id from reporting_unit where k = %s", [units[0]]).fetchone()[0]
+                unit = one(conn.execute("select id from reporting_unit where k = %s", [units[0]]))[0]
                 default = None
             elif default is not None and default[1] not in (*SUPERSEDES, SOURCE):
                 report.setdefault(f"kept {default[1]}", []).append(tag)
@@ -1623,9 +1625,9 @@ def emit():
                 if len(units) != 1:
                     report.setdefault("default has more than one unit", []).append(tag)
                     continue
-                unit = conn.execute("select id from reporting_unit where k = %s", [units[0]]).fetchone()[0]
+                unit = one(conn.execute("select id from reporting_unit where k = %s", [units[0]]))[0]
             elif template is None and office in ("governor", "us senate"):
-                election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
+                election = one(conn.execute("select election_id from contest where id = %s", [contest]))[0]
                 unit = cs.unit("us.state", "33")
             elif template is None:
                 report.setdefault("no unit", []).append(tag)

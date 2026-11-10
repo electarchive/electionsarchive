@@ -6,13 +6,14 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import slug
 from ea.store import DATA
+from ea.typed import one, required
 
 SOURCE = "us.nh_manual"
 VERSION = "1"
@@ -234,9 +235,9 @@ def header(text: str) -> tuple[str, str] | None:
     return None
 
 
-def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
-    out: list[dict[str, object]] = []
-    state: dict[str, object] = {
+def lines(all_rows: list[Row], heading=header) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    state: dict[str, Any] = {
         "run": 0,
         "county": None,
         "office": None,
@@ -244,7 +245,7 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         "seen": set(),
         "opening": False,
     }
-    group: list[dict[str, object]] = []
+    group: list[dict[str, Any]] = []
     ids = [0]
     pending: list[Word] = []
     pending_number: tuple[int, bool, list[Word]] | None = None
@@ -337,7 +338,7 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         group.append(entry)
 
     last_page = 0
-    tailable: dict[str, object] | None = None
+    tailable: dict[str, Any] | None = None
     for row in all_rows:
         prior, tailable = tailable, None
         before = len(out)
@@ -422,7 +423,7 @@ HEAD_TOWN = re.compile(r"(.+ [A-Z]\.?) ([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 INITIAL_SURNAME = re.compile(r"([A-Z]\.?) ([A-Z][a-z]+)")
 
 
-def cut_short(entry: dict[str, object]) -> bool:
+def cut_short(entry: dict[str, Any]) -> bool:
     name = re.sub(r"[, ]+(?:Jr|Sr|II|III|IV)\.?$", "", str(entry["name"]))
     return (
         entry["town"] is None
@@ -712,7 +713,7 @@ def page_words(year: int, page: int) -> list[tuple[float, str]]:
         text=True,
         check=True,
     ).stdout
-    height = float(re.search(r'<page width="[\d.]+" height="([\d.]+)"', out)[1])
+    height = float(required(re.search(r'<page width="[\d.]+" height="([\d.]+)"', out))[1])
     return [(float(top) / height, text) for top, text in re.findall(r'yMin="([\d.]+)"[^>]*>([^<]*)<', out)]
 
 
@@ -1371,8 +1372,8 @@ def emit() -> Path:
             contests.setdefault(
                 (int(year), county.lower(), name.lower(), district, party.lower() if party else None), []
             ).append((value, contest))
-        templates: dict[tuple[str, str, str | None], dict[str, object]] = {}
-        scopes: dict[str, object] = {}
+        templates: dict[tuple[str, str, str | None], dict[str, Any]] = {}
+        scopes: dict[str, Any] = {}
         days: dict[tuple[int, str, bool], tuple[object, str]] = {}
         columns = ", ".join(f"c.{column}" for column in TEMPLATE)
         for text, election, path, *rest in conn.execute(
@@ -1486,9 +1487,7 @@ def emit() -> Path:
                     [contest],
                 ).fetchone() or (None, None, None)
                 first = first or 1
-                election = (
-                    election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
-                )
+                election = election or one(conn.execute("select election_id from contest where id = %s", [contest]))[0]
                 options = conn.execute(
                     """select o.id::text, o.ballot_label, o.kind,
                               coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k

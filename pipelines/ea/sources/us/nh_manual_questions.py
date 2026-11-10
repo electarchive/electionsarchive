@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import subprocess
+from typing import Any
 
 import polars as pl
 
@@ -44,9 +45,9 @@ READ_PROMPT = (
 )
 
 
-def pairs(year: int, page: int) -> list[dict[str, object]]:
+def pairs(year: int, page: int) -> list[dict[str, Any]]:
     width, height, found = nh_manual.words(nh_manual.pdf(year), page, page)[page]
-    out: list[dict[str, object]] = []
+    out: list[dict[str, Any]] = []
     for row in nh_manual.rows({page: (width, height, found)}):
         tokens = row.words
         if (
@@ -126,8 +127,8 @@ def seen(year: int, page: int) -> list[list[int | None]]:
     return json.loads(found[0]) if found else []
 
 
-def agreed() -> list[tuple[str, int, dict[str, object]]]:
-    out: list[tuple[str, int, dict[str, object]]] = []
+def agreed() -> list[tuple[str, int, dict[str, Any]]]:
+    out: list[tuple[str, int, dict[str, Any]]] = []
     for date, (year, pages) in QUESTIONS.items():
         position = 0
         for page in pages:
