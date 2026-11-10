@@ -65,7 +65,11 @@ ALIASES = {
 }
 FORCED = {("KS", 2012): 4}
 DEPTH = {("KS", 2014): max, ("NY", 2012): min}
-SKIPPED = {"2004/20041102__ok__general__state_house__county.csv"}
+SKIPPED = {
+    "2004/20041102__ok__general__state_house__county.csv",
+    "2010/20101102__ct__general__middletown__precinct.csv",
+    "2010/20101102__ct__general__milford__precinct.csv",
+}
 TIERS = ["__county", "__county-level", "__town", "", "__precinct", "__ward"]
 OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board|commission\w*|court|judge|regents?|school|recorder|clerk)\b"
 
