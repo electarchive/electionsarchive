@@ -7,6 +7,7 @@ import { execFileSync } from "node:child_process";
 import { hostname } from "node:os";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
+import { clientMessages } from "./client-messages.ts";
 import { codeVersion } from "./code-version.ts";
 import { viewPreloads } from "./view-preloads.ts";
 
@@ -48,6 +49,7 @@ export default defineConfig(({ command }) => {
           polity: "src/routes/[...path]/polity.svelte",
         },
       }),
+      clientMessages(),
       codeVersion({
         inputs: ["../../packages/db/migrations"],
         lockfile: "../../pnpm-lock.yaml",
@@ -58,7 +60,7 @@ export default defineConfig(({ command }) => {
         paraglideVitePlugin({
           project: "./project.inlang",
           outdir: "./src/lib/paraglide",
-          outputStructure: "message-modules",
+          outputStructure: "locale-modules",
           strategy: ["cookie", "custom-edge", "globalVariable", "baseLocale"],
         }),
     ],

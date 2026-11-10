@@ -1,6 +1,9 @@
+import type { ClientInit } from "@sveltejs/kit/hooks";
 import { version } from "$app/env";
+import { use } from "#lib/dictionary.js";
 import {
   defineCustomClientStrategy,
+  getLocale,
   isLocale,
 } from "#lib/paraglide/runtime.js";
 
@@ -31,3 +34,5 @@ Object.defineProperty(globalThis, "fetch", {
     return native(input, init);
   },
 });
+
+export const init: ClientInit = async () => use(getLocale());

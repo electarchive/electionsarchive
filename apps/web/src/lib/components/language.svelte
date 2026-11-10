@@ -1,5 +1,6 @@
 <script lang="ts">
   import LanguagesIcon from "@lucide/svelte/icons/languages";
+  import { translations } from "#lib/dictionary.js";
   import { LANGUAGES } from "#lib/languages.js";
   import { m } from "#lib/paraglide/messages.js";
   import {
@@ -50,7 +51,9 @@
         class="bg-card block-7 inline-auto min-inline-36"
         onValueChange={(value) => {
           if (value != null && isLocale(value) && value !== current) {
-            void setLocale(value);
+            void translations(value)
+              .catch(() => null)
+              .then(async () => setLocale(value));
           }
         }}
       />
