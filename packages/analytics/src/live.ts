@@ -923,7 +923,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     let leaned = 0;
     for (const [index, unit] of found.entries()) {
       const final = totals[index]!;
-      const fraction = Math.min(1, unit.total / final);
+      const fraction = final > 0 ? Math.min(1, unit.total / final) : 1;
       const prior = unit.hasBaseline
         ? predict(coefficients, unit, center)
         : unit.margin;
