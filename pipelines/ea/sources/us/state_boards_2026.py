@@ -2,6 +2,7 @@ import csv
 import html
 import json
 import re
+import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
@@ -17,10 +18,12 @@ from ea.store import DATA, connect
 from ea.typed import one
 
 SOURCE = "us.state_boards_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAY = "2026-11-03"
 NE = "https://electionresults.nebraska.gov/resultsCSV.aspx?text=All&type={}&map=DIST"
+ND = "https://vip.sos.nd.gov/CandidateList.aspx?eid=348"
+ND_CONTEST = "22025"
 MT = "https://esersws.mt.gov/ResultsAjax.svc/GetMapData?type=PSC&category=CTY&raceID={}&osn={}&county=0&party=0"
 SOURCES = {
     "MI": (
@@ -67,7 +70,26 @@ SOURCES = {
         [f"{enr_al.PAGE.format(enr_al.ECODE)}#export"],
         ".xlsx",
     ),
+    "KS": (
+        "Kansas Secretary of State",
+        "Candidate list, 2026 general election",
+        ["https://www.sos.ks.gov/elections/elections_upcoming_candidate.aspx#browser"],
+        ".json",
+    ),
+    "NV": (
+        "Nevada Secretary of State",
+        "2026 General Election: Statewide Certified List of Candidates",
+        ["https://www.nvsos.gov/sos/elections/election-information/2026-election-information"],
+        ".pdf",
+    ),
+    "ND": (
+        "North Dakota Secretary of State",
+        "Candidate list, Public Service Commissioner, 2026 general election",
+        [f"{ND}#contest-{ND_CONTEST}"],
+        ".html",
+    ),
 }
+HELD = {"KS": ("us.fec_2026", "application/json"), "NV": ("us.nv_districts_2026", "application/pdf")}
 OFFICES = {
     "MI:sboe": ("member-of-the-state-board-of-education", "Member of the State Board of Education"),
     "MI:um": ("regent-of-the-university-of-michigan", "Regent of the University of Michigan"),
@@ -75,6 +97,8 @@ OFFICES = {
     "MI:wsu": ("governor-of-wayne-state-university", "Governor of Wayne State University"),
     "CO:sboe": ("member-of-the-state-board-of-education", "Member of the State Board of Education"),
     "CO:regents": ("regent-of-the-university-of-colorado", "Regent of the University of Colorado"),
+    "ND:psc": ("public-service-commissioner", "Public Service Commissioner"),
+    "ND:psc-unexpired": ("public-service-commissioner", "Public Service Commissioner"),
 }
 BODIES = {
     "NE:sboe": ("state-board-of-education", "Nebraska State Board of Education"),
@@ -84,6 +108,8 @@ BODIES = {
     "NM:pec": ("public-education-commission", "New Mexico Public Education Commission"),
     "UT:sboe": ("state-board-of-education", "Utah State Board of Education"),
     "AL:sboe": ("state-board-of-education", "Alabama State Board of Education"),
+    "KS:sboe": ("state-board-of-education", "Kansas State Board of Education"),
+    "NV:regents": ("board-of-regents", "Nevada System of Higher Education Board of Regents"),
 }
 SEATS = {
     "MI:sboe": {"": 2},
@@ -99,9 +125,24 @@ SEATS = {
     "NM:pec": {"2": 1, "3": 1, "5": 1, "6": 1, "7": 1},
     "UT:sboe": {"1": 1, "2": 1, "4": 1, "5": 1, "7": 1, "8": 1, "11": 1, "14": 1},
     "AL:sboe": {"2": 1, "4": 1, "6": 1, "8": 1},
+    "KS:sboe": {"1": 1, "3": 1, "5": 1, "7": 1, "9": 1},
+    "NV:regents": {"2": 1, "3": 1, "5": 1, "8": 1, "10": 1},
+    "ND:psc": {"": 1},
+    "ND:psc-unexpired": {"": 1},
 }
-REMAINDER = {("NE:regents", "4"), ("UT:sboe", "7")}
-FIPS = {"MI": "26", "CO": "08", "NE": "31", "MT": "30", "NM": "35", "UT": "49", "AL": "01"}
+REMAINDER = {("NE:regents", "4"), ("UT:sboe", "7"), ("ND:psc-unexpired", "")}
+FIPS = {
+    "MI": "26",
+    "CO": "08",
+    "NE": "31",
+    "MT": "30",
+    "NM": "35",
+    "UT": "49",
+    "AL": "01",
+    "KS": "20",
+    "NV": "32",
+    "ND": "38",
+}
 STATES = {
     "MI": "Michigan",
     "CO": "Colorado",
@@ -110,6 +151,9 @@ STATES = {
     "NM": "New Mexico",
     "UT": "Utah",
     "AL": "Alabama",
+    "KS": "Kansas",
+    "NV": "Nevada",
+    "ND": "North Dakota",
 }
 PARTIES = {
     "Democratic Party": "democratic-party",
@@ -124,6 +168,7 @@ PARTIES = {
     "Working Class Party": "MI:working-class-party",
     "Natural Law Party": "MI:natural-law-party",
     "FWD": "forward-party",
+    "Democratic-NPL": "democratic-party",
 }
 NONPARTISAN = {"NON", "Nonpartisan"}
 MI_BOARDS = {
@@ -139,8 +184,18 @@ NE_BOARDS = {"SE": "NE:sboe", "RG": "NE:regents", "PS": "NE:psc"}
 def fetch() -> None:
     for state, (_, _, urls, suffix) in SOURCES.items():
         for url in urls:
-            if state != "AL":
+            if state not in ("AL", "ND") and state not in HELD:
                 raw.fetch(SOURCE, url, suffix=suffix)
+    for state, (origin, media_type) in HELD.items():
+        held = raw.cached(origin, SOURCES[state][2][0])
+        raw.store(
+            SOURCE,
+            held.url,
+            held.path.read_bytes(),
+            suffix=SOURCES[state][3],
+            retrieved_at=held.retrieved_at,
+            media_type=media_type,
+        )
     with httpx.Client(timeout=120, follow_redirects=True) as client:
 
         def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
@@ -152,8 +207,34 @@ def fetch() -> None:
                 SOURCE, url, content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type="application/xlsx"
             )
 
-        enr_al.collect(client, get, store)
-    raw.cached(SOURCE, SOURCES["AL"][2][0])
+        try:
+            raw.cached(SOURCE, SOURCES["AL"][2][0])
+        except LookupError:
+            enr_al.collect(client, get, store)
+            raw.cached(SOURCE, SOURCES["AL"][2][0])
+        try:
+            raw.cached(SOURCE, SOURCES["ND"][2][0])
+            return
+        except LookupError:
+            pass
+        page = client.get(ND, headers={"User-Agent": "Mozilla/5.0"}).text
+        for fields in (
+            {"__EVENTTARGET": "ctl00$ContentPlaceHolder1$ddlContest"},
+            {"ctl00$ContentPlaceHolder1$btnSearch": "Search"},
+        ):
+            form = dict(re.findall(r'<input type="hidden" name="([^"]+)" id="[^"]*" value="([^"]*)"', page))
+            form |= {"ctl00$ContentPlaceHolder1$ddlContest": ND_CONTEST, **fields}
+            response = client.post(ND, data=form, headers={"User-Agent": "Mozilla/5.0"})
+            response.raise_for_status()
+            page = response.text
+        raw.store(
+            SOURCE,
+            SOURCES["ND"][2][0],
+            page.encode(),
+            suffix=".html",
+            retrieved_at=datetime.now(UTC),
+            media_type="text/html",
+        )
 
 
 def cells(text: str) -> list[str]:
@@ -162,6 +243,13 @@ def cells(text: str) -> list[str]:
         re.sub(r"\s+", " ", html.unescape(cell)).strip()
         for cell in re.split(r"<[^>]+>", text)
         if re.sub(r"\s+", " ", html.unescape(cell)).strip()
+    ]
+
+
+def cells_of(row: str) -> list[str]:
+    return [
+        re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+        for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.DOTALL)
     ]
 
 
@@ -242,6 +330,28 @@ def parse() -> None:
         found = re.fullmatch(r"STATE BOARD OF EDUCATION MEMBER DISTRICT (\d+)", row["Contest Title"])
         if found and row["Candidate Name"] != "Write-In":
             add("AL", "AL:sboe", found[1], row["Candidate Name"], row["Party Code"], url)
+    url = SOURCES["KS"][2][0]
+    header, *table = json.loads(raw.cached(SOURCE, url).path.read_text())["rows"]
+    for row in table:
+        record = dict(zip(header, row, strict=True))
+        if record["Office"] == "Member, State Board of Education":
+            add("KS", "KS:sboe", record["District"], record["Candidate"], record["Party"], url)
+    url = SOURCES["NV"][2][0]
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, check=True, text=True
+    ).stdout
+    for line in text.splitlines():
+        if found := re.fullmatch(
+            r"\s*\S.*?\s{2,}(\S.*?)\s{2,}(Nonpartisan)\s{2,}Board of Regent, District (\d+)\s{2,}.*", line
+        ):
+            add("NV", "NV:regents", found[3], found[1], found[2], url)
+    url = SOURCES["ND"][2][0]
+    page = raw.cached(SOURCE, url).path.read_text()
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, flags=re.DOTALL):
+        found = cells_of(row)
+        if len(found) > 9 and found[2] == "Public Service Commissioner" and found[4] == "STATE":
+            board = "ND:psc-unexpired" if "Unexpired" in found[0] else "ND:psc"
+            add("ND", board, "", found[5], found[9], url)
     frame = pl.DataFrame(rows).unique(maintain_order=True)
     for board, seats in SEATS.items():
         found = set(frame.filter(pl.col("board") == board)["district"].to_list())
@@ -259,7 +369,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide boards and commissions on the November 3, 2026 ballot in Michigan, Colorado, Nebraska, Montana, New Mexico, Utah, and Alabama, with candidates from each state's official candidate list or results site",
+            summary="Statewide boards and commissions on the November 3, 2026 ballot in Michigan, Colorado, Nebraska, Montana, New Mexico, Utah, Alabama, Kansas, Nevada, and North Dakota, with candidates from each state's official candidate list or results site",
             polity="US",
         )
 
