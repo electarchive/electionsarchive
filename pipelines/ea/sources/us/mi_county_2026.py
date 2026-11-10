@@ -46,6 +46,20 @@ COUNTIES = {
     ),
 }
 PAGED = {"26099"}
+DUPLICATES = {
+    "c9cd46a1-0d6b-572b-89c6-c625ce396660": "a411e2ee-e0e1-5155-9614-31eaca69494b",
+    "b1b828fb-57aa-5d68-a5cd-b29764475f4e": "bcc24f51-c837-5fef-b42a-527b648092a3",
+    "195c1f13-da60-5c8d-87d9-aa469458707f": "7d069623-7948-5780-8840-526505c962c9",
+    "87a43759-c594-5b93-8db6-ea9b4c93921b": "ab73dec2-a866-5582-9579-4622affe4d3b",
+    "e9a42750-069b-5a1c-a6a9-b46ee02e660f": "8f78267b-81f8-559f-85cf-a5971d422c1d",
+    "19d3f1c4-e8b8-507d-8304-3f67c709da51": "78b687cb-87cd-5e46-89b5-7fb102821a60",
+    "fbc70c47-485f-54db-84e5-f066120bb35c": "1699fe4f-c3f7-5f9b-ad99-81dd5192f9bd",
+}
+EMPTIED = (
+    "29b8ccef-1eca-579c-a07b-5fdb2e9d5d10",
+    "009bba27-0abe-5aa5-baaa-c10800bcd351",
+    "d28c5319-1928-5842-9544-fd49c768c041",
+)
 TITLE = "Official candidates and proposals list, November 3, 2026 general election"
 CENTERED = re.compile(r"^\s{40,}\S")
 NOISE = re.compile(
@@ -360,6 +374,11 @@ def emit() -> Path:
             county_key = f"us.county:{row['county']}"
             if county_key in found and jurisdiction.startswith(found[county_key][2]):
                 option = county_key
+            elif re.fullmatch(r"(?i)\w[\w. ]* County", jurisdiction):
+                option = next(
+                    (key for key, value in found.items() if key.startswith("us.county:") and value[2] == jurisdiction),
+                    None,
+                )
             elif jurisdiction.lower().startswith(("city of", "village of")):
                 option = civil.place(re.sub(r"(?i)^(city|village) of ", "", jurisdiction))
             elif re.search(r"(?i)township", jurisdiction):
@@ -457,6 +476,23 @@ def emit() -> Path:
                 body=row["wording"],
                 url=row["url"],
                 source_id=sources[row["url"]],
+            )
+        for stale, twin in DUPLICATES.items():
+            options = dict(
+                conn.execute(
+                    """select o.ballot_label, o.id from contest_option o where o.contest_id = %s""", [UUID(twin)]
+                ).fetchall()
+            )
+            for label, option in conn.execute(
+                "select ballot_label, id from contest_option where contest_id = %s", [UUID(stale)]
+            ).fetchall():
+                cs.merge(option, options[label])
+            cs.merge(UUID(stale), UUID(twin))
+        for election in EMPTIED:
+            cs.add(
+                "entity_retirement",
+                entity_id=UUID(election),
+                reason="emptied when its duplicate contests merged into the county's own election",
             )
         print(f"{kept} of {frame.height} propositions")
         return cs.write()
