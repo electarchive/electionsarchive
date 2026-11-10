@@ -1719,6 +1719,8 @@ def emit() -> Path:
             tallies: dict[str, int] = {}
             complete = False
             default = None
+            if state == "OK" and totals["county"].null_count() < totals.height:
+                totals = totals.filter(pl.col("county").is_not_null())
             if totals.height:
                 url = totals["origin"][0]
                 default = cs.key(f"{SOURCE}.result_set", f"{contest_key}:official")
@@ -1730,7 +1732,7 @@ def emit() -> Path:
                 for item in totals.iter_rows(named=True):
                     tallies[item["answer"]] = tallies.get(item["answer"], 0) + item["votes"]
                     unit = state_units[state][0] if item["county"] is None else counties[item["county"]][0]
-                    if default not in cs.minted:
+                    if default not in cs.minted and state != "OK":
                         continue
                     cs.add(
                         "result_value",
