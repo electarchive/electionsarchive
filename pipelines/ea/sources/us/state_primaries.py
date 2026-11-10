@@ -20,7 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.encoding import decode, rekey, repair
+from ea.encoding import DOUBLED, decode, rekey, repair, restorer
 from ea.names import initials
 from ea.sources.us import (
     elstats,
@@ -3645,6 +3645,11 @@ def emit() -> Path:
             "2010–2012, and 2016–2024 by county from the Lieutenant Governor's canvasses",
             polity="US",
         )
+        restore = restorer(conn)
+        garbled = {text: restore(text) for text in lines["choice"].unique().to_list() if restore(text) != text}
+        for text, fixed in garbled.items():
+            cs.renamed.setdefault(slug(fixed), slug(text))
+        lines = lines.with_columns(pl.col("choice").replace(garbled))
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -4516,15 +4521,17 @@ def emit() -> Path:
                       or exists (select from outcome t where t.option_id = o.id)
                       or exists (select from candidacy d where d.option_id = o.id)
                from contest_option o join changeset g on g.id = o.changeset_id
-               where g.pipeline = %s and o.ballot_label like '%%' || chr(65533) || '%%'""",
-            [SOURCE],
+               where g.pipeline = %s and (strpos(o.ballot_label, chr(65533)) > 0 or strpos(o.ballot_label, %s) > 0)""",
+            [SOURCE, DOUBLED],
         ).fetchall()
         fixed: dict[str, list[tuple[str, str]]] = {}
         for row in cs.rows.get("contest_option", []):
             fixed.setdefault(str(row["contest_id"]), []).append((str(row["id"]), str(row["ballot_label"])))
         renamed: dict[str, str] = {}
         for option, k, contest, label, used in mangled:
-            pattern = re.compile("".join("." if char == "�" else re.escape(char) for char in label))
+            pattern = re.compile(
+                "".join("." if char == "�" else re.escape(char) for char in label.replace(DOUBLED, "�"))
+            )
             twins = [id for id, text in fixed.get(str(contest), []) if pattern.fullmatch(text) and "�" not in text]
             if len(twins) != 1:
                 continue
@@ -4601,10 +4608,11 @@ def emit() -> Path:
         for (person,) in conn.execute(
             """select p.id from person p join changeset g on g.id = p.changeset_id
                join name n on n.entity_id = p.id and n.is_preferred
-               where g.pipeline = %s and n.text like '%%' || chr(65533) || '%%'
-                 and not exists (select from candidacy where person_id = p.id)
+               where g.pipeline = %s and (strpos(n.text, chr(65533)) > 0 or strpos(n.text, %s) > 0)
+                 and not exists (select from candidacy d join entity e on e.id = d.id
+                                 where d.person_id = p.id and e.retired_by is null and d.option_id <> all(%s::uuid[]))
                  and not exists (select from entity e where e.id = p.id and e.retired_by is not null)""",
-            [SOURCE],
+            [SOURCE, DOUBLED, list(renamed)],
         ).fetchall():
             cs.add("entity_retirement", entity_id=person, reason=MANGLED)
         print(f"{len(renamed)} mangled options repointed in {len(repaired)} sets")
