@@ -13200,8 +13200,16 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 uncertain = bool(group["unexpired"][0]) or len(past) < 2 or len(set(past.values())) > 1
                 if uncertain and state == "MN":
                     magnitude, uncertain = 1, False
+            elif state == "MN" and magnitude is None and not group["seats"][0]:
+                magnitude, system = 1, cs.key("us.electoral_system", "fptp")
             if (
-                (state in ("IN", "MD", "MN") or cited is not None or magnitude == 1)
+                (
+                    state in ("IN", "MD", "MN")
+                    or state in ("KY", "CA", "ceda")
+                    and group["seats"][0]
+                    or cited is not None
+                    or magnitude == 1
+                )
                 and magnitude is not None
                 and system in plurality.values()
             ):
