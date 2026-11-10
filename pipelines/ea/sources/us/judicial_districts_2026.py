@@ -1,7 +1,10 @@
 import csv
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID
+
+import httpx
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -27,6 +30,16 @@ PUBLISHERS = {
     "knowyourjudges.utah.gov": (
         "Utah Judicial Performance Evaluation Commission",
         "Judges Standing for Retention in 2026",
+    ),
+}
+BALLOTS = {
+    "f556954e-bea5-489c-8351-dee0327daf9a": (
+        "Westchester County Board of Elections",
+        "2026 General Election Sample Ballot",
+    ),
+    "2caf39ae-a496-44e6-baa7-142c5f40644e": (
+        "Suffolk County Board of Elections",
+        "2026 General Election Sample Ballot",
     ),
 }
 PAGES = {
@@ -62,6 +75,17 @@ def fetch() -> None:
                     retrieved_at=held.retrieved_at,
                     media_type=held.media_type or "application/pdf",
                 )
+            elif host == "app.enhancedvoting.com":
+                response = httpx.get(url, headers={"x-csrf": "1"}, timeout=120)
+                response.raise_for_status()
+                raw.store(
+                    SOURCE,
+                    url,
+                    response.content,
+                    suffix=".json",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/json",
+                )
             else:
                 raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
 
@@ -83,7 +107,13 @@ def emit() -> Path:
 
         sources: dict[str, UUID] = {}
         for url in sorted({row["source"] for row in rows}):
-            publisher, title = PUBLISHERS[urlparse(url).netloc]
+            publisher, title = (
+                next(
+                    (ballot for jurisdiction, ballot in BALLOTS.items() if f"jurisdictionId={jurisdiction}" in url),
+                    None,
+                )
+                or PUBLISHERS[urlparse(url).netloc]
+            )
             title = TITLES.get(url, title)
             if page := PAGES.get(url.rpartition("id=")[2]):
                 title = f"{title}: {page}"
@@ -189,7 +219,7 @@ def emit() -> Path:
                 district_area_id=districts[row["district"]],
                 seat_id=None,
                 boundary_set_id=None,
-                magnitude=1,
+                magnitude=int(row.get("seats") or 1),
                 term="full",
                 round_number=1,
                 previous_round_id=None,
