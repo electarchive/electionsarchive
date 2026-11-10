@@ -736,6 +736,7 @@ def attach(
     empty: bool = False,
     restage: bool = False,
     accepted: frozenset[str] = frozenset(),
+    shortfall: str | None = None,
 ) -> None:
     declared = declared or {}
     tag = str(cs.manifest["pipeline"])
@@ -925,8 +926,11 @@ def attach(
             .agg(pl.col("votes").sum())
         )
         overcounted = undercounted = held_back = False
+        shorts: list[float] = []
         for option, kind, label, _, fec in known:
             medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
+            if kind in ("candidate", "ticket") and fec:
+                shorts.append((fec - medsl) / fec * 100)
             if kind in ("candidate", "ticket") and fec and abs(medsl - fec) > max(100, fec * 0.02):
                 drifted.append((key, label, medsl, fec))
                 held_back |= medsl < fec * 0.9
@@ -935,8 +939,19 @@ def attach(
         if overcounted and authoritative is None:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
+        uniform = (
+            shortfall is not None
+            and undercounted
+            and not overcounted
+            and max(shorts) < 5
+            and max(shorts) - min(shorts) <= 0.5
+        )
+        if shortfall is not None and undercounted and not uniform and key not in accepted:
+            print(f"{key}: the county sums fall short of the FEC totals by different or large percents, skipped")
+            continue
         if (
             undercounted
+            and not uniform
             and key not in accepted
             and (strict or authoritative is None and ":" in chamber)
             and (partial is None or held_back)
@@ -1099,7 +1114,15 @@ def attach(
             winner, caveat = declared[key]
             cs.add("outcome", result_set_id=result_set, option_id=picked[winner], kind="won")
             cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
-        if undercounted and partial is not None:
+        if uniform:
+            counted_votes = int(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum())
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="caveat",
+                body_md=f"Every candidate's county total falls about {sum(shorts) / len(shorts):.1f} percent short of the official statewide total ({counted_votes:,} county votes against {int(official):,}): {shortfall}. The statewide total stays the official default.",
+            )
+        elif undercounted and partial is not None:
             counted_votes = int(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum())
             cs.add(
                 "note",
