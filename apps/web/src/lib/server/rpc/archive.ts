@@ -2557,12 +2557,13 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
     ),
   ]);
 
-  const options =
+  const listed =
     picked.length === 0
       ? []
       : rowsOf(
           await db.execute<{
             k: number;
+            id: string;
             contest: string;
             kind: string;
             party: string | null;
@@ -2582,52 +2583,7 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
               select contest_id from contest_option
               where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[])
             `)})
-            select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id, (
-                select coalesce(mm.into_id, cy.member_of_party_id, ta.party_id, nm.party_id, nb.party)
-                from candidacy cy
-                left join lateral (
-                  select n.party_id from candidacy_nomination n where n.candidacy_id = cy.id and n.kind = 'nominated'
-                  order by (
-                    select max(coalesce(
-                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k and x.area_k = (
-                        select a.k from contest ck join election ce on ce.id = ck.election_id
-                        join area a on a.id = coalesce(ck.district_area_id, (
-                          select pt.area_id from polity_territory pt where pt.polity_id = ce.polity_id and pt.valid @> ce.date_from limit 1
-                        ))
-                        where ck.id = ch.contest_id
-                      )),
-                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = ch.k offset 0)
-                    )) from (select ch.k, ch.contest_id, ch.party_id from contest_option ch where ch.parent_option_id = o.id offset 0) ch
-                    join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-                    where ch.party_id = n.party_id
-                  ) desc nulls last, n.party_id
-                  limit 1
-                ) nm on true
-                left join lateral (
-                  select a.party_id from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
-                  where t.person_id = cy.person_id and t.contest_id = o.contest_id order by lower(a.valid) nulls first limit 1
-                ) ta on true
-                left join lateral (
-                  select coalesce(xm.into_id, xo.party_id) as party
-                  from candidacy xc
-                  join contest_option xo on xo.id = xc.option_id and xo.party_id is not null
-                  join contest xk on xk.id = xo.contest_id and xk.party_scope_id is null
-                  join election xe on xe.id = xk.election_id
-                  left join entity_merge xm on xm.entity_id = xo.party_id
-                  where xc.person_id = cy.person_id and xc.id <> cy.id and not xc.is_independent
-                    and (o.alliance_id is null or exists (
-                      select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id in (xo.party_id, xm.into_id)
-                    ))
-                    and xe.date_from between (select e.date_from - 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
-                      and (select e.date_from + 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
-                  order by abs(xe.date_from - (select e.date_from from contest k join election e on e.id = k.election_id where k.id = o.contest_id)), xe.date_from desc
-                  limit 1
-                ) nb on cy.member_of_party_id is null and nm.party_id is null and ta.party_id is null
-                left join entity_merge mm on mm.entity_id = coalesce(cy.member_of_party_id, ta.party_id, nm.party_id)
-                where o.parent_option_id is null and o.kind in ('candidate', 'ticket') and cy.option_id = o.id and cy.role = 'head' and not cy.is_independent
-                  and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
-                limit 1
-              )) as party, o.ballot_label as label, o.candidate_count as candidates,
+            select o.k, o.id, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, o.candidate_count as candidates,
               o.alliance_id as alliance, o.parent_option_id is not null as is_line,
               exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent offset 0) as independent,
               case when o.contest_id in (select id from covered) then exists (
@@ -2676,6 +2632,73 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
             order by o.k
           `),
         );
+  const unparted = listed.flatMap((row) =>
+    row.party == null &&
+    !row.is_line &&
+    (row.kind === "candidate" || row.kind === "ticket")
+      ? [row.id]
+      : [],
+  );
+  const headParty = new Map(
+    unparted.length === 0
+      ? []
+      : rowsOf(
+          await db.execute<{ id: string; party: string | null }>(sql`
+            select o.id, (
+              select coalesce(mm.into_id, cy.member_of_party_id, ta.party_id, nm.party_id, nb.party)
+                from candidacy cy
+                left join lateral (
+                  select n.party_id from candidacy_nomination n where n.candidacy_id = cy.id and n.kind = 'nominated'
+                  order by (
+                    select max(coalesce(
+                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k and x.area_k = (
+                        select a.k from contest ck join election ce on ce.id = ck.election_id
+                        join area a on a.id = coalesce(ck.district_area_id, (
+                          select pt.area_id from polity_territory pt where pt.polity_id = ce.polity_id and pt.valid @> ce.date_from limit 1
+                        ))
+                        where ck.id = ch.contest_id
+                      )),
+                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = ch.k offset 0)
+                    )) from (select ch.k, ch.contest_id, ch.party_id from contest_option ch where ch.parent_option_id = o.id offset 0) ch
+                    join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
+                    where ch.party_id = n.party_id
+                  ) desc nulls last, n.party_id
+                  limit 1
+                ) nm on true
+                left join lateral (
+                  select a.party_id from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
+                  where t.person_id = cy.person_id and t.contest_id = o.contest_id order by lower(a.valid) nulls first limit 1
+                ) ta on true
+                left join lateral (
+                  select coalesce(xm.into_id, xo.party_id) as party
+                  from candidacy xc
+                  join contest_option xo on xo.id = xc.option_id and xo.party_id is not null
+                  join contest xk on xk.id = xo.contest_id and xk.party_scope_id is null
+                  join election xe on xe.id = xk.election_id
+                  left join entity_merge xm on xm.entity_id = xo.party_id
+                  where xc.person_id = cy.person_id and xc.id <> cy.id and not xc.is_independent
+                    and (o.alliance_id is null or exists (
+                      select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id in (xo.party_id, xm.into_id)
+                    ))
+                    and xe.date_from between (select e.date_from - 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
+                      and (select e.date_from + 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
+                  order by abs(xe.date_from - (select e.date_from from contest k join election e on e.id = k.election_id where k.id = o.contest_id)), xe.date_from desc
+                  limit 1
+                ) nb on cy.member_of_party_id is null and nm.party_id is null and ta.party_id is null
+                left join entity_merge mm on mm.entity_id = coalesce(cy.member_of_party_id, ta.party_id, nm.party_id)
+                where o.parent_option_id is null and o.kind in ('candidate', 'ticket') and cy.option_id = o.id and cy.role = 'head' and not cy.is_independent
+                  and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
+                limit 1
+              ) as party
+            from contest_option o
+            where o.id = any(${sql.param(unparted)}::uuid[])
+          `),
+        ).map((row) => [row.id, row.party] as const),
+  );
+  const options = listed.map(({ id, ...row }) => ({
+    ...row,
+    party: row.party ?? headParty.get(id) ?? null,
+  }));
 
   const byOption = new Map(options.map((row) => [row.k, row]));
   const byContest = Map.groupBy(options, (row) => row.contest);
