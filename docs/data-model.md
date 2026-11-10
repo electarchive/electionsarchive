@@ -150,6 +150,14 @@ A `tenure` is one person's term in an office or seat. It records how the person 
 
 Being elected is an outcome, and being seated is a tenure. A winner who never takes up a seat keeps the declared outcome and gains no tenure.
 
+### Election cadence and results access
+
+`election_cadence` records when a government votes, as law states it. A row with `government_kind` set is a class rule: its polity is a state, and it covers every government of that kind in the state whose Census function and name match `function` and `name_pattern`. A row without `government_kind` is a rule for its own polity, such as one city or school district, and wins over the class rule. Elections fall in the years where `(year - phase) % period_years = 0`, within `[valid_from, valid_to)`, so a change in the law closes one row and opens the next. `selection` says whether the board is elected, appointed, chosen by landowners, chosen at town meeting, or abolished. `month` and `day_rule` place the election in its year (`nov_tuesday_after_first_monday`, `with_state_primary`, `off_november`, `mixed`, or `fixed:MM-DD`). `classes` and `term_years` describe staggering, and `runoff`, `runoff_threshold`, and `runoff_rule` describe the runoff. Every row cites its statute or charter through `source_id` and `locator`.
+
+`results_access` records where an authority publishes results and how a script reaches them: the platform, a URL pattern, the format, and an `access` of `open`, `browser`, `blocked`, `manual`, or `none`, with when and how that was checked.
+
+Upcoming dates are not stored here: a scheduled election is an `election` row with `status = 'scheduled'`. The derived `coverage_government` table, rebuilt by `ea coverage`, holds the cadence of each government in the Census of Governments, and `coverage_goal` measures how many of the governments due in a year the archive holds.
+
 ## Provenance
 
 Every published number traces to a source through its result set, or through a `citation` when the fact is not a result. Every number also traces to the changeset that wrote it.
@@ -174,28 +182,29 @@ A release is every changeset published on or before its watermark. The `release`
 
 The schema in `packages/db/src/core.ts` is the complete reference. This table lists the main tables by purpose.
 
-| Table                                                                                                            | What one row holds                                                                     |
-| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `entity`                                                                                                         | The identity of every addressable thing, with its type                                 |
-| `polity`, `polity_parent`, `polity_territory`, `polity_relation`, `polity_period`                                | An institution that holds elections, and its parents, territory, links, and periods    |
-| `scheme`, `area`, `area_code`, `area_parent`, `area_geometry`, `area_event`                                      | A family of areas, the areas, their codes, hierarchy, shapes, and lineage events       |
-| `boundary_set`, `crosswalk`, `crosswalk_weight`                                                                  | A scheme at one vintage, and re-aggregations between boundary sets                     |
-| `reporting_unit`, `reporting_unit_area`, `area_universe`                                                         | A place where votes are counted, its area memberships, and its expected count          |
-| `election`, `contest`, `ballot_question`, `ballot_question_text`                                                 | An occasion, a decision within it, and a ballot question with its wording              |
-| `contest_option`, `candidacy`, `candidacy_nomination`                                                            | A ballot line, a person's place on it, and a party's nomination of that person         |
-| `result_set`, `result_value`, `result_flow`, `value_locator`                                                     | A tabulation at one stage, its values and flows, and their page locators               |
-| `result_rollup_sum`, `result_rollup_unit`, `rollup_coverage`                                                     | Derived sums over areas, and how many reporting units each place has reported          |
-| `outcome`                                                                                                        | What the authority declared for an option or a candidacy                               |
-| `measure`, `channel`, `electoral_system`                                                                         | The codes for what a number counts and how votes were cast, and the rules for a system |
-| `party`, `party_color`, `party_founding`, `party_position`, `party_relation`, `party_affiliation`, `party_image` | A party and its colors, founding, position, lineage, memberships, and logo             |
-| `alliance`, `alliance_member`                                                                                    | An alliance and its members                                                            |
-| `person`, `person_party_membership`, `person_image`                                                              | A person with published data only, party memberships, and a portrait                   |
-| `body`, `body_size`, `body_size_part`, `body_apportionment`, `representation_gap`                                | An assembly, its declared size, its apportionment, and gaps in representation          |
-| `office`, `seat`, `tenure`, `tenure_event`, `tenure_affiliation`                                                 | An office, a seat, a term, events within it, and the group the member sat with         |
-| `government`, `government_party`                                                                                 | A cabinet and the parties in it                                                        |
-| `name`, `external_id`, `slug`                                                                                    | A name, an identifier in another system, and a URL path                                |
-| `note`, `translation`, `label`, `flag`                                                                           | Prose, translations, outside assessments, and failed checks or caveats                 |
-| `source`, `source_artifact`, `source_page`, `citation`                                                           | A source, its cached files and page images, and its link to an entity                  |
-| `changeset`, `release`                                                                                           | The unit of write, and a dated snapshot defined by a watermark                         |
-| `entity_merge`, `entity_retirement`, `row_drop`, `fact_rekey`                                                    | Recorded corrections, each with a reason, and a record of changed compact keys         |
-| `user_role`, `saved_view`, `proposal`, `proposal_revision`, `proposal_job`, `activity`                           | Application tables for roles, saved views, proposed changesets, and activity           |
+| Table                                                                                                            | What one row holds                                                                                |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `entity`                                                                                                         | The identity of every addressable thing, with its type                                            |
+| `polity`, `polity_parent`, `polity_territory`, `polity_relation`, `polity_period`                                | An institution that holds elections, and its parents, territory, links, and periods               |
+| `scheme`, `area`, `area_code`, `area_parent`, `area_geometry`, `area_event`                                      | A family of areas, the areas, their codes, hierarchy, shapes, and lineage events                  |
+| `boundary_set`, `crosswalk`, `crosswalk_weight`                                                                  | A scheme at one vintage, and re-aggregations between boundary sets                                |
+| `reporting_unit`, `reporting_unit_area`, `area_universe`                                                         | A place where votes are counted, its area memberships, and its expected count                     |
+| `election`, `contest`, `ballot_question`, `ballot_question_text`                                                 | An occasion, a decision within it, and a ballot question with its wording                         |
+| `contest_option`, `candidacy`, `candidacy_nomination`                                                            | A ballot line, a person's place on it, and a party's nomination of that person                    |
+| `result_set`, `result_value`, `result_flow`, `value_locator`                                                     | A tabulation at one stage, its values and flows, and their page locators                          |
+| `result_rollup_sum`, `result_rollup_unit`, `rollup_coverage`                                                     | Derived sums over areas, and how many reporting units each place has reported                     |
+| `outcome`                                                                                                        | What the authority declared for an option or a candidacy                                          |
+| `measure`, `channel`, `electoral_system`                                                                         | The codes for what a number counts and how votes were cast, and the rules for a system            |
+| `party`, `party_color`, `party_founding`, `party_position`, `party_relation`, `party_affiliation`, `party_image` | A party and its colors, founding, position, lineage, memberships, and logo                        |
+| `alliance`, `alliance_member`                                                                                    | An alliance and its members                                                                       |
+| `person`, `person_party_membership`, `person_image`                                                              | A person with published data only, party memberships, and a portrait                              |
+| `body`, `body_size`, `body_size_part`, `body_apportionment`, `representation_gap`                                | An assembly, its declared size, its apportionment, and gaps in representation                     |
+| `office`, `seat`, `tenure`, `tenure_event`, `tenure_affiliation`                                                 | An office, a seat, a term, events within it, and the group the member sat with                    |
+| `election_cadence`, `results_access`                                                                             | When a government votes under the law, and where its results appear and how a script reaches them |
+| `government`, `government_party`                                                                                 | A cabinet and the parties in it                                                                   |
+| `name`, `external_id`, `slug`                                                                                    | A name, an identifier in another system, and a URL path                                           |
+| `note`, `translation`, `label`, `flag`                                                                           | Prose, translations, outside assessments, and failed checks or caveats                            |
+| `source`, `source_artifact`, `source_page`, `citation`                                                           | A source, its cached files and page images, and its link to an entity                             |
+| `changeset`, `release`                                                                                           | The unit of write, and a dated snapshot defined by a watermark                                    |
+| `entity_merge`, `entity_retirement`, `row_drop`, `fact_rekey`                                                    | Recorded corrections, each with a reason, and a record of changed compact keys                    |
+| `user_role`, `saved_view`, `proposal`, `proposal_revision`, `proposal_job`, `activity`                           | Application tables for roles, saved views, proposed changesets, and activity                      |

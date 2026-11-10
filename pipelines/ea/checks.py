@@ -19,7 +19,13 @@ KEYS = {
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 DROPPABLE = ("area_code", "area_parent", "area_geometry")
-SWEEPABLE = {"party_image": "id", "party_founding": "party_id", "party_affiliation": "party_id"}
+SWEEPABLE = {
+    "party_image": "id",
+    "party_founding": "party_id",
+    "party_affiliation": "party_id",
+    "election_cadence": "id",
+    "results_access": "id",
+}
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -789,6 +795,69 @@ def _held_translations(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _cadence(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "election_cadence" not in stage.tables:
+        return []
+    staged = stage.staged("election_cadence")
+    columns = stage.tables["election_cadence"]
+    kinds: dict[str, LiteralString] = {
+        "government_kind": "text",
+        "function": "text",
+        "name_pattern": "text",
+        "body_id": "uuid",
+        "office_id": "uuid",
+        "valid_from": "date",
+        "valid_to": "date",
+        "source_id": "uuid",
+        "locator": "text",
+    }
+    held = {
+        column: sql.Identifier(column) if column in columns else sql.SQL("null::" + kind)
+        for column, kind in kinds.items()
+    }
+    rules = sql.SQL(
+        """(select id, polity_id, {government_kind} as government_kind, {function} as function,
+                   {name_pattern} as name_pattern, {body_id} as body_id, {office_id} as office_id,
+                   daterange({valid_from}, {valid_to}, '[)') as valid
+            from {staged}
+            union all
+            select p.id, p.polity_id, p.government_kind, p.function, p.name_pattern, p.body_id, p.office_id,
+                   daterange(p.valid_from, p.valid_to, '[)')
+            from public.election_cadence p join changeset c on c.id = p.changeset_id
+            where not exists (select from {staged} s where s.id = p.id){swept})"""
+    ).format(
+        staged=staged,
+        swept=sql.SQL(" and c.pipeline <> {}").format(sql.Literal(stage.pipeline))
+        if "election_cadence" in stage.sweeps
+        else sql.SQL(""),
+        **held,
+    )
+    return [
+        (
+            "cadence.uncited",
+            sql.SQL(
+                """select id, null::uuid, jsonb_build_object('polity', polity_id, 'kind', {government_kind})
+                   from {staged} where {source_id} is null or coalesce(btrim({locator}), '') = ''"""
+            ).format(staged=staged, **held),
+        ),
+        (
+            "cadence.overlap",
+            sql.SQL(
+                """select a.id, null::uuid, jsonb_build_object('other', b.id, 'polity', a.polity_id, 'kind', a.government_kind,
+                          'function', a.function, 'name_pattern', a.name_pattern)
+                   from {staged} s join {rules} a on a.id = s.id
+                   join {rules} b on b.id <> a.id and b.polity_id = a.polity_id
+                     and b.government_kind is not distinct from a.government_kind
+                     and b.function is not distinct from a.function
+                     and b.name_pattern is not distinct from a.name_pattern
+                     and b.body_id is not distinct from a.body_id
+                     and b.office_id is not distinct from a.office_id
+                     and b.valid && a.valid"""
+            ).format(staged=staged, rules=rules),
+        ),
+    ]
+
+
 def run(conn: Connection, stage: Stage) -> list[Finding]:
     findings: list[Finding] = []
     if "electoral_system" in stage.tables:
@@ -817,6 +886,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_scope(stage),
         *_capitals(stage),
         *_held_translations(stage),
+        *_cadence(stage),
     ]:
         findings.extend(
             Finding(

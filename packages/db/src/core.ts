@@ -56,6 +56,9 @@ export const representationGapReason = pgEnum("representation_gap_reason", ["sec
 export const unitAreaMethod = pgEnum("unit_area_method", ["source_code", "city_universe", "shape_contained", "official_list", "point_in_polygon"])
 export const translationOrigin = pgEnum("translation_origin", ["official", "human", "machine"])
 export const seatCategory = pgEnum("seat_category", ["elected", "appointed", "ex_officio", "indirect"])
+export const cadenceSelection = pgEnum("cadence_selection", ["elected", "appointed", "landowner", "town_meeting", "abolished"])
+export const cadenceRunoff = pgEnum("cadence_runoff", ["none", "majority", "threshold", "instant"])
+export const resultsPlatformAccess = pgEnum("results_platform_access", ["open", "browser", "blocked", "manual", "none"])
 
 
 export const activity = pgTable("activity", {
@@ -1195,6 +1198,61 @@ export const election = pgTable("election", {
 	index("election_parent_idx").using("btree", table.parentId.asc().nullsLast()),
 	index("election_polity_idx").using("btree", table.polityId.asc().nullsLast(), table.dateFrom.asc().nullsLast()),
 check("election_check", sql`(date_to >= date_from)`),]);
+
+export const electionCadence = pgTable("election_cadence", {
+	id: uuid().primaryKey(),
+	polityId: uuid("polity_id").notNull(),
+	governmentKind: text("government_kind"),
+	function: text(),
+	namePattern: text("name_pattern"),
+	bodyId: uuid("body_id"),
+	officeId: uuid("office_id"),
+	selection: cadenceSelection().default("elected").notNull(),
+	periodYears: integer("period_years"),
+	phase: integer(),
+	month: integer(),
+	dayRule: text("day_rule"),
+	classes: integer().default(1).notNull(),
+	termYears: integer("term_years"),
+	partisan: boolean(),
+	runoff: cadenceRunoff().default("none").notNull(),
+	runoffThreshold: numeric("runoff_threshold"),
+	runoffRule: text("runoff_rule"),
+	administeredBy: text("administered_by"),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	sourceId: uuid("source_id").notNull(),
+	locator: text().notNull(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.bodyId],
+		foreignColumns: [body.id],
+		name: "election_cadence_body_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "election_cadence_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.officeId],
+		foreignColumns: [office.id],
+		name: "election_cadence_office_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.polityId],
+		foreignColumns: [polity.id],
+		name: "election_cadence_polity_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "election_cadence_source_id_fkey"
+	}),
+	index("election_cadence_polity_idx").using("btree", table.polityId.asc().nullsLast(), table.governmentKind.asc().nullsLast()),
+check("election_cadence_check", sql`((phase IS NULL) OR ((period_years IS NOT NULL) AND ((phase >= 0) AND (phase <= (period_years - 1)))))`),check("election_cadence_check1", sql`((government_kind IS NOT NULL) OR ((function IS NULL) AND (name_pattern IS NULL)))`),check("election_cadence_check2", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),check("election_cadence_classes_check", sql`(classes >= 1)`),check("election_cadence_month_check", sql`((month >= 1) AND (month <= 12))`),check("election_cadence_period_years_check", sql`((period_years >= 1) AND (period_years <= 8))`),]);
 
 export const electoralSystem = pgTable("electoral_system", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
@@ -2637,6 +2695,42 @@ export const resultValue = pgTable("result_value", {
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "result_value_pkey"}),
 	index("result_value_unit_k_idx").using("btree", table.unitK.asc().nullsLast()),
 ]);
+
+export const resultsAccess = pgTable("results_access", {
+	id: uuid().primaryKey(),
+	polityId: uuid("polity_id").notNull(),
+	serves: text().default("administered").notNull(),
+	platform: text().notNull(),
+	urlPattern: text("url_pattern").notNull(),
+	format: text().notNull(),
+	access: resultsPlatformAccess().notNull(),
+	firstDate: date("first_date"),
+	lastDate: date("last_date"),
+	checkedAt: timestamp("checked_at", { withTimezone: true }).notNull(),
+	evidence: text(),
+	validFrom: date("valid_from"),
+	validTo: date("valid_to"),
+	sourceId: uuid("source_id"),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "results_access_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.polityId],
+		foreignColumns: [polity.id],
+		name: "results_access_polity_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "results_access_source_id_fkey"
+	}),
+	index("results_access_polity_idx").using("btree", table.polityId.asc().nullsLast()),
+check("results_access_check", sql`((valid_to IS NULL) OR (valid_from IS NULL) OR (valid_to > valid_from))`),]);
 
 export const rollupCoverage = pgTable("rollup_coverage", {
 	resultSetK: integer("result_set_k").notNull(),
