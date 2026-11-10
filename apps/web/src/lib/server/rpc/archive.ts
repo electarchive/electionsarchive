@@ -1402,32 +1402,41 @@ async function gather(
   if (ks.length === 0) {
     return [];
   }
-  const counted = sql`
-    (
-        exists (
-          select from result_rollup_sum r
-          where r.area_k = a.k and r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
-        )
-        or exists (
-          select from result_rollup_unit u
-          cross join lateral (
-            select from result_value v
-            where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
-            limit 1
-          ) v
-          where u.area_k = a.k and u.result_set_k = any(${sql.param(ks)}::int[])
-        )
-        or exists (
-          select from result_set s join contest c on c.id = s.contest_id
-          where s.k = any(${sql.param(ks)}::int[]) and c.district_area_id = a.id
-        )
-      )
+  const pool = sql`${sql.param(ks)}::int[]`;
+  const counted = (candidates: SQL) => sql`
+    with kids as materialized (${candidates}),
+    units as materialized (
+      select kids.* from kids
+      where kids.k in (select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}))
+    )
+    select kids.* from kids
+    where kids.k in (
+      select r.area_k from result_rollup_sum r where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
+    )
+    union
+    select units.* from units
+    where exists (
+      select from result_rollup_unit u
+      cross join lateral (
+        select from result_value v
+        where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+        limit 1
+      ) v
+      where u.area_k = units.k and u.result_set_k = any(${pool})
+    )
+    union
+    select kids.* from kids
+    where kids.id in (
+      select c.district_area_id from result_set s join contest c on c.id = s.contest_id where s.k = any(${pool})
+    )
   `;
-  let found = await db.execute<{ id: string; k: number; scheme: string }>(sql`
-    select a.id, a.k, a.scheme_code as scheme
-    from area_parent p join area a on a.id = p.area_id
-    where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and ${counted}
-  `);
+  let found = await db.execute<{ id: string; k: number; scheme: string }>(
+    counted(sql`
+      select a.id, a.k, a.scheme_code as scheme
+      from area_parent p join area a on a.id = p.area_id
+      where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date
+    `),
+  );
   const lone = Map.groupBy(found.rows, (row) => row.scheme)
     .values()
     .filter((group) => group.length === 1)
@@ -1435,17 +1444,14 @@ async function gather(
     .toArray();
   const deeper = new Set<string>();
   if (lone.length > 0) {
-    const through = await db.execute<{
-      id: string;
-      k: number;
-      scheme: string;
-    }>(sql`
-      select a.id, a.k, a.scheme_code as scheme
-      from area_parent p join area a on a.id = p.area_id
-      where p.parent_id = any(${sql.param(lone)}::uuid[]) and p.valid @> ${date}::date
-        and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
-        and ${counted}
-    `);
+    const through = await db.execute<{ id: string; k: number; scheme: string }>(
+      counted(sql`
+        select a.id, a.k, a.scheme_code as scheme
+        from area_parent p join area a on a.id = p.area_id
+        where p.parent_id = any(${sql.param(lone)}::uuid[]) and p.valid @> ${date}::date
+          and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
+      `),
+    );
     for (const row of through.rows) {
       deeper.add(row.id);
       found.rows.push(row);
@@ -1525,18 +1531,20 @@ async function gather(
     isRoot &&
     !isSettled &&
     found.rows.every((row) => row.scheme !== "world.country")
-      ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
-        select a.id, a.k, a.scheme_code as scheme from area a
-        where a.k = any(${sql.param(
-          rowsOf(
-            await remember("countries", () =>
-              db.execute<{ k: number }>(
-                sql`select k from area where scheme_code = 'world.country'`,
-              ),
-            ),
-          ).map((row) => row.k),
-        )}::int[]) and ${counted}
-      `)
+      ? await db.execute<{ id: string; k: number; scheme: string }>(
+          counted(sql`
+            select a.id, a.k, a.scheme_code as scheme from area a
+            where a.k = any(${sql.param(
+              rowsOf(
+                await remember("countries", () =>
+                  db.execute<{ k: number }>(
+                    sql`select k from area where scheme_code = 'world.country'`,
+                  ),
+                ),
+              ).map((row) => row.k),
+            )}::int[])
+          `),
+        )
       : { rows: [] };
   const members = new Set(
     [...joined.rows, ...abroad.rows].map((row) => row.id),
@@ -1605,35 +1613,32 @@ async function gather(
           scheme: string;
           parent: string;
         }>(
-          sized.facts < sized.kids
-            ? sql`
-              select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
-              from (
-                select r.area_k as k from result_rollup_sum r
-                where r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
-                union
-                select u.area_k from result_rollup_unit u
-                where u.result_set_k = any(${sql.param(ks)}::int[])
-              ) r
-              join area a on a.k = r.k
-              join area_parent p on p.area_id = a.id and p.valid @> ${date}::date
-              where p.parent_id = any(${parents})
-                and a.scheme_code in (${level})
-                and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
-                and ${counted}
-            `
-            : sql`
-              select a.id, a.k, a.scheme, a.parent from (
+          counted(
+            sized.facts < sized.kids
+              ? sql`
+                select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+                from (
+                  select r.area_k as k from result_rollup_sum r
+                  where r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
+                  union
+                  select u.area_k from result_rollup_unit u
+                  where u.result_set_k = any(${sql.param(ks)}::int[])
+                ) r
+                join area a on a.k = r.k
+                join area_parent p on p.area_id = a.id and p.valid @> ${date}::date
+                where p.parent_id = any(${parents})
+                  and a.scheme_code in (${level})
+                  and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+              `
+              : sql`
                 select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
                 from area_parent p join area a on a.id = p.area_id
                 where p.parent_id = any(${parents})
                   and p.valid @> ${date}::date
                   and a.scheme_code in (${level})
                   and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
-                offset 0
-              ) a
-              where ${counted}
-            `,
+              `,
+          ),
         );
   const deep = Map.groupBy(below.rows, (row) => row.scheme)
     .values()
