@@ -360,7 +360,7 @@ def snap(people: frozenset[str], wanted: set[str], words: set[str]) -> frozenset
             and len(other) > 4
             and (
                 name[0] == other[0]
-                and (edits(name, other) and min(len(name), len(other)) > 5 or agreed and name[1:] in words)
+                and (edits(name, other) and (agreed or min(len(name), len(other)) > 5) or agreed and name[1:] in words)
                 or agreed
                 and name[1:] == other[1:]
             )
