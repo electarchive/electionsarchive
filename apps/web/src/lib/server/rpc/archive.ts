@@ -9286,6 +9286,129 @@ export const contests = {
           row.indirect !== contest.indirect &&
           row.year === contest.year,
       );
+      const compared = (async () => {
+        const [{ chosen, notes: picked }, { chosen: previous }] =
+          await Promise.all([
+            pick(comparable, { ...contest, fence }, input.vs),
+            pick(comparable, { ...contest, fence }, "previous"),
+          ]);
+        const relations = await db.execute<{
+          from: string;
+          to: string;
+          kind: string;
+        }>(sql`
+          select coalesce(fm.into_id, r.from_party_id) as from, coalesce(tm.into_id, r.to_party_id) as to, r.kind::text
+          from party_relation r
+          left join entity_merge fm on fm.entity_id = r.from_party_id
+          left join entity_merge tm on tm.entity_id = r.to_party_id
+          where r.to_party_id is not null
+            and (r.date is null or r.date <= greatest(${contest.date ?? "infinity"}::date, ${chosen?.date ?? null}::date))
+            and (r.election_id is null or r.election_id in (${contest.election}::uuid, ${chosen?.election ?? null}::uuid))
+          union all
+          select coalesce(fm.into_id, a.party_id), coalesce(tm.into_id, a.parent_party_id), a.kind::text
+          from party_affiliation a
+          left join entity_merge fm on fm.entity_id = a.party_id
+          left join entity_merge tm on tm.entity_id = a.parent_party_id
+          where a.kind = 'regional_branch' and a.valid @> ${contest.date ?? "infinity"}::date
+        `);
+        const relationLabels = await names([
+          ...new Set(relations.rows.map((row) => row.to)),
+        ]);
+        const lineage: Array<Relation> = relations.rows.map((row) => ({
+          ...row,
+          toLabel:
+            relationLabels.short.get(row.to) ??
+            relationLabels.full.get(row.to) ??
+            "",
+        }));
+        const owned = isRoot
+          ? null
+          : await db.execute<{ id: string }>(sql`
+            with recursive grp(id) as (
+              select ${contest.id}::uuid
+              union all
+              select c.id from contest c join grp on c.allocation_parent_id = grp.id
+            )
+            select c.id from contest c join grp on grp.id = c.id where c.district_area_id = ${area.id}::uuid
+          `);
+        const loading = load(
+          [contest.root],
+          [area.k],
+          contest.date ?? "infinity",
+          owned?.rows.map((row) => row.id) ?? [contest.id],
+          [],
+          round,
+        );
+        const [now, before, grid, cast, seats, pairs, steps, shifted] =
+          await Promise.all([
+            loading,
+            chosen == null
+              ? null
+              : load(
+                  [chosen.id],
+                  [area.k],
+                  chosen.date ?? "infinity",
+                  [chosen.id].filter(() => isRoot),
+                  [],
+                  null,
+                  "area",
+                  null,
+                  round === 1,
+                ),
+            places(
+              contest,
+              area,
+              isRoot,
+              scopePath,
+              input.by,
+              chosen,
+              lineage,
+              input.match,
+              input.group,
+              isShallow && round === last ? 1 : round,
+            ).then((found) =>
+              found != null && isShallow && round === last
+                ? { ...found, isOpening: true }
+                : found,
+            ),
+            counterpart == null
+              ? null
+              : load(
+                  [counterpart.id],
+                  [area.k],
+                  counterpart.date ?? "infinity",
+                  [],
+                ),
+            chamber(contest, area, loading, lineage, isRoot),
+            sisters([contest.root], contest.date ?? "infinity"),
+            tally(
+              contest,
+              area.k,
+              round,
+              last,
+              lineage,
+              input.match,
+              input.group,
+              elects,
+            ),
+            redrawn([area.id], contest, chosen),
+          ]);
+        return {
+          chosen,
+          picked,
+          previous,
+          lineage,
+          now,
+          before,
+          grid,
+          cast,
+          seats,
+          pairs,
+          steps,
+          shifted,
+        };
+      })();
+      compared.catch(() => null);
       const [rootLabels, rootSlugs, located, tops] = await Promise.all([
         names(rootIds),
         paths(rootIds),
@@ -9675,11 +9798,20 @@ export const contests = {
             );
           }),
         }));
-      const [{ chosen, notes: picked }, { chosen: previous }] =
-        await Promise.all([
-          pick(comparable, { ...contest, fence }, input.vs),
-          pick(comparable, { ...contest, fence }, "previous"),
-        ]);
+      const {
+        chosen,
+        picked,
+        previous,
+        lineage,
+        now,
+        before,
+        grid,
+        cast,
+        seats,
+        pairs,
+        steps,
+        shifted,
+      } = await compared;
       const targets = comparable.map((row) => ({
         value: rootSlugs.get(row.id) ?? row.id,
         label: rootLabels.full.get(row.id) ?? "",
@@ -9689,107 +9821,6 @@ export const contests = {
         annulled: row.status === "annulled",
         previous: row.id === previous?.id,
       }));
-      const relations = await db.execute<{
-        from: string;
-        to: string;
-        kind: string;
-      }>(sql`
-        select coalesce(fm.into_id, r.from_party_id) as from, coalesce(tm.into_id, r.to_party_id) as to, r.kind::text
-        from party_relation r
-        left join entity_merge fm on fm.entity_id = r.from_party_id
-        left join entity_merge tm on tm.entity_id = r.to_party_id
-        where r.to_party_id is not null
-          and (r.date is null or r.date <= greatest(${contest.date ?? "infinity"}::date, ${chosen?.date ?? null}::date))
-          and (r.election_id is null or r.election_id in (${contest.election}::uuid, ${chosen?.election ?? null}::uuid))
-        union all
-        select coalesce(fm.into_id, a.party_id), coalesce(tm.into_id, a.parent_party_id), a.kind::text
-        from party_affiliation a
-        left join entity_merge fm on fm.entity_id = a.party_id
-        left join entity_merge tm on tm.entity_id = a.parent_party_id
-        where a.kind = 'regional_branch' and a.valid @> ${contest.date ?? "infinity"}::date
-      `);
-      const relationLabels = await names([
-        ...new Set(relations.rows.map((row) => row.to)),
-      ]);
-      const lineage: Array<Relation> = relations.rows.map((row) => ({
-        ...row,
-        toLabel:
-          relationLabels.short.get(row.to) ??
-          relationLabels.full.get(row.to) ??
-          "",
-      }));
-      const owned = isRoot
-        ? null
-        : await db.execute<{ id: string }>(sql`
-          with recursive grp(id) as (
-            select ${contest.id}::uuid
-            union all
-            select c.id from contest c join grp on c.allocation_parent_id = grp.id
-          )
-          select c.id from contest c join grp on grp.id = c.id where c.district_area_id = ${area.id}::uuid
-        `);
-      const loading = load(
-        [contest.root],
-        [area.k],
-        contest.date ?? "infinity",
-        owned?.rows.map((row) => row.id) ?? [contest.id],
-        [],
-        round,
-      );
-      const [now, before, grid, cast, seats, pairs, steps, shifted] =
-        await Promise.all([
-          loading,
-          chosen == null
-            ? null
-            : load(
-                [chosen.id],
-                [area.k],
-                chosen.date ?? "infinity",
-                [chosen.id].filter(() => isRoot),
-                [],
-                null,
-                "area",
-                null,
-                round === 1,
-              ),
-          places(
-            contest,
-            area,
-            isRoot,
-            scopePath,
-            input.by,
-            chosen,
-            lineage,
-            input.match,
-            input.group,
-            isShallow && round === last ? 1 : round,
-          ).then((found) =>
-            found != null && isShallow && round === last
-              ? { ...found, isOpening: true }
-              : found,
-          ),
-          counterpart == null
-            ? null
-            : load(
-                [counterpart.id],
-                [area.k],
-                counterpart.date ?? "infinity",
-                [],
-              ),
-          chamber(contest, area, loading, lineage, isRoot),
-          sisters([contest.root], contest.date ?? "infinity"),
-          tally(
-            contest,
-            area.k,
-            round,
-            last,
-            lineage,
-            input.match,
-            input.group,
-            elects,
-          ),
-          redrawn([area.id], contest, chosen),
-        ]);
       const locator = (async () => {
         if (!isRoot || contest.place == null) {
           return null;
