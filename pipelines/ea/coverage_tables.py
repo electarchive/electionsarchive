@@ -11,6 +11,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
 from difflib import SequenceMatcher
+from typing import NamedTuple
 
 import polars as pl
 import psycopg
@@ -86,8 +87,6 @@ JUDICIAL = {
     "WI": 1,
 }
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
-SWITCHED = {("MI", "county"): (2024, (4, 0))}
-HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 DECIDED_EARLIER = {
     "FL": (
         "2026-08-18",
@@ -111,847 +110,6 @@ CANCELED = {
             "Rosemead",
         ],
     ),
-}
-DISTRICT_CALENDAR = {
-    ("MD", "Anne Arundel County Public Schools"): (
-        4,
-        0,
-        11,
-        "Maryland State Board of Elections, Anne Arundel County sample general ballot for November 3, 2026: no Board of Education contest appears, and the state's 2026 general candidate list carries none, https://www.elections.maryland.gov/elections/2026/general_ballots/AnneArundel.pdf",
-    ),
-    ("TX", "Hawkins Independent School District"): (
-        1,
-        0,
-        5,
-        "Hawkins ISD elections page: Places 6 and 7 were on the May 2, 2026 uniform election date, https://hawkinsisd.org/176801_2",
-    ),
-    ("TX", "Academy Independent School District"): (
-        1,
-        0,
-        5,
-        "Academy ISD trustee election page: the 2026 election was May 2, 2026, with filing January 14 to February 13, 2026, https://www.academyisd.net/our-district/our-district-a-z/board-of-trustees/trustee-election",
-    ),
-    ("TX", "Granbury Independent School District"): (
-        2,
-        1,
-        5,
-        "Hood County Elections, Precinct 101 sample ballot for November 3, 2026: only City of Granbury races appear and no Granbury ISD trustee contest, with the district's last trustee election in 2025 (Places 5 to 7), https://hoodcounty.texas.gov/departments/elections_administration/sample_ballots.php",
-    ),
-    ("VA", "City of Falls Church"): (
-        2,
-        1,
-        11,
-        "Virginia Department of Elections, November 3, 2026 all-offices candidate list (rev. 10-9-2026): no Falls Church city council or mayor contest appears, https://www.elections.virginia.gov/casting-a-ballot/candidate-list/november-3-2026-gen-elect-all-offices/",
-    ),
-    ("VA", "City of Galax"): (
-        2,
-        1,
-        11,
-        "Virginia Department of Elections, November 3, 2026 all-offices candidate list (rev. 10-9-2026): no Galax city council or mayor contest appears, https://www.elections.virginia.gov/casting-a-ballot/candidate-list/november-3-2026-gen-elect-all-offices/",
-    ),
-    ("TX", "Killeen Independent School District"): (
-        1,
-        0,
-        5,
-        "Killeen ISD election results page: the May 2, 2026 trustee election covered Places 4 and 5, https://www.killeenisd.org/article/2861919",
-    ),
-    ("TX", "Galena Park Independent School District"): (
-        1,
-        0,
-        5,
-        "Galena Park ISD elections page: trustee elections are held each year on the May uniform election date, with 2026 results dated May 2, 2026, https://www.galenaparkisd.com/district-info/gpisd-elections",
-    ),
-    ("TX", "Tyler"): (
-        1,
-        0,
-        5,
-        "City of Tyler City Clerk elections page: Mayor and Council are elected in May, even-numbered districts in even years and odd-numbered districts in odd years, with a May 2, 2026 general election, https://www.cityoftyler.org/City-Government/Mayor-and-Council/City-Clerk/Elections",
-    ),
-    ("TX", "Midland"): (
-        3,
-        2,
-        11,
-        "City of Midland: the next scheduled City Council elections are set for November 2027, https://golf.midlandtexas.gov/CivicAlerts.asp?AID=1843",
-    ),
-    ("GA", "Athens-Clarke County"): (
-        4,
-        2,
-        5,
-        "Athens-Clarke County elections page: local elections were held May 19, 2026 with a June 16 runoff, and the November 3 ballot carries only a special election for Board of Education District 8, https://www.accgov.com/elections",
-    ),
-    ("MN", "Anoka-Hennepin Sch Dist 11"): (
-        2,
-        1,
-        11,
-        "Anoka-Hennepin School District school board page: Districts 1, 2, and 5 four-year terms expire in 2027, so the district elects in odd-numbered years, https://www.ahschools.us/schoolboard",
-    ),
-    ("TX", "Katy Independent School District"): (
-        1,
-        0,
-        5,
-        "Katy ISD Board election page and canvass: trustee Positions 3, 4, and 5 were decided at the May 2, 2026 election, certified May 11, https://www.katyisd.org/board/election/home",
-    ),
-    ("OK", "Tulsa County"): (
-        4,
-        2,
-        6,
-        "NonDoc, Tulsa County candidate filing: 6 of 20 county offices contested, 14 elected by default, and the District 1 commissioner and treasurer races decided in the June 16, 2026 Republican primary, https://nondoc.com/2026/04/03/tulsa-county-candidate-filing-6-elections-set-14-elected-by-default/",
-    ),
-    ("GA", "Gwinnett County School District"): (
-        2,
-        0,
-        5,
-        "Gwinnett County Board of Registrations and Elections: Board of Education Districts 2 and 4 qualify for the nonpartisan general election held with the May 19, 2026 general primary (runoffs June 16 and December 1), https://www.gwinnettcounty.com/government/departments/elections/running-for-office",
-    ),
-    ("NC", "Charlotte-Mecklenburg Schools"): (
-        2,
-        1,
-        11,
-        "North Carolina Session Law 1993-167: Charlotte-Mecklenburg Board of Education members serve four-year terms and are elected in odd-numbered years, the three at-large seats from 1995 and the six district seats from 1997, so the six district seats were on the ballot on November 4, 2025, https://www.ncleg.gov/EnactedLegislation/SessionLaws/HTML/1993-1994/SL1993-167.html",
-    ),
-    ("TX", "Cypress-Fairbanks Independent School District"): (
-        2,
-        1,
-        11,
-        "Cypress-Fairbanks ISD board elections page: next trustee election November 2, 2027, https://www.cfisd.net/our-district/board-of-trustees/board-elections",
-    ),
-    ("NJ", "Union City"): (
-        4,
-        2,
-        5,
-        "City of Union City public notice: nonpartisan municipal election Tuesday, May 12, 2026, five commissioners for four-year terms, https://www.ucnj.com/News/View/2532/public-notice",
-    ),
-    ("NJ", "North Bergen"): (
-        4,
-        3,
-        5,
-        "Township of North Bergen, FAQ on the mayoral transition: next municipal election May 11, 2027, https://www.northbergen.org/News/View/12009/frequently-asked-questions-on-the-mayoral-transition",
-    ),
-    ("NY", "Buffalo"): (
-        4,
-        1,
-        11,
-        "Wikipedia, 2025 Buffalo mayoral election (Common Council and mayor elected November 4, 2025 for four-year terms; Buffalo City Charter), https://en.wikipedia.org/wiki/2025_Buffalo_mayoral_election",
-    ),
-    ("NJ", "Newark City School System"): (
-        1,
-        0,
-        4,
-        "Chalkbeat Newark: four board seats filled at the April 21, 2026 school election, https://www.chalkbeat.org/newark/2026/03/17/voters-choose-between-nine-candidates-four-seats-board-of-education-election-april/",
-    ),
-    ("PA", "Crawford County"): (
-        4,
-        3,
-        11,
-        "Crawford County commissioners (three seats, four-year terms) were elected November 7, 2023; County Commissioners Association of Pennsylvania, https://ccapweb.pacounties.org/getattachment/11a99fb1-af07-42d4-8b1f-16967730f5aa/Commissioner-Elections-2023G-FINAL.pdf",
-    ),
-    ("ME", "Biddeford"): (
-        2,
-        1,
-        11,
-        "Biddeford mayor and council elected in November of odd years; mayor LaFountain elected November 4, 2025, term to December 31, 2027, https://spectrumlocalnews.com/me/maine/politics/2025/11/05/biddeford-chooses-new-mayor--passes-bonds-for-sewer-and-recreation-projects",
-    ),
-    ("NJ", "Edison"): (
-        4,
-        1,
-        11,
-        "Edison mayor and township council elected together in November of odd years on four-year terms, most recently November 4, 2025, https://www.aol.com/articles/heres-where-edison-mayor-township-131513200.html",
-    ),
-    ("NJ", "Woodbridge"): (
-        4,
-        3,
-        11,
-        "Woodbridge mayor elected to a four-year term November 7, 2023; at-large council seat runs to December 31, 2027, https://www.ballotready.org/people/kyle-anderson",
-    ),
-    ("NJ", "Old Bridge Township"): (
-        2,
-        1,
-        11,
-        "Old Bridge mayor elected for four years November 7, 2023 (https://newbrunswicktoday.com/2023/11/a-dozen-mayor-elections-in-county-but-almost-half-are-uncontested/); ward council seats elected in the offset odd years, https://newjerseyglobe.com/local/merwin-to-face-henry-in-old-bridge/",
-    ),
-    ("MA", "Berkshire County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 2000; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Essex County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Franklin County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1997; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Hampden County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 2000; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Hampshire County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Middlesex County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1997; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Suffolk County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-    ("MA", "Worcester County"): (
-        6,
-        4,
-        11,
-        "Massachusetts abolished county government in 1998; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
-    ),
-}
-CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
-    ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
-    ("AK", "municipality"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
-    ("AK", "school"): (
-        1,
-        0,
-        "Alaska Division of Elections, REAA elections: held every year on the first Tuesday in October, https://www.elections.alaska.gov/reaa/",
-    ),
-    ("AL", "county"): (2, 0, None),
-    ("AL", "municipality"): (
-        4,
-        0,
-        "Alabama Code § 11-46-21(a) (2000 to 2020; from 2025 the cycle is 2025, 2029), https://law.justia.com/codes/alabama/title-11/title-2/chapter-46/article-2/section-11-46-21/",
-    ),
-    ("AL", "school"): (2, 0, None),
-    ("AR", "county"): (
-        2,
-        0,
-        "Ark. Code Ann. § 7-5-102, https://law.justia.com/codes/arkansas/title-7/chapter-5/subchapter-1/section-7-5-102/",
-    ),
-    ("AR", "municipality"): (
-        2,
-        0,
-        "Ark. Code Ann. §§ 14-44-103, 14-44-105, 14-44-115; § 14-43-201, https://www.armunileague.org/wp-content/uploads/2024/07/Municipal-Law-in-Arkansas-FAQ_2021_11_WEB.pdf",
-    ),
-    ("AR", "school"): (
-        1,
-        0,
-        "Ark. Code Ann. § 6-14-102(a)(1)(A) (as amended by Act 503 of 2025), https://law.justia.com/codes/arkansas/2017/title-6/subtitle-2/chapter-14/section-6-14-102-d-1/",
-    ),
-    ("AZ", "county"): (
-        4,
-        0,
-        "Ariz. Rev. Stat. § 11-211(A); Ariz. Const. art. 12, § 3, https://www.azleg.gov/ars/11/00211.htm",
-    ),
-    ("AZ", "school"): (
-        2,
-        0,
-        "Ariz. Rev. Stat. § 15-424(A); Ariz. Const. art. 7, § 11, https://www.azleg.gov/ars/15/00424.htm",
-    ),
-    ("CA", "county"): (
-        2,
-        0,
-        "Cal. Gov. Code § 24200; Cal. Elec. Code § 1300, https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=GOV&division=2.&title=3.&part=1.&chapter=5.&article=",
-    ),
-    ("CA", "municipality"): (
-        2,
-        0,
-        "Cal. Elec. Code §§ 1000, 1301, https://california.public.law/codes/elections_code_section_1301",
-    ),
-    ("CA", "school"): (
-        2,
-        0,
-        "Cal. Elec. Code § 1302(a), (b), https://codes.findlaw.com/ca/elections-code/elec-sect-1302/",
-    ),
-    ("CA", "special"): (
-        2,
-        0,
-        "Cal. Elec. Code § 1303(a), (b), https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?article=&chapter=4.&division=1.&lawCode=ELEC&part=&title=",
-    ),
-    ("CO", "county"): (
-        2,
-        0,
-        "Colo. Rev. Stat. § 1-1-104(17), https://content.leg.colorado.gov/sites/default/files/r26-925-special-district-information-and-elections-accessible.pdf",
-    ),
-    ("CO", "school"): (2, 1, "Colo. Rev. Stat. § 22-31-104(1), https://colorado.public.law/statutes/crs_22-31-104"),
-    ("CO", "special"): (
-        2,
-        1,
-        "Colo. Rev. Stat. § 1-13.5-111(1), https://colorado.public.law/statutes/crs%5F1-13.5-111",
-    ),
-    ("CT", "municipality"): (
-        2,
-        1,
-        "Conn. Gen. Stat. § 9-164(a)(1)(A), https://www.cga.ct.gov/current/pub/chap_146.htm",
-    ),
-    ("CT", "school"): (
-        2,
-        1,
-        "Conn. Gen. Stat. §§ 10-46(a), (b); 9-164, https://www.cga.ct.gov/2005/rpt/2005-R-0097.htm",
-    ),
-    ("CT", "township"): (2, 1, "Conn. Gen. Stat. § 9-164(a)(1)(A), https://www.cga.ct.gov/current/pub/chap_146.htm"),
-    ("DE", "municipality"): (1, 0, None),
-    ("DE", "school"): (1, 0, "Del. Code tit. 14, § 1072, https://delcode.delaware.gov/title14/c010/sc04/"),
-    ("FL", "county"): (2, 0, "Fla. Stat. § 100.041(2)(a), https://flsenate.gov/Laws/Statutes/2026/100.041"),
-    ("FL", "school"): (
-        2,
-        0,
-        "Fla. Stat. §§ 100.041(3)(a), (b); 100.031, https://flsenate.gov/Laws/Statutes/2026/100.041",
-    ),
-    ("FL", "special"): (
-        2,
-        0,
-        "Fla. Stat. § 100.031; § 189.04, https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&Search_String=&URL=0100-0199%2F0100%2FSections%2F0100.031.html",
-    ),
-    ("GA", "county"): (2, 0, None),
-    ("GA", "municipality"): (2, 1, "Ga. Code Ann. § 21-2-9(c), (d), https://georgiacommons.org/code/21-2-9"),
-    ("GA", "school"): (
-        2,
-        0,
-        "Ga. Code Ann. § 21-2-139 (nonpartisan school board elections at the May general primary unless local law says otherwise), https://law.justia.com/codes/georgia/title-21/chapter-2/article-4/section-21-2-139/",
-        5,
-    ),
-    ("HI", "county"): (
-        2,
-        0,
-        "Hawaii Office of Elections, primary and general elections (HRS ch. 11), https://elections.hawaii.gov/elections-in-hawaii/",
-    ),
-    ("IA", "county"): (2, 0, "Iowa Code §§ 39.1, 39.18, https://www.legis.iowa.gov/docs/code/39.pdf"),
-    ("IA", "municipality"): (2, 1, "Iowa Code § 376.1(1), https://www.legis.iowa.gov/docs/code/376.pdf"),
-    ("IA", "school"): (2, 1, "Iowa Code § 277.1, https://www.legis.iowa.gov/docs/code/277.1.pdf"),
-    ("ID", "county"): (
-        2,
-        0,
-        "Idaho Secretary of State, general elections; Idaho Code title 31 (county commissioners, not read), https://voteidaho.gov/election-information/",
-    ),
-    ("ID", "municipality"): (
-        2,
-        1,
-        "Idaho Code § 50-405(1), https://legislature.idaho.gov/statutesrules/idstat/title50/t50ch4/sect50-405/",
-    ),
-    ("ID", "school"): (
-        2,
-        1,
-        "Idaho Code § 33-503(1), https://legislature.idaho.gov/statutesrules/idstat/title33/t33ch5/sect33-503/",
-    ),
-    ("IL", "county"): (
-        2,
-        0,
-        "10 ILCS 5/2A-1.2(a)(5), https://ilga.gov/documents/legislation/ilcs/documents/001000050K2A-1.2.htm",
-    ),
-    ("IL", "municipality"): (
-        2,
-        1,
-        "10 ILCS 5/2A-1.1(b); 10 ILCS 5/2A-1.2(c)(1), https://www.ilga.gov/documents/legislation/ilcs/documents/001000050K2A-1.1.htm",
-    ),
-    ("IL", "school"): (
-        2,
-        1,
-        "10 ILCS 5/2A-1.1(b); 10 ILCS 5/2A-1.2, https://elections.il.gov/agencyforms/1%20ELECTION%20CALENDAR/2025%20Election%20Calendar%20Issued%2007292024.pdf",
-    ),
-    ("IL", "special"): (2, 1, None),
-    ("IL", "township"): (4, 1, None),
-    ("IN", "county"): (
-        2,
-        0,
-        "Ind. Code § 3-10 (general election, even years); county officers per Indiana Election Division 2026 calendar, https://www.in.gov/sos/elections/files/2026-Election-Calendar-Election-Administrators-Edition-Revised-March-2026.pdf",
-    ),
-    ("IN", "municipality"): (
-        4,
-        3,
-        "Ind. Code § 3-10-6-5, https://law.justia.com/codes/indiana/title-3/article-10/chapter-6/section-3-10-6-5/",
-    ),
-    ("IN", "school"): (
-        2,
-        0,
-        "Ind. Code § 20-23-4-29.1(b), https://law.justia.com/codes/indiana/title-20/article-23/chapter-4/section-20-23-4-29-1/",
-    ),
-    ("IN", "township"): (
-        4,
-        2,
-        "Ind. Code §§ 3-10-2-13, 36-6-4-2, 36-6-6-2, https://www.in.gov/sboa/files/Township-Manual-Chapter-2.pdf",
-    ),
-    ("KS", "county"): (
-        2,
-        0,
-        "Kan. Stat. Ann. §§ 19-202(c), (d); 19-204 (general elections in November of even-numbered years), https://ksrevisor.gov/statutes/chapters/ch19/019_002_0002.html",
-    ),
-    ("KS", "municipality"): (
-        2,
-        1,
-        "Kan. Stat. Ann. § 25-21a01(a), (h), https://kslegislature.gov/b2025_26/laws/025_000_0000_chapter/025_021a_0000_article/025_021a_0001_section/025_021a_0001_k",
-    ),
-    ("KS", "school"): (
-        2,
-        1,
-        "Kan. Stat. Ann. § 25-2010, https://www.ksrevisor.gov/statutes/chapters/ch25/025_020_0010.html",
-    ),
-    ("KS", "township"): (
-        2,
-        0,
-        "Kan. Stat. Ann. § 25-1601, https://www.ksrevisor.gov/statutes/chapters/ch25/025_016_0001.html",
-    ),
-    ("KY", "county"): (
-        4,
-        2,
-        "Ky. Const. § 99; KRS 67.700; 2026 State Board of Elections calendar, https://legislature.ky.gov/LRC/Publications/Informational%20Bulletins/ib115.pdf",
-    ),
-    ("KY", "municipality"): (
-        2,
-        0,
-        "Ky. Const. § 167, https://apps.legislature.ky.gov/Law/Constitution/Constitution/ViewConstitution?rsn=193",
-    ),
-    ("KY", "school"): (
-        2,
-        0,
-        "Ky. Rev. Stat. § 160.200(1), (2), https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=56916",
-    ),
-    ("LA", "county"): (4, 3, "La. Rev. Stat. § 33:1221(A), https://legis.la.gov/legis/Law.aspx?d=88684"),
-    ("LA", "municipality"): (
-        4,
-        1,
-        "La. Rev. Stat. § 33:383(A)(1); § 18:402(D)(1), https://www.legis.la.gov/Legis/Law.aspx?d=90382",
-    ),
-    ("LA", "school"): (4, 2, "La. Rev. Stat. § 17:52(A)(1), (A)(2), https://legis.la.gov/legis/Law.aspx?d=81132"),
-    ("MA", "municipality"): (
-        2,
-        1,
-        "Mass. Gen. Laws ch. 43, §§ 15(a)-(c), 109, https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter43/Section109",
-    ),
-    ("MA", "school"): (
-        1,
-        0,
-        "Mass. Gen. Laws ch. 41, § 1, https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter41/Section1",
-    ),
-    ("MA", "special"): (1, 0, None),
-    ("MA", "township"): (
-        1,
-        0,
-        "Mass. Gen. Laws ch. 41, § 1, https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter41/section1",
-    ),
-    ("MD", "county"): (
-        2,
-        0,
-        "Md. Code, Elec. Law § 8-301 (general elections), https://msa.maryland.gov/msa/mdmanual/41electp/html/forth.html",
-    ),
-    ("MD", "school"): (
-        2,
-        0,
-        "Md. Code, Elec. Law § 8-301 (general elections), https://msa.maryland.gov/msa/mdmanual/41electp/html/forth.html",
-    ),
-    ("ME", "municipality"): (
-        1,
-        0,
-        "30-A M.R.S. § 2525 (Annual meeting), https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html",
-    ),
-    ("ME", "school"): (
-        1,
-        0,
-        "30-A M.R.S. § 2525(1)(C); 20-A M.R.S. § 1653, https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html",
-    ),
-    ("ME", "special"): (1, 0, None),
-    ("ME", "township"): (
-        1,
-        0,
-        "30-A M.R.S. § 2525 (Annual meeting), https://legislature.maine.gov/statutes/30-a/title30-Asec2525.html",
-    ),
-    ("MI", "county"): (
-        2,
-        0,
-        "Mich. Const. art. II, § 5, https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-Article-II-5",
-    ),
-    ("MI", "municipality"): (2, 1, "MCL 168.642(1)(a), https://www.legislature.mi.gov/Laws/MCL?objectName=MCL-168-642"),
-    ("MI", "school"): (2, 0, None),
-    ("MI", "township"): (4, 0, None),
-    ("MN", "county"): (
-        2,
-        0,
-        "Minn. Stat. § 204D.03 and § 204B.09 (state general election); SOS county guide, https://www.sos.mn.gov/media/4251/county-election-administration-guide.pdf",
-    ),
-    ("MN", "municipality"): (
-        2,
-        0,
-        "Minn. Stat. § 205.07, subd. 1, https://www.revisor.mn.gov/statutes/2025/cite/205.07",
-    ),
-    ("MN", "school"): (2, 0, "Minn. Stat. § 205A.04, subd. 1, https://www.revisor.mn.gov/statutes/cite/205A.04"),
-    ("MN", "township"): (
-        1,
-        0,
-        "Minn. Stat. § 205.075, subd. 1 (second Tuesday in March); § 365.51, subd. 3, https://www.revisor.mn.gov/statutes/cite/205.075",
-        3,
-    ),
-    ("MO", "county"): (2, 0, "RSMo § 115.121.1, https://revisor.mo.gov/main/OneSection.aspx?section=115.121"),
-    ("MO", "municipality"): (1, 0, "RSMo § 115.121.3, https://revisor.mo.gov/main/OneSection.aspx?section=115.121"),
-    ("MO", "school"): (1, 0, "RSMo § 115.121.3, https://revisor.mo.gov/main/OneSection.aspx?section=115.121"),
-    ("MS", "county"): (
-        4,
-        3,
-        "Miss. Code Ann. § 23-15-213(2) (county election commissioners); Miss. Const. § 102 and Code §§ 19-3-1, 23-15-193 (supervisors), https://law.justia.com/codes/mississippi/title-23/chapter-15/article-7/section-23-15-213/",
-    ),
-    ("MS", "municipality"): (
-        4,
-        1,
-        "Miss. Code Ann. § 23-15-173(1), https://www.sos.ms.gov/content/documents/Elections/2021/2021%20Municipal%20Elections%20Overview%20(Full%20Page).pdf",
-    ),
-    ("MT", "county"): (
-        2,
-        0,
-        "Mont. Code Ann. § 13-1-104(2), https://mca.legmt.gov/bills/MCA/title_0130/chapter_0010/part_0010/section_0040/0130-0010-0010-0040.html",
-    ),
-    ("MT", "municipality"): (
-        2,
-        1,
-        "Mont. Code Ann. § 13-1-104(3), https://mca.legmt.gov/bills/mca/title_0130/chapter_0010/part_0010/section_0040/0130-0010-0010-0040.html",
-    ),
-    ("MT", "school"): (
-        1,
-        0,
-        "Mont. Code Ann. § 20-20-105(1), https://mca.legmt.gov/bills/2015/mca/20/20/20-20-105.htm",
-    ),
-    ("NC", "county"): (
-        2,
-        0,
-        "N.C. Gen. Stat. § 163-1(c) (statewide general elections, even years); county commissioners per NCpedia, https://www.ncpedia.org/article/board-county-commissioners",
-    ),
-    ("NC", "municipality"): (
-        2,
-        1,
-        "N.C. Gen. Stat. § 163-279(a), https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_163/GS_163-279.html",
-    ),
-    ("NC", "school"): (
-        2,
-        0,
-        "N.C. Gen. Stat. § 115C-37(a), https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_115C/GS_115C-37.html",
-    ),
-    ("CA", "Soil and water conservation"): (
-        2,
-        0,
-        "Cal. Pub. Res. Code § 9314, https://www.conservation.ca.gov/dlrp/RCD/Documents/DIVISION%209.pdf",
-    ),
-    ("FL", "Soil and water conservation"): (
-        2,
-        0,
-        "Fla. Stat. § 582.18, https://www.flsenate.gov/Laws/Statutes/2025/582.18",
-    ),
-    ("IA", "Soil and water conservation"): (
-        2,
-        0,
-        "Iowa Code § 161A.5, https://www.legis.iowa.gov/docs/code/2026/161A.5.pdf",
-    ),
-    ("ID", "Soil and water conservation"): (
-        2,
-        0,
-        "Idaho Code § 22-2721, https://swc.idaho.gov/wp-content/uploads/2025/01/ELECTION-GUIDANCE-DOC.pdf",
-    ),
-    ("KY", "Soil and water conservation"): (
-        2,
-        0,
-        "KRS 262.210, https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=12731",
-    ),
-    ("MN", "Soil and water conservation"): (
-        2,
-        0,
-        "Minn. Stat. § 103C.305, https://www.revisor.mn.gov/statutes/cite/103C.305",
-    ),
-    ("MT", "Soil and water conservation"): (
-        2,
-        0,
-        "MCA § 76-15-305, https://leg.mt.gov/bills/mca/title_0760/chapter_0150/part_0030/section_0050/0760-0150-0030-0050.html",
-    ),
-    ("ND", "Soil and water conservation"): (2, 0, "N.D.C.C. § 4.1-20-18, https://ndlegis.gov/cencode/t04-1c20.pdf"),
-    ("NE", "Soil and water conservation"): (
-        2,
-        0,
-        "Neb. Rev. Stat. § 32-513, https://www.nebraskalegislature.gov/laws/statutes.php?statute=32-513",
-    ),
-    ("NV", "Soil and water conservation"): (2, 0, "NRS 548.285, https://www.leg.state.nv.us/nrs/nrs-548.html"),
-    ("OR", "Soil and water conservation"): (
-        2,
-        0,
-        "ORS 568.560, https://www.oregonlegislature.gov/bills_laws/ors/ors568.html",
-    ),
-    ("SC", "Soil and water conservation"): (
-        2,
-        0,
-        "S.C. Code § 48-9-1220, https://www.scstatehouse.gov/code/t48c009.php",
-    ),
-    ("SD", "Soil and water conservation"): (2, 0, "SDCL 38-8-39, https://sdlegislature.gov/Statutes/38-8-39"),
-    ("VA", "Soil and water conservation"): (
-        4,
-        3,
-        "Va. Code § 10.1-523(D), https://law.lis.virginia.gov/vacode/title10.1/chapter5/section10.1-523/",
-    ),
-    ("WV", "Soil and water conservation"): (2, 0, "W. Va. Code § 19-21A-6, https://code.wvlegislature.gov/19-21A-6/"),
-    ("WY", "Soil and water conservation"): (
-        2,
-        0,
-        "W.S. §§ 11-16-120, 22-2-101(a)(ix), https://wyoleg.gov/statutes/compress/title11.pdf",
-    ),
-    ("NC", "Soil and water conservation"): (
-        2,
-        0,
-        "N.C. Gen. Stat. § 139-6, https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_139/GS_139-6.html",
-    ),
-    ("ND", "county"): (2, 0, None),
-    ("ND", "municipality"): (2, 0, "N.D. Cent. Code § 40-21-02, https://ndlegis.gov/cencode/t40c21.pdf"),
-    ("ND", "school"): (
-        1,
-        0,
-        "N.D. Cent. Code § 15.1-09-22(1), https://codes.findlaw.com/nd/title-15-1-elementary-and-secondary-education/nd-cent-code-sect-15-1-09-22/",
-    ),
-    ("ND", "township"): (1, 0, "N.D. Cent. Code § 58-05-02, https://ndlegis.gov/cencode/t58c05.pdf"),
-    ("NE", "county"): (2, 0, None),
-    ("NE", "municipality"): (2, 0, None),
-    ("NE", "school"): (
-        2,
-        0,
-        "Neb. Rev. Stat. § 32-543(2) (Class I, II, III); § 32-544 (Class IV, city election); § 32-545 (Class V), https://nebraskalegislature.gov/laws/statutes.php?statute=32-543",
-    ),
-    ("NE", "special"): (
-        2,
-        0,
-        "Neb. Rev. Stat. § 32-404(3), https://nebraskalegislature.gov/laws/statutes.php?statute=32-404",
-    ),
-    ("NE", "township"): (2, 0, None),
-    ("NH", "municipality"): (2, 1, None),
-    ("NH", "school"): (1, 0, None),
-    ("NH", "special"): (1, 0, None),
-    ("NH", "township"): (1, 0, "N.H. RSA 669:1, I, https://gc.nh.gov/rsa/html/LXIII/669/669-1.htm"),
-    ("NJ", "county"): (1, 0, None),
-    ("NJ", "municipality"): (
-        1,
-        0,
-        "N.J. Stat. § 40:45-1, https://law.justia.com/codes/new-jersey/title-40/section-40-45-1/",
-    ),
-    ("NJ", "school"): (1, 0, "N.J. Stat. § 19:60-1(a), https://pub.njleg.state.nj.us/Bills/2018/PL18/20_.HTM"),
-    ("NJ", "special"): (1, 0, None),
-    ("NJ", "township"): (
-        1,
-        0,
-        "N.J. Stat. § 40:45-1, https://law.justia.com/codes/new-jersey/title-40/section-40-45-1/",
-    ),
-    ("NM", "county"): (2, 0, None),
-    ("NM", "municipality"): (
-        2,
-        1,
-        "N.M. Stat. § 1-22-3, https://codes.findlaw.com/nm/chapter-1-elections/nm-st-sect-1-22-3/",
-    ),
-    ("NM", "school"): (
-        2,
-        1,
-        "N.M. Stat. § 1-22-3, https://codes.findlaw.com/nm/chapter-1-elections/nm-st-sect-1-22-3/",
-    ),
-    ("NV", "county"): (
-        2,
-        0,
-        "Nev. Rev. Stat. § 293.12755 (general election), https://www.leg.state.nv.us/nrs/nrs-293.html",
-    ),
-    ("NV", "municipality"): (
-        2,
-        0,
-        "Nev. Rev. Stat. §§ 293C.140, 293C.145, https://www.leg.state.nv.us/nrs/NRS-293C.html",
-    ),
-    ("NV", "school"): (2, 0, None),
-    ("NY", "municipality"): (1, 0, None),
-    ("NY", "school"): (
-        1,
-        0,
-        "N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2), https://www.nysenate.gov/legislation/laws/EDN/2002",
-        5,
-    ),
-    ("NY", "special"): (1, 0, None),
-    ("NY", "village"): (
-        1,
-        0,
-        "N.Y. Elec. Law § 15-104(1)(a) (third Tuesday in March, unless a village moves it to June or November), https://www.nysenate.gov/legislation/laws/ELN/15-104",
-        3,
-    ),
-    ("NY", "township"): (
-        2,
-        1,
-        "N.Y. Town Law § 80 (odd years; L. 2023, ch. 741 moves town elections to even years from 2026), https://assembly.state.ny.us/leg/?Text=Y&bn=A8822&default_fld=&leg_video=&term=2023",
-    ),
-    ("OH", "county"): (
-        2,
-        0,
-        "Ohio Rev. Code § 3501.02(C); Ohio Const. art. XVII, § 1, https://codes.ohio.gov/ohio-revised-code/section-3501.02",
-    ),
-    ("OH", "municipality"): (
-        2,
-        1,
-        "Ohio Rev. Code § 3501.02(D); § 3501.01(B), https://codes.ohio.gov/ohio-revised-code/section-3501.02",
-    ),
-    ("OH", "school"): (2, 1, "Ohio Rev. Code § 3501.02(D), https://codes.ohio.gov/ohio-revised-code/section-3501.02"),
-    ("OH", "township"): (2, 1, "Ohio Rev. Code § 3501.02(D), https://codes.ohio.gov/ohio-revised-code/section-3501.02"),
-    ("OK", "county"): (
-        2,
-        0,
-        "Okla. Stat. tit. 19, § 19-131(A)-(C); Okla. Const. art. XVII, http://ok.elaws.us/os/19-131",
-    ),
-    ("OK", "school"): (
-        1,
-        0,
-        "Okla. Stat. tit. 26, § 13A-103(A)(1), https://www.oscn.net/applications/oscn/DeliverDocument.asp?CiteID=78700",
-    ),
-    ("OR", "county"): (
-        2,
-        0,
-        "Or. Rev. Stat. § 254.056(1), https://www.oregonlegislature.gov/bills_laws/ors/ors254.html",
-    ),
-    ("OR", "municipality"): (
-        2,
-        0,
-        "Or. Rev. Stat. § 254.035(2), https://www.oregonlegislature.gov/bills_laws/ors/ors254.html",
-    ),
-    ("OR", "school"): (
-        2,
-        1,
-        "Or. Rev. Stat. § 255.335(1), https://www.oregonlegislature.gov/bills_laws/ors/ors255.html",
-    ),
-    ("OR", "special"): (
-        2,
-        1,
-        "Or. Rev. Stat. § 255.335(1); § 255.345, https://www.oregonlegislature.gov/bills_laws/ors/ors255.html",
-    ),
-    ("PA", "county"): (
-        2,
-        1,
-        "25 P.S. § 2752, https://codes.findlaw.com/pa/title-25-ps-elections-electoral-districts/pa-st-sect-25-2752/",
-    ),
-    ("PA", "municipality"): (
-        2,
-        1,
-        "25 P.S. § 2752, https://codes.findlaw.com/pa/title-25-ps-elections-electoral-districts/pa-st-sect-25-2752/",
-    ),
-    ("PA", "school"): (
-        2,
-        1,
-        "25 P.S. § 2752, https://codes.findlaw.com/pa/title-25-ps-elections-electoral-districts/pa-st-sect-25-2752/",
-    ),
-    ("PA", "township"): (
-        2,
-        1,
-        "25 P.S. § 2752, https://codes.findlaw.com/pa/title-25-ps-elections-electoral-districts/pa-st-sect-25-2752/",
-    ),
-    ("RI", "municipality"): (
-        2,
-        0,
-        "R.I. Gen. Laws § 17-18-5; § 16-2-5, https://webserver.rilegislature.gov/statutes/TITLE17/17-18/17-18-5.htm",
-    ),
-    ("RI", "school"): (
-        2,
-        0,
-        "R.I. Gen. Laws § 16-2-5; § 17-18-5, https://webserver.rilegislature.gov/Statutes/TITLE16/16-2/16-2-5.htm",
-    ),
-    ("RI", "township"): (
-        2,
-        0,
-        "R.I. Gen. Laws § 17-18-5, https://webserver.rilegislature.gov/statutes/TITLE17/17-18/17-18-5.htm",
-    ),
-    ("SC", "county"): (
-        2,
-        0,
-        "S.C. Code § 7-13-10; § 7-13-20, https://www.scstatehouse.gov/Archives/CodeofLaws2018/t07c013.php",
-    ),
-    ("SC", "school"): (
-        2,
-        0,
-        "S.C. Code § 7-13-15(B)(2)(c); § 7-13-10, https://www.scstatehouse.gov/Archives/CodeofLaws2018/t07c013.php",
-    ),
-    ("SD", "county"): (2, 0, "S.D. Codified Laws § 7-8-1, https://sdlegislature.gov/Statutes/7-8"),
-    ("SD", "municipality"): (1, 0, "S.D. Codified Laws §§ 9-13-1, 9-13-1.3, https://sdlegislature.gov/Statutes/9-13"),
-    ("SD", "school"): (1, 0, "S.D. Codified Laws § 13-7-10, https://sdlegislature.gov/Statutes/13-7"),
-    ("SD", "township"): (1, 0, "S.D. Codified Laws § 8-3-12; ch. 8-3, https://sdlegislature.gov/Statutes/8-3-12"),
-    ("TN", "county"): (2, 0, "T.C.A. § 2-3-202, https://www.ctas.tennessee.edu/eli/dates-regular-elections"),
-    ("TN", "school"): (
-        2,
-        0,
-        "T.C.A. § 49-2-201(a)(1), (d); § 2-3-202, https://law.justia.com/codes/tennessee/title-49/chapter-2/part-2/section-49-2-201/",
-    ),
-    ("TX", "county"): (2, 0, "Tex. Elec. Code § 41.002, https://statutes.capitol.texas.gov/Docs/EL/htm/EL.41.htm"),
-    ("TX", "municipality"): (1, 0, None),
-    ("TX", "special"): (
-        2,
-        0,
-        "Tex. Elec. Code § 41.001(a)(2)–(3); § 41.0052, https://www.sos.texas.gov/elections/laws/changing-election-dates-local-political-subdivisions.shtml",
-    ),
-    ("UT", "county"): (
-        2,
-        0,
-        "Utah Code § 20A-1-201(1), (2)(a)(vi), https://le.utah.gov/xcode/Title20A/Chapter1/20A-1-S201.html?v=C20A-1-S201_2023022720230227",
-    ),
-    ("UT", "municipality"): (
-        2,
-        1,
-        "Utah Code § 20A-1-202(1), https://le.utah.gov/xcode/Title20A/Chapter1/C20A-1-S202_2024050220240621.pdf",
-    ),
-    ("UT", "school"): (
-        2,
-        0,
-        "Utah Code § 20A-1-201(2)(a)(vii)–(viii); § 20A-14-202, https://le.utah.gov/xcode/Title20A/Chapter1/20A-1-S201.html?v=C20A-1-S201_2023022720230227",
-    ),
-    ("VA", "county"): (
-        4,
-        3,
-        "Va. Code § 24.2-218, https://law.lis.virginia.gov/vacodefull/title24.2/chapter2/article5/",
-    ),
-    ("VA", "municipality"): (2, 0, None),
-    ("VA", "school"): (
-        2,
-        1,
-        "Va. Code § 24.2-223, https://law.lis.virginia.gov/vacodefull/title24.2/chapter2/article5/",
-    ),
-    ("VT", "municipality"): (
-        1,
-        0,
-        "17 V.S.A. § 2640(a), https://legislature.vermont.gov/statutes/section/17/055/02640",
-    ),
-    ("VT", "school"): (1, 0, "16 V.S.A. § 423(a), https://legislature.vermont.gov/statutes/fullchapter/16/009"),
-    ("VT", "special"): (1, 0, None),
-    ("VT", "township"): (1, 0, "17 V.S.A. § 2640(a), https://legislature.vermont.gov/statutes/section/17/055/02640"),
-    ("WA", "county"): (
-        2,
-        0,
-        "RCW 29A.04.321(1); RCW 36.16.010, https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330",
-    ),
-    ("WA", "municipality"): (2, 1, "RCW 29A.04.330(1), https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330"),
-    ("WA", "school"): (2, 1, "RCW 29A.04.330(1), https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330"),
-    ("WA", "special"): (2, 1, "RCW 29A.04.330(1)(b), https://app.leg.wa.gov/rcw/default.aspx?cite=29a.04.330"),
-    ("WI", "county"): (
-        2,
-        0,
-        "Wis. Stat. § 59.10(3)(d), https://docs.legis.wisconsin.gov/scroll/up/274/statutes/statutes/59",
-    ),
-    ("WI", "municipality"): (1, 0, None),
-    ("WI", "school"): (
-        1,
-        0,
-        "Wis. Stat. § 120.06(3), (7)(b), https://docs.legis.wisconsin.gov/statutes/statutes/120/i/06/9",
-    ),
-    ("WI", "township"): (
-        2,
-        1,
-        "Wis. Stat. § 60.30(1)(a), (4)(a), https://law.justia.com/codes/wisconsin/chapter-60/section-60-30/",
-    ),
-    ("WV", "county"): (2, 0, "W. Va. Code § 3-1-31(a), https://code.wvlegislature.gov/pdf/3-1-31/"),
-    ("WV", "school"): (2, 0, "W. Va. Code § 18-5-1b, https://code.wvlegislature.gov/18-5-1b/"),
-    ("WY", "county"): (
-        2,
-        0,
-        "Wyo. Stat. §§ 22-2-104(a), 22-2-105(a)(ii), https://wyoleg.gov/statutes/compress/title22.pdf",
-    ),
-    ("WY", "municipality"): (2, 0, None),
-    ("WY", "school"): (2, 0, "Wyo. Stat. § 22-2-104(e), https://wyoleg.gov/statutes/compress/title22.pdf"),
 }
 ACRONYMS = {"MUD", "ISD", "CISD", "PUD", "USD", "CSD", "WCID", "GCD", "CDD", "SID", "MSD", "UD", "LID", "FWSD"}
 ABBREVIATIONS = {
@@ -1209,17 +367,111 @@ def request() -> None:
 
 
 WORKERS = 8
-OFF_NOVEMBER = ("other_date", "appointed", "landowner")
+CADENCE = "pipelines/ea/sources/us/election_cadence.tsv"
+CADENCE_SQL = """
+select s.iso_code, e.government_kind, e.function, e.name_pattern, e.polity_id::text, e.selection::text,
+       e.period_years, e.phase, e.month, e.day_rule, extract(year from e.valid_from)::int
+from election_cadence e join polity s on s.id = e.polity_id
+"""
+CADENCE_STAMP_SQL = "select count(*), max(changeset_id::text) from election_cadence"
 
 
-@functools.cache
-def district_rules() -> list[tuple[str, str, re.Pattern[str], str]]:
-    with (ROOT / "pipelines/ea/coverage_inputs/special-district-elections.tsv").open(newline="") as f:
-        lines = (line for line in f if not line.startswith("#"))
-        return [
-            (row["state"], row["function"], re.compile(row["name_pattern"] or ".", re.IGNORECASE), row["group"])
-            for row in csv.DictReader(lines, delimiter="\t")
-        ]
+class Rule(NamedTuple):
+    state: str
+    kind: str | None
+    function: str | None
+    pattern: re.Pattern[str] | None
+    government: str | None
+    selection: str
+    period: int | None
+    phase: int | None
+    month: int | None
+    day_rule: str | None
+    since: int | None
+    cited: bool
+
+
+def cadence_rules(conn: psycopg.Connection) -> tuple[dict[str, list[Rule]], dict[object, Rule]]:
+    rules = [
+        Rule(
+            "" if kind is None else (iso or "").removeprefix("US-"),
+            kind,
+            function,
+            None if pattern is None else re.compile(pattern, re.IGNORECASE),
+            polity if kind is None else None,
+            selection,
+            period,
+            phase,
+            month,
+            day_rule,
+            since,
+            True,
+        )
+        for iso, kind, function, pattern, polity, selection, period, phase, month, day_rule, since in conn.execute(
+            CADENCE_SQL
+        )
+    ]
+    with (ROOT / CADENCE).open(newline="") as f:
+        for row in csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"):
+            cited = bool(row["locator"] and row["url"])
+            if cited and not row["government"]:
+                continue
+            rules.append(
+                Rule(
+                    row["state"],
+                    row["government_kind"] or None,
+                    row["function"] or None,
+                    re.compile(row["name_pattern"], re.IGNORECASE) if row["name_pattern"] else None,
+                    row["government"] or None,
+                    row["selection"],
+                    int(row["period_years"]) if row["period_years"] else None,
+                    int(row["phase"]) if row["phase"] else None,
+                    int(row["month"]) if row["month"] else None,
+                    row["day_rule"] or None,
+                    int(row["valid_from"][:4]) if row["valid_from"] else None,
+                    cited,
+                )
+            )
+    classes: dict[str, list[Rule]] = defaultdict(list)
+    own: dict[object, Rule] = {}
+    for r in rules:
+        if r.kind is not None:
+            classes[r.state].append(r)
+        elif r.state:
+            own.setdefault((r.state, r.government), r)
+        else:
+            own.setdefault(r.government, r)
+    return classes, own
+
+
+def cadence(
+    rules: tuple[dict[str, list[Rule]], dict[object, Rule]], g: dict, census: str
+) -> tuple[Rule | None, Rule | None, Rule | None, Rule | None]:
+    classes, own = rules
+    kinds = (g["kind"], "school") if g["kind"] == "college" else (g["kind"],)
+    function = None if g["function"] is None else g["function"].lower()
+    matching = [
+        r
+        for r in classes.get(g["state"], [])
+        if r.kind in kinds and r.function in (None, function) and (r.pattern is None or r.pattern.search(census))
+    ]
+
+    def rank(r: Rule) -> tuple[bool, bool, bool]:
+        return (r.pattern is not None, r.function is not None, r.kind == g["kind"])
+
+    timed = [r for r in matching if r.period is not None]
+    best = max(timed, key=rank, default=None)
+    era = sorted(
+        (r for r in timed if best is not None and r[1:4] == best[1:4]),
+        key=lambda r: r.since or 0,
+    )
+    chosen = max((r for r in matching if r.kind == "special"), key=rank, default=None)
+    return (
+        era[0] if era else None,
+        era[1] if len(era) > 1 else None,
+        own.get(g["polity_id"]) or own.get((g["state"], g["name"])),
+        chosen,
+    )
 
 
 @functools.cache
@@ -1227,14 +479,6 @@ def government_links() -> list[tuple[str, str, str]]:
     with (ROOT / "pipelines/ea/coverage_inputs/government-links.tsv").open(newline="") as f:
         lines = (line for line in f if not line.startswith("#"))
         return [(row["government"], row["county"], row["polity"]) for row in csv.DictReader(lines, delimiter="\t")]
-
-
-def off_november(state: str, function: str | None, name: str) -> bool:
-    kind = "" if function is None else function.split(" - ", 1)[-1].lower()
-    for st, fn, pattern, group in district_rules():
-        if st == state and fn in ("", kind) and pattern.search(name):
-            return group in OFF_NOVEMBER
-    return False
 
 
 STATE_INPUTS = (
@@ -1246,7 +490,6 @@ STATE_INPUTS = (
     "pipelines/ea/sources/us/ncsl_measures.csv",
     "pipelines/ea/coverage_inputs/finest-reported.csv",
     "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
-    "pipelines/ea/coverage_inputs/special-district-elections.tsv",
     "pipelines/ea/coverage_inputs/government-links.tsv",
 )
 COUNTRY_INPUTS = (
@@ -1508,7 +751,7 @@ def build(full: bool = False) -> str:
     countries_code = digest(COUNTRY_INPUTS)
     cog_files = sorted(raw.parsed("us.cog").glob("*.parquet"))
     local_code = (
-        digest(("pipelines/ea/coverage_tables.py",))
+        digest(("pipelines/ea/coverage_tables.py", CADENCE))
         + ":"
         + ":".join(f"{f.name}{f.stat().st_mtime_ns}" for f in cog_files)
     )
@@ -1552,7 +795,7 @@ def build(full: bool = False) -> str:
             )
             extra = "" if cc == "us" else digest((f"pipelines/ea/denominators/{cc}.json",))
             wanted[("country", cc)] = f"{countries_code}:{extra}:{today}:{','.join(zones)}"
-        wanted[("local", "")] = f"{local_code}:{today}"
+        wanted[("local", "")] = f"{local_code}:{next(iter(conn.execute(CADENCE_STAMP_SQL)))}:{today}"
         clock = time.monotonic()
         moved: dict[tuple[str, str], datetime] = {}
         since = min((built for (stage, _), (_, built, _) in parts.items() if stage != "cache"), default=None)
@@ -1653,6 +896,7 @@ def build(full: bool = False) -> str:
                 for year, values in years.items():
                     held[polity][int(year)] = values
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
+        rules = cadence_rules(conn)
         timings["load"] = time.monotonic() - clock
         clock = time.monotonic()
 
@@ -1903,14 +1147,13 @@ def build(full: bool = False) -> str:
                     for i, w in enumerate(words)
                 ),
                 "function": None if function is None else function.split(" - ", 1)[-1].capitalize(),
-                "village": match is not None and match[1] == "VILLAGE",
+                "census": name,
                 "population": population,
                 "population_basis": population_basis,
                 "active": active,
                 # NJ county vocational boards are appointed by the county executive or commissioners (N.J.S.A. 18A:54-16, https://pub.njleg.state.nj.us/statutes), not elected.
                 "elected": elected
-                and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name))
-                and not (kind == "special" and off_november(states[st][0], function, name)),
+                and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
                 "polity_id": pid,
                 "held_key": held_key,
             }
@@ -1934,7 +1177,7 @@ def build(full: bool = False) -> str:
                 ),
                 "name": name,
                 "function": None,
-                "village": False,
+                "census": "",
                 "population": None,
                 "population_basis": None,
                 "active": True,
@@ -1986,50 +1229,59 @@ def build(full: bool = False) -> str:
     ahead: dict[tuple[str, int], bool] = {}
     for g in governments:
         group = (g["state"], g["kind"])
-        calendar = CALENDAR.get(
-            (g["state"], g["function"] or ""),
-            CALENDAR.get(group, CALENDAR.get((g["state"], "school")))
-            if g["kind"] == "college"
-            else CALENDAR.get((g["state"], "village") if g["village"] else group, CALENDAR.get(group)),
-        )
+        calendar, switch, own, chosen = cadence(rules, g, g["census"])
+        if (
+            g["kind"] == "special"
+            and g["census"]
+            and chosen is not None
+            and (chosen.selection in ("appointed", "landowner") or chosen.day_rule == "off_november")
+        ):
+            g["elected"] = False
         if g["period"] is None:
-            period, phase, cite = calendar[:3] if calendar is not None else (None, None, None)
+            period, phase = (None, None) if calendar is None else (calendar.period, calendar.phase)
             common = [p for p, _ in patterns[group].most_common() if period is None or p[0] == period]
             if g["phase"] is not None:
                 if period is None:
                     counted = Counter(p for p, _ in patterns[group].elements()).most_common(1)
                     period = counted[0][0] if counted else 2
                 g["period"], g["phase"] = period, g["phase"] % period
-            elif period is not None:
+            elif calendar is not None and period is not None:
                 g["period"], g["phase"] = period, phase
-                g["basis"] = "state calendar" if cite else "estimated state calendar"
+                g["basis"] = "state calendar" if calendar.cited else "estimated state calendar"
             elif common:
                 g["period"], g["phase"] = common[0]
             else:
                 g["period"], g["phase"], g["basis"] = 2, 0, "unknown"
         if (
             calendar is not None
-            and calendar[0] == 2
-            and calendar[2]
+            and calendar.period == 2
+            and calendar.cited
             and g["period"] == 1
             and g["era"] is None
             and g["basis"].startswith("own")
         ):
-            g["period"], g["phase"] = calendar[:2]
+            g["period"], g["phase"] = calendar.period, calendar.phase
             g["basis"] = "state calendar, own history conflicted"
-        if g["month"] is None and calendar is not None and len(calendar) == 4:
-            g["month"] = calendar[3]
+        primary = calendar is not None and calendar.day_rule == "with_state_primary"
+        if g["month"] is None and calendar is not None and calendar.month is not None and not primary:
+            g["month"] = calendar.month
         elif g["month"] is None and months[group]:
             g["month"] = months[group].most_common(1)[0][0]
-        if group in SWITCHED and (g["period"], g["phase"]) != SWITCHED[group][1]:
-            g["era"] = (SWITCHED[group][0] - 1, SWITCHED[group][0], (g["period"], g["phase"]))
-            g["period"], g["phase"] = SWITCHED[group][1]
+        if (
+            switch is not None
+            and switch.since is not None
+            and switch.period is not None
+            and (g["period"], g["phase"]) != (switch.period, switch.phase)
+        ):
+            g["era"] = (switch.since - 1, switch.since, (g["period"], g["phase"]))
+            g["period"], g["phase"] = switch.period, switch.phase
             g["basis"] = "state calendar, changed"
-        if (g["state"], g["name"]) in DISTRICT_CALENDAR:
-            g["period"], g["phase"], g["month"], _ = DISTRICT_CALENDAR[(g["state"], g["name"])]
+        if own is not None and own.period is not None:
+            g["period"], g["phase"], g["month"] = own.period, own.phase, own.month
             g["era"] = None
             g["basis"] = "district calendar"
-        g["month"] = HELD_IN.get(group, g["month"])
+        if primary and calendar is not None and calendar.kind == g["kind"]:
+            g["month"] = calendar.month
         years = held.get(g.get("held_key") or g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
             era = g["era"]
