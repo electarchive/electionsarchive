@@ -10,7 +10,7 @@ from ea.sources.us.enr_clarity_twins import LIVE, _person
 from ea.store import connect
 
 SOURCE = "us.special_district_merge"
-VERSION = "12"
+VERSION = "13"
 GENERIC = re.compile(
     r"\b(?:no|number|ward|wd|district|dist|subdistrict|subdivision|protection|fire|water|sewer|sewerage|drainage|drain|"
     r"gravity|grav|road|rd|lighting|light|recreation|recreational|hospital|hosp|service|services|ser|serv|svc|area|"
@@ -27,6 +27,8 @@ ALIASES = {
     ("48", "trophyclubmunicipalutilitydistrict"): "trophyclubmunicipalutilitydistrict1",
     ("48", "ftbendwatercontrolandimprovementdistrict2"): "fortbendwatercontrolandimprovementdistrict2",
     ("48", "bastoptraviscoemergencyservicesdistrict1"): "bastroptravisemergencyservicesdistrict1",
+    ("48", "bastropemergencyservicesdistrict3"): "bastropcountyemergencyservicesdistrict3",
+    ("48", "smithvilleemergencyservicesdistrict3"): "bastropcountyemergencyservicesdistrict3",
     ("06", "sjdeltacommunitycollegedistrict"): "sanjoaquindeltacommunitycollegedistrict",
     ("20", "wyandottecountywaterdistrict1"): "jocowaterdistrict1",
     ("26", "gratiotcountycommunitycollegedistrict"): "montcalmcommunitycollegedistrict",
@@ -104,7 +106,9 @@ def emit() -> Path:
                 join contest o on o.election_id = f.id and o.id <> s.id and o.kind = s.kind
                   and o.round_number is not distinct from s.round_number
                   and o.party_scope_id is not distinct from s.party_scope_id and {LIVE.format("o")}
-                join changeset h on h.id = o.changeset_id and h.pipeline = any(%s)
+                join changeset h on h.id = o.changeset_id
+                  and (h.pipeline = any(%s) or s.pipeline = 'us.medsl_local' and f.polity_id = s.polity_id
+                       and h.pipeline <> 'us.medsl_local')
                 join external_id a on a.entity_id = s.polity_id and a.scheme = 'us.polity'
                 join external_id b on b.entity_id = f.polity_id and b.scheme = 'us.polity'
                   and left(split_part(a.value, ':', 2), 2) = left(split_part(b.value, ':', 2), 2)
