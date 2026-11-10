@@ -2082,7 +2082,7 @@ def emit() -> Path:
             kind="general",
             date_from=DAY,
             date_to=DAY,
-            status="scheduled",
+            status="held" if DAY <= date.today() else "scheduled",
         )
         name(national, "2026 United States general election")
         cs.add("slug", path=f"us/{DAY}-general", entity_id=national)
@@ -2715,7 +2715,7 @@ def emit() -> Path:
                     kind="general",
                     date_from=DAY,
                     date_to=DAY,
-                    status="scheduled",
+                    status="held" if DAY <= date.today() else "scheduled",
                 )
                 name(elections[state], f"2026 {state_name} general election")
                 cs.add("slug", path=f"us/{state.lower()}/{DAY}-general", entity_id=elections[state])

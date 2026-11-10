@@ -4,14 +4,16 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.election_status"
-VERSION = "2"
+VERSION = "3"
 PIPELINES = [
     "us.az_districts_2026",
     "us.az_fire_2026",
     "us.ca_districts_2026",
     "us.fl_districts_2026",
     "us.ia_districts_2026",
+    "us.fec_2026",
     "us.nc_swcd_2026",
+    "us.nov3_manual_2026",
     "us.ne_districts_2026",
     "us.nj_fire_2026",
     "us.nv_districts_2026",
