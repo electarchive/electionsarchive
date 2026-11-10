@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "#lib/server/db/index.js";
 
-const FRESH_MS = 120_000;
+const FRESH_MS = 300_000;
 
 export type Counting = {
   elections: Map<string, { path: string; date: string; polity: string }>;
