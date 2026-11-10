@@ -787,6 +787,9 @@ def emit(source: ModuleType) -> Path:
                 with Image.open(image) as rendered:
                     width, height = rendered.size
                 page = cs.page(artifact, number)
+                if any(made == page for made, _, _ in pages.values()):
+                    pages[(year, number)] = (page, width, height)
+                    continue
                 pages[(year, number)] = (page, width, height)
                 if conn.execute(
                     """select 1 from source_page p join changeset c on c.id = p.changeset_id
