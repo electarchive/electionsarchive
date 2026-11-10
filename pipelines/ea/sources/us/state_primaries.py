@@ -20,7 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.encoding import decode
+from ea.encoding import decode, rekey, repair
 from ea.names import initials
 from ea.sources.us import (
     elstats,
@@ -41,7 +41,7 @@ from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
 
 SOURCE = "us.state_primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 NC_DAYS = {
     date(2002, 9, 10): None,
@@ -4216,6 +4216,7 @@ def emit() -> Path:
                         and shared.count((words[0][0], slug(words[-1]))) == 1
                         else set()
                     )
+                    rekey(cs, text)
                     local = f"{state}:{office if role == 'head' else 'lieutenant-governor'}:{code or ''}:{party}:{slug(text)}"
                     if len(found) == 1:
                         person = next(iter(found))
@@ -4398,6 +4399,10 @@ def emit() -> Path:
                         "outcome", result_set_id=current[0], option_id=option, kind=outcome, seats=seats, notes=notes
                     )
             result_set = sets[(state, day, office, code, party)] = cs.key(f"{SOURCE}.result_set", latest)
+            if supersedes in yielded and any(
+                row is not None and row[0] == supersedes for row in (old, replaced, current)
+            ):
+                yielded.add(result_set)
             ed_level = state == "NY" and not parted
             cs.add(
                 "result_set",
@@ -4866,4 +4871,5 @@ def emit() -> Path:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
+        repair(cs)
         return cs.write()
