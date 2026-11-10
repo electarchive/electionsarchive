@@ -7906,7 +7906,7 @@ def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
     if not states:
         return rows
     for home, tail, text in conn.execute(
-        """select distinct on (k.home, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named)
+        """select distinct on (k.home, k.county, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named)
                   k.home, regexp_replace(x.value, '^[0-9-]+:', ''), n.text
            from contest c
            join election e on e.id = c.election_id
@@ -7918,9 +7918,10 @@ def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
            left join body b on b.id = c.body_id
            join polity op on op.id = coalesce(f.polity_id, b.polity_id, e.polity_id)
            cross join lateral (
-               select m[1] as home from regexp_matches(x.value, %s, 'g') m
+               select m[1] as home, substring(x.value from '^[0-9-]+:[A-Z]{2}:(\\d{5})(?:\\d{5})?(?::|$)') as county
+               from regexp_matches(x.value, %s, 'g') m
                union
-               select 'CA' where %s and x.value ~ '^ceda:'
+               select 'CA', null where %s and x.value ~ '^ceda:'
            ) k
            cross join lateral (
                select case when c.seat_id is null and seg !~ '\\d|at-large|(^|-)[a-z]($|-)' then seg end as named
@@ -7929,7 +7930,7 @@ def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
            where e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by k.home, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named, e.date_from desc, x.value ~ 'at-large', x.value""",
+           order by k.home, k.county, c.office_id, c.body_id, c.district_area_id, c.seat_id, s.named, e.date_from desc, x.value ~ 'at-large', x.value""",
         [f"(?:^|:)({'|'.join(sorted(states))})(?=:)", "CA" in states, DAY],
     ):
         rows[home].append((tail, text))
