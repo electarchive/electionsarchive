@@ -1205,6 +1205,144 @@ async function find(id: string) {
   return contest;
 }
 
+type Cover = {
+  id: string;
+  series: string;
+  election: string;
+  indirect: boolean;
+  date: string | null;
+  year: number | null;
+  status: string;
+  isRemainder: boolean;
+  notional: boolean;
+  district: string | null;
+  members: Array<string>;
+  decided: boolean;
+  reach: Array<string> | null;
+};
+
+const TALLY_ROWS = 50_000;
+
+const cover = (ids: SQL) => sql`
+  select c.id, ${serial("c", "e")} as series, e.id as election, e.kind = 'indirect' as indirect,
+    e.date_from::text as date, ${CYCLE} as year, e.status::text as status,
+    c.term is not distinct from 'remainder' as "isRemainder", c.notional, c.district_area_id as district, g.members,
+    exists (
+      select from contest_option o
+      join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
+      join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+      where o.contest_id = any(g.members)
+    ) as decided,
+    ${reached} as reach
+  from (${ids}) hit
+  cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
+  cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
+  cross join lateral (
+    with recursive grp(id) as (
+      select c.id
+      union all
+      select x.id from contest x join grp on x.allocation_parent_id = grp.id
+    )
+    select array_agg(grp.id) as members from grp
+  ) g
+`;
+
+async function placed(area: string) {
+  return remember(
+    `placed:${area}`,
+    async () =>
+      rowsOf(
+        await db.execute<Cover>(
+          cover(sql`
+            select x.id from contest x where x.district_area_id = ${area}::uuid and x.allocation_parent_id is null
+          `),
+        ),
+      ),
+    true,
+    undefined,
+    true,
+  );
+}
+
+async function ruled(area: string) {
+  return remember(
+    `ruled:${area}`,
+    async () =>
+      rowsOf(
+        await db.execute<Cover>(
+          cover(sql`
+            select x.id from polity_territory pt
+            join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
+            join contest x on x.election_id = y.id
+            where pt.area_id = ${area}::uuid and x.district_area_id is null and x.allocation_parent_id is null
+              and y.kind <> 'by_election'
+              and not exists (
+                select from contest z
+                where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
+                  and z.district_area_id is not null and z.allocation_parent_id is null
+              )
+          `),
+        ),
+      ),
+    true,
+    undefined,
+    true,
+  );
+}
+
+async function tallies(k: number) {
+  return remember(
+    `tallies:${k}`,
+    async () => {
+      const size = await db.execute<{ n: number }>(sql`
+        select (select count(*) from (select from result_rollup_sum where area_k = ${k} limit ${TALLY_ROWS}) s)::int
+          + (select count(*) from (select from result_rollup_unit where area_k = ${k} limit ${TALLY_ROWS}) u)::int as n
+      `);
+      if ((size.rows[0]?.n ?? 0) >= TALLY_ROWS) {
+        return null;
+      }
+      const found = await db.execute<{ id: string }>(sql`
+        select distinct rs.contest_id as id from (
+          select x.result_set_k from result_rollup_sum x where x.area_k = ${k} and x.measure = any(${COUNTED})
+          union
+          select u.result_set_k from result_rollup_unit u
+          where u.area_k = ${k}
+            and exists (
+              select from result_value v where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+            )
+        ) h
+        join result_set rs on rs.k = h.result_set_k
+        where rs.status <> 'withdrawn' and ${served("rs")}
+      `);
+      return found.rows.map((row) => row.id);
+    },
+    true,
+    undefined,
+    true,
+  );
+}
+
+async function probed(source: string, k: number, members: Array<string>) {
+  return members.length === 0
+    ? []
+    : remember(
+        `probed:${source}:${k}`,
+        async () =>
+          rowsOf(
+            await db.execute<{ id: string }>(sql`
+              select distinct rs.contest_id as id from result_set rs
+              cross join lateral (
+                select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${k} and x.measure = any(${COUNTED}) limit 1
+              ) probe
+              where rs.contest_id = any(${sql.param(members)}::uuid[]) and rs.status <> 'withdrawn' and ${served("rs")}
+            `),
+          ).map((row) => row.id),
+        true,
+        undefined,
+        true,
+      );
+}
+
 async function children(
   contest: string | Array<string>,
   area: { id: string; k: number },
@@ -8222,22 +8360,12 @@ export const contests = {
           ? null
           : remember(
               `covering:${area.id}:${contest.place?.id ?? ""}:${contest.root}:${path?.split("/").at(-1) ?? ""}:${area.k}`,
-              async () =>
-                rowsOf(
-                  await db.execute<{
-                    id: string;
-                    series: string;
-                    election: string;
-                    indirect: boolean;
-                    date: string | null;
-                    year: number | null;
-                    status: string;
-                    isRemainder: boolean;
-                    counted: boolean;
-                    own: boolean;
-                    lineage: boolean;
-                    notional: boolean;
-                    reach: Array<string> | null;
+              async () => {
+                const place = contest.place?.id ?? null;
+                const [frame, pathed] = await Promise.all([
+                  db.execute<{
+                    anc: Array<string>;
+                    lineage: Array<string | null>;
                   }>(sql`
                     with recursive anc(id) as (
                       select ${area.id}::uuid
@@ -8397,94 +8525,89 @@ export const contests = {
                             )
                           )
                       ) x
-                    ),
-                    roots as (
-                      select c.id, ${serial("c", "e")} as series,
-                        e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
-                        c.term is not distinct from 'remainder' as "isRemainder", c.notional,
-                        c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
-                        c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
-                          and c.district_area_id in (select id from later union select id from earlier) as lineage
-                      from (
-                        select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
-                        union
-                        select x.id from contest x where x.district_area_id = ${contest.place?.id ?? null}::uuid and x.allocation_parent_id is null
-                        union
-                        select x.id from contest x
-                        where x.district_area_id in (select id from later union select id from earlier) and x.allocation_parent_id is null
-                        union
-                        select x.id from polity_territory pt
-                        join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
-                        join contest x on x.election_id = y.id
-                        where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
-                          and y.kind <> 'by_election'
-                          and not exists (
-                            select from contest z
-                            where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
-                              and z.district_area_id is not null and z.allocation_parent_id is null
-                          )
-                        union
-                        select x.id from contest r
-                        join contest x on x.body_id = r.body_id and x.district_area_id is null and x.allocation_parent_id is null
-                        join slug sx on sx.entity_id = x.id and sx.is_current
-                        where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
-                          and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
-                      ) hit
-                      cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
-                      cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
-                    ),
-                    grp(root, id) as materialized (
-                      select id, id from roots
-                      union all
-                      select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
-                    ),
-                    direct as materialized (
-                      select r.id as root from roots r
-                      cross join lateral (
-                        select from result_set rs
-                        cross join lateral (
-                          select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
-                        ) probe
-                        where rs.contest_id = r.id and rs.status <> 'withdrawn' and ${served("rs")}
-                        limit 1
-                      ) hit
-                    ),
-                    tallied as materialized (
-                      select root from direct
-                      union
-                      select grp.root from grp
-                      cross join lateral (
-                        select from result_set rs
-                        cross join lateral (
-                          select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
-                        ) probe
-                        where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
-                        limit 1
-                      ) hit
-                      where grp.id <> grp.root and not (grp.root = any(array(select root from direct)))
-                    ),
-                    decided as materialized (
-                      select distinct grp.root from grp
-                      cross join lateral (
-                        select from contest_option o
-                        join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-                        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-                        where o.contest_id = grp.id
-                        limit 1
-                      ) hit
-                      where not (grp.root = any(array(select root from tallied)))
                     )
-                    select r.*, (select ${reached} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
-                      select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-                        r."isRemainder", r.id = any(array(select root from tallied)) as counted, r.own, r.lineage, r.notional, r.date_from
-                      from roots r
-                      where r.id <> ${contest.root}::uuid
-                    ) r
-                    where r.counted or (r.id = any(array(select root from decided))
-                      and not (r.own and ${contest.place?.id ?? null}::uuid not in (select id from anc)))
-                    order by r.date_from desc nulls last, r.id
+                    select array(select id from anc) as anc, array(select id from later union select id from earlier) as lineage
                   `),
-                ),
+                  db.execute<Cover>(
+                    cover(sql`
+                      select distinct x.id from contest r
+                      join contest x on x.body_id = r.body_id and x.district_area_id is null and x.allocation_parent_id is null
+                      join slug sx on sx.entity_id = x.id and sx.is_current
+                      where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
+                        and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
+                    `),
+                  ),
+                ]);
+                const anc = frame.rows[0]?.anc ?? [];
+                const lineage = new Set(
+                  (frame.rows[0]?.lineage ?? []).filter((id) => id != null),
+                );
+                const sources: Array<readonly [string, Array<Cover>]> = [
+                  ...(await Promise.all([
+                    ...new Set([...anc, ...lineage])
+                      .values()
+                      .map(
+                        async (id) =>
+                          [`placed:${id}`, await placed(id)] as const,
+                      ),
+                    ...anc.map(
+                      async (id) => [`ruled:${id}`, await ruled(id)] as const,
+                    ),
+                  ])),
+                  [
+                    `pathed:${contest.root}:${path?.split("/").at(-1) ?? ""}`,
+                    pathed.rows,
+                  ],
+                ];
+                const found = new Map(
+                  sources
+                    .flatMap(([, rows]) => rows)
+                    .filter((row) => row.id !== contest.root)
+                    .map((row) => [row.id, row]),
+                );
+                const tally =
+                  (await tallies(area.k)) ??
+                  (
+                    await Promise.all(
+                      sources.map(async ([key, rows]) =>
+                        probed(
+                          key,
+                          area.k,
+                          rows.flatMap((row) => row.members),
+                        ),
+                      ),
+                    )
+                  ).flat();
+                const hit = new Set(tally);
+                const isOutside = place == null || !anc.includes(place);
+                const rows = [];
+                for (const {
+                  members: ids,
+                  district,
+                  decided,
+                  ...row
+                } of found.values()) {
+                  const counted = ids.some((id) => hit.has(id));
+                  const own = district === place;
+                  if (counted || (decided && !(own && isOutside))) {
+                    rows.push({
+                      ...row,
+                      counted,
+                      own,
+                      lineage:
+                        district != null &&
+                        district !== place &&
+                        lineage.has(district),
+                    });
+                  }
+                }
+                return rows.toSorted(
+                  (a, b) =>
+                    Number(a.date == null) - Number(b.date == null) ||
+                    (b.date ?? "").localeCompare(a.date ?? "") ||
+                    a.id.localeCompare(b.id),
+                );
+              },
               true,
             );
       covers?.catch(() => null);
