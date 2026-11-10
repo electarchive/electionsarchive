@@ -2585,6 +2585,7 @@
   "map_nav": "Harita",
   "header_map_about": "Herhangi bir seçimi tam ekran haritada inceleyin",
   "map_landing_title": "Seçim haritaları",
+  "map_landing_counting": "Sayım sürüyor: canlı haritayı aç",
   "map_landing_lede": "Herhangi bir ülkenin son seçimini tam ekran haritada açın. Ülke genelindeki sonuçlardan en küçük sonuç birimine kadar yakınlaştırabilir, önceki seçimlerle karşılaştırabilir ve yarışlar arasında geçiş yapabilirsiniz.",
   "map_landing_elections": [
     {

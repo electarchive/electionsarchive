@@ -2633,6 +2633,7 @@
   "map_nav": "Mapa",
   "header_map_about": "Explore qualquer eleição em um mapa em tela cheia",
   "map_landing_title": "Mapas de eleições",
+  "map_landing_counting": "Apuração em andamento: abrir o mapa ao vivo",
   "map_landing_lede": "Abra a eleição mais recente de qualquer país em um mapa em tela cheia. Depois, dê zoom dos resultados nacionais até a menor unidade de apuração, compare com eleições anteriores e alterne entre disputas.",
   "map_landing_elections": [
     {

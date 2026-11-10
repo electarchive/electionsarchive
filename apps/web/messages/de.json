@@ -2585,6 +2585,7 @@
   "map_nav": "Karte",
   "header_map_about": "Jede Wahl auf einer Vollbildkarte erkunden",
   "map_landing_title": "Wahlkarten",
+  "map_landing_counting": "Auszählung läuft: Live-Karte öffnen",
   "map_landing_lede": "Öffnen Sie die jüngste Wahl eines beliebigen Landes auf einer Vollbildkarte, zoomen Sie von den nationalen Ergebnissen bis zur kleinsten Meldeeinheit, vergleichen Sie mit früheren Wahlen und wechseln Sie zwischen den Wahlen um einzelne Ämter.",
   "map_landing_elections": [
     {

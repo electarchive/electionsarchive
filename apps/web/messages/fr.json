@@ -2635,6 +2635,7 @@
   "map_nav": "Carte",
   "header_map_about": "Explorer n'importe quelle élection sur une carte plein écran",
   "map_landing_title": "Cartes des élections",
+  "map_landing_counting": "Dépouillement en cours : ouvrir la carte en direct",
   "map_landing_lede": "Ouvrez la dernière élection de n'importe quel pays sur une carte plein écran, puis zoomez des résultats nationaux jusqu'à la plus petite unité de résultats, comparez avec les élections précédentes et passez d'un scrutin à l'autre.",
   "map_landing_elections": [
     {
