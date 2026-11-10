@@ -105,7 +105,7 @@ def emit(
                     date_from=DAY,
                     date_to=DAY,
                     date_precision="day",
-                    status="scheduled",
+                    status="held" if DAY <= date.today() else "scheduled",
                 )
                 cs.add(
                     "name",

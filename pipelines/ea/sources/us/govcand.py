@@ -82,7 +82,7 @@ def races(
                 date_from=day,
                 date_to=day,
                 date_precision="day",
-                status="scheduled",
+                status="held" if day <= date.today() else "scheduled",
             )
             cs.add(
                 "name",
