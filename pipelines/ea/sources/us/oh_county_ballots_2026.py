@@ -518,31 +518,31 @@ JUNK = re.compile(
 SPILLED = re.compile(
     r"Board Signatures|CHECK BOTH SIDES|Page ?2 ?of|Require voters to present|Review Both Sides|Joint Resolution of the General|\b(?:Republican|Democratic)\b"
 )
-JOINT = re.compile(r"Proposed by Joint Resolution of the General Assembly.*?adoption of Section 5\.\s*")
-SALVAGE = {
+JUNK_START = re.compile(r"Pike County Board of Elections This proposed amendment would")
+SAMPLE_BALLOT_BODIES = {
     "us/oh/crestview-local/2026-11-03-general/permanent-improvements-1": (
         "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#23    1x.pdf",
-        "Crestview Local School District for the purpose",
+        "A renewal of a tax for the benefit of Crestview Local School District for the purpose of permanent improvements, that the county auditor estimates will collect $221,314 annually, at a rate not exceeding 2 mills for each $1 of taxable value, which amounts to $26 for each $100,000 of the county auditor's market value, for 5 years, commencing in 2027, first due in calendar year 2028.",
     ),
     "us/oh/jackson-township-van-wert-county/2026-11-03-general/fire-protection-ems-1": (
         "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#16    1x.pdf",
-        "Jackson Township for the purpose",
+        "A renewal of a tax for the benefit of Jackson Township for the purpose of fire and EMS service, that the county auditor estimates will collect $43,900 annually, at a rate not exceeding 1.8 mills for each $1 of taxable value, which amounts to $40 for each $100,000 of the county auditor's market value, for 5 years, commencing in 2027, first due in calendar year 2028.",
     ),
     "us/oh/liberty-township-van-wert-county/2026-11-03-general/fire-protection-1": (
         "https://lookup.boe.ohio.gov/vtrapp/vanwert/ballotlist.aspx#19    1x (1).pdf",
-        "Liberty Township \\(excluding the Village of Ohio City\\) for the purpose",
+        "A renewal of a tax for the benefit of Liberty Township (excluding the Village of Ohio City) for the purpose of fire protection that the county auditor estimates will collect $36,392 annually, at a rate not exceeding 1.4 mills for each $1 of taxable value, which amounts to $27 for each $100,000 of the county auditor's market value, for 3 years, commencing in 2027, first due in calendar year 2028.",
     ),
     "us/oh/champaign-county/2026-11-03-general/operate-champaign-county-health-district-1": (
         "https://lookup.boe.ohio.gov/vtrapp/champaign/ballotlist.aspx#0011  1x.pdf",
-        "Champaign County for the purpose of the operation",
+        "A renewal of a tax for the benefit of Champaign County for the purpose of the operation of the Champaign Health District that the county auditor estimates will collect $303,400 annually, at a rate not exceeding 0.4 mill for each $1 of taxable value, which amounts to $6 for each $100,000 of the county auditor's market value, for 5 years, commencing in 2027, first due in calendar year 2028.",
     ),
     "us/oh/falls-township/2026-11-03-general/fire-protection-1": (
         "https://lookup.boe.ohio.gov/vtrapp/hocking/ballotlist.aspx#06    1x.pdf",
-        "Falls Township for the purpose",
+        "A renewal of 1.2 mills and an increase of 0.25 mill for each $1 of taxable value to constitute a tax for the benefit of Falls Township for the purpose of fire protection that the county auditor estimates will collect $198,018 annually, at a rate not exceeding 1.45 mills for each $1 of taxable value, which amounts to $27 for each $100,000 of the county auditor's market value, for 5 years, commencing in 2027, first due in calendar year 2028.",
     ),
     "us/oh/pike-county/2026-11-03-general/community-developmental-disabilities-program-services-1": (
         "https://lookup.boe.ohio.gov/vtrapp/pike/ballotlist.aspx#005   1x (1).pdf",
-        "Pike County for the purpose of the developmental",
+        "An additional tax for the benefit of Pike County for the purpose of the developmental disabilites programs and services, including but not limited to, The Kemper Connection school-age program, as authorized by Ohio Revised Code Chapter 5126, and for acquisition, construction, renovation, financing, maintenance, and operation of facilities of the Pike County Board of Developmental Disabilities that the county auditor estimates will collect $1,327,292 annually, at a rate not exceeding 2 mills for each $1 of taxable value, which amounts to $70 for each $100,000 of the county auditor's market value, for 5 years, commencing in 2026, first due in calendar year 2027.",
     ),
 }
 REPLACEMENTS = {
@@ -1184,29 +1184,6 @@ def pick(
     return narrowed[0][0]
 
 
-def salvage(url: str, anchor: str) -> str | None:
-    text = subprocess.run(
-        ["pdftotext", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
-    ).stdout
-    text = re.sub(r"\s+", " ", text)
-    found = re.search(anchor, text)
-    if found is None:
-        return None
-    end = re.compile(r"calendar year \d{4}\.").search(text, found.end())
-    if end is None:
-        return None
-    segment = JOINT.sub("", text[max(0, found.start() - 400) : end.end()])
-    segment = re.sub(
-        r"This proposed amendment would: |Require voters to present an approved form |(?<= )5 (?=calendar year)",
-        "",
-        segment,
-    )
-    segment = segment.replace("for years,", "for 5 years,") if "Pike County" in anchor else segment
-    start = max(segment.rfind(key) for key in ("A renewal of", "An additional tax", "A replacement"))
-    body = segment[start:] if start >= 0 else None
-    return None if body is None or SPILLED.search(body) else body
-
-
 def excerpt(county: str, name: str, start: str, end: str) -> tuple[str, str] | None:
     path = next((path for owner, path in mf_files() if owner == county and path.name == name), None)
     if path is None:
@@ -1274,14 +1251,6 @@ def emit() -> Path:
             for contest, url, body in conn.execute(
                 """select b.contest_id, b.url, b.body from ballot_question_text b
                    join changeset c on c.id = b.changeset_id where c.pipeline = %s and b.kind = 'text'""",
-                [SOURCE],
-            )
-        }
-        written = {
-            (contest, body)
-            for contest, body in conn.execute(
-                "select b.contest_id, b.body from ballot_question_text b join changeset c on c.id = b.changeset_id"
-                " where c.pipeline = %s and b.kind = 'text'",
                 [SOURCE],
             )
         }
@@ -1365,17 +1334,26 @@ def emit() -> Path:
                     taken.add(contest)
                     if contest not in loaded and SPILLED.search(existing[(contest, url)]):
                         load(contest, row)
-        for path, (url, anchor) in SALVAGE.items():
+        for path, (url, body) in SAMPLE_BALLOT_BODIES.items():
             found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
-            body = salvage(url, anchor)
-            if (
-                found is not None
-                and body is not None
-                and (found[0], url) in existing
-                and SPILLED.search(existing[(found[0], url)])
-                and (found[0], body) not in written
-            ):
-                load(found[0], {"url": url, "text": body})
+            if found is None:
+                continue
+            contest = found[0]
+            for source_id, old in conn.execute(
+                "select source_id, body from ballot_question_text where contest_id = %s and url = %s", [contest, url]
+            ).fetchall():
+                if old != body and (SPILLED.search(old) or JUNK_START.match(old)):
+                    kept[0] += 1
+                    loaded.add(contest)
+                    cs.add(
+                        "ballot_question_text",
+                        contest_id=contest,
+                        kind="text",
+                        lang="en",
+                        body=body,
+                        url=url,
+                        source_id=source_id,
+                    )
         for path, (url, (county, name, start, end)) in REPLACEMENTS.items():
             found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
             picked = excerpt(county, name, start, end)
