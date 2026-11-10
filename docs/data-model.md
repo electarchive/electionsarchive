@@ -46,7 +46,7 @@ Use these terms in the same sense across the code, the API, the documentation, a
 
 Every addressable thing has a row in `entity`, the supertype. Subtype tables such as `polity`, `contest`, `result_set`, and `party` share its primary key. Names, notes, labels, flags, external IDs, slugs, and citations refer to `entity.id`, so each works with an ordinary foreign key.
 
-Postgres gives new rows a UUIDv7 through the `uuidv7()` default. When a pipeline has a stable key, it derives a UUIDv5 from the scheme and the key, so a rebuild keeps the same IDs.
+Postgres gives new rows a UUIDv7 through the `uuidv7()` default. When a pipeline has a stable key, it derives a UUIDv5 from the scheme and the key, so a rebuild keeps the same IDs. Rows in `name`, `note`, `label`, `citation`, `flag`, and `ballot_question_text` that a changeset stages without an ID get one from the apply step, which hashes the table, the pipeline, and the staged columns into a UUIDv8. Two databases that apply the same changeset therefore give those rows the same IDs, and applying a changeset again cannot insert a second copy of a row whose other columns have changed since. Rows written before 2026-11-10 keep their UUIDv7.
 
 Each entity also has a public ID in the form `{prefix}_{crockford-base32(uuid)}`. The prefix names the type: `pl` for polity, `ar` for area, `ru` for reporting unit, `el` for election, `ct` for contest, `op` for option, `rs` for result set, `pt` for party, and `pe` for person, among others. Public IDs are permanent and are served at `/id/{public_id}`. The `ea_public_id` function computes one, and `ea_resolve` reverses it. Public IDs are computed, not stored in a column.
 

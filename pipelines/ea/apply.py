@@ -15,6 +15,7 @@ from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
 MERGE_LOCK = 1700949316
+DERIVED_IDS = {"name", "note", "label", "citation", "flag", "ballot_question_text"}
 
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
@@ -218,6 +219,38 @@ def _present(conn: Connection, table: str, columns: list[str]) -> sql.Composable
             )
             for column in columns
         ),
+    )
+
+
+def _derived(stage: Stage, table: str, columns: list[str]) -> sql.Composable:
+    return sql.SQL(
+        "overlay(overlay(md5(concat_ws(chr(31), {}, {}, {})) placing '8' from 13 for 1) placing '8' from 17 for 1)::uuid"
+    ).format(
+        sql.Literal(table),
+        sql.Literal(stage.pipeline),
+        sql.SQL(", ").join(
+            sql.SQL("{}, coalesce(s.{}::text, chr(30))").format(sql.Literal(column), sql.Identifier(column))
+            for column in sorted(columns)
+        ),
+    )
+
+
+def _insert_absent(
+    conn: Connection, stage: Stage, table: str, columns: list[str], source: sql.Composable, absent: sql.Composable
+) -> None:
+    listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+    if table not in DERIVED_IDS:
+        conn.execute(
+            sql.SQL("insert into public.{} ({}) select distinct {} from {} s where {}").format(
+                sql.Identifier(table), listed, listed, source, absent
+            )
+        )
+        return
+    conn.execute(
+        sql.SQL(
+            """insert into public.{} (id, {}) select {}, {} from (select distinct {} from {} s where {}) s
+               on conflict (id) do nothing"""
+        ).format(sql.Identifier(table), listed, _derived(stage, table, columns), listed, listed, source, absent)
     )
 
 
@@ -477,11 +510,13 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 [stage.pipeline],
             )
         if compared:
-            others = sql.SQL(", ").join(map(sql.Identifier, compared))
-            conn.execute(
-                sql.SQL("insert into public.{} ({}) select distinct {} from {} s where s.id is null and not {}").format(
-                    target, others, others, staged, _present(conn, table, compared)
-                )
+            _insert_absent(
+                conn,
+                stage,
+                table,
+                compared,
+                staged,
+                sql.SQL("s.id is null and not {}").format(_present(conn, table, compared)),
             )
         if table == "name" and "is_preferred" in columns:
             conn.execute(
@@ -883,10 +918,13 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where id in (select entity_id from {})"""
             ).format(staged)
         )
-        conn.execute(
-            sql.SQL("insert into note (entity_id, kind, body_md) select entity_id, 'retired', reason from {}").format(
-                staged
-            )
+        _insert_absent(
+            conn,
+            stage,
+            "note",
+            ["entity_id", "kind", "body_md"],
+            sql.SQL("(select entity_id, 'retired'::note_kind as kind, reason as body_md from {})").format(staged),
+            sql.SQL("true"),
         )
         conn.execute(
             sql.SQL(
@@ -1250,10 +1288,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ).fetchall(),
         )
         kept = sql.SQL(" and not {}").format(guard)
-    conn.execute(
-        sql.SQL("insert into public.{} ({}) select distinct {} from {} s where not {}{}").format(
-            target, listed, listed, staged, _present(conn, table, columns), kept
-        )
+    _insert_absent(
+        conn, stage, table, columns, staged, sql.SQL("not {}{}").format(_present(conn, table, columns), kept)
     )
 
 
