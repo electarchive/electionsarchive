@@ -181,14 +181,16 @@ async function compute(path: string): Promise<Cycle | null> {
   async function apportioned(contest: string, whole: number) {
     const [found, state] = await Promise.all([
       db.execute<Tally & { rough: number | null; placed: number | null }>(sql`
-        with picked as materialized (
+        with ranked as materialized (
           select rs.k from result_set rs
           where rs.contest_id = ${contest}::uuid and rs.status = 'active' and rs.kind = 'counted' and rs.stage in ('official', 'certified')
-            and exists (
-              select from result_value v join reporting_unit u on u.k = v.unit_k
-              where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code = 'us.precinct'
-            )
           order by rs.is_default desc, rs.stage = 'certified' desc, rs.k desc
+        ), picked as materialized (
+          select r.k from ranked r
+          where exists (
+            select from result_value v join reporting_unit u on u.k = v.unit_k
+            where v.result_set_k = r.k and v.measure = 1 and u.scheme_code = 'us.precinct'
+          )
           limit 1
         ), shape as materialized (
           select g.geom from area_geometry g where g.area_id = ${area}::uuid and g.valid @> ${drawn}::date limit 1
