@@ -346,7 +346,7 @@ def bands(
         if count > 1 and "header" in spec:
             top, bottom = spec["header"]
             header = crop.crop((0, round(top * crop.height), crop.width, round(bottom * crop.height)))
-        labelled = "columns" in spec and not ("discover" in spec and reader == "first")
+        labeled = "columns" in spec and not ("discover" in spec and reader == "first")
         labels = json.dumps([column["label"] for column in spec.get("columns", [])])
         for band in range(count):
             start = max(0, round(band * crop.height / count) - overlap)
@@ -376,7 +376,7 @@ def bands(
                 pixels += part.width * part.height
             across = spec.get("orientation") == "counties_across"
             unit = "towns" if manifest.get("unit_scheme") == "town" else "counties"
-            if labelled:
+            if labeled:
                 text = (
                     f"The columns are the {unit} and the rows are the candidates' lines, one row per line in this "
                     f"order: {labels}. Skip heading lines that carry no cells. Put the {unit[:-1]} names in header, "
