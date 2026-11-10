@@ -427,6 +427,22 @@ TABLES += [
         "bycandidate": True,
     }
 ]
+NILES = "sim_niles-national-register_{}"
+TABLES += [
+    {
+        "table": "1835:democratic",
+        "item": NILES.format("1835-05-30_48_1236"),
+        "leaves": (11,),
+        "ballot": 1,
+        "transcribed": "conventions_baltimore_1835.tsv",
+    },
+    *(
+        spec | {"transcribed": "conventions_baltimore_1844.tsv"}
+        for spec in ballots(
+            NILES.format("1844-06-01_66_1705"), "1844", dict.fromkeys(range(1, 10), (2, 2)), party="democratic"
+        )
+    ),
+]
 TABLES += [
     {"table": "1900:democratic", "item": "official00demo", "leaves": (166, 167, 168)},
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
@@ -461,6 +477,20 @@ BALTIMORE_1852 = (
     "delegations held 288 votes, so the needed figure stored here is 192. No candidate reached it before the "
     "forty-ninth ballot, on which Franklin Pierce was nominated."
 )
+NILES_1835 = (
+    "The archive has found no free copy of a separate report of this convention's proceedings; the roll is the "
+    "state-by-state count as Niles' "
+    "Weekly Register reprinted it from the official statement in the Baltimore Republican (page 228). Every "
+    "delegation's votes went to Martin Van Buren, 265 in all; the count gives no votes held by each delegation, "
+    "and the delegations were entitled to as many votes as their states had presidential electors."
+)
+NILES_1844 = (
+    "The archive has found no free copy of a separate report of this convention's proceedings; the roll is the "
+    "table of all nine ballots that "
+    "Niles' National Register printed (page 211), which gives 266 votes to the 25 delegations present, South "
+    "Carolina not being represented, and 178 votes as needed to nominate. The table has columns only for the "
+    "leading candidates, so a delegation's row can add to less than its votes; the rows are stored as printed."
+)
 PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2},
     {"tables": {1: "1864:republican"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "Third", "city": "Baltimore", "days": (date(1864, 6, 7), date(1864, 6, 8)), "ballots": {1: date(1864, 6, 8)}, "deciding": 1},
@@ -489,6 +519,8 @@ PROCEEDINGS: list[dict[str, Any]] = [
 ]  # fmt: skip
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
+    {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835},
+    {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
     {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
     {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING)},
@@ -630,6 +662,15 @@ CANDIDATES = {
     "democratic:James Buchanan": ("James Buchanan", "Q12325"),
     "democratic:Franklin Pierce": ("Franklin Pierce", "Q12312"),
     "democratic:F. Pierce": ("Franklin Pierce", "Q12312"),
+    "1835:democratic:Van Buren": ("Martin Van Buren", "Q11820"),
+    "1844:democratic:Van Buren": ("Martin Van Buren", "Q11820"),
+    "1844:democratic:Cass": ("Lewis Cass", "Q503119"),
+    "1844:democratic:Johnson": ("Richard Mentor Johnson", "Q109463"),
+    "1844:democratic:Stewart": ("Charles Stewart", None),
+    "1844:democratic:Woodbury": ("Levi Woodbury", "Q579228"),
+    "1844:democratic:Buchanan": ("James Buchanan", "Q12325"),
+    "1844:democratic:Calhoun": ("John C. Calhoun", "Q207191"),
+    "1844:democratic:Polk": ("James K. Polk", "Q11891"),
     "1852:democratic:Cass": ("Lewis Cass", "Q503119"),
     "1852:democratic:Buchanan": ("James Buchanan", "Q12325"),
     "1852:democratic:Marcy": ("William L. Marcy", "Q389258"),
@@ -1550,6 +1591,34 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1844:democratic:b1": (
+        "North Carolina's row adds to 12 against its 11 votes and Georgia's to 9 against its 10. The rows are stored as printed.",
+        {"NC": (11, 12, "the row adds to 12"), "GA": (10, 9, "the row adds to 9")},
+    ),
+    "1844:democratic:b3": (
+        "The printed Buchanan total is 11, against 4 in the state figures; Louisiana's row prints 0 in every column against its 6 votes, and New Hampshire's adds to 5 against its 6. The rows are stored as printed.",
+        {
+            "column Buchanan": (11, 4, "the state figures add to 4"),
+            "LA": (6, 0, "every column prints 0"),
+            "NH": (6, 5, "the row adds to 5"),
+        },
+    ),
+    **{
+        f"1844:democratic:b{n}": (
+            "Georgia's row adds to 9 against its 10 votes; the table has no column for its other vote. The row is stored as printed.",
+            {"GA": (10, 9, "the row adds to 9")},
+        )
+        for n in (4, 5, 6, 7)
+    },
+    "1844:democratic:b8": (
+        "The table has columns only for Van Buren, Cass, and Polk on this ballot, so the rows of New Jersey (6 of 7), Pennsylvania (25 of 26), North Carolina (10 of 11), and Georgia (9 of 10) leave out their other votes. The rows are stored as printed.",
+        {
+            "NJ": (7, 6, "the row adds to 6"),
+            "PA": (26, 25, "the row adds to 25"),
+            "NC": (11, 10, "the row adds to 10"),
+            "GA": (10, 9, "the row adds to 9"),
+        },
+    ),
     "1852:democratic:b3": (
         "Buchanan's list prints Maryland, 15, where Virginia, which gave Buchanan its 15 votes on the ballots before and after, is meant; Maryland's 8 votes are also printed for Cass. The rows are stored as printed.",
         {},
@@ -2369,7 +2438,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1860 to 1984, the Democratic conventions from 1852 to 1956, and the 2016 and 2020 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1860 to 1984, the Democratic conventions from 1835 to 1956, and the 2016 and 2020 conventions",
             polity="US",
         )
 
@@ -2608,7 +2677,7 @@ def emit() -> Path:
             cs.add(
                 "source",
                 id=source,
-                kind="official_body",
+                kind=convention.get("kind", "official_body"),
                 publisher=publisher,
                 title=title,
                 url=source_url,
