@@ -24994,14 +24994,25 @@ export const bodies = {
                   coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
                     lag(t.id) over (partition by t.seat_id order by t.from_date nulls first) end) as before
                 from tenure t where t.body_id = ${input.id}::uuid
+                  and (t.acquired_via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+                    or t.seat_id in (select r.seat_id from tenure r where r.body_id = ${input.id}::uuid
+                      and r.acquired_via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')))
+              ),
+              walk(origin, via, before) as (
+                select t.id, t.acquired_via::text, c.before from tenure t left join chain c on c.id = t.id
+                where t.body_id = ${input.id}::uuid
+                  and coalesce(t.from_date, '-infinity'::date) < coalesce(${end}::date, 'infinity'::date)
+                  and coalesce(t.to_date, 'infinity'::date) > ${start}::date
+                union all
+                select w.origin, p.acquired_via::text, c.before from walk w
+                join tenure p on p.id = w.before and p.body_id = ${input.id}::uuid
+                left join chain c on c.id = p.id
+                where w.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
               ),
               kinds(id, category) as (
-                select c.id, case when c.via in ('ex_officio', 'appointed') then c.via else 'elected' end
-                from chain c
-                where c.before is null or c.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
-                union all
-                select c.id, k.category from kinds k join chain c on c.before = k.id
-                where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+                select w.origin, case when w.via in ('ex_officio', 'appointed') then w.via else 'elected' end
+                from walk w
+                where w.before is null or w.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
               )
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
                 t.from_precision::text as "fromPrecision",
