@@ -10,10 +10,14 @@ from ea.sources.us.as_precincts import AS_OF_2026, CLOUD, PUBLISHER
 from ea.store import connect
 
 SOURCE = "us.as_house_2026"
-VERSION = "1"
+VERSION = "2"
 URL = CLOUD + "2026/11/04083335/2026-midterm-election-results-district-representatives.pdf"
 TITLE = "2026 midterm election results by district (House of Representatives, election-night sheet)"
 NOTE = "Votes for each candidate as printed on the Election Office's unofficial sheet from the November 3, 2026 election, with its ELECTED marks stored as the outcomes. The Office gave the sheet to KHJ News, and this copy comes from KHJ's Talanei site, because the Office's own site doesn't post results. The Office will release official results after certification. The sheet has no Swains Island seat, which the island's voters fill at a meeting."
+
+
+ALSO_ELECTED = {12: "HO CHING"}
+ALSO_NOTE = " The sheet marks only Manumaua Wayne Wilson ELECTED in Ituau, which elects two members; Sauasetoa Tautoloitua Soliai Ho Ching, second with 542 votes, is also recorded as elected on the strength of Samoa News and Talanei reports."
 
 
 def read(path: Path) -> dict[int, list[tuple[str, int, bool]]]:
@@ -114,7 +118,12 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=NOTE + (ALSO_NOTE if number in ALSO_ELECTED else ""),
+            )
             unit = cs.unit("us.precinct", f"2026-11-03:AS:d{number:02d}")
             for r, o in paired.items():
                 _, votes, elected = rows[r]
@@ -130,6 +139,6 @@ def emit() -> Path:
                     flags=0,
                     value=votes,
                 )
-                if elected:
+                if elected or ALSO_ELECTED.get(number, "\0") in rows[r][0]:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
         return cs.write()
