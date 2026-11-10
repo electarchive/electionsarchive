@@ -19,7 +19,7 @@ from ea.changeset import NAMESPACE, Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.la_local"
-VERSION = "2"
+VERSION = "3"
 PUBLISHER = "Louisiana Secretary of State"
 TITLE = "Official election results"
 DATA_URL = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
@@ -837,6 +837,21 @@ def emit() -> Path:
         }
         owners: dict[tuple[str, str], UUID] = {}
         persons: dict[UUID, str] = {}
+        scheme = f"{SOURCE}.person"
+        known_persons = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [scheme]).fetchall()
+        )
+        spellings: dict[UUID, str] = {}
+        for key, text in (
+            pl.read_parquet(PARSED / "options.parquet")
+            .join(everything.select("ckey", "day", pl.col("code").replace(adopted)), on="ckey")
+            .with_columns(key=pl.col("code") + ":" + pl.col("name").map_elements(slug, return_dtype=pl.String))
+            .sort("day", "ckey", "position")
+            .select("key", "name")
+            .iter_rows()
+        ):
+            person = known_persons.get(key) or uuid5(NAMESPACE, f"external_id:{scheme}\x1f{key}")
+            spellings[cs.survivors.get(person, person)] = text
         codes: set[str] = set()
         sets: list[str] = []
         memberships: set[tuple[UUID, UUID, date]] = set()
@@ -1053,7 +1068,7 @@ def emit() -> Path:
                     if canon[candidate] != candidate:
                         continue
                     if person not in persons:
-                        persons[person] = candidate
+                        persons[person] = spellings[person]
                         cs.add("person", id=person)
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     cs.add(
@@ -1166,6 +1181,22 @@ def emit() -> Path:
         print(f"{len(folded)} re-keyed contests folded into their corrected copies; {len(unmatched)} unmatched")
         for value in sorted(unmatched):
             print(f"  no corrected copy: {value}")
+        rehomed = 0
+        for election, into in conn.execute(
+            """select e.id, min(k.election_id::text)::uuid from election e
+               join changeset g on g.id = e.changeset_id and g.pipeline = %s
+               join result_set r on r.election_id = e.id
+               join contest k on k.id = r.contest_id and k.election_id <> e.id
+               where extract(year from e.date_from)::int / 10 * 10 = %s
+                 and not exists (select from contest c where c.election_id = e.id)
+                 and not exists (select from election x where x.parent_id = e.id)
+                 and not exists (select from entity_merge m where m.entity_id = e.id)
+               group by e.id having count(distinct k.election_id) = 1""",
+            [SOURCE, decade],
+        ).fetchall():
+            cs.merge(election, into)
+            rehomed += 1
+        print(f"{rehomed} contest-less elections merged into the elections that hold their contests")
         precinct_code.units(cs, conn, pl.Series(sorted(codes)))
         old = pl.DataFrame(
             conn.execute(
