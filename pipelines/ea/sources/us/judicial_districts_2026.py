@@ -212,7 +212,7 @@ def emit() -> Path:
                     id=option,
                     contest_id=contest,
                     kind="candidate",
-                    party_id=cs.key("us.party", each["party"]) if each["party"] else None,
+                    party_id=cs.key("us.party", each["party"]) if each["party"] not in ("", "independent") else None,
                     ballot_label=each["candidate"],
                 )
                 person = cs.key(f"{SOURCE}.person", who)
@@ -227,7 +227,7 @@ def emit() -> Path:
                     option_id=option,
                     role="head",
                     ballot_name=each["candidate"],
-                    is_independent=False,
+                    is_independent=each["party"] == "independent",
                 )
                 cs.add("citation", entity_id=candidacy, source_id=sources[each["source"]], locator=None)
             contests += 1
