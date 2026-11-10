@@ -842,6 +842,15 @@ MI_OLD_PROPOSALS = (
 NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
 NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
 NC_2000 = "https://web.archive.org/web/20100129210216id_/www.app.sboe.state.nc.us/NCSBE/Elec/Results/y2000elect/"
+NC_1996 = "https://web.archive.org/web/20081126222630if_/http://www.app.sboe.state.nc.us/NCSBE/Elec/Results/PastElect/results9/"
+NC_1996_PAGES = {
+    "amend.htm": (
+        ("Veto Power For Governor", "Legislative Referendum"),
+        ("Alternative Punishment", "Legislative Referendum"),
+        ("Victims Rights Amendment", "Legislative Referendum"),
+    ),
+    "bonds.htm": (("School Bonds", "Legislative Referendum"), ("Road Bonds", "Legislative Referendum")),
+}
 NC_2002 = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2002_11_05/results_statewide_20021105.pdf"
 NC_2002_TOTALS = (1283375, 507426)
 WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/elections/history/electionreturns/Documents/{0}/{0}%20Constitutional%20Amendment{1}.pdf"
@@ -2776,6 +2785,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}"), suffix=".zip")
         time.sleep(1)
     raw.fetch(SOURCE, NC_2002, suffix=".pdf")
+    for page in NC_1996_PAGES:
+        raw.fetch(SOURCE, NC_1996 + page, suffix=".htm")
+        time.sleep(1)
     index = raw.fetch(SOURCE, NC_2000 + "staterl.htm", suffix=".htm")
     for page in nc_2000_pages(index.path.read_text(errors="replace")):
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
@@ -5825,6 +5837,48 @@ def north_carolina_early() -> list[dict[str, object]]:
     return rows
 
 
+def north_carolina_1996() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for page, measures in NC_1996_PAGES.items():
+        url = NC_1996 + page
+        text = html.unescape(re.sub(r"<[^>]+>", "\n", raw.cached(SOURCE, url).path.read_text(errors="replace")))
+        text = text.split("Against", len(measures))[-1]
+        table: dict[str, list[int]] = {}
+        name = ""
+        for line in (line.strip() for line in text.splitlines()):
+            if re.fullmatch(r"[\d,]+", line):
+                table[name].append(int(line.replace(",", "")))
+            elif re.fullmatch(r"[A-Z][A-Z .'-]*", line):
+                name = line
+                table[name] = []
+            elif line.startswith("Last Updated"):
+                break
+        totals = table.pop("TOTAL")
+        if len(table) != 100 or any(len(v) != 2 * len(measures) for v in table.values()):
+            raise ValueError(f"NC 1996 {page}: {len(table)} counties")
+        for at in range(2 * len(measures)):
+            if sum(v[at] for v in table.values()) != totals[at]:
+                raise ValueError(f"NC 1996 {page}: column {at} does not sum to its total")
+        for index, (label, kind) in enumerate(measures):
+            rows.extend(
+                {
+                    "state": "NC",
+                    "day": date(1996, 11, 5),
+                    "number": label,
+                    "label": label,
+                    "title": label,
+                    "kind": kind,
+                    "url": url,
+                    "county": county.title(),
+                    "answer": answer,
+                    "votes": votes[2 * index + offset],
+                }
+                for county, votes in table.items()
+                for answer, offset in (("YES", 0), ("NO", 1))
+            )
+    return rows
+
+
 def north_carolina() -> list[dict[str, object]]:
     roman = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5"}
     rows: list[dict[str, object]] = []
@@ -7632,6 +7686,7 @@ def parse() -> None:
             *minnesota(),
             *pennsylvania(),
             *north_carolina(),
+            *north_carolina_1996(),
             *north_carolina_early(),
             *west_virginia(),
             *west_virginia_2012(),
@@ -7812,7 +7867,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide ballot measures by county, 2000–2024, from state election offices' official returns",
+            summary="Statewide ballot measures by county, 1996–2024, from state election offices' official returns",
             polity="US",
         )
 
