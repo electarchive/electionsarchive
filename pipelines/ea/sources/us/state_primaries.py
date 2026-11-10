@@ -219,6 +219,8 @@ ELSTATS = {
 ELSTATS = {state: offices for state, offices in ELSTATS.items() if state not in elstats.HELD}
 ELSTATS_YEARS = range(2000, 2023)
 ELSTATS_LAST = {"ID": 2024}
+CT_TABLE = "https://ct.elstats.civera.com/api/download_contest/{}_table.csv?split_party=false"
+CT_ZERO = {49: (6187, 6188, 6189, 6190), 48: (6205,)}
 MA_YEARS = range(1994, 2023)
 ELSTATS_DATES = {
     ("ID", date(2000, 5, 24)): date(2000, 5, 23),
@@ -1216,7 +1218,22 @@ def search(state: str, office: int, year: int) -> str:
     )
 
 
+def ct_table(contest: int) -> pl.DataFrame:
+    table = pl.read_csv(raw.cached(SOURCE, CT_TABLE.format(contest)).path, infer_schema=False, skip_rows_after_header=1)
+    names = pl.read_csv(raw.cached(SOURCE, CT_TABLE.format(contest)).path, infer_schema=False, n_rows=0).columns
+    table.columns = ["division_type", "division_name", *names[2:]]
+    return (
+        table.filter(pl.col("division_type") == "City/Town")
+        .unpivot(
+            names[2:], index=["division_type", "division_name"], variable_name="candidate_name", value_name="table"
+        )
+        .with_columns(pl.col("table").str.replace_all(",", ""))
+    )
+
+
 def fetch() -> None:
+    for contest in (id for ids in CT_ZERO.values() for id in ids):
+        raw.fetch(SOURCE, CT_TABLE.format(contest), suffix=".csv")
     for stamp, link in NY_FEDERAL.values():
         raw.fetch(SOURCE, f"https://web.archive.org/web/{stamp}id_/{link}", suffix=Path(link).suffix)
     for year in NYC_YEARS:
@@ -1494,6 +1511,27 @@ def parse() -> None:
                         continue
                 else:
                     frame = pl.read_csv(raw.cached(SOURCE, search(state, office, year)).path, infer_schema=False)
+                    if state == "CT" and year == 2010:
+                        for contest in CT_ZERO.get(office, ()):
+                            frame = (
+                                frame.filter(
+                                    ~((pl.col("contest_id") == str(contest)) & (pl.col("vote_channel") == "Absentee"))
+                                )
+                                .join(
+                                    ct_table(contest),
+                                    on=["division_type", "division_name", "candidate_name"],
+                                    how="left",
+                                )
+                                .with_columns(
+                                    votes=pl.when(pl.col("contest_id") == str(contest))
+                                    .then(pl.col("table"))
+                                    .otherwise(pl.col("votes")),
+                                    vote_channel=pl.when(pl.col("contest_id") == str(contest))
+                                    .then(None)
+                                    .otherwise(pl.col("vote_channel")),
+                                )
+                                .drop("table")
+                            )
                 if "office_id" not in frame.columns:
                     continue
                 frame = frame.filter(
