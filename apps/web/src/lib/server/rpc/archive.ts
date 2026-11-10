@@ -2588,10 +2588,18 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                 left join lateral (
                   select n.party_id from candidacy_nomination n where n.candidacy_id = cy.id and n.kind = 'nominated'
                   order by (
-                    select max(x.value) from contest_option ch
+                    select max(coalesce(
+                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k and x.area_k = (
+                        select a.k from contest ck join election ce on ce.id = ck.election_id
+                        join area a on a.id = coalesce(ck.district_area_id, (
+                          select pt.area_id from polity_territory pt where pt.polity_id = ce.polity_id and pt.valid @> ce.date_from limit 1
+                        ))
+                        where ck.id = ch.contest_id
+                      )),
+                      (select max(x.value) from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = ch.k offset 0)
+                    )) from (select ch.k, ch.contest_id, ch.party_id from contest_option ch where ch.parent_option_id = o.id offset 0) ch
                     join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-                    cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = ch.k offset 0) x
-                    where ch.parent_option_id = o.id and ch.party_id = n.party_id
+                    where ch.party_id = n.party_id
                   ) desc nulls last, n.party_id
                   limit 1
                 ) nm on true
