@@ -702,6 +702,14 @@ export async function chamber(path: string) {
   return remember(`chamber:v1:${path}`, async () => buildChamber(path));
 }
 
+async function chamberRecord(polity: string, body: string) {
+  const whole = await call(router.polities.record, { id: polity });
+  const own = whole.series.find((series) => series.id === body);
+  return own == null
+    ? call(router.polities.record, { id: polity, body })
+    : { ...whole, series: [own] };
+}
+
 async function buildChamber(path: string) {
   const segments = path.split("/");
   const { id, polity } = await found(
@@ -712,7 +720,7 @@ async function buildChamber(path: string) {
   );
   const [body, record, council] = await Promise.all([
     call(router.bodies.get, { id }),
-    call(router.polities.record, { id: polity, body: id }),
+    chamberRecord(polity, id),
     call(router.seats.council, { id }),
   ]);
   const size = (on: string) =>

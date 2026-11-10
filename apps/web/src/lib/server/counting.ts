@@ -32,10 +32,15 @@ async function load(): Promise<Counting> {
       select distinct election_id from lit
       union
       select e.parent_id from election e join up on up.id = e.id where e.parent_id is not null
+    ),
+    listed as (
+      select lit.election_id, array_agg(cs.path) as contests
+      from lit join slug cs on cs.entity_id = lit.id and cs.is_current
+      group by lit.election_id
     )
-    select e.id, s.path, e.date_from::text as date, e.polity_id as polity,
-      (select array_agg(cs.path) from lit join slug cs on cs.entity_id = lit.id and cs.is_current where lit.election_id = e.id) as contests
+    select e.id, s.path, e.date_from::text as date, e.polity_id as polity, l.contests
     from up join election e on e.id = up.id join slug s on s.entity_id = e.id and s.is_current
+    left join listed l on l.election_id = e.id
   `);
   return {
     elections: new Map(
