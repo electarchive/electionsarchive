@@ -97,7 +97,7 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
     1926: (
         0,
         {
-            7: ("lieutenant-governor", "Walter Haddock", "REP"),
+            7: ("lieutenant-governor", "Walter Maddock", "REP"),
             8: ("lieutenant-governor", "A. C. Pagenkopf", "DEM"),
             9: ("secretary-of-state", "Robert Byrne", "REP"),
             10: ("secretary-of-state", "F. L. Walker", "DEM"),
@@ -138,7 +138,7 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             7: ("auditor", "D. C. Poindexter", None),
             8: ("treasurer", "O. A. Fisher", "REP"),
             9: ("treasurer", "J. V. Birder", "DEM"),
-            10: ("attorney-general", "George V. Shafer", "REP"),
+            10: ("attorney-general", "George F. Shafer", "REP"),
             11: ("attorney-general", "T. H. H. Thoreson", "DEM"),
             12: ("insurance-commissioner", "S. A. Olsness", "REP"),
             13: ("insurance-commissioner", "W. S. Hooper", "DEM"),
@@ -167,7 +167,7 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             13: ("attorney-general", "H. J. Ulsrud", None),
             14: ("insurance-commissioner", "S. A. Olsness", "REP"),
             15: ("insurance-commissioner", "E. A. Lillibridge", "DEM"),
-            16: ("commissioner-of-agriculture", "J. A. Kitchen", "REP"),
+            16: ("commissioner-of-agriculture", "Joseph A. Kitchen", "REP"),
             17: ("commissioner-of-agriculture", "Bert F. Baker", None),
             18: ("public-service-commissioner", "Fay Harding", "REP"),
             19: ("public-service-commissioner", "C. W. McDonnell", "REP"),
@@ -189,10 +189,10 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             10: ("treasurer", "Ole Kaldor", None),
             11: ("treasurer", "John Steen", "REP"),
             12: ("attorney-general", "Rheinhart J. Kamplin", "DEM"),
-            13: ("attorney-general", "William Demise", "REP"),
+            13: ("attorney-general", "William Lemke", "REP"),
             14: ("insurance-commissioner", "S. A. Olsness", "REP"),
             15: ("insurance-commissioner", "G. I. Solum", "DEM"),
-            16: ("commissioner-of-agriculture", "John N. Hagen", "REP"),
+            16: ("commissioner-of-agriculture", "John N. Hagan", "REP"),
             17: ("commissioner-of-agriculture", "J. T. Nelson", None),
             18: ("public-service-commissioner", "H. D. Allert", "DEM"),
             19: ("public-service-commissioner", "F. C. Hildebrand", None),
@@ -807,9 +807,20 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
-DEBUG: list = []
-WORDS: dict = {}
-LINES: dict = {}
+UNREAD = {
+    (1918, "treasurer"),
+    (1920, "lieutenant-governor"),
+    (1920, "attorney-general"),
+    (1920, "insurance-commissioner"),
+    (1922, "public-service-commissioner"),
+    (1924, "auditor"),
+    (1924, "treasurer"),
+    (1924, "attorney-general"),
+    (1924, "public-service-commissioner"),
+    (1926, "lieutenant-governor"),
+    (1926, "insurance-commissioner"),
+    (1926, "public-service-commissioner"),
+}
 CUTS = {1928: 870, 1920: 960, 1922: 800}
 LABELS = {1924: 400}
 PRINTED = {(1926, 7): 127506}
@@ -963,7 +974,6 @@ def parse() -> None:
         keys = [TYPOS.get(plain(text), plain(text)) for _, text in lines[:-1]]
         if sorted(keys) != sorted(codes):
             raise ValueError(f"{year}: counties {sorted(set(keys) ^ set(codes))}")
-        LINES[year] = (lines, edge, keys, min(w[0] for w in names))
         numbers = [w for w in words if re.fullmatch(NUMBER, w[4]) and w[0] >= edge and w[3] - w[1] <= 12]
 
         def nearest(w: tuple) -> int:
@@ -1075,7 +1085,6 @@ def parse() -> None:
                     pi, pj, matched = back[(i, j)]
                     if matched is not None:
                         cells[(matched, column)] = value(members[pi][4])
-                        WORDS[(year, matched, column)] = (index, members[pi])
                         if re.search(r"[?<So]", members[pi][4]) or re.search(r",\d{1,2}$", members[pi][4]):
                             unreadable.add((matched, column))
                     i, j = pi, pj
@@ -1091,6 +1100,8 @@ def parse() -> None:
                     raise ValueError(f"{year}: two numbers in {keys[line]} column {column}")
                 cells[(line, column)] = value(w[4])
         for column, (office, candidate, code) in columns.items():
+            if (year, office) in UNREAD:
+                continue
             printed = PRINTED.get((year, column)) or cells[(len(keys), column)]
             gaps = [
                 line
@@ -1102,11 +1113,6 @@ def parse() -> None:
                 cells[(gaps[0], column)] = printed - sum(cells.get((line, column), 0) for line in range(len(keys)))
             values = [cells.get((line, column), 0) for line in range(len(keys))]
             if sum(values) != printed:
-                if __import__("os").environ.get("ND_DEBUG"):
-                    DEBUG.append(
-                        (year, column, office, candidate, sum(values) - printed, list(keys), list(values), printed)
-                    )
-                    continue
                 if (
                     year not in FILES
                     or (year, candidate) not in ERRATA
@@ -1137,7 +1143,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="North Dakota's president, U.S. Senate, governor, and other statewide offices by county "
-            "1928–1998 from the Secretary of State's official abstracts",
+            "1918–1998 from the Secretary of State's official abstracts",
             polity="US",
         )
 
@@ -1205,6 +1211,7 @@ def emit() -> Path:
             return len(mine) < 3 or len(theirs) < 3 or mine[1][:1] == theirs[1][:1]
 
         fptp = cs.key("us.electoral_system", "fptp")
+        block = cs.key("us.electoral_system", "block")
         parties = {
             "DEM": cs.key("us.party", "democratic-party"),
             "REP": cs.key("us.party", "republican-party"),
@@ -1212,7 +1219,7 @@ def emit() -> Path:
             "NAT": cs.key("us.party", "natural-law-party"),
             "REF": cs.key("us.party", "reform-party"),
         }
-        if cs.minted & {fptp, *parties.values()}:
+        if cs.minted & {fptp, block, *parties.values()}:
             raise ValueError("the electoral system and parties must exist")
         contests: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':ND:'")
@@ -1224,6 +1231,7 @@ def emit() -> Path:
         made: set[UUID] = set()
         for (day, office), lines in frame.sort("day").group_by("day", "office", maintain_order=True):
             year = day.year
+            seats = 3 if office == "public-service-commissioner" and year < 1928 else 1
             key = f"{day}:ND:{office}"
             election = elections[f"{day}:ND"]
             contest = contests.get(key)
@@ -1247,9 +1255,9 @@ def emit() -> Path:
                     office_id=office_id,
                     district_area_id=state,
                     term="remainder" if office.endswith(":special") else "full",
-                    magnitude=1,
+                    magnitude=seats,
                     round_number=1,
-                    electoral_system_id=fptp,
+                    electoral_system_id=block if seats > 1 else fptp,
                     default_result_kind="counted",
                 )
                 name(
@@ -1391,6 +1399,6 @@ def emit() -> Path:
             for option, kind, seats in kept:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             if not kept:
-                winner = max(totals, key=totals.__getitem__)
-                cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=1)
+                for winner in sorted(totals, key=totals.__getitem__, reverse=True)[:seats]:
+                    cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=1)
         return cs.write()
