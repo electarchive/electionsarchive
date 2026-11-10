@@ -22,6 +22,11 @@ HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-r
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
+    1918: "1918-11-05-general",
+    1920: "1920-11-02-general",
+    1922: "1922-11-07-general",
+    1924: "1924-11-04-general",
+    1926: "1926-11-02-general",
     1928: "1928-11-06-general",
     1930: "1930-11-04-general",
     1932: "1932-11-08-general",
@@ -51,6 +56,11 @@ FILES = {
     1990: "1990-11-06-general",
 }
 DAYS = {
+    1918: date(1918, 11, 5),
+    1920: date(1920, 11, 2),
+    1922: date(1922, 11, 7),
+    1924: date(1924, 11, 4),
+    1926: date(1926, 11, 2),
     1928: date(1928, 11, 6),
     1930: date(1930, 11, 4),
     1932: date(1932, 11, 8),
@@ -84,6 +94,138 @@ DAYS = {
     1990: date(1990, 11, 6),
 }
 COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
+    1926: (
+        0,
+        {
+            7: ("lieutenant-governor", "Walter Haddock", "REP"),
+            8: ("lieutenant-governor", "A. C. Pagenkopf", "DEM"),
+            9: ("secretary-of-state", "Robert Byrne", "REP"),
+            10: ("secretary-of-state", "F. L. Walker", "DEM"),
+            11: ("secretary-of-state", "Charles G. Johnson", None),
+            12: ("auditor", "John Steen", "REP"),
+            13: ("auditor", "Ole S. Johnson", "DEM"),
+            14: ("auditor", "Allan McManus", None),
+            15: ("treasurer", "C. A. Fisher", "REP"),
+            16: ("treasurer", "Lillian Lillibridge", "DEM"),
+            17: ("treasurer", "E. W. Cart", None),
+            18: ("attorney-general", "George F. Shafer", "REP"),
+            19: ("attorney-general", "S. L. Nichols", "DEM"),
+            20: ("insurance-commissioner", "A. Olsness", "REP"),
+            21: ("insurance-commissioner", "W. S. Hooper", "DEM"),
+            22: ("insurance-commissioner", "Magnus Snowfield", None),
+            23: ("commissioner-of-agriculture", "Joseph A. Kitchen", "REP"),
+            24: ("commissioner-of-agriculture", "Charles K. Otto", "DEM"),
+            25: ("commissioner-of-agriculture", "D. I. Todd", None),
+            26: ("public-service-commissioner", "Fay Harding", "REP"),
+            27: ("public-service-commissioner", "W. C. McDonnell", "REP"),
+            28: ("public-service-commissioner", "Frank Milhollan", "REP"),
+            29: ("public-service-commissioner", "C. H. Boatman", "DEM"),
+            30: ("public-service-commissioner", "John A. Helling", "DEM"),
+            31: ("public-service-commissioner", "Thomas H. Maloney", "DEM"),
+            32: ("public-service-commissioner", "James Wenstrom", None),
+            33: ("public-service-commissioner", "Oscar Korsmo", None),
+            34: ("public-service-commissioner", "J. A. McGovern", None),
+        },
+    ),
+    1924: (
+        0,
+        {
+            2: ("lieutenant-governor", "Walter Maddock", "REP"),
+            3: ("lieutenant-governor", "John E. Paulson", "DEM"),
+            4: ("secretary-of-state", "Robert Byrne", "REP"),
+            5: ("secretary-of-state", "D. E. Shipley", "DEM"),
+            6: ("auditor", "John Steen", "REP"),
+            7: ("auditor", "D. C. Poindexter", None),
+            8: ("treasurer", "O. A. Fisher", "REP"),
+            9: ("treasurer", "J. V. Birder", "DEM"),
+            10: ("attorney-general", "George V. Shafer", "REP"),
+            11: ("attorney-general", "T. H. H. Thoreson", "DEM"),
+            12: ("insurance-commissioner", "S. A. Olsness", "REP"),
+            13: ("insurance-commissioner", "W. S. Hooper", "DEM"),
+            14: ("commissioner-of-agriculture", "Joseph A. Kitchen", "REP"),
+            15: ("commissioner-of-agriculture", "William J. Church", None),
+            16: ("public-service-commissioner", "Fay Harding", "REP"),
+            17: ("public-service-commissioner", "C. W. McDonnell", "REP"),
+            18: ("public-service-commissioner", "Frank Milholland", "REP"),
+            19: ("public-service-commissioner", "L. M. Byrne", "DEM"),
+            20: ("public-service-commissioner", "Edward Hadley", "DEM"),
+            21: ("public-service-commissioner", "Edward Kibler", "DEM"),
+        },
+    ),
+    1922: (
+        0,
+        {
+            4: ("lieutenant-governor", "Frank H. Hyland", "REP"),
+            5: ("lieutenant-governor", "Eric A. Bowman", None),
+            6: ("secretary-of-state", "Thomas Hall", "REP"),
+            7: ("secretary-of-state", "P. A. Moeller", None),
+            8: ("auditor", "D. C. Poindexter", "REP"),
+            9: ("auditor", "Hans Anderson", "DEM"),
+            10: ("treasurer", "John Steen", "REP"),
+            11: ("treasurer", "E. G. Larson", None),
+            12: ("attorney-general", "George F. Shafer", "REP"),
+            13: ("attorney-general", "H. J. Ulsrud", None),
+            14: ("insurance-commissioner", "S. A. Olsness", "REP"),
+            15: ("insurance-commissioner", "E. A. Lillibridge", "DEM"),
+            16: ("commissioner-of-agriculture", "J. A. Kitchen", "REP"),
+            17: ("commissioner-of-agriculture", "Bert F. Baker", None),
+            18: ("public-service-commissioner", "Fay Harding", "REP"),
+            19: ("public-service-commissioner", "C. W. McDonnell", "REP"),
+            20: ("public-service-commissioner", "Frank Milholland", "REP"),
+            21: ("public-service-commissioner", "Arthur Dixon", "DEM"),
+            22: ("public-service-commissioner", "Wm. J. O'Leary", "DEM"),
+            23: ("public-service-commissioner", "C. W. Pollock", "DEM"),
+        },
+    ),
+    1920: (
+        0,
+        {
+            4: ("lieutenant-governor", "John F. McGrann", "DEM"),
+            5: ("lieutenant-governor", "Howard R. Wood", "REP"),
+            6: ("secretary-of-state", "Thomas Hall", "REP"),
+            7: ("secretary-of-state", "Alfhild Alfson", None),
+            8: ("auditor", "Carl R. Kositzky", "DEM"),
+            9: ("auditor", "D. C. Poindexter", "REP"),
+            10: ("treasurer", "Ole Kaldor", None),
+            11: ("treasurer", "John Steen", "REP"),
+            12: ("attorney-general", "Rheinhart J. Kamplin", "DEM"),
+            13: ("attorney-general", "William Demise", "REP"),
+            14: ("insurance-commissioner", "S. A. Olsness", "REP"),
+            15: ("insurance-commissioner", "G. I. Solum", "DEM"),
+            16: ("commissioner-of-agriculture", "John N. Hagen", "REP"),
+            17: ("commissioner-of-agriculture", "J. T. Nelson", None),
+            18: ("public-service-commissioner", "H. D. Allert", "DEM"),
+            19: ("public-service-commissioner", "F. C. Hildebrand", None),
+            20: ("public-service-commissioner", "C. W. McDonnell", "REP"),
+            21: ("public-service-commissioner", "Frank Milholland", "REP"),
+            22: ("public-service-commissioner", "F. J. Krueger", "REP"),
+            23: ("public-service-commissioner", "W. H. Stutsman", "REP"),
+        },
+    ),
+    1918: (
+        0,
+        {
+            4: ("lieutenant-governor", "Howard R. Wood", "REP"),
+            5: ("lieutenant-governor", "J. P. Smith", "DEM"),
+            6: ("secretary-of-state", "Thomas Hall", "REP"),
+            7: ("auditor", "Carl R. Kositzky", "REP"),
+            8: ("auditor", "Theo. Serr", "DEM"),
+            9: ("treasurer", "Obert A. Olson", "REP"),
+            10: ("treasurer", "M. F. Hegge", "DEM"),
+            11: ("attorney-general", "William Langer", "REP"),
+            12: ("attorney-general", "G. S. Wooledge", "DEM"),
+            13: ("insurance-commissioner", "S. A. Olsness", "REP"),
+            14: ("insurance-commissioner", "F. B. Schneller", "DEM"),
+            15: ("commissioner-of-agriculture", "John N. Hagan", "REP"),
+            16: ("commissioner-of-agriculture", "David Gorman", "DEM"),
+            17: ("public-service-commissioner", "S. J. Aandahl", "REP"),
+            18: ("public-service-commissioner", "O. F. Dupuis", "REP"),
+            19: ("public-service-commissioner", "Frank Milholland", "REP"),
+            20: ("public-service-commissioner", "J. L. Harvey", "DEM"),
+            21: ("public-service-commissioner", "M. P. Johnson", "DEM"),
+            22: ("public-service-commissioner", "Adam G. Lesmeister", "DEM"),
+        },
+    ),
     1992: (
         1,
         {
@@ -665,7 +807,12 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
-CUTS = {1928: 870}
+DEBUG: list = []
+WORDS: dict = {}
+LINES: dict = {}
+CUTS = {1928: 870, 1920: 960, 1922: 800}
+LABELS = {1924: 400}
+PRINTED = {(1926, 7): 127506}
 ERRATA = {
     (1940, "Alvin C. Strutz"),
     (1940, "Math Dahl"),
@@ -786,7 +933,12 @@ def parse() -> None:
                 for i, piece in enumerate(pieces)
                 if piece and piece != "|"
             ]
-        first = next(w for w in words if w[4].upper() == "ADAMS" and w[0] < 300)
+        for i, w in enumerate(words):
+            if w[4] == "A" and any(v[4] == "dams" and abs(v[1] - w[1]) < 2 and 0 <= v[0] - w[2] < 3 for v in words):
+                other = next(v for v in words if v[4] == "dams" and abs(v[1] - w[1]) < 2 and 0 <= v[0] - w[2] < 3)
+                words.remove(other)
+                words[i] = (w[0], w[1], other[2], other[3], "Adams")
+        first = next(w for w in words if w[4].upper() == "ADAMS" and w[0] < LABELS.get(year, 300))
         edge = (
             EDGES.get(year)
             or -20
@@ -811,6 +963,7 @@ def parse() -> None:
         keys = [TYPOS.get(plain(text), plain(text)) for _, text in lines[:-1]]
         if sorted(keys) != sorted(codes):
             raise ValueError(f"{year}: counties {sorted(set(keys) ^ set(codes))}")
+        LINES[year] = (lines, edge, keys, min(w[0] for w in names))
         numbers = [w for w in words if re.fullmatch(NUMBER, w[4]) and w[0] >= edge and w[3] - w[1] <= 12]
 
         def nearest(w: tuple) -> int:
@@ -922,6 +1075,7 @@ def parse() -> None:
                     pi, pj, matched = back[(i, j)]
                     if matched is not None:
                         cells[(matched, column)] = value(members[pi][4])
+                        WORDS[(year, matched, column)] = (index, members[pi])
                         if re.search(r"[?<So]", members[pi][4]) or re.search(r",\d{1,2}$", members[pi][4]):
                             unreadable.add((matched, column))
                     i, j = pi, pj
@@ -937,7 +1091,7 @@ def parse() -> None:
                     raise ValueError(f"{year}: two numbers in {keys[line]} column {column}")
                 cells[(line, column)] = value(w[4])
         for column, (office, candidate, code) in columns.items():
-            printed = cells[(len(keys), column)]
+            printed = PRINTED.get((year, column)) or cells[(len(keys), column)]
             gaps = [
                 line
                 for line in range(len(keys))
@@ -948,6 +1102,11 @@ def parse() -> None:
                 cells[(gaps[0], column)] = printed - sum(cells.get((line, column), 0) for line in range(len(keys)))
             values = [cells.get((line, column), 0) for line in range(len(keys))]
             if sum(values) != printed:
+                if __import__("os").environ.get("ND_DEBUG"):
+                    DEBUG.append(
+                        (year, column, office, candidate, sum(values) - printed, list(keys), list(values), printed)
+                    )
+                    continue
                 if (
                     year not in FILES
                     or (year, candidate) not in ERRATA
