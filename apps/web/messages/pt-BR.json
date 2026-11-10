@@ -1614,6 +1614,7 @@
   "cycle_day": "Também na cédula de {place} em {date}",
   "cycle_governor": "Governadores",
   "cycle_legislature": "Cadeiras legislativas estaduais",
+  "cycle_region_legislature": "Cadeiras legislativas regionais",
   "cycle_regional_office": "Outros cargos estaduais",
   "cycle_region_office": "Outros cargos regionais",
   "cycle_national_measure": "Consultas populares nacionais",

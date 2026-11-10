@@ -1576,6 +1576,7 @@
   "cycle_day": "Außerdem auf dem Stimmzettel in {place} am {date}",
   "cycle_governor": "Gouverneurswahlen",
   "cycle_legislature": "Parlamentssitze der Bundesstaaten",
+  "cycle_region_legislature": "Sitze in Regionalparlamenten",
   "cycle_regional_office": "Weitere Ämter auf Bundesstaatsebene",
   "cycle_region_office": "Weitere regionale Ämter",
   "cycle_national_measure": "Nationale Abstimmungsvorlagen",

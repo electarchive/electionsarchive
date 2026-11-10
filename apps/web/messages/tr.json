@@ -1576,6 +1576,7 @@
   "cycle_day": "{date} tarihinde {place} için oy pusulasında yer alan diğer konular",
   "cycle_governor": "Valilik yarışları",
   "cycle_legislature": "Eyalet yasama organı sandalyeleri",
+  "cycle_region_legislature": "Bölgesel yasama organı sandalyeleri",
   "cycle_regional_office": "Eyalet genelindeki diğer görevler",
   "cycle_region_office": "Diğer bölgesel görevler",
   "cycle_national_measure": "Ulusal halkoylaması önerileri",

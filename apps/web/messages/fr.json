@@ -1615,6 +1615,7 @@
   "cycle_day": "Également au scrutin le {date} : {place}",
   "cycle_governor": "Gouverneurs",
   "cycle_legislature": "Sièges des législatures d'État",
+  "cycle_region_legislature": "Sièges des assemblées régionales",
   "cycle_regional_office": "Autres postes à l'échelle de l'État",
   "cycle_region_office": "Autres postes régionaux",
   "cycle_national_measure": "Questions référendaires nationales",
