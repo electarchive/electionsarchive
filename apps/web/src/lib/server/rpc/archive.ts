@@ -8413,6 +8413,9 @@ export const contests = {
           `),
         ]);
       const path = slugs.get(contest.id) ?? null;
+      if (area != null) {
+        turnout(contest.id, [area.k]).catch(() => null);
+      }
       const covers =
         area == null
           ? null
