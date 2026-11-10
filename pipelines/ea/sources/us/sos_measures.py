@@ -157,10 +157,16 @@ AZ_SCANS = {
     1982: (date(1982, 11, 2), "canvass1982ge.pdf"),
     1984: (date(1984, 11, 6), "canvass1984ge.pdf"),
     1986: (date(1986, 11, 4), "canvass1986ge.pdf"),
+    1988: (date(1988, 11, 8), "canvass1988ge.pdf"),
     1990: (date(1990, 11, 6), "canvass1990ge.pdf"),
     1992: (date(1992, 11, 3), "canvass1992ge.pdf"),
     1994: (date(1994, 11, 8), "canvass1994ge.pdf"),
     1996: (date(1996, 11, 5), "canvass1996ge.pdf"),
+}
+AZ_SCAN_COPIES = {
+    (1980, 14): "35965.pdf",
+    (1988, 11): "35969.pdf",
+    (1988, 12): "35969.pdf",
 }
 AZ_SCAN_MEASURES = {
     1974: {
@@ -196,6 +202,10 @@ AZ_SCAN_MEASURES = {
         "102": ("Ineligibility of the state treasurer for more than two consecutive terms", "Legislative Referendum"),
         "103": ("Tax exemption for areas of privately owned airports", "Legislative Referendum"),
         "104": ("Confinement of minors convicted as adults", "Legislative Referendum"),
+        "105": ("Right to sue for persons eligible for workers' compensation", "Legislative Referendum"),
+        "106": ("Limit on property taxes and on new taxes without a two-thirds vote", "Initiative"),
+        "200": ("State lottery", "Initiative"),
+        "300": ("Legislative salaries", "Legislative Referendum"),
     },
     1982: {
         "101": ("Bail for felony defendants who pose a danger to society", "Legislative Referendum"),
@@ -231,6 +241,16 @@ AZ_SCAN_MEASURES = {
         "102": ("Expenditure limitation base limits for political subdivisions", "Legislative Referendum"),
         "103": ("Right to seek monetary damages", "Initiative"),
         "200": ("Campaign contribution limits", "Initiative"),
+        "300": ("Legislative salaries", "Legislative Referendum"),
+    },
+    1988: {
+        "100": ("Repeal of the term limit for the state treasurer", "Legislative Referendum"),
+        "101": ("Corporation Commission valuation of public service corporations", "Legislative Referendum"),
+        "102": ("Commission on Judicial Conduct", "Legislative Referendum"),
+        "103": ("Removal of the male requirement for state office", "Legislative Referendum"),
+        "104": ("Voter-approved debt for cities and towns", "Legislative Referendum"),
+        "105": ("Vote requirements and runoff elections for state executive officers", "Legislative Referendum"),
+        "106": ("English as the official language", "Initiative"),
         "300": ("Legislative salaries", "Legislative Referendum"),
     },
     1990: {
@@ -2859,6 +2879,8 @@ def fetch() -> None:
     store_manual(AZ_1998_URL, AZ_1998[1], "application/pdf")
     for _, file in AZ_SCANS.values():
         store_manual(f"manual://MF-556/{file}", f"MF-556/{file}", "application/pdf")
+    for file in set(AZ_SCAN_COPIES.values()):
+        store_manual(f"manual://MF-574/{file}", f"MF-574/{file}", "application/pdf")
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, path if path.startswith("https:") else AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -3668,7 +3690,8 @@ def arizona() -> list[dict[str, object]]:
         for line in csv.DictReader(handle, delimiter="\t"):
             year = int(line["year"])
             day, file = AZ_SCANS[year]
-            url = f"manual://MF-556/{file}"
+            copy = AZ_SCAN_COPIES.get((year, int(line["page"])))
+            url = f"manual://MF-574/{copy}" if copy else f"manual://MF-556/{file}"
             if url not in sizes:
                 info = subprocess.run(
                     ["pdfinfo", str(raw.cached(SOURCE, url).path)], capture_output=True, text=True, check=True
