@@ -372,16 +372,56 @@ def snap(people: frozenset[str], wanted: set[str], words: set[str]) -> frozenset
     return frozenset(swaps.get(name, name) for name in people)
 
 
+CLARITY_HOST = "results.enr.clarityelections.com"
+CLARITY_CHALLENGE = {202, 403, 405}
+CLARITY_EVERY = 300
+CLARITY_CHALLENGED_EVERY = 3600
+clarity_admitted: set[str] = set()
+
+
+def clarity_tenant(url: str) -> str | None:
+    parts = httpx.URL(url)
+    if parts.host != CLARITY_HOST:
+        return None
+    return "/".join(parts.path.strip("/").split("/")[:2])
+
+
+def clarity_gate(tenant: str, challenged: bool | None = None) -> bool:
+    path = PARSED / "clarity-polls.json"
+    state: dict[str, dict[str, float | bool]] = json.loads(path.read_text()) if path.exists() else {}
+    entry = state.get(tenant, {})
+    now = time.time()
+    if challenged is None:
+        wait = CLARITY_CHALLENGED_EVERY if entry.get("challenged") else CLARITY_EVERY
+        return now - float(entry.get("at", 0)) >= wait
+    state[tenant] = {"at": now, "challenged": challenged}
+    PARSED.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state))
+    return True
+
+
 def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
+    tenant = clarity_tenant(url)
+    if tenant is not None and tenant not in clarity_admitted:
+        if not clarity_gate(tenant):
+            print(f"clarity {tenant}: polled recently, frame kept")
+            return None
+        clarity_admitted.add(tenant)
     for attempt in range(3):
         try:
             response = client.get(url, headers=headers)
         except httpx.TransportError:
             time.sleep(2 + attempt * 3)
             continue
+        if tenant is not None and response.status_code in CLARITY_CHALLENGE:
+            clarity_gate(tenant, True)
+            print(f"clarity {tenant}: challenged (HTTP {response.status_code}), frame kept")
+            return None
         if response.status_code == 404:
             return None
         if response.status_code < 400 and response.status_code != 202:
+            if tenant is not None:
+                clarity_gate(tenant, False)
             return response.content
         time.sleep(1 + attempt)
     return None
