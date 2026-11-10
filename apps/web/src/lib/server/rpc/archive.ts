@@ -9728,12 +9728,9 @@ export const contests = {
         if (first == null) {
           return null;
         }
-        if (
+        const isPlain =
           new Set(found.rows.map((row) => row.party)).size <= 1 &&
-          found.rows.some((row) => row.person != null)
-        ) {
-          return null;
-        }
+          found.rows.some((row) => row.person != null);
         const keyed = (row: {
           party: string | null;
           person: string | null;
@@ -9749,12 +9746,15 @@ export const contests = {
                 : `person:${row.person}`;
         const own = found.rows.find((row) => row.id === contest.root);
         const legend = Map.groupBy(
-          [
-            ...found.rows.filter(
-              (row) => row.option != null && (row.margin !== 0 || row.decided),
-            ),
-            ...found.rows.flatMap((row) => row.held ?? []),
-          ],
+          isPlain
+            ? []
+            : [
+                ...found.rows.filter(
+                  (row) =>
+                    row.option != null && (row.margin !== 0 || row.decided),
+                ),
+                ...found.rows.flatMap((row) => row.held ?? []),
+              ],
           keyed,
         )
           .entries()
@@ -9835,7 +9835,7 @@ export const contests = {
               (row.held ?? []).map((entry) => [keyed(entry), entry.seats]),
               index,
             ),
-            margin: row.margin,
+            margin: isPlain ? null : row.margin,
             earlier: null,
             prior: null,
           })),

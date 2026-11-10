@@ -1675,6 +1675,7 @@
       levels={[]}
       span={null}
       isLinked
+      isFixed={shown.places.legend.length === 0}
     />
   {/key}
   {#if shown.places.context != null}
@@ -1766,85 +1767,95 @@
 {/if}
 
 {#if contest.current == null && contest.declared != null}
-  <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
-    <p class="text-[0.9375rem] text-muted-foreground">
-      {DECLARED[contest.declared.kind]?.() ?? ""}
-    </p>
-    <ul class="grid gap-1.5 text-sm/tight">
-      {#each contest.declared.rows as row (row.key)}
-        <li
-          class="flex items-baseline gap-2"
-          style:--party={swatch(row.color, row.key)}
-        >
-          <span
-            class="shrink-0 self-center rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-          ></span>
-          <span class="min-inline-0">
-            <Name
-              class="font-semibold"
-              label={row.label}
-              color={swatch(row.color, row.key)}
-              hasSwatch={false}
-              person={row.person}
-              party={row.party}
-            />
-            {#if row.short != null && row.short !== row.label}
+  {const declared = $derived(contest.declared)}
+  {#snippet located()}
+    {#if locating != null}
+      {@render locator(locating)}
+    {/if}
+  {/snippet}
+  {#snippet listed()}
+    <section class="grid content-start gap-2.5 bg-card px-3.5 py-4">
+      <p class="text-[0.9375rem] text-muted-foreground">
+        {DECLARED[declared.kind]?.() ?? ""}
+      </p>
+      <ul class="grid gap-1.5 text-sm/tight">
+        {#each declared.rows as row (row.key)}
+          <li
+            class="flex items-baseline gap-2"
+            style:--party={swatch(row.color, row.key)}
+          >
+            <span
+              class="shrink-0 self-center rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+            ></span>
+            <span class="min-inline-0">
               <Name
-                class="text-[0.8125rem] text-muted-foreground"
-                label={row.short}
+                class="font-semibold"
+                label={row.label}
                 color={swatch(row.color, row.key)}
                 hasSwatch={false}
+                person={row.person}
                 party={row.party}
               />
-            {/if}
-            {#if row.seats != null}
-              <span
-                class="ms-1 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                >{SEATS[contest.kind]?.() ?? m.col_seats()}
-                {count(row.seats)}</span
-              >
-            {/if}
-            {#if row.note == null || row.isDeclined}
-              <span
-                class={cn("ms-1 px-1 text-xs font-semibold", {
-                  "rounded-xs bg-(--party) knockout":
-                    !row.isDeclined && ["won", "elected"].includes(row.outcome),
-                  "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
-                    row.isDeclined,
-                  "highlighter text-foreground":
-                    !row.isDeclined &&
-                    !["won", "elected"].includes(row.outcome),
-                })}>{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
-              >
-              {#if row.isDeclined}
-                <Term
-                  class="ms-1 text-xs text-muted-foreground"
-                  label={m.outcome_declined()}
-                  definition={row.note == null
-                    ? m.outcome_declined_definition()
-                    : explain(row.note)}
+              {#if row.short != null && row.short !== row.label}
+                <Name
+                  class="text-[0.8125rem] text-muted-foreground"
+                  label={row.short}
+                  color={swatch(row.color, row.key)}
+                  hasSwatch={false}
+                  party={row.party}
                 />
               {/if}
-            {:else}
-              <Term
-                class={cn("ms-1 px-1 text-xs font-semibold", {
-                  "rounded-xs bg-(--party) knockout": [
-                    "won",
-                    "elected",
-                  ].includes(row.outcome),
-                  "highlighter text-foreground": !["won", "elected"].includes(
-                    row.outcome,
-                  ),
-                })}
-                label={OUTCOMES[row.outcome]?.() ?? row.outcome}
-                definition={explain(row.note)}
-              />
-            {/if}
-          </span>
-        </li>
-      {/each}
-    </ul>
-  </section>
+              {#if row.seats != null}
+                <span
+                  class="ms-1 font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                  >{SEATS[contest.kind]?.() ?? m.col_seats()}
+                  {count(row.seats)}</span
+                >
+              {/if}
+              {#if row.note == null || row.isDeclined}
+                <span
+                  class={cn("ms-1 px-1 text-xs font-semibold", {
+                    "rounded-xs bg-(--party) knockout":
+                      !row.isDeclined &&
+                      ["won", "elected"].includes(row.outcome),
+                    "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                      row.isDeclined,
+                    "highlighter text-foreground":
+                      !row.isDeclined &&
+                      !["won", "elected"].includes(row.outcome),
+                  })}>{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
+                >
+                {#if row.isDeclined}
+                  <Term
+                    class="ms-1 text-xs text-muted-foreground"
+                    label={m.outcome_declined()}
+                    definition={row.note == null
+                      ? m.outcome_declined_definition()
+                      : explain(row.note)}
+                  />
+                {/if}
+              {:else}
+                <Term
+                  class={cn("ms-1 px-1 text-xs font-semibold", {
+                    "rounded-xs bg-(--party) knockout": [
+                      "won",
+                      "elected",
+                    ].includes(row.outcome),
+                    "highlighter text-foreground": !["won", "elected"].includes(
+                      row.outcome,
+                    ),
+                  })}
+                  label={OUTCOMES[row.outcome]?.() ?? row.outcome}
+                  definition={explain(row.note)}
+                />
+              {/if}
+            </span>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/snippet}
+  <Lead results={listed} map={locating == null ? null : located} />
 {:else if contest.current == null && contest.turnout != null}
   {@render stats()}
   <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
