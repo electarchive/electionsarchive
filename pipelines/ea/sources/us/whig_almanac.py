@@ -188,10 +188,10 @@ def _read(name: str) -> tuple[list[tuple[int, str, str, list[int | None], list[s
                 elif line.startswith("HEAD") and "|" in line:
                     head = [label.strip() for label in line.split("|", 1)[1].replace("|", ",").split(",")]
                 elif match := re.fullmatch(r"TOTAL\s+(\d{4})\s*\|(.*)", line):
-                    for part in match[2].split(","):
+                    for part in match[2].split(",") if int(match[1]) in CANDIDATES else ():
                         if found := re.fullmatch(r"\s*(.*?)\s+([\d,]+)\s*", part):
                             candidate = _candidate(int(match[1]), found[1])
-                            if candidate is not None and int(match[1]) in CANDIDATES:
+                            if candidate is not None:
                                 totals[(state, int(match[1]), candidate)] = int(found[2].replace(",", ""))
                 elif "|" in line and state and head:
                     county, rest = (part.strip() for part in line.split("|", 1))
@@ -205,6 +205,22 @@ def _read(name: str) -> tuple[list[tuple[int, str, str, list[int | None], list[s
 
 def build() -> None:
     reads = {name: _read(name) for name in READS}
+    labeled: dict[tuple[int, str, int], str] = {}
+    for page in PAGES:
+        best = max(READS, key=lambda n: len({r[1] for r in reads[n][0] if r[0] == page}))
+        seen_n: Counter[tuple[int, str]] = Counter()
+        for row in reads[best][0]:
+            if row[0] == page:
+                seen_n[(page, _plain(row[2]))] += 1
+                labeled[(page, _plain(row[2]), seen_n[(page, _plain(row[2]))])] = row[1]
+    for name, (rows, totals) in reads.items():
+        seen_n = Counter()
+        fixed = []
+        for row in rows:
+            at = (row[0], _plain(row[2]))
+            seen_n[at] += 1
+            fixed.append((row[0], labeled.get((*at, seen_n[at]), row[1]), *row[2:]))
+        reads[name] = (fixed, totals)
     first = next(iter(READS))
     order: list[tuple[str, str]] = []
     pages: dict[tuple[str, str], int] = {}
