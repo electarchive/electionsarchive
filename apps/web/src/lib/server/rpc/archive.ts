@@ -25163,8 +25163,8 @@ export const bodies = {
               walk(origin, via, before) as (
                 select t.id, t.acquired_via::text, c.before from tenure t left join chain c on c.id = t.id
                 where t.body_id = ${input.id}::uuid
-                  and coalesce(t.from_date, '-infinity'::date) < coalesce(${end}::date, 'infinity'::date)
-                  and coalesce(t.to_date, 'infinity'::date) > ${start}::date
+                  and (t.from_date is null or ${end}::date is null or t.from_date < ${end}::date)
+                  and (t.to_date is null or t.to_date > ${start}::date)
                 union all
                 select w.origin, p.acquired_via::text, c.before from walk w
                 join tenure p on p.id = w.before and p.body_id = ${input.id}::uuid
@@ -25230,8 +25230,8 @@ export const bodies = {
                   lower(a.valid) nulls first limit 1
               ) a on true
               where t.body_id = ${input.id}::uuid
-                and coalesce(t.from_date, '-infinity'::date) < coalesce(${end}::date, 'infinity'::date)
-                and coalesce(t.to_date, 'infinity'::date) > ${start}::date
+                and (t.from_date is null or ${end}::date is null or t.from_date < ${end}::date)
+                and (t.to_date is null or t.to_date > ${start}::date)
               order by t.from_date, t.person_id
             `);
       let kept = seated?.rows ?? [];
