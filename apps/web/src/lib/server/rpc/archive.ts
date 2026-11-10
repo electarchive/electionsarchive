@@ -1134,8 +1134,11 @@ export async function paths(ids: Array<string>) {
 
 const COURT = /\b(?:Judge|Justice|Court|Surrogate|Magistrate)\b/u;
 
-async function breadcrumbs(polity: string, keep: string | null = null) {
-  const result = await db.execute<{ id: string }>(sql`
+const crumbIds = (polity: string, keep: string | null) =>
+  remember(
+    `crumbs:${polity}:${keep ?? ""}`,
+    async () => {
+      const result = await db.execute<{ id: string }>(sql`
     with recursive chain(id, depth) as (
       select ${polity}::uuid, 0
       union all
@@ -1173,7 +1176,15 @@ async function breadcrumbs(polity: string, keep: string | null = null) {
     ) x
     group by id order by max(depth) desc
   `);
-  const ids = result.rows.map((row) => row.id);
+      return result.rows.map((row) => row.id);
+    },
+    true,
+    undefined,
+    true,
+  );
+
+async function breadcrumbs(polity: string, keep: string | null = null) {
+  const ids = await crumbIds(polity, keep);
   const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
   return ids.map((id) => ({
     name: labels.full.get(id) ?? "",
