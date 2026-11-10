@@ -895,6 +895,7 @@ export const contest = pgTable("contest", {
 	index("contest_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 	index("contest_district_area_idx").using("btree", table.districtAreaId.asc().nullsLast()),
 	index("contest_election_idx").using("btree", table.electionId.asc().nullsLast()),
+	index("contest_later_round_idx").using("btree", table.electionId.asc().nullsLast()).where(sql`(round_number > 1)`),
 	index("contest_office_idx").using("btree", table.officeId.asc().nullsLast()),
 	index("contest_previous_round_idx").using("btree", table.previousRoundId.asc().nullsLast()),
 	index("contest_seat_idx").using("btree", table.seatId.asc().nullsLast()),
