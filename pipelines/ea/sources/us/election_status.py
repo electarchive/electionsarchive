@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.election_status"
-VERSION = "1"
+VERSION = "2"
 PIPELINES = [
     "us.az_districts_2026",
     "us.az_fire_2026",
@@ -19,6 +19,31 @@ PIPELINES = [
     "us.or_swcd_2026",
     "us.sc_swcd_2026",
     "us.wa_districts_2026",
+    "us.ar_measures_2026",
+    "us.az_measures_2026",
+    "us.ca_measures_2026",
+    "us.co_boulder_2026",
+    "us.co_denver_2026",
+    "us.co_frpr_2026",
+    "us.co_tabor_2026",
+    "us.fl_charter_2026",
+    "us.ga_measures_2026",
+    "us.ia_measures_2026",
+    "us.id_ada_2026",
+    "us.il_measures_2026",
+    "us.in_questions_2026",
+    "us.la_propositions_2026",
+    "us.mi_county_2026",
+    "us.mn_questions_2026",
+    "us.mo_measures_2026",
+    "us.nc_referendums_2026",
+    "us.nd_measures_2026",
+    "us.tx_colleges_2026",
+    "us.tx_harris_2026",
+    "us.tx_lonestar_2026",
+    "us.va_referenda_2026",
+    "us.wa_measures_2026",
+    "ie.byelections",
 ]
 
 
