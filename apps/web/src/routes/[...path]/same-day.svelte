@@ -151,7 +151,9 @@
         group.label !== "" &&
         !(
           isHere &&
-          (group.kind === "governor" || group.kind === "regional_office")
+          (group.kind === "governor" ||
+            group.kind === "regional_office" ||
+            group.kind === "region_office")
         ) &&
         !(group.anchor == null && listed.has(group.path)),
     );

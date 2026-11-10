@@ -581,8 +581,10 @@ const GROUPS = [
   "governor",
   "legislature",
   "regional_office",
+  "region_office",
   "national_measure",
   "regional_measure",
+  "region_measure",
   "local",
   "local_measure",
 ] as const;
@@ -12178,12 +12180,14 @@ export const contests = {
             select id, okind, part, case
                 when kind = 'ballot_question' then case
                   when ykind in ('sovereign_state', 'supranational', 'historical_state') then 'national_measure'
-                  when ykind in ('federal_unit', 'region') then 'regional_measure'
+                  when ykind = 'federal_unit' then 'regional_measure'
+                  when ykind = 'region' then 'region_measure'
                   else 'local_measure' end
                 when ykind in ('sovereign_state', 'supranational', 'historical_state') or own then 'owner'
                 when okind = 'governor' then 'governor'
                 when ykind in ('federal_unit', 'region') and kind <> 'office' then 'legislature'
-                when ykind in ('federal_unit', 'region') then 'regional_office'
+                when ykind = 'federal_unit' then 'regional_office'
+                when ykind = 'region' then 'region_office'
                 else 'local' end as kind,
               case when kind <> 'ballot_question' and (ykind in ('sovereign_state', 'supranational', 'historical_state') or own)
                 then coalesce(office_id, body_id)
@@ -12391,6 +12395,7 @@ export const contests = {
             "owner",
             "legislature",
             "regional_office",
+            "region_office",
             "local",
             "local_measure",
           ].includes(row.kind),

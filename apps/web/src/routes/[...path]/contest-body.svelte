@@ -136,8 +136,10 @@
     governor: m.cycle_governor,
     legislature: m.cycle_legislature,
     regional_office: m.cycle_regional_office,
+    region_office: m.cycle_region_office,
     national_measure: m.cycle_national_measure,
     regional_measure: m.cycle_regional_measure,
+    region_measure: m.cycle_region_measure,
     local: m.same_day_local,
     local_measure: m.same_day_local_measure,
   };
