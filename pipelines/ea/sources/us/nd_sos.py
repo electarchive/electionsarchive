@@ -420,7 +420,7 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             24: ("attorney-general", "John Moses", "DEM"),
             25: ("insurance-commissioner", "Harold Hopton", "REP"),
             26: ("insurance-commissioner", "John P. Jungers", "DEM"),
-            27: ("commissioner-of-agriculture", "Theo. Mantell", "REP"),
+            27: ("commissioner-of-agriculture", "Theo. Martell", "REP"),
             28: ("commissioner-of-agriculture", "O. W. Klindworth", "DEM"),
             29: ("commissioner-of-agriculture", "Harry Juul", None),
             30: ("public-service-commissioner", "Elmer Cart", "REP"),
