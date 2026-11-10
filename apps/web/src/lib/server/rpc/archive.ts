@@ -1555,23 +1555,24 @@ async function gather(
   const joined = linked.rows[0]?.yes
     ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
       with r as materialized (
-        select u.area_k, array_agg(u.unit_k) as units from unnest(${sql.param(ks)}::int[]) as s(k)
+        select distinct u.area_k from unnest(${sql.param(ks)}::int[]) as s(k)
         join result_rollup_unit u on u.result_set_k = s.k
-        group by u.area_k
       )
       select a.id, a.k, a.scheme_code as scheme
       from r join area a on a.k = r.area_k
+      cross join lateral (
+        select from result_rollup_unit u
+        join reporting_unit ru on ru.k = u.unit_k
+        cross join lateral (
+          select from reporting_unit_area m
+          where m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date offset 0
+        ) m
+        where u.result_set_k = any(${sql.param(ks)}::int[]) and u.area_k = a.k
+        limit 1
+      ) m
       where (select count(*) from r) <= 25000
         and a.id <> ${area.id}::uuid
         and a.scheme_code <> all(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
-        and exists (
-          select from reporting_unit ru
-          cross join lateral (
-            select from reporting_unit_area m
-            where m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date offset 0
-          ) m
-          where ru.k = any(r.units)
-        )
     `)
     : { rows: [] };
   const abroad =
