@@ -136,6 +136,7 @@ Every column that a page looks rows up by needs a btree index. The migration `20
 - `source_icpsr_idx`, a partial index of the sources whose license mentions ICPSR. The withdrawn-license filter reads it in every result-set query.
 - `body_polity_idx`, `office_polity_idx`, `office_body_idx`, `tenure_body_idx`, and `polity_parent_parent_idx`, which polity and body pages use.
 - `contest_option_alliance_idx`, a partial index on `(alliance_id, party_id)` for the 1% of options that belong to an alliance. Counting an alliance's wins had read every option of each member party, which took up to 400 ms. It now takes under a millisecond. It is added in migration `20261031230000_alliance_option_index`.
+- `candidacy_independent_idx` and `contest_option_independent_label_idx`, two partial indexes for the test of whether a winner is independent on the polity record. Without them, Postgres built each test's hash table by reading all of `candidacy` and every option with no party, about 100,000 buffers on every record, however small the polity. With them, the two tests read about 430 index pages, plus heap pages only where the visibility map is out of date. The second index's predicate repeats the ballot-label regex in `record()`, and the planner uses the index only when the two match exactly. Both are added in migration `20261110130000_independent_indexes`.
 
 To find another missing index, run the benchmark and then look at `seq_scan` and `seq_tup_read` in `pg_stat_user_tables`.
 

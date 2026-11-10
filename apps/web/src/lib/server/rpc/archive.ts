@@ -21483,6 +21483,7 @@ export async function record(input: { id: string; body?: string }) {
               and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
                 or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id)))
           or exists (select from contest_option o where o.id = w.id and o.party_id is null and o.alliance_id is null
+            /* contest_option_independent_label_idx: its predicate must match this regex byte for byte */
             and o.ballot_label ~* '^(independent|bağımsız|indépendant|unabhängig|indipendent)') as independent,
         case when r."isOffice" then (select coalesce(m.into_id, cy.person_id) from candidacy cy
           left join entity_merge m on m.entity_id = cy.person_id
