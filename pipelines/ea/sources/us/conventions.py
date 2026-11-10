@@ -2694,14 +2694,16 @@ def emit() -> Path:
             )
             publisher = convention.get("publisher", "Republican National Committee")
             source = cs.source(publisher, title)
-            cs.add(
-                "source",
-                id=source,
-                kind=convention.get("kind", "official_body"),
-                publisher=publisher,
-                title=title,
-                url=source_url,
-            )
+            if source not in added:
+                added.add(source)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind=convention.get("kind", "official_body"),
+                    publisher=publisher,
+                    title=title,
+                    url=source_url,
+                )
             pages = {}
             for spec in specs.values():
                 for leaf in spec["leaves"]:
