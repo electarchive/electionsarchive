@@ -338,7 +338,13 @@ TABLES += [
         "columns": (None, "Fremont", "McLean", "Seward"),
         "electors": True,
     },
-    {"table": "1864:republican", "item": "proceedingsoffir00inrepu", "leaves": (236, 237, 238, 239), "narrated": True},
+    {
+        "table": "1864:republican",
+        "item": "proceedingsoffir00inrepu",
+        "leaves": (236, 237, 238, 239),
+        "narrated": True,
+        "announced": True,
+    },
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (42,), "columns": ("votes", "Grant")},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
@@ -358,7 +364,12 @@ TABLES += [
             zip(((),) + DNC_1912[:-1], DNC_1912, DNC_1912[1:] + ((),), strict=True), start=1
         )
     ),
-    *leaves("official00demo", "1900", {"": (165, 166, 167)}, party="democratic"),
+    {
+        "table": "1900:democratic",
+        "item": "official00demo",
+        "leaves": (165, 166, 167),
+        "parts": {165: "full"},
+    },
     *leaves(
         "officialproce00de",
         "1896",
@@ -444,7 +455,6 @@ TABLES += [
     ),
 ]
 TABLES += [
-    {"table": "1900:democratic", "item": "official00demo", "leaves": (166, 167, 168)},
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
     {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295), "rotate": True},
     {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
@@ -2320,6 +2330,8 @@ def table(
                         ],
                     }
                 )
+    if spec.get("announced"):
+        cells = list({(cell["state"], cell["column"]): cell for cell in cells}.values())
     held = sum(cell["value"] for cell in cells if cell["column"] == "votes")
     if shifted and totals.get("votes", held) != held:
         totals = shifted
