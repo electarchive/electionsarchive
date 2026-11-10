@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "stray_names"
-VERSION = "7"
+VERSION = "8"
 FUSION = "a fusion ballot line, kept on the option's ballot label; merging the label into the party carried it over"
 DROPS = [
     ("us", "Republican Party", "Republican/Democratic", FUSION),
@@ -132,4 +132,19 @@ def emit() -> Path:
                 text=text,
                 reason="the same name with its accents stripped, beside the accented name",
             )
+        for name, entity, text, lang, kind, twin in conn.execute(
+            r"""select a.id, a.entity_id, a.text, a.lang, a.kind,
+                 exists (select from name b where b.entity_id = a.entity_id and b.lang = a.lang
+                   and b.text = btrim(a.text)) from name a
+               where a.text ~ '^\s' and not a.is_preferred"""
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=name,
+                entity_id=entity,
+                text=text,
+                reason="the name with a leading space, kept without it",
+            )
+            if not twin:
+                cs.add("name", entity_id=entity, text=text.strip(), lang=lang, kind=kind, is_preferred=False)
         return cs.write()
