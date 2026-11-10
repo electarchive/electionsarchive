@@ -1353,6 +1353,16 @@ export async function archive(path: string, search: URLSearchParams) {
         sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
       ),
     ).then((found) => found[0]?.id);
+    const races = parent.then(async (election) =>
+      election == null
+        ? null
+        : call(router.elections.races, {
+            id: election,
+            contest: slug.entity_id,
+            unit,
+          }).catch(() => null),
+    );
+    races.catch(() => null);
     const body = (async () => {
       const [
         contest,
@@ -1389,18 +1399,11 @@ export async function archive(path: string, search: URLSearchParams) {
       ahead(contest.count, input.round, async (round) =>
         call(router.contests.get, { ...input, round }),
       );
-      const election = await parent;
       const [surround, sameDay, isMerged] = await Promise.all([
         own != null && level?.tiles != null && own.frame != null
           ? null
           : around,
-        election == null
-          ? null
-          : call(router.elections.races, {
-              id: election,
-              contest: slug.entity_id,
-              unit,
-            }).catch(() => null),
+        races,
         merged.then((found) => found != null),
       ]);
       return {

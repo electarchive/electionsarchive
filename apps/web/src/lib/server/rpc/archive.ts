@@ -8965,7 +8965,6 @@ export const contests = {
           (there === "" ? here == null || here === "" : there === here)
         );
       });
-      const rootIds = kept.map((row) => row.id);
       const held = new Set([
         contest.election,
         ...kept
@@ -8981,6 +8980,9 @@ export const contests = {
       const comparable = kept.filter(
         (row) => row.counted && row.indirect === contest.indirect,
       );
+      const rootIds = [
+        ...new Set([...sameRace, ...comparable].map((row) => row.id)),
+      ];
       const day = contest.date;
       const county = (async () => {
         if (!isRoot || day == null) {
