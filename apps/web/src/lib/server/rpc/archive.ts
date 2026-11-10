@@ -24882,7 +24882,7 @@ export const bodies = {
           coalesce(sum(greatest(0, a.seats - (
             select count(distinct t.seat_id) from tenure t join seat st on st.id = t.seat_id
             where t.body_id = a.body_id and st.voting and st.apportioned_area_id = a.area_id
-              and t.from_date <= s.start and coalesce(t.to_date, 'infinity'::date) > s.start
+              and t.from_date <= s.start and (t.to_date is null or t.to_date > s.start)
           ))) filter (where exists (
             select from representation_gap g where g.body_id = a.body_id and g.area_id = a.area_id and g.valid @> s.start
           )), 0)::int as seceded
