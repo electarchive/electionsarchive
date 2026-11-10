@@ -1,8 +1,10 @@
 party	polity	name	item	inception	precision	earliest	evidence
 047942f1-3645-53eb-b2af-e248d22ff95c	BR	Democratas	Q1185830	2007-03-28	day	1994-10-03	option
 e5739d74-35aa-513d-b11c-6e0c4f95aa7e	BR	Partido Geral dos Trabalhadores	Q3056426	1995-01-01	year	1994-10-03	option
+6c61632c-c14e-55f7-a823-101a3a0685cb	BR	Partido Social Trabalhista	Q28678919	1996-01-01	year	1994-10-03	option
 01a13fb9-5ed7-71fc-acca-7e4894cbac62	CA	Co-operative Commonwealth Federation	Q1104026	1932-01-01	year	1930-07-08	option
 01a13fb6-eb6e-74dc-99cc-2a95bf8c0b13	CA	New Democratic Party	Q130765	1961-08-03	day	1961-05-29	option
+01a13fb9-5ed7-71fc-acca-7e2bff7a1d88	CA	Progressive	Q2112263	1920-03-03	day	1891-03-05	option
 01a13fb9-5ed7-71fc-acca-7e36dad16d63	CA	United Farmers	Q2622935	1926-01-01	year	1919-10-17	option
 cebf578a-7153-5c4d-91a0-b76d7a6f1b10	CH	Christlichsoziale Partei	Q667725	1997-06-21	day	1971-10-31	option
 01a13b7e-b158-7755-a39c-0b15339b6e61	CH	FDP.Die Liberalen	Q202638	2009-01-01	day	1919-10-26	option
@@ -27,6 +29,7 @@ ba3757d9-a949-5da1-af6e-720613fc2b9b	EU	Independence/Democracy Group	Q655137	200
 f575aabf-c859-5b95-a9b1-e814144b64e0	EU	Left Unity	Q2981072	1989-07-25	day	1989-01-01	name
 2740400b-7d89-5cb3-ae13-72865d523784	EU	Technical Group of Independent Members	Q1499674	1999-07-20	day	1999-01-01	name
 cca3f2b2-6729-5181-8426-c9561068e7ce	EU	Union for Europe of the Nations Group	Q835545	1999-07-20	day	1999-01-01	name
+207da6fd-e181-5fd7-83c6-202e1f0eada4	FR	Europe Écologie Les Verts	Q613786	2010-11-13	day	2009-06-04	option
 6e3a553f-9b1f-5a04-86fe-c52913e4dd6f	FR	Front national	Q205150	1972-10-27	day	1972-10-05	name
 3a9b1fd4-6431-57f3-9ea6-8624e61346bd	FR	Ligue communiste révolutionnaire	Q862627	1974-01-01	year	1969-06-01	option
 740afc7d-033c-5434-b6e8-9836ea464839	FR	Mouvement national républicain	Q1469596	1999-10-02	day	1999-06-10	option
@@ -73,6 +76,7 @@ e6b68b22-e54c-5858-a050-ed6df271ebea	IT	Left, Ecology and Freedom	Q286140	2009-1
 e598bbed-f242-5883-a4d1-be5965f4a898	IT	National Alliance	Q662849	1995-01-27	day	1994-03-27	option
 18067f0f-dad9-5adc-a90c-b65720b62952	IT	Party of Italian Communists	Q1428001	1998-10-11	day	1996-05-15	tenure_affiliation
 8c7c443a-62cd-5054-b46b-791ab39669be	IT	The People of Freedom	Q47720	2009-03-29	day	2008-04-13	option
+c7ca5ee1-ba76-555b-908a-1b9fecef87b4	PL	URP Real politics union	Q1584987	2011-03-25	day	2009-06-04	option
 01a13c0c-c7c5-74b3-a52f-540d0f6e2f76	TR	Adalet Partisi	Q97210769	2023-10-09	day	2023-05-14	option
 01a13dfc-a279-73f2-957b-1a15a210f39b	TR	Demokrat Parti	Q2067217	2007-05-27	day	1984-03-25	option
 01a140e3-5bde-7618-a844-44749ee044e9	TR	Demokratik Bölgeler Partisi	Q809719	2008-05-03	day	1999-04-01	tenure_affiliation
