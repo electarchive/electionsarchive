@@ -1,0 +1,10 @@
+[Unit]
+Description=Rebuild the precomputed polity records when a changeset was published after them (infra/records.sh)
+
+[Service]
+Type=oneshot
+Nice=10
+TimeoutStartSec=90min
+WorkingDirectory=%h/electionsarchive
+Environment=PATH=%h/.local/bin:%h/.local/share/vite-plus/bin:/usr/local/bin:/usr/bin
+ExecStart=%h/electionsarchive/infra/records.sh
