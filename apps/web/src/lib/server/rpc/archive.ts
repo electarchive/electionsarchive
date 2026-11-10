@@ -337,7 +337,7 @@ const undated = (tenure: string) => {
   return sql`
     (${t}.from_precision = 'unknown'
       and exists (select from note n where n.entity_id = ${t}.id and n.body_md like '%entering at a by-election%')
-      and exists (select from tenure d where d.body_id = ${t}.body_id and d.from_date = ${t}.from_date and d.from_precision = 'day'))
+      and exists (select from tenure dd where dd.body_id = ${t}.body_id and dd.from_date = ${t}.from_date and dd.from_precision = 'day'))
   `;
 };
 
