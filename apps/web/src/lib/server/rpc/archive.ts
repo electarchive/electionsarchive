@@ -9366,13 +9366,18 @@ export const contests = {
       }>(sql`
         select distinct on (c.id, o.k) c.id as root, head.person, x.party, ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
           coalesce(o.ballot_label, o.kind::text) as label, w.seats, (
-            select sum(y.value)::float8 from result_rollup y
-            where y.result_set_k = rs.k and y.option_k = o.k and y.measure = any(${COUNTED}) and y.count_round in (0, 1)
-              and y.area_k = (
-                select a.k from area a where a.id = coalesce(c.district_area_id, (
-                  select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1
-                ))
-              )
+            select sum(t.value)::float8 from (
+              select y.value from result_rollup_sum y
+              where y.result_set_k = rs.k and y.area_k = ar.k and y.option_k = o.k and y.measure = any(${COUNTED}) and y.count_round in (0, 1)
+              union all
+              select z.value from result_rollup_unit u
+              cross join lateral (
+                select v.measure, v.count_round, v.value from result_value v
+                where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.option_k = o.k
+                offset 0
+              ) z
+              where u.result_set_k = rs.k and u.area_k = ar.k and z.measure = any(${COUNTED}) and z.count_round in (0, 1)
+            ) t
             offset 0
           ) as votes
         from contest c
@@ -9380,6 +9385,11 @@ export const contests = {
         join result_set rs on rs.contest_id = c.id and ${latest("rs")}
         join outcome w on w.result_set_id = rs.id and w.kind in ('won', 'elected') and w.candidacy_id is null
         join contest_option o on o.id = w.option_id
+        left join lateral (
+          select a.k from area a where a.id = coalesce(c.district_area_id, (
+            select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1
+          ))
+        ) ar on true
         left join entity_merge pm on pm.entity_id = o.party_id
         cross join lateral (select coalesce(pm.into_id, o.party_id) as party) x
         left join lateral (
