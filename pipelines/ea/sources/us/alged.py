@@ -340,6 +340,11 @@ def _people(frame: pl.DataFrame) -> dict[tuple[str, str, int], tuple[str, str | 
     return people
 
 
+def _person(name: str) -> str:
+    words = slug(re.sub(r"(?i)\b(?:jr|sr|ii|iii|iv)\b\.?", " ", name)).split("-")
+    return f"{words[0][:1]}:{_surname(name)}" if words[0] else ""
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     people = _people(frame)
@@ -567,7 +572,7 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
-        dated: dict[tuple[UUID, int], list[tuple[int, date, UUID, UUID, set[str]]]] = defaultdict(list)
+        dated: dict[tuple[UUID, int], list[tuple[int, date, UUID, UUID, set[str], set[str]]]] = defaultdict(list)
         for contest, election, polity, day, ballots in conn.execute(
             """select c.id, e.id, e.polity_id, e.date_from, array_agg(y.ballot_name)
                from contest c join election e on e.id = c.election_id and e.date_precision = 'day'
@@ -580,7 +585,16 @@ def emit() -> Path:
                group by 1, 2, 3, 4""",
             [SOURCE, [polity for polity, *_ in polities.values()]],
         ).fetchall():
-            dated[(polity, day.year)].append((day.month, day, contest, election, set(map(_surname, ballots)) - {""}))
+            dated[(polity, day.year)].append(
+                (
+                    day.month,
+                    day,
+                    contest,
+                    election,
+                    set(map(_surname, ballots)) - {""},
+                    set(map(_person, ballots)) - {""},
+                )
+            )
         twins: dict[UUID, tuple[date, UUID, UUID]] = {}
         for (contest_id,), rows in frame.sort("contest", "votes", descending=[False, True]).group_by(
             "contest", maintain_order=True
@@ -599,23 +613,24 @@ def emit() -> Path:
             if code not in polities:
                 continue
             polity, place, path, word = polities[code]
-            if not (month == 11 and usps != "LA"):
-                names = {
-                    _surname(full_name)
-                    for full_name in rows["full_name"]
-                    if not re.fullmatch(r"(?i)scattering|write-?ins?", full_name)
-                } - {""}
-                found = sorted(
-                    (day, contest, election)
-                    for held_month, day, contest, election, theirs in dated.get((polity, year), [])
-                    if (month is None or held_month == month)
-                    and names
-                    and len(names & theirs) * 2 > max(len(names), len(theirs))
-                )
-                if found:
-                    if (ours := held.get(f"alged:{contest_id}")) is not None:
-                        twins[ours] = found[-1]
-                    continue
+            listed = [
+                full_name
+                for full_name in rows["full_name"]
+                if not re.fullmatch(r"(?i)scattering|write-?ins?", full_name)
+            ]
+            names, initials = set(map(_surname, listed)) - {""}, set(map(_person, listed)) - {""}
+            found = sorted(
+                (day, contest, election)
+                for held_month, day, contest, election, theirs, persons in dated.get((polity, year), [])
+                if (month is None or held_month == month)
+                and names
+                and len(names & theirs) * 2 > max(len(names), len(theirs))
+                and (max(len(names), len(theirs)) > 1 or initials == persons)
+            )
+            if found:
+                if (ours := held.get(f"alged:{contest_id}")) is not None:
+                    twins[ours] = found[-1]
+                continue
             city = len(code) == 5 and word == "City"
             place = place.removeprefix("City of ") if city else place
             geoid = code.removeprefix("sd")
