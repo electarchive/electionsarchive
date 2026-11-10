@@ -12,9 +12,12 @@ from ea.sources.us import ceda, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.or_swcd_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
+KEY_CODES = {
+    "41009:conservation:west-multnomah-soil-and-water-conservation-district": "41051:water:west-multnomah-soil-and-water-conservation-district"
+}
 UNEXPIRED = {("Benton Soil and Water Conservation District", "At Large 2")}
 INBOX = DATA / "inbox" / "y26" / "or"
 TITLE = "Certified candidates for soil and water conservation district directors, November 3, 2026 general election"
@@ -123,6 +126,7 @@ def emit() -> Path:
                     continue
                 made[district] = special
             polity, area, place, path, code = made[district]
+            code = KEY_CODES.get(code, code)
             election = cs.key("us.election", f"{DAY}:OR:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
