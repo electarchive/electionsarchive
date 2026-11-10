@@ -264,6 +264,18 @@ const pooled = (list: SQL) => sql`
     offset 0
   )
 `;
+const pooledIds = (list: SQL, parent: SQL) => sql`
+  select array(
+    select pl.id from contest_option pl
+    where pl.id in (${list}, ${parent}) and pl.kind = 'list' and exists (
+      select from contest_option ch
+      join outcome y on y.option_id = ch.id and y.kind = 'elected' and y.candidacy_id is null
+      where y.result_set_id in (select id from newest)
+        and ch.parent_option_id = pl.id and ch.party_id is not null and ch.party_id is distinct from pl.party_id
+      offset 0
+    )
+  ) as ids
+`;
 const stray = (candidacy: SQL, option: SQL, contest: SQL) => sql`
   (
     select case
@@ -2579,7 +2591,11 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
             independent: boolean;
             incumbent: boolean;
           }>(sql`
-            with covered as (${covered(sql`
+            with newest as materialized (
+              select rs.id from result_set rs
+              where rs.contest_id in (select contest_id from contest_option where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[]))
+                and ${latest("rs")}
+            ), covered as (${covered(sql`
               select contest_id from contest_option
               where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[])
             `)})
@@ -2606,21 +2622,22 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                  and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
                order by cy.option_id = o.id desc, cy.id limit 1) as person,
               oc.kind::text as outcome, oc.note, coalesce(oc.declined, false) as declined,
-              case when o.kind = 'list' and ${pooled(sql`o.id`)} then null
-                when o.parent_option_id is null or ${pooled(sql`o.parent_option_id`)} or not exists (
-                  select from outcome y join result_set ry on ry.id = y.result_set_id and ${latest("ry")}
-                  where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+              case when o.id = any(pf.ids) then null
+                when o.parent_option_id is null or o.parent_option_id = any(pf.ids) or not exists (
+                  select from outcome y
+                  where y.result_set_id in (select id from newest) and y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
                   offset 0
                 ) then oc.seats end as seats
             from contest_option o
             left join entity_merge pm on pm.entity_id = o.party_id
+            left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`)}) pf on true
             left join lateral (
               select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)) filter (where x.kind <> 'declined'))[1] as kind,
                 (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified', 'declined']::outcome_kind[], x.kind)) filter (where x.notes is not null))[1] as note,
                 bool_or(x.kind = 'declined') as declined,
                 coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
-              from outcome x join result_set rs on rs.id = x.result_set_id
-              where x.option_id = o.id and o.contest_id = any(${outcomes}::uuid[]) and ${latest("rs")}
+              from outcome x
+              where x.option_id = o.id and o.contest_id = any(${outcomes}::uuid[]) and x.result_set_id in (select id from newest)
                 and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified', 'declined') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
                 and not (x.kind in ('withdrew', 'disqualified') and exists (
                   select from contest_option lp where lp.id = o.parent_option_id and lp.kind = 'list'
@@ -2628,7 +2645,7 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
             ) oc on true
             where (o.k = any(${optionKs}::int[]) or o.contest_id = any(${outcomes}::uuid[]))
               and (o.k = any(${optionKs}::int[]) or oc.kind is not null)
-              and not (o.kind = 'list' and ${pooled(sql`o.id`)})
+              and not (o.id = any(pf.ids))
             order by o.k
           `),
         );
