@@ -166,6 +166,13 @@ TABLES: list[dict[str, Any]] = [
         "leaves": (444, 445),
         "columns": ("votes", "Reagan", None, "Abstention", None, None, None),
     },
+    {
+        "table": "1988:republican",
+        "item": RNC.format("august-15-18-1988_34"),
+        "leaves": tuple(range(539, 561)),
+        "ballot": 1,
+        "transcribed": "conventions_new_orleans_1988.tsv",
+    },
 ]
 
 
@@ -526,6 +533,7 @@ PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1976:republican"}, "ordinal": "Thirty-First", "city": "Kansas City", "days": (date(1976, 8, 16), date(1976, 8, 19)), "ballots": {1: date(1976, 8, 18)}, "deciding": 1},
     {"tables": {1: "1980:republican"}, "ordinal": "Thirty-Second", "city": "Detroit", "days": (date(1980, 7, 14), date(1980, 7, 17)), "ballots": {1: date(1980, 7, 16)}, "deciding": 1},
     {"tables": {1: "1984:republican"}, "ordinal": "Thirty-Third", "city": "Dallas", "days": (date(1984, 8, 20), date(1984, 8, 23)), "ballots": {1: date(1984, 8, 22)}, "deciding": 1},
+    {"tables": {1: "1988:republican"}, "ordinal": "Thirty-Fourth", "city": "New Orleans", "days": (date(1988, 8, 15), date(1988, 8, 18)), "ballots": {1: date(1988, 8, 17)}, "deciding": 1, "caveat": "The proceedings print no tabulation. The roll is transcribed from the narrated call (pages 504 to 525): the Secretary announced each delegation's votes, the Assistant Secretary repeated each vote as cast, and nine delegations passed and voted on the second call. Hawaii's votes were not announced by the Secretary; its 20 are the figure the delegation gave when it cast them. The Chair announced 2,277 votes for George Bush, and the nomination was then made by acclamation."},
 ]  # fmt: skip
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
@@ -2450,7 +2458,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1860 to 1984, the Democratic conventions from 1835 to 1956, and the 2016 and 2020 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956, and the 2016 and 2020 conventions",
             polity="US",
         )
 
