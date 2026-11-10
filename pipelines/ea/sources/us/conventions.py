@@ -338,7 +338,7 @@ TABLES += [
         "columns": (None, "Fremont", "McLean", "Seward"),
         "electors": True,
     },
-    {"table": "1864:republican", "item": "proceedingsoffir00inrepu", "leaves": (236, 237, 238), "narrated": True},
+    {"table": "1864:republican", "item": "proceedingsoffir00inrepu", "leaves": (236, 237, 238, 239), "narrated": True},
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (42,), "columns": ("votes", "Grant")},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
@@ -462,6 +462,9 @@ BALTIMORE_1852 = (
     "forty-ninth ballot, on which Franklin Pierce was nominated."
 )
 PROCEEDINGS: list[dict[str, Any]] = [
+    {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2},
+    {"tables": {1: "1864:republican"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "Third", "city": "Baltimore", "days": (date(1864, 6, 7), date(1864, 6, 8)), "ballots": {1: date(1864, 6, 8)}, "deciding": 1},
+    {"tables": {1: "1872:republican"}, "ordinal": "Fifth", "city": "Philadelphia", "days": (date(1872, 6, 5), date(1872, 6, 6)), "ballots": {1: date(1872, 6, 6)}, "deciding": 1, "held": 1},
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
     {"tables": {n: f"1876:republican:b{n}" for n in range(1, 8)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
@@ -587,6 +590,8 @@ CANDIDATES = {
     "Hawley": ("Joseph R. Hawley", "Q240188"),
     "Lincoln": ("Robert T. Lincoln", None),
     "1860:Lincoln": ("Abraham Lincoln", "Q91"),
+    "1864:Lincoln": ("Abraham Lincoln", "Q91"),
+    "Banks": ("Nathaniel P. Banks", "Q714106"),
     "1888:Grant": ("Frederick Dent Grant", None),
     "1888:Douglas": ("Frederick Douglass", None),
     "1860:Reed": ("Andrew H. Reeder", None),
