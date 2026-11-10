@@ -611,6 +611,7 @@ const GROUPS = [
   "owner",
   "governor",
   "legislature",
+  "region_legislature",
   "regional_office",
   "region_office",
   "national_measure",
@@ -12458,6 +12459,7 @@ export const contests = {
           ),
           roots as materialized (
             select c.id, c.kind, c.body_id, c.office_id, o.kind as okind, y.kind as ykind,
+              coalesce(y.iso_code like 'US-%', false) as us,
               y.id = (select t.polity_id from election t where t.id = (select id from up where parent is null))
                 or (y.id = (select x.polity_id from election x where x.id = (select election_id from contest where id = ${contest.id}::uuid))
                   and y.kind not in ('sovereign_state', 'supranational', 'historical_state', 'federal_unit', 'region')) as own,
@@ -12473,14 +12475,15 @@ export const contests = {
             select id, okind, part, case
                 when kind = 'ballot_question' then case
                   when ykind in ('sovereign_state', 'supranational', 'historical_state') then 'national_measure'
-                  when ykind = 'federal_unit' then 'regional_measure'
-                  when ykind = 'region' then 'region_measure'
+                  when ykind = 'federal_unit' and us then 'regional_measure'
+                  when ykind in ('federal_unit', 'region') then 'region_measure'
                   else 'local_measure' end
                 when ykind in ('sovereign_state', 'supranational', 'historical_state') or own then 'owner'
                 when okind = 'governor' then 'governor'
-                when ykind in ('federal_unit', 'region') and kind <> 'office' then 'legislature'
-                when ykind = 'federal_unit' then 'regional_office'
-                when ykind = 'region' then 'region_office'
+                when ykind = 'federal_unit' and us and kind <> 'office' then 'legislature'
+                when ykind in ('federal_unit', 'region') and kind <> 'office' then 'region_legislature'
+                when ykind = 'federal_unit' and us then 'regional_office'
+                when ykind in ('federal_unit', 'region') then 'region_office'
                 else 'local' end as kind,
               case when kind <> 'ballot_question' and (ykind in ('sovereign_state', 'supranational', 'historical_state') or own)
                 then coalesce(office_id, body_id)
@@ -12687,6 +12690,7 @@ export const contests = {
           [
             "owner",
             "legislature",
+            "region_legislature",
             "regional_office",
             "region_office",
             "local",
@@ -12920,7 +12924,9 @@ export const contests = {
                 ? null
                 : label != null &&
                     (row.kind === "owner" ||
-                      (isScoped && row.kind === "legislature"))
+                      (isScoped &&
+                        (row.kind === "legislature" ||
+                          row.kind === "region_legislature")))
                   ? `race-${segment(label)}`
                   : isScoped
                     ? null

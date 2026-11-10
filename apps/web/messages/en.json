@@ -1579,6 +1579,7 @@
   "cycle_day": "Also on the ballot in {place} on {date}",
   "cycle_governor": "Governors",
   "cycle_legislature": "State legislative seats",
+  "cycle_region_legislature": "Regional legislative seats",
   "cycle_regional_office": "Other statewide offices",
   "cycle_region_office": "Other regional offices",
   "cycle_national_measure": "National ballot measures",

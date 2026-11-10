@@ -5026,6 +5026,7 @@ function contestMarkdown(
     owner: () => "",
     governor: m.cycle_governor,
     legislature: m.cycle_legislature,
+    region_legislature: m.cycle_region_legislature,
     regional_office: m.cycle_regional_office,
     region_office: m.cycle_region_office,
     national_measure: m.cycle_national_measure,
