@@ -1254,27 +1254,50 @@ type Cover = {
 const TALLY_ROWS = 50_000;
 
 const cover = (ids: SQL) => sql`
+  with recursive hit as materialized (${ids}),
+  grp(root, id) as (
+    select distinct id, id from hit
+    union all
+    select grp.root, x.id from contest x join grp on x.allocation_parent_id = grp.id
+  ),
+  own as materialized (select root, id from grp),
+  sets as materialized (
+    select rs.id, rs.k, rs.contest_id, rs.is_default, rs.stage, rs.source_id from result_set rs
+    where rs.contest_id = any(array(select id from own))
+  ),
+  won as materialized (
+    select distinct o.root from own o
+    join sets rs on rs.contest_id = o.id and ${latest("rs")}
+    where exists (
+      select from outcome x where x.result_set_id = rs.id and x.option_id is not null and x.kind in ('won', 'elected')
+    )
+  ),
+  sums as materialized (
+    select rs.contest_id, array_agg(distinct x.area_k) as ks from sets rs
+    join result_rollup_sum x on x.result_set_k = rs.k
+    where rs.is_default and rs.contest_id in (select id from hit)
+    group by rs.contest_id
+  ),
+  kin as materialized (
+    select f.k, a.id, a.scheme_code, ap.parent_id from (select distinct unnest(ks) as k from sums) f
+    cross join lateral (select a.id, a.scheme_code from area a where a.k = f.k offset 0) a
+    cross join lateral (select ap.parent_id from area_parent ap where ap.area_id = a.id offset 0) ap
+  )
   select c.id, ${serial("c", "e")} as series, e.id as election, e.kind = 'indirect' as indirect,
     e.date_from::text as date, ${CYCLE} as year, e.status::text as status,
     c.term is not distinct from 'remainder' as "isRemainder", c.notional, c.district_area_id as district, g.members,
-    exists (
-      select from contest_option o
-      join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-      join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-      where o.contest_id = any(g.members)
-    ) as decided,
-    ${reached} as reach
-  from (${ids}) hit
+    c.id in (select root from won) as decided,
+    case when c.district_area_id is null or c.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id) then (
+      select coalesce(array_agg(k.scheme_code || ':' || k.id::text order by k.scheme_code, k.id), '{}')
+      from sums s cross join unnest(s.ks) f(k)
+      join kin k on k.k = f.k
+      join polity_territory pt on pt.area_id = k.parent_id and pt.polity_id = e.polity_id and pt.valid @> e.date_from
+      where s.contest_id = c.id
+    ) end as reach
+  from hit
   cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
   cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
-  cross join lateral (
-    with recursive grp(id) as (
-      select c.id
-      union all
-      select x.id from contest x join grp on x.allocation_parent_id = grp.id
-    )
-    select array_agg(grp.id) as members from grp
-  ) g
+  cross join lateral (select array_agg(o.id) as members from own o where o.root = c.id) g
 `;
 
 async function placed(area: string) {
