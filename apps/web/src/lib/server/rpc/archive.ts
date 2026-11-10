@@ -341,16 +341,29 @@ const undated = (tenure: string) => {
   `;
 };
 
+const voting = (tenure: string) => sql`
+  coalesce(${sql.raw(tenure)}.seat_id <> all(array(select nv.id from seat nv where not nv.voting)), true)
+`;
+
+const elected = (body: SQL) => sql`
+  select c.id, e.date_from as won from contest c join election e on e.id = c.election_id where c.body_id = ${body}
+`;
+
+const WON = sql`
+  case when w.id is not null then w.won
+    else (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) end
+`;
+
 const sittings = (body: SQL) => sql`
   with c as (
-    select t.from_date as start from tenure t left join seat st on st.id = t.seat_id
-    where t.body_id = ${body} and t.from_date is not null and coalesce(st.voting, true) and not ${undated("t")}
+    select t.from_date as start from tenure t
+    where t.body_id = ${body} and t.from_date is not null and ${voting("t")} and not ${undated("t")}
     group by t.from_date
     having count(*) >= 0.15 * coalesce(
       (select z.seats from body_size z where z.body_id = ${body} and z.valid @> t.from_date limit 1),
       (select max(n) from (
-        select count(*) as n from tenure d left join seat ds on ds.id = d.seat_id
-        where d.body_id = ${body} and d.from_date is not null and coalesce(ds.voting, true) and not ${undated("d")}
+        select count(*) as n from tenure d
+        where d.body_id = ${body} and d.from_date is not null and ${voting("d")} and not ${undated("d")}
         group by d.from_date) m)
     )
   )
@@ -358,18 +371,24 @@ const sittings = (body: SQL) => sql`
 `;
 
 const vacated = (body: SQL) => sql`
-  with o as materialized (
+  with w as materialized (${elected(body)}),
+  o as materialized (
     select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.succeeds_tenure_id,
-      (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
-    from tenure t join seat st on st.id = t.seat_id
-    where t.body_id = ${body} and t.from_date is not null and st.voting and not ${undated("t")}
+      ${WON} as won
+    from tenure t left join w on w.id = t.contest_id
+    where t.body_id = ${body} and t.from_date is not null and t.seat_id is not null and ${voting("t")} and not ${undated("t")}
   ),
   p as materialized (
     select b.id as b, b.from_date as day, b.succeeds_tenure_id as succeeds, a.id as a, a.from_date as since, a.won,
       a.id <> b.id and (a.from_date < b.from_date or (a.from_date = b.from_date and (
         (a.won is not null and (b.won is null or a.won > b.won))
         or (a.won is not distinct from b.won and (a.to_date, a.id) < (b.to_date, b.id))))) as ahead
-    from o b join o a on a.seat_id = b.seat_id and a.from_date <= b.from_date and a.to_date > b.from_date
+    from o b join (
+      select o.*, generate_series(extract(year from o.from_date)::int,
+        extract(year from least(o.to_date, (select max(m.from_date) from o m)))::int) as year
+      from o
+    ) a on a.seat_id = b.seat_id and a.year = extract(year from b.from_date)::int
+      and a.from_date <= b.from_date and a.to_date > b.from_date
   ),
   k as materialized (
     select q.b, bool_or(q.since < q.day) as dated,
@@ -24427,11 +24446,12 @@ export const bodies = {
             select c.id, k.category from kinds k join chain c on c.before = k.id
             where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
           ),
+          w as materialized (${elected(sql`${input.id}::uuid`)}),
           t as materialized (
             select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id,
-              (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
-            from tenure t left join seat st on st.id = t.seat_id
-            where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
+              ${WON} as won
+            from tenure t left join w on w.id = t.contest_id
+            where t.body_id = ${input.id}::uuid and t.from_date is not null and ${voting("t")}
               and not ${undated("t")}
           ),
           starts as (${sittings(sql`${input.id}::uuid`)}),
@@ -24441,10 +24461,11 @@ export const bodies = {
                 row_number() over (partition by q.start, q.slot order by q.from_date > q.start, q.won desc nulls last, q.from_date, q.to_date, q.id) as rank,
                 greatest(1, count(*) filter (where q.won = q.first) over (partition by q.start, q.slot)) as cap
               from (
-                select s.start, t.id, coalesce(t.seat_id, t.id) as slot, t.from_date, t.to_date, t.won,
-                  min(t.won) filter (where t.won <= s.start) over (partition by s.start, coalesce(t.seat_id, t.id)) as first
-                from starts s join t on t.from_date < s.start + 30
-                  and t.to_date > s.start + case when t.seat_id is null then 30 else 0 end
+                select s.d[j] as start, t.id, coalesce(t.seat_id, t.id) as slot, t.from_date, t.to_date, t.won,
+                  min(t.won) filter (where t.won <= s.d[j]) over (partition by s.d[j], coalesce(t.seat_id, t.id)) as first
+                from (select array_agg(start order by start) as d from starts) s cross join t
+                cross join generate_series(width_bucket(t.from_date - 30, s.d) + 1,
+                  width_bucket(t.to_date - case when t.seat_id is null then 31 else 1 end, s.d)) j
               ) q
             ) r where r.rank <= r.cap
           ),
@@ -24471,7 +24492,8 @@ export const bodies = {
               case when k.category in ('appointed', 'ex_officio') then null when a.found then a.party else f.party end as party,
               (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
                 left join entity_merge pm on pm.entity_id = g.party_id
-                where g.tenure_id = s.id and g.kind = 'parliamentary_group' and g.party_id is not null
+                where s.id in (select q.tenure_id from tenure_affiliation q where q.kind = 'parliamentary_group')
+                  and g.tenure_id = s.id and g.kind = 'parliamentary_group' and g.party_id is not null
                   and g.valid @> s.start and k.category is distinct from 'appointed' and k.category is distinct from 'ex_officio' limit 1) as caucus
             from sat s left join fallback f on f.id = s.id
             left join kinds k on k.id = s.id
@@ -24519,12 +24541,15 @@ export const bodies = {
             where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
           ),
           v as materialized (${vacated(sql`${input.id}::uuid`)}),
+          ends as materialized (
+            select d.to_date, count(*) as n from tenure d
+            where d.body_id = ${input.id}::uuid and d.ended_via in ('term_end', 'dissolved') and d.to_date is not null
+            group by d.to_date
+          ),
           starts as materialized (
             select s.start, (
-              select d.to_date from tenure d
-              where d.body_id = ${input.id}::uuid and d.ended_via in ('term_end', 'dissolved')
-                and d.to_date <= s.start and d.to_date > s.start - 400
-              group by d.to_date order by count(*) desc, d.to_date desc limit 1
+              select d.to_date from ends d where d.to_date <= s.start and d.to_date > s.start - 400
+              order by d.n desc, d.to_date desc limit 1
             ) as exodus
             from (${sittings(sql`${input.id}::uuid`)}) s
           ),
@@ -24534,16 +24559,21 @@ export const bodies = {
               case when t.acquired_via = 'elected' and t.contest_id is null and t.succeeds_tenure_id is not null
                 then 'by_election' else t.acquired_via::text end as acquired,
               coalesce(k.category, 'elected') as category
-            from tenure t left join seat st on st.id = t.seat_id
+            from tenure t
             left join kinds k on k.id = t.id
             left join v on v.id = t.id
-            where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
+            where t.body_id = ${input.id}::uuid and t.from_date is not null and ${voting("t")}
               and (t.to_date is null or t.to_date > t.from_date) and not ${undated("t")} and v.shadow is not true
           ),
+          sa as materialized (
+            select array_agg(s.start order by s.start) as d, array_agg(s.exodus order by s.start) as x from starts s
+          ),
           e as materialized (
-            select t.id, coalesce((select min(s.start) from starts s where s.start > t.from_date
-              and (t.from_date > s.start - 30 or t.from_date >= s.exodus)), t.from_date) as day
-            from t
+            select t.id, coalesce((
+              select min(a.d[j]) from generate_series(width_bucket(t.from_date, a.d) + 1, width_bucket(t.from_date + 399, a.d)) j
+              where t.from_date > a.d[j] - 30 or t.from_date >= a.x[j]
+            ), t.from_date) as day
+            from t cross join sa a
           ),
           s as materialized (
             select a.tenure_id, coalesce(pm.into_id, a.party_id) as party,
@@ -24610,8 +24640,9 @@ export const bodies = {
             from ordered o join t on t.id = o.tenure_id join e on e.id = t.id where o.n = 1
             union all
             select greatest(coalesce(
-                (select min(s.start) from starts s where t.ended in ('term_end', 'dissolved') and o.u = t.to_date
-                  and s.start > t.from_date + 30 and s.start >= o.u - 30 and (o.u > s.start - 30 or o.u >= s.exodus)),
+                (select min(a.d[j]) from sa a cross join generate_series(width_bucket(o.u - 31, a.d) + 1, width_bucket(o.u + 399, a.d)) j
+                  where t.ended in ('term_end', 'dissolved') and o.u = t.to_date
+                  and a.d[j] > t.from_date + 30 and (o.u > a.d[j] - 30 or o.u >= a.x[j])),
                 o.u), e.day), 'out', o.key, null, t.ended
             from ordered o join t on t.id = o.tenure_id join e on e.id = t.id where o.n = o.of and o.u < 'infinity'::date
             union all
@@ -24626,8 +24657,8 @@ export const bodies = {
         `),
         db.execute<{ start: string; to: string | null }>(sql`
           select t.from_date::text as start, t.to_date::text as to
-          from tenure t left join seat st on st.id = t.seat_id
-          where t.body_id = ${input.id}::uuid and coalesce(st.voting, true)
+          from tenure t
+          where t.body_id = ${input.id}::uuid and ${voting("t")}
             and (${undated("t")} or t.id in (select v.id from (${vacated(sql`${input.id}::uuid`)}) v where v.shadow))
         `),
       ]);
