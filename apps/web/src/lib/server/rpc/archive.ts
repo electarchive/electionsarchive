@@ -9708,7 +9708,7 @@ export const contests = {
                     where o.election_id = c.election_id and o.id <> c.id and o.kind = c.kind and o.round_number = c.round_number
                       and o.body_id is not distinct from c.body_id and o.office_id is not distinct from c.office_id
                       and o.party_scope_id is not distinct from c.party_scope_id and o.allocation_parent_id is null and not o.notional
-                  ) then array(select s.id from election s where s.parent_id = e.parent_id and s.id <> e.id) else '{}' end as wide,
+                  ) then array(select s.id from election s where s.id <> e.id and (s.parent_id = e.parent_id or (s.id = e.parent_id and not exists (select from election t where t.parent_id = e.parent_id and t.id <> e.id)))) else '{}' end as wide,
                   (
                     select ST_Expand(g.geom::box2d, (ST_XMax(g.geom) - ST_XMin(g.geom)) / 2, (ST_YMax(g.geom) - ST_YMin(g.geom)) / 2)::geometry
                     from area_geometry g where g.area_id = c.district_area_id
