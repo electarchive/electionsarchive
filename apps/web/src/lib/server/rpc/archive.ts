@@ -6667,6 +6667,16 @@ async function atlas(input: {
     .map((row) => ({
       ...row,
       shares: merge(row.shares),
+      people: (() => {
+        const named = legend.map((): string | null => null);
+        for (const [index, label] of (row.people ?? []).entries()) {
+          const at = fold[index] ?? index;
+          if (label != null && named[at] == null) {
+            named[at] = label;
+          }
+        }
+        return named;
+      })(),
       earlier: row.earlier == null ? null : merge(row.earlier),
       absent: row.absent?.flatMap((index) =>
         fold.every(
@@ -6797,6 +6807,11 @@ async function atlas(input: {
       leader: rows.map((row) => row.leader),
       held: rows.map((row) => row.held),
       prior: rows.map((row) => row.prior),
+      ...(rows.some((row) => row.people.some((label) => label != null)) && {
+        people: legend.map((_, index) =>
+          rows.map((row) => row.people[index] ?? null),
+        ),
+      }),
       shares: legend.map((_, index) =>
         rows.map((row) =>
           row.absent?.includes(index) === true
@@ -11711,6 +11726,7 @@ export const contests = {
             v.array(v.nullable(v.array(v.tuple([v.number(), v.number()])))),
           ),
           prior: v.array(v.nullable(v.number())),
+          people: v.optional(v.array(v.array(v.nullable(v.string())))),
           shares: v.array(v.array(v.nullable(v.number()))),
           before: v.array(v.array(v.nullable(v.number()))),
           previous: v.array(v.nullable(v.number())),

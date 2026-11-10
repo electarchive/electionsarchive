@@ -55,7 +55,9 @@
       {#each data.polities as polity, index (polity.path)}
         <li class="grid border-e border-be border-border">
           <a
-            href={resolve("/map/[...path]", { path: polity.latest.path })}
+            href={polity.isCounting
+              ? resolve("/live/map/[...path]", { path: polity.latest.path })
+              : resolve("/map/[...path]", { path: polity.latest.path })}
             class="group grid content-start gap-2.5 px-3.5 pbs-3 pbe-3.5 hover:bg-secondary focus-visible:bg-secondary"
           >
             <span class="flex items-baseline justify-between gap-3">
@@ -73,44 +75,63 @@
               class="line-clamp-1 text-[0.8125rem] text-muted-foreground group-hover:text-foreground"
               >{polity.latest.name}</span
             >
-            {#await data.leads}
-              <span class="grid gap-1.5" aria-hidden="true">
-                <span class="rounded-xs bg-secondary block-1.5"></span>
-                <span class="block-4"></span>
-              </span>
-            {:then leads}
-              {const shown = $derived(strip(leads[index] ?? null))}
+            {#if polity.isCounting}
               <span class="grid gap-1.5">
                 <span
-                  class="flex overflow-clip rounded-xs bg-secondary block-1.5"
+                  class="rounded-xs bg-secondary block-1.5"
                   aria-hidden="true"
-                >
-                  {#each shown?.parts ?? [] as part (part.key)}
-                    <span
-                      class="block-full"
-                      style:background={part.color}
-                      style:inline-size="{part.width}%"
-                    ></span>
-                  {/each}
-                </span>
+                ></span>
                 <span
-                  class="flex items-baseline justify-between gap-3 text-[0.8125rem] block-4"
+                  class="flex items-center gap-1.5 text-[0.8125rem] font-semibold block-4"
                 >
-                  {#if shown != null}
-                    <span class="flex items-baseline gap-1.5 min-inline-0">
-                      <span
-                        class="shrink-0 self-center rounded-xs block-2 inline-2"
-                        style:background={shown.color}
-                      ></span>
-                      <span class="truncate font-semibold">{shown.label}</span>
-                    </span>
-                    <span class="shrink-0 font-figures tabular-nums"
-                      >{shown.value}</span
-                    >
-                  {/if}
+                  <span
+                    class="shrink-0 rounded-full bg-destructive block-2 inline-2"
+                    aria-hidden="true"
+                  ></span>
+                  {m.map_landing_counting()}
                 </span>
               </span>
-            {/await}
+            {:else}
+              {#await data.leads}
+                <span class="grid gap-1.5" aria-hidden="true">
+                  <span class="rounded-xs bg-secondary block-1.5"></span>
+                  <span class="block-4"></span>
+                </span>
+              {:then leads}
+                {const shown = $derived(strip(leads[index] ?? null))}
+                <span class="grid gap-1.5">
+                  <span
+                    class="flex overflow-clip rounded-xs bg-secondary block-1.5"
+                    aria-hidden="true"
+                  >
+                    {#each shown?.parts ?? [] as part (part.key)}
+                      <span
+                        class="block-full"
+                        style:background={part.color}
+                        style:inline-size="{part.width}%"
+                      ></span>
+                    {/each}
+                  </span>
+                  <span
+                    class="flex items-baseline justify-between gap-3 text-[0.8125rem] block-4"
+                  >
+                    {#if shown != null}
+                      <span class="flex items-baseline gap-1.5 min-inline-0">
+                        <span
+                          class="shrink-0 self-center rounded-xs block-2 inline-2"
+                          style:background={shown.color}
+                        ></span>
+                        <span class="truncate font-semibold">{shown.label}</span
+                        >
+                      </span>
+                      <span class="shrink-0 font-figures tabular-nums"
+                        >{shown.value}</span
+                      >
+                    {/if}
+                  </span>
+                </span>
+              {/await}
+            {/if}
           </a>
         </li>
       {/each}

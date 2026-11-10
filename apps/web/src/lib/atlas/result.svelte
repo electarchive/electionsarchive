@@ -70,7 +70,13 @@
 
   let isAll = $state(false);
   const LIMIT = 6;
-  const top = $derived(summary.rows[0]?.share ?? 0);
+  const scale = $derived.by(() => {
+    let widest = 0.5;
+    for (const row of summary.rows) {
+      widest = Math.max(widest, row.share, row.share - (row.change ?? 0));
+    }
+    return widest;
+  });
   const rows = $derived(isAll ? summary.rows : summary.rows.slice(0, LIMIT));
   const growth = $derived(
     summary.previous == null || summary.previous === 0 || summary.valid === 0
@@ -207,15 +213,13 @@
               <div
                 class="absolute inset-y-0 inset-s-0 rounded-xs"
                 style:background={row.tone}
-                style:inline-size="{top === 0
-                  ? 0
-                  : (row.share / Math.max(top, 0.5)) * 100}%"
+                style:inline-size="{(row.share / scale) * 100}%"
               ></div>
               {#if row.change != null}
                 {const then = $derived(row.share - row.change)}
                 <div
-                  class="absolute -inset-y-0.5 bg-foreground inline-0.5"
-                  style:inset-inline-start="{(then / Math.max(top, 0.5)) *
+                  class="absolute -inset-y-0.5 -translate-x-1/2 bg-foreground inline-0.5 rtl:translate-x-1/2"
+                  style:inset-inline-start="{(Math.max(then, 0) / scale) *
                     100}%"
                   aria-hidden="true"
                 ></div>

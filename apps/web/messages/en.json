@@ -2591,6 +2591,7 @@
   "map_nav": "Map",
   "header_map_about": "Explore any election on a full-screen map",
   "map_landing_title": "Election maps",
+  "map_landing_counting": "Still counting: open the live map",
   "map_landing_lede": "Open any country's latest election on a full-screen map, then zoom from national results down to the smallest reporting unit, compare with earlier elections, and switch between races.",
   "map_landing_elections": [
     {

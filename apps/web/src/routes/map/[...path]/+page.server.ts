@@ -2,6 +2,7 @@ import { call } from "@orpc/server";
 import { redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { shell } from "#lib/atlas/data.js";
+import { liveFor } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { atlasPage } from "#lib/server/pages.js";
 import { races } from "#lib/server/rpc/archive.js";
@@ -18,6 +19,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
     const next = new URL(url);
     next.searchParams.set("vs", found.rows[0]?.id ?? "previous");
     redirect(307, `${next.pathname}${next.search}`);
+  }
+  const night = /^us\/(?:[a-z]{2}\/)?\d{4}-\d{2}-\d{2}-general(?=\/|$)/u.exec(
+    params.path,
+  )?.[0];
+  if (night != null && (await liveFor(night)) != null) {
+    redirect(307, `/live/map/${night}`);
   }
   const held = await db.execute<{
     id: string;

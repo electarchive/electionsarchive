@@ -1,14 +1,18 @@
 import { call } from "@orpc/server";
 import { sql } from "drizzle-orm";
+import { counting, liveOf } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { router } from "#lib/server/rpc/router.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-  const found = await call(router.polities.list, {
-    kinds: ["sovereign_state", "supranational"],
-    limit: 500,
-  });
+  const [found, now] = await Promise.all([
+    call(router.polities.list, {
+      kinds: ["sovereign_state", "supranational"],
+      limit: 500,
+    }),
+    counting(),
+  ]);
   const polities = found.polities
     .flatMap((polity) =>
       polity.path == null || polity.latest?.path == null
@@ -19,6 +23,7 @@ export const load: PageServerLoad = async () => {
               path: polity.path,
               elections: polity.elections,
               latest: { name: polity.latest.name, path: polity.latest.path },
+              isCounting: liveOf(now, polity.latest.path) != null,
             },
           ],
     )
@@ -33,7 +38,7 @@ export const load: PageServerLoad = async () => {
     leads: Promise.all(
       polities.map(async (polity) => {
         const id = known.get(polity.latest.path);
-        return id == null
+        return id == null || polity.isCounting
           ? null
           : call(router.elections.lead, { id }).catch(() => null);
       }),

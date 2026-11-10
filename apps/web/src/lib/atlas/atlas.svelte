@@ -648,7 +648,10 @@
           continue;
         }
         const entry = totals.get(item.key) ?? {
-          label: labels.get(item.key) ?? item.label,
+          label:
+            (hits.length === 1 ? set.places.people?.[index]?.[i] : null) ??
+            labels.get(item.key) ??
+            item.label,
           past: pasts.get(item.key) ?? item.then ?? item.label,
           votes: 0,
           then: 0,
@@ -679,7 +682,7 @@
             ? entry.then / previous
             : null,
       }))
-      .filter((row) => row.share > 0 || row.then != null)
+      .filter((row) => row.share > 0 || (row.then ?? 0) > 0)
       .toSorted((a, b) => b.share - a.share)
       .map((row, index) => ({
         ...row,
