@@ -195,6 +195,36 @@ async function compute(path: string): Promise<Cycle | null> {
     if (pick == null) {
       return null;
     }
+    const placedBlocks = await remember(
+      `cycle-located:${pick}:${priorDay}`,
+      async () => {
+        const rows = await db.execute<{
+          area: string;
+          units: Array<number>;
+          precise: boolean;
+          point: string;
+        }>(sql`
+          with blocks as materialized (
+            select u.area_id, array_agg(u.k) as units, bool_and(r.scheme_code = u.scheme_code) as precise
+            from (
+              select distinct v.unit_k from result_value v
+              where v.result_set_k = ${pick} and v.measure = 1 and v.option_k <> 0
+                and v.count_round = (select min(q.count_round) from result_value q where q.result_set_k = ${pick} and q.measure = 1)
+            ) x
+            join reporting_unit u on u.k = x.unit_k
+            join area r on r.id = u.area_id
+            group by 1
+          )
+          select b.area_id as area, b.units, b.precise, encode(ST_AsEWKB(g.point), 'hex') as point from blocks b
+          cross join lateral (
+            select coalesce(a.label_point, ST_PointOnSurface(a.geom)) as point from area_geometry a
+            where a.area_id = b.area_id and a.valid @> ${priorDay}::date
+            limit 1
+          ) g
+        `);
+        return JSON.stringify(rows.rows);
+      },
+    );
     const [found, state] = await Promise.all([
       db.execute<Tally & { rough: number | null; placed: number | null }>(sql`
         with shape as materialized (
@@ -203,19 +233,11 @@ async function compute(path: string): Promise<Cycle | null> {
           select v.unit_k, v.option_k, v.value from result_value v
           where v.result_set_k = ${pick} and v.measure = 1 and v.option_k <> 0
             and v.count_round = (select min(q.count_round) from result_value q where q.result_set_k = ${pick} and q.measure = 1)
-        ), blocks as materialized (
-          select u.area_id, array_agg(u.k) as units, bool_and(r.scheme_code = u.scheme_code) as precise
-          from (select distinct unit_k from votes) x
-          join reporting_unit u on u.k = x.unit_k
-          join area r on r.id = u.area_id
-          group by 1
         ), located as materialized (
-          select b.area_id, b.units, b.precise, g.point from blocks b
-          cross join lateral (
-            select coalesce(a.label_point, ST_PointOnSurface(a.geom)) as point from area_geometry a
-            where a.area_id = b.area_id and a.valid @> ${priorDay}::date
-            limit 1
-          ) g
+          select t.area as area_id,
+            array(select e::bigint from jsonb_array_elements_text(t.units) e) as units,
+            t.precise, ST_GeomFromEWKB(decode(t.point, 'hex')) as point
+          from jsonb_to_recordset(${placedBlocks}::jsonb) as t(area uuid, units jsonb, precise boolean, point text)
         ), near as materialized (
           select l.units, l.precise, 1 as share from located l cross join shape s
           where l.precise and l.point && s.geom and ST_Intersects(s.geom, l.point)
