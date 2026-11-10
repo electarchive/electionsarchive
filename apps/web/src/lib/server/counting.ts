@@ -9,6 +9,7 @@ export type Counting = {
 };
 
 let held: { at: number; value: Promise<Counting> } | null = null;
+let last: Counting | null = null;
 
 async function load(): Promise<Counting> {
   const found = await db.execute<{
@@ -36,6 +37,7 @@ async function load(): Promise<Counting> {
     listed as (
       select lit.election_id, array_agg(cs.path) as contests
       from lit join slug cs on cs.entity_id = lit.id and cs.is_current
+        and cs.path ~ '^us/([a-z]{2}/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-general/[^/]+$'
       group by lit.election_id
     )
     select e.id, s.path, e.date_from::text as date, e.polity_id as polity, l.contests
@@ -55,17 +57,25 @@ async function load(): Promise<Counting> {
   };
 }
 
-export async function counting() {
-  if (held == null || Date.now() - held.at > FRESH_MS) {
-    const value = load();
-    held = { at: Date.now(), value };
-    value.catch(() => {
+function reload() {
+  const value = load();
+  held = { at: Date.now(), value };
+  value
+    .then((loaded) => {
+      last = loaded;
+    })
+    .catch(() => {
       if (held?.value === value) {
         held = null;
       }
     });
+}
+
+export async function counting() {
+  if (held == null || Date.now() - held.at > FRESH_MS) {
+    reload();
   }
-  return held.value;
+  return last ?? held?.value ?? load();
 }
 
 const LIVE =
