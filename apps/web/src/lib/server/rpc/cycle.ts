@@ -179,25 +179,30 @@ async function compute(path: string): Promise<Cycle | null> {
   }
 
   async function apportioned(contest: string, whole: number) {
+    const ranked = await db.execute<{ k: number }>(sql`
+      select r.k from (
+        select rs.k, rs.is_default, rs.stage from result_set rs
+        where rs.contest_id = ${contest}::uuid and rs.status = 'active' and rs.kind = 'counted' and rs.stage in ('official', 'certified')
+      ) r
+      where exists (
+        select from result_value v join reporting_unit u on u.k = v.unit_k
+        where v.result_set_k = r.k and v.measure = 1 and u.scheme_code = 'us.precinct'
+      )
+      order by r.is_default desc, r.stage = 'certified' desc, r.k desc
+      limit 1
+    `);
+    const pick = ranked.rows[0]?.k;
+    if (pick == null) {
+      return null;
+    }
     const [found, state] = await Promise.all([
       db.execute<Tally & { rough: number | null; placed: number | null }>(sql`
-        with ranked as materialized (
-          select rs.k from result_set rs
-          where rs.contest_id = ${contest}::uuid and rs.status = 'active' and rs.kind = 'counted' and rs.stage in ('official', 'certified')
-          order by rs.is_default desc, rs.stage = 'certified' desc, rs.k desc
-        ), picked as materialized (
-          select r.k from ranked r
-          where exists (
-            select from result_value v join reporting_unit u on u.k = v.unit_k
-            where v.result_set_k = r.k and v.measure = 1 and u.scheme_code = 'us.precinct'
-          )
-          limit 1
-        ), shape as materialized (
+        with shape as materialized (
           select g.geom from area_geometry g where g.area_id = ${area}::uuid and g.valid @> ${drawn}::date limit 1
         ), votes as materialized (
           select v.unit_k, v.option_k, v.value from result_value v
-          where v.result_set_k = (select k from picked) and v.measure = 1 and v.option_k <> 0
-            and v.count_round = (select min(q.count_round) from result_value q where q.result_set_k = (select k from picked) and q.measure = 1)
+          where v.result_set_k = ${pick} and v.measure = 1 and v.option_k <> 0
+            and v.count_round = (select min(q.count_round) from result_value q where q.result_set_k = ${pick} and q.measure = 1)
         ), blocks as materialized (
           select u.area_id, array_agg(u.k) as units, bool_and(r.scheme_code = u.scheme_code) as precise
           from (select distinct unit_k from votes) x
