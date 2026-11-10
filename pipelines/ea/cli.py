@@ -112,9 +112,13 @@ def main() -> None:
         "(rebuild: all of them), "
         "check them against the cited counts, the pages, their twins, and REST, or write world-gaps.md there",
     ).add_argument("polity", choices=("us", "refresh", "rebuild", "check", "world", *coverage_countries.countries()))
-    portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
-    portal.add_argument("action", choices=("census",))
-    portal.add_argument("state", help="two-letter state code, such as TX")
+    portal = commands.add_parser(
+        "portals",
+        help="find a state's county results portals and emit them with the rest of results_access as a us.results_access "
+        "changeset (census), or emit results_access from a registry CSV (load)",
+    )
+    portal.add_argument("action", choices=("census", "load"))
+    portal.add_argument("target", help="two-letter state code, such as TX, for census; the registry CSV path for load")
     portal.add_argument(
         "--only",
         help="comma-separated platforms (clarity, enhanced_voting, hosted_static) to probe; skips the crawl and keeps "
@@ -185,7 +189,11 @@ def main() -> None:
         case "apply":
             print(apply(args.changeset))
         case "portals":
-            print(portals.census(args.state.upper(), args.only.split(",") if args.only else None))
+            print(
+                portals.load(Path(args.target))
+                if args.action == "load"
+                else portals.census(args.target.upper(), args.only.split(",") if args.only else None)
+            )
         case "scans":
             print(
                 scans.status()

@@ -8,29 +8,19 @@ import time
 import urllib.robotparser
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime
+from pathlib import Path
 from urllib.parse import urljoin, urlparse
+from uuid import UUID
 
 import httpx
 
-from ea import coverage
 from ea.raw import USER_AGENT
+from ea.sources.us import results_access
 from ea.store import connect
 
-REGISTRY = coverage.REPORTS / "us-portals.csv"
-COLUMNS = (
-    "state",
-    "county_fips",
-    "county",
-    "platform",
-    "tenant",
-    "status",
-    "elections",
-    "first",
-    "last",
-    "evidence",
-    "checked_at",
-    "pinned",
-)
+PROBED = ("clarity", "enhanced_voting", "hosted_static")
+ACCESS = {"listed": "open", "blocked": "blocked", "empty": "none", "lead": "none"}
+FORMATS = {"clarity": "json", "clarity_json": "json", "enhanced_voting": "json"}
 CLARITY = "https://results.enr.clarityelections.com"
 EV = "https://app.enhancedvoting.com/results/public"
 STATIC = "https://www.livevoterturnout.com/ENR"
@@ -259,6 +249,54 @@ def crawl(starts: list[str]) -> list[dict[str, str]]:
     return list(hits.values())
 
 
+def counties_of() -> dict[str, UUID]:
+    with connect() as conn:
+        return {
+            fips: polity
+            for fips, polity in conn.execute(
+                """select distinct on (g.county) g.county, g.polity_id from coverage_government g
+                   where g.polity_id is not null and (g.kind = 'county' or g.kind = 'municipality' and not exists
+                     (select from coverage_government c where c.kind = 'county' and c.county = g.county))
+                   order by g.county, g.kind, g.population desc nulls last"""
+            ).fetchall()
+        }
+
+
+def entry(found: dict[str, str], polity: UUID) -> dict[str, object]:
+    def day(text: str) -> date | None:
+        return date.fromisoformat(text) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text or "") else None
+
+    first, last = found.get("first", ""), found.get("last", "")
+    span = "" if day(first) or not first else f"pages {first}-{last}; "
+    count = f"{found['elections']} elections; " if found.get("elections") else ""
+    return {
+        "polity_id": polity,
+        "serves": "administered",
+        "platform": found["platform"],
+        "url_pattern": found["tenant"],
+        "format": FORMATS.get(found["platform"], "html"),
+        "access": ACCESS[found["status"]],
+        "first_date": day(first),
+        "last_date": day(last),
+        "checked_at": datetime.fromisoformat(found["checked_at"]),
+        "evidence": ("lead: " if found["status"] == "lead" else "")
+        + count
+        + span
+        + (found.get("evidence") or found["tenant"]),
+    }
+
+
+def load(path: Path) -> Path:
+    polities = counties_of()
+    with path.open() as file:
+        rows = list(csv.DictReader(file))
+    if missing := sorted({row["county_fips"] for row in rows if row["county_fips"] not in polities}):
+        print(f"no polity for {', '.join(missing)}")
+    return results_access.write(
+        [entry(row, polities[row["county_fips"]]) for row in rows if row["county_fips"] in polities]
+    )
+
+
 def census(st: str, only: list[str] | None = None) -> str:
     with connect() as conn:
         counties = dict(
@@ -281,9 +319,7 @@ def census(st: str, only: list[str] | None = None) -> str:
     def add(fips: str, found: dict[str, str] | None) -> None:
         if found is None:
             return
-        row = {column: "" for column in COLUMNS} | {"state": st, "county_fips": fips, "county": counties[fips]}
-        row |= found | {"checked_at": checked}
-        row["evidence"] = row["evidence"] or row["tenant"]
+        row = found | {"checked_at": checked}
         key = (fips, row["platform"])
         if key not in rows or rows[key]["status"] in ("lead", "blocked"):
             rows[key] = row
@@ -298,7 +334,7 @@ def census(st: str, only: list[str] | None = None) -> str:
                 ),
             )
 
-    probed = only or ["clarity", "enhanced_voting", "hosted_static"]
+    probed = only or list(PROBED)
     with ThreadPoolExecutor(3) as pool:
         list(pool.map(probe, probed))
     found = {} if only else seeds(st, counties)
@@ -309,28 +345,30 @@ def census(st: str, only: list[str] | None = None) -> str:
         )
     for name, hits in crawled:
         for hit in hits:
-            if (
-                hit["platform"] in ("clarity", "enhanced_voting", "hosted_static")
-                and (names[name], hit["platform"]) in rows
-            ):
+            if hit["platform"] in PROBED and (names[name], hit["platform"]) in rows:
                 continue
             add(names[name], hit)
-    kept = []
-    if REGISTRY.exists():
-        with REGISTRY.open() as file:
-            kept = [
-                row
-                for row in csv.DictReader(file)
-                if row["state"] != st or row["pinned"] or (only and row["platform"] not in only)
-            ]
-    pinned = {(row["county_fips"], row["platform"]) for row in kept if row["state"] == st}
-    merged = kept + [row for key, row in rows.items() if key not in pinned]
-    merged.sort(key=lambda row: (row["state"], row["county_fips"], row["platform"]))
-    with REGISTRY.open("w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=COLUMNS, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(merged)
+    polities = counties_of()
+    mine = {polities[fips] for fips in counties if fips in polities}
+    swept = set(only or PROBED) | (set() if only else {"site", "countysuite"})
+    kept = {
+        results_access.key(row): row
+        for row in results_access.current()
+        if row["polity_id"] not in mine or row["platform"] not in swept or row["access"] == "open"
+    }
+    for (fips, _), found in rows.items():
+        if fips not in polities:
+            continue
+        row = entry(found, polities[fips])
+        id = results_access.key(row)
+        if id not in kept or kept[id]["access"] != "open" or row["access"] == "open":
+            kept[id] = row
+    path = results_access.write(list(kept.values()))
     tally: dict[str, int] = {}
     for row in rows.values():
         tally[f"{row['platform']} {row['status']}"] = tally.get(f"{row['platform']} {row['status']}", 0) + 1
-    return f"{st}: {len(counties)} counties; " + ", ".join(f"{key} {count}" for key, count in sorted(tally.items()))
+    return (
+        f"{st}: {len(counties)} counties; "
+        + ", ".join(f"{key} {count}" for key, count in sorted(tally.items()))
+        + f"; {path}"
+    )
