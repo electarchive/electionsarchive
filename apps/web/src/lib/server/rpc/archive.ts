@@ -24482,7 +24482,33 @@ export const bodies = {
               and not ${undated("t")}
           ),
           starts as (${sittings(sql`${input.id}::uuid`)}),
-          sat as (
+          stood as materialized (
+            select m.id, array_agg(distinct x.party) as parties
+            from (
+              select d.id, d.person_id, c.cid from (
+                select t.id, t.person_id, t.contest_id from t
+                where (select count(*) from tenure_affiliation q where q.tenure_id = t.id and q.kind = 'party') > 1
+                offset 0
+              ) d
+              cross join lateral (
+                select d.contest_id as cid
+                union all
+                select k.id from contest k where k.allocation_parent_id = d.contest_id
+              ) c
+            ) m
+            cross join lateral (
+              select o.party_id, po.party_id as parent_party_id, cd.member_of_party_id
+              from candidacy cd
+              join contest_option o on o.id = cd.option_id and o.contest_id = m.cid
+              left join contest_option po on po.id = o.parent_option_id
+              where cd.person_id = m.person_id
+              offset 0
+            ) c
+            cross join lateral unnest(array[c.party_id, c.parent_party_id, c.member_of_party_id]) x(party)
+            where x.party is not null
+            group by m.id
+          ),
+          sat as materialized (
             select r.start, r.id from (
               select q.start, q.id,
                 row_number() over (partition by q.start, q.slot order by q.from_date > q.start, q.won desc nulls last, q.from_date, q.to_date, q.id) as rank,
@@ -24495,6 +24521,15 @@ export const bodies = {
                   width_bucket(t.to_date - case when t.seat_id is null then 31 else 1 end, s.d)) j
               ) q
             ) r where r.rank <= r.cap
+          ),
+          picked as materialized (
+            select distinct on (q.start, q.id) q.start, q.id, a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found
+            from sat q
+            join tenure_affiliation a on a.tenure_id = q.id and a.kind = 'party'
+            left join stood st on st.id = q.id
+            left join entity_merge pm on pm.entity_id = a.party_id
+            order by q.start, q.id, coalesce(a.valid @> q.start, false) desc, a.party_id is null, lower(a.valid) nulls first,
+              coalesce(a.party_id = any(st.parties), false) desc, a.party_id
           ),
           fallback as materialized (
             select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id,
@@ -24524,17 +24559,12 @@ export const bodies = {
                   and g.valid @> s.start and k.category is distinct from 'appointed' and k.category is distinct from 'ex_officio' limit 1) as caucus
             from sat s left join fallback f on f.id = s.id
             left join kinds k on k.id = s.id
-            left join lateral (
-              select a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found from tenure_affiliation a
-              left join entity_merge pm on pm.entity_id = a.party_id
-              where a.tenure_id = s.id and a.kind = 'party'
-              order by coalesce(a.valid @> s.start, false) desc, a.party_id is null, lower(a.valid) nulls first limit 1
-            ) a on true
+            left join picked a on a.start = s.start and a.id = s.id
           ) x
           left join party_affiliation br on br.party_id = x.party
             and br.kind = 'regional_branch' and br.valid @> x.start
           left join entity_merge bm on bm.entity_id = br.parent_party_id
-          group by 1, 2, 3, 4 order by 1, x.category = 'elected' desc, 5 desc
+          group by 1, 2, 3, 4 order by 1, x.category = 'elected' desc, 5 desc, 2, 3
         `),
         db.execute<{ id: string; date: string; seats: number }>(sql`
           select e.id, e.date_from::text as date, sum(coalesce(c.magnitude, 1))::int as seats
@@ -24602,17 +24632,56 @@ export const bodies = {
             ), t.from_date) as day
             from t cross join sa a
           ),
+          stood as materialized (
+            select m.id, array_agg(distinct x.party) as parties
+            from (
+              select d.id, d.person_id, c.cid from (
+                select t.id, t.person_id, t.contest_id from t
+                where (select count(*) from tenure_affiliation q where q.tenure_id = t.id and q.kind = 'party') > 1
+                offset 0
+              ) d
+              cross join lateral (
+                select d.contest_id as cid
+                union all
+                select k.id from contest k where k.allocation_parent_id = d.contest_id
+              ) c
+            ) m
+            cross join lateral (
+              select o.party_id, po.party_id as parent_party_id, cd.member_of_party_id
+              from candidacy cd
+              join contest_option o on o.id = cd.option_id and o.contest_id = m.cid
+              left join contest_option po on po.id = o.parent_option_id
+              where cd.person_id = m.person_id
+              offset 0
+            ) c
+            cross join lateral unnest(array[c.party_id, c.parent_party_id, c.member_of_party_id]) x(party)
+            where x.party is not null
+            group by m.id
+          ),
           s as materialized (
-            select a.tenure_id, coalesce(pm.into_id, a.party_id) as party,
-              greatest(coalesce(a.valid_from, t.from_date), t.from_date) as f, a.valid_to as u,
-              row_number() over (partition by a.tenure_id order by a.valid_from nulls first, a.party_id is null) as n
-            from t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
-            left join entity_merge pm on pm.entity_id = a.party_id
-            where a.valid_to is null or a.valid_to > t.from_date
+            select * from (
+              select a.tenure_id, coalesce(pm.into_id, a.party_id) as party,
+                greatest(coalesce(a.valid_from, t.from_date), t.from_date) as f, a.valid_to as u,
+                row_number() over w as n,
+                row_number() over (partition by a.tenure_id, a.valid_from, a.valid_to order by a.party_id is null,
+                  coalesce(a.party_id = any(st.parties), false) desc, a.party_id) as dup
+              from t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
+              left join stood st on st.id = t.id
+              left join entity_merge pm on pm.entity_id = a.party_id
+              where a.valid_to is null or a.valid_to > t.from_date
+              window w as (partition by a.tenure_id order by a.valid_from nulls first, a.party_id is null,
+                coalesce(a.party_id = any(st.parties), false) desc, a.party_id)
+            ) q where q.dup = 1
           ),
           fallback as materialized (
             select t.id, t.from_date, t.to_date, x.party, coalesce(x.independent, false) as independent
-            from t left join lateral (
+            from (
+              select t.id, t.from_date, t.to_date, t.contest_id, t.person_id from t
+              where not exists (
+                select from tenure_affiliation a
+                where a.tenure_id = t.id and a.kind = 'party' and (a.valid_to is null or a.valid_to > t.from_date)
+              )
+            ) t left join lateral (
               select coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id,
                   ${lined(sql`o.id`, sql`o.contest_id`)}) as party,
                 cd.is_independent as independent
@@ -24624,9 +24693,8 @@ export const bodies = {
                 or o.contest_id in (select k.id from contest k where k.allocation_parent_id = t.contest_id))
               limit 1
             ) x on true
-            where not exists (select from s where s.tenure_id = t.id)
           ),
-          raw as (
+          raw as materialized (
             select s.tenure_id, case when s.n = 1 then t.from_date else s.f end as f,
               least(coalesce(s.u, 'infinity'::date), coalesce(t.to_date, 'infinity'::date)) as u, s.party, s.party is null as independent
             from s join t on t.id = s.tenure_id
@@ -24639,6 +24707,14 @@ export const bodies = {
             select f.id, f.from_date, coalesce(f.to_date, 'infinity'::date), f.party, f.independent
             from fallback f
           ),
+          caucus as materialized (
+            select distinct on (r.tenure_id, r.f) r.tenure_id, r.f, coalesce(pm.into_id, g.party_id) as caucus
+            from raw r
+            join tenure_affiliation g on g.tenure_id = r.tenure_id and g.kind = 'parliamentary_group'
+              and g.party_id is not null and g.valid @> r.f
+            left join entity_merge pm on pm.entity_id = g.party_id
+            order by r.tenure_id, r.f, coalesce(pm.into_id, g.party_id)
+          ),
           seg as (
             select r.tenure_id, r.f, r.u, t.category,
               case when t.category in ('appointed', 'ex_officio') then 'category:' || t.category
@@ -24650,11 +24726,7 @@ export const bodies = {
             from raw r join t on t.id = r.tenure_id
             left join party_affiliation br on br.party_id = r.party and br.kind = 'regional_branch' and br.valid @> r.f
             left join entity_merge bm on bm.entity_id = br.parent_party_id
-            left join lateral (
-              select coalesce(pm.into_id, g.party_id) as caucus from tenure_affiliation g
-              left join entity_merge pm on pm.entity_id = g.party_id
-              where g.tenure_id = r.tenure_id and g.kind = 'parliamentary_group' and g.party_id is not null and g.valid @> r.f limit 1
-            ) g on true
+            left join caucus g on g.tenure_id = r.tenure_id and g.f = r.f
             where r.f < r.u
           ),
           ordered as (
@@ -24680,7 +24752,7 @@ export const bodies = {
             from ordered o join e on e.id = o.tenure_id where o.n > 1 and o.key is distinct from o.was
           )
           select day::text as date, kind, "from", "to", cause, count(*)::int as members
-          from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc
+          from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc, 3, 4, 5
         `),
         db.execute<{ start: string; to: string | null }>(sql`
           select t.from_date::text as start, t.to_date::text as to
