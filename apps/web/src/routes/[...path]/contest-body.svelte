@@ -2314,7 +2314,7 @@
     {/if}
   {/if}
   <Await promise={standing} name="contest.standing">
-    {#snippet children(lean)}
+    {#snippet children(lean: Awaited<typeof standing>)}
       {#if lean != null}
         {const ahead = $derived(lean.axis[0])}
         {const behind = $derived(lean.axis[1])}
