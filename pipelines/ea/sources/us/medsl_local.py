@@ -552,6 +552,13 @@ def _surname(name: str) -> str | None:
     return words[-1] if words else None
 
 
+def _person(name: str) -> tuple[str, str] | None:
+    words = [
+        word for word in re.sub(r"[^a-z ]", " ", name.lower()).split() if word not in ("jr", "sr", "ii", "iii", "iv")
+    ]
+    return (words[0][0], words[-1]) if words else None
+
+
 def _files(listing: str, local: bool) -> dict[str, str]:
     files = {}
     for file in json.loads(raw.cached(SOURCE, listing).path.read_text())["data"]["latestVersion"]["files"]:
@@ -1694,7 +1701,7 @@ def emit() -> Path:
                    join result_set r on r.contest_id = c.id
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
-                   where e.date_from = any(%s) and r.source_id <> all(%s)""",
+                   where e.date_from = any(%s) and r.source_id <> all(%s) and r.status <> 'withdrawn'""",
                 [
                     [*DATASETS, *set(contests.filter(pl.col("state_po") == "FL")["day"])],
                     [*sources.values(), *contributed.values(), *florida.values()],
@@ -1709,7 +1716,7 @@ def emit() -> Path:
                    join result_set r on r.contest_id = c.id
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body') and x.value like 'FL:%%'
-                   where r.source_id <> all(%s)""",
+                   where r.source_id <> all(%s) and r.status <> 'withdrawn'""",
                 [[*sources.values(), *contributed.values(), *florida.values()]],
             ).fetchall()
         )
@@ -2649,21 +2656,9 @@ def emit() -> Path:
                 cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
                 cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=PARTIAL)
         emitted = {str(row["id"]) for row in cs.rows.get("contest", [])}
-        into = dict(
-            conn.execute(
-                """select m.entity_id::text, m.into_id::text from entity_merge m join entity e on e.id = m.entity_id
-                   where e.type in ('office', 'body')"""
-            ).fetchall()
-        )
-
-        def root(entity: str | None) -> str | None:
-            while entity in into:
-                entity = into[entity]
-            return entity
-
         dropped: dict[str, tuple[date, str | None, set[str]]] = {}
         for contest, day, owner, ballot in conn.execute(
-            """select c.id::text, e.date_from, coalesce(c.office_id, c.body_id)::text, y.ballot_name
+            """select c.id::text, e.date_from, e.polity_id::text, y.ballot_name
                from contest c join election e on e.id = c.election_id
                left join contest_option p on p.contest_id = c.id left join candidacy y on y.option_id = p.id
                where exists (select from result_set r join changeset g on g.id = r.changeset_id
@@ -2673,27 +2668,30 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             if contest not in emitted:
-                found = dropped.setdefault(contest, (day, root(owner), set()))
+                found = dropped.setdefault(contest, (day, owner, set()))
                 if ballot and (surname := _surname(ballot)):
                     found[2].add(surname)
         rivals: dict[tuple[date, str | None], dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
         for contest, day, owner, ballot in conn.execute(
-            """select c.id::text, e.date_from, coalesce(c.office_id, c.body_id)::text, y.ballot_name
+            """select c.id::text, e.date_from, e.polity_id::text, y.ballot_name
                from contest c join election e on e.id = c.election_id
                join contest_option p on p.contest_id = c.id join candidacy y on y.option_id = p.id
-               where e.date_from = any(%s)
-                 and exists (select from result_set r join changeset g on g.id = r.changeset_id
-                             where r.contest_id = c.id and r.status = 'active' and g.pipeline <> %s)
+               where e.date_from = any(%s) and e.polity_id = any(%s::uuid[])
+                 and exists (select from result_set r where r.contest_id = c.id and r.status = 'active')
                  and not exists (select from entity_merge m where m.entity_id = c.id)
                  and not exists (select from entity_retirement t where t.entity_id = c.id)""",
-            [sorted({day for day, _, _ in dropped.values()}), SOURCE],
+            [sorted({day for day, _, _ in dropped.values()}), sorted({owner for _, owner, _ in dropped.values()})],
         ).fetchall():
-            if ballot and (surname := _surname(ballot)):
-                rivals[(day, root(owner))][contest].add(surname)
+            if contest not in dropped and ballot and (surname := _surname(ballot)):
+                rivals[(day, owner)][contest].add(surname)
         twins = [
             contest
             for contest, (day, owner, names) in dropped.items()
-            if names and any(len(names & theirs) * 2 >= len(names) for theirs in rivals.get((day, owner), {}).values())
+            if names
+            and any(
+                len(names & theirs) * 2 >= max(len(names), len(theirs))
+                for theirs in rivals.get((day, owner), {}).values()
+            )
         ]
         for row in conn.execute(
             f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
@@ -2703,6 +2701,59 @@ def emit() -> Path:
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
             cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=TWIN)
+        races = {str(row["id"]): str(row["election_id"]) for row in cs.rows.get("contest", [])}
+        places = {str(row["id"]): (str(row["polity_id"]), row["date_from"]) for row in cs.rows.get("election", [])} | {
+            str(election): (str(polity), day)
+            for election, polity, day in conn.execute(
+                "select id, polity_id, date_from from election where id = any(%s::uuid[])",
+                [sorted(set(races.values()))],
+            ).fetchall()
+        }
+        ballots = {str(row["id"]): str(row["contest_id"]) for row in cs.rows.get("contest_option", [])}
+        people: dict[str, set[tuple[str, str]]] = defaultdict(set)
+        for row in cs.rows.get("candidacy", []):
+            if (contest := ballots.get(str(row["option_id"]))) and (person := _person(str(row["ballot_name"] or ""))):
+                people[contest].add(person)
+        held_by: dict[tuple[str, date], dict[str, set[tuple[str, str]]]] = defaultdict(lambda: defaultdict(set))
+        for contest, owner, day, ballot in conn.execute(
+            """select c.id::text, e.polity_id::text, e.date_from, y.ballot_name
+               from contest c join election e on e.id = c.election_id and e.date_precision = 'day'
+               join contest_option p on p.contest_id = c.id join candidacy y on y.option_id = p.id
+               where e.polity_id = any(%s::uuid[]) and e.date_from = any(%s)
+                 and exists (select from result_set r join changeset g on g.id = r.changeset_id
+                             where r.contest_id = c.id and r.status = 'active'
+                               and g.pipeline not in (%s, 'us.alged'))
+                 and not exists (select from entity_merge m where m.entity_id = c.id)
+                 and not exists (select from entity_retirement t where t.entity_id = c.id)""",
+            [sorted({owner for owner, _ in places.values()}), sorted({day for _, day in places.values()}), SOURCE],
+        ).fetchall():
+            if contest not in races and ballot and (person := _person(ballot)):
+                held_by[(owner, day)][contest].add(person)
+
+        def twinned(ours: set[tuple[str, str]], theirs: set[tuple[str, str]]) -> bool:
+            if max(len(ours), len(theirs)) == 1:
+                return ours == theirs
+            mine, other = {surname for _, surname in ours}, {surname for _, surname in theirs}
+            return len(mine & other) * 2 > max(len(mine), len(other))
+
+        shadowed = {
+            contest
+            for contest, election in races.items()
+            if election in places
+            and people[contest]
+            and any(twinned(people[contest], theirs) for theirs in held_by.get(places[election], {}).values())
+        }
+        for row in cs.rows.get("result_set", []):
+            if str(row["contest_id"]) in shadowed and row["status"] == "active":
+                row["status"], row["is_default"] = "withdrawn", False
+                cs.add(
+                    "note",
+                    id=uuid5(UUID(str(row["id"])), "withdrawn"),
+                    entity_id=row["id"],
+                    kind="caveat",
+                    body_md=TWIN,
+                )
+        print(f"{len(shadowed)} emitted contests withdrawn as twins of another pipeline's contest")
         for (contest,) in conn.execute(
             """select x.entity_id from external_id x where x.scheme = 'us.contest' and x.value = any(%s)
                and exists (select from result_set r where r.contest_id = x.entity_id)
