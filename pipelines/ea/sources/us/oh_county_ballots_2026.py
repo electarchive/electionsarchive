@@ -545,6 +545,12 @@ SALVAGE = {
         "Pike County for the purpose of the developmental",
     ),
 }
+REPLACEMENTS = {
+    "us/oh/clinton-county/2026-11-03-general/gas-aggregation-1": (
+        "https://lookup.boe.ohio.gov/vtrapp/clinton/ballotlist.aspx#03    1x (1).pdf",
+        ("Clinton", "17    2x.pdf", r"Shall the Board of County Commissioners of Clinton County", r"opt out\?"),
+    ),
+}
 EXCERPTS = {
     "us/oh/urbana/2026-11-03-general/charter-amendment-article-vii-section-8-07-1": (
         "Champaign",
@@ -1370,6 +1376,31 @@ def emit() -> Path:
                 and (found[0], body) not in written
             ):
                 load(found[0], {"url": url, "text": body})
+        for path, (url, (county, name, start, end)) in REPLACEMENTS.items():
+            found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
+            picked = excerpt(county, name, start, end)
+            if (
+                found is not None
+                and picked is not None
+                and (found[0], url) in existing
+                and SPILLED.search(existing[(found[0], url)])
+            ):
+                old = conn.execute(
+                    "select source_id from ballot_question_text where contest_id = %s and url = %s",
+                    [found[0], url],
+                ).fetchone()
+                if old is not None:
+                    kept[0] += 1
+                    loaded.add(found[0])
+                    cs.add(
+                        "ballot_question_text",
+                        contest_id=found[0],
+                        kind="text",
+                        lang="en",
+                        body=picked[1],
+                        url=url,
+                        source_id=old[0],
+                    )
         for path, (county, name, start, end) in EXCERPTS.items():
             found = conn.execute("select entity_id from slug where path = %s and is_current", [path]).fetchone()
             picked = excerpt(county, name, start, end)
