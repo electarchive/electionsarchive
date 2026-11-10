@@ -1345,6 +1345,16 @@
       }),
     ...contest.notes.map((note) => note.body),
   ]);
+  const citations = $derived(
+    contest.citations.filter((citation) =>
+      contest.sets.every(
+        ({ source }) =>
+          (citation.url == null || citation.url !== source.url) &&
+          (citation.title !== source.title ||
+            citation.publisher !== source.publisher),
+      ),
+    ),
+  );
   const checks = $derived(
     contest.checks.map((check) => ({
       code: check.code,
@@ -2469,7 +2479,7 @@
   </section>
 {/if}
 
-{#if contest.sets.length > 0 || contest.citations.length > 0 || checks.length > 0 || (isMapped && boundaries.length > 0)}
+{#if contest.sets.length > 0 || citations.length > 0 || checks.length > 0 || (isMapped && boundaries.length > 0)}
   <section
     id="sources"
     class={cn("col-span-12 grid content-start gap-4 bg-card px-3.5 py-3", {
@@ -2550,13 +2560,13 @@
         </ul>
       </div>
     {/if}
-    {#if contest.citations.length > 0}
+    {#if citations.length > 0}
       <div>
         <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
           {m.citations_title()}
         </h2>
         <ul class="grid gap-1.5 text-sm/snug">
-          {#each contest.citations as citation, index (index)}
+          {#each citations as citation, index (index)}
             <li>
               {citation.publisher}:
               {#if citation.url == null}
