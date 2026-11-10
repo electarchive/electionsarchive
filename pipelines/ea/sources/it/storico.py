@@ -47,6 +47,29 @@ REVISIONS = {
         {"DC": 1, "PLI": -1},
     ),
 }
+RECOUNT_URL = "https://legislature.camera.it/_dati/leg02/lavori/stampati/pdf/010_001001.pdf"
+RECOUNT_TITLE = (
+    "Relazione della Giunta delle elezioni sulla elezione contestata per la circoscrizione di Torino (I) "
+    "(Giuseppe Alpino), Doc. X, n. 1, II legislatura"
+)
+RECOUNT_PAGE = (2480, 3509)
+RECOUNT = {
+    (date(1953, 6, 7), 6): {
+        "PCI": (16, 1, (1278, 3023, 2183, 3113)),
+        "DC": (35, 1, (1278, 3116, 2183, 3204)),
+        "PSI": (-54, 2, (289, 541, 1197, 628)),
+        "P.NAZ.MONARCHICO": (-44, 2, (289, 635, 1197, 725)),
+        "PLI": (-61, 2, (289, 681, 1197, 771)),
+        "MSI": (-26, 2, (289, 729, 1197, 866)),
+        "PSDI": (-119, 2, (289, 823, 1197, 912)),
+        "UNITA'POPOLARE": (-1, 2, (289, 871, 1197, 959)),
+        "PRI": (-13, 2, (289, 917, 1197, 1006)),
+        "ALL.DEMOC.NAZIONALE": (-7, 2, (289, 1012, 1197, 1102)),
+        "MOV.SOC.CRISTIANO": (-13, 2, (289, 1060, 1197, 1148)),
+        "": (865669, 2, (289, 1397, 1197, 1672)),
+    }
+}
+DIGITIZED = 8
 MISATTRIBUTED = {(date(1948, 4, 18), 8): {"UNITA' SOCIALISTA": -1, "FR.DEMOCR.POPOLARE": 1}}
 GAZZETTA = {
     1948: (
@@ -540,7 +563,7 @@ PROCLAIMED = (
 REVISED = {
     1948: (
         "In 1949 the Chamber of Deputies changed two seats after its elections committee rechecked the count in Pisa "
-        "and Roma. In Pisa the Republicans reached a full quota, so on July 16, 1949 the Chamber annulled Ferruccio "
+        "and Roma. In Pisa the Republicans reached a full quota, so on July 6, 1949 the Chamber annulled Enrico "
         "Parri's national-college seat and Mary Chiesa Tibaldi took the new Pisa seat. In Roma the committee counted "
         "1,272 more votes for the Blocco Nazionale, enough for a full quota: Guglielmo Giannini took that seat, and "
         "the Christian Democrats lost their last national-college seat. The seats follow the committee's report "
@@ -549,7 +572,10 @@ REVISED = {
     1953: (
         "On July 28, 1954 the Chamber of Deputies annulled the election of Giuseppe Alpino, a Liberal deputy for "
         "Torino-Novara-Vercelli, and proclaimed Antonio Cavalli, a Christian Democrat, deputy for Brescia-Bergamo, on "
-        "its elections committee's report (Doc. X, n. 1). The votes are the count before this change."
+        "its elections committee's report (Doc. X, n. 1). Rechecking the section records in Brescia-Bergamo, the "
+        "committee found transcription and arithmetic errors that cut the valid list votes by 287 to 865,669, which "
+        "gave the Christian Democrats a 13th seat there; the revised result for Brescia-Bergamo carries those votes. "
+        "Elsewhere the votes are the count before this change."
     ),
 }
 MISATTRIBUTED_NOTE = (
@@ -855,6 +881,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, SEAT_LAW, suffix=".html")
     for address, *_ in REVISIONS.values():
         raw.fetch(SOURCE, address, suffix=".pdf")
+    raw.fetch(SOURCE, RECOUNT_URL, suffix=".pdf")
     for groups_url in GROUPS.values():
         raw.fetch(SOURCE, groups_url, suffix=".json")
     raw.fetch(SOURCE, url(NEXT), suffix=".zip")
@@ -1392,6 +1419,50 @@ def emit() -> Path:
             )
             cs.artifact(raw.cached(SOURCE, address), record)
             revision_sources[day] = record
+        recount = cs.source("Camera dei deputati", RECOUNT_TITLE)
+        cs.add(
+            "source",
+            id=recount,
+            kind="official_body",
+            publisher="Camera dei deputati",
+            title=RECOUNT_TITLE,
+            url=RECOUNT_URL,
+            license=state_acts,
+        )
+        recount_pdf = raw.cached(SOURCE, RECOUNT_URL)
+        recount_artifact = cs.artifact(recount_pdf, recount)
+        recount_pages: dict[int, UUID] = {}
+        for number in (1, 2):
+            image = PAGES / f"{recount_pdf.sha256}-{number}.png"
+            if not image.exists():
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        "100",
+                        "-gray",
+                        "-png",
+                        "-f",
+                        str(number),
+                        "-l",
+                        str(number),
+                        "-singlefile",
+                        str(recount_pdf.path),
+                        str(image.with_suffix("")),
+                    ],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            recount_pages[number] = cs.page(recount_artifact, number)
+            cs.add(
+                "source_page",
+                id=recount_pages[number],
+                artifact_id=recount_artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
         seat_table = pl.read_csv(SEAT_TABLE, separator="\t")
         magnitudes = {(year, n): seats for year, n, seats in seat_table.select("year", "n", "seats").iter_rows()}
         PAGES.mkdir(parents=True, exist_ok=True)
@@ -1624,7 +1695,7 @@ def emit() -> Path:
             )
             return id
 
-        def revised_set(key: str, election: UUID, contest: UUID, day: date) -> UUID:
+        def revised_set(key: str, election: UUID, contest: UUID, day: date, completeness: float = 0) -> UUID:
             id = cs.key(f"{SOURCE}.result_set", f"{key}:revised")
             cs.add(
                 "result_set",
@@ -1637,7 +1708,7 @@ def emit() -> Path:
                 source_id=revision_sources[day],
                 as_of=REVISIONS[day][2],
                 is_default=True,
-                completeness=0,
+                completeness=completeness,
             )
             note_once(id, REVISED[day.year])
             return id
@@ -2056,7 +2127,46 @@ def emit() -> Path:
                 if fixed:
                     note_once(child_set, MISATTRIBUTED_NOTE)
                 gains = REVISIONS[day][3].get(n, {}) if day in REVISIONS else {}
-                child_revised = revised_set(child_key, election, child, day) if gains else None
+                recounted = RECOUNT.get((day, n), {})
+                child_revised = revised_set(child_key, election, child, day, 1 if recounted else 0) if gains else None
+
+                def recounted_row(option: UUID | None, measure: int, value: int, label: str) -> None:
+                    assert child_revised is not None
+                    value, number, box = (
+                        (value + recounted[label][0], *recounted[label][1:]) if label else recounted[""]
+                    )
+                    cs.add(
+                        "result_value",
+                        result_set_id=child_revised,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=DIGITIZED,
+                        value=value,
+                    )
+                    cs.add(
+                        "value_locator",
+                        result_set_id=child_revised,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=recount_pages[number],
+                        x0=box[0] / RECOUNT_PAGE[0],
+                        y0=box[1] / RECOUNT_PAGE[1],
+                        x1=box[2] / RECOUNT_PAGE[0],
+                        y1=box[3] / RECOUNT_PAGE[1],
+                    )
+
+                if recounted:
+                    assert (
+                        int(rows["votes"].sum()) + sum(delta for label, (delta, *_) in recounted.items() if label)
+                        == recounted[""][0]
+                    )
+                    recounted_row(None, VALID, 0, "")
                 if gains:
                     note_once(child_set, PROCLAIMED)
                 for label, votes, final in rows.select("label", "votes", "seats").sort("label").iter_rows():
@@ -2077,6 +2187,8 @@ def emit() -> Path:
                         cs.add("outcome", result_set_id=child_revised, option_id=option, kind="won", seats=final)
                     if fresh and votes:
                         value_row(child_set, unit, option, VOTES, votes)
+                    if recounted:
+                        recounted_row(option, VOTES, votes, label)
 
             abroad_contests(day, election, path, year)
 
