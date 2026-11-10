@@ -9,7 +9,7 @@ from ea.changeset import NAMESPACE, Changeset
 from ea.store import ROOT, connect
 
 SOURCE = "us.election_cadence"
-VERSION = "2"
+VERSION = "3"
 TSV = ROOT / "pipelines/ea/sources/us/election_cadence.tsv"
 VILLAGE = "^VILLAGE OF "
 COLUMNS = ("selection", "period_years", "phase", "month", "day_rule", "valid_from", "valid_to")

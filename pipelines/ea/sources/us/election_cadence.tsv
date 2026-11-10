@@ -6,7 +6,8 @@ AK	county				elected	1	0						Alaska Stat. § 29.26.040	https://ak.elaws.us/as/2
 AK	municipality				elected	1	0						Alaska Stat. § 29.26.040	https://ak.elaws.us/as/29.26.040
 AK	school				elected	1	0						Alaska Division of Elections, REAA elections: held every year on the first Tuesday in October	https://www.elections.alaska.gov/reaa/
 AL	county				elected	2	0							
-AL	municipality				elected	4	0						Alabama Code § 11-46-21(a) (2000 to 2020; from 2025 the cycle is 2025, 2029)	https://law.justia.com/codes/alabama/title-11/title-2/chapter-46/article-2/section-11-46-21/
+AL	municipality				elected	4	0				2025-01-01		Alabama Code § 11-46-21(a) before 2021 Ala. Acts SB119: regular municipal elections on the fourth Tuesday in August 1984 and every fourth year, held 2000 to 2020	https://law.justia.com/codes/alabama/title-11/title-2/chapter-46/article-2/section-11-46-21/
+AL	municipality				elected	4	1	8		2025-01-01			Alabama Code § 11-46-21(a) as amended by 2021 SB119 (signed April 2021): regular municipal elections on the fourth Tuesday in August 2025 and every fourth year thereafter, so a city or town elected in 2020 serves an extra year	https://alison.legislature.state.al.us/files/pdf/SearchableInstruments/2021RS/PrintFiles/SB119-Eng.pdf
 AL	school				elected	2	0							
 AR	county				elected	2	0						Ark. Code Ann. § 7-5-102	https://law.justia.com/codes/arkansas/title-7/chapter-5/subchapter-1/section-7-5-102/
 AR	municipality				elected	2	0						Ark. Code Ann. §§ 14-44-103, 14-44-105, 14-44-115; § 14-43-201	https://www.armunileague.org/wp-content/uploads/2024/07/Municipal-Law-in-Arkansas-FAQ_2021_11_WEB.pdf
