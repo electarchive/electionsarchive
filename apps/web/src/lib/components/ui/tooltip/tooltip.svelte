@@ -9,6 +9,12 @@
       return;
     }
     isWatching = true;
+    const prefetch = () => void import("./tooltip-body.svelte");
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(prefetch);
+    } else {
+      setTimeout(prefetch, 1000);
+    }
     const options = { capture: true, passive: true };
     document.addEventListener(
       "pointerdown",
