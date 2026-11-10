@@ -13129,7 +13129,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     kind="general",
                     date_from=DAY,
                     date_to=DAY,
-                    status="scheduled",
+                    status="held" if DAY <= datetime.now(UTC).date() else "scheduled",
                 )
                 row_name = re.sub(r"^\d{4} (.+?) \w+ elections?$", r"2026 \1 general election", election_title)
                 name(elections[claim], row_name)
