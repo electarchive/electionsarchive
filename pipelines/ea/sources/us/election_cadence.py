@@ -61,13 +61,14 @@ def emit() -> Path:
             polity="US",
         )
         cs.manifest["scope"] = {"polity": "US", "sweeps": ["election_cadence"]}
-        sources: dict[tuple[str, str], UUID] = {}
+        sources: set[UUID] = set()
         counts: Counter[str] = Counter()
 
         def source(title: str, url: str) -> UUID:
             host = urlsplit(url).netloc.removeprefix("www.")
-            if (title, url) not in sources:
-                id = sources[(title, url)] = cs.source(host, title)
+            id = cs.source(host, title)
+            if id not in sources:
+                sources.add(id)
                 if id in cs.minted:
                     cs.add(
                         "source",
@@ -78,7 +79,7 @@ def emit() -> Path:
                         url=url,
                         license=None,
                     )
-            return sources[(title, url)]
+            return id
 
         def rule(key: str, cite: str | None, url: str | None = None, /, **row: object) -> None:
             locator, link = split(cite or "")
