@@ -6232,7 +6232,7 @@ async function atlas(input: {
           and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
         group by tops.top, tops.date
         having count(*) * 2 >= ${group.ids.length}
-        order by tops.date desc
+        order by tops.date desc, tops.top
         limit 16
       `
         : sql`
@@ -6246,7 +6246,7 @@ async function atlas(input: {
           and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
           and (e.kind = 'indirect') = ${contest.indirect}
           and ${serial("c", "e")} = ${contest.series}
-        order by e.date_from desc
+        order by e.date_from desc, c.id
         limit 16
       `,
     ),

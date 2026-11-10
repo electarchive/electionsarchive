@@ -21,6 +21,10 @@ const TABLES: Array<[RegExp, string]> = [
 const SCANNED = new Set([25, 114, 1009, 1043, 2950, 2951, 3802]);
 const tables = new Map<string, Array<string>>();
 
+export function depend(key: string) {
+  reading.getStore()?.keys.add(key);
+}
+
 export function fresh(): Reads {
   return { ids: new Set(), keys: new Set(), pending: [], isWide: false };
 }

@@ -3,6 +3,7 @@ import * as v from "valibot";
 import type { Held as Counted, Supply } from "#lib/source-kinds.js";
 import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { depend } from "#lib/server/reads.js";
 import { CATEGORIES, SUPPLIES } from "#lib/source-kinds.js";
 import catalog from "#lib/sources.json";
 
@@ -119,6 +120,7 @@ function tally(rows: Array<Held>, countries: Array<string>): Held {
 }
 
 async function held() {
+  depend("changesets");
   return (
     await db.execute<Row>(sql`
       with by_polity as (
