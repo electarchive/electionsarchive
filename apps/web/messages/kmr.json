@@ -1427,6 +1427,13 @@
   "polity_counting": "Niha tê jimartin",
   "polity_counting_body": "Deng hê jî tên jimartin. Heta ku encam bên pejirandin, jimartinê rasterast bişopîne. Dema encamên pejirandî bên weşandin, arşîv wan li vir zêde dike.",
   "polity_counting_short": "Tê jimartin",
+  "counting_title": "Jimartin hîn didome",
+  "counting_contest": "Ev hejmarên nefermî yên herî dawî ne ku {publisher} heta saet {time} weşandine. Ev hejmar nehatine pejirandin.",
+  "counting_election": "Di vê hilbijartinê de {count} pêşbazî hîn tên jimartin. Hejmarên herî dawî yên saet {time} nefermî ne û nehatine pejirandin.",
+  "counting_election_one": "Di vê hilbijartinê de pêşbaziyek hîn tê jimartin. Hejmarên herî dawî yên saet {time} nefermî ne û nehatine pejirandin.",
+  "counting_reporting": "Ji {expected} yekeyan {reporting} encamên xwe ragihandine",
+  "counting_link": "Jimartina zindî bişopîne",
+  "counting_admin": "Encamên zindî ji bo xwendevanan girtî ne. Ji ber vê yekê tenê rêveber vê girêdanê dibînin.",
   "polity_next_races": [
     {
       "declarations": [

@@ -1427,6 +1427,13 @@
   "polity_counting": "Şu anda sayım sürüyor",
   "polity_counting_body": "Oylar hâlâ sayılıyor. Sonuçlar onaylanana kadar canlı sayımı izleyin. Arşiv, onaylanmış sonuçları yayımlandıklarında buraya ekler.",
   "polity_counting_short": "Sayım sürüyor",
+  "counting_title": "Sayım sürüyor",
+  "counting_contest": "Bunlar, {publisher} kaynağının {time} itibarıyla açıkladığı en son resmî olmayan rakamlar. Rakamlar henüz onaylanmadı.",
+  "counting_election": "Bu seçimde {count} yarışta sayım sürüyor. {time} itibarıyla açıklanan en son rakamlar resmî değil ve henüz onaylanmadı.",
+  "counting_election_one": "Bu seçimde bir yarışta sayım sürüyor. {time} itibarıyla açıklanan en son rakamlar resmî değil ve henüz onaylanmadı.",
+  "counting_reporting": "{expected} birimden {reporting} birim sonuç bildirdi",
+  "counting_link": "Canlı sayımı takip et",
+  "counting_admin": "Canlı sonuçlar okurlara kapalı, bu yüzden bu bağlantıyı yalnızca yöneticiler görüyor.",
   "polity_next_races": [
     {
       "declarations": [

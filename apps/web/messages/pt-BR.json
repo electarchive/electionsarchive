@@ -1458,6 +1458,13 @@
   "polity_counting": "Apuração em andamento",
   "polity_counting_body": "Os votos ainda estão em apuração. Enquanto os resultados não forem homologados, acompanhe a apuração ao vivo. O arquivo adiciona aqui os resultados homologados quando forem publicados.",
   "polity_counting_short": "Em apuração",
+  "counting_title": "A apuração ainda está em andamento",
+  "counting_contest": "Estes são os números não oficiais mais recentes de {publisher}, atualizados às {time}. Ainda não foram homologados.",
+  "counting_election": "{count} disputas desta eleição ainda estão em apuração. Os números mais recentes, atualizados às {time}, não são oficiais nem foram homologados.",
+  "counting_election_one": "Uma disputa desta eleição ainda está em apuração. Os números mais recentes, atualizados às {time}, não são oficiais nem foram homologados.",
+  "counting_reporting": "{reporting} de {expected} unidades apuradas",
+  "counting_link": "Acompanhar a apuração ao vivo",
+  "counting_admin": "Os resultados ao vivo estão desativados para os leitores. Por isso, só administradores veem este link.",
   "polity_next_races": [
     {
       "declarations": [

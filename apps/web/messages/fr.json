@@ -1459,6 +1459,13 @@
   "polity_counting": "Dépouillement en cours",
   "polity_counting_body": "Le dépouillement est toujours en cours. Jusqu'à la certification des résultats, suivez le dépouillement en direct. Les résultats certifiés seront ajoutés ici dès leur publication.",
   "polity_counting_short": "Dépouillement",
+  "counting_title": "Dépouillement encore en cours",
+  "counting_contest": "Ces chiffres non officiels sont les derniers publiés par {publisher}, à {time}. Ils ne sont pas certifiés.",
+  "counting_election": "{count} scrutins de cette élection sont encore en cours de dépouillement. Les derniers chiffres, arrêtés à {time}, ne sont ni officiels ni certifiés.",
+  "counting_election_one": "Un scrutin de cette élection est encore en cours de dépouillement. Les derniers chiffres, arrêtés à {time}, ne sont ni officiels ni certifiés.",
+  "counting_reporting": "Unités de résultats dépouillées : {reporting} sur {expected}",
+  "counting_link": "Suivre le dépouillement en direct",
+  "counting_admin": "Les résultats en direct sont désactivés pour les lecteurs. Seuls les administrateurs voient ce lien.",
   "polity_next_races": [
     {
       "declarations": [

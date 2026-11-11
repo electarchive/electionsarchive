@@ -1427,6 +1427,13 @@
   "polity_counting": "Auszählung läuft",
   "polity_counting_body": "Die Stimmen werden noch ausgezählt. Bis die Ergebnisse amtlich festgestellt sind, verfolgen Sie die Auszählung live. Das Archiv ergänzt die amtlich festgestellten Ergebnisse hier, sobald sie veröffentlicht sind.",
   "polity_counting_short": "Auszählung läuft",
+  "counting_title": "Die Auszählung läuft noch",
+  "counting_contest": "Dies sind die neuesten inoffiziellen Zahlen von {publisher} (Stand: {time}). Sie sind nicht amtlich festgestellt.",
+  "counting_election": "Bei dieser Wahl werden {count} Rennen noch ausgezählt. Die neuesten Zahlen (Stand: {time}) sind inoffiziell und nicht amtlich festgestellt.",
+  "counting_election_one": "Bei dieser Wahl wird ein Rennen noch ausgezählt. Die neuesten Zahlen (Stand: {time}) sind inoffiziell und nicht amtlich festgestellt.",
+  "counting_reporting": "{reporting} von {expected} Meldeeinheiten ausgezählt",
+  "counting_link": "Auszählung live verfolgen",
+  "counting_admin": "Live-Ergebnisse sind für Leser abgeschaltet. Deshalb sehen nur Admins diesen Link.",
   "polity_next_races": [
     {
       "declarations": [
