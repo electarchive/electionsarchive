@@ -343,7 +343,7 @@ def bands(
         crop = image.crop((round(x0 * width), round(y0 * height), round(x1 * width), round(y1 * height)))
         overlap = round(crop.height * 0.02) if count > 1 else 0
         header = None
-        if count > 1 and "header" in spec:
+        if count > 1 and "header" in spec and spec["header"][1] > spec["header"][0]:
             top, bottom = spec["header"]
             header = crop.crop((0, round(top * crop.height), crop.width, round(bottom * crop.height)))
         labeled = "columns" in spec and not ("discover" in spec and reader == "first")

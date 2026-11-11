@@ -1,0 +1,111 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1976-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1977nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1977nort"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "NC",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 747,
+      "id": "747-0",
+      "columns": [
+        {
+          "label": "Jimmy Carter Democrat",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Gerald R. Ford Republican",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Thomas J. Anderson American",
+          "contest": "president",
+          "candidate": "American"
+        },
+        {
+          "label": "Lyndon H. LaRouche, Jr. Labor",
+          "contest": "president",
+          "candidate": "U.S. Labor"
+        },
+        {
+          "label": "Roger MacBride Libertarian",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.153,
+        0.952,
+        1.0
+      ],
+      "hint": "Read only the table headed 'COUNTY TABULATIONS FOR PRESIDENT NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0555
+      ]
+    },
+    {
+      "page": 748,
+      "id": "748-0",
+      "columns": [
+        {
+          "label": "Jimmy Carter Democrat",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Gerald R. Ford Republican",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Thomas J. Anderson American",
+          "contest": "president",
+          "candidate": "American"
+        },
+        {
+          "label": "Lyndon H. LaRouche, Jr. Labor",
+          "contest": "president",
+          "candidate": "U.S. Labor"
+        },
+        {
+          "label": "Roger MacBride Libertarian",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.097,
+        0.939,
+        0.893
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0616
+      ]
+    }
+  ]
+}
