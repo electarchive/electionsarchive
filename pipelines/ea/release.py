@@ -93,6 +93,7 @@ TYPES: dict[str, pl.DataType] = {
 CAST = {"USER-DEFINED", "ARRAY", "jsonb", "boolean"}
 MIN_ROWS = 2_000_000
 GEOMETRY_SOFT = 256 << 20
+PART_BYTES = 512 << 20
 MAX_BYTES = 2 << 30
 MAX_FILES = 1000
 
@@ -188,31 +189,53 @@ class Writer:
         query: sql.Composable,
     ) -> int:
         stem = f"{bundle}_{table}" + (f"_{part}" if part else "")
-        scratch = self.folder / f".{stem}.csv"
         select = sql.SQL("copy (select {} from ({}) q) to stdout (format csv, header)").format(
             sql.SQL(", ").join(sql.SQL("{} as {}").format(expr, sql.Identifier(name)) for name, expr, _ in columns),
             query,
         )
-        with scratch.open("wb") as file, self.conn.cursor().copy(select) as copy:
-            for chunk in copy:
-                file.write(chunk)
-        _drop(scratch)
-        parquet = self.folder / f"{stem}.parquet"
-        pl.scan_csv(scratch, schema={name: kind for name, _, kind in columns}).with_columns(
-            pl.col(name).dt.replace_time_zone("UTC") for name, _, kind in columns if kind == pl.Datetime("us")
-        ).sink_parquet(parquet, compression="zstd", statistics=True)
-        rows = pl.scan_parquet(parquet).select(pl.len()).collect().item()
-        if not rows:
-            scratch.unlink()
-            parquet.unlink()
-            return 0
-        self._record(parquet, bundle, table, part, rows)
         csv = self.folder / f"{stem}.csv.gz"
-        with scratch.open("rb") as source, gzip.open(csv, "wb", compresslevel=6) as target:
-            shutil.copyfileobj(source, target, 1 << 24)
-        scratch.unlink()
+        pieces: list[Path] = []
+        header = b""
+        size = 0
+        file = None
+        with gzip.open(csv, "wb", compresslevel=6) as target, self.conn.cursor().copy(select) as copy:
+            for chunk in copy:
+                data = bytes(chunk)
+                target.write(data)
+                if not header:
+                    header = data
+                    continue
+                if file is None or size >= PART_BYTES:
+                    if file is not None:
+                        file.close()
+                    pieces.append(self.folder / f".{stem}.{len(pieces) + 1}.csv")
+                    file = pieces[-1].open("wb")
+                    file.write(header)
+                    size = 0
+                file.write(data)
+                size += len(data)
+        if file is not None:
+            file.close()
+        if not pieces:
+            csv.unlink()
+            return 0
+        schema = {name: kind for name, _, kind in columns}
+        total = 0
+        for number, piece in enumerate(pieces, 1):
+            name = part if len(pieces) == 1 else f"{part}_{number}" if part else str(number)
+            parquet = self.folder / (f"{bundle}_{table}" + (f"_{name}" if name else "") + ".parquet")
+            frame = pl.read_csv(piece, schema=schema).with_columns(
+                pl.col(n).dt.replace_time_zone("UTC") for n, _, kind in columns if kind == pl.Datetime("us")
+            )
+            frame.write_parquet(parquet, compression="zstd", statistics=True)
+            rows = frame.height
+            del frame
+            piece.unlink()
+            self._record(parquet, bundle, table, name, rows)
+            total += rows
         _mem(stem)
-        self._record(csv, bundle, table, part, rows)
+        self._record(csv, bundle, table, part, total)
+        rows = total
         return rows
 
     def geometry(self, bundle: str, scheme: str, years: tuple[str, str], rows: list[tuple]) -> None:
