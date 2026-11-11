@@ -1,0 +1,22 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1980-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1981nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1981nort"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across"
+  },
+  "leaves": [
+    932,
+    933,
+    934,
+    935
+  ]
+}

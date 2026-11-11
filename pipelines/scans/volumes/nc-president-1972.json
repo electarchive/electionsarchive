@@ -1,0 +1,23 @@
+{
+  "year": 1972,
+  "day": "1972-11-07",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1972-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1973nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1973nort"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across"
+  },
+  "leaves": [
+    346,
+    347,
+    348,
+    349,
+    350
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1984-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1985nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1985nort"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across"
+  },
+  "leaves": [
+    1282,
+    1283,
+    1284,
+    1285,
+    1286,
+    1287
+  ]
+}

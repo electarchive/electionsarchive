@@ -1,0 +1,23 @@
+{
+  "year": 1976,
+  "day": "1976-11-02",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1976-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1977nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1977nort"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across"
+  },
+  "leaves": [
+    746,
+    747,
+    748,
+    749,
+    750
+  ]
+}
