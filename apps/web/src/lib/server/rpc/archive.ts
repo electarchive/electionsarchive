@@ -19317,7 +19317,8 @@ export const elections = {
                         join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
                         where e.id = ${election}::uuid limit 1
                       )
-                      select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.shaped_id as shaped
+                      , base as materialized (
+                      select x.n, s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.chain
                       from unnest(${sql.param(chunk)}::uuid[]) with ordinality as x(id, n)
                       join election k on k.id = x.id
                       join slug s on s.entity_id = k.id and s.is_current
@@ -19399,13 +19400,21 @@ export const elections = {
                             where u.id = (select id from top) and u.child is not null
                             order by u.depth limit 1
                           ) as group_id,
-                          (
-                            select u.id from (select u.id, u.depth from up u where u.depth < 7 order by u.depth offset 0) u
-                            where exists (select from area_geometry ag where ag.area_id = u.id)
-                            order by u.depth limit 1
-                          ) as shaped_id
+                          (select array_agg(u.id order by u.depth) from up u where u.depth < 7) as chain
                       ) az on true
-                      order by x.n
+                      ), shapes as materialized (
+                        select a.id as area_id
+                        from unnest((select coalesce(array_agg(distinct c), '{}'::uuid[]) from base b, unnest(b.chain) c)::uuid[]) a(id)
+                        where exists (select from area_geometry ag where ag.area_id = a.id)
+                      )
+                      select b.path, b.date, b.person, b.party, b.label, b.color, b.area, b.led, b.votes, b.office, b.group,
+                        (
+                          select t.c from unnest(b.chain) with ordinality t(c, i)
+                          where t.c in (select area_id from shapes)
+                          order by t.i limit 1
+                        ) as shaped
+                      from base b
+                      order by b.n
                     `),
                   );
                 }),
