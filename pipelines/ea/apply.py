@@ -538,10 +538,10 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     """update public.name n set is_preferred = false
                        from (select p.id, row_number() over (
                                  partition by p.entity_id, p.lang, p.script
-                                 order by exists (select from {0} s where s.entity_id = p.entity_id and s.text = p.text
-                                                  and s.lang = p.lang and s.is_preferred) desc,
-                                          p.recorded_from desc, p.id) as rank
+                                 order by s.entity_id is not null desc, p.recorded_from desc, p.id) as rank
                              from public.name p join changeset c on c.id = p.changeset_id and c.pipeline = %s
+                             left join (select distinct entity_id, text, lang from {0} where is_preferred) s
+                               on s.entity_id = p.entity_id and s.text = p.text and s.lang = p.lang
                              where p.is_preferred and p.valid_from is null and p.valid_to is null
                                and p.entity_id in (select entity_id from {0})) ranked
                        where n.id = ranked.id and ranked.rank > 1"""
