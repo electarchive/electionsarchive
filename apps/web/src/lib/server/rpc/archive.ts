@@ -4651,7 +4651,7 @@ async function places(
             order by g.area_id, g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first
           ) g on g.area_id = a.id
           cross join me
-          where ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
+          where not ST_Covers(me.geom, g.geom) and ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
         ),
         siblings as materialized (
           select rs.k from contest own
