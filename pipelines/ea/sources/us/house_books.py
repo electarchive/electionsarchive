@@ -1014,7 +1014,7 @@ def emit(source: ModuleType) -> Path:
             units: dict[str, UUID] = {}
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
-                if district and (int(year), where, county) in split:
+                if district > 0 and (int(year), where, county) in split:
                     part = (
                         f"{year}:{code}:{source.CHAMBER}:{key.split(':', 3)[3]}"
                         if hasattr(source, "CHAMBER")
