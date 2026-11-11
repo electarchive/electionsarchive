@@ -152,12 +152,17 @@ export async function pieces(
       where a.id = ${clip}::uuid and a.scheme_code not in ('us.state', 'us.county')
       order by g.valid_from desc nulls last limit 1
     ),
-    picked as materialized (
-      select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
+    hit as materialized (
+      select distinct g.area_id
       from (
         select ST_Collect(d.geom) as geom from edge e cross join ST_Dump(e.geom) d group by ST_XMin(d.geom) < 0
       ) e join area_geometry g on g.geom && e.geom and g.valid @> ${date}::date
-      join area a on a.id = g.area_id and a.scheme_code = ${scheme}
+      order by g.area_id
+    ),
+    picked as materialized (
+      select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
+      from hit h join area a on a.id = h.area_id and a.scheme_code = ${scheme}
+      join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
       order by a.id, g.valid_from desc nulls last
     ),
     cut as materialized (
