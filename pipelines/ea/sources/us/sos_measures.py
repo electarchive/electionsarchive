@@ -892,6 +892,11 @@ MS_2004_TOTALS = (
     (957104, (0.5601, 0.7486, 0.6226, 0.7586)),
     (155648, (0.3678, 0.7767, 0.4279, 0.7867)),
 )
+MS_2002 = "https://web.archive.org/web/20060623000000id_/http://www.sos.state.ms.us/ed_pubs/BlueBook/2004elections.pdf"
+MS_2002_TOTALS = (
+    (243618, (0.6962, 0.7423, 0.7578, 0.7550)),
+    (385570, (0.8316, 0.7423, 0.8932, 0.7550)),
+)
 TX_2022 = "https://results.texas-election.com/OfficialCanvassReport-2022-05-07"
 TX_2022_FILE = "MF-492/OfficialCanvassReport.xlsx"
 TX_2022_MEASURES = {
@@ -903,6 +908,7 @@ TX_2022_MEASURES = {
     "2": ("Increase in the school homestead exemption to $40,000", "Legislative Referendum", True),
 }
 MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
+MS_2002_MEASURES = {"1": ("Terms of circuit court judges and chancellors", "Legislative Referendum", False)}
 IA_2022_MEASURES = {"1": ("Right to keep and bear arms, with strict scrutiny review", "Legislative Referendum", True)}
 VT_2002_MEASURES = {"4": ("Mandatory retirement age for judges", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
@@ -2513,6 +2519,10 @@ AL_2007_NOTE = (
     "degraded to read, so the figures are the printed Total row, entered by hand from page 3; the box shown on each "
     "figure is approximate."
 )
+MS_2002_NOTE = (
+    " Only the statewide totals are recorded: the figures are the printed Total row of the Mississippi Official and"
+    " Statistical Register 2004-2008 table for Amendment 1 (SCR 543), page 574; the county rows are not loaded."
+)
 MS_2004_NOTE = (
     " Only the statewide totals are recorded: the figures are those printed in the Secretary of State's proclamation "
     "certifying the amendment, entered by hand from page 1; the box shown on each figure is approximate."
@@ -2666,6 +2676,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, AL_2010_PRIMARY, suffix=".pdf")
     raw.fetch(SOURCE, GA_2022_URL, suffix=".json")
     raw.fetch(SOURCE, MS_2004, suffix=".pdf")
+    store_manual(MS_2002, "MF-598/2004elections.pdf", "application/pdf")
     for rows in CA_TOTALS.values():
         for url in {row[3] for row in rows}:
             raw.fetch(SOURCE, url, suffix=".pdf")
@@ -5992,6 +6003,27 @@ def mississippi_2004() -> list[dict[str, object]]:
     ]
 
 
+def mississippi_2002() -> list[dict[str, object]]:
+    return [
+        {
+            "state": "MS",
+            "day": date(2002, 11, 5),
+            "number": "1",
+            "label": "Amendment 1",
+            "url": MS_2002,
+            "county": "statewide",
+            "answer": answer,
+            "votes": votes,
+            "page": 50,
+            "x0": box[0],
+            "y0": box[1],
+            "x1": box[2],
+            "y1": box[3],
+        }
+        for answer, (votes, box) in zip(("YES", "NO"), MS_2002_TOTALS, strict=True)
+    ]
+
+
 def texas_2022() -> list[dict[str, object]]:
     book = fastexcel.read_excel(str(raw.cached(SOURCE, TX_2022).path))
     sheet = book.load_sheet_by_idx(0, header_row=0).to_polars()
@@ -7713,6 +7745,7 @@ def parse() -> None:
             *north_carolina_early(),
             *west_virginia(),
             *west_virginia_2012(),
+            *mississippi_2002(),
             *mississippi_2004(),
             *georgia_2022(),
             *texas_2022(),
@@ -7782,6 +7815,7 @@ def parse() -> None:
             ("GA", 2022),
             ("TX", 2022),
             ("WV", 2012),
+            ("MS", 2002),
             ("MS", 2004),
             ("VT", 2002),
             ("IA", 2022),
@@ -7804,7 +7838,7 @@ def parse() -> None:
                     "GA": GA_2022_MEASURES,
                     "TX": TX_2022_MEASURES,
                     "WV": WV_2012_MEASURES,
-                    "MS": MS_2004_MEASURES,
+                    "MS": MS_2004_MEASURES if day.year == 2004 else MS_2002_MEASURES,
                     "VT": VT_2002_MEASURES,
                     "IA": IA_2022_MEASURES,
                 }.get(state, AZ_2022)[number]
@@ -8177,7 +8211,7 @@ def emit() -> Path:
                     (
                         AL_2007_NOTE
                         if state == "AL"
-                        else MS_2004_NOTE
+                        else (MS_2002_NOTE if day.year == 2002 else MS_2004_NOTE)
                         if state == "MS"
                         else GA_2022_NOTE
                         if state == "GA" and day.year == 2022
