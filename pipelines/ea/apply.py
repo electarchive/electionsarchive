@@ -10,7 +10,7 @@ import polars as pl
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ea import checks, coverage_tables, search, touched
+from ea import checks, coverage_tables, covers, search, touched
 from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
@@ -1522,6 +1522,7 @@ def rollup(conn: Connection, sets: list[int], affected: bool) -> int:
     for start in range(0, len(sets), 500):
         with conn.transaction():
             _rollup(conn, None, [], [], sets[start : start + 500])
+            covers.uncover(conn, None, sets=sets[start : start + 500])
         print(f"{min(start + 500, len(sets))} of {len(sets)} result sets rolled up", flush=True)
     return len(sets)
 
@@ -2017,6 +2018,15 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                             json.dumps(finding.details, default=str),
                         )
                     )
+        covers.uncover(
+            conn,
+            changeset_id,
+            moved,
+            repointed,
+            facts=sql.SQL("select result_set_id from {}").format(stage.staged("result_value"))
+            if "result_value" in stage.tables
+            else None,
+        )
         touched.recorded(conn, changeset_id)
         search.scope(conn, [changeset_id])
         search.refresh(conn)
@@ -2250,6 +2260,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
         raise ValueError(f"{changeset_id} has later changesets built on it: {', '.join(row for (row,) in dependents)}")
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+        covers.uncover(conn, changeset_id)
         search.scope(conn, [changeset_id])
         conn.execute("delete from release where changeset_id = %s", [changeset_id])
         conn.execute(

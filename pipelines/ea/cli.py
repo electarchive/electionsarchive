@@ -107,6 +107,7 @@ def main() -> None:
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
     commands.add_parser("records", help="rebuild the precomputed election records of the largest polities")
+    commands.add_parser("covers", help="fill the precomputed contest covers that contest pages read")
     rolling = commands.add_parser("rollup", help="recompute the area rollups of result sets")
     rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
     rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
@@ -319,6 +320,12 @@ def main() -> None:
         case "records":
             subprocess.run(
                 ["node", "scripts/polity-records.js"],
+                cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
+                check=True,
+            )
+        case "covers":
+            subprocess.run(
+                ["node", "scripts/contest-covers.js"],
                 cwd=Path(__file__).resolve().parents[2] / "apps" / "web",
                 check=True,
             )

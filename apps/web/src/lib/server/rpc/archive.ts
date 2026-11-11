@@ -1315,7 +1315,7 @@ async function find(id: string) {
   return contest;
 }
 
-type Cover = {
+export type Cover = {
   id: string;
   series: string;
   election: string;
@@ -1333,7 +1333,7 @@ type Cover = {
 
 const TALLY_ROWS = 50_000;
 
-const cover = (ids: SQL) => sql`
+export const cover = (ids: SQL) => sql`
   with recursive hit as materialized (${ids}),
   grp(root, id) as (
     select distinct id, id from hit
@@ -1377,17 +1377,42 @@ const cover = (ids: SQL) => sql`
   cross join lateral (select array_agg(o.id) as members from own o where o.root = c.id) g
 `;
 
+export const KEPT = sql`
+  k.id, k.series, k.election, k.indirect, k.date, k.year, k.status, k.is_remainder as "isRemainder", k.notional,
+  k.district, k.members, k.decided, k.reach
+`;
+
+async function kept(ids: Array<string>, rows: Array<Cover>) {
+  const found = new Map(rows.map((row) => [row.id, row]));
+  const missing = ids.filter((id) => !found.has(id));
+  if (missing.length > 0) {
+    const live = await db.execute<Cover>(
+      cover(sql`select unnest(${sql.param(missing)}::uuid[]) as id`),
+    );
+    for (const row of live.rows) {
+      found.set(row.id, row);
+    }
+  }
+  return ids.flatMap((id) => found.get(id) ?? []);
+}
+
 async function placed(area: string) {
   return remember(
     `placed:${area}`,
-    async () =>
-      rowsOf(
-        await db.execute<Cover>(
-          cover(sql`
-            select x.id from contest x where x.district_area_id = ${area}::uuid and x.allocation_parent_id is null
-          `),
+    async () => {
+      const [hit, stored] = await Promise.all([
+        db.execute<{ id: string }>(sql`
+          select x.id from contest x where x.district_area_id = ${area}::uuid and x.allocation_parent_id is null
+        `),
+        db.execute<Cover>(
+          sql`select ${KEPT} from contest_cover k where k.district = ${area}::uuid`,
         ),
-      ),
+      ]);
+      return kept(
+        hit.rows.map((row) => row.id),
+        stored.rows,
+      );
+    },
     true,
     undefined,
     true,
@@ -1397,23 +1422,25 @@ async function placed(area: string) {
 async function ruled(area: string) {
   return remember(
     `ruled:${area}`,
-    async () =>
-      rowsOf(
-        await db.execute<Cover>(
-          cover(sql`
-            select x.id from polity_territory pt
-            join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
-            join contest x on x.election_id = y.id
-            where pt.area_id = ${area}::uuid and x.district_area_id is null and x.allocation_parent_id is null
-              and y.kind <> 'by_election'
-              and not exists (
-                select from contest z
-                where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
-                  and z.district_area_id is not null and z.allocation_parent_id is null
-              )
-          `),
-        ),
-      ),
+    async () => {
+      const hit = await db.execute<{ id: string }>(sql`
+        select x.id from polity_territory pt
+        join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
+        join contest x on x.election_id = y.id
+        where pt.area_id = ${area}::uuid and x.district_area_id is null and x.allocation_parent_id is null
+          and y.kind <> 'by_election'
+          and not exists (
+            select from contest z
+            where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
+              and z.district_area_id is not null and z.allocation_parent_id is null
+          )
+      `);
+      const ids = hit.rows.map((row) => row.id);
+      const stored = await db.execute<Cover>(
+        sql`select ${KEPT} from contest_cover k where k.id = any(${sql.param(ids)}::uuid[])`,
+      );
+      return kept(ids, stored.rows);
+    },
     true,
     undefined,
     true,
