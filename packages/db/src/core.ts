@@ -15,7 +15,7 @@ export const bodyEventKind = pgEnum("body_event_kind", ["dissolved", "suspended"
 export const bodyKind = pgEnum("body_kind", ["lower_house", "upper_house", "unicameral", "council", "electoral_college", "constituent_assembly", "appointed_assembly"])
 export const calendar = pgEnum("calendar", ["gregorian", "julian", "rumi", "hijri", "french_republican"])
 export const candidacyRole = pgEnum("candidacy_role", ["head", "running_mate", "list_member", "substitute"])
-export const changesetKind = pgEnum("changeset_kind", ["import", "edit", "correction", "match", "digitization", "live"])
+export const changesetKind = pgEnum("changeset_kind", ["import", "edit", "correction", "match", "digitization", "live", "release"])
 export const changesetStatus = pgEnum("changeset_status", ["draft", "pending_review", "published", "rejected", "superseded"])
 export const contestKind = pgEnum("contest_kind", ["office", "body_seats", "list_allocation", "ballot_question", "elector_slate", "delegate_allocation"])
 export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
@@ -2444,11 +2444,17 @@ export const release = pgTable("release", {
 	createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`).notNull(),
 	doi: text(),
 	manifest: jsonb(),
+	changesetId: uuid("changeset_id"),
 }, (table) => [
 	foreignKey({
 		columns: [table.watermarkChangesetId],
 		foreignColumns: [changeset.id],
 		name: "release_watermark_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "release_changeset_id_fkey"
 	}),
 	unique("release_calver_key").on(table.calver),]);
 

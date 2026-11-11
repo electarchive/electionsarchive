@@ -148,6 +148,11 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
                 staged=staged,
                 target=target,
             )
+        elif table == "release":
+            query = sql.SQL(
+                """select count(*) filter (where p.calver is null), 0, count(*) filter (where p.calver is not null)
+                   from {} s left join public.release p using (calver)"""
+            ).format(staged)
         elif table == "external_id":
             query = sql.SQL(
                 """select count(*) filter (where p.value is null),
@@ -294,6 +299,15 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
     columns = stage.tables[table]
     staged = stage.staged(table)
     target = sql.Identifier(table)
+    if table == "release":
+        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+        conn.execute(
+            sql.SQL(
+                """insert into public.release ({}, changeset_id)
+                   select {}, current_setting('ea.changeset_id')::uuid from {} on conflict (calver) do nothing"""
+            ).format(listed, listed, staged)
+        )
+        return
     if table in FACTS:
         joins: list[sql.Composable] = []
         selected: list[sql.Composable] = []
@@ -2237,6 +2251,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
         search.scope(conn, [changeset_id])
+        conn.execute("delete from release where changeset_id = %s", [changeset_id])
         conn.execute(
             """delete from search_document where entity_id in (select id from entity where changeset_id = %(id)s)
                or polity_id in (select id from polity where changeset_id = %(id)s)""",

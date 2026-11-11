@@ -170,13 +170,13 @@ Prose is written once, in English. The `translation` table holds translations of
 
 ## Changesets and the apply path
 
-A changeset is the only unit of write to the core tables. Each row records its author (`author_kind` is `pipeline`, `user`, `agent`, or `system`), its pipeline and version, its `kind` (`import`, `edit`, `correction`, `match`, `digitization`, or `live`), and its `status` (`draft`, `pending_review`, `published`, `rejected`, or `superseded`). It also records a summary, a rationale, the scope it may touch, its payload, its checks, and its review times.
+A changeset is the only unit of write to the core tables. Each row records its author (`author_kind` is `pipeline`, `user`, `agent`, or `system`), its pipeline and version, its `kind` (`import`, `edit`, `correction`, `match`, `digitization`, `live`, or `release`), and its `status` (`draft`, `pending_review`, `published`, `rejected`, or `superseded`). It also records a summary, a rationale, the scope it may touch, its payload, its checks, and its review times.
 
 A payload takes one of two forms. The `ops` form holds small edits as JSON operations that people and agents submit through the API. The `artifacts` form points to Parquet files in object storage, which pipelines use for imports.
 
 The apply path loads the payload into staging, runs the checks, and then publishes the changeset in one transaction or queues it for review. A pipeline changeset from a registered official source, and any `match` changeset, publishes automatically when every check passes and the diff stays inside its declared scope. Everything else waits in `pending_review`, including every changeset that a person or an agent submits.
 
-A release is every changeset published on or before its watermark. The `release` table stores the calendar-version label, the watermark changeset, an optional DOI, and a manifest.
+A release is every changeset published on or before its watermark. The `release` table stores the calendar-version label, the watermark changeset, an optional DOI, and a manifest. A `release` changeset records a built release: `ea release --record --calver <calver>` stages the row from the release's `manifest.json`, publishing inserts it with `changeset_id` set to that changeset (an existing calver is left alone), and reverting the changeset deletes the row.
 
 ## Main tables
 

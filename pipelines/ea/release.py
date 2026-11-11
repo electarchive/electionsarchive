@@ -10,6 +10,7 @@ import polars as pl
 from psycopg import Connection, sql
 
 from ea.cache import _class
+from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 RELEASES = DATA / "releases"
@@ -465,6 +466,27 @@ def build(calver: str | None = None) -> str:
     (folder / "SHA256SUMS").write_text("\n".join(sums) + "\n")
     size = sum(int(str(entry["bytes"])) for entry in writer.files)
     return f"{folder}: {len(writer.files) + 3} files, {size / (1 << 30):.2f} GiB"
+
+
+def record(calver: str | None = None) -> str:
+    calver = calver or datetime.now(UTC).strftime("%Y.%m.%d")
+    manifest = json.loads((RELEASES / calver / "manifest.json").read_text())
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline="release",
+            version="1",
+            summary=f"Record release {calver} at watermark {manifest['watermark_changeset_id']}",
+            polity=None,
+            kind="release",
+        )
+        cs.add(
+            "release",
+            calver=manifest["release"],
+            watermark_changeset_id=manifest["watermark_changeset_id"],
+            manifest=manifest,
+        )
+        return str(cs.write())
 
 
 def _geometry(conn: Connection, writer: Writer) -> None:

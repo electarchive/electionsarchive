@@ -257,7 +257,12 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_proposal_id_via_proposalRevision"
 		}),
 		proposalRevisions: r.one.proposalRevision(),
-		releases: r.many.release(),
+		releasesWatermarkChangesetId: r.many.release({
+			alias: "release_watermarkChangesetId_changeset_id"
+		}),
+		releasesChangesetId: r.many.release({
+			alias: "release_changesetId_changeset_id"
+		}),
 		reportingUnits: r.many.reportingUnit(),
 		reportingUnitAreas: r.many.reportingUnitArea(),
 		representationGaps: r.many.representationGap(),
@@ -1769,9 +1774,15 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 	},
 	release: {
-		changeset: r.one.changeset({
+		changesetWatermarkChangesetId: r.one.changeset({
 			from: r.release.watermarkChangesetId,
-			to: r.changeset.id
+			to: r.changeset.id,
+			alias: "release_watermarkChangesetId_changeset_id"
+		}),
+		changesetChangesetId: r.one.changeset({
+			from: r.release.changesetId,
+			to: r.changeset.id,
+			alias: "release_changesetId_changeset_id"
 		}),
 	},
 	reportingUnit: {
