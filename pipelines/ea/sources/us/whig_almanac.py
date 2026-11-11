@@ -48,7 +48,7 @@ VOLUMES = {year: (PDF, LANDING, day, pages) for year, (_, _, day, pages) in ITEM
 ERRATA: set[tuple[int, tuple[str, int]]] = set()
 CHECKED = {
     1848: ("ME", "VT", "MA", "NH", "CT", "DE", "MD"),
-    1844: (),
+    1844: ("ME", "VT", "MA", "NH", "CT", "DE", "MD"),
 }
 FIXES = {
     (1848, "MD", "kent", "Cass"): 447,
