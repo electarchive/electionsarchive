@@ -1,0 +1,222 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1977, election returns (general election 1976-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1977.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1977.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1976,
+      "chamber": "senate",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 651,
+      "id": "651-0",
+      "columns": [
+        {
+          "label": "Paul H. Price Robin C. Capehart",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.202,
+        0.886,
+        0.917
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - REPUBLICAN ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0671
+      ]
+    },
+    {
+      "page": 652,
+      "id": "652-0",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd Sophia Democrat",
+          "contest": "senate",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Unopposed",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.123,
+        0.898,
+        0.89
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1199
+      ]
+    },
+    {
+      "page": 653,
+      "id": "653-0",
+      "columns": [
+        {
+          "label": "*Robert H. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "John F. McCuskey Bridgeport Republican",
+          "contest": "house1",
+          "candidate": "John F. McCuskey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.12,
+        0.886,
+        0.463
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Jim Sloan Beverly Republican",
+          "contest": "house2",
+          "candidate": "Jim Sloan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.455,
+        0.888,
+        0.932
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3229
+      ]
+    },
+    {
+      "page": 654,
+      "id": "654-0",
+      "columns": [
+        {
+          "label": "*John Slack Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack"
+        },
+        {
+          "label": "Unopposed",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.135,
+        0.9,
+        0.513
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 654,
+      "id": "654-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        },
+        {
+          "label": "E.S. (Steve) Goodman Huntington Republican",
+          "contest": "house4",
+          "candidate": "E. S. (Steve) Goodman"
+        },
+        {
+          "label": "Ken Hechler Huntington (Write-In)",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.505,
+        0.896,
+        0.814
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

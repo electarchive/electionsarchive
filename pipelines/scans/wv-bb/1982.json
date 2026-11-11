@@ -1,0 +1,190 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1983, election returns (general election 1982-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1983.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1983.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 653,
+      "id": "653-0",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd Sophia Democrat",
+          "contest": "senate",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Clive K. Benedict Lewisburg Republican",
+          "contest": "senate",
+          "candidate": "Cleveland K. Benedict"
+        },
+        {
+          "label": "William B. Howland Morgantown Socialist",
+          "contest": "senate",
+          "candidate": "William B. Hovland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.098,
+        0.931,
+        0.863
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1307
+      ]
+    },
+    {
+      "page": 654,
+      "id": "654-0",
+      "columns": [
+        {
+          "label": "*Alan B. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Alan B. Mollohan"
+        },
+        {
+          "label": "John F. McCuskey Bridgeport Republican",
+          "contest": "house1",
+          "candidate": "John F. McCuskey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.099,
+        0.931,
+        0.472
+      ],
+      "hint": "Read only the table headed 'UNITED STATES HOUSE OF REPRESENTATIVES FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 654,
+      "id": "654-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Jr. Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers Jr."
+        },
+        {
+          "label": "J. D. Hinkle Buckhannon Republican",
+          "contest": "house2",
+          "candidate": "J.D. Hinkle Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.464,
+        0.929,
+        0.897
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 655,
+      "id": "655-0",
+      "columns": [
+        {
+          "label": "*Robert E. Wise, Jr. Charleston Democrat",
+          "contest": "house3",
+          "candidate": "Robert E. Wise Jr."
+        },
+        {
+          "label": "David M. Staton South Charleston Republican",
+          "contest": "house3",
+          "candidate": "David M. Staton"
+        },
+        {
+          "label": "Adrienne Benjamin Charleston Socialist",
+          "contest": "house3",
+          "candidate": "Adrienne Benjamin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.096,
+        0.887,
+        0.422
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 655,
+      "id": "655-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        },
+        {
+          "label": "Homer L. Harris Huntington Republican",
+          "contest": "house4",
+          "candidate": "Homer L. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.414,
+        0.891,
+        0.663
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1917, election returns (general election 1912-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1917.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1917.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1912,
+      "chamber": "president",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "governor": {
+      "year": 1912,
+      "chamber": "governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "WV",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 744,
+      "id": "744-0",
+      "columns": [
+        {
+          "label": "Hughes Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wilson Democrat",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wilson Democrat",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Taft Republican",
+          "contest": "president",
+          "candidate": "William H. Taft (Republican)"
+        },
+        {
+          "label": "Roosevelt Progressive",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Progressive \"Bull Moose\")"
+        },
+        {
+          "label": "Debs Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.136,
+        0.87,
+        0.802
+      ],
+      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT\u20141916-1912.\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1216
+      ]
+    },
+    {
+      "page": 747,
+      "id": "747-0",
+      "columns": [
+        {
+          "label": "Cornwell Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hatfield Republican",
+          "contest": "governor",
+          "candidate": "Harry D. Hatfield"
+        },
+        {
+          "label": "Thompson Democrat",
+          "contest": "governor",
+          "candidate": "William R. Thompson"
+        },
+        {
+          "label": "Hilton Socialist",
+          "contest": "governor",
+          "candidate": "Walter B. Hilton"
+        },
+        {
+          "label": "Jackson Prohibition",
+          "contest": "governor",
+          "candidate": "Goodloe Jackson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.106,
+        0.872,
+        0.799
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u20141916-1912'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.14
+      ]
+    }
+  ]
+}

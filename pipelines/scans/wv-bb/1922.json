@@ -1,0 +1,319 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1923, election returns (general election 1922-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1923.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1923.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1922,
+      "chamber": "senate",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 457,
+      "id": "457-0",
+      "columns": [
+        {
+          "label": "M. M. Neely, Democrat",
+          "contest": "senate",
+          "candidate": "M. M. Neely"
+        },
+        {
+          "label": "M. S. Holt, Socialist",
+          "contest": "senate",
+          "candidate": "M. S. Holt"
+        },
+        {
+          "label": "Howard Sutherland, Republican",
+          "contest": "senate",
+          "candidate": "Howard Sutherland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.186,
+        0.83,
+        0.814
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR, 1922'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1115
+      ]
+    },
+    {
+      "page": 460,
+      "id": "460-0",
+      "columns": [
+        {
+          "label": "Benjamin L. Rosenbloom, Republican",
+          "contest": "house1",
+          "candidate": "Benj. L. Rosenbloom"
+        },
+        {
+          "label": "Raymond Kenny, Democrat",
+          "contest": "house1",
+          "candidate": "Raymond Kenny"
+        },
+        {
+          "label": "Benjamin L. Rosenbloom, Republican (1920)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. M. Neely, Democrat (1920)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.183,
+        0.157,
+        0.921,
+        0.363
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 460,
+      "id": "460-1",
+      "columns": [
+        {
+          "label": "Geo. M. Bowers, Republican",
+          "contest": "house2",
+          "candidate": "George M. Bowers"
+        },
+        {
+          "label": "R. E. L. Allen, Democrat",
+          "contest": "house2",
+          "candidate": "R. E. L. Allen"
+        },
+        {
+          "label": "John C. Chase, Socialist",
+          "contest": "house2",
+          "candidate": "John C. Chase"
+        },
+        {
+          "label": "Geo. M. Bowers, Republican (1920)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Forrest W. Brown, Democrat (1920)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.183,
+        0.355,
+        0.921,
+        0.641
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 460,
+      "id": "460-2",
+      "columns": [
+        {
+          "label": "Stuart F. Reed, Republican",
+          "contest": "house3",
+          "candidate": "Stuart F. Reed"
+        },
+        {
+          "label": "Eskridge H. Morton, Democrat",
+          "contest": "house3",
+          "candidate": "Eskridge H. Morton"
+        },
+        {
+          "label": "Stuart F. Reed, Republican (1920)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert F. Kidd, Democrat (1920)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.633,
+        0.921,
+        0.873
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 461,
+      "id": "461-0",
+      "columns": [
+        {
+          "label": "Harry C. Woodyard, Republican",
+          "contest": "house4",
+          "candidate": "Harry C. Woodyard"
+        },
+        {
+          "label": "George W. Johnson, Democrat",
+          "contest": "house4",
+          "candidate": "George W. Johnson"
+        },
+        {
+          "label": "Harry C. Woodyard, Republican",
+          "contest": "house4",
+          "candidate": "Harry C. Woodyard"
+        },
+        {
+          "label": "John L. Conner, Democrat",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.158,
+        0.84,
+        0.403
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 461,
+      "id": "461-1",
+      "columns": [
+        {
+          "label": "Wells Goodykoontz, Republican",
+          "contest": "house5",
+          "candidate": "Wells Goodykoontz"
+        },
+        {
+          "label": "T. J. Lilly, Democrat",
+          "contest": "house5",
+          "candidate": "Thomas J. Lilly"
+        },
+        {
+          "label": "Wells Goodykoontz, Republican",
+          "contest": "house5",
+          "candidate": "Wells Goodykoontz"
+        },
+        {
+          "label": "W. W. McNeal, Democrat",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.395,
+        0.84,
+        0.653
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 461,
+      "id": "461-2",
+      "columns": [
+        {
+          "label": "Leonard S. Echols, Republican",
+          "contest": "house6",
+          "candidate": "Leonard S. Echols"
+        },
+        {
+          "label": "J. Alfred Taylor, Democrat",
+          "contest": "house6",
+          "candidate": "J. Alfred Taylor"
+        },
+        {
+          "label": "Homer James, Socialist",
+          "contest": "house6",
+          "candidate": "Homer James"
+        },
+        {
+          "label": "Leonard S. Echols, Republican",
+          "contest": "house6",
+          "candidate": "Leonard S. Echols"
+        },
+        {
+          "label": "William E. Wilson, Democrat",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.645,
+        0.845,
+        0.859
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

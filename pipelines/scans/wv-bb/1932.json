@@ -1,0 +1,530 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1933, election returns (general election 1932-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1933.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1933.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 656,
+      "id": "656-0",
+      "columns": [
+        {
+          "label": "William L. Brice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Alfred Taylor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. H. Rose",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Minter L. Wilson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. Guy Tetrick",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clyde A. Wellman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Crawford",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Bumgardner",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.134,
+        0.905,
+        0.915
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1524
+      ]
+    },
+    {
+      "page": 657,
+      "id": "657-0",
+      "columns": [
+        {
+          "label": "John Novak",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward Steele",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Cantis",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. P. Miller",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Isadore Nestor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mark Rukavania",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mark Vedakovich",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Beale",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.163,
+        0.91,
+        0.919
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1085
+      ]
+    },
+    {
+      "page": 658,
+      "id": "658-0",
+      "columns": [
+        {
+          "label": "Mary T. Glasgow",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John F. Higgins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anna L. Kerr",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Charles O. Beckett",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Crotshire",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John C. Chase",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James T. Keesecker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Winifrede Grant",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.121,
+        0.904,
+        0.934
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1636
+      ]
+    },
+    {
+      "page": 659,
+      "id": "659-0",
+      "columns": [
+        {
+          "label": "J. W. Bedford",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Ellen M. Chevront",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Squire Halstead",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Weadon C. Koon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John MacDonald",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. C. B. Moore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Ramsey",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Withers",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.16,
+        0.888,
+        0.904
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1048
+      ]
+    },
+    {
+      "page": 660,
+      "id": "660-0",
+      "columns": [
+        {
+          "label": "H. C. Greer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. James A. Hughes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas J. Sherrard",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "Emery Tyler",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George D. Curtin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paul W. Neuenschwander",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Luther",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. S. A. Scott",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.162,
+        0.892,
+        0.907
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.102
+      ]
+    },
+    {
+      "page": 665,
+      "id": "665-0",
+      "columns": [
+        {
+          "label": "Robert L. Ramsey (D)",
+          "contest": "house1",
+          "candidate": "Robert L. Ramsey"
+        },
+        {
+          "label": "Henry L. Franklin (Soc.)",
+          "contest": "house1",
+          "candidate": "Henry L. Franklin"
+        },
+        {
+          "label": "Carl G. Bachmann (R)",
+          "contest": "house1",
+          "candidate": "Carl G. Bachmann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.176,
+        0.881,
+        0.374
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 665,
+      "id": "665-1",
+      "columns": [
+        {
+          "label": "Jennings Randolph (D)",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Emilio Garbarino (Com.)",
+          "contest": "house2",
+          "candidate": "Emilio Garbarino"
+        },
+        {
+          "label": "Jessie T. Brillhart (Soc.)",
+          "contest": "house2",
+          "candidate": "Jesse T. Brillhart"
+        },
+        {
+          "label": "Frank L. Bowman (R)",
+          "contest": "house2",
+          "candidate": "Frank L. Bowman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.366,
+        0.881,
+        0.645
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 665,
+      "id": "665-2",
+      "columns": [
+        {
+          "label": "Lynn S. Hornor (D)",
+          "contest": "house3",
+          "candidate": "Lynn S. Hornor"
+        },
+        {
+          "label": "John M. Wolverton (R)",
+          "contest": "house3",
+          "candidate": "John M. Wolverton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.637,
+        0.881,
+        0.863
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 666,
+      "id": "666-0",
+      "columns": [
+        {
+          "label": "George W. Johnson (D)",
+          "contest": "house4",
+          "candidate": "George W. Johnson"
+        },
+        {
+          "label": "J. S. Jeffrey (Soc.)",
+          "contest": "house4",
+          "candidate": "J. S. Jeffrey"
+        },
+        {
+          "label": "Robert L. Hogg (R)",
+          "contest": "house4",
+          "candidate": "Robert L. Hogg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.166,
+        0.902,
+        0.429
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 666,
+      "id": "666-1",
+      "columns": [
+        {
+          "label": "John Kee (D)",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Hugh Ike Shott (R)",
+          "contest": "house5",
+          "candidate": "Hugh Ike Shott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.421,
+        0.904,
+        0.647
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 666,
+      "id": "666-2",
+      "columns": [
+        {
+          "label": "Joe L. Smith (D)",
+          "contest": "house6",
+          "candidate": "Joe L. Smith"
+        },
+        {
+          "label": "James O. Lakin (R)",
+          "contest": "house6",
+          "candidate": "James O. Lakin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.639,
+        0.908,
+        0.852
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

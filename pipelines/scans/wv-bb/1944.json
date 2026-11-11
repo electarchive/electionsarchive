@@ -1,0 +1,244 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1945, election returns (general election 1944-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1945.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1945.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 257,
+      "id": "257-0",
+      "columns": [
+        {
+          "label": "*Clarence W. Meadows, (Democrat) Beckley, W. Va.",
+          "contest": "governor",
+          "candidate": "Clarence W. Meadows"
+        },
+        {
+          "label": "Daniel Boone Dawson, (Republican) Charleston, W. Va.",
+          "contest": "governor",
+          "candidate": "Daniel Boone Dawson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.147,
+        0.461,
+        0.926
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2272
+      ]
+    },
+    {
+      "page": 259,
+      "id": "259-0",
+      "columns": [
+        {
+          "label": "*Matthew M. Neely, (Democrat) Fairmont",
+          "contest": "house1",
+          "candidate": "Matthew M. Neely"
+        },
+        {
+          "label": "A. C. Schiffler, (Republican) Wheeling",
+          "contest": "house1",
+          "candidate": "A. C. Schiffler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.186,
+        0.142,
+        0.528,
+        0.359
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-1",
+      "columns": [
+        {
+          "label": "E. B. Pennybacker, (Democrat) Parkersburg",
+          "contest": "house4",
+          "candidate": "E. B. Pennybacker"
+        },
+        {
+          "label": "*Hubert S. Ellis, (Republican) Huntington",
+          "contest": "house4",
+          "candidate": "Hubert S. Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.143,
+        0.625,
+        0.42
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-2",
+      "columns": [
+        {
+          "label": "*Jennings Randolph, (Democrat) Elkins",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Melvin C. Muntzing, (Republican) Petersburg",
+          "contest": "house2",
+          "candidate": "Melvin C. Muntzing"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.186,
+        0.351,
+        0.528,
+        0.653
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-3",
+      "columns": [
+        {
+          "label": "*John Kee, (Democrat) Bluefield",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Hartley Sanders, (Republican) Princeton",
+          "contest": "house5",
+          "candidate": "Hartley Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.412,
+        0.625,
+        0.683
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-4",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey, (Democrat) Clarksburg",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Edward G. Rohrbough, (Republican) Glenville",
+          "contest": "house3",
+          "candidate": "Edward G. Rohrbough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.186,
+        0.645,
+        0.528,
+        0.893
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-5",
+      "columns": [
+        {
+          "label": "*Dr. E. H. Hedrick, (Democrat) Beckley",
+          "contest": "house6",
+          "candidate": "E. H. Hedrick"
+        },
+        {
+          "label": "J. W. (Judge) Maxwell, (Republican) Beckley",
+          "contest": "house6",
+          "candidate": "J. W. (Judge) Maxwell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.675,
+        0.625,
+        0.89
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

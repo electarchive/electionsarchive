@@ -1,0 +1,212 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1971, election returns (general election 1970-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1971.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1971.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1970,
+      "chamber": "senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 614,
+      "id": "614-0",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd Sophia (D)",
+          "contest": "senate",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Elmer H. Dodson Charleston (R)",
+          "contest": "senate",
+          "candidate": "Elmer Dodson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.124,
+        0.904,
+        0.904
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0654
+      ]
+    },
+    {
+      "page": 615,
+      "id": "615-0",
+      "columns": [
+        {
+          "label": "*Robert H. Mollohan Fairmont (D)",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Ken Doll Wheeling (R)",
+          "contest": "house1",
+          "candidate": "Ken Doll"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.097,
+        0.881,
+        0.294
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 615,
+      "id": "615-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser (D)",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Richard Marshall Reddecliff Buckhannon (R)",
+          "contest": "house2",
+          "candidate": "Richard Marshall Reddecliff"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.286,
+        0.881,
+        0.585
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 615,
+      "id": "615-2",
+      "columns": [
+        {
+          "label": "*John Slack Charleston (D)",
+          "contest": "house3",
+          "candidate": "John M. Slack, Jr."
+        },
+        {
+          "label": "Neal A. Kinsolving Charleston (R)",
+          "contest": "house3",
+          "candidate": "Neal A. Kinsolving"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.577,
+        0.876,
+        0.742
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 615,
+      "id": "615-3",
+      "columns": [
+        {
+          "label": "*Ken Hechler Huntington (D)",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Ralph Shannon Huntington (R)",
+          "contest": "house4",
+          "candidate": "Ralph Shannon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.734,
+        0.87,
+        0.917
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-0",
+      "columns": [
+        {
+          "label": "*James Kee Bluefield (D)",
+          "contest": "house5",
+          "candidate": "James Kee"
+        },
+        {
+          "label": "Mrs. Joe (Marian) McQuade Gauley Bridge (R)",
+          "contest": "house5",
+          "candidate": "Mrs. Joe (Marian) McQuade"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.122,
+        0.903,
+        0.254
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

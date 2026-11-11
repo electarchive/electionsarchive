@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1955, election returns (general election 1954-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1955.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1955.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 344,
+      "id": "344-0",
+      "columns": [
+        {
+          "label": "*Robert H. Mollohan, (Democrat) Fairmont",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Arch A. Moore, Jr., (Republican) Moundsville",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.093,
+        0.939,
+        0.326
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 344,
+      "id": "344-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, (Democrat) Keyser",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Albert M. Morgan, (Republican) Morgantown",
+          "contest": "house2",
+          "candidate": "Albert M. Morgan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.318,
+        0.939,
+        0.631
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 344,
+      "id": "344-2",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey, (Democrat) Clarksburg",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Joseph B. Lightburn, (Republican) Jane Lew",
+          "contest": "house3",
+          "candidate": "Joseph B. Lightburn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.623,
+        0.939,
+        0.907
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 345,
+      "id": "345-0",
+      "columns": [
+        {
+          "label": "*Dr. M. G. \"Burnie\" Burnside, (Democrat) Huntington",
+          "contest": "house4",
+          "candidate": "M. G. (Burnie) Burnside"
+        },
+        {
+          "label": "Dr. Will E. Neal, (Republican) Huntington",
+          "contest": "house4",
+          "candidate": "Will E. Neal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.093,
+        0.86,
+        0.394
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 345,
+      "id": "345-1",
+      "columns": [
+        {
+          "label": "*Elizabeth (Mrs. John) Kee, (Democrat) Bluefield",
+          "contest": "house5",
+          "candidate": "Elizabeth (Mrs. John) Kee"
+        },
+        {
+          "label": "Fred O. Blue, (Republican) Bluefield",
+          "contest": "house5",
+          "candidate": "Fred O. Blue"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.386,
+        0.86,
+        0.671
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 345,
+      "id": "345-2",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd, (Democrat) Sophia",
+          "contest": "house6",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Pat B. Withrow, Jr., (Republican) Charleston",
+          "contest": "house6",
+          "candidate": "Pat B. Withrow, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.663,
+        0.86,
+        0.886
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

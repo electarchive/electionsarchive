@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1941, election returns (general election 1940-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1941.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1941.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 830,
+      "id": "830-0",
+      "columns": [
+        {
+          "label": "Robert L. Ramsey (D)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. C. Schiffler (R)",
+          "contest": "house1",
+          "candidate": "A. C. Schiffler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.179,
+        0.469,
+        0.372
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-1",
+      "columns": [
+        {
+          "label": "George W. Johnson (D)",
+          "contest": "house4",
+          "candidate": "George W. Johnson"
+        },
+        {
+          "label": "Harry O. Hiteshew (R)",
+          "contest": "house4",
+          "candidate": "Harry O. Hiteshew"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.48,
+        0.179,
+        0.817,
+        0.43
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-2",
+      "columns": [
+        {
+          "label": "Jennings Randolph (D)",
+          "contest": "house2",
+          "candidate": "Jennings, Randolph"
+        },
+        {
+          "label": "Summers H. Sharp (R)",
+          "contest": "house2",
+          "candidate": "Summers, H. Sharp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.364,
+        0.469,
+        0.645
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-3",
+      "columns": [
+        {
+          "label": "John Kee (D)",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Hartley Sanders (R)",
+          "contest": "house5",
+          "candidate": "Hartley Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.422,
+        0.818,
+        0.68
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-4",
+      "columns": [
+        {
+          "label": "Andrew Edmiston (D)",
+          "contest": "house3",
+          "candidate": "Andrew Edmiston"
+        },
+        {
+          "label": "H. Roy Waugh (R)",
+          "contest": "house3",
+          "candidate": "H. Roy Waugh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.637,
+        0.469,
+        0.867
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 830,
+      "id": "830-5",
+      "columns": [
+        {
+          "label": "Joe L. Smith (D)",
+          "contest": "house6",
+          "candidate": "Joe L. Smith"
+        },
+        {
+          "label": "R. E. O'Connor (R)",
+          "contest": "house6",
+          "candidate": "R. E. O'Connor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.672,
+        0.818,
+        0.867
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

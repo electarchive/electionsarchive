@@ -1,0 +1,212 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1967, election returns (general election 1966-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1967.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1967.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1966,
+      "chamber": "senate",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 613,
+      "id": "613-0",
+      "columns": [
+        {
+          "label": "*Jennings Randolph, Elkins, W. Va. Democrat",
+          "contest": "senate",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Francis J. Love, Wheeling, W. Va. Republican",
+          "contest": "senate",
+          "candidate": "Francis J. Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.122,
+        0.793,
+        0.882
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1066
+      ]
+    },
+    {
+      "page": 615,
+      "id": "615-0",
+      "columns": [
+        {
+          "label": "William M. Kidd, Sutton, W. Va. Democrat",
+          "contest": "house1",
+          "candidate": "William M. Kidd"
+        },
+        {
+          "label": "*Arch A. Moore, Jr., Moundsville, W. Va. Republican",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.13,
+        0.787,
+        0.482
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT\u2014CONGRESSMAN'; ignore any other table visible in the image."
+    },
+    {
+      "page": 615,
+      "id": "615-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Keyser, W. Va. Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "George L. Strader, Buckhannon, W. Va. Republican",
+          "contest": "house2",
+          "candidate": "George L. Strader"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.474,
+        0.783,
+        0.877
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT\u2014CONGRESSMAN'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-0",
+      "columns": [
+        {
+          "label": "*John M. Slack, Jr., Charleston, W. Va. Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack"
+        },
+        {
+          "label": "Mal Guthrie, Charleston, W. Va. Republican",
+          "contest": "house3",
+          "candidate": "Mal Guthrie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.234,
+        0.145,
+        0.909,
+        0.436
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT\u2014CONGRESSMAN'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-1",
+      "columns": [
+        {
+          "label": "*Ken Hechler, Huntington, W. Va. Democrat",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Harry D. Humphreys, Huntington, W. Va. Republican",
+          "contest": "house4",
+          "candidate": "Harry D. (Pinkie) Humphreys"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.234,
+        0.428,
+        0.909,
+        0.844
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT\u2014CONGRESSMAN'; ignore any other table visible in the image."
+    },
+    {
+      "page": 617,
+      "id": "617-0",
+      "columns": [
+        {
+          "label": "*James Kee, Bluefield, W. Va. Democrat",
+          "contest": "house5",
+          "candidate": "James Kee"
+        },
+        {
+          "label": "Elizabeth Ann Bowen, Bluefield, W. Va. Republican",
+          "contest": "house5",
+          "candidate": "Elizabeth Ann Bowen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.166,
+        0.751,
+        0.377
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT\u2014CONGRESSMAN'; ignore any other table visible in the image."
+    }
+  ]
+}

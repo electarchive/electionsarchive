@@ -1,0 +1,282 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1927, election returns (general election 1926-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1927.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1927.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 652,
+      "id": "652-0",
+      "columns": [
+        {
+          "label": "George W. Oldham, Democrat",
+          "contest": "house1",
+          "candidate": "George W. Oldham"
+        },
+        {
+          "label": "Carl G. Bachmann, Republican",
+          "contest": "house1",
+          "candidate": "Carl G. Bachmann"
+        },
+        {
+          "label": "George W. Oldham, Democrat",
+          "contest": "house1",
+          "candidate": "George W. Oldham"
+        },
+        {
+          "label": "Carl G. Bachmann, Republican",
+          "contest": "house1",
+          "candidate": "Carl G. Bachmann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.111,
+        0.84,
+        0.337
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 652,
+      "id": "652-1",
+      "columns": [
+        {
+          "label": "Robert E. Lee Allen, Democrat",
+          "contest": "house2",
+          "candidate": "R. E. L. Allen"
+        },
+        {
+          "label": "Emelio Garbarino, Socialist",
+          "contest": "house2",
+          "candidate": "Emelio Garbarino"
+        },
+        {
+          "label": "Frank L. Bowman, Republican",
+          "contest": "house2",
+          "candidate": "Frank L. Bowman"
+        },
+        {
+          "label": "Robert E. Lee Allen, Democrat",
+          "contest": "house2",
+          "candidate": "R. E. L. Allen"
+        },
+        {
+          "label": "John Chase, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank L. Bowman, Republican",
+          "contest": "house2",
+          "candidate": "Frank L. Bowman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.329,
+        0.84,
+        0.631
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 652,
+      "id": "652-2",
+      "columns": [
+        {
+          "label": "William S. O'Brien, Democrat",
+          "contest": "house3",
+          "candidate": "William S. O'Brien"
+        },
+        {
+          "label": "John M. Wolverton, Republican",
+          "contest": "house3",
+          "candidate": "John M. Wolverton"
+        },
+        {
+          "label": "Robert H. Kidd, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Wolverton, Republican",
+          "contest": "house3",
+          "candidate": "John M. Wolverton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.623,
+        0.846,
+        0.884
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-0",
+      "columns": [
+        {
+          "label": "John D. Sweeney, Democrat",
+          "contest": "house4",
+          "candidate": "John D. Sweeney"
+        },
+        {
+          "label": "James A. Hughes, Republican",
+          "contest": "house4",
+          "candidate": "James A. Hughes"
+        },
+        {
+          "label": "George W. Johnson, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry C. Woodyard, Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.13,
+        0.874,
+        0.375
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-1",
+      "columns": [
+        {
+          "label": "Emmet F. Scaggs, Democrat",
+          "contest": "house5",
+          "candidate": "Emmett F. Scaggs"
+        },
+        {
+          "label": "James F. Strother, Republican",
+          "contest": "house5",
+          "candidate": "James French Strother"
+        },
+        {
+          "label": "Thomas Jefferson Lilly, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James French Strother, Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.367,
+        0.874,
+        0.654
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-2",
+      "columns": [
+        {
+          "label": "J. Alfred Taylor, Democrat",
+          "contest": "house6",
+          "candidate": "J. Alfred Taylor"
+        },
+        {
+          "label": "E. T. England, Republican",
+          "contest": "house6",
+          "candidate": "E. T. England"
+        },
+        {
+          "label": "J. Alfred Taylor, Democrat",
+          "contest": "house6",
+          "candidate": "J. Alfred Taylor"
+        },
+        {
+          "label": "Fisher B. Plymale, Farm'r-Lab'r",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. S. Echols, Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.646,
+        0.874,
+        0.859
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

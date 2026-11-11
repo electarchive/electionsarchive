@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1943, election returns (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1943.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1943.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 598,
+      "id": "598-0",
+      "columns": [
+        {
+          "label": "Robert L. Ramsey, Follansbee (Democrat)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*A. C. Schiffler, Wheeling (Republican)",
+          "contest": "house1",
+          "candidate": "A. C. Schiffler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.132,
+        0.899,
+        0.356
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 598,
+      "id": "598-1",
+      "columns": [
+        {
+          "label": "*Jennings Randolph, Elkins (Democrat)",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Chas. G. Baker, Morgantown (Republican)",
+          "contest": "house2",
+          "candidate": "Charles G. Baker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.348,
+        0.899,
+        0.66
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 598,
+      "id": "598-2",
+      "columns": [
+        {
+          "label": "Andrew Edmiston, Weston (Democrat)",
+          "contest": "house3",
+          "candidate": "Andrew Edmiston"
+        },
+        {
+          "label": "*Edward G. Rohrbough, Glenville (Republican)",
+          "contest": "house3",
+          "candidate": "Edward G. Rohrbough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.652,
+        0.899,
+        0.912
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 599,
+      "id": "599-0",
+      "columns": [
+        {
+          "label": "George W. Johnson, Parkersburg (Democrat)",
+          "contest": "house4",
+          "candidate": "George W. Johnson"
+        },
+        {
+          "label": "*Hubert S. Ellis, Huntington (Republican)",
+          "contest": "house4",
+          "candidate": "Hubert S. Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.13,
+        0.903,
+        0.425
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 599,
+      "id": "599-1",
+      "columns": [
+        {
+          "label": "*John Kee, Bluefield (Democrat)",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "B. F. Howard, Welch (Republican)",
+          "contest": "house5",
+          "candidate": "B. F. Howard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.417,
+        0.903,
+        0.681
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 599,
+      "id": "599-2",
+      "columns": [
+        {
+          "label": "*Joe L. Smith, Beckley (Democrat)",
+          "contest": "house6",
+          "candidate": "Joe L. Smith"
+        },
+        {
+          "label": "Houston G. Young, Charleston (Republican)",
+          "contest": "house6",
+          "candidate": "Houston G. Young"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.673,
+        0.903,
+        0.883
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1963, election returns (general election 1962-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1963.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1963.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 452,
+      "id": "452-0",
+      "columns": [
+        {
+          "label": "Cleveland M. Bailey, Clarksburg Democrat",
+          "contest": "house1",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "*Arch A. Moore, Jr., Moundsville Republican",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.486,
+        0.899,
+        0.754
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 452,
+      "id": "452-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Cooper P. Benedict, Lewisburg Republican",
+          "contest": "house2",
+          "candidate": "Cooper P. Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.746,
+        0.899,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 453,
+      "id": "453-0",
+      "columns": [
+        {
+          "label": "*John M. Slack, Jr. Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack, Jr."
+        },
+        {
+          "label": "M. G. (Mal) Guthrie Charleston Republican",
+          "contest": "house3",
+          "candidate": "M. G. Guthrie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.243,
+        0.878,
+        0.428
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 453,
+      "id": "453-1",
+      "columns": [
+        {
+          "label": "*Dr. Ken Hechler, Huntington Democrat",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Clyde B. Pinson, Huntington Republican",
+          "contest": "house4",
+          "candidate": "Clyde B. Pinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.42,
+        0.878,
+        0.699
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 453,
+      "id": "453-2",
+      "columns": [
+        {
+          "label": "*Elizabeth (Mrs. John) Kee, Bluefield Democrat",
+          "contest": "house5",
+          "candidate": "Elizabeth Kee"
+        },
+        {
+          "label": "James Strother Crockett, Welch Republican",
+          "contest": "house5",
+          "candidate": "James S. Crockett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.691,
+        0.872,
+        0.905
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

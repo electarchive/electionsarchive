@@ -1,0 +1,249 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1935, election returns (general election 1934-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1935.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1935.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1934,
+      "chamber": "senate",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 747,
+      "id": "747-0",
+      "columns": [
+        {
+          "label": "*Rush D. Holt (D)",
+          "contest": "senate",
+          "candidate": "Rush D. Holt"
+        },
+        {
+          "label": "John Wesley McDonald (Pro.)",
+          "contest": "senate",
+          "candidate": "John Wesley McDonald"
+        },
+        {
+          "label": "Henry D. Hatfield (R)",
+          "contest": "senate",
+          "candidate": "Henry D. Hatfield"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.171,
+        0.127,
+        0.864,
+        0.881
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.13
+      ]
+    },
+    {
+      "page": 750,
+      "id": "750-0",
+      "columns": [
+        {
+          "label": "*Robt. L. Ramsay (D)",
+          "contest": "house1",
+          "candidate": "Robert L. Ramsay"
+        },
+        {
+          "label": "Carl G. Bachmann (R)",
+          "contest": "house1",
+          "candidate": "Carl G. Bachmann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.186,
+        0.832,
+        0.376
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 750,
+      "id": "750-1",
+      "columns": [
+        {
+          "label": "*Jennings Randolph (D)",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Herbert E. Hannis (R)",
+          "contest": "house2",
+          "candidate": "Herbert E. Hannis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.368,
+        0.832,
+        0.671
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 750,
+      "id": "750-2",
+      "columns": [
+        {
+          "label": "*Andrew Edmiston (D)",
+          "contest": "house3",
+          "candidate": "Andrew Edmiston"
+        },
+        {
+          "label": "James A. Rusmisell (R)",
+          "contest": "house3",
+          "candidate": "James A. Rusmisell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.663,
+        0.832,
+        0.894
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 751,
+      "id": "751-0",
+      "columns": [
+        {
+          "label": "*Geo. W. Johnson (D)",
+          "contest": "house4",
+          "candidate": "George W. Johnson"
+        },
+        {
+          "label": "Robert B. McDougle (R)",
+          "contest": "house4",
+          "candidate": "Robert B. McDougle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.183,
+        0.177,
+        0.884,
+        0.425
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 751,
+      "id": "751-1",
+      "columns": [
+        {
+          "label": "*John Kee (D)",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "C. M.(Casey) Jones (R)",
+          "contest": "house5",
+          "candidate": "C. M. (Casey) Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.183,
+        0.417,
+        0.882,
+        0.651
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 751,
+      "id": "751-2",
+      "columns": [
+        {
+          "label": "*Joe L. Smith (D)",
+          "contest": "house6",
+          "candidate": "Joe L. Smith"
+        },
+        {
+          "label": "Frank C. Burdette (R)",
+          "contest": "house6",
+          "candidate": "Frank C. Burdette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.643,
+        0.881,
+        0.82
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

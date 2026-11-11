@@ -1,0 +1,261 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1969, election returns (general election 1968-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1969.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1969.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 580,
+      "id": "580-0",
+      "columns": [
+        {
+          "label": "T. C. Gregory Institute, West Virginia",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cecil H. Underwood Huntington, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. Donald Everly Kingwood, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. Blake Billingslea Fairmont, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. C. McGinnis Huntington, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James O. Holliday Hurricane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. Harry Vest Bluefield, W. Va.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.203,
+        0.206,
+        0.874,
+        0.897
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2214
+      ]
+    },
+    {
+      "page": 581,
+      "id": "581-0",
+      "columns": [
+        {
+          "label": "AMERICAN ELECTORS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.133,
+        0.79,
+        0.888
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2755
+      ]
+    },
+    {
+      "page": 586,
+      "id": "586-0",
+      "columns": [
+        {
+          "label": "Democrat *Robert H. \"Bob\" Mollohan Fairmont",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Republican Tom Sweeney Wheeling",
+          "contest": "house1",
+          "candidate": "Tom Sweeney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.222,
+        0.192,
+        0.882,
+        0.478
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 586,
+      "id": "586-1",
+      "columns": [
+        {
+          "label": "Democrat *Harley O. Staggers Keyser",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Republican Georeg L. Strader Buckhannon",
+          "contest": "house2",
+          "candidate": "George L. Strader"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.222,
+        0.47,
+        0.882,
+        0.852
+      ],
+      "hint": "Read only the table headed 'CONGRESSMAN SECOND CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 587,
+      "id": "587-0",
+      "columns": [
+        {
+          "label": "Democrat *John Slack Charleston",
+          "contest": "house3",
+          "candidate": "John Slack"
+        },
+        {
+          "label": "Republican Neal A. Kinsolving Charleston",
+          "contest": "house3",
+          "candidate": "Neal A. Kinsolving"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.149,
+        0.781,
+        0.383
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICIALS\u2014(Continued) CONGRESSMAN THIRD CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 587,
+      "id": "587-1",
+      "columns": [
+        {
+          "label": "Democrat *Ken Hechler Huntington",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Republican Ralph Lewis Shannon Huntington",
+          "contest": "house4",
+          "candidate": "Ralph Lewis Shannon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.375,
+        0.779,
+        0.666
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICIALS\u2014(Continued) CONGRESSMAN FOURTH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 587,
+      "id": "587-2",
+      "columns": [
+        {
+          "label": "Democrat *James Kee Bluefield",
+          "contest": "house5",
+          "candidate": "James Kee"
+        },
+        {
+          "label": "Republican J. Donald \"Don\" Clark Bluefield",
+          "contest": "house5",
+          "candidate": "J. Donald Clark"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.658,
+        0.778,
+        0.892
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICIALS\u2014(Continued) CONGRESSMAN FIFTH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    }
+  ]
+}

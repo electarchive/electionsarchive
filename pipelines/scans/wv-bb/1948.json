@@ -1,0 +1,392 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1949, election returns (general election 1948-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1949.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1949.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 340,
+      "id": "340-0",
+      "columns": [
+        {
+          "label": "*Gordon P. Fought, Wheeling, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*James M. Mason, III, Charles Town, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Dr. Chester R. Ogden, Clarksburg, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Rolla A. Johnston, Sr., Parkersburg, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Judge R. D. Railey, Pineville, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Dr. H. H. Farley, Logan, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mrs. Mary Vinson Clark, Huntington, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mrs. Bird Forney, Fairmont, W. Va.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.204,
+        0.201,
+        0.886,
+        0.896
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - DEMOCRATIC ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2072
+      ]
+    },
+    {
+      "page": 341,
+      "id": "341-0",
+      "columns": [
+        {
+          "label": "Irl Thomas, Fairmont, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. J. Funkhouser, Charles Town, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Claude R. Hill, Oak Hill, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Bartow Jones, Point Pleasant, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William H. Maynard, Delbarton, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John T. Copenhaver, Charleston, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas E. Milsop, Weirton, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Daisy M. Early, Welch, W. Va.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.211,
+        0.817,
+        0.904
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - REPUBLICAN ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.202
+      ]
+    },
+    {
+      "page": 342,
+      "id": "342-0",
+      "columns": [
+        {
+          "label": "Walter Icen Pritchard Weston, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Phyllis Hall Matewan, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Julian M. Barclay Bethany, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Solomon Tate Fairmont, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Max Henry Green Montgomery, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Donald Richard Stewart Charleston, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ervin William Dement Point Pleasant, W. Va.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Carlotta Fryer Ridgeley, W. Va.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.208,
+        0.212,
+        0.89,
+        0.922
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - PROGRESSIVE PARTY ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2099
+      ]
+    },
+    {
+      "page": 347,
+      "id": "347-0",
+      "columns": [
+        {
+          "label": "*Robert L. Ramsay, (Democratic) Follansbee",
+          "contest": "house1",
+          "candidate": "Robert L. Ramsay"
+        },
+        {
+          "label": "Francis J. Love, (Republican) Wheeling",
+          "contest": "house1",
+          "candidate": "Francis J. Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.141,
+        0.477,
+        0.355
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 347,
+      "id": "347-1",
+      "columns": [
+        {
+          "label": "*M. G. Burnside (Democratic) Huntington",
+          "contest": "house4",
+          "candidate": "M. G. Burnside"
+        },
+        {
+          "label": "Hubert S. Ellis (Republican) Huntington",
+          "contest": "house4",
+          "candidate": "Hubert S. Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.141,
+        0.822,
+        0.437
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 347,
+      "id": "347-2",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers (Democratic) Keyser",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Melvin C. Snyder (Republican) Kingwood",
+          "contest": "house2",
+          "candidate": "Melvin C. Snyder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.347,
+        0.477,
+        0.646
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 347,
+      "id": "347-3",
+      "columns": [
+        {
+          "label": "*John Kee (Democratic) Bluefield",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Hartley Sanders (Republican) Princeton",
+          "contest": "house5",
+          "candidate": "Hartley Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.429,
+        0.822,
+        0.685
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 347,
+      "id": "347-4",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey (Democratic) Clarksburg",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Edward G. Rohrbough (Republican) Glenville",
+          "contest": "house3",
+          "candidate": "Edward G. Rohrbough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.638,
+        0.48,
+        0.896
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 347,
+      "id": "347-5",
+      "columns": [
+        {
+          "label": "*Dr. E. H. Hedrick (Democratic) Beckley",
+          "contest": "house6",
+          "candidate": "E. H. Hedrick"
+        },
+        {
+          "label": "D. L. Salisbury (Republican) Dunbar",
+          "contest": "house6",
+          "candidate": "D. L. Salisbury"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.486,
+        0.677,
+        0.824,
+        0.894
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

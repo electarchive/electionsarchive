@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1959, election returns (general election 1958-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1959.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1959.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 371,
+      "id": "371-0",
+      "columns": [
+        {
+          "label": "*Arch A. Moore, Jr., Glendale (Republican)",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        },
+        {
+          "label": "Robert H. Mollohan Fairmont (Democrat)",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.227,
+        0.147,
+        0.773,
+        0.341
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 371,
+      "id": "371-1",
+      "columns": [
+        {
+          "label": "Dr. Ward W. Keesecker, Berkeley Springs (Republican)",
+          "contest": "house2",
+          "candidate": "Ward Keesecker"
+        },
+        {
+          "label": "*Harley O. Staggers, Keyser (Democrat)",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.226,
+        0.333,
+        0.773,
+        0.609
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 371,
+      "id": "371-2",
+      "columns": [
+        {
+          "label": "Rex Keith Bumgardner, Clarksburg (Republican)",
+          "contest": "house3",
+          "candidate": "Rex Keith Bumgardner"
+        },
+        {
+          "label": "*Cleveland M. Bailey, Clarksburg (Democrat)",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.223,
+        0.601,
+        0.773,
+        0.84
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-0",
+      "columns": [
+        {
+          "label": "Will E. Neal, Huntington (Republican)",
+          "contest": "house4",
+          "candidate": "Will E. Neal"
+        },
+        {
+          "label": "*Dr. Ken Hechler, Huntington (Democrat)",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.226,
+        0.162,
+        0.767,
+        0.408
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-1",
+      "columns": [
+        {
+          "label": "\u2020Geo A. Daugherty, (Republican)",
+          "contest": "house5",
+          "candidate": "Geo. A. Daughtery"
+        },
+        {
+          "label": "*Elizabeth (Mrs. John) Kee, Bluefield (Democrat)",
+          "contest": "house5",
+          "candidate": "Elizabeth Kee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.223,
+        0.4,
+        0.771,
+        0.661
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-2",
+      "columns": [
+        {
+          "label": "F. O'Dair Duff, Charleston (Republican)",
+          "contest": "house6",
+          "candidate": "F. O'Dair Duff"
+        },
+        {
+          "label": "*John M. Slack, Jr., Charleston (Democrat)",
+          "contest": "house6",
+          "candidate": "John M. Slack, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.221,
+        0.653,
+        0.774,
+        0.853
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

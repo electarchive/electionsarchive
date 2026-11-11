@@ -1,0 +1,259 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1931, election returns (general election 1930-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1931.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1931.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1930,
+      "chamber": "senate",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1930,
+      "chamber": "house",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 584,
+      "id": "584-0",
+      "columns": [
+        {
+          "label": "Matthew M. Neely (Democrat)",
+          "contest": "senate",
+          "candidate": "M. M. Neely"
+        },
+        {
+          "label": "John MacDonald (Prohibition)",
+          "contest": "senate",
+          "candidate": "John MacDonald"
+        },
+        {
+          "label": "James Ellwood Jones (Republican)",
+          "contest": "senate",
+          "candidate": "James Elwood Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.169,
+        0.43,
+        0.887
+      ],
+      "hint": "Read only the table headed '1930 VOTE FOR UNITED STATES SENATOR AND LEGISLATIVE AMENDMENTS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2284
+      ]
+    },
+    {
+      "page": 585,
+      "id": "585-0",
+      "columns": [
+        {
+          "label": "Robert L. Ramsey Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl G. Bachmann Republican",
+          "contest": "house1",
+          "candidate": "Carl G. Bachmann"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.188,
+        0.47,
+        0.373
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 585,
+      "id": "585-1",
+      "columns": [
+        {
+          "label": "Mary M. Johnson Dem. (Short Term)",
+          "contest": "house4",
+          "candidate": "Mary M. Johnson"
+        },
+        {
+          "label": "Robert L. Hogg Rep. (Short Term)",
+          "contest": "house4",
+          "candidate": "Robert L. Hogg"
+        },
+        {
+          "label": "L. R. Via Dem. (Long Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert L. Hogg Rep. (Long Term)",
+          "contest": "house4",
+          "candidate": "Robert L. Hogg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.19,
+        0.814,
+        0.433
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 585,
+      "id": "585-2",
+      "columns": [
+        {
+          "label": "Jennings Randolph Democrat",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Frank L. Bowman Republican",
+          "contest": "house2",
+          "candidate": "Frank L. Bowman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.365,
+        0.47,
+        0.632
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 585,
+      "id": "585-3",
+      "columns": [
+        {
+          "label": "T. J. Lilly Democrat",
+          "contest": "house5",
+          "candidate": "T. J. Lilly"
+        },
+        {
+          "label": "Hugh Ike Shott Republican",
+          "contest": "house5",
+          "candidate": "Hugh Ike Shott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.425,
+        0.814,
+        0.654
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 585,
+      "id": "585-4",
+      "columns": [
+        {
+          "label": "Lynn S. Hornor Democrat",
+          "contest": "house3",
+          "candidate": "Lynn S. Hornor"
+        },
+        {
+          "label": "John M. Wolverton Republican",
+          "contest": "house3",
+          "candidate": "John M. Wolverton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.624,
+        0.47,
+        0.826
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 585,
+      "id": "585-5",
+      "columns": [
+        {
+          "label": "Joe L. Smith Democrat",
+          "contest": "house6",
+          "candidate": "Joe L. Smith"
+        },
+        {
+          "label": "Fred O. Blue Republican",
+          "contest": "house6",
+          "candidate": "Fred O. Blue"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.646,
+        0.814,
+        0.841
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

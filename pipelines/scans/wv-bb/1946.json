@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1947, election returns (general election 1946-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1947.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1947.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 338,
+      "id": "338-0",
+      "columns": [
+        {
+          "label": "Mathew M. Neely, Fairmont, (Democrat)",
+          "contest": "house1",
+          "candidate": "Mathew M. Neely"
+        },
+        {
+          "label": "*Francis J. Love, Wheeling (Republican)",
+          "contest": "house1",
+          "candidate": "Francis J. Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.174,
+        0.499,
+        0.374
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 338,
+      "id": "338-1",
+      "columns": [
+        {
+          "label": "M. G. Burnside, Huntington (Democrat)",
+          "contest": "house4",
+          "candidate": "M. G. Burnside"
+        },
+        {
+          "label": "*Herbert S. Ellis, Huntington (Republican)",
+          "contest": "house4",
+          "candidate": "Hubert S. Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.505,
+        0.174,
+        0.806,
+        0.425
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 338,
+      "id": "338-2",
+      "columns": [
+        {
+          "label": "Jennings Randolph, Elkins (Democrat)",
+          "contest": "house2",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "*Melvin C. Snyder, Kingwood (Republican)",
+          "contest": "house2",
+          "candidate": "Melvin C. Snyder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.366,
+        0.499,
+        0.641
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 338,
+      "id": "338-3",
+      "columns": [
+        {
+          "label": "*John Kee, Bluefield (Democrat)",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Hartley Sanders, Princeton (Republican)",
+          "contest": "house5",
+          "candidate": "Hartley Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.505,
+        0.417,
+        0.806,
+        0.663
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 338,
+      "id": "338-4",
+      "columns": [
+        {
+          "label": "Cleveland M. Bailey, Clarksburg (Democrat)",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "*E. G. Rohrbough, Glenville (Republican)",
+          "contest": "house3",
+          "candidate": "Edward G. Rohrbough"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.633,
+        0.499,
+        0.857
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 338,
+      "id": "338-5",
+      "columns": [
+        {
+          "label": "*Dr. E. H. Hedrick, Beckley (Democrat)",
+          "contest": "house6",
+          "candidate": "E. H. Hedrick"
+        },
+        {
+          "label": "Harold H. Neff, Charleston (Republican)",
+          "contest": "house6",
+          "candidate": "Harold H. Neff"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.505,
+        0.655,
+        0.806,
+        0.848
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

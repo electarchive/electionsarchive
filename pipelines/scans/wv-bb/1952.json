@@ -1,0 +1,370 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1953, election returns (general election 1952-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1953.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1953.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WV",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 374,
+      "id": "374-0",
+      "columns": [
+        {
+          "label": "*Fred L. McMullen, Moundsville",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Don Marchand, Morgantown",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Dr. G. Steele Callison, Oak Hill",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*John F. Throckmorton, Parkersburg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Walter Vergil Ross, Bluefield",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Joe L. Smith, Beckley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mary Gee Carper, Charleston",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Fanny Fields, Charleston",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.241,
+        0.104,
+        0.912,
+        0.923
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2259
+      ]
+    },
+    {
+      "page": 375,
+      "id": "375-0",
+      "columns": [
+        {
+          "label": "Frank A. O'Brien, Jr., Wheeling",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Manning Smith, Charles Town",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Claude R. Hill, Oak Hill",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Naaman Jackson, Huntington",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Beury, Algoma",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ira Hager, Logan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. W. Fred Kisner, Fairmont",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fred M. Staunton, Charleston",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.298,
+        0.803,
+        0.924
+      ],
+      "hint": "Read only the table headed \"VOTE FOR PRESIDENT OF THE UNITED STATES (Cont'd.)\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0128
+      ]
+    },
+    {
+      "page": 377,
+      "id": "377-0",
+      "columns": [
+        {
+          "label": "*Robert H. \"Bob\" Mollohan, Fairmont, (Democrat)",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Francis J. Love Wheeling, (Republican)",
+          "contest": "house1",
+          "candidate": "Francis J. Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.138,
+        0.457,
+        0.356
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-1",
+      "columns": [
+        {
+          "label": "M. G. \"Burnie\" Burnside, Huntington, (Democrat)",
+          "contest": "house4",
+          "candidate": "M. G. \"Burnie\" Burnside"
+        },
+        {
+          "label": "*Dr. Will E. Neal, Huntington, (Republican)",
+          "contest": "house4",
+          "candidate": "Dr. Will E. Neal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.469,
+        0.138,
+        0.806,
+        0.411
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-2",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Keyser, (Democrat)",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Kermit R. Mason Morgantown, (Republican)",
+          "contest": "house2",
+          "candidate": "Kermit R. Mason"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.348,
+        0.459,
+        0.641
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-3",
+      "columns": [
+        {
+          "label": "*Elizabeth (Mrs. John) Kee, Bluefield, (Democrat)",
+          "contest": "house5",
+          "candidate": "Elizabeth (Mrs. John) Kee"
+        },
+        {
+          "label": "Cyrus H. Gadd, Princeton (Republican)",
+          "contest": "house5",
+          "candidate": "Cyrus H. Gadd"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.473,
+        0.403,
+        0.809,
+        0.676
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-4",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey Clarksburg, (Democrat)",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Frank Love Fayetteville (Republican)",
+          "contest": "house3",
+          "candidate": "Frank Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.633,
+        0.464,
+        0.894
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 377,
+      "id": "377-5",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd, Sophia, (Democrat)",
+          "contest": "house6",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Latelle M. LaFollette, Charleston, (Republican)",
+          "contest": "house6",
+          "candidate": "Latelle M. LaFollette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.476,
+        0.668,
+        0.815,
+        0.896
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 378,
+      "id": "378-0",
+      "columns": [
+        {
+          "label": "*William C. Marland, Glen Rogers (Democrat)",
+          "contest": "governor",
+          "candidate": "William C. Marland"
+        },
+        {
+          "label": "Rush D. Holt, Weston (Republican)",
+          "contest": "governor",
+          "candidate": "Rush D. Holt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.277,
+        0.29,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2863
+      ]
+    }
+  ]
+}

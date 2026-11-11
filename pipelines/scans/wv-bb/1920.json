@@ -1,0 +1,244 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1921, election returns (general election 1920-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1921.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1921.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 407,
+      "id": "407-0",
+      "columns": [
+        {
+          "label": "R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.196,
+        0.851,
+        0.77
+      ],
+      "hint": "Read only the table headed 'ELECTORAL VOTE FOR PRESIDENT, BY STATES, 1896-1920'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1254
+      ]
+    },
+    {
+      "page": 412,
+      "id": "412-0",
+      "columns": [
+        {
+          "label": "M. M. Neely Democrat",
+          "contest": "house1",
+          "candidate": "M. M. Neely"
+        },
+        {
+          "label": "Benjamin L. Rosenbloom Republican",
+          "contest": "house1",
+          "candidate": "Benj. L. Rosenbloom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.176,
+        0.898,
+        0.371
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 412,
+      "id": "412-1",
+      "columns": [
+        {
+          "label": "Forrest W. Brown Democrat",
+          "contest": "house2",
+          "candidate": "Forrest W. Brown"
+        },
+        {
+          "label": "Geo. M. Bowers Republican",
+          "contest": "house2",
+          "candidate": "George M. Bowers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.363,
+        0.898,
+        0.652
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 412,
+      "id": "412-2",
+      "columns": [
+        {
+          "label": "Robert F. Kidd Democrat",
+          "contest": "house3",
+          "candidate": "Robert F. Kidd"
+        },
+        {
+          "label": "Stuart F. Reed Republican",
+          "contest": "house3",
+          "candidate": "Stuart F. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.644,
+        0.9,
+        0.883
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 413,
+      "id": "413-0",
+      "columns": [
+        {
+          "label": "John L. Conner Democrat",
+          "contest": "house4",
+          "candidate": "John L. Conner"
+        },
+        {
+          "label": "Harry C. Woodyard Republican",
+          "contest": "house4",
+          "candidate": "Harry C. Woodyard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.178,
+        0.846,
+        0.389
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 413,
+      "id": "413-1",
+      "columns": [
+        {
+          "label": "W. W. McNeal Democrat",
+          "contest": "house5",
+          "candidate": "W. W. McNeal"
+        },
+        {
+          "label": "Wells Goodykoontz Republican",
+          "contest": "house5",
+          "candidate": "Wells Goodykoontz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.381,
+        0.841,
+        0.622
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 413,
+      "id": "413-2",
+      "columns": [
+        {
+          "label": "William Edwin Wilson Democrat",
+          "contest": "house6",
+          "candidate": "William E. Wilson"
+        },
+        {
+          "label": "Leonard Sidney Echols Republican",
+          "contest": "house6",
+          "candidate": "Leonard S. Echols"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.614,
+        0.833,
+        0.798
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

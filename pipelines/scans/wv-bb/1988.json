@@ -1,0 +1,254 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1989, election returns (general election 1988-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1989.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1989.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "governor": {
+      "year": 1988,
+      "chamber": "governor",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WV",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 749,
+      "id": "749-0",
+      "columns": [
+        {
+          "label": "George Bush Republican",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Michael Dukakis Democrat",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.12,
+        0.909,
+        0.856
+      ],
+      "hint": "Read only the table headed 'U.S. PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0951
+      ]
+    },
+    {
+      "page": 750,
+      "id": "750-0",
+      "columns": [
+        {
+          "label": "M. Jay Wolfe Republican",
+          "contest": "senate",
+          "candidate": "M. Jay Wolfe"
+        },
+        {
+          "label": "*Robert C. Byrd Democrat",
+          "contest": "senate",
+          "candidate": "Robert C. Byrd"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.108,
+        0.899,
+        0.789
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0764
+      ]
+    },
+    {
+      "page": 751,
+      "id": "751-0",
+      "columns": [
+        {
+          "label": "Howard K. Tuck Republican",
+          "contest": "house1",
+          "candidate": "Howard K. Tuck"
+        },
+        {
+          "label": "*Alan B. Mollohan Democrat",
+          "contest": "house1",
+          "candidate": "Alan B. Mollohan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.088,
+        0.913,
+        0.361
+      ],
+      "hint": "Read only the table headed 'U.S. HOUSE OF REPRESENTATIVES First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 751,
+      "id": "751-1",
+      "columns": [
+        {
+          "label": "No Opponent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Harley O. Staggers, Jr. Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.353,
+        0.913,
+        0.688
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 752,
+      "id": "752-0",
+      "columns": [
+        {
+          "label": "Paul W. Hart Republican",
+          "contest": "house3",
+          "candidate": "Paul W. Hart"
+        },
+        {
+          "label": "*Bob Wise Democrat",
+          "contest": "house3",
+          "candidate": "Robert E. Wise Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.104,
+        0.916,
+        0.369
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 752,
+      "id": "752-1",
+      "columns": [
+        {
+          "label": "Marianne R. Brewster Republican",
+          "contest": "house4",
+          "candidate": "Marianne R. Brewster"
+        },
+        {
+          "label": "*Nick Joe Rahall II Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.361,
+        0.916,
+        0.564
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 753,
+      "id": "753-0",
+      "columns": [
+        {
+          "label": "Arch A. Moore, Jr. Republican",
+          "contest": "governor",
+          "candidate": "Arch A. Jr. Moore"
+        },
+        {
+          "label": "*Gaston Caperton Democrat",
+          "contest": "governor",
+          "candidate": "Gaston Caperton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.091,
+        0.922,
+        0.799
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1003
+      ]
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1985, election returns (general election 1984-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1985.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1985.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "governor": {
+      "year": 1984,
+      "chamber": "governor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 671,
+      "id": "671-0",
+      "columns": [
+        {
+          "label": "Walter F. Mondale Geraldine A. Ferraro Democrats",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "*Ronald Reagan George Bush Republicans",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.09,
+        0.818,
+        0.894
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.153
+      ]
+    },
+    {
+      "page": 672,
+      "id": "672-0",
+      "columns": [
+        {
+          "label": "Mel Mason Matilde Zimmermann Socialist Workers",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Dennis L. Serrette Populist",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "Bob Richards Charles E. Perry W. Va. Alliance",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.09,
+        0.913,
+        0.897
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1561
+      ]
+    },
+    {
+      "page": 673,
+      "id": "673-0",
+      "columns": [
+        {
+          "label": "*John D. Rockefeller Charleston Democrat",
+          "contest": "senate",
+          "candidate": "Jay Rockefeller"
+        },
+        {
+          "label": "John R. Raese Morgantown Republican",
+          "contest": "senate",
+          "candidate": "John R. Raese"
+        },
+        {
+          "label": "Mary E. (Joan) Radin Charleston Socialist Workers",
+          "contest": "senate",
+          "candidate": "Mary E. (Joan) Radin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.131,
+        0.861,
+        0.855
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.076
+      ]
+    },
+    {
+      "page": 674,
+      "id": "674-0",
+      "columns": [
+        {
+          "label": "*Alan B. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Alan B. Mollohan"
+        },
+        {
+          "label": "Jim Altmeyer Wheeling Republican",
+          "contest": "house1",
+          "candidate": "Jim Altmeyer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.086,
+        0.919,
+        0.458
+      ],
+      "hint": "Read only the table headed 'UNITED STATES HOUSE OF REPRESENTATIVES FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 674,
+      "id": "674-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Jr. Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers Jr."
+        },
+        {
+          "label": "Cleve Benedict Lewisburg Republican",
+          "contest": "house2",
+          "candidate": "Cleve Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.45,
+        0.919,
+        0.89
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 675,
+      "id": "675-0",
+      "columns": [
+        {
+          "label": "*Robert E. Wise, Jr. Charleston Democrat",
+          "contest": "house3",
+          "candidate": "Robert E. Wise Jr."
+        },
+        {
+          "label": "Margaret Peggy Miller Charleston Republican",
+          "contest": "house3",
+          "candidate": "Margaret Peggy Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.136,
+        0.868,
+        0.51
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 675,
+      "id": "675-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        },
+        {
+          "label": "Jess T. Shumate Beckley Republican",
+          "contest": "house4",
+          "candidate": "Jess T. Shumate"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.502,
+        0.865,
+        0.804
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 676,
+      "id": "676-0",
+      "columns": [
+        {
+          "label": "Clyde M. See Moorefield Democrat",
+          "contest": "governor",
+          "candidate": "Clyde M. See"
+        },
+        {
+          "label": "*Arch A. Moore, Jr. Glen Dale Republican",
+          "contest": "governor",
+          "candidate": "Arch A. Jr. Moore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.1,
+        0.868,
+        0.864
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1139
+      ]
+    }
+  ]
+}

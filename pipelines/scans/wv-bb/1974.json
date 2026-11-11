@@ -1,0 +1,148 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1975, election returns (general election 1974-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1975.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1975.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 682,
+      "id": "682-0",
+      "columns": [
+        {
+          "label": "*Robert Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Joe Laurita, Jr. Morgantown Republican",
+          "contest": "house1",
+          "candidate": "Joe Laurita, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.156,
+        0.931,
+        0.482
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 682,
+      "id": "682-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "William H. Loy Romney Republican",
+          "contest": "house2",
+          "candidate": "William H. \"Bill\" Loy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.474,
+        0.931,
+        0.926
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2788
+      ]
+    },
+    {
+      "page": 683,
+      "id": "683-0",
+      "columns": [
+        {
+          "label": "*John M. Slack Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack"
+        },
+        {
+          "label": "William L. Larcamp St. Albans Republican",
+          "contest": "house3",
+          "candidate": "William L. Larcamp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.132,
+        0.863,
+        0.529
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 683,
+      "id": "683-1",
+      "columns": [
+        {
+          "label": "*Ken Hechler Huntington Democrat",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Unopposed",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.521,
+        0.853,
+        0.833
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

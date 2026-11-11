@@ -1,0 +1,185 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1979, election returns (general election 1978-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1979.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1979.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1978,
+      "chamber": "senate",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 647,
+      "id": "647-0",
+      "columns": [
+        {
+          "label": "*Jennings Randolph Elkins Democrat",
+          "contest": "senate",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Arch A. Moore, Jr. Glen Dale Republican",
+          "contest": "senate",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.121,
+        0.838,
+        0.878
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1083
+      ]
+    },
+    {
+      "page": 648,
+      "id": "648-0",
+      "columns": [
+        {
+          "label": "*Robert H. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "Gene Haynes Parkersburg Republican",
+          "contest": "house1",
+          "candidate": "Gene A. Haynes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.117,
+        0.917,
+        0.458
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 648,
+      "id": "648-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Cleveland K. Benedict Lewisburg Republican",
+          "contest": "house2",
+          "candidate": "Cleveland Keith Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.45,
+        0.917,
+        0.936
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2757
+      ]
+    },
+    {
+      "page": 649,
+      "id": "649-0",
+      "columns": [
+        {
+          "label": "*John M. Slack Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack"
+        },
+        {
+          "label": "David M. Staton South Charleston Republican",
+          "contest": "house3",
+          "candidate": "David Michael Staton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.114,
+        0.878,
+        0.517
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 649,
+      "id": "649-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick J. Rahall II"
+        },
+        {
+          "label": "No Republican Candidate",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.509,
+        0.878,
+        0.835
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

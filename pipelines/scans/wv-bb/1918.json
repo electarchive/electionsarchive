@@ -1,0 +1,274 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1919, election returns (general election 1918-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1919.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1919.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1918,
+      "chamber": "senate",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 369,
+      "id": "369-0",
+      "columns": [
+        {
+          "label": "Davis Elkins Republican",
+          "contest": "senate",
+          "candidate": "Davis Elkins"
+        },
+        {
+          "label": "Clarence W. Watson Democrat",
+          "contest": "senate",
+          "candidate": "Clarence W. Watson"
+        },
+        {
+          "label": "M. S. Holt Socialist",
+          "contest": "senate",
+          "candidate": "M. S. Holt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.104,
+        0.916,
+        0.727
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u20141918.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1075
+      ]
+    },
+    {
+      "page": 371,
+      "id": "371-0",
+      "columns": [
+        {
+          "label": "Matthew M. Neely Democrat",
+          "contest": "house1",
+          "candidate": "Matthew Mansfield Neely"
+        },
+        {
+          "label": "Charles J. Schuck Republican",
+          "contest": "house1",
+          "candidate": "Charles J. Schuck"
+        },
+        {
+          "label": "E. B. Hibbs Socialist",
+          "contest": "house1",
+          "candidate": "E. B. Hibbs"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.151,
+        0.916,
+        0.499
+      ],
+      "hint": "Read only the table headed 'First Congressional District\u20141918.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 371,
+      "id": "371-1",
+      "columns": [
+        {
+          "label": "Geo. M. Bowers Republican",
+          "contest": "house2",
+          "candidate": "George Meade Bowers"
+        },
+        {
+          "label": "B. H. Hiner Democrat",
+          "contest": "house2",
+          "candidate": "B. H. Hiner"
+        },
+        {
+          "label": "E. E. Smith Socialist",
+          "contest": "house2",
+          "candidate": "E. E. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.491,
+        0.919,
+        0.889
+      ],
+      "hint": "Read only the table headed 'Second Congressional District\u20141918.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 372,
+      "id": "372-1",
+      "columns": [
+        {
+          "label": "Stuart F. Reed Republican",
+          "contest": "house3",
+          "candidate": "Stuart Felix Reed"
+        },
+        {
+          "label": "Ernest Randolph Democrat",
+          "contest": "house3",
+          "candidate": "Ernest Randolph"
+        },
+        {
+          "label": "P. R. Garrett Socialist",
+          "contest": "house3",
+          "candidate": "P. R. Garrett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.36,
+        0.883,
+        0.652
+      ],
+      "hint": "Read only the table headed 'Third Congressional District\u20141918.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 373,
+      "id": "373-0",
+      "columns": [
+        {
+          "label": "Harry C. Woodyard Republican",
+          "contest": "house4",
+          "candidate": "Harry Chapman Woodyard"
+        },
+        {
+          "label": "Stuart H. Bowman Democrat",
+          "contest": "house4",
+          "candidate": "Stuart H. Bowman"
+        },
+        {
+          "label": "G. W. Gillispie Socialist",
+          "contest": "house4",
+          "candidate": "G. W. Gillespie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.114,
+        0.9,
+        0.512
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District\u20141918.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 373,
+      "id": "373-1",
+      "columns": [
+        {
+          "label": "Wells Goodykoontz Republican",
+          "contest": "house5",
+          "candidate": "Wells Goodykoontz"
+        },
+        {
+          "label": "W. H. McNeal Democrat",
+          "contest": "house5",
+          "candidate": "W. W. McNeal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.504,
+        0.897,
+        0.903
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District\u20141918.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 374,
+      "id": "374-0",
+      "columns": [
+        {
+          "label": "L. S. Echols Republican",
+          "contest": "house6",
+          "candidate": "Leonard Sidney Echols"
+        },
+        {
+          "label": "Adam B. Littlepage Democrat",
+          "contest": "house6",
+          "candidate": "Adam B. Littlepage"
+        },
+        {
+          "label": "P. H. Camp Socialist",
+          "contest": "house6",
+          "candidate": "P. H. Camp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.384,
+        0.898,
+        0.557
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District\u20141918.'; ignore any other table visible in the image."
+    }
+  ]
+}

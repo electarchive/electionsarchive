@@ -1,0 +1,236 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1973, election returns (general election 1972-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1973.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1973.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1972,
+      "chamber": "president",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1972,
+      "chamber": "senate",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 635,
+      "id": "635-0",
+      "columns": [
+        {
+          "label": "Lee C. Paull, Jr. / John A. Shanklin / Brown Hugo Payne / Charles R. Bain / B. C. McGinnis / Joan VanTol",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.173,
+        0.848,
+        0.936
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - REPUBLICAN ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0826
+      ]
+    },
+    {
+      "page": 636,
+      "id": "636-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC ELECTORS",
+          "contest": "president",
+          "candidate": "McGovern (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.1,
+        0.892,
+        0.949
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1602
+      ]
+    },
+    {
+      "page": 637,
+      "id": "637-0",
+      "columns": [
+        {
+          "label": "*Jennings Randolph Clarksburg Democrat",
+          "contest": "senate",
+          "candidate": "Jennings Randolph"
+        },
+        {
+          "label": "Louise Leonard Harpers Ferry Republican",
+          "contest": "senate",
+          "candidate": "Louise Leonard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.101,
+        0.833,
+        0.916
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1166
+      ]
+    },
+    {
+      "page": 638,
+      "id": "638-0",
+      "columns": [
+        {
+          "label": "*Robert H. (Bob) Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Robert H. Mollohan"
+        },
+        {
+          "label": "George E. Kapnicky Sistersville Republican",
+          "contest": "house1",
+          "candidate": "George E. Kapnicky"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.103,
+        0.891,
+        0.45
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 638,
+      "id": "638-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "David Dix Oak Hill Republican",
+          "contest": "house2",
+          "candidate": "David Dix"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.442,
+        0.891,
+        0.89
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 639,
+      "id": "639-0",
+      "columns": [
+        {
+          "label": "*John Slack Charleston Democrat",
+          "contest": "house3",
+          "candidate": "John Slack"
+        },
+        {
+          "label": "T. David Higgins Charleston Republican",
+          "contest": "house3",
+          "candidate": "T. David Higgins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.114,
+        0.833,
+        0.519
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 639,
+      "id": "639-1",
+      "columns": [
+        {
+          "label": "*Ken Hechler Huntington Democrat",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Joe Neal Huntington Republican",
+          "contest": "house4",
+          "candidate": "Joe Neal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.511,
+        0.831,
+        0.87
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

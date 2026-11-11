@@ -1,0 +1,279 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1957, election returns (general election 1956-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1957.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1957.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 690,
+      "id": "690-0",
+      "columns": [
+        {
+          "label": "*Mrs. Henry Oates, Parkersburg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. J. M. Ellis, Oak Hill",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. L. H. McCamic, Wheeling",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. Henry Miller, Paw Paw",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. George Hurd, Craigsville",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. Paul R. Humphreys, Huntington",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Miss Martha Ford, Lewisburg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "*Mr. Litz McGuire, Logan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.073,
+        0.848,
+        0.912
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2062
+      ]
+    },
+    {
+      "page": 694,
+      "id": "694-0",
+      "columns": [
+        {
+          "label": "C. Lee Spillers, Wheeling (Democrat)",
+          "contest": "house1",
+          "candidate": "C. Lee Spillers"
+        },
+        {
+          "label": "*Arch A. Moore, Jr., Glen Dale (Republican)",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.096,
+        0.819,
+        0.313
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 694,
+      "id": "694-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Keyser (Democrat)",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Mrs. Davis Elkins, Morgantown (Republican)",
+          "contest": "house2",
+          "candidate": "Mary (Mrs. Davis) Elkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.305,
+        0.818,
+        0.596
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 694,
+      "id": "694-2",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey, Clarksburg (Democrat)",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Daniel L. Louchery, Clarksburg (Republican)",
+          "contest": "house3",
+          "candidate": "Daniel L. Louchery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.588,
+        0.818,
+        0.849
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 695,
+      "id": "695-0",
+      "columns": [
+        {
+          "label": "Dr. M. G. \"Burnie\" Burnside Huntington (Democrat)",
+          "contest": "house4",
+          "candidate": "M. G. \"Burnie\" Burnside"
+        },
+        {
+          "label": "*Dr. Will E. Neal, Huntington, (Republican)",
+          "contest": "house4",
+          "candidate": "Will E. Neal"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.107,
+        0.833,
+        0.385
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 695,
+      "id": "695-1",
+      "columns": [
+        {
+          "label": "*Elizabeth (Mrs. John) Kee, Bluefield (Democrat)",
+          "contest": "house5",
+          "candidate": "Elizabeth Kee"
+        },
+        {
+          "label": "William H. Sanders, Princeton (Republican)",
+          "contest": "house5",
+          "candidate": "William H. Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.377,
+        0.83,
+        0.648
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 695,
+      "id": "695-2",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd, Sophia, (Democrat)",
+          "contest": "house6",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Cleo S. Jones, Charleston (Republican)",
+          "contest": "house6",
+          "candidate": "Cleo S. Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.64,
+        0.834,
+        0.855
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

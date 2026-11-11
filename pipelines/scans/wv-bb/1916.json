@@ -1,0 +1,368 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1917, election returns (general election 1916-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1917.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1917.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1916,
+      "chamber": "president",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "governor": {
+      "year": 1916,
+      "chamber": "governor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1916,
+      "chamber": "senate",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house6": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 744,
+      "id": "744-0",
+      "columns": [
+        {
+          "label": "Hughes Republican",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson Democrat",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson Socialist",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Wilson Democrat (1912)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Taft Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Roosevelt Progressive",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Debs Socialist",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.113,
+        0.869,
+        0.796
+      ],
+      "hint": "Read only the table headed \"WEST VIRGINIA'S VOTE FOR PRESIDENT\u20141916-1912.\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1523
+      ]
+    },
+    {
+      "page": 747,
+      "id": "747-0",
+      "columns": [
+        {
+          "label": "Cornwell Democrat",
+          "contest": "governor",
+          "candidate": "John J. Cornwell"
+        },
+        {
+          "label": "Robinson Republican",
+          "contest": "governor",
+          "candidate": "Ira E. Robinson"
+        },
+        {
+          "label": "Hatfield Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thompson Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hilton Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jackson Prohibition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.108,
+        0.871,
+        0.801
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR\u20141916-1912'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1371
+      ]
+    },
+    {
+      "page": 759,
+      "id": "759-0",
+      "columns": [
+        {
+          "label": "Sutherland Republican",
+          "contest": "senate",
+          "candidate": "Howard Sutherland"
+        },
+        {
+          "label": "Chilton Democrat",
+          "contest": "senate",
+          "candidate": "William E. Chilton"
+        },
+        {
+          "label": "Cuciser Socialist",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.113,
+        0.882,
+        0.782
+      ],
+      "hint": "Read only the table headed 'VOTE FOR UNITED STATES SENATOR\u20141916.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1091
+      ]
+    },
+    {
+      "page": 760,
+      "id": "760-0",
+      "columns": [
+        {
+          "label": "M. M. Neeley Democrat",
+          "contest": "house1",
+          "candidate": "Matthew Mansfield Neely"
+        },
+        {
+          "label": "T. W. Fleming Republican",
+          "contest": "house1",
+          "candidate": "T. W. Fleming"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.172,
+        0.866,
+        0.378
+      ],
+      "hint": "Read only the table headed 'First Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 760,
+      "id": "760-1",
+      "columns": [
+        {
+          "label": "Geo. M. Bowers Republican",
+          "contest": "house2",
+          "candidate": "George Meade Bowers"
+        },
+        {
+          "label": "Sam'l V. Woods Democrat",
+          "contest": "house2",
+          "candidate": "Samuel V. Woods"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.37,
+        0.868,
+        0.677
+      ],
+      "hint": "Read only the table headed 'Second Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 760,
+      "id": "760-2",
+      "columns": [
+        {
+          "label": "Stuart F. Reed Republican",
+          "contest": "house3",
+          "candidate": "Stuart Felix Reed"
+        },
+        {
+          "label": "Fleming N. Alderson Democrat",
+          "contest": "house3",
+          "candidate": "Fleming N. Alderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.669,
+        0.866,
+        0.94
+      ],
+      "hint": "Read only the table headed 'Third Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 761,
+      "id": "761-0",
+      "columns": [
+        {
+          "label": "Harry C. Woodyard Republican",
+          "contest": "house4",
+          "candidate": "Harry Chapman Woodyard"
+        },
+        {
+          "label": "T. A. Null Democrat",
+          "contest": "house4",
+          "candidate": "T. A. Null"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.121,
+        0.86,
+        0.343
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 761,
+      "id": "761-1",
+      "columns": [
+        {
+          "label": "Edward Cooper Republican",
+          "contest": "house5",
+          "candidate": "Edward Cooper"
+        },
+        {
+          "label": "G. R. C. Wiles Democrat",
+          "contest": "house5",
+          "candidate": "G. R. C. Wiles"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.335,
+        0.86,
+        0.556
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 761,
+      "id": "761-2",
+      "columns": [
+        {
+          "label": "Adam B. Littlepage Democrat",
+          "contest": "house6",
+          "candidate": "Adam Brown Littlepage"
+        },
+        {
+          "label": "M. V. Godbey Republican",
+          "contest": "house6",
+          "candidate": "M. V. Godbey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.548,
+        0.86,
+        0.739
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

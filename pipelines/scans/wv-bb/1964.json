@@ -1,0 +1,328 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1965, election returns (general election 1964-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1965.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1965.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "chamber": "president",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "senate": {
+      "year": 1964,
+      "chamber": "senate",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house5": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 791,
+      "id": "791-0",
+      "columns": [
+        {
+          "label": "Mrs. Edward Long Huntington",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mrs. Clara M. Lincoln Institute",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred F. Chapman Wheeling",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clarence Johnson Morgantown",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ray Humphreys Charleston",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Felix M. Brown Buffalo",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Paige Wooldridge Bluefield",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.108,
+        0.849,
+        0.914
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT OF THE UNITED STATES - DEMOCRATIC ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1538
+      ]
+    },
+    {
+      "page": 792,
+      "id": "792-0",
+      "columns": [
+        {
+          "label": "Lawrence Pearson Fairmont",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dr. B. F. Mitchell Petersburg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Floyd Sayre Beckley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ned H. Tanner Parkersburg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Ballard, II Welch",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John A. Jones Weirton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fred O. Blue Bluefield",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.116,
+        0.931,
+        0.909
+      ],
+      "hint": "Read only the table headed 'REPUBLICAN ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1475
+      ]
+    },
+    {
+      "page": 793,
+      "id": "793-0",
+      "columns": [
+        {
+          "label": "*Robert C. Byrd, Sophia, W. Va. Democrat",
+          "contest": "senate",
+          "candidate": "Robert C. Byrd"
+        },
+        {
+          "label": "Cooper P. Benedict, Lewisburg, W. Va. Republican",
+          "contest": "senate",
+          "candidate": "Cooper P. Benedict"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.078,
+        0.85,
+        0.894
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS - U. S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1495
+      ]
+    },
+    {
+      "page": 797,
+      "id": "797-0",
+      "columns": [
+        {
+          "label": "John L. \"Larrie\" Bailey Weston, W. Va. Democrat",
+          "contest": "house1",
+          "candidate": "John L. Bailey"
+        },
+        {
+          "label": "*Arch A. Moore, Jr. Moundsville, W. Va. Republican",
+          "contest": "house1",
+          "candidate": "Arch A. Moore, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.109,
+        0.86,
+        0.488
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 797,
+      "id": "797-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers Keyser, W. Va. Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Stanley R. Cox, Jr. Morgantown, W. Va. Republican",
+          "contest": "house2",
+          "candidate": "Stanley R. Cox, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.48,
+        0.86,
+        0.902
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 798,
+      "id": "798-0",
+      "columns": [
+        {
+          "label": "*John M. Slack, Jr. Charleston, W. Va. Democrat",
+          "contest": "house3",
+          "candidate": "John M. Slack, Jr."
+        },
+        {
+          "label": "Jim Comstock Richwood, W. Va. Republican",
+          "contest": "house3",
+          "candidate": "Jim Comstock"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.132,
+        0.92,
+        0.438
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 798,
+      "id": "798-1",
+      "columns": [
+        {
+          "label": "*Dr. Ken Hechler Huntington, W. Va. Democrat",
+          "contest": "house4",
+          "candidate": "Ken Hechler"
+        },
+        {
+          "label": "Jack L. Miller Parkersburg, W. Va. Republican",
+          "contest": "house4",
+          "candidate": "Jack L. Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.43,
+        0.917,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 799,
+      "id": "799-0",
+      "columns": [
+        {
+          "label": "*James Kee Bluefield, W. Va. Democrat",
+          "contest": "house5",
+          "candidate": "James Kee"
+        },
+        {
+          "label": "Wade Hampton \"Jim\" Ballard, III Peterstown, W. Va Republican",
+          "contest": "house5",
+          "candidate": "Wade H. Ballard III"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.084,
+        0.846,
+        0.366
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

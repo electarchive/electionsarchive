@@ -1,0 +1,138 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1987, election returns (general election 1986-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1987.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1987.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 695,
+      "id": "695-0",
+      "columns": [
+        {
+          "label": "*Alan B. Mollohan Democrat Fairmont",
+          "contest": "house1",
+          "candidate": "Alan B. Mollohan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.087,
+        0.923,
+        0.431
+      ],
+      "hint": "Read only the table headed 'U.S. HOUSE OF REPRESENTATIVES FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 695,
+      "id": "695-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Jr. Democrat Keyser",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers Jr."
+        },
+        {
+          "label": "Michele Golden Republican Morgantown",
+          "contest": "house2",
+          "candidate": "Michele Golden"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.423,
+        0.923,
+        0.826
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 696,
+      "id": "696-0",
+      "columns": [
+        {
+          "label": "*Bob Wise Democrat Charleston",
+          "contest": "house3",
+          "candidate": "Robert E. Wise Jr."
+        },
+        {
+          "label": "Tim Sharp Republican Charleston",
+          "contest": "house3",
+          "candidate": "Tim Sharp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.102,
+        0.908,
+        0.429
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 696,
+      "id": "696-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Democrat Beckley",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        },
+        {
+          "label": "Martin Miller, Sr. Republican Moynor",
+          "contest": "house4",
+          "candidate": "Martin Miller Sr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.421,
+        0.908,
+        0.669
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

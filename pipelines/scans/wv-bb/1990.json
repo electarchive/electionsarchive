@@ -1,0 +1,175 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1991, election returns (general election 1990-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1991.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1991.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WV",
+      "district": null
+    },
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 722,
+      "id": "722-0",
+      "columns": [
+        {
+          "label": "\u2022Jay Rockefeller Charleston Democrat",
+          "contest": "senate",
+          "candidate": "Jay Rockefeller"
+        },
+        {
+          "label": "John Yoder Harpers Ferry Republican",
+          "contest": "senate",
+          "candidate": "John Yoder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.095,
+        0.939,
+        0.857
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS November 6, 1990 U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1509
+      ]
+    },
+    {
+      "page": 723,
+      "id": "723-0",
+      "columns": [
+        {
+          "label": "*Alan B. Mollohan Fairmont Democrat",
+          "contest": "house1",
+          "candidate": "Alan B. Mollohan"
+        },
+        {
+          "label": "Howard K. Tuck Parkersburg Republican",
+          "contest": "house1",
+          "candidate": "Howard K. Tuck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.102,
+        0.912,
+        0.387
+      ],
+      "hint": "Read only the table headed 'U.S. HOUSE OF REPRESENTATIVES First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 723,
+      "id": "723-1",
+      "columns": [
+        {
+          "label": "*Harley O. Staggers, Jr. Keyser Democrat",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers Jr."
+        },
+        {
+          "label": "Oliver Luck Morgantown Republican",
+          "contest": "house2",
+          "candidate": "Oliver Luck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.379,
+        0.912,
+        0.761
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 724,
+      "id": "724-0",
+      "columns": [
+        {
+          "label": "*Bob Wise Clendenin Democrat",
+          "contest": "house3",
+          "candidate": "Robert E. Wise Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.094,
+        0.911,
+        0.403
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 724,
+      "id": "724-1",
+      "columns": [
+        {
+          "label": "*Nick Joe Rahall II Beckley Democrat",
+          "contest": "house4",
+          "candidate": "Nick Joe Rahall II"
+        },
+        {
+          "label": "Marianne R. Brewster Bluefield Republican",
+          "contest": "house4",
+          "candidate": "Marianne R. Brewster"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.395,
+        0.911,
+        0.631
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

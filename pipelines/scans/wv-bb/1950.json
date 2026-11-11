@@ -1,0 +1,207 @@
+{
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1951, election returns (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1951.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1951.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "contests": {
+    "house1": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 1
+    },
+    "house4": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 4
+    },
+    "house2": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 2
+    },
+    "house5": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 5
+    },
+    "house3": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 3
+    },
+    "house6": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "WV",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 339,
+      "id": "339-0",
+      "columns": [
+        {
+          "label": "*Robert L. Ramsay, (Democratic) Follansbee",
+          "contest": "house1",
+          "candidate": "Robert L. Ramsay"
+        },
+        {
+          "label": "Francis J. Love, (Republican) Wheeling",
+          "contest": "house1",
+          "candidate": "Francis J. Love"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.136,
+        0.476,
+        0.345
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 339,
+      "id": "339-1",
+      "columns": [
+        {
+          "label": "*M.G. \"Burnie\" Burnside, (Democratic) Huntington",
+          "contest": "house4",
+          "candidate": "M. G. Burnside"
+        },
+        {
+          "label": "Hubert S. Ellis, (Republican) Huntington",
+          "contest": "house4",
+          "candidate": "Hubert S. Ellis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.136,
+        0.855,
+        0.421
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 339,
+      "id": "339-2",
+      "columns": [
+        {
+          "label": "Harley O. Staggers, (Democratic) Keyser",
+          "contest": "house2",
+          "candidate": "Harley O. Staggers"
+        },
+        {
+          "label": "Melvin C. Snyder, (Republican) Kingwood",
+          "contest": "house2",
+          "candidate": "Melvin C. Snyder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.337,
+        0.476,
+        0.635
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 339,
+      "id": "339-3",
+      "columns": [
+        {
+          "label": "*John Kee, (Democratic) Bluefield",
+          "contest": "house5",
+          "candidate": "John Kee"
+        },
+        {
+          "label": "Arnold G. Porterfield, (Republican) Bluefield",
+          "contest": "house5",
+          "candidate": "Arnold G. Porterfield"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.413,
+        0.855,
+        0.686
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 339,
+      "id": "339-4",
+      "columns": [
+        {
+          "label": "*Cleveland M. Bailey, (Democratic) Clarksburg",
+          "contest": "house3",
+          "candidate": "Cleveland M. Bailey"
+        },
+        {
+          "label": "Rush D. Holt, (Republican) Weston",
+          "contest": "house3",
+          "candidate": "Rush D. Holt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.627,
+        0.472,
+        0.881
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 339,
+      "id": "339-5",
+      "columns": [
+        {
+          "label": "*Dr. E. H. Hedrick, (Democratic) Beckley",
+          "contest": "house6",
+          "candidate": "E. H. Hedrick"
+        },
+        {
+          "label": "Latelle M. LaFollette, Jr. (Republican) Charleston",
+          "contest": "house6",
+          "candidate": "Latelle M. LaFollette, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.678,
+        0.855,
+        0.886
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
