@@ -33,6 +33,32 @@ STATEWIDE = {
     "state senate district 15 unexpired term": "senate:15:gs",
 }
 DISTRICT = re.compile(r"^(u s|state) house of representatives district (\d+)$")
+DISTRICTS = {
+    "brushy creek watershed conservation district": ("Brushy Creek Watershed Conservation District", "Anderson"),
+    "three and twenty watershed conservation district": (
+        "Three and Twenty Watershed Conservation District",
+        "Anderson",
+    ),
+    "thicketty creek watershed conservation district": ("Thicketty Creek Watershed Conservation District", "Cherokee"),
+    "rocky creek watershed conservation district": ("Rocky Creek Watershed Conservation District", "Chester"),
+    "tinker s creek watershed conservation district": ("Tinker's Creek Watershed Conservation District", "Chester"),
+    "rabon creek watershed conservation district": ("Rabon Creek Watershed Conservation District", "Greenville"),
+    "little lynches creek watershed conservation district": (
+        "Little Lynches Creek Watershed Conservation District",
+        "Kershaw",
+    ),
+    "fire district commissioner piedmont public service area": (
+        "Piedmont Public Service Area Fire District",
+        "Anderson",
+    ),
+    "fire district commissioner south lynches": ("South Lynches Fire District", "Florence"),
+}
+
+
+def district_of(text: str) -> tuple[str, str] | None:
+    return DISTRICTS.get(" ".join(re.findall(r"[a-z]+|\d+", text.lower())))
+
+
 NOTE = (
     "County totals by voting method from the State Election Commission's results system, the version posted "
     "on November 10, 2026, the day the State Board of Canvassers met. Early voting, absentee by mail, and "
@@ -44,6 +70,8 @@ def contest_key(text: str) -> str | None:
     plain = " ".join(re.findall(r"[a-z]+|\d+", text.lower()))
     if plain in STATEWIDE:
         return f"{DAY}:SC:{STATEWIDE[plain]}"
+    if (district := DISTRICTS.get(plain)) is not None:
+        return f"district:{district[0]}"
     house = DISTRICT.match(plain)
     if house is None:
         return None
@@ -71,6 +99,7 @@ def parse() -> None:
         key = contest_key(contest.get("text") or "")
         if key is None:
             continue
+        seats = int(contest.get("voteFor") or 1)
         for choice in contest.findall("Choice"):
             for vote_type in choice.findall("VoteType"):
                 channel = CHANNELS.get(vote_type.get("name") or "", 5)
@@ -78,6 +107,7 @@ def parse() -> None:
                     rows.append(
                         {
                             "contest": key,
+                            "seats": seats,
                             "choice": choice.get("text"),
                             "party": choice.get("party"),
                             "total": int(choice.get("totalVotes") or 0),
@@ -89,7 +119,7 @@ def parse() -> None:
                     )
     frame = (
         pl.DataFrame(rows)
-        .group_by("contest", "choice", "party", "total", "county", "channel", "as_of")
+        .group_by("contest", "seats", "choice", "party", "total", "county", "channel", "as_of")
         .agg(pl.col("votes").sum())
     )
     mismatched = (
@@ -134,11 +164,19 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, PAGE), source)
         for (key,), rows in frame.group_by("contest", maintain_order=True):
-            found = conn.execute(
-                """select c.id, c.election_id from contest c
-                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s""",
-                [key],
-            ).fetchall()
+            if key.startswith("district:"):
+                found = conn.execute(
+                    """select c.id, c.election_id from contest c
+                       join name n on n.entity_id = c.id and n.is_preferred and n.text = %s
+                       join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like %s""",
+                    [f"{DAY.year} {key.removeprefix('district:')} Commissioner election", f"{DAY}:SC:%"],
+                ).fetchall()
+            else:
+                found = conn.execute(
+                    """select c.id, c.election_id from contest c
+                       join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s""",
+                    [key],
+                ).fetchall()
             if len(found) != 1:
                 raise ValueError(f"{key}: {len(found)} contests")
             contest, election = found[0]
@@ -190,9 +228,11 @@ def emit() -> Path:
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
             totals = dict(rows.group_by("choice").agg(pl.col("votes").sum()).iter_rows())
             ranked = sorted((c for c in totals if c != "Write-In"), key=lambda c: -totals[c])
-            if len(ranked) > 1 and totals[ranked[0]] == totals[ranked[1]]:
-                raise ValueError(f"{key}: tie for first")
-            cs.add("outcome", result_set_id=result_set, option_id=chosen[ranked[0]], kind="elected", seats=1)
+            seats = rows["seats"][0]
+            if len(ranked) > seats and totals[ranked[seats - 1]] == totals[ranked[seats]]:
+                raise ValueError(f"{key}: tie for the last seat")
+            for choice in ranked[:seats]:
+                cs.add("outcome", result_set_id=result_set, option_id=chosen[choice], kind="elected", seats=1)
             for choice, county, channel, votes in rows.select("choice", "county", "channel", "votes").iter_rows():
                 cs.add(
                     "result_value",
