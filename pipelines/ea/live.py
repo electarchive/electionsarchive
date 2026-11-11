@@ -293,10 +293,14 @@ def issue(conn: Connection, feed: str, kind: str, detail: str) -> None:
     )
 
 
+QUIET_CAP_S = 240
+
+
 def run(poller: str, once: bool = False) -> None:
     client = httpx.Client(follow_redirects=True, timeout=30, headers=enr_2026.HEADERS, transport=LastGood())
     due: dict[str, float] = {}
-    running: dict[str, Future[None]] = {}
+    quiet: dict[str, int] = {}
+    running: dict[str, Future[str]] = {}
     with ThreadPoolExecutor(max_workers=8) as pool, ThreadPoolExecutor(max_workers=6) as fallback:
         while True:
             with connect() as conn:
@@ -308,13 +312,14 @@ def run(poller: str, once: bool = False) -> None:
             for feed, adapter, params, interval in feeds:
                 if feed in running or due.get(feed, 0) > now:
                     continue
-                due[feed] = now + interval
+                due[feed] = now + min(interval * 2 ** (quiet.get(feed, 0) // 10), max(interval, QUIET_CAP_S))
                 running[feed] = (fallback if adapter == "us.civicapi" else pool).submit(
                     attempt, feed, adapter, params, client
                 )
             for feed, future in list(running.items()):
                 if future.done():
                     del running[feed]
+                    quiet[feed] = quiet.get(feed, 0) + 1 if future.result() == "unchanged" else 0
             if once:
                 for future in running.values():
                     future.result()
@@ -322,7 +327,7 @@ def run(poller: str, once: bool = False) -> None:
             time.sleep(2)
 
 
-def attempt(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) -> None:
+def attempt(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) -> str:
     started = time.monotonic()
     try:
         result = poll(feed, adapter, params, client)
@@ -331,6 +336,7 @@ def attempt(feed: str, adapter: str, params: dict[str, str], client: httpx.Clien
         with connect() as conn:
             record(conn, feed, datetime.now(UTC), None, None, None, "error", traceback.format_exc()[-2000:])
     print(f"{datetime.now(UTC):%H:%M:%S} {feed}: {result} ({time.monotonic() - started:.1f} s)", flush=True)
+    return result
 
 
 def status() -> str:
