@@ -259,7 +259,29 @@ def emit(
             scope_slug = slug(str(scope).removesuffix(" Party")).removesuffix("-party") if scope else None
             key = f"{day}:{state}:{office}" + (f":{scope_slug}" if scope else "")
             election_key = f"{day}:{state}" if stage == "general" else f"{day}:{state}:{stage}"
-            if (key in taken) if stage != "general" else (f"{office}:{state}", year) in held:
+            if state == "ND" and year in (1928, 1936, 1938):
+                row = conn.execute(
+                    """select rs.id, rs.election_id, rs.contest_id, rs.stage, rs.kind, rs.source_id, rs.completeness
+                       from result_set rs join external_id x on x.entity_id = rs.id and x.scheme = %s
+                       where x.value = %s and not rs.is_default and rs.status = 'active'""",
+                    [f"{pipeline}.result_set", key],
+                ).fetchone()
+                if row is not None:
+                    cs.add(
+                        "result_set",
+                        **dict(
+                            zip(
+                                ("id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness"),
+                                row,
+                                strict=True,
+                            )
+                        ),
+                        is_default=False,
+                        status="superseded",
+                    )
+                skipped += 1
+                continue
+            if key in taken or (stage == "general" and (f"{office}:{state}", year) in held):
                 print(f"{key}: held by another pipeline, skipped")
                 skipped += 1
                 continue
