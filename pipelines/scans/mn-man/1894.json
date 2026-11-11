@@ -1,0 +1,496 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1895, general election returns (general election 1894-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1894-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1894,
+      "chamber": "governor",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 91,
+      "id": "91-0",
+      "columns": [
+        {
+          "label": "Knute Nelson, R.",
+          "contest": "governor",
+          "candidate": "Knute Nelson"
+        },
+        {
+          "label": "George L. Becker, D.",
+          "contest": "governor",
+          "candidate": "George L. Becker"
+        },
+        {
+          "label": "Sidney M. Owen, Peo.",
+          "contest": "governor",
+          "candidate": "Sidney M. Owen"
+        },
+        {
+          "label": "Hans S. Hilleboe, P.",
+          "contest": "governor",
+          "candidate": "Hans S. Hilleboe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.358,
+        0.208,
+        0.62,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Governor.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2235
+      ]
+    },
+    {
+      "page": 92,
+      "id": "92-0",
+      "columns": [
+        {
+          "label": "Knute Nelson, R.",
+          "contest": "governor",
+          "candidate": "Knute Nelson"
+        },
+        {
+          "label": "George L. Becker, D.",
+          "contest": "governor",
+          "candidate": "George L. Becker"
+        },
+        {
+          "label": "Sidney M. Owen, Peo.",
+          "contest": "governor",
+          "candidate": "Sidney M. Owen"
+        },
+        {
+          "label": "Hans S. Hilleboe, P.",
+          "contest": "governor",
+          "candidate": "Hans S. Hilleboe"
+        },
+        {
+          "label": "David M. Clough, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Ludwig, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edwin E. Lommen, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Charles M. Way, P.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.215,
+        0.87,
+        0.725
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS BY COUNTIES.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3667
+      ]
+    },
+    {
+      "page": 99,
+      "id": "99-0",
+      "columns": [
+        {
+          "label": "Republican",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Democrat",
+          "contest": null,
+          "candidate": "",
+          "party": "Democrat"
+        },
+        {
+          "label": "Peoples",
+          "contest": null,
+          "candidate": "",
+          "party": "Peoples"
+        },
+        {
+          "label": "Prohibition",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.286,
+        0.495,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS BY COUNTIES.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.119
+      ]
+    },
+    {
+      "page": 99,
+      "id": "99-1",
+      "columns": [
+        {
+          "label": "Republican",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Democrat",
+          "contest": null,
+          "candidate": "",
+          "party": "Democrat"
+        },
+        {
+          "label": "Peoples",
+          "contest": null,
+          "candidate": "",
+          "party": "Peoples"
+        },
+        {
+          "label": "Prohibition",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.495,
+        0.29,
+        0.861,
+        0.769
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS BY COUNTIES.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1691
+      ]
+    },
+    {
+      "page": 109,
+      "id": "109-0",
+      "columns": [
+        {
+          "label": "James A. Tawney,R",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "John Moonan, D.",
+          "contest": "house1",
+          "candidate": "John Moonan"
+        },
+        {
+          "label": "Thos. G. Meighen, Peo.",
+          "contest": "house1",
+          "candidate": "Thos G. Meighen"
+        },
+        {
+          "label": "I.Horcutt, Pro.",
+          "contest": "house1",
+          "candidate": "I. Horcutt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.221,
+        0.87,
+        0.42
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 109,
+      "id": "109-1",
+      "columns": [
+        {
+          "label": "James H. McCleary, R.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "James H. Baker, D.",
+          "contest": "house2",
+          "candidate": "James H. Baker"
+        },
+        {
+          "label": "L. C. Long, Peo.",
+          "contest": "house2",
+          "candidate": "L. C. Long"
+        },
+        {
+          "label": "H. S. Kellom, Pro.",
+          "contest": "house2",
+          "candidate": "H. S. Kellom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.412,
+        0.87,
+        0.683
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 109,
+      "id": "109-2",
+      "columns": [
+        {
+          "label": "Joel P. Heatwole, R.",
+          "contest": "house3",
+          "candidate": "Joel Prescott Heatwole"
+        },
+        {
+          "label": "O. M. Hall, D.",
+          "contest": "house3",
+          "candidate": "O. M. Hall"
+        },
+        {
+          "label": "J. M. Bowler, Peo.",
+          "contest": "house3",
+          "candidate": "J. M. Bowler"
+        },
+        {
+          "label": "Lucien W. Chaney, Pro.",
+          "contest": "house3",
+          "candidate": "Lucien W. Chaney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.675,
+        0.87,
+        0.868
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-0",
+      "columns": [
+        {
+          "label": "Andrew R. Keifer, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edw. J. Darragh, D.",
+          "contest": "house4",
+          "candidate": "Edw J. Darragh"
+        },
+        {
+          "label": "Francis H. Clark, Peo.",
+          "contest": "house4",
+          "candidate": "Francis H. Clark"
+        },
+        {
+          "label": "David Morgan, Pro.",
+          "contest": "house4",
+          "candidate": "David Morgan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.169,
+        0.872,
+        0.305
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-1",
+      "columns": [
+        {
+          "label": "Loren Fletcher, R.",
+          "contest": "house5",
+          "candidate": "Loren Fletcher"
+        },
+        {
+          "label": "Oliver T. Erickson, D.",
+          "contest": "house5",
+          "candidate": "Oliver T. Erickson"
+        },
+        {
+          "label": "Ernest F. Clark, Peo.",
+          "contest": "house5",
+          "candidate": "Ernest F. Clark"
+        },
+        {
+          "label": "Theo. S. Reimstad, Pro.",
+          "contest": "house5",
+          "candidate": "Theo S. Reimstad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.297,
+        0.872,
+        0.395
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-2",
+      "columns": [
+        {
+          "label": "Chas. A. Towne, R.",
+          "contest": "house6",
+          "candidate": "Chas A. Towne"
+        },
+        {
+          "label": "M.R. Baldwin, D.",
+          "contest": "house6",
+          "candidate": "M. R. Baldwin"
+        },
+        {
+          "label": "Kitt'lHal-vorsen, Peo.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.387,
+        0.872,
+        0.672
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-3",
+      "columns": [
+        {
+          "label": "Frank M. Eddy, R.",
+          "contest": "house7",
+          "candidate": "Frank Marion Eddy"
+        },
+        {
+          "label": "Thos. N. McLean, D.",
+          "contest": "house7",
+          "candidate": "Thos N. McLean"
+        },
+        {
+          "label": "Haldor E. Boen, Peo.",
+          "contest": "house7",
+          "candidate": "Haldor E. Boen"
+        },
+        {
+          "label": "Ole Kron, Pro.",
+          "contest": "house7",
+          "candidate": "Ole Kron"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.664,
+        0.872,
+        0.898
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

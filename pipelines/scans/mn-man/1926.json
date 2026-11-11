@@ -1,0 +1,360 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1927, general election returns (general election 1926-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1926-11-02-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 166,
+      "id": "166-0",
+      "columns": [
+        {
+          "label": "Furlow",
+          "contest": "house1",
+          "candidate": "Allen J. Furlow"
+        },
+        {
+          "label": "Hanna",
+          "contest": "house1",
+          "candidate": "L. B. Hanna"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.137,
+        0.931,
+        0.295
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-1",
+      "columns": [
+        {
+          "label": "Clague",
+          "contest": "house2",
+          "candidate": "Frank Clague"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.287,
+        0.931,
+        0.482
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-2",
+      "columns": [
+        {
+          "label": "Andresen",
+          "contest": "house3",
+          "candidate": "August H. Andresen"
+        },
+        {
+          "label": "Gagen",
+          "contest": "house3",
+          "candidate": "August M. Gagen"
+        },
+        {
+          "label": "Kolars",
+          "contest": "house3",
+          "candidate": "Charles C. Kolars"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.474,
+        0.931,
+        0.645
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-3",
+      "columns": [
+        {
+          "label": "Maas",
+          "contest": "house4",
+          "candidate": "Melvin J. Maas"
+        },
+        {
+          "label": "Sullivan",
+          "contest": "house4",
+          "candidate": "Thomas V. Sullivan"
+        },
+        {
+          "label": "Wessel",
+          "contest": "house4",
+          "candidate": "Henry F. Wessel"
+        },
+        {
+          "label": "Pearson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.637,
+        0.931,
+        0.715
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-4",
+      "columns": [
+        {
+          "label": "Newton",
+          "contest": "house5",
+          "candidate": "Walter H. Newton"
+        },
+        {
+          "label": "Bastis",
+          "contest": "house5",
+          "candidate": "Albert G. Bastis"
+        },
+        {
+          "label": "Jensen",
+          "contest": "house5",
+          "candidate": "Fred Jensen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.707,
+        0.931,
+        0.793
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-5",
+      "columns": [
+        {
+          "label": "Knutson",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "Himsl",
+          "contest": "house6",
+          "candidate": "Joseph B. Himsel"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.785,
+        0.931,
+        0.974
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 167,
+      "id": "167-0",
+      "columns": [
+        {
+          "label": "Howard",
+          "contest": "house7",
+          "candidate": "E. E. Howard"
+        },
+        {
+          "label": "Kvale",
+          "contest": "house7",
+          "candidate": "O. J. Kvale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.155,
+        0.858,
+        0.362
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 167,
+      "id": "167-1",
+      "columns": [
+        {
+          "label": "Larson",
+          "contest": "house8",
+          "candidate": "Oscar J. Larson"
+        },
+        {
+          "label": "Carss",
+          "contest": "house8",
+          "candidate": "William L. Carss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.354,
+        0.858,
+        0.486
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 167,
+      "id": "167-2",
+      "columns": [
+        {
+          "label": "Selvig",
+          "contest": "house9",
+          "candidate": "C. G. Selvig"
+        },
+        {
+          "label": "Wefald",
+          "contest": "house9",
+          "candidate": "Knud Wefald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.478,
+        0.858,
+        0.685
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 167,
+      "id": "167-3",
+      "columns": [
+        {
+          "label": "Goodwin",
+          "contest": "house10",
+          "candidate": "Godfrey G. Goodwin"
+        },
+        {
+          "label": "Lundeen",
+          "contest": "house10",
+          "candidate": "Ernest Lundeen"
+        },
+        {
+          "label": "Finlayson",
+          "contest": "house10",
+          "candidate": "Henry A. Finlayson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.677,
+        0.858,
+        0.842
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

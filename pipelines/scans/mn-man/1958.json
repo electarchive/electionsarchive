@@ -1,0 +1,387 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1959, general election returns (general election 1958-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1958-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house5": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house1": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house6": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house2": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house7": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house3": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house8": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "senate": {
+      "year": 1958,
+      "chamber": "senate",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1958,
+      "chamber": "governor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Joseph Robbie, Democratic-Farmer-Labor",
+          "contest": "house5",
+          "candidate": "Joseph Robbie"
+        },
+        {
+          "label": "Walter H. Judd, Republican",
+          "contest": "house5",
+          "candidate": "Walter H. Judd"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.477,
+        0.148,
+        0.856,
+        0.263
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Eugene P. Foley, Democratic-Farmer-Labor",
+          "contest": "house1",
+          "candidate": "Eugene P. Foley"
+        },
+        {
+          "label": "Albert H. Quie, Republican",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.149,
+        0.446,
+        0.364
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-2",
+      "columns": [
+        {
+          "label": "Fred Marshall, Democratic-Farmer-Labor",
+          "contest": "house6",
+          "candidate": "Fred Marshall"
+        },
+        {
+          "label": "Hugo Holmstrom, Republican",
+          "contest": "house6",
+          "candidate": "Hugo Holmstrom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.481,
+        0.255,
+        0.853,
+        0.542
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-3",
+      "columns": [
+        {
+          "label": "Conrad H. Hammar, Democratic-Farmer-Labor",
+          "contest": "house2",
+          "candidate": "Conrad H. Hammar"
+        },
+        {
+          "label": "Ancher Nelsen, Republican",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.356,
+        0.446,
+        0.603
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-4",
+      "columns": [
+        {
+          "label": "A. I. Johnson, Democratic-Farmer-Labor",
+          "contest": "house7",
+          "candidate": "A. I. Johnson"
+        },
+        {
+          "label": "H. Carl Andersen, Republican",
+          "contest": "house7",
+          "candidate": "H. Carl Andersen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.477,
+        0.534,
+        0.853,
+        0.851
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-5",
+      "columns": [
+        {
+          "label": "Roy W. Wier, Democratic-Farmer-Labor",
+          "contest": "house3",
+          "candidate": "Roy W. Wier"
+        },
+        {
+          "label": "Leonard E. Lindquist, Republican",
+          "contest": "house3",
+          "candidate": "Leonard E. Lindquist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.595,
+        0.446,
+        0.749
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-6",
+      "columns": [
+        {
+          "label": "Joseph E. Karth, Democratic-Farmer-Labor",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "Frank S. Farrell, Republican",
+          "contest": "house4",
+          "candidate": "Frank S. Farrell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.741,
+        0.446,
+        0.851
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "John A. Blatnik Democratic-Farmer-Labor",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "Roy W. Ranum Republican",
+          "contest": "house8",
+          "candidate": "Roy W. Ranum"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.116,
+        0.528,
+        0.264
+      ],
+      "hint": "Read only the table headed 'Eighth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Coya Knutson Democratic-Farmer-Labor",
+          "contest": "house9",
+          "candidate": "Coya Knutson"
+        },
+        {
+          "label": "Odin Langen Republican",
+          "contest": "house9",
+          "candidate": "Odin Langen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.54,
+        0.116,
+        0.918,
+        0.35
+      ],
+      "hint": "Read only the table headed 'Ninth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Eugene J. McCarthy Democratic-Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Edward J. Thye Republican",
+          "contest": "senate",
+          "candidate": "Edward J. Thye"
+        },
+        {
+          "label": "William M. Curran Socialist Workers Party Nominated by Petition",
+          "contest": "senate",
+          "candidate": "William M. Curran"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.086,
+        0.568,
+        0.954
+      ],
+      "hint": "Read only the table headed 'For U. S. Senator In Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1198
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-1",
+      "columns": [
+        {
+          "label": "Orville L. Freeman Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Orville L. Freeman"
+        },
+        {
+          "label": "George MacKinnon Republican",
+          "contest": "governor",
+          "candidate": "George MacKinnon"
+        },
+        {
+          "label": "Arne Anderson Industrial Government Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Arne Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.558,
+        0.086,
+        0.82,
+        0.954
+      ],
+      "hint": "Read only the table headed 'For Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1198
+      ]
+    }
+  ]
+}

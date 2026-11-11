@@ -1,0 +1,627 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1893, general election returns (general election 1892-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1892-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1892,
+      "chamber": "governor",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "president": {
+      "year": 1892,
+      "chamber": "president",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 96,
+      "id": "96-0",
+      "columns": [
+        {
+          "label": "Knute Nelson, R.",
+          "contest": "governor",
+          "candidate": "Knute Nelson"
+        },
+        {
+          "label": "Daniel W. Lawler, D.",
+          "contest": "governor",
+          "candidate": "Daniel W. Lawler"
+        },
+        {
+          "label": "Ignatius Donnelly, Peo.",
+          "contest": "governor",
+          "candidate": "Ignatius L. Donnelly"
+        },
+        {
+          "label": "William J. Dean, P.",
+          "contest": "governor",
+          "candidate": "William J. Dean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.219,
+        0.64,
+        1.0
+      ],
+      "hint": "Read only the table headed 'For Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2305
+      ]
+    },
+    {
+      "page": 97,
+      "id": "97-0",
+      "columns": [
+        {
+          "label": "Knute Nelson, R.",
+          "contest": "governor",
+          "candidate": "Knute Nelson"
+        },
+        {
+          "label": "Daniel W. Lawler, D.",
+          "contest": "governor",
+          "candidate": "Daniel W. Lawler"
+        },
+        {
+          "label": "Ignatius Donnelly, Peo.",
+          "contest": "governor",
+          "candidate": "Ignatius L. Donnelly"
+        },
+        {
+          "label": "William J. Dean, P.",
+          "contest": "governor",
+          "candidate": "William J. Dean"
+        },
+        {
+          "label": "David M. Clough, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. H. Hawkins, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Swan Nelson, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ole Kron, P.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.204,
+        0.843,
+        0.703
+      ],
+      "hint": "Read only the table headed 'OFFICIAL CANVASS BY THE STATE BOARD OF CANVASSERS FOR STATE OFFICERS, ELECTION HELD NOVEMBER 8, 1892.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3788
+      ]
+    },
+    {
+      "page": 102,
+      "id": "102-0",
+      "columns": [
+        {
+          "label": "Harrison, R.",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "Cleveland, D.",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Weaver, F.",
+          "contest": "president",
+          "candidate": "James Weaver (Populist)"
+        },
+        {
+          "label": "Weaver, Peo.",
+          "contest": "president",
+          "candidate": "James Weaver (Populist)"
+        },
+        {
+          "label": "Bidwell, P.",
+          "contest": "president",
+          "candidate": "John Bidwell (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.168,
+        0.216,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Election Returns by Counties. Official canvass by the State Board of Canvassers for Presidential Electors, election held November 8, 1892. Presidential Electors.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1416
+      ]
+    },
+    {
+      "page": 103,
+      "id": "103-0",
+      "columns": [
+        {
+          "label": "Harrison, R.",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "Cleveland, D.",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Weaver, F.",
+          "contest": "president",
+          "candidate": "James Weaver (Populist)"
+        },
+        {
+          "label": "Weaver, Peo.",
+          "contest": "president",
+          "candidate": "James Weaver (Populist)"
+        },
+        {
+          "label": "Bidwell, P.",
+          "contest": "president",
+          "candidate": "John Bidwell (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.211,
+        0.843,
+        0.562
+      ],
+      "hint": "Read only the table headed 'Official canvass by the State Board of Canvassers for Presidential Electors, Election held November 8, 1892'; ignore any other table visible in the image."
+    },
+    {
+      "page": 104,
+      "id": "104-0",
+      "columns": [
+        {
+          "label": "Republican.",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Democrat.",
+          "contest": null,
+          "candidate": "",
+          "party": "Democratic"
+        },
+        {
+          "label": "Peoples.",
+          "contest": null,
+          "candidate": "",
+          "party": "People's"
+        },
+        {
+          "label": "Prohibition.",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        },
+        {
+          "label": "Amendment to article four (4) of the constitution, to prohibit special legislation.\u2014YES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to article four (4) of the constitution, to prohibit special legislation.\u2014NO.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to section three (3) of article nine (9) of the constitution, providing for the taxation of sleeping car companies and other companies.\u2014YES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to section three (3) of article nine (9) of the constitution, providing for the taxation of sleeping car companies and other companies.\u2014NO.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.193,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Member of Congress and Constitutional Amendments, by county (1892 general election)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2615
+      ]
+    },
+    {
+      "page": 105,
+      "id": "105-0",
+      "columns": [
+        {
+          "label": "Republican.",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Democrat.",
+          "contest": null,
+          "candidate": "",
+          "party": "Democratic"
+        },
+        {
+          "label": "Peoples.",
+          "contest": null,
+          "candidate": "",
+          "party": "People's"
+        },
+        {
+          "label": "Prohibition.",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        },
+        {
+          "label": "Amendment to article four (4) of the constitution, to prohibit special legislation.\u2014YES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to article four (4) of the constitution, to prohibit special legislation.\u2014NO.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to section three (3) of article nine (9) of the constitution, providing for the taxation of sleeping car companies and other companies.\u2014YES.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment to section three (3) of article nine (9) of the constitution, providing for the taxation of sleeping car companies and other companies.\u2014NO.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.0,
+        0.898,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 112,
+      "id": "112-0",
+      "columns": [
+        {
+          "label": "James A. Tawney.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "William H. Harries.",
+          "contest": "house1",
+          "candidate": "William H. Harries"
+        },
+        {
+          "label": "James I. Vermilya.",
+          "contest": "house1",
+          "candidate": "James I. Vermilya"
+        },
+        {
+          "label": "P. H. Harsh.",
+          "contest": "house1",
+          "candidate": "P. H. Harsh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.222,
+        0.898,
+        0.432
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 112,
+      "id": "112-1",
+      "columns": [
+        {
+          "label": "James T. McCleary.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "Winfield S. Hammond.",
+          "contest": "house2",
+          "candidate": "Winfield S. Hammond"
+        },
+        {
+          "label": "S. C. Long.",
+          "contest": "house2",
+          "candidate": "S. C. Long"
+        },
+        {
+          "label": "E. H. Bronson.",
+          "contest": "house2",
+          "candidate": "E. H. Bronson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.424,
+        0.898,
+        0.717
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 112,
+      "id": "112-2",
+      "columns": [
+        {
+          "label": "Joel P. Heatwole.",
+          "contest": "house3",
+          "candidate": "Joel P. Heatwole"
+        },
+        {
+          "label": "O. M. Hall.",
+          "contest": "house3",
+          "candidate": "Osee Matson Hall"
+        },
+        {
+          "label": "Ferdin'nd Borchert.",
+          "contest": "house3",
+          "candidate": "Ferdinand Borchert"
+        },
+        {
+          "label": "Wm. B. Reed.",
+          "contest": "house3",
+          "candidate": "William B. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.169,
+        0.709,
+        0.898,
+        0.912
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-0",
+      "columns": [
+        {
+          "label": "Andrew R. Kiefer.",
+          "contest": "house4",
+          "candidate": "Andrew Robert Kiefer"
+        },
+        {
+          "label": "James N. Castle.",
+          "contest": "house4",
+          "candidate": "James N. Castle"
+        },
+        {
+          "label": "James G. Dougherty.",
+          "contest": "house4",
+          "candidate": "James G. Dougherty"
+        },
+        {
+          "label": "David Morgan.",
+          "contest": "house4",
+          "candidate": "David Morgan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.133,
+        0.827,
+        0.289
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-1",
+      "columns": [
+        {
+          "label": "Loren Fletcher.",
+          "contest": "house5",
+          "candidate": "Loren Fletcher"
+        },
+        {
+          "label": "James W. Lawrence.",
+          "contest": "house5",
+          "candidate": "James W. Lawrence"
+        },
+        {
+          "label": "Thos. H. Lucas.",
+          "contest": "house5",
+          "candidate": "Thos H. Lucas"
+        },
+        {
+          "label": "J. T. Caton.",
+          "contest": "house5",
+          "candidate": "J. T. Caton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.281,
+        0.827,
+        0.384
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-2",
+      "columns": [
+        {
+          "label": "Dolson B. Searle.",
+          "contest": "house6",
+          "candidate": "Dolson B. Searle"
+        },
+        {
+          "label": "M. R. Baldwin.",
+          "contest": "house6",
+          "candidate": "Melvin Riley Baldwin"
+        },
+        {
+          "label": "A. C. Parsons.",
+          "contest": "house6",
+          "candidate": "A. C. Parsons"
+        },
+        {
+          "label": "Edward L. Curial.",
+          "contest": "house6",
+          "candidate": "Edward L. Curial"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.376,
+        0.824,
+        0.676
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-3",
+      "columns": [
+        {
+          "label": "Henry Feig.",
+          "contest": "house7",
+          "candidate": "Henry Feig"
+        },
+        {
+          "label": "W. F. Kelso.",
+          "contest": "house7",
+          "candidate": "W. F. Kelso"
+        },
+        {
+          "label": "Haldor E. Boen.",
+          "contest": "house7",
+          "candidate": "Haldor Erickson Boen"
+        },
+        {
+          "label": "L. F. Hampson.",
+          "contest": "house7",
+          "candidate": "L. F. Hampson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.668,
+        0.824,
+        0.931
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

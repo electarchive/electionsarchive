@@ -1,0 +1,668 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1905, general election returns (general election 1904-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1904-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1904,
+      "chamber": "governor",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "president": {
+      "year": 1904,
+      "chamber": "president",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 125,
+      "id": "125-0",
+      "columns": [
+        {
+          "label": "Dunn, Rep.",
+          "contest": "governor",
+          "candidate": "Robert C. Dunn"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Nash, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "Anderson, Soc.-Lab.",
+          "contest": "governor",
+          "candidate": "A. W. M. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.203,
+        0.543,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Abstract of Votes Polled for State Officers by Counties, 1904 - Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2296
+      ]
+    },
+    {
+      "page": 126,
+      "id": "126-0",
+      "columns": [
+        {
+          "label": "Dunn, Rep.",
+          "contest": "governor",
+          "candidate": "Robert C. Dunn"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Nash, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "Anderson, Soc.-Lab.",
+          "contest": "governor",
+          "candidate": "A. W. M. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.0,
+        0.543,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 127,
+      "id": "127-0",
+      "columns": [
+        {
+          "label": "Dunn, Rep.",
+          "contest": "governor",
+          "candidate": "Robert C. Dunn"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Nash, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "Anderson, Soc.-Lab.",
+          "contest": "governor",
+          "candidate": "A. W. M. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.0,
+        0.543,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 128,
+      "id": "128-0",
+      "columns": [
+        {
+          "label": "Dunn, Rep.",
+          "contest": "governor",
+          "candidate": "Robert C. Dunn"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Nash, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "Anderson, Soc.-Lab.",
+          "contest": "governor",
+          "candidate": "A. W. M. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.0,
+        0.543,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 129,
+      "id": "129-0",
+      "columns": [
+        {
+          "label": "Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "Nelson, Dem.",
+          "contest": "house1",
+          "candidate": "Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.169,
+        0.857,
+        0.333
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 129,
+      "id": "129-1",
+      "columns": [
+        {
+          "label": "McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "Jones, Dem.",
+          "contest": "house2",
+          "candidate": "Jones"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.325,
+        0.857,
+        0.514
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 129,
+      "id": "129-2",
+      "columns": [
+        {
+          "label": "Davis, Rep.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Craven, Dem.",
+          "contest": "house3",
+          "candidate": "Craven"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.506,
+        0.857,
+        0.677
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 129,
+      "id": "129-3",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.669,
+        0.857,
+        0.781
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 129,
+      "id": "129-4",
+      "columns": [
+        {
+          "label": "Fletcher, Rep.",
+          "contest": "house5",
+          "candidate": "Loren Fletcher"
+        },
+        {
+          "label": "Kohler, Dem.",
+          "contest": "house5",
+          "candidate": "Kohler"
+        },
+        {
+          "label": "Morton, Pro.",
+          "contest": "house5",
+          "candidate": "Morton"
+        },
+        {
+          "label": "Hirshfield,",
+          "contest": "house5",
+          "candidate": "Hirshfield"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.773,
+        0.857,
+        0.854
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 130,
+      "id": "130-0",
+      "columns": [
+        {
+          "label": "Buckman Rep.",
+          "contest": "house6",
+          "candidate": "Clarence Bennett Buckman"
+        },
+        {
+          "label": "Van Dyke Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.146,
+        0.869,
+        0.325
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 130,
+      "id": "130-1",
+      "columns": [
+        {
+          "label": "Volstead Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.317,
+        0.869,
+        0.521
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 130,
+      "id": "130-2",
+      "columns": [
+        {
+          "label": "Bede Rep.",
+          "contest": "house8",
+          "candidate": "James Adam Bede"
+        },
+        {
+          "label": "Hughes Dem.",
+          "contest": "house8",
+          "candidate": "Hughes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.513,
+        0.848,
+        0.692
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 130,
+      "id": "130-3",
+      "columns": [
+        {
+          "label": "Steenerson Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.684,
+        0.869,
+        0.862
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 142,
+      "id": "142-0",
+      "columns": [
+        {
+          "label": "John Frank",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. D. Murphy",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Batchelder",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. F. Wessel",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. W. Parsons",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. J. McKinnon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. G. Farrington",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anton C. Weiss",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John E. Ostrom",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas J. Meighen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. J. Hibbard",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Campbell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Allan A. Brackinreed",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. C. Long",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George F. Wells",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. A. Wilson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Bucklin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. Marschner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. G. Davidson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.306,
+        0.848,
+        0.859
+      ],
+      "hint": "Read only the table headed 'OF MINNESOTA FOR PRESIDENTIAL ELECTORS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0253
+      ]
+    },
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "Thomas Lowry.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arthur W. Wright.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Simpson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Basil Smoutt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Benj. B. Sheffield.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John G. Nelson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward W. Backus.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Peterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank L. Cliff.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Hearding.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peter I. Holden.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Timothy O'Conner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Swan J. Turnblad.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.144,
+        0.888,
+        0.571
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED IN THE STATE'; ignore any other table visible in the image."
+    }
+  ]
+}

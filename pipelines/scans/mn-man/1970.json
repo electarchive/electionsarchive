@@ -1,0 +1,1053 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1971, general election returns (general election 1970-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1970-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house6": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house2": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house7": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house3": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house8": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house5": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "senate": {
+      "year": 1970,
+      "chamber": "senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1970,
+      "chamber": "governor",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Lundeen DFL",
+          "contest": "house1",
+          "candidate": "B. A. Lundeen"
+        },
+        {
+          "label": "Quie Republican",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.154,
+        0.558,
+        0.328
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Montgomery DFL",
+          "contest": "house6",
+          "candidate": "Terry Montgomery"
+        },
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Martin Independ.",
+          "contest": "house6",
+          "candidate": "Richard Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.548,
+        0.189,
+        0.944,
+        0.387
+      ],
+      "hint": "Read only the table headed 'Sixth District\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-2",
+      "columns": [
+        {
+          "label": "Adams DFL",
+          "contest": "house2",
+          "candidate": "Clifford R. Adams"
+        },
+        {
+          "label": "Nelsen Republican",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.32,
+        0.558,
+        0.578
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-3",
+      "columns": [
+        {
+          "label": "Bergland DFL",
+          "contest": "house7",
+          "candidate": "Bob Bergland"
+        },
+        {
+          "label": "Langen Republican",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.548,
+        0.379,
+        0.944,
+        0.689
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-4",
+      "columns": [
+        {
+          "label": "Rice DFL",
+          "contest": "house3",
+          "candidate": "George Rice"
+        },
+        {
+          "label": "Frenzel Republican",
+          "contest": "house3",
+          "candidate": "Bill Frenzel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.57,
+        0.558,
+        0.669
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-5",
+      "columns": [
+        {
+          "label": "Karth DFL",
+          "contest": "house4",
+          "candidate": "Joseph Karth"
+        },
+        {
+          "label": "Loss Republican",
+          "contest": "house4",
+          "candidate": "Frank L. Loss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.661,
+        0.558,
+        0.756
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-6",
+      "columns": [
+        {
+          "label": "Blatnik DFL",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "Reed Republican",
+          "contest": "house8",
+          "candidate": "Paul Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.548,
+        0.681,
+        0.944,
+        0.857
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-7",
+      "columns": [
+        {
+          "label": "Fraser DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "Enroth Republican",
+          "contest": "house5",
+          "candidate": "Dick Enroth"
+        },
+        {
+          "label": "Myers SWP",
+          "contest": "house5",
+          "candidate": "Derrell Myers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.748,
+        0.558,
+        0.815
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-8",
+      "columns": [
+        {
+          "label": "Montgomery DFL",
+          "contest": "house6",
+          "candidate": "Terry Montgomery"
+        },
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Martin Independ.",
+          "contest": "house6",
+          "candidate": "Richard Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.807,
+        0.558,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "HUBERT H. HUMPHREY DEMOCRATIC-FARMER-LABOR",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "CLARK MACGREGOR REPUBLICAN",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "NANCY STREBE SOCIALIST WORKERS",
+          "contest": "senate",
+          "candidate": "Nancy Strebe"
+        },
+        {
+          "label": "WILLIAM BRAATZ INDUSTRIAL GOVERNMENT",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.114,
+        0.94,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2968
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Total Number of Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment One Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment One No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Two Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Two No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hubert H. Humphrey Democratic-Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Clark MacGregor Republican",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Nancy Strebe Socialist Workers",
+          "contest": "senate",
+          "candidate": "Nancy Strebe"
+        },
+        {
+          "label": "William Braatz Industrial Government",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.233,
+        0.934,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3416
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Total Number of Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment One Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment One No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Two Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Two No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hubert H. Humphrey Democratic-Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Clark MacGregor Republican",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Nancy Strebe Socialist Workers",
+          "contest": "senate",
+          "candidate": "Nancy Strebe"
+        },
+        {
+          "label": "William Braatz Industrial Government",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.0,
+        0.934,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Total Number of Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HUBERT H. HUMPHREY DEMOCRATIC-FARMER-LABOR",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "CLARK MacGREGOR REPUBLICAN",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "NANCY STREBE SOCIALIST WORKERS",
+          "contest": "senate",
+          "candidate": "Nancy Strebe"
+        },
+        {
+          "label": "WILLIAM BRAATZ INDUSTRIAL GOVERNMENT",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.219,
+        0.938,
+        0.754
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4841
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Wendell R. Anderson Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Douglas M. Head Republican",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Karl Heck Industrial Government",
+          "contest": "governor",
+          "candidate": "Karl Heck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.125,
+        0.549,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3451
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Wendell R. Anderson Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Douglas M. Head Republican",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Karl Heck Industrial Government",
+          "contest": "governor",
+          "candidate": "Karl Heck"
+        },
+        {
+          "label": "Rudy Perpich Democratic-Farmer-Labor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ben Boo Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Daniel D. Donovan Democratic-Farmer-Labor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arlen I. Erdahl Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jon Wefald Democratic-Farmer-Labor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rolland F. Hatfield Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Betty M. Smith Minnesota Communist Party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.517,
+        0.936,
+        0.932
+      ],
+      "hint": "Read only the table headed 'Returns of General Election in State of Minnesota, November 3, 1970. Official Canvass'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.193,
+        0.684,
+        0.326
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR - THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-1",
+      "columns": [
+        {
+          "label": "Anderson DFL",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Head GOP",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.692,
+        0.193,
+        0.933,
+        0.326
+      ],
+      "hint": "Read only the table headed 'GOVERNOR - THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-2",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.318,
+        0.684,
+        0.456
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR - FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-3",
+      "columns": [
+        {
+          "label": "Anderson DFL",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Head GOP",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.692,
+        0.318,
+        0.933,
+        0.456
+      ],
+      "hint": "Read only the table headed 'GOVERNOR - FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-4",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.448,
+        0.684,
+        0.546
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR - FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-5",
+      "columns": [
+        {
+          "label": "Anderson DFL",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Head GOP",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.692,
+        0.448,
+        0.933,
+        0.546
+      ],
+      "hint": "Read only the table headed 'GOVERNOR - FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-6",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": "senate",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.538,
+        0.684,
+        0.914
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR - SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-7",
+      "columns": [
+        {
+          "label": "Anderson DFL",
+          "contest": "governor",
+          "candidate": "Wendell R. Anderson"
+        },
+        {
+          "label": "Head GOP",
+          "contest": "governor",
+          "candidate": "Douglas M. Head"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.692,
+        0.538,
+        0.933,
+        0.914
+      ],
+      "hint": "Read only the table headed 'GOVERNOR - SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": null,
+          "candidate": "",
+          "party": "GOP"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Head GOP",
+          "contest": null,
+          "candidate": "",
+          "party": "GOP"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.1,
+        0.929,
+        0.473
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-1",
+      "columns": [
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "MacGregor GOP",
+          "contest": null,
+          "candidate": "",
+          "party": "GOP"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Two Party Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Head GOP",
+          "contest": null,
+          "candidate": "",
+          "party": "GOP"
+        },
+        {
+          "label": "Percent DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.465,
+        0.929,
+        0.716
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

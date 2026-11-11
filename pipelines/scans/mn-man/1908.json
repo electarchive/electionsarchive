@@ -1,0 +1,1201 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1909, general election returns (general election 1908-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1908-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 135,
+      "id": "135-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jacobson, Rep.",
+          "contest": "governor",
+          "candidate": "Jacob F. Jacobson"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Haggard, Pro.",
+          "contest": "governor",
+          "candidate": "George D. Haggard"
+        },
+        {
+          "label": "Moore, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Beecher Moore"
+        },
+        {
+          "label": "Allen, Ind.",
+          "contest": "governor",
+          "candidate": "William W. Allen"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reiter, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Higbee, Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.186,
+        0.899,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Abstract of votes polled for state officers by counties, 1908'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1929
+      ]
+    },
+    {
+      "page": 136,
+      "id": "136-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jacobson, Rep.",
+          "contest": "governor",
+          "candidate": "Jacob F. Jacobson"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Haggard, Pro.",
+          "contest": "governor",
+          "candidate": "George D. Haggard"
+        },
+        {
+          "label": "Moore, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Beecher Moore"
+        },
+        {
+          "label": "Allen, Ind.",
+          "contest": "governor",
+          "candidate": "William W. Allen"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reiter, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Higbee, Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.0,
+        0.899,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 137,
+      "id": "137-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jacobson, Rep.",
+          "contest": "governor",
+          "candidate": "Jacob F. Jacobson"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Haggard, Pro.",
+          "contest": "governor",
+          "candidate": "George D. Haggard"
+        },
+        {
+          "label": "Moore, Pub. Own.",
+          "contest": "governor",
+          "candidate": "Beecher Moore"
+        },
+        {
+          "label": "Allen, Ind.",
+          "contest": "governor",
+          "candidate": "William W. Allen"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reiter, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anderson, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Higbee, Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.176,
+        0.9,
+        0.666
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR STATE OFFICERS BY COUNTIES, 1908.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3184
+      ]
+    },
+    {
+      "page": 141,
+      "id": "141-0",
+      "columns": [
+        {
+          "label": "John J. Eklund",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Job W. Lloyd",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard E. Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew C. Dunn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hiram L. Sumption",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James Edward Melin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stewart Gamble",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Albert H. Turrittin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thorbjorn Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Daniel Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eugene J. Herringer",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.173,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. REPUBLICAN.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.127
+      ]
+    },
+    {
+      "page": 142,
+      "id": "142-0",
+      "columns": [
+        {
+          "label": "John J. Eklund.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Job W. Lloyd.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard E. Thompson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew C. Dunn.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hiram L. Sumption.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James Ed-ward Melin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stewart Gamble.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Albert H. Turrittin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thorbjorn Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Daniel Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eugene J. Herringer.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.146,
+        0.831,
+        0.525
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. REPUBLICAN.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 142,
+      "id": "142-1",
+      "columns": [
+        {
+          "label": "John B. Galarneault.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Donald B. Pritchard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. M. Wilder.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. J. Rudolph.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. M. Shields.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald M. Livingston.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George M. Bleecker.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lawrence Wisniewski.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Aarnes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. P. Yngve.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "August Hicks.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.517,
+        0.831,
+        1.0
+      ],
+      "hint": "Read only the table headed 'DEMOCRATIC'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2567
+      ]
+    },
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "John B. Galarneault",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Donald B. Pritchard",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. M. Wilder",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. J. Rudolph",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. M. Shields",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald M. Livingston",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George M. Bleecker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lawrence Wisniewski",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Aarnes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. P. Yngve",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "August Hicks",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.127,
+        0.901,
+        0.891
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. DEMOCRATIC.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1859
+      ]
+    },
+    {
+      "page": 144,
+      "id": "144-0",
+      "columns": [
+        {
+          "label": "John P. Nygaard.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peter Clare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clarence Wedge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Erdahl.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. F. Brand.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. H. Moore.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George W. Butters.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. A. Stafford.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. W. Peterson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. C. Hendricks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. J. Villesvek.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.172,
+        0.844,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. PROHIBITION.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.128
+      ]
+    },
+    {
+      "page": 145,
+      "id": "145-0",
+      "columns": [
+        {
+          "label": "John P. Nygaard.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.146,
+        0.906,
+        0.534
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS: PROHIBITION'; ignore any other table visible in the image."
+    },
+    {
+      "page": 145,
+      "id": "145-1",
+      "columns": [
+        {
+          "label": "G. W. Bucklin.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.526,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS: PUBLIC OWNERSHIP'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2616
+      ]
+    },
+    {
+      "page": 146,
+      "id": "146-0",
+      "columns": [
+        {
+          "label": "G. W. Bucklin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. L. Larson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Victor Judin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. G. Philips.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elias Thorsett.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Maki.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. C. Curtis.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. Mahoney.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. J. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. G. Maattala.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. Rowles.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.123,
+        0.844,
+        0.892
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. PUBLIC OWNERSHIP.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1912
+      ]
+    },
+    {
+      "page": 147,
+      "id": "147-0",
+      "columns": [
+        {
+          "label": "A. J. Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arnold Joerns",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Sprott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. M. McDade",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. O. Lindberg.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. C. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Parks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Victor S. Knutson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. J. Jones.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Sellect.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Halstad.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.172,
+        0.887,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. INDEPENDENCE.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.128
+      ]
+    },
+    {
+      "page": 148,
+      "id": "148-0",
+      "columns": [
+        {
+          "label": "A. J. Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Arnold Joerns",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. Sprott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. M. McDade",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. O. Lindberg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. C. Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Parks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Victor S. Knutson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. J. Jones",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Sellect",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Halstad",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.165,
+        0.851,
+        0.544
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS. INDEPENDENCE.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 149,
+      "id": "149-0",
+      "columns": [
+        {
+          "label": "Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "French, Dem.",
+          "contest": "house1",
+          "candidate": "French"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.239,
+        0.853,
+        0.444
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 149,
+      "id": "149-1",
+      "columns": [
+        {
+          "label": "McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "McCleary"
+        },
+        {
+          "label": "Hammond, Dem.",
+          "contest": "house2",
+          "candidate": "Winfield Scott Hammond"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.436,
+        0.853,
+        0.675
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 149,
+      "id": "149-2",
+      "columns": [
+        {
+          "label": "Davis, Rep.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Leeman, Dem.",
+          "contest": "house3",
+          "candidate": "Leeman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.667,
+        0.853,
+        0.861
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-0",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Peebles, Dem.",
+          "contest": "house4",
+          "candidate": "Peebles"
+        },
+        {
+          "label": "Woodrich, Pub. Own.",
+          "contest": "house4",
+          "candidate": "Woodrich"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.192,
+        0.878,
+        0.315
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-1",
+      "columns": [
+        {
+          "label": "Frank M. Nye, Rep.",
+          "contest": "house5",
+          "candidate": "Frank Mellen Nye"
+        },
+        {
+          "label": "Thos. P. Dwyer, Dem.",
+          "contest": "house5",
+          "candidate": "Thos P. Dwyer"
+        },
+        {
+          "label": "Charles F. Dight, Pub. Own.",
+          "contest": "house5",
+          "candidate": "Charles F. Dight"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.307,
+        0.878,
+        0.403
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-2",
+      "columns": [
+        {
+          "label": "Lindbergh, Rep.",
+          "contest": "house6",
+          "candidate": "Charles August Lindbergh"
+        },
+        {
+          "label": "Gilkinson, Dem.",
+          "contest": "house6",
+          "candidate": "Gilkinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.395,
+        0.878,
+        0.638
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-3",
+      "columns": [
+        {
+          "label": "Volstead, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.63,
+        0.878,
+        0.886
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-0",
+      "columns": [
+        {
+          "label": "Miller, Rep.",
+          "contest": "house8",
+          "candidate": "Clarence Benjamin Miller"
+        },
+        {
+          "label": "Halliday, Pub. Own.",
+          "contest": "house8",
+          "candidate": "Halliday"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.192,
+        0.861,
+        0.427
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-1",
+      "columns": [
+        {
+          "label": "Steenerson, Rep.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Braaten, Pub. Own.",
+          "contest": "house9",
+          "candidate": "Braaten"
+        },
+        {
+          "label": "Sageng, Ind.",
+          "contest": "house9",
+          "candidate": "Sageng"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.419,
+        0.857,
+        0.67
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

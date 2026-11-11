@@ -1,0 +1,983 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1967, general election returns (general election 1966-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1966-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "senate": {
+      "year": 1966,
+      "chamber": "senate",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1966,
+      "chamber": "governor",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house7": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house1": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Total Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pink Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. MONDALE DFL",
+          "contest": "senate",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "R. A. FORSYTHE Rep.",
+          "contest": "senate",
+          "candidate": "Robert A. Forsythe"
+        },
+        {
+          "label": "WM. BRAATZ Ind. Gov.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "JOS. JOHNSON Socialist Workers",
+          "contest": "senate",
+          "candidate": "Joseph Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.146,
+        0.91,
+        0.849
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION IN STATE OF MINNESOTA, NOVEMBER 8, 1966. OFFICIAL CANVASS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2831
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "K. F. Rolvaag DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "Harold LeVander Rep.",
+          "contest": "governor",
+          "candidate": "Harold Levander"
+        },
+        {
+          "label": "Kenneth Sachs Ind. Gov.",
+          "contest": "governor",
+          "candidate": "Kenneth Sachs"
+        },
+        {
+          "label": "R. E. Short DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Goetz Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Donovan DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. J. O'Brien REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. Hansen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stafford King Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.097,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of General Election in State of Minnesota, November 8, 1966. Official Canvass'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2204
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "K. F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "HAROLD LeVANDER Rep.",
+          "contest": "governor",
+          "candidate": "Harold Levander"
+        },
+        {
+          "label": "KENNETH SACHS Ind. Gov.",
+          "contest": "governor",
+          "candidate": "Kenneth Sachs"
+        },
+        {
+          "label": "R. E. SHORT DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. GOETZ Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. DONOVAN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. J. O'BRIEN REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. HANSEN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STAFFORD KING Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.148,
+        0.905,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION IN STATE OF MINNESOTA, NOVEMBER 8, 1966. OFFICIAL CANVASS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2289
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.048,
+        0.905,
+        0.466
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-1",
+      "columns": [
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.458,
+        0.905,
+        0.701
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": "senate",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": "senate",
+          "candidate": "Robert A. Forsythe"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": "governor",
+          "candidate": "Harold Levander"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.33,
+        0.938,
+        0.589
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": "senate",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": "senate",
+          "candidate": "Robert A. Forsythe"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": "governor",
+          "candidate": "Harold Levander"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.581,
+        0.94,
+        0.931
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.204,
+        0.943,
+        0.312
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.304,
+        0.943,
+        0.436
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.428,
+        0.943,
+        0.53
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-3",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "FORSYTHE REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "LeVANDER REP.",
+          "contest": null,
+          "candidate": "",
+          "party": "REP."
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.522,
+        0.943,
+        0.888
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DALEY DFL",
+          "contest": "house1",
+          "candidate": "George Daley"
+        },
+        {
+          "label": "QUIE REP.",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.175,
+        0.913,
+        0.4
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CHRISTENSEN DFL",
+          "contest": "house2",
+          "candidate": "Charles M. Christensen"
+        },
+        {
+          "label": "NELSEN REP.",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.392,
+        0.913,
+        0.696
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WALKER DFL",
+          "contest": "house3",
+          "candidate": "Elva D. Walker"
+        },
+        {
+          "label": "MacGREGOR REP.",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.688,
+        0.913,
+        0.835
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-3",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KARTH DFL",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "MAXWELL REP.",
+          "contest": "house4",
+          "candidate": "Stephen Maxwell"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.827,
+        0.913,
+        0.949
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRASER DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "HATHAWAY REP.",
+          "contest": "house5",
+          "candidate": "William L. Hathaway"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.176,
+        0.923,
+        0.265
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": "house6",
+          "candidate": "Alec G. Olson"
+        },
+        {
+          "label": "ZWACH REP.",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.257,
+        0.923,
+        0.561
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DAVISON DFL",
+          "contest": "house7",
+          "candidate": "Keith C. Davison"
+        },
+        {
+          "label": "LANGEN REP.",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        },
+        {
+          "label": "PERCENT REP.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.553,
+        0.923,
+        0.871
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

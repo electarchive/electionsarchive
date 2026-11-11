@@ -1,0 +1,114 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1943, general election returns (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1942-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "senate": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 197,
+      "id": "197-0",
+      "columns": [
+        {
+          "label": "Joseph H. Ball Republican",
+          "contest": "senate",
+          "candidate": "Joseph H. Ball"
+        },
+        {
+          "label": "Elmer A. Benson Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Elmer A. Benson"
+        },
+        {
+          "label": "Ed Murphy Democrat",
+          "contest": "senate",
+          "candidate": "Ed. Murphy"
+        },
+        {
+          "label": "Martin A. Nelson Independent Progressive Nominated by Petition",
+          "contest": "senate",
+          "candidate": "Martin A. Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.192,
+        0.056,
+        0.333,
+        0.95
+      ],
+      "hint": "Read only the table headed 'U.S. Senator in Congress (For term beginning Jan. 3, 1943, and ending Jan. 3, 1949)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1857
+      ]
+    },
+    {
+      "page": 197,
+      "id": "197-2",
+      "columns": [
+        {
+          "label": "Harold E. Stassen Republican",
+          "contest": "governor",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "Hjalmar Peterson Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Hjalmar Petersen"
+        },
+        {
+          "label": "John D. Sullivan Democrat",
+          "contest": "governor",
+          "candidate": "John D. Sullivan"
+        },
+        {
+          "label": "Harris A. Prandborg Industrial Government Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Harris A. Brandborg"
+        },
+        {
+          "label": "Martin Mackie Communist Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Martin Mackie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.413,
+        0.056,
+        0.574,
+        0.95
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1857
+      ]
+    }
+  ]
+}

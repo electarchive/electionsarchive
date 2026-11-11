@@ -1,0 +1,166 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1937, general election returns (general election 1936-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1936-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1936,
+      "chamber": "senate",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1936,
+      "chamber": "governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 175,
+      "id": "175-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican LANDON and KNOX (Dr. Frank J. Lexa)",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and GARNER (G. M. Helland)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial AIKEN and TEICHERT (Grant H. Campbell)",
+          "contest": "president",
+          "candidate": "Industrial"
+        },
+        {
+          "label": "Union LEMKE and O'BRIEN (Endre B. Anderson)",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "Communist BROWDER and FORD (Nat Ross)",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Socialist THOMAS and NELSON (Carl Pemble)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.083,
+        0.872,
+        0.861
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4306
+      ]
+    },
+    {
+      "page": 189,
+      "id": "189-0",
+      "columns": [
+        {
+          "label": "Guy V. Howard, Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. J. Holmberg, Independent Nominated by Petition",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew Olaf Devold, Independent-Progressive Nominated by Petition",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John G. Alexander, Independent Nominated by Petition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.223,
+        0.044,
+        0.35,
+        0.959
+      ],
+      "hint": "Read only the table headed 'U. S. Senator in Congress (For term beginning Nov. 3, 1936, ending Jan. 3, 1937.)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1934
+      ]
+    },
+    {
+      "page": 189,
+      "id": "189-1",
+      "columns": [
+        {
+          "label": "Elmer A. Benson, Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Elmer Austin Benson"
+        },
+        {
+          "label": "Martin A. Nelson, Republican",
+          "contest": "governor",
+          "candidate": "Martin A. Nelson"
+        },
+        {
+          "label": "Earl Stewart, Industrial Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Earl Stewart"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.336,
+        0.044,
+        0.432,
+        0.959
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1934
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1715 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1963, general election returns (general election 1962-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1962-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house6": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house2": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house7": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house3": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house8": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house5": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "governor": {
+      "year": 1962,
+      "chamber": "governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "DFL David L. Graven",
+          "contest": "house1",
+          "candidate": "David L. Graven"
+        },
+        {
+          "label": "Republican Albert H. Quie",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.111,
+        0.529,
+        0.307
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "DFL Alec G. Olson",
+          "contest": "house6",
+          "candidate": "Alec G. Olson"
+        },
+        {
+          "label": "Republican Robert J. Odegard",
+          "contest": "house6",
+          "candidate": "Robert J. Odegard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.536,
+        0.119,
+        0.935,
+        0.374
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-2",
+      "columns": [
+        {
+          "label": "Conrad H. Hammar",
+          "contest": "house2",
+          "candidate": "Conrad Hammar"
+        },
+        {
+          "label": "Ancher Nelsen",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.299,
+        0.529,
+        0.544
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-3",
+      "columns": [
+        {
+          "label": "Harding C. Noblitt",
+          "contest": "house7",
+          "candidate": "Harding C. Noblitt"
+        },
+        {
+          "label": "Odin Langen",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.536,
+        0.366,
+        0.935,
+        0.667
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-4",
+      "columns": [
+        {
+          "label": "Irving R. (Irv) Keldsen",
+          "contest": "house3",
+          "candidate": "Irving R. Keldsen"
+        },
+        {
+          "label": "Clark MacGregor",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.536,
+        0.529,
+        0.646
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-5",
+      "columns": [
+        {
+          "label": "Joseph E. Karth",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "Harry Strong",
+          "contest": "house4",
+          "candidate": "Harry Strong"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.638,
+        0.529,
+        0.739
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-6",
+      "columns": [
+        {
+          "label": "John A. Blatnik",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "Jerry H. Ketola",
+          "contest": "house8",
+          "candidate": "Jerry H. Ketola"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.536,
+        0.659,
+        0.935,
+        0.827
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-7",
+      "columns": [
+        {
+          "label": "Donald M. Fraser",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "Walter H. Judd",
+          "contest": "house5",
+          "candidate": "Walter H. Judd"
+        },
+        {
+          "label": "Joseph Johnson Socialist Workers Party",
+          "contest": "house5",
+          "candidate": "Joseph Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.731,
+        0.529,
+        0.865
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "PERSONS WHO VOTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PINK BALLOTS COUNTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 1 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 2 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 2 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 3 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 3 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WHITE BALLOTS COUNTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KARL F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ELMER L. ANDERSEN Republican",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "WILLIAM BRAATZ Industrial Govt.",
+          "contest": "governor",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "A. M. (SANDY) KEITH DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. DONALD PETERSON Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.244,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'REPORT OF THE STATE CANVASSING BOARD OF THE GENERAL ELECTION NOVEMBER 6, 1962'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.373
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "PERSONS WHO VOTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PINK BALLOTS COUNTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 1 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 2 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 2 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 3 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "AMENDMENT 3 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WHITE BALLOTS COUNTED",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KARL F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ELMER L. ANDERSEN Republican",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "WILLIAM BRAATZ Industrial Govt.",
+          "contest": "governor",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "A. M. (SANDY) KEITH DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. DONALD PETERSON Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.0,
+        0.915,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "KARL F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ELMER L. ANDERSEN Republican",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "WILLIAM BRAATZ Industrial Govt.",
+          "contest": "governor",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.673,
+        0.293,
+        0.826,
+        0.969
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4216
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GRAVEN DFL",
+          "contest": "house1",
+          "candidate": "David L. Graven"
+        },
+        {
+          "label": "QUIE REP.",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.181,
+        0.841,
+        0.393
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HAMMAR DFL",
+          "contest": "house2",
+          "candidate": "Conrad Hammar"
+        },
+        {
+          "label": "NELSEN REP.",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.385,
+        0.839,
+        0.681
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KELDSEN DFL",
+          "contest": "house3",
+          "candidate": "Irving R. Keldsen"
+        },
+        {
+          "label": "MacGREGOR REP.",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.673,
+        0.837,
+        0.773
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-3",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KARTH DFL",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "STRONG REP.",
+          "contest": "house4",
+          "candidate": "Harry Strong"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.765,
+        0.836,
+        0.865
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-4",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRASER DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "JUDD REP.",
+          "contest": "house5",
+          "candidate": "Walter H. Judd"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.857,
+        0.835,
+        0.932
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": "house6",
+          "candidate": "Alec G. Olson"
+        },
+        {
+          "label": "ODEGARD REP.",
+          "contest": "house6",
+          "candidate": "Robert J. Odegard"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.109,
+        0.881,
+        0.399
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 26,
+      "id": "26-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NOBLITT DFL",
+          "contest": "house7",
+          "candidate": "Harding C. Noblitt"
+        },
+        {
+          "label": "LANGEN REP.",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.391,
+        0.879,
+        0.736
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 26,
+      "id": "26-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BLATNIK DFL",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "KETOLA REP.",
+          "contest": "house8",
+          "candidate": "Jerry H. Ketola"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.728,
+        0.876,
+        0.926
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.185,
+        0.858,
+        0.339
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.331,
+        0.858,
+        0.545
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.537,
+        0.858,
+        0.605
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-3",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.597,
+        0.858,
+        0.667
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-4",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.659,
+        0.858,
+        0.718
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-5",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.71,
+        0.858,
+        0.923
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.141,
+        0.893,
+        0.465
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.457,
+        0.893,
+        0.669
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.661,
+        0.893,
+        1.0
+      ],
+      "hint": "Read only the table headed 'AMENDED VOTE AND PERCENTAGES'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ANDERSEN REP.",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.0,
+        0.893,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KEITH DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.138,
+        0.888,
+        0.408
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KEITH DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.4,
+        0.888,
+        0.732
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KEITH DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.724,
+        0.888,
+        0.904
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONOVAN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCRADY REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.147,
+        0.878,
+        0.418
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONOVAN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCRADY REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.41,
+        0.878,
+        0.737
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONOVAN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCRADY REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.729,
+        0.878,
+        0.903
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NEVIN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KING REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.107,
+        0.888,
+        0.407
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 34,
+      "id": "34-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NEVIN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KING REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.399,
+        0.888,
+        0.727
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 34,
+      "id": "34-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NEVIN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KING REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.719,
+        0.888,
+        0.897
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": "house6",
+          "candidate": "Alec G. Olson"
+        },
+        {
+          "label": "BJORNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.125,
+        0.882,
+        0.398
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 36,
+      "id": "36-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BJORNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.39,
+        0.882,
+        0.726
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 36,
+      "id": "36-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BJORNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.718,
+        0.882,
+        0.896
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KUNZIG REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.127,
+        0.883,
+        0.398
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KUNZIG REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.39,
+        0.883,
+        0.723
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MONDALE DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KUNZIG REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.715,
+        0.883,
+        0.892
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RASMUSSEN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.127,
+        0.878,
+        0.401
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RASMUSSEN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.393,
+        0.878,
+        0.734
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RASMUSSEN DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHNSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.726,
+        0.878,
+        0.904
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

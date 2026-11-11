@@ -1,0 +1,872 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1903, general election returns (general election 1902-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1902-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1902,
+      "chamber": "governor",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 109,
+      "id": "109-0",
+      "columns": [
+        {
+          "label": "Total Names on Registry of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Registry of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Van Sant, Rep.",
+          "contest": "governor",
+          "candidate": "Samuel R. Van Sant"
+        },
+        {
+          "label": "Rosing, Dem.",
+          "contest": "governor",
+          "candidate": "Leonard A. Rosing"
+        },
+        {
+          "label": "Meighen, Peo.",
+          "contest": "governor",
+          "candidate": "Thomas J. Meighen"
+        },
+        {
+          "label": "Scanlon, Pro.",
+          "contest": "governor",
+          "candidate": "Charles Scanlon"
+        },
+        {
+          "label": "Nash",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "VanLear, Soc.-Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hompe, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aaker, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bratland, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Odell, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lanman, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Loveless, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morledge, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Iverson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leick, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.196,
+        0.895,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR STATE OFFICERS BY COUNTIES, 1902.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2388
+      ]
+    },
+    {
+      "page": 110,
+      "id": "110-0",
+      "columns": [
+        {
+          "label": "Total Names on Registry of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Registry of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Van Sant, Rep.",
+          "contest": "governor",
+          "candidate": "Samuel R. Van Sant"
+        },
+        {
+          "label": "Rosing, Dem.",
+          "contest": "governor",
+          "candidate": "Leonard A. Rosing"
+        },
+        {
+          "label": "Meighen, Peo.",
+          "contest": "governor",
+          "candidate": "Thomas J. Meighen"
+        },
+        {
+          "label": "Scanlon, Pro.",
+          "contest": "governor",
+          "candidate": "Charles Scanlon"
+        },
+        {
+          "label": "Nash",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "VanLear, Soc.-Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hompe, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aaker, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bratland, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Odell, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lanman, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Loveless, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morledge, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Iverson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leick, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.0,
+        0.895,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 111,
+      "id": "111-0",
+      "columns": [
+        {
+          "label": "Total Names on Registry of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Registry of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Van Sant, Rep.",
+          "contest": "governor",
+          "candidate": "Samuel R. Van Sant"
+        },
+        {
+          "label": "Rosing, Dem.",
+          "contest": "governor",
+          "candidate": "Leonard A. Rosing"
+        },
+        {
+          "label": "Meighen, Peo.",
+          "contest": "governor",
+          "candidate": "Thomas J. Meighen"
+        },
+        {
+          "label": "Scanlon, Pro.",
+          "contest": "governor",
+          "candidate": "Charles Scanlon"
+        },
+        {
+          "label": "Nash",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "VanLear, Soc.-Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hompe, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aaker, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bratland, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Odell, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lanman, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Loveless, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morledge, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Iverson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leick, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.0,
+        0.895,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 112,
+      "id": "112-0",
+      "columns": [
+        {
+          "label": "Total Names on Registry of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Registry of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Van Sant, Rep.",
+          "contest": "governor",
+          "candidate": "Samuel R. Van Sant"
+        },
+        {
+          "label": "Rosing, Dem.",
+          "contest": "governor",
+          "candidate": "Leonard A. Rosing"
+        },
+        {
+          "label": "Meighen, Peo.",
+          "contest": "governor",
+          "candidate": "Thomas J. Meighen"
+        },
+        {
+          "label": "Scanlon, Pro.",
+          "contest": "governor",
+          "candidate": "Charles Scanlon"
+        },
+        {
+          "label": "Nash",
+          "contest": "governor",
+          "candidate": "Jay E. Nash"
+        },
+        {
+          "label": "VanLear, Soc.-Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hompe, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aaker, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bratland, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Odell, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lanman, Peo.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Loveless, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morledge, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Iverson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leick, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carlson, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.0,
+        0.895,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 113,
+      "id": "113-0",
+      "columns": [
+        {
+          "label": "Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "McGovern, Dem.",
+          "contest": "house1",
+          "candidate": "McGovern"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.242,
+        0.895,
+        0.44
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-1",
+      "columns": [
+        {
+          "label": "McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "Andrews, Dem.",
+          "contest": "house2",
+          "candidate": "Andrews"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.432,
+        0.895,
+        0.654
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-2",
+      "columns": [
+        {
+          "label": "Davis, Rep.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Kolars, Dem.",
+          "contest": "house3",
+          "candidate": "Kolars"
+        },
+        {
+          "label": "Charles H. Blood.",
+          "contest": "house3",
+          "candidate": "Charles H. Blood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.646,
+        0.892,
+        0.834
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-0",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Gieske, Dem.",
+          "contest": "house4",
+          "candidate": "Gieske"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.234,
+        0.82,
+        0.368
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-1",
+      "columns": [
+        {
+          "label": "Fletcher, Rep.",
+          "contest": "house5",
+          "candidate": "Fletcher"
+        },
+        {
+          "label": "Lind, Dem.",
+          "contest": "house5",
+          "candidate": "John Lind"
+        },
+        {
+          "label": "Holman, Soc.",
+          "contest": "house5",
+          "candidate": "Holman"
+        },
+        {
+          "label": "A. H. Nelson",
+          "contest": "house5",
+          "candidate": "A. H. Nelson"
+        },
+        {
+          "label": "Geo. D. Haggard",
+          "contest": "house5",
+          "candidate": "George D. Haggard"
+        },
+        {
+          "label": "Martin Hanson",
+          "contest": "house5",
+          "candidate": "Martin Hanson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.36,
+        0.82,
+        0.544
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-2",
+      "columns": [
+        {
+          "label": "Buckman, Rep.",
+          "contest": "house6",
+          "candidate": "Clarence Bennett Buckman"
+        },
+        {
+          "label": "Du Bois, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.536,
+        0.82,
+        0.756
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 115,
+      "id": "115-0",
+      "columns": [
+        {
+          "label": "Volstead, Rep.",
+          "contest": "house7",
+          "candidate": "Andrew John Volstead"
+        },
+        {
+          "label": "Forsberg, Peo.",
+          "contest": "house7",
+          "candidate": "Forsberg"
+        },
+        {
+          "label": "Johnson, Pro.",
+          "contest": "house7",
+          "candidate": "Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.174,
+        0.883,
+        0.409
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 115,
+      "id": "115-1",
+      "columns": [
+        {
+          "label": "Bede, Rep.",
+          "contest": "house8",
+          "candidate": "James Adam Bede"
+        },
+        {
+          "label": "Fay, Dem.",
+          "contest": "house8",
+          "candidate": "Fay"
+        },
+        {
+          "label": "V. C. Koncegney",
+          "contest": "house8",
+          "candidate": "V. C. Koncegney"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.157,
+        0.401,
+        0.881,
+        0.625
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 115,
+      "id": "115-2",
+      "columns": [
+        {
+          "label": "Steenerson, Rep.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "McKinnon, Dem.",
+          "contest": "house9",
+          "candidate": "McKinnon"
+        },
+        {
+          "label": "Moen, Peo.",
+          "contest": "house9",
+          "candidate": "Moen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.617,
+        0.881,
+        0.828
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

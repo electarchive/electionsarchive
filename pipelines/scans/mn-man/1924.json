@@ -1,0 +1,180 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1925, general election returns (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1924-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house6": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 169,
+      "id": "169-0",
+      "columns": [
+        {
+          "label": "*Knutson",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "Shipstead",
+          "contest": "house6",
+          "candidate": "S. C. Shipstead"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.134,
+        0.872,
+        0.295
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-1",
+      "columns": [
+        {
+          "label": "Bjornson",
+          "contest": "house7",
+          "candidate": "Gunnar B. Bjornson"
+        },
+        {
+          "label": "*Kvale",
+          "contest": "house7",
+          "candidate": "O. J. Kvale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.287,
+        0.872,
+        0.47
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-2",
+      "columns": [
+        {
+          "label": "Power",
+          "contest": "house8",
+          "candidate": "Victor L. Power"
+        },
+        {
+          "label": "*Carss",
+          "contest": "house8",
+          "candidate": "William L. Carss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.462,
+        0.872,
+        0.569
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-3",
+      "columns": [
+        {
+          "label": "Peterson",
+          "contest": "house9",
+          "candidate": "F. H. Peterson"
+        },
+        {
+          "label": "*Wefald",
+          "contest": "house9",
+          "candidate": "Knud Wefald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.561,
+        0.872,
+        0.736
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-4",
+      "columns": [
+        {
+          "label": "*Goodwin",
+          "contest": "house10",
+          "candidate": "Godfrey G. Goodwin"
+        },
+        {
+          "label": "Brewer",
+          "contest": "house10",
+          "candidate": "George D. Brewer"
+        },
+        {
+          "label": "Hicks",
+          "contest": "house10",
+          "candidate": "Frank Hicks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.728,
+        0.872,
+        0.859
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

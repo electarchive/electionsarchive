@@ -1,0 +1,705 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1915, general election returns (general election 1914-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1914-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1914,
+      "chamber": "governor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 152,
+      "id": "152-0",
+      "columns": [
+        {
+          "label": "Total names on Register of electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total names on Register of electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee, Rep.",
+          "contest": "governor",
+          "candidate": "William E. Lee"
+        },
+        {
+          "label": "Hammond, Dem.",
+          "contest": "governor",
+          "candidate": "Winfield S. Hammond"
+        },
+        {
+          "label": "Lewis, Socialist",
+          "contest": "governor",
+          "candidate": "Thomas J. Lewis"
+        },
+        {
+          "label": "Calderwood, Prohib.",
+          "contest": "governor",
+          "candidate": "Willis G. Calderwood"
+        },
+        {
+          "label": "Halbert, Prog.",
+          "contest": "governor",
+          "candidate": "Hugh T. Halbert"
+        },
+        {
+          "label": "Johnson, Indus. Lbr.",
+          "contest": "governor",
+          "candidate": "Herbert Johnson"
+        },
+        {
+          "label": "Burnquist, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrist, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Piper, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Spencer, Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bergheim, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.136,
+        0.965,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR STATE OFFICERS BY COUNTIES, 1914.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.228
+      ]
+    },
+    {
+      "page": 153,
+      "id": "153-0",
+      "columns": [
+        {
+          "label": "Total names on Register of electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total names on Register of electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee, Rep.",
+          "contest": "governor",
+          "candidate": "William E. Lee"
+        },
+        {
+          "label": "Hammond, Dem.",
+          "contest": "governor",
+          "candidate": "Winfield S. Hammond"
+        },
+        {
+          "label": "Lewis, Socialist",
+          "contest": "governor",
+          "candidate": "Thomas J. Lewis"
+        },
+        {
+          "label": "Calderwood, Prohib.",
+          "contest": "governor",
+          "candidate": "Willis G. Calderwood"
+        },
+        {
+          "label": "Halbert, Prog.",
+          "contest": "governor",
+          "candidate": "Hugh T. Halbert"
+        },
+        {
+          "label": "Johnson, Indus. Lbr.",
+          "contest": "governor",
+          "candidate": "Herbert Johnson"
+        },
+        {
+          "label": "Burnquist, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrist, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Piper, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Spencer, Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bergheim, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.0,
+        0.965,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 154,
+      "id": "154-0",
+      "columns": [
+        {
+          "label": "Total names on Register of electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total names on Register of electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lee, Rep.",
+          "contest": "governor",
+          "candidate": "William E. Lee"
+        },
+        {
+          "label": "Hammond, Dem",
+          "contest": "governor",
+          "candidate": "Winfield S. Hammond"
+        },
+        {
+          "label": "Lewis, Socialist",
+          "contest": "governor",
+          "candidate": "Thomas J. Lewis"
+        },
+        {
+          "label": "Calderwood, Prohib.",
+          "contest": "governor",
+          "candidate": "Willis G. Calderwood"
+        },
+        {
+          "label": "Halbert, Prog.",
+          "contest": "governor",
+          "candidate": "Hugh T. Halbert"
+        },
+        {
+          "label": "Johnson, Indus. Lbr.",
+          "contest": "governor",
+          "candidate": "Herbert Johnson"
+        },
+        {
+          "label": "Burnquist, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrist, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hanson, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Piper, Prohib.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Spencer, Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bergheim, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.184,
+        0.969,
+        0.86
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR STATE OFFICERS BY COUNTIES, 1914'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4083
+      ]
+    },
+    {
+      "page": 160,
+      "id": "160-0",
+      "columns": [
+        {
+          "label": "Anderson.",
+          "contest": "house1",
+          "candidate": "Sydney Anderson"
+        },
+        {
+          "label": "Witherstine.",
+          "contest": "house1",
+          "candidate": "Witherstine"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.274,
+        0.923,
+        0.445
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 160,
+      "id": "160-1",
+      "columns": [
+        {
+          "label": "Ellsworth.",
+          "contest": "house2",
+          "candidate": "Franklin Fowler Ellsworth"
+        },
+        {
+          "label": "Flittie.",
+          "contest": "house2",
+          "candidate": "Flittie"
+        },
+        {
+          "label": "Hollister.",
+          "contest": "house2",
+          "candidate": "Hollister"
+        },
+        {
+          "label": "Dehual.",
+          "contest": "house2",
+          "candidate": "Dehual"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.437,
+        0.923,
+        0.638
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 160,
+      "id": "160-2",
+      "columns": [
+        {
+          "label": "Davis.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Avery.",
+          "contest": "house3",
+          "candidate": "Avery"
+        },
+        {
+          "label": "Mackintosh.",
+          "contest": "house3",
+          "candidate": "Mackintosh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.63,
+        0.923,
+        0.804
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 160,
+      "id": "160-3",
+      "columns": [
+        {
+          "label": "Stevens.",
+          "contest": "house4",
+          "candidate": "Stevens"
+        },
+        {
+          "label": "Van Dyke.",
+          "contest": "house4",
+          "candidate": "Carl Chester Van Dyke"
+        },
+        {
+          "label": "Mahoney.",
+          "contest": "house4",
+          "candidate": "Mahoney"
+        },
+        {
+          "label": "Learned.",
+          "contest": "house4",
+          "candidate": "Learned"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.796,
+        0.923,
+        0.876
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 161,
+      "id": "161-0",
+      "columns": [
+        {
+          "label": "Smith. Rep.",
+          "contest": "house5",
+          "candidate": "George Ross Smith"
+        },
+        {
+          "label": "Long. Dem.",
+          "contest": "house5",
+          "candidate": "Long"
+        },
+        {
+          "label": "Van Lear. Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Powers. Prog.",
+          "contest": "house5",
+          "candidate": "Powers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.18,
+        0.883,
+        0.304
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 161,
+      "id": "161-1",
+      "columns": [
+        {
+          "label": "Lindbergh.",
+          "contest": "house6",
+          "candidate": "Charles August Lindbergh"
+        },
+        {
+          "label": "Du Bois.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sharkey.",
+          "contest": "house6",
+          "candidate": "Sharkey"
+        },
+        {
+          "label": "Thomason.",
+          "contest": "house6",
+          "candidate": "Thomason"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.296,
+        0.883,
+        0.502
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 161,
+      "id": "161-2",
+      "columns": [
+        {
+          "label": "Volstead.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.494,
+        0.878,
+        0.73
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 161,
+      "id": "161-3",
+      "columns": [
+        {
+          "label": "Miller.",
+          "contest": "house8",
+          "candidate": "Clarence Benjamin Miller"
+        },
+        {
+          "label": "Nelson.",
+          "contest": "house8",
+          "candidate": "Nelson"
+        },
+        {
+          "label": "Towne.",
+          "contest": "house8",
+          "candidate": "Towne"
+        },
+        {
+          "label": "Higbee.",
+          "contest": "house8",
+          "candidate": "Higbee"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.722,
+        0.883,
+        0.867
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 162,
+      "id": "162-0",
+      "columns": [
+        {
+          "label": "Steenerson",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Brattland",
+          "contest": "house9",
+          "candidate": "Brattland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.148,
+        0.897,
+        0.336
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 162,
+      "id": "162-1",
+      "columns": [
+        {
+          "label": "Jepson",
+          "contest": "house10",
+          "candidate": "Jepson"
+        },
+        {
+          "label": "Swenson",
+          "contest": "house10",
+          "candidate": "Swenson"
+        },
+        {
+          "label": "Schall",
+          "contest": "house10",
+          "candidate": "Thomas David Schall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.328,
+        0.897,
+        0.478
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1933, general election returns (general election 1932-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1932-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 174,
+      "id": "174-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican HOOVER and CURTIS",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and GARNER",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Communist FOSTER and FORD",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Industrial REYNOLDS and AIKEN",
+          "contest": "president",
+          "candidate": "Industrialist"
+        },
+        {
+          "label": "Socialist THOMAS and MAURER",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "Farmer-Labor COXEY and REITER",
+          "contest": "president",
+          "candidate": "Farmer-Labor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.119,
+        0.929,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3451
+      ]
+    },
+    {
+      "page": 175,
+      "id": "175-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican HOOVER and CURTIS",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and GARNER",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Communist FOSTER and FORD",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Industrial REYNOLDS and AIKEN",
+          "contest": "president",
+          "candidate": "Industrialist"
+        },
+        {
+          "label": "Socialist THOMAS and MAURER",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "Farmer-Labor COXEY and REITER",
+          "contest": "president",
+          "candidate": "Farmer-Labor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.12,
+        0.901,
+        0.857
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4179
+      ]
+    }
+  ]
+}

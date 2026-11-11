@@ -1,0 +1,563 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1911, general election returns (general election 1910-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1910-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1910,
+      "chamber": "governor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 137,
+      "id": "137-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Gray, Dem.",
+          "contest": "governor",
+          "candidate": "James Gray"
+        },
+        {
+          "label": "Helberg, Pro.",
+          "contest": "governor",
+          "candidate": "J. F. Heiberg"
+        },
+        {
+          "label": "Barrett, Pub. Own.",
+          "contest": "governor",
+          "candidate": "George E. Barrett"
+        },
+        {
+          "label": "Brandborg, Soc. Lab.",
+          "contest": "governor",
+          "candidate": "C. W. Brandborg"
+        },
+        {
+          "label": "Gordon, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tifft, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Engle, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ayer, Pub. Own.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.191,
+        0.96,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Abstract of Votes Polled for State Officers by Counties, 1910'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1916
+      ]
+    },
+    {
+      "page": 138,
+      "id": "138-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Gray, Dem.",
+          "contest": "governor",
+          "candidate": "James Gray"
+        },
+        {
+          "label": "Helberg, Pro.",
+          "contest": "governor",
+          "candidate": "J. F. Heiberg"
+        },
+        {
+          "label": "Barrett, Pub. Own.",
+          "contest": "governor",
+          "candidate": "George E. Barrett"
+        },
+        {
+          "label": "Brandborg, Soc. Lab.",
+          "contest": "governor",
+          "candidate": "C. W. Brandborg"
+        },
+        {
+          "label": "Gordon, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tifft, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Engle, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ayer, Pub. Own.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.0,
+        0.96,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 139,
+      "id": "139-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Gray, Dem.",
+          "contest": "governor",
+          "candidate": "James Gray"
+        },
+        {
+          "label": "Heiberg, Pro.",
+          "contest": "governor",
+          "candidate": "J. F. Heiberg"
+        },
+        {
+          "label": "Barrett, Pub. Own.",
+          "contest": "governor",
+          "candidate": "George E. Barrett"
+        },
+        {
+          "label": "Brandborg, Soc. Lab.",
+          "contest": "governor",
+          "candidate": "C. W. Brandborg"
+        },
+        {
+          "label": "Gordon, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Tifft, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Engle, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ayer, Pub. Own.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.211,
+        0.974,
+        0.71
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR STATE OFFICERS BY COUNTIES, 1910.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3347
+      ]
+    },
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "Anderson, Rep.",
+          "contest": "house1",
+          "candidate": "Sydney Anderson"
+        },
+        {
+          "label": "Buck, Dem.",
+          "contest": "house1",
+          "candidate": "Buck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.212,
+        0.857,
+        0.436
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 143,
+      "id": "143-1",
+      "columns": [
+        {
+          "label": "Ellsworth, Rep.",
+          "contest": "house2",
+          "candidate": "Ellsworth"
+        },
+        {
+          "label": "Hammond, Dem.",
+          "contest": "house2",
+          "candidate": "Winfield Scott Hammond"
+        },
+        {
+          "label": "Thayer, Socialist.",
+          "contest": "house2",
+          "candidate": "Thayer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.428,
+        0.857,
+        0.68
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 143,
+      "id": "143-2",
+      "columns": [
+        {
+          "label": "Davis, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.672,
+        0.851,
+        0.855
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 144,
+      "id": "144-0",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Gieske, Dem.",
+          "contest": "house4",
+          "candidate": "Gieske"
+        },
+        {
+          "label": "Stratton, P. O.",
+          "contest": "house4",
+          "candidate": "Stratton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.181,
+        0.882,
+        0.301
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 144,
+      "id": "144-1",
+      "columns": [
+        {
+          "label": "Nye, Rep.",
+          "contest": "house5",
+          "candidate": "Frank Mellen Nye"
+        },
+        {
+          "label": "Dwyer, Dem.",
+          "contest": "house5",
+          "candidate": "Dwyer"
+        },
+        {
+          "label": "Lindsay, P. O.",
+          "contest": "house5",
+          "candidate": "Lindsay"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.293,
+        0.882,
+        0.373
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 144,
+      "id": "144-2",
+      "columns": [
+        {
+          "label": "Lindbergh, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.365,
+        0.88,
+        0.602
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 144,
+      "id": "144-3",
+      "columns": [
+        {
+          "label": "Volstead, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.594,
+        0.88,
+        0.844
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 145,
+      "id": "145-0",
+      "columns": [
+        {
+          "label": "Miller, Rep.",
+          "contest": "house8",
+          "candidate": "Clarence Benjamin Miller"
+        },
+        {
+          "label": "Jaques, Dem.",
+          "contest": "house8",
+          "candidate": "Jaques"
+        },
+        {
+          "label": "Watkins, P. O.",
+          "contest": "house8",
+          "candidate": "Watkins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.169,
+        0.85,
+        0.41
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 145,
+      "id": "145-1",
+      "columns": [
+        {
+          "label": "Steenerson, Rep.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Sanders, P. O.",
+          "contest": "house9",
+          "candidate": "Sanders"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.402,
+        0.842,
+        0.655
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

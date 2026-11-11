@@ -1,0 +1,660 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1917, general election returns (general election 1916-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1916-11-07-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1916,
+      "chamber": "president",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1916,
+      "chamber": "senate",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1916,
+      "chamber": "governor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 158,
+      "id": "158-0",
+      "columns": [
+        {
+          "label": "Total names on register of electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hughes, Repub.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, Dem.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, Soc.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanley, Prohib.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Edward J. Meier, Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reimer, Indus. Lbr.",
+          "contest": "president",
+          "candidate": "Arthur Reimer (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.137,
+        0.936,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR PRESIDENT BY COUNTIES, 1916.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2804
+      ]
+    },
+    {
+      "page": 159,
+      "id": "159-0",
+      "columns": [
+        {
+          "label": "Total names on register of electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hughes, Repub.",
+          "contest": "president",
+          "candidate": "Charles Evans Hughes (Republican)"
+        },
+        {
+          "label": "Wilson, Dem.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Benson, Soc.",
+          "contest": "president",
+          "candidate": "Allan Benson (Socialist)"
+        },
+        {
+          "label": "Hanley, Prohib.",
+          "contest": "president",
+          "candidate": "James Hanly (Prohibition)"
+        },
+        {
+          "label": "Edward J. Meier, Prog.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reimer, Indus. Lbr.",
+          "contest": "president",
+          "candidate": "Arthur Reimer (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.128,
+        0.943,
+        0.722
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR PRESIDENT BY COUNTIES, 1916'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4074
+      ]
+    },
+    {
+      "page": 160,
+      "id": "160-0",
+      "columns": [
+        {
+          "label": "Total names on register of electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank R. Kellogg, Repub.",
+          "contest": "senate",
+          "candidate": "Frank Billings Kellogg"
+        },
+        {
+          "label": "Daniel W. Lawler, Dem.",
+          "contest": "senate",
+          "candidate": "Daniel W. Lawler"
+        },
+        {
+          "label": "W. G. Calderwood, Prohib.",
+          "contest": "senate",
+          "candidate": "W. G. Calderwood"
+        },
+        {
+          "label": "J. A. A. Burnquist, Rep.",
+          "contest": "governor",
+          "candidate": "Joseph A.A. Burnquist"
+        },
+        {
+          "label": "Thomas P. Dwyer, Dem.",
+          "contest": "governor",
+          "candidate": "Thomas P. Dwyer"
+        },
+        {
+          "label": "J. O. Bentall, Soc.",
+          "contest": "governor",
+          "candidate": "J. O. Bentall"
+        },
+        {
+          "label": "Thomas J. Anderson, Prohib.",
+          "contest": "governor",
+          "candidate": "Thomas J. Anderson"
+        },
+        {
+          "label": "John P. Johnson, Indus. Lbr.",
+          "contest": "governor",
+          "candidate": "John P. Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.146,
+        0.968,
+        0.988
+      ],
+      "hint": "Read only the table headed 'Abstract of votes polled for state officers by counties, 1916'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3219
+      ]
+    },
+    {
+      "page": 162,
+      "id": "162-0",
+      "columns": [
+        {
+          "label": "Total names on register of electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank B. Kellogg, Repub.",
+          "contest": "senate",
+          "candidate": "Frank Billings Kellogg"
+        },
+        {
+          "label": "Daniel W. Lawler, Dem.",
+          "contest": "senate",
+          "candidate": "Daniel W. Lawler"
+        },
+        {
+          "label": "W. G. Calderwood, Prohib.",
+          "contest": "senate",
+          "candidate": "W. G. Calderwood"
+        },
+        {
+          "label": "J. A. A. Burnquist, Rep.",
+          "contest": "governor",
+          "candidate": "Joseph A.A. Burnquist"
+        },
+        {
+          "label": "Thomas P. Dwyer, Dem.",
+          "contest": "governor",
+          "candidate": "Thomas P. Dwyer"
+        },
+        {
+          "label": "J. O. Bentall, Soc.",
+          "contest": "governor",
+          "candidate": "J. O. Bentall"
+        },
+        {
+          "label": "Thomas J. Anderson, Prohib.",
+          "contest": "governor",
+          "candidate": "Thomas J. Anderson"
+        },
+        {
+          "label": "John P. Johnson, Indus. Lbr.",
+          "contest": "governor",
+          "candidate": "John P. Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.131,
+        0.963,
+        0.725
+      ],
+      "hint": "Read only the table headed 'Abstract of Votes Polled for State Officers by Counties, 1916'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4108
+      ]
+    },
+    {
+      "page": 168,
+      "id": "168-0",
+      "columns": [
+        {
+          "label": "Anderson.",
+          "contest": "house1",
+          "candidate": "Sydney Anderson"
+        },
+        {
+          "label": "Lamberton.",
+          "contest": "house1",
+          "candidate": "Lamberton"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.276,
+        0.913,
+        0.446
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 168,
+      "id": "168-1",
+      "columns": [
+        {
+          "label": "Ellsworth.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.438,
+        0.913,
+        0.639
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 168,
+      "id": "168-2",
+      "columns": [
+        {
+          "label": "Davis.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Kelly, Jr.",
+          "contest": "house3",
+          "candidate": "Jr. Kelly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.631,
+        0.913,
+        0.813
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 168,
+      "id": "168-3",
+      "columns": [
+        {
+          "label": "Reese.",
+          "contest": "house4",
+          "candidate": "Reese"
+        },
+        {
+          "label": "Van Dyke.",
+          "contest": "house4",
+          "candidate": "Carl Chester Van Dyke"
+        },
+        {
+          "label": "Phillips.",
+          "contest": "house4",
+          "candidate": "Phillips"
+        },
+        {
+          "label": "Peterson.",
+          "contest": "house4",
+          "candidate": "Peterson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.805,
+        0.913,
+        0.888
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-0",
+      "columns": [
+        {
+          "label": "Lundeen.",
+          "contest": "house5",
+          "candidate": "Ernest Lundeen"
+        },
+        {
+          "label": "Bowler.",
+          "contest": "house5",
+          "candidate": "Bowler"
+        },
+        {
+          "label": "Latimer.",
+          "contest": "house5",
+          "candidate": "Latimer"
+        },
+        {
+          "label": "Markve.",
+          "contest": "house5",
+          "candidate": "Markve"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.178,
+        0.868,
+        0.303
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-1",
+      "columns": [
+        {
+          "label": "Knutson.",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "Donohue.",
+          "contest": "house6",
+          "candidate": "Donohue"
+        },
+        {
+          "label": "Knutsen.",
+          "contest": "house6",
+          "candidate": "Knutsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.295,
+        0.866,
+        0.509
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-2",
+      "columns": [
+        {
+          "label": "Volstead.",
+          "contest": "house7",
+          "candidate": "Andrew John Volstead"
+        },
+        {
+          "label": "Townsend.",
+          "contest": "house7",
+          "candidate": "Townsend"
+        },
+        {
+          "label": "Lobeck.",
+          "contest": "house7",
+          "candidate": "Lobeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.501,
+        0.861,
+        0.745
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 169,
+      "id": "169-3",
+      "columns": [
+        {
+          "label": "Miller.",
+          "contest": "house8",
+          "candidate": "Clarence Benjamin Miller"
+        },
+        {
+          "label": "Wheeler.",
+          "contest": "house8",
+          "candidate": "Wheeler"
+        },
+        {
+          "label": "Anderson.",
+          "contest": "house8",
+          "candidate": "Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.737,
+        0.861,
+        0.879
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 170,
+      "id": "170-0",
+      "columns": [
+        {
+          "label": "Steenerson.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Swanson.",
+          "contest": "house9",
+          "candidate": "Swanson"
+        },
+        {
+          "label": "Thompson.",
+          "contest": "house9",
+          "candidate": "Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.166,
+        0.9,
+        0.355
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 170,
+      "id": "170-1",
+      "columns": [
+        {
+          "label": "Jepson.",
+          "contest": "house10",
+          "candidate": "Jepson"
+        },
+        {
+          "label": "Cronin.",
+          "contest": "house10",
+          "candidate": "Cronin"
+        },
+        {
+          "label": "Soltis.",
+          "contest": "house10",
+          "candidate": "Soltis"
+        },
+        {
+          "label": "Schall.",
+          "contest": "house10",
+          "candidate": "Thomas David Schall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.347,
+        0.892,
+        0.496
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

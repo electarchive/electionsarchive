@@ -1,0 +1,289 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1901, general election returns (general election 1900-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1900-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 110,
+      "id": "110-0",
+      "columns": [
+        {
+          "label": "Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "Brown, Dem-Peo.",
+          "contest": "house1",
+          "candidate": "Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.199,
+        0.866,
+        0.406
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-1",
+      "columns": [
+        {
+          "label": "McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "Mathews, Dem-Peo.",
+          "contest": "house2",
+          "candidate": "Mathews"
+        },
+        {
+          "label": "Works, Pro.",
+          "contest": "house2",
+          "candidate": "Works"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.398,
+        0.866,
+        0.689
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 110,
+      "id": "110-2",
+      "columns": [
+        {
+          "label": "Heatwole, Rep.",
+          "contest": "house3",
+          "candidate": "Joel Prescott Heatwole"
+        },
+        {
+          "label": "Schaller, Dem-Peo.",
+          "contest": "house3",
+          "candidate": "Schaller"
+        },
+        {
+          "label": "Lowe, Midr'd-Pop.",
+          "contest": "house3",
+          "candidate": "Lowe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.681,
+        0.858,
+        0.87
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 111,
+      "id": "111-0",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Stone, Dem-Peo.",
+          "contest": "house4",
+          "candidate": "Stone"
+        },
+        {
+          "label": "Scanlan, Pro.",
+          "contest": "house4",
+          "candidate": "Scanlan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.191,
+        0.832,
+        0.402
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 111,
+      "id": "111-1",
+      "columns": [
+        {
+          "label": "Fletcher, Rep.",
+          "contest": "house5",
+          "candidate": "Loren Fletcher"
+        },
+        {
+          "label": "Stockwell, Dem.",
+          "contest": "house5",
+          "candidate": "Stockwell"
+        },
+        {
+          "label": "Johnson, Soc-Labor.",
+          "contest": "house5",
+          "candidate": "Johnson"
+        },
+        {
+          "label": "Hirshfield, Soc-Dem.",
+          "contest": "house5",
+          "candidate": "Hirshfield"
+        },
+        {
+          "label": "Phillips, Ind-Pro.",
+          "contest": "house5",
+          "candidate": "Phillips"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.394,
+        0.832,
+        0.619
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 111,
+      "id": "111-2",
+      "columns": [
+        {
+          "label": "Morris, Rep.",
+          "contest": "house6",
+          "candidate": "Robert Page Walter Morris"
+        },
+        {
+          "label": "Truelson, Dem-Peo.",
+          "contest": "house6",
+          "candidate": "Truelson"
+        },
+        {
+          "label": "Seberger, Midr'd Pop.",
+          "contest": "house6",
+          "candidate": "Seberger"
+        },
+        {
+          "label": "Johnson, Soc-Labor.",
+          "contest": "house6",
+          "candidate": "Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.611,
+        0.83,
+        0.975
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 112,
+      "id": "112-0",
+      "columns": [
+        {
+          "label": "Eddy, Rep.",
+          "contest": "house7",
+          "candidate": "Frank Marion Eddy"
+        },
+        {
+          "label": "Daly, Dem-Peo.",
+          "contest": "house7",
+          "candidate": "Daly"
+        },
+        {
+          "label": "Aaker, Pro.",
+          "contest": "house7",
+          "candidate": "Aaker"
+        },
+        {
+          "label": "Boen, Referendum.",
+          "contest": "house7",
+          "candidate": "Boen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.368,
+        0.872,
+        0.63
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1945, general election returns (general election 1944-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1944-11-07-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 178,
+      "id": "178-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican DEWEY and BRICKER",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic-Farmer-Labor ROOSEVELT and TRUMAN",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial Government TEICHERT and ALBAUGH",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "Socialist THOMAS and HOOPES",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.155,
+        0.887,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4201
+      ]
+    },
+    {
+      "page": 179,
+      "id": "179-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican DEWEY and BRICKER",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic-Farmer-Labor ROOSEVELT and TRUMAN",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial Government TEICHERT and ALBAUGH",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "Ole Rortvedt Nominated by Petition",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist THOMAS and HOOPES",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Pauline M. Erickson Nominated by Petition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.146,
+        0.874,
+        0.994
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4186
+      ]
+    },
+    {
+      "page": 194,
+      "id": "194-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edward J. Thye, Republican",
+          "contest": "governor",
+          "candidate": "Edward J. Thye"
+        },
+        {
+          "label": "Byron G. Allen, Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Byron G. Allen"
+        },
+        {
+          "label": "Gerald M. York, Industrial Government, Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Gerald M. York"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.042,
+        0.299,
+        0.96
+      ],
+      "hint": "Read only the table headed 'Abstract of votes polled for state officers by counties, 1944: Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1819
+      ]
+    }
+  ]
+}

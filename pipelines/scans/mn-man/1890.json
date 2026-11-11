@@ -1,0 +1,316 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1891, general election returns (general election 1890-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1890-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1890,
+      "chamber": "governor",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 70,
+      "id": "70-0",
+      "columns": [
+        {
+          "label": "Merriam, R.",
+          "contest": "governor",
+          "candidate": "William R. Merriam"
+        },
+        {
+          "label": "Wilson, D.",
+          "contest": "governor",
+          "candidate": "Thomas Wilson"
+        },
+        {
+          "label": "Owen A.",
+          "contest": "governor",
+          "candidate": "Sidney M. Owen"
+        },
+        {
+          "label": "Pinkham, P.",
+          "contest": "governor",
+          "candidate": "James P. Pinkham"
+        },
+        {
+          "label": "Gideon S. Ives, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Pahl, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Barrett, P. & A.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.148,
+        0.246,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor. Lieut. Governor.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1989
+      ]
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "Merriam, R.",
+          "contest": "governor",
+          "candidate": "William R. Merriam"
+        },
+        {
+          "label": "Wilson, D.",
+          "contest": "governor",
+          "candidate": "Thomas Wilson"
+        },
+        {
+          "label": "Owen, A.",
+          "contest": "governor",
+          "candidate": "Sidney M. Owen"
+        },
+        {
+          "label": "Pinkham, P.",
+          "contest": "governor",
+          "candidate": "James P. Pinkham"
+        },
+        {
+          "label": "Gideon S. Ives, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. G. Pahl, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. Barrett, P. & A.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.229,
+        0.859,
+        0.633
+      ],
+      "hint": "Read only the table headed 'ELECTION RETURNS BY COUNTIES.\u2014Continued. Official canvass by the State Board of Canvassers, election held November 4, 1890'; ignore any other table visible in the image."
+    },
+    {
+      "page": 90,
+      "id": "90-0",
+      "columns": [
+        {
+          "label": "Dunnell, R.",
+          "contest": "house1",
+          "candidate": "Dunnell"
+        },
+        {
+          "label": "Harries, D.",
+          "contest": "house1",
+          "candidate": "William Henry Harries"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.232,
+        0.88,
+        0.51
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 90,
+      "id": "90-1",
+      "columns": [
+        {
+          "label": "Lind, R.",
+          "contest": "house2",
+          "candidate": "John Lind"
+        },
+        {
+          "label": "Baker, A.",
+          "contest": "house2",
+          "candidate": "Baker"
+        },
+        {
+          "label": "Reynolds, P.",
+          "contest": "house2",
+          "candidate": "Reynolds"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.502,
+        0.874,
+        0.911
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 91,
+      "id": "91-0",
+      "columns": [
+        {
+          "label": "D. S. Hall, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. M. Hall, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gamble, A.",
+          "contest": "house3",
+          "candidate": "Gamble"
+        },
+        {
+          "label": "Shepard, P.",
+          "contest": "house3",
+          "candidate": "Shepard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.166,
+        0.839,
+        0.502
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 91,
+      "id": "91-1",
+      "columns": [
+        {
+          "label": "Snider, R.",
+          "contest": "house4",
+          "candidate": "R. Snider"
+        },
+        {
+          "label": "Castle, D.",
+          "contest": "house4",
+          "candidate": "James Nathan Castle"
+        },
+        {
+          "label": "Dean. P.",
+          "contest": "house4",
+          "candidate": "Dean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.494,
+        0.835,
+        0.805
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 92,
+      "id": "92-0",
+      "columns": [
+        {
+          "label": "Comstock, R.",
+          "contest": "house5",
+          "candidate": "Comstock"
+        },
+        {
+          "label": "Whiteman, D",
+          "contest": "house5",
+          "candidate": "Whiteman"
+        },
+        {
+          "label": "Halvorson, A.",
+          "contest": "house5",
+          "candidate": "Kittel Halvorson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.176,
+        0.914,
+        0.696
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1923
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1301 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1969, general election returns (general election 1968-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1968-11-05-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house6": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house7": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house8": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Total Number of White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NIXON-AGNEW REPUBLICAN",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "HUMPHREY-MUSKIE DEMOCRATIC-FARMER-LABOR",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "WALLACE-GRIFFIN AMERICAN PARTY",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "HALSTEAD-BOUTELLE SOCIALIST WORKERS PARTY",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "BLOMEN-TAYLOR INDUSTRIAL GOVERNMENT",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "MITCHELL-ZAGARELL COMMUNIST PARTY",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "CLEAVER-TERRY PEACE AND FREEDOM PARTY",
+          "contest": "president",
+          "candidate": "Peace and Freedom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.146,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION IN STATE OF MINNESOTA, NOVEMBER 5, 1968. OFFICIAL CANVASS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.281
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Total Number of White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NIXON-AGNEW REPUBLICAN",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "HUMPHREY-MUSKIE DEMOCRATIC-FARMER-LABOR",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "WALLACE-GRIFFIN AMERICAN PARTY",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "HALSTEAD-BOUTELLE SOCIALIST WORKERS PARTY",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "BLOMEN-TAYLOR INDUSTRIAL GOVERNMENT",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "MITCHELL-ZAGARELL COMMUNIST PARTY",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "CLEAVER-TERRY PEACE AND FREEDOM PARTY",
+          "contest": "president",
+          "candidate": "Peace and Freedom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.0,
+        0.93,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Total Number of White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon-Agnew Republican",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Humphrey-Muskie Democratic-Farmer-Labor",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Wallace-Griffin American Party",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "Halstead-Boutelle Socialist Workers Party",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Blomen-Taylor Industrial Government",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "Mitchell-Zagarell Communist Party",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Cleaver-Terry Peace and Freedom Party",
+          "contest": "president",
+          "candidate": "Peace and Freedom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.473,
+        0.94,
+        0.878
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Quie Republican",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        },
+        {
+          "label": "Daley DFL",
+          "contest": "house1",
+          "candidate": "George Daley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.137,
+        0.541,
+        0.318
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.141,
+        0.932,
+        0.354
+      ],
+      "hint": "Read only the table headed 'Sixth District\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-2",
+      "columns": [
+        {
+          "label": "Nelsen Republican",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "Wefald DFL",
+          "contest": "house2",
+          "candidate": "Jon Wefald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.31,
+        0.541,
+        0.559
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-3",
+      "columns": [
+        {
+          "label": "Langen Republican",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        },
+        {
+          "label": "Bergland DFL",
+          "contest": "house7",
+          "candidate": "Bob Bergladn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.346,
+        0.932,
+        0.645
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-4",
+      "columns": [
+        {
+          "label": "MacGregor Republican",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Stokowski DFL",
+          "contest": "house3",
+          "candidate": "Eugene E. Stokowski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.551,
+        0.541,
+        0.647
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-5",
+      "columns": [
+        {
+          "label": "Barrette Republican",
+          "contest": "house4",
+          "candidate": "Emery Barrette"
+        },
+        {
+          "label": "Karth DFL",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.639,
+        0.541,
+        0.735
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-6",
+      "columns": [
+        {
+          "label": "Hennen Republican",
+          "contest": "house8",
+          "candidate": "James A. Hennen"
+        },
+        {
+          "label": "Blatnik DFL",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.543,
+        0.637,
+        0.932,
+        0.805
+      ],
+      "hint": "Read only the table headed 'Eighth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-7",
+      "columns": [
+        {
+          "label": "Ogdahl Repub.",
+          "contest": "house5",
+          "candidate": "Harmon T. Ogdahl"
+        },
+        {
+          "label": "Fraser DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "Braatz Ind. Gov.",
+          "contest": "house5",
+          "candidate": "William C. Braatz"
+        },
+        {
+          "label": "Thorstad SWP",
+          "contest": "house5",
+          "candidate": "David Thorstad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.727,
+        0.541,
+        0.792
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-8",
+      "columns": [
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.784,
+        0.541,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.0,
+        0.541,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.0,
+        0.541,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Zwach Republican",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.0,
+        0.541,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Quie Rep.",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Daley DFL",
+          "contest": "house1",
+          "candidate": "George Daley"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.103,
+        0.928,
+        0.429
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-1",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelsen Rep.",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wefald DFL",
+          "contest": "house2",
+          "candidate": "Jon Wefald"
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.421,
+        0.928,
+        0.833
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Nixon Agnew %",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Humphrey Muskie %",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Wallace Griffin %",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MacGregor Rep.",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "MacGregor %",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "Stokowski DFL",
+          "contest": "house3",
+          "candidate": "Eugene E. Stokowski"
+        },
+        {
+          "label": "Stokowski %",
+          "contest": "house3",
+          "candidate": "Eugene E. Stokowski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.141,
+        0.928,
+        0.312
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-1",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Nixon Agnew %",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Humphrey Muskie %",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Wallace Griffin %",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Barrette Rep.",
+          "contest": "house4",
+          "candidate": "Emery Barrette"
+        },
+        {
+          "label": "Barrette %",
+          "contest": "house4",
+          "candidate": "Emery Barrette"
+        },
+        {
+          "label": "Karth DFL",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "Karth %",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.304,
+        0.928,
+        0.433
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-2",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Nixon Agnew %",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Humphrey Muskie %",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Wallace Griffin %",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ogdahl Rep.",
+          "contest": "house5",
+          "candidate": "Harmon T. Ogdahl"
+        },
+        {
+          "label": "Ogdahl %",
+          "contest": "house5",
+          "candidate": "Harmon T. Ogdahl"
+        },
+        {
+          "label": "Fraser DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "Fraser %",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.425,
+        0.928,
+        0.523
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 24,
+      "id": "24-3",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Agnew Rep.",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Nixon Agnew %",
+          "contest": null,
+          "candidate": "",
+          "party": "Rep."
+        },
+        {
+          "label": "Humphrey Muskie DFL",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Humphrey Muskie %",
+          "contest": null,
+          "candidate": "",
+          "party": "DFL"
+        },
+        {
+          "label": "Wallace Griffin Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Wallace Griffin %",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "Nelson Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nelson %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rasmussen %",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Zwach Rep.",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Zwach %",
+          "contest": "house6",
+          "candidate": "John M. Zwach"
+        },
+        {
+          "label": "Johnson DFL",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        },
+        {
+          "label": "Johnson %",
+          "contest": "house6",
+          "candidate": "J. Buford Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.515,
+        0.928,
+        0.935
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.082,
+        0.93,
+        0.554
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1907
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-1",
+      "columns": [
+        {
+          "label": "Total White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Am.",
+          "contest": null,
+          "candidate": "",
+          "party": "Am."
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "%",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.546,
+        0.93,
+        0.849
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

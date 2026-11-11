@@ -1,0 +1,533 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1921, general election returns (general election 1920-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1920-11-02-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 162,
+      "id": "162-0",
+      "columns": [
+        {
+          "label": "Total number of ballots cast and counted.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican\u2014Harding",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Democrat\u2014Jas. M. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Industrial\u2014W. W Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist\u2014Debs",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Prohibition\u2014Watkins",
+          "contest": "president",
+          "candidate": "Aaron Watkins (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.14,
+        0.877,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2291
+      ]
+    },
+    {
+      "page": 163,
+      "id": "163-0",
+      "columns": [
+        {
+          "label": "Total number of ballots cast and counted.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican\u2014Harding",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Democrat\u2014Jas. M. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Industrial\u2014W. W. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist\u2014Debs",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "Prohibition\u2014Watkins",
+          "contest": "president",
+          "candidate": "Aaron Watkins (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.141,
+        0.866,
+        0.701
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.35
+      ]
+    },
+    {
+      "page": 164,
+      "id": "164-0",
+      "columns": [
+        {
+          "label": "*Anderson.",
+          "contest": "house1",
+          "candidate": "Sidney Anderson"
+        },
+        {
+          "label": "Reiter.",
+          "contest": "house1",
+          "candidate": "Julius J. Reiter"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.239,
+        0.887,
+        0.396
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 164,
+      "id": "164-1",
+      "columns": [
+        {
+          "label": "*Clague.",
+          "contest": "house2",
+          "candidate": "Frank Clague"
+        },
+        {
+          "label": "Simon.",
+          "contest": "house2",
+          "candidate": "Frank Simon"
+        },
+        {
+          "label": "Fuller.",
+          "contest": "house2",
+          "candidate": "H. A. Fuller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.388,
+        0.883,
+        0.58
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 164,
+      "id": "164-2",
+      "columns": [
+        {
+          "label": "*Davis.",
+          "contest": "house3",
+          "candidate": "Charles R. Davis"
+        },
+        {
+          "label": "Millett.",
+          "contest": "house3",
+          "candidate": "James M. Millett"
+        },
+        {
+          "label": "Pomadt.",
+          "contest": "house3",
+          "candidate": "R. A. Pomadt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.572,
+        0.883,
+        0.736
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 164,
+      "id": "164-3",
+      "columns": [
+        {
+          "label": "*Keller.",
+          "contest": "house4",
+          "candidate": "Oscar E. Keller"
+        },
+        {
+          "label": "Brady.",
+          "contest": "house4",
+          "candidate": "Thomas J. Brady"
+        },
+        {
+          "label": "Cummins.",
+          "contest": "house4",
+          "candidate": "Carl W. Cummins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.728,
+        0.887,
+        0.803
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 164,
+      "id": "164-4",
+      "columns": [
+        {
+          "label": "*Newton.",
+          "contest": "house5",
+          "candidate": "Walter H. Newton"
+        },
+        {
+          "label": "Dahl.",
+          "contest": "house5",
+          "candidate": "T. O. Dahl"
+        },
+        {
+          "label": "Thompson.",
+          "contest": "house5",
+          "candidate": "Lynn Thompson"
+        },
+        {
+          "label": "Lundeen.",
+          "contest": "house5",
+          "candidate": "Ernest Lundeen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.795,
+        0.887,
+        0.882
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-0",
+      "columns": [
+        {
+          "label": "*Knutson.",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "Lindbergh.",
+          "contest": "house6",
+          "candidate": "Chas. A. Lindbergh"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.157,
+        0.858,
+        0.304
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-1",
+      "columns": [
+        {
+          "label": "*Volstead.",
+          "contest": "house7",
+          "candidate": "Andrew J. Volstead"
+        },
+        {
+          "label": "Mitchell.",
+          "contest": "house7",
+          "candidate": "James C. Mitchell"
+        },
+        {
+          "label": "Kvale.",
+          "contest": "house7",
+          "candidate": "O. J. Kvale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.296,
+        0.862,
+        0.478
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-2",
+      "columns": [
+        {
+          "label": "*Larson.",
+          "contest": "house8",
+          "candidate": "Oscar J. Larson"
+        },
+        {
+          "label": "Carss.",
+          "contest": "house8",
+          "candidate": "William L. Carss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.47,
+        0.851,
+        0.579
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-3",
+      "columns": [
+        {
+          "label": "*Steenerson.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Jeffers.",
+          "contest": "house9",
+          "candidate": "Frank Jeffers"
+        },
+        {
+          "label": "Thormodson.",
+          "contest": "house9",
+          "candidate": "N. E. Thormodson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.571,
+        0.851,
+        0.746
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-4",
+      "columns": [
+        {
+          "label": "*Schall.",
+          "contest": "house10",
+          "candidate": "Thomas D. Schall"
+        },
+        {
+          "label": "Finlayson.",
+          "contest": "house10",
+          "candidate": "H. A. Finlayson"
+        },
+        {
+          "label": "Soltis.",
+          "contest": "house10",
+          "candidate": "John G. Soltis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.115,
+        0.738,
+        0.854,
+        0.87
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 174,
+      "id": "174-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. A. O. Preus, Repub.",
+          "contest": "governor",
+          "candidate": "Jacob A.O. Preus"
+        },
+        {
+          "label": "L. C. Hodgson, Dem.",
+          "contest": "governor",
+          "candidate": "L. C. Hodgson"
+        },
+        {
+          "label": "Henrik Shipstead, Ind.",
+          "contest": "governor",
+          "candidate": "Henrik Shipstead"
+        },
+        {
+          "label": "Peter J. Samson, Soc.",
+          "contest": "governor",
+          "candidate": "Peter J. Sampson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.049,
+        0.269,
+        0.999
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1453
+      ]
+    }
+  ]
+}

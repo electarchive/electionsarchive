@@ -1,0 +1,538 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1907, general election returns (general election 1906-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1906-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "governor": {
+      "year": 1906,
+      "chamber": "governor",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 127,
+      "id": "127-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cole, Rep.",
+          "contest": "governor",
+          "candidate": "A. L. Cole"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Lofthus, Pub. Own.",
+          "contest": "governor",
+          "candidate": "O. E. Lofthus"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pendergast, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lokensgaard, Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.18,
+        0.88,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1744
+      ]
+    },
+    {
+      "page": 128,
+      "id": "128-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cole, Rep.",
+          "contest": "governor",
+          "candidate": "A. L. Cole"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Lofthus, Pub. Own.",
+          "contest": "governor",
+          "candidate": "O. E. Lofthus"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pendergast, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lokensgaard, Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.0,
+        0.88,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 129,
+      "id": "129-0",
+      "columns": [
+        {
+          "label": "Total Names on Register of Electors\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Names on Register of Electors\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Males.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total No. of Ballots Cast and Counted\u2014Females.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cole, Rep.",
+          "contest": "governor",
+          "candidate": "A. L. Cole"
+        },
+        {
+          "label": "Johnson, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Johnson"
+        },
+        {
+          "label": "Dorsett, Pro.",
+          "contest": "governor",
+          "candidate": "Charles W. Dorsett"
+        },
+        {
+          "label": "Lofthus, Pub. Own.",
+          "contest": "governor",
+          "candidate": "O. E. Lofthus"
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pendergast, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lokensgaard, Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.145,
+        0.181,
+        0.884,
+        0.64
+      ],
+      "hint": "Read only the table headed 'ABSTRACT OF VOTES POLLED FOR Rep., Republican; Dem., Democrat; Pro., Prohibitionist; Pub. Own., Public Ownership.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3159
+      ]
+    },
+    {
+      "page": 133,
+      "id": "133-0",
+      "columns": [
+        {
+          "label": "Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "French, Dem.",
+          "contest": "house1",
+          "candidate": "French"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.186,
+        0.861,
+        0.349
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 133,
+      "id": "133-1",
+      "columns": [
+        {
+          "label": "McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "McCleary"
+        },
+        {
+          "label": "Hammond, Dem.",
+          "contest": "house2",
+          "candidate": "Winfield Scott Hammond"
+        },
+        {
+          "label": "Tucker, Pro.",
+          "contest": "house2",
+          "candidate": "Tucker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.341,
+        0.858,
+        0.54
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 133,
+      "id": "133-2",
+      "columns": [
+        {
+          "label": "Davis, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.532,
+        0.857,
+        0.703
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 133,
+      "id": "133-3",
+      "columns": [
+        {
+          "label": "Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Scholle, Dem.",
+          "contest": "house4",
+          "candidate": "Scholle"
+        },
+        {
+          "label": "Lando, P. O.",
+          "contest": "house4",
+          "candidate": "Lando"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.695,
+        0.857,
+        0.81
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 133,
+      "id": "133-4",
+      "columns": [
+        {
+          "label": "Nye, Rep.",
+          "contest": "house5",
+          "candidate": "Frank Mellen Nye"
+        },
+        {
+          "label": "Larrabee, Dem.",
+          "contest": "house5",
+          "candidate": "Larrabee"
+        },
+        {
+          "label": "Lindsay,",
+          "contest": "house5",
+          "candidate": "Lindsay"
+        },
+        {
+          "label": "Dight,",
+          "contest": "house5",
+          "candidate": "Dight"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.802,
+        0.857,
+        0.885
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 134,
+      "id": "134-0",
+      "columns": [
+        {
+          "label": "Lindbergh, Rep.",
+          "contest": "house6",
+          "candidate": "Charles August Lindbergh"
+        },
+        {
+          "label": "Tift, Dem.",
+          "contest": "house6",
+          "candidate": "Tift"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.174,
+        0.855,
+        0.348
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 134,
+      "id": "134-1",
+      "columns": [
+        {
+          "label": "Volstead, Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.34,
+        0.855,
+        0.539
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 134,
+      "id": "134-2",
+      "columns": [
+        {
+          "label": "Bede, Rep.",
+          "contest": "house8",
+          "candidate": "James Adam Bede"
+        },
+        {
+          "label": "Peterson, P. O.",
+          "contest": "house8",
+          "candidate": "Peterson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.531,
+        0.855,
+        0.701
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 134,
+      "id": "134-3",
+      "columns": [
+        {
+          "label": "Steenerson, Rep.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "Boen, P. O.",
+          "contest": "house9",
+          "candidate": "Boen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.138,
+        0.693,
+        0.855,
+        0.876
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

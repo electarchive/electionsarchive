@@ -1,0 +1,355 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1897, general election returns (general election 1896-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1896-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1896,
+      "chamber": "president",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    }
+  },
+  "pages": [
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "McKinley, R.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Bryan, Dem-Peo.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "Levering, Pro.",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "Palmer, Nat-Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matchett, Soc.",
+          "contest": "president",
+          "candidate": "Charles Matchett (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.221,
+        0.896,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Election Returns by Counties, 1896'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1386
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "McKinley, R.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Bryan, Dem-Peo.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "Levering, Pro.",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "Palmer, Nat-Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Matchett, Soc.",
+          "contest": "president",
+          "candidate": "Charles Matchett (Socialist Labor)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.224,
+        0.915,
+        0.6
+      ],
+      "hint": "Read only the table headed 'Presidential Electors.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 79,
+      "id": "79-0",
+      "columns": [
+        {
+          "label": "James A. Tawney, Rep.",
+          "contest": "house1",
+          "candidate": "James Albertus Tawney"
+        },
+        {
+          "label": "P. Fitzpatrick, Dem-Peo.",
+          "contest": "house1",
+          "candidate": "P. Fitzpatrick"
+        },
+        {
+          "label": "H. Clark, Pro.",
+          "contest": "house1",
+          "candidate": "H. Clark"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.187,
+        0.891,
+        0.389
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 79,
+      "id": "79-1",
+      "columns": [
+        {
+          "label": "James T. McCleary, Rep.",
+          "contest": "house2",
+          "candidate": "James Thompson McCleary"
+        },
+        {
+          "label": "Frank A. Day, Dem-Peo.",
+          "contest": "house2",
+          "candidate": "Frank A. Day"
+        },
+        {
+          "label": "Richard Price, Pro.",
+          "contest": "house2",
+          "candidate": "Richard Price"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.381,
+        0.891,
+        0.672
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 79,
+      "id": "79-2",
+      "columns": [
+        {
+          "label": "Joel P. Heatwole, Rep.",
+          "contest": "house3",
+          "candidate": "Joel Prescott Heatwole"
+        },
+        {
+          "label": "H. J. Peck, Dem-Peo.",
+          "contest": "house3",
+          "candidate": "H. J. Peck"
+        },
+        {
+          "label": "C. T. Laugeson, Pro.",
+          "contest": "house3",
+          "candidate": "C. T. Laugeson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.664,
+        0.891,
+        0.871
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-0",
+      "columns": [
+        {
+          "label": "F. C. Stevens, Rep.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "Francis H. Clark, Peo-Dem.",
+          "contest": "house4",
+          "candidate": "Francis H. Clark"
+        },
+        {
+          "label": "George S. Innis, Pro.",
+          "contest": "house4",
+          "candidate": "George S. Innis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.125,
+        0.893,
+        0.267
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-1",
+      "columns": [
+        {
+          "label": "Loren Fletcher, Rep.",
+          "contest": "house5",
+          "candidate": "Loren Fletcher"
+        },
+        {
+          "label": "S. M. Owen, Peo-Dem.",
+          "contest": "house5",
+          "candidate": "S. M. Owen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.259,
+        0.893,
+        0.344
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-2",
+      "columns": [
+        {
+          "label": "Page Morris, Rep.",
+          "contest": "house6",
+          "candidate": "Robert Page Walter Morris"
+        },
+        {
+          "label": "Charles A. Towne, Dem-Peo.",
+          "contest": "house6",
+          "candidate": "Charles A. Towne"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.336,
+        0.893,
+        0.62
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 80,
+      "id": "80-3",
+      "columns": [
+        {
+          "label": "Frank M. Eddy, Rep.",
+          "contest": "house7",
+          "candidate": "Frank Marion Eddy"
+        },
+        {
+          "label": "Edwin E. Lommen, Peo-Dem.",
+          "contest": "house7",
+          "candidate": "Edwin E. Lommen"
+        },
+        {
+          "label": "J. F. Heiberg, Pro.",
+          "contest": "house7",
+          "candidate": "J. F. Heiberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.612,
+        0.893,
+        0.863
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

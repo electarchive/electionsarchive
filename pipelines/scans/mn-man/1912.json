@@ -1,0 +1,760 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1913, general election returns (general election 1912-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1912-11-05-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1912,
+      "chamber": "president",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1912,
+      "chamber": "governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    }
+  },
+  "pages": [
+    {
+      "page": 138,
+      "id": "138-0",
+      "columns": [
+        {
+          "label": "Taft, Republican.",
+          "contest": "president",
+          "candidate": "William H. Taft (Republican)"
+        },
+        {
+          "label": "Wilson, Democrat.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Debs, Pub.-Own.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Chafin, Prohibition.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Reimer, Soc.-Labor.",
+          "contest": "president",
+          "candidate": "Arthur Reimer (Socialist Labor)"
+        },
+        {
+          "label": "Roosevelt, Progressive.",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Progressive \"Bull Moose\")"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.131,
+        0.879,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT, 1912.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1415
+      ]
+    },
+    {
+      "page": 139,
+      "id": "139-0",
+      "columns": [
+        {
+          "label": "Taft, Republican.",
+          "contest": "president",
+          "candidate": "William H. Taft (Republican)"
+        },
+        {
+          "label": "Wilson, Democrat.",
+          "contest": "president",
+          "candidate": "Woodrow Wilson (Democratic)"
+        },
+        {
+          "label": "Debs, Pub.-Own.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Chafin, Prohibition.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Reimer, Soc.-Labor.",
+          "contest": "president",
+          "candidate": "Arthur Reimer (Socialist Labor)"
+        },
+        {
+          "label": "Roosevelt, Progressive.",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Progressive \"Bull Moose\")"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.164,
+        0.846,
+        0.529
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT, 1912.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 140,
+      "id": "140-0",
+      "columns": [
+        {
+          "label": "James Manahan, Republican.",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Carl Johnson Buell, Democrat.",
+          "contest": null,
+          "candidate": "",
+          "party": "Democratic"
+        },
+        {
+          "label": "Wm. G. Calderwood, Prohibition.",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        },
+        {
+          "label": "J. S. Ingalls, Pub. Ownership.",
+          "contest": null,
+          "candidate": "",
+          "party": "Pub. Ownership"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.555,
+        0.197,
+        0.889,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Representative in Congress at Large'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.188
+      ]
+    },
+    {
+      "page": 141,
+      "id": "141-0",
+      "columns": [
+        {
+          "label": "James Manahan, Republican.",
+          "contest": null,
+          "candidate": "",
+          "party": "Republican"
+        },
+        {
+          "label": "Carl Johnson Buell, Democrat.",
+          "contest": null,
+          "candidate": "",
+          "party": "Democrat"
+        },
+        {
+          "label": "Wm. G. Calderwood, Prohibition.",
+          "contest": null,
+          "candidate": "",
+          "party": "Prohibition"
+        },
+        {
+          "label": "J. S. Ingalls, Pub. Ownership.",
+          "contest": null,
+          "candidate": "",
+          "party": "Pub. Ownership"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.537,
+        0.191,
+        0.867,
+        0.621
+      ],
+      "hint": "Read only the table headed 'Representative in Congress at Large'; ignore any other table visible in the image."
+    },
+    {
+      "page": 142,
+      "id": "142-0",
+      "columns": [
+        {
+          "label": "Total names on Register of electors-Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total names on Register of electors-Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted-Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted-Female",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Ringdal, Dem.",
+          "contest": "governor",
+          "candidate": "Peter M. Ringdal"
+        },
+        {
+          "label": "Morgan, Pub. Own.",
+          "contest": "governor",
+          "candidate": "David Morgan"
+        },
+        {
+          "label": "Lobeck, Pro.",
+          "contest": "governor",
+          "candidate": "Engebret E. Lobeck"
+        },
+        {
+          "label": "Collins, Prog.",
+          "contest": "governor",
+          "candidate": "Paul V. Collins"
+        },
+        {
+          "label": "Burnquist, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Powers, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robertson, Pub.Own.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrews, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Grimmer, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Johnson, Pub. Own.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.195,
+        0.965,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Abstract of votes polled for state officers by counties, 1912'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1925
+      ]
+    },
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "Total names on Register of electors-Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total names on Register of electors-Females",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted-Males",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total number of ballots cast and counted-Female",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Ringdal, Dem.",
+          "contest": "governor",
+          "candidate": "Peter M. Ringdal"
+        },
+        {
+          "label": "Morgan, Pub. Own.",
+          "contest": "governor",
+          "candidate": "David Morgan"
+        },
+        {
+          "label": "Lobeck, Pro.",
+          "contest": "governor",
+          "candidate": "Engebret E. Lobeck"
+        },
+        {
+          "label": "Collins, Prog.",
+          "contest": "governor",
+          "candidate": "Paul V. Collins"
+        },
+        {
+          "label": "Burnquist, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Powers, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robertson, Pub.Own.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrews, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmahl, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Grimmer, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Johnson, Pub. Own.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.0,
+        0.965,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 144,
+      "id": "144-0",
+      "columns": [
+        {
+          "label": "Eberhart, Rep.",
+          "contest": "governor",
+          "candidate": "Adolph O. Eberhart"
+        },
+        {
+          "label": "Ringdal, Dem.",
+          "contest": "governor",
+          "candidate": "Peter M. Ringdal"
+        },
+        {
+          "label": "Morgan, Pub. Own.",
+          "contest": "governor",
+          "candidate": "David Morgan"
+        },
+        {
+          "label": "Lobeck, Pro.",
+          "contest": "governor",
+          "candidate": "Engebret E. Lobeck"
+        },
+        {
+          "label": "Collins, Prog.",
+          "contest": "governor",
+          "candidate": "Paul V. Collins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.382,
+        0.189,
+        0.633,
+        0.638
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-0",
+      "columns": [
+        {
+          "label": "Sydney Anderson.",
+          "contest": "house1",
+          "candidate": "Sydney Anderson"
+        },
+        {
+          "label": "Clinton Robinson.",
+          "contest": "house1",
+          "candidate": "Clinton Robinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.142,
+        0.879,
+        0.311
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-1",
+      "columns": [
+        {
+          "label": "Franklin F. Ellsworth.",
+          "contest": "house2",
+          "candidate": "Franklin F. Ellsworth"
+        },
+        {
+          "label": "W. S. Hammond.",
+          "contest": "house2",
+          "candidate": "Winfield Scott Hammond"
+        },
+        {
+          "label": "John R. Hollister.",
+          "contest": "house2",
+          "candidate": "John R. Hollister"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.303,
+        0.879,
+        0.496
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-2",
+      "columns": [
+        {
+          "label": "Charles R. Davis.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Frank L. Glotzbach.",
+          "contest": "house3",
+          "candidate": "Frank L. Glotzbach"
+        },
+        {
+          "label": "Frank F. Marzahn.",
+          "contest": "house3",
+          "candidate": "Frank F. Marzahn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.488,
+        0.879,
+        0.66
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-3",
+      "columns": [
+        {
+          "label": "Frederick C. Stevens.",
+          "contest": "house4",
+          "candidate": "Frederick Clement Stevens"
+        },
+        {
+          "label": "James J. Regan.",
+          "contest": "house4",
+          "candidate": "James J. Regan"
+        },
+        {
+          "label": "Albert Rosenquist.",
+          "contest": "house4",
+          "candidate": "Albert Rosenquist"
+        },
+        {
+          "label": "H. T. Halbert.",
+          "contest": "house4",
+          "candidate": "H. T. Halbert"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.652,
+        0.876,
+        0.769
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 150,
+      "id": "150-4",
+      "columns": [
+        {
+          "label": "George R. Smith, R.",
+          "contest": "house5",
+          "candidate": "George Ross Smith"
+        },
+        {
+          "label": "Thomas P. Dwyer, D.",
+          "contest": "house5",
+          "candidate": "Thomas P. Dwyer"
+        },
+        {
+          "label": "Thomas E. Latimer, P. O.",
+          "contest": "house5",
+          "candidate": "Thomas E. Latimer"
+        },
+        {
+          "label": "Thomas D. Schall, Prog.",
+          "contest": "house5",
+          "candidate": "Thomas D. Schall"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.761,
+        0.879,
+        0.855
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-0",
+      "columns": [
+        {
+          "label": "Charles A. Lindbergh",
+          "contest": "house6",
+          "candidate": "Charles August Lindbergh"
+        },
+        {
+          "label": "Andrew J. Gilkinson",
+          "contest": "house6",
+          "candidate": "Andrew J. Gilkinson"
+        },
+        {
+          "label": "A. W. Uhl",
+          "contest": "house6",
+          "candidate": "A. W. Uhl"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.14,
+        0.881,
+        0.32
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-1",
+      "columns": [
+        {
+          "label": "A. J. Volstead",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.312,
+        0.881,
+        0.508
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-2",
+      "columns": [
+        {
+          "label": "Clarence B. Miller",
+          "contest": "house8",
+          "candidate": "Clarence Benjamin Miller"
+        },
+        {
+          "label": "John Jenswold, Jr.",
+          "contest": "house8",
+          "candidate": "John Jr. Jenswold"
+        },
+        {
+          "label": "Morris Kaplan",
+          "contest": "house8",
+          "candidate": "Morris Kaplan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.5,
+        0.881,
+        0.686
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 151,
+      "id": "151-3",
+      "columns": [
+        {
+          "label": "Halvor Steenerson",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        },
+        {
+          "label": "M. A. Brattland",
+          "contest": "house9",
+          "candidate": "M. A. Brattland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.678,
+        0.881,
+        0.874
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

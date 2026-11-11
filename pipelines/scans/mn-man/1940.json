@@ -1,0 +1,215 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1941, general election returns (general election 1940-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1940-11-05-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1940,
+      "chamber": "senate",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 172,
+      "id": "172-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican WILLKIE and McNARY",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and WALLACE",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial AIKEN and ORANGE",
+          "contest": "president",
+          "candidate": "Industrial"
+        },
+        {
+          "label": "Socialist THOMAS and KRUGER",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Communist BROWDER and FORD",
+          "contest": "president",
+          "candidate": "Communist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.114,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3702
+      ]
+    },
+    {
+      "page": 173,
+      "id": "173-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican WILLKIE and McNARY",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and WALLACE",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial AIKEN and ORANGE",
+          "contest": "president",
+          "candidate": "Industrial"
+        },
+        {
+          "label": "Socialist THOMAS and KRUGER",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "Communist BROWDER and FORD",
+          "contest": "president",
+          "candidate": "Communist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.108,
+        0.883,
+        0.929
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES ON PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4227
+      ]
+    },
+    {
+      "page": 186,
+      "id": "186-0",
+      "columns": [
+        {
+          "label": "Henrik Shipstead Republican",
+          "contest": "senate",
+          "candidate": "Henrik Shipstead"
+        },
+        {
+          "label": "Elmer A. Benson Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Elmer A. Benson"
+        },
+        {
+          "label": "John E. Regan Democrat",
+          "contest": "senate",
+          "candidate": "John E. Regan"
+        },
+        {
+          "label": "Grace Holmes Carlson, Trotskyist, Anti-War Nominated by Petition",
+          "contest": "senate",
+          "candidate": "Grace Holmes Carlson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.071,
+        0.253,
+        0.938
+      ],
+      "hint": "Read only the table headed 'U. S. Senator in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.173
+      ]
+    },
+    {
+      "page": 186,
+      "id": "186-1",
+      "columns": [
+        {
+          "label": "Harold E. Stassen Republican",
+          "contest": "governor",
+          "candidate": "Harold E. Stassen"
+        },
+        {
+          "label": "Hjalmar Petersen Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Hjalmar Petersen"
+        },
+        {
+          "label": "Ed. Murphy Democrat",
+          "contest": "governor",
+          "candidate": "Ed Murphy"
+        },
+        {
+          "label": "John William Castle Industrial Nominated by Petition",
+          "contest": "governor",
+          "candidate": "John William Castle"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.237,
+        0.071,
+        0.353,
+        0.938
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.173
+      ]
+    }
+  ]
+}

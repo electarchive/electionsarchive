@@ -1,0 +1,325 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1919, general election returns (general election 1918-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1918-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 158,
+      "id": "158-0",
+      "columns": [
+        {
+          "label": "Anderson.",
+          "contest": "house1",
+          "candidate": "Sydney Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.245,
+        0.889,
+        0.399
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 158,
+      "id": "158-1",
+      "columns": [
+        {
+          "label": "Ellsworth.",
+          "contest": "house2",
+          "candidate": "Franklin Fowler Ellsworth"
+        },
+        {
+          "label": "Simon.",
+          "contest": "house2",
+          "candidate": "Simon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.391,
+        0.889,
+        0.582
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 158,
+      "id": "158-2",
+      "columns": [
+        {
+          "label": "Davis.",
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
+        },
+        {
+          "label": "Farrell.",
+          "contest": "house3",
+          "candidate": "Farrell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.574,
+        0.889,
+        0.737
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 158,
+      "id": "158-3",
+      "columns": [
+        {
+          "label": "Mallory.",
+          "contest": "house4",
+          "candidate": "Mallory"
+        },
+        {
+          "label": "Van Dyke.",
+          "contest": "house4",
+          "candidate": "Carl Chester Van Dyke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.729,
+        0.889,
+        0.805
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 158,
+      "id": "158-4",
+      "columns": [
+        {
+          "label": "Newton.",
+          "contest": "house5",
+          "candidate": "Walter Hughes Newton"
+        },
+        {
+          "label": "Robertson.",
+          "contest": "house5",
+          "candidate": "Robertson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.797,
+        0.889,
+        0.872
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 159,
+      "id": "159-0",
+      "columns": [
+        {
+          "label": "Knutson.",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "Russell.",
+          "contest": "house6",
+          "candidate": "Russell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.145,
+        0.865,
+        0.297
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 159,
+      "id": "159-1",
+      "columns": [
+        {
+          "label": "Volstead.",
+          "contest": "house7",
+          "candidate": "Andrew John Volstead"
+        },
+        {
+          "label": "Lobeck.",
+          "contest": "house7",
+          "candidate": "Lobeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.289,
+        0.865,
+        0.479
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 159,
+      "id": "159-2",
+      "columns": [
+        {
+          "label": "Miller.",
+          "contest": "house8",
+          "candidate": "Miller"
+        },
+        {
+          "label": "Carss.",
+          "contest": "house8",
+          "candidate": "William Leighton Carss"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.471,
+        0.856,
+        0.583
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 159,
+      "id": "159-3",
+      "columns": [
+        {
+          "label": "Steenerson.",
+          "contest": "house9",
+          "candidate": "Halvor Steenerson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.575,
+        0.856,
+        0.755
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 159,
+      "id": "159-4",
+      "columns": [
+        {
+          "label": "Schall.",
+          "contest": "house10",
+          "candidate": "Thomas David Schall"
+        },
+        {
+          "label": "Finlayson.",
+          "contest": "house10",
+          "candidate": "Finlayson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.747,
+        0.876,
+        0.871
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}
