@@ -900,13 +900,17 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       ? Infinity
       : Math.max(0, tail * onNight - (latest - onNight)) / latest,
   );
-  const newest = shown.at(-1);
   const complete =
     isLate &&
-    newest?.reporting != null &&
-    newest.expected != null &&
-    newest.expected > 0 &&
-    newest.reporting >= newest.expected;
+    cutoff != null &&
+    shown.some(
+      (frame) =>
+        Date.parse(frame.at) > cutoff &&
+        frame.reporting != null &&
+        frame.expected != null &&
+        frame.expected > 0 &&
+        frame.reporting >= frame.expected,
+    );
   const isTail =
     complete ||
     (isLate && onNight > 0 && latest - onNight <= MODEL.late.small * onNight);
