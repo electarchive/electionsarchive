@@ -1,0 +1,121 @@
+{
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, vote for President by county, general election 1980-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1981nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1981nort"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "NC",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 931,
+      "id": "931-0",
+      "columns": [
+        {
+          "label": "Jimmy Carter (Democrat)",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Ronald Reagan (Republican)",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Ed Clark (Libertarian)",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "Barry Commoner (Citizens)",
+          "contest": "president",
+          "candidate": "Citizens"
+        },
+        {
+          "label": "John B. Anderson (Independent)",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Clifton DeBerry (Socialist Workers)",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.234,
+        0.923,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTES CAST FOR PRESIDENT, GENERAL ELECTION November 4, 1980 (Continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0235
+      ]
+    },
+    {
+      "page": 932,
+      "id": "932-0",
+      "columns": [
+        {
+          "label": "Jimmy Carter (Democrat)",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Ronald Reagan (Republican)",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Ed Clark (Libertarian)",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "Barry Commoner (Citizens)",
+          "contest": "president",
+          "candidate": "Citizens"
+        },
+        {
+          "label": "John B. Anderson (Independent)",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Clifton DeBerry (Socialist Workers)",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.238,
+        0.936,
+        0.929
+      ],
+      "hint": "Read only the table headed 'VOTES CAST FOR PRESIDENT, GENERAL ELECTION November 4, 1980 (Continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0333
+      ]
+    }
+  ]
+}
