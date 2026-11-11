@@ -1473,7 +1473,27 @@ async function probed(source: string, k: number, members: Array<string>) {
       );
 }
 
-async function children(
+const childrenKey = (
+  contest: string | Array<string>,
+  area: { id: string; k: number },
+  isRoot: boolean,
+  date: string,
+  target: number | undefined,
+  isDeep: boolean,
+) =>
+  JSON.stringify([
+    contest,
+    area.id,
+    area.k,
+    isRoot,
+    date,
+    target ?? null,
+    isDeep,
+  ]);
+
+type Surveyed = Awaited<ReturnType<typeof survey>>;
+
+async function surveyed(
   contest: string | Array<string>,
   area: { id: string; k: number },
   isRoot: boolean,
@@ -1482,12 +1502,31 @@ async function children(
   isDeep = false,
 ) {
   return remember(
-    `children:${JSON.stringify([contest, area.id, area.k, isRoot, date, target ?? null, isDeep])}`,
-    async () => gather(contest, area, isRoot, date, target, isDeep),
+    `survey:${childrenKey(contest, area, isRoot, date, target, isDeep)}`,
+    async () => survey(contest, area, isRoot, date, target, isDeep),
   );
 }
 
-async function gather(
+async function children(
+  contest: string | Array<string>,
+  area: { id: string; k: number },
+  isRoot: boolean,
+  date: string,
+  target?: number,
+  isDeep = false,
+) {
+  return labeled(
+    surveyed(contest, area, isRoot, date, target, isDeep),
+    childrenKey(contest, area, isRoot, date, target, isDeep),
+    date,
+  );
+}
+
+async function labeled(rows: Promise<Surveyed>, key: string, date: string) {
+  return remember(`children:${key}`, async () => label(await rows, date));
+}
+
+async function survey(
   contest: string | Array<string>,
   area: { id: string; k: number },
   isRoot: boolean,
@@ -1757,61 +1796,75 @@ async function gather(
     .filter((rows) => rows.length > tops.length && rows.length <= 10_000)
     .toArray()
     .flat();
-  const [labels, schemes, dating] = await Promise.all([
-    names(
-      [...found.rows, ...deep].map((row) => row.id),
-      date,
-    ),
-    db.execute<{ code: string; noun: string; kind: string; rank: number }>(sql`
-      select code, noun, kind::text, rank from scheme
-      where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
-    `),
-    names(
-      [...found.rows, ...deep].map((row) => row.id),
-      date,
-      [],
-      true,
-    ),
-  ]);
+  const schemes = await db.execute<{
+    code: string;
+    noun: string;
+    kind: string;
+    rank: number;
+  }>(sql`
+    select code, noun, kind::text, rank from scheme
+    where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
+  `);
   const scheme = new Map(schemes.rows.map((row) => [row.code, row]));
-  const taken = new Map<string, number>();
   const shaped = (
     row: { id: string; k: number; scheme: string },
-    prefix: string,
-  ) => {
-    const slug = labels.full.get(row.id) ?? "";
-    const name = dating.full.get(row.id) ?? slug;
-    const base = `${prefix}${segment(slug)}`;
-    const seen = (taken.get(base) ?? 0) + 1;
-    taken.set(base, seen);
-    return {
-      id: row.id,
-      k: row.k,
-      scheme: row.scheme,
-      name,
-      segment: seen === 1 ? base : `${base}-${seen}`,
-      noun: scheme.get(row.scheme)?.noun ?? "",
-      kind: scheme.get(row.scheme)?.kind ?? "",
-      rank: scheme.get(row.scheme)?.rank ?? 0,
-      isMember: members.has(row.id),
-      isDeep: prefix !== "",
-    };
-  };
-  const listed = found.rows
-    .toSorted(
-      (a, b) =>
-        Number(deeper.has(a.id)) - Number(deeper.has(b.id)) ||
-        Number(members.has(a.id)) - Number(members.has(b.id)) ||
-        a.k - b.k,
-    )
-    .map((row) => shaped(row, ""));
-  const prefixes = new Map(listed.map((row) => [row.id, `${row.segment}/`]));
+    parent: string | null,
+  ) => ({
+    id: row.id,
+    k: row.k,
+    scheme: row.scheme,
+    noun: scheme.get(row.scheme)?.noun ?? "",
+    kind: scheme.get(row.scheme)?.kind ?? "",
+    rank: scheme.get(row.scheme)?.rank ?? 0,
+    isMember: members.has(row.id),
+    isDeep: parent != null,
+    parent,
+  });
   return [
-    ...listed,
-    ...deep
-      .toSorted((a, b) => a.k - b.k)
-      .map((row) => shaped(row, prefixes.get(row.parent) ?? "")),
-  ].toSorted((a, b) => natural(a.name, b.name));
+    ...found.rows
+      .toSorted(
+        (a, b) =>
+          Number(deeper.has(a.id)) - Number(deeper.has(b.id)) ||
+          Number(members.has(a.id)) - Number(members.has(b.id)) ||
+          a.k - b.k,
+      )
+      .map((row) => shaped(row, null)),
+    ...deep.toSorted((a, b) => a.k - b.k).map((row) => shaped(row, row.parent)),
+  ];
+}
+
+async function label(rows: Surveyed, date: string) {
+  const ids = rows.map((row) => row.id);
+  const [labels, dating] = await Promise.all([
+    names(ids, date),
+    names(ids, date, [], true),
+  ]);
+  const taken = new Map<string, number>();
+  const prefixes = new Map<string, string>();
+  return rows
+    .map((row) => {
+      const slug = labels.full.get(row.id) ?? "";
+      const base = `${prefixes.get(row.parent ?? "") ?? ""}${segment(slug)}`;
+      const seen = (taken.get(base) ?? 0) + 1;
+      taken.set(base, seen);
+      const shown = seen === 1 ? base : `${base}-${seen}`;
+      if (row.parent == null) {
+        prefixes.set(row.id, `${shown}/`);
+      }
+      return {
+        id: row.id,
+        k: row.k,
+        scheme: row.scheme,
+        name: dating.full.get(row.id) ?? slug,
+        segment: shown,
+        noun: row.noun,
+        kind: row.kind,
+        rank: row.rank,
+        isMember: row.isMember,
+        isDeep: row.isDeep,
+      };
+    })
+    .toSorted((a, b) => natural(a.name, b.name));
 }
 
 async function reaches(place: string, area: string, date: string) {
@@ -4395,14 +4448,15 @@ async function places(
 ): Promise<v.InferOutput<typeof Places>> {
   const strays = unlocated();
   strays.catch(() => null);
-  const found = await children(
-    contest.id,
-    area,
-    isRoot,
-    contest.date ?? "infinity",
-    undefined,
-    true,
+  const day = contest.date ?? "infinity";
+  const surveying = surveyed(contest.id, area, isRoot, day, undefined, true);
+  const naming = labeled(
+    surveying,
+    childrenKey(contest.id, area, isRoot, day, undefined, true),
+    day,
   );
+  naming.catch(() => null);
+  const found = await surveying;
   const electoral = found.filter((kid) => kid.kind === "electoral_district");
   const loose =
     electoral.length === 0
@@ -4712,7 +4766,9 @@ async function places(
   if (level == null) {
     return null;
   }
-  const shown = kids.filter((kid) => kid.scheme === level.code);
+  const shown = (await naming).filter(
+    (kid) => kid.scheme === level.code && !loose.has(kid.k),
+  );
   const tail = /, [^,]+$/.exec(shown[0]?.name ?? "")?.[0];
   const isShared =
     tail != null && shown.every((kid) => kid.name.endsWith(tail));
