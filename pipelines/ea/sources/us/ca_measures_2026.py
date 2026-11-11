@@ -257,7 +257,7 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=election,
-                    text=f"{DAY.year} {name} general election",
+                    text=f"{DAY.year} {name} general election".strip(),
                     lang="en",
                     kind="official",
                     is_preferred=True,
@@ -292,7 +292,7 @@ def emit() -> Path:
             cs.add(
                 "name",
                 entity_id=contest,
-                text=f"{DAY.year} {name}: {label}",
+                text=f"{DAY.year} {name}: {label}".strip(),
                 lang="en",
                 kind="official",
                 is_preferred=True,

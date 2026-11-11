@@ -225,7 +225,7 @@ def emit() -> Path:
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+            cs.add("name", entity_id=entity, text=text.strip(), lang=lang, kind=kind, is_preferred=kind == "official")
 
         source = cs.source(PUBLISHER, TITLE)
         cs.add(

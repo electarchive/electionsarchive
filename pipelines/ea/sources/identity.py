@@ -2852,4 +2852,7 @@ def emit() -> Path:
             )
             spaced += 1
         print(f"{spaced} preferred names lose doubled or stray spaces")
+        for row in cs.rows.get("name", []):
+            if isinstance(row.get("text"), str):
+                row["text"] = row["text"].strip()
         return cs.write()
