@@ -153,6 +153,7 @@ def page(title: str) -> str:
 LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
 EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
+SHEET_2008 = "https://www.thegreenpapers.com/P08/D-VoteTallySheet-2008-09-02.pdf"
 RNC = "sim_republican-national-convention-proceedings_{}"
 TABLES: list[dict[str, Any]] = [
     {"table": "1968:republican:first", "item": RNC.format("august-5-8-1968"), "leaves": (409, 410)},
@@ -172,6 +173,14 @@ TABLES: list[dict[str, Any]] = [
         "leaves": tuple(range(539, 561)),
         "ballot": 1,
         "transcribed": "conventions_new_orleans_1988.tsv",
+    },
+    {
+        "table": "2008:democratic",
+        "pdf": SHEET_2008,
+        "leaves": (1,),
+        "ballot": 1,
+        "transcribed": "conventions_denver_2008.tsv",
+        "short": True,
     },
 ]
 
@@ -535,6 +544,17 @@ PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1984:republican"}, "ordinal": "Thirty-Third", "city": "Dallas", "days": (date(1984, 8, 20), date(1984, 8, 23)), "ballots": {1: date(1984, 8, 22)}, "deciding": 1},
     {"tables": {1: "1988:republican"}, "ordinal": "Thirty-Fourth", "city": "New Orleans", "days": (date(1988, 8, 15), date(1988, 8, 18)), "ballots": {1: date(1988, 8, 17)}, "deciding": 1, "caveat": "The proceedings print no tabulation. The roll is transcribed from the narrated call (pages 504 to 525): the Secretary announced each delegation's votes, the Assistant Secretary repeated each vote as cast, and nine delegations passed and voted on the second call. Hawaii's votes were not announced by the Secretary; its 20 are the figure the delegation gave when it cast them. The Chair announced 2,277 votes for George Bush, and the nomination was then made by acclamation."},
 ]  # fmt: skip
+SHEET_METHOD = (
+    "The roll call of the states on the presidential nomination, as tabulated in the Final Vote Tally compiled by "
+    "the Democratic National Committee's Office of the Secretary, a one-page sheet read from its text layer and "
+    "checked against the page image. The sheet gives each delegation's allocated votes, the votes it cast, and the "
+    "votes for each candidate."
+)
+SHEET_CAVEAT = (
+    "The sheet is the Secretary's compiled tally, not a transcript of the roll call as it was called. Democrats "
+    "Abroad is stored as an unlocated delegation, apart from the states and territories, and its 11 votes include "
+    "half votes. Where a delegation cast fewer votes than it was allocated, the difference is its abstentions."
+)
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835},
@@ -558,6 +578,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1940:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 15–18, 1940", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1940, 7, 15), date(1940, 7, 18)), "ballots": {1: date(1940, 7, 17)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1944:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 19–21, 1944", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1944, 7, 19), date(1944, 7, 21)), "ballots": {1: date(1944, 7, 20)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
+    {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
@@ -566,6 +587,8 @@ REPORTS = {
     "democratic": "the convention's official proceedings",
 }
 CANDIDATES = {
+    "2008:democratic:Clinton": ("Hillary Clinton", "Q6294"),
+    "2008:democratic:Obama": ("Barack Obama", "Q76"),
     "Nixon": ("Richard M. Nixon", "Q9588"),
     "N. Rockefeller": ("Nelson A. Rockefeller", "Q11237"),
     "Reagan": ("Ronald Reagan", "Q9960"),
@@ -2024,7 +2047,27 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
+def sheet(spec: dict[str, Any], fetch: bool) -> raw.Artifact:
+    import subprocess
+    import tempfile
+
+    url = f"{spec['pdf']}#page=1"
+    try:
+        return raw.cached(SOURCE, url)
+    except LookupError:
+        if not fetch:
+            raise
+    pdf = raw.fetch(SOURCE, spec["pdf"], suffix=".pdf")
+    with tempfile.TemporaryDirectory() as folder:
+        out = Path(folder) / "page"
+        subprocess.run(["pdftoppm", "-r", "200", "-jpeg", "-singlefile", str(pdf.path), str(out)], check=True)
+        content = out.with_suffix(".jpg").read_bytes()
+    return raw.store(SOURCE, url, content, suffix=".jpg", retrieved_at=pdf.retrieved_at, media_type="image/jpeg")
+
+
 def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
+    if "pdf" in spec:
+        return sheet(spec, fetch)
     if "uky" in spec:
         url = EXPLOREUK.format(item=spec["uky"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
@@ -2391,7 +2434,7 @@ def parse() -> None:
             if (
                 abs(votes - cast) > 1e-6
                 and allowed.get(state, ())[:2] != (votes, cast)
-                and not (cast < votes and spec["table"].startswith("1880:republican:"))
+                and not (cast < votes and (spec["table"].startswith("1880:republican:") or spec.get("short")))
             ):
                 failures.append(f"{state}: {cast:g} cast of {votes:g} held")
         for column, total in printed.items():
@@ -2458,7 +2501,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956, and the 2016 and 2020 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956 and 2008, and the 2016 and 2020 conventions",
             polity="US",
         )
 
@@ -2681,7 +2724,9 @@ def emit() -> Path:
             scope = cs.key("us.party", f"{party}-party")
             first_spec = next(iter(specs.values()))
             source_url = (
-                f"https://babel.hathitrust.org/cgi/pt?id={first_spec['htid']}"
+                first_spec["pdf"]
+                if "pdf" in first_spec
+                else f"https://babel.hathitrust.org/cgi/pt?id={first_spec['htid']}"
                 if "htid" in first_spec
                 else f"https://exploreuk.uky.edu/catalog/{first_spec['uky']}"
                 if "uky" in first_spec
@@ -2815,7 +2860,7 @@ def emit() -> Path:
                     completeness=1,
                     as_of=datetime.combine(day, datetime.min.time(), UTC),
                 )
-                method = OFFICIAL.format(REPORTS[party])
+                method = convention.get("method") or OFFICIAL.format(REPORTS[party])
                 if own or held is not None:
                     method += HELD_TOTALS
                 if held is not None and not own:
