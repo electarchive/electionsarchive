@@ -4780,24 +4780,11 @@ async function places(
   if (level == null) {
     return null;
   }
-  const shown = (await naming).filter(
-    (kid) => kid.scheme === level.code && !loose.has(kid.k),
-  );
-  const tail = /, [^,]+$/.exec(shown[0]?.name ?? "")?.[0];
-  const isShared =
-    tail != null && shown.every((kid) => kid.name.endsWith(tail));
-  const rows = shown.map((kid) => {
-    const child = childPath.get(kid.id);
-    const name = isShared ? kid.name.slice(0, -tail.length) : kid.name;
-    return {
-      k: kid.k,
-      name: split.has(kid.k) ? m.map_part({ name }) : name,
-      path: child ?? (base == null ? null : `${base}/${kid.segment}`),
-      isContest: child != null,
-      owner: childContest.get(kid.id) ?? null,
-    };
-  });
-  const pooled = await across(
+  const shownKs = found
+    .filter((kid) => kid.scheme === level.code && !loose.has(kid.k))
+    .map((kid) => kid.k)
+    .toSorted((x, y) => x - y);
+  const pooling = across(
     round != null,
     () =>
       `pooled:${createHash("sha1")
@@ -4809,7 +4796,7 @@ async function places(
             contest.place?.k ?? null,
             area.k,
             area.id,
-            shown.map((kid) => kid.k),
+            shownKs,
             "units",
           ]),
         )
@@ -4847,7 +4834,7 @@ async function places(
                 where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
               ) r
             ) > (
-              select coalesce(sum(r.value), 0) from sets cross join unnest(${sql.param(shown.map((kid) => kid.k))}::int[]) as kid(k) cross join lateral (
+              select coalesce(sum(r.value), 0) from sets cross join unnest(${sql.param(shownKs)}::int[]) as kid(k) cross join lateral (
                 select r.value from result_rollup r
                 where r.result_set_k = sets.k and r.area_k = kid.k and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
               ) r
@@ -4879,6 +4866,25 @@ async function places(
         `),
       ),
   );
+  pooling.catch(() => null);
+  const shown = (await naming).filter(
+    (kid) => kid.scheme === level.code && !loose.has(kid.k),
+  );
+  const tail = /, [^,]+$/.exec(shown[0]?.name ?? "")?.[0];
+  const isShared =
+    tail != null && shown.every((kid) => kid.name.endsWith(tail));
+  const rows = shown.map((kid) => {
+    const child = childPath.get(kid.id);
+    const name = isShared ? kid.name.slice(0, -tail.length) : kid.name;
+    return {
+      k: kid.k,
+      name: split.has(kid.k) ? m.map_part({ name }) : name,
+      path: child ?? (base == null ? null : `${base}/${kid.segment}`),
+      isContest: child != null,
+      owner: childContest.get(kid.id) ?? null,
+    };
+  });
+  const pooled = await pooling;
   const pools = pooled
     .filter(() => level.code !== "world.country")
     .map((row) => ({ ...row, index: POOLS.indexOf(row.pool) }))
