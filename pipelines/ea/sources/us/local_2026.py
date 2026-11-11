@@ -13320,9 +13320,11 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     valid_from=DAY,
                 )
                 counts["no filing"] += 1
+            listed = set()
             for row in group.iter_rows(named=True):
-                if row["name"] == NO_FILING:
+                if row["name"] == NO_FILING or slug(row["name"]) in listed:
                     continue
+                listed.add(slug(row["name"]))
                 tokens = [
                     token
                     for token in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", row["name"])).split("-")
