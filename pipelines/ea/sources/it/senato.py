@@ -74,6 +74,7 @@ DAYS = [
     date(2022, 9, 25),
 ]
 MATTARELLA = date(1994, 3, 27)
+LAW_33_1992 = date(1992, 1, 23)
 CALDEROLI = date(2006, 4, 9)
 ROSATO = date(2018, 3, 4)
 REDUCED = date(2022, 9, 25)
@@ -167,16 +168,34 @@ SENATE_2005 = [
 ]
 SYSTEMS = {
     "senato-1948": (
-        {"formula": "dhondt", "lists": {"order": "open", "constituencies": "skip", "vacancy": "next_by_votes"}},
-        "Senate, single-member collegi with regional groups, 1948–1993",
+        {
+            "formula": "dhondt",
+            "singleMember": {"quorum": 0.65, "of": "voters", "scorporo": "winners"},
+            "lists": {"order": "share", "constituencies": "skip", "vacancy": "next_by_votes"},
+        },
+        "Senate, single-member collegi with regional groups, 1948–1987",
         (
-            "Under law 29 of 1948, each region was divided into single-member collegi. A candidate who won at least 65% "
+            "Under law 29 of 1948, each region was divided into single-member collegi. A candidate who won the votes "
+            "of at least 65% of those who voted in a collegio was elected outright. The region's other seats went to "
+            "groups of candidates who ran under the same symbol, shared by the D'Hondt method on each group's votes "
+            "across the region, less the votes of its candidates already elected outright. Within a group, seats went "
+            "to the candidates with the highest share of those who voted in their own collegio, so a collegio could "
+            "elect several senators or none."
+        ),
+    ),
+    "senato-1992": (
+        {
+            "formula": "dhondt",
+            "singleMember": {"quorum": 0.65, "of": "valid", "scorporo": "winners"},
+            "lists": {"order": "share", "constituencies": "skip", "vacancy": "next_by_votes"},
+        },
+        "Senate, single-member collegi with regional groups, 1992",
+        (
+            "Law 33 of 1992 amended the rules of 1948 for the election of April 1992. A candidate who won at least 65% "
             "of the valid votes in a collegio was elected outright. The region's other seats went to groups of "
             "candidates who ran under the same symbol, shared by the D'Hondt method on each group's votes across the "
             "region, less the votes of its candidates already elected outright. Within a group, seats went to the "
-            "candidates with the highest share of the vote in their own collegio, so a collegio could elect several "
-            "senators or none. The schema stores the D'Hondt step; the 65% rule and the ranking by share are described "
-            "here only."
+            "candidates with the highest share of the valid votes in their own collegio."
         ),
     ),
     "senato-single-member-1993": (
@@ -185,14 +204,18 @@ SYSTEMS = {
         None,
     ),
     "senato-recovery-1993": (
-        {"formula": "dhondt", "lists": {"order": "open", "constituencies": "skip", "vacancy": "next_by_votes"}},
+        {
+            "formula": "dhondt",
+            "singleMember": {"scorporo": "winners"},
+            "lists": {"order": "share", "constituencies": "skip", "vacancy": "next_by_votes"},
+        },
         "Senate, regional proportional recovery, 1993–2005",
         (
             "Under law 276 of 1993, three quarters of each region's senators were elected by plurality in single-member "
             "collegi. The rest were shared out in each region by the D'Hondt method among groups of candidates who ran "
             "under the same symbol. A group's total was the votes of its candidates who had not won their collegio "
-            "(scorporo), and its seats went to those candidates in order of their share of the vote in their own "
-            "collegio. The schema stores the D'Hondt step; the scorporo and the ranking by share are described here only."
+            "(scorporo), and its seats went to those candidates in order of their share of the valid votes in their "
+            "own collegio."
         ),
     ),
     "senato-valle-d-aosta": ({"formula": "fptp"}, "Senate, Valle d'Aosta single-member seat", None),
@@ -216,8 +239,7 @@ SYSTEMS = {
             "the votes of a coalition's lists, and then among each coalition's qualifying lists in the same way. If the "
             "coalition or list with the most votes in the region won less than 55% of its seats, it received 55%, "
             "rounded up, and the others shared the rest. Molise, with two seats, had no bonus. Valle d'Aosta elected "
-            "one senator by plurality, and Trentino-Alto Adige kept the single-member collegi of 1993. The schema "
-            "stores the Hare step; the thresholds and the bonus are described here only."
+            "one senator by plurality, and Trentino-Alto Adige kept the single-member collegi of 1993."
         ),
     ),
     "senato-molise-2005": (
@@ -236,14 +258,17 @@ SYSTEMS = {
         None,
     ),
     "senato-trentino-recovery-2005": (
-        {"formula": "dhondt", "lists": {"order": "open", "constituencies": "skip", "vacancy": "next_by_votes"}},
+        {
+            "formula": "dhondt",
+            "singleMember": {"scorporo": "winners"},
+            "lists": {"order": "share", "constituencies": "skip", "vacancy": "next_by_votes"},
+        },
         "Senate, Trentino-Alto Adige proportional seat, 2005–2017",
         (
             "Under law 270 of 2005, Trentino-Alto Adige kept the rules of law 276 of 1993: six senators were elected by "
             "plurality in single-member collegi and one was shared out by the D'Hondt method among groups of candidates "
             "who ran under the same symbol, counting the votes of their candidates who had not won their collegio. "
-            "The seat went to the group's candidate with the highest share of the vote in their own collegio. The "
-            "schema stores the D'Hondt step; the scorporo and the ranking by share are described here only."
+            "The seat went to the group's candidate with the highest share of the valid votes in their own collegio."
         ),
     ),
     "senato-single-member-2017": (
@@ -1454,16 +1479,41 @@ def emit() -> Path:
             if start not in sized:
                 cs.add("body_size", body_id=senate, seats=size, valid_from=start, valid_to=end)
 
-        systems: dict[str, UUID] = {}
+        systems = {code: cs.key("it.electoral_system", code) for code in SYSTEMS}
+        held_rules = dict(
+            conn.execute("select id, rules from electoral_system where id = any(%s)", [list(systems.values())])
+        )
+        held_names: dict[UUID, list[tuple[UUID, str]]] = {}
+        held_notes: dict[UUID, list[tuple[UUID, str]]] = {}
+        for held, table, kind, column in (
+            (held_names, "name", "official", "text"),
+            (held_notes, "note", "methodology", "body_md"),
+        ):
+            for row_id, entity, text in conn.execute(
+                f"select id, entity_id, {column} from {table} where entity_id = any(%s) and kind = %s",
+                [list(systems.values()), kind],
+            ).fetchall():
+                held.setdefault(entity, []).append((row_id, text))
         for code, (rules, label, methodology) in SYSTEMS.items():
-            systems[code] = cs.key("it.electoral_system", code)
-            if code in ("senato-proportional-2005", "senato-molise-2005") and systems[code] not in cs.minted:
-                cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
-            if systems[code] in cs.minted:
-                cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
-                name(systems[code], label)
-                if methodology is not None:
-                    cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
+            system = systems[code]
+            if held_rules.get(system) != rules:
+                cs.add("electoral_system", id=system, polity_id=italy, rules=rules, rules_version=1)
+            if label not in [text for _, text in held_names.get(system, [])]:
+                name(system, label)
+            for row_id, text in held_names.get(system, []):
+                if text != label:
+                    cs.add("name_drop", name_id=row_id, entity_id=system, text=text, reason="The system was relabeled.")
+            if methodology is not None and methodology not in [text for _, text in held_notes.get(system, [])]:
+                cs.add("note", entity_id=system, kind="methodology", body_md=methodology)
+            for row_id, text in held_notes.get(system, []):
+                if text != methodology:
+                    cs.add(
+                        "note_drop",
+                        note_id=row_id,
+                        entity_id=system,
+                        body_md=text,
+                        reason="The methodology note was rewritten.",
+                    )
 
         parties: dict[tuple[str, str], UUID] = {}
 
@@ -2388,11 +2438,12 @@ def emit() -> Path:
                 }
                 extra = reserve(day, region)
                 if day < MATTARELLA:
+                    system = "senato-1992" if day >= LAW_33_1992 else "senato-1948"
                     parent = cs.key("it.contest", f"{day}:senate:{region}")
                     placed = [
                         row
                         for key, group in sorted(by_key.items())
-                        for row in collegio_contest(day, election, path, region, key, group, parent, "senato-1948")
+                        for row in collegio_contest(day, election, path, region, key, group, parent, system)
                     ]
                     members = [row for row in placed if row["elected"]]
                     counts: dict[str, int] = {}
@@ -2440,7 +2491,7 @@ def emit() -> Path:
                         path,
                         region,
                         magnitude,
-                        "senato-1948",
+                        system,
                         f"Senate, {region_names[region]}",
                         members,
                         won,

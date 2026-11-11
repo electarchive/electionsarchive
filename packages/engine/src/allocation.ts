@@ -1,4 +1,6 @@
+import type { Candidate, Filled } from "./lists.ts";
 import type { Rules, Threshold } from "./rules.ts";
+import { fill } from "./lists.ts";
 
 type Entry = { id: string; votes: number; won?: number; inert?: boolean };
 type Claim = { id: string; score: number; votes: number };
@@ -552,4 +554,83 @@ export function apportion(
     leader,
     bonus: extra,
   };
+}
+
+export type College = {
+  voters?: number | undefined;
+  candidates: Array<{ id: string; votes: number; group?: string | undefined }>;
+};
+
+export type Recovery = Apportionment & {
+  outright: Array<string>;
+  lists: Record<string, Filled>;
+};
+
+export function recover(
+  rules: Proportional,
+  seats: number,
+  colleges: Array<College>,
+): Recovery {
+  const single = "singleMember" in rules ? rules.singleMember : undefined;
+  const quorum = single?.quorum;
+  const outright = new Set<string>();
+  const kept = new Map<string, number>();
+  const totals = new Map<string, number>();
+  const members = new Map<string, Map<string, Candidate>>();
+  for (const college of colleges) {
+    let valid = 0;
+    for (const { votes } of college.candidates) valid += votes;
+    const base = single?.of === "voters" ? (college.voters ?? valid) : valid;
+    const [top, second] = college.candidates.toSorted(
+      (a, b) => b.votes - a.votes,
+    );
+    if (
+      single != null &&
+      top != null &&
+      (quorum == null
+        ? top.votes !== second?.votes
+        : top.votes >= quorum * base)
+    ) {
+      outright.add(top.id);
+      if (quorum != null) {
+        const holder = top.group ?? top.id;
+        kept.set(holder, (kept.get(holder) ?? 0) + 1);
+      }
+    }
+    for (const { id, votes, group } of college.candidates) {
+      if (group == null) continue;
+      const list = members.get(group) ?? new Map<string, Candidate>();
+      members.set(group, list);
+      const share = base > 0 ? votes / base : 0;
+      if ((list.get(id)?.share ?? -1) < share)
+        list.set(id, { id, votes, share });
+    }
+  }
+  for (const college of colleges)
+    for (const { id, votes, group } of college.candidates)
+      if (
+        group != null &&
+        !(single?.scorporo === "winners" && outright.has(id))
+      )
+        totals.set(group, (totals.get(group) ?? 0) + votes);
+  let held = 0;
+  for (const won of kept.values()) held += won;
+  const apportionment = apportion(
+    rules,
+    seats - held,
+    [...totals].map(([id, votes]) => ({ id, votes })),
+  );
+  const lists: Record<string, Filled> = {};
+  for (const [group, won] of Object.entries(apportionment.seats))
+    if (won > 0 && rules.lists != null)
+      lists[group] = fill(
+        rules.lists,
+        won,
+        [...(members.get(group)?.values() ?? [])],
+        outright,
+      );
+  const result = { ...apportionment.seats };
+  for (const [holder, won] of kept)
+    result[holder] = (result[holder] ?? 0) + won;
+  return { ...apportionment, seats: result, outright: [...outright], lists };
 }

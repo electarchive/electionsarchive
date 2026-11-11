@@ -3,9 +3,12 @@ export {
   type Allocation,
   apportion,
   type Apportionment,
+  type College,
   distribute,
   type Distribution,
   qualify,
+  recover,
+  type Recovery,
 } from "./allocation.ts";
 export {
   type Candidate,
@@ -22,6 +25,7 @@ export {
   type Rules,
   rules,
   rulesJsonSchema,
+  type SingleMember,
   type Threshold,
 } from "./rules.ts";
 export { advance } from "./runoff.ts";

@@ -301,6 +301,31 @@
         "compensation": {
           "const": "constituency_seats"
         },
+        "singleMember": {
+          "type": "object",
+          "properties": {
+            "quorum": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
+            "of": {
+              "enum": [
+                "valid",
+                "voters"
+              ],
+              "type": "string",
+              "default": "valid"
+            },
+            "scorporo": {
+              "enum": [
+                "winners"
+              ],
+              "type": "string"
+            }
+          },
+          "required": []
+        },
         "lists": {
           "type": "object",
           "properties": {
@@ -308,7 +333,8 @@
               "enum": [
                 "closed",
                 "open",
-                "flexible"
+                "flexible",
+                "share"
               ],
               "type": "string"
             },
@@ -676,7 +702,8 @@
               "enum": [
                 "closed",
                 "open",
-                "flexible"
+                "flexible",
+                "share"
               ],
               "type": "string"
             },
@@ -1101,7 +1128,8 @@
               "enum": [
                 "closed",
                 "open",
-                "flexible"
+                "flexible",
+                "share"
               ],
               "type": "string"
             },

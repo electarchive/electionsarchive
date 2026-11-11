@@ -7,7 +7,7 @@ const compensation = v.optional(v.literal("constituency_seats"));
 
 const lists = v.optional(
   v.object({
-    order: v.picklist(["closed", "open", "flexible"]),
+    order: v.picklist(["closed", "open", "flexible", "share"]),
     quota: v.optional(v.pipe(v.number(), v.minValue(0))),
     individual: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
     constituencies: v.optional(v.picklist(["skip", "all", "covered"])),
@@ -19,6 +19,14 @@ const lists = v.optional(
       "substitute",
       "by_election",
     ]),
+  }),
+);
+
+const singleMember = v.optional(
+  v.object({
+    quorum: v.optional(v.pipe(v.number(), v.gtValue(0), v.maxValue(1))),
+    of: v.optional(v.picklist(["valid", "voters"]), "valid"),
+    scorporo: v.optional(v.picklist(["winners"])),
   }),
 );
 
@@ -90,6 +98,7 @@ export const rules = v.variant("formula", [
     bonus,
     pooling,
     compensation,
+    singleMember,
     lists,
     tieBreak,
   }),
@@ -252,5 +261,6 @@ export type Rules = v.InferOutput<typeof rules>;
 export type Threshold = v.InferOutput<typeof threshold>;
 export type Bonus = NonNullable<v.InferOutput<typeof bonus>>;
 export type Lists = NonNullable<v.InferOutput<typeof lists>>;
+export type SingleMember = NonNullable<v.InferOutput<typeof singleMember>>;
 
 export const rulesJsonSchema = toJsonSchema(rules);

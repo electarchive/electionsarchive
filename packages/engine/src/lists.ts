@@ -4,6 +4,7 @@ export type Candidate = {
   id: string;
   rank?: number | null | undefined;
   votes?: number | null | undefined;
+  share?: number | null | undefined;
 };
 export type Slate = {
   id: string;
@@ -43,6 +44,12 @@ export function fill(
       ordered = eligible.toSorted(byVotes);
       break;
     }
+    case "share": {
+      ordered = eligible.toSorted(
+        (a, b) => (b.share ?? 0) - (a.share ?? 0) || byVotes(a, b),
+      );
+      break;
+    }
     case "flexible": {
       const reach = (lists.quota ?? 1) * quotient;
       const preferred = eligible
@@ -58,11 +65,15 @@ export function fill(
     }
   }
   const last = ordered[seats - 1];
+  const next = ordered[seats];
+  const standing = (candidate: Candidate) =>
+    lists.order === "share" ? candidate.share : candidate.votes;
   const tied =
-    lists.order === "open" &&
+    (lists.order === "open" || lists.order === "share") &&
     last != null &&
-    last.votes === ordered[seats]?.votes
-      ? ordered.filter(({ votes }) => votes === last.votes)
+    next != null &&
+    standing(last) === standing(next)
+      ? ordered.filter((candidate) => standing(candidate) === standing(last))
       : [];
   return {
     elected: ordered
