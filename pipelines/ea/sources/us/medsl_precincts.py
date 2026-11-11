@@ -21,6 +21,30 @@ METHOD = (
     "the others are placed within their county."
 )
 
+LINES = {
+    "democratic": ("Democratic", "democratic-party"),
+    "democrat": ("Democratic", "democratic-party"),
+    "republican": ("Republican", "republican-party"),
+    "conservative": ("Conservative", "NY:conservative-party"),
+    "constitution": ("Conservative", "NY:conservative-party"),
+    "working families": ("Working Families", "NY:working-families-party"),
+    "independence": ("Independence", "NY:independence-party"),
+    "independent": ("Independence", "NY:independence-party"),
+    "women's equality": ("Women's Equality", "NY:women-s-equality-party"),
+    "reform": ("Reform", "NY:reform-party"),
+    "green": ("Green", "green-party"),
+    "libertarian": ("Libertarian", "libertarian-party"),
+    "people's choice": ("People's Choice", "NY:people-s-choice"),
+    "upstate jobs": ("Upstate Jobs", "NY:upstate-jobs"),
+    "harris bhatti": ("Haris Bhatti", "NY:haris-bhatti"),
+    "blue lives matter": ("Blue Lives Matter", "NY:blue-lives-matter"),
+    "transparent government": ("Transparent Government", "NY:transparent-govt"),
+    "stop the iran deal": ("Stop the Iran Deal", "NY:stop-the-iran-deal"),
+    "friends of diane neal": ("Friends of Diane Neal", "NY:friends-of-diane-neal"),
+    "frd": ("Friends of Diane Neal", "NY:friends-of-diane-neal"),
+    "fri": ("Friends of Diane Neal", "NY:friends-of-diane-neal"),
+}
+
 RESTAGED = [
     "AL",
     "AZ",
@@ -100,6 +124,24 @@ def parse() -> None:
         .with_columns(
             precinct=pl.col("precinct").str.strip_chars(),
             jurisdiction=pl.col("jurisdiction").str.strip_chars(),
+            line=pl.when(
+                (pl.col("state") == "NY") & (pl.col("chamber") == "house") & pl.col("year").is_in([2016, 2018])
+            ).then(
+                pl.col("party")
+                .str.to_lowercase()
+                .replace_strict({label: line for label, (line, _) in LINES.items()}, default=None)
+            ),
+        )
+        .with_columns(
+            line=pl.when(
+                (
+                    pl.col("line").is_in(["Democratic", "Republican"])
+                    & (pl.col("candidate").n_unique().over("year", "chamber", "state", "district", "fips", "line") > 1)
+                )
+                .any()
+                .over("year", "chamber", "state", "district", "fips")
+                .not_()
+            ).then("line")
         )
         .with_columns(
             kind=pl.when(pl.col("kind").is_in(["county", "place"]) & (pl.col("precinct") != ""))
@@ -127,6 +169,7 @@ def parse() -> None:
         "kind",
         "code",
         "candidate",
+        "line",
         "measure",
         maintain_order=True,
     ).agg(pl.col("writein").any(), pl.col("votes").sum())
@@ -229,12 +272,23 @@ def emit() -> Path:
             license="CC0 1.0",
         )
         cs.artifact(raw.cached(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0]), sources["president:2024"])
+        parties = dict(
+            conn.execute(
+                "select value, entity_id::text from external_id where scheme = 'us.party' and value = any(%s)",
+                [[party for _, party in LINES.values()]],
+            ).fetchall()
+        )
         medsl.attach(
             cs,
             conn,
             pl.read_parquet(PARSED / "returns.parquet")
             .filter(pl.col("state").is_in(RESTAGED))
-            .with_columns(source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)),
+            .with_columns(
+                source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String),
+                line_party=pl.col("line").replace_strict(
+                    {line: parties.get(party) for line, party in LINES.values()}, default=None, return_dtype=pl.String
+                ),
+            ),
             sources,
             restage=True,
         )

@@ -332,9 +332,7 @@ def precincts(
                 if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
                 seat=pl.col("district") if chamber in ("state", "statewide", "retention") else pl.lit(None, pl.String),
-                party=pl.col("party_detailed")
-                if chamber in ("state", "statewide", "retention")
-                else pl.lit(None, pl.String),
+                party=pl.col("party_detailed"),
                 stage=pl.col("stage").str.to_uppercase()
                 if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
@@ -1198,11 +1196,14 @@ def attach(
                 if spread[candidate] < 2 and root not in children:
                     continue
                 choices = children.get(root, [])
-                found = [option for option, party, _ in choices if line_party is not None and party == line_party] or [
-                    option for option, _, label in choices if slug(line)[:5] in slug(label.rsplit("(", 1)[-1])
+                same = [
+                    (slug(label.rsplit("(", 1)[-1]) != slug(line), option)
+                    for option, party, label in choices
+                    if line_party is not None and party == line_party
                 ]
-                if len(found) == 1:
-                    lined[f"{candidate}\x1f{line}"] = found[0]
+                near = [option for option, _, label in choices if slug(line)[:5] in slug(label.rsplit("(", 1)[-1])]
+                if same or len(near) == 1:
+                    lined[f"{candidate}\x1f{line}"] = min(same)[1] if same else near[0]
                     continue
                 child = cs.key("us.option", f"{key}:{root}:{slug(line)}")
                 if child in cs.minted:
