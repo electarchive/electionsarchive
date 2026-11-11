@@ -1,0 +1,25 @@
+{
+ "year": 1970,
+ "day": "1970-11-03",
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1970, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/reportofofficial1970montrich/reportofofficial1970montrich.pdf",
+  "item": "https://archive.org/details/reportofofficial1970montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "presidential electors, one column per candidate",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative; one column per candidate, district noted in the header"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4
+ ]
+}

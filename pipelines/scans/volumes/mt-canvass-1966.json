@@ -1,0 +1,25 @@
+{
+ "year": 1966,
+ "day": "1966-11-08",
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1966, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionofficial1966montrich/electionofficial1966montrich.pdf",
+  "item": "https://archive.org/details/electionofficial1966montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "presidential electors, one column per candidate",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative; one column per candidate, district noted in the header"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4
+ ]
+}

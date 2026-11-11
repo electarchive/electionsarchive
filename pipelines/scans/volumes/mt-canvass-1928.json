@@ -1,0 +1,27 @@
+{
+ "year": 1928,
+ "day": "1928-11-06",
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1928, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1928montrich/officialmontanag1928montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1928montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "presidential electors, one column per candidate",
+  "governor": "Governor",
+  "senate": "U.S. Senator",
+  "house": "U.S. Representative; one column per candidate, district noted in the header"
+ },
+ "leaves": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+ ]
+}
