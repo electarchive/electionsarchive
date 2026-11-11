@@ -119,7 +119,14 @@ export type LiveEstimate = {
   leader: string | null;
   runnerUp: string | null;
   winProbability: Record<string, number>;
-  units: Array<{ unitId: string; expectedTotal: Band; projectedMargin: Band }>;
+  remaining: { votes: Band; margin: Band };
+  late: { since: string; totals: Array<number> } | null;
+  units: Array<{
+    unitId: string;
+    expectedTotal: Band;
+    projectedMargin: Band;
+    remainingMargin: Band;
+  }>;
 };
 
 export type EstimateInput = { race: LiveRace; at: string | null };
@@ -150,6 +157,18 @@ const MODEL = {
     local: 0.05,
     grace: 1,
     pace: 13,
+  },
+  late: {
+    prior: 0.1,
+    floor: 0.05,
+    grain: 2,
+    drift: 0.04,
+    base: 0.002,
+    window: 2,
+    carry: 1,
+    amount: 1.2,
+    small: 0.03,
+    weigh: 1,
   },
 };
 
@@ -189,6 +208,7 @@ type Unit = {
   settled: number;
   sigma: number;
   hasBaseline: boolean;
+  night: Array<number> | null;
 };
 
 function seeded(text: string) {
@@ -303,10 +323,11 @@ function pair(race: LiveRace, latest: Map<string, Array<number>>) {
   return [order[0]?.index ?? 0, order[1]?.index ?? 1] as const;
 }
 
-function units(race: LiveRace, at: string | null) {
+function units(race: LiveRace, at: string | null, cutoff: number | null) {
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const byUnit = series(race, at);
   const latest = new Map<string, Array<number>>();
+  const nights = new Map<string, Array<number>>();
   const changed = new Map<string, string>();
   const waits = new Map<string, number>();
   let now = at ?? "";
@@ -326,6 +347,20 @@ function units(race: LiveRace, at: string | null) {
     }
     latest.set(id, pick.votes);
     changed.set(id, since);
+    if (cutoff != null) {
+      let before: LiveUnitCount | null = null;
+      for (const count of list) {
+        if (
+          Date.parse(count.at) <= cutoff &&
+          (before == null || count.at > before.at)
+        ) {
+          before = count;
+        }
+      }
+      if (before != null) {
+        nights.set(id, before.votes);
+      }
+    }
     const steps: Array<number> = [];
     let last = -1;
     for (const count of list.toSorted((x, y) => x.at.localeCompare(y.at))) {
@@ -409,6 +444,7 @@ function units(race: LiveRace, at: string | null) {
         : 1,
       sigma: MODEL.spread,
       hasBaseline: base != null && base.turnout > 0,
+      night: nights.get(id) ?? null,
     });
   }
   const sized = found.filter((unit) => unit.hasBaseline);
@@ -715,9 +751,84 @@ function fit(
   return solve(matrix, vector, random);
 }
 
+function lean(found: Array<Unit>, a: number, b: number, coming: number) {
+  const rows: Array<{ index: number; gap: number; noise: number }> = [];
+  let seen = 0;
+  for (const [index, unit] of found.entries()) {
+    const night = unit.night;
+    const before = night == null ? 0 : sum(night);
+    const added = unit.total - before;
+    if (night == null || before <= 0 || added <= 0) {
+      continue;
+    }
+    const gained =
+      (unit.counted[a] ?? 0) -
+      (night[a] ?? 0) -
+      ((unit.counted[b] ?? 0) - (night[b] ?? 0));
+    seen += added;
+    rows.push({
+      index,
+      gap:
+        clamp(gained / added, -1, 1) -
+        ((night[a] ?? 0) - (night[b] ?? 0)) / before,
+      noise: MODEL.late.grain / added,
+    });
+  }
+  const prior = MODEL.late.prior ** 2;
+  let spread = MODEL.late.floor ** 2;
+  let pooled = 0;
+  let error = Infinity;
+  if (rows.length > 0) {
+    let weights = 0;
+    let squares = 0;
+    let center = 0;
+    for (const row of rows) {
+      weights += 1 / row.noise;
+      squares += 1 / row.noise ** 2;
+      center += row.gap / row.noise;
+    }
+    center /= weights;
+    let q = 0;
+    for (const row of rows) {
+      q += (row.gap - center) ** 2 / row.noise;
+    }
+    const c = weights - squares / weights;
+    if (rows.length > 1 && c > 0) {
+      spread = Math.max(spread, (q - (rows.length - 1)) / c);
+    }
+    let total = 0;
+    for (const row of rows) {
+      total += 1 / (row.noise + spread);
+      pooled += row.gap / (row.noise + spread);
+    }
+    pooled /= total;
+    error = 1 / total;
+  }
+  const trust = seen > 0 ? seen / (seen + MODEL.late.weigh * coming) : 0;
+  const mean = Number.isFinite(error)
+    ? (trust * pooled * prior) / (prior + error)
+    : 0;
+  const variance = Number.isFinite(error)
+    ? (prior * error) / (prior + error)
+    : prior;
+  const own = new Map<number, { shift: number; variance: number }>();
+  for (const row of rows) {
+    const weight = spread / (spread + row.noise);
+    own.set(row.index, {
+      shift: trust * weight * (row.gap - pooled),
+      variance: (1 - weight) * spread,
+    });
+  }
+  return { mean, sd: Math.sqrt(variance + MODEL.late.drift ** 2), spread, own };
+}
+
 export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const stamp = at ?? race.frames.at(-1)?.at ?? "";
-  const { found, a, b } = units(race, at);
+  const opened = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
+  const cutoff =
+    opened == null ? null : Date.parse(opened) + MODEL.tail.grace * 86_400_000;
+  const isLate = cutoff != null && Date.parse(stamp) > cutoff;
+  const { found, a, b } = units(race, at, cutoff);
   const tail = TAILS[race.state] ?? MODEL.tail.share;
   const counted = sum(found.map((unit) => unit.total));
   const empty: LiveEstimate = {
@@ -730,6 +841,11 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     leader: null,
     runnerUp: null,
     winProbability: {},
+    remaining: {
+      votes: { low: 0, mid: 0, high: 0 },
+      margin: { low: 0, mid: 0, high: 0 },
+    },
+    late: null,
     units: [],
   };
   if (race.options.length < 2 || found.length === 0 || counted === 0) {
@@ -737,7 +853,6 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   }
   const optionA = race.options[a]!;
   const optionB = race.options[b]!;
-  const opened = race.frames.find((frame) => sum(frame.totals) > 0)?.at;
   const days =
     opened == null
       ? 0
@@ -746,14 +861,20 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     (frame) => Date.parse(frame.at) <= Date.parse(stamp),
   );
   const night = shown.findLast(
-    (frame) =>
-      opened != null &&
-      Date.parse(frame.at) <=
-        Date.parse(opened) + MODEL.tail.grace * 86_400_000,
+    (frame) => cutoff != null && Date.parse(frame.at) <= cutoff,
   );
   const onNight = night == null ? 0 : sum(night.totals);
   const latest = shown.length > 0 ? sum(shown.at(-1)!.totals) : 0;
-  const left = Math.min(
+  const since = shown.findLast(
+    (frame) =>
+      Date.parse(frame.at) <=
+      Math.max(cutoff ?? 0, Date.parse(stamp) - MODEL.late.window * 86_400_000),
+  );
+  const recent =
+    isLate && since != null && latest > 0
+      ? Math.max(0, latest - sum(since.totals)) / latest
+      : 0;
+  const planned = Math.min(
     tail *
       Math.exp(
         -Math.max(0, days - MODEL.tail.grace) / (MODEL.tail.pace * tail),
@@ -762,6 +883,29 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       ? Infinity
       : Math.max(0, tail * onNight - (latest - onNight)) / latest,
   );
+  const newest = shown.at(-1);
+  const complete =
+    isLate &&
+    newest?.reporting != null &&
+    newest.expected != null &&
+    newest.expected > 0 &&
+    newest.reporting >= newest.expected;
+  const isTail =
+    complete ||
+    (isLate && onNight > 0 && latest - onNight <= MODEL.late.small * onNight);
+  const left = isTail
+    ? Math.max(planned, MODEL.late.carry * recent + MODEL.late.base)
+    : planned;
+  const late =
+    isLate && night != null
+      ? {
+          since: night.at,
+          totals: race.options.map(
+            (_, index) =>
+              (shown.at(-1)!.totals[index] ?? 0) - (night.totals[index] ?? 0),
+          ),
+        }
+      : null;
   if (race.certified != null) {
     const totals = race.certified.totals;
     const all = sum(totals);
@@ -786,6 +930,11 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
         unitId: unit.id,
         expectedTotal: { low: unit.total, mid: unit.total, high: unit.total },
         projectedMargin: {
+          low: unit.margin,
+          mid: unit.margin,
+          high: unit.margin,
+        },
+        remainingMargin: {
           low: unit.margin,
           mid: unit.margin,
           high: unit.margin,
@@ -870,14 +1019,19 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
           MODEL.volatility.calm ** 2,
       ),
     );
+  const learned = isTail ? lean(found, a, b, left * latest) : null;
+  const ahead = sum(found.map((unit) => unit.margin * unit.total));
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
   const shareIn: Array<number> = [];
+  const restVotes: Array<number> = [];
+  const restMargins: Array<number> = [];
   const centers: Array<number> = [];
   const spreads: Array<number> = [];
   const perUnit = found.map(() => ({
     totals: [] as Array<number>,
     margins: [] as Array<number>,
+    rests: [] as Array<number>,
   }));
   const totals = found.map(() => 0);
   for (let draw = 0; draw < MODEL.draws; draw += 1) {
@@ -885,16 +1039,18 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const surge = MODEL.surge * gaussian(random);
     const shift = MODEL.shift * gaussian(random);
     const mode = modeScale * gaussian(random);
-    const late =
-      left *
-      Math.exp(
-        MODEL.tail.spread * gaussian(random) - MODEL.tail.spread ** 2 / 2,
-      );
-    const lean = MODEL.tail.lean * gaussian(random);
+    const amount = isTail ? MODEL.late.amount : MODEL.tail.spread;
+    const later = left * Math.exp(amount * gaussian(random) - amount ** 2 / 2);
+    const tilt =
+      (learned?.mean ?? 0) +
+      (learned?.sd ?? MODEL.tail.lean) * gaussian(random);
     const fractions: Array<number> = [];
     for (const [index, unit] of found.entries()) {
       if (unit.hasBaseline) {
-        totals[index] = model.unit(unit, cell, tau, surge, random);
+        totals[index] =
+          unit.total > 0 && complete
+            ? unit.total
+            : model.unit(unit, cell, tau, surge, random);
         if (unit.total > 0) {
           fractions.push(unit.total / totals[index]);
         }
@@ -906,11 +1062,13 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
         : 0.7;
     for (const [index, unit] of found.entries()) {
       if (!unit.hasBaseline) {
-        totals[index] = Math.max(
-          unit.total,
-          (unit.total / Math.max(typicalFraction, 0.2)) *
-            Math.exp(MODEL.spread * gaussian(random)),
-        );
+        totals[index] = complete
+          ? unit.total
+          : Math.max(
+              unit.total,
+              (unit.total / Math.max(typicalFraction, 0.2)) *
+                Math.exp(MODEL.spread * gaussian(random)),
+            );
       }
     }
     const coefficients = fit(found, totals, center, residuals, random);
@@ -921,6 +1079,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     let shifted = 0;
     let moded = 0;
     let leaned = 0;
+    let scattered = 0;
     for (const [index, unit] of found.entries()) {
       const final = totals[index]!;
       const fraction = final > 0 ? Math.min(1, unit.total / final) : 1;
@@ -945,15 +1104,25 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       const remaining = final - unit.total;
       const room = remaining * (1 - unit.others);
       const countedLead = unit.margin * unit.total;
+      const own = learned?.own.get(index) ?? {
+        shift: 0,
+        variance: learned?.spread ?? 0,
+      };
+      const drift =
+        learned == null
+          ? tilt
+          : tilt + own.shift + Math.sqrt(own.variance) * gaussian(random);
+      const expect = (learned?.mean ?? 0) + own.shift;
       const lead = clamp(
         (margin + shift * reach + mode * (1 - fraction)) * final - countedLead,
         -room,
         room,
       );
       const steady = clamp(margin * final - countedLead, -room, room);
-      const extra = final * late;
+      const extra = final * later;
       const ceiling = 1 - unit.others;
-      const local = final > 0 ? MODEL.tail.local * gaussian(random) : 0;
+      const local =
+        final > 0 && learned == null ? MODEL.tail.local * gaussian(random) : 0;
       const tail = (value: number, tilt: number) =>
         final > 0
           ? extra *
@@ -963,29 +1132,38 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
               ceiling,
             )
           : 0;
-      const unitVotes = countedLead + lead + tail(lead, lean);
+      const unitVotes = countedLead + lead + tail(lead, drift);
       const unitTotal = final + extra;
       votes += unitVotes;
-      still += countedLead + steady + tail(steady, 0);
+      still += countedLead + steady + tail(steady, expect);
       all += unitTotal;
       if (Math.abs(margin * final - countedLead) < room) {
         shifted += unitTotal * reach;
         moded += unitTotal * (1 - fraction);
       }
       leaned += extra;
+      scattered += extra ** 2 * own.variance;
       perUnit[index]!.totals.push(unitTotal);
       perUnit[index]!.margins.push(unitTotal > 0 ? unitVotes / unitTotal : 0);
+      perUnit[index]!.rests.push(
+        unitTotal > unit.total
+          ? (unitVotes - countedLead) / (unitTotal - unit.total)
+          : unit.margin,
+      );
     }
     finalMargins.push(all > 0 ? votes / all : 0);
     finalTotals.push(all);
     shareIn.push(all > 0 ? Math.min(1, counted / all) : 0);
+    restVotes.push(Math.max(0, all - counted));
+    restMargins.push(all > counted ? (votes - ahead) / (all - counted) : 0);
     centers.push(all > 0 ? still / all : 0);
     spreads.push(
       all > 0
         ? Math.hypot(
             MODEL.shift * shifted,
             modeScale * moded,
-            MODEL.tail.lean * leaned,
+            (learned?.sd ?? MODEL.tail.lean) * leaned,
+            Math.sqrt(scattered),
           ) / all
         : 0,
     );
@@ -1005,31 +1183,30 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
         ? "ranked"
         : "estimating";
   const isModeled = status !== "ranked";
+  const turn = (value: Band) =>
+    flip ? { low: -value.high, mid: -value.mid, high: -value.low } : value;
   return {
     status,
     at: stamp,
     counted,
     expectedTotal: band(finalTotals),
     shareIn: shareInBand,
-    margin: !isModeled
-      ? { low: 0, mid: 0, high: 0 }
-      : flip
-        ? { low: -margin.high, mid: -margin.mid, high: -margin.low }
-        : margin,
+    margin: !isModeled ? { low: 0, mid: 0, high: 0 } : turn(margin),
     leader: leader.id,
     runnerUp: runnerUp.id,
     winProbability: isModeled
       ? { [optionA.id]: chance, [optionB.id]: 1 - chance }
       : {},
-    units: found.map((unit, index) => {
-      const projected = band(perUnit[index]!.margins);
-      return {
-        unitId: unit.id,
-        expectedTotal: band(perUnit[index]!.totals),
-        projectedMargin: flip
-          ? { low: -projected.high, mid: -projected.mid, high: -projected.low }
-          : projected,
-      };
-    }),
+    remaining: {
+      votes: band(restVotes),
+      margin: isModeled ? turn(band(restMargins)) : { low: 0, mid: 0, high: 0 },
+    },
+    late,
+    units: found.map((unit, index) => ({
+      unitId: unit.id,
+      expectedTotal: band(perUnit[index]!.totals),
+      projectedMargin: turn(band(perUnit[index]!.margins)),
+      remainingMargin: turn(band(perUnit[index]!.rests)),
+    })),
   };
 }

@@ -175,6 +175,11 @@
           },
           margin: { low: 0, mid: 0, high: 0 },
           winProbability: {},
+          remaining: {
+            votes: { low: 0, mid: 0, high: 0 },
+            margin: { low: 0, mid: 0, high: 0 },
+          },
+          late: null,
           units: [],
         },
   );

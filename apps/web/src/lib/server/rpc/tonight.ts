@@ -427,6 +427,11 @@ export const tonight = {
                   mid: Math.round(estimate.expectedTotal.mid),
                   high: Math.round(estimate.expectedTotal.high),
                 },
+                votesLeft: {
+                  low: Math.round(estimate.remaining.votes.low),
+                  mid: Math.round(estimate.remaining.votes.mid),
+                  high: Math.round(estimate.remaining.votes.high),
+                },
                 counted: {
                   low: round(Math.min(1, estimate.shareIn.low), 3),
                   mid: round(Math.min(1, estimate.shareIn.mid), 3),

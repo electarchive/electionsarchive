@@ -210,6 +210,7 @@
             <li>{m.method_order_shift()}</li>
             <li>{m.method_order_swing()}</li>
             <li>{m.method_order_tail()}</li>
+            <li>{m.method_order_after()}</li>
           </ul>
         </div>
         <div class="max-inline-xl">
