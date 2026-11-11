@@ -1505,18 +1505,18 @@ const childrenKey = (
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
-  target: number | undefined,
   isDeep: boolean,
-) =>
-  JSON.stringify([
-    contest,
+) => {
+  const ids = [contest].flat();
+  return JSON.stringify([
+    ids.length === 1 ? ids[0] : ids,
     area.id,
     area.k,
     isRoot,
     date,
-    target ?? null,
-    isDeep,
+    isDeep && isRoot,
   ]);
+};
 
 type Surveyed = Awaited<ReturnType<typeof survey>>;
 
@@ -1525,12 +1525,11 @@ async function surveyed(
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
-  target?: number,
   isDeep = false,
 ) {
   return remember(
-    `survey:${childrenKey(contest, area, isRoot, date, target, isDeep)}`,
-    async () => survey(contest, area, isRoot, date, target, isDeep),
+    `survey:${childrenKey(contest, area, isRoot, date, isDeep)}`,
+    async () => survey(contest, area, isRoot, date, isDeep && isRoot),
   );
 }
 
@@ -1539,12 +1538,11 @@ async function children(
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
-  target?: number,
   isDeep = false,
 ) {
   return labeled(
-    surveyed(contest, area, isRoot, date, target, isDeep),
-    childrenKey(contest, area, isRoot, date, target, isDeep),
+    surveyed(contest, area, isRoot, date, isDeep),
+    childrenKey(contest, area, isRoot, date, isDeep),
     date,
   );
 }
@@ -1558,7 +1556,6 @@ async function survey(
   area: { id: string; k: number },
   isRoot: boolean,
   date: string,
-  target?: number,
   isDeep = false,
 ) {
   const sets = await db.execute<{ k: number }>(sql`
@@ -1687,17 +1684,12 @@ async function survey(
         )
     `);
   }
-  const isSettled = found.rows.some(
-    (row) => row.k === target && !deeper.has(row.id),
-  );
-  const linked = isSettled
-    ? { rows: [] }
-    : await db.execute<{ yes: boolean }>(sql`
-      select exists (
-        select from (select m.valid from reporting_unit_area m where m.area_id = any(array[${area.id}::uuid]) offset 0) m
-        where m.valid @> ${date}::date
-      ) as yes
-    `);
+  const linked = await db.execute<{ yes: boolean }>(sql`
+    select exists (
+      select from (select m.valid from reporting_unit_area m where m.area_id = any(array[${area.id}::uuid]) offset 0) m
+      where m.valid @> ${date}::date
+    ) as yes
+  `);
   const joined = linked.rows[0]?.yes
     ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
       with r as materialized (
@@ -1722,9 +1714,7 @@ async function survey(
     `)
     : { rows: [] };
   const abroad =
-    isRoot &&
-    !isSettled &&
-    found.rows.every((row) => row.scheme !== "world.country")
+    isRoot && found.rows.every((row) => row.scheme !== "world.country")
       ? await db.execute<{ id: string; k: number; scheme: string }>(
           counted(sql`
             select a.id, a.k, a.scheme_code as scheme from area a
@@ -1953,8 +1943,9 @@ async function descend(
       current,
       chain.length === 0,
       contest.date ?? "infinity",
+      true,
     );
-    const kid = kids.find((entry) => entry.segment === piece);
+    const kid = kids.find((entry) => !entry.isDeep && entry.segment === piece);
     if (kid == null) {
       throw new ORPCError("NOT_FOUND");
     }
@@ -4492,7 +4483,7 @@ async function places(
   const strays = unlocated();
   strays.catch(() => null);
   const day = contest.date ?? "infinity";
-  const surveying = surveyed(contest.id, area, isRoot, day, undefined, true);
+  const surveying = surveyed(contest.id, area, isRoot, day, true);
   const found = await surveying;
   const electoral = found.filter((kid) => kid.kind === "electoral_district");
   const loose =
@@ -4827,7 +4818,7 @@ async function places(
       .map((kid) => kid.parent ?? kid.id),
   );
   const naming = remember(
-    `children:${childrenKey(contest.id, area, isRoot, day, undefined, true)}:${level.code}`,
+    `children:${childrenKey(contest.id, area, isRoot, day, true)}:${level.code}`,
     async () =>
       label(
         found.filter(
@@ -11754,14 +11745,7 @@ export const contests = {
         `),
         input.level == null
           ? []
-          : children(
-              contest.id,
-              area,
-              chain.length === 0,
-              day,
-              undefined,
-              true,
-            ),
+          : children(contest.id, area, chain.length === 0, day, true),
       ]);
       const scheme = own.rows[0]?.scheme ?? "";
       const listed = kids
@@ -12477,15 +12461,25 @@ export const contests = {
           union all
           select g.id, grp.top from contest g join grp on g.allocation_parent_id = grp.id
         ),
+        here as materialized (
+          select r.result_set_k as k from result_rollup_sum r
+          where r.area_k = ${area.k} and r.measure = any(${COUNTED})
+          union
+          select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k}
+        ),
+        matched as materialized (
+          select grp.top, x.k from here
+          join result_set x on x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
+          join grp on grp.id = x.contest_id
+        ),
         hits as (
-          select grp.top, bool_or(r.voted) as voted from grp
-          cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+          select m.top, bool_or(r.voted) as voted from matched m
           cross join lateral (
             select bool_or(r.value <> 0) as voted from result_rollup r
-            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+            where r.result_set_k = m.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
             having count(*) > 0
           ) r
-          group by grp.top
+          group by m.top
         )
         select c.id, c.parent, s.path, h.voted
         from candidates c
@@ -12513,7 +12507,7 @@ export const contests = {
         const kids =
           other.place.k === area.k
             ? []
-            : await children(row.id, other.place, true, day, area.k);
+            : await children(row.id, other.place, true, day);
         const unit =
           other.place.k === area.k
             ? ""
