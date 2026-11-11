@@ -1,0 +1,24 @@
+{
+  "year": 1922,
+  "day": "1922-11-07",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1923, consolidated vote of the general election held 1922-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1923/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1923"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator (regular election only)",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    125,
+    126,
+    127,
+    128,
+    129
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "year": 1938,
+  "day": "1938-11-08",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1939-1943, consolidated vote of the general election held 1938-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19391943/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19391943"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator (regular election only)",
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    401,
+    402,
+    403,
+    404,
+    405,
+    406,
+    407,
+    408,
+    427,
+    428,
+    429
+  ]
+}

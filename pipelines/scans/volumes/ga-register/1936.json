@@ -1,0 +1,34 @@
+{
+  "year": 1936,
+  "day": "1936-11-03",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1933-1937, consolidated vote of the general election held 1936-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19331937/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19331937"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors; when each elector is printed, use the column of the elector with the most votes for each party, or the party total if printed); only the 1936 columns: columns for any other year printed beside them are office other",
+    "senate": "U.S. Senator (regular election only); only the 1936 columns: columns for any other year printed beside them are office other",
+    "house": "U.S. Representative in Congress, one table per congressional district; only the 1936 columns: columns for any other year printed beside them are office other"
+  },
+  "leaves": [
+    647,
+    648,
+    649,
+    650,
+    651,
+    654,
+    655,
+    656,
+    657,
+    779,
+    780,
+    781,
+    782,
+    783
+  ]
+}

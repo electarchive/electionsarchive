@@ -1,0 +1,25 @@
+{
+  "year": 1944,
+  "day": "1944-11-07",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1945-1950, consolidated vote of the general election held 1944-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19451950/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19451950"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors; when each elector is printed, use the column of the elector with the most votes for each party, or the party total if printed)",
+    "senate": "U.S. Senator (regular election only)",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    432,
+    433,
+    434,
+    435,
+    436
+  ]
+}

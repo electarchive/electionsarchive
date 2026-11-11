@@ -1,0 +1,28 @@
+{
+  "year": 1946,
+  "day": "1946-11-05",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1945-1950, consolidated vote of the general election held 1946-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19451950/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19451950"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    539,
+    540,
+    541,
+    542,
+    543,
+    544,
+    567,
+    568,
+    569
+  ]
+}
