@@ -627,7 +627,14 @@ def emit() -> Path:
                             stored.add((f"{state}:{grain}", artifact.storage_key))
                             cs.artifact(artifact, sources[f"{state}:{grain}"])
         restage = bool(os.environ.get("OE_REEMIT"))
-        medsl.attach(cs, conn, counties, sources, restage=restage)
+        medsl.attach(
+            cs,
+            conn,
+            counties,
+            sources,
+            restage=restage,
+            shortfall="OpenElections' county file leaves out some county votes, and its sums fall the same share short for every candidate",
+        )
         medsl.attach(cs, conn, precincts, sources, grain="precinct", restage=restage)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         units = {
