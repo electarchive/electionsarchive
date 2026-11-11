@@ -1009,7 +1009,7 @@ const datedTogether = together(
         select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[]) p(entity_id, on_date)
       ),
       c as materialized (
-        select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from, ctid as tid
+        select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
         from name
         where entity_id = any(${sql.param(ids)}::uuid[])
           and (kind in ('official', 'english') or (${historical} and kind = 'historical'))
@@ -1021,7 +1021,7 @@ const datedTogether = together(
       l as (
         select distinct on (entity_id) entity_id, lang from c
         where is_preferred and kind in ('official', 'english')
-        order by entity_id, tid
+        order by entity_id, id
       ),
       n as (
         select distinct on (p.entity_id, p.on_date) p.entity_id, p.on_date, c.kind::text as kind, c.text
