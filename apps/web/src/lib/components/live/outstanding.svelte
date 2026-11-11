@@ -110,6 +110,7 @@
       second,
       firstShare: (estimate.late.totals[first] ?? 0) / added,
       secondShare: (estimate.late.totals[second] ?? 0) / added,
+      isReported: estimate.late.isReported,
     };
   });
 </script>
@@ -180,7 +181,9 @@
           secondShare: percent(late.secondShare, 1),
         })}
       </p>
-      <p>{m.night_left_unknown()}</p>
+      <p>
+        {late.isReported ? m.night_left_reported() : m.night_left_unknown()}
+      </p>
     </div>
   {/if}
   {#if top.length === 0}

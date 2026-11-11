@@ -2,11 +2,13 @@ import json
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
+from uuid import UUID
 
 import httpx
 import polars as pl
 
-from ea.sources.us.enr_2026 import FIPS, table
+from ea.sources.us.enr_2026 import DAY, FIPS, table
+from ea.store import Connection
 
 BASE = "https://apps.npr.org/2026-election-results/data/"
 OFFICES = {
@@ -92,3 +94,31 @@ def frame(state: str, paths: dict[str, Path]) -> pl.DataFrame:
                     }
                 )
     return pl.DataFrame(found, schema=table({}).schema)
+
+
+def expectations(conn: Connection, state: str, paths: dict[str, Path]) -> dict[str, dict[UUID, tuple[float, int]]]:
+    races = [
+        race
+        for race in json.loads(paths[f"{BASE}states/{state}.json"].read_bytes())["results"]
+        if not race.get("test") and race.get("office") in COUNTIES
+    ]
+    found: dict[str, dict[str, tuple[float, int]]] = {}
+    for race in races:
+        url = f"{BASE}counties/{state}-{race['id']}.json"
+        key = f"{DAY}:{state}:{OFFICES[race['office']]}"
+        if url not in paths or sum(other["office"] == race["office"] for other in races) > 1:
+            continue
+        found[key] = {
+            town["fips"]: (round(float(town["eevp"]), 4), round(int(town["totalVotes"]) / float(town["eevp"])))
+            for town in json.loads(paths[url].read_bytes())["results"]
+            if not town["fips"].endswith("000")
+            and 0 < float(town.get("eevp") or 0) <= 1
+            and int(town.get("totalVotes") or 0) > 0
+        }
+    codes = sorted({code for towns in found.values() for code in towns})
+    units = dict(
+        conn.execute(
+            "select code, id from reporting_unit where scheme_code = 'us.county' and code = any(%s)", [codes]
+        ).fetchall()
+    )
+    return {key: {units[code]: value for code, value in towns.items() if code in units} for key, towns in found.items()}

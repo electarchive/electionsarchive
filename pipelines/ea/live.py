@@ -196,6 +196,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if adapter == "us.vi_live"
             else nyc_enr_live.plan(conn, feed, paths)
         )
+        expected = npr_live.expectations(conn, params["state"], paths) if adapter == "us.npr" else {}
         if adapter == "us.enr_2026" and enr_2026.county_only(params["state"], paths):
             tallies = [tally for tally in tallies if enr_2026.countywide(tally[1])]
         conn.execute(
@@ -206,7 +207,9 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         for line in sorted(set(unmatched)):
             issue(conn, feed, "unmatched", line)
         written = 0
-        frames: list[tuple[UUID, datetime, dict[tuple[UUID, UUID], int], tuple[int, int]]] = []
+        frames: list[
+            tuple[UUID, datetime, dict[tuple[UUID, UUID], int], tuple[int, int], dict[UUID, tuple[float, int]]]
+        ] = []
         for _, contest_key, contest, sums, reporting, stamp in tallies:
             as_of = datetime.fromisoformat(str(stamp)) if stamp else fetched_at
             if as_of.tzinfo is None or as_of > fetched_at + timedelta(minutes=10):
@@ -217,6 +220,8 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                 continue
             if not any(sums.values()):
                 continue
+            units = {unit for unit, _ in sums}
+            told = {unit: value for unit, value in expected.get(contest_key, {}).items() if unit in units}
             previous = conn.execute(
                 """select f.k, f.as_of from live.frame f
                    where f.feed_id = %s and f.contest_id = %s and f.status = 'active' order by f.as_of desc limit 1""",
@@ -231,7 +236,17 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                         "select unit_id, option_id, votes from live.value where frame_k = %s", [previous[0]]
                     ).fetchall()
                 }
-                if stored == sums:
+                known = (
+                    {
+                        unit: (float(share), int(total))
+                        for unit, share, total in conn.execute(
+                            "select unit_id, share, expected from live.expectation where frame_k = %s", [previous[0]]
+                        ).fetchall()
+                    }
+                    if adapter == "us.npr"
+                    else {}
+                )
+                if stored == sums and known == told:
                     continue
                 if sum(sums.values()) < DROP * sum(stored.values()):
                     issue(
@@ -241,7 +256,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
                         f"{contest_key}: total fell from {sum(stored.values())} to {sum(sums.values())}; frame held back",
                     )
                     continue
-            frames.append((contest, as_of, sums, reporting))
+            frames.append((contest, as_of, sums, reporting, told))
         fetch = record(
             conn,
             feed,
@@ -252,7 +267,7 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             "frame" if frames else "unchanged",
             None,
         )
-        for contest, as_of, sums, reporting in frames:
+        for contest, as_of, sums, reporting, told in frames:
             conn.execute(
                 "delete from live.frame where feed_id = %s and contest_id = %s and as_of = %s", [feed, contest, as_of]
             )
@@ -264,6 +279,10 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             with conn.cursor().copy("copy live.value (frame_k, unit_id, option_id, votes) from stdin") as copy:
                 for (unit, option), votes in sums.items():
                     copy.write_row((k, unit, option, votes))
+            if told:
+                with conn.cursor().copy("copy live.expectation (frame_k, unit_id, share, expected) from stdin") as copy:
+                    for unit, (share, total) in told.items():
+                        copy.write_row((k, unit, share, total))
             written += 1
         return f"{written} frames" + (f", {len(set(unmatched))} unmatched" if unmatched else "")
 
