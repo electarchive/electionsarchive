@@ -1,6 +1,8 @@
 import gzip
 import hashlib
 import json
+import os
+import resource
 import shutil
 from collections import defaultdict
 from datetime import UTC, datetime
@@ -90,8 +92,7 @@ TYPES: dict[str, pl.DataType] = {
 }
 CAST = {"USER-DEFINED", "ARRAY", "jsonb", "boolean"}
 MIN_ROWS = 2_000_000
-GEOMETRY_SOFT = 512 << 20
-GEOMETRY_HARD = 768 << 20
+GEOMETRY_SOFT = 256 << 20
 MAX_BYTES = 2 << 30
 MAX_FILES = 1000
 
@@ -131,6 +132,25 @@ def _columns(
     return out
 
 
+def _drop(path: Path) -> None:
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+        os.posix_fadvise(fd, 0, 0, os.POSIX_FADV_DONTNEED)
+    finally:
+        os.close(fd)
+
+
+def _mem(label: str) -> None:
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss >> 10
+    cgroup = ""
+    try:
+        cgroup = f" cgroup={int(Path('/sys/fs/cgroup/memory.current').read_text()) >> 20}M"
+    except OSError:
+        pass
+    print(f"mem {label} peak_rss={peak}M{cgroup}", flush=True)
+
+
 class Writer:
     def __init__(self, conn: Connection, folder: Path) -> None:
         self.conn = conn
@@ -146,6 +166,7 @@ class Writer:
         with path.open("rb") as file:
             while chunk := file.read(1 << 24):
                 digest.update(chunk)
+        _drop(path)
         self.files.append(
             {
                 "file": path.name,
@@ -175,6 +196,7 @@ class Writer:
         with scratch.open("wb") as file, self.conn.cursor().copy(select) as copy:
             for chunk in copy:
                 file.write(chunk)
+        _drop(scratch)
         parquet = self.folder / f"{stem}.parquet"
         pl.scan_csv(scratch, schema={name: kind for name, _, kind in columns}).with_columns(
             pl.col(name).dt.replace_time_zone("UTC") for name, _, kind in columns if kind == pl.Datetime("us")
@@ -189,6 +211,7 @@ class Writer:
         with scratch.open("rb") as source, gzip.open(csv, "wb", compresslevel=6) as target:
             shutil.copyfileobj(source, target, 1 << 24)
         scratch.unlink()
+        _mem(stem)
         self._record(csv, bundle, table, part, rows)
         return rows
 
@@ -213,6 +236,7 @@ class Writer:
             },
             orient="row",
         )
+        rows.clear()
         geo = {
             "version": "1.1.0",
             "primary_column": "geometry",
@@ -224,6 +248,7 @@ class Writer:
         path = self.folder / f"{stem}.parquet"
         frame.write_parquet(path, compression="zstd", metadata={"geo": json.dumps(geo)})
         self._record(path, bundle, "geometry", part, frame.height)
+        _mem(stem)
 
 
 def _key(polities: dict[str, tuple[str, str | None]], parents: dict[str, str], polity: str) -> str:
@@ -510,7 +535,7 @@ def _geometry(conn: Connection, writer: Writer) -> None:
             target = target or "cc-by"
             year = str(row[2].year) if row[2] else "undated"
             group = (target, row[1])
-            if batch and (group != current or size >= GEOMETRY_HARD or (size >= GEOMETRY_SOFT and year != years[1])):
+            if batch and (group != current or size >= GEOMETRY_SOFT):
                 writer.geometry(current[0], current[1], years, batch)
                 print(f"geometry {current[0]} {current[1]} {years[0]}-{years[1]}", flush=True)
                 batch, size = [], 0
