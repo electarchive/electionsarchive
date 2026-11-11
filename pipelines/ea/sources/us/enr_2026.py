@@ -1972,6 +1972,7 @@ def plan(
                     and (
                         difflib.SequenceMatcher(None, words[-1], terms(name)[-1]).ratio() >= 0.9
                         or words[-1].replace("l", "i") == terms(name)[-1].replace("l", "i")
+                        or edits(words[-1], terms(name)[-1])
                     )
                 ]
                 hits = [(1, option) for option in spelled] if len(spelled) == 1 else []

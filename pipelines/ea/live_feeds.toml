@@ -1,7 +1,7 @@
 [[feed]]
 id = "us.enr_2026.ar"
 adapter = "us.enr_2026"
-params = { revision = "2026-11-10", state = "AR" }
+params = { revision = "2026-11-10-2", state = "AR" }
 poller = "muktedir"
 publisher = "Arkansas Secretary of State"
 url = "https://arkansas.tally-enr.com/"
