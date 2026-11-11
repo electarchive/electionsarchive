@@ -17,7 +17,7 @@ from ea.sources.de.btw import CONSTITUENCIES
 from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
@@ -46,6 +46,120 @@ NOTE_BE = (
     "total came to 153."
 )
 KEYS = {"KPD": "KPD:1990"}
+HISTORY = "https://www.bundeswahlleiterin.de/dam/jcr/a333e523-0717-42ad-a772-d5ad7e7e97cc/ltw_erg_gesamt.pdf"
+HISTORY_PUBLISHER = "Die Bundeswahlleiterin"
+HISTORY_TITLE = "Ergebnisse früherer Landtagswahlen, Stand: 13. Oktober 2026"
+LAENDER = {
+    "Schleswig-Holstein": "SH",
+    "Hamburg": "HH",
+    "Niedersachsen": "NI",
+    "Bremen": "HB",
+    "Nordrhein-Westfalen": "NW",
+    "Hessen": "HE",
+    "Rheinland-Pfalz": "RP",
+    "Baden-Württemberg": "BW",
+    "Bayern": "BY",
+    "Saarland": "SL",
+    "Berlin": "BE",
+    "Brandenburg": "BB",
+    "Mecklenburg-Vorpommern": "MV",
+    "Sachsen": "SN",
+    "Sachsen-Anhalt": "ST",
+    "Thüringen": "TH",
+}
+LAND_INFO = {
+    "SH": (
+        "01",
+        "Schleswig-Holstein",
+        ("Landtag of Schleswig-Holstein", "Schleswig-Holsteinischer Landtag"),
+        "Landtagswahl in Schleswig-Holstein",
+    ),
+    "HH": ("02", "Hamburg", ("Hamburg Parliament", "Hamburgische Bürgerschaft"), "Bürgerschaftswahl in Hamburg"),
+    "NI": (
+        "03",
+        "Lower Saxony",
+        ("Landtag of Lower Saxony", "Niedersächsischer Landtag"),
+        "Landtagswahl in Niedersachsen",
+    ),
+    "HB": ("04", "Bremen", ("Bremen Parliament", "Bremische Bürgerschaft"), "Bürgerschaftswahl in Bremen"),
+    "NW": (
+        "05",
+        "North Rhine-Westphalia",
+        ("Landtag of North Rhine-Westphalia", "Landtag Nordrhein-Westfalen"),
+        "Landtagswahl in Nordrhein-Westfalen",
+    ),
+    "HE": ("06", "Hesse", ("Landtag of Hesse", "Hessischer Landtag"), "Landtagswahl in Hessen"),
+    "RP": ("07", "Rhineland-Palatinate", None, "Landtagswahl in Rheinland-Pfalz"),
+    "BW": ("08", "Baden-Württemberg", None, "Landtagswahl in Baden-Württemberg"),
+    "BY": ("09", "Bavaria", ("Landtag of Bavaria", "Bayerischer Landtag"), "Landtagswahl in Bayern"),
+    "SL": ("10", "Saarland", ("Landtag of Saarland", "Landtag des Saarlandes"), "Landtagswahl im Saarland"),
+    "BE": ("11", "Berlin", None, "Wahl zum Abgeordnetenhaus von Berlin"),
+    "BB": ("12", "Brandenburg", ("Landtag of Brandenburg", "Landtag Brandenburg"), "Landtagswahl in Brandenburg"),
+    "MV": ("13", "Mecklenburg-Vorpommern", None, "Landtagswahl in Mecklenburg-Vorpommern"),
+    "SN": ("14", "Saxony", ("Landtag of Saxony", "Sächsischer Landtag"), "Landtagswahl in Sachsen"),
+    "ST": ("15", "Saxony-Anhalt", None, "Landtagswahl in Sachsen-Anhalt"),
+    "TH": ("16", "Thuringia", ("Landtag of Thuringia", "Thüringer Landtag"), "Landtagswahl in Thüringen"),
+}
+HISTORY_OTHERS = ("Wgr./Einzelbew.",)
+HISTORY_SKIP = {("BE", date(1946, 10, 20))}
+HISTORY_NOTES = {
+    "Stand nach der Wiederholungswahl am 12.03.1961.": "The figures include the repeat vote of 12 March 1961.",
+    "Stand nach der Wiederholungswahl am 25.01.1976.": "The figures include the repeat vote of 25 January 1976.",
+    "Stand nach der Wiederholungswahl am 15.05.2011 im Wahlkreis 17. Jeder Wählende hatte 5 Stimmen.": (
+        "The figures include the repeat vote of 15 May 2011 in constituency 17."
+    ),
+    "Einbeziehung des Ergebnisses der Wiederholungswahl am 6. Juli 2008 im Wahlbezirk 132/02.": (
+        "The figures include the repeat vote of 6 July 2008 in polling district 132/02."
+    ),
+    "Einschließlich Nachwahl am 18.09.2011 im Wahlkreis 33 Rügen I.": (
+        "The figures include the delayed vote of 18 September 2011 in constituency 33 (Rügen I)."
+    ),
+    "Berichtigung und Neufeststellung des Ergebnisses durch den Landtag am 28.01.2010.": (
+        "The Landtag corrected the result and declared it again on 28 January 2010."
+    ),
+    "Korrektur der Zahl der Wahlberechtigten im Wege des Wahlprüfungsverfahrens am 1. August 2008.": (
+        "The number of registered voters was corrected in the election review of 1 August 2008."
+    ),
+    "Jeder Wählende konnte bis zu 4 Stimmen abgeben.": "Each voter could cast up to four votes.",
+    "SpB: Nur im Wahlbereich der Stadt Bremen.": "SpB stood only in the city of Bremen.",
+    "WI Europ. Arbeiterp.: Nur im Wahlbereich der Stadt Bremen.": "WI Europ. Arbeiterp. stood only in the city of Bremen.",
+    "DKP (1946-47): Deutsche Konservative Partei.": "DKP (1946-47) is the Deutsche Konservative Partei.",
+}
+HISTORY_IGNORED = (
+    "Ab der Wahl am",
+    "Jeder Wählende hatte 5 Stimmen",
+    "Stand nach der Wiederholungswahl am 12.02.2023.",
+)
+PARTY_ALIASES = {
+    "PDS": "DIE LINKE",
+    "LL/PDS": "DIE LINKE",
+    "LL-PDS": "DIE LINKE",
+    "PDS/LL": "DIE LINKE",
+    "PDS HAMBURG": "DIE LINKE",
+    "DIE LINKE.": "DIE LINKE",
+    "GB/BHE": "GB/BHE",
+    "ZENTRUM": "ZENTRUM",
+    "DP": "DP",
+    "PRO DM": "PRO DM",
+}
+PARTY_STOPWORDS = {"der", "die", "das", "und", "für", "e", "v", "in", "des", "landesverband"}
+HISTORY_ROWS = {
+    "Wahlberechtigte": "registered",
+    "Wählende": "voters",
+    "Wähler": "voters",
+    "Gesamtstimmen": "cast",
+    "Ungültige Stimmen": "invalid",
+    "Ungültige Stimmzettel": "invalid",
+    "Gültige Stimmzettel": "valid_ballots",
+    "Ausgefallene Stimmen": "lost",
+    "Gültige Stimmen": "valid",
+}
+FOOTNOTED = ("DKP (1946-47)", "SpB", "WI Europ. Arbeiterp.")
+SUPERSCRIPTS = str.maketrans("¹²³", "123")
+SCHEDULE = (
+    ("BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV"),
+    ("NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"),
+)
 BE_PARTIES = {"MIETERPARTEI", "MERA25", "DL", "DIE FRAUEN"}
 NOTE_BW = (
     "Voters have two votes for the first time in 2026. The second vote decides how many of the Landtag's seats each "
@@ -216,6 +330,189 @@ def fetch() -> None:
     for urls in URLS.values():
         for url in urls:
             raw.fetch(SOURCE, url, suffix=f".{url.rsplit('.', 1)[1]}")
+    raw.fetch(SOURCE, HISTORY, suffix=".pdf")
+
+
+def history_count(text: str) -> int | None:
+    return None if text in ("X", "–", ".") else int(text.replace(".", ""))
+
+
+def parse_history() -> None:
+    path = str(raw.cached(SOURCE, HISTORY).path)
+    pages = int(
+        re.search(
+            r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", path], check=True, capture_output=True, text=True).stdout
+        )[1]
+    )
+
+    def text(page: int, *crop: str) -> str:
+        return subprocess.run(
+            ["pdftotext", "-layout", "-f", str(page), "-l", str(page), *crop, path, "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
+    scheduled: set[tuple[str, date]] = set()
+    block = -1
+    anchors: list[int] = []
+    for line in text(5).splitlines():
+        if "Tag der Wahl in" in line:
+            block += 1
+        row = re.match(r"\s*(\d+)\.\s", line)
+        if row is None:
+            continue
+        found = [(match.start(), match[0]) for match in re.finditer(r"\d\d\.\d\d\.\d{4}", line)]
+        if row[1] == "1":
+            pending_first = found
+            continue
+        if row[1] == "2":
+            anchors = [start for start, _ in found]
+            found = found + pending_first
+        for start, day in found:
+            column = min(range(len(anchors)), key=lambda i: abs(anchors[i] - start))
+            scheduled.add((SCHEDULE[block][column], date(int(day[6:]), int(day[3:5]), int(day[:2]))))
+    elections: list[dict[str, object]] = []
+    results: list[dict[str, object]] = []
+    glossary: list[dict[str, object]] = []
+    for page in range(1, pages + 1):
+        full = text(page)
+        lines = full.splitlines()
+        if not lines or not re.match(
+            r"3\.\d+\s+Wahlberechtigte, Wähle(?:nde|r), Stimmabgabe und Sitzverteilung in den Ländern", lines[0]
+        ):
+            continue
+        state = LAENDER[lines[1].strip()]
+        footnotes: dict[str, str] = {}
+        pending = None
+        for line in lines:
+            if pending is not None and line.strip():
+                footnotes[pending] = line.strip()
+                pending = None
+            elif re.fullmatch(r"\s*([\d¹²³])\s*", line):
+                pending = line.strip().translate(SUPERSCRIPTS)
+            elif match := re.fullmatch(r"\s{0,3}([\d¹²³]) {0,3}([A-ZÄÖÜ].+)", line):
+                footnotes[match[1].translate(SUPERSCRIPTS)] = match[2].strip()
+        cut = next((i for i, line in enumerate(lines) if "Volle Bezeichnung des Parteinamens" in line), len(lines))
+        if cut < len(lines):
+            entry = None
+            for line in lines[next(i for i in range(cut, len(lines)) if "Abkürzung" in lines[i]) + 1 :]:
+                if line.startswith("Informationen der Bundeswahlleiterin") or re.match(r"\s{0,3}\d ", line):
+                    break
+                match = re.fullmatch(r"(\S.*?)\s{2,}(\S.*?)\s{2,}(\S.*?)\s*", line)
+                if match:
+                    entry = {"state": state, "label": match[1], "name": match[2], "remark": match[3]}
+                    glossary.append(entry)
+                elif entry is not None and line.strip():
+                    parts = re.split(r"\s{2,}", line.strip())
+                    column = len(line) - len(line.lstrip())
+                    if column < 60:
+                        entry["name"] = f"{entry['name']} {parts[0]}"
+                        parts = parts[1:]
+                    if parts:
+                        entry["remark"] = f"{entry['remark']} {' '.join(parts)}"
+        current: list[dict[str, object] | None] = [None, None]
+        positions = [0, 0]
+        split: int | None = None
+        for line in lines[:cut]:
+            headings = list(re.finditer(r"(?:^|\s{3})(Wahl\b.*?)am (\d\d)\.(\d\d)\.(\d{4})([\d¹²³]?)", line))
+            for heading in headings:
+                column = int(heading.start(1) > 60)
+                mark = heading[5].translate(SUPERSCRIPTS)
+                current[column] = {
+                    "index": len(elections),
+                    "state": state,
+                    "day": date(int(heading[4]), int(heading[3]), int(heading[2])),
+                    "heading": f"{heading[1]}am {heading[2]}.{heading[3]}.{heading[4]}".strip(),
+                    "notes": [footnotes[mark]] if mark in footnotes else [],
+                    "page": page,
+                }
+                elections.append(current[column])
+                positions[column] = 0
+            if headings:
+                if len(headings) == 1 and headings[0].start(1) <= 60:
+                    current[1] = None
+                continue
+            if "Kurzbezeichnung" in line:
+                found = [match.start() for match in re.finditer("Kurzbezeichnung", line)]
+                split = found[1] - 3 if len(found) > 1 else None
+                continue
+            for column, part in enumerate((line, "") if split is None else (line[:split], line[split:])):
+                row = re.fullmatch(r"\s*(\S.*?)\s+([\d.]+|–|X|\.)(?:\s+([\d,]+|X|–|\.))?\s+(\d+|–|X|\.)\s*", part)
+                election = current[column]
+                if election is None or row is None:
+                    continue
+                label = row[1]
+                mark = label[-1].translate(SUPERSCRIPTS)
+                if (
+                    re.search(r"[^\d\s][\d¹²³]$", label)
+                    and mark in footnotes
+                    and label[:-1] in {*HISTORY_ROWS, *FOOTNOTED}
+                ):
+                    note = footnotes[mark]
+                    label = label[:-1]
+                    election["notes"].append(note if label in HISTORY_ROWS else f"{label}: {note}")
+                if label in HISTORY_ROWS:
+                    election[HISTORY_ROWS[label]] = history_count(row[2])
+                    if label == "Gültige Stimmen":
+                        election["seats"] = history_count(row[4])
+                    continue
+                positions[column] += 1
+                results.append(
+                    {
+                        "index": election["index"],
+                        "position": positions[column],
+                        "label": label,
+                        "votes": history_count(row[2]),
+                        "share": float(row[3].replace(",", ".")) if row[3] and row[3][0].isdigit() else None,
+                        "seats": history_count(row[4]) or 0,
+                    }
+                )
+    for election in elections:
+        labels = {row["label"] for row in results if row["index"] == election["index"]}
+        if election["state"] == "HH" and election["day"] == date(1991, 6, 2) and "STATT Partei" in labels:
+            election["day"] = date(1993, 9, 19)
+            election["heading"] = "Wahl am 19.09.1993"
+        if election["state"] == "HH" and election["seats"] == 360:
+            election["seats"] = sum(row["seats"] for row in results if row["index"] == election["index"])
+    election_frame = pl.DataFrame(elections, infer_schema_length=None)
+    result_frame = pl.DataFrame(results, infer_schema_length=None)
+    problems = []
+    for election in election_frame.iter_rows(named=True):
+        rows = result_frame.filter(pl.col("index") == election["index"])
+        votes = rows["votes"].drop_nulls().sum() if rows["votes"].null_count() < rows.height else None
+        seats = rows["seats"].sum()
+        if votes is not None and election["valid"] is not None and votes != election["valid"]:
+            problems.append(
+                f"{election['state']} {election['day']}: party votes {votes} against valid {election['valid']}"
+            )
+        if seats != election["seats"]:
+            problems.append(
+                f"{election['state']} {election['day']}: party seats {seats} against total {election['seats']}"
+            )
+        accounted = sum(
+            election[field] or 0
+            for field in ("invalid", "lost", "valid_ballots" if election["valid_ballots"] else "valid")
+        )
+        if election["voters"] is not None and accounted != election["voters"]:
+            problems.append(f"{election['state']} {election['day']}: voters {election['voters']} against {accounted}")
+    shares = result_frame.join(election_frame.select("index", "valid"), on="index").filter(
+        ((pl.col("votes") / pl.col("valid") * 100).round(1) - pl.col("share")).abs() > 0.15
+    )
+    for row in shares.iter_rows(named=True):
+        problems.append(f"share mismatch {row}")
+    held = set(election_frame.select("state", "day").iter_rows())
+    for state, day in sorted(scheduled - held):
+        problems.append(f"{state} {day}: scheduled but not in the tables")
+    for state, day in sorted(held - scheduled):
+        problems.append(f"{state} {day}: in the tables but not scheduled")
+    for problem in problems:
+        print(problem)
+    print(election_frame.height, "elections,", result_frame.height, "party rows,", len(glossary), "glossary entries")
+    PARSED.mkdir(parents=True, exist_ok=True)
+    election_frame.write_parquet(PARSED / "history_elections.parquet")
+    result_frame.write_parquet(PARSED / "history_results.parquet")
+    pl.DataFrame(glossary).write_parquet(PARSED / "history_glossary.parquet")
 
 
 def parse() -> None:
@@ -576,6 +873,7 @@ def parse() -> None:
     vote_frame.write_parquet(PARSED / "votes.parquet")
     pl.DataFrame(seats).write_parquet(PARSED / "seats.parquet")
     member_frame.write_parquet(PARSED / "members.parquet")
+    parse_history()
 
 
 def emit() -> Path:
@@ -588,7 +886,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="German state elections of 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency",
+            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, and every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin",
             polity="DE",
         )
 
@@ -867,4 +1165,335 @@ def emit() -> Path:
 
         for abbreviation, state in STATES.items():
             emit_state(abbreviation, state)
+
+        history_elections = pl.read_parquet(PARSED / "history_elections.parquet")
+        history_results = pl.read_parquet(PARSED / "history_results.parquet")
+        glossary = pl.read_parquet(PARSED / "history_glossary.parquet")
+        emit_history(cs, conn, germany, history_elections, history_results, glossary)
         return cs.write()
+
+
+def party_words(text: str) -> set[str]:
+    return (
+        set(re.findall(r"\w+", text.casefold()))
+        - PARTY_STOPWORDS
+        - {word.casefold() for land in LAENDER for word in re.findall(r"\w+", land)}
+    )
+
+
+def similar(a: str, b: str) -> bool:
+    left, right = party_words(a), party_words(b)
+    return bool(left and right) and len(left & right) / min(len(left), len(right)) >= 0.75
+
+
+def history_parties(
+    cs: Changeset, conn: Any, germany: UUID, results: pl.DataFrame, glossary: pl.DataFrame
+) -> dict[tuple[str, str], UUID]:
+    full: dict[tuple[str, str], str] = {}
+    for state, label, name_ in glossary.select("state", "label", "name").iter_rows():
+        full.setdefault((state, label), name_)
+    anywhere = {label: name_ for (_, label), name_ in full.items()}
+    folded = {(state, label.casefold()): name_ for (state, label), name_ in full.items()}
+    known: dict[str, list[str]] = {}
+    for value, text_ in conn.execute(
+        "select e.value, n.text from external_id e join name n on n.entity_id = e.entity_id where e.scheme = 'de.party'"
+    ).fetchall():
+        known.setdefault(value, []).append(text_)
+    used = sorted(set(results.filter(~pl.col("label").is_in(HISTORY_OTHERS)).select("state", "label").iter_rows()))
+    clusters: dict[str, list[dict[str, Any]]] = {}
+    for state, label in used:
+        name_ = full.get((state, label)) or folded.get((state, label.casefold())) or anywhere.get(label) or label
+        group = clusters.setdefault(PARTY_ALIASES.get(label.upper(), label.upper()), [])
+        for cluster in group:
+            if similar(cluster["name"], name_):
+                cluster["members"].append(state)
+                break
+        else:
+            group.append({"name": name_, "label": label, "members": [state]})
+    by_name: dict[str, set[str]] = {}
+    for value, texts in known.items():
+        for text_ in texts:
+            by_name.setdefault(text_.casefold(), set()).add(value)
+    ids: dict[tuple[str, str], UUID] = {}
+    for key, group in clusters.items():
+        for cluster in group:
+            names = known.get(key, [])
+            bare = all(text_.upper() == key for text_ in names)
+            if names and (
+                key in PARTY_ALIASES.values()
+                or any(similar(text_, cluster["name"]) for text_ in names)
+                or (bare and len(group) == 1)
+            ):
+                party = cs.key("de.party", key)
+            elif len(by_name.get(cluster["name"].casefold(), ())) == 1:
+                party = cs.key("de.party", next(iter(by_name[cluster["name"].casefold()])))
+            else:
+                minted_key = key if len(group) == 1 and not names else f"{key}|{cluster['name']}"
+                by_name.setdefault(cluster["name"].casefold(), set()).add(minted_key)
+                party = cs.key("de.party", minted_key)
+                if party in cs.minted:
+                    states = set(cluster["members"])
+                    polity = germany if len(states) > 1 else cs.polity(f"DE-{next(iter(states))}")
+                    cs.add("party", id=party, kind="party", polity_id=polity)
+                    cs.add("name", entity_id=party, text=cluster["name"], lang="de", kind="official", is_preferred=True)
+                    if cluster["label"] != cluster["name"]:
+                        cs.add(
+                            "name",
+                            entity_id=party,
+                            text=cluster["label"],
+                            lang="de",
+                            kind="abbreviation",
+                            is_preferred=False,
+                        )
+            for state in cluster["members"]:
+                for state_, label in used:
+                    if (
+                        state_ == state
+                        and PARTY_ALIASES.get(label.upper(), label.upper()) == key
+                        and (state, label) not in ids
+                    ):
+                        name_ = (
+                            full.get((state, label))
+                            or folded.get((state, label.casefold()))
+                            or anywhere.get(label)
+                            or label
+                        )
+                        if similar(name_, cluster["name"]) or name_ == cluster["name"]:
+                            ids[state, label] = party
+    missing = [pair for pair in used if pair not in ids]
+    if missing:
+        raise ValueError(f"unresolved parties: {missing}")
+    return ids
+
+
+def emit_history(
+    cs: Changeset,
+    conn: Any,
+    germany: UUID,
+    elections: pl.DataFrame,
+    results: pl.DataFrame,
+    glossary: pl.DataFrame,
+) -> None:
+    held = {(abbreviation, state["day"]) for abbreviation, state in STATES.items()}
+    elections = elections.filter(
+        ~pl.struct("state", "day").map_elements(
+            lambda row: (row["state"], row["day"]) in held | HISTORY_SKIP, return_dtype=pl.Boolean
+        )
+        & (~pl.col("heading").str.contains("ehemaligen Land") | (pl.col("day") == date(1956, 3, 4)))
+    ).sort("state", "day")
+    results = results.join(elections.select("index", "state", "day"), on="index")
+    party_ids = history_parties(cs, conn, germany, results, glossary)
+    source = cs.source(HISTORY_PUBLISHER, HISTORY_TITLE)
+    cs.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=HISTORY_PUBLISHER,
+        title=HISTORY_TITLE,
+        url=HISTORY,
+        license="Vervielfältigung und Verbreitung, auch auszugsweise, mit Quellenangabe gestattet",
+        license_url=None,
+    )
+    cs.artifact(raw.cached(SOURCE, HISTORY), source)
+    second_from: dict[str, date] = {}
+    for state, notes in elections.select("state", "notes").iter_rows():
+        for note in notes:
+            match = re.match(r"Ab der Wahl am (\d\d)\.(\d\d)\.(\d{4}) Zweitstimmen", note)
+            if match:
+                second_from[state] = date(int(match[3]), int(match[2]), int(match[1]))
+    days: dict[str, list[date]] = {}
+    for state, day in elections.select("state", "day").iter_rows():
+        days.setdefault(state, []).append(day)
+    for abbreviation, state in STATES.items():
+        days.setdefault(abbreviation, []).append(state["day"])
+    units: dict[str, UUID] = {}
+    for abbreviation in sorted(days):
+        code, english, body_names, native_stem = LAND_INFO[abbreviation]
+        land = cs.polity(f"DE-{abbreviation}")
+        land_area = cs.area("de.land", code)
+        if {land, land_area} & cs.minted:
+            raise ValueError(f"run de.bundeswahlleiterin first: {abbreviation} must exist")
+        units[abbreviation] = cs.unit("de.land", code)
+        cs.add(
+            "reporting_unit",
+            id=units[abbreviation],
+            polity_id=land,
+            scheme_code="de.land",
+            code=code,
+            area_relation="equals",
+            area_id=land_area,
+            kind="standard",
+            valid_from=None,
+            valid_to=None,
+        )
+        body = cs.key(f"{SOURCE}.body", f"landtag:{abbreviation}")
+        if body_names is not None:
+            cs.add("body", id=body, polity_id=land, kind="unicameral")
+            cs.add("name", entity_id=body, text=body_names[0], lang="en", kind="official", is_preferred=True)
+            cs.add("name", entity_id=body, text=body_names[1], lang="de", kind="native", is_preferred=False)
+        ordered = sorted(days[abbreviation])
+        rows = elections.filter(pl.col("state") == abbreviation).iter_rows(named=True)
+        for row in rows:
+            printed: date = row["day"]
+            day = date(2023, 2, 12) if (abbreviation, printed) == ("BE", date(2021, 9, 26)) else printed
+            following = ordered[ordered.index(printed) + 1] if ordered.index(printed) + 1 < len(ordered) else None
+            if following == date(2021, 9, 26) and abbreviation == "BE":
+                following = date(2023, 2, 12)
+            cs.add("body_size", body_id=body, seats=row["seats"], valid_from=day, valid_to=following)
+            same_year = [other for other in ordered if other.year == day.year]
+            label = f"{day:%B} {day.year}" if len(same_year) > 1 else str(day.year)
+            heading: str = row["heading"]
+            if day == date(2023, 2, 12):
+                english_name = "2023 Berlin repeat state election"
+                native = "Wiederholungswahl zum 19. Abgeordnetenhaus von Berlin 2023"
+            elif "Stadtverordnetenversammlung" in heading:
+                english_name = f"{label} Berlin city assembly election"
+                native = re.sub(r" am \S+$", f" {day.year}", heading)
+            elif "verfassungsgebenden" in heading:
+                english_name = f"{label} Baden-Württemberg constituent assembly election"
+                native = f"Wahl zur Verfassunggebenden Landesversammlung Baden-Württemberg {day.year}"
+            else:
+                english_name = f"{label} {english} state election"
+                native = f"{native_stem} {day.year}"
+            election = cs.key(f"{SOURCE}.election", f"{abbreviation}:{day}")
+            cs.add("election", id=election, polity_id=land, kind="general", date_from=day, date_to=day, status="held")
+            cs.add("name", entity_id=election, text=english_name, lang="en", kind="official", is_preferred=True)
+            cs.add("name", entity_id=election, text=native, lang="de", kind="native", is_preferred=False)
+            path = f"de/{abbreviation.lower()}/{day}-general"
+            cs.add("slug", path=path, entity_id=election)
+
+            def make_set(key: str, contest: UUID | None, election: UUID = election, day: date = day) -> UUID:
+                set_id = cs.key(f"{SOURCE}.result_set", f"{abbreviation}:{day}:{key}")
+                cs.add(
+                    "result_set",
+                    id=set_id,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                )
+                return set_id
+
+            contest = cs.key(f"{SOURCE}.contest", f"{abbreviation}:{day}:list")
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="list_allocation",
+                body_id=body,
+                district_area_id=land_area,
+                magnitude=row["seats"],
+                electoral_system_id=None,
+                default_result_kind="counted",
+            )
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{english_name}, seat allocation",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            cs.add("slug", path=f"{path}/landtag", entity_id=contest)
+            multiple = row["cast"] is not None or row["valid_ballots"] is not None
+            notes: list[str] = []
+            if day == date(2023, 2, 12):
+                notes.append(
+                    "The Constitutional Court of Berlin declared the election of 26 September 2021 invalid, and it was "
+                    "held again in full on 12 February 2023. These are the results of the repeat election."
+                )
+            if abbreviation == "BE" and day.year < 1990:
+                notes.append("Only the western sectors of Berlin voted, so the figures cover West Berlin.")
+            if abbreviation in second_from and day >= second_from[abbreviation]:
+                notes.append(
+                    "Each voter has two votes. The votes shown are second votes (Zweitstimmen), which decide the seats."
+                )
+            if row["cast"] is not None:
+                notes.append(
+                    "Each voter has two votes, and both count toward a party's seats, so the votes shown are first and "
+                    f"second votes added together. The source counts {row['voters']:,} voters and {row['cast']:,} votes."
+                )
+            if row["valid_ballots"] is not None:
+                notes.append(
+                    "Each voter had five votes. The invalid figure counts ballot papers, and the valid figure counts "
+                    f"votes; the source counts {row['valid_ballots']:,} valid ballot papers."
+                )
+            if (abbreviation, day) == ("HB", date(1946, 10, 13)):
+                notes.append(
+                    "The first Bürgerschaft was elected as a municipal election under conditions the source calls not "
+                    "comparable. Each voter had three to five votes, and only valid ballot papers were counted, so "
+                    "the numbers of voters and invalid votes are not known."
+                )
+            if "ehemaligen Land" in heading or (heading.startswith("Wahl in West-Berlin") and day.year == 1990):
+                notes.append(f"The source heads this table \u201c{heading}\u201d; its figures are for the whole Land.")
+            if (abbreviation, day) == ("HH", date(1993, 9, 19)):
+                notes.append(
+                    "The source prints the date of this election as 2 June 1991; its figures are those of 19 September 1993."
+                )
+            if abbreviation == "HH" and day.year in (1957, 1961):
+                notes.append("The source prints 360 as the total of seats; the parties' seats add up to 120.")
+            if row["lost"]:
+                notes.append(
+                    f"The source also counts {row['lost']:,} lost votes (ausgefallene Stimmen), which are in neither "
+                    "the valid nor the invalid total."
+                )
+            for note in row["notes"]:
+                if note in HISTORY_NOTES:
+                    notes.append(HISTORY_NOTES[note])
+                elif not note.startswith(HISTORY_IGNORED):
+                    raise ValueError(f"{abbreviation} {day}: untranslated note {note}")
+            if notes:
+                cs.add("note", entity_id=contest, kind="context", body_md=" ".join(notes))
+            accounting = make_set("election", None)
+            root = make_set("list", contest)
+            unit = str(units[abbreviation])
+            values: list[tuple[UUID, UUID | None, int, int | None]] = [
+                (accounting, None, 2, row["registered"]),
+                (accounting, None, 14 if multiple else 3, row["voters"]),
+                (root, None, 5, row["invalid"]),
+                (root, None, 4, row["valid"]),
+            ]
+            for party_row in results.filter(pl.col("index") == row["index"]).sort("position").iter_rows(named=True):
+                label_ = party_row["label"]
+                option = cs.key(f"{SOURCE}.option", f"{abbreviation}:{day}:list:{label_}")
+                others = label_ in HISTORY_OTHERS
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="others" if others else "list",
+                    party_id=None if others else party_ids[abbreviation, label_],
+                    ballot_label=label_,
+                )
+                values.append((root, option, 1, party_row["votes"]))
+                if party_row["seats"]:
+                    cs.add("outcome", result_set_id=root, option_id=option, kind="won", seats=party_row["seats"])
+            cs.frame(
+                "result_value",
+                pl.DataFrame(
+                    [
+                        {
+                            "result_set_id": str(set_id),
+                            "unit_id": unit,
+                            "option_id": None if option is None else str(option),
+                            "channel": 0,
+                            "measure": measure,
+                            "count_round": 0,
+                            "flags": 0,
+                            "value": value,
+                        }
+                        for set_id, option, measure, value in values
+                        if value is not None
+                    ],
+                    schema_overrides={"value": pl.Int64},
+                ).with_columns(
+                    channel=pl.col("channel").cast(pl.Int16),
+                    measure=pl.col("measure").cast(pl.Int16),
+                    count_round=pl.col("count_round").cast(pl.Int16),
+                    flags=pl.col("flags").cast(pl.Int16),
+                ),
+            )

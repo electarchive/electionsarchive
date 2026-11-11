@@ -278,13 +278,15 @@
         },
         {
           "date": "1947-04-20",
-          "contests": 2,
+          "contests": 3,
           "regions": {
+            "NI": 1,
             "NW": 1,
             "SH": 1
           },
           "source": "bwl-ltw",
-          "quote": "Table 1, 20.04.1947: NW 1.; SH 1."
+          "quote": "Table 1, 20.04.1947: NW 1.; SH 1.; Table 3.9: Wahl am 20.04.1947 (Niedersachsen)",
+          "note": "Table 1 prints Lower Saxony's first election as 12.10.1947; Table 3.9 gives the results of 20.04.1947, the date the Landtag was elected."
         },
         {
           "date": "1947-05-18",
@@ -307,13 +309,12 @@
         },
         {
           "date": "1947-10-12",
-          "contests": 2,
+          "contests": 1,
           "regions": {
-            "HB": 1,
-            "NI": 1
+            "HB": 1
           },
           "source": "bwl-ltw",
-          "quote": "Table 1, 12.10.1947: HB 2.; NI 1."
+          "quote": "Table 1, 12.10.1947: HB 2."
         },
         {
           "date": "1949-10-16",
