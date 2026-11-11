@@ -1,0 +1,24 @@
+{
+  "year": 1956,
+  "day": "1956-11-06",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1956",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1956%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "president": "Presidential electors (President and Vice President), one column per candidate pair",
+    "governor": "Governor only; the lieutenant governor columns on the same table are another office (other)",
+    "house": "Representative in Congress; District 1 and District 2 candidates are separate columns, and a town in only one district has blanks in the other district's columns"
+  },
+  "leaves": [
+    21,
+    23,
+    26
+  ],
+  "unit_scheme": "town"
+}

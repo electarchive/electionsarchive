@@ -1,0 +1,22 @@
+{
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1986%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor only; the lieutenant governor columns on the same table are another office (other)",
+    "house": "Representative in Congress; District 1 and District 2 candidates are separate columns, and a town in only one district has blanks in the other district's columns"
+  },
+  "leaves": [
+    25,
+    30
+  ],
+  "unit_scheme": "town"
+}

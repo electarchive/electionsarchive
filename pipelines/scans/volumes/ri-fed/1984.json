@@ -1,0 +1,24 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1984%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "president": "Presidential electors (President and Vice President), one column per candidate pair",
+    "senate": "United States Senator",
+    "house": "Representative in Congress; District 1 and District 2 candidates are separate columns, and a town in only one district has blanks in the other district's columns"
+  },
+  "leaves": [
+    31,
+    34,
+    39
+  ],
+  "unit_scheme": "town"
+}
