@@ -19126,119 +19126,138 @@ export const elections = {
         const found = await remember(
           `crown:${election}`,
           async () => {
-            const offices = await db.execute<{ id: string }>(sql`
-              select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
-              where k.parent_id = ${election}::uuid
+            const children = await db.execute<{ id: string }>(sql`
+              select k.id from election k where k.parent_id = ${election}::uuid
             `);
-            const decisions = await decide(offices.rows.map((row) => row.id));
-            const decided = decisions
-              .entries()
-              .filter(([id, chain]) => chain.final !== id)
-              .toArray();
-            return rowsOf(
-              await db.execute<{
-                path: string;
-                group: string | null;
-                area: string | null;
-                date: string;
-                person: string | null;
-                party: string | null;
-                label: string | null;
-                color: string | null;
-                shaped: string | null;
-                led: boolean | null;
-                votes: Array<[string | null, string | null, number]> | null;
-                office: string | null;
-              }>(sql`
-                with top as (
-                  select pt.area_id as id from election e
-                  join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-                  where e.id = ${election}::uuid limit 1
-                )
-                select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.shaped_id as shaped
-                from election k
-                join slug s on s.entity_id = k.id and s.is_current
-                left join lateral (
-                  select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
-                    (select f.kind::text from office f where f.id = c.office_id) as office,
-                    coalesce(tl.persons[array_position(tl.options, o.id)], (
-                      select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-                      where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1
-                    )) as person,
-                    ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
-                    tl.votes
-                  from contest c
-                  left join unnest(
-                    ${sql.param(decided.map(([id]) => id))}::uuid[],
-                    ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
-                  ) as d(id, final) on d.id = c.id
-                  join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
-                  cross join lateral (
-                    select coalesce(c.district_area_id, (
-                      select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
-                      order by pt.valid @> k.date_from desc limit 1
-                    )) as id
-                  ) ar
-                  left join area da on da.id = ar.id
-                  cross join lateral (
-                    select json_agg(json_build_array(coalesce(qm.into_id, q.party_id), qp.person, t.value)) as votes,
-                      array_agg(q.id) as options, array_agg(qp.person) as persons,
-                      (array_agg(q.id order by t.value desc))[1] as top
-                    from (
-                      select y.option_k, sum(y.value)::float8 as value
-                      from (
-                        select r.option_k, r.value, r.count_round, max(r.count_round) over () as last
-                        from result_rollup r
-                        where r.result_set_k = rs.k and r.area_k = da.k and r.measure = 1
-                      ) y
-                      where y.count_round = y.last and y.option_k <> 0
-                      group by y.option_k
-                      offset 0
-                    ) t
-                    join contest_option q on q.k = t.option_k
-                    left join entity_merge qm on qm.entity_id = q.party_id
-                    left join lateral (
-                      select coalesce(m.into_id, cy.person_id) as person from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-                      where cy.option_id = q.id and cy.role = 'head' order by cy.id limit 1
-                    ) qp on true
-                  ) tl
-                  cross join lateral (
-                    (
-                      select x.option_id as id, false as led from outcome x
-                      where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                      order by x.option_id limit 1
-                    )
-                    union all
-                    (select tl.top, true where tl.top is not null)
-                    limit 1
-                  ) pick
-                  join contest_option o on o.id = pick.id
-                  left join entity_merge pm on pm.entity_id = o.party_id
-                  where c.election_id = k.id and c.kind = 'office'
-                  order by c.id limit 1
-                ) w on true
-                left join lateral (
-                  with recursive up(id, depth, child) as (
-                    select w.area, 0, null::uuid
-                    union all
-                    select p.parent_id, up.depth + 1, up.id from area_parent p join up on p.area_id = up.id
-                    where up.depth < 7 and p.valid @> k.date_from
-                  )
-                  select
-                    (
-                      select u.child from up u
-                      where u.id = (select id from top) and u.child is not null
-                      order by u.depth limit 1
-                    ) as group_id,
-                    (
-                      select u.id from (select u.id, u.depth from up u where u.depth < 7 order by u.depth offset 0) u
-                      where exists (select from area_geometry ag where ag.area_id = u.id)
-                      order by u.depth limit 1
-                    ) as shaped_id
-                ) az on true
-                where k.parent_id = ${election}::uuid
-              `),
+            const ids = children.rows.map((row) => row.id);
+            const size = Math.ceil(
+              ids.length / Math.min(3, Math.ceil(ids.length / 300)),
             );
+            const chunks = await Promise.all(
+              Map.groupBy(ids, (_id, index) => Math.floor(index / size))
+                .values()
+                .map(async (chunk) => {
+                  const offices = await db.execute<{ id: string }>(sql`
+                    select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
+                    where k.id = any(${sql.param(chunk)}::uuid[])
+                  `);
+                  const decisions = await decide(
+                    offices.rows.map((row) => row.id),
+                  );
+                  const decided = decisions
+                    .entries()
+                    .filter(([id, chain]) => chain.final !== id)
+                    .toArray();
+                  return rowsOf(
+                    await db.execute<{
+                      path: string;
+                      group: string | null;
+                      area: string | null;
+                      date: string;
+                      person: string | null;
+                      party: string | null;
+                      label: string | null;
+                      color: string | null;
+                      shaped: string | null;
+                      led: boolean | null;
+                      votes: Array<
+                        [string | null, string | null, number]
+                      > | null;
+                      office: string | null;
+                    }>(sql`
+                      with top as (
+                        select pt.area_id as id from election e
+                        join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+                        where e.id = ${election}::uuid limit 1
+                      )
+                      select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.shaped_id as shaped
+                      from unnest(${sql.param(chunk)}::uuid[]) with ordinality as x(id, n)
+                      join election k on k.id = x.id
+                      join slug s on s.entity_id = k.id and s.is_current
+                      left join lateral (
+                        select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
+                          (select f.kind::text from office f where f.id = c.office_id) as office,
+                          coalesce(tl.persons[array_position(tl.options, o.id)], (
+                            select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                            where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1
+                          )) as person,
+                          ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
+                          tl.votes
+                        from contest c
+                        left join unnest(
+                          ${sql.param(decided.map(([id]) => id))}::uuid[],
+                          ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
+                        ) as d(id, final) on d.id = c.id
+                        join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
+                        cross join lateral (
+                          select coalesce(c.district_area_id, (
+                            select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
+                            order by pt.valid @> k.date_from desc limit 1
+                          )) as id
+                        ) ar
+                        left join area da on da.id = ar.id
+                        cross join lateral (
+                          select json_agg(json_build_array(coalesce(qm.into_id, q.party_id), qp.person, t.value)) as votes,
+                            array_agg(q.id) as options, array_agg(qp.person) as persons,
+                            (array_agg(q.id order by t.value desc))[1] as top
+                          from (
+                            select y.option_k, sum(y.value)::float8 as value
+                            from (
+                              select r.option_k, r.value, r.count_round, max(r.count_round) over () as last
+                              from result_rollup r
+                              where r.result_set_k = rs.k and r.area_k = da.k and r.measure = 1
+                            ) y
+                            where y.count_round = y.last and y.option_k <> 0
+                            group by y.option_k
+                            offset 0
+                          ) t
+                          join contest_option q on q.k = t.option_k
+                          left join entity_merge qm on qm.entity_id = q.party_id
+                          left join lateral (
+                            select coalesce(m.into_id, cy.person_id) as person from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                            where cy.option_id = q.id and cy.role = 'head' order by cy.id limit 1
+                          ) qp on true
+                        ) tl
+                        cross join lateral (
+                          (
+                            select x.option_id as id, false as led from outcome x
+                            where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                            order by x.option_id limit 1
+                          )
+                          union all
+                          (select tl.top, true where tl.top is not null)
+                          limit 1
+                        ) pick
+                        join contest_option o on o.id = pick.id
+                        left join entity_merge pm on pm.entity_id = o.party_id
+                        where c.election_id = k.id and c.kind = 'office'
+                        order by c.id limit 1
+                      ) w on true
+                      left join lateral (
+                        with recursive up(id, depth, child) as (
+                          select w.area, 0, null::uuid
+                          union all
+                          select p.parent_id, up.depth + 1, up.id from area_parent p join up on p.area_id = up.id
+                          where up.depth < 7 and p.valid @> k.date_from
+                        )
+                        select
+                          (
+                            select u.child from up u
+                            where u.id = (select id from top) and u.child is not null
+                            order by u.depth limit 1
+                          ) as group_id,
+                          (
+                            select u.id from (select u.id, u.depth from up u where u.depth < 7 order by u.depth offset 0) u
+                            where exists (select from area_geometry ag where ag.area_id = u.id)
+                            order by u.depth limit 1
+                          ) as shaped_id
+                      ) az on true
+                      order by x.n
+                    `),
+                  );
+                }),
+            );
+            return chunks.flat();
           },
           true,
           undefined,
@@ -19308,9 +19327,12 @@ export const elections = {
         rows: [],
       };
       const children = await db.execute<{ count: number }>(sql`
-        select count(*)::int as count from election k
-        join slug s on s.entity_id = k.id and s.is_current
-        where k.parent_id = ${input.id}::uuid
+        select count(*)::int as count from (
+          select from election k
+          join slug s on s.entity_id = k.id and s.is_current
+          where k.parent_id = ${input.id}::uuid
+          limit 40
+        ) k
       `);
       if ((children.rows[0]?.count ?? 0) < 40) {
         return empty;
