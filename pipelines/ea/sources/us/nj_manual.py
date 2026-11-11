@@ -28,6 +28,14 @@ DIGITIZED = 8
 DERIVED = 1
 MANUAL = "Manual of the Legislature of New Jersey, {}"
 VOLUMES = {
+    1874: ("manualoflegislat1875mull", MANUAL.format(1875), PUBLISHER, date(1874, 11, 3), range(130, 131), False),
+    1878: ("manualoflegislat1879mull", MANUAL.format(1879), PUBLISHER, date(1878, 11, 5), range(191, 194), False),
+    1880: ("manualoflegislat1881mull", MANUAL.format(1881), PUBLISHER, date(1880, 11, 2), range(220, 223), False),
+    1882: ("manualoflegislat1883mull", MANUAL.format(1883), PUBLISHER, date(1882, 11, 7), range(245, 248), False),
+    1884: ("manualoflegislat1885mull", MANUAL.format(1885), PUBLISHER, date(1884, 11, 4), range(255, 258), False),
+    1886: ("manualoflegislat1887mull", MANUAL.format(1887), PUBLISHER, date(1886, 11, 2), range(313, 316), False),
+    1888: ("manualoflegislat1889mull", MANUAL.format(1889), PUBLISHER, date(1888, 11, 6), range(324, 327), False),
+    1890: ("manualoflegislat1891mull", MANUAL.format(1891), PUBLISHER, date(1890, 11, 4), range(334, 337), False),
     1892: ("manualoflegislat1893mull", MANUAL.format(1893), PUBLISHER, date(1892, 11, 8), range(362, 366), False),
     1894: ("manualoflegislat1895mull", MANUAL.format(1895), PUBLISHER, date(1894, 11, 6), range(391, 394), False),
     1896: ("manualoflegislat1897mull", MANUAL.format(1897), PUBLISHER, date(1896, 11, 3), range(424, 427), False),
