@@ -1,0 +1,24 @@
+{
+  "year": 1942,
+  "day": "1942-11-03",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1943, general election returns (general election 1942-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1942-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1942 general election",
+    "governor": "Governor; only the 1942 general election"
+  },
+  "leaves": [
+    178,
+    179,
+    180,
+    197
+  ]
+}

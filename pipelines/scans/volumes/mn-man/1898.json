@@ -1,0 +1,28 @@
+{
+  "year": 1898,
+  "day": "1898-11-08",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1899, general election returns (general election 1898-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1898-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1898 general election"
+  },
+  "leaves": [
+    2,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+  ]
+}

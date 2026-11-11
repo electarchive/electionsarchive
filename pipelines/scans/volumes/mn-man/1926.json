@@ -1,0 +1,22 @@
+{
+  "year": 1926,
+  "day": "1926-11-02",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1927, general election returns (general election 1926-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1926-11-02-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "governor": "Governor; only the 1926 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1926 general election"
+  },
+  "leaves": [
+    166,
+    167
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "year": 1916,
+  "day": "1916-11-07",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1917, general election returns (general election 1916-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1916-11-07-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector); only the 1916 general election",
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1916 general election",
+    "governor": "Governor; only the 1916 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1916 general election"
+  },
+  "leaves": [
+    158,
+    159,
+    160,
+    161,
+    162,
+    168,
+    169,
+    170
+  ]
+}

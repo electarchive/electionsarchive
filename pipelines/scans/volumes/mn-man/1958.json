@@ -1,0 +1,39 @@
+{
+  "year": 1958,
+  "day": "1958-11-04",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1959, general election returns (general election 1958-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1958-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1958 general election",
+    "governor": "Governor; only the 1958 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1958 general election"
+  },
+  "leaves": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    20,
+    21,
+    22,
+    23
+  ]
+}

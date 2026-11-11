@@ -1,0 +1,23 @@
+{
+  "year": 1918,
+  "day": "1918-11-05",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1919, general election returns (general election 1918-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1918-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1918 general election",
+    "governor": "Governor; only the 1918 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1918 general election"
+  },
+  "leaves": [
+    158,
+    159
+  ]
+}

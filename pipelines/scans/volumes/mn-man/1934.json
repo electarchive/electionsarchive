@@ -1,0 +1,24 @@
+{
+  "year": 1934,
+  "day": "1934-11-06",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1935, general election returns (general election 1934-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1934-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1934 general election",
+    "governor": "Governor; only the 1934 general election"
+  },
+  "leaves": [
+    172,
+    173,
+    174,
+    175
+  ]
+}

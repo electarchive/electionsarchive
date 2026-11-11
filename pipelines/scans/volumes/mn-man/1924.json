@@ -1,0 +1,23 @@
+{
+  "year": 1924,
+  "day": "1924-11-04",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1925, general election returns (general election 1924-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1924-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector); only the 1924 general election",
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1924 general election",
+    "governor": "Governor; only the 1924 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1924 general election"
+  },
+  "leaves": [
+    169
+  ]
+}

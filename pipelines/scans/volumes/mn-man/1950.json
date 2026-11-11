@@ -1,0 +1,24 @@
+{
+  "year": 1950,
+  "day": "1950-11-07",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1951, general election returns (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1950-11-07-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "governor": "Governor; only the 1950 general election"
+  },
+  "leaves": [
+    191,
+    192,
+    193,
+    194,
+    195
+  ]
+}

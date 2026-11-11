@@ -1,0 +1,30 @@
+{
+  "year": 1904,
+  "day": "1904-11-08",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1905, general election returns (general election 1904-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1904-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector); only the 1904 general election",
+    "governor": "Governor; only the 1904 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1904 general election"
+  },
+  "leaves": [
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    141,
+    142,
+    143
+  ]
+}

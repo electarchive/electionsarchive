@@ -1,0 +1,27 @@
+{
+  "year": 1902,
+  "day": "1902-11-04",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1903, general election returns (general election 1902-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1902-11-04-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "governor": "Governor; only the 1902 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1902 general election"
+  },
+  "leaves": [
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115
+  ]
+}

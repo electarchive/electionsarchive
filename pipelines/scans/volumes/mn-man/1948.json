@@ -1,0 +1,25 @@
+{
+  "year": 1948,
+  "day": "1948-11-02",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1949, general election returns (general election 1948-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1948-11-02-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "president": "President (votes for presidential electors by county; when the page prints one column per elector, the column of each party's first elector); only the 1948 general election",
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1948 general election",
+    "governor": "Governor; only the 1948 general election"
+  },
+  "leaves": [
+    176,
+    177,
+    178,
+    183
+  ]
+}

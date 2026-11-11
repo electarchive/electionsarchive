@@ -1,0 +1,41 @@
+{
+  "year": 1966,
+  "day": "1966-11-08",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1967, general election returns (general election 1966-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1966-11-08-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "senate": "U.S. Senator (Senator in Congress), not a state senator; only the 1966 general election",
+    "governor": "Governor; only the 1966 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1966 general election"
+  },
+  "leaves": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ]
+}

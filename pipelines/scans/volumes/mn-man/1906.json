@@ -1,0 +1,25 @@
+{
+  "year": 1906,
+  "day": "1906-11-06",
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1907, general election returns (general election 1906-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1906-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "create": true,
+  "offices": {
+    "governor": "Governor; only the 1906 general election",
+    "house": "U.S. Representative in Congress, one table per congressional district; district is the congressional district number (0 for a representative at large); only the 1906 general election"
+  },
+  "leaves": [
+    127,
+    128,
+    129,
+    133,
+    134
+  ]
+}
