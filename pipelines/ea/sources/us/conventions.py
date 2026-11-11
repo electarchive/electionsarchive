@@ -625,6 +625,9 @@ VICE_TABLES = {
     "1912:republican:vp": {"item": "officialreportfi00repuiala", "leaves": (449, 450), "ballot": 1, "transcribed": "conventions_chicago_1912_vp.tsv", "short": True},
     "1916:republican:vp": {"item": "officialreportsi00repuiala", "leaves": (254, 255), "ballot": 1, "transcribed": "conventions_chicago_1916_vp.tsv", "short": True},
     "1920:republican:vp": {"item": "officialreportof00repuiala", "leaves": (282, 283), "ballot": 1, "transcribed": "conventions_chicago_1920_vp.tsv", "short": True},
+    "1924:republican:vp-b1": {"htid": "mdp.39015030802287", "leaves": (240, 241), "ballot": 1, "transcribed": "conventions_cleveland_1924_vp.tsv", "short": True},
+    "1924:republican:vp-b2": {"htid": "mdp.39015030802287", "leaves": (245, 246), "ballot": 2, "transcribed": "conventions_cleveland_1924_vp.tsv", "short": True},
+    "1928:republican:vp": {"htid": "mdp.39015030802295", "leaves": (316, 317), "ballot": 1, "transcribed": "conventions_kansas_city_1928_vp.tsv", "short": True},
 }  # fmt: skip
 TABLES += [{"table": name} | spec for name, spec in VICE_TABLES.items()]
 TABLES += [
@@ -716,6 +719,10 @@ REPUBLICAN_VICE_1868 = {
 REPUBLICAN_VICE_1896 = "The table gives each delegation's votes by candidate. Colorado and Idaho, whose delegations had bolted the convention, passed and are stored with their votes held only; Montana, Nevada, and Texas cast fewer votes than they held. The printed totals omit Thomas B. Reed (3 votes in the rows) and Brown (2, Maine)."
 REPUBLICAN_VICE_1900 = "Theodore Roosevelt received every vote cast; New York cast 71 of its 72, one delegate not voting, and the proceedings print the total vote as 926 with 925 for Roosevelt."
 REPUBLICAN_VICE_1912 = "The roll was challenged in Illinois, which cast 9 for Sherman and 1 for Gillette with 17 present and not voting and 31 absent. The printed Sherman column adds to 595 in the proceedings' totals row and 596 in the state rows and in the Chair's announcement; 596 is stored."
+REPUBLICAN_VICE_1924 = {
+    1: "Some delegations cast fewer votes than they held: California cast 25 of its 29, New York 88 of 91, and Wisconsin 28 of 29; the difference is not stored.",
+    2: "This is the final tabulation after delegations changed their votes from the roll call as first announced (Lowden 413, Burton 288, Dawes 111, Kenyon 95, Watson 55), which the proceedings also tabulate by state but which is not stored. Frank O. Lowden received 766 of 1,109 votes but declined the nomination, and the convention then nominated Charles G. Dawes; the proceedings' state tabulation of that later vote is not stored, so no outcome is recorded for this ballot. New York and Wisconsin cast 87 of 91 and 27 of 29, the rest absent; the difference is not stored.",
+}
 REPUBLICAN_VICE_SHORT = "Some delegations cast fewer votes than they held; the difference is not stored."
 PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2, "vice": {"tables": {1: "1856:republican:vp"}, "ballots": {1: date(1856, 6, 19)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1856}},
@@ -735,8 +742,8 @@ PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1912:republican"}, "ordinal": "Fifteenth", "city": "Chicago", "days": (date(1912, 6, 18), date(1912, 6, 22)), "ballots": {1: date(1912, 6, 22)}, "deciding": 1, "vice": {"tables": {1: "1912:republican:vp"}, "ballots": {1: date(1912, 6, 22)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1912}},
     {"tables": {n: f"1916:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Sixteenth", "city": "Chicago", "days": (date(1916, 6, 7), date(1916, 6, 10)), "ballots": dict.fromkeys(range(1, 4), date(1916, 6, 10)), "deciding": 3, "vice": {"tables": {1: "1916:republican:vp"}, "ballots": {1: date(1916, 6, 10)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_SHORT}},
     {"tables": {n: f"1920:republican:b{n}" for n in range(1, 11)}, "ordinal": "Seventeenth", "city": "Chicago", "days": (date(1920, 6, 8), date(1920, 6, 12)), "ballots": dict.fromkeys(range(1, 5), date(1920, 6, 11)) | dict.fromkeys(range(5, 11), date(1920, 6, 12)), "deciding": 10, "caveat": "On the tenth ballot several delegations changed their votes after they were first called and before the result was announced; the tabulation stored here is the one the convention declared.", "vice": {"tables": {1: "1920:republican:vp"}, "ballots": {1: date(1920, 6, 12)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_SHORT}},
-    {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1},
-    {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1},
+    {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1, "vice": {"tables": {1: "1924:republican:vp-b1", 2: "1924:republican:vp-b2"}, "ballots": dict.fromkeys((1, 2), date(1924, 6, 12)), "deciding": 2, "declined": True, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1924}},
+    {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1, "vice": {"tables": {1: "1928:republican:vp"}, "ballots": {1: date(1928, 6, 15)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_SHORT}},
     {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
     {"tables": {1: "1972:republican"}, "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballots": {1: date(1972, 8, 22)}, "deciding": 1},
     {"tables": {1: "1976:republican"}, "ordinal": "Thirty-First", "city": "Kansas City", "days": (date(1976, 8, 16), date(1976, 8, 19)), "ballots": {1: date(1976, 8, 18)}, "deciding": 1},
@@ -947,6 +954,21 @@ CANDIDATES = {
     "republican:Root": ("Elihu Root", "Q220619"),
     "republican:Weeks": ("John W. Weeks", "Q1371272"),
     "republican:Burton": ("Theodore E. Burton", "Q252449"),
+    "1924:republican:Kenyon": ("William S. Kenyon", None),
+    "1924:republican:Hyde": ("Arthur M. Hyde", None),
+    "1924:republican:Hines": ("Frank T. Hines", None),
+    "1924:republican:March": ("Charles A. March", None),
+    "1924:republican:Harbord": ("James G. Harbord", None),
+    "1924:republican:Graham": ("George S. Graham", None),
+    "1924:republican:Taylor": ("J. Will Taylor", None),
+    "1924:republican:Beveridge": ("Albert J. Beveridge", None),
+    "1924:republican:Wrigley": ("William Wrigley Jr.", None),
+    "1924:republican:Jackson": ("William P. Jackson", None),
+    "1924:republican:Dixon": ("Joseph M. Dixon", None),
+    "1924:republican:Brookhart": ("Smith W. Brookhart", None),
+    "1924:republican:Coulter": ("Lee Coulter", None),
+    "1928:republican:Ekern": ("Herman L. Ekern", None),
+    "1928:republican:Macnider": ("Hanford MacNider", None),
     "republican:Brumbaugh": ("Martin G. Brumbaugh", "Q658426"),
     "republican:Willis": ("Frank B. Willis", None),
     "republican:McCall": ("Samuel W. McCall", None),
@@ -2562,7 +2584,11 @@ def render(spec: dict[str, Any], leaf: int) -> raw.Artifact:
 
     from PIL import Image
 
-    (pdf,) = (DATA / "inbox" / "manual").glob(f"MF-*/{str(spec['htid']).replace('$', '')}/*-{leaf}-*.pdf")
+    htid = str(spec["htid"]).replace("$", "")
+    manual = DATA / "inbox" / "manual"
+    (pdf,) = [*manual.glob(f"MF-*/{htid}/*-{leaf}-*.pdf")] or [
+        *manual.glob(f"MF-*/{htid.replace('.', '-')}-{leaf}-*.pdf")
+    ]
     with tempfile.TemporaryDirectory() as folder:
         out = Path(folder) / "page"
         subprocess.run(["pdftoppm", "-r", "300", "-gray", "-png", "-singlefile", str(pdf), str(out)], check=True)
@@ -3005,7 +3031,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, and 1888, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1872, 1876, 1880, 1884, 1888, 1896, 1900, 1908, 1912, 1916, 1920, 1924, and 1928, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
@@ -3548,7 +3574,7 @@ def emit() -> Path:
                             x1=x1,
                             y1=y1,
                         )
-                    if number == chain["deciding"]:
+                    if number == chain["deciding"] and not chain.get("declined"):
                         winner = max(totals, key=lambda column: totals[column])
                         if (
                             rule == "two-thirds"
