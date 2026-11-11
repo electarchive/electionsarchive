@@ -683,7 +683,14 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
-        systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round")}
+        runoff_parents = {
+            parent
+            for (parent,) in conn.execute(
+                """select c.previous_round_id from contest c join electoral_system s on s.id = c.electoral_system_id
+                   where c.previous_round_id is not null and s.rules->>'formula' = 'two_round'"""
+            )
+        }
         labels = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         parties = {label: cs.key("us.party", key) for label, key in PARTIES.items()}
         if cs.minted & {*systems.values(), *parties.values()}:
@@ -899,7 +906,9 @@ def emit() -> Path:
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
-                electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                electoral_system_id=systems[
+                    "block" if magnitude != 1 else "two_round" if contest in runoff_parents else "fptp"
+                ],
                 default_result_kind="counted",
                 term="remainder" if special else "full",
             )
