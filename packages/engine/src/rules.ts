@@ -167,6 +167,20 @@ export const rules = v.variant("formula", [
     tieBreak,
   }),
   v.object({
+    formula: v.literal("contingent"),
+    majority: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
+    of: v.optional(v.picklist(["votes", "appointed"]), "votes"),
+    districts: v.optional(v.boolean(), false),
+    chooser: v.picklist([
+      "legislature",
+      "lower_house",
+      "house_delegations",
+      "senate",
+    ]),
+    among: v.pipe(v.number(), v.integer(), v.minValue(1)),
+    tieBreak,
+  }),
+  v.object({
     formula: v.literal("supplementary"),
     majority: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
     advance: v.optional(v.pipe(v.number(), v.integer(), v.minValue(2)), 2),

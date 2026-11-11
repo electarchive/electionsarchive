@@ -10,6 +10,7 @@ type Allocating = Exclude<
     formula:
       | "referendum"
       | "two_round"
+      | "contingent"
       | "supplementary"
       | "top_two"
       | "irv"

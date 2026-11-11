@@ -10,6 +10,7 @@ export {
   recover,
   type Recovery,
 } from "./allocation.ts";
+export { elect } from "./contingent.ts";
 export {
   type Candidate,
   cover,

@@ -1292,6 +1292,57 @@
       "type": "object",
       "properties": {
         "formula": {
+          "const": "contingent"
+        },
+        "majority": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        },
+        "of": {
+          "enum": [
+            "votes",
+            "appointed"
+          ],
+          "type": "string",
+          "default": "votes"
+        },
+        "districts": {
+          "type": "boolean",
+          "default": false
+        },
+        "chooser": {
+          "enum": [
+            "legislature",
+            "lower_house",
+            "house_delegations",
+            "senate"
+          ],
+          "type": "string"
+        },
+        "among": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tieBreak": {
+          "enum": [
+            "votes",
+            "lot"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "formula",
+        "chooser",
+        "among"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": {
           "const": "supplementary"
         },
         "majority": {
