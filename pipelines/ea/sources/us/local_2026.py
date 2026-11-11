@@ -12272,7 +12272,9 @@ def parse() -> None:
                     and stem != tail
                 ):
                     base = minted[stem]
-                    if (", " in base[0] and not (state == "NJ" and base[2].startswith("school:"))) or not base[2]:
+                    if (", " in base[0] and not (state == "NJ" and base[2].startswith("school:"))) or not (
+                        base[2] or base[1] == place
+                    ):
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
                     minted[tail] = (
