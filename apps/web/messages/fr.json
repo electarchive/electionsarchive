@@ -4521,6 +4521,7 @@
   "night_left_row": "{count} restants, {lean}",
   "night_left_summary": "Il reste environ {count} votes à dépouiller, probablement entre {low} et {high}",
   "night_left_unknown": "Aucun décompte officiel des bulletins encore en attente n'est disponible. Les votes restants sont donc estimés d'après le rythme auquel de nouveaux votes arrivent encore.",
+  "night_left_reported": "Les votes restants sont évalués à partir des estimations de l'Associated Press sur les bulletins encore en attente dans chaque comté. Ces chiffres sont eux aussi des projections. La fourchette tient donc compte d'une erreur possible dans un sens comme dans l'autre.",
   "night_left_title": "Où il reste des votes à dépouiller",
   "night_legend_bubbles": "Cercles : bulletins dépouillés",
   "night_legend_counted": "Plus la teinte est foncée, plus le dépouillement est avancé",

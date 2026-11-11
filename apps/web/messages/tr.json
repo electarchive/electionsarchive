@@ -4443,6 +4443,7 @@
   "night_left_row": "{count} kaldı, {lean}",
   "night_left_summary": "Sayılacak yaklaşık {count} oy kaldı; bu sayı büyük olasılıkla {low} ile {high} arasında",
   "night_left_unknown": "Henüz sayılmamış oy pusulalarının resmî bir sayısı yok. Bu yüzden kalan oy, yeni oyların hâlâ ne hızla geldiğine bakılarak tahmin ediliyor.",
+  "night_left_reported": "Kalan oy bir tahmin. Associated Press'in henüz sayılmamış oy pusulaları için ilçe düzeyinde yaptığı tahminlere dayanıyor. Bu rakamlar da tahmin olduğu için aralık, iki yönde de sapma olasılığını kapsıyor.",
   "night_left_title": "Kalan oylar nerede",
   "night_legend_bubbles": "Daireler sayılan oyu gösterir",
   "night_legend_counted": "Renk koyulaştıkça sayılan oy oranı artar",

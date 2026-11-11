@@ -4443,6 +4443,7 @@
   "night_left_row": "{count} offen, {lean}",
   "night_left_summary": "Noch etwa {count} Stimmen auszuzählen, voraussichtlich zwischen {low} und {high}",
   "night_left_unknown": "Eine amtliche Zahl der noch ausstehenden Stimmzettel liegt nicht vor. Die Zahl der verbleibenden Stimmen ist daher geschätzt. Die Schätzung beruht darauf, wie schnell noch neue Stimmen eintreffen.",
+  "night_left_reported": "Die Zahl der verbleibenden Stimmen ist geschätzt. Grundlage sind die Schätzungen der Associated Press zu den noch ausstehenden Stimmzetteln in den einzelnen Countys. Auch diese Werte sind Hochrechnungen und können in beide Richtungen abweichen. Die angegebene Spanne schließt das ein.",
   "night_left_title": "Wo noch Stimmen auszuzählen sind",
   "night_legend_bubbles": "Kreise zeigen die ausgezählten Stimmen",
   "night_legend_counted": "Je dunkler, desto mehr Stimmen sind ausgezählt",

@@ -4443,6 +4443,7 @@
   "night_left_row": "{count} mayî, {lean}",
   "night_left_summary": "Dengên nejimartî nêzîkî {count} in û dibe ku di navbera {low} û {high} de bin",
   "night_left_unknown": "Hejmara fermî ya pusulayên hê nehatine jimartin nayê zanîn. Ji ber vê yekê hejmara dengên mayî texmîn e. Ev texmîn li gorî leza hatina dengên nû tê kirin.",
+  "night_left_reported": "Associated Press ji bo her navçeyê hejmara pusulayên hê nehatine jimartin texmîn dike. Hejmara dengên mayî li ser van texmînan tê hesibandin. Ev texmîn jî pêşbînî ne. Ji ber vê yekê navber îhtimala ku ew ji rastiyê zêdetir an kêmtir bin jî dihewîne.",
   "night_left_title": "Dengên mayî li ku ne",
   "night_legend_bubbles": "Dayire dengên hatine jimartin nîşan didin",
   "night_legend_counted": "Reng çiqas tarîtir be, deng zêdetir hatine jimartin",

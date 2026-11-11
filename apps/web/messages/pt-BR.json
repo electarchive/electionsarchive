@@ -4519,6 +4519,7 @@
   "night_left_row": "{count} a apurar, {lean}",
   "night_left_summary": "Faltam cerca de {count} votos a apurar (provavelmente entre {low} e {high})",
   "night_left_unknown": "Não há contagem oficial das cédulas ainda pendentes. Por isso, os votos restantes são uma estimativa baseada no ritmo com que novos votos continuam chegando.",
+  "night_left_reported": "Os votos restantes são uma estimativa feita a partir dos cálculos da Associated Press para as cédulas ainda pendentes em cada condado. Esses cálculos também são projeções. Por isso, a faixa cobre a possibilidade de erro para mais ou para menos.",
   "night_left_title": "Onde estão os votos restantes",
   "night_legend_bubbles": "Os círculos mostram os votos apurados",
   "night_legend_counted": "Quanto mais escuro, maior a parte apurada",
