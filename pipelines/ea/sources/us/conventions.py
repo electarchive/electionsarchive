@@ -555,6 +555,17 @@ TABLES += [
         "short": True,
     }
 ]
+EVENING_STAR_1932 = "https://chroniclingamerica.loc.gov/lccn/sn83045462/1932-07-02/ed-1/seq-4/"
+TABLES += [
+    {
+        "table": "1932:democratic:b4",
+        "manual": "MF-611/1932-07-02",
+        "url": EVENING_STAR_1932,
+        "leaves": (1,),
+        "ballot": 4,
+        "transcribed": "conventions_chicago_1932.tsv",
+    }
+]
 NILES = "sim_niles-national-register_{}"
 TABLES += [
     {
@@ -617,6 +628,14 @@ BALTIMORE_1852 = (
     "The proceedings give the rule as two-thirds of the votes. South Carolina cast no vote, and the other 30 "
     "delegations held 288 votes, so the needed figure stored here is 192. No candidate reached it before the "
     "forty-ninth ballot, on which Franklin Pierce was nominated."
+)
+EVENING_STAR_1932_CAVEAT = (
+    "The archive has not located a free copy of the official proceedings' roll call, so this ballot is the "
+    "state-by-state table the Washington Evening Star printed on July 2, 1932 (page A-4). It is a default to be "
+    "superseded by the official proceedings. The table prints the fourth ballot only; the first three ballots by "
+    "state are not loaded. Pennsylvania's 76 votes include 5½ not recorded for a candidate. The printed totals are "
+    "945 for Franklin D. Roosevelt, 190½ for Alfred E. Smith, 5½ for Newton D. Baker, 3½ for Albert C. Ritchie, 3 for "
+    "George White, and 1 for James M. Cox, 1,148½ votes cast of 1,154; two-thirds, 770, were needed."
 )
 NILES_1835 = (
     "The archive has found no free copy of a separate report of this convention's proceedings; the roll is the "
@@ -725,6 +744,7 @@ FOURTH_1848 = (
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}},
     {"party": "democratic", "tables": {1: "1908:democratic"}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Denver, Colorado, July 7, 8, 9 and 10, 1908", "publisher": "Western Newspaper Union", "city": "Denver", "days": (date(1908, 7, 7), date(1908, 7, 10)), "ballots": {1: date(1908, 7, 10)}, "deciding": 1, "caveat": DENVER_1908},
+    {"party": "democratic", "tables": {4: "1932:democratic:b4"}, "title": "The Evening Star (Washington, D.C.), July 2, 1932: Fourth Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1932, 6, 27), date(1932, 7, 2)), "ballots": {4: date(1932, 7, 2)}, "deciding": 4, "required": 770, "caveat": EVENING_STAR_1932_CAVEAT},
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835, "vice": {"tables": {1: "1835:democratic:vp"}, "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "required": 177, "method": VICE_METHOD.format("Niles' Weekly Register's reprint of the official statement"), "caveat": NILES_1835_VICE}},
     {"party": "democratic", "tables": {}, "vice": {"tables": {1: "1832:democratic:vp"}, "ballots": {1: date(1832, 5, 22)}, "deciding": 1, "required": 189, "method": VICE_METHOD.format("the convention's summary of its proceedings"), "caveat": BALTIMORE_1832}, "title": "Summary of the Proceedings of a Convention of Republican Delegates, from the Several States in the Union, for the Purpose of Nominating a Candidate for the Office of Vice-President of the United States; Held at Baltimore, in the State of Maryland, May, 1832", "publisher": "Packard and Van Benthuysen", "city": "Baltimore", "days": (date(1832, 5, 21), date(1832, 5, 23))},
     {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
@@ -1048,6 +1068,11 @@ CANDIDATES = {
     "1924:democratic:Harrison": ("Pat Harrison", "Q369437"),
     "1924:democratic:Thompson": ("Thompson", None),
     "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
+    "1932:democratic:Smith": ("Alfred E. Smith", "Q430714"),
+    "1932:democratic:Ritchie": ("Albert C. Ritchie", None),
+    "1932:democratic:Baker": ("Newton D. Baker", None),
+    "1932:democratic:White": ("George White", None),
+    "1932:democratic:Cox": ("James M. Cox", "Q440117"),
     "democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
     "democratic:Farley": ("James A. Farley", "Q954859"),
     "democratic:Tydings": ("Millard Tydings", "Q354099"),
@@ -2257,6 +2282,13 @@ def sheet(spec: dict[str, Any], fetch: bool) -> raw.Artifact:
 
 
 def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
+    if "manual" in spec:
+        try:
+            return raw.cached(SOURCE, spec["url"])
+        except LookupError:
+            if not fetch:
+                raise
+        return render_page(spec["url"], 1, spec["manual"])
     if "image" in spec:
         return raw.fetch(SOURCE, spec["image"], suffix=".jpg") if fetch else raw.cached(SOURCE, spec["image"])
     if "pdf" in spec:
@@ -3025,7 +3057,9 @@ def emit() -> Path:
             scope = cs.key("us.party", f"{party}-party")
             first_spec = every[0]
             source_url = (
-                first_spec["release"]
+                first_spec["url"]
+                if "manual" in first_spec
+                else first_spec["release"]
                 if "release" in first_spec
                 else first_spec["pdf"]
                 if "pdf" in first_spec
