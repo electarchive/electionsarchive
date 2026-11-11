@@ -848,6 +848,13 @@ def emit() -> Path:
                 "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
             ).fetchall()
         }
+        defaults: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select r.contest_id, r.id from result_set r join changeset g on g.id = r.changeset_id
+                   where g.pipeline = %s and r.is_default and r.status = 'active'""",
+                [SOURCE],
+            ).fetchall()
+        )
         precincts: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.precinct' and code like '20__:CA:06%%'"
@@ -1009,6 +1016,7 @@ def emit() -> Path:
                 if first_round["advanced"]:
                     previous[runoff["race"]] = first_round["race"]
         majority = set(previous) | set(previous.values())
+        runoff_places = set(races.filter(pl.col("race").is_in(list(majority)))["code"])
 
         owners: set[UUID] = set()
         elections: set[UUID] = set()
@@ -1122,11 +1130,24 @@ def emit() -> Path:
                 sources.add(taken_over["election"])
                 area = taken_over["area"] or area
                 unit = taken_over["unit"] or unit
-            contest_key = taken_over["value"] if taken_over is not None else f"ceda:{race}"
+            contest_key = (
+                taken_over["value"]
+                if taken_over is not None and (taken_over["value"] in sets or f"ceda:{race}" not in own)
+                else f"ceda:{race}"
+            )
             contest = cs.key("us.contest", contest_key)
             used.add(election)
             magnitude = first["magnitude"]
             rcv = rows["rcv"].any()
+            system = systems[
+                "irv"
+                if rcv and magnitude == 1
+                else "block"
+                if magnitude != 1
+                else "two_round"
+                if race in majority or code in runoff_places or (len(code) == 5 and key != "board-of-education")
+                else "fptp"
+            ]
             cs.add(
                 "contest",
                 id=contest,
@@ -1142,16 +1163,10 @@ def emit() -> Path:
                 )
                 if race in previous
                 else None,
-                electoral_system_id=kept.get(contest)
-                or systems[
-                    "irv"
-                    if rcv and magnitude == 1
-                    else "block"
-                    if magnitude != 1
-                    else "two_round"
-                    if race in majority or (len(code) == 5 and key != "board-of-education")
-                    else "fptp"
-                ],
+                electoral_system_id=system
+                if (held_system := kept.get(contest)) is None
+                or (held_system == systems["fptp"] and system == systems["two_round"])
+                else held_system,
                 default_result_kind="counted",
                 term="remainder" if first["remainder"] else "full",
             )
@@ -1194,11 +1209,16 @@ def emit() -> Path:
                     )
                     if taken_over["disagree"]:
                         cs.add("note", entity_id=taken_over["set"], kind="context", body_md=DISAGREE)
+            held_set = defaults.get(contest)
             if reported is None:
-                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                result_set = held_set or cs.key(f"{SOURCE}.result_set", contest_key)
             else:
-                if contest_key in sets:
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
+                if held_set is not None and held_set != result_set:
+                    superseded = held_set
+                elif contest_key in sets:
                     superseded = cs.key(f"{SOURCE}.result_set", contest_key)
+                if superseded is not None:
                     cs.add(
                         "result_set",
                         id=superseded,
@@ -1211,7 +1231,6 @@ def emit() -> Path:
                         is_default=False,
                         completeness=1,
                     )
-                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
             cs.add(
                 "result_set",
                 id=result_set,
