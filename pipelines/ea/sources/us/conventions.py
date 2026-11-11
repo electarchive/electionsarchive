@@ -95,6 +95,15 @@ ABROAD_NOTE_2020 = (
     "superdelegate positions assigned to no state did not vote and are not counted in any delegation. Delegates "
     "voted remotely, and the convention's ceremonial roll call of the states announced the result."
 )
+LISTED = (
+    "The article's table gives each delegation's votes by candidate. A delegation's total is the delegates it held, "
+    "which the table shows as the votes cast for candidates plus its abstentions."
+)
+LISTED_2024 = (
+    "The article's table gives each delegation's delegates and its votes for Trump and Haley; the delegates not "
+    "voting for either are stored as abstentions. The Chair announced 2,387 votes for Trump, while the delegations' "
+    "votes add up to 2,388, as stored here."
+)
 CONVENTIONS: list[dict[str, Any]] = [
     {
         "key": "2016-02-01:president:republican",
@@ -132,8 +141,33 @@ CONVENTIONS: list[dict[str, Any]] = [
         "city": "Milwaukee",
         "caveat": ABROAD_NOTE_2020,
     },
+    {
+        "key": "2012-01-03:president:republican",
+        "party": "republican",
+        "title": "2012 Republican National Convention",
+        "marker": '{| class="wikitable"\n!Candidates',
+        "days": (date(2012, 8, 27), date(2012, 8, 30)),
+        "ballots": [date(2012, 8, 28)],
+        "required": 1144,
+        "nominee": "Romney",
+        "city": "Tampa",
+        "caveat": LISTED,
+    },
+    {
+        "key": "2024-01-15:president:republican",
+        "party": "republican",
+        "title": "2024 Republican National Convention",
+        "marker": "=== Results by state or territory ===",
+        "days": (date(2024, 7, 15), date(2024, 7, 18)),
+        "ballots": [date(2024, 7, 15)],
+        "required": 1215,
+        "nominee": "Trump",
+        "city": "Milwaukee",
+        "caveat": LISTED_2024,
+    },
 ]
 ABROAD = "DA"
+LISTED_PLACES = {"Georgia": "GA", "Virgin Islands": "VI", "Northern Mariana Islands": "MP"}
 METHOD = (
     "The roll call of the states on the presidential nomination, one ballot per contest, with each delegation's "
     "votes as the convention secretary recorded them. The party has published no official report of the proceedings "
@@ -2574,6 +2608,36 @@ def roll_call(text: str, caption: str) -> tuple[list[str], dict[str, list[int]]]
     return labels, votes
 
 
+def listed_roll_call(text: str, marker: str) -> tuple[list[str], dict[str, list[int]]]:
+    start = text.index(marker)
+    rows = text[start : text.index("\n|}", start)].split("\n|-\n")
+    header = [
+        line.split("]]")[-1].split("<br />")[-1].strip("! ").strip()
+        for line in rows[0].split("\n")
+        if line.startswith("!")
+    ][1:]
+    held = header[0] == "Delegates"
+    labels = [*header[held:], "Abstain"] if held else header
+    votes: dict[str, list[int]] = {}
+    for row in rows[1:]:
+        place = re.search(r"\[\[(?:[^]|]*\|)?([^]]*)\]\]", row.split("\n|")[0])
+        if place is None:
+            continue
+        code = PLACES.get(place.group(1)) or LISTED_PLACES[place.group(1)]
+        cells = []
+        for cell in re.sub(r"\{\{efn\|[^}]*\}\}", "", row).split("\n|")[1:]:
+            recorded = re.sub(r"[',\s]", "", cell)
+            cells.append(int(recorded) if recorded else 0)
+        if len(cells) != len(header):
+            raise ValueError(f"{code}: {len(cells)} cells for {len(header)} columns")
+        if held:
+            if cells[0] < sum(cells[1:]):
+                raise ValueError(f"{code}: {sum(cells[1:])} votes cast of {cells[0]} held")
+            cells = [*cells[1:], cells[0] - sum(cells[1:])]
+        votes[code] = cells
+    return labels, votes
+
+
 def emit() -> Path:
     from PIL import Image
 
@@ -2582,7 +2646,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956 and 2008, and the 2016 and 2020 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956 and 2008, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
@@ -2635,8 +2699,12 @@ def emit() -> Path:
             )
             artifact = raw.cached(SOURCE, page(title))
             parsed = json.loads(artifact.path.read_text())["parse"]
-            labels, roll = roll_call(parsed["wikitext"], convention["table"])
-            expected = set(units) | ({ABROAD} if ABROAD in roll else set())
+            labels, roll = (
+                listed_roll_call(parsed["wikitext"], convention["marker"])
+                if "marker" in convention
+                else roll_call(parsed["wikitext"], convention["table"])
+            )
+            expected = set(units) - {ABROAD} | ({ABROAD} if ABROAD in roll else set())
             if set(roll) != expected:
                 raise ValueError(f"{title}: delegations {sorted(expected ^ set(roll))} do not match the states")
             if ABROAD in roll:
