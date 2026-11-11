@@ -4591,21 +4591,22 @@ async function places(
           select geom from area_geometry where area_id = ${area.id}::uuid
           order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
         ),
+        listed as materialized (
+          select a.id, a.k from area a
+          where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
+            and not exists (
+              select from area_parent p
+              where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
+            )
+        ),
         straddling as materialized (
-          select a.id, a.k from (
-            select a.id, a.k from area a
-            where a.k = any(${sql.param(checked.map((kid) => kid.k))}::int[])
-              and not exists (
-                select from area_parent p
-                where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
-              )
-            offset 0
-          ) a
+          select a.id, a.k from listed a
+          join (
+            select distinct on (g.area_id) g.area_id, g.geom from area_geometry g
+            where g.area_id = any(array(select id from listed))
+            order by g.area_id, g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first
+          ) g on g.area_id = a.id
           cross join me
-          cross join lateral (
-            select g.geom from area_geometry g where g.area_id = a.id
-            order by g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first limit 1
-          ) g
           where ST_Area(ST_Intersection(g.geom, me.geom)) < 0.95 * ST_Area(g.geom)
         ),
         siblings as materialized (
