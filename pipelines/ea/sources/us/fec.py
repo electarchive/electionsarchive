@@ -1062,6 +1062,7 @@ UNLINKED = {
 MISNAMED = {
     (2016, "H4WI04266"): "Robert R. Raymond",
     (2016, "H6WI01234"): "Spencer Zimmerman",
+    (2018, "H8NY12152"): "Scott Hutchins",
     (2020, "H0SD00088"): "Randy Luallin",
 }
 VACANCY = "Vacancy in Nomination"
@@ -1090,6 +1091,7 @@ SURNAMES = {"Bloomberg": "P00014530", "Romney": "P80003353"}
 NAMESAKES = {"H8CA52052", "P00014613"}
 FIGURES = {"george-pataki": "P60007572"}
 MOVED_IDS = {"H2IL06090": "IL:niki-conforti"}
+RESPELLED = {"H8NY12152": ("us.nyc_general.person", "2018-11-06:NY:house:12:scott-hutchins")}
 MISATTRIBUTED = {"2020:Democratic:P60016342": "P00014613"}
 REUSED_IDS = {
     "2002:H2CA46073:Richard B. Owens": None,
@@ -4874,6 +4876,25 @@ def emit() -> Path:
             raise ValueError("a person pairs with two others")
         for duplicate, survivor in twins.values():
             cs.merge(duplicate, survivor)
+        for fec_id, (scheme, value) in RESPELLED.items():
+            row = conn.execute(
+                "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+            ).fetchone()
+            if row is None or fec_id not in fec_persons:
+                raise ValueError(f"respelled {fec_id} has no person to merge")
+            survivor, spelled = row[0], fec_persons[fec_id]
+            for head, kept, option, kept_option in conn.execute(
+                """select a.id, b.id, a.option_id, b.option_id
+                   from candidacy a join contest_option x on x.id = a.option_id
+                   join contest_option y on y.contest_id = x.contest_id and y.id <> x.id
+                   join candidacy b on b.option_id = y.id and b.role = 'head' and b.person_id = %s
+                   where a.person_id = %s and a.role = 'head'""",
+                [survivor, spelled],
+            ).fetchall():
+                cs.merge(option, kept_option)
+                cs.merge(head, kept)
+            cs.merge(spelled, survivor)
+            cs.renamed[str(survivor)] = str(spelled)
         fec_persons = {key: cs.survivors.get(person, person) for key, person in fec_persons.items()}
         for fec_id, handle in MOVED_IDS.items():
             fec_persons[fec_id] = cs.key(f"{SOURCE}.person", handle)
