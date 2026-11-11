@@ -13,7 +13,7 @@ from ea.sources.us.mp_cec_live import pick, words
 from ea.store import DATA, connect
 
 SOURCE = "us.sc_general_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 PAGE = "https://www.enr-scvotes.org/SC/127300/reports/detailxml.zip"
@@ -55,6 +55,29 @@ DISTRICTS = {
 }
 
 
+LOCAL = {
+    "solicitor circuit 3": ("solicitor:third-judicial-circuit", "SC:circuit-3"),
+    "solicitor circuit 5": ("solicitor:fifth-judicial-circuit", "SC:circuit-5"),
+    "solicitor circuit 6": ("solicitor:sixth-judicial-circuit", "SC:circuit-6"),
+    "solicitor circuit 12": ("solicitor:twelfth-judicial-circuit", "SC:circuit-12"),
+    "solicitor circuit 13": ("solicitor:thirteenth-judicial-circuit", "SC:circuit-13"),
+    "solicitor circuit 15": ("solicitor:fifteenth-judicial-circuit", "SC:circuit-15"),
+    "town council town of ware shoals": ("4574680:town-council", "4574680"),
+    "town council unexpired term town of ware shoals": ("4574680:town-council-unexpired", "4574680"),
+    "city council at large city of north augusta": ("4550695:city-council-at-large", "4550695"),
+    "city council clemson": ("4514950:city-council", "4514950"),
+    "city council city of hardeeville": ("4532245:city-council", "4532245"),
+    "anderson county school trustee district 2 at large": ("4500810:board-of-trustees-at-large", "4500810"),
+    "anderson county board of education district 5": ("45007:board-of-education-district-5", "4500900"),
+    "greenville county school board district 18": ("4502310:board-of-trustees-district-18", "4502310"),
+    "greenville county school board district 28": ("4502310:board-of-trustees-district-28", "4502310"),
+    "lexington county school trustee district 3": ("4502760:board-of-trustees", "4502760"),
+    "spartanburg county school district 2 referendum question 1": ("4503510:measure:question-1", "4503510"),
+    "spartanburg county school district 2 referendum question 2": ("4503510:measure:question-2", "4503510"),
+    "town of irmo form of government referendum": ("4535890:measure:form-of-government", "4535890"),
+}
+
+
 def district_of(text: str) -> tuple[str, str] | None:
     return DISTRICTS.get(" ".join(re.findall(r"[a-z]+|\d+", text.lower())))
 
@@ -70,6 +93,8 @@ def contest_key(text: str) -> str | None:
     plain = " ".join(re.findall(r"[a-z]+|\d+", text.lower()))
     if plain in STATEWIDE:
         return f"{DAY}:SC:{STATEWIDE[plain]}"
+    if plain in LOCAL:
+        return f"{DAY}:SC:{LOCAL[plain][0]}"
     if (district := DISTRICTS.get(plain)) is not None:
         return f"district:{district[0]}"
     house = DISTRICT.match(plain)
@@ -149,7 +174,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina November 3, 2026 general election: statewide offices, U.S. Senate, U.S. House, and state legislative contests by county and voting method, as certified",
+            summary="South Carolina November 3, 2026 general election: statewide offices, U.S. Senate, U.S. House, state legislative, solicitor, special district, municipal, and school district contests and local questions by county and voting method, as certified",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -166,20 +191,20 @@ def emit() -> Path:
         for (key,), rows in frame.group_by("contest", maintain_order=True):
             if key.startswith("district:"):
                 found = conn.execute(
-                    """select c.id, c.election_id from contest c
+                    """select c.id, c.election_id, c.kind from contest c
                        join name n on n.entity_id = c.id and n.is_preferred and n.text = %s
                        join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like %s""",
                     [f"{DAY.year} {key.removeprefix('district:')} Commissioner election", f"{DAY}:SC:%"],
                 ).fetchall()
             else:
                 found = conn.execute(
-                    """select c.id, c.election_id from contest c
+                    """select c.id, c.election_id, c.kind from contest c
                        join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s""",
                     [key],
                 ).fetchall()
             if len(found) != 1:
                 raise ValueError(f"{key}: {len(found)} contests")
-            contest, election = found[0]
+            contest, election, kind = found[0]
             options = conn.execute(
                 """select o.id, o.kind, case when o.kind = 'candidate'
                    then coalesce(nullif(ca.ballot_name, ''), o.ballot_label) else o.ballot_label end
@@ -231,7 +256,9 @@ def emit() -> Path:
             seats = rows["seats"][0]
             if len(ranked) > seats and totals[ranked[seats - 1]] == totals[ranked[seats]]:
                 raise ValueError(f"{key}: tie for the last seat")
-            for choice in ranked[:seats]:
+            if kind == "ballot_question":
+                cs.add("outcome", result_set_id=result_set, option_id=chosen[ranked[0]], kind="won")
+            for choice in ranked[:seats] if kind != "ballot_question" else []:
                 cs.add("outcome", result_set_id=result_set, option_id=chosen[choice], kind="elected", seats=1)
             for choice, county, channel, votes in rows.select("choice", "county", "channel", "votes").iter_rows():
                 cs.add(
