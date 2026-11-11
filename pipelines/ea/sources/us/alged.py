@@ -536,6 +536,12 @@ def emit() -> Path:
                 )
             )
 
+        kept: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select o.id, o.party_id from contest_option o join external_id x on x.entity_id = o.contest_id
+                   where x.scheme = 'us.contest' and x.value like 'alged:%%' and o.party_id is not null"""
+            ).fetchall()
+        )
         frame = frame.with_columns(fips=pl.col("fips").replace(aliases))
         owners: set[UUID] = set()
         offices = Offices(conn)
@@ -825,7 +831,9 @@ def emit() -> Path:
                 magnitude=magnitude,
                 round_number=2 if runoff else 1,
                 previous_round_id=previous,
-                electoral_system_id=system if runoff else systems["fptp" if magnitude == 1 else "block"],
+                electoral_system_id=system
+                if runoff
+                else systems["block" if magnitude != 1 else "two_round" if usps == "GA" else "fptp"],
                 default_result_kind="counted",
                 term="remainder" if remainder else "full",
             )
@@ -909,7 +917,7 @@ def emit() -> Path:
                         id=option,
                         contest_id=contest,
                         kind="candidate",
-                        party_id=None if label is None else cs.key("us.party", label),
+                        party_id=kept.get(option) if label is None else cs.key("us.party", label),
                         ballot_label=ballot,
                     )
                     cs.add(
