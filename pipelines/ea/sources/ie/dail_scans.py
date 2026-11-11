@@ -354,7 +354,7 @@ def grids(pixels: np.ndarray) -> list[dict]:
     clusters: dict[int, list[tuple[int, int, int]]] = {}
     for index, line in enumerate(lines):
         clusters.setdefault(root(index), []).append(line)
-    found = [
+    found: list[dict] = [
         {
             "rules": [line[0] for line in members],
             "top": min(line[1] for line in members),
