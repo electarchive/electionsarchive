@@ -386,7 +386,7 @@ def finish(
     listed = 0
     for candidate in candidates:
         if year == 2011 and not candidate["party"].strip():
-            words = re.sub(r"^[^A-Za-z]+", "", candidate["name"]).replace(",", " ").split()
+            words = re.sub(r"^[\W\d_]+", "", candidate["name"]).replace(",", " ").split()
             surname = squeeze(
                 words[0]
                 if len(words) > 1 and len(words[-1]) == 1
@@ -403,7 +403,7 @@ def finish(
                 listed += 1
                 candidate["name"] = f"{found[0][0].split()[-1]}, {' '.join(found[0][0].split()[:-1])}"
                 candidate["party"] = "" if found[0][1].startswith("Independent") else found[0][1]
-        candidate["name"] = re.sub(r"^[^A-Za-z]+", "", candidate["name"])
+        candidate["name"] = re.sub(r"^[\W\d_]+", "", candidate["name"])
         words = candidate["name"].split()
         given = candidate["name"].partition(",")[2].strip()
         if (not given and (len(words) == 1 or year == 2014)) or (given and len(given) <= 2):
@@ -1087,7 +1087,8 @@ def display_word(word: str) -> str:
         return word
     parts = []
     for part in word.split("-"):
-        if re.search(r"[A-Z]{2}", part):
+        letters = [c for c in part if c.isalpha()]
+        if len(letters) > 1 and sum(c.isupper() for c in letters) > 1:
             found = re.fullmatch(r"(MC|Mc|O['’])(.+)", part)
             part = found.group(1).capitalize() + found.group(2).capitalize() if found else part.capitalize()
         parts.append(part)
@@ -1136,6 +1137,7 @@ def parse() -> None:
 
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DERIVED = 1
+NO_LICENSE = "No license stated: facts published with attribution, raw files not redistributed"
 OGL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
 
 
@@ -1380,8 +1382,8 @@ def emit() -> Path:
                             else f"result sheet {url.rsplit('/', 1)[-1]}"
                         ),
                         url=url,
-                        license="Open Government Licence v3.0" if year == 2014 else None,
-                        license_url=OGL if year == 2014 else None,
+                        license=NO_LICENSE if publisher.startswith("ARK") else "Open Government Licence v3.0",
+                        license_url=None if publisher.startswith("ARK") else OGL,
                         attribution=publisher,
                     )
                     try:
