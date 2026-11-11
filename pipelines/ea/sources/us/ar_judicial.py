@@ -69,6 +69,12 @@ CANDIDATE = re.compile(r"^(.+?) - Non Partisan Judicial\s+([\d,]+)\s+[\d.]+%\s*$
 HELD = {(date(2018, 11, 6), "Associate", "Position 3"), (date(2024, 11, 5), "Chief", "Position 1")}
 ALIASES = {"Jim Gunter": "James Gunter"}
 TITLES = {"Chief": "Chief Justice of the Supreme Court", "Associate": "Justice of the Supreme Court"}
+STATEWIDE = "Arkansas"
+UNOPPOSED = re.compile(r"Justice Tom Glaze\s+All unopposed\s+([\d,]+)\s+100\.00%")
+TOTALS_NOTE = (
+    "Statewide total only, from the Secretary of State's certification report summary page; the report's county "
+    "pages do not give a usable Pulaski County figure for this unopposed race."
+)
 NOTE = "County totals from the Secretary of State's certification report; the statewide page agrees with their sum."
 
 
@@ -223,8 +229,33 @@ def check(day: date, court: str, seat: str, places: dict[str | None, dict[str, i
     return {place: votes for place, votes in places.items() if place is not None}
 
 
+def read_2002() -> dict[str, int]:
+    url = ar_pri_cert.BASE + "2002_Preferential_Primary_Non-Partisan_Judicial.pdf"
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(ar_pri_cert.SOURCE, url).path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    found = UNOPPOSED.findall(text)
+    if len(found) != 1:
+        raise ValueError(f"2002 Glaze statewide total: {len(found)} matches")
+    return {"Tom Glaze": int(found[0].replace(",", ""))}
+
+
 def emit() -> Path:
-    contests = []
+    contests = [
+        (
+            ar_pri_cert.SOURCE,
+            ar_pri_cert.BASE + "2002_Preferential_Primary_Non-Partisan_Judicial.pdf",
+            date(2002, 5, 21),
+            "2002-05-21:AR:primary",
+            "primary",
+            "Associate",
+            "Position 6",
+            {STATEWIDE: read_2002()},
+        )
+    ]
     for url, day, election_key, kind, _, sheets in WORKBOOKS:
         for (court, seat), places in workbook(url, sheets).items():
             contests.append((SOURCE, url, day, election_key, kind, court, seat, check(day, court, seat, places)))
@@ -306,6 +337,9 @@ def emit() -> Path:
                 """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
                where p.iso_code = 'US-AR'"""
             )
+        )[0]
+        counties[flat(STATEWIDE)] = one(
+            conn.execute("select id from reporting_unit where scheme_code = 'us.state' and area_id = %s", [state_area])
         )[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ar/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
@@ -389,7 +423,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            cs.add("note", entity_id=result, kind="methodology", body_md=NOTE)
+            cs.add("note", entity_id=result, kind="methodology", body_md=TOTALS_NOTE if len(places) == 1 else NOTE)
             names = list(next(iter(places.values())))
             totals = {name: sum(place.get(name, 0) for place in places.values()) for name in names}
             options: dict[str, UUID] = {}
