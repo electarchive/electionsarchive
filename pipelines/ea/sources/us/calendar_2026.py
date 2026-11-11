@@ -11,16 +11,10 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.calendar_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 LA_CANDIDATES = "https://voterportal.sos.la.gov/CandidateInquiry/StatewideCandidate/CandidateList"
 SOURCES = {
-    "guam": (
-        "https://www.govinfo.gov/link/uscode/48/1422?type=usc&year=mostrecent&link-type=html",
-        "official_body",
-        "U.S. Government Publishing Office (govinfo)",
-        "48 U.S.C. § 1422: Governor and Lieutenant Governor of Guam (runoff on the fourteenth day after a general election no ticket wins by a majority)",
-    ),
     "GA": (
         "https://web.archive.org/web/2026id_/https://sos.ga.gov/sites/default/files/forms/2026%20Elections%20Calendar_0.pdf",
         "official_body",
@@ -101,7 +95,6 @@ SOURCES = {
     ),
 }
 ELECTIONS = [
-    ("2026-11-17:GU:runoff", "runoff", "2026-11-03:GU", "2026 Guam runoff election", "guam"),
     ("2026-12-01:GA:runoff", "runoff", "2026-11-03:GA", "2026 Georgia runoff election", "GA"),
     ("2026-12-01:MS:runoff", "runoff", "2026-11-03:MS", "2026 Mississippi runoff election", "MS"),
     ("2026-12-01:AR:runoff", "runoff", "2026-11-03:AR", "2026 Arkansas runoff election", "AR"),
@@ -224,7 +217,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The 2026 elections after November 3 as scheduled: the Guam, Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs, and Mississippi's November 3 Court of Appeals, chancery, and circuit court elections and District Attorney District 7 special election with their qualified candidates",
+            summary="The 2026 elections after November 3 as scheduled: the Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs, and Mississippi's November 3 Court of Appeals, chancery, and circuit court elections and District Attorney District 7 special election with their qualified candidates",
             polity="US",
         )
 
@@ -494,5 +487,22 @@ def emit() -> Path:
                 )
                 cs.add("citation", entity_id=candidacy, source_id=sources["MS-qualifying"], locator=None)
                 counts["candidates"] += 1
-        print(counts)
+        stale = conn.execute(
+            """select e.id from election e join entity en on en.id = e.id and en.retired_by is null
+               join changeset ch on ch.id = e.changeset_id
+               where ch.pipeline = %s and e.id <> all(%s::uuid[])
+               and not exists (select from election k where k.parent_id = e.id)
+               and not exists (select from entity_merge m where m.entity_id = e.id or m.into_id = e.id)
+               and not exists (
+                   select from contest c join entity ce on ce.id = c.id and ce.retired_by is null
+                   where c.election_id = e.id)""",
+            [SOURCE, list(elections.values())],
+        ).fetchall()
+        for (election,) in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=election,
+                reason="Unofficial results show a ticket won a majority on November 3, so no runoff is held.",
+            )
+        print(counts, f"{len(stale)} elections retired")
         return cs.write()

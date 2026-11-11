@@ -323,4 +323,23 @@ def emit() -> Path:
                 option_id=options["Yes" if status == "Approved" else "No"],
                 kind="won",
             )
+        used = list({str(row["election_id"]) for row in cs.rows.get("contest", [])})
+        stale = conn.execute(
+            """select e.id from election e join entity en on en.id = e.id and en.retired_by is null
+               join changeset c on c.id = e.changeset_id
+               where c.pipeline = %s and e.id <> all(%s::uuid[])
+               and not exists (select from election k where k.parent_id = e.id)
+               and not exists (select from entity_merge m where m.entity_id = e.id)
+               and not exists (
+                   select from contest k join entity ke on ke.id = k.id and ke.retired_by is null
+                   where k.election_id = e.id)""",
+            [SOURCE, used],
+        ).fetchall()
+        for (election,) in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=election,
+                reason="No measure is held on this date; the measure moved to its real election date.",
+            )
+        print(f"{len(stale)} empty elections retired")
         return cs.write()

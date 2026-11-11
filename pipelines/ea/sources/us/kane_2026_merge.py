@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.kane_2026_merge"
-VERSION = "1"
+VERSION = "2"
 
 
 def emit() -> Path:
@@ -13,7 +13,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Merge us.kane_il's leftover 2026-11-03 candidacies, options, and people into us.local_2026's",
+            summary="Merge us.kane_il's leftover 2026-11-03 candidacies, options, and people into us.local_2026's, and retire its 2026-11-03 elections that hold no contest",
             polity="US-IL",
         )
         rows = conn.execute(
@@ -48,4 +48,21 @@ def emit() -> Path:
                 cs.merge(local_person, person)
             else:
                 cs.merge(person, local_person)
+        empty = conn.execute(
+            """select e.id from election e join entity en on en.id = e.id and en.retired_by is null
+               join changeset ch on ch.id = e.changeset_id
+               where ch.pipeline = 'us.kane_il' and e.date_from = '2026-11-03'
+               and not exists (select from entity_merge m where m.entity_id = e.id or m.into_id = e.id)
+               and not exists (select from election k where k.parent_id = e.id)
+               and not exists (
+                   select from contest c join entity ce on ce.id = c.id and ce.retired_by is null
+                   where c.election_id = e.id)"""
+        ).fetchall()
+        for (election,) in empty:
+            cs.add(
+                "entity_retirement",
+                entity_id=election,
+                reason="No contest is held under this municipality on this date; the ballot questions listed for it belong to its school, fire protection, and township districts.",
+            )
+        print(f"{len(empty)} empty elections retired")
         return cs.write()

@@ -2,12 +2,12 @@ import re
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.us import medsl_local
 from ea.sources.us.medsl import RECODED
 from ea.sources.us.medsl_state import PUBLISHER
@@ -343,6 +343,11 @@ def emit() -> Path:
             if (scheme, code) not in polities:
                 continue
             polity, place, path, whole = polities[(scheme, code)]
+            contest_key = f"{day}:{state}:{code}:question:{slug(office)[:80]}" + (
+                f":{slug(district)[:40]}" if district else ""
+            )
+            if uuid5(NAMESPACE, f"external_id:us.contest\x1f{contest_key}") in cs.retired:
+                continue
             parent = cs.key("us.election", f"{day}:{state}")
             if parent in cs.minted:
                 raise ValueError(f"no election {day}:{state}")
@@ -382,9 +387,6 @@ def emit() -> Path:
                 heading = f"{heading}, {district.title()}"
             if len(heading) > 120:
                 heading = heading[:117].rsplit(" ", 1)[0] + "..."
-            contest_key = f"{day}:{state}:{code}:question:{slug(office)[:80]}" + (
-                f":{slug(district)[:40]}" if district else ""
-            )
             contest = cs.key("us.contest", contest_key)
             area = whole
             if partial:
@@ -535,4 +537,23 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        used = list({str(row["election_id"]) for row in cs.rows.get("contest", [])})
+        stale = conn.execute(
+            """select e.id from election e join entity en on en.id = e.id and en.retired_by is null
+               join changeset c on c.id = e.changeset_id
+               where c.pipeline = %s and e.id <> all(%s::uuid[])
+               and not exists (select from election k where k.parent_id = e.id)
+               and not exists (select from entity_merge m where m.entity_id = e.id)
+               and not exists (
+                   select from contest k join entity ke on ke.id = k.id and ke.retired_by is null
+                   where k.election_id = e.id)""",
+            [SOURCE, used],
+        ).fetchall()
+        for (election,) in stale:
+            cs.add(
+                "entity_retirement",
+                entity_id=election,
+                reason="No local ballot question is loaded for this county on this date.",
+            )
+        print(f"{len(stale)} empty elections retired")
         return cs.write()
