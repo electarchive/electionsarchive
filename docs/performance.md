@@ -181,6 +181,16 @@ The `coarse()` helper in `archive.ts` returns the simplified copy when one exist
 
 Across the 70 predecessor pairs of the 12 heaviest districts of Canada's 2025 election, the largest difference between coarse and exact shares was 0.00047. None changed at two decimal places, and none crossed the 1% cutoff for listing a predecessor.
 
+### Straddling areas on a contest map
+
+The contest map checks which of its listed counties, towns, and precincts straddle the district's boundary, which means the district covers less than 95% of their area. Running that check from the shapes means fetching every listed area's geometry. For one New York House district in 2020, with 560 listed areas, the query read about 2,900 buffers, 1,100 of them from disk, and took about 1.5 seconds on a cold database.
+
+`ea straddle` stores the answer in `display.straddle`, with one row per district, election day, and listed area. It covers every electoral district and day whose contests report results for more than 100 areas. The first build wrote 2.7 million rows for 6,166 districts and days. It takes up 381 MB and took 75 minutes to build. Later runs only fill in what is missing and take about two minutes. `ea tiles` runs it too.
+
+`display.straddle_mark` records the newest changeset that touched `area_geometry` when the rows were last checked. That is the highest `changeset_id` in `area_geometry` or `superseded_by` in its history. `places()` in `archive.ts` uses the stored rows only while that changeset is still the newest one. It computes any area without a row from the shapes, so the output is the same either way. After a geometry load, the app ignores the table until `ea straddle` runs again, and that run recomputes only the rows for districts and areas whose shapes changed. Changeset ids come from the time a changeset was created. A geometry changeset created before the stored id but applied after the check goes unnoticed. After applying one, delete the row in `display.straddle_mark` and run `ea straddle` to rebuild the whole table.
+
+On two other cold New York House districts from 2020, the lookup of stored rows read about 600 buffers, with 14 and 15 pages from disk, and the whole query took 99 and 182 ms. The output of `contests.get` was byte-identical to the old query's on 14 New York House contests, a French constituency, and two California legislative districts.
+
 ## Rendering and payloads
 
 The server's CPU time matters as much as the database's once the queries are fast. These patterns came out of CPU profiles of cold page loads.

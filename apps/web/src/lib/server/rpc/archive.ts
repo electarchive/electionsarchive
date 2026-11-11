@@ -4697,11 +4697,25 @@ async function places(
               where p.area_id = a.id and p.parent_id = ${area.id}::uuid and p.valid @> ${contest.date ?? "infinity"}::date
             )
         ),
+        known as materialized (
+          select s.kid_id as id, s.straddles from display.straddle s
+          join listed l on l.id = s.kid_id
+          where s.area_id = ${area.id}::uuid and s.day = ${contest.date ?? "infinity"}::date
+            and exists (
+              select from display.straddle_mark m
+              where m.mark = greatest(
+                (select changeset_id from area_geometry order by changeset_id desc limit 1),
+                (select superseded_by from area_geometry_history where superseded_by > '00000000-0000-0000-0000-000000000000' order by superseded_by desc limit 1)
+              )
+            )
+        ),
         straddling as materialized (
+          select a.id, a.k from listed a join known s on s.id = a.id where s.straddles
+          union all
           select a.id, a.k from listed a
           join (
             select distinct on (g.area_id) g.area_id, g.geom from area_geometry g
-            where g.area_id = any(array(select id from listed))
+            where g.area_id = any(array(select id from listed where id not in (select id from known)))
             order by g.area_id, g.valid @> ${contest.date ?? "infinity"}::date desc, upper(g.valid) desc nulls first
           ) g on g.area_id = a.id
           cross join me
