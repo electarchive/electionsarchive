@@ -987,20 +987,25 @@ const datedTogether = together(
       common: Array<string>;
       historical: boolean;
     }>,
-    { common, historical },
+    { common },
   ) => {
     const version = dataVersion();
     if (version !== datedMemo.version) {
       datedMemo.version = version;
       datedMemo.entries.clear();
     }
-    const scope = `${historical}|${common.join(",")}|`;
+    const scope = `${common.join(",")}|`;
     const found = new Map<string, { label: string; short: string | null }>();
-    const lookup = (id: string, on: string | null) =>
-      found.get(`${id}|${on ?? ""}`) ?? { label: "", short: null };
-    const unique: Array<{ id: string; on: string | null }> = [];
-    for (const pair of asks.flatMap((ask) => ask.pairs)) {
-      const key = `${pair.id}|${pair.on ?? ""}`;
+    const lookup = (historical: boolean) => (id: string, on: string | null) =>
+      found.get(`${historical}|${id}|${on ?? ""}`) ?? {
+        label: "",
+        short: null,
+      };
+    const unique: Array<{ id: string; on: string | null; h: boolean }> = [];
+    for (const pair of asks.flatMap((ask) =>
+      ask.pairs.map((pair) => ({ ...pair, h: ask.historical })),
+    )) {
+      const key = `${pair.h}|${pair.id}|${pair.on ?? ""}`;
       if (found.has(key)) {
         continue;
       }
@@ -1014,23 +1019,25 @@ const datedTogether = together(
       }
     }
     if (unique.length === 0) {
-      return () => lookup;
+      return (at: number) => lookup(asks[at]?.historical ?? false);
     }
     const ids = [...new Set(unique.map((pair) => pair.id))];
+    const withHistory = unique.some((pair) => pair.h);
     const result = await db.execute<{
       entity_id: string;
+      historical: boolean;
       on: string | null;
       kind: string;
       text: string;
     }>(sql`
       with p as (
-        select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[]) p(entity_id, on_date)
+        select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[], ${sql.param(unique.map((pair) => pair.h))}::boolean[]) p(entity_id, on_date, h)
       ),
       c as materialized (
         select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
         from name
         where entity_id = any(${sql.param(ids)}::uuid[])
-          and (kind in ('official', 'english') or (${historical} and kind = 'historical'))
+          and (kind in ('official', 'english') or (${withHistory} and kind = 'historical'))
       ),
       e as materialized (
         select id, date_from, polity_id from election
@@ -1042,20 +1049,21 @@ const datedTogether = together(
         order by entity_id, id
       ),
       n as (
-        select distinct on (p.entity_id, p.on_date) p.entity_id, p.on_date, c.kind::text as kind, c.text
+        select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.kind::text as kind, c.text
         from p
         join c on c.entity_id = p.entity_id
+          and (c.kind <> 'historical' or p.h)
           and (c.kind in ('official', 'english')
             or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
         left join l on l.entity_id = p.entity_id
-        order by p.entity_id, p.on_date, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
+        order by p.entity_id, p.on_date, p.h, coalesce(c.valid @> coalesce(p.on_date, (select name_day())), false) desc,
           coalesce(c.valid @> coalesce(p.on_date, (select name_day())) and not (lower_inf(c.valid) and upper_inf(c.valid)), false) desc,
           ${nearest(sql`c`, sql`p.on_date`)} nulls first,
           coalesce(c.kind = 'english' and c.script = 'Latn' and c.entity_id = any(${sql.param(common)}::uuid[]), false) desc, c.is_preferred desc,
           c.lang = l.lang desc nulls last,
           (c.lang = 'en') desc, (c.kind = 'official') desc, c.recorded_from desc, c.id
       )
-      (select n.entity_id, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+      (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
       from n
       left join e on e.id = n.entity_id and n.text like extract(year from e.date_from)::int || ' %'
       left join lateral (
@@ -1071,14 +1079,14 @@ const datedTogether = together(
         )
       ) d on true)
       union all
-      select p.entity_id, p.on_date::text, 'abbreviation', short.text
+      select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text
       from p
       cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
       where p.entity_id = any(array(select entity_id from name where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('short', 'abbreviation')))
         and short.text is not null
     `);
     for (const row of result.rows) {
-      const key = `${row.entity_id}|${row.on ?? ""}`;
+      const key = `${row.historical}|${row.entity_id}|${row.on ?? ""}`;
       const entry = found.get(key) ?? { label: "", short: null };
       if (row.kind === "abbreviation") {
         entry.short = row.text;
@@ -1089,7 +1097,7 @@ const datedTogether = together(
     }
     if (version !== "" && version === datedMemo.version) {
       for (const pair of unique) {
-        const key = `${pair.id}|${pair.on ?? ""}`;
+        const key = `${pair.h}|${pair.id}|${pair.on ?? ""}`;
         const entry = found.get(key);
         if (entry != null) {
           datedMemo.entries.set(scope + key, entry);
@@ -1102,12 +1110,9 @@ const datedTogether = together(
         datedMemo.entries.delete(oldest);
       }
     }
-    return () => lookup;
+    return (at: number) => lookup(asks[at]?.historical ?? false);
   },
-  {
-    shape: ({ common, historical }) => JSON.stringify([common, historical]),
-    size: 2000,
-  },
+  { shape: ({ common }) => JSON.stringify(common), size: 2000 },
 );
 
 export async function dated(
