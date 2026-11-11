@@ -12,6 +12,7 @@
     slate,
     last,
     held,
+    isCounting,
   }: {
     slate: NonNullable<
       Awaited<
@@ -22,6 +23,7 @@
       Extract<PageServerData, { kind: "contest" }>["body"]
     >["contest"]["last"];
     held: string | null;
+    isCounting: boolean;
   } = $props();
 
   const uid = $props.id();
@@ -52,6 +54,7 @@
         slate.closes,
         now,
         slate.options.length === 1 && !slate.isUnqualified,
+        isCounting,
       )}
     </p>
   </div>

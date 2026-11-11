@@ -489,6 +489,7 @@
   "slate_scheduled": "Voting is on {date}. Results will appear here once they're counted.",
   "slate_voting": "Voting is underway on {date}. The last polls in the state close at {time}, and results will appear here once they're published.",
   "slate_unqualified": "No candidate qualified (write-in only)",
+  "slate_counting": "Certified results are not published yet.",
   "slate_unreported": "Voting took place on {date}. No results are published for this contest yet.",
   "slate_unreported_unopposed": "Voting took place on {date}. This candidate ran unopposed, so no live count was published; the vote total will appear here once the official returns are certified.",
   "slate_incumbent": "Incumbent",

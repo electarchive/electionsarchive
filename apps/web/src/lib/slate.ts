@@ -10,6 +10,7 @@ export function slateLine(
   closes: string | null,
   now: number,
   isUnopposed: boolean,
+  isCounting = false,
 ) {
   const day = date(held);
   const ended =
@@ -17,6 +18,9 @@ export function slateLine(
       ? Date.parse(`${held}T12:00:00Z`) + 86_400_000
       : Date.parse(closes);
   if (held == null || now >= ended) {
+    if (isCounting) {
+      return m.slate_counting();
+    }
     return (isUnopposed ? m.slate_unreported_unopposed : m.slate_unreported)({
       date: day,
     });

@@ -1878,6 +1878,7 @@
     slate={contest.slate}
     last={contest.last ?? null}
     held={contest.election.date}
+    isCounting={live != null}
   />
   {#if locating != null}
     <section

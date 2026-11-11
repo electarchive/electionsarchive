@@ -1046,6 +1046,7 @@ function markdown(
           data.standing,
           link,
           ledger,
+          data.live != null,
         ).toSpliced(2, 0, ...countingMarkdown(data.live, link)),
         ...(data.sameDay != null && data.sameDay.races.length > 1
           ? sameDayMarkdown(data.sameDay, link)
@@ -5073,6 +5074,7 @@ function contestMarkdown(
   standing: Extract<Data, { kind: "contest" }>["standing"],
   link: Link,
   ledger: Ledger,
+  isCounting: boolean,
 ) {
   const groups: Record<string, (place: string) => string> = {
     owner: () => "",
@@ -5468,6 +5470,7 @@ function contestMarkdown(
         : contest,
       then,
       link,
+      isCounting,
     ),
     ...(contest.nomination == null
       ? []
@@ -6183,6 +6186,7 @@ function resultsMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   then: string | null,
   link: Link,
+  isCounting: boolean,
 ) {
   let won = 0;
   for (const row of contest.rows) {
@@ -6333,6 +6337,7 @@ function resultsMarkdown(
         contest.slate.closes,
         Date.now(),
         contest.slate.options.length === 1 && !contest.slate.isUnqualified,
+        isCounting,
       ),
       "",
       ...(contest.slate.isUnqualified ? [m.slate_unqualified()] : []),
