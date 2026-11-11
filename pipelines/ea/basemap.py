@@ -493,9 +493,10 @@ def historical(schemes: list[str], date: str) -> str:
         line = LineString(points)
         props = ohm.stamp(tags)
         vetted = None if props is None else ohm.vet(tags, tally)
-        for scheme, (area, _) in regions.items():
+        for scheme, (area, ground) in regions.items():
             if not area.intersects(line):
                 continue
+            beyond = not ground.intersects(line)
             if props is None:
                 tally.counts[(scheme, "rail", "dropped_undated" if "start_date" not in tags else "dropped_date")] += 1
             elif vetted is None:
@@ -503,6 +504,9 @@ def historical(schemes: list[str], date: str) -> str:
             else:
                 tally.counts[(scheme, "rail", vetted[0])] += 1
                 row = {"kind": tags["railway"], **props}
+                if beyond:
+                    tally.counts[(scheme, "rail_outside", vetted[0])] += 1
+                    row["out"] = 1
                 if vetted[1] is not None:
                     tally.credits[(scheme, "rail", vetted[1])] += 1
                     row["c"] = vetted[1].id
@@ -543,8 +547,9 @@ def historical(schemes: list[str], date: str) -> str:
                 for credit in credits:
                     tally.credits[(scheme, "borders", credit)] += 1
                 info: dict[str, str | int] = {"id": rid, "level": int(tags.get("admin_level", 0)), **props}
-                if "name" in tags:
-                    info["name"] = tags["name"]
+                name = tags.get("name") or tags.get("name:en") or tags.get("name:de")
+                if name is not None:
+                    info["name"] = name
                 if credits:
                     info["c"] = ",".join(sorted(credit.id for credit in credits))
                 borders[scheme].append((clipped, info))

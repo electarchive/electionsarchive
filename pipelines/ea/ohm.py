@@ -1,7 +1,7 @@
 """Reads OpenHistoricalMap's daily planet for the historical basemap (`ea basemap --historical`).
 
-License handling, decided by Firat on 2026-11-11. Each feature carries its own `license` tag and is kept or dropped on
-that tag alone:
+License handling follows the project's rule: keep CC0, public domain, and CC BY (with credit), and drop ODbL and CC BY-SA.
+Each feature carries its own `license` tag and is kept or dropped on that tag alone:
 
 - `CC0`, `CC0-1.0`, and similar are kept (class `cc0`).
 - `public domain`, `PDM`, `copyright expired`, and `dl-de/zero` are kept (class `public_domain`).
@@ -17,7 +17,7 @@ Dates follow `start_date` and `end_date`. A year-only or year-month start reads 
 year-only or year-month end covers its whole period, so `end_date` is stored as the first day after it (an end of
 `1972` becomes `1973-01-01`) and the half-open rule below still holds. Unpadded months and days (`2010-6-8`) and
 negative years (read as BCE) are accepted. A feature with no `start_date`, with free text or any other unparseable
-date, or with an end that is not after its start is dropped, and the counts report these as `dropped_undated` and
+date, with a start after 2026, or with an end that is not after its start is dropped, and the counts report these as `dropped_undated` and
 `dropped_date`. A feature is valid on date D when `start <= D < end`, and a missing end means open. The
 tile properties `s` and `e` are days since 1970-01-01, so the comparison needs no date parsing in the app. Syria and
 Hatay State overlap from 1938-09-02 to 1938-09-07, and the half-open rule keeps both on those days.
@@ -94,7 +94,7 @@ def normalize(value: str | None, end: bool = False) -> tuple[str, int] | None:
 
 def stamp(tags: dict[str, str]) -> dict[str, str | int] | None:
     start = normalize(tags.get("start_date"))
-    if start is None:
+    if start is None or start[1] >= days(2027, 1, 1):
         return None
     props: dict[str, str | int] = {"start_date": start[0], "s": start[1]}
     if "end_date" in tags:
