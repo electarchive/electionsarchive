@@ -20,7 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.encoding import DOUBLED, decode, rekey, repair, restorer
+from ea.encoding import DOUBLED, GARBLED, decode, rekey, repair, restorer
 from ea.names import initials
 from ea.sources.us import (
     elstats,
@@ -3684,6 +3684,10 @@ def emit() -> Path:
             polity="US",
         )
         restore = restorer(conn)
+        lost = {
+            text: re.sub(r"(?<=[^\W\d_])\?(?=[^\W\d_])", GARBLED, text) for text in lines["choice"].unique().to_list()
+        }
+        lines = lines.with_columns(pl.col("choice").replace(lost))
         garbled = {text: restore(text) for text in lines["choice"].unique().to_list() if restore(text) != text}
         for text, fixed in garbled.items():
             cs.renamed.setdefault(slug(fixed), slug(text))
