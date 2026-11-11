@@ -152,6 +152,7 @@ def page(title: str) -> str:
 
 LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
 EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
+GBOOKS = "https://books.google.com/books?id={gbooks}&pg=PA{leaf}"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
 SHEET_2008 = "https://www.thegreenpapers.com/P08/D-VoteTallySheet-2008-09-02.pdf"
 RNC = "sim_republican-national-convention-proceedings_{}"
@@ -454,6 +455,17 @@ TABLES += [
         "bycandidate": True,
     }
 ]
+TABLES += [
+    {
+        "table": f"1848:democratic:b{n}",
+        "gbooks": "tQIbAAAAYAAJ",
+        "pdf_page": {13: 20, 14: 21, 15: 22},
+        "leaves": leaves_,
+        "ballot": n,
+        "transcribed": "conventions_baltimore_1848.tsv",
+    }
+    for n, leaves_ in {1: (13,), 2: (14,), 3: (14,), 4: (15,)}.items()
+]
 NILES = "sim_niles-national-register_{}"
 TABLES += [
     {
@@ -556,7 +568,23 @@ SHEET_CAVEAT = (
     "half votes. Where a delegation cast fewer votes than it was allocated, the difference is its abstentions."
 )
 DNC = "Official Proceedings of the National Democratic Convention, Held "
+NEWS_LICENSE = "All rights reserved: a news article cited for one fact, not redistributed"
+BALTIMORE_1848 = (
+    "The two-thirds rule was applied to the votes given: on the first and second ballots 251 votes were cast, and 168 "
+    "were needed; on the third and fourth, 254, and 170. New York's 36 votes were not cast on any ballot, the table marking it as not voting, and Florida's "
+    "3 were not cast on the first two ballots, the table printing declined voting and then excused. The table gives "
+    "no column for votes held, so only votes for candidates are stored, and the figures for John C. Calhoun "
+    "(South Carolina) and William J. Worth (Tennessee and Kentucky) on the first ballots, and for Worth on the "
+    "second, are printed in the state names, not in columns."
+)
+FOURTH_1848 = (
+    " The table's printed total for Lewis Cass, 179 votes, is the count before states changed their votes. After the "
+    "nomination was declared, the delegations that had not voted for Cass changed to make it unanimous, and the "
+    "proceedings then give the whole ballot as 254 votes, 242 for Cass, 8 for Levi Woodbury, and 4 for James "
+    "Buchanan. The rows stored here are the 179 as printed in the table."
+)
 PROCEEDINGS += [
+    {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}},
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835},
     {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
     {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
@@ -712,6 +740,13 @@ CANDIDATES = {
     "1844:democratic:Buchanan": ("James Buchanan", "Q12325"),
     "1844:democratic:Calhoun": ("John C. Calhoun", "Q207191"),
     "1844:democratic:Polk": ("James K. Polk", "Q11891"),
+    "1848:democratic:Cass": ("Lewis Cass", "Q503119"),
+    "1848:democratic:Buchanan": ("James Buchanan", "Q12325"),
+    "1848:democratic:Woodbury": ("Levi Woodbury", "Q579228"),
+    "1848:democratic:Calhoun": ("John C. Calhoun", "Q207191"),
+    "1848:democratic:Dallas": ("George M. Dallas", None),
+    "1848:democratic:Worth": ("William J. Worth", None),
+    "1848:democratic:Butler": ("William O. Butler", "Q693499"),
     "1852:democratic:Cass": ("Lewis Cass", "Q503119"),
     "1852:democratic:Buchanan": ("James Buchanan", "Q12325"),
     "1852:democratic:Marcy": ("William L. Marcy", "Q389258"),
@@ -2074,6 +2109,14 @@ def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
     if "uky" in spec:
         url = EXPLOREUK.format(item=spec["uky"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
+    if "gbooks" in spec:
+        url = GBOOKS.format(gbooks=spec["gbooks"], leaf=leaf)
+        try:
+            return raw.cached(SOURCE, url)
+        except LookupError:
+            if not fetch:
+                raise
+        return render_page(url, spec["pdf_page"][leaf])
     if "htid" not in spec:
         url = LEAF.format(item=spec["item"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
@@ -2083,6 +2126,41 @@ def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
         if not fetch:
             raise
     return render(spec, leaf)
+
+
+def render_page(url: str, page_number: int) -> raw.Artifact:
+    import subprocess
+    import tempfile
+
+    (pdf,) = (DATA / "inbox" / "manual").glob("MF-607/*.pdf")
+    with tempfile.TemporaryDirectory() as folder:
+        out = Path(folder) / "page"
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                "300",
+                "-gray",
+                "-jpeg",
+                "-f",
+                str(page_number),
+                "-l",
+                str(page_number),
+                "-singlefile",
+                str(pdf),
+                str(out),
+            ],
+            check=True,
+        )
+        content = out.with_suffix(".jpg").read_bytes()
+    return raw.store(
+        SOURCE,
+        url,
+        content,
+        suffix=".jpg",
+        retrieved_at=datetime.fromtimestamp(pdf.stat().st_mtime, UTC),
+        media_type="image/jpeg",
+    )
 
 
 def render(spec: dict[str, Any], leaf: int) -> raw.Artifact:
@@ -2729,6 +2807,8 @@ def emit() -> Path:
             source_url = (
                 first_spec["pdf"]
                 if "pdf" in first_spec
+                else f"https://books.google.com/books?id={first_spec['gbooks']}"
+                if "gbooks" in first_spec
                 else f"https://babel.hathitrust.org/cgi/pt?id={first_spec['htid']}"
                 if "htid" in first_spec
                 else f"https://exploreuk.uky.edu/catalog/{first_spec['uky']}"
@@ -2751,6 +2831,7 @@ def emit() -> Path:
                     publisher=publisher,
                     title=title,
                     url=source_url,
+                    license=NEWS_LICENSE if convention.get("kind") == "news_agency" else "Public record",
                 )
             pages = {}
             for spec in specs.values():
