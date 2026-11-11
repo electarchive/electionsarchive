@@ -5089,73 +5089,75 @@
         {/if}
       </span>
     </span>
-    <span class="grid gap-1">
-      {#each ranked as entry (entry.index)}
-        {const option = $derived(places.legend[entry.index])}
-        <span
-          class={cn(
-            "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-0.5 text-[0.8125rem]",
-            {
-              "opacity-55":
-                current.runoff != null &&
-                current.runoff.shares.some((share) => share > 0) &&
-                (current.runoff.shares[entry.index] ?? 0) === 0,
-            },
-          )}
-          style:--party={colors[entry.index]}
-        >
-          {const person = $derived(current.people?.[entry.index] ?? null)}
-          {const tag = $derived.by(() => {
-            const lines = current.tags?.[entry.index];
-            return lines != null
-              ? new Intl.ListFormat(getLocale(), {
-                  type: "unit",
-                  style: "short",
-                }).format(lines)
-              : person == null
-                ? null
-                : (names[entry.index] ?? option?.label ?? null);
-          })}
-          <span class="flex items-baseline gap-1.5 min-inline-0">
-            <span
-              class={cn("truncate", {
-                "font-semibold":
-                  current.runoff == null && entry.index === current.leader,
-              })}>{person ?? names[entry.index] ?? option?.label}</span
-            >
-            {#if tag != null}
-              <span
-                class="shrink-999 truncate text-xs text-muted-foreground min-inline-0"
-                title={tag}>{tag}</span
-              >
-            {/if}
-          </span>
+    {#if ranked.length > 0}
+      <span class="grid gap-1">
+        {#each ranked as entry (entry.index)}
+          {const option = $derived(places.legend[entry.index])}
           <span
-            class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
+            class={cn(
+              "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-0.5 text-[0.8125rem]",
+              {
+                "opacity-55":
+                  current.runoff != null &&
+                  current.runoff.shares.some((share) => share > 0) &&
+                  (current.runoff.shares[entry.index] ?? 0) === 0,
+              },
+            )}
+            style:--party={colors[entry.index]}
           >
-            {#if current.valid > 0 && !tallied}
-              <span class="text-muted-foreground"
-                >{count(Math.round(entry.share * current.valid))}</span
+            {const person = $derived(current.people?.[entry.index] ?? null)}
+            {const tag = $derived.by(() => {
+              const lines = current.tags?.[entry.index];
+              return lines != null
+                ? new Intl.ListFormat(getLocale(), {
+                    type: "unit",
+                    style: "short",
+                  }).format(lines)
+                : person == null
+                  ? null
+                  : (names[entry.index] ?? option?.label ?? null);
+            })}
+            <span class="flex items-baseline gap-1.5 min-inline-0">
+              <span
+                class={cn("truncate", {
+                  "font-semibold":
+                    current.runoff == null && entry.index === current.leader,
+                })}>{person ?? names[entry.index] ?? option?.label}</span
               >
-            {/if}
-            <span class="text-end min-inline-10"
-              >{tallied
-                ? count(Math.round(entry.share * current.valid))
-                : percent(entry.share, precision(current.margin))}</span
-            >
-          </span>
-          <span class="relative col-span-2 rounded-xs bg-muted block-1.5">
+              {#if tag != null}
+                <span
+                  class="shrink-999 truncate text-xs text-muted-foreground min-inline-0"
+                  title={tag}>{tag}</span
+                >
+              {/if}
+            </span>
             <span
-              class="block rounded-xs bg-(--party) block-full"
-              style:inline-size="{entry.share * 100}%"
-            ></span>
-            {#if current.runoff?.bar != null}
-              {@render tick(current.runoff.bar)}
-            {/if}
+              class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
+            >
+              {#if current.valid > 0 && !tallied}
+                <span class="text-muted-foreground"
+                  >{count(Math.round(entry.share * current.valid))}</span
+                >
+              {/if}
+              <span class="text-end min-inline-10"
+                >{tallied
+                  ? count(Math.round(entry.share * current.valid))
+                  : percent(entry.share, precision(current.margin))}</span
+              >
+            </span>
+            <span class="relative col-span-2 rounded-xs bg-muted block-1.5">
+              <span
+                class="block rounded-xs bg-(--party) block-full"
+                style:inline-size="{entry.share * 100}%"
+              ></span>
+              {#if current.runoff?.bar != null}
+                {@render tick(current.runoff.bar)}
+              {/if}
+            </span>
           </span>
-        </span>
-      {/each}
-    </span>
+        {/each}
+      </span>
+    {/if}
     {#if current.runoff != null}
       {@render second(current.runoff)}
     {/if}
