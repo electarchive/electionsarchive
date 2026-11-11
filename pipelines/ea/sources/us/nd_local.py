@@ -78,6 +78,14 @@ DISTRICT = (
 )
 
 
+def join_place(place: str, heading: str) -> str:
+    words, tail = heading.split(), place.split()
+    for size in range(min(len(words), len(tail)), 0, -1):
+        if [w.lower() for w in tail[-size:]] == [w.lower() for w in words[:size]]:
+            return f"{place} {' '.join(words[size:])}".strip()
+    return f"{place} {heading}"
+
+
 def title_case(text: str) -> str:
     small = {"of", "and", "the", "for", "to", "a", "in", "on", "at", "by"}
     words = re.sub(r"\s+", " ", text).strip(" -.,").lower().split(" ")
@@ -217,7 +225,10 @@ def emit() -> Path:
             conn, pipeline=SOURCE, version=VERSION, summary="North Dakota's local elections, 2000–2024", polity="US-ND"
         )
 
+        wanted: dict[UUID, str] = {}
+
         def name(entity: UUID, text: str) -> None:
+            wanted[entity] = text
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         source = cs.source(PUBLISHER, TITLE)
@@ -427,14 +438,14 @@ def emit() -> Path:
                 owner = owners[(code, office)] = (
                     cs.key("us.body", f"ND:{code}:{office}")
                     if body
-                    else offices.key(cs, f"ND:{code}:{office}", polity, office_kind, f"{place} {heading}")
+                    else offices.key(cs, f"ND:{code}:{office}", polity, office_kind, join_place(place, heading))
                 )
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
                         cs.add("office", id=owner, polity_id=polity, kind=office_kind)
-                    name(owner, f"{place} {heading}")
+                name(owner, join_place(place, heading))
             if (day, code, election_kind) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, code, election_kind)] = foreign["election"][f"{path}/{day}-{election_kind}"]
             if (day, code, election_kind) not in elections:
@@ -528,7 +539,7 @@ def emit() -> Path:
                 contest,
                 f"{day.year} {place}: {heading}"
                 if question
-                else f"{day.year} {place} {heading} election"
+                else f"{day.year} {join_place(place, heading)} election"
                 + (f", {seat}" if seat else "")
                 + (" (unexpired term)" if item["remainder"] else "")
                 + (f" ({item['scope']} primary)" if item["scope"] else ""),
@@ -626,6 +637,13 @@ def emit() -> Path:
             for resolved, seat in [resolve(area, "")]
             if resolved != f"special:{slug(area)}"
         }
+        for name_id, entity, text in conn.execute(
+            """select id, entity_id, text from name where entity_id = any(%s)
+               and text ~* '\\m(\\w+) \\1\\M|\\mBoard Park Board\\M' and not is_preferred""",
+            [list(wanted)],
+        ).fetchall():
+            if text != wanted[entity]:
+                cs.add("name_drop", name_id=name_id, entity_id=entity, text=text, reason="repeats the district name")
         fold(conn, cs, moved, polities, elections, owners, districts, people, order, staged)
         return cs.write()
 
