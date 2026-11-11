@@ -8,11 +8,8 @@ type Place = InferRouterOutputs<
 export function crowned(places: Place) {
   const size = places.legend.length;
   const dense = (spread: Array<[number, number]>) => {
-    const found = new Array<number>(size).fill(0);
-    for (const [index, value] of spread) {
-      found[index] = value;
-    }
-    return found;
+    const found = new Map(spread);
+    return Array.from({ length: size }, (_, index) => found.get(index) ?? 0);
   };
   return {
     ...places,
