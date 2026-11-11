@@ -9519,9 +9519,11 @@ export const contests = {
                        select a.k, 1 from contest c join area a on a.id = c.district_area_id
                        where c.id = rs.root and c.id = any(${sql.param(lineageIds)}::uuid[])
                      ) x
-                     where exists (
-                       select from result_rollup r where r.result_set_k = rs.k and r.area_k = x.area and r.measure = any(${COUNTED})
-                     )
+                     where exists (select from result_rollup_sum r where r.result_set_k = rs.k and r.area_k = x.area and r.measure = any(${COUNTED}))
+                       or exists (
+                         select from result_rollup_unit u join result_value v on v.result_set_k = u.result_set_k and v.unit_k = u.unit_k
+                         where u.result_set_k = rs.k and u.area_k = x.area and v.measure = any(${COUNTED})
+                       )
                      order by x.rank limit 1
                    ) hit on true
                    order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
@@ -9567,8 +9569,8 @@ export const contests = {
                  ),
                  declared as (
                    select distinct on (grp.root) grp.root, null::text as key, 1::int2 as measure, null::float8 as appointed,
-                     head.person, coalesce(pm.into_id, o.party_id) as party, o.kind::text as kind, o.ballot_label as label,
-                     0::float8 as votes, 0::float8 as total, array[o.id] as options
+                     head.person, coalesce((select pm.into_id from entity_merge pm where pm.entity_id = o.party_id), o.party_id) as party,
+                     o.kind::text as kind, o.ballot_label as label, 0::float8 as votes, 0::float8 as total, array[o.id] as options
                    from grp
                    cross join lateral (select * from contest_option y where y.contest_id = grp.id offset 0) o
                    cross join lateral (
@@ -9577,7 +9579,6 @@ export const contests = {
                        and exists (select from result_set z where z.id = x.result_set_id and ${latest("z")})
                      limit 1
                    ) won
-                   left join entity_merge pm on pm.entity_id = o.party_id
                    left join lateral (
                      select coalesce(em.into_id, cy.person_id) as person
                      from candidacy cy left join entity_merge em on em.entity_id = cy.person_id
