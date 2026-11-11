@@ -30,7 +30,21 @@ TITLES = {
     for year, (_, book, congress, _, _) in ITEMS.items()
 }
 NAMES: dict[tuple[str, str], str] = {}
-ERRATA: set[tuple[int, int]] = set()
+ERRATA: set[tuple[int, int]] = {(1982, 9), (1986, 7)}
+NOTES = {
+    (1982, 9): (
+        (
+            "The Blue Book's county figures for Sensenbrenner add up to 110,503, a thousand fewer than the 111,503 it "
+            "prints as the district total."
+        ),
+    ),
+    (1986, 7): (
+        (
+            "The Blue Book's county figures for Hermening add up to 63,468, sixty more than the 63,408 it prints as "
+            "the district total."
+        ),
+    ),
+}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1

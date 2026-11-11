@@ -10,16 +10,18 @@ VERSION = "1"
 PUBLISHER = "Washington Secretary of State"
 TITLE = "Official Returns of the State General Election, {day:%B %-d, %Y}"
 LICENSE = "Public record"
-SUMMARY = "Washington's House results by county from the Secretary of State's official abstract of the general election"
+SUMMARY = "Washington's House and Senate results by county from the Secretary of State's official abstract of the general election"
 STATE = "WA"
 FIPS = "53"
 ITEMS = {
+    1986: ("micro_IA40706926_0225", date(1986, 11, 4), (5, 6, 7, 8)),
     1994: ("micro_IA40706953_0368", date(1994, 11, 8), (6, 7, 8)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
 }
+KEYS = {(1986, 0): "1986-11-04:WA:senate"}
 ERRATA: set[tuple[int, int]] = set()
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
