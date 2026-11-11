@@ -14,7 +14,7 @@ from ea.sources.us.sc_general_2026 import DAY, INBOX, LOCAL, PAGE, PUBLISHER
 from ea.store import DATA, connect
 
 SOURCE = "us.sc_local_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 TITLE = "2026 Statewide General Election certified results file, solicitor, municipal, and school district contests"
 PLACES = {
@@ -59,6 +59,30 @@ TITLES = {
     "4503510:measure:question-1": ("Referendum Question 1", "full"),
     "4503510:measure:question-2": ("Referendum Question 2", "full"),
     "4535890:measure:form-of-government": ("Form of Government Referendum", "full"),
+}
+CHEROKEE = (
+    "Cherokee County Voter Registration and Elections",
+    "2026 November Referendums Info",
+    "https://cherokeecountysc.gov/wp-content/uploads/2026/08/2026-November-Referendums-Info.pdf",
+)
+IRMO = (
+    "Town of Irmo",
+    "Final public informational meeting ahead of the November ballot referendum on form of government",
+    "https://www.swlexledger.com/single-post/town-of-irmo-to-hold-final-public-informational-meeting-ahead-of-november-ballot-referendum-on-form",
+)
+WORDING = {
+    "4503510:measure:question-1": (
+        *CHEROKEE,
+        'Shall the Board of Trustees of School District No. 2 of Spartanburg County, South Carolina (the "School District"), be empowered to issue, at one time or from time to time, general obligation bonds of the School District, in a principal amount of not exceeding $156,600,000.00 the proceeds of which shall be used to finance the costs (including architectural, engineering, legal and related fees) of constructing and equipping a new K-8 school in the Boiling Springs community and constructing and equipping additional classroom space at Cooley Springs-Fingerville Elementary School and Mayo Elementary School?',
+    ),
+    "4503510:measure:question-2": (
+        *CHEROKEE,
+        'If and only if Question 1 above is approved, shall the Board of Trustees of School District No. 2 of Spartanburg County, South Carolina (the "School District") be empowered to issue, at one time or from time to time, general obligation bonds of the School District, in a principal amount of not exceeding $30,000,000, the proceeds of which shall be used to finance the costs (including architectural, engineering, legal and related fees) of stadium upgrades at both of the School District\'s high schools, athletic improvements at all middle schools, and improvements to playgrounds at all elementary schools?',
+    ),
+    "4535890:measure:form-of-government": (
+        *IRMO,
+        "Shall the Town of Irmo change its form of government from the Council form to the Council-Manager form?",
+    ),
 }
 PARTIES = {"DEM": "democratic-party", "REP": "republican-party"}
 
@@ -194,6 +218,7 @@ def emit() -> Path:
                 quality="official",
                 source_id=census,
             )
+        wording_sources: set[UUID] = set()
         elections: set[UUID] = set()
         offices: set[UUID] = set()
         referendum = cs.key("us.electoral_system", "referendum")
@@ -250,6 +275,28 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 cs.add("ballot_question", contest_id=contest, type="optional_referendum")
+                publisher, wording_title, wording_url, wording = WORDING[token]
+                wording_source = cs.source(publisher, wording_title)
+                if wording_source not in wording_sources:
+                    wording_sources.add(wording_source)
+                    cs.add(
+                        "source",
+                        id=wording_source,
+                        kind="official_body",
+                        publisher=publisher,
+                        title=wording_title,
+                        url=wording_url,
+                        license="Public record",
+                    )
+                cs.add(
+                    "ballot_question_text",
+                    contest_id=contest,
+                    kind="text",
+                    lang="en",
+                    body=wording,
+                    url=wording_url,
+                    source_id=wording_source,
+                )
                 cs.add(
                     "name",
                     entity_id=contest,
