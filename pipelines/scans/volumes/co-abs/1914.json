@@ -1,0 +1,20 @@
+{
+  "year": 1914,
+  "day": "1914-11-03",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1914john/abstractofvotesc1914john.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress; district is the congressional district number (0 for representatives at large); only general-election (G. E.) columns, never primary (P. E.) columns"
+  },
+  "leaves": [
+    106,
+    107,
+    108
+  ]
+}

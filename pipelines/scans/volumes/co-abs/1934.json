@@ -1,0 +1,21 @@
+{
+  "year": 1934,
+  "day": "1934-11-06",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1934",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1934jame/abstractofvotesc1934jame.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor; only the general election, never the primary"
+  },
+  "leaves": [
+    7,
+    8,
+    9,
+    11
+  ]
+}

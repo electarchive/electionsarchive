@@ -1,0 +1,23 @@
+{
+  "year": 1938,
+  "day": "1938-11-08",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1938",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1938geor/abstractofvotesc1938geor.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator; only the general election, never the primary; a table may print both a full-term and an unexpired-term senator",
+    "governor": "Governor; only the general election, never the primary",
+    "house": "U.S. Representative in Congress; district is the congressional district number (0 for representatives at large); only general-election (G. E.) columns, never primary (P. E.) columns"
+  },
+  "leaves": [
+    13,
+    15,
+    16,
+    17
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "year": 1908,
+  "day": "1908-11-03",
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Presidential electors (one column per elector, grouped by party; read every elector column)",
+    "house": "U.S. Representative in Congress; district is the congressional district number (0 for representatives at large, elected statewide before 1912; 1, 2, or 3 from 1912)",
+    "governor": "Governor"
+  },
+  "leaves": [
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151
+  ]
+}

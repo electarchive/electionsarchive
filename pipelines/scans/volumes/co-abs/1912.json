@@ -1,0 +1,25 @@
+{
+  "year": 1912,
+  "day": "1912-11-05",
+  "polity": "US-CO",
+  "publisher": "Colorado Secretary of State",
+  "title": "Abstract of votes cast at the general election, 1912",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/abstractofvotesc1912jame/abstractofvotesc1912jame.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress; district is the congressional district number (0 for representatives at large); only general-election (G. E.) columns, never primary (P. E.) columns"
+  },
+  "leaves": [
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161
+  ]
+}
