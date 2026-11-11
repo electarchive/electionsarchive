@@ -692,10 +692,12 @@
           {#if isLive && estimate != null && !isSettled}
             <span class="text-xl font-semibold"
               >{count(
-                Math.max(
-                  0,
-                  Math.round(estimate.expectedTotal.mid - estimate.counted),
-                ),
+                Math.max(0, Math.round(estimate.remaining.votes.mid)),
+              )}</span
+            >
+            <span class="block text-xs text-muted-foreground"
+              >{compact(Math.max(0, estimate.remaining.votes.low))}–{compact(
+                Math.max(0, estimate.remaining.votes.high),
               )}</span
             >
           {:else}

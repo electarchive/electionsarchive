@@ -610,6 +610,11 @@ export function sketch(race: LiveRace, found: LiveEstimate): LiveEstimate {
   const spread = 0.004 + 0.22 * (1 - share) ** 1.3;
   const chance = normal(margin / spread);
   const expected = total / share;
+  const band = {
+    low: margin - 1.28 * spread,
+    mid: margin,
+    high: margin + 1.28 * spread,
+  };
   return {
     ...found,
     status: "estimating",
@@ -620,10 +625,14 @@ export function sketch(race: LiveRace, found: LiveEstimate): LiveEstimate {
       high: expected * 1.03,
     },
     shareIn: { low: share, mid: share, high: share },
-    margin: {
-      low: margin - 1.28 * spread,
-      mid: margin,
-      high: margin + 1.28 * spread,
+    margin: band,
+    remaining: {
+      votes: {
+        low: expected * 0.97 - total,
+        mid: expected - total,
+        high: expected * 1.03 - total,
+      },
+      margin: band,
     },
     leader: first.id,
     runnerUp: second.id,

@@ -11,7 +11,7 @@
     surname,
     tone,
   } from "#lib/live/format.js";
-  import { sum, toward } from "#lib/live/standing.js";
+  import { ranked, sum, toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import MethodLink from "./method-link.svelte";
@@ -35,11 +35,12 @@
   const a = $derived(now.pair[0]);
   const b = $derived(now.pair[1]);
 
+  const flip = $derived(toward(estimate, options[a]));
+
   const rows = $derived.by(() => {
     if (estimate == null) {
       return [];
     }
-    const flip = toward(estimate, options[a]);
     return estimate.units
       .flatMap((unit) => {
         const row = now.units.get(unit.unitId);
@@ -57,7 +58,7 @@
             row,
             left,
             expected: Math.max(row.total, unit.expectedTotal.mid),
-            lean: unit.projectedMargin.mid * flip,
+            lean: unit.remainingMargin.mid * flip,
           },
         ];
       })
@@ -65,24 +66,51 @@
   });
   const top = $derived(rows.slice(0, 8));
   const widest = $derived(Math.max(1, ...top.map((entry) => entry.expected)));
-  const left = $derived(sum(rows.map((entry) => entry.left)));
+  const left = $derived(
+    estimate == null
+      ? { low: 0, mid: 0, high: 0 }
+      : {
+          low: Math.max(0, Math.round(estimate.remaining.votes.low)),
+          mid: Math.max(0, Math.round(estimate.remaining.votes.mid)),
+          high: Math.max(0, Math.round(estimate.remaining.votes.high)),
+        },
+  );
 
   const path = $derived.by(() => {
-    if (estimate == null || left < 1 || now.total === 0) {
+    if (estimate == null || left.high < 1 || now.total === 0) {
       return null;
     }
     const votesA = now.totals[a] ?? 0;
     const votesB = now.totals[b] ?? 0;
     const trailer = votesA >= votesB ? b : a;
     const gap = Math.abs(votesA - votesB);
-    let leanSum = 0;
-    for (const entry of rows) {
-      leanSum += entry.left * entry.lean;
-    }
-    const lean = leanSum / left;
+    const lean = estimate.remaining.margin.mid * flip;
     const trailerShare = trailer === a ? (1 + lean) / 2 : (1 - lean) / 2;
-    const needed = (left + gap) / (2 * left);
-    return { trailer, needed, trailerShare, isOut: needed > 1 };
+    const isMost = left.mid < 1 || gap >= left.mid;
+    const pool = isMost ? left.high : left.mid;
+    const needed = (pool + gap) / (2 * pool);
+    return { trailer, needed, trailerShare, pool, isMost, isOut: needed > 1 };
+  });
+
+  const late = $derived.by(() => {
+    if (estimate?.late == null) {
+      return null;
+    }
+    const added = sum(estimate.late.totals);
+    if (added < 1) {
+      return null;
+    }
+    const [first, second] = ranked(estimate.late.totals);
+    if (first == null || second == null) {
+      return null;
+    }
+    return {
+      added,
+      first,
+      second,
+      firstShare: (estimate.late.totals[first] ?? 0) / added,
+      secondShare: (estimate.late.totals[second] ?? 0) / added,
+    };
   });
 </script>
 
@@ -92,9 +120,13 @@
       <h3 class="heading text-lg!">{m.night_left_title()}</h3>
       <MethodLink section="turnout" />
     </div>
-    {#if estimate != null && left >= 1}
+    {#if estimate != null && left.high >= 1}
       <p class="text-sm text-muted-foreground">
-        {m.night_left_summary({ count: compact(left) })}
+        {m.night_left_summary({
+          count: compact(left.mid),
+          low: compact(left.low),
+          high: compact(left.high),
+        })}
       </p>
     {/if}
   </header>
@@ -104,7 +136,14 @@
     {const digits = $derived(places([path.needed - pace]))}
     <p class="font-serif text-[1.0625rem] leading-snug text-pretty">
       {#if path.isOut}
-        {m.night_left_out({ name })}
+        {m.night_left_out({ name, count: compact(path.pool) })}
+      {:else if path.isMost}
+        {m.night_left_needs_most({
+          name,
+          count: compact(path.pool),
+          needed: percent(path.needed, digits),
+          pace: percent(pace, digits),
+        })}
       {:else}
         {m.night_left_needs({
           name,
@@ -129,6 +168,20 @@
         ></span>
       </div>
     {/if}
+  {/if}
+  {#if late != null}
+    <div class="grid gap-1 text-sm text-pretty text-muted-foreground">
+      <p>
+        {m.night_left_late({
+          count: count(late.added),
+          first: surname(options[late.first]),
+          firstShare: percent(late.firstShare, 1),
+          second: surname(options[late.second]),
+          secondShare: percent(late.secondShare, 1),
+        })}
+      </p>
+      <p>{m.night_left_unknown()}</p>
+    </div>
   {/if}
   {#if top.length === 0}
     <p
@@ -197,7 +250,6 @@
         ><span class="bg-muted-foreground/40 block-2 inline-4"
         ></span>{m.night_left_remaining()}</span
       >
-      <span>{m.night_left_votes({ count: count(left) })}</span>
     </p>
   {/if}
 </section>

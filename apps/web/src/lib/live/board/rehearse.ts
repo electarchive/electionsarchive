@@ -180,6 +180,9 @@ export function forecast(
     const p = phi(guess / sd);
     const band = { low: guess - sd * 1.3, mid: guess, high: guess + sd * 1.3 };
     const isBlue = guess >= 0;
+    const margin = isBlue
+      ? band
+      : { low: -band.high, mid: -band.mid, high: -band.low };
     const probability: Record<string, number> = {};
     if (blueId != null) {
       probability[blueId] = p;
@@ -198,12 +201,15 @@ export function forecast(
         mid: share,
         high: Math.min(1, share + 0.04),
       },
-      margin: isBlue
-        ? band
-        : { low: -band.high, mid: -band.mid, high: -band.low },
+      margin,
       leader: isBlue ? blueId : redId,
       runnerUp: isBlue ? redId : blueId,
       winProbability: probability,
+      remaining: {
+        votes: { low: 0.9 - share, mid: 1 - share, high: 1.1 - share },
+        margin,
+      },
+      late: null,
       units: [],
     };
   }

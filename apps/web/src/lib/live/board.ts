@@ -14,13 +14,24 @@ type Sent = { low: number | null; mid: number | null; high: number | null };
 
 type Estimate = Omit<
   LiveEstimate,
-  "expectedTotal" | "shareIn" | "margin" | "winProbability" | "units"
+  | "expectedTotal"
+  | "shareIn"
+  | "margin"
+  | "winProbability"
+  | "remaining"
+  | "units"
 > & {
   expectedTotal: Sent;
   shareIn: Sent;
   margin: Sent;
   winProbability: Record<string, number | null>;
-  units: Array<{ unitId: string; expectedTotal: Sent; projectedMargin: Sent }>;
+  remaining: { votes: Sent; margin: Sent };
+  units: Array<{
+    unitId: string;
+    expectedTotal: Sent;
+    projectedMargin: Sent;
+    remainingMargin: Sent;
+  }>;
 };
 
 export type Head = Omit<LiveElection, "races">;
@@ -70,10 +81,15 @@ function encode(estimate: LiveEstimate): Estimate {
         trim(chance),
       ]),
     ),
+    remaining: {
+      votes: sent(estimate.remaining.votes),
+      margin: sent(estimate.remaining.margin),
+    },
     units: estimate.units.map((unit) => ({
       unitId: unit.unitId,
       expectedTotal: sent(unit.expectedTotal),
       projectedMargin: sent(unit.projectedMargin),
+      remainingMargin: sent(unit.remainingMargin),
     })),
   };
 }
@@ -90,10 +106,15 @@ function decode(estimate: Estimate): LiveEstimate {
         chance ?? NaN,
       ]),
     ),
+    remaining: {
+      votes: band(estimate.remaining.votes),
+      margin: band(estimate.remaining.margin),
+    },
     units: estimate.units.map((unit) => ({
       unitId: unit.unitId,
       expectedTotal: band(unit.expectedTotal),
       projectedMargin: band(unit.projectedMargin),
+      remainingMargin: band(unit.remainingMargin),
     })),
   };
 }
