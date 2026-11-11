@@ -1,0 +1,23 @@
+{
+  "year": 1906,
+  "day": "1906-11-06",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1906, returns of the general election 1906-11-06 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreportof1903texa/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreportof1903texa"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor (the For Governor columns only; Lieutenant Governor and other state officers are office other)"
+  },
+  "leaves": [
+    404,
+    405,
+    406,
+    407
+  ],
+  "autorotate": true
+}

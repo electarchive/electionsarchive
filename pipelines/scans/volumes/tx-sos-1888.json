@@ -1,0 +1,37 @@
+{
+  "year": 1888,
+  "day": "1888-11-06",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1888, returns of the general election 1888-11-06 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports06texagoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports06texagoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors for President and Vice President: tables of county rows with one column per elector, grouped by party; name is the elector's name and party the party printed over the electors",
+    "governor": "Governor (the For Governor columns only; Lieutenant Governor and other state officers are office other)"
+  },
+  "leaves": [
+    178,
+    179,
+    180,
+    181,
+    182,
+    183,
+    184,
+    185,
+    186,
+    187,
+    188,
+    189,
+    190,
+    196,
+    197,
+    198,
+    199
+  ],
+  "autorotate": true
+}

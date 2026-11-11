@@ -1,0 +1,47 @@
+{
+  "year": 1884,
+  "day": "1884-11-04",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1884, returns of the general election 1884-11-04 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports07texagoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports07texagoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors for President and Vice President: tables of county rows with one column per elector, grouped by party; name is the elector's name and party the party printed over the electors",
+    "governor": "Governor (the For Governor columns only; Lieutenant Governor and other state officers are office other)",
+    "house": "Member of the United States Congress, one table per district, county rows"
+  },
+  "leaves": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    154,
+    155,
+    156,
+    157
+  ],
+  "autorotate": true
+}

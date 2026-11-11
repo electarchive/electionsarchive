@@ -1,0 +1,46 @@
+{
+  "year": 1900,
+  "day": "1900-11-06",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1900, returns of the general election 1900-11-06 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports05texagoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports05texagoog"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "Electors for President and Vice President: tables of county rows with one column per elector, grouped by party; name is the elector's name and party the party printed over the electors",
+    "governor": "Governor (the For Governor columns only; Lieutenant Governor and other state officers are office other)"
+  },
+  "leaves": [
+    89,
+    90,
+    91,
+    92,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129
+  ],
+  "autorotate": true
+}
