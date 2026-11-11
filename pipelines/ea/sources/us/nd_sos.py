@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from datetime import date
@@ -928,7 +929,6 @@ BANDED = {1964}
 EDGES = {1966: 100}
 UNREAD = {
     (1918, "treasurer"),
-    (1920, "lieutenant-governor"),
     (1920, "attorney-general"),
     (1920, "insurance-commissioner"),
     (1922, "public-service-commissioner"),
@@ -940,10 +940,13 @@ UNREAD = {
     (1926, "insurance-commissioner"),
     (1926, "public-service-commissioner"),
 }
+BATCH_READ = {(1920, "lieutenant-governor")}
 CUTS = {1928: 870, 1920: 960, 1922: 800}
 LABELS = {1924: 400}
 PRINTED = {(1926, 7): 127506}
 ERRATA = {
+    (1920, "John F. McGrann"),
+    (1920, "Howard R. Wood"),
     (1940, "Alvin C. Strutz"),
     (1940, "Math Dahl"),
     (1940, "Alfred S. Dale"),
@@ -1099,6 +1102,20 @@ def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
                 for county, amount in votes[column].items()
             )
     return rows
+
+
+def batch_column(year: int, column: int, size: int) -> list[int | None]:
+    out: list[int | None] = []
+    for half in (0, 1):
+        message = json.loads(raw.cached("us.nd_sos", f"nd-read2/{year}/{column}/{half}").path.read_text())
+        text = "".join(block.get("text", "") for block in message["content"])
+        for line in text.splitlines():
+            found = re.fullmatch(r"\s*[^:]+:\s*(\d+|\?)\s*", line)
+            if found:
+                out.append(None if found[1] == "?" else int(found[1]))
+    if len(out) != size:
+        raise ValueError(f"{year} column {column}: {len(out)} batch rows, wanted {size}")
+    return out
 
 
 def url(year: int) -> str:
@@ -1316,6 +1333,10 @@ def parse() -> None:
             if (year, office) in UNREAD:
                 continue
             printed = PRINTED.get((year, column)) or cells[(len(keys), column)]
+            if (year, office) in BATCH_READ:
+                for line, amount in enumerate(batch_column(year, column, len(keys) + 1)):
+                    if amount is not None:
+                        cells[(line, column)] = amount
             gaps = [
                 line
                 for line in range(len(keys))
