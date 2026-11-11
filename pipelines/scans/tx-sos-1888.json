@@ -1,0 +1,569 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1888, returns of the general election 1888-11-06 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports06texagoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports06texagoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1888,
+      "chamber": "president",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "governor": {
+      "year": 1888,
+      "chamber": "governor",
+      "day": "1888-11-06",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 186,
+      "id": "186-0",
+      "columns": [
+        {
+          "label": "Abby, H. S. P.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Foster, S. T.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, G. W.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Weyman, B. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, E. J.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carothers, A. J.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Durham, W. W.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Etheredge, W. G.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Byrne, John, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Denson, James",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McKenna, John",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, E. F.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edwards, A.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rankin, J. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphreys, B. M.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.249,
+        0.826,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns for Electors for President and Vice President (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.016
+      ]
+    },
+    {
+      "page": 187,
+      "id": "187-0",
+      "columns": [
+        {
+          "label": "Abby, H. S. P.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Foster, S. T.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, G. W.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Weyman, B. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith, E. J.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carothers, A. J.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Durham, W. W.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Etheredge, W. G.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O'Byrne, John, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Denson, James",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McKenna, John",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, E. F.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edwards, A.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rankin, J. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Humphreys, B. M.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.0,
+        0.826,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 188,
+      "id": "188-0",
+      "columns": [
+        {
+          "label": "Knowles, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Link, J. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Burroughs, S. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, D. C.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "England, A. R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ward, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson, F. M.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hendrick, J. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Snodgrass, D. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Callahan, P. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mullins, S. G.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morris, W. A.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clark, B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.253,
+        0.847,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns for Electors for President and Vice President. (Continued.)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0134
+      ]
+    },
+    {
+      "page": 189,
+      "id": "189-0",
+      "columns": [
+        {
+          "label": "Knowles, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Link, J. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Burroughs, S. E.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, D. C.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "England, A. R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ward, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson, F. M.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hendrick, J. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Snodgrass, D. S.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Callahan, P. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mullins, S. G.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morris, W. A.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clark, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.249,
+        0.883,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns for Electors for President and Vice President (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0133
+      ]
+    },
+    {
+      "page": 190,
+      "id": "190-0",
+      "columns": [
+        {
+          "label": "Knowles, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Link, J. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Burroughs, S. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jones, D. C.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "England, A. B.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ward, W. D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robinson, F. M.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hendrick, J. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Snodgrass, D. S.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Callahan, P. H.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mullins, S. G.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Morris, W. A.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clark, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.252,
+        0.827,
+        0.894
+      ],
+      "hint": "Read only the table headed 'Returns for Electors for President and Vice President (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0405
+      ]
+    },
+    {
+      "page": 197,
+      "id": "197-0",
+      "columns": [
+        {
+          "label": "Ross, L. S.",
+          "contest": "governor",
+          "candidate": "Lawrence S. Ross"
+        },
+        {
+          "label": "Martin, Marion",
+          "contest": "governor",
+          "candidate": "Francis Marion Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.209,
+        0.2,
+        0.277,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns for State Officers. (continued.) Governor.'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.22
+      ]
+    },
+    {
+      "page": 198,
+      "id": "198-0",
+      "columns": [
+        {
+          "label": "Ross, L. S.",
+          "contest": "governor",
+          "candidate": "Lawrence S. Ross"
+        },
+        {
+          "label": "Martin, Marion",
+          "contest": "governor",
+          "candidate": "Francis Marion Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.209,
+        0.0,
+        0.277,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 199,
+      "id": "199-0",
+      "columns": [
+        {
+          "label": "Ross, L. S.",
+          "contest": "governor",
+          "candidate": "Lawrence S. Ross"
+        },
+        {
+          "label": "Martin, Marion",
+          "contest": "governor",
+          "candidate": "Francis Marion Martin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.209,
+        0.0,
+        0.277,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}
