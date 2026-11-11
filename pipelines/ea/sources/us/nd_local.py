@@ -246,6 +246,7 @@ def emit() -> Path:
             found = re.fullmatch(r"(?:\d+ - )?(.+?)(?: - (District \d+))?", area)
             base = found[1].upper() if found else area.upper()
             seat = found[2] if found else None
+            base = re.sub(r"^(?:CITY|TOWN) OF ", "", base)
             if base in counties:
                 return counties[base][0], seat
             if base in places:
