@@ -12,6 +12,12 @@ ${TRAINING.map((name) => `User-agent: ${name}`).join("\n")}
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 
+User-agent: ShapBot
+User-agent: Applebot
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Crawl-delay: 3
+Allow: /
+
 User-agent: Epochal-Search
 Disallow: /
 
