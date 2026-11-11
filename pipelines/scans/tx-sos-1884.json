@@ -1,0 +1,2554 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Biennial Report of the Secretary of State of the State of Texas, 1884, returns of the general election 1884-11-04 by counties",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports07texagoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports07texagoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1884,
+      "chamber": "president",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "house1": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 1
+    },
+    "house2": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 2
+    },
+    "house3": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 3
+    },
+    "house4": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 4
+    },
+    "house5": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 5
+    },
+    "house6": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 6
+    },
+    "house7": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 7
+    },
+    "house8": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 8
+    },
+    "house9": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 9
+    },
+    "house10": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 10
+    },
+    "house11": {
+      "year": 1884,
+      "chamber": "house",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": 11
+    },
+    "governor": {
+      "year": 1884,
+      "chamber": "governor",
+      "day": "1884-11-04",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Silas Hare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. McLeary.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. McComb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. F. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Finley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Hinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Matlock.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Wells.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. Phelps.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Tyler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Breckenridge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. K. Leggitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Dilley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rob't Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. W. Cooper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. McCoy.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. B. Hanna.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. McCormick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Haynes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Meisner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. McDonald.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Talbot.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. Slade.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.115,
+        0.907,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for Electors for President and Vice-President, continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2542
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Silas Hare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. McLeary.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. McComb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. F. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Finley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Hinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Matlock.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Wells.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. Phelps.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Tyler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Breckenridge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. K. Leggitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Dilley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rob't Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. W. Cooper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. McCoy.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. B. Hanna.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. McCormick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Haynes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Meisner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. McDonald.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Talbot.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. Slade.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.0,
+        0.907,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Silas Hare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. McLeary.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. McComb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. F. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Finley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Hinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Matlock.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Wells.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. Phelps.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Tyler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Breckenridge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. K. Leggitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Dilley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rob't Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. W. Cooper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. McCoy.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. B. Hanna.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. McCormick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Haynes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Meisner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. McDonald.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Talbot.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. Slade.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.0,
+        0.907,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Silas Hare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. McLeary.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. McComb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. F. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Finley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Hinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Matlock.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Wells.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. Phelps.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Tyler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Breckenridge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. K. Leggitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Dilley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rob't Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. W. Cooper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. McCoy.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. B. Hanna.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. McCormick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Haynes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Meisner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. McDonald.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Talbot.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. Slade.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.0,
+        0.907,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Silas Hare.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. McLeary.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. McComb.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. F. Edwards.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. W. Finley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Hinson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Matlock.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. Ramsey.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Wells.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. H. Phelps.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. W. Tyler.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. T. Breckenridge.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K. K. Leggitt.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Dilley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rob't Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. L. Taylor.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. W. Cooper.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Anderson.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. McCoy.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. B. Hanna.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. McCormick.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. L. Haynes.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Meisner.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno. McDonald.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Talbot.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. C. Slade.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.142,
+        0.901,
+        0.876
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for Electors for President and Vice-President \u2014 continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2302
+      ]
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Bright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B R Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C McFarlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wilshart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.259,
+        0.106,
+        0.878,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for Electors for President and Vice-President (continued)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B R Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birthright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.344,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for Electors for President and Vice-President\u2014continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0244
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B R Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birthright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.0,
+        0.903,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B R Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birthright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.35,
+        0.902,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for President and Vice-President (continued)'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0123
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B R Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birthright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.0,
+        0.902,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B E Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birchright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.353,
+        0.907,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Returns of an Election held November 4, 1884, for Electors for President and Vice-President\u2014continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0309
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B E Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birchright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.0,
+        0.907,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": 90
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "W K Homan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas Culmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J N Sanborn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E E Winn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo Clothier",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W Carey Crane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Wishart",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J C Worlane",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A H Latimer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Hovenkamp",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Willett Holmes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C R King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R Clark",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J D Rankin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C H Jenkins",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H C Still",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B E Echols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I B Rogers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Birchright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A Harris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J E Dixon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W J Hilan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Beach",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Cleveland",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "Horace Baker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M J Nolan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jno T Brady",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A J Rosenthal",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J M Perdue",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J L Burton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W M Allen",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.0,
+        0.907,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Chas. Stewart, (Dem.)",
+          "contest": "house1",
+          "candidate": "Charles Stewart"
+        },
+        {
+          "label": "A. T. Monroe. (Rep.)",
+          "contest": "house1",
+          "candidate": "A. T. Monroe"
+        },
+        {
+          "label": "John T. Brady. (Rep.)",
+          "contest": "house1",
+          "candidate": "John T. Brady"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.161,
+        0.884,
+        0.59
+      ],
+      "hint": "Read only the table headed 'First District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 37,
+      "id": "37-1",
+      "columns": [
+        {
+          "label": "J. H. Reagan (Dem.)",
+          "contest": "house2",
+          "candidate": "John Henninger Reagan"
+        },
+        {
+          "label": "A. T. Monroe (Rep.)",
+          "contest": "house2",
+          "candidate": "A. T. Monroe"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.582,
+        0.883,
+        0.899
+      ],
+      "hint": "Read only the table headed 'Second District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "J. H. Jones. (Dem.)",
+          "contest": "house3",
+          "candidate": "James Henry Jones"
+        },
+        {
+          "label": "G. F. Conley.",
+          "contest": "house3",
+          "candidate": "G. F. Conley"
+        },
+        {
+          "label": "Jno. O'Brien.",
+          "contest": "house3",
+          "candidate": "Jno Obrien"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.136,
+        0.873,
+        0.487
+      ],
+      "hint": "Read only the table headed 'Third District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-1",
+      "columns": [
+        {
+          "label": "D. B. Culberson. (Dem.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.479,
+        0.87,
+        0.824
+      ],
+      "hint": "Read only the table headed 'Fourth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "J. W. Throckmorton (Dem.)",
+          "contest": "house5",
+          "candidate": "James Webb Throckmorton"
+        },
+        {
+          "label": "M. H. Eddy",
+          "contest": "house5",
+          "candidate": "M. H. Eddy"
+        },
+        {
+          "label": "H. C. Dillingham",
+          "contest": "house5",
+          "candidate": "H. C. Dillingham"
+        },
+        {
+          "label": "C. C. Binkley",
+          "contest": "house5",
+          "candidate": "C. C. Binkley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.133,
+        0.884,
+        0.494
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 39,
+      "id": "39-1",
+      "columns": [
+        {
+          "label": "Olin Wellborn (Dem.)",
+          "contest": "house6",
+          "candidate": "Olin Wellborn"
+        },
+        {
+          "label": "J. C Bigger (Rep.)",
+          "contest": "house6",
+          "candidate": "J. C. Bigger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.486,
+        0.883,
+        0.787
+      ],
+      "hint": "Read only the table headed 'Sixth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "W. H. Crain (Dem.)",
+          "contest": "house7",
+          "candidate": "William Henry Crain"
+        },
+        {
+          "label": "R. B. Rentfro (Rep.)",
+          "contest": "house7",
+          "candidate": "R. B. Rentfro"
+        },
+        {
+          "label": "Richard Nelson (Rep.)",
+          "contest": "house7",
+          "candidate": "Richard Nelson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.271,
+        0.865,
+        0.642
+      ],
+      "hint": "Read only the table headed 'Seventh District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "J. F. Miller (Dem.)",
+          "contest": "house8",
+          "candidate": "James Francis Miller"
+        },
+        {
+          "label": "W. P. Burns (Rep.)",
+          "contest": "house8",
+          "candidate": "W. P. Burns"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.14,
+        0.88,
+        0.511
+      ],
+      "hint": "Read only the table headed 'Eighth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-1",
+      "columns": [
+        {
+          "label": "R. Q. Mills (Dem.)",
+          "contest": "house9",
+          "candidate": "Roger Quarles Mills"
+        },
+        {
+          "label": "J. P. Osterhout (Rep.)",
+          "contest": "house9",
+          "candidate": "J. P. Osterhout"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.503,
+        0.88,
+        0.814
+      ],
+      "hint": "Read only the table headed 'Ninth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "J. D. Sayers (Dem.)",
+          "contest": "house10",
+          "candidate": "Joseph Draper Sayers"
+        },
+        {
+          "label": "J. B. Rector (Ind.)",
+          "contest": "house10",
+          "candidate": "J. B. Rector"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.14,
+        0.867,
+        0.631
+      ],
+      "hint": "Read only the table headed 'Tenth District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2505
+      ]
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "S. W. T. Lanham (Dem.)",
+          "contest": "house11",
+          "candidate": "Samuel Willis Tucker Lanham"
+        },
+        {
+          "label": "W. A. Saylor (Rep.)",
+          "contest": "house11",
+          "candidate": "W. A. Saylor"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.277,
+        0.887,
+        0.672
+      ],
+      "hint": "Read only the table headed 'Eleventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 154,
+      "id": "154-0",
+      "columns": [
+        {
+          "label": "John Ireland.",
+          "contest": "governor",
+          "candidate": "John Ireland"
+        },
+        {
+          "label": "G. W. Jones.",
+          "contest": "governor",
+          "candidate": "George Washington Jones"
+        },
+        {
+          "label": "A. B. Norton.",
+          "contest": "governor",
+          "candidate": "A.B. Norton"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.134,
+        0.673,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1386
+      ]
+    }
+  ]
+}
