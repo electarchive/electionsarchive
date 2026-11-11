@@ -12,7 +12,7 @@ from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "ca.referendums"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DAY = date(1992, 10, 26)
@@ -167,7 +167,7 @@ def emit() -> Path:
             publisher="Elections Canada",
             title=REPORT_TITLE,
             url=REPORT_PAGE,
-            license="Elections Canada website terms and conditions",
+            license="Elections Canada website terms: non-commercial reproduction only, commercial redistribution needs written permission",
         )
         wording = cs.source("Privy Council Office", WORDING_TITLE)
         cs.add(
