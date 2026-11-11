@@ -1673,7 +1673,7 @@ def emit(
                 [source, DOUBLED],
             )
         }
-    lines = lines.with_columns(pl.col("choice").replace(garbled))
+    lines = lines.with_columns(pl.col("choice").replace(garbled).str.replace_all("ŕe", "ré"))
     made = {
         (scheme, code): (display, geom, json.loads(shares))
         for scheme, code, display, geom, shares in pl.read_parquet(parsed / "polities.parquet").iter_rows()
@@ -1946,6 +1946,16 @@ def emit(
             polity="US",
         )
         cs.renamed["2021-04-06:IL"] = "2021-03-29:IL"
+
+        own_names: dict[UUID, tuple[UUID, str]] = {
+            entity: (name_id, text)
+            for entity, name_id, text in conn.execute(
+                """select n.entity_id, n.id, n.text from name n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.is_preferred and n.lang = 'en'
+                     and exists (select 1 from person p where p.id = n.entity_id)""",
+                [source],
+            ).fetchall()
+        }
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -2815,6 +2825,17 @@ def emit(
                         if person in cs.minted:
                             cs.add("person", id=person)
                         person_name(person, ballot)
+                    elif person not in persons and (held := own_names.get(person)) is not None and held[1] != ballot:
+                        persons.add(person)
+                        cs.add(
+                            "name",
+                            id=held[0],
+                            entity_id=person,
+                            text=ballot,
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
                     tag = party or choice_party
                     won = (
                         primary_winners.get(series, {}).get(slug(_title(choice)), set())

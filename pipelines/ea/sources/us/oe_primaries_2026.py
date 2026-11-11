@@ -2112,6 +2112,15 @@ def emit() -> Path:
             ["|".join(FILES), "|".join(key for _, key, _ in EXEC.values())],
         ).fetchall():
             pool[(state, slug(text))].add(person)
+        own_names: dict[UUID, tuple[UUID, str]] = {
+            entity: (name_id, text)
+            for entity, name_id, text in conn.execute(
+                """select n.entity_id, n.id, n.text from name n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.is_preferred and n.lang = 'en'
+                     and exists (select 1 from person p where p.id = n.entity_id)""",
+                [SOURCE],
+            ).fetchall()
+        }
         persons: dict[tuple[str, str], UUID] = {}
         parties: dict[str, UUID] = {}
 
@@ -2130,7 +2139,17 @@ def emit() -> Path:
             if (state, slug(text)) not in persons:
                 found = pool.get((state, slug(text)), set())
                 if len(found) == 1:
-                    persons[(state, slug(text))] = next(iter(found))
+                    person = persons[(state, slug(text))] = next(iter(found))
+                    if (held := own_names.get(person)) is not None and held[1] != text:
+                        cs.add(
+                            "name",
+                            id=held[0],
+                            entity_id=person,
+                            text=text,
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
                 else:
                     id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
                     if id in cs.minted:
