@@ -100,7 +100,7 @@ LAND_INFO = {
     "ST": ("15", "Saxony-Anhalt", None, "Landtagswahl in Sachsen-Anhalt"),
     "TH": ("16", "Thuringia", ("Landtag of Thuringia", "Thüringer Landtag"), "Landtagswahl in Thüringen"),
 }
-HISTORY_OTHERS = ("Wgr./Einzelbew.",)
+HISTORY_OTHERS = ("Wgr./Einzelbew.", "Sonstige")
 HISTORY_SKIP = {("BE", date(1946, 10, 20))}
 HISTORY_NOTES = {
     "Stand nach der Wiederholungswahl am 12.03.1961.": "The figures include the repeat vote of 12 March 1961.",
@@ -474,6 +474,28 @@ def parse_history() -> None:
             election["day"] = date(1993, 9, 19)
             election["heading"] = "Wahl am 19.09.1993"
         if election["state"] == "HH" and election["seats"] == 360:
+            election["seats"] = sum(row["seats"] for row in results if row["index"] == election["index"])
+        rows = sorted((row for row in results if row["index"] == election["index"]), key=lambda row: row["position"])
+        seen: set[str] = set()
+        election["folded"] = None
+        for row in rows:
+            if row["label"] in seen:
+                election["folded"] = row["position"]
+                break
+            seen.add(row["label"])
+        if election["folded"] is not None:
+            tail = [row for row in rows if row["position"] >= election["folded"]]
+            results = [row for row in results if not any(row is other for other in tail)]
+            results.append(
+                {
+                    "index": election["index"],
+                    "position": election["folded"],
+                    "label": "Sonstige",
+                    "votes": sum(row["votes"] for row in tail),
+                    "share": None,
+                    "seats": 0,
+                }
+            )
             election["seats"] = sum(row["seats"] for row in results if row["index"] == election["index"])
     election_frame = pl.DataFrame(elections, infer_schema_length=None)
     result_frame = pl.DataFrame(results, infer_schema_length=None)
@@ -1436,6 +1458,11 @@ def emit_history(
                 )
             if abbreviation == "HH" and day.year in (1957, 1961):
                 notes.append("The source prints 360 as the total of seats; the parties' seats add up to 120.")
+            if row["folded"] is not None:
+                notes.append(
+                    f"From row {row['folded']} on, the source repeats party abbreviations from above and prints seat "
+                    "numbers that do not add up, so those rows are shown together as other parties without seats."
+                )
             if row["lost"]:
                 notes.append(
                     f"The source also counts {row['lost']:,} lost votes (ausgefallene Stimmen), which are in neither "
