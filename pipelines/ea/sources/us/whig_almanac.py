@@ -5,13 +5,13 @@ import itertools
 import json
 import math
 import re
-import subprocess
 import sys
-import tempfile
+import tarfile
 from collections import Counter
 from datetime import date
 from pathlib import Path
 
+import numpy
 from anthropic.types import ImageBlockParam, MessageParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
@@ -72,23 +72,37 @@ COMMAS = False
 TURNED: set[tuple[int, int]] = set()
 THRESHOLDS = (150, 190, 230)
 MODEL = "claude-haiku-5-5"
-READS = {"c": 300, "d": 400, "e": 350}
-JOB = "columns"
-SPLITS = {53: 0.461, 55: 0.465, 57: 0.457, 59: 0.459, 61: 0.469}
-CROPS = {
-    page: (
-        {"l": (0.0, 0.03, SPLITS[page] + 0.03, 0.97), "r": (SPLITS[page] - 0.02, 0.03, 0.95, 0.97)}
-        if page in SPLITS
-        else {"l": (0.04, 0.03, 0.57, 0.97), "r": (0.49, 0.03, 1.0, 0.97)}
-    )
-    for page in PAGES
+ORIGINALS = f"https://archive.org/download/{ITEM}/{ITEM}_orig_jp2.tar"
+READS = {"f": (2, 1.0), "g": (2, 1.0), "h": (3, 1.25)}
+JOB = "originals"
+FRAMES = {
+    53: (0.02, 0.47, 0.97),
+    54: (0.17, 0.568, 0.97),
+    55: (0.02, 0.474, 0.92),
+    56: (0.17, 0.564, 0.95),
+    57: (0.02, 0.435, 0.86),
+    58: (0.17, 0.582, 0.97),
+    59: (0.02, 0.466, 0.92),
+    60: (0.17, 0.584, 0.97),
+    61: (0.02, 0.432, 0.86),
+    62: (0.19, 0.577, 0.96),
+}
+CROPS: dict[int, dict[str, tuple[tuple[float, float, float, float], bool]]] = {
+    page: {"l": ((left, 0.02, middle + 0.015, 0.99), True), "r": ((middle - 0.015, 0.02, right, 0.99), True)}
+    for page, (left, middle, right) in FRAMES.items()
+}
+CROPS[62] = {
+    "l": CROPS[62]["l"],
+    "m": ((0.574, 0.02, 0.78, 0.665), False),
+    "n": ((0.772, 0.02, 0.98, 0.665), False),
+    "o": ((0.574, 0.65, 0.98, 0.99), False),
 }
 CROPS[63] = {
-    "l": (0.0, 0.03, 0.5, 0.2),
-    "r": (0.44, 0.03, 0.95, 0.2),
-    "x": (0.0, 0.17, 0.41, 0.48),
-    "y": (0.37, 0.17, 0.66, 0.48),
-    "z": (0.6, 0.17, 0.95, 0.48),
+    "a": ((0.0, 0.02, 0.49, 0.185), False),
+    "b": ((0.43, 0.02, 0.88, 0.185), False),
+    "x": ((0.0, 0.17, 0.37, 0.53), False),
+    "y": ((0.33, 0.17, 0.59, 0.53), False),
+    "z": ((0.55, 0.17, 0.88, 0.53), False),
 }
 PROMPT = (
     "This is a crop of a page of the Whig Almanac for 1849 that prints election returns by county. Transcribe the "
@@ -110,25 +124,48 @@ PROMPT = (
 
 def fetch() -> None:
     raw.fetch(RAW, PDF, suffix=".pdf")
+    raw.fetch(RAW, ORIGINALS, suffix=".tar")
+
+
+def _leaf(page: int) -> Image.Image:
+    with tarfile.open(raw.cached(RAW, ORIGINALS).path) as tar:
+        member = tar.extractfile(f"{ITEM}_orig_jp2/{ITEM}_orig_{page:04d}.jp2")
+        if member is None:
+            raise ValueError(f"no original image for page {page}")
+        image = Image.open(io.BytesIO(member.read())).convert("L").rotate(-90 if page % 2 else 90, expand=True)
+    light = numpy.asarray(image) > 150
+    rows = numpy.flatnonzero(light.mean(axis=1) > 0.35)
+    columns = numpy.flatnonzero(light.mean(axis=0) > 0.35)
+    return image.crop((int(columns.min()), int(rows.min()), int(columns.max()), int(rows.max())))
+
+
+def _labels(name: str, page: int) -> list[str]:
+    pieces = READS[name][0]
+    return [f"{side}{index}" for side, (_, split) in CROPS[page].items() for index in range(pieces if split else 1)]
 
 
 def crops(name: str) -> dict[str, tuple[bytes, tuple[int, int]]]:
-    book = raw.cached(RAW, PDF)
+    pieces, scale = READS[name]
     out: dict[str, tuple[bytes, tuple[int, int]]] = {}
     for page in PAGES:
-        with tempfile.TemporaryDirectory() as folder:
-            subprocess.run(
-                ["pdftoppm", "-r", str(READS[name]), "-gray", "-png", "-f", str(page), "-l", str(page)]
-                + ["-singlefile", str(book.path), f"{folder}/p"],
-                check=True,
-            )
-            image = Image.open(f"{folder}/p.png").convert("L")
+        image = _leaf(page)
         width, height = image.size
-        for side, (left, top, right, bottom) in CROPS[page].items():
+        for side, ((left, top, right, bottom), split) in CROPS[page].items():
             part = image.crop((round(left * width), round(top * height), round(right * width), round(bottom * height)))
-            buffer = io.BytesIO()
-            part.save(buffer, "PNG")
-            out[f"p{page}{side}"] = (buffer.getvalue(), part.size)
+            ink = 255 - numpy.asarray(part, dtype=float).mean(axis=1)
+            edges = [0]
+            for k in range(1, pieces if split else 1):
+                low, high = round(part.height * (k / pieces - 0.05)), round(part.height * (k / pieces + 0.05))
+                edges.append(low + int(ink[low:high].argmin()))
+            edges.append(part.height)
+            for index, (upper, lower) in enumerate(itertools.pairwise(edges)):
+                piece = part.crop((0, upper, part.width, lower))
+                piece = piece.resize(
+                    (round(piece.width * scale), round(piece.height * scale)), Image.Resampling.LANCZOS
+                )
+                buffer = io.BytesIO()
+                piece.save(buffer, "PNG")
+                out[f"p{page}{side}{index}"] = (buffer.getvalue(), piece.size)
     return out
 
 
@@ -194,8 +231,8 @@ def _read(name: str) -> tuple[list[tuple[int, str, str, list[int | None], list[s
     state = ""
     head: list[str] = []
     for page in PAGES:
-        for side in CROPS[page]:
-            message = json.loads(raw.cached(RAW, key(name, f"p{page}{side}")).path.read_text())
+        for label in _labels(name, page):
+            message = json.loads(raw.cached(RAW, key(name, f"p{page}{label}")).path.read_text())
             text = "".join(block.get("text", "") for block in message["content"] if block.get("type") == "text")
             for line in text.splitlines():
                 line = line.strip().strip("`")
@@ -213,7 +250,12 @@ def _read(name: str) -> tuple[list[tuple[int, str, str, list[int | None], list[s
                     county, rest = (part.strip() for part in line.split("|", 1))
                     county = re.sub(r"\s*[*\u2020\u2021]+$", "", county)
                     cells = rest.replace("|", " ").split()
-                    if not county or len(cells) != len(head) or not all(re.fullmatch(r"\d+|-", c) for c in cells):
+                    if (
+                        not county
+                        or re.search(r"vote|total", county, re.IGNORECASE)
+                        or len(cells) != len(head)
+                        or not all(re.fullmatch(r"\d+|-", c) for c in cells)
+                    ):
                         continue
                     rows.append((page, state, county, [None if c == "-" else int(c) for c in cells], head))
     return rows, totals
