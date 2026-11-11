@@ -9593,19 +9593,25 @@ export const contests = {
                    where grp.root not in (select root from grouped)
                    order by grp.root, o.k
                  ),
+                 wins as materialized (
+                   select w.option_id
+                   from grp
+                   cross join lateral (
+                     select w.option_id from contest wc
+                     join result_set z on z.contest_id = wc.id
+                     join outcome w on w.result_set_id = z.id and w.kind in ('won', 'elected')
+                     where wc.id = grp.id and (wc.allocation_parent_id is null and ${isRoot} or wc.district_area_id = ${area.id}::uuid)
+                       and ${latest("z")}
+                     offset 0
+                   ) w
+                 ),
                  tops as (
                    select * from (select *, (row_number() over (partition by root order by votes desc))::int as place from grouped) g where place <= 3
                    union all
                    select *, 1 as place from declared
                  )
                  select t.root, t.person, t.label, t.kind, t.measure, t.votes, case when t.measure = 11 then coalesce(t.appointed, t.total) else t.total end as total, x.party,
-                   t.place, exists (
-                     select from outcome w
-                     join result_set z on z.id = w.result_set_id
-                     join contest wc on wc.id = z.contest_id
-                       and (wc.allocation_parent_id is null and ${isRoot} or wc.district_area_id = ${area.id}::uuid)
-                     where w.option_id = any(t.options) and w.kind in ('won', 'elected') and ${latest("z")}
-                   ) as won,
+                   t.place, exists (select from wins where wins.option_id = any(t.options)) as won,
                    ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
                    (select n.text from name n where n.entity_id = x.party and n.kind in ('official', 'english')
                      order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
