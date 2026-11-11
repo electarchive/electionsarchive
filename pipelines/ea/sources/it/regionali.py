@@ -1,0 +1,585 @@
+import io
+import re
+import zipfile
+from datetime import date
+from pathlib import Path
+from uuid import UUID
+
+import polars as pl
+
+from ea import raw
+from ea.changeset import Changeset, slug
+from ea.sources.it.interno import BLANK, INVALID, REGISTERED, VOTERS, VOTES, proper
+from ea.sources.it.storico import EXISTING, NEW, cased
+from ea.store import DATA, connect
+
+SOURCE = "it.regionali"
+VERSION = "1"
+PARSED = DATA / "parsed" / SOURCE
+ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/regionali"
+DAYS = [
+    date(1970, 6, 7),
+    date(1975, 6, 15),
+    date(1980, 6, 8),
+    date(1985, 5, 12),
+    date(1990, 5, 6),
+    date(1995, 4, 23),
+    date(2000, 4, 16),
+    date(2001, 6, 24),
+    date(2001, 11, 11),
+    date(2005, 4, 3),
+    date(2005, 4, 17),
+    date(2006, 11, 5),
+    date(2008, 12, 14),
+    date(2010, 3, 28),
+    date(2011, 10, 16),
+    date(2013, 2, 24),
+    date(2013, 11, 17),
+    date(2014, 5, 25),
+    date(2014, 11, 23),
+    date(2015, 5, 31),
+    date(2018, 3, 4),
+    date(2019, 2, 10),
+    date(2019, 3, 24),
+    date(2019, 5, 26),
+    date(2019, 10, 27),
+    date(2020, 1, 26),
+    date(2020, 9, 20),
+    date(2021, 10, 3),
+    date(2023, 2, 12),
+    date(2024, 3, 10),
+    date(2024, 4, 21),
+    date(2024, 6, 9),
+    date(2024, 10, 27),
+    date(2024, 11, 17),
+    date(2025, 10, 5),
+    date(2025, 10, 12),
+    date(2025, 11, 23),
+]
+REGIONS = {
+    "PIEMONTE": "01",
+    "LOMBARDIA": "03",
+    "VENETO": "05",
+    "LIGURIA": "07",
+    "EMILIA-ROMAGNA": "08",
+    "EMILIA ROMAGNA": "08",
+    "TOSCANA": "09",
+    "UMBRIA": "10",
+    "MARCHE": "11",
+    "LAZIO": "12",
+    "ABRUZZO": "13",
+    "MOLISE": "14",
+    "CAMPANIA": "15",
+    "PUGLIA": "16",
+    "BASILICATA": "17",
+    "CALABRIA": "18",
+    "SICILIA": "19",
+}
+COLUMNS = {
+    "REGIONE": ("REGIONE", "REG"),
+    "CIRCOSCRIZIONE": ("CIRCOSCRIZIONE", "CIRCOSCR", "CIRC"),
+    "PROVINCIA": ("PROVINCIA", "PROV"),
+    "COMUNE": ("COMUNE",),
+    "SEZIONE": ("SEZIONE",),
+    "registered": ("ELETTORI", "ELETTORITOT", "ELETTORI_TOT", "NUMELETTORI", "ELETTORI_TOTALI"),
+    "voters": ("VOTANTI", "VOTANTITOT", "VOTANTI_TOT", "VOTANTI_TOTALI"),
+    "blank": ("SCHEDE_BIANCHE", "SKBIANCHE"),
+    "null": ("SCHEDE_NULLE",),
+    "contested": ("SCHEDE_CONTESTATE",),
+    "surname": ("COGNOME", "COGNOME_CANDIDATO"),
+    "forename": ("NOME", "NOME_CANDIDATO"),
+    "candidate_votes": ("VOTI_CANDIDATO", "VOTICANDIDATO", "VOTICAND", "VOTICANDIDLEADER", "VOTICANDLEADER"),
+    "list": ("LISTA", "DESCRLISTA"),
+    "list_votes": ("VOTI_LISTA", "VOTILISTA"),
+}
+REGION_INFO = {
+    "01": (
+        "IT-21",
+        "piemonte",
+        "Piemonte",
+        "Piedmont",
+        "Consiglio regionale del Piemonte",
+        "Regional Council of Piedmont",
+    ),
+    "03": (
+        "IT-25",
+        "lombardia",
+        "Lombardia",
+        "Lombardy",
+        "Consiglio regionale della Lombardia",
+        "Regional Council of Lombardy",
+    ),
+    "05": ("IT-34", "veneto", "Veneto", "Veneto", "Consiglio regionale del Veneto", "Regional Council of Veneto"),
+    "07": (
+        "IT-42",
+        "liguria",
+        "Liguria",
+        "Liguria",
+        "Consiglio regionale della Liguria",
+        "Regional Council of Liguria",
+    ),
+    "08": (
+        "IT-45",
+        "emilia-romagna",
+        "Emilia-Romagna",
+        "Emilia-Romagna",
+        "Assemblea legislativa dell'Emilia-Romagna",
+        "Legislative Assembly of Emilia-Romagna",
+    ),
+    "09": (
+        "IT-52",
+        "toscana",
+        "Toscana",
+        "Tuscany",
+        "Consiglio regionale della Toscana",
+        "Regional Council of Tuscany",
+    ),
+    "10": (
+        "IT-55",
+        "umbria",
+        "Umbria",
+        "Umbria",
+        "Assemblea legislativa dell'Umbria",
+        "Legislative Assembly of Umbria",
+    ),
+    "11": ("IT-57", "marche", "Marche", "Marche", "Consiglio regionale delle Marche", "Regional Council of Marche"),
+    "12": ("IT-62", "lazio", "Lazio", "Lazio", "Consiglio regionale del Lazio", "Regional Council of Lazio"),
+    "13": ("IT-65", "abruzzo", "Abruzzo", "Abruzzo", "Consiglio regionale dell'Abruzzo", "Regional Council of Abruzzo"),
+    "14": ("IT-67", "molise", "Molise", "Molise", "Consiglio regionale del Molise", "Regional Council of Molise"),
+    "15": (
+        "IT-72",
+        "campania",
+        "Campania",
+        "Campania",
+        "Consiglio regionale della Campania",
+        "Regional Council of Campania",
+    ),
+    "16": ("IT-75", "puglia", "Puglia", "Apulia", "Consiglio regionale della Puglia", "Regional Council of Apulia"),
+    "17": (
+        "IT-77",
+        "basilicata",
+        "Basilicata",
+        "Basilicata",
+        "Consiglio regionale della Basilicata",
+        "Regional Council of Basilicata",
+    ),
+    "18": (
+        "IT-78",
+        "calabria",
+        "Calabria",
+        "Calabria",
+        "Consiglio regionale della Calabria",
+        "Regional Council of Calabria",
+    ),
+    "19": ("IT-82", "sicilia", "Sicilia", "Sicily", "Assemblea regionale siciliana", "Sicilian Regional Assembly"),
+}
+COUNCIL_SIZES = [30, 40, 50, 60, 80]
+AGGREGATED = (
+    "Regional totals are the sums of the municipal (from 2024, polling-section) rows in the Interior Ministry's open "
+    "data file for this election."
+)
+SEATS_NOTE = (
+    "Seats are the candidates the open data marks as elected, counted by list; they add up to the whole council."
+)
+NO_SEATS = (
+    "Seats are not shown: the candidates the open data marks as elected do not add up to the size of the council."
+)
+LIST_PART = (
+    "These are the votes for the provincial lists, which share out most of the council's seats; the rest went to the "
+    "regional list or coalition of the winning candidate for president, so seats by list are not shown."
+)
+LISTINO = (
+    "In 1995 each voter could also choose a regional list headed by a candidate for president, and the head of the "
+    "winning regional list was then elected president by the council, so no winner is marked here. Candidates' "
+    "votes include those cast for them alone."
+)
+DIRECT = (
+    "The candidate with the most votes is elected president. Candidates' votes include those cast for them alone, "
+    "without a list."
+)
+NAMES = {
+    ("D'ANTONI SERGIO ANTONIO", ""): ("Sergio Antonio", "D'Antoni"),
+    ("ORLANDO LEOLUCA", ""): ("Leoluca", "Orlando"),
+    ("R.FITTO", ""): ("Raffaele", "Fitto"),
+    ("N.VENDOLA", ""): ("Nichi", "Vendola"),
+    ("F.G.GALASSI", ""): ("F. G.", "Galassi"),
+    ("L.SCALABRINI", ""): ("L.", "Scalabrini"),
+    ("FAENZI", "M."): ("M.", "Faenzi"),
+    ("BOSI", "F."): ("F.", "Bosi"),
+    ("PALMISANI", "I."): ("I.", "Palmisani"),
+    ("DE VIRGILIS", "A."): ("A.", "De Virgilis"),
+    ("SPACCA", ""): ("Gian Mario", "Spacca"),
+}
+NAMES_IN = {
+    ("09", "ROSSI", "E."): ("Enrico", "Rossi"),
+    ("11", "ROSSI", ""): ("", "Rossi"),
+    ("11", "MARINELLI", ""): ("", "Marinelli"),
+}
+PLACES = ("REGIONE", "CIRCOSCRIZIONE", "PROVINCIA", "COMUNE", "SEZIONE")
+COUNTS = ("registered", "voters", "blank", "null", "contested")
+RESULTS = re.compile(
+    r"(?i)^(regionali-\d{8}\.(txt|csv|xlsx)|scrutini[-_]\d{8}\.txt|[^/]*scrutini\.(csv|xlsx)|liste&candidati_\d{8}\.txt)$"
+)
+PREFERENCES = re.compile(r"^Preferenze_Regionali(19[789]\d)\.txt$")
+
+
+def person_name(row: dict[str, str]) -> tuple[str, str]:
+    surname = re.sub(r"\s+", " ", row["surname"]).strip()
+    forename = re.sub(r"\s+", " ", row["forename"]).strip()
+    if (surname, forename) in NAMES:
+        return NAMES[surname, forename]
+    if (row["region"], surname, forename) in NAMES_IN:
+        return NAMES_IN[row["region"], surname, forename]
+    mixed = re.fullmatch(r"([A-Z][a-z]+(?: [A-Z][a-z]+)*) ([A-Z'][A-Z' ]+)", surname)
+    if mixed and not forename:
+        return mixed[1], proper(mixed[2])
+    forename = re.split(r"(?i)\s+dett[oa]\s+", forename)[-1]
+    return proper(forename), proper(surname)
+
+
+def url(day: date) -> str:
+    return f"{ARCHIVE}/regionali-{day:%Y%m%d}.zip"
+
+
+def fetch() -> None:
+    for day in DAYS:
+        raw.fetch(SOURCE, url(day), suffix=".zip")
+
+
+def read(archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
+    data = archive.read(member)
+    if member.lower().endswith(".xlsx"):
+        frame = pl.read_excel(io.BytesIO(data), infer_schema_length=0)
+    else:
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            text = data.decode("cp1252")
+        frame = pl.read_csv(io.StringIO(text), separator=";", infer_schema_length=0, quote_char='"')
+    frame = frame.rename({column: column.strip().upper() for column in frame.columns})
+    renamed: dict[str, str] = {}
+    for canonical, aliases in COLUMNS.items():
+        for alias in aliases:
+            if alias in frame.columns:
+                renamed[alias] = canonical
+                break
+    frame = frame.select(list(renamed)).rename(renamed)
+    return frame.with_columns(
+        [
+            pl.col(c).str.strip_chars().fill_null("")
+            for c in frame.columns
+            if c not in COUNTS + ("candidate_votes", "list_votes")
+        ]
+        + [
+            pl.col(c).str.strip_chars().str.replace(r"[.,]00?$", "").cast(pl.Int64, strict=True)
+            for c in frame.columns
+            if c in COUNTS + ("candidate_votes", "list_votes")
+        ]
+    )
+
+
+def parse() -> None:
+    accounting: list[pl.DataFrame] = []
+    lists: list[pl.DataFrame] = []
+    candidates: list[pl.DataFrame] = []
+    seats: list[pl.DataFrame] = []
+    PARSED.mkdir(parents=True, exist_ok=True)
+    for day in DAYS:
+        archive = zipfile.ZipFile(raw.cached(SOURCE, url(day)).path)
+        members = [m for m in archive.namelist() if RESULTS.match(m)]
+        if not members:
+            raise ValueError(f"{day}: no results member in {archive.namelist()}")
+        for member in members:
+            frame = read(archive, member)
+            places = [c for c in PLACES if c in frame.columns]
+            frame = frame.with_columns(
+                region=pl.col("REGIONE").str.to_uppercase().replace_strict(REGIONS), day=pl.lit(day)
+            )
+            if "registered" in frame.columns:
+                rows = frame.select(*places, "region", "day", *[c for c in COUNTS if c in frame.columns])
+                per_place = rows.unique()
+                if per_place.select(places).is_duplicated().any():
+                    raise ValueError(f"{day} {member}: accounting differs within a place")
+                accounting.append(
+                    per_place.group_by("day", "region").agg(
+                        [pl.col(c).sum() for c in COUNTS if c in frame.columns], places=pl.len()
+                    )
+                )
+            if "list" in frame.columns:
+                lists.append(
+                    frame.filter(pl.col("list") != "")
+                    .group_by("day", "region", "list")
+                    .agg(pl.col("list_votes").sum(), places=pl.len())
+                )
+            if "candidate_votes" in frame.columns and day.year >= 1995:
+                per_place = frame.select(*places, "region", "day", "surname", "forename", "candidate_votes").unique()
+                if per_place.select(*places, "surname", "forename").is_duplicated().any():
+                    raise ValueError(f"{day} {member}: candidate votes differ within a place")
+                candidates.append(
+                    per_place.group_by("day", "region", "surname", "forename").agg(pl.col("candidate_votes").sum())
+                )
+        for member in archive.namelist():
+            if PREFERENCES.match(member):
+                text = archive.read(member).decode("cp1252")
+                frame = pl.read_csv(io.StringIO(text), separator=";", infer_schema_length=0, quote_char='"')
+                frame = frame.rename({column: column.strip().upper() for column in frame.columns})
+                region = "REGIONE" if "REGIONE" in frame.columns else "ENTE1"
+                seats.append(
+                    frame.filter(pl.col("CODTIPOELETTO") == "E")
+                    .select(
+                        day=pl.lit(day),
+                        region=pl.col(region).str.strip_chars().str.to_uppercase().replace_strict(REGIONS),
+                        list=pl.col("DESCRLISTA").str.strip_chars(),
+                    )
+                    .group_by("day", "region", "list")
+                    .agg(seats=pl.len())
+                )
+    pl.concat(accounting, how="diagonal").write_parquet(PARSED / "accounting.parquet")
+    pl.concat(lists).write_parquet(PARSED / "lists.parquet")
+    pl.concat(candidates).with_columns(
+        pl.struct("region", "surname", "forename")
+        .map_elements(lambda row: list(person_name(row)), return_dtype=pl.List(pl.String))
+        .alias("named")
+    ).with_columns(given=pl.col("named").list.get(0), family=pl.col("named").list.get(1)).drop("named").write_parquet(
+        PARSED / "candidates.parquet"
+    )
+    pl.concat(seats).write_parquet(PARSED / "seats.parquet")
+
+
+def emit() -> Path:
+    accounting = pl.read_parquet(PARSED / "accounting.parquet")
+    lists = pl.read_parquet(PARSED / "lists.parquet")
+    candidates = pl.read_parquet(PARSED / "candidates.parquet")
+    seats = pl.read_parquet(PARSED / "seats.parquet")
+    totals = accounting.group_by("day", "region").agg(pl.all().exclude("day", "region").sum())
+    list_totals = lists.group_by("day", "region", "list").agg(pl.col("list_votes").sum())
+    elected = seats.filter(
+        pl.col("day").dt.year() < 1995, pl.col("seats").sum().over("day", "region").is_in(COUNCIL_SIZES)
+    )
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Italian regional council and presidential elections 1970–2025 from the Interior Ministry's open data, by region",
+            polity="IT",
+        )
+
+        def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
+            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+
+        interno = cs.source("Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data")
+        if interno in cs.minted:
+            raise ValueError("publish it.interno before it.regionali")
+        for day in DAYS:
+            cs.artifact(raw.cached(SOURCE, url(day)), interno)
+        italy = cs.polity("IT")
+        if italy in cs.minted:
+            raise ValueError("publish it.interno before it.regionali")
+
+        parties: dict[tuple[str, str], UUID] = {}
+
+        def party_of(label: str, day: date) -> UUID:
+            spec = ("it.party", "forza-italia") if label == "FORZA ITALIA" and day.year >= 2014 else EXISTING.get(label)
+            if spec is not None:
+                if spec not in parties:
+                    parties[spec] = cs.key(*spec)
+                    if parties[spec] in cs.minted:
+                        raise ValueError(f"{spec} is not in the database")
+                return parties[spec]
+            full, abbreviation, kind = NEW.get(label) or (label, None, "list_vehicle")
+            known = label in NEW
+            key = ("it.party", slug(full)) if known else ("it.storico.list", slug(label))
+            if key not in parties:
+                parties[key] = cs.key(*key)
+                if parties[key] in cs.minted:
+                    cs.add("party", id=parties[key], kind=kind, polity_id=italy)
+                    if abbreviation is not None:
+                        name(parties[key], abbreviation, "it", "abbreviation")
+                    name(parties[key], full if known else cased(label), "it")
+            return parties[key]
+
+        persons: dict[str, UUID] = {}
+
+        def person_of(given: str, family: str, day: date, region: str) -> UUID:
+            first = given.split(" ")[0] if given else ""
+            key = f"{family}|{first}" if len(first) > 2 and "." not in first else f"{day}:{region}:{family}|{given}"
+            if key not in persons:
+                persons[key] = cs.key(f"{SOURCE}.person", key)
+                if persons[key] in cs.minted:
+                    cs.add("person", id=persons[key])
+                    name(persons[key], f"{given} {family}".strip(), "it")
+            return persons[key]
+
+        rows: list[dict[str, object]] = []
+
+        def value(result_set: UUID, unit: UUID, option: UUID | None, measure: int, count: int | None) -> None:
+            if count is not None:
+                rows.append(
+                    {
+                        "result_set_id": str(result_set),
+                        "unit_id": str(unit),
+                        "option_id": None if option is None else str(option),
+                        "measure": measure,
+                        "value": count,
+                    }
+                )
+
+        def result_set(key: str, election: UUID, contest: UUID | None) -> UUID:
+            id = cs.key(f"{SOURCE}.result_set", key)
+            cs.add(
+                "result_set",
+                id=id,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=interno,
+                is_default=True,
+                completeness=1,
+            )
+            return id
+
+        held = totals.select("day", "region").sort("day", "region")
+        for code in sorted(held["region"].unique()):
+            iso, slug_, native, english, council_it, council_en = REGION_INFO[code]
+            region = cs.polity(iso)
+            area = cs.area("it.regione", code)
+            unit = cs.unit("it.regione", code)
+            if area in cs.minted or unit in cs.minted:
+                raise ValueError("publish it.istat and it.storico before it.regionali")
+            if region in cs.minted:
+                cs.add("polity", id=region, kind="region", iso_code=iso)
+                cs.add("slug", path=f"it/{slug_}", entity_id=region)
+                cs.add("polity_parent", polity_id=region, parent_id=italy)
+                cs.add("polity_territory", polity_id=region, area_id=area)
+                name(region, native, "it")
+                if english != native:
+                    name(region, english, "en", "english")
+            body = cs.key(f"{SOURCE}.body", code)
+            if body in cs.minted:
+                cs.add("body", id=body, polity_id=region, kind="unicameral")
+                name(body, council_en)
+                name(body, council_it, "it", "native")
+            office = cs.key(f"{SOURCE}.office", code)
+            if office in cs.minted:
+                cs.add("office", id=office, polity_id=region, kind="head_of_government")
+                name(office, f"President of {english}")
+                name(office, f"Presidente della Regione {native}", "it", "native")
+            days = held.filter(pl.col("region") == code)["day"].to_list()
+            for day in days:
+                label = str(day.year) if sum(other.year == day.year for other in days) == 1 else f"{day:%B} {day.year}"
+                election = cs.key(f"{SOURCE}.election", f"{code}:{day}")
+                cs.add(
+                    "election", id=election, polity_id=region, kind="general", date_from=day, date_to=day, status="held"
+                )
+                name(election, f"{label} {english} regional election")
+                name(election, f"Elezioni regionali in {native} del {day.year}", "it", "native")
+                path = f"it/{slug_}/{day}-general"
+                cs.add("slug", path=path, entity_id=election)
+                total = totals.filter(pl.col("day") == day, pl.col("region") == code).row(0, named=True)
+                accounting_set = result_set(f"{code}:{day}:election", election, None)
+                value(accounting_set, unit, None, REGISTERED, total["registered"])
+                value(accounting_set, unit, None, VOTERS, total["voters"])
+                value(accounting_set, unit, None, BLANK, total["blank"])
+                value(accounting_set, unit, None, INVALID, total.get("null"))
+                won = elected.filter(pl.col("day") == day, pl.col("region") == code)
+                size = int(won["seats"].sum()) if won.height else None
+                contest = cs.key(f"{SOURCE}.contest", f"{code}:{day}:list")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=body,
+                    district_area_id=area,
+                    magnitude=size,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{label} {english} regional election, council lists")
+                cs.add("slug", path=f"{path}/consiglio", entity_id=contest)
+                notes = [AGGREGATED]
+                if day.year >= 1995:
+                    notes.append(LIST_PART)
+                elif size is not None:
+                    notes.append(SEATS_NOTE)
+                else:
+                    notes.append(NO_SEATS)
+                cs.add("note", entity_id=contest, kind="context", body_md=" ".join(notes))
+                list_set = result_set(f"{code}:{day}:list", election, contest)
+                seats_by_list = dict(won.select("list", "seats").iter_rows())
+                for label_, votes in (
+                    list_totals.filter(pl.col("day") == day, pl.col("region") == code)
+                    .sort("list_votes", "list", descending=[True, False])
+                    .select("list", "list_votes")
+                    .iter_rows()
+                ):
+                    option = cs.key(f"{SOURCE}.option", f"{code}:{day}:list:{label_}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="list",
+                        party_id=party_of(label_, day),
+                        ballot_label=label_,
+                    )
+                    value(list_set, unit, option, VOTES, votes)
+                    if seats_by_list.get(label_):
+                        cs.add(
+                            "outcome", result_set_id=list_set, option_id=option, kind="won", seats=seats_by_list[label_]
+                        )
+                if size is not None:
+                    following = next((other for other in days if other > day), None)
+                    cs.add("body_size", body_id=body, seats=size, valid_from=day, valid_to=following)
+                running = candidates.filter(pl.col("day") == day, pl.col("region") == code).sort(
+                    "candidate_votes", "family", descending=[True, False]
+                )
+                if running.height == 0:
+                    continue
+                race = cs.key(f"{SOURCE}.contest", f"{code}:{day}:president")
+                cs.add(
+                    "contest",
+                    id=race,
+                    election_id=election,
+                    kind="office",
+                    office_id=office,
+                    district_area_id=area,
+                    magnitude=1,
+                    default_result_kind="counted",
+                )
+                name(race, f"{label} {english} regional election, President")
+                cs.add("slug", path=f"{path}/presidente", entity_id=race)
+                cs.add(
+                    "note",
+                    entity_id=race,
+                    kind="context",
+                    body_md=" ".join([AGGREGATED, LISTINO if day.year == 1995 else DIRECT]),
+                )
+                race_set = result_set(f"{code}:{day}:president", election, race)
+                top = running["candidate_votes"].max()
+                for row in running.iter_rows(named=True):
+                    ballot = f"{row['surname']} {row['forename']}".strip()
+                    option = cs.key(f"{SOURCE}.option", f"{code}:{day}:president:{ballot}")
+                    cs.add("contest_option", id=option, contest_id=race, kind="candidate", ballot_label=ballot)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", f"{code}:{day}:president:{ballot}"),
+                        person_id=person_of(row["given"], row["family"], day, code),
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot,
+                    )
+                    value(race_set, unit, option, VOTES, row["candidate_votes"])
+                    if day.year >= 2000 and row["candidate_votes"] == top:
+                        cs.add("outcome", result_set_id=race_set, option_id=option, kind="elected")
+        cs.frame(
+            "result_value",
+            pl.DataFrame(rows, schema_overrides={"value": pl.Int64}).with_columns(
+                channel=pl.lit(0, pl.Int16),
+                measure=pl.col("measure").cast(pl.Int16),
+                count_round=pl.lit(0, pl.Int16),
+                flags=pl.lit(0, pl.Int16),
+            ),
+        )
+        return cs.write()
