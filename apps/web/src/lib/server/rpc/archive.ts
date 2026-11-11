@@ -9908,7 +9908,7 @@ export const contests = {
                 seats: number;
               }> | null;
             }>(sql`
-              with me as (
+              with me as materialized (
                 select c.*, a.scheme_code as scheme, e.date_from as day,
                   (
                     select g.id from election g
