@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ComponentProps } from "svelte";
+  import { crowned } from "#lib/crowned.js";
   import { capitalize, plural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -27,13 +28,14 @@
   const shape = $derived(
     maps.find((entry) => entry.places.level === level) ?? maps[0],
   );
+  const places = $derived(shape == null ? null : crowned(shape.places));
 </script>
 
-{#if shape != null}
+{#if shape != null && places != null}
   {#if shape.map.tiles != null}
     {#key shape.places.level}
       <PlaceMap
-        places={shape.places}
+        {places}
         colors={shape.places.legend.map((item) => swatch(item.color, item.key))}
         tiles={shape.map.tiles}
         own={shape.map.own}

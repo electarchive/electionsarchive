@@ -766,6 +766,13 @@ const PlaceRow = v.pipe(
   }),
 );
 
+const Spread = v.array(v.tuple([v.number(), FINE]));
+
+const sparse = (values: Array<number>) =>
+  values.flatMap((value, index) =>
+    value === 0 ? [] : [[index, value] as [number, number]],
+  );
+
 const Places = v.nullable(
   v.object({
     levels: v.array(
@@ -803,6 +810,17 @@ const Places = v.nullable(
     ),
   }),
 );
+
+const Crowned = v.object({
+  ...v.unwrap(Places).entries,
+  rows: v.array(
+    v.object({
+      ...PlaceRow.pipe[0].entries,
+      shares: Spread,
+      earlier: v.nullable(Spread),
+    }),
+  ),
+});
 
 const Parted = v.object({
   isOnly: v.boolean(),
@@ -19013,7 +19031,7 @@ export const elections = {
             name: v.string(),
           }),
         ),
-        maps: v.array(v.object({ places: v.nonNullable(Places), map: Sketch })),
+        maps: v.array(v.object({ places: Crowned, map: Sketch })),
         parties: v.array(
           v.object({
             key: v.string(),
@@ -19728,11 +19746,13 @@ export const elections = {
                                     contest: true,
                                     isRemainder: false,
                                     valid,
-                                    shares: legend.map((item) =>
-                                      valid === 0
-                                        ? 0
-                                        : (row.tally.get(item.key) ?? 0) /
-                                          valid,
+                                    shares: sparse(
+                                      legend.map((item) =>
+                                        valid === 0
+                                          ? 0
+                                          : (row.tally.get(item.key) ?? 0) /
+                                            valid,
+                                      ),
                                     ),
                                     leader: position.get(key(row)) ?? null,
                                     margin:
@@ -19742,10 +19762,12 @@ export const elections = {
                                     earlier:
                                       old == null || oldValid === 0
                                         ? null
-                                        : legend.map(
-                                            (item) =>
-                                              (old.tally.get(item.key) ?? 0) /
-                                              oldValid,
+                                        : sparse(
+                                            legend.map(
+                                              (item) =>
+                                                (old.tally.get(item.key) ?? 0) /
+                                                oldValid,
+                                            ),
                                           ),
                                     prior:
                                       old == null

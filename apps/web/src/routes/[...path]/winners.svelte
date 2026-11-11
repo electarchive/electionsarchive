@@ -4,6 +4,7 @@
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { crowned } from "#lib/crowned.js";
   import { capitalize, count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -55,6 +56,7 @@
   const shape = $derived(
     maps.find((entry) => entry.places.level === level) ?? maps[0],
   );
+  const drawn = $derived(shape == null ? null : crowned(shape.places));
   const noun = $derived(
     shape == null || shape === maps[0]
       ? (winners.data?.noun ?? "")
@@ -189,11 +191,11 @@
           )}
       />
     </div>
-    {#if shape != null && hasMap}
+    {#if shape != null && drawn != null && hasMap}
       {#if shape.map.tiles != null}
         {#key shape.places.level}
           <PlaceMap
-            places={shape.places}
+            places={drawn}
             colors={shape.places.legend.map((item) =>
               swatch(item.color, item.key),
             )}
