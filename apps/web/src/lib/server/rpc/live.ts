@@ -541,12 +541,14 @@ const nights = new Map<string, Kept<Awaited<ReturnType<typeof night>>>>();
 type Replayed = {
   totals: Array<[string, number]>;
   units: Array<[string, Array<[string, number]>]>;
+  told: Array<[string, number, number]>;
 };
 
 type Replay = {
   ks: Array<number>;
   frames: Map<number, Replayed>;
   last: Map<string, string>;
+  told: Map<string, string>;
 };
 
 const replays = new Map<string, Replay>();
@@ -575,23 +577,39 @@ function leads(head: Array<number>, whole: Array<number>) {
 
 async function framed(ks: Array<number>) {
   if (ks.length === 0) {
-    return new Map<
-      number,
-      Array<{ unit: string; option: string; votes: number }>
-    >();
+    return {
+      values: new Map<
+        number,
+        Array<{ unit: string; option: string; votes: number }>
+      >(),
+      told: new Map<
+        number,
+        Array<{ unit: string; share: number; expected: number }>
+      >(),
+    };
   }
-  const result = await db.execute<{
-    k: number;
-    unit: string;
-    option: string;
-    votes: number;
-  }>(sql`
-    select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
-    from live.value v join contest_option o on o.id = v.option_id
-    where v.frame_k = any(${sql.param(ks)}::bigint[])
-    group by 1, 2, 3
-  `);
-  return Map.groupBy(result.rows, (row) => row.k);
+  const [values, told] = await Promise.all([
+    db.execute<{ k: number; unit: string; option: string; votes: number }>(sql`
+      select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
+      from live.value v join contest_option o on o.id = v.option_id
+      where v.frame_k = any(${sql.param(ks)}::bigint[])
+      group by 1, 2, 3
+    `),
+    db.execute<{
+      k: number;
+      unit: string;
+      share: number;
+      expected: number;
+    }>(sql`
+      select frame_k as k, unit_id as unit, share::float8 as share, expected::float8 as expected
+      from live.expectation
+      where frame_k = any(${sql.param(ks)}::bigint[])
+    `),
+  ]);
+  return {
+    values: Map.groupBy(values.rows, (row) => row.k),
+    told: Map.groupBy(told.rows, (row) => row.k),
+  };
 }
 
 function extend(
@@ -602,7 +620,7 @@ function extend(
   for (const k of ks.slice(kept.ks.length)) {
     const totals = new Map<string, number>();
     const pairs = new Map<string, Array<[string, number]>>();
-    for (const row of byK.get(k) ?? []) {
+    for (const row of byK.values.get(k) ?? []) {
       const option = intern(row.option);
       const unit = intern(row.unit);
       totals.set(option, (totals.get(option) ?? 0) + row.votes);
@@ -621,8 +639,17 @@ function extend(
         units.push([unit, votes]);
       }
     }
+    const told: Replayed["told"] = [];
+    for (const row of byK.told.get(k) ?? []) {
+      const unit = intern(row.unit);
+      const key = `${row.share}:${row.expected}`;
+      if (kept.told.get(unit) !== key) {
+        kept.told.set(unit, key);
+        told.push([unit, row.share, row.expected]);
+      }
+    }
     kept.ks.push(k);
-    kept.frames.set(k, { totals: [...totals], units });
+    kept.frames.set(k, { totals: [...totals], units, told });
   }
 }
 
@@ -632,7 +659,7 @@ async function replay(frames: Array<{ k: number; contest: string }>) {
       const ks = rows.map((row) => row.k);
       let kept = replays.get(contest);
       if (kept == null || !leads(kept.ks, ks)) {
-        kept = { ks: [], frames: new Map(), last: new Map() };
+        kept = { ks: [], frames: new Map(), last: new Map(), told: new Map() };
         replays.set(contest, kept);
       }
       return { contest, kept, ks, from: kept.ks.length };
@@ -643,7 +670,12 @@ async function replay(frames: Array<{ k: number; contest: string }>) {
     leads(kept.ks, ks) || leads(ks, kept.ks) ? "settled" : "crossed",
   );
   const redone = (sorted.get("crossed") ?? []).map(({ contest, ks }) => {
-    const kept: Replay = { ks: [], frames: new Map(), last: new Map() };
+    const kept: Replay = {
+      ks: [],
+      frames: new Map(),
+      last: new Map(),
+      told: new Map(),
+    };
     replays.set(contest, kept);
     return { kept, ks };
   });
@@ -1398,6 +1430,7 @@ async function night(
       (drawnBy.get(row.id) ?? []).map((line) => fold(line.unit)),
     );
     const current = new Map<string, Array<number>>();
+    const outstanding = new Map<string, { share: number; total: number }>();
     const members = new Map<string, Set<string>>();
     let front: (typeof mine)[number] | undefined;
     let place: (typeof mine)[number] | undefined;
@@ -1450,17 +1483,37 @@ async function night(
         members.set(folded, (members.get(folded) ?? new Set()).add(unit));
         touched.add(folded);
       }
+      for (const [unit, share, total] of entry?.told ?? []) {
+        outstanding.set(unit, { share, total });
+        if (current.has(unit)) {
+          touched.add(fold(unit));
+        }
+      }
       for (const unit of touched) {
         seen.add(unit);
         const votes = own.map(() => 0);
+        let expected = 0;
+        let weighed = 0;
+        let isTold = true;
         for (const member of members.get(unit) ?? []) {
           for (const [position, value] of (
             current.get(member) ?? []
           ).entries()) {
             votes[position] = (votes[position] ?? 0) + value;
           }
+          const told = outstanding.get(member);
+          if (told == null) {
+            isTold = false;
+          } else {
+            expected += told.total;
+            weighed += told.share * told.total;
+          }
         }
-        const key = votes.join(",");
+        const eevp =
+          isTold && expected > 0
+            ? { share: weighed / expected, total: expected }
+            : null;
+        const key = `${votes.join(",")}|${eevp?.share ?? ""}:${eevp?.total ?? ""}`;
         if (last.get(unit) !== key) {
           last.set(unit, key);
           counts.push({
@@ -1469,6 +1522,7 @@ async function night(
             votes,
             reporting: null,
             expected: null,
+            eevp,
           });
         }
       }

@@ -4449,6 +4449,7 @@
   "night_left_row": "{count} left, {lean}",
   "night_left_summary": "About {count} votes left to count, likely between {low} and {high}",
   "night_left_unknown": "We don't have an official count of the ballots still outstanding, so the votes left are an estimate based on how fast new votes are still coming in.",
+  "night_left_reported": "The votes left are an estimate built from the Associated Press's county estimates of the ballots still outstanding. Those are projections too, so the range covers the chance that they are off in either direction.",
   "night_left_title": "Where the votes are left",
   "night_legend_bubbles": "Circles show votes counted",
   "night_legend_counted": "Darker means more of the vote is counted",
