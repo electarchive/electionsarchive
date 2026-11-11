@@ -67,6 +67,10 @@ const seated = memo((rows: NonNullable<Contest["places"]>["rows"]) =>
     : null,
 );
 
+const encircled = memo((rows: NonNullable<Contest["places"]>["rows"]) =>
+  weigh(rows) > ROSTER ? part("contest.surround", rows) : null,
+);
+
 function isQuestion(race: { kind: string }) {
   return race.kind === "ballot_question";
 }
@@ -541,6 +545,21 @@ export const load: PageServerLoad = async ({
         },
       };
     });
+    const shapes = data.shapes.then(({ boundaries, surround }) => {
+      const places = surround?.places;
+      const rows = places == null ? null : encircled(places.rows);
+      return {
+        boundaries,
+        rows,
+        surround:
+          surround == null || places == null || rows == null
+            ? surround
+            : {
+                ...surround,
+                places: { ...places, rows: places.rows.slice(0, 0) },
+              },
+      };
+    });
     const primed =
       budget === Infinity
         ? null
@@ -564,6 +583,8 @@ export const load: PageServerLoad = async ({
       stream(
         {
           body,
+          shapes,
+          sameDay: data.sameDay,
           primed,
           ballot: data.ballot,
           standing: data.standing,

@@ -16,6 +16,29 @@ async function seat(
     : { ...body, contest: { ...contest, places: { ...contest.places, rows } } };
 }
 
+type Shapes = Awaited<Extract<PageServerData, { kind: "contest" }>["shapes"]>;
+
+async function encircle({ rows: part, surround, ...rest }: Shapes) {
+  const rows = part == null ? null : await fetched(part).catch(() => null);
+  return {
+    ...rest,
+    surround:
+      rows == null || surround?.places == null
+        ? surround
+        : { ...surround, places: { ...surround.places, rows } },
+  };
+}
+
+function encircled(
+  shapes: Shapes | Promise<Shapes>,
+): ReturnType<typeof encircle> | Awaited<ReturnType<typeof encircle>> {
+  if (shapes instanceof Promise) {
+    return shapes.then(encircle);
+  }
+  const { rows, ...rest } = shapes;
+  return rows == null ? rest : encircle(shapes);
+}
+
 async function due<T>(promise: Promise<T>) {
   if (!browser) {
     return promise;
@@ -56,10 +79,12 @@ export const load: PageLoad = async ({ data }) => {
     const { body } = data;
     const primed = unfolded(data.primed);
     const view = import("./contest.svelte");
+    const shapes = encircled(data.shapes);
     if (body instanceof Promise) {
       return {
         ...data,
         body: due(body.then(seat)),
+        shapes,
         primed: data.primed instanceof Promise ? primed : await primed,
         View: (await view).default,
       };
@@ -68,6 +93,7 @@ export const load: PageLoad = async ({ data }) => {
     return {
       ...data,
       body: ready,
+      shapes,
       primed: data.primed instanceof Promise ? primed : await primed,
       View: View.default,
     };

@@ -31,6 +31,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { latest } from "#lib/settled.svelte.js";
   import { marginSafety, marginShade } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import {
@@ -40,7 +41,7 @@
     comeback as rerun,
     winners,
   } from "#lib/verdict.js";
-  import type { PageServerData } from "./$types";
+  import type { PageData, PageServerData } from "./$types";
   import Additional from "./additional.svelte";
   import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
@@ -83,8 +84,7 @@
     additional,
     successors,
     statutes,
-    boundaries,
-    surround,
+    shapes,
     match,
     standing,
     crowned,
@@ -119,20 +119,24 @@
     statutes: Awaited<
       Extract<PageServerData, { kind: "contest" }>["body"]
     >["statutes"];
-    boundaries: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["boundaries"];
-    surround: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["surround"];
+    shapes: Extract<PageData, { kind: "contest" }>["shapes"];
     match: string;
     standing: Extract<PageServerData, { kind: "contest" }>["standing"];
     crowned: Extract<PageServerData, { kind: "contest" }>["crowned"];
-    sameDay: Awaited<
-      Extract<PageServerData, { kind: "contest" }>["body"]
-    >["sameDay"];
+    sameDay: Extract<PageServerData, { kind: "contest" }>["sameDay"];
     live: Extract<PageServerData, { kind: "contest" }>["live"];
   } = $props();
+
+  const shaped = latest(
+    () => shapes,
+    () => `${id}:${path}`,
+  );
+  const boundaries = $derived(shaped.current?.boundaries ?? []);
+  const surround = $derived(shaped.current?.surround ?? null);
+  const day = latest(
+    (): typeof sameDay | Awaited<typeof sameDay> => sameDay,
+    () => `${id}:${path}`,
+  );
 
   const DAY: Record<string, () => string> = {
     owner: () => "",
@@ -1571,8 +1575,8 @@
     </nav>
   {/if}
   <SameDay
-    place={sameDay?.place ?? cycle.day.place}
-    races={sameDay?.races ?? []}
+    place={day.current?.place ?? cycle.day.place}
+    races={day.current?.races ?? []}
     day={{
       place: cycle.day.place,
       part: cycle.day.part,
@@ -2062,9 +2066,26 @@
       </Await>
     {/if}
   {/snippet}
+  {#snippet shown()}
+    <Await
+      promise={shapes}
+      name="contest.map"
+      key="{id}:{path}"
+      reserve="min(38rem,70svh)"
+      class="[--island-inset:0]"
+    >
+      {#if isMapped}
+        {@render mapped()}
+      {:else if crowned == null}
+        {@render missing()}
+      {:else}
+        {@render crowns()}
+      {/if}
+    </Await>
+  {/snippet}
   <Lead
     results={summary}
-    map={isMapped ? mapped : crowned == null ? missing : crowns}
+    map={shown}
     aside={chamber == null ? null : hemicycle}
   />
   {#if drawn != null && placed != null}

@@ -1354,20 +1354,20 @@ export async function archive(path: string, search: URLSearchParams) {
         sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
       ),
     ).then((found) => found[0]?.id);
-    const races = parent.then(async (election) =>
-      election == null
-        ? null
-        : call(router.elections.races, {
-            id: election,
-            contest: slug.entity_id,
-            unit,
-          }).catch(() => null),
-    );
-    races.catch(() => null);
+    const races = parent
+      .then(async (election) =>
+        election == null
+          ? null
+          : call(router.elections.races, {
+              id: election,
+              contest: slug.entity_id,
+              unit,
+            }),
+      )
+      .catch(() => null);
     const body = (async () => {
       const [
         contest,
-        boundaries,
         lists,
         rounds,
         cycle,
@@ -1377,12 +1377,6 @@ export async function archive(path: string, search: URLSearchParams) {
         statutes,
       ] = await Promise.all([
         got,
-        (async () =>
-          call(router.contests.boundaries, {
-            id: slug.entity_id,
-            unit,
-            level: (await got).places?.level,
-          }))(),
         call(router.contests.lists, { id: slug.entity_id }),
         call(router.contests.rounds, { id: slug.entity_id, unit }),
         call(router.contests.cycle, { id: slug.entity_id, unit }),
@@ -1391,22 +1385,10 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.seats.successors, { id: slug.entity_id }),
         call(router.seats.statutes, { id: slug.entity_id }),
       ]);
-      const level = boundaries.find(
-        (entry) => entry.scheme === contest.places?.level,
-      );
-      const own = boundaries.find(
-        (entry) => entry.k != null && entry.scheme !== contest.places?.level,
-      );
       ahead(contest.count, input.round, async (round) =>
         call(router.contests.get, { ...input, round }),
       );
-      const [surround, sameDay, isMerged] = await Promise.all([
-        own != null && level?.tiles != null && own.frame != null
-          ? null
-          : around,
-        races,
-        merged.then((found) => found != null),
-      ]);
+      const isMerged = await merged.then((found) => found != null);
       return {
         contest: isMerged
           ? { ...contest, election: { ...contest.election, path: null } }
@@ -1418,11 +1400,28 @@ export async function archive(path: string, search: URLSearchParams) {
         additional,
         successors,
         statutes,
-        boundaries,
-        surround,
-        sameDay,
       };
     })();
+    const shapes = (async () => {
+      const level = (await got).places?.level;
+      const boundaries = await call(router.contests.boundaries, {
+        id: slug.entity_id,
+        unit,
+        level,
+      });
+      const drawn = boundaries.find((entry) => entry.scheme === level);
+      const own = boundaries.find(
+        (entry) => entry.k != null && entry.scheme !== level,
+      );
+      return {
+        boundaries,
+        surround:
+          own != null && drawn?.tiles != null && own.frame != null
+            ? null
+            : await around,
+      };
+    })();
+    void shapes.catch(() => null);
     const crowned = body
       .then(async ({ contest }) => {
         const election = await parent;
@@ -1470,6 +1469,8 @@ export async function archive(path: string, search: URLSearchParams) {
       within,
       live,
       body,
+      shapes,
+      sameDay: races,
       ballot,
       standing,
       crowned,

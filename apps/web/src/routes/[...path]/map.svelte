@@ -2061,7 +2061,7 @@
           result.type === "loaded" ? result.data : {};
         const opened =
           data.kind === "contest"
-            ? await Promise.resolve(data.body).catch(() => null)
+            ? await Promise.resolve(data.shapes).catch(() => null)
             : null;
         exact =
           opened?.boundaries.find(

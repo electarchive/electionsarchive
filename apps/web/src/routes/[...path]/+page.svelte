@@ -244,6 +244,8 @@
         unit={data.unit}
         head={data.head}
         body={data.body}
+        shapes={data.shapes}
+        sameDay={data.sameDay}
         primed={data.primed}
         ballot={data.ballot}
         standing={data.standing}

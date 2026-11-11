@@ -13,7 +13,7 @@
   import TalkLink from "#lib/components/contrib/talk-link.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { prime } from "#lib/primed.js";
-  import type { PageServerData } from "./$types";
+  import type { PageData, PageServerData } from "./$types";
   import ContestBody from "./contest-body.svelte";
   import ContestTitle from "./contest-title.svelte";
 
@@ -23,6 +23,8 @@
     unit,
     head,
     body,
+    shapes,
+    sameDay,
     primed,
     ballot,
     standing,
@@ -35,6 +37,8 @@
     unit: string;
     head: Extract<PageServerData, { kind: "contest" }>["head"];
     body: Extract<PageServerData, { kind: "contest" }>["body"];
+    shapes: Extract<PageData, { kind: "contest" }>["shapes"];
+    sameDay: Extract<PageServerData, { kind: "contest" }>["sameDay"];
     primed: Primed | Promise<Primed>;
     ballot: Extract<PageServerData, { kind: "contest" }>["ballot"];
     standing: Extract<PageServerData, { kind: "contest" }>["standing"];
@@ -134,12 +138,11 @@
       additional={opened.additional}
       successors={opened.successors}
       statutes={opened.statutes}
-      boundaries={opened.boundaries}
-      surround={opened.surround}
+      {shapes}
       {match}
       {standing}
       {crowned}
-      sameDay={opened.sameDay}
+      {sameDay}
       {live}
     />
   {/snippet}
