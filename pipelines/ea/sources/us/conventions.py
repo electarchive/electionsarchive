@@ -715,7 +715,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1944:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 19–21, 1944", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1944, 7, 19), date(1944, 7, 21)), "ballots": {1: date(1944, 7, 20)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
-    {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
+    {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "umbrella": "2024-01-23:president:democratic", "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
@@ -3031,11 +3031,21 @@ def emit() -> Path:
                             height=opened.height,
                         )
             election = cs.key("us.election", f"{first}:{party}-national-convention")
+            umbrella = None
+            if "umbrella" in convention:
+                found = conn.execute(
+                    """select c.election_id from external_id x join contest c on c.id = x.entity_id
+                       where x.scheme = 'us.contest' and x.value = %s""",
+                    [convention["umbrella"]],
+                ).fetchone()
+                if found is None:
+                    raise ValueError(f"{convention['umbrella']} is not held")
+                umbrella = found[0]
             cs.add(
                 "election",
                 id=election,
                 polity_id=us,
-                parent_id=None,
+                parent_id=umbrella,
                 kind="indirect",
                 date_from=first,
                 date_to=last,
