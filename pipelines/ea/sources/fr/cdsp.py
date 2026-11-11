@@ -323,6 +323,34 @@ NUANCE_FIXES = {
         "ROG": "DIV",
     }
 }
+VOTE_FIXES = {
+    (2012, 1, "1403"): {"LETEURTRE CLAUDE": 15656, "ANNOOT CHRISTINE": 272},
+    (2012, 1, "6709"): {
+        "STURNI CLAUDE": 14042,
+        "THOMAS NICOLE": 11906,
+        "CHABOD CLARISSE": 9196,
+        "LUDWIG FRANÇOIS": 0,
+        "DIARI MOUNIR": 229,
+    },
+    (2012, 1, "6905"): {
+        "BUGNI JIM": 143,
+        "CHIAVAZZA VÉRONIQUE": 1945,
+        "TOUTANT VÉRONIQUE": 2098,
+        "DARNE JACKY": 14034,
+        "RUSDIKIAN ERIC": 2,
+        "SAVOYE-DI SPIRITO JOANNE": 903,
+        "PROUHET KIM": 298,
+        "BOUVAT CYRILLE": 414,
+        "SARAFIAN LOUISE": 0,
+        "CHEVALIER ALAIN": 5835,
+        "COCHET PHILIPPE": 23486,
+        "EKOBE ELEAZARD": 0,
+    },
+    (2012, 1, "9209"): {"GUEANT CLAUDE": 10978, "SOLERE THIERRY": 9709, "CRETEGNY GUILLAUME": 1691},
+}
+RELABELS = {
+    (1993, 2, "2901", "RAINERO PIERO"): ("POIGNANT", "BERNARD", "SOC"),
+}
 NOTES = {
     "legi": (
         "Results by constituency, compiled by the Banque de données socio-politiques in Grenoble and Sciences Po's "
@@ -592,6 +620,38 @@ def parse() -> None:
         )
     values = pl.concat(accounting)
     standing = pl.concat(options, how="diagonal")
+    fixes = pl.DataFrame(
+        [
+            (year, number, circ, label, votes)
+            for (year, number, circ), fix in VOTE_FIXES.items()
+            for label, votes in fix.items()
+        ],
+        schema={"year": pl.Int32, "round": pl.Int32, "circ": pl.String, "label": pl.String, "fixed": pl.Int64},
+        orient="row",
+    )
+    missing = fixes.join(standing, on=["year", "round", "circ", "label"], how="anti")
+    if missing.height:
+        raise ValueError(f"vote fixes without a candidate: {missing.rows()}")
+    standing = (
+        standing.join(fixes, on=["year", "round", "circ", "label"], how="left")
+        .with_columns(votes=pl.coalesce("fixed", "votes"))
+        .drop("fixed")
+    )
+    for (year, number, circ, label), (surname, forename, nuance) in RELABELS.items():
+        hit = (
+            (pl.col("year") == year)
+            & (pl.col("round") == number)
+            & (pl.col("circ") == circ)
+            & (pl.col("label") == label)
+        )
+        if standing.filter(hit).height != 1:
+            raise ValueError(f"relabel without a candidate: {label}")
+        standing = standing.with_columns(
+            surname=pl.when(hit).then(pl.lit(surname)).otherwise("surname"),
+            forename=pl.when(hit).then(pl.lit(forename)).otherwise("forename"),
+            nuance=pl.when(hit).then(pl.lit(nuance)).otherwise("nuance"),
+            label=pl.when(hit).then(pl.lit(f"{surname} {forename}")).otherwise("label"),
+        )
     values = values.group_by("kind", "year", "round", "dept", "circ", "measure").agg(pl.col("value").sum())
     voters = values.filter(pl.col("measure") == VOTERS).select("kind", "year", "round", "dept", "circ", voters="value")
     values = (
