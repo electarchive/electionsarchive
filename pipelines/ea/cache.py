@@ -21,13 +21,15 @@ RESTRICTED = {
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
     ("restricted", re.compile(r"ICPSR|All rights reserved|permission .*pending|^Pending:", re.IGNORECASE)),
-    ("non-commercial", re.compile(r"non-?commercial", re.IGNORECASE)),
+    ("non-commercial", re.compile(r"non-?commercial|\bBY-NC\b", re.IGNORECASE)),
     ("revocable", re.compile(r"revocable", re.IGNORECASE)),
     ("share-alike", re.compile(r"ShareAlike|BY-SA|ODbL|Open Database License", re.IGNORECASE)),
     (
         "open",
         re.compile(
-            r"CC0|public domain|excluded from copyright|freely reproduced|open by default|\bMIT\b", re.IGNORECASE
+            r"CC0|public domain|excluded from copyright|not protected by copyright|freely reproduced|frees officially published"
+            r"|open by default|\bMIT\b",
+            re.IGNORECASE,
         ),
     ),
     (
@@ -35,7 +37,9 @@ CLASSES = [
         re.compile(
             r"CC BY|Creative Commons Attribution|Licence Ouverte|Open Government|Open Parliament|Datenlizenz"
             r"|reuse is authorized|2011/833/EU|Open use|free use|free to distribute|free to copy|freely reproducible"
-            r"|City of Chicago Data Portal Terms of Use|Scottish Boundary Commissions Historical Electoral Data terms of use",
+            r"|City of Chicago Data Portal Terms of Use|Scottish Boundary Commissions Historical Electoral Data terms of use"
+            r"|Statistics Canada Open Licence|PSI (General )?Licence|ODC-By|Scottish Parliament Copyright Licence"
+            r"|with acknowledge?ment|données ouvertes",
             re.IGNORECASE,
         ),
     ),
