@@ -1043,10 +1043,6 @@ const datedTogether = together(
         where entity_id = any(${sql.param(ids)}::uuid[])
           and (kind in ('official', 'english') or (${withHistory} and kind = 'historical'))
       ),
-      e as materialized (
-        select id, date_from, polity_id from election
-        where id = any(${sql.param(ids)}::uuid[]) and date_precision = 'day'
-      ),
       l as (
         select distinct on (entity_id) entity_id, lang from c
         where is_preferred and kind in ('official', 'english')
@@ -1069,7 +1065,11 @@ const datedTogether = together(
       )
       (select n.entity_id, n.h as historical, n.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
       from n
-      left join e on e.id = n.entity_id and n.text like extract(year from e.date_from)::int || ' %'
+      left join lateral (
+        select o.id, o.date_from, o.polity_id from election o
+        where n.text ~ '^[0-9]' and o.id = n.entity_id and o.date_precision = 'day'
+          and n.text like extract(year from o.date_from)::int || ' %'
+      ) e on true
       left join lateral (
         select e.date_from as date
         where e.id is not null and exists (
@@ -19697,9 +19697,10 @@ export const elections = {
       }
       const mentioned = [
         ...groups,
-        ...[...rows, ...prior].flatMap((row) =>
+        ...rows.flatMap((row) =>
           [row.person, row.party, row.area].filter((id) => id != null),
         ),
+        ...prior.flatMap((row) => row.party ?? []),
         ...[
           ...(measure?.totals.keys() ?? []),
           ...(measureBefore?.totals.keys() ?? []),
@@ -19707,7 +19708,7 @@ export const elections = {
           .filter((entry) => entry.startsWith("party:"))
           .map((entry) => entry.slice(6)),
       ];
-      const [labels, nouns, areas, territory] = await Promise.all([
+      const [named0, nouns, areas, territory] = await Promise.all([
         names([...new Set(mentioned)], rows[0]?.date ?? null),
         db.execute<{ noun: string }>(sql`
           select sc.noun from area a join scheme sc on sc.code = a.scheme_code
@@ -19767,9 +19768,23 @@ export const elections = {
           })
           .toArray(),
       ].filter((level) => level.length > 1);
+      const shown = levels.flat().map((entry) => entry.row);
+      const asked = new Set(mentioned);
+      const rest = await names(
+        shown
+          .flatMap((row) => {
+            const old = then.get(row.place);
+            return old?.party == null ? (old?.person ?? []) : [];
+          })
+          .filter((id) => !asked.has(id)),
+        rows[0]?.date ?? null,
+      );
+      const labels = {
+        full: new Map([...named0.full, ...rest.full]),
+        short: new Map([...named0.short, ...rest.short]),
+      };
       const named = (row: { party: string | null; person: string | null }) =>
         labels.full.get(row.party ?? row.person ?? "") ?? null;
-      const shown = levels.flat().map((entry) => entry.row);
       const legend = [
         ...Map.groupBy(shown, key)
           .entries()
