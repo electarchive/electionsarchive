@@ -51,6 +51,7 @@ type Entry = {
   mark: number | null;
   day: string;
   born: number;
+  used: number;
   origin: "renew" | "store";
   size: number;
   isSettled: boolean;
@@ -713,6 +714,7 @@ function store(
     mark: shadow.seq,
     day: state.today,
     born: Date.now(),
+    used: Date.now(),
     origin: "store",
     size: 0,
     isSettled: false,
@@ -771,18 +773,88 @@ function store(
 }
 
 const RENEWING = 4;
-const waiting: Array<() => Promise<void>> = [];
+const ACROSS = 4;
+const SEATS = "renewing";
+const SEAT = 120_000;
+const RECENT = 600_000;
+const ADMIT = `
+local clock = redis.call('TIME')
+local now = tonumber(clock[1]) * 1000 + math.floor(tonumber(clock[2]) / 1000)
+redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', now)
+if redis.call('ZCARD', KEYS[1]) >= tonumber(ARGV[1]) then
+  return 0
+end
+redis.call('ZADD', KEYS[1], now + tonumber(ARGV[2]), ARGV[3])
+redis.call('PEXPIRE', KEYS[1], ARGV[2])
+return 1
+`;
+const waiting: Array<{ key: string; hit: Entry; task: () => Promise<void> }> =
+  [];
 let renewing = 0;
+
+async function admit() {
+  const token = randomUUID();
+  for (;;) {
+    const owner = client();
+    const admitted =
+      owner == null
+        ? 1
+        : await owner
+            .eval(ADMIT, {
+              keys: [SEATS],
+              arguments: [String(ACROSS), String(SEAT), token],
+            })
+            .catch(() => 1);
+    if (admitted === 1) {
+      return () => {
+        void owner?.zRem(SEATS, token).catch(() => null);
+      };
+    }
+    await new Promise((resolve) =>
+      setTimeout(resolve, 250 + Math.random() * 250),
+    );
+  }
+}
+
+async function claim(slot: string) {
+  const owner = client();
+  if (owner == null) {
+    return () => null;
+  }
+  const lock = `lock:${slot}`;
+  const token = randomUUID();
+  const acquired = await owner
+    .set(lock, token, { NX: true, PX: LOCK })
+    .catch(() => "OK");
+  if (acquired == null) {
+    return null;
+  }
+  return () => {
+    void owner
+      .get(lock)
+      .then(async (held) =>
+        held?.toString() === token ? owner.del(lock) : null,
+      )
+      .catch(() => null);
+  };
+}
 
 async function drain() {
   while (renewing < RENEWING) {
-    const task = waiting.shift();
-    if (task == null) {
+    const next = waiting.shift();
+    if (next == null) {
       return;
+    }
+    if (
+      entries.get(next.key) !== next.hit ||
+      Date.now() - next.hit.used > RECENT
+    ) {
+      next.hit.isRenewing = false;
+      continue;
     }
     renewing++;
     try {
-      await task();
+      await next.task();
     } finally {
       renewing--;
     }
@@ -798,11 +870,35 @@ function renew(
   isDated: boolean,
 ) {
   hit.isRenewing = true;
-  waiting.push(async () => {
-    const version = current();
-    const mark = shadow.seq;
-    const day = state.today;
+  const attempt = async () => {
+    const leave = await admit();
+    const release = await claim(slot);
     try {
+      if (release == null) {
+        return null;
+      }
+      const version = current();
+      const found = await recall(slot);
+      if (found?.version === version) {
+        if (entries.get(key) === hit) {
+          put(key, {
+            value: Promise.resolve(found.value),
+            deps: Promise.resolve(found.deps),
+            version,
+            mark: null,
+            day: state.today,
+            born: Date.now(),
+            used: hit.used,
+            origin: "renew",
+            size: found.size,
+            isSettled: true,
+            isRenewing: false,
+          });
+        }
+        return null;
+      }
+      const mark = shadow.seq;
+      const day = state.today;
       const traced = await trace(compute);
       const deps = await traced.deps;
       const next: Entry = {
@@ -812,6 +908,7 @@ function renew(
         mark,
         day,
         born: Date.now(),
+        used: hit.used,
         origin: "renew",
         size: keep(slot, version, traced.value, deps),
         isSettled: true,
@@ -820,15 +917,22 @@ function renew(
       if (entries.get(key) === hit) {
         put(key, next);
       }
-      if (CACHE_SHADOW) {
-        await verify(key, hit, traced.value, compute, isDated).catch(
-          () => null,
-        );
-      }
-    } catch {
-      hit.isRenewing = false;
+      return { value: traced.value };
+    } finally {
+      release?.();
+      leave();
     }
-  });
+  };
+  const task = async () => {
+    const renewed = await attempt().catch(() => null);
+    if (renewed != null && CACHE_SHADOW) {
+      await verify(key, hit, renewed.value, compute, isDated).catch(
+        () => null,
+      );
+    }
+    hit.isRenewing = false;
+  };
+  waiting.push({ key, hit, task });
   void drain();
 }
 
@@ -864,6 +968,7 @@ export async function remember<T>(
   if (hit != null) {
     entries.delete(key);
     entries.set(key, hit);
+    hit.used = Date.now();
     const version = current();
     if (isRefresh && hit.version !== version) {
       const next = store(key, slot, run, true, current, isDated);
