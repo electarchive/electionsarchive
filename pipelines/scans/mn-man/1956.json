@@ -1,0 +1,393 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1957, general election returns (general election 1956-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1956-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "house1": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house8": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house7": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1956,
+      "chamber": "governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 113,
+      "id": "113-0",
+      "columns": [
+        {
+          "label": "Arnold L. Fredriksen Democratic-Farmer-Labor",
+          "contest": "house1",
+          "candidate": "Arnold L. Fredriksen"
+        },
+        {
+          "label": "August H. Andresen Republican",
+          "contest": "house1",
+          "candidate": "August H. Andresen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.113,
+        0.501,
+        0.347
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-1",
+      "columns": [
+        {
+          "label": "Harold Zupp Democratic-Farmer-Labor",
+          "contest": "house2",
+          "candidate": "Harold Zupp"
+        },
+        {
+          "label": "Joseph P. O'Hara Republican",
+          "contest": "house2",
+          "candidate": "Joseph P. O'Hara"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.514,
+        0.113,
+        0.914,
+        0.353
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-2",
+      "columns": [
+        {
+          "label": "Roy W. Wier Democratic-Farmer-Labor",
+          "contest": "house3",
+          "candidate": "Roy W. Wier"
+        },
+        {
+          "label": "George Mikan Republican",
+          "contest": "house3",
+          "candidate": "George Mikan"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.345,
+        0.914,
+        0.577
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-3",
+      "columns": [
+        {
+          "label": "Eugene J. McCarthy Democratic-Farmer-Labor",
+          "contest": "house4",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Edward C. Slettedahl Republican",
+          "contest": "house4",
+          "candidate": "Edward C. Slettedahl"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.569,
+        0.914,
+        0.725
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 113,
+      "id": "113-4",
+      "columns": [
+        {
+          "label": "Joseph Robbie Democratic-Farmer-Labor",
+          "contest": "house5",
+          "candidate": "Joseph Robbie"
+        },
+        {
+          "label": "Walter H. Judd Republican",
+          "contest": "house5",
+          "candidate": "Walter H. Judd"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.717,
+        0.914,
+        0.87
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-0",
+      "columns": [
+        {
+          "label": "Fred Marshall Democratic-Farmer-Labor",
+          "contest": "house6",
+          "candidate": "Fred Marshall"
+        },
+        {
+          "label": "Joseph L. Kaczmarek Republican",
+          "contest": "house6",
+          "candidate": "Joseph L. Kaczmarek"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.106,
+        0.478,
+        0.224
+      ],
+      "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-1",
+      "columns": [
+        {
+          "label": "John A. Blatnik Democratic-Farmer-Labor",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "Alfred J. Weinberg Republican",
+          "contest": "house8",
+          "candidate": "Alfred J. Weinberg"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.455,
+        0.216,
+        0.876,
+        0.259
+      ],
+      "hint": "Read only the table headed 'Eighth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-2",
+      "columns": [
+        {
+          "label": "Mrs. Coya Knutson Democratic-Farmer-Labor",
+          "contest": "house9",
+          "candidate": "Coya Knutson"
+        },
+        {
+          "label": "Harold C. Hagen Republican",
+          "contest": "house9",
+          "candidate": "Harold C. Hagen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.455,
+        0.297,
+        0.876,
+        0.424
+      ],
+      "hint": "Read only the table headed 'Ninth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 114,
+      "id": "114-3",
+      "columns": [
+        {
+          "label": "Clint Haroldson Democratic Farmer-Labor",
+          "contest": "house7",
+          "candidate": "Clint Haroldson"
+        },
+        {
+          "label": "H. Carl Andersen Republican",
+          "contest": "house7",
+          "candidate": "H. Carl Andersen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.416,
+        0.478,
+        0.609
+      ],
+      "hint": "Read only the table headed 'Seventh Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 124,
+      "id": "124-0",
+      "columns": [
+        {
+          "label": "Total Number of Names Entered on Election Register",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank O'Gorman, Democratic-Farmer-Labor",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Merle Olson, Republican",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Theodore E. Peterson, Industrial Government",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Dorothy Schultz, Socialist Workers",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Orville L. Freeman, Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Orville L. Freeman"
+        },
+        {
+          "label": "Ancher Nelson, Republican",
+          "contest": "governor",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "Rudolph Gustafson, Industrial Government",
+          "contest": "governor",
+          "candidate": "Rudolph Gustafson"
+        },
+        {
+          "label": "Karl F. Rolvaag, Democratic-Farmer-Labor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Leonard R. Dickinson, Republican",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.072,
+        0.944,
+        0.963
+      ],
+      "hint": "Read only the table headed 'Abstract of Votes by Counties'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2907
+      ]
+    }
+  ]
+}

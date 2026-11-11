@@ -1,0 +1,647 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1965, general election returns (general election 1964-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1964-11-03-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "chamber": "president",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1964,
+      "chamber": "senate",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "JOHNSON HUMPHREY DFL",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        },
+        {
+          "label": "Goldwater Miller Republ.",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "Hass Blomen Indust. Govt.",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "DeBerry Shaw Socialist Workers",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.67,
+        0.211,
+        0.915,
+        0.893
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2243
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "JOHNSON HUMPHREY DFL",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        },
+        {
+          "label": "Goldwater Miller Republ.",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "Hass Blomen Indust. Govt.",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "DeBerry Shaw Socialist Workers",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.672,
+        0.146,
+        0.916,
+        0.906
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1961
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "EUGENE J. McCARTHY DFL",
+          "contest": "senate",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Wheelock Whitney Republ.",
+          "contest": "senate",
+          "candidate": "Wheelock Whitney"
+        },
+        {
+          "label": "William Braatz Ind. Govt.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "Everett E. Luoma Soc. Work.",
+          "contest": "senate",
+          "candidate": "Everett E. Luoma"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.29,
+        0.131,
+        0.525,
+        0.935
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3184
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "EUGENE J. McCARTHY DFL",
+          "contest": "senate",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Wheelock Whitney Republ.",
+          "contest": "senate",
+          "candidate": "Wheelock Whitney"
+        },
+        {
+          "label": "William Braatz Ind. Govt.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "Everett E. Luoma Soc. Work.",
+          "contest": "senate",
+          "candidate": "Everett E. Luoma"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.089,
+        0.523,
+        0.924
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3162
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "EUGENE J. McCARTHY DFL",
+          "contest": "senate",
+          "candidate": "Eugene J. McCarthy"
+        },
+        {
+          "label": "Wheelock Whitney Republ.",
+          "contest": "senate",
+          "candidate": "Wheelock Whitney"
+        },
+        {
+          "label": "William Braatz Ind. Govt.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "Everett E. Luoma Soc. Work.",
+          "contest": "senate",
+          "candidate": "Everett E. Luoma"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.292,
+        0.058,
+        0.526,
+        0.93
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.297
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DALEY DFL",
+          "contest": "house1",
+          "candidate": "George Daley"
+        },
+        {
+          "label": "QUIE REP.",
+          "contest": "house1",
+          "candidate": "Albert H. Quie"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.172,
+        0.946,
+        0.492
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SIMPSON DFL",
+          "contest": "house2",
+          "candidate": "Charles V. Simpson"
+        },
+        {
+          "label": "NELSEN REP.",
+          "contest": "house2",
+          "candidate": "Ancher Nelsen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.484,
+        0.947,
+        0.884
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PARISH DFL",
+          "contest": "house3",
+          "candidate": "Richard J. Parish"
+        },
+        {
+          "label": "MacGREGOR REP.",
+          "contest": "house3",
+          "candidate": "Clark MacGregor"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.192,
+        0.588,
+        0.332
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KARTH DFL",
+          "contest": "house4",
+          "candidate": "Joseph E. Karth"
+        },
+        {
+          "label": "DREXLER REP.",
+          "contest": "house4",
+          "candidate": "John M. Drexler"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.324,
+        0.588,
+        0.468
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-2",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRASER DFL",
+          "contest": "house5",
+          "candidate": "Donald M. Fraser"
+        },
+        {
+          "label": "JOHNSON REP.",
+          "contest": "house5",
+          "candidate": "John W. Johnson"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.46,
+        0.588,
+        0.563
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-3",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "OLSON DFL",
+          "contest": "house6",
+          "candidate": "Alec G. Olson"
+        },
+        {
+          "label": "ODEGARD REP.",
+          "contest": "house6",
+          "candidate": "Robert J. Odegard"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.555,
+        0.588,
+        0.948
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WICHTERMAN DFL",
+          "contest": "house7",
+          "candidate": "Ben M. Wichterman"
+        },
+        {
+          "label": "LANGEN REP.",
+          "contest": "house7",
+          "candidate": "Odin Langen"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.06,
+        0.942,
+        0.52
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1109
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-1",
+      "columns": [
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BLATNIK DFL",
+          "contest": "house8",
+          "candidate": "John A. Blatnik"
+        },
+        {
+          "label": "GLOSSBRENNER REP.",
+          "contest": "house8",
+          "candidate": "David W. Glossbrenner"
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TWO PARTY VOTE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON DFL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PETERSON REP.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT DFL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.512,
+        0.942,
+        0.786
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

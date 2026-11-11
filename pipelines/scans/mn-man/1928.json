@@ -1,0 +1,491 @@
+{
+  "polity": "US-MN",
+  "publisher": "Minnesota Secretary of State",
+  "title": "Legislative Manual of the State of Minnesota 1929, general election returns (general election 1928-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.lrl.mn.gov/archive/sessions/electionresults/1928-11-06-g-man.pdf",
+    "item": "https://www.lrl.mn.gov/mngov/electionresults"
+  },
+  "raw_source": "us.mn_lrl",
+  "contests": {
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "MN",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 176,
+      "id": "176-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican\u2014Hoover",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Democrat\u2014Smith",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Industrial\u2014Reynolds",
+          "contest": "president",
+          "candidate": "Verne Reynolds (Socialist Labor)"
+        },
+        {
+          "label": "Workers Communist\u2014Foster",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Socialist\u2014Thomas",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.13,
+        0.865,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.269
+      ]
+    },
+    {
+      "page": 177,
+      "id": "177-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican\u2014Hoover",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Democrat\u2014Smith",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Industrial\u2014Reynolds",
+          "contest": "president",
+          "candidate": "Verne Reynolds (Socialist Labor)"
+        },
+        {
+          "label": "Workers Communist\u2014Foster",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Socialist\u2014Thomas",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.181,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4591
+      ]
+    },
+    {
+      "page": 178,
+      "id": "178-0",
+      "columns": [
+        {
+          "label": "*Victor Christgau Republican",
+          "contest": "house1",
+          "candidate": "Victor Christgau"
+        },
+        {
+          "label": "James F. Lynn Democrat",
+          "contest": "house1",
+          "candidate": "James F. Lynn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.204,
+        0.858,
+        0.392
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 178,
+      "id": "178-1",
+      "columns": [
+        {
+          "label": "*Frank Clague Republican",
+          "contest": "house2",
+          "candidate": "Frank Clague"
+        },
+        {
+          "label": "J. A. Cashel Democrat",
+          "contest": "house2",
+          "candidate": "J. A. Cashel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.384,
+        0.858,
+        0.611
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 178,
+      "id": "178-2",
+      "columns": [
+        {
+          "label": "*August H. Andresen Republican",
+          "contest": "house3",
+          "candidate": "August H. Andresen"
+        },
+        {
+          "label": "Henry Arens Farmer-Labor",
+          "contest": "house3",
+          "candidate": "Henry Arens"
+        },
+        {
+          "label": "Charles C. Kolars Democrat",
+          "contest": "house3",
+          "candidate": "Charles C. Kolars"
+        },
+        {
+          "label": "E. B. Ford Workers Communist",
+          "contest": "house3",
+          "candidate": "E. B. Ford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.603,
+        0.868,
+        0.803
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 178,
+      "id": "178-3",
+      "columns": [
+        {
+          "label": "*Melvin Joseph Maas Republican",
+          "contest": "house4",
+          "candidate": "Melvin J. Maas"
+        },
+        {
+          "label": "Howard Y. Williams Farmer-Labor",
+          "contest": "house4",
+          "candidate": "Howard Y. Williams"
+        },
+        {
+          "label": "John P. J. Dolan Democrat",
+          "contest": "house4",
+          "candidate": "John P. J. Dolan"
+        },
+        {
+          "label": "Maurice Powers Workers Communist",
+          "contest": "house4",
+          "candidate": "Maurice Powers"
+        },
+        {
+          "label": "Fred A. Snyder Independent",
+          "contest": "house4",
+          "candidate": "Fred A. Snyder"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.795,
+        0.869,
+        0.899
+      ],
+      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 179,
+      "id": "179-0",
+      "columns": [
+        {
+          "label": "*Walter H. Newton Republican",
+          "contest": "house5",
+          "candidate": "Walter H. Newton"
+        },
+        {
+          "label": "Ferdinand Johnson Farmer-Labor",
+          "contest": "house5",
+          "candidate": "Ferdinand Johnson"
+        },
+        {
+          "label": "James Robertson Democrat",
+          "contest": "house5",
+          "candidate": "James Robertson"
+        },
+        {
+          "label": "O. R. Votaw Workers Communist",
+          "contest": "house5",
+          "candidate": "O. R. Votaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.018,
+        0.144,
+        0.885,
+        0.283
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 179,
+      "id": "179-1",
+      "columns": [
+        {
+          "label": "*Harold Knutson Republican",
+          "contest": "house6",
+          "candidate": "Harold Knutson"
+        },
+        {
+          "label": "John Knutsen Farmer-Labor",
+          "contest": "house6",
+          "candidate": "John Knutsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.275,
+        0.885,
+        0.493
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 179,
+      "id": "179-2",
+      "columns": [
+        {
+          "label": "Lawrence M. Carlson Republican",
+          "contest": "house7",
+          "candidate": "Lawrence M. Carlson"
+        },
+        {
+          "label": "*O. J. Kvale Farmer-Labor",
+          "contest": "house7",
+          "candidate": "O. J. Kvale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.485,
+        0.885,
+        0.724
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 179,
+      "id": "179-3",
+      "columns": [
+        {
+          "label": "*William A. Pittenger Republican",
+          "contest": "house8",
+          "candidate": "William A. Pittenger"
+        },
+        {
+          "label": "William L. Carss Farmer-Labor",
+          "contest": "house8",
+          "candidate": "William L. Carss"
+        },
+        {
+          "label": "Dana C. Reed Democrat",
+          "contest": "house8",
+          "candidate": "Dana C. Reed"
+        },
+        {
+          "label": "Thomas Foley Workers Communist",
+          "contest": "house8",
+          "candidate": "Thomas Foley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.716,
+        0.885,
+        0.872
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 180,
+      "id": "180-0",
+      "columns": [
+        {
+          "label": "*C. G. Selvig Republican",
+          "contest": "house9",
+          "candidate": "C. G. Selvig"
+        },
+        {
+          "label": "Knud Wefald Farmer-Labor",
+          "contest": "house9",
+          "candidate": "Knud Wefald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.139,
+        0.878,
+        0.35
+      ],
+      "hint": "Read only the table headed 'NINTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 180,
+      "id": "180-1",
+      "columns": [
+        {
+          "label": "*Godfrey G. Goodwin Republican",
+          "contest": "house10",
+          "candidate": "Godfrey G. Goodwin"
+        },
+        {
+          "label": "C. R. Hedlund Farmer-Labor",
+          "contest": "house10",
+          "candidate": "C. R. Hedlund"
+        },
+        {
+          "label": "Ernest W. Erickson Democrat",
+          "contest": "house10",
+          "candidate": "Ernest W. Erickson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.342,
+        0.881,
+        0.519
+      ],
+      "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
