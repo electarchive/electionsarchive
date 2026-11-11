@@ -1,18 +1,32 @@
 import base64
+import difflib
 import io
+import itertools
 import json
 import re
+import statistics
 import subprocess
+import tempfile
+from dataclasses import dataclass
+from datetime import date, timedelta
+from pathlib import Path
+from uuid import UUID
 
 import numpy as np
+import polars as pl
 from anthropic.types import ImageBlockParam, MessageParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
-from ea import batch, raw
-from ea.store import DATA
+from ea import batch, raw, scan
+from ea.changeset import Changeset
+from ea.store import DATA, connect
 
 SOURCE = "us.nj_results"
+PUBLISHER = "New Jersey Division of Elections"
+DIGITIZED = 8
+PEOPLE = ("candidate", "ticket", "legend")
+DERIVED = 1
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
@@ -196,3 +210,699 @@ def seen(year: int, number: int, block: int, read: str) -> list[dict[str, object
 def parse() -> None:
     if not ensure():
         raise SystemExit(f"waiting for batch:{SOURCE}/{JOB}")
+    rows: list[dict[str, object]] = []
+    failed: list[str] = []
+    for (year, number), boxes in sorted(layout().items()):
+        words: list[tuple[str, tuple[int, int, int, int]]] | None = None
+        turn, size = 0, (0, 0)
+        headings: dict[str, str | None] = {}
+        for block, box in enumerate(boxes):
+            reads: list[list[Shape]] = []
+            for read in READS:
+                shapes = []
+                for table in seen(year, number, block, read):
+                    if not isinstance(table, dict):
+                        continue
+                    if (shape := _shape(table, headings.get(read))) is not None:
+                        shapes.append(shape)
+                    headings[read] = _office(table.get("title")) or headings.get(read)
+                reads.append(shapes)
+            gray, ink = reads
+            if not gray:
+                continue
+            if words is None:
+                words, turn, size = _words(year, number)
+            frame = _turned(box, turn, size)
+            inside = [
+                (d, b)
+                for d, b in words
+                if frame[0] <= (b[0] + b[2]) / 2 <= frame[2] and frame[1] <= (b[1] + b[3]) / 2 <= frame[3]
+            ]
+            printed = {d for d, _ in inside}
+            used: set[int] = set()
+            for index, first in enumerate(gray):
+                match = next(
+                    (
+                        i
+                        for i, t in enumerate(ink)
+                        if i not in used and t.office == first.office and t.district == first.district
+                    ),
+                    None,
+                )
+                if match is not None:
+                    used.add(match)
+                settled, problems = _settle(first, None if match is None else ink[match], printed)
+                if problems:
+                    where = f"{year} p{number} b{block} t{index} {first.office} {first.district or ''}"
+                    failed.extend(f"{where}: {p}" for p in problems)
+                    continue
+                located = _locate(settled, inside, frame, first.across)
+                for (r, c), (votes, status, unit, label) in settled.items():
+                    found, how = located[(r, c)]
+                    rows.append(
+                        {
+                            "year": year,
+                            "office": first.office,
+                            "title": first.title,
+                            "district": first.district,
+                            "page": number,
+                            "table": f"{year}:{number}:{block}:{index}",
+                            "unit": unit,
+                            "label": label,
+                            "votes": votes,
+                            "box": list(_turned(found, -turn, size)),
+                            "located": how,
+                            "status": status,
+                        }
+                    )
+    for line in failed:
+        print(line)
+    values = pl.DataFrame(rows, infer_schema_length=None)
+    print(values.group_by("office", "status").len().sort("office", "status"))
+    print(values.group_by("located").len().sort("located"))
+    values.write_parquet(PARSED / "values.parquet")
+
+
+def _words(year: int, number: int) -> tuple[list[tuple[str, tuple[int, int, int, int]]], int, tuple[int, int]]:
+    image = page(year, number)
+    best: tuple[int, list[tuple[str, tuple[int, int, int, int]]], int] | None = None
+    for turn in (0, 90, 270):
+        cache = PARSED / "ocr" / (f"{year}-{number}.tsv" if turn == 0 else f"{year}-{number}-{turn}.tsv")
+        if turn and not cache.exists():
+            with tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "page.png"
+                image.rotate(turn, expand=True).save(path)
+                cache.write_text(
+                    subprocess.run(
+                        ["tesseract", str(path), "stdout", "--psm", "6", "tsv"],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout
+                )
+        found = scan.words(pdf(year).path, number, cache)
+        tokens = [
+            (digits, b)
+            for text, b, _, _ in found
+            for digits in {re.sub(r"\D", "", text), re.sub(r"\D", "", text.translate(scan.CONFUSABLE))}
+            if digits
+        ]
+        score = sum(bool(re.fullmatch(r"[\d,.]{3,}", text)) for text, *_ in found)
+        if best is None or score > best[0]:
+            best = (score, tokens, turn)
+        if turn == 0 and score >= 60:
+            break
+    assert best is not None
+    return best[1], best[2], image.size
+
+
+def _turned(box: tuple[int, int, int, int], turn: int, size: tuple[int, int]) -> tuple[int, int, int, int]:
+    width, height = size
+    x0, y0, x1, y1 = box
+    match turn:
+        case 90:
+            return (y0, width - x1, y1, width - x0)
+        case 270:
+            return (height - y1, x0, height - y0, x1)
+        case -90:
+            return (width - y1, x0, width - y0, x1)
+        case -270:
+            return (y0, height - x1, y1, height - x0)
+    return box
+
+
+COUNTIES = [
+    "Atlantic", "Bergen", "Burlington", "Camden", "Cape May", "Cumberland", "Essex", "Gloucester", "Hudson",
+    "Hunterdon", "Mercer", "Middlesex", "Monmouth", "Morris", "Ocean", "Passaic", "Salem", "Somerset", "Sussex",
+    "Union", "Warren",
+]  # fmt: skip
+SKIP = ("total", "plurality", "majority", "number", "whole", "names", "ballots", "rejected", "registered", "party")
+
+
+def _plain(text: object) -> str:
+    return re.sub(r"[^a-z]", "", str(text or "").lower())
+
+
+def _county(label: object) -> tuple[str | None, bool]:
+    text = _plain(label)
+    hit = next((c for c in COUNTIES if text.startswith(_plain(c)) or text.endswith(_plain(c))), None)
+    if hit is None or len(text) > len(_plain(hit)) + len("part") + 2:
+        return None, False
+    return hit, "part" in text
+
+
+@dataclass
+class Shape:
+    title: str
+    office: str
+    district: int | None
+    across: bool
+    units: list[str | None]
+    names: list[str | None]
+    total: int | None
+    grid: list[list[int | None]]
+
+
+def _office(title: object) -> str | None:
+    text = _plain(title)
+    if "average" in text or "military" in text:
+        return None
+    if "congress" in text or "representatives" in text:
+        return "house"
+    if "senat" in text and ("united" in text or "us" in text):
+        return "senate"
+    if "governor" in text:
+        return "governor"
+    if "president" in text:
+        return "president"
+    return None
+
+
+def _shape(table: dict[str, object], heading: str | None) -> Shape | None:
+    title = _plain(table.get("title"))
+    columns = table.get("columns") if isinstance(table.get("columns"), list) else []
+    listed = table.get("rows")
+    rows = (
+        [r for r in listed if isinstance(r, dict) and isinstance(r.get("values"), list)]
+        if isinstance(listed, list)
+        else []
+    )
+    assert isinstance(columns, list)
+    if "average" in title or "military" in title or not rows:
+        return None
+    district = table.get("district")
+    office = _office(title)
+    if office is None:
+        office = heading if heading in ("president", "senate", "governor") else "statewide"
+    if office == "house" and not isinstance(district, int):
+        return None
+    across = office != "house"
+    labels = [r.get("label") for r in rows]
+    heads = [str(c or "") for c in columns]
+    if across:
+        units = [_unit(label) for label in labels]
+        names: list[str | None] = [
+            None if any(_plain(h).startswith(s) for s in SKIP) or not _plain(h) else h for h in heads
+        ]
+        totals = [i for i, label in enumerate(labels) if "total" in _plain(label)]
+        if sum(u is not None for u in units) < 15:
+            return None
+    else:
+        units = [_unit(h) for h in heads]
+        names = [None if "total" in _plain(label) else str(label) for label in labels]
+        totals = [i for i, h in enumerate(heads) if "total" in _plain(h)]
+        if not totals and heads and not _plain(heads[-1]) and len(rows[0]["values"]) == len(heads):
+            totals = [len(heads) - 1]
+        if not any(u is not None for u in units):
+            return None
+    return Shape(
+        str(table.get("title") or ""),
+        office,
+        district if isinstance(district, int) and office == "house" else None,
+        across,
+        units,
+        names,
+        totals[0] if totals else None,
+        [[v if isinstance(v, int) and not isinstance(v, bool) else None for v in r["values"]] for r in rows],
+    )
+
+
+def _unit(label: object) -> str | None:
+    county, part = _county(label)
+    return None if county is None else f"part of {county}" if part else county
+
+
+def _cells(shape: Shape) -> tuple[list[str], dict[tuple[int, str], tuple[int | None, int, int]], dict[int, int | None]]:
+    grid, total = shape.grid, shape.total
+    if shape.across:
+        picks = [c for c, name in enumerate(shape.names) if name]
+        lines = [(r, u) for r, u in enumerate(shape.units) if u]
+    else:
+        picks = [r for r, name in enumerate(shape.names) if name and r < len(grid)]
+        lines = [(c, u) for c, u in enumerate(shape.units) if u]
+    names = [str(shape.names[k]) for k in picks]
+    cells: dict[tuple[int, str], tuple[int | None, int, int]] = {}
+    totals: dict[int, int | None] = {}
+    for n, k in enumerate(picks):
+        for i, unit in lines:
+            r, c = (i, k) if shape.across else (k, i)
+            if r < len(grid) and c < len(grid[r]):
+                cells[(n, unit.removeprefix("part of "))] = (grid[r][c], r, c)
+        if total is not None:
+            r, c = (total, k) if shape.across else (k, total)
+            totals[n] = grid[r][c] if r < len(grid) and c < len(grid[r]) else None
+    return names, cells, totals
+
+
+def _settle(
+    first: Shape, second: Shape | None, printed: set[str]
+) -> tuple[dict[tuple[int, int], tuple[int, str, str, str]], list[str]]:
+    names, one, sums = _cells(first)
+    others, two, again = _cells(second) if second is not None else (names, one, sums)
+    if len(names) != len(others):
+        return {}, [f"the reads find {len(names)} and {len(others)} candidates"]
+    settled: dict[tuple[int, int], tuple[int, str, str, str]] = {}
+    problems: list[str] = []
+    for n, name in enumerate(names):
+        units = sorted({u for k, u in one if k == n} | {u for k, u in two if k == n})
+        values = [((one.get((n, u)) or (None,))[0], (two.get((n, u)) or (None,))[0]) for u in units]
+        balanced = n in sums or n in again
+        if balanced:
+            values.append((sums.get(n), again.get(n)))
+        ruled = set()
+        for i, (x, y) in enumerate(values):
+            if x != y and (str(x) in printed) != (str(y) in printed):
+                values[i] = (x, x) if str(x) in printed else (y, y)
+                ruled.add(i)
+        disputed = [i for i, (x, y) in enumerate(values) if x != y]
+        if len(disputed) > 8:
+            problems.append(f"{name}: {len(disputed)} cells disagree")
+            continue
+        if disputed and not balanced:
+            problems.append(f"{name}: no printed total and {len(disputed)} cells disagree")
+            continue
+        if second is None and not balanced:
+            problems.append(f"{name}: one read and no printed total")
+            continue
+        fits = []
+        for picks in itertools.product((0, 1), repeat=len(disputed)):
+            trial = [v[0] for v in values]
+            for i, p in zip(disputed, picks):
+                trial[i] = values[i][p]
+            if not balanced or (trial[-1] is not None and sum(v or 0 for v in trial[: len(units)]) == trial[-1]):
+                fits.append(tuple(trial))
+        fits = list(dict.fromkeys(fits))
+        status = "agreed" if second is not None else "single"
+        if not fits and not disputed and not ruled and second is not None:
+            fits, status = [tuple(v[0] for v in values)], "unbalanced"
+        if len(fits) != 1:
+            problems.append(f"{name}: {len(fits)} ways to balance {values}")
+            continue
+        for i, unit in enumerate(units):
+            if (votes := fits[0][i]) is None:
+                continue
+            _, r, c = one.get((n, unit)) or two[(n, unit)]
+            how = "balanced" if i in disputed else "ocr" if i in ruled else status
+            settled[(r, c)] = (votes, how, unit, name)
+    return settled, problems
+
+
+def _locate(
+    settled: dict[tuple[int, int], tuple[int, str, str, str]],
+    words: list[tuple[str, tuple[int, int, int, int]]],
+    block: tuple[int, int, int, int],
+    across: bool,
+) -> dict[tuple[int, int], tuple[tuple[int, int, int, int], str]]:
+    hits: dict[tuple[int, int], list[tuple[int, int, int, int]]] = {}
+    for key, (votes, *_) in settled.items():
+        merged: list[tuple[int, int, int, int]] = []
+        for _, box in sorted((w for w in words if w[0] == str(votes)), key=lambda w: w[1][2] - w[1][0]):
+            if not any(abs(box[0] - m[0]) < 15 and abs(box[1] - m[1]) < 15 for m in merged):
+                merged.append(box)
+        hits[key] = merged
+    anchors = {key: found[0] for key, found in hits.items() if len(found) == 1}
+    if not across:
+        for key, found in hits.items():
+            if len(found) > 1 and max(b[1] for b in found) - min(b[1] for b in found) < 15:
+                anchors.setdefault(key, min(found))
+    for _ in range(2):
+        ys, xs = _axes(anchors)
+        anchors = {
+            (r, c): b for (r, c), b in anchors.items() if abs((b[1] + b[3]) / 2 - ys[r]) < 25 and abs(b[2] - xs[c]) < 80
+        }
+    ys, xs = _axes(anchors)
+    height = statistics.median(b[3] - b[1] for b in anchors.values()) if anchors else 30
+    digit = statistics.median((b[2] - b[0]) / len(str(settled[k][0])) for k, b in anchors.items()) if anchors else 20
+    wanted = {0: {r for r, _ in settled}, 1: {c for _, c in settled}}
+    for side, axis in enumerate((ys, xs)):
+        known = sorted(axis)
+        if not known or (len(known) == 1 and side == 1):
+            continue
+        if len(known) > 1:
+            step = statistics.median((axis[j] - axis[i]) / (j - i) for i, j in itertools.pairwise(known))
+        else:
+            step = height * 1.4
+        for k in wanted[side] - set(known):
+            below, above = [i for i in known if i < k], [i for i in known if i > k]
+            if below and above:
+                lo, hi = max(below), min(above)
+                axis[k] = axis[lo] + (axis[hi] - axis[lo]) * (k - lo) / (hi - lo)
+            elif below:
+                axis[k] = axis[max(below)] + step * (k - max(below))
+            else:
+                axis[k] = axis[min(above)] - step * (min(above) - k)
+    out: dict[tuple[int, int], tuple[tuple[int, int, int, int], str]] = {}
+    for (r, c), (votes, *_) in settled.items():
+        if (r, c) in anchors:
+            out[(r, c)] = (anchors[(r, c)], "unique")
+        elif r in ys and c in xs:
+            near = [b for b in hits[(r, c)] if abs((b[1] + b[3]) / 2 - ys[r]) < 25 and abs(b[2] - xs[c]) < 80]
+            width = digit * len(str(votes))
+            out[(r, c)] = (
+                (near[0], "aligned")
+                if near
+                else (
+                    (round(xs[c] - width), round(ys[r] - height / 2), round(xs[c]), round(ys[r] + height / 2)),
+                    "placed",
+                )
+            )
+        else:
+            out[(r, c)] = (block, "block")
+    return out
+
+
+def _axes(
+    anchors: dict[tuple[int, int], tuple[int, int, int, int]],
+) -> tuple[dict[int, float], dict[int, float]]:
+    ys = {
+        r: statistics.median((b[1] + b[3]) / 2 for (rr, _), b in anchors.items() if rr == r)
+        for r in {r for r, _ in anchors}
+    }
+    xs = {c: statistics.median(b[2] for (_, cc), b in anchors.items() if cc == c) for c in {c for _, c in anchors}}
+    return ys, xs
+
+
+def _surnames(label: str) -> list[str]:
+    words = [w for w in re.split(r"[\s,]+", re.sub(r"\(.*?\)", "", label)) if _plain(w) not in ("jr", "sr", "and")]
+    return [_plain(w) for w in words if len(_plain(w)) > 2]
+
+
+def _named(label: str, ballot: str, fuzzy: bool = True) -> bool:
+    words = [
+        w
+        for w in re.sub(r"\(.*\)", "", ballot).replace(",", " ").replace("-", " ").split()
+        if _plain(w) not in ("jr", "sr")
+    ]
+    if not words:
+        return False
+    surname = _plain(words[-1])
+    return any(
+        w == surname or fuzzy and difflib.SequenceMatcher(None, w, surname).ratio() >= 0.85 for w in _surnames(label)
+    )
+
+
+def _pick(cells: pl.DataFrame, known: list[tuple[UUID, str, str, int]]) -> dict[str, tuple[UUID, int]]:
+    picked: dict[str, tuple[UUID, int, bool]] = {}
+    signatures: set[tuple[tuple[str, int], ...]] = set()
+    for (label,), part in cells.group_by("label", maintain_order=True):
+        signature = tuple(sorted(zip(part["unit"], part["votes"])))
+        if signature in signatures:
+            continue
+        signatures.add(signature)
+        summed = int(part["votes"].sum())
+        people = [(o, t, name) for o, kind, name, t in known if kind in PEOPLE]
+        exact = [(o, t) for o, t, name in people if _named(str(label), name, False)]
+        named = exact or [(o, t) for o, t, name in people if _named(str(label), name)]
+        same = [(o, t) for o, t in named if t == summed]
+        if len(same) == 1:
+            picked[str(label)] = (*same[0], bool(exact))
+        elif len({o for o, _ in named}) == 1:
+            picked[str(label)] = (*named[0], bool(exact))
+        elif not named and len(same := [(o, t) for o, t, _ in people if t == summed]) == 1:
+            picked[str(label)] = (*same[0], False)
+    claims: dict[UUID, list[str]] = {}
+    for label, (option, _, _) in picked.items():
+        claims.setdefault(option, []).append(label)
+    for labels in claims.values():
+        if len(labels) > 1:
+            sure = [label for label in labels if picked[label][2]]
+            for label in labels:
+                if len(sure) != 1 or label != sure[0]:
+                    picked.pop(label)
+    return {label: (option, total) for label, (option, total, _) in picked.items()}
+
+
+def emit() -> Path:
+    frame = pl.read_parquet(PARSED / "values.parquet").filter(pl.col("year").is_in(YEARS))
+    shared = (
+        frame.filter(pl.col("office") == "house")
+        .group_by("year", "unit")
+        .agg(pl.col("district").n_unique().alias("districts"))
+        .filter(pl.col("districts") > 1)
+    )
+    split = {(int(y), str(u)) for y, u, _ in shared.iter_rows()}
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="New Jersey's federal and governor results by county from the state's general election results",
+            polity="US",
+        )
+        counties: dict[str, tuple[str, UUID, UUID]] = {
+            _plain(text): (code, unit, area)
+            for code, unit, area, text in conn.execute(
+                """select u.code, u.id, u.area_id, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '34%%'"""
+            ).fetchall()
+        }
+        newjersey = cs.polity("US-NJ")
+        contests: dict[str, UUID] = dict(
+            conn.execute(
+                """select value, entity_id from external_id where scheme = 'us.contest'
+                   and value ~ '^19[2-7][0-9][^:]*:NJ:(president|governor|senate|senate:special|house:[0-9]+)$'"""
+            ).fetchall()
+        )
+        held: dict[str, tuple[UUID, UUID | None, date, int, int, list[tuple[UUID, str, str, int]]]] = {}
+
+        def facts(key: str) -> tuple[UUID, UUID | None, date, int, int, list[tuple[UUID, str, str, int]]]:
+            if key not in held:
+                row = conn.execute(
+                    """select c.election_id, c.district_area_id, e.date_from, coalesce(min(v.count_round), 0),
+                              coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
+                                       sum(v.value) filter (where v.measure = 1), 0)::bigint
+                       from contest c join election e on e.id = c.election_id
+                       left join result_set rs on rs.contest_id = c.id and rs.is_default
+                       left join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
+                       where c.id = %s group by 1, 2, 3""",
+                    [contests[key]],
+                ).fetchone()
+                assert row is not None
+                election, district_area, day, first, official = row
+                known = conn.execute(
+                    """select o.id, o.kind, coalesce(o.ballot_label, ''),
+                              coalesce((select sum(v.value)::bigint from result_value v
+                               where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1), 0)
+                       from contest_option o left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+                       where o.contest_id = %s""",
+                    [contests[key]],
+                ).fetchall()
+                held[key] = (election, district_area, day, first, official, known)
+            return held[key]
+
+        def keys(year: int, office: str, district: int | None) -> list[str]:
+            if office == "house":
+                ends = (f":NJ:house:{district}",)
+            else:
+                offices = ("president", "governor", "senate") if office == "statewide" else (office,)
+                ends = tuple(f":NJ:{o}{tail}" for o in offices for tail in ("", ":special"))
+            return [k for k in contests if k[:4] == str(year) and k.endswith(ends)]
+
+        chosen: dict[str, list[pl.DataFrame]] = {}
+        for (table,), cells in frame.group_by("table", maintain_order=True):
+            year, office, district = int(cells["year"][0]), str(cells["office"][0]), cells["district"][0]
+            labels = cells["label"].unique(maintain_order=True).to_list()
+            scored = []
+            for key in keys(year, office, district):
+                known = facts(key)[5]
+                hits = sum(
+                    any(kind in PEOPLE and _named(label, name) for _, kind, name, _ in known) for label in labels
+                )
+                scored.append((hits, key))
+            scored.sort(reverse=True)
+            if not scored or scored[0][0] < min(2, len(labels)) or (len(scored) > 1 and scored[1][0] == scored[0][0]):
+                print(f"{table} {office} {district or ''}: no contest ({scored[:2]})")
+                continue
+            chosen.setdefault(scored[0][1], []).append(cells)
+        PAGES.mkdir(parents=True, exist_ok=True)
+        sources: dict[int, UUID] = {}
+        pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
+        loaded = 0
+        for key, tables in sorted(chosen.items()):
+            election, district_area, day, first, official, known = facts(key)
+            if len(tables) > 1 and any("recount" in _plain(t["title"][0]) for t in tables):
+                tables = [t for t in tables if "recount" in _plain(t["title"][0])]
+            picks = [_pick(t, known) for t in tables]
+            fits = [
+                sum(sum(t.filter(pl.col("label") == label)["votes"]) == total for label, (_, total) in pick.items())
+                for t, pick in zip(tables, picks)
+            ]
+            merged = pl.concat(
+                t.with_columns(
+                    option=pl.col("label").replace_strict({k: str(v[0]) for k, v in pick.items()}, default=None)
+                )
+                for t, pick in zip(tables, picks)
+            )
+            if merged.unique(["option", "unit", "votes"]).select("option", "unit").is_duplicated().any():
+                best = max(fits)
+                if fits.count(best) > 1:
+                    print(f"{key}: tables disagree")
+                    continue
+                tables, picks = [tables[fits.index(best)]], [picks[fits.index(best)]]
+            picked = {k: v[0] for pick in picks for k, v in pick.items()}
+            lines = pl.concat(tables)
+            lines = lines.with_columns(
+                option=pl.col("label").replace_strict({k: str(v) for k, v in picked.items()}, default=None)
+            )
+            if (
+                lines.filter(pl.col("option").is_not_null())
+                .unique(["option", "unit", "votes"])
+                .select("option", "unit")
+                .is_duplicated()
+                .any()
+            ):
+                print(f"{key}: two columns name one candidate")
+                continue
+            loose = lines.filter(pl.col("option").is_null())
+            signatures = {
+                tuple(sorted(zip(part["unit"], part["votes"])))
+                for _, part in lines.filter(pl.col("option").is_not_null()).group_by("table", "label")
+            }
+            kept: list[tuple[str, str]] = []
+            for (table, label), part in loose.group_by("table", "label", maintain_order=True):
+                signature = tuple(sorted(zip(part["unit"], part["votes"])))
+                if signature not in signatures:
+                    signatures.add(signature)
+                    kept.append((str(table), str(label)))
+            loose = loose.filter(
+                pl.concat_str("table", "label", separator="\x1f").is_in([f"{t}\x1f{l}" for t, l in kept])
+            )
+            lines = loose.vstack(
+                lines.filter(pl.col("option").is_not_null()).unique(
+                    ["option", "unit", "votes"], keep="first", maintain_order=True
+                )
+            )
+            totals = {str(o): t for o, _, _, t in known}
+            shaky = [
+                str(label)
+                for (label, option), cells in lines.group_by("label", "option")
+                if (cells["status"] == "unbalanced").any() and totals.get(str(option)) != int(cells["votes"].sum())
+            ]
+            if shaky:
+                print(f"{key}: {shaky} miss the printed total and the held total, not emitted")
+                continue
+            if lines["option"].is_null().any():
+                pool = cs.key("us.option", f"{key}:others:nj_results")
+                cs.add("contest_option", id=pool, contest_id=contests[key], kind="others", ballot_label="Others")
+                lines = lines.with_columns(pl.col("option").fill_null(str(pool)))
+            counted = int(lines["votes"].sum())
+            matched = lines.filter(pl.col("option").is_in([str(o) for o, *_ in known]))
+            owned = sum(t for o, _, _, t in known if str(o) in set(matched["option"]))
+            if not official or counted < 0.98 * official or abs(int(matched["votes"].sum()) - owned) > 0.02 * owned:
+                print(f"{key}: {counted} by county against {official} held, not emitted")
+                continue
+            for option, kind, name, total in known:
+                sum_ = int(lines.filter(pl.col("option") == str(option))["votes"].sum())
+                if total and sum_ != total:
+                    print(f"{key}: {name or kind} {sum_} by county, {total} in the default set")
+            year = int(lines["year"][0])
+            if year not in sources:
+                title = f"Results of the General Election Held {day:%B} {day.day}, {year}"
+                sources[year] = cs.source(PUBLISHER, title)
+                cs.add(
+                    "source",
+                    id=sources[year],
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=URL.format(year=year),
+                    license="Public domain",
+                )
+            artifact = cs.artifact(pdf(year), sources[year])
+            for number in lines["page"].unique().to_list():
+                if (year, number) in pages:
+                    continue
+                image = PAGES / f"{pdf(year).sha256}-{number}.png"
+                if not image.exists():
+                    page(year, number).resize(
+                        (round(page(year, number).width / 3), round(page(year, number).height / 3))
+                    ).save(image)
+                with Image.open(image) as rendered:
+                    width, height = rendered.size
+                pages[(year, number)] = (cs.page(artifact, number), width, height)
+                cs.add(
+                    "source_page",
+                    id=pages[(year, number)][0],
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{pdf(year).sha256}-{number}.png",
+                    width=width,
+                    height=height,
+                )
+            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contests[key],
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=sources[year],
+                is_default=False,
+                completeness=round(min(counted / official, 1), 4),
+            )
+            district = lines["district"][0]
+            units: dict[str, UUID] = {}
+            for county in lines["unit"].unique(maintain_order=True).to_list():
+                code, parent, area = counties[_plain(county)]
+                if district is None or (year, county) not in split:
+                    units[county] = parent
+                    continue
+                part = f"{year}:{code}:{district}"
+                units[county] = cs.unit("us.county_part", part)
+                cs.add(
+                    "reporting_unit",
+                    id=units[county],
+                    polity_id=newjersey,
+                    scheme_code="us.county_part",
+                    code=part,
+                    parent_id=parent,
+                    area_relation="within",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+                if district_area is not None:
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=units[county],
+                        area_id=district_area,
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
+            for (county, option), cells in lines.group_by("unit", "option", maintain_order=True):
+                unit = units[str(county)]
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=UUID(str(option)),
+                    channel=0,
+                    measure=1,
+                    count_round=first,
+                    flags=DIGITIZED | (DERIVED if cells.height > 1 else 0),
+                    value=int(cells["votes"].sum()),
+                )
+                boxes = [list(box) for box in cells["box"]]
+                number, width, height = pages[(year, int(cells["page"][0]))]
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=UUID(str(option)),
+                    channel=0,
+                    measure=1,
+                    count_round=first,
+                    page_id=number,
+                    source_id=None,
+                    x0=min(box[0] for box in boxes) / width / 3,
+                    y0=min(box[1] for box in boxes) / height / 3,
+                    x1=max(box[2] for box in boxes) / width / 3,
+                    y1=max(box[3] for box in boxes) / height / 3,
+                )
+            loaded += 1
+        print(f"{loaded} contests")
+        return cs.write()
