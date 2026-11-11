@@ -12963,8 +12963,10 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 created.add(tail)
                 known[tail] = []
             elif template != tail and template in templates:
+                if (ending := re.search(r":unexpired(-\d{4})?$", tail)) and tail[: ending.start()] in templates:
+                    template = tail[: ending.start()]
                 base = list(templates[template])
-                if ending := re.search(r":unexpired(-\d{4})?$", tail):
+                if ending:
                     base[15] = f"{base[15]}-unexpired{ending[1] or ''}"
                     known[tail] = known.get(template, [])
                 elif template == f"{tail}:remainder":
