@@ -880,15 +880,16 @@ def attach(
                             surname in texts or "".join(words[-2:]) in texts,
                             len(set(words) & texts),
                             kind != "write_in",
+                            bool(fec),
                             option,
                         )
-                        for option, kind, _, texts, _ in known
+                        for option, kind, _, texts, fec in known
                     ),
-                    key=lambda score: score[:3],
+                    key=lambda score: score[:4],
                     reverse=True,
                 )
-                if scores and scores[0][0] and (len(scores) == 1 or scores[0][:3] != scores[1][:3]):
-                    picked[candidate] = str(scores[0][3])
+                if scores and scores[0][0] and (len(scores) == 1 or scores[0][:4] != scores[1][:4]):
+                    picked[candidate] = str(scores[0][4])
                     continue
                 near = {
                     option
