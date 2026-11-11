@@ -1514,6 +1514,7 @@ def plan(
     unmatched: list[str] = []
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
     local_keys: set[str] = set()
+    clashed: set[str] = set()
     for (state, office, district), group in frame.group_by("state", "office", "district", maintain_order=True):
         contest_key = f"{DAY}:{state}:{office}" + (f":{district}" if district else "")
         found = conn.execute(
@@ -1910,6 +1911,7 @@ def plan(
                     )
                     matched[office] += 1
                     continue
+                clashed.add(key)
                 unmatched.append(
                     f"{'state' if office == 'state' else 'local'} {state}: {name} ({', '.join(sorted(places)[:2])}): duplicate of {key}"
                 )
@@ -1917,6 +1919,9 @@ def plan(
             matched[office] += 1
             local_keys.add(key)
             work.append((state, key, contest, part, place))
+        for entry in [entry for entry in work if entry[0] == state and entry[1] in clashed]:
+            work.remove(entry)
+            unmatched.append(f"local {state}: several feed races share {entry[1]}; none counted")
         for office, label in (("other", "local"), ("state", "state")):
             total = sum(1 for race in races if race[0] == office)
             if total:
