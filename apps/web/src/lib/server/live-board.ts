@@ -154,7 +154,9 @@ export async function pieces(
     ),
     picked as materialized (
       select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
-      from edge e join area_geometry g on g.geom && e.geom and g.valid @> ${date}::date
+      from (
+        select ST_Collect(d.geom) as geom from edge e cross join ST_Dump(e.geom) d group by ST_XMin(d.geom) < 0
+      ) e join area_geometry g on g.geom && e.geom and g.valid @> ${date}::date
       join area a on a.id = g.area_id and a.scheme_code = ${scheme}
       order by a.id, g.valid_from desc nulls last
     ),
