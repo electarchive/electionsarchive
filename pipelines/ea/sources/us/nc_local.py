@@ -11,6 +11,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import display
 from ea.sources.us.ncsbe import FILES, PUBLISHER, TITLE
 from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
@@ -919,7 +920,7 @@ def emit() -> Path:
                     if person not in persons:
                         persons[person] = choice
                         cs.add("person", id=person)
-                        name(person, choice)
+                        name(person, display(choice) if choice.isupper() else choice)
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     cs.add(
                         "contest_option",
