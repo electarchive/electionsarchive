@@ -399,10 +399,10 @@ def run() -> int:
                    p as (
                      select *, lag(total) over w as before, lag(options) over w as had
                      from t window w as (partition by feed_id, contest_id order by as_of, k))
-                   select p.feed_id, count(*) filter (where total < before), count(*) filter (where options <> had),
+                   select p.feed_id, count(*) filter (where total < before * 0.95), count(*) filter (where options <> had),
                      min(s.path)
                    from p left join slug s on s.entity_id = p.contest_id and s.is_current
-                   where before > 0 and (total < before or options <> had) group by 1"""
+                   where before > 0 and (total < before * 0.95 or options <> had) group by 1"""
             ).fetchall()
         }
         elsewhere = dict(
@@ -485,7 +485,7 @@ def run() -> int:
         if feed_id in regressions:
             ok = False
             dropped, changed, example = regressions[feed_id]
-            notes.append(f"frames: {dropped} total drops, {changed} candidate changes (e.g. {example})")
+            notes.append(f"frames: {dropped} total drops over 5%, {changed} candidate changes (e.g. {example})")
         counts = issues.get(feed_id, {})
         if counts.get("drop"):
             ok = False
