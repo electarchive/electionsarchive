@@ -9,11 +9,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda, govmint
+from ea.sources.us import ceda, civmint, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.co_tabor_2026"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 MANUAL = DATA / "inbox" / "manual" / "MF-376"
@@ -453,21 +453,6 @@ def parse() -> None:
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
-        found: dict[str, tuple[UUID, UUID, str, str, str]] = {}
-        names: dict[str, list[str]] = {}
-        for scheme, code, polity, area, text, path in conn.execute(
-            """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
-               join area_code c on c.area_id = a.id
-               join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
-               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-               join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code in ('us.county', 'us.place', 'us.school_district') and left(c.code, 2) = '08'"""
-        ).fetchall():
-            key = f"{scheme}:{code}"
-            found[key] = (polity, area, text, path, code)
-            names.setdefault(ceda._city(text) if scheme == "us.place" else ceda._core(text), []).append(key)
-        slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/co/%%'").fetchall())
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -475,6 +460,9 @@ def emit() -> Path:
             summary="Colorado county and school district tax and debt questions on the November 3, 2026 ballot, with official wording",
             polity="US-CO",
         )
+        civil = civmint.Civil(conn, cs, "08", "CO")
+        found = civil.found
+        slugs = civil.slugs
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
         for county, (url, _, publisher) in COUNTIES.items():
@@ -489,11 +477,12 @@ def emit() -> Path:
             county_key = f"us.county:{row['county']}"
             source = sources[row["county"]]
             if re.match(r"(?i)(city|town) of ", entity):
-                options = names.get(ceda._city(re.sub(r"(?i)^(city|town) of ", "", entity)), [])
+                place = civil.place(re.sub(r"(?i)^(city|town) of ", "", entity))
+                options = [] if place is None else [place]
             elif county_key in found and entity == found[county_key][2]:
                 options = [county_key]
             elif "school district" in entity.lower():
-                options = names.get(ceda._core(entity), [])
+                options = civil.schools.get(ceda._core(entity), [])
             else:
                 options = []
             option = options[0] if len(options) == 1 else None
