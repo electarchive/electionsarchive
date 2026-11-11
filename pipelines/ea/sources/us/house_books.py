@@ -910,7 +910,7 @@ def emit(source: ModuleType) -> Path:
                 if source.REVISION > 1
                 else None
             )
-            fresh = result_set in cs.minted
+            fresh = result_set in cs.minted or key in getattr(source, "REREAD", ())
             if not fresh and conn.execute(
                 "select coalesce(bool_or(is_default), true) from result_set where id = %s", [result_set]
             ).fetchone() == (True,):
@@ -945,6 +945,10 @@ def emit(source: ModuleType) -> Path:
                 if total and sum_ != total:
                     ties = False
                     print(f"{key}: {name or kind} {sum_} by county, {total} in the default set")
+            if fresh and result_set not in cs.minted:
+                ties = conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone() == (
+                    True,
+                )
             if ties:
                 for row in conn.execute(
                     "select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness, supersedes_id"

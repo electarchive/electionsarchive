@@ -1,0 +1,171 @@
+year	state	county	candidate	votes
+1848	MD	kent	Cass	447
+1844	MD	washington	Clay	2633
+1844	VT	windham	Birney	385
+1844	VT	chittenden	Birney	386
+1844	CT	windham	Birney	363
+1848	NJ	hudson	Taylor	1434
+1844	NJ	middlesex	Polk	2023
+1848	PA	coinpart	Taylor	4695
+1848	PA	coinpart	Cass	3358
+1848	PA	coinpart	Van Buren	48
+1844	PA	coinpart	Clay	3437
+1844	PA	coinpart	Polk	2832
+1844	PA	coinpart	Birney	11
+1848	PA	citywds	Taylor	2181
+1848	PA	citywds	Cass	885
+1848	PA	citywds	Van Buren	41
+1844	PA	citywds	Clay	1696
+1844	PA	citywds	Polk	848
+1844	PA	citywds	Birney	14
+1848	PA	cityinpart	Taylor	8384
+1848	PA	cityinpart	Cass	4381
+1848	PA	cityinpart	Van Buren	278
+1844	PA	cityinpart	Clay	7618
+1844	PA	cityinpart	Polk	4520
+1844	PA	cityinpart	Birney	96
+1848	PA	springgn	Taylor	4785
+1848	PA	springgn	Cass	3003
+1848	PA	springgn	Van Buren	222
+1844	PA	springgn	Clay	2860
+1844	PA	springgn	Polk	2341
+1844	PA	springgn	Birney	34
+1848	PA	nliberties	Taylor	3086
+1848	PA	nliberties	Cass	3095
+1848	PA	nliberties	Van Buren	114
+1844	PA	nliberties	Clay	2802
+1844	PA	nliberties	Polk	3168
+1844	PA	nliberties	Birney	46
+1848	PA	germantn	Taylor	701
+1848	PA	germantn	Cass	470
+1848	PA	germantn	Van Buren	37
+1844	PA	germantn	Clay	578
+1844	PA	germantn	Polk	444
+1844	PA	germantn	Birney	8
+1848	PA	kensington	Taylor	3305
+1848	PA	kensington	Cass	2190
+1848	PA	kensington	Van Buren	46
+1844	PA	kensington	Clay	1784
+1844	PA	kensington	Polk	1854
+1844	PA	kensington	Birney	7
+1848	PA	districts	Taylor	3584
+1848	PA	districts	Cass	4128
+1848	PA	districts	Van Buren	100
+1844	PA	districts	Clay	2506
+1844	PA	districts	Polk	2620
+1844	PA	districts	Birney	12
+1848	PA	delaware	Taylor	2194
+1848	PA	delaware	Cass	1547
+1848	PA	delaware	Van Buren	84
+1844	PA	delaware	Clay	2090
+1844	PA	delaware	Polk	1466
+1844	PA	delaware	Birney	15
+1848	PA	montgomry	Taylor	5040
+1848	PA	montgomry	Cass	5627
+1848	PA	montgomry	Van Buren	251
+1844	PA	montgomry	Clay	4491
+1844	PA	montgomry	Polk	5596
+1844	PA	montgomry	Birney	49
+1848	PA	bucks	Taylor	5140
+1848	PA	bucks	Cass	5364
+1848	PA	bucks	Van Buren	163
+1844	PA	bucks	Clay	4862
+1844	PA	bucks	Polk	5251
+1844	PA	bucks	Birney	27
+1848	PA	lehigh	Taylor	2978
+1848	PA	lehigh	Cass	3199
+1848	PA	lehigh	Van Buren	3
+1844	PA	lehigh	Clay	2553
+1844	PA	lehigh	Polk	2811
+1844	PA	lehigh	Birney	
+1848	PA	chester	Taylor	5949
+1848	PA	chester	Cass	5360
+1848	PA	chester	Van Buren	507
+1844	PA	chester	Clay	6070
+1844	PA	chester	Polk	5550
+1844	PA	chester	Birney	106
+1848	PA	lancaster	Taylor	11390
+1848	PA	lancaster	Cass	6080
+1848	PA	lancaster	Van Buren	163
+1844	PA	lancaster	Clay	10295
+1844	PA	lancaster	Polk	5943
+1844	PA	lancaster	Birney	21
+1848	PA	berks	Taylor	5082
+1848	PA	berks	Cass	9484
+1848	PA	berks	Van Buren	51
+1844	PA	berks	Clay	4000
+1844	PA	berks	Polk	8674
+1844	PA	berks	Birney	3
+1844	PA	northamton	Polk	3870
+1844	PA	blair	Clay	
+1844	PA	blair	Polk	
+1844	PA	huntingdon	Clay	4086
+1844	PA	huntingdon	Polk	2575
+1844	VA	pittsylvania	Clay	838
+1844	VA	jamescity	Clay	103
+1844	VA	jamescity	Polk	39
+1844	VA	york	Polk	109
+1848	VA	jackson	Taylor	239
+1848	VA	wood	Taylor	430
+1844	NC	chatham	Clay	1136
+1844	GA	murray	Clay	303
+1848	GA	green	Cass	139
+1844	GA	jasper	Polk	536
+1844	GA	morgan	Polk	348
+1848	GA	wilkinson	Cass	498
+1844	GA	jefferson	Polk	108
+1844	GA	scriven	Polk	278
+1848	MS	desoto	Taylor	836
+1848	MS	panola	Taylor	578
+1844	TN	washington	Clay	881
+1848	TN	coffee	Taylor	332
+1848	TN	montgomery	Taylor	1288
+1848	TN	henry	Taylor	860
+1848	KY	allen	Taylor	423
+1848	KY	wayne	Taylor	689
+1848	KY	clay	Taylor	377
+1848	OH	hamilton	Taylor	9018
+1844	OH	hamilton	Birney	298
+1844	OH	greene	Birney	126
+1844	OH	montgomery	Polk	3101
+1848	OH	seneca	Taylor	1536
+1848	OH	clermont	Cass	2833
+1848	OH	highland	Van Buren	342
+1848	OH	licking	Taylor	3030
+1848	IL	jersey	Taylor	530
+1848	IL	menard	Cass	488
+1848	IL	morgan	Taylor	1372
+1844	IL	sangamon	Clay	1837
+1848	MO	shelby	Taylor	175
+1848	MO	shelby	Cass	263
+1848	MO	dekalb	Taylor	37
+1848	MO	gentry	Cass	396
+1848	MO	mercer	Cass	183
+1848	MO	benton	Cass	382
+1848	MO	henry	Cass	239
+1848	MO	vanburen	Taylor	270
+1848	MI	berrien	Taylor	953
+1848	MI	ionia	Taylor	379
+1844	VA	petersburg	Clay	376
+1844	VA	campbell	Clay	833
+1844	VA	smyth	Polk	371
+1844	NC	mcdowell	Clay	
+1844	NC	mcdowell	Polk	
+1848	NC	iredell	Taylor	1137
+1844	NC	cabarrus	Polk	374
+1848	VT	orange	Van Buren	1308
+1844	LA	stlandry	Clay	789
+1844	KY	grant	Polk	493
+1848	OH	madison	Taylor	1329
+1844	GA	rabun	Clay	34
+1844	GA	putnam	Clay	430
+1848	IL	lee	Taylor	300
+1844	IL	tazewell	Birney	33
+1848	MO	carroll	Cass	298
+1848	MO	holt	Cass	248
+1848	MO	linn	Taylor	230
+1848	MO	dallas	Cass	283
+1848	MO	hickory	Cass	224
+1848	MO	saline	Taylor	536
+1848	MO	vanburen	Cass	420
+1848	MI	genesee	Taylor	876
