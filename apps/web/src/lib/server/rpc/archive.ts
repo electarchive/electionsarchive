@@ -4619,13 +4619,17 @@ async function places(
             and (c.office_id = own.office_id or c.body_id = own.body_id)
           join result_set rs on rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
           where own.id = ${contest.id}::uuid
+        ),
+        equal as materialized (
+          select ru.area_id as id, ru.k from straddling s
+          join reporting_unit ru on ru.area_id = s.id and ru.area_relation = 'equals'
         )
         select s.k from straddling s
         where not exists (
-            select from reporting_unit ru
-            join result_value v on v.unit_k = ru.k
-            join result_set rs on rs.k = v.result_set_k and rs.contest_id = ${contest.id}::uuid
-            where ru.area_id = s.id and ru.area_relation = 'equals'
+            select from equal q
+            join result_set rs on rs.contest_id = ${contest.id}::uuid
+            join result_value v on v.result_set_k = rs.k and v.unit_k = q.k
+            where q.id = s.id
           )
           or exists (select from siblings x join result_rollup_unit u on u.result_set_k = x.k and u.area_k = s.k)
           or exists (select from siblings x join result_rollup_sum r on r.result_set_k = x.k and r.area_k = s.k)
