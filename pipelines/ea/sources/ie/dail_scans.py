@@ -1,14 +1,17 @@
 import base64
+import difflib
 import io
 import json
 import re
 import subprocess
 import tempfile
 import time
+import unicodedata
 import urllib.request
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from itertools import pairwise
 from pathlib import Path
+from uuid import UUID
 
 import numpy as np
 from anthropic.types import ImageBlockParam, TextBlockParam
@@ -17,7 +20,11 @@ from PIL import Image
 from scipy import ndimage
 
 from ea import batch, raw
-from ea.store import DATA
+from ea.changeset import Changeset, slug
+from ea.sources.ie.dail import ALIASES as DAIL_ALIASES
+from ea.sources.ie.dail import EXHAUSTED, PARTY_CODES, QUOTA, REGISTERED, VALID, VOTES
+from ea.sources.ie.dail_pdf import ORDINALS
+from ea.store import DATA, connect
 
 SOURCE = "ie.dail_scans"
 VERSION = "1"
@@ -533,3 +540,1004 @@ def fetch() -> None:
                     (crop.width * crop.height / 750 * price_in + 2000 * price_out) / 1e6,
                 )
     print(batch.ensure(SOURCE, "cells", cells)[1])
+
+
+NUMBER = re.compile(r"([+-]*)\s*(\d{1,3}(?:[,.]\d{3})+|\d+)")
+TOTAL = re.compile(r"^\W*total")
+SPOILT = re.compile(r"non.?transfer|not effective|papers")
+
+
+def amounts(text: str) -> list[int]:
+    found = []
+    for sign, digits in NUMBER.findall(text.replace("—", "").replace("–", "-")):
+        value = int(re.sub(r"\D", "", digits))
+        found.append(-value if "-" in sign else value)
+    return found
+
+
+def answer(path: Path) -> dict:
+    message = json.loads(path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
+def cell_read(year: int, page: Path, tile: dict) -> dict | None:
+    try:
+        return answer(raw.cached(SOURCE, cell_key(year, page, tile)).path)
+    except LookupError:
+        return None
+
+
+def person(label: str) -> str:
+    return re.sub(r"[^a-z]", "", re.sub(r"\(.*", "", label.lower()).split(",")[0])
+
+
+def role(label: str) -> str:
+    folded = label.lower()
+    if TOTAL.search(folded):
+        return "total"
+    if SPOILT.search(folded):
+        return "spoilt"
+    return "candidate"
+
+
+def similar(a: str, b: str) -> float:
+    return difflib.SequenceMatcher(None, fold(a), fold(b)).ratio()
+
+
+def align(base: list[dict], other: list[dict], numbers: bool = False) -> list[int | None]:
+    def score(row: dict, candidate: dict, index: int, position: int) -> float:
+        points = similar(row["label"], candidate["label"]) + (role(row["label"]) == role(candidate["label"]))
+        if numbers:
+            mine = {value for cell in row["cells"] for value in amounts(cell) if value > 0}
+            theirs = {value for cell in candidate["cells"] for value in amounts(cell) if value > 0}
+            points += 2 * len(mine & theirs) / max(len(mine | theirs), 1)
+            points += 0.3 * (len(base) == len(other) and index == position)
+        return points
+
+    matched: list[int | None] = []
+    used: set[int] = set()
+    for position, row in enumerate(base):
+        kind = role(row["label"])
+        options = [
+            (score(row, candidate, index, position), index)
+            for index, candidate in enumerate(other)
+            if index not in used and (kind == "candidate") == (role(candidate["label"]) == "candidate")
+        ]
+        best = max(options, default=(0.0, -1))
+        if best[0] >= (1.5 if kind != "candidate" else 0.6):
+            used.add(best[1])
+            matched.append(best[1])
+        else:
+            matched.append(None)
+    return matched
+
+
+def grid(year: int, page: Path, tiles: list[dict]) -> dict | None:
+    reads = [
+        (tile, got) for tile in sorted(tiles, key=lambda tile: tile["first"]) if (got := cell_read(year, page, tile))
+    ]
+    if not reads or not any(got["rows"] for _, got in reads):
+        return None
+    rows = [
+        {"label": row["label"], "cells": []}
+        for row in max((got["rows"] for _, got in reads), key=len)
+        if row["label"].strip() and not re.fullmatch(r"\W*(votes|count|result|candidates?)\W*", row["label"].lower())
+    ]
+    headings: list[str] = []
+    for tile, got in reads:
+        width = len(tile["columns"])
+        heads = [*got["headings"][:width], *[""] * (width - len(got["headings"]))]
+        matched = align(rows, got["rows"])
+        for row, index in zip(rows, matched, strict=True):
+            cells = got["rows"][index]["cells"] if index is not None else []
+            row["cells"].extend([*cells[:width], *[""] * (width - len(cells))])
+        headings.extend(heads)
+    keep = [column for column in range(len(headings)) if any(amounts(row["cells"][column]) for row in rows)]
+    return {
+        "headings": [headings[column] for column in keep],
+        "rows": [{"label": row["label"], "cells": [row["cells"][column] for column in keep]} for row in rows],
+    }
+
+
+def layout(table: dict) -> list[str]:
+    kinds: list[str] = []
+    rows = table["rows"]
+    for column, heading in enumerate(table["headings"]):
+        cells = [row["cells"][column] for row in rows]
+        head = heading.lower()
+        if column == 0:
+            signed = sum(bool(re.match(r"\s*[+-]\s*\d", cell)) for cell in cells)
+            kinds.append("transfer" if signed >= 2 else "first")
+        elif sum(len(amounts(cell)) == 2 for cell in cells) >= 2 or "and result" in head:
+            kinds.append("combined")
+        elif "transfer" in head or "distribution" in head:
+            kinds.append("transfer")
+        elif "result" in head:
+            kinds.append("result")
+        else:
+            kinds.append("result" if kinds[-1] == "transfer" else "transfer")
+    return kinds
+
+
+def series(table: dict) -> dict:
+    kinds = layout(table)
+    results: list[list[int | None]] = [[] for _ in table["rows"]]
+    transfers: list[list[int | None]] = [[] for _ in table["rows"]]
+    for column, kind in enumerate(kinds):
+        for index, row in enumerate(table["rows"]):
+            found = amounts(row["cells"][column])
+            text = row["cells"][column].strip()
+            if kind == "first":
+                results[index].append(found[0] if found else None)
+            elif kind == "transfer":
+                if not results[index]:
+                    results[index].append(None)
+                transfers[index].append(found[0] if found else None)
+            elif kind == "result":
+                if len(transfers[index]) < len(results[index]):
+                    transfers[index].append(None)
+                results[index].append(found[-1] if found else None)
+            elif len(found) == 2:
+                transfers[index].append(found[0])
+                results[index].append(found[1])
+            elif found and re.match(r"[+-]", text):
+                transfers[index].append(found[0])
+                results[index].append(None)
+            else:
+                transfers[index].append(None)
+                results[index].append(found[0] if found else None)
+    return {"kinds": kinds, "results": results, "transfers": transfers}
+
+
+def page_grid(table: dict) -> dict:
+    width = max(len(row["cells"]) for row in table["rows"])
+    return {
+        "headings": ["first", *["transfer", "result"] * ((width - 1) // 2), *["transfer"] * ((width - 1) % 2)],
+        "rows": [
+            {"label": row["label"], "cells": [*row["cells"], *[""] * (width - len(row["cells"]))]}
+            for row in table["rows"]
+        ],
+    }
+
+
+def merge(page: dict | None, cells: dict | None) -> dict:
+    base = page or cells
+    assert base is not None
+    sources = [got for got in (cells, page) if got is not None]
+    matched = [
+        align(base["rows"], got["rows"], True) if got is not base else list(range(len(base["rows"]))) for got in sources
+    ]
+    found = [series(got) for got in sources]
+    if len(found) == 2:
+        reference = [found[1]["results"][where] if where is not None else [] for where in matched[1]]
+        mine = [found[0]["results"][where] if where is not None else [] for where in matched[0]]
+
+        def agreement(shift: int) -> int:
+            return sum(
+                1
+                for left, right in zip(mine, reference, strict=True)
+                for count, value in enumerate(left)
+                if value and 0 <= count + shift < len(right) and right[count + shift] == value
+            )
+
+        shift = max((0, 1, -1, 2), key=agreement)
+        if shift > 0:
+            found[0]["results"] = [[None] * shift + row for row in found[0]["results"]]
+            found[0]["transfers"] = [[None] * shift + row for row in found[0]["transfers"]]
+        elif shift < 0:
+            found[0]["results"] = [row[-shift:] for row in found[0]["results"]]
+            found[0]["transfers"] = [row[-shift:] for row in found[0]["transfers"]]
+    counts = max(
+        (count + 1 for got in found for row in got["results"] for count, value in enumerate(row) if value is not None),
+        default=0,
+    )
+    rows: list[dict] = []
+    for index, row in enumerate(base["rows"]):
+        reads = [
+            (got["results"][where], got["transfers"][where])
+            for got, mapping in zip(found, matched, strict=True)
+            if (where := mapping[index]) is not None
+        ]
+        rows.append({"label": row["label"], "role": role(row["label"]), "reads": reads})
+    for row in rows:
+
+        def consistent(read: tuple[list[int | None], list[int | None]]) -> float:
+            results, moved = read
+            good = sum(
+                abs((results[count] or 0) - (results[count - 1] or 0)) == abs(moved[count - 1] or 0)
+                for count in range(1, min(len(results), len(moved) + 1))
+            )
+            return good + 0.5 * (read is row["reads"][0])
+
+        ranked = sorted(row["reads"], key=consistent, reverse=True)
+        row["results"] = [
+            next((results[count] for results, _ in ranked if count < len(results) and results[count] is not None), 0)
+            for count in range(counts)
+        ]
+    return {"rows": rows, "counts": counts}
+
+
+def overlap(a: dict, b: dict) -> float:
+    matched = align(a["rows"], b["rows"], True)
+    return sum(index is not None for index in matched) / max(len(matched), 1)
+
+
+def repair(merged: dict, valid: int | None) -> None:
+    if valid is None:
+        return
+    for count in range(merged["counts"]):
+        rows = [row for row in merged["rows"] if row["role"] != "total"]
+        gap = valid - sum(row["results"][count] for row in rows)
+        if not gap:
+            continue
+        fixes = [
+            (row, option)
+            for row in rows
+            for results, _ in row["reads"]
+            if count < len(results) and (option := results[count] or 0) - row["results"][count] == gap
+        ]
+        if len({id(row) for row, _ in fixes}) == 1:
+            row, option = fixes[0]
+            row["results"][count] = option
+
+
+def poll(merged: dict, table: dict) -> int | None:
+    printed = [
+        value
+        for row in merged["rows"]
+        if row["role"] == "total"
+        for results, _ in row["reads"]
+        for value in results
+        if value
+    ]
+    printed.extend(amounts(table["valid_poll"])[:1] * 2)
+    return max(printed, key=printed.count) if printed else None
+
+
+def assess(merged: dict, table: dict) -> list[str]:
+    issues = []
+    valid = merged["valid"]
+    seats = (amounts(table["seats"]) or [None])[0]
+    quota = (amounts(table["quota"]) or [None])[0]
+    rows = [row for row in merged["rows"] if row["role"] != "total"]
+    if sum(row["role"] == "total" for row in merged["rows"]) != 1:
+        issues.append("no total row")
+    if valid is None or seats is None:
+        issues.append("no valid poll or seats")
+    elif quota != valid // (seats + 1) + 1:
+        issues.append(f"quota {quota} is not the Droop quota of {valid} for {seats}")
+    for count in range(merged["counts"]):
+        summed = sum(row["results"][count] for row in rows)
+        if summed != valid:
+            issues.append(f"count {count + 1}: rows sum to {summed}, valid poll {valid}")
+    for row in rows:
+        for count in range(1, merged["counts"]):
+            before, after = row["results"][count - 1], row["results"][count]
+            moves = {
+                abs(value)
+                for _, moved in row["reads"]
+                if count - 1 < len(moved)
+                for value in variants(moved[count - 1] or 0)
+            }
+            if abs(after - before) not in moves and not (
+                after == 0
+                and row["role"] == "candidate"
+                and not any(results[count] for results, _ in row["reads"] if count < len(results))
+            ):
+                issues.append(f"{row['label']}: count {count + 1}: {before} to {after}, transfers {sorted(moves)}")
+    names = {person(row["label"]) for row in rows if row["role"] == "candidate"}
+    for elected in table["elected"]:
+        if not any(name and name in fold(elected) for name in names):
+            issues.append(f"elected {elected} not among the candidates")
+    return issues
+
+
+def tables(year: int) -> list[dict]:
+    found = []
+    for page, index, table in wanted_tables(year):
+        target = PARSED / "tiles" / str(year) / f"{page.stem}.json"
+        groups: dict[int, list[dict]] = {}
+        for tile in json.loads(target.read_text()) if target.exists() else []:
+            groups.setdefault(tile["table"], []).append(tile)
+        built = [cells for tiles in groups.values() if (cells := grid(year, page, tiles)) is not None]
+        shaped = page_grid(table)
+        best = max(built, key=lambda cells: overlap(shaped, cells), default=None)
+        cells = best if best is not None and overlap(shaped, best) >= 0.5 else None
+        merged = merge(shaped, cells)
+        printed = len(
+            {word for heading in table["counts"] for word in ORDINALS if heading.lower().startswith(word.lower())}
+        )
+        if table["complete"] and 0 < printed < merged["counts"]:
+            merged["counts"] = printed
+            for row in merged["rows"]:
+                row["results"] = row["results"][:printed]
+        merged["valid"] = valid = poll(merged, table)
+        repair(merged, valid)
+        merged["changes"] = solve(merged, valid) if valid else []
+        found.append(
+            {
+                "year": year,
+                "page": page.stem,
+                "index": index,
+                "table": table,
+                "merged": merged,
+                "cells": cells is not None,
+            }
+        )
+    return found
+
+
+CONFUSED = {"3": "58", "5": "36", "6": "58", "8": "3609", "9": "80", "0": "89", "1": "7", "7": "1"}
+
+
+def variants(value: int) -> list[int]:
+    text = str(abs(value))
+    found = [value]
+    for position, digit in enumerate(text):
+        for other in CONFUSED.get(digit, ""):
+            if position == 0 and other == "0":
+                continue
+            found.append(int(text[:position] + other + text[position + 1 :]))
+    return list(dict.fromkeys(found))
+
+
+def solve(merged: dict, valid: int) -> list[tuple[int, int, int, int]]:
+    rows = [row for row in merged["rows"] if row["role"] != "total"]
+    counts = merged["counts"]
+    moves = [
+        [
+            {
+                abs(value)
+                for _, moved in row["reads"]
+                if 0 < count <= len(moved)
+                for value in variants(moved[count - 1] or 0)
+            }
+            for count in range(counts)
+        ]
+        for row in rows
+    ]
+    read = [
+        [{results[count] or 0 for results, _ in row["reads"] if count < len(results)} for count in range(counts)]
+        for row in rows
+    ]
+
+    def broken(index: int, count: int) -> int:
+        if count == 0 or count >= counts:
+            return 0
+        results = rows[index]["results"]
+        step = abs(results[count] - results[count - 1])
+        if step in moves[index][count] or (
+            results[count] == 0 and rows[index]["role"] == "candidate" and 0 in read[index][count]
+        ):
+            return 0
+        return 1
+
+    def gap(count: int) -> int:
+        return valid - sum(row["results"][count] for row in rows)
+
+    changes: list[tuple[int, int, int, int]] = []
+    for _ in range(200):
+        best: tuple[float, int, int, int, int] | None = None
+        for index, row in enumerate(rows):
+            results = row["results"]
+            for count in range(counts):
+                if not (gap(count) or broken(index, count) or broken(index, count + 1)):
+                    continue
+                end = count
+                while end + 1 < counts and results[end + 1] == results[count]:
+                    end += 1
+                for span in {(count, count), (count, end)}:
+                    first, last = span
+                    old = results[first]
+                    options = {old, *read[index][first]}
+                    for option in sorted({value for base in options for value in variants(base)}):
+                        if option == old or option < 0:
+                            continue
+                        before = sum(bool(gap(k)) for k in range(first, last + 1)) + sum(
+                            broken(index, k) for k in range(first, last + 2)
+                        )
+                        for k in range(first, last + 1):
+                            results[k] = option
+                        after = sum(bool(gap(k)) for k in range(first, last + 1)) + sum(
+                            broken(index, k) for k in range(first, last + 2)
+                        )
+                        for k in range(first, last + 1):
+                            results[k] = old
+                        if after < before:
+                            known = option in read[index][first]
+                            score = (after - before) - 0.5 * known
+                            if best is None or score < best[0]:
+                                best = (score, index, first, last, option)
+        if best is None:
+            break
+        _, index, first, last, option = best
+        for count in range(first, last + 1):
+            changes.append((index, count, rows[index]["results"][count], option))
+            rows[index]["results"][count] = option
+    return changes
+
+
+GENERALS = {
+    1954: date(1954, 5, 18),
+    1957: date(1957, 3, 5),
+    1961: date(1961, 10, 4),
+    1965: date(1965, 4, 7),
+    1969: date(1969, 6, 18),
+    1973: date(1973, 2, 28),
+    1977: date(1977, 6, 16),
+    1981: date(1981, 6, 11),
+    19822: date(1982, 2, 18),
+    198211: date(1982, 11, 24),
+    1987: date(1987, 2, 17),
+    1989: date(1989, 6, 15),
+    1992: date(1992, 11, 25),
+    1997: date(1997, 6, 6),
+}
+MONTHS = {
+    month: number
+    for number, month in enumerate(
+        [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+        ],
+        1,
+    )
+}
+POLLING = re.compile(r"(\d{1,2})\s*(?:st|nd|rd|th)?\.?\s+(" + "|".join(MONTHS) + r"),?\s*(\d{4})")
+
+
+def polling_day(table: dict) -> date | None:
+    text = " ".join([*table["heading"], *table["footnotes"]]).lower()
+    found = POLLING.search(text)
+    return date(int(found[3]), MONTHS[found[2]], int(found[1])) if found else None
+
+
+def firsts(entry: dict) -> set[int]:
+    return {
+        row["results"][0]
+        for row in entry["merged"]["rows"]
+        if row["role"] == "candidate" and row["results"] and row["results"][0]
+    }
+
+
+def select(year: int) -> list[dict]:
+    found = [entry for entry in tables(year) if entry["merged"]["counts"] and firsts(entry)]
+    for entry in found:
+        entry["issues"] = assess(entry["merged"], entry["table"])
+    ranked = sorted(
+        found, key=lambda entry: (bool(entry["issues"]), not entry["table"]["complete"], -len(firsts(entry)))
+    )
+    kept: list[dict] = []
+    for entry in ranked:
+        mine = firsts(entry)
+        if all(len(mine & firsts(other)) < 0.6 * len(mine) for other in kept):
+            kept.append(entry)
+    dated: dict[str, date] = {}
+    for page in pages(year):
+        for table in (read(year, page) or {"tables": []})["tables"]:
+            if (day := polling_day(table)) is not None:
+                dated.setdefault(fold(table["constituency"]), day)
+    for entry in kept:
+        table = entry["table"]
+        entry["by"] = (amounts(table["seats"]) or [0])[0] == 1
+        entry["day"] = (polling_day(table) or dated.get(fold(table["constituency"]))) if entry["by"] else GENERALS[year]
+    return sorted(kept, key=lambda entry: (entry["page"], entry["index"]))
+
+
+BY_ELECTIONS = {
+    (1961, "p048"): date(1957, 11, 14),
+    (1965, "p049"): date(1963, 5, 30),
+    (1969, "p058"): date(1967, 11, 9),
+    (1969, "p059"): date(1966, 12, 7),
+    (1969, "p056"): date(1966, 12, 7),
+    (1977, "p060"): date(1975, 3, 4),
+    (198211, "p057"): date(1982, 5, 25),
+    (1997, "p074"): date(1994, 11, 10),
+}
+ACTS = [
+    (date(1948, 2, 4), 1947),
+    (date(1961, 10, 4), 1961),
+    (date(1969, 6, 18), 1969),
+    (date(1977, 6, 16), 1974),
+    (date(1981, 6, 11), 1980),
+    (date(1987, 2, 17), 1983),
+    (date(1992, 11, 25), 1990),
+    (date(1997, 6, 6), 1995),
+]
+PARTIES = {
+    "F.F.": "Fianna Fáil",
+    "F.G.": "Fine Gael",
+    "Lab.": "The Labour Party",
+    "S.F.": "Sinn Féin",
+    "G.P.": "Green Party",
+    "G.A.": "Green Party",
+    "P.D.": "Progressive Democrats",
+    "W.P.": "The Workers' Party",
+    "S.F.W.P.": "Sinn Féin The Workers' Party",
+    "D.L.": "Democratic Left",
+    "C.-P.": "Clann na Poblachta",
+    "C.-T.": "Clann na Talmhan",
+    "A.É.": "Aontacht Éireann",
+    "C.P.I.": "Communist Party of Ireland",
+    "D.S.P.": "Democratic Socialist Party",
+    "N.L.P.": "Natural Law Party",
+    "I.R.S.P.": "Irish Republican Socialist Party",
+    "C.S.P.": "Christian Solidarity Party",
+    "S.L.P.": "Socialist Labour Party",
+    "S.P.": "Socialist Party",
+    "C.C.P.": "Christian Centrist Party",
+    "N.P.D.": "National Progressive Democrats",
+    "S.W.P.": "Socialist Workers Party",
+    "Y.I.": "Young Ireland",
+    "R.P.": "Ratepayers",
+    "N.P.": "National Party (1995)",
+    "N.A.": "National Action",
+    "C.G.": "Cine Gael",
+    "I.W.L.": "Irish Workers' League",
+    "C.D.": "Christian Democrat",
+    "W.L.": "Workers' League",
+    "S.K.I.A.": "South Kerry Independent Alliance",
+}
+DISTINCT = {"National Party (1995)": "National Party", "Socialist Party (1971)": "Socialist Party"}
+MISREAD = {
+    "F.F": "F.F.",
+    "F.F.F.": "F.F.",
+    "F.G": "F.G.",
+    "F.C.": "F.G.",
+    "LAB.": "Lab.",
+    "Lab": "Lab.",
+    "A.E.": "A.É.",
+    "A.Ë.": "A.É.",
+    "A.F.": "A.É.",
+    "C.P.": "C.P.I.",
+    "D S P": "D.S.P.",
+    "N.L.P": "N.L.P.",
+    "C.S.P": "C.S.P.",
+}
+INDEPENDENT = re.compile(r"^(ind\b|non|neamh|far\.)", re.IGNORECASE)
+AFFILIATION = re.compile(r"\(([^()]*)\)\W*$")
+DESCRIPTOR = re.compile(r"\s*[—–-]\s*(community|independent)\b", re.IGNORECASE)
+SPELLING = {"leix": "laois", "laoghis": "laois", "laoighis": "laois", "laoise": "laois"}
+FILLER = {"borough", "county", "city", "constituency", "of", "the", "and"}
+
+
+def tokens(name: str) -> frozenset[str]:
+    plain = "".join(char for char in unicodedata.normalize("NFKD", name.lower()) if not unicodedata.combining(char))
+    words = re.sub(r"[^a-z]+", " ", plain).split()
+    return frozenset(SPELLING.get(word, word) for word in words if word not in FILLER)
+
+
+def act_of(day: date) -> int:
+    return [act for start, act in ACTS if start <= day][-1]
+
+
+def affiliation(year: int, label: str) -> tuple[str | None, bool | None]:
+    found = AFFILIATION.search(label)
+    text = found[1].strip() if found else ""
+    if not text:
+        return None, None
+    if INDEPENDENT.match(text):
+        return None, True
+    text = MISREAD.get(text, text)
+    if year == 1981 and text == "S.P.":
+        return "Socialist Party (1971)", None
+    if text not in PARTIES:
+        raise LookupError(text)
+    return PARTIES[text], None
+
+
+def capital(word: str) -> str:
+    mixed = re.match(r"^(Mc|Mac|O')([A-ZÁÉÍÓÚ].*)$", word)
+    if mixed:
+        return mixed[1] + mixed[2].capitalize()
+    if not word.isupper():
+        return word[0].upper() + word[1:]
+    word = word.capitalize()
+    for prefix in ("Mc", "O'"):
+        if word.startswith(prefix) and len(word) > len(prefix) + 1:
+            word = prefix + word[len(prefix)].upper() + word[len(prefix) + 1 :]
+    return word
+
+
+def full_name(label: str) -> str:
+    text = DESCRIPTOR.sub("", AFFILIATION.sub("", label))
+    text = re.sub(r"(\s*\.){2,}.*$", "", text)
+    text = re.sub(r"^[\s*†‡+]+|[\s…,]+$", "", text)
+    text = re.sub(r"(?<![A-Z])\.+$", "", text).strip(" ,")
+    parts = re.split(r",\s*|\.\s+", text, maxsplit=1)
+    if len(parts) == 1:
+        parts = text.split(" ", 1)
+    surname, given = parts[0], parts[1] if len(parts) > 1 else ""
+    words = [capital(word) for word in f"{given} {surname}".split()]
+    return " ".join("-".join(capital(piece) for piece in word.split("-")) for word in words)
+
+
+def title(name: str) -> str:
+    text = re.sub(r"(^|[\s(-])(\w)", lambda found: found[1] + found[2].upper(), re.sub(r"\s*-\s*", "-", name.lower()))
+    return re.sub(r"\s+", " ", text.replace(" And ", " and ")).strip()
+
+
+def winners(rows: list[dict], elected: list[str]) -> set[int] | None:
+    chosen: set[int] = set()
+    for text in elected:
+        names = [index for index, row in enumerate(rows) if row["surname"] and row["surname"] in fold(text)]
+        if not names:
+            return None
+        chosen.add(max(names, key=lambda index: similar(rows[index]["label"], text)))
+    return chosen if len(chosen) == len(elected) else None
+
+
+def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
+    year, table, merged = entry["year"], entry["table"], entry["merged"]
+    day = BY_ELECTIONS.get((year, entry["page"]), entry["day"])
+    if day is None:
+        raise LookupError("no polling day")
+    act = act_of(day if entry["by"] else GENERALS[year])
+    label = title(table["constituency"])
+    if act in areas:
+        code = areas[act].get(tokens(label))
+        if code is None:
+            raise LookupError(f"no {act} constituency named {label}")
+    else:
+        code = f"{act}:{slug(label)}"
+    rows = []
+    for row, printed in zip(merged["rows"], table["rows"], strict=True):
+        if row["role"] == "total":
+            continue
+        party, independent = affiliation(year, row["label"]) if row["role"] == "candidate" else (None, None)
+        rows.append(
+            {
+                "label": row["label"],
+                "role": row["role"],
+                "name": full_name(row["label"]) if row["role"] == "candidate" else None,
+                "surname": person(row["label"]),
+                "party": party,
+                "independent": independent,
+                "results": row["results"][: merged["counts"]],
+                "box": printed["box"],
+            }
+        )
+    spoilt = [row for row in rows if row["role"] == "spoilt"]
+    for extra in spoilt[1:]:
+        spoilt[0]["results"] = [
+            left + right for left, right in zip(spoilt[0]["results"], extra["results"], strict=True)
+        ]
+        spoilt[0]["box"] = [*spoilt[0]["box"][:3], extra["box"][3]]
+        rows.remove(extra)
+    candidates = [row for row in rows if row["role"] == "candidate"]
+    chosen = winners(candidates, table["elected"])
+    if chosen is None:
+        raise LookupError("elected names do not match the candidates one to one")
+    if len(chosen) != amounts(table["seats"])[0]:
+        raise LookupError(f"{len(chosen)} elected for {table['seats']} seats")
+    for index, row in enumerate(candidates):
+        row["elected"] = index in chosen
+    return {
+        "year": year,
+        "page": entry["page"],
+        "by": entry["by"],
+        "day": day.isoformat(),
+        "general": GENERALS[year].isoformat(),
+        "constituency": label,
+        "act": act,
+        "code": code,
+        "seats": amounts(table["seats"])[0],
+        "quota": amounts(table["quota"])[0],
+        "valid": merged["valid"],
+        "electorate": (amounts(table["electorate"]) or [None])[0],
+        "counts": merged["counts"],
+        "resolved": len(merged["changes"]),
+        "rows": rows,
+    }
+
+
+def parse() -> None:
+    with connect() as conn:
+        found = conn.execute(
+            "select c.code, n.text from area a join area_code c on c.area_id = a.id"
+            " join name n on n.entity_id = a.id and n.is_preferred"
+            " where a.scheme_code = 'ie.dail' and c.code ~ '^19[4-9][0-9]:' and c.code !~ '^1974:'"
+        ).fetchall()
+    areas: dict[int, dict[frozenset[str], str]] = {}
+    for code, text in found:
+        areas.setdefault(int(code[:4]), {})[tokens(text)] = code
+    kept, skipped = [], []
+    for year in VOLUMES:
+        for entry in select(year):
+            where = {"year": year, "page": entry["page"], "constituency": entry["table"]["constituency"]}
+            if entry["issues"]:
+                skipped.append({**where, "issues": entry["issues"]})
+                continue
+            try:
+                kept.append(contest(entry, areas))
+            except LookupError as error:
+                skipped.append({**where, "issues": [str(error)]})
+    keys = [(item["day"], item["code"]) for item in kept]
+    if len(keys) != len(set(keys)):
+        raise ValueError("two tables for one contest")
+    PARSED.mkdir(parents=True, exist_ok=True)
+    (PARSED / "contests.json").write_text(json.dumps(kept, ensure_ascii=False, indent=1))
+    (PARSED / "skipped.json").write_text(json.dumps(skipped, ensure_ascii=False, indent=1))
+    print(len(kept), "contests kept,", len(skipped), "tables skipped")
+
+
+RESOLVED = (
+    "The scanned print makes some digits look alike (3, 5, 6, 8, 9, and 0). Where a read of this table did not "
+    "add up, the look-alike digit was chosen that makes every count sum to the valid poll and every candidate's "
+    "total move by the printed transfer."
+)
+LICENSE = "Irish public sector information licence, CC BY 4.0 terms"
+LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
+DIGITIZED = 8
+
+
+def emit() -> Path:
+    found = json.loads((PARSED / "contests.json").read_text())
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=(
+                f"Dáil general elections from 1954 to 1997 and the by-elections between them, digitized from the "
+                f"Stationery Office's printed results and transfers: {len(found)} constituency counts"
+            ),
+            polity="IE",
+        )
+
+        def name(entity: UUID, text: str) -> None:
+            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        ireland = cs.polity("IE")
+        nation = cs.area("ie.nation", "IE")
+        system = cs.key("ie.electoral_system", "dail-eireann")
+        body = cs.key("ie.body", "dail-eireann")
+        if {system, body, nation} & cs.minted:
+            raise ValueError("run ie.dail first")
+        known: dict[str, list[UUID]] = {}
+        for text, party in conn.execute(
+            "select n.text, p.id from party p join polity y on y.id = p.polity_id"
+            " join name n on n.entity_id = p.id where y.iso_code = 'IE'"
+        ).fetchall():
+            known.setdefault(fold(text), []).append(party)
+        strays = {
+            str(value): entity
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'ie.dail.party'"
+            ).fetchall()
+        }
+        parties: dict[str, UUID] = {}
+
+        def party_id(label: str) -> UUID:
+            if label not in parties:
+                canonical = DAIL_ALIASES.get(label, label)
+                if label in PARTY_CODES:
+                    parties[label] = cs.key("ie.party", PARTY_CODES[label])
+                elif label not in DISTINCT and slug(canonical) in strays:
+                    parties[label] = strays[slug(canonical)]
+                elif label not in DISTINCT and len(set(known.get(fold(canonical), ()))) == 1:
+                    parties[label] = known[fold(canonical)][0]
+                else:
+                    parties[label] = cs.key("ie.dail.party", slug(canonical))
+                    if parties[label] in cs.minted:
+                        cs.add("party", id=parties[label], kind="party", polity_id=ireland)
+                        name(parties[label], DISTINCT.get(label, label))
+            return parties[label]
+
+        sources: dict[int, UUID] = {}
+        artifacts: dict[int, UUID] = {}
+        for year in sorted({item["year"] for item in found}):
+            when = GENERALS[year]
+            title_text = (
+                f"Election results and transfer of votes in the general election of {when:%B %Y} "
+                "and the preceding by-elections"
+            )
+            sources[year] = cs.source("Stationery Office", title_text)
+            cs.add(
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher="Stationery Office",
+                title=title_text,
+                url=url(year),
+                license=LICENSE,
+                license_url=LICENSE_URL,
+                attribution=(
+                    "Election results and transfer of votes, published by the Stationery Office and held by the "
+                    "Oireachtas Library (opac.oireachtas.ie)."
+                ),
+            )
+            artifacts[year] = cs.artifact(volume(year), sources[year])
+        pages_done: dict[tuple[int, str], UUID] = {}
+
+        def page_id(year: int, stem: str) -> UUID:
+            if (year, stem) not in pages_done:
+                path = PAGES / str(year) / f"{stem}.png"
+                width, height = Image.open(path).size
+                pages_done[year, stem] = cs.page(artifacts[year], int(stem[1:]))
+                cs.add(
+                    "source_page",
+                    id=pages_done[year, stem],
+                    artifact_id=artifacts[year],
+                    page_number=int(stem[1:]),
+                    image_key=f"pages/{SOURCE}/{year}/{stem}.png",
+                    width=width,
+                    height=height,
+                )
+            return pages_done[year, stem]
+
+        elections: dict[tuple[str, bool], tuple[UUID, str]] = {}
+        for item in sorted(found, key=lambda item: (item["day"], item["constituency"])):
+            day = date.fromisoformat(item["day"])
+            if (item["day"], item["by"]) not in elections:
+                if item["by"]:
+                    election = cs.key(f"{SOURCE}.election", f"{day}:dail")
+                    path = f"ie/{day}-by-election"
+                    label = (
+                        f"{day.year} Dáil by-election"
+                        if sum(other["by"] and other["day"] == item["day"] for other in found) == 1
+                        else f"{day.year} Dáil by-elections"
+                    )
+                    kind = "by_election"
+                else:
+                    election = cs.key("ie.election", f"{day}:dail-eireann")
+                    path = f"ie/{day}-general"
+                    label = label_of(day)
+                    kind = "general"
+                cs.add("election", id=election, polity_id=ireland, kind=kind, date_from=day, date_to=day, status="held")
+                name(election, label)
+                cs.add("slug", path=path, entity_id=election)
+                elections[item["day"], item["by"]] = (election, path)
+            election, path = elections[item["day"], item["by"]]
+            constituency, code = item["constituency"], item["code"]
+            area = cs.area("ie.dail", code)
+            if area in cs.minted:
+                if item["act"] != 1974:
+                    raise ValueError(f"{code} is not on record")
+                cs.add("area", id=area, scheme_code="ie.dail")
+                cs.add("area_code", area_id=area, code=code, valid_from=None)
+                cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
+                name(area, constituency)
+            unit = cs.unit("ie.dail", code)
+            if unit in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=ireland,
+                    scheme_code="ie.dail",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
+                name(unit, constituency)
+            contest_key = f"{day}:dail-eireann:{slug(constituency)}"
+            contest = cs.key("ie.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=area,
+                magnitude=item["seats"],
+                round_number=1,
+                electoral_system_id=system,
+                default_result_kind="counted",
+            )
+            if item["by"]:
+                name(contest, f"{day.year} {constituency} by-election")
+            else:
+                name(contest, f"{label_of(day)} in {constituency}")
+            cs.add("slug", path=f"{path}/{slug(constituency)}", entity_id=contest)
+            if item["resolved"]:
+                cs.add("note", entity_id=contest, kind="caveat", body_md=RESOLVED)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=sources[item["year"]],
+                is_default=True,
+                completeness=1,
+            )
+            page = page_id(item["year"], item["page"])
+            values: list[tuple[UUID | None, int, int, int, list[int] | None]] = [
+                (None, VALID, 0, item["valid"], None),
+                (None, QUOTA, 0, item["quota"], None),
+            ]
+            if item["electorate"]:
+                values.append((None, REGISTERED, 0, item["electorate"], None))
+            position = 0
+            for row in item["rows"]:
+                if row["role"] == "spoilt":
+                    values.extend(
+                        (None, EXHAUSTED, count + 1, amount, row["box"])
+                        for count, amount in enumerate(row["results"])
+                        if count
+                    )
+                    continue
+                position += 1
+                key = f"{contest_key}:{fold(row['name'])}"
+                if sum(fold(other["name"] or "") == fold(row["name"]) for other in item["rows"]) > 1:
+                    key = f"{key}:{position}"
+                person = cs.key(f"{SOURCE}.person", key)
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    name(person, row["name"])
+                party = party_id(row["party"]) if row["party"] else None
+                option = cs.key("ie.option", key)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_position=position,
+                    ballot_label=row["name"],
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("ie.candidacy", key),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=row["name"],
+                    member_of_party_id=party,
+                    is_independent=party is None,
+                )
+                results = row["results"]
+                last = max((count for count, amount in enumerate(results) if amount), default=0)
+                values.extend(
+                    (option, VOTES, count + 1, amount, row["box"]) for count, amount in enumerate(results[: last + 1])
+                )
+                kind = "elected" if row["elected"] else "lost" if last == len(results) - 1 else "eliminated"
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+            for option, measure, count_round, amount, box in values:
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=measure,
+                    count_round=count_round,
+                    flags=DIGITIZED,
+                    value=amount,
+                )
+                if box is not None:
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=count_round,
+                        page_id=page,
+                        x0=box[0] / 1000,
+                        y0=box[1] / 1000,
+                        x1=1.0,
+                        y1=box[3] / 1000,
+                    )
+        return cs.write()
+
+
+def label_of(day: date) -> str:
+    month = f"{day:%B} " if day.year == 1982 else ""
+    return f"{month}{day.year} Irish general election"
