@@ -46,7 +46,23 @@ KEYS = {
 }
 VOLUMES = {year: (PDF, LANDING, day, pages) for year, (_, _, day, pages) in ITEMS.items()}
 ERRATA: set[tuple[int, tuple[str, int]]] = set()
-NAMES: dict[tuple[str, str], str] = {}
+CHECKED = {
+    1848: ("ME", "VT", "MA", "NH", "CT", "DE", "MD"),
+    1844: (),
+}
+FIXES = {
+    (1848, "MD", "kent", "Cass"): 447,
+    (1844, "MD", "washington", "Clay"): 2633,
+    (1844, "VT", "windham", "Birney"): 385,
+    (1844, "VT", "chittenden", "Birney"): 386,
+    (1844, "CT", "windham", "Birney"): 363,
+}
+NAMES = {
+    ("NH", "Hillsboro'"): "Hillsborough",
+    ("CT", "N.-London"): "New London",
+    ("MD", "Balt. City"): "24510",
+    ("MD", "Baltimore Co."): "24005",
+}
 FORMER: dict[tuple[str, str], tuple[str, str, date]] = {}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
@@ -285,11 +301,13 @@ def build() -> None:
         else:
             for county, options in loose:
                 print(f"unsettled {state} {year} {candidate} {NAMED[(state, county)]}: {options}")
+    for (year, state, county, candidate), value in FIXES.items():
+        settled[(state, county, year, candidate)] = value
     folder = raw.parsed(SOURCE) / "model"
     folder.mkdir(parents=True, exist_ok=True)
     for year, names in CANDIDATES.items():
         text: list[str] = []
-        states = list(dict.fromkeys(state for state, _ in order))
+        states = [state for state in dict.fromkeys(state for state, _ in order) if state in CHECKED[year]]
         for state in states:
             rows = [row for row in order if row[0] == state]
             used = [c for c in names if any(settled.get((*row, year, c)) is not None for row in rows)]
