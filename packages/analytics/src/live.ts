@@ -26,6 +26,7 @@ export type LiveUnitCount = {
   votes: Array<number>;
   reporting: number | null;
   expected: number | null;
+  eevp?: { share: number; total: number } | null;
 };
 
 export type LiveFrame = {
@@ -120,7 +121,7 @@ export type LiveEstimate = {
   runnerUp: string | null;
   winProbability: Record<string, number>;
   remaining: { votes: Band; margin: Band };
-  late: { since: string; totals: Array<number> } | null;
+  late: { since: string; totals: Array<number>; isReported: boolean } | null;
   units: Array<{
     unitId: string;
     expectedTotal: Band;
@@ -170,6 +171,7 @@ const MODEL = {
     small: 0.03,
     weigh: 1,
   },
+  reported: { common: 0.9, own: 0.3, capped: 0.99 },
 };
 
 const TAILS: Record<string, number> = {
@@ -209,6 +211,7 @@ type Unit = {
   sigma: number;
   hasBaseline: boolean;
   night: Array<number> | null;
+  reported: { share: number; total: number } | null;
 };
 
 function seeded(text: string) {
@@ -330,13 +333,26 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
   const nights = new Map<string, Array<number>>();
   const changed = new Map<string, string>();
   const waits = new Map<string, number>();
+  const reported = new Map<string, { share: number; total: number }>();
   let now = at ?? "";
   for (const [id, list] of byUnit) {
     let pick = list[0]!;
+    let told: LiveUnitCount | null = null;
     for (const count of list) {
       if (count.at > pick.at) {
         pick = count;
       }
+      if (
+        count.eevp != null &&
+        count.eevp.share > 0 &&
+        count.eevp.total > 0 &&
+        (told == null || count.at > told.at)
+      ) {
+        told = count;
+      }
+    }
+    if (told?.eevp != null) {
+      reported.set(id, told.eevp);
     }
     const total = sum(pick.votes);
     let since = pick.at;
@@ -445,6 +461,7 @@ function units(race: LiveRace, at: string | null, cutoff: number | null) {
       sigma: MODEL.spread,
       hasBaseline: base != null && base.turnout > 0,
       night: nights.get(id) ?? null,
+      reported: reported.get(id) ?? null,
     });
   }
   const sized = found.filter((unit) => unit.hasBaseline);
@@ -896,6 +913,22 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   const left = isTail
     ? Math.max(planned, MODEL.late.carry * recent + MODEL.late.base)
     : planned;
+  const outstanding = found.map((unit) => {
+    if (!isTail || unit.reported == null) {
+      return null;
+    }
+    const { share, total } = unit.reported;
+    const isCapped = share >= MODEL.reported.capped;
+    return {
+      open: isCapped
+        ? (1 - MODEL.reported.capped) * Math.max(total, unit.total)
+        : Math.max(0, total - Math.max(share * total, unit.total)),
+      isCapped,
+    };
+  });
+  const told = sum(
+    found.map((unit, index) => (outstanding[index] == null ? 0 : unit.total)),
+  );
   const late =
     isLate && night != null
       ? {
@@ -904,6 +937,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
             (_, index) =>
               (shown.at(-1)!.totals[index] ?? 0) - (night.totals[index] ?? 0),
           ),
+          isReported: told >= counted / 2,
         }
       : null;
   if (race.certified != null) {
@@ -1019,7 +1053,16 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
           MODEL.volatility.calm ** 2,
       ),
     );
-  const learned = isTail ? lean(found, a, b, left * latest) : null;
+  const coming =
+    left * latest +
+    sum(
+      found.map((unit, index) =>
+        outstanding[index] == null
+          ? 0
+          : outstanding[index].open - left * unit.total,
+      ),
+    );
+  const learned = isTail ? lean(found, a, b, coming) : null;
   const ahead = sum(found.map((unit) => unit.margin * unit.total));
   const finalMargins: Array<number> = [];
   const finalTotals: Array<number> = [];
@@ -1044,6 +1087,22 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
     const tilt =
       (learned?.mean ?? 0) +
       (learned?.sd ?? MODEL.tail.lean) * gaussian(random);
+    const { common, own: alone } = MODEL.reported;
+    const reportedDraw =
+      told > 0
+        ? {
+            common: common * gaussian(random) - (common ** 2 + alone ** 2) / 2,
+            capped: random(),
+          }
+        : null;
+    const opens = outstanding.map((open) =>
+      open == null || reportedDraw == null
+        ? null
+        : open.isCapped
+          ? (open.open * (reportedDraw.capped + random())) / 2
+          : open.open *
+            Math.exp(reportedDraw.common + alone * gaussian(random)),
+    );
     const fractions: Array<number> = [];
     for (const [index, unit] of found.entries()) {
       if (unit.hasBaseline) {
@@ -1069,6 +1128,13 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
               (unit.total / Math.max(typicalFraction, 0.2)) *
                 Math.exp(MODEL.spread * gaussian(random)),
             );
+      }
+    }
+    for (const [index, unit] of found.entries()) {
+      const open = opens[index];
+      if (open != null) {
+        totals[index] =
+          unit.total + Math.min(Math.max(0, totals[index]! - unit.total), open);
       }
     }
     const coefficients = fit(found, totals, center, residuals, random);
@@ -1119,7 +1185,9 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
         room,
       );
       const steady = clamp(margin * final - countedLead, -room, room);
-      const extra = final * later;
+      const open = opens[index];
+      const extra =
+        open == null ? final * later : Math.max(0, open - remaining);
       const ceiling = 1 - unit.others;
       const local =
         final > 0 && learned == null ? MODEL.tail.local * gaussian(random) : 0;
