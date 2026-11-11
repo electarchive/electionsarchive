@@ -43,113 +43,6 @@
   },
   "pages": [
     {
-      "page": 15,
-      "id": "15-0",
-      "columns": [
-        {
-          "label": "Harlan Dale House, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "James B. Pearson, Rep.",
-          "contest": "senate",
-          "candidate": "James B. Pearson"
-        },
-        {
-          "label": "Arch Tetzlaff, M. D., Dem.",
-          "contest": "senate",
-          "candidate": "Arch O. Tetzlaff"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.102,
-        0.088,
-        0.95,
-        0.804
-      ],
-      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0964
-      ]
-    },
-    {
-      "page": 16,
-      "id": "16-0",
-      "columns": [
-        {
-          "label": "Keith A. Sebelius, Rep.",
-          "contest": "house1",
-          "candidate": "Keith G. Sebelius"
-        },
-        {
-          "label": "Morris Coover, Dem.",
-          "contest": "house1",
-          "candidate": "Morris Coover"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.055,
-        0.091,
-        0.906,
-        0.891
-      ],
-      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIRST DISTRICT'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.09
-      ]
-    },
-    {
-      "page": 20,
-      "id": "20-0",
-      "columns": [
-        {
-          "label": "John Anderson, Jr., Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Ray E. Frisbie, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Morris Kay, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Reynolds \"Ren\" Shultz, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Robert Docking, Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.044,
-        0.096,
-        0.894,
-        0.814
-      ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0961
-      ]
-    },
-    {
       "page": 79,
       "id": "79-0",
       "columns": [
@@ -220,7 +113,7 @@
         0.928,
         0.816
       ],
-      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -298,7 +191,7 @@
         0.938,
         0.812
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -400,7 +293,7 @@
         0.891,
         0.803
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,

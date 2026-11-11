@@ -67,312 +67,6 @@
   },
   "pages": [
     {
-      "page": 13,
-      "id": "13-0",
-      "columns": [
-        {
-          "label": "Frank Carlson, Rep.",
-          "contest": "senate",
-          "candidate": "Frank Carlson"
-        },
-        {
-          "label": "Joe Corpstein, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Joseph J. Poizner, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "K. L. (Ken) Smith, Dem.",
-          "contest": "senate",
-          "candidate": "K. L. (Ken) Smith"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.054,
-        0.081,
-        0.943,
-        1.0
-      ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR (Regular term)'; ignore any other table visible in the image.",
-      "bands": 3,
-      "header": [
-        0.0,
-        0.1077
-      ]
-    },
-    {
-      "page": 14,
-      "id": "14-0",
-      "columns": [
-        {
-          "label": "Frank Carlson, Rep.",
-          "contest": "senate",
-          "candidate": "Frank Carlson"
-        },
-        {
-          "label": "Joe Corpstein, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Joseph J. Poizner, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "K. L. (Ken) Smith, Dem.",
-          "contest": "senate",
-          "candidate": "K. L. (Ken) Smith"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.064,
-        0.088,
-        0.921,
-        0.831
-      ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded (Regular term)'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1238
-      ]
-    },
-    {
-      "page": 17,
-      "id": "17-0",
-      "columns": [
-        {
-          "label": "Bob Dole, Rep.",
-          "contest": "house1",
-          "candidate": "Bob Dole"
-        },
-        {
-          "label": "J. Floyd Breeding, Dem.",
-          "contest": "house1",
-          "candidate": "J. Floyd Breeding"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.069,
-        0.084,
-        0.963,
-        0.932
-      ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS - FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1132
-      ]
-    },
-    {
-      "page": 18,
-      "id": "18-0",
-      "columns": [
-        {
-          "label": "Wm. H. Avery, Rep.",
-          "contest": "house2",
-          "candidate": "William H. Avery"
-        },
-        {
-          "label": "Harry F. Kelioe, Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.059,
-        0.116,
-        0.937,
-        0.429
-      ],
-      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
-    },
-    {
-      "page": 18,
-      "id": "18-1",
-      "columns": [
-        {
-          "label": "Robert F. Ellsworth, Rep.",
-          "contest": "house3",
-          "candidate": "Robert F. Ellsworth"
-        },
-        {
-          "label": "Bill Sparks, Dem.",
-          "contest": "house3",
-          "candidate": "Bill Sparks"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.064,
-        0.421,
-        0.939,
-        0.666
-      ],
-      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
-    },
-    {
-      "page": 18,
-      "id": "18-2",
-      "columns": [
-        {
-          "label": "Garner E. Shriver, Rep.",
-          "contest": "house4",
-          "candidate": "Garner E. Shriver"
-        },
-        {
-          "label": "Lawrence J. Wetzel, Dem.",
-          "contest": "house4",
-          "candidate": "Lawrence J. Wetzel"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.068,
-        0.658,
-        0.942,
-        0.877
-      ],
-      "hint": "Read only the table headed 'FOURTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
-    },
-    {
-      "page": 19,
-      "id": "19-0",
-      "columns": [
-        {
-          "label": "Ralph O. Brownfield, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Walter L. McVey, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Joe Skubitz, Rep.",
-          "contest": "house5",
-          "candidate": "Joe Skubitz"
-        },
-        {
-          "label": "J. Ed Thompson, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Denver D. Hargis, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Wade A. Myers, Dem.",
-          "contest": "house5",
-          "candidate": "Wade A. Myers"
-        },
-        {
-          "label": "Reb Russell, Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.078,
-        0.072,
-        0.967,
-        0.448
-      ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Concluded. FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
-    },
-    {
-      "page": 20,
-      "id": "20-0",
-      "columns": [
-        {
-          "label": "John Anderson, Jr., Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Harvey F. Crouch, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "George Hart, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Dale E. Saffels, Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.077,
-        0.159,
-        0.94,
-        1.0
-      ],
-      "hint": "Read only the table headed 'FOR GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0155
-      ]
-    },
-    {
-      "page": 21,
-      "id": "21-0",
-      "columns": [
-        {
-          "label": "John Anderson, Jr., Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Harvey F. Crouch, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "George Hart, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Dale E. Saffels, Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.07,
-        0.098,
-        0.943,
-        0.807
-      ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0804
-      ]
-    },
-    {
       "page": 51,
       "id": "51-0",
       "columns": [
@@ -443,7 +137,7 @@
         0.913,
         0.864
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED (Regular term)'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—CONCLUDED (Regular term)'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -482,7 +176,7 @@
         0.913,
         0.842
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED (Unexpired term)'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—CONCLUDED (Unexpired term)'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -612,7 +306,7 @@
         0.964,
         0.461
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONCLUDED FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
     {
       "page": 58,
@@ -685,7 +379,7 @@
         0.962,
         0.837
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—CONCLUDED'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,

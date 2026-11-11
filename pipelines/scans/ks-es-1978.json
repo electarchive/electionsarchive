@@ -35,192 +35,6 @@
   },
   "pages": [
     {
-      "page": 19,
-      "id": "19-0",
-      "columns": [
-        {
-          "label": "Deryl K Schuster Rep",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "James R. Maher Dem",
-          "contest": "senate",
-          "candidate": "James R. Maher"
-        },
-        {
-          "label": "Roland Wes Preboth Dem",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Bill Roy Dem",
-          "contest": "senate",
-          "candidate": "Bill Roy"
-        },
-        {
-          "label": "Dorothy K White Dem",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.08,
-        0.092,
-        0.905,
-        1.0
-      ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
-      "bands": 3,
-      "header": [
-        0.0,
-        0.0738
-      ]
-    },
-    {
-      "page": 20,
-      "id": "20-0",
-      "columns": [
-        {
-          "label": "Deryl K Schuster Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "James R. Maher Dem.",
-          "contest": "senate",
-          "candidate": "James R. Maher"
-        },
-        {
-          "label": "Roland Wes Preboth Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Bill Roy Dem.",
-          "contest": "senate",
-          "candidate": "Bill Roy"
-        },
-        {
-          "label": "Dorothy K White Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.102,
-        0.097,
-        0.918,
-        0.807
-      ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.093
-      ]
-    },
-    {
-      "page": 24,
-      "id": "24-0",
-      "columns": [
-        {
-          "label": "Bennett and Montgomery Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Knight and Carr Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Sanders and Dunton Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Carlin and Dugan Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Chaney and Smith Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Wiles and Lang Dem.",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.097,
-        0.08,
-        0.948,
-        1.0
-      ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 3,
-      "header": [
-        0.0,
-        0.0793
-      ]
-    },
-    {
-      "page": 25,
-      "id": "25-0",
-      "columns": [
-        {
-          "label": "Bennett and Montgomery Rep",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Knight and Carr Rep",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Sanders and Dunton Rep",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Carlin and Dugan Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Chaney and Smith Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Wiles and Lang Dem",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.071,
-        0.088,
-        0.93,
-        0.797
-      ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0917
-      ]
-    },
-    {
       "page": 60,
       "id": "60-0",
       "columns": [
@@ -291,7 +105,7 @@
         0.921,
         0.784
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -354,7 +168,7 @@
         0.933,
         1.0
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
@@ -393,7 +207,7 @@
         0.918,
         0.802
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—LIEUTENANT GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,

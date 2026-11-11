@@ -611,6 +611,42 @@ def cells(
     towns = manifest.get("unit_scheme") == "town"
     folded = towns or manifest.get("unit_scheme") == "split"
     home: dict[str, str] = {}
+
+    def stem_of(label: str) -> str:
+        return slug(
+            ABBREVIATION.sub(lambda hit: f"{EXPANDED[hit[1].lower()]} ", WARD.sub("", label))
+            if towns
+            else re.sub(
+                r"\s+county$",
+                "",
+                re.sub(r"\s*[(\[]+\s*part(\s+of)?\s*[)\]]*$", "", label, flags=re.IGNORECASE),
+                flags=re.IGNORECASE,
+            )
+        ).replace(" ", "")
+
+    def county(stem: str) -> str | None:
+        code = names.get(stem)
+        if code is None:
+            close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.84)
+            starts = {names[name] for name in names if name.startswith(stem) and len(stem) > 4}
+            code = names[close[0]] if len(close) == 1 else starts.pop() if len(starts) == 1 else None
+        return code
+
+    def place(label: str) -> tuple[str | None, str | None]:
+        stem = stem_of(label)
+        if stem in extra:
+            return extra[stem], None
+        found = county(stem)
+        if found is not None or towns:
+            return found, None
+        inner = re.fullmatch(r"(.+?)\s*[(\[](.+?)[)\]]\s*", label)
+        if inner is not None and stem_of(inner[1]) in extra and (owner := county(stem_of(inner[2]))) is not None:
+            return extra[stem_of(inner[1])], owner
+        for key, code in extra.items():
+            if stem.endswith(key) and len(stem) > len(key) and (owner := county(stem[: -len(key)])) is not None:
+                return code, owner
+        return None, None
+
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
         (x0, y0, x1, y1), _, _ = framing(spec, reader)
@@ -646,6 +682,14 @@ def cells(
                 continue
             start, stop = request.span
             ax, bx, _, ay, by, _ = lines.get(request.key, [0.001, 0.0, 0, 0.001, 0.0, 0])
+            owners: list[tuple[str | None, str | None]] = [place(row["label"]) for row in rows]
+            found = [code for code, _ in owners]
+            for r, (code, owner) in enumerate(owners):
+                if code is None or ":" not in code or owner is not None:
+                    continue
+                if any(other is not None and ":" not in other for other in found[r + 1 :]) or found.count(code) > 1:
+                    before = [other for other in found[:r] if other is not None and ":" not in other]
+                    owners[r] = (code, before[-1]) if before else (None, "")
             heading = ""
             for r, row in enumerate(rows):
                 if towns and not any(row["values"]):
@@ -680,28 +724,16 @@ def cells(
                         continue
                     if value is None:
                         continue
-                    stem = slug(
-                        ABBREVIATION.sub(lambda hit: f"{EXPANDED[hit[1].lower()]} ", WARD.sub("", label))
-                        if towns
-                        else re.sub(
-                            r"\s+county$",
-                            "",
-                            re.sub(r"\s*[(\[]+\s*part\s*[)\]]*$", "", label, flags=re.IGNORECASE),
-                            flags=re.IGNORECASE,
-                        )
-                    ).replace(" ", "")
-                    code = extra.get(stem) or names.get(stem)
-                    if code is None:
-                        close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.84)
-                        starts = {names[name] for name in names if name.startswith(stem) and len(stem) > 4}
-                        code = names[close[0]] if len(close) == 1 else starts.pop() if len(starts) == 1 else None
+                    code, owner = (place(label)[0], None) if across or towns else owners[r]
+                    if owner == "":
+                        continue
                     if code is None:
                         errors[number] = (
                             f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
                         )
                         break
-                    unit = slug(label).replace(" ", "") if folded else code
-                    home[unit] = code
+                    unit = slug(label).replace(" ", "") if folded else code if owner is None else f"{owner}+{code}"
+                    home[unit] = owner or code
                     left, right, top, bottom = (
                         min(1.0, max(0.0, a * v + b))
                         for a, b, v in (
@@ -724,7 +756,7 @@ def cells(
                 else:
                     continue
                 break
-    if folded:
+    if folded or any(unit != code for unit, code in home.items()):
         summed: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
         for (number, unit, series), (value, box) in values.items():
             before = summed.get((number, home[unit], series))
@@ -1242,6 +1274,8 @@ def emit(name: str) -> Path:
         if whole and "EA_SCANS_RESTAGE" not in os.environ:
             return totals(manifest, frame.filter(pl.col("contest").is_in(whole)))
         frame = frame.filter(~pl.col("contest").is_in(missing))
+    review = {item["series"] for item in json.loads((WORK / name / "review.json").read_text())}
+    frame = frame.filter(~pl.col("contest").is_in({series.split("|", 1)[0] for series in review}))
     towns = manifest.get("unit_scheme") == "town"
     if towns:
         frame = frame.group_by("contest", "candidate", "code", maintain_order=True).agg(
