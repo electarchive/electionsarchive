@@ -4,6 +4,7 @@ import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 import polars as pl
 
@@ -16,6 +17,10 @@ SOURCE = "us.il_measures_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
+PORTAL = "https://electionresults.kanecountyil.gov/2026-11-03/Contests/"
+PORTAL_ROWS = {
+    "Refuse Collection and Disposal Authority": "(ST CHARLES TWSP) PROPOSITION TO AUTHORIZE ENHANCED TOWNSHIP AUTHORITY FOR REGULATION OF REFUSE COLLECTION &amp; DISPOSAL"
+}
 MANUAL = DATA / "inbox" / "manual" / "MF-376"
 TITLE = "Referenda questions, November 3, 2026 general election"
 COUNTIES = {
@@ -256,6 +261,20 @@ NOTICES = (
             "the remaining term in office?"
         ),
     ),
+    (
+        "17089",
+        "St. Charles Township",
+        "Refuse Collection and Disposal Authority",
+        "https://clerk.kanecountyil.gov/elections/lists/referenda/allitems.aspx",
+        None,
+        "Kane County Clerk",
+        (
+            "Shall St. Charles Township, Kane County, Illinois, be authorized to exercise the powers of the “Township "
+            "Refuse Collection and Disposal Act” (60 ILCS 1-210 et seq.) to enter into a contract for the collection, "
+            "disposal, composting and recycling of garbage and refuse for residents of the unincorporated areas of "
+            "St. Charles Township?"
+        ),
+    ),
 )
 DOCUMENTS = {
     url: (file, publisher, ".pdf" if url.endswith("pdf") or "diligent" in url else ".html")
@@ -264,6 +283,10 @@ DOCUMENTS = {
 
 
 def fetch() -> None:
+    try:
+        raw.cached(SOURCE, PORTAL)
+    except LookupError:
+        raw.fetch(SOURCE, PORTAL, suffix=".html")
     for url, file, _, suffix in [*COUNTIES.values(), *((url, *rest) for url, rest in DOCUMENTS.items())]:
         try:
             raw.cached(SOURCE, url)
@@ -327,7 +350,11 @@ def page_text(url: str) -> str:
 def notice_rows() -> list[dict[str, str]]:
     rows = []
     for county, entity, label, url, _, _, wording in NOTICES:
-        text = pdf_text(url, "-raw") if DOCUMENTS[url][2] == ".pdf" else html.unescape(page_text(url))
+        text = (
+            pdf_text(url, "-raw")
+            if DOCUMENTS[url][2] == ".pdf"
+            else re.sub(r"\\u([0-9a-f]{4})", lambda m: chr(int(m[1], 16)), html.unescape(page_text(url)))
+        )
         assert re.sub(r"\W+", "", wording).lower() in re.sub(r"\W+", "", text).lower(), label
         rows.append({"county": county, "entity": entity, "label": label, "wording": wording, "url": url})
     return rows
@@ -427,6 +454,18 @@ def parse() -> None:
     frame = pl.DataFrame(tagged).unique(["county", "entity", "label"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "measures.parquet")
     print(frame.height)
+
+
+def portal_result(heading: str) -> tuple[datetime, int, int]:
+    page = page_text(PORTAL)
+    stamp = re.search(r"Current as of \w+, (\w+ \d+, \d{4} \d+:\d+ [AP]M)", page)
+    block = re.split(rf"<h2>\s*{re.escape(heading)}", page, maxsplit=1)[1].split('<div class="c"', 1)[0]
+    votes = {
+        answer.strip(): int(count)
+        for answer, count in re.findall(r'<td class="b">(Yes|No) ?</td>\s*<td>(\d+)</td>', block)
+    }
+    as_of = datetime.strptime(stamp[1], "%B %d, %Y %I:%M %p").replace(tzinfo=ZoneInfo("America/Chicago"))
+    return as_of, votes["Yes"], votes["No"]
 
 
 def emit() -> Path:
@@ -554,5 +593,43 @@ def emit() -> Path:
                 url=row["url"],
                 source_id=source,
             )
+            if label in PORTAL_ROWS:
+                as_of, yes, no = portal_result(PORTAL_ROWS[label])
+                portal = cs.source("Kane County Clerk", "2026 General Election Results - Unofficial Contest Results")
+                cs.add(
+                    "source",
+                    id=portal,
+                    kind="official_body",
+                    publisher="Kane County Clerk",
+                    title="2026 General Election Results - Unofficial Contest Results",
+                    url=PORTAL,
+                )
+                cs.artifact(raw.cached(SOURCE, PORTAL), portal)
+                result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="preliminary",
+                    kind="counted",
+                    source_id=portal,
+                    as_of=as_of,
+                    status="active",
+                    is_default=True,
+                    completeness=1.0,
+                )
+                for position, (answer, votes) in enumerate((("Yes", yes), ("No", no))):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=cs.unit(option.split(":")[0], code),
+                        option_id=cs.key("us.option", f"{contest_key}:{slug(answer)}"),
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
         print(f"{kept} of {frame.height} referenda")
         return cs.write()
