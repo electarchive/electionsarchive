@@ -63,6 +63,22 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house7": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 7
+    },
+    "house8": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 8
     }
   },
   "pages": [
@@ -301,12 +317,71 @@
         0.923,
         0.87
       ],
-      "hint": "Read only the table headed 'GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'GOVERNOR—Concluded.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.2781
       ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "J. N. Tincher, Rep.",
+          "contest": "house7",
+          "candidate": "J. N. Tincher"
+        },
+        {
+          "label": "A. S. Allphin, Dem.",
+          "contest": "house7",
+          "candidate": "A. S. Allphin"
+        },
+        {
+          "label": "E. E. Colglazier, Soc.",
+          "contest": "house7",
+          "candidate": "E. E. Colglazier"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.1,
+        0.97,
+        0.555
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Richard E. Bird, Rep.",
+          "contest": "house8",
+          "candidate": "Richard E. Bird"
+        },
+        {
+          "label": "W. A. Ayres, Dem.",
+          "contest": "house8",
+          "candidate": "William A. Ayres"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.55,
+        0.97,
+        0.75
+      ],
+      "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
   ],
   "unit_codes": {

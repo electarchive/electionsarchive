@@ -79,6 +79,14 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house5": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "KS",
+      "district": 5
     }
   },
   "pages": [
@@ -153,7 +161,7 @@
         0.902,
         0.944
       ],
-      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT—CONCLUDED'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -231,7 +239,7 @@
         0.899,
         0.842
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -318,7 +326,7 @@
         0.886,
         0.448
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
     {
       "page": 7,
@@ -371,7 +379,7 @@
         0.894,
         0.769
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014Continued, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—Continued, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -400,7 +408,7 @@
         0.942,
         0.897
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED. SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONCLUDED. SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -478,7 +486,7 @@
         0.888,
         0.826
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -556,7 +564,7 @@
         0.873,
         0.912
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR PRESIDENT AND VICE PRESIDENT\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR PRESIDENT AND VICE PRESIDENT—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -595,7 +603,7 @@
         0.949,
         1.0
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATE SENATOR'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR UNITED STATE SENATOR'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
@@ -634,7 +642,7 @@
         0.886,
         0.824
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR UNITED STATES SENATOR—CONCLUDED'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -668,7 +676,7 @@
         0.972,
         1.0
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR GOVERNOR'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
@@ -702,12 +710,36 @@
         0.883,
         0.831
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.0793
       ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "J. B. Patterson, Rep.",
+          "contest": "house5",
+          "candidate": "J. B. Patterson"
+        },
+        {
+          "label": "John M. Houston, Dem.",
+          "contest": "house5",
+          "candidate": "John M. Houston"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.12,
+        0.97,
+        0.37
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
   ],
   "unit_codes": {

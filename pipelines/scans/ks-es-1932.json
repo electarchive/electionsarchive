@@ -63,6 +63,30 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house5": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 5
+    },
+    "house6": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 6
+    },
+    "house7": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 7
     }
   },
   "pages": [
@@ -127,7 +151,7 @@
         0.898,
         0.904
       ],
-      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE PRESIDENT\u2014Concluded.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE PRESIDENT—Concluded.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -215,7 +239,7 @@
         0.908,
         0.774
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—CONCLUDED.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -419,7 +443,7 @@
         0.906,
         0.767
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—Concluded.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -487,12 +511,91 @@
         0.914,
         0.897
       ],
-      "hint": "Read only the table headed 'Absent Vote\u2014General Election, November 8, 1932. FOR PRESIDENT AND VICE PRESIDENT\u2014Concluded.'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'Absent Vote—General Election, November 8, 1932. FOR PRESIDENT AND VICE PRESIDENT—Concluded.'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.1088
       ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "W. L. Farquharson, Rep.",
+          "contest": "house5",
+          "candidate": "W. L. Farquharson"
+        },
+        {
+          "label": "W. A. Ayres, Dem.",
+          "contest": "house5",
+          "candidate": "William A. Ayres"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.11,
+        0.97,
+        0.345
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 8,
+      "id": "8-1",
+      "columns": [
+        {
+          "label": "Charles I. Sparks, Rep.",
+          "contest": "house6",
+          "candidate": "Charles I. Sparks"
+        },
+        {
+          "label": "Kathryn O Loughlin, Dem.",
+          "contest": "house6",
+          "candidate": "Kathryn O'Loughlin"
+        },
+        {
+          "label": "Scattering",
+          "contest": "house6",
+          "candidate": "Scattering"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.335,
+        0.97,
+        0.96
+      ],
+      "hint": "Read only the table headed 'SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Clifford R. Hope, Rep.",
+          "contest": "house7",
+          "candidate": "Clifford R. Hope"
+        },
+        {
+          "label": "Aaron Coleman, Dem.",
+          "contest": "house7",
+          "candidate": "Aaron Coleman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.1,
+        0.97,
+        0.82
+      ],
+      "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2
     }
   ],
   "unit_codes": {

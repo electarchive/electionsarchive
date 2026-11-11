@@ -39,6 +39,38 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house2": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1972,
+      "chamber": "house",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 5
     }
   },
   "pages": [
@@ -299,6 +331,122 @@
         0.0,
         0.097
       ]
+    },
+    {
+      "page": 84,
+      "id": "84-0",
+      "columns": [
+        {
+          "label": "Charles D. McAtee, Rep.",
+          "contest": "house2",
+          "candidate": "Charles D. McAtee"
+        },
+        {
+          "label": "Dr. Bill Roy, Dem.",
+          "contest": "house2",
+          "candidate": "William R. Roy"
+        },
+        {
+          "label": "Bert Falley, Con.",
+          "contest": "house2",
+          "candidate": "Bert Falley"
+        },
+        {
+          "label": "David Scoggin, Prohib.",
+          "contest": "house2",
+          "candidate": "David Scoggin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.97,
+        0.4
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 84,
+      "id": "84-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        },
+        {
+          "label": "Charles Barsotti, Dem.",
+          "contest": "house3",
+          "candidate": "Charles Barsotti"
+        },
+        {
+          "label": "Warren Redding, Con.",
+          "contest": "house3",
+          "candidate": "Warren Redding"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.39,
+        0.97,
+        0.58
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 84,
+      "id": "84-2",
+      "columns": [
+        {
+          "label": "Garner E. Shriver, Rep.",
+          "contest": "house4",
+          "candidate": "Garner E. Shriver"
+        },
+        {
+          "label": "John S. Stevens, Dem.",
+          "contest": "house4",
+          "candidate": "John S. Stevens"
+        },
+        {
+          "label": "Wayne Nobbs, Jr., Prohib.",
+          "contest": "house4",
+          "candidate": "Wayne Nobbs, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.57,
+        0.97,
+        0.77
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 85,
+      "id": "85-0",
+      "columns": [
+        {
+          "label": "Joe Skubitz, Rep.",
+          "contest": "house5",
+          "candidate": "Joe Skubitz"
+        },
+        {
+          "label": "Lloyd L. Kitch, Sr., Dem.",
+          "contest": "house5",
+          "candidate": "Lloyd L. Kitch, Sr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.97,
+        0.52
+      ],
+      "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
     }
   ]
 }

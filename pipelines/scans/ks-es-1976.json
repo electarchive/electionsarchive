@@ -47,6 +47,14 @@
       "special": false,
       "state": "KS",
       "district": 5
+    },
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -209,6 +217,106 @@
         0.518
       ],
       "hint": "Read only the table headed 'FOR CONGRESSMAN, FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Ford and Dole, Rep.",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Carter and Mondale, Dem.",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Anderson and Shackelford, Amer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bubar and Dodge, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MacBride and Bergland, Ind.",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Maddox and Dyke, Cons.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCarthy and Barrett, Ind.",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 73,
+      "id": "73-0",
+      "columns": [
+        {
+          "label": "Ford and Dole, Rep.",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "Carter and Mondale, Dem.",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Anderson and Shackelford, Amer.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bubar and Dodge, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MacBride and Bergland, Ind.",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "Maddox and Dyke, Cons.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCarthy and Barrett, Ind.",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENT AND VICE-PRESIDENT—Concluded'; ignore any other table visible in the image.",
+      "bands": 2
     }
   ]
 }

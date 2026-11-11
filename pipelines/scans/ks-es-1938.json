@@ -71,6 +71,14 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house5": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "KS",
+      "district": 5
     }
   },
   "pages": [
@@ -101,7 +109,7 @@
         0.88,
         0.864
       ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -130,7 +138,7 @@
         0.978,
         1.0
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -159,7 +167,7 @@
         0.874,
         0.849
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR UNITED STATES SENATOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR UNITED STATES SENATOR—CONCLUDED'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -236,7 +244,7 @@
         0.873,
         0.467
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONTINUED THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
     {
       "page": 7,
@@ -284,7 +292,7 @@
         0.879,
         0.779
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONTINUED, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONTINUED, SIXTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -313,7 +321,7 @@
         0.96,
         0.894
       ],
-      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS\u2014CONCLUDED SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR REPRESENTATIVES IN CONGRESS—CONCLUDED SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -401,7 +409,7 @@
         0.88,
         0.861
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR—CONCLUDED'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -445,7 +453,7 @@
         0.962,
         1.0
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR GOVERNOR'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -489,12 +497,36 @@
         0.874,
         0.842
       ],
-      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'ABSENT VOTE—FOR GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.105
       ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Stanley Taylor, Rep.",
+          "contest": "house5",
+          "candidate": "Stanley Taylor"
+        },
+        {
+          "label": "John M. Houston, Dem.",
+          "contest": "house5",
+          "candidate": "John M. Houston"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.12,
+        0.97,
+        0.37
+      ],
+      "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
   ],
   "unit_codes": {

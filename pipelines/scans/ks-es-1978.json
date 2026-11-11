@@ -31,6 +31,38 @@
       "special": false,
       "state": "KS",
       "district": 1
+    },
+    "house2": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "KS",
+      "district": 5
     }
   },
   "pages": [
@@ -213,6 +245,102 @@
         0.0,
         0.0945
       ]
+    },
+    {
+      "page": 63,
+      "id": "63-0",
+      "columns": [
+        {
+          "label": "Jeffries, Jim, Rep.",
+          "contest": "house2",
+          "candidate": "James E. Jeffries"
+        },
+        {
+          "label": "Keys, Martha, Dem.",
+          "contest": "house2",
+          "candidate": "Martha Keys"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.07,
+        0.97,
+        0.36
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 2nd DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 63,
+      "id": "63-1",
+      "columns": [
+        {
+          "label": "Winn, Larry, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.4,
+        0.97,
+        0.56
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 3rd DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 63,
+      "id": "63-2",
+      "columns": [
+        {
+          "label": "Litsey, Jim, Rep.",
+          "contest": "house4",
+          "candidate": "James Paul Litsey"
+        },
+        {
+          "label": "Glickman, Dan, Dem.",
+          "contest": "house4",
+          "candidate": "Dan Glickman"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.58,
+        0.97,
+        0.79
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 4th DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 64,
+      "id": "64-0",
+      "columns": [
+        {
+          "label": "Whittaker, Robert \"Bob\", Rep.",
+          "contest": "house5",
+          "candidate": "Robert \"Bob\" Whittaker"
+        },
+        {
+          "label": "Allegrucci, Don, Dem.",
+          "contest": "house5",
+          "candidate": "Don Allegrucci"
+        },
+        {
+          "label": "Blackwell, Jack, Pro.",
+          "contest": "house5",
+          "candidate": "Jack C. Blackwell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.07,
+        0.97,
+        0.48
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 5th DISTRICT'; ignore any other table visible in the image."
     }
   ]
 }

@@ -63,6 +63,14 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "senate_special": {
+      "year": 1962,
+      "chamber": "senate",
+      "day": "1962-11-06",
+      "special": true,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -142,45 +150,6 @@
       "header": [
         0.0,
         0.0847
-      ]
-    },
-    {
-      "page": 54,
-      "id": "54-0",
-      "columns": [
-        {
-          "label": "James B. Pearson, Rep.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Paul L. Aylward, Dem.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "C. E. Cowen, Prohib.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Scattering",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.03,
-        0.125,
-        0.913,
-        0.842
-      ],
-      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—CONCLUDED (Unexpired term)'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.0795
       ]
     },
     {
@@ -385,6 +354,76 @@
         0.0,
         0.0798
       ]
+    },
+    {
+      "page": 53,
+      "id": "53-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate_special",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Paul L. Aylward, Dem.",
+          "contest": "senate_special",
+          "candidate": "Paul L. Aylward"
+        },
+        {
+          "label": "C. E. Cowen, Prohib.",
+          "contest": "senate_special",
+          "candidate": "C. E. Cowen"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.08,
+        0.97,
+        0.97
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR (Unexpired term)'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 54,
+      "id": "54-0",
+      "columns": [
+        {
+          "label": "James B. Pearson, Rep.",
+          "contest": "senate_special",
+          "candidate": "James B. Pearson"
+        },
+        {
+          "label": "Paul L. Aylward, Dem.",
+          "contest": "senate_special",
+          "candidate": "Paul L. Aylward"
+        },
+        {
+          "label": "C. E. Cowen, Prohib.",
+          "contest": "senate_special",
+          "candidate": "C. E. Cowen"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.125,
+        0.913,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOR UNITED STATES SENATOR—CONCLUDED (Unexpired term)'; ignore any other table visible in the image.",
+      "bands": 2
     }
   ],
   "unit_codes": {

@@ -55,6 +55,14 @@
       "special": false,
       "state": "KS",
       "district": 5
+    },
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -86,7 +94,7 @@
         1.0
       ],
       "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image.",
-      "bands": 3,
+      "bands": 2,
       "header": [
         0.0,
         0.0752
@@ -97,19 +105,19 @@
       "id": "74-0",
       "columns": [
         {
-          "label": "",
-          "contest": null,
-          "candidate": ""
+          "label": "Pat Roberts Rep",
+          "contest": "house1",
+          "candidate": "Pat Roberts"
         },
         {
-          "label": "",
-          "contest": null,
-          "candidate": ""
+          "label": "Darrell I Ringer Dem",
+          "contest": "house1",
+          "candidate": "Darrell T. Ringer"
         },
         {
-          "label": "",
-          "contest": null,
-          "candidate": ""
+          "label": "Clement (Clem) N Scoggin Pro",
+          "contest": "house1",
+          "candidate": "Clement Scoggin"
         }
       ],
       "orientation": "counties_down",
@@ -119,7 +127,7 @@
         0.881,
         0.233
       ],
-      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the short table at the top of the page, which continues the U.S. REPRESENTATIVE, 1st DISTRICT table from the previous page (no column headings printed): county rows Stanton through Wichita and TOTALS; the three columns are Pat Roberts, Darrell T. Ringer, and Clement N. Scoggin. Ignore every other table visible in the image."
     },
     {
       "page": 74,
@@ -236,6 +244,186 @@
         0.0,
         0.1308
       ]
+    },
+    {
+      "page": 69,
+      "id": "69-0",
+      "columns": [
+        {
+          "label": "Reagan and Bush, Rep.",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Mondale and Ferraro, Dem.",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Bergland and Lewis, Lib.",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Dodge and Martin, Pro.",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "Richards and Salaman, Con.",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "Serrette and Azalay, Ind.",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.05,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE-PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 70,
+      "id": "70-0",
+      "columns": [
+        {
+          "label": "Reagan and Bush, Rep.",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "Mondale and Ferraro, Dem.",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Bergland and Lewis, Lib.",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Dodge and Martin, Pro.",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "Richards and Salaman, Con.",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "Serrette and Azalay, Ind.",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.05,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'PRESIDENT AND VICE-PRESIDENT (continued from the previous page; columns in order: Reagan, Mondale, Bergland, Dodge, Richards, Serrette)'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 71,
+      "id": "71-0",
+      "columns": [
+        {
+          "label": "Nancy Kassebaum, Rep.",
+          "contest": "senate",
+          "candidate": "Nancy L. Kassebaum"
+        },
+        {
+          "label": "James R. Maher, Dem.",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Marian Ruck Jackson, Amer.",
+          "contest": "senate",
+          "candidate": "Marian R. Jackson"
+        },
+        {
+          "label": "Lucille Bieger, Con.",
+          "contest": "senate",
+          "candidate": "Lucille Bieger"
+        },
+        {
+          "label": "Douglas N. Merritt, Lib.",
+          "contest": "senate",
+          "candidate": "Douglas N. Merritt"
+        },
+        {
+          "label": "Freda H. Steele, Pro.",
+          "contest": "senate",
+          "candidate": "Freda H. Steele"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.05,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 72,
+      "id": "72-0",
+      "columns": [
+        {
+          "label": "Nancy Kassebaum, Rep.",
+          "contest": "senate",
+          "candidate": "Nancy L. Kassebaum"
+        },
+        {
+          "label": "James R. Maher, Dem.",
+          "contest": "senate",
+          "candidate": "James R. Maher"
+        },
+        {
+          "label": "Marian Ruck Jackson, Amer.",
+          "contest": "senate",
+          "candidate": "Marian R. Jackson"
+        },
+        {
+          "label": "Lucille Bieger, Con.",
+          "contest": "senate",
+          "candidate": "Lucille Bieger"
+        },
+        {
+          "label": "Douglas N. Merritt, Lib.",
+          "contest": "senate",
+          "candidate": "Douglas N. Merritt"
+        },
+        {
+          "label": "Freda H. Steele, Pro.",
+          "contest": "senate",
+          "candidate": "Freda H. Steele"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.05,
+        0.98,
+        0.97
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR (continued from the previous page; columns in order: Kassebaum, Maher, Jackson, Bieger, Merritt, Steele)'; ignore any other table visible in the image.",
+      "bands": 2
     }
   ]
 }

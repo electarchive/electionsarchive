@@ -15,6 +15,46 @@
       "special": false,
       "state": "KS",
       "district": null
+    },
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "KS",
+      "district": 5
     }
   },
   "pages": [
@@ -119,7 +159,7 @@
         0.973,
         0.814
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -207,12 +247,153 @@
         0.948,
         0.779
       ],
-      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR\u2014Concluded'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'FOR GOVERNOR-LIEUTENANT GOVERNOR—Concluded'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
         0.0819
       ]
+    },
+    {
+      "page": 61,
+      "id": "61-0",
+      "columns": [
+        {
+          "label": "Pat Roberts, Rep.",
+          "contest": "house1",
+          "candidate": "Pat Roberts"
+        },
+        {
+          "label": "Kent Roth, Dem.",
+          "contest": "house1",
+          "candidate": "Kent Roth"
+        },
+        {
+          "label": "Kent Earnest, Lib.",
+          "contest": "house1",
+          "candidate": "Kent Earnest"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.07,
+        0.97,
+        0.88
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 1st DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2
+    },
+    {
+      "page": 62,
+      "id": "62-0",
+      "columns": [
+        {
+          "label": "Morris Kay, Rep.",
+          "contest": "house2",
+          "candidate": "Morris Nay"
+        },
+        {
+          "label": "Jim Slattery, Dem.",
+          "contest": "house2",
+          "candidate": "Jim Slattery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.97,
+        0.33
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 2nd DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 62,
+      "id": "62-1",
+      "columns": [
+        {
+          "label": "Larry Winn, Jr., Rep.",
+          "contest": "house3",
+          "candidate": "Larry Winn Jr."
+        },
+        {
+          "label": "William L. Kostar, Dem.",
+          "contest": "house3",
+          "candidate": "William L. Kostar"
+        },
+        {
+          "label": "Gene R. Blair, Lib.",
+          "contest": "house3",
+          "candidate": "Gene R. Blair"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.33,
+        0.97,
+        0.49
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 3rd DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 62,
+      "id": "62-2",
+      "columns": [
+        {
+          "label": "Gerald Jerry Caywood, Rep.",
+          "contest": "house4",
+          "candidate": "Gerald \"Jerry\" Caywood"
+        },
+        {
+          "label": "Dan Glickman, Dem.",
+          "contest": "house4",
+          "candidate": "Dan Glickman"
+        },
+        {
+          "label": "Karl Peterjohn, Lib.",
+          "contest": "house4",
+          "candidate": "Karl Peterjohn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.49,
+        0.97,
+        0.67
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 4th DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 63,
+      "id": "63-0",
+      "columns": [
+        {
+          "label": "Bob Whittaker, Rep.",
+          "contest": "house5",
+          "candidate": "Bob Whittaker"
+        },
+        {
+          "label": "Lee Rowe, Dem.",
+          "contest": "house5",
+          "candidate": "Lee Rowe"
+        },
+        {
+          "label": "John L. Conger, Lib.",
+          "contest": "house5",
+          "candidate": "John L. Conger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.06,
+        0.97,
+        0.49
+      ],
+      "hint": "Read only the table headed 'FOR U.S. REPRESENTATIVE, 5th DISTRICT'; ignore any other table visible in the image."
     }
   ]
 }
