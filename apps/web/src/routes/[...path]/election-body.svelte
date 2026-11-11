@@ -2234,7 +2234,7 @@
       reserve="0.75rem"
       class="[--island-inset:0]"
     >
-      {#snippet children(found)}
+      {#snippet children(found: Awaited<typeof sameDay>)}
         {#if found != null && found.races.some((race) => !race.isOwn)}
           <SameDay place={found.place} races={found.races} />
         {/if}

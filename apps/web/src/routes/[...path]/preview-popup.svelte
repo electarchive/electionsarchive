@@ -80,7 +80,9 @@
         </p>
       </div>
       <Await promise={data.body} name="preview.contest" key={data.id}>
-        {#snippet children(opened)}
+        {#snippet children(
+          opened: Awaited<Extract<PageData, { kind: "contest" }>["body"]>,
+        )}
           {const contest = $derived(opened.contest)}
           {const rows = $derived(
             contest.rows
@@ -161,7 +163,9 @@
         {/if}
       </div>
       <Await promise={data.body} name="preview.election" key={data.id}>
-        {#snippet children(opened)}
+        {#snippet children(
+          opened: Awaited<Extract<PageData, { kind: "election" }>["body"]>,
+        )}
           {const contests = $derived(
             opened.election.contests == null
               ? []
