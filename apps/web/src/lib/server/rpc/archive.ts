@@ -19344,13 +19344,13 @@ export const elections = {
                       > | null;
                       office: string | null;
                     }>(sql`
-                      with top as (
+                      with recursive top as (
                         select pt.area_id as id from election e
                         join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
                         where e.id = ${election}::uuid limit 1
                       )
-                      , base as materialized (
-                      select x.n, s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, az.group_id as group, az.chain
+                      , base0 as materialized (
+                      select x.n, s.path, k.date_from as dt, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office
                       from unnest(${sql.param(chunk)}::uuid[]) with ordinality as x(id, n)
                       join election k on k.id = x.id
                       join slug s on s.entity_id = k.id and s.is_current
@@ -19419,21 +19419,32 @@ export const elections = {
                         where c.election_id = k.id and c.kind = 'office'
                         order by c.id limit 1
                       ) w on true
-                      left join lateral (
-                        with recursive up(id, depth, child) as (
-                          select w.area, 0, null::uuid
-                          union all
-                          select p.parent_id, up.depth + 1, up.id from area_parent p join up on p.area_id = up.id
-                          where up.depth < 7 and p.valid @> k.date_from
-                        )
-                        select
-                          (
-                            select u.child from up u
-                            where u.id = (select id from top) and u.child is not null
-                            order by u.depth limit 1
-                          ) as group_id,
-                          (select array_agg(u.id order by u.depth) from up u where u.depth < 7) as chain
-                      ) az on true
+                      ), seeds as materialized (
+                        select distinct b.area, b.dt from base0 b where b.area is not null
+                      ), reach(child, dt, parent, depth) as (
+                        select p.area_id, s.dt, p.parent_id, 1 from seeds s
+                        join area_parent p on p.area_id = s.area and p.valid @> s.dt
+                        where p.area_id = any(array(select z.area from seeds z))
+                        union
+                        select p.area_id, r.dt, p.parent_id, r.depth + 1 from reach r
+                        join area_parent p on p.area_id = r.parent and p.valid @> r.dt
+                        where r.depth < 7
+                      ), edges as materialized (
+                        select distinct r.child, r.dt, r.parent from reach r
+                      ), up(area, dt, id, depth, child) as (
+                        select s.area, s.dt, s.area, 0, null::uuid from seeds s
+                        union all
+                        select u.area, u.dt, e.parent, u.depth + 1, u.id from up u
+                        join edges e on e.child = u.id and e.dt = u.dt
+                        where u.depth < 7
+                      ), az as materialized (
+                        select u.area, u.dt,
+                          (array_agg(u.child order by u.depth) filter (where u.id = (select id from top) and u.child is not null))[1] as group_id,
+                          array_agg(u.id order by u.depth) filter (where u.depth < 7) as chain
+                        from up u group by u.area, u.dt
+                      ), base as materialized (
+                        select b.n, b.path, b.dt::text as date, b.person, b.party, b.label, b.color, b.area, b.led, b.votes, b.office, az.group_id as group, az.chain
+                        from base0 b left join az on az.area = b.area and az.dt = b.dt
                       ), shapes as materialized (
                         select a.id as area_id
                         from unnest((select coalesce(array_agg(distinct c), '{}'::uuid[]) from base b, unnest(b.chain) c)::uuid[]) a(id)
