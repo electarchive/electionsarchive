@@ -1274,21 +1274,10 @@ const cover = (ids: SQL) => sql`
     select grp.root, x.id from contest x join grp on x.allocation_parent_id = grp.id
   ),
   own as materialized (select root, id from grp),
-  sets as materialized (
-    select rs.id, rs.k, rs.contest_id, rs.is_default, rs.stage, rs.source_id from result_set rs
-    where rs.contest_id = any(array(select id from own))
-  ),
-  won as materialized (
-    select distinct o.root from own o
-    join sets rs on rs.contest_id = o.id and ${latest("rs")}
-    where exists (
-      select from outcome x where x.result_set_id = rs.id and x.option_id is not null and x.kind in ('won', 'elected')
-    )
-  ),
   sums as materialized (
-    select rs.contest_id, array_agg(distinct x.area_k) as ks from sets rs
+    select rs.contest_id, array_agg(distinct x.area_k) as ks from result_set rs
     join result_rollup_sum x on x.result_set_k = rs.k
-    where rs.is_default and rs.contest_id in (select id from hit)
+    where rs.is_default and rs.contest_id = any(array(select id from hit))
     group by rs.contest_id
   ),
   kin as materialized (
@@ -1299,7 +1288,15 @@ const cover = (ids: SQL) => sql`
   select c.id, ${serial("c", "e")} as series, e.id as election, e.kind = 'indirect' as indirect,
     e.date_from::text as date, ${CYCLE} as year, e.status::text as status,
     c.term is not distinct from 'remainder' as "isRemainder", c.notional, c.district_area_id as district, g.members,
-    c.id in (select root from won) as decided,
+    exists (
+      select from result_set rs
+      where rs.contest_id = c.id and ${latest("rs")}
+        and exists (select from outcome x where x.result_set_id = rs.id and x.option_id is not null and x.kind in ('won', 'elected'))
+    ) or exists (
+      select from own o join result_set rs on rs.contest_id = o.id
+      where o.root = c.id and o.id <> c.id and ${latest("rs")}
+        and exists (select from outcome x where x.result_set_id = rs.id and x.option_id is not null and x.kind in ('won', 'elected'))
+    ) as decided,
     case when c.district_area_id is null or c.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = e.polity_id) then (
       select coalesce(array_agg(k.scheme_code || ':' || k.id::text order by k.scheme_code, k.id), '{}')
       from sums s cross join unnest(s.ks) f(k)
@@ -8486,6 +8483,8 @@ export const contests = {
               `covering:${area.id}:${contest.place?.id ?? ""}:${contest.root}:${path?.split("/").at(-1) ?? ""}:${area.k}`,
               async () => {
                 const place = contest.place?.id ?? null;
+                const tallied = tallies(area.k);
+                tallied.catch(() => null);
                 const [frame, pathed] = await Promise.all([
                   db.execute<{
                     anc: Array<string>;
@@ -8690,7 +8689,7 @@ export const contests = {
                     .map((row) => [row.id, row]),
                 );
                 const tally =
-                  (await tallies(area.k)) ??
+                  (await tallied) ??
                   (
                     await Promise.all(
                       sources.map(async ([key, rows]) =>
