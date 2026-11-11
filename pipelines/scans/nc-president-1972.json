@@ -80,8 +80,8 @@
         0.914,
         0.735
       ],
-      "hint": "Read only the table headed 'VOTE FOR PRESIDENT BY COUNTIES 1972—Continued'; ignore any other table visible in the image.",
-      "bands": 1
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT BY COUNTIES 1972\u2014Continued'; ignore any other table visible in the image. Every row before the Totals row is a North Carolina county in alphabetical order; the Totals row is not a county.",
+      "bands": 2
     }
   ]
 }
