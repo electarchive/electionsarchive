@@ -564,6 +564,7 @@ TABLES += [
         "leaves": (1,),
         "ballot": 4,
         "transcribed": "conventions_chicago_1932.tsv",
+        "short": True,
     }
 ]
 NILES = "sim_niles-national-register_{}"
