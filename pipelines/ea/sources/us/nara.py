@@ -12,6 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import contingent
 from ea.store import DATA, connect
 
 SOURCE = "us.nara"
@@ -750,6 +751,19 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), wikidata)
 
         us = cs.polity("US")
+        majority = contingent.systems(cs, name)
+        foreign = {
+            entity
+            for (entity,) in conn.execute(
+                """select distinct n.entity_id from name n join person p on p.id = n.entity_id
+                   join changeset c on c.id = n.changeset_id
+                   where n.lang = 'en' and n.kind = 'official' and n.is_preferred and c.pipeline <> %s
+                     and not exists (select from name o join changeset oc on oc.id = o.changeset_id
+                                     where o.entity_id = n.entity_id and o.lang = 'en' and o.is_preferred
+                                       and oc.pipeline = %s)""",
+                [SOURCE, SOURCE],
+            ).fetchall()
+        }
         parties: dict[str, UUID] = {}
         for key in sorted({party for _, party, _, _ in choices.values() if party is not None}):
             qid, text = PARTIES[key]
@@ -945,6 +959,11 @@ def emit() -> Path:
                         magnitude=magnitude,
                         round_number=round_number,
                         previous_round_id=previous,
+                        electoral_system_id=None
+                        if office == "both" or round_number > 1
+                        else majority(
+                            "contingent_senate" if office == "vice_president" else "contingent_house_delegations"
+                        ),
                     )
                     name(contest, label)
                     cs.add("slug", path=path, entity_id=contest)
@@ -956,6 +975,7 @@ def emit() -> Path:
                         contest_id=contest,
                         stage="certified",
                         source_id=nara,
+                        status="active",
                         is_default=True,
                         completeness=1,
                     )
@@ -972,7 +992,8 @@ def emit() -> Path:
                             if person not in persons:
                                 persons[person] = cs.key("us.person", person)
                                 cs.add("person", id=persons[person])
-                                name(persons[person], canonical)
+                                if persons[person] in cs.minted or persons[person] not in foreign:
+                                    name(persons[person], canonical)
                                 if qid is not None:
                                     cs.add("external_id", entity_id=persons[person], scheme="wikidata", value=qid)
                             options[candidate] = cs.key(f"{SOURCE}.option", f"{key}:{person}")
