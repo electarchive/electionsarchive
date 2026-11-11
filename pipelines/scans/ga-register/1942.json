@@ -1,0 +1,658 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1939-1943, consolidated vote of the general election held 1942-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19391943/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19391943"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1942,
+      "chamber": "senate",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house7": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house10": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    },
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "GA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 681,
+      "id": "681-0",
+      "columns": [
+        {
+          "label": "Richard B. Russell Dem.",
+          "contest": "senate",
+          "candidate": "Richard B. Russell"
+        },
+        {
+          "label": "Mrs. LeVert Dwyer Shivers Ind.",
+          "contest": "senate",
+          "candidate": "LeVert Dwyer Shivers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.087,
+        0.505,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR Succeed Richard B. Russell'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1555
+      ]
+    },
+    {
+      "page": 681,
+      "id": "681-1",
+      "columns": [
+        {
+          "label": "Richard B. Russell Dem.",
+          "contest": "senate",
+          "candidate": "Richard B. Russell"
+        },
+        {
+          "label": "Mrs. LeVert Dwyer Shivers Ind.",
+          "contest": "senate",
+          "candidate": "LeVert Dwyer Shivers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.492,
+        0.091,
+        0.897,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR Succeed Richard B. Russell'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1518
+      ]
+    },
+    {
+      "page": 682,
+      "id": "682-0",
+      "columns": [
+        {
+          "label": "Richard B.Russell",
+          "contest": "senate",
+          "candidate": "Richard B. Russell"
+        },
+        {
+          "label": "Mrs. LeVert Dwyer Shivers",
+          "contest": "senate",
+          "candidate": "LeVert Dwyer Shivers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.095,
+        0.502,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION NOVEMBER 3, 1942. UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1602
+      ]
+    },
+    {
+      "page": 682,
+      "id": "682-1",
+      "columns": [
+        {
+          "label": "Richard B.Russell",
+          "contest": "senate",
+          "candidate": "Richard B. Russell"
+        },
+        {
+          "label": "Mrs. LeVert Dwyer Shivers",
+          "contest": "senate",
+          "candidate": "LeVert Dwyer Shivers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.49,
+        0.099,
+        0.892,
+        0.652
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION NOVEMBER 3, 1942. UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.255
+      ]
+    },
+    {
+      "page": 683,
+      "id": "683-0",
+      "columns": [
+        {
+          "label": "Dem. Hugh Peterson",
+          "contest": "house1",
+          "candidate": "Hugh Peterson"
+        },
+        {
+          "label": "Ind. H. W. Sheppard",
+          "contest": "house1",
+          "candidate": "H. W. Sheppard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.091,
+        0.517,
+        0.455
+      ],
+      "hint": "Read only the table headed '1st Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 683,
+      "id": "683-1",
+      "columns": [
+        {
+          "label": "Dem. Stephen Pace",
+          "contest": "house3",
+          "candidate": "Stephen Pace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.514,
+        0.095,
+        0.911,
+        0.425
+      ],
+      "hint": "Read only the table headed '3rd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 683,
+      "id": "683-2",
+      "columns": [
+        {
+          "label": "Dem. Sidney Camp",
+          "contest": "house4",
+          "candidate": "A. Sidney Camp"
+        },
+        {
+          "label": "Ind. Roscoe Pickett",
+          "contest": "house4",
+          "candidate": "Roscoe Pickett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.52,
+        0.417,
+        0.911,
+        0.754
+      ],
+      "hint": "Read only the table headed '4th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 683,
+      "id": "683-3",
+      "columns": [
+        {
+          "label": "Dem. E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        },
+        {
+          "label": "Ind. Joe Baker",
+          "contest": "house2",
+          "candidate": "Joe Baker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.447,
+        0.527,
+        0.749
+      ],
+      "hint": "Read only the table headed '2nd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 683,
+      "id": "683-5",
+      "columns": [
+        {
+          "label": "Dem. Robert Ramspeck",
+          "contest": "house5",
+          "candidate": "Robert Ramspeck"
+        },
+        {
+          "label": "Ind. H. A. Alexander",
+          "contest": "house5",
+          "candidate": "Henry A. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.522,
+        0.746,
+        0.914,
+        0.918
+      ],
+      "hint": "Read only the table headed '5th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 684,
+      "id": "684-0",
+      "columns": [
+        {
+          "label": "Carl Vinson",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.074,
+        0.508,
+        0.384
+      ],
+      "hint": "Read only the table headed '6th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 684,
+      "id": "684-1",
+      "columns": [
+        {
+          "label": "John Gibson",
+          "contest": "house8",
+          "candidate": "John S. Gibson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.498,
+        0.074,
+        0.91,
+        0.254
+      ],
+      "hint": "Read only the table headed '8th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 684,
+      "id": "684-2",
+      "columns": [
+        {
+          "label": "B. Frank Whelchel",
+          "contest": "house9",
+          "candidate": "B. Frank Whelchel"
+        },
+        {
+          "label": "Roscoe Pickett",
+          "contest": "house9",
+          "candidate": "Roscoe Pickett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.498,
+        0.246,
+        0.91,
+        0.6
+      ],
+      "hint": "Read only the table headed '9th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 684,
+      "id": "684-3",
+      "columns": [
+        {
+          "label": "Malcolm Tarver",
+          "contest": "house7",
+          "candidate": "Malcolm C. Tarver"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.376,
+        0.508,
+        0.671
+      ],
+      "hint": "Read only the table headed '7th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 684,
+      "id": "684-4",
+      "columns": [
+        {
+          "label": "Paul Brown",
+          "contest": "house10",
+          "candidate": "Paul Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.498,
+        0.592,
+        0.91,
+        0.918
+      ],
+      "hint": "Read only the table headed '10th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 685,
+      "id": "685-0",
+      "columns": [
+        {
+          "label": "Governor ELLIS ARNALL",
+          "contest": "governor",
+          "candidate": "Ellis Arnall"
+        },
+        {
+          "label": "Secretary of State JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Treasurer GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Attorney General T. GRADY HEAD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Comptroller General HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor J. N. FOREMAN",
+          "contest": "governor",
+          "candidate": "J. N. Foreman"
+        },
+        {
+          "label": "Governor D. TALMADGE BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.066,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GEORGIA CONSTITUTIONAL OFFICERS GENERAL ELECTION NOVEMBER 3, 1942'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2848
+      ]
+    },
+    {
+      "page": 686,
+      "id": "686-0",
+      "columns": [
+        {
+          "label": "Governor ELLIS ARNALL",
+          "contest": "governor",
+          "candidate": "Ellis Arnall"
+        },
+        {
+          "label": "Secretary of State JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Treasurer GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Attorney General T. GRADY HEAD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Comptroller General HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor J. N. FOREMAN",
+          "contest": "governor",
+          "candidate": "J. N. Foreman"
+        },
+        {
+          "label": "Governor D. TALMADGE BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.101,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GEORGIA CONSTITUTIONAL OFFICERS GENERAL ELECTION NOVEMBER 3, 1942'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2514
+      ]
+    },
+    {
+      "page": 687,
+      "id": "687-0",
+      "columns": [
+        {
+          "label": "Governor ELLIS ARNALL",
+          "contest": "governor",
+          "candidate": "Ellis Arnall"
+        },
+        {
+          "label": "Secretary of State JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Treasurer GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Attorney General T. GRADY HEAD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Comptroller General HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor J. N. FOREMAN",
+          "contest": "governor",
+          "candidate": "J. N. Foreman"
+        },
+        {
+          "label": "Governor D. TALMADGE BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.096,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GEORGIA CONSTITUTIONAL OFFICERS GENERAL ELECTION NOVEMBER 3, 1942'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2522
+      ]
+    },
+    {
+      "page": 688,
+      "id": "688-0",
+      "columns": [
+        {
+          "label": "Governor ELLIS ARNALL",
+          "contest": "governor",
+          "candidate": "Ellis Arnall"
+        },
+        {
+          "label": "Secretary of State JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Treasurer GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Attorney General T. GRADY HEAD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Comptroller General HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor J. N. FOREMAN",
+          "contest": "governor",
+          "candidate": "J. N. Foreman"
+        },
+        {
+          "label": "Governor D. TALMADGE BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.103,
+        0.915,
+        0.812
+      ],
+      "hint": "Read only the table headed 'GEORGIA CONSTITUTIONAL OFFICERS GENERAL ELECTION NOVEMBER 3, 1942'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.323
+      ]
+    }
+  ]
+}

@@ -1,0 +1,463 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1925, consolidated vote of the general election held 1924-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1925/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1925"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house2": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house4": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house7": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house6": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house11": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 11
+    },
+    "house10": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    },
+    "house12": {
+      "year": 1924,
+      "chamber": "house",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "GA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 239,
+      "id": "239-0",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.13,
+        0.505,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 4, 1924, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0368
+      ]
+    },
+    {
+      "page": 239,
+      "id": "239-1",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.565,
+        0.13,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 4, 1924, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0368
+      ]
+    },
+    {
+      "page": 240,
+      "id": "240-0",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.089,
+        0.448,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 4, 1924, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0582
+      ]
+    },
+    {
+      "page": 240,
+      "id": "240-1",
+      "columns": [
+        {
+          "label": "WILLIAM J. HARRIS, U. S. SENATOR",
+          "contest": "senate",
+          "candidate": "William J. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.499,
+        0.093,
+        0.865,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF ELECTION HELD NOVEMBER 4, 1924, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.054
+      ]
+    },
+    {
+      "page": 241,
+      "id": "241-0",
+      "columns": [
+        {
+          "label": "Don H. Clark",
+          "contest": "house1",
+          "candidate": "Don H. Clark"
+        },
+        {
+          "label": "Chas G. Edwards",
+          "contest": "house1",
+          "candidate": "Charles G. Edwards"
+        },
+        {
+          "label": "H. G. Aaron",
+          "contest": "house1",
+          "candidate": "A. G. Aaron"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.165,
+        0.535,
+        0.528
+      ],
+      "hint": "Read only the table headed '1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 241,
+      "id": "241-1",
+      "columns": [
+        {
+          "label": "Chas. R. Crisp",
+          "contest": "house3",
+          "candidate": "Charles R. Crisp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.536,
+        0.165,
+        0.939,
+        0.528
+      ],
+      "hint": "Read only the table headed '3rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 241,
+      "id": "241-2",
+      "columns": [
+        {
+          "label": "E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.52,
+        0.527,
+        0.855
+      ],
+      "hint": "Read only the table headed '2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 241,
+      "id": "241-3",
+      "columns": [
+        {
+          "label": "W. O. Wright",
+          "contest": "house4",
+          "candidate": "William C. Wright"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.532,
+        0.52,
+        0.936,
+        0.855
+      ],
+      "hint": "Read only the table headed '4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-0",
+      "columns": [
+        {
+          "label": "William D. Upshaw",
+          "contest": "house5",
+          "candidate": "William D. Upshaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.152,
+        0.468,
+        0.432
+      ],
+      "hint": "Read only the table headed '5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-1",
+      "columns": [
+        {
+          "label": "Gordon Lee",
+          "contest": "house7",
+          "candidate": "Gordon Lee"
+        },
+        {
+          "label": "A. T. Atwater",
+          "contest": "house7",
+          "candidate": "A. T. Atwater"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.459,
+        0.155,
+        0.878,
+        0.5
+      ],
+      "hint": "Read only the table headed '7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-2",
+      "columns": [
+        {
+          "label": "Samuel Rutherford",
+          "contest": "house6",
+          "candidate": "Samuel Rutherford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.424,
+        0.468,
+        0.824
+      ],
+      "hint": "Read only the table headed '6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 242,
+      "id": "242-3",
+      "columns": [
+        {
+          "label": "Chas. H. Brand",
+          "contest": "house8",
+          "candidate": "Charles H. Brand"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.465,
+        0.492,
+        0.878,
+        0.836
+      ],
+      "hint": "Read only the table headed '8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-0",
+      "columns": [
+        {
+          "label": "T. M. Bell",
+          "contest": "house9",
+          "candidate": "Thomas M. Bell"
+        },
+        {
+          "label": "J. M. Johnson",
+          "contest": "house9",
+          "candidate": "J. M. Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.151,
+        0.541,
+        0.545
+      ],
+      "hint": "Read only the table headed '9th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-1",
+      "columns": [
+        {
+          "label": "W. O. Langford",
+          "contest": "house11",
+          "candidate": "William C. Lankford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.539,
+        0.151,
+        0.945,
+        0.55
+      ],
+      "hint": "Read only the table headed '11th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-2",
+      "columns": [
+        {
+          "label": "Carl Vinson",
+          "contest": "house10",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.537,
+        0.541,
+        0.854
+      ],
+      "hint": "Read only the table headed '10th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 243,
+      "id": "243-3",
+      "columns": [
+        {
+          "label": "W. W. Larsen",
+          "contest": "house12",
+          "candidate": "William W. Larsen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.539,
+        0.542,
+        0.941,
+        0.863
+      ],
+      "hint": "Read only the table headed '12th District'; ignore any other table visible in the image."
+    }
+  ]
+}

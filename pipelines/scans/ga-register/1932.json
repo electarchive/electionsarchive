@@ -1,0 +1,945 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1933-1937, consolidated vote of the general election held 1932-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19331937/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19331937"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    },
+    "senate_special": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": true,
+      "state": "GA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 647,
+      "id": "647-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "UNION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.147,
+        0.92,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2755
+      ]
+    },
+    {
+      "page": 648,
+      "id": "648-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "UNION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.0,
+        0.92,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 649,
+      "id": "649-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "UNION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.061,
+        0.945,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2939
+      ]
+    },
+    {
+      "page": 650,
+      "id": "650-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "UNION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.0,
+        0.945,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 651,
+      "id": "651-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "UNION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.066,
+        0.955,
+        0.93
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3079
+      ]
+    },
+    {
+      "page": 654,
+      "id": "654-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": "senate",
+          "candidate": "James W. Arnold"
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": "senate_special",
+          "candidate": "Richard B. Russell, jr."
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.076,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1883
+      ]
+    },
+    {
+      "page": 655,
+      "id": "655-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": "senate",
+          "candidate": "James W. Arnold"
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": "senate_special",
+          "candidate": "Richard B. Russell, jr."
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.076,
+        0.917,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1688
+      ]
+    },
+    {
+      "page": 656,
+      "id": "656-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": "senate",
+          "candidate": "James W. Arnold"
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": "senate_special",
+          "candidate": "Richard B. Russell, jr."
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.12,
+        0.907,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1761
+      ]
+    },
+    {
+      "page": 657,
+      "id": "657-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": "senate",
+          "candidate": "James W. Arnold"
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": "senate_special",
+          "candidate": "Richard B. Russell, jr."
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.086,
+        0.946,
+        0.487
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-0",
+      "columns": [
+        {
+          "label": "HOMER C. PARKER",
+          "contest": "house1",
+          "candidate": "Homer C. Parker"
+        },
+        {
+          "label": "E. K. OVERSTREET Jr.",
+          "contest": "house1",
+          "candidate": "E. K. Overstreet, jr."
+        },
+        {
+          "label": "HUGH PETERSON Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HUGH PETERSON Jr.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.104,
+        0.946,
+        0.506
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-1",
+      "columns": [
+        {
+          "label": "E. E. COX",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        },
+        {
+          "label": "E. E. COX",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. E. COX",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.498,
+        0.946,
+        0.869
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 780,
+      "id": "780-0",
+      "columns": [
+        {
+          "label": "Democrat B. T. CASTELLOW (1932)",
+          "contest": "house3",
+          "candidate": "B. T. Castellow"
+        },
+        {
+          "label": "Democrat B. T. CASTELLOW (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat STEPHEN PACE (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.104,
+        0.917,
+        0.552
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 3rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 780,
+      "id": "780-1",
+      "columns": [
+        {
+          "label": "Democrat E. M. OWEN (1932)",
+          "contest": "house4",
+          "candidate": "Emmett M. Owen"
+        },
+        {
+          "label": "Republican H. O. LOVVORN (1932)",
+          "contest": "house4",
+          "candidate": "H. O. Lovvorn"
+        },
+        {
+          "label": "Democrat E. M. OWEN (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican B. W. MIDDLEBROOKS (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat E. M. OWEN (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.544,
+        0.917,
+        0.894
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-0",
+      "columns": [
+        {
+          "label": "Democrat ROBERT RAMSPECK",
+          "contest": "house5",
+          "candidate": "Robert Ramspeck"
+        },
+        {
+          "label": "Democrat ROBERT RAMSPECK (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat ROBERT RAMSPECK (1936)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican H. H. ALEXANDER (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.104,
+        0.938,
+        0.274
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-1",
+      "columns": [
+        {
+          "label": "Democrat CARL VINSON",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        },
+        {
+          "label": "Independent GEO. S. JONES",
+          "contest": "house6",
+          "candidate": "George S. Jones"
+        },
+        {
+          "label": "Democrat CARL VINSON (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat CARL VINSON (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.266,
+        0.935,
+        0.598
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-2",
+      "columns": [
+        {
+          "label": "Democrat M. C. TARVER",
+          "contest": "house7",
+          "candidate": "M. C. Tarver"
+        },
+        {
+          "label": "Independent MRS. REGINA RAMBO BENSON",
+          "contest": "house7",
+          "candidate": "Regina Rambo Benson"
+        },
+        {
+          "label": "Democrat M. C. TARVER (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat M. C. TARVER (1936)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican L. MITCHELL JOHNSON (1936)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.59,
+        0.932,
+        0.92
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 782,
+      "id": "782-0",
+      "columns": [
+        {
+          "label": "BRASWELL DEEN",
+          "contest": "house8",
+          "candidate": "Braswell Deen"
+        },
+        {
+          "label": "H. J. CARSWELL",
+          "contest": "house8",
+          "candidate": "H. J. Carswell"
+        },
+        {
+          "label": "BRASWELL DEEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BRASWELL DEEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN J. FORD",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.102,
+        0.9,
+        0.521
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 782,
+      "id": "782-1",
+      "columns": [
+        {
+          "label": "JOHN S. WOOD",
+          "contest": "house9",
+          "candidate": "John S. Wood"
+        },
+        {
+          "label": "J. M. JOHNSON",
+          "contest": "house9",
+          "candidate": "J. M. Johnson"
+        },
+        {
+          "label": "LAWRENCE A. LEWIS",
+          "contest": "house9",
+          "candidate": "Lawrence A. Lewis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.513,
+        0.9,
+        0.881
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 9th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 783,
+      "id": "783-1",
+      "columns": [
+        {
+          "label": "1932 Democrat C. H. BRAND",
+          "contest": "house10",
+          "candidate": "Charles H. Brand"
+        },
+        {
+          "label": "1932 Independent C. L. UPCHURCH",
+          "contest": "house10",
+          "candidate": "C. L. Upchurch"
+        },
+        {
+          "label": "1934 Democrat PAUL BROWN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1936 Democrat PAUL BROWN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.5,
+        0.943,
+        0.869
+      ],
+      "hint": "Read only the table headed '10th District'; ignore any other table visible in the image."
+    }
+  ]
+}

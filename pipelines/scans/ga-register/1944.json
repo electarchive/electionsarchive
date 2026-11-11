@@ -1,0 +1,448 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1945-1950, consolidated vote of the general election held 1944-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19451950/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19451950"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house2": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house5": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house7": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house10": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 432,
+      "id": "432-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Walter F. George Dem.",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.106,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 7, 1944\u2014GEORGIA'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1465
+      ]
+    },
+    {
+      "page": 433,
+      "id": "433-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Walter F. George Dem.",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.118,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 7, 1944\u2014GEORGIA COUNTIES AND COUNTY SITES IN GEORGIA'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.144
+      ]
+    },
+    {
+      "page": 434,
+      "id": "434-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Walter F. George Dem.",
+          "contest": "senate",
+          "candidate": "Walter F. George"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.121,
+        0.906,
+        0.45
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 7, 1944\u2014GEORGIA COUNTIES AND COUNTY SITES IN GEORGIA'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-0",
+      "columns": [
+        {
+          "label": "Dem. Hugh Peterson",
+          "contest": "house1",
+          "candidate": "Hugh Peterson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.107,
+        0.511,
+        0.44
+      ],
+      "hint": "Read only the table headed '1st Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-1",
+      "columns": [
+        {
+          "label": "Dem. Stephen Pace",
+          "contest": "house3",
+          "candidate": "Stephen Pace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.109,
+        0.948,
+        0.428
+      ],
+      "hint": "Read only the table headed '3rd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-2",
+      "columns": [
+        {
+          "label": "Dem. A. Sidney Camp",
+          "contest": "house4",
+          "candidate": "A. Sidney Camp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.42,
+        0.943,
+        0.721
+      ],
+      "hint": "Read only the table headed '4th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-3",
+      "columns": [
+        {
+          "label": "Dem. E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.065,
+        0.432,
+        0.511,
+        0.72
+      ],
+      "hint": "Read only the table headed '2nd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 435,
+      "id": "435-5",
+      "columns": [
+        {
+          "label": "Dem. Robert Ramspeck",
+          "contest": "house5",
+          "candidate": "Robert Ramspeck"
+        },
+        {
+          "label": "Ind. H. A. Alexander",
+          "contest": "house5",
+          "candidate": "Henry A. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.713,
+        0.943,
+        0.884
+      ],
+      "hint": "Read only the table headed '5th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 436,
+      "id": "436-0",
+      "columns": [
+        {
+          "label": "Carl Vinson (Dem.)",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.115,
+        0.508,
+        0.414
+      ],
+      "hint": "Read only the table headed '6th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 436,
+      "id": "436-1",
+      "columns": [
+        {
+          "label": "John S. Gibson (Dem.)",
+          "contest": "house8",
+          "candidate": "John S. Gibson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.119,
+        0.924,
+        0.292
+      ],
+      "hint": "Read only the table headed '8th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 436,
+      "id": "436-2",
+      "columns": [
+        {
+          "label": "John S. Wood (Dem.)",
+          "contest": "house9",
+          "candidate": "John S. Wood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.284,
+        0.924,
+        0.607
+      ],
+      "hint": "Read only the table headed '9th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 436,
+      "id": "436-3",
+      "columns": [
+        {
+          "label": "Malcolm Tarver (Dem.)",
+          "contest": "house7",
+          "candidate": "Malcolm C. Tarver"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.406,
+        0.508,
+        0.676
+      ],
+      "hint": "Read only the table headed '7th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 436,
+      "id": "436-4",
+      "columns": [
+        {
+          "label": "Paul Brown (Dem.)",
+          "contest": "house10",
+          "candidate": "Paul Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.599,
+        0.924,
+        0.905
+      ],
+      "hint": "Read only the table headed '10th Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

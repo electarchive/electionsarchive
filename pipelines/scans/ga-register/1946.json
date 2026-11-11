@@ -1,0 +1,707 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1945-1950, consolidated vote of the general election held 1946-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19451950/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19451950"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1946,
+      "chamber": "governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house2": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house4": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house7": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house5": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 539,
+      "id": "539-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        },
+        {
+          "label": "M. E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN W. FORTSON, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EUGENE COOK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. D. COLLINS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ZACK CRAVEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEO. B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOM LINDER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN T. HUIET",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.129,
+        0.954,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election, November 5, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3984
+      ]
+    },
+    {
+      "page": 540,
+      "id": "540-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        },
+        {
+          "label": "M. E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN W. FORTSON, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EUGENE COOK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. D. COLLINS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ZACK CRAVEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEO. B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOM LINDER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN T. HUIET",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.0,
+        0.954,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 541,
+      "id": "541-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        },
+        {
+          "label": "M. E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN W. FORTSON, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EUGENE COOK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. D. COLLINS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ZACK CRAVEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEO. B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOM LINDER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN T. HUIET",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.141,
+        0.954,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION, NOVEMBER 5, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.404
+      ]
+    },
+    {
+      "page": 542,
+      "id": "542-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        },
+        {
+          "label": "M. E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN W. FORTSON, Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EUGENE COOK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. D. COLLINS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ZACK CRAVEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEO. B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOM LINDER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BEN T. HUIET",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.0,
+        0.954,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 543,
+      "id": "543-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.123,
+        0.387,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4048
+      ]
+    },
+    {
+      "page": 544,
+      "id": "544-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "HERMAN E. TALMADGE",
+          "contest": "governor",
+          "candidate": "Herman Talmadge"
+        },
+        {
+          "label": "T. D. BOWERS",
+          "contest": "governor",
+          "candidate": "D. Talmadge Bowers"
+        },
+        {
+          "label": "J. V. CARMICHAEL",
+          "contest": "governor",
+          "candidate": "James V. Carmichael"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.0,
+        0.387,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 567,
+      "id": "567-0",
+      "columns": [
+        {
+          "label": "Prince H. Preston",
+          "contest": "house1",
+          "candidate": "Prince H. Preston, Jr."
+        },
+        {
+          "label": "H. W. Sheppard",
+          "contest": "house1",
+          "candidate": "H. W. Sheppard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.109,
+        0.512,
+        0.538
+      ],
+      "hint": "Read only the table headed '1ST CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 567,
+      "id": "567-1",
+      "columns": [
+        {
+          "label": "Stephen Pace",
+          "contest": "house3",
+          "candidate": "Stephen Pace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.504,
+        0.109,
+        0.908,
+        0.563
+      ],
+      "hint": "Read only the table headed '3RD CONGRESSIONAL DIST.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2004
+      ]
+    },
+    {
+      "page": 567,
+      "id": "567-2",
+      "columns": [
+        {
+          "label": "E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        },
+        {
+          "label": "J. N. Peacock, Jr.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.53,
+        0.512,
+        0.887
+      ],
+      "hint": "Read only the table headed '2ND CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 567,
+      "id": "567-3",
+      "columns": [
+        {
+          "label": "A. Sidney Camp",
+          "contest": "house4",
+          "candidate": "A. Sidney Camp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.555,
+        0.907,
+        0.887
+      ],
+      "hint": "Read only the table headed '4TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 568,
+      "id": "568-0",
+      "columns": [
+        {
+          "label": "Henderson Lanham",
+          "contest": "house7",
+          "candidate": "Henderson Lanham"
+        },
+        {
+          "label": "Malcolm C. Tarver",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.486,
+        0.101,
+        0.891,
+        0.496
+      ],
+      "hint": "Read only the table headed '7TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 568,
+      "id": "568-1",
+      "columns": [
+        {
+          "label": "James C. Davis",
+          "contest": "house5",
+          "candidate": "James C. Davis"
+        },
+        {
+          "label": "Helen Douglas Mankin",
+          "contest": "house5",
+          "candidate": "Helen Douglas Mankin"
+        },
+        {
+          "label": "Henry A. Alexander",
+          "contest": "house5",
+          "candidate": "Henry A. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.112,
+        0.489,
+        0.374
+      ],
+      "hint": "Read only the table headed '5TH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 568,
+      "id": "568-2",
+      "columns": [
+        {
+          "label": "Carl Vinson",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.366,
+        0.489,
+        0.767
+      ],
+      "hint": "Read only the table headed '6TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 568,
+      "id": "568-3",
+      "columns": [
+        {
+          "label": "W. M. (Don) Wheeler",
+          "contest": "house8",
+          "candidate": "W. M. (Don) Wheeler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.486,
+        0.488,
+        0.891,
+        0.913
+      ],
+      "hint": "Read only the table headed '8TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 569,
+      "id": "569-0",
+      "columns": [
+        {
+          "label": "John Wood",
+          "contest": "house9",
+          "candidate": "John S. Wood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.094,
+        0.51,
+        0.504
+      ],
+      "hint": "Read only the table headed '9TH CONGRESSIONAL DIST. Dem. John Wood'; ignore any other table visible in the image."
+    },
+    {
+      "page": 569,
+      "id": "569-1",
+      "columns": [
+        {
+          "label": "Paul Brown",
+          "contest": "house10",
+          "candidate": "Paul Brown"
+        },
+        {
+          "label": "Mrs. L. Shivers",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.5,
+        0.098,
+        0.921,
+        0.507
+      ],
+      "hint": "Read only the table headed '10TH CONGRESSIONAL DIST. Dem. Paul Brown, Mrs. L. Shivers'; ignore any other table visible in the image."
+    }
+  ]
+}

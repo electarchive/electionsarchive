@@ -1,0 +1,523 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1939-1943, consolidated vote of the general election held 1940-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19391943/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19391943"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "GA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 547,
+      "id": "547-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.075,
+        0.907,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0584
+      ]
+    },
+    {
+      "page": 548,
+      "id": "548-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.046,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0818
+      ]
+    },
+    {
+      "page": 549,
+      "id": "549-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "Ind. Dem.",
+          "contest": "president",
+          "candidate": "Independent Democrats"
+        },
+        {
+          "label": "Pro.",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "Ind.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.087,
+        0.923,
+        0.792
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENTIAL ELECTORS NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0723
+      ]
+    },
+    {
+      "page": 551,
+      "id": "551-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "J. L. R. BOYD",
+          "contest": "governor",
+          "candidate": "J. L. R. Boyd"
+        },
+        {
+          "label": "JOSEPH M. WALLACE",
+          "contest": "governor",
+          "candidate": "Joseph M. Wallace"
+        },
+        {
+          "label": "JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. JOLLEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELLIS G. ARNALL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. L. WHITWORTH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. LEE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.076,
+        0.954,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION, NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.4437
+      ]
+    },
+    {
+      "page": 552,
+      "id": "552-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "EUGENE TALMADGE",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "J. L. R. BOYD",
+          "contest": "governor",
+          "candidate": "J. L. R. Boyd"
+        },
+        {
+          "label": "JOSEPH M. WALLACE",
+          "contest": "governor",
+          "candidate": "Joseph M. Wallace"
+        },
+        {
+          "label": "JOHN B. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEORGE B. HAMILTON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. JOLLEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELLIS G. ARNALL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. L. WHITWORTH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. LEE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.0,
+        0.954,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 553,
+      "id": "553-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "EUGENE TALMADGE Ind.Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "J. L. R. BOYD Pro.",
+          "contest": "governor",
+          "candidate": "J. L. R. Boyd"
+        },
+        {
+          "label": "JOSEPH M. WALLACE Ind.",
+          "contest": "governor",
+          "candidate": "Joseph M. Wallace"
+        },
+        {
+          "label": "JOHN B. WILSON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEORGE B. HAMILTON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. JOLLEY Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELLIS G. ARNALL Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. L. WHITWORTH Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HOMER C. PARKER Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. LEE Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.114,
+        0.958,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION, NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4244
+      ]
+    },
+    {
+      "page": 554,
+      "id": "554-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "EUGENE TALMADGE Ind.Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "J. L. R. BOYD Pro.",
+          "contest": "governor",
+          "candidate": "J. L. R. Boyd"
+        },
+        {
+          "label": "JOSEPH M. WALLACE Ind.",
+          "contest": "governor",
+          "candidate": "Joseph M. Wallace"
+        },
+        {
+          "label": "JOHN B. WILSON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEORGE B. HAMILTON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. JOLLEY Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELLIS G. ARNALL Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. L. WHITWORTH Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HOMER C. PARKER Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. LEE Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.0,
+        0.958,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 555,
+      "id": "555-0",
+      "columns": [
+        {
+          "label": "EUGENE TALMADGE Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "EUGENE TALMADGE Ind.Dem.",
+          "contest": "governor",
+          "candidate": "Eugene Talmadge"
+        },
+        {
+          "label": "J. L. R. BOYD Pro.",
+          "contest": "governor",
+          "candidate": "J. L. R. Boyd"
+        },
+        {
+          "label": "JOSEPH M. WALLACE Ind.",
+          "contest": "governor",
+          "candidate": "Joseph M. Wallace"
+        },
+        {
+          "label": "JOHN B. WILSON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEORGE B. HAMILTON Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. O. JOLLEY Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELLIS G. ARNALL Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. E. L. WHITWORTH Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HOMER C. PARKER Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. H. LEE Pro.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.103,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION, NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4281
+      ]
+    }
+  ]
+}

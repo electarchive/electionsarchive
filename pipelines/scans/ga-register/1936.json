@@ -1,0 +1,942 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1933-1937, consolidated vote of the general election held 1936-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19331937/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19331937"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "senate": {
+      "year": 1936,
+      "chamber": "senate",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 647,
+      "id": "647-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "UNION",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.116,
+        0.921,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3009
+      ]
+    },
+    {
+      "page": 648,
+      "id": "648-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "UNION",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.0,
+        0.921,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 649,
+      "id": "649-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "UNION",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.092,
+        0.945,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2698
+      ]
+    },
+    {
+      "page": 650,
+      "id": "650-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "UNION",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.0,
+        0.945,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 651,
+      "id": "651-0",
+      "columns": [
+        {
+          "label": "DEMOCRAT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REPUBLICIAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COMMUNIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEMOCRAT",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "PROHIBITION",
+          "contest": "president",
+          "candidate": "Prohibition"
+        },
+        {
+          "label": "UNION",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "SOCIALIST",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.064,
+        0.955,
+        0.924
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE OF GENERAL ELECTIONS FOR PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3093
+      ]
+    },
+    {
+      "page": 654,
+      "id": "654-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.) (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (1936)",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.075,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1892
+      ]
+    },
+    {
+      "page": 655,
+      "id": "655-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR.",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.081,
+        0.919,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1665
+      ]
+    },
+    {
+      "page": 656,
+      "id": "656-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR.",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.091,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2079
+      ]
+    },
+    {
+      "page": 657,
+      "id": "657-0",
+      "columns": [
+        {
+          "label": "Democrat WALTER F. GEORGE (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican JAMES W. ARNOLD (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (Unexpired term of William J. Harris dec.) (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat RICHARD B. RUSSELL, JR. (1936)",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.086,
+        0.946,
+        0.487
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTIONS, FOR UNITED STATES SENATOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-0",
+      "columns": [
+        {
+          "label": "HOMER C. PARKER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. K. OVERSTREET Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HUGH PETERSON Jr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HUGH PETERSON Jr.",
+          "contest": "house1",
+          "candidate": "Hugh Peterson, Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.102,
+        0.945,
+        0.504
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 779,
+      "id": "779-1",
+      "columns": [
+        {
+          "label": "E. E. COX",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. E. COX",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. E. COX",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.496,
+        0.945,
+        0.854
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 780,
+      "id": "780-0",
+      "columns": [
+        {
+          "label": "1932 Democrat B. T. CASTELLOW",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1934 Democrat B. T. CASTELLOW",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1936 Democrat STEPHEN PACE",
+          "contest": "house3",
+          "candidate": "Stephen Pace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.106,
+        0.914,
+        0.556
+      ],
+      "hint": "Read only the table headed '3rd District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2244
+      ]
+    },
+    {
+      "page": 780,
+      "id": "780-1",
+      "columns": [
+        {
+          "label": "1932 Democrat E. M. OWEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1932 Republican H. O. LOVVORN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1934 Democrat E. M. OWEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1934 Republican B. W. MIDDLEBROOKS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "1936 Democrat E. M. OWEN",
+          "contest": "house4",
+          "candidate": "Emmet M. Owen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.548,
+        0.91,
+        0.895
+      ],
+      "hint": "Read only the table headed '4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-0",
+      "columns": [
+        {
+          "label": "Democrat ROBERT RAMSPECK (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat ROBERT RAMSPECK (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat ROBERT RAMSPECK (1936)",
+          "contest": "house5",
+          "candidate": "Robert Ramspeck"
+        },
+        {
+          "label": "Republican H. H. ALEXANDER (1936)",
+          "contest": "house5",
+          "candidate": "Henry A. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.105,
+        0.938,
+        0.273
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-1",
+      "columns": [
+        {
+          "label": "Democrat CARL VINSON (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent GEO. S. JONES (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat CARL VINSON (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat CARL VINSON (1936)",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.122,
+        0.265,
+        0.934,
+        0.599
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 781,
+      "id": "781-2",
+      "columns": [
+        {
+          "label": "Democrat M. C. TARVER (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent MRS. REGINA RAMBO BENSON (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat M. C. TARVER (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat M. C. TARVER (1936)",
+          "contest": "house7",
+          "candidate": "Malcolm C. Tarver"
+        },
+        {
+          "label": "Republican L. MITCHELL JOHNSON (1936)",
+          "contest": "house7",
+          "candidate": "L. Mitchell Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.591,
+        0.931,
+        0.919
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN - 7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 782,
+      "id": "782-0",
+      "columns": [
+        {
+          "label": "BRASWELL DEEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. J. CARSWELL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BRASWELL DEEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BRASWELL DEEN",
+          "contest": "house8",
+          "candidate": "Braswell Deen"
+        },
+        {
+          "label": "BEN J. FORD",
+          "contest": "house8",
+          "candidate": "Ben J. Ford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.101,
+        0.9,
+        0.501
+      ],
+      "hint": "Read only the table headed 'CONSOLIDATED VOTE, GENERAL ELECTION FOR CONGRESSMEN'; ignore any other table visible in the image."
+    },
+    {
+      "page": 783,
+      "id": "783-0",
+      "columns": [
+        {
+          "label": "Democrat B. FRANK WHELCHEL (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat B. FRANK WHECHEL (1936)",
+          "contest": "house9",
+          "candidate": "B. Frank Whelchel"
+        },
+        {
+          "label": "Republican JOHN M. JOHNSON (1936)",
+          "contest": "house9",
+          "candidate": "John M. Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.092,
+        0.945,
+        0.503
+      ],
+      "hint": "Read only the table headed '9th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 783,
+      "id": "783-1",
+      "columns": [
+        {
+          "label": "Democrat C. H. BRAND (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Independent C. L. UPCHURCH (1932)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat PAUL BROWN (1934)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democrat PAUL BROWN (1936)",
+          "contest": "house10",
+          "candidate": "Paul Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.495,
+        0.945,
+        0.864
+      ],
+      "hint": "Read only the table headed '10th District'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,550 @@
+{
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1945-1950, consolidated vote of the general election held 1948-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister19451950/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister19451950"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "senate": {
+      "year": 1948,
+      "chamber": "senate",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": null
+    },
+    "house1": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 1
+    },
+    "house3": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 3
+    },
+    "house2": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 2
+    },
+    "house4": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 5
+    },
+    "house7": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 7
+    },
+    "house6": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "GA",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 609,
+      "id": "609-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "States Rights",
+          "contest": "president",
+          "candidate": "J. Strom Thurmond (Dixiecrat)"
+        },
+        {
+          "label": "Progressive",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Prohibition",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.094,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 2, 1948 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0596
+      ]
+    },
+    {
+      "page": 610,
+      "id": "610-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "States Rights",
+          "contest": "president",
+          "candidate": "J. Strom Thurmond (Dixiecrat)"
+        },
+        {
+          "label": "Progressive",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Prohibition",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.097,
+        0.896,
+        1.0
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 2, 1948 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0598
+      ]
+    },
+    {
+      "page": 611,
+      "id": "611-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Repub.",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "States Rights",
+          "contest": "president",
+          "candidate": "J. Strom Thurmond (Dixiecrat)"
+        },
+        {
+          "label": "Progressive",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Prohibition",
+          "contest": "president",
+          "candidate": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.092,
+        0.91,
+        0.749
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION NOVEMBER 2, 1948 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0776
+      ]
+    },
+    {
+      "page": 612,
+      "id": "612-0",
+      "columns": [
+        {
+          "label": "Russell",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        },
+        {
+          "label": "Marshall",
+          "contest": "senate",
+          "candidate": "Larkin Marshall"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.097,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0609
+      ]
+    },
+    {
+      "page": 613,
+      "id": "613-0",
+      "columns": [
+        {
+          "label": "Russell",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        },
+        {
+          "label": "Marshall",
+          "contest": "senate",
+          "candidate": "Larkin Marshall"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.096,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0597
+      ]
+    },
+    {
+      "page": 614,
+      "id": "614-0",
+      "columns": [
+        {
+          "label": "Russell",
+          "contest": "senate",
+          "candidate": "Richard B. Russell, Jr."
+        },
+        {
+          "label": "Marshall",
+          "contest": "senate",
+          "candidate": "Larkin Marshall"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.056,
+        0.902,
+        0.845
+      ],
+      "hint": "Read only the table headed 'General Election November 2, 1948 - United States Senators'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1191
+      ]
+    },
+    {
+      "page": 652,
+      "id": "652-0",
+      "columns": [
+        {
+          "label": "Prince H. Preston",
+          "contest": "house1",
+          "candidate": "Prince H. Preston, Jr."
+        },
+        {
+          "label": "H. W. Sheppard",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.119,
+        0.508,
+        0.538
+      ],
+      "hint": "Read only the table headed '1ST CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 652,
+      "id": "652-1",
+      "columns": [
+        {
+          "label": "Stephen Pace",
+          "contest": "house3",
+          "candidate": "Stephen Pace"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.5,
+        0.119,
+        0.911,
+        0.571
+      ],
+      "hint": "Read only the table headed '3RD CONGRESSIONAL DIST.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2013
+      ]
+    },
+    {
+      "page": 652,
+      "id": "652-2",
+      "columns": [
+        {
+          "label": "E. E. Cox",
+          "contest": "house2",
+          "candidate": "E. E. Cox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.53,
+        0.506,
+        0.871
+      ],
+      "hint": "Read only the table headed '2ND CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 652,
+      "id": "652-3",
+      "columns": [
+        {
+          "label": "A. Sidney Camp",
+          "contest": "house4",
+          "candidate": "A. Sidney Camp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.5,
+        0.563,
+        0.911,
+        0.899
+      ],
+      "hint": "Read only the table headed '4TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-0",
+      "columns": [
+        {
+          "label": "James C. Davis (Dem.)",
+          "contest": "house5",
+          "candidate": "James C. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.113,
+        0.526,
+        0.387
+      ],
+      "hint": "Read only the table headed '5TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-1",
+      "columns": [
+        {
+          "label": "Henderson Lanham (Dem.)",
+          "contest": "house7",
+          "candidate": "Henderson Lanham"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.516,
+        0.113,
+        0.946,
+        0.443
+      ],
+      "hint": "Read only the table headed '7TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 653,
+      "id": "653-2",
+      "columns": [
+        {
+          "label": "Carl Vinson (Dem.)",
+          "contest": "house6",
+          "candidate": "Carl Vinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.093,
+        0.379,
+        0.526,
+        0.84
+      ],
+      "hint": "Read only the table headed '6TH CONGRESSIONAL DIST.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4425
+      ]
+    },
+    {
+      "page": 653,
+      "id": "653-3",
+      "columns": [
+        {
+          "label": "W. M. (Don) Wheeler (Dem.)",
+          "contest": "house8",
+          "candidate": "W. M. (Don) Wheeler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.516,
+        0.435,
+        0.946,
+        0.84
+      ],
+      "hint": "Read only the table headed '8TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 654,
+      "id": "654-0",
+      "columns": [
+        {
+          "label": "John S. Wood Dem.",
+          "contest": "house9",
+          "candidate": "John S. Wood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.108,
+        0.515,
+        0.495
+      ],
+      "hint": "Read only the table headed '9TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 654,
+      "id": "654-1",
+      "columns": [
+        {
+          "label": "Paul Brown Dem.",
+          "contest": "house10",
+          "candidate": "Paul Brown"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.502,
+        0.108,
+        0.921,
+        0.495
+      ],
+      "hint": "Read only the table headed '10TH CONGRESSIONAL DIST.'; ignore any other table visible in the image."
+    }
+  ]
+}
