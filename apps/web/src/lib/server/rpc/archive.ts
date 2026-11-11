@@ -8398,6 +8398,30 @@ export const contests = {
           isShallow: false,
         },
       ] = counted.rows;
+      const unitSchemes = async () => {
+        const active = await db.execute<{ k: number }>(sql`
+          select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
+        `);
+        return rowsOf(
+          await db.execute<{
+            code: string;
+            noun: string;
+            rank: number;
+            units: number;
+          }>(sql`
+            select ru.scheme_code as code, sc.noun, sc.rank, count(*)::int as units
+            from (
+              select distinct unit_k from result_value
+              where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
+            ) x
+            join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
+            join scheme sc on sc.code = ru.scheme_code
+            group by ru.scheme_code, sc.noun, sc.rank
+          `),
+        );
+      };
+      const early = isRoot && last <= 1 ? unitSchemes() : null;
+      early?.catch(() => null);
       const childIds = parts.rows.map((row) => row.id);
       const ancestorIds = ancestors.rows.map((row) => row.id);
       const [labels, slugs, crumbs, notes, sets, declared, wording] =
@@ -10222,25 +10246,44 @@ export const contests = {
           () =>
             `deeper:${contest.id}:${grid.level}:${grid.levels.map((level) => level.code).join(",")}:${grid.rows.length}`,
           async () => {
-            const active = await db.execute<{ k: number }>(sql`
-              select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
-            `);
-            const found = await db.execute<{ noun: string }>(sql`
-              select sc.noun
-              from (
-                select distinct unit_k from result_value
-                where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
-              ) x
-              join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
-              join scheme sc on sc.code = ru.scheme_code
-              where ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
-                and sc.rank > (select rank from scheme where code = ${grid.level})
-              group by sc.noun, sc.rank
-              having count(*) > ${grid.rows.length}
-              order by sc.rank desc
-              limit 1
-            `);
-            return found.rows[0]?.noun ?? null;
+            const [counts, floor] = await Promise.all([
+              early ?? unitSchemes(),
+              db.execute<{ rank: number }>(sql`
+                select rank from scheme where code = ${grid.level}
+              `),
+            ]);
+            const above = floor.rows[0]?.rank;
+            if (above == null) {
+              return null;
+            }
+            const skipped = new Set(grid.levels.map((level) => level.code));
+            const nouns = new Map<
+              string,
+              { noun: string; rank: number; units: number }
+            >();
+            for (const row of counts) {
+              if (skipped.has(row.code) || row.rank <= above) {
+                continue;
+              }
+              const key = `${row.rank}:${row.noun}`;
+              const entry = nouns.get(key) ?? {
+                noun: row.noun,
+                rank: row.rank,
+                units: 0,
+              };
+              entry.units += row.units;
+              nouns.set(key, entry);
+            }
+            let finest: { noun: string; rank: number } | null = null;
+            for (const entry of nouns.values()) {
+              if (
+                entry.units > grid.rows.length &&
+                entry.rank > (finest?.rank ?? -Infinity)
+              ) {
+                finest = entry;
+              }
+            }
+            return finest?.noun ?? null;
           },
         );
       })();
