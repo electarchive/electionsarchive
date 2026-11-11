@@ -4353,6 +4353,8 @@ async function places(
   grouping: Grouping = "option",
   round: number | null = null,
 ): Promise<v.InferOutput<typeof Places>> {
+  const strays = unlocated();
+  strays.catch(() => null);
   const found = await children(
     contest.id,
     area,
@@ -4551,49 +4553,47 @@ async function places(
       })),
     };
   }
-  const allocated = await db.execute<{
-    id: string;
-    area: string;
-    k: number;
-    parent: string | null;
-    path: string | null;
-    seats: number | null;
-  }>(sql`
-    select c.id, c.district_area_id as area, a.k, p.parent_id as parent, s.path,
-      (
-        select sum(x.seats)::int from contest_option o
-        cross join lateral (
-          select max(x.seats) as seats from outcome x
-          join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-          where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-          having count(*) > 0
-        ) x
-        where o.contest_id = c.id
-      ) as seats
-    from contest c
-    join area a on a.id = c.district_area_id
-    left join area_parent p on p.area_id = a.id and p.valid @> ${contest.date ?? "infinity"}::date
-    left join slug s on s.entity_id = c.id and s.is_current
-    where c.allocation_parent_id = ${contest.id}::uuid
-  `);
-  const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
-  const childContest = new Map(allocated.rows.map((row) => [row.area, row.id]));
-  const joined = new Set(
-    kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
-  );
   const checked = kids.filter(
     (kid) =>
       !kid.isDeep &&
       kid.scheme !== "world.country" &&
       eligible.some((level) => level.code === kid.scheme),
   );
-  const straddled =
+  const [allocated, straddled, tiled] = await Promise.all([
+    db.execute<{
+      id: string;
+      area: string;
+      k: number;
+      parent: string | null;
+      path: string | null;
+      seats: number | null;
+    }>(sql`
+      select c.id, c.district_area_id as area, a.k, p.parent_id as parent, s.path,
+        (
+          select sum(x.seats)::int from contest_option o
+          cross join lateral (
+            select max(x.seats) as seats from outcome x
+            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+            where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            having count(*) > 0
+          ) x
+          where o.contest_id = c.id
+        ) as seats
+      from contest c
+      join area a on a.id = c.district_area_id
+      left join area_parent p on p.area_id = a.id and p.valid @> ${contest.date ?? "infinity"}::date
+      left join slug s on s.entity_id = c.id and s.is_current
+      where c.allocation_parent_id = ${contest.id}::uuid
+    `),
     checked.length > 600
       ? null
-      : await db.execute<{ k: number }>(sql`
+      : db.execute<{ k: number }>(sql`
         with me as materialized (
-          select geom from area_geometry where area_id = ${area.id}::uuid
-          order by valid @> ${contest.date ?? "infinity"}::date desc, upper(valid) desc nulls first limit 1
+          select geom from (
+            (select geom from area_geometry where area_id = ${area.id}::uuid and valid @> ${contest.date ?? "infinity"}::date)
+            union all
+            (select geom from area_geometry where area_id = ${area.id}::uuid order by upper(valid) desc nulls first limit 1)
+          ) g limit 1
         ),
         listed as materialized (
           select a.id, a.k from area a
@@ -4629,7 +4629,18 @@ async function places(
           )
           or exists (select from siblings x join result_rollup_unit u on u.result_set_k = x.k and u.area_k = s.k)
           or exists (select from siblings x join result_rollup_sum r on r.result_set_k = x.k and r.area_k = s.k)
-      `);
+      `),
+    db.execute<{ code: string }>(sql`
+      select distinct bs.scheme_code as code from boundary_set bs
+      where bs.scheme_code = any(${sql.param(eligible.map((entry) => entry.code))}::text[])
+        and (bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or bs.valid @> ${contest.date ?? "infinity"}::date)
+    `),
+  ]);
+  const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
+  const childContest = new Map(allocated.rows.map((row) => [row.area, row.id]));
+  const joined = new Set(
+    kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
+  );
   const split = new Set(straddled?.rows.map((row) => row.k));
   const partial = new Set(
     checked.filter((kid) => split.has(kid.k)).map((kid) => kid.scheme),
@@ -4650,11 +4661,6 @@ async function places(
         Number(a.kind === "administrative") ||
       b.count - a.count,
   );
-  const tiled = await db.execute<{ code: string }>(sql`
-    select distinct bs.scheme_code as code from boundary_set bs
-    where bs.scheme_code = any(${sql.param(levels.map((entry) => entry.code))}::text[])
-      and (bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or bs.valid @> ${contest.date ?? "infinity"}::date)
-  `);
   const level =
     levels.find((entry) => entry.code === by) ??
     levels.find((entry) => tiled.rows.some((row) => row.code === entry.code)) ??
@@ -4714,7 +4720,7 @@ async function places(
           loose as materialized (
             select u.id, u.k, u.kind
             from jsonb_array_elements_text(${JSON.stringify(
-              await unlocated(),
+              await strays,
             )}::jsonb -> (
               select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
             )) as uk(k)
