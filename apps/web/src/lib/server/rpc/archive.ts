@@ -1580,33 +1580,49 @@ async function survey(
     return [];
   }
   const pool = sql`${sql.param(ks)}::int[]`;
-  const counted = (candidates: SQL) => sql`
-    with kids as materialized (${candidates}),
-    units as materialized (
-      select kids.* from kids
-      where kids.k in (select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}))
-    )
-    select kids.* from kids
-    where kids.k in (
-      select r.area_k from result_rollup_sum r where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
-    )
-    union
-    select units.* from units
-    where exists (
+  const valued = (k: SQL) => sql`
+    exists (
       select from result_rollup_unit u
       cross join lateral (
         select from result_value v
         where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
         limit 1
       ) v
-      where u.area_k = units.k and u.result_set_k = any(${pool})
+      where u.area_k = ${k} and u.result_set_k = any(${pool})
     )
-    union
-    select kids.* from kids
-    where kids.id in (
+  `;
+  const named = sql`
+    kids.id in (
       select c.district_area_id from result_set s join contest c on c.id = s.contest_id where s.k = any(${pool})
     )
   `;
+  const counted = (candidates: SQL) =>
+    ks.length < 100
+      ? sql`
+        with kids as materialized (${candidates}),
+        units as materialized (
+          select kids.* from kids
+          where kids.k in (select u.area_k from result_rollup_unit u where u.result_set_k = any(${pool}))
+        )
+        select kids.* from kids
+        where kids.k in (
+          select r.area_k from result_rollup_sum r where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
+        )
+        union
+        select units.* from units where ${valued(sql`units.k`)}
+        union
+        select kids.* from kids where ${named}
+      `
+      : sql`
+        with kids as materialized (${candidates})
+        select distinct kids.* from kids
+        where exists (
+          select from result_rollup_sum r
+          where r.area_k = kids.k and r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
+        )
+        or ${valued(sql`kids.k`)}
+        or ${named}
+      `;
   let found = await db.execute<{ id: string; k: number; scheme: string }>(
     counted(sql`
       select a.id, a.k, a.scheme_code as scheme
