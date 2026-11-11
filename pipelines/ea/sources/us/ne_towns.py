@@ -199,6 +199,9 @@ def emit(
                     if legals[(row["state"], legal[row["town"]])] == 1 and row["code"] not in governments
                     else f"{legal[row['town']]} ({counties.get(row['code'][:5], row['code'][:5])})"
                 )
+        foreign = {
+            row[0] for row in cs.conn.execute("select id from reporting_unit where scheme_code = 'us.place'").fetchall()
+        }
         created = reused = skipped = polities = 0
         for row in towns.iter_rows(named=True):
             state, abbreviation = row["state"], states[row["state"]]
@@ -263,9 +266,12 @@ def emit(
                 cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{abbreviation}"))
                 cs.add("slug", path=path, entity_id=polity)
                 cs.add("polity_territory", polity_id=polity, area_id=area)
+            unit = cs.unit("us.town", row["code"])
+            if unit in foreign:
+                continue
             cs.add(
                 "reporting_unit",
-                id=cs.unit("us.town", row["code"]),
+                id=unit,
                 polity_id=polity or governments.get(row["code"]) or str(cs.polity(f"US-{abbreviation}")),
                 scheme_code="us.town",
                 code=row["code"],

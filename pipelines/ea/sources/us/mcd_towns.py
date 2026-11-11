@@ -75,7 +75,7 @@ def parse() -> None:
             if row["FUNCSTAT"] == "F" and counted[legal] == 1:
                 parts.append((code, active[legal]))
         for row in records(TIGER.format("PLACE", fips, "place")):
-            governments[str(row["GEOID"])] = (fips, str(row["NAME"]), str(row["NAMELSAD"]))
+            governments[str(row["GEOID"])] = (fips, re.sub(r"^Village of ", "", str(row["NAME"])), str(row["NAMELSAD"]))
     used = {geoid for _, geoid in parts}
     shapes = []
     for fips in STATES:
@@ -199,6 +199,32 @@ def emit() -> Path:
                 )
                 cs.add("name", entity_id=entity, text=fresh, lang="en", kind="official", is_preferred=True)
                 renamed.append(f"{text} -> {fresh}")
+        prefixed = places.filter(pl.col("legal").str.starts_with("Village of ")).get_column("geoid").to_list()
+        for entity, *name in cs.conn.execute(
+            """select distinct e.entity::text, n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id
+               from (select a.id as entity, c.code from area a join area_code c on c.area_id = a.id
+                     where a.scheme_code = 'us.place'
+                     union all
+                     select t.polity_id, c.code from polity_territory t join area a on a.id = t.area_id
+                     join area_code c on c.area_id = a.id where a.scheme_code = 'us.place') e
+               join name n on n.entity_id = e.entity and n.is_preferred and n.valid_from is null and n.valid_to is null
+               where e.code = any(%s) and n.text like 'Village of %%'""",
+            [prefixed],
+        ).fetchall():
+            cs.add(
+                "name",
+                **dict(zip(("id", "entity_id", "text", "lang", "script", "kind", "source_id"), name, strict=True)),
+                is_preferred=False,
+            )
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=name[2].removeprefix("Village of "),
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            renamed.append(name[2])
         print("renamed:", "; ".join(sorted(renamed)))
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         for fips in states:
