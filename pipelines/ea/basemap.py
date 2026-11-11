@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont
 from pmtiles.reader import MmapSource, Reader
 from pyproj import Transformer
-from shapely import affinity, box, clip_by_rect, get_dimensions, make_valid, unary_union
+from shapely import LineString, affinity, box, clip_by_rect, get_dimensions, make_valid, unary_union
 from shapely.geometry import Point, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.prepared import PreparedGeometry, prep
@@ -66,6 +66,26 @@ SCALE = 8
 BUFFER = 3
 RADIUS = 8
 CUTOFF = 0.25
+ATTRIBUTION = "Map data © OpenStreetMap contributors (ODbL); Protomaps"
+OHM = "https://planet.openhistoricalmap.org/planet/planet-{date}_0000.osm.pbf"
+OHM_ATTRIBUTION = "Historical data © OpenHistoricalMap contributors (CC0, CC BY; credits in the credits file)"
+RAIL_ZOOM = {
+    "rail": 5,
+    "narrow_gauge": 8,
+    "light_rail": 9,
+    "preserved": 9,
+    "monorail": 10,
+    "funicular": 10,
+    "tram": 10,
+    "subway": 10,
+}
+BORDER_IDS = {"tr": {2801012, 2864001, 2863989}}
+BORDER_LEVELS = {"de": ({"2", "3", "4"}, ((1950, 1, 1), (1980, 1, 1)))}
+MUTED = {
+    "before": "1970-01-01",
+    "hide": ["roads", "streets", "places", "hoods"],
+    "keep": ["earth", "bounds", "water"],
+}
 
 zones: list[tuple[list[list[float]], list[float] | None, Transformer, list[float] | None]] = []
 land: BaseGeometry
@@ -424,35 +444,214 @@ def build(scheme: str) -> str:
         (f"{scheme}.metro", ("streets", "hoods"), 8, 14),
     ):
         target = OUT / f"{name}.pmtiles"
-        subprocess.run(
-            [
-                "tippecanoe",
-                "-o",
-                str(target),
-                "--force",
-                "-t",
-                str(staging),
-                "--projection=EPSG:3857",
-                f"-Z{low}",
-                f"-z{high}",
-                "--no-feature-limit",
-                "--no-tile-size-limit",
-                "-r1",
-                "--simplification=4",
-                "--detect-shared-borders",
-                "-n",
-                f"Basemap {name}",
-                "-A",
-                "Map data © OpenStreetMap contributors (ODbL); Protomaps",
-                "-P",
-                "-q",
-                *[str(staging / f"{layer}.geojsons") for layer in layers if (staging / f"{layer}.geojsons").exists()],
-            ],
-            check=True,
-        )
+        pack(target, f"Basemap {name}", ATTRIBUTION, low, high, staging, layers)
         sizes.append(f"{target.name} {target.stat().st_size / 1e6:.0f} MB")
     shutil.rmtree(staging)
     return f"{scheme}: {len(jobs)} source tiles, {len(cities)} metro areas, {', '.join(sizes)}"
+
+
+def historical(schemes: list[str], date: str) -> str:
+    """Builds the OpenHistoricalMap layers (railways, German boundaries, Turkish and Syrian outlines) for each scheme
+    from the planet of `date` (such as 261111), plus the credits and the modern-layer config. See `ea.ohm` for the
+    license and date rules."""
+    import sqlite3
+
+    from ea import ohm
+
+    planet = raw.fetch("world.ohm", OHM.format(date=date), suffix=".osm.pbf").path
+    admin = raw.fetch("world.natural_earth", ADMIN, suffix=".geojson")
+    world = unary_union([shape(f["geometry"]) for f in json.loads(admin.path.read_text())["features"]]).buffer(0.02)
+    regions: dict[str, tuple[PreparedGeometry, PreparedGeometry]] = {}
+    for scheme in schemes:
+        setup(scheme)
+        regions[scheme] = (near, inside)
+    folder = WORK / "ohm" / date
+    shutil.rmtree(folder, ignore_errors=True)
+    for scheme in schemes:
+        (folder / scheme).mkdir(parents=True)
+    tally = ohm.Tally()
+
+    def selects(scheme: str, tags: dict[str, str]) -> bool:
+        if scheme not in BORDER_LEVELS or tags.get("boundary") != "administrative":
+            return False
+        levels, dates = BORDER_LEVELS[scheme]
+        props = ohm.stamp(tags)
+        return (
+            tags.get("admin_level") in levels
+            and props is not None
+            and any(ohm.valid_on(props, ohm.days(*day)) for day in dates)
+        )
+
+    found = ohm.relations(
+        planet,
+        lambda rid, tags: any(rid in BORDER_IDS.get(s, ()) or selects(s, tags) for s in schemes),
+    )
+    keep = {ref for _, members in found.values() for ref, _ in members}
+    handles = {scheme: (folder / scheme / "rail.wgs").open("w") for scheme in schemes}
+
+    def rail(points: list[tuple[float, float]], tags: dict[str, str]) -> None:
+        line = LineString(points)
+        props = ohm.stamp(tags)
+        vetted = None if props is None else ohm.vet(tags, tally)
+        for scheme, (area, _) in regions.items():
+            if not area.intersects(line):
+                continue
+            if props is None:
+                tally.counts[(scheme, "rail", "dropped_undated" if "start_date" not in tags else "dropped_date")] += 1
+            elif vetted is None:
+                tally.counts[(scheme, "rail", "dropped_license")] += 1
+            else:
+                tally.counts[(scheme, "rail", vetted[0])] += 1
+                row = {"kind": tags["railway"], **props}
+                if vetted[1] is not None:
+                    tally.credits[(scheme, "rail", vetted[1])] += 1
+                    row["c"] = vetted[1].id
+                zoom = RAIL_ZOOM[tags["railway"]] if "service" not in tags else max(9, RAIL_ZOOM[tags["railway"]])
+                handles[scheme].write(
+                    json.dumps({"p": row, "z": zoom, "g": mapping(line)}, separators=(",", ":")) + "\n"
+                )
+
+    store = sqlite3.connect(folder / "ways.db")
+    ohm.ways(planet, folder, keep, rail, store)
+    for handle in handles.values():
+        handle.close()
+    borders: dict[str, list[tuple[BaseGeometry, dict[str, str | int]]]] = {scheme: [] for scheme in schemes}
+    for rid, (tags, members) in found.items():
+        geometry, members_credits = ohm.assemble(store, members, tally)
+        if geometry is None and members_credits is not None:
+            continue
+        clipped = geometry.intersection(world) if geometry is not None else None
+        point = None if clipped is None or clipped.is_empty else clipped.representative_point()
+        targets = [
+            scheme
+            for scheme, (_, ground) in regions.items()
+            if rid in BORDER_IDS.get(scheme, ())
+            or (point is not None and selects(scheme, tags) and ground.contains(point))
+        ]
+        props = ohm.stamp(tags)
+        vetted = None if props is None or members_credits is None else ohm.vet(tags, tally)
+        for scheme in targets:
+            if props is None:
+                tally.counts[
+                    (scheme, "borders", "dropped_undated" if "start_date" not in tags else "dropped_date")
+                ] += 1
+            elif vetted is None:
+                tally.counts[(scheme, "borders", "dropped_license")] += 1
+            elif clipped is not None and not clipped.is_empty:
+                tally.counts[(scheme, "borders", vetted[0])] += 1
+                credits = {*(members_credits or []), *([vetted[1]] if vetted[1] is not None else [])}
+                for credit in credits:
+                    tally.credits[(scheme, "borders", credit)] += 1
+                info: dict[str, str | int] = {"id": rid, "level": int(tags.get("admin_level", 0)), **props}
+                if "name" in tags:
+                    info["name"] = tags["name"]
+                if credits:
+                    info["c"] = ",".join(sorted(credit.id for credit in credits))
+                borders[scheme].append((clipped, info))
+    store.close()
+    OUT.mkdir(parents=True, exist_ok=True)
+    report = []
+    for scheme in schemes:
+        setup(scheme)
+        staging = folder / scheme
+        written = {"rail": 0, "borders": 0}
+        with (staging / "rail.geojsons").open("w") as out, (staging / "rail.wgs").open() as source:
+            for line in source:
+                item = json.loads(line)
+                row = settle(shape(item["g"]), "rail", item["p"], (item["z"], 12), True)
+                if row is not None:
+                    out.write(row + "\n")
+                    written["rail"] += 1
+        with (staging / "borders.geojsons").open("w") as out:
+            for geometry, props in borders[scheme]:
+                row = settle(geometry, "borders", props, (0 if props["level"] == 2 else 4, 12), True)
+                if row is not None:
+                    out.write(row + "\n")
+                    written["borders"] += 1
+        target = OUT / f"{scheme}.historical.pmtiles"
+        pack(target, f"Historical basemap {scheme}", OHM_ATTRIBUTION, 0, 12, staging, ("rail", "borders"))
+        counts: dict[str, dict[str, int]] = {}
+        for (s, theme, outcome), n in sorted(tally.counts.items()):
+            if s == scheme:
+                counts.setdefault(theme, {})[outcome] = n
+        sources: dict[str, dict[str, str]] = {}
+        features: dict[str, dict[str, int]] = {}
+        for (s, theme, credit), n in sorted(
+            tally.credits.items(), key=lambda item: (item[0][0], item[0][1], item[0][2].id)
+        ):
+            if s == scheme:
+                sources[credit.id] = {
+                    "id": credit.id,
+                    "license": credit.license,
+                    "source": credit.source,
+                    "attribution": credit.attribution,
+                }
+                features.setdefault(credit.id, {})[theme] = n
+        (OUT / f"{scheme}.historical.credits.json").write_text(
+            json.dumps(
+                {
+                    "planet": date,
+                    "provider": "OpenHistoricalMap",
+                    "url": "https://www.openhistoricalmap.org/",
+                    "note": "Features without a license tag are kept as the planet's default CC0. Every feature below with a credit id in its c property is CC BY or an attribution-only equivalent and must be credited as listed.",
+                    "tiles": written,
+                    "counts": counts,
+                    "sources": [{**entry, "features": features[key]} for key, entry in sources.items()],
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+            + "\n"
+        )
+        report.append(
+            f"{scheme}: {written['rail']} rail, {written['borders']} borders, {len(sources)} credits, {target.stat().st_size / 1e6:.0f} MB; {json.dumps(counts)}"
+        )
+    (OUT / "historical.json").write_text(
+        json.dumps(
+            {
+                "planet": date,
+                "days": "days since 1970-01-01",
+                "valid": "s <= day < e; a missing e means open",
+                "muted": MUTED,
+                "rejected_licenses": dict(tally.rejected.most_common()),
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+        + "\n"
+    )
+    return "\n".join(report)
+
+
+def pack(
+    target: Path, title: str, attribution: str, low: int, high: int, staging: Path, layers: tuple[str, ...]
+) -> None:
+    subprocess.run(
+        [
+            "tippecanoe",
+            "-o",
+            str(target),
+            "--force",
+            "-t",
+            str(staging),
+            "--projection=EPSG:3857",
+            f"-Z{low}",
+            f"-z{high}",
+            "--no-feature-limit",
+            "--no-tile-size-limit",
+            "-r1",
+            "--simplification=4",
+            "--detect-shared-borders",
+            "-n",
+            title,
+            "-A",
+            attribution,
+            "-P",
+            "-q",
+            *[str(staging / f"{layer}.geojsons") for layer in layers if (staging / f"{layer}.geojsons").exists()],
+        ],
+        check=True,
+    )
 
 
 def varint(value: int) -> bytes:
