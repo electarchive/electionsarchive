@@ -743,7 +743,7 @@
       </section>
     {:else}
       <section
-        class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
+        class="grid items-start gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
       >
         <LiveMap
           {geography}
@@ -845,7 +845,7 @@
 
     {#if isLive && !isUnestimated}
       <section
-        class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
+        class="grid items-start gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
       >
         <Withheld isOff={!forecasts}>
           <Outstanding
