@@ -41,6 +41,7 @@ def build(prefix: str | None) -> str:
     with connect() as conn:
         mask = display.ensure(conn)
         display.coarsen(conn)
+        display.straddle(conn)
     summaries: list[str] = []
     with tempfile.TemporaryDirectory() as scratch:
         for scheme_code, vintage, as_of, features, attribution in sets:

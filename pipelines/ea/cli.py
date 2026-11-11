@@ -68,6 +68,7 @@ def main() -> None:
     contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
     contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
     commands.add_parser("coarse", help="refresh the simplified copies of heavy area geometries used for overlaps")
+    commands.add_parser("straddle", help="refresh which contest-map areas straddle their district's boundary")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme",
         nargs="?",
@@ -277,6 +278,9 @@ def main() -> None:
         case "coarse":
             with connect() as conn:
                 print(display.coarsen(conn))
+        case "straddle":
+            with connect() as conn:
+                print(display.straddle(conn))
         case "tiles":
             print(tiles.build(args.scheme))
         case "rasters":
