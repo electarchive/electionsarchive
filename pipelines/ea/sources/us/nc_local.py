@@ -723,19 +723,23 @@ def emit() -> Path:
                 else:
                     cs.add("office", id=owner, polity_id=polity, kind="mayor" if office == "mayor" else "other")
                 name(owner, title)
-            if not general and (day, "37") not in elections:
+            if (not general or day.month != 11) and (day, "37") not in elections:
                 umbrella = elections[(day, "37")] = cs.key("us.election", f"{day}:NC")
                 cs.add(
                     "election",
                     id=umbrella,
                     polity_id=state,
-                    kind="local" if kind_of == "primary" else kind_of,
+                    kind="local" if kind_of == "primary" or general else kind_of,
                     date_from=day,
                     date_to=day,
                     status="held",
                 )
                 name(umbrella, f"{day.year} North Carolina municipal {label} elections")
-                cs.add("slug", path=f"us/nc/{day}-{'local' if kind_of == 'primary' else kind_of}", entity_id=umbrella)
+                cs.add(
+                    "slug",
+                    path=f"us/nc/{day}-{'local' if kind_of == 'primary' or general else kind_of}",
+                    entity_id=umbrella,
+                )
             if (day, code) not in elections and f"{path}/{day}-{kind_of}" in foreign["election"]:
                 elections[(day, code)] = foreign["election"][f"{path}/{day}-{kind_of}"]
             if (day, code) not in elections:
@@ -744,7 +748,7 @@ def emit() -> Path:
                     "election",
                     id=election,
                     polity_id=polity,
-                    parent_id=cs.key("us.election", f"{day}:NC") if day.month == 11 or not general else None,
+                    parent_id=cs.key("us.election", f"{day}:NC"),
                     kind=kind_of,
                     date_from=day,
                     date_to=day,
