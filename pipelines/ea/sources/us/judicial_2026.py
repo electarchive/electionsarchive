@@ -196,5 +196,22 @@ def emit() -> Path:
         ).fetchall():
             if str(option) not in staged:
                 cs.add("option_drop", option_id=option, contest_id=contest, reason=f"{label} has no candidacy left")
+        stale = conn.execute(
+            """select c.id from contest c join changeset w on w.id = c.changeset_id
+               where w.pipeline = %s and c.id <> all(%s::uuid[])
+                 and not exists (select from result_set r where r.contest_id = c.id)""",
+            [SOURCE, [str(contest) for contest in contests]],
+        ).fetchall()
+        for (contest,) in stale:
+            cs.add("entity_retirement", entity_id=contest, reason="Not on the certified 2026 ballot")
+            for (person,) in conn.execute(
+                """select p.id from candidacy cy join contest_option o on o.id = cy.option_id
+                   join person p on p.id = cy.person_id and p.changeset_id = o.changeset_id
+                   where o.contest_id = %s and not exists (
+                     select from candidacy x join contest_option xo on xo.id = x.option_id
+                     where x.person_id = p.id and xo.contest_id <> %s)""",
+                [contest, contest],
+            ).fetchall():
+                cs.add("entity_retirement", entity_id=person, reason="Not on the certified 2026 ballot")
         print(counts)
         return cs.write()
