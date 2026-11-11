@@ -489,6 +489,7 @@
   "slate_scheduled": "Gewählt wird am {date}. Sobald die Stimmen ausgezählt sind, erscheinen die Ergebnisse hier.",
   "slate_voting": "Am {date} wird gewählt. Die letzten Wahllokale im Bundesstaat schließen um {time}. Die Ergebnisse erscheinen hier, sobald sie veröffentlicht sind.",
   "slate_unqualified": "Kein Kandidat zugelassen (nur handschriftlich eingetragene Namen)",
+  "slate_counting": "Das amtliche Endergebnis ist noch nicht veröffentlicht.",
   "slate_unreported": "Am {date} wurde gewählt. Für diese Wahl sind noch keine Ergebnisse veröffentlicht.",
   "slate_unreported_unopposed": "Am {date} wurde gewählt. Dieser Kandidat trat ohne Gegenkandidaten an. Deshalb wurden keine Zwischenergebnisse veröffentlicht. Die Stimmenzahl erscheint hier, sobald das Ergebnis amtlich festgestellt ist.",
   "slate_incumbent": "Amtsinhaber",

@@ -489,6 +489,7 @@
   "slate_scheduled": "Oylama {date} tarihinde yapılacak. Sonuçlar sayıldıktan sonra burada görünecek.",
   "slate_voting": "Oylama {date} tarihinde sürüyor. Eyalette son sandıklar {time} saatinde kapanıyor. Sonuçlar yayımlandığında burada görünecek.",
   "slate_unqualified": "Şartları sağlayan aday çıkmadı (yalnızca listede olmayan aday)",
+  "slate_counting": "Onaylanmış sonuçlar henüz yayımlanmadı.",
   "slate_unreported": "Oylama {date} tarihinde yapıldı. Bu yarış için henüz yayımlanmış sonuç yok.",
   "slate_unreported_unopposed": "Oylama {date} tarihinde yapıldı. Bu aday rakipsiz yarıştığı için canlı sayım yayımlanmadı. Adayın aldığı toplam oy, resmî sonuçlar onaylandığında burada görünecek.",
   "slate_incumbent": "Görevde",
