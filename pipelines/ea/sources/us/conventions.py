@@ -621,7 +621,7 @@ VICE_TABLES = {
     "1888:republican:vp": {"item": "officialproceedi00repu_0", "leaves": (449, 450), "ballot": 1, "transcribed": "conventions_chicago_1888_vp.tsv", "short": True},
     "1896:republican:vp": {"item": "officialproceedi00repu", "leaves": (150,), "ballot": 1, "transcribed": "conventions_st_louis_1896_vp.tsv", "short": True},
     "1900:republican:vp": {"item": "12threpubnaticon00blumrich", "leaves": (165,), "ballot": 1, "transcribed": "conventions_philadelphia_1900_vp.tsv", "short": True},
-    "1908:republican:vp": {"item": "officialreporto00repu", "leaves": (256, 257), "ballot": 1, "transcribed": "conventions_chicago_1908_vp.tsv"},
+    "1908:republican:vp": {"item": "officialreporto00repu", "leaves": (256, 257), "ballot": 1, "transcribed": "conventions_chicago_1908_vp.tsv", "short": True},
     "1912:republican:vp": {"item": "officialreportfi00repuiala", "leaves": (449, 450), "ballot": 1, "transcribed": "conventions_chicago_1912_vp.tsv", "short": True},
     "1916:republican:vp": {"item": "officialreportsi00repuiala", "leaves": (254, 255), "ballot": 1, "transcribed": "conventions_chicago_1916_vp.tsv", "short": True},
     "1920:republican:vp": {"item": "officialreportof00repuiala", "leaves": (282, 283), "ballot": 1, "transcribed": "conventions_chicago_1920_vp.tsv", "short": True},
@@ -713,10 +713,9 @@ REPUBLICAN_VICE_1868 = {
     2: "The figure needed stored here, 325, is the one the proceedings give with the final vote, a majority of the 648 votes cast. The proceedings narrate the changes of vote that followed this roll call but print no further count by state until the final vote.",
     3: "This is the final vote after changes, which the proceedings tabulate by state; it is numbered 3 here because it is the third count by state the volume prints, and other accounts number the ballots differently. Of 650 votes, 648 were cast and 325 were needed; Alabama cast 16 of its 18.",
 }
-REPUBLICAN_VICE_1896 = "The table gives each delegation's votes by candidate. Colorado and Idaho, whose delegations had bolted the convention, passed and are stored with their votes held only; Montana, Nevada, and Texas cast fewer votes than they held. The printed total for Henry Clay Evans is 280\u00bd, against 277\u00bd in the state rows; the rows are stored as printed. The printed totals omit Thomas B. Reed (3 votes in the rows) and Brown (2, Maine)."
+REPUBLICAN_VICE_1896 = "The table gives each delegation's votes by candidate. Colorado and Idaho, whose delegations had bolted the convention, passed and are stored with their votes held only; Montana, Nevada, and Texas cast fewer votes than they held. The printed totals omit Thomas B. Reed (3 votes in the rows) and Brown (2, Maine)."
 REPUBLICAN_VICE_1900 = "Theodore Roosevelt received every vote cast; New York cast 71 of its 72, one delegate not voting, and the proceedings print the total vote as 926 with 925 for Roosevelt."
 REPUBLICAN_VICE_1912 = "The roll was challenged in Illinois, which cast 9 for Sherman and 1 for Gillette with 17 present and not voting and 31 absent. The printed Sherman column adds to 595 in the proceedings' totals row and 596 in the state rows and in the Chair's announcement; 596 is stored."
-REPUBLICAN_VICE_1920 = "The printed total for Pritchard is 11, against 10 in the state rows. The rows are stored as printed. Delegations cast fewer votes than they held; the difference is not stored."
 REPUBLICAN_VICE_SHORT = "Some delegations cast fewer votes than they held; the difference is not stored."
 PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2, "vice": {"tables": {1: "1856:republican:vp"}, "ballots": {1: date(1856, 6, 19)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1856}},
@@ -735,7 +734,7 @@ PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1908:republican"}, "ordinal": "Fourteenth", "city": "Chicago", "days": (date(1908, 6, 16), date(1908, 6, 19)), "ballots": {1: date(1908, 6, 19)}, "deciding": 1, "vice": {"tables": {1: "1908:republican:vp"}, "ballots": {1: date(1908, 6, 19)}, "deciding": 1, "method": PROCEEDINGS_VICE}},
     {"tables": {1: "1912:republican"}, "ordinal": "Fifteenth", "city": "Chicago", "days": (date(1912, 6, 18), date(1912, 6, 22)), "ballots": {1: date(1912, 6, 22)}, "deciding": 1, "vice": {"tables": {1: "1912:republican:vp"}, "ballots": {1: date(1912, 6, 22)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1912}},
     {"tables": {n: f"1916:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Sixteenth", "city": "Chicago", "days": (date(1916, 6, 7), date(1916, 6, 10)), "ballots": dict.fromkeys(range(1, 4), date(1916, 6, 10)), "deciding": 3, "vice": {"tables": {1: "1916:republican:vp"}, "ballots": {1: date(1916, 6, 10)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_SHORT}},
-    {"tables": {n: f"1920:republican:b{n}" for n in range(1, 11)}, "ordinal": "Seventeenth", "city": "Chicago", "days": (date(1920, 6, 8), date(1920, 6, 12)), "ballots": dict.fromkeys(range(1, 5), date(1920, 6, 11)) | dict.fromkeys(range(5, 11), date(1920, 6, 12)), "deciding": 10, "caveat": "On the tenth ballot several delegations changed their votes after they were first called and before the result was announced; the tabulation stored here is the one the convention declared.", "vice": {"tables": {1: "1920:republican:vp"}, "ballots": {1: date(1920, 6, 12)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1920}},
+    {"tables": {n: f"1920:republican:b{n}" for n in range(1, 11)}, "ordinal": "Seventeenth", "city": "Chicago", "days": (date(1920, 6, 8), date(1920, 6, 12)), "ballots": dict.fromkeys(range(1, 5), date(1920, 6, 11)) | dict.fromkeys(range(5, 11), date(1920, 6, 12)), "deciding": 10, "caveat": "On the tenth ballot several delegations changed their votes after they were first called and before the result was announced; the tabulation stored here is the one the convention declared.", "vice": {"tables": {1: "1920:republican:vp"}, "ballots": {1: date(1920, 6, 12)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_SHORT}},
     {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1},
     {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1},
     {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
@@ -2006,6 +2005,14 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1896:republican:vp": (
+        "The printed total for Henry Clay Evans is 280\u00bd, against 277\u00bd in the state rows. The rows are stored as printed.",
+        {"column Evans": (280.5, 277.5, "the state figures add to 277\u00bd")},
+    ),
+    "1920:republican:vp": (
+        "The printed total for Jeter C. Pritchard is 11, against 10 in the state rows. The rows are stored as printed.",
+        {"column Pritchard": (11, 10, "the state figures add to 10")},
+    ),
     "1860:republican:vp-b1": (
         "The printed totals give Cassius M. Clay 101\u00bd and John Hickman 58, against 100\u00bd and 57 in the state rows. The rows are stored as printed.",
         {
