@@ -1,6 +1,6 @@
 {
   "year": 1889,
-  "day": "1889-10-01",
+  "day": "1889-10",
   "polity": "US-SD",
   "publisher": "South Dakota Secretary of State",
   "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
@@ -15,5 +15,8 @@
   },
   "leaves": [
     7
-  ]
+  ],
+  "mixed": true,
+  "at_large": true,
+  "create": true
 }

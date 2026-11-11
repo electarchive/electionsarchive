@@ -1,0 +1,143 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1890,
+      "chamber": "governor",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "John R. Gamble Republican",
+          "contest": "house",
+          "candidate": "John Rankin Gamble"
+        },
+        {
+          "label": "John A. Pickler Republican",
+          "contest": "house",
+          "candidate": "John Alfred Pickler"
+        },
+        {
+          "label": "F. A. Clark Democrat",
+          "contest": "house",
+          "candidate": "F. A. Clark"
+        },
+        {
+          "label": "W. H. Quigley Democrat",
+          "contest": "house",
+          "candidate": "W. Y. Quigley"
+        },
+        {
+          "label": "F. A. Leavitt Independent",
+          "contest": "house",
+          "candidate": "F. A. Leavitt"
+        },
+        {
+          "label": "Fred Zipp Independent",
+          "contest": "house",
+          "candidate": "Fred Zipp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.156,
+        0.876,
+        0.856
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2057
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Arthur C. Mellette Republican",
+          "contest": "governor",
+          "candidate": "Arthur C. Mellette"
+        },
+        {
+          "label": "Maris Taylor Democrat",
+          "contest": "governor",
+          "candidate": "Maris Taylor"
+        },
+        {
+          "label": "H. L. Loucks Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George H. Hoffman Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peter Couchman Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. L. Van Osdel Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. O. Ringsrud Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. H. Freeman Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. M. Hanson Independent",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.165,
+        0.898,
+        0.86
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1890'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2216
+      ]
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "president": {
+      "year": 1892,
+      "chamber": "president",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1892,
+      "chamber": "governor",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "John A. Pickler Republican",
+          "contest": "house",
+          "candidate": "John Alfred Pickler"
+        },
+        {
+          "label": "W. V. Lucas Republican",
+          "contest": "house",
+          "candidate": "William Vincent Lucas"
+        },
+        {
+          "label": "Chauncey L. Wood Democrat",
+          "contest": "house",
+          "candidate": "Chauncey L. Wood"
+        },
+        {
+          "label": "Lewis E. Whitcher Democrat",
+          "contest": "house",
+          "candidate": "L. E. Whitcher"
+        },
+        {
+          "label": "Wm. Lardner Independent",
+          "contest": "house",
+          "candidate": "William Lardner"
+        },
+        {
+          "label": "J. E. Kelley Independent",
+          "contest": "house",
+          "candidate": "J. E. Kelley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.18,
+        0.874,
+        0.878
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.202
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Geo. A. Silsby Republican",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "John A. Prothero Republican",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "Geo. W. Kingsbury Republican",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "Chas. J. Buell Republican",
+          "contest": "president",
+          "candidate": "Benjamin Harrison (Republican)"
+        },
+        {
+          "label": "Michael J. Dinneen Democrat",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "John Burke Democrat",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.099,
+        0.196,
+        0.889,
+        0.884
+      ],
+      "hint": "Read only the table headed 'Presidential Electors, 1892'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2137
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Chas. Keith Democrat",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "John La Fabre Democrat",
+          "contest": "president",
+          "candidate": "Grover Cleveland (Democratic)"
+        },
+        {
+          "label": "J. H. Kinzer Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. W. Smith Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I. D. Suydam Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. C. Waldron Independent",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.148,
+        0.862,
+        0.854
+      ],
+      "hint": "Read only the table headed 'Presidential Electors, 1892'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.221
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Chas. H. Sheldon Republican",
+          "contest": "governor",
+          "candidate": "Charles H. Sheldon"
+        },
+        {
+          "label": "Peter Couchman Democrat",
+          "contest": "governor",
+          "candidate": "Peter Couchman"
+        },
+        {
+          "label": "A. L. Van Osdel Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. N. Herreid Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Samuel A. Ramsey Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. M. Price Independent",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.157,
+        0.908,
+        0.871
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued, November Election, 1892: Governor and Lieutenant Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2227
+      ]
+    }
+  ]
+}

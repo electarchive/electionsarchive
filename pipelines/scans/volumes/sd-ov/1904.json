@@ -23,5 +23,7 @@
     100,
     101,
     102
-  ]
+  ],
+  "mixed": true,
+  "at_large": true
 }

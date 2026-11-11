@@ -1,0 +1,92 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1889,
+      "chamber": "house",
+      "day": "1889-10",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1889,
+      "chamber": "governor",
+      "day": "1889-10",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "Oscar S. Gifford Republican",
+          "contest": "house",
+          "candidate": "Oscar Sherman Gifford"
+        },
+        {
+          "label": "John A. Pickler Republican",
+          "contest": "house",
+          "candidate": "John Alfred Pickler"
+        },
+        {
+          "label": "Linneus Q. Jefferies Democrat",
+          "contest": "house",
+          "candidate": "Linneus Q. Jeffries"
+        },
+        {
+          "label": "S. M. Booth Democrat",
+          "contest": "house",
+          "candidate": "S. M. Booth"
+        },
+        {
+          "label": "Arthur C. Mellette Republican",
+          "contest": "governor",
+          "candidate": "Arthur C. Mellette",
+          "party": "Republican"
+        },
+        {
+          "label": "P. F. McClure Democrat",
+          "contest": "governor",
+          "candidate": "P. F. McClure",
+          "party": "Democrat"
+        },
+        {
+          "label": "Jas. H. Fletcher Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Anson W. Pratt Democrat",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.142,
+        0.832,
+        0.884
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF SOUTH DAKOTA BY COUNTIES October Election, 1889'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2642
+      ]
+    }
+  ]
+}

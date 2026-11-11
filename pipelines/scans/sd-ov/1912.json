@@ -1,0 +1,381 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1912,
+      "chamber": "president",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house1": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "SD",
+      "district": 3
+    },
+    "governor": {
+      "year": 1912,
+      "chamber": "governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 237,
+      "id": "237-0",
+      "columns": [
+        {
+          "label": "Oscar Olson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. C. Preston",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. T. Van Slyke",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. H. Rugg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Thompson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.165,
+        0.852,
+        0.926
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014REPUBLICAN'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.138
+      ]
+    },
+    {
+      "page": 238,
+      "id": "238-0",
+      "columns": [
+        {
+          "label": "Millard Aasved",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John P. Biehn",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. E. Hitchcock",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Isaac B. Matthews",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James Mee",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.149,
+        0.942,
+        0.931
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014DEMOCRATIC'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.156
+      ]
+    },
+    {
+      "page": 239,
+      "id": "239-0",
+      "columns": [
+        {
+          "label": "C. M. Dahlberg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. T. Hurd",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Nolt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Earle McCain",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. K. Thompson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.152,
+        0.836,
+        0.914
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014PROHIBITION'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1378
+      ]
+    },
+    {
+      "page": 240,
+      "id": "240-0",
+      "columns": [
+        {
+          "label": "M. J. Foley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter A. Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Rhodes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Heber Fenne",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard Bunney",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.149,
+        0.168,
+        0.93,
+        0.914
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS\u2014SOCIALIST'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1099
+      ]
+    },
+    {
+      "page": 241,
+      "id": "241-0",
+      "columns": [
+        {
+          "label": "C. H. Dillon",
+          "contest": "house1",
+          "candidate": "Charles Hall Dillon"
+        },
+        {
+          "label": "Robert E. Dowdell",
+          "contest": "house1",
+          "candidate": "Robert E. Dowdell"
+        },
+        {
+          "label": "C. V. Templeton",
+          "contest": "house1",
+          "candidate": "C. V. Templeton"
+        },
+        {
+          "label": "E. M. Jacobson",
+          "contest": "house1",
+          "candidate": "E. M. Jacobson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.175,
+        0.843,
+        0.912
+      ],
+      "hint": "Read only the table headed 'MEMBER OF CONGRESS\u2014FIRST DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.114
+      ]
+    },
+    {
+      "page": 242,
+      "id": "242-0",
+      "columns": [
+        {
+          "label": "Charles H. Burke",
+          "contest": "house2",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "C. Boyd Barrett, Sr.",
+          "contest": "house2",
+          "candidate": "C. Boyd Sr. Barrett"
+        },
+        {
+          "label": "W. J. Edgar",
+          "contest": "house2",
+          "candidate": "W. J. Edgar"
+        },
+        {
+          "label": "E. Francis Atwood",
+          "contest": "house2",
+          "candidate": "E. Francis Atwood"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.16,
+        0.923,
+        0.919
+      ],
+      "hint": "Read only the table headed 'Member of Congress\u2014Second District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1331
+      ]
+    },
+    {
+      "page": 243,
+      "id": "243-0",
+      "columns": [
+        {
+          "label": "Eben W. Martin",
+          "contest": "house3",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "Harry L. Gandy",
+          "contest": "house3",
+          "candidate": "Harry L. Gandy"
+        },
+        {
+          "label": "J. E. Ballinger",
+          "contest": "house3",
+          "candidate": "J. E. Ballinger"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.179,
+        0.849,
+        0.917
+      ],
+      "hint": "Read only the table headed 'MEMBER OF CONGRESS\u2014THIRD DISTRICT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1138
+      ]
+    },
+    {
+      "page": 244,
+      "id": "244-0",
+      "columns": [
+        {
+          "label": "Frank M. Byrne",
+          "contest": "governor",
+          "candidate": "Frank M. Byrne"
+        },
+        {
+          "label": "Edwin S. Johnson",
+          "contest": "governor",
+          "candidate": "Edwin S. Johnson"
+        },
+        {
+          "label": "O. W. Butterfield",
+          "contest": "governor",
+          "candidate": "O. W. Butterfield"
+        },
+        {
+          "label": "Samuel Lovett",
+          "contest": "governor",
+          "candidate": "Samuel Lovett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.151,
+        0.942,
+        0.916
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1359
+      ]
+    }
+  ]
+}

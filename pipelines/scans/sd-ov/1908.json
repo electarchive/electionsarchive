@@ -1,0 +1,360 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "John L. Browne Republican",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "C. H. Lien Republican",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "John F. Schrader Republican",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "Gotthilf Doering Republican",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.177,
+        0.86,
+        0.891
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1919
+      ]
+    },
+    {
+      "page": 144,
+      "id": "144-0",
+      "columns": [
+        {
+          "label": "Zack T. Sutley Democrat",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Fred C. Nutting Democrat",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "J. T. Goodwin Democrat",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "William Galvin Democrat",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.172,
+        0.924,
+        0.879
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1952
+      ]
+    },
+    {
+      "page": 145,
+      "id": "145-0",
+      "columns": [
+        {
+          "label": "Ben Brave Prohibition",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "M. L. Dunlap Prohibition",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "H. W. Reinecke Prohibition",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Wm. MacKenzie Prohibition",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.041,
+        0.194,
+        0.838,
+        0.891
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1722
+      ]
+    },
+    {
+      "page": 146,
+      "id": "146-0",
+      "columns": [
+        {
+          "label": "Ira W. Siebrass Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "D. E. Mullins Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Chris Grosse Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Henry Ojala Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.176,
+        0.944,
+        0.894
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.195
+      ]
+    },
+    {
+      "page": 147,
+      "id": "147-0",
+      "columns": [
+        {
+          "label": "William L. Palmer Scales of Justice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. G. Taylor Scales of Justice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Everett Fiske Scales of Justice",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. S. Winsey Scales of Justice",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.191,
+        0.852,
+        0.887
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1724
+      ]
+    },
+    {
+      "page": 148,
+      "id": "148-0",
+      "columns": [
+        {
+          "label": "Charles H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "Eben W. Martin Republican",
+          "contest": "house",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "Robert E. Dowdell Democrat",
+          "contest": "house",
+          "candidate": "Robert E. Dowdell"
+        },
+        {
+          "label": "Andrew H. Olson Democrat",
+          "contest": "house",
+          "candidate": "Andr H. Olson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.192,
+        0.958,
+        0.907
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1678
+      ]
+    },
+    {
+      "page": 149,
+      "id": "149-0",
+      "columns": [
+        {
+          "label": "E. S. Chappell Prohibition",
+          "contest": "house",
+          "candidate": "E. S. Chappell"
+        },
+        {
+          "label": "L. R. Erskine Prohibition",
+          "contest": "house",
+          "candidate": "L. R. Erskine"
+        },
+        {
+          "label": "Thos. G. Deffebach Socialist",
+          "contest": "house",
+          "candidate": "T. G. Deffebach"
+        },
+        {
+          "label": "S. H. Goodfellow Socialist",
+          "contest": "house",
+          "candidate": "S. H. Goodfellow"
+        },
+        {
+          "label": "Louis V. Schneider Scales of Justice",
+          "contest": "house",
+          "candidate": "L. V. Schneider"
+        },
+        {
+          "label": "W. S. Bray Scales of Justice",
+          "contest": "house",
+          "candidate": "W. S. Bray"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.09,
+        0.181,
+        0.887,
+        0.87
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1727
+      ]
+    },
+    {
+      "page": 151,
+      "id": "151-0",
+      "columns": [
+        {
+          "label": "Robert S. Vessey Republican",
+          "contest": "governor",
+          "candidate": "Robert S. Vessey"
+        },
+        {
+          "label": "Andrew E. Lee Democrat",
+          "contest": "governor",
+          "candidate": "Andrew E. Lee"
+        },
+        {
+          "label": "G. F. Knappen Prohibition",
+          "contest": "governor",
+          "candidate": "G. F. Knappen"
+        },
+        {
+          "label": "J. C. Knapp Socialist",
+          "contest": "governor",
+          "candidate": "J. C. Knapp"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.184,
+        0.883,
+        0.881
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1693
+      ]
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1900,
+      "chamber": "president",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1900,
+      "chamber": "governor",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 65,
+      "id": "65-0",
+      "columns": [
+        {
+          "label": "Thomas Fitch Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "A. R. Brown Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Charles Thompson Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Arthur H. Marble Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "John P. McElroy Fusion",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Martin Fusion",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. King Fusion",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.168,
+        0.84,
+        0.877
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1975
+      ]
+    },
+    {
+      "page": 66,
+      "id": "66-0",
+      "columns": [
+        {
+          "label": "Fred H. Bacon Fusion",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. S. Wilson Prohibition",
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
+        },
+        {
+          "label": "E. E. Ostroot Prohibition",
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
+        },
+        {
+          "label": "N. G. Rude Prohibition",
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
+        },
+        {
+          "label": "A. H. Reed Prohibition",
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
+        },
+        {
+          "label": "Thos. Thompson Populist",
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
+        },
+        {
+          "label": "Edward W. Tracy Populist",
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.166,
+        0.924,
+        0.888
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1925
+      ]
+    },
+    {
+      "page": 67,
+      "id": "67-0",
+      "columns": [
+        {
+          "label": "K. Halvorson Populist",
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
+        },
+        {
+          "label": "Ulrich Bosley Populist",
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
+        },
+        {
+          "label": "W. Haire Robt. Social Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. W. Swan Social Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. F. Atwood Social Democrat",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.174,
+        0.831,
+        0.868
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1931
+      ]
+    },
+    {
+      "page": 68,
+      "id": "68-0",
+      "columns": [
+        {
+          "label": "Charles H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "E. W. Martin Republican",
+          "contest": "house",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "Andrew E. Lee Fusion",
+          "contest": "house",
+          "candidate": "Andrew E. Lee"
+        },
+        {
+          "label": "Jos. B. Moore Fusion",
+          "contest": "house",
+          "candidate": "Joseph B. Moore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.158,
+        0.919,
+        0.88
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1994
+      ]
+    },
+    {
+      "page": 69,
+      "id": "69-0",
+      "columns": [
+        {
+          "label": "Edmond F. English Populist",
+          "contest": "house",
+          "candidate": "Edm F. English"
+        },
+        {
+          "label": "John M. Pease Populist",
+          "contest": "house",
+          "candidate": "John M. Pease"
+        },
+        {
+          "label": "O. A. Harpel Prohibition",
+          "contest": "house",
+          "candidate": "O. A. Harpel"
+        },
+        {
+          "label": "M. Rogers Prohibition",
+          "contest": "house",
+          "candidate": "M. Rogers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.161,
+        0.86,
+        0.878
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1967
+      ]
+    },
+    {
+      "page": 70,
+      "id": "70-0",
+      "columns": [
+        {
+          "label": "Charles N. Herreid Republican",
+          "contest": "governor",
+          "candidate": "Charles N. Herreid",
+          "party": "Republican"
+        },
+        {
+          "label": "Burre H. Lien Fusion",
+          "contest": "governor",
+          "candidate": "Burre H. Lien",
+          "party": "Fusion"
+        },
+        {
+          "label": "F. J. Carlisle Prohibition",
+          "contest": "governor",
+          "candidate": "F. J. Carlisle",
+          "party": "Prohibition"
+        },
+        {
+          "label": "L. E. Stair Populist",
+          "contest": "governor",
+          "candidate": "L. E. Stair",
+          "party": "Populist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.117,
+        0.906,
+        0.874
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1900'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2404
+      ]
+    }
+  ]
+}

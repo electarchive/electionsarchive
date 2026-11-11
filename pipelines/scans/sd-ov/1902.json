@@ -1,0 +1,147 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1902,
+      "chamber": "governor",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 83,
+      "id": "83-0",
+      "columns": [
+        {
+          "label": "Chas. H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "Eben W. Martin Republican",
+          "contest": "house",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "John R. Wilson Democrat",
+          "contest": "house",
+          "candidate": "Wilson"
+        },
+        {
+          "label": "F. C. Robinson Democrat",
+          "contest": "house",
+          "candidate": "Robinson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.166,
+        0.83,
+        0.884
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1978
+      ]
+    },
+    {
+      "page": 84,
+      "id": "84-0",
+      "columns": [
+        {
+          "label": "J. W. Kelley Prohibition",
+          "contest": "house",
+          "candidate": "Kelley"
+        },
+        {
+          "label": "W. W. Smith Prohibition",
+          "contest": "house",
+          "candidate": "Smith"
+        },
+        {
+          "label": "Freeman Knowles Socialist",
+          "contest": "house",
+          "candidate": "Knowles"
+        },
+        {
+          "label": "Walter Price Socialist",
+          "contest": "house",
+          "candidate": "Price"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.164,
+        0.93,
+        0.876
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.198
+      ]
+    },
+    {
+      "page": 85,
+      "id": "85-0",
+      "columns": [
+        {
+          "label": "Chas. N. Herreid Republican",
+          "contest": "governor",
+          "candidate": "Charles N. Herreid"
+        },
+        {
+          "label": "John W. Martin Democrat",
+          "contest": "governor",
+          "candidate": "John W. Martin"
+        },
+        {
+          "label": "H. H. Curtis Prohibition",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John C. Crawford Socialist",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.159,
+        0.863,
+        0.876
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election 1902'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1939
+      ]
+    }
+  ]
+}

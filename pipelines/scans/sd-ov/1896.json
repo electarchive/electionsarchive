@@ -1,0 +1,196 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1896,
+      "chamber": "president",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1896,
+      "chamber": "house",
+      "day": "1896-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    }
+  },
+  "pages": [
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Richard J. Woods Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Richard M. Slocum Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "John L. Turner Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Thomas D. Edwards Republican",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.15,
+        0.855,
+        0.912
+      ],
+      "hint": "Read only the table headed 'Presidential Electors, November Election, 1896'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1798
+      ]
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "Henry P. Lason Populist",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "F. M. Goodykoontz Populist",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "F. M. McLaFresh Populist",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        },
+        {
+          "label": "P. M. Ringrose Populist",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic / Populist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.125,
+        0.898,
+        0.922
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2095
+      ]
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "G. O. Goddard Prohibition",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "A. H. Reed Prohibition",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "A. G. Hunt Prohibition",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        },
+        {
+          "label": "C. A. Kelly Prohibition",
+          "contest": "president",
+          "candidate": "Joshua Levering (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.187,
+        0.855,
+        0.882
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2086
+      ]
+    },
+    {
+      "page": 46,
+      "id": "46-0",
+      "columns": [
+        {
+          "label": "Robert J. Gamble Republican",
+          "contest": "house",
+          "candidate": "Robert Jackson Gamble"
+        },
+        {
+          "label": "Coe I. Crawford Republican",
+          "contest": "house",
+          "candidate": "Coe I. Crawford"
+        },
+        {
+          "label": "John E. Kelley Peoples",
+          "contest": "house",
+          "candidate": "John F. Kelley"
+        },
+        {
+          "label": "Freeman Knowles Peoples",
+          "contest": "house",
+          "candidate": "Freeman Knowles"
+        },
+        {
+          "label": "M. H. Alexander Prohibition",
+          "contest": "house",
+          "candidate": "M. H. Alexander"
+        },
+        {
+          "label": "K. Lewis Prohibition",
+          "contest": "house",
+          "candidate": "K. Lewis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.163,
+        0.901,
+        0.94
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1828
+      ]
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "SD",
+      "district": 3
+    },
+    "senate": {
+      "year": 1914,
+      "chamber": "senate",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "governor": {
+      "year": 1914,
+      "chamber": "governor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 308,
+      "id": "308-0",
+      "columns": [
+        {
+          "label": "C. H. Dillon",
+          "contest": "house1",
+          "candidate": "Charles Hall Dillon"
+        },
+        {
+          "label": "Theodore Bailey",
+          "contest": "house1",
+          "candidate": "Theodore Bailey"
+        },
+        {
+          "label": "K. O. Stakke",
+          "contest": "house1",
+          "candidate": "K. O. Stakke"
+        },
+        {
+          "label": "D. C. Bond",
+          "contest": "house1",
+          "candidate": "D. C. Bond"
+        },
+        {
+          "label": "A. L. Van Osdel",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.173,
+        0.168,
+        0.953,
+        0.495
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 308,
+      "id": "308-1",
+      "columns": [
+        {
+          "label": "Royal C. Johnson",
+          "contest": "house2",
+          "candidate": "Royal Cleaves Johnson"
+        },
+        {
+          "label": "John M. King",
+          "contest": "house2",
+          "candidate": "John M. King"
+        },
+        {
+          "label": "V. B. Jump",
+          "contest": "house2",
+          "candidate": "V. B. Jump"
+        },
+        {
+          "label": "E. Francis Atwood",
+          "contest": "house2",
+          "candidate": "E. Francis Atwood"
+        },
+        {
+          "label": "H. P. Packard",
+          "contest": "house2",
+          "candidate": "H. P. Packard"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.173,
+        0.487,
+        0.953,
+        0.835
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 309,
+      "id": "309-0",
+      "columns": [
+        {
+          "label": "William G. Rice",
+          "contest": "house3",
+          "candidate": "William G. Rice"
+        },
+        {
+          "label": "Harry L. Gandy",
+          "contest": "house3",
+          "candidate": "Harry Luther Gandy"
+        },
+        {
+          "label": "Fred L. Fairchild",
+          "contest": "house3",
+          "candidate": "Fred L. Fairchild"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.173,
+        0.87,
+        0.444
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 312,
+      "id": "312-0",
+      "columns": [
+        {
+          "label": "Chas. H. Burke",
+          "contest": "senate",
+          "candidate": "Charles H. Burke"
+        },
+        {
+          "label": "Ed. S. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. W. Butterfield",
+          "contest": "senate",
+          "candidate": "O. W. Butterfield"
+        },
+        {
+          "label": "E. P. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. L. Loucks",
+          "contest": "senate",
+          "candidate": "H. L. Loucks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.109,
+        0.916,
+        0.834
+      ],
+      "hint": "Read only the table headed 'VOTE CAST FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1103
+      ]
+    },
+    {
+      "page": 313,
+      "id": "313-0",
+      "columns": [
+        {
+          "label": "Frank M. Byrne",
+          "contest": "governor",
+          "candidate": "Frank M. Byrne"
+        },
+        {
+          "label": "J. W. McCarter",
+          "contest": "governor",
+          "candidate": "J. W. McCarter"
+        },
+        {
+          "label": "C. K. Thompson",
+          "contest": "governor",
+          "candidate": "C. K. Thompson"
+        },
+        {
+          "label": "John C. Knapp",
+          "contest": "governor",
+          "candidate": "John C. Knapp"
+        },
+        {
+          "label": "R. O. Richards",
+          "contest": "governor",
+          "candidate": "Richard O. Richards"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.156,
+        0.882,
+        0.849
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0765
+      ]
+    }
+  ]
+}

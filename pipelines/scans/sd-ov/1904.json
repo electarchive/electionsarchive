@@ -1,0 +1,341 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1904,
+      "chamber": "president",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    },
+    "house": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1904,
+      "chamber": "governor",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 95,
+      "id": "95-0",
+      "columns": [
+        {
+          "label": "Henry H. Gulstine Republican",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "Henry S. Morris Republican",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "John Q. Anderson Republican",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "Peter Edwards Republican",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.048,
+        0.178,
+        0.842,
+        0.894
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election 1902'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1927
+      ]
+    },
+    {
+      "page": 96,
+      "id": "96-0",
+      "columns": [
+        {
+          "label": "James Phillip Democrat",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "J. G. Segers Democrat",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "John S. Bean Democrat",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "H. C. Burch Democrat",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.119,
+        0.177,
+        0.901,
+        0.879
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1952
+      ]
+    },
+    {
+      "page": 97,
+      "id": "97-0",
+      "columns": [
+        {
+          "label": "Christopher Gross Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "G. A. Grant Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "D. G. Stewart Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Edward Anderson Socialist",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.173,
+        0.846,
+        0.892
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued. November Election, 1904'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1961
+      ]
+    },
+    {
+      "page": 98,
+      "id": "98-0",
+      "columns": [
+        {
+          "label": "John M. Pease People's",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Philip Rammp Peoples",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. L. Crawley People's",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. A. Harpel Prohibition",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "A. H. Brehmer Prohibition",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "C. A. Kelley Prohibition",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "E. C. Pitcher Prohibition",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.174,
+        0.915,
+        0.876
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1994
+      ]
+    },
+    {
+      "page": 99,
+      "id": "99-0",
+      "columns": [
+        {
+          "label": "Charles H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "Eben W. Martin Republican",
+          "contest": "house",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "W. A. Lynch Democrat",
+          "contest": "house",
+          "candidate": "W. A. Lynch"
+        },
+        {
+          "label": "Wesley A. Stuart Democrat",
+          "contest": "house",
+          "candidate": "Wesley A. Stuart"
+        },
+        {
+          "label": "H. W. Smith Socialist",
+          "contest": "house",
+          "candidate": "H. W. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.041,
+        0.162,
+        0.837,
+        0.877
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1972
+      ]
+    },
+    {
+      "page": 100,
+      "id": "100-0",
+      "columns": [
+        {
+          "label": "S. A. Cochrane Socialist",
+          "contest": "house",
+          "candidate": "S. A. Cochrane"
+        },
+        {
+          "label": "A. J. McCain People's",
+          "contest": "house",
+          "candidate": "A. J. McCain"
+        },
+        {
+          "label": "G. W. Lattin People's",
+          "contest": "house",
+          "candidate": "G. W. Lattin"
+        },
+        {
+          "label": "A. Jamison Prohibition",
+          "contest": "house",
+          "candidate": "A. Jamison"
+        },
+        {
+          "label": "C. K. Thompson Prohibition",
+          "contest": "house",
+          "candidate": "C. K. Thompson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.153,
+        0.161,
+        0.933,
+        0.885
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1961
+      ]
+    },
+    {
+      "page": 101,
+      "id": "101-0",
+      "columns": [
+        {
+          "label": "Samuel H. Elrod Republican",
+          "contest": "governor",
+          "candidate": "Samuel H. Elrod"
+        },
+        {
+          "label": "Louis N. Crill Democrat",
+          "contest": "governor",
+          "candidate": "Louis N. Crill"
+        },
+        {
+          "label": "Freeman Knowles Socialist",
+          "contest": "governor",
+          "candidate": "Freeman Knowles"
+        },
+        {
+          "label": "R. C. Warne People's",
+          "contest": "governor",
+          "candidate": "R. C. Warne"
+        },
+        {
+          "label": "W. J. Edgar Prohibition",
+          "contest": "governor",
+          "candidate": "W. J. Edgar"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.177,
+        0.866,
+        0.895
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1978
+      ]
+    }
+  ]
+}

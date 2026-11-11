@@ -833,26 +833,26 @@ def read(job: str, reader: str, plan: dict[str, Read]) -> str | None:
     return None if ready else note
 
 
-def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int]]:
+def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int | None]]:
     if contest is None:
         return []
-    return [
-        (label or text, text, total)
-        for label, text, total in conn.execute(
-            """select coalesce(o.ballot_label, ''), coalesce(n.text, ''),
-                      (select sum(v.value)::bigint from result_value v
-                       where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
-                         and v.count_round = (select min(count_round) from result_value
-                                              where result_set_k = rs.k))
-               from contest_option o
-               join result_set rs on rs.contest_id = o.contest_id and rs.is_default
-               left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-               left join name n on n.entity_id = cy.person_id and n.is_preferred
-               where o.contest_id = %s and o.parent_option_id is null""",
-            [contest],
-        ).fetchall()
-        if total
-    ]
+    rows = conn.execute(
+        """select coalesce(o.ballot_label, ''), coalesce(n.text, ''),
+                  (select sum(v.value)::bigint from result_value v
+                   where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
+                     and v.count_round = (select min(count_round) from result_value
+                                          where result_set_k = rs.k)),
+                  rs.k is not null
+           from contest_option o
+           left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+           left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+           left join name n on n.entity_id = cy.person_id and n.is_preferred
+           where o.contest_id = %s and o.parent_option_id is null""",
+        [contest],
+    ).fetchall()
+    if any(held for *_, held in rows):
+        return [(label or text, text, total) for label, text, total, _ in rows if total]
+    return [(label or text, text, None) for label, text, _, _ in rows if label or text]
 
 
 def official_totals(manifest: Manifest) -> dict[str, int | None]:
@@ -884,7 +884,7 @@ def official_totals(manifest: Manifest) -> dict[str, int | None]:
 GENERIC_NAMES = {"votes"}
 
 
-def match(labels: list[str], held: list[tuple[str, str, int]], contest: str) -> tuple[list[Column], list[str]]:
+def match(labels: list[str], held: list[tuple[str, str, int | None]], contest: str) -> tuple[list[Column], list[str]]:
     surnames: list[tuple[str, set[str]]] = []
     for name, text, _ in held:
         found_surnames = set()

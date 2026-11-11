@@ -70,6 +70,7 @@ class Volume(TypedDict):
     create: NotRequired[bool]
     mixed: NotRequired[bool]
     autorotate: NotRequired[bool]
+    at_large: NotRequired[bool]
     turn: NotRequired[int]
 
 
@@ -333,7 +334,9 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                         "day": volume["day"],
                         "special": False,
                         "state": state,
-                        "district": table["district"] or None,
+                        "district": table["district"]
+                        if office == "house" and table["district"] == 0 and volume.get("at_large")
+                        else table["district"] or None,
                     }
                     key = scans.key_of(contest)
                     candidates = [c for c in table["columns"] if c["role"] == "candidate" and c["office"] == office]

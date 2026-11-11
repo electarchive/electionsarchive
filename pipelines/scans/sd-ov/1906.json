@@ -1,0 +1,147 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1906,
+      "chamber": "governor",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 115,
+      "id": "115-0",
+      "columns": [
+        {
+          "label": "Philo Hall Republican",
+          "contest": "house",
+          "candidate": "Philo Hall"
+        },
+        {
+          "label": "William H. Parker Republican",
+          "contest": "house",
+          "candidate": "William Henry Parker"
+        },
+        {
+          "label": "William S. Elder Democrat",
+          "contest": "house",
+          "candidate": "William S. Elder"
+        },
+        {
+          "label": "Samuel A. Ramsey Democrat",
+          "contest": "house",
+          "candidate": "Samuel A. Ramsey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.174,
+        0.846,
+        0.89
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1927
+      ]
+    },
+    {
+      "page": 116,
+      "id": "116-0",
+      "columns": [
+        {
+          "label": "James Kirwan Socialist",
+          "contest": "house",
+          "candidate": "James Kirwan"
+        },
+        {
+          "label": "Henry Adolph Berg Socialist",
+          "contest": "house",
+          "candidate": "Henry A. Berge"
+        },
+        {
+          "label": "C. V. Templeton Prohibition",
+          "contest": "house",
+          "candidate": "C. V. Templeton"
+        },
+        {
+          "label": "R. J. Day Prohibition",
+          "contest": "house",
+          "candidate": "R. J. Day"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.167,
+        0.177,
+        0.951,
+        0.904
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1953
+      ]
+    },
+    {
+      "page": 117,
+      "id": "117-0",
+      "columns": [
+        {
+          "label": "Coe I. Crawford Republican",
+          "contest": "governor",
+          "candidate": "Coe I. Crawford"
+        },
+        {
+          "label": "John A. Stransky Democrat",
+          "contest": "governor",
+          "candidate": "John A. Stransky"
+        },
+        {
+          "label": "Freeman Knowles Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Knute Lewis Prohibition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.132,
+        0.857,
+        0.891
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1906'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2398
+      ]
+    }
+  ]
+}

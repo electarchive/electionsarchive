@@ -1,0 +1,117 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1898,
+      "chamber": "house",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1898,
+      "chamber": "governor",
+      "day": "1898-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 51,
+      "id": "51-0",
+      "columns": [
+        {
+          "label": "F. J. Gamble Republican",
+          "contest": "house",
+          "candidate": "Robert Jackson Gamble"
+        },
+        {
+          "label": "C. H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "F. Knowles Fusion",
+          "contest": "house",
+          "candidate": "F. Knowles"
+        },
+        {
+          "label": "J. E. Kelly Fusion",
+          "contest": "house",
+          "candidate": "J. E. Kelley"
+        },
+        {
+          "label": "A. Jamieson Prohibition",
+          "contest": "house",
+          "candidate": "A. Jamieson"
+        },
+        {
+          "label": "M. D. Alexander Prohibition",
+          "contest": "house",
+          "candidate": "M. D. Alexander"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.157,
+        0.865,
+        0.898
+      ],
+      "hint": "Read only the table headed 'Vote for Congressman'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1849
+      ]
+    },
+    {
+      "page": 52,
+      "id": "52-0",
+      "columns": [
+        {
+          "label": "Kirk G. Phillips Republican",
+          "contest": "governor",
+          "candidate": "Kirk G. Phillips",
+          "party": "Republican"
+        },
+        {
+          "label": "Andrew E. Lee Fusion",
+          "contest": "governor",
+          "candidate": "Andrew E. Lee",
+          "party": "Fusion"
+        },
+        {
+          "label": "K. Lewis Prohibition",
+          "contest": "governor",
+          "candidate": "K. Lewis",
+          "party": "Prohibition"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.303,
+        0.922,
+        0.903
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1898'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.025
+      ]
+    }
+  ]
+}

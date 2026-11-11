@@ -21,5 +21,8 @@
     68,
     69,
     70
-  ]
+  ],
+  "mixed": true,
+  "at_large": true,
+  "create": true
 }

@@ -1,0 +1,138 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1894,
+      "chamber": "governor",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Robert J. Gamble Republican",
+          "contest": "house",
+          "candidate": "Robert Jackson Gamble"
+        },
+        {
+          "label": "John A. Pickler Republican",
+          "contest": "house",
+          "candidate": "John Alfred Pickler"
+        },
+        {
+          "label": "Wm. A. Lynch Democrat",
+          "contest": "house",
+          "candidate": "William A. Lynch"
+        },
+        {
+          "label": "Roger F. Connor Democrat",
+          "contest": "house",
+          "candidate": "Roger F. Connor"
+        },
+        {
+          "label": "John E. Kelley Independent",
+          "contest": "house",
+          "candidate": "John E. Kelley"
+        },
+        {
+          "label": "Freeman Knowles Independent",
+          "contest": "house",
+          "candidate": "Freeman Knowles"
+        },
+        {
+          "label": "George A. Ragan Prohibition",
+          "contest": "house",
+          "candidate": "George A. Ragan"
+        },
+        {
+          "label": "A. Jamieson Prohibition",
+          "contest": "house",
+          "candidate": "A. Jamieson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.108,
+        0.163,
+        0.897,
+        0.885
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2244
+      ]
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "A. O. Ringsrud Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andrew E. Lee Peoples",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. F. Hanson Prohibition",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. T. Hindman Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. R. Crothers Peoples",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. J. Carlisle Prohibition",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.154,
+        0.897,
+        0.924
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1779
+      ]
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official vote of South Dakota, by counties, from October, 1889, to November, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofso00sout/officialvoteofso00sout.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "SD",
+      "district": 0
+    },
+    "governor": {
+      "year": 1910,
+      "chamber": "governor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "SD",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 178,
+      "id": "178-0",
+      "columns": [
+        {
+          "label": "Charles H. Burke Republican",
+          "contest": "house",
+          "candidate": "Charles Henry Burke"
+        },
+        {
+          "label": "Eben W. Martin Republican",
+          "contest": "house",
+          "candidate": "Eben Wever Martin"
+        },
+        {
+          "label": "W. W. Soule Democrat",
+          "contest": "house",
+          "candidate": "W. W. Soule"
+        },
+        {
+          "label": "J. E. Kelley Democrat",
+          "contest": "house",
+          "candidate": "J. E. Kelley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.166,
+        0.926,
+        0.897
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1436
+      ]
+    },
+    {
+      "page": 179,
+      "id": "179-0",
+      "columns": [
+        {
+          "label": "Knute Lewis Prohibition",
+          "contest": "house",
+          "candidate": "Knute Lewis"
+        },
+        {
+          "label": "W. J. Edgar Prohibition",
+          "contest": "house",
+          "candidate": "W. J. Edgar"
+        },
+        {
+          "label": "Isaac M. Burnside Independent",
+          "contest": "house",
+          "candidate": "Isaac M. Burnside"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.191,
+        0.85,
+        0.89
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1173
+      ]
+    },
+    {
+      "page": 181,
+      "id": "181-0",
+      "columns": [
+        {
+          "label": "Vessey Republican",
+          "contest": "governor",
+          "candidate": "Robert S. Vessey"
+        },
+        {
+          "label": "Chauncey L. Wood Democrat",
+          "contest": "governor",
+          "candidate": "Chauncey L. Wood"
+        },
+        {
+          "label": "O. W. Butterfield Prohibition",
+          "contest": "governor",
+          "candidate": "O. W. Butterfield"
+        },
+        {
+          "label": "M. G. Opsahl Independent",
+          "contest": "governor",
+          "candidate": "M. G. Opsahl"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.171,
+        0.899,
+        0.87
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1187
+      ]
+    }
+  ]
+}
