@@ -187,7 +187,7 @@ export const parted = async (
     select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y,
       lower(g.valid)::text as "from", upper(g.valid)::text as until
     from (
-      select g.area_id, g.geom, g.valid from area_geometry g
+      select g.area_id, g.geom, g.label_point, g.valid from area_geometry g
       where (${sql.raw(
         insets
           .flatMap((inset) => inset.within)
@@ -200,7 +200,7 @@ export const parted = async (
       offset 0
     ) g
     join area a on a.id = g.area_id
-    cross join lateral (select ST_PointOnSurface(g.geom) as point) o
+    cross join lateral (select coalesce(g.label_point, ST_PointOnSurface(g.geom)) as point) o
     where a.scheme_code = ${scheme}
   `;
   const [everyDay, own, held] = await Promise.all([
