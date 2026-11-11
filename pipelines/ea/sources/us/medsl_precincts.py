@@ -21,6 +21,8 @@ METHOD = (
     "the others are placed within their county."
 )
 
+RESTAGED = ["OH", "MI"]
+
 
 def fetch() -> None:
     medsl.fetch()
@@ -88,7 +90,7 @@ def parse() -> None:
     frame.filter(pl.col("kind") == "precinct").group_by("code").agg(
         pl.col("state").first(), pl.col("county").first(), pl.col("day").min()
     ).sort("code").write_parquet(PARSED / "units.parquet")
-    frame.group_by(
+    returns = frame.group_by(
         "year",
         "chamber",
         "day",
@@ -100,12 +102,22 @@ def parse() -> None:
         "candidate",
         "measure",
         maintain_order=True,
-    ).agg(pl.col("writein").any(), pl.col("votes").sum()).write_parquet(PARSED / "returns.parquet")
+    ).agg(pl.col("writein").any(), pl.col("votes").sum())
+    key = ["year", "chamber", "special", "state", "code"]
+    returns = (
+        returns.with_columns(
+            district_votes=pl.col("votes").sum().over(*key, "district"),
+            code_votes=pl.col("votes").sum().over(*key),
+        )
+        .filter(~((pl.col("kind") == "precinct") & (pl.col("district_votes") == 0) & (pl.col("code_votes") > 0)))
+        .drop("district_votes", "code_votes")
+    )
+    returns.write_parquet(PARSED / "returns.parquet")
     print(f"{frame.filter(pl.col('kind') == 'precinct')['code'].n_unique()} precincts")
 
 
 def emit() -> Path:
-    units = pl.read_parquet(PARSED / "units.parquet")
+    units = pl.read_parquet(PARSED / "units.parquet").filter(pl.col("state").is_in(RESTAGED))
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -193,10 +205,11 @@ def emit() -> Path:
         medsl.attach(
             cs,
             conn,
-            pl.read_parquet(PARSED / "returns.parquet").with_columns(
-                source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)
-            ),
+            pl.read_parquet(PARSED / "returns.parquet")
+            .filter(pl.col("state").is_in(RESTAGED))
+            .with_columns(source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)),
             sources,
+            restage=True,
         )
         notes = dict(
             conn.execute(
