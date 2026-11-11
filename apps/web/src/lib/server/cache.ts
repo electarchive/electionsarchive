@@ -926,9 +926,7 @@ function renew(
   const task = async () => {
     const renewed = await attempt().catch(() => null);
     if (renewed != null && CACHE_SHADOW) {
-      await verify(key, hit, renewed.value, compute, isDated).catch(
-        () => null,
-      );
+      await verify(key, hit, renewed.value, compute, isDated).catch(() => null);
     }
     hit.isRenewing = false;
   };
