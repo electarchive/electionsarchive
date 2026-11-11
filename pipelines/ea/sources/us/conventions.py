@@ -564,6 +564,20 @@ TABLES += [
         "ballot": 1,
         "transcribed": "conventions_baltimore_1835.tsv",
     },
+    {
+        "table": "1835:democratic:vp",
+        "item": NILES.format("1835-05-30_48_1236"),
+        "leaves": (11,),
+        "ballot": 1,
+        "transcribed": "conventions_baltimore_1835_vp.tsv",
+    },
+    {
+        "table": "1832:democratic:vp",
+        "item": "summaryproceedi00convgoog",
+        "leaves": (8, 9),
+        "ballot": 1,
+        "transcribed": "conventions_baltimore_1832.tsv",
+    },
     *(
         spec | {"transcribed": "conventions_baltimore_1844.tsv"}
         for spec in ballots(
@@ -617,6 +631,24 @@ NILES_1844 = (
     "Niles' National Register printed (page 211), which gives 266 votes to the 25 delegations present, South "
     "Carolina not being represented, and 178 votes as needed to nominate. The table has columns only for the "
     "leading candidates, so a delegation's row can add to less than its votes; the rows are stored as printed."
+)
+VICE_METHOD = (
+    "The ballot of the states on the vice-presidential nomination, as reported in {}, read from the scanned page "
+    "and checked against the printed totals."
+)
+BALTIMORE_1832 = (
+    "The convention took no ballot for president: it resolved to concur in the nominations Andrew Jackson had "
+    "already received, and its only ballot was this one for vice president. The counts are those the narrative of "
+    "the proceedings gives for each candidate by state (pages 6 and 7); the footnote table of each state's "
+    "delegates and votes is blank in the scanned copy. Missouri was not represented. Each delegation cast as many "
+    "votes as its state would have presidential electors under the new apportionment, and two-thirds of the 283 "
+    "votes given, 189, were needed. The delegates of the District of Columbia, who had no vote, were afterward "
+    "allowed to record theirs for Martin Van Buren; that vote is not stored."
+)
+NILES_1835_VICE = (
+    "The archive has found no free copy of a separate report of this convention's proceedings; the count is the "
+    "state-by-state table of the ballot for vice president as Niles' Weekly Register printed it (page 228). The "
+    "table gives no votes held by each delegation. Two-thirds of the 265 votes given, 177, were needed to nominate."
 )
 PROCEEDINGS: list[dict[str, Any]] = [
     {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2},
@@ -693,7 +725,8 @@ FOURTH_1848 = (
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}},
     {"party": "democratic", "tables": {1: "1908:democratic"}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Denver, Colorado, July 7, 8, 9 and 10, 1908", "publisher": "Western Newspaper Union", "city": "Denver", "days": (date(1908, 7, 7), date(1908, 7, 10)), "ballots": {1: date(1908, 7, 10)}, "deciding": 1, "caveat": DENVER_1908},
-    {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835},
+    {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835, "vice": {"tables": {1: "1835:democratic:vp"}, "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "required": 177, "method": VICE_METHOD.format("Niles' Weekly Register's reprint of the official statement"), "caveat": NILES_1835_VICE}},
+    {"party": "democratic", "tables": {}, "vice": {"tables": {1: "1832:democratic:vp"}, "ballots": {1: date(1832, 5, 22)}, "deciding": 1, "required": 189, "method": VICE_METHOD.format("the convention's summary of its proceedings"), "caveat": BALTIMORE_1832}, "title": "Summary of the Proceedings of a Convention of Republican Delegates, from the Several States in the Union, for the Purpose of Nominating a Candidate for the Office of Vice-President of the United States; Held at Baltimore, in the State of Maryland, May, 1832", "publisher": "Packard and Van Benthuysen", "city": "Baltimore", "days": (date(1832, 5, 21), date(1832, 5, 23))},
     {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
     {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
@@ -841,7 +874,12 @@ CANDIDATES = {
     "democratic:James Buchanan": ("James Buchanan", "Q12325"),
     "democratic:Franklin Pierce": ("Franklin Pierce", "Q12312"),
     "democratic:F. Pierce": ("Franklin Pierce", "Q12312"),
+    "1832:democratic:Van Buren": ("Martin Van Buren", "Q11820"),
+    "1832:democratic:Johnson": ("Richard Mentor Johnson", "Q109463"),
+    "1832:democratic:Barbour": ("Philip P. Barbour", "Q726427"),
     "1835:democratic:Van Buren": ("Martin Van Buren", "Q11820"),
+    "1835:democratic:Johnson": ("Richard Mentor Johnson", "Q109463"),
+    "1835:democratic:Rives": ("William C. Rives", "Q3568477"),
     "1844:democratic:Van Buren": ("Martin Van Buren", "Q11820"),
     "1844:democratic:Cass": ("Lewis Cass", "Q503119"),
     "1844:democratic:Johnson": ("Richard Mentor Johnson", "Q109463"),
@@ -2729,7 +2767,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1835 to 1956 and 2008, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the vice-presidential ballots of 1832 and 1835, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
@@ -2973,13 +3011,19 @@ def emit() -> Path:
         for convention in PROCEEDINGS:
             first, last = convention["days"]
             year = first.year
-            specs = {
-                n: next(spec for spec in TABLES if spec["table"] == ballot)
-                for n, ballot in convention["tables"].items()
-            }
+            chains = [
+                (office, chain)
+                for office, chain in (("president", convention), ("vice_president", convention.get("vice")))
+                if chain and chain["tables"]
+            ]
+            every = [
+                next(spec for spec in TABLES if spec["table"] == ballot)
+                for _, chain in chains
+                for ballot in chain["tables"].values()
+            ]
             party = convention.get("party", "republican")
             scope = cs.key("us.party", f"{party}-party")
-            first_spec = next(iter(specs.values()))
+            first_spec = every[0]
             source_url = (
                 first_spec["release"]
                 if "release" in first_spec
@@ -3012,7 +3056,7 @@ def emit() -> Path:
                     license=NEWS_LICENSE if convention.get("kind") == "news_agency" else "Public record",
                 )
             pages = {}
-            for spec in specs.values():
+            for spec in every:
                 for leaf in spec["leaves"]:
                     if leaf in pages:
                         continue
@@ -3054,213 +3098,226 @@ def emit() -> Path:
             name(election, f"{year} {party.title()} National Convention")
             path = f"us/{first}-{party}-national-convention"
             cs.add("slug", path=path, entity_id=election)
-            held = None
-            if "held" in convention:
-                full = rolls.filter(pl.col("table") == convention["tables"][convention["held"]])
-                full = full.filter(pl.col("column") == "votes") if "votes" in set(full["column"]) else full
-                held = dict(full.group_by("state").agg(pl.col("value").sum()).iter_rows())
-                for ballot in convention["tables"].values():
-                    cast = (
-                        rolls.filter((pl.col("table") == ballot) & (pl.col("column") != "votes"))
-                        .group_by("state")
-                        .agg(pl.col("value").sum())
-                    )
-                    for state, value in cast.iter_rows():
-                        if value > held.get(state, 0) and state not in MISPRINTS.get(ballot, ("", {}))[1]:
-                            raise ValueError(f"{ballot}: {state} cast {value:g}, more than {held.get(state, 0):g}")
-            loaded = rolls.filter(pl.col("table").is_in(list(convention["tables"].values())))
-            seated = loaded.filter(pl.col("column") == "votes").group_by("table").agg(pl.col("value").sum())["value"]
-            rule = "two-thirds" if party == "democratic" and year in TWO_THIRDS else "majority"
-            previous = None
-            for number, spec in specs.items():
-                day = convention["ballots"][number]
-                cells = rolls.filter(pl.col("table") == spec["table"])
-                if cells.is_empty():
-                    raise ValueError(f"{spec['table']} did not pass its checks")
-                own = "votes" in set(cells["column"])
-                key = f"{first}:president:{party}:convention:{number}"
-                contest = cs.key("us.contest", key)
-                if party == "democratic" and len(seated):
-                    total = seated.max()
-                elif held is not None:
-                    total = sum(held.values())
-                elif own:
-                    total = cells.filter(pl.col("column") == "votes")["value"].sum()
-                else:
-                    total = None
-                if total is not None and not isinstance(total, int | float):
-                    raise TypeError(f"the total {total!r} of {key} is not a number")
-                if "required" in convention:
-                    required = convention["required"]
-                    if isinstance(required, dict):
-                        required = required[number]
-                elif total is None:
-                    required = None
-                elif rule == "two-thirds":
-                    required = -(-int(total) * 2 // 3)
-                else:
-                    required = int(total) // 2 + 1
-                cs.add(
-                    "contest",
-                    id=contest,
-                    election_id=election,
-                    kind="office",
-                    office_id=cs.key("us.office", "president"),
-                    party_scope_id=scope,
-                    district_area_id=nation,
-                    magnitude=1,
-                    round_number=number,
-                    previous_round_id=previous,
-                    electoral_system_id=systems[rule],
-                    rules_override=None if required is None else {"required": required},
-                    default_result_kind="counted",
-                )
-                previous = contest
-                name(contest, f"Presidential nomination, ballot {number}")
-                cs.add("slug", path=f"{path}/ballot-{number}", entity_id=contest)
-                result_set = cs.key(f"{SOURCE}.result_set", key)
-                cs.add(
-                    "result_set",
-                    id=result_set,
-                    election_id=election,
-                    contest_id=contest,
-                    stage="official",
-                    kind="counted",
-                    status="active",
-                    source_id=source,
-                    is_default=True,
-                    completeness=1,
-                    as_of=datetime.combine(day, datetime.min.time(), UTC),
-                )
-                method = convention.get("method") or OFFICIAL.format(REPORTS[party])
-                if own or held is not None:
-                    method += HELD_TOTALS
-                if held is not None and not own:
-                    deciding = (
-                        "the ballot"
-                        if len(convention["ballots"]) == 1
-                        else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[convention['held'] - 1]} ballot"
-                    )
-                    method += HELD.format(deciding)
-                method += (
-                    f" The convention met in {convention.get('cities', {}).get(number, convention['city'])} and "
-                    + (
-                        f"took this ballot in its session of {day:%B %-d, %Y}"
-                        if party == "democratic"
-                        else f"voted on {day:%B %-d, %Y}"
-                    )
-                )
-                share = "two-thirds" if rule == "two-thirds" else "a majority"
-                method += (
-                    "."
-                    if required is None
-                    else f"; {required:,} votes, {share} of the delegates, were needed to nominate."
-                )
-                cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
-                if "caveat" in convention:
-                    caveat = convention["caveat"]
-                    if isinstance(caveat, dict):
-                        caveat = caveat.get(number)
-                    if caveat is not None:
-                        cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
-                if spec["table"] in MISPRINTS:
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=MISPRINTS[spec["table"]][0])
-                if "first" in convention:
-                    _, printed, _ = table(next(s for s in TABLES if s["table"] == convention["first"]), "low")
-                    ranked = sorted(((v, k) for k, v in printed.items() if k != "votes" and v), reverse=True)
-                    cs.add(
-                        "note",
-                        entity_id=result_set,
-                        kind="caveat",
-                        body_md=FIRST_1968.format(
-                            ", ".join(f"{k} {v:,.0f}" for v, k in ranked[:-1])
-                            + f", and {ranked[-1][1]} {ranked[-1][0]:,.0f}"
-                        ),
-                    )
-                totals = {
-                    column: total
-                    for column, total in cells.group_by("column").agg(pl.col("value").sum()).iter_rows()
-                    if column not in ABSTAINED and total
+            for office, chain in chains:
+                specs = {
+                    n: next(spec for spec in TABLES if spec["table"] == ballot) for n, ballot in chain["tables"].items()
                 }
-                ballot_options, made = {}, {}
-                for column in totals:
-                    label, qid = (
-                        CANDIDATES.get(f"{year}:{party}:{column}")
-                        or CANDIDATES.get(f"{year}:{column}")
-                        or CANDIDATES.get(f"{party}:{column}")
-                        or CANDIDATES[column]
-                    )
-                    slug = re.sub(r"[^a-z]+", "-", label.lower()).strip("-")
-                    if slug in made:
-                        ballot_options[column] = made[slug]
-                        continue
-                    if qid is None or qid not in people:
-                        person = cs.key("us.person", slug)
-                        if person in cs.minted and person not in added:
-                            added.add(person)
-                            cs.add("person", id=person)
-                            name(person, label)
-                        if qid is not None and person not in added:
-                            added.add(person)
-                            cs.add("external_id", entity_id=person, scheme="wikidata", value=qid)
+                held = None
+                if "held" in chain:
+                    full = rolls.filter(pl.col("table") == chain["tables"][chain["held"]])
+                    full = full.filter(pl.col("column") == "votes") if "votes" in set(full["column"]) else full
+                    held = dict(full.group_by("state").agg(pl.col("value").sum()).iter_rows())
+                    for ballot in chain["tables"].values():
+                        cast = (
+                            rolls.filter((pl.col("table") == ballot) & (pl.col("column") != "votes"))
+                            .group_by("state")
+                            .agg(pl.col("value").sum())
+                        )
+                        for state, value in cast.iter_rows():
+                            if value > held.get(state, 0) and state not in MISPRINTS.get(ballot, ("", {}))[1]:
+                                raise ValueError(f"{ballot}: {state} cast {value:g}, more than {held.get(state, 0):g}")
+                loaded = rolls.filter(pl.col("table").is_in(list(chain["tables"].values())))
+                seated = (
+                    loaded.filter(pl.col("column") == "votes").group_by("table").agg(pl.col("value").sum())["value"]
+                )
+                rule = "two-thirds" if party == "democratic" and year in TWO_THIRDS else "majority"
+                previous = None
+                for number, spec in specs.items():
+                    day = chain["ballots"][number]
+                    cells = rolls.filter(pl.col("table") == spec["table"])
+                    if cells.is_empty():
+                        raise ValueError(f"{spec['table']} did not pass its checks")
+                    own = "votes" in set(cells["column"])
+                    key = f"{first}:{office.replace('_', '-')}:{party}:convention:{number}"
+                    contest = cs.key("us.contest", key)
+                    if party == "democratic" and len(seated):
+                        total = seated.max()
+                    elif held is not None:
+                        total = sum(held.values())
+                    elif own:
+                        total = cells.filter(pl.col("column") == "votes")["value"].sum()
                     else:
-                        person = people[qid]
-                    option = ballot_options[column] = made[slug] = cs.key("us.option", f"{key}:{slug}")
+                        total = None
+                    if total is not None and not isinstance(total, int | float):
+                        raise TypeError(f"the total {total!r} of {key} is not a number")
+                    if "required" in chain:
+                        required = chain["required"]
+                        if isinstance(required, dict):
+                            required = required[number]
+                    elif total is None:
+                        required = None
+                    elif rule == "two-thirds":
+                        required = -(-int(total) * 2 // 3)
+                    else:
+                        required = int(total) // 2 + 1
                     cs.add(
-                        "contest_option",
-                        id=option,
+                        "contest",
+                        id=contest,
+                        election_id=election,
+                        kind="office",
+                        office_id=cs.key("us.office", office),
+                        party_scope_id=scope,
+                        district_area_id=nation,
+                        magnitude=1,
+                        round_number=number,
+                        previous_round_id=previous,
+                        electoral_system_id=systems[rule],
+                        rules_override=None if required is None else {"required": required},
+                        default_result_kind="counted",
+                    )
+                    previous = contest
+                    name(
+                        contest,
+                        f"{'Presidential' if office == 'president' else 'Vice-presidential'} nomination, ballot {number}",
+                    )
+                    cs.add(
+                        "slug",
+                        path=f"{path}{'' if office == 'president' else '/vice-president'}/ballot-{number}",
+                        entity_id=contest,
+                    )
+                    result_set = cs.key(f"{SOURCE}.result_set", key)
+                    cs.add(
+                        "result_set",
+                        id=result_set,
+                        election_id=election,
                         contest_id=contest,
-                        kind="candidate",
-                        party_id=scope,
-                        ballot_label=label,
+                        stage="official",
+                        kind="counted",
+                        status="active",
+                        source_id=source,
+                        is_default=True,
+                        completeness=1,
+                        as_of=datetime.combine(day, datetime.min.time(), UTC),
                     )
-                    cs.add(
-                        "candidacy",
-                        id=cs.key("us.candidacy", f"{key}:{slug}:head"),
-                        person_id=person,
-                        option_id=option,
-                        role="head",
-                        ballot_name=label,
-                        is_independent=False,
+                    method = chain.get("method") or OFFICIAL.format(REPORTS[party])
+                    if own or held is not None:
+                        method += HELD_TOTALS
+                    if held is not None and not own:
+                        deciding = (
+                            "the ballot"
+                            if len(chain["ballots"]) == 1
+                            else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[chain['held'] - 1]} ballot"
+                        )
+                        method += HELD.format(deciding)
+                    method += (
+                        f" The convention met in {chain.get('cities', {}).get(number, convention['city'])} and "
+                        + (
+                            f"took this ballot in its session of {day:%B %-d, %Y}"
+                            if party == "democratic"
+                            else f"voted on {day:%B %-d, %Y}"
+                        )
                     )
-                if held is not None and not own:
-                    for state, value in held.items():
-                        values.append((str(result_set), str(unit(state)), None, DELEGATION, value))
-                for cell in cells.iter_rows(named=True):
-                    if cell["column"] == "votes":
-                        option, measure = None, DELEGATION
-                    elif cell["column"] in ballot_options and cell["value"]:
-                        option, measure = str(ballot_options[cell["column"]]), VOTES
-                    else:
-                        continue
-                    where = unit(cell["state"])
-                    values.append((str(result_set), str(where), option, measure, cell["value"]))
-                    x0, y0, x1, y1 = cell["box"]
-                    cs.add(
-                        "value_locator",
-                        result_set_id=result_set,
-                        unit_id=where,
-                        option_id=option,
-                        channel=0,
-                        measure=measure,
-                        count_round=0,
-                        page_id=pages[cell["leaf"]],
-                        source_id=None,
-                        x0=x0,
-                        y0=y0,
-                        x1=x1,
-                        y1=y1,
+                    share = "two-thirds" if rule == "two-thirds" else "a majority"
+                    method += (
+                        "."
+                        if required is None
+                        else f"; {required:,} votes, {share} of the delegates, were needed to nominate."
                     )
-                if number == convention["deciding"]:
-                    winner = max(totals, key=lambda column: totals[column])
-                    if (
-                        rule == "two-thirds"
-                        and required is not None
-                        and totals[winner] < required
-                        and not (convention.get("acclamation") or convention.get("shifted"))
-                    ):
-                        raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
-                    cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
+                    cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
+                    if "caveat" in chain:
+                        caveat = chain["caveat"]
+                        if isinstance(caveat, dict):
+                            caveat = caveat.get(number)
+                        if caveat is not None:
+                            cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
+                    if spec["table"] in MISPRINTS:
+                        cs.add("note", entity_id=result_set, kind="caveat", body_md=MISPRINTS[spec["table"]][0])
+                    if "first" in chain:
+                        _, printed, _ = table(next(s for s in TABLES if s["table"] == chain["first"]), "low")
+                        ranked = sorted(((v, k) for k, v in printed.items() if k != "votes" and v), reverse=True)
+                        cs.add(
+                            "note",
+                            entity_id=result_set,
+                            kind="caveat",
+                            body_md=FIRST_1968.format(
+                                ", ".join(f"{k} {v:,.0f}" for v, k in ranked[:-1])
+                                + f", and {ranked[-1][1]} {ranked[-1][0]:,.0f}"
+                            ),
+                        )
+                    totals = {
+                        column: total
+                        for column, total in cells.group_by("column").agg(pl.col("value").sum()).iter_rows()
+                        if column not in ABSTAINED and total
+                    }
+                    ballot_options, made = {}, {}
+                    for column in totals:
+                        label, qid = (
+                            CANDIDATES.get(f"{year}:{party}:{column}")
+                            or CANDIDATES.get(f"{year}:{column}")
+                            or CANDIDATES.get(f"{party}:{column}")
+                            or CANDIDATES[column]
+                        )
+                        slug = re.sub(r"[^a-z]+", "-", label.lower()).strip("-")
+                        if slug in made:
+                            ballot_options[column] = made[slug]
+                            continue
+                        if qid is None or qid not in people:
+                            person = cs.key("us.person", slug)
+                            if person in cs.minted and person not in added:
+                                added.add(person)
+                                cs.add("person", id=person)
+                                name(person, label)
+                            if qid is not None and person not in added:
+                                added.add(person)
+                                cs.add("external_id", entity_id=person, scheme="wikidata", value=qid)
+                        else:
+                            person = people[qid]
+                        option = ballot_options[column] = made[slug] = cs.key("us.option", f"{key}:{slug}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=scope,
+                            ballot_label=label,
+                        )
+                        cs.add(
+                            "candidacy",
+                            id=cs.key("us.candidacy", f"{key}:{slug}:head"),
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=label,
+                            is_independent=False,
+                        )
+                    if held is not None and not own:
+                        for state, value in held.items():
+                            values.append((str(result_set), str(unit(state)), None, DELEGATION, value))
+                    for cell in cells.iter_rows(named=True):
+                        if cell["column"] == "votes":
+                            option, measure = None, DELEGATION
+                        elif cell["column"] in ballot_options and cell["value"]:
+                            option, measure = str(ballot_options[cell["column"]]), VOTES
+                        else:
+                            continue
+                        where = unit(cell["state"])
+                        values.append((str(result_set), str(where), option, measure, cell["value"]))
+                        x0, y0, x1, y1 = cell["box"]
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=where,
+                            option_id=option,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            page_id=pages[cell["leaf"]],
+                            source_id=None,
+                            x0=x0,
+                            y0=y0,
+                            x1=x1,
+                            y1=y1,
+                        )
+                    if number == chain["deciding"]:
+                        winner = max(totals, key=lambda column: totals[column])
+                        if (
+                            rule == "two-thirds"
+                            and required is not None
+                            and totals[winner] < required
+                            and not (chain.get("acclamation") or chain.get("shifted"))
+                        ):
+                            raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
+                        cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(
             "result_value",
             pl.DataFrame(
