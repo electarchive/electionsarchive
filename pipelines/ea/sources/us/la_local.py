@@ -131,6 +131,76 @@ ABBREVIATIONS = (
     (r"\bNumber\b", "No."),
     (r"\s{2,}", " "),
 )
+SPELLINGS = {
+    "dist": "district",
+    "dst": "district",
+    "rd": "road",
+    "sub": "subdivision",
+    "subd": "subdivision",
+    "subdiv": "subdivision",
+    "wd": "ward",
+    "wds": "ward",
+    "wards": "ward",
+    "gdd": "gravity drainage district",
+    "fpd": "fire protection district",
+    "grav": "gravity",
+    "drain": "drainage",
+    "drn": "drainage",
+    "vol": "volunteer",
+    "ctr": "center",
+    "cntr": "center",
+    "com": "community",
+    "comm": "community",
+    "sch": "school",
+    "plygrnd": "playground",
+    "play": "playground",
+    "wtrwks": "waterworks",
+    "wtrwrks": "waterworks",
+    "rvr": "river",
+    "riv": "river",
+    "prot": "protection",
+    "rec": "recreation",
+    "recreational": "recreation",
+    "parks": "park",
+    "light": "lighting",
+    "dr": "drive",
+    "n": "north",
+    "s": "south",
+    "e": "east",
+    "w": "west",
+}
+NUMBERS = {
+    word: str(value)
+    for value, word in enumerate(
+        [
+            "zero",
+            "one",
+            "two",
+            "three",
+            "four",
+            "five",
+            "six",
+            "seven",
+            "eight",
+            "nine",
+            "ten",
+            "eleven",
+            "twelve",
+            "thirteen",
+            "fourteen",
+            "fifteen",
+            "sixteen",
+            "seventeen",
+            "eighteen",
+            "nineteen",
+        ]
+    )
+}
+TENS = {
+    word: 10 * value
+    for value, word in enumerate(["twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"], 2)
+}
+FILLER = {"no", "of", "and", "the", "number"}
 TWIN = (
     "Withdrawn: an earlier reading of the Secretary of State's file listed this race under a misspelled district name. "
     "The corrected copy, with the same totals, replaces it."
@@ -143,6 +213,17 @@ DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
     "results are shown for the district as a whole."
 )
+
+
+def spelling(code: str) -> str:
+    words: list[str] = []
+    for word in code[6:].split("-"):
+        if word in NUMBERS and words and words[-1] in TENS:
+            words[-1] = str(TENS[words[-1]] + int(NUMBERS[word]))
+            continue
+        words += SPELLINGS.get(word, NUMBERS.get(word, word)).split(" ")
+    words = [str(TENS[word]) if word in TENS else word for word in words if word not in FILLER]
+    return code[:5] + ":" + " ".join(word for i, word in enumerate(words) if not i or word != words[i - 1])
 
 
 def many(value: Any) -> list[Any]:
@@ -767,6 +848,13 @@ def emit() -> Path:
             for code in contests.filter(pl.col("kind") == "special")["code"].unique()
             if code not in known and (path := f"{polities[code[:5]][2]}/{code[6:]}") in foreign_specials
         }
+        spelled: dict[str, str] = {}
+        for code in sorted(known):
+            spelled.setdefault(spelling(code), code)
+        for code in contests.filter(pl.col("kind") == "special").sort("day")["code"].unique(maintain_order=True):
+            if code not in known and code not in adopted:
+                adopted[code] = spelled.setdefault(spelling(code), code)
+        adopted = {code: into for code, into in adopted.items() if code != into}
         contests = contests.with_columns(pl.col("code").replace(adopted))
         special_names = dict(
             contests.filter(pl.col("kind") == "special")
