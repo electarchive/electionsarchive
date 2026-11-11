@@ -12,6 +12,7 @@ type Operator = {
   agent: RegExp;
   lists?: Array<string>;
   hosts?: Array<string>;
+  isFetcher?: true;
 };
 
 type Client = { tokens: number; seconds: number; at: number; running: number };
@@ -68,6 +69,7 @@ const OPERATORS: Array<Operator> = [
     name: "openai-user",
     agent: /ChatGPT-User/iu,
     lists: ["https://openai.com/chatgpt-user.json"],
+    isFetcher: true,
   },
   {
     name: "perplexity",
@@ -78,6 +80,7 @@ const OPERATORS: Array<Operator> = [
     name: "perplexity-user",
     agent: /Perplexity-User/iu,
     lists: ["https://www.perplexity.com/perplexity-user.json"],
+    isFetcher: true,
   },
 ];
 
@@ -117,6 +120,7 @@ PRIVATE.addSubnet("fc00::", 7, "ipv6");
 
 const CRAWLERS = 6;
 const EACH = 2;
+const FETCHERS = 6;
 const PREVIEWS = 3;
 const SHED = 24;
 const BURST = 240;
@@ -429,15 +433,16 @@ function track(response: Response, done: () => void) {
   });
 }
 
-function crawl(pool: string, limit: number) {
+function crawl(pool: string, limit: number, isShared = true) {
   const mine = pools.get(pool) ?? 0;
-  if (mine >= limit || crawling >= CRAWLERS || inFlight >= SHED) {
+  if (mine >= limit || (isShared && crawling >= CRAWLERS) || inFlight >= SHED) {
     return null;
   }
   pools.set(pool, mine + 1);
-  crawling++;
+  const counted = isShared ? 1 : 0;
+  crawling += counted;
   return () => {
-    crawling--;
+    crawling -= counted;
     const left = (pools.get(pool) ?? 1) - 1;
     if (left > 0) {
       pools.set(pool, left);
@@ -529,7 +534,10 @@ async function admit(request: Request, pathname: string) {
     if (!(await genuine(operator, address, version))) {
       return { status: 403 } as const;
     }
-    const release = crawl(operator.name, EACH);
+    const release =
+      operator.isFetcher === true
+        ? crawl(operator.name, FETCHERS, false)
+        : crawl(operator.name, EACH);
     return release == null
       ? ({ status: 503 } as const)
       : ({ status: 200, release } as const);
