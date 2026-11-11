@@ -158,7 +158,7 @@ Responses are cached in the raw cache, keyed by the model, the prompt version, t
 
 ## Live ingestion
 
-Live workers poll official machine-readable feeds where they exist, and official results pages, such as HTML, PDF, or results platforms that vendors host for election offices, where they do not. They poll at a polite interval, send conditional requests, back off when a server pushes back, and identify themselves with a User-Agent header. Each update writes a live result set and publishes a snapshot with a manifest. Live values never become certified values. Certified results come from post-count imports, which replace the live set through the usual changeset path. The architecture document covers how live results are served.
+Live workers poll official machine-readable feeds where they exist, and official results pages, such as HTML, PDF, or results platforms that vendors host for election offices, where they do not. They poll at a polite interval, send conditional requests, back off when a server pushes back, and identify themselves with a User-Agent header. Each update writes a live result set and publishes a snapshot with a manifest. Live values never become certified values. Certified results come from post-count imports, which replace the live set through the usual changeset path. Any restore or copy into `live.fetch`, `live.frame`, or `live.issue` must re-run the setval statements in the `live_sequences` migration, or the next insert hits a duplicate key. The architecture document covers how live results are served.
 
 ## Adding a source
 
