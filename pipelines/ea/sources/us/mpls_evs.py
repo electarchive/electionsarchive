@@ -677,11 +677,15 @@ def emit() -> Path:
     }
     tallies = pl.read_parquet(PARSED / "tallies.parquet")
     literal = set(json.loads((PARSED / "columns.json").read_text()))
-    shapes = {
-        (plan, unit): (geom, point)
-        for plan, unit, _, geom, point in pl.read_parquet(PARSED / "precincts.parquet").iter_rows()
-    }
+    precinct_rows = list(pl.read_parquet(PARSED / "precincts.parquet").iter_rows())
+    shapes = {(plan, unit): (geom, point) for plan, unit, _, geom, point in precinct_rows}
     with connect() as conn:
+        origin = {
+            (plan, unit): conn.execute(
+                "select source_id from area_geometry where area_id = %s and source_id is not null limit 1", [area]
+            ).fetchone()
+            for plan, unit, area, _, _ in precinct_rows
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -795,7 +799,7 @@ def emit() -> Path:
                 geom=shapes[plan, unit][0],
                 label_point=shapes[plan, unit][1],
                 quality="official",
-                source_id=None,
+                source_id=(origin[plan, unit] or (None,))[0],
             )
             cs.add(
                 "reporting_unit",
@@ -962,7 +966,7 @@ def emit() -> Path:
                             geom=geom,
                             label_point=point,
                             quality="synthetic",
-                            source_id=None,
+                            source_id=(origin[key[:4], rows["unit"][0]] or (None,))[0],
                         )
             else:
                 contest = cs.key("us.contest", existing)

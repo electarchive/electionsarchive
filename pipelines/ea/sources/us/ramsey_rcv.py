@@ -559,12 +559,13 @@ def emit() -> Path:
                     if area in cs.minted and area not in done:
                         done.add(area)
                         ((ward_number, number),) = re.findall(r"W-(\d+) P-(\d+)", unit)
-                        geom, point = conn.execute(
-                            """select encode(st_asewkb(g.geom), 'hex'), encode(st_asewkb(g.label_point), 'hex')
+                        geom, point, origin = conn.execute(
+                            """select encode(st_asewkb(g.geom), 'hex'), encode(st_asewkb(g.label_point), 'hex'),
+                                 g.source_id
                                from area_code c join area_geometry g on g.area_id = c.area_id
                                where c.code = %s""",
                             [f"2022:MN:27123:RAMSEY:{unit}"],
-                        ).fetchone() or (None, None)
+                        ).fetchone() or (None, None, None)
                         if geom is None:
                             raise ValueError(f"{key}: no 2022 shape for {unit}")
                         cs.add("area", id=area, scheme_code="us.precinct")
@@ -579,7 +580,7 @@ def emit() -> Path:
                             geom=geom,
                             label_point=point,
                             quality="official",
-                            source_id=None,
+                            source_id=origin,
                         )
                         cs.add(
                             "reporting_unit",
