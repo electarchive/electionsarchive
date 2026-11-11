@@ -221,6 +221,12 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result, kind="methodology", body_md=NOTE)
+            for note, text in conn.execute(
+                """select n.id, n.body_md from note n join changeset c on c.id = n.changeset_id
+                   where n.entity_id = %s and n.kind = 'methodology' and n.body_md <> %s and c.pipeline = %s""",
+                [result, NOTE, SOURCE],
+            ).fetchall():
+                cs.add("note_drop", note_id=note, entity_id=result, body_md=text, reason="replaced by the current note")
             order = sorted(range(len(candidates)), key=lambda index: -totals[index])
             options: dict[int, UUID] = {}
             for index, (candidate, _) in enumerate(candidates):

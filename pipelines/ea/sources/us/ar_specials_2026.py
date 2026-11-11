@@ -22,8 +22,8 @@ HEADERS = {**oe.BROWSER, "Origin": "https://arkansas.tally-enr.com"}
 LISTS = "https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={}"
 FILES = "https://results.tally-enr.com/results/arkansas/{}/FullDataFile.json"
 PRELIMINARY = (
-    "The results site marks these totals unofficial. The certified canvass has been requested, and the totals will be "
-    "replaced if it differs."
+    "The results site marks these totals unofficial. Its county download, headed Official Results, gives the same "
+    "totals, and the Secretary of State publishes no separate certified canvass."
 )
 VIN_VIO = (
     "The results site files two contests for this election under the labels VIN and VIO. VIO is the special primary "
@@ -384,10 +384,20 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if not official:
-                cs.add("note", entity_id=result, kind="caveat", body_md=PRELIMINARY)
+            notes = {("caveat", PRELIMINARY)} if not official else set()
             if note is not None:
-                cs.add("note", entity_id=result, kind="methodology", body_md=note)
+                notes.add(("methodology", note))
+            for note_kind, text in sorted(notes):
+                cs.add("note", entity_id=result, kind=note_kind, body_md=text)
+            for old, note_kind, text in conn.execute(
+                """select n.id, n.kind::text, n.body_md from note n join changeset c on c.id = n.changeset_id
+                   where n.entity_id = %s and c.pipeline = %s""",
+                [result, SOURCE],
+            ).fetchall():
+                if (note_kind, text) not in notes:
+                    cs.add(
+                        "note_drop", note_id=old, entity_id=result, body_md=text, reason="replaced by the current note"
+                    )
             options: dict[str, UUID] = {}
             totals: dict[str, int] = {}
             for choice in sorted(meta[enr_id]["choices"].values(), key=lambda c: c["order"]):
