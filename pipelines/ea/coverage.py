@@ -310,9 +310,18 @@ group by rs.contest_id;
 """
 
 CACHE_SQL = """
+create temp table dc_geom as
+select g.area_id, g.valid
+from (select district_area_id as id from district_county union select county_area_id from district_county) a
+cross join lateral (select area_id, valid from area_geometry where area_id = a.id) g;
+
+create index on dc_geom (area_id, valid);
+
 delete from district_county x
-where not exists (select from area_geometry g where g.area_id = x.district_area_id and g.valid = x.district_valid)
-    or not exists (select from area_geometry g where g.area_id = x.county_area_id and g.valid = x.county_valid);
+where not exists (select from dc_geom g where g.area_id = x.district_area_id and g.valid = x.district_valid)
+    or not exists (select from dc_geom g where g.area_id = x.county_area_id and g.valid = x.county_valid);
+
+drop table dc_geom;
 
 create table if not exists coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
     primary key (result_set_k, unit_k));
