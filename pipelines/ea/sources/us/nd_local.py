@@ -261,7 +261,7 @@ def emit() -> Path:
             for town in (base, re.sub(r" CITY$", "", base), *([f"{base} CITY"] if city else [])):
                 if re.sub(r"[^A-Z0-9 ]", "", town) in plain:
                     return plain[re.sub(r"[^A-Z0-9 ]", "", town)][0], seat
-            return f"special:{slug(area)}", found[2] if found else None
+            return f"special:{slug(base if city else area)}", found[2] if found else None
 
         owners: dict[tuple[str, str], UUID] = {}
         offices = Offices(conn)
@@ -362,7 +362,7 @@ def emit() -> Path:
         for item in order:
             code = item["code"]
             if code.startswith("special:") and code not in polities:
-                title = title_case(item["area"])
+                title = title_case(re.sub(r"(?i)^(?:(?:city|town) of|city) ", "", item["area"]))
                 polity = cs.key("us.polity", f"special:{code}")
                 path = f"us/nd/{slug(title)}"
                 while path in taken or path in {p[2] for p in polities.values()}:
@@ -624,7 +624,7 @@ def emit() -> Path:
             f"special:{slug(area)}": (resolved, seat)
             for area in frame["area"].unique().to_list()
             for resolved, seat in [resolve(area, "")]
-            if not resolved.startswith("special:")
+            if resolved != f"special:{slug(area)}"
         }
         fold(conn, cs, moved, polities, elections, owners, districts, people, order, staged)
         return cs.write()
@@ -675,7 +675,7 @@ def fold(
         if code not in moved:
             continue
         target = moved[code][0]
-        scheme = "us.county" if polities[target][3] == "county" else "us.place"
+        scheme = {"county": "us.county", "special": "us.special_district"}.get(polities[target][3], "us.place")
         for election, day, kind in conn.execute(
             """select e.id, e.date_from, e.kind::text from election e where e.polity_id = %s
                and not exists (select from entity_merge m where m.entity_id = e.id)""",
