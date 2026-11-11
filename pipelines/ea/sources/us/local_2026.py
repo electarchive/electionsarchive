@@ -11606,15 +11606,15 @@ def parse() -> None:
                     ).split()
                 if state == "MI":
                     tokens = re.sub(
-                        r"^walkerville public schools\b",
-                        "walkerville rural schools",
+                        r"^walkerville public schools\b|^carson city crystal\b",
+                        lambda m: "carson crystal" if m[0].startswith("carson") else "walkerville rural schools",
                         re.sub(
                             r"^mason county (central|eastern)\b",
                             r"mason \1",
                             re.sub(
                                 r"\bausable\b",
                                 "au sable",
-                                re.sub(r"^village of minden city\b", "village of minden", " ".join(tokens)),
+                                re.sub(r"^village of (minden|howard) city\b", r"village of \1", " ".join(tokens)),
                             ),
                         ),
                     ).split()
@@ -11828,6 +11828,7 @@ def parse() -> None:
                                     and ((said, sort) != ("town", "township") or state == "IN")
                                     and (state != "NC" or (said, sort) != ("town", "city"))
                                     and (state not in ("KY", "OR", "AR") or (said, sort) != ("city", "village"))
+                                    and (state != "MI" or (said, sort) != ("village", "city"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
@@ -12089,14 +12090,17 @@ def parse() -> None:
                     )
                     if (
                         state == "MI"
-                        and role == "board-of-education"
+                        and role in ("board-of-education", "board-of-trustees")
                         and (term := re.search(r"(?i)^(.*?)\s+(\d+) year term$", str(row["contest"])))
-                        and any(
-                            (other := re.search(r"(?i)^(.*?)\s+(\d+) year term$", str(sibling["contest"])))
-                            and other[1] == term[1]
-                            and other[2] != term[2]
-                            for sibling in found
-                            if sibling["fips"] == row["fips"]
+                        and (
+                            role == "board-of-trustees"
+                            or any(
+                                (other := re.search(r"(?i)^(.*?)\s+(\d+) year term$", str(sibling["contest"])))
+                                and other[1] == term[1]
+                                and other[2] != term[2]
+                                for sibling in found
+                                if sibling["fips"] == row["fips"]
+                            )
                         )
                     ):
                         seat = f"{term[2]} Year Term"
@@ -12344,6 +12348,7 @@ def parse() -> None:
                     or tail is None
                     or tail in taken
                     and not (state == "IN" and tail in state_used and tail not in county_used)
+                    and not (state == "MI" and tail not in prior_taken and tail.split(":")[2] == "board-of-education")
                     and not (
                         state == "CA"
                         and tail not in prior_taken
