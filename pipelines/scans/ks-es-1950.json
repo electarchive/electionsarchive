@@ -332,13 +332,13 @@
         },
         {
           "label": "W. W. Tamplin, Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         },
         {
           "label": "C. Floyd Hester, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "C. Floyd Hester"
         }
       ],
       "orientation": "counties_down",
@@ -371,13 +371,13 @@
         },
         {
           "label": "W. W. Tamplin, Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         },
         {
           "label": "C. Floyd Hester, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "C. Floyd Hester"
         }
       ],
       "orientation": "counties_down",

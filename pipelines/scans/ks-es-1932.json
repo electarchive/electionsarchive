@@ -354,13 +354,13 @@
         },
         {
           "label": "H. M. Perkins, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "H. M. Perkins"
         },
         {
           "label": "John R. Brinkley, Ind.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "John R. Brinkley"
         },
         {
           "label": "Scattering.",
@@ -398,13 +398,13 @@
         },
         {
           "label": "H. M. Perkins, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "H. M. Perkins"
         },
         {
           "label": "John R. Brinkley, Ind.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "John R. Brinkley"
         },
         {
           "label": "Scattering.",
@@ -494,5 +494,17 @@
         0.1088
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

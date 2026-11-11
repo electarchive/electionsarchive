@@ -24,8 +24,8 @@
       "columns": [
         {
           "label": "Hardage and Thiessen Rep.",
-          "contest": "governor",
-          "candidate": "Sam Hardage"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Huffman and Humphrey Rep.",
@@ -49,8 +49,8 @@
         },
         {
           "label": "Carlin and Docking Dem.",
-          "contest": "governor",
-          "candidate": "John Carlin"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Montgomery and Wainscott Dem.",
@@ -78,8 +78,8 @@
       "columns": [
         {
           "label": "Hardage and Thiessen Rep",
-          "contest": "governor",
-          "candidate": "Sam Hardage"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Huffman and Humphrey Rep",
@@ -103,8 +103,8 @@
         },
         {
           "label": "Carlin and Docking Dem",
-          "contest": "governor",
-          "candidate": "John Carlin"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Montgomery and Wainscott Dem",
@@ -142,18 +142,18 @@
         },
         {
           "label": "Shelton and Jackson Am.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Frank W. Shelton Jr."
         },
         {
           "label": "Ward and Warren Lib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "James H. Ward"
         },
         {
           "label": "Martin and Williams Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Warren C. Martin"
         }
       ],
       "orientation": "counties_down",
@@ -186,18 +186,18 @@
         },
         {
           "label": "Shelton and Jackson Am.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Frank W. Shelton Jr."
         },
         {
           "label": "Ward and Warren Lib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "James H. Ward"
         },
         {
           "label": "Martin and Williams Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Warren C. Martin"
         }
       ],
       "orientation": "counties_down",

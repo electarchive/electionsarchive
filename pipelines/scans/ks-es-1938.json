@@ -326,18 +326,18 @@
       "columns": [
         {
           "label": "Ida A. Beloof, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Ida A. Beloof"
         },
         {
           "label": "Jonathan M. Davis, Ind.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
         },
         {
           "label": "C. Floyd Hester, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "C. Floyd Hester"
         },
         {
           "label": "Walter A. Huxman, Dem.",
@@ -370,18 +370,18 @@
       "columns": [
         {
           "label": "Ida A. Beloof, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Ida A. Beloof"
         },
         {
           "label": "Jonathan M. Davis, Ind.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
         },
         {
           "label": "C. Floyd Hester, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "C. Floyd Hester"
         },
         {
           "label": "Walter A. Huxman, Dem.",
@@ -429,13 +429,13 @@
         },
         {
           "label": "Walter A. Huxman, Dem.",
-          "contest": "governor",
-          "candidate": "Walter A. Huxman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Payne Ratner, Rep.",
-          "contest": "governor",
-          "candidate": "Payne Ratner"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -473,13 +473,13 @@
         },
         {
           "label": "Walter A. Huxman, Dem.",
-          "contest": "governor",
-          "candidate": "Walter A. Huxman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Payne Ratner, Rep.",
-          "contest": "governor",
-          "candidate": "Payne Ratner"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -496,5 +496,17 @@
         0.105
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

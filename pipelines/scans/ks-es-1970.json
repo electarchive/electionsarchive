@@ -209,8 +209,8 @@
         },
         {
           "label": "Kent Frizzell, Rep.",
-          "contest": "governor",
-          "candidate": "Kent Frizzell"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Rick Harman, Rep.",
@@ -229,8 +229,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -403,13 +403,13 @@
         },
         {
           "label": "P. Everett Sperry, Con.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "P. Everett Sperry"
         },
         {
           "label": "Marshall Uncapher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",
@@ -442,13 +442,13 @@
         },
         {
           "label": "P. Everett Sperry, Con.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "P. Everett Sperry"
         },
         {
           "label": "Marshall Uncapher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",

@@ -7,6 +7,18 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/27/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "senate": {
       "year": 1930,
@@ -71,6 +83,14 @@
       "special": false,
       "state": "KS",
       "district": 7
+    },
+    "governor": {
+      "year": 1930,
+      "chamber": "governor",
+      "day": "1930-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -421,6 +441,222 @@
       "header": [
         0.0,
         0.1021
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Frank Haucke, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Haucke"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "J. B. Shields, Soc.",
+          "contest": "governor",
+          "candidate": "J. B. Shields"
+        },
+        {
+          "label": "J. R. Brinkley.",
+          "contest": "governor",
+          "candidate": "John R. Brinkley"
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cora G. Lewis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. L. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.116,
+        0.95,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND FOR LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1278
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Frank Haucke, Rep.",
+          "contest": "governor",
+          "candidate": "Frank Haucke"
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": "governor",
+          "candidate": "Harry H. Woodring"
+        },
+        {
+          "label": "J. B. Shields, Soc.",
+          "contest": "governor",
+          "candidate": "J. B. Shields"
+        },
+        {
+          "label": "J. R. Brinkley.",
+          "contest": "governor",
+          "candidate": "John R. Brinkley"
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cora G. Lewis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. L. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.16,
+        0.922,
+        0.837
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND FOR LIEUTENANT GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0576
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Frank Haucke, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Shields, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. R. Brinkley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cora G. Lewis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. L. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.116,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE\u2014FOR GOVERNOR AND FOR LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1471
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Frank Haucke, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry H. Woodring, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. B. Shields, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. R. Brinkley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cora G. Lewis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. L. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.103,
+        0.929,
+        0.574
+      ],
+      "hint": "Read only the table headed 'ABSENT VOTE--FOR GOVERNOR AND FOR LIEUTENANT GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2081
       ]
     }
   ]

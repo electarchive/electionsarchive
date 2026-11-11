@@ -68,6 +68,7 @@ class Volume(TypedDict):
     offices: dict[str, str]
     leaves: list[int]
     create: NotRequired[bool]
+    mixed: NotRequired[bool]
     autorotate: NotRequired[bool]
     turn: NotRequired[int]
 
@@ -309,7 +310,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 if table["party"] or table["special"]:
                     notes.append(f"{leaf}: {table['title']!r} skipped ({table['party'] or 'special'})")
                     continue
-                if table["office"] == "mixed" and not volume.get("create"):
+                if table["office"] == "mixed" and not (volume.get("create") or volume.get("mixed")):
                     notes.append(f"{leaf}: {table['title']!r} mixes offices")
                     continue
                 if not table["columns"] and table["office"] in cache:

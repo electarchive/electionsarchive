@@ -395,8 +395,8 @@
       "columns": [
         {
           "label": "Wm. H. Avery, Rep.",
-          "contest": "governor",
-          "candidate": "William H. Avery"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Dell Crozier, Rep.",
@@ -405,8 +405,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "George Hart, Dem.",
@@ -434,8 +434,8 @@
       "columns": [
         {
           "label": "Wm. H. Avery, Rep.",
-          "contest": "governor",
-          "candidate": "William H. Avery"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Dell Crozier, Rep.",
@@ -444,8 +444,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "George Hart, Dem.",
@@ -716,13 +716,13 @@
         },
         {
           "label": "Rolland E. Fisher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Rolland Ernest Fisher"
         },
         {
           "label": "Carson E. Crawford, Conserv.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Carson Crawford"
         }
       ],
       "orientation": "counties_down",
@@ -755,13 +755,13 @@
         },
         {
           "label": "Rolland E. Fisher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Rolland Ernest Fisher"
         },
         {
           "label": "Carson E. Crawford, Conserv.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Carson Crawford"
         }
       ],
       "orientation": "counties_down",

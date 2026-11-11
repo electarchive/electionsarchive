@@ -7,6 +7,18 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/23/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "senate": {
       "year": 1926,
@@ -79,6 +91,14 @@
       "special": false,
       "state": "KS",
       "district": 8
+    },
+    "governor": {
+      "year": 1926,
+      "chamber": "governor",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -371,6 +391,124 @@
         0.754
       ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen, Republican",
+          "contest": "governor",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "Jonathan M. Davis, Democrat",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "H. Hilfrich, Socialist",
+          "contest": "governor",
+          "candidate": "H. Hilfrich"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. A. N. Chase, Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanche E. Mize, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. L. Pruett, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.118,
+        0.116,
+        0.934,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2036
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen, Republican",
+          "contest": "governor",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "Jonathan M. Davis, Democrat",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "H. Hilfrich, Socialist",
+          "contest": "governor",
+          "candidate": "H. Hilfrich"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. A. N. Chase, Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanche E. Mize, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. L. Pruett, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.153,
+        0.925,
+        0.774
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2528
+      ]
     },
     {
       "page": 35,

@@ -423,8 +423,8 @@
         },
         {
           "label": "Geo. M. Whiteside, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "George M. Whiteside"
         },
         {
           "label": "Scattering.",
@@ -462,8 +462,8 @@
         },
         {
           "label": "Geo. M. Whiteside, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "George M. Whiteside"
         },
         {
           "label": "Scattering",
@@ -647,13 +647,13 @@
       "columns": [
         {
           "label": "Will G. West, Rep.",
-          "contest": "governor",
-          "candidate": "Will G. West"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Walter A. Huxman, Dem.",
-          "contest": "governor",
-          "candidate": "Walter A. Huxman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Geo. M. Whiteside, Soc.",
@@ -681,13 +681,13 @@
       "columns": [
         {
           "label": "Will G. West, Rep.",
-          "contest": "governor",
-          "candidate": "Will G. West"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Walter A. Huxman, Dem.",
-          "contest": "governor",
-          "candidate": "Walter A. Huxman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Geo. M. Whiteside, Soc.",
@@ -709,5 +709,17 @@
         0.0793
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

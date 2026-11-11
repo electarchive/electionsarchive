@@ -241,8 +241,8 @@
         },
         {
           "label": "Warren C. Martin, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Warren C. Martin"
         }
       ],
       "orientation": "counties_down",
@@ -275,8 +275,8 @@
         },
         {
           "label": "Warren C. Martin, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Warren C. Martin"
         }
       ],
       "orientation": "counties_down",

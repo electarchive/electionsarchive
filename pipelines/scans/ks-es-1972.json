@@ -121,8 +121,8 @@
         },
         {
           "label": "Morris Kay, Rep.",
-          "contest": "governor",
-          "candidate": "Morris Kay"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Reynolds \"Ren\" Shultz, Rep.",
@@ -131,8 +131,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -355,8 +355,8 @@
         },
         {
           "label": "Rolland E. Fisher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Rolland Ernest Fisher"
         }
       ],
       "orientation": "counties_down",
@@ -389,8 +389,8 @@
         },
         {
           "label": "Rolland E. Fisher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Rolland Ernest Fisher"
         }
       ],
       "orientation": "counties_down",

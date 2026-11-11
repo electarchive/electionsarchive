@@ -154,7 +154,7 @@ IMAGE_LIMIT = 4_500_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
 HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
-SUBTOTAL = re.compile(r"^(down ?state|downstate|percent(age)?s?)$")
+SUBTOTAL = re.compile(r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$")
 TOTAL = re.compile(r"^(state ?wide |state |grand |county |district )?totals?\b|^state ?wide$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
@@ -1259,7 +1259,7 @@ def emit(name: str) -> Path:
             for name_ in ("year", "chamber", "day", "special", "state", "district")
         },
         measure=pl.lit(1, pl.Int16),
-        kind=pl.lit("county"),
+        kind=pl.when(pl.col("code").str.contains(":")).then(pl.lit("aggregate")).otherwise(pl.lit("county")),
         source=pl.lit(f"SC{name}"),
         file=pl.lit(0),
     ).with_columns(
@@ -1333,6 +1333,29 @@ def emit(name: str) -> Path:
                 height=height,
             )
         frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1))
+        for (code,) in frame.filter(pl.col("kind") == "aggregate").select("code").unique().iter_rows():
+            if conn.execute(
+                "select 1 from reporting_unit where scheme_code = 'us.aggregate' and code = %s", [code]
+            ).fetchone():
+                continue
+            polity, parent, area = conn.execute(
+                """select p.id, u.id, u.area_id from reporting_unit u join polity p on p.id = u.polity_id
+                   where u.scheme_code = 'us.state' and p.iso_code = %s""",
+                [manifest["polity"]],
+            ).fetchone() or (None, None, None)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.aggregate", code),
+                polity_id=polity,
+                scheme_code="us.aggregate",
+                code=code,
+                parent_id=parent,
+                area_relation="within",
+                area_id=area,
+                kind="aggregate",
+                valid_from=None,
+                valid_to=None,
+            )
         medsl.attach(
             cs,
             conn,

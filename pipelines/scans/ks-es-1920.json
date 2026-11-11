@@ -7,10 +7,38 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/17/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "president": {
       "year": 1920,
       "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "senate": {
+      "year": 1920,
+      "chamber": "senate",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "KS",
+      "district": null
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
       "day": "1920-11-02",
       "special": false,
       "state": "KS",
@@ -639,6 +667,212 @@
       ]
     },
     {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Charles Curtis, Republican.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Geo. H. Hodges, Democratic.",
+          "contest": "senate",
+          "candidate": "George H. Hodges"
+        },
+        {
+          "label": "Dan Beedy, Socialist.",
+          "contest": "senate",
+          "candidate": "Dan Beedy"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry F. Mason, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl M. Holmquist, Democratic.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.137,
+        0.946,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election, November 2, 1920. UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2596
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Charles Curtis Republican.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Gen. H. Hodges Democratic.",
+          "contest": "senate",
+          "candidate": "George H. Hodges"
+        },
+        {
+          "label": "Dan Beedy Socialist.",
+          "contest": "senate",
+          "candidate": "Dan Beedy"
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry F. Mason Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl M. Holmquist Democratic.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.148,
+        0.94,
+        0.922
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5\u2014CONCLUDED.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2842
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Republican.",
+          "contest": "governor",
+          "candidate": "Henry J. Allen"
+        },
+        {
+          "label": "Jonathan M. Davis, Democratic.",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "Roy Stanton, Socialist.",
+          "contest": "governor",
+          "candidate": "Roy Stanton"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. S. Huffman, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank C. Field, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Stone, Socialist.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.094,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election, November 2, 1920. GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2517
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Republican.",
+          "contest": "governor",
+          "candidate": "Henry J. Allen"
+        },
+        {
+          "label": "Jonathan M. Davis, Democratic.",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "Roy Stanton, Socialist.",
+          "contest": "governor",
+          "candidate": "Roy Stanton"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. S. Huffman, Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank C. Field, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John R. Stone, Socialist.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.1,
+        0.914,
+        0.865
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3007
+      ]
+    },
+    {
       "page": 31,
       "id": "31-0",
       "columns": [
@@ -879,6 +1113,84 @@
       "header": [
         0.0,
         0.2947
+      ]
+    },
+    {
+      "page": 56,
+      "id": "56-0",
+      "columns": [
+        {
+          "label": "Charles Curtis Rep.",
+          "contest": "senate",
+          "candidate": "Charles Curtis"
+        },
+        {
+          "label": "Geo. H. Hodges, Dem.",
+          "contest": "senate",
+          "candidate": "George H. Hodges"
+        },
+        {
+          "label": "Henry F. Mason, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl M. Holmquist, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.094,
+        0.897,
+        0.637
+      ],
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. UNITED STATES SENATOR, AND JUSTICE OF SUPREME COURT FOR POSITION No. 5.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2652
+      ]
+    },
+    {
+      "page": 58,
+      "id": "58-0",
+      "columns": [
+        {
+          "label": "Henry J. Allen, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jonathan M. Davis, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. S. Huffman, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank C. Field, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.089,
+        0.936,
+        0.618
+      ],
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 2, 1920. GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2325
       ]
     }
   ]

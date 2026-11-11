@@ -300,8 +300,8 @@
       "columns": [
         {
           "label": "John Anderson, Jr., Rep.",
-          "contest": "governor",
-          "candidate": "John Jr. Anderson"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Harvey F. Crouch, Rep.",
@@ -315,8 +315,8 @@
         },
         {
           "label": "Dale E. Saffels, Dem.",
-          "contest": "governor",
-          "candidate": "Dale E. Saffels"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -339,8 +339,8 @@
       "columns": [
         {
           "label": "John Anderson, Jr., Rep.",
-          "contest": "governor",
-          "candidate": "John Jr. Anderson"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Harvey F. Crouch, Rep.",
@@ -354,8 +354,8 @@
         },
         {
           "label": "Dale E. Saffels, Dem.",
-          "contest": "governor",
-          "candidate": "Dale E. Saffels"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -630,8 +630,8 @@
         },
         {
           "label": "Vearl A. Bacon, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Vearl Bacon"
         },
         {
           "label": "Scattering",
@@ -669,8 +669,8 @@
         },
         {
           "label": "Vearl A. Bacon, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Vearl Bacon"
         },
         {
           "label": "Scattering",
@@ -692,5 +692,8 @@
         0.0798
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Summer": "20191"
+  }
 }

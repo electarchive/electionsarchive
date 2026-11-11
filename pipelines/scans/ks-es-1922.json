@@ -246,8 +246,8 @@
         },
         {
           "label": "M. L. Phillips, Socialist",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "M. L. Phillips"
         },
         {
           "label": "Scattering",
@@ -285,8 +285,8 @@
         },
         {
           "label": "M. L. Phillips, Socialist.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "M. L. Phillips"
         },
         {
           "label": "Scattering",
@@ -308,5 +308,17 @@
         0.2781
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

@@ -317,13 +317,13 @@
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         },
         {
           "label": "W. W. Tamplin, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         }
       ],
       "orientation": "counties_down",
@@ -356,13 +356,13 @@
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         },
         {
           "label": "W. W. Tamplin, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         }
       ],
       "orientation": "counties_down",

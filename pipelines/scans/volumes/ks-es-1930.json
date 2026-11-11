@@ -30,5 +30,18 @@
   18,
   19
  ],
- "autorotate": true
+ "autorotate": true,
+ "mixed": true,
+ "unit_codes": {
+  "Absent vote": "KS:absent",
+  "Absent vote.": "KS:absent",
+  "Absent vote*": "KS:absent",
+  "Absent": "KS:absent",
+  "Absent vote (outside state)": "KS:absent",
+  "Absent vote outside state": "KS:absent",
+  "Federal service vote": "KS:federal",
+  "Fedl. service vote": "KS:federal",
+  "Federal service": "KS:federal",
+  "Soldier vote": "KS:federal"
+ }
 }

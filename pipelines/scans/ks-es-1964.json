@@ -232,8 +232,8 @@
       "columns": [
         {
           "label": "Wm. H. Avery, Rep.",
-          "contest": "governor",
-          "candidate": "William H. Avery"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "McDill \"Huck\" Boyd, Rep.",
@@ -297,8 +297,8 @@
         },
         {
           "label": "Harry G. Wiles, Dem.",
-          "contest": "governor",
-          "candidate": "Harry G. Wiles"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -321,8 +321,8 @@
       "columns": [
         {
           "label": "Wm. H. Avery, Rep.",
-          "contest": "governor",
-          "candidate": "William H. Avery"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "McDill \"Huck\" Boyd, Rep.",
@@ -386,8 +386,8 @@
         },
         {
           "label": "Harry G. Wiles, Dem.",
-          "contest": "governor",
-          "candidate": "Harry G. Wiles"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -410,8 +410,8 @@
       "columns": [
         {
           "label": "Wm. H. Avery, Rep.",
-          "contest": "governor",
-          "candidate": "William H. Avery"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "McDill \"Huck\" Boyd, Rep.",
@@ -475,8 +475,8 @@
         },
         {
           "label": "Harry G. Wiles, Dem.",
-          "contest": "governor",
-          "candidate": "Harry G. Wiles"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -712,13 +712,13 @@
         },
         {
           "label": "Harry E. Livermore, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Harry E. Livermore"
         },
         {
           "label": "Kenneth L. Myers, Conserv.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Kenneth L. Myers"
         }
       ],
       "orientation": "counties_down",
@@ -751,13 +751,13 @@
         },
         {
           "label": "Harry E. Livermore, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Harry E. Livermore"
         },
         {
           "label": "Kenneth L. Myers, Conserv.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Kenneth L. Myers"
         }
       ],
       "orientation": "counties_down",

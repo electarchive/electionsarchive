@@ -325,8 +325,8 @@
       "columns": [
         {
           "label": "Bennett-Smith, Rep.",
-          "contest": "governor",
-          "candidate": "Robert F. Bennett"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Clack-Lowe, Rep.",
@@ -345,8 +345,8 @@
         },
         {
           "label": "Miller-Steineger, Dem.",
-          "contest": "governor",
-          "candidate": "Vern Miller"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -369,8 +369,8 @@
       "columns": [
         {
           "label": "Bennett-Smith, Rep.",
-          "contest": "governor",
-          "candidate": "Robert F. Bennett"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Clack-Lowe, Rep.",
@@ -389,8 +389,8 @@
         },
         {
           "label": "Miller-Steineger, Dem.",
-          "contest": "governor",
-          "candidate": "Vern Miller"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -631,8 +631,8 @@
         },
         {
           "label": "Marshall Uncapher Roscoe Scoggin Proh.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",
@@ -665,8 +665,8 @@
         },
         {
           "label": "Marshall Uncapher Roscoe Scoggin Proh.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",

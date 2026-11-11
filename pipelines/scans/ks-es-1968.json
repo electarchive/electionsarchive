@@ -338,8 +338,8 @@
         },
         {
           "label": "Rick Harman, Rep.",
-          "contest": "governor",
-          "candidate": "Rick Harman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Raymond J. Van Skiver, Rep.",
@@ -348,8 +348,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -377,8 +377,8 @@
         },
         {
           "label": "Rick Harman, Rep.",
-          "contest": "governor",
-          "candidate": "Rick Harman"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Raymond J. Van Skiver, Rep.",
@@ -387,8 +387,8 @@
         },
         {
           "label": "Robert Docking, Dem.",
-          "contest": "governor",
-          "candidate": "Robert Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -692,8 +692,8 @@
         },
         {
           "label": "Marshall Uncapher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",
@@ -726,8 +726,8 @@
         },
         {
           "label": "Marshall Uncapher, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Marshall Uncapher"
         }
       ],
       "orientation": "counties_down",

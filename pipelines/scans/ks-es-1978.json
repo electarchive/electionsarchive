@@ -128,8 +128,8 @@
       "columns": [
         {
           "label": "Bennett and Montgomery Rep.",
-          "contest": "governor",
-          "candidate": "Robert F. Bennett"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Knight and Carr Rep.",
@@ -143,8 +143,8 @@
         },
         {
           "label": "Carlin and Dugan Dem.",
-          "contest": "governor",
-          "candidate": "John Carlin"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Chaney and Smith Dem.",
@@ -177,8 +177,8 @@
       "columns": [
         {
           "label": "Bennett and Montgomery Rep",
-          "contest": "governor",
-          "candidate": "Robert F. Bennett"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Knight and Carr Rep",
@@ -192,8 +192,8 @@
         },
         {
           "label": "Carlin and Dugan Dem.",
-          "contest": "governor",
-          "candidate": "John Carlin"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Chaney and Smith Dem.",
@@ -338,13 +338,13 @@
         },
         {
           "label": "Shelton and Jackson Amer.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Frank W. Shelton Jr."
         },
         {
           "label": "Beets and Martin Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Berry Beets"
         }
       ],
       "orientation": "counties_down",
@@ -377,13 +377,13 @@
         },
         {
           "label": "Shelton and Jackson Amer.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Frank W. Shelton Jr."
         },
         {
           "label": "Beets and Martin Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Berry Beets"
         }
       ],
       "orientation": "counties_down",

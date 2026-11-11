@@ -7,6 +7,18 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/31/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "house1": {
       "year": 1934,
@@ -283,8 +295,8 @@
       ]
     },
     {
-      "page": 39,
-      "id": "39-0",
+      "page": 8,
+      "id": "8-0",
       "columns": [
         {
           "label": "Alf M. Landon, Rep.",
@@ -295,6 +307,104 @@
           "label": "Omar B. Ketchum, Dem.",
           "contest": "governor",
           "candidate": "Omar B. Ketchum"
+        },
+        {
+          "label": "Geo. M. Whiteside, Soc.",
+          "contest": "governor",
+          "candidate": "George M. Whiteside"
+        },
+        {
+          "label": "Chas. W. Thompson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Wood, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. R. Ingraham, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.128,
+        0.103,
+        0.966,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1249
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Alf M. Landon, Rep.",
+          "contest": "governor",
+          "candidate": "Alfred M. Landon"
+        },
+        {
+          "label": "Omar B. Ketchum, Dem.",
+          "contest": "governor",
+          "candidate": "Omar B. Ketchum"
+        },
+        {
+          "label": "Geo. M. Whiteside, Soc.",
+          "contest": "governor",
+          "candidate": "George M. Whiteside"
+        },
+        {
+          "label": "Chas. W. Thompson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Wood, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. R. Ingraham, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.133,
+        0.887,
+        0.884
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1158
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Alf M. Landon, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Omar B. Ketchum, Dem.",
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Geo. M. Whiteside, Soc.",
@@ -329,6 +439,55 @@
       "header": [
         0.0,
         0.0101
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Alf M. Landon, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Omar B. Ketchum, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. M. Whiteside, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. W. Thompson, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James B. Wood, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. R. Ingraham, Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.131,
+        0.91,
+        0.842
+      ],
+      "hint": "Read only the table headed 'FOR GOVERNOR AND LIEUTENANT GOVERNOR\u2014CONCLUDED'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1195
       ]
     }
   ]

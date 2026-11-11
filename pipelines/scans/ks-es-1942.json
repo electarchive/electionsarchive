@@ -312,13 +312,13 @@
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         },
         {
           "label": "Ida A. Beloof, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Ida A. Beloof"
         }
       ],
       "orientation": "counties_down",
@@ -351,13 +351,13 @@
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         },
         {
           "label": "Ida A. Beloof, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "Ida A. Beloof"
         }
       ],
       "orientation": "counties_down",
@@ -448,13 +448,13 @@
       "columns": [
         {
           "label": "Andrew Schoeppel, Rep.",
-          "contest": "governor",
-          "candidate": "Andrew F. Schoeppel"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "William H. Burke, Dem.",
-          "contest": "governor",
-          "candidate": "William H. Burke"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "David C. White, Prohib.",
@@ -481,5 +481,17 @@
         0.0736
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

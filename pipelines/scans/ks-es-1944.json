@@ -403,13 +403,13 @@
         },
         {
           "label": "W. W. Tamplin, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         }
       ],
       "orientation": "counties_down",
@@ -442,13 +442,13 @@
         },
         {
           "label": "W. W. Tamplin, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "W. W. Tamplin"
         },
         {
           "label": "David C. White, Prohib.",
-          "contest": null,
-          "candidate": ""
+          "contest": "governor",
+          "candidate": "David C. White"
         }
       ],
       "orientation": "counties_down",
@@ -465,5 +465,17 @@
         0.0796
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  }
 }

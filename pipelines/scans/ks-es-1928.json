@@ -7,6 +7,18 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/25/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "president": {
       "year": 1928,
@@ -55,6 +67,14 @@
       "special": false,
       "state": "KS",
       "district": 5
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -277,6 +297,114 @@
       "hint": "Read only the table headed 'FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
     {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "governor",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "Chauncey B. Little, Dem.",
+          "contest": "governor",
+          "candidate": "Chauncey B. Little"
+        },
+        {
+          "label": "Henry L. Peterson, Soc.",
+          "contest": "governor",
+          "candidate": "Henry L. Peterson"
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jere Kimmel, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. Z. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.094,
+        0.117,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.12
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": "governor",
+          "candidate": "Clyde M. Reed"
+        },
+        {
+          "label": "Chauncey B. Little, Dem.",
+          "contest": "governor",
+          "candidate": "Chauncey B. Little"
+        },
+        {
+          "label": "Henry L. Peterson, Soc.",
+          "contest": "governor",
+          "candidate": "Henry L. Peterson"
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jere Kimmel, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V. Z. Malone, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.13,
+        0.903,
+        0.674
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1562
+      ]
+    },
+    {
       "page": 45,
       "id": "45-0",
       "columns": [
@@ -303,6 +431,50 @@
       "header": [
         0.0,
         0.2651
+      ]
+    },
+    {
+      "page": 47,
+      "id": "47-0",
+      "columns": [
+        {
+          "label": "Clyde M. Reed, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chauncey B. Little, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Henry L. Peterson, Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. W. Graybill, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jere Kimmel, Dem.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.101,
+        0.921,
+        0.792
+      ],
+      "hint": "Read only the table headed 'Federal Service Vote\u2014General Election, November 6, 1928. GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1939
       ]
     }
   ]

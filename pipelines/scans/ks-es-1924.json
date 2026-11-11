@@ -7,6 +7,18 @@
   "file": {
     "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/21/download"
   },
+  "unit_codes": {
+    "Absent vote": "KS:absent",
+    "Absent vote.": "KS:absent",
+    "Absent vote*": "KS:absent",
+    "Absent": "KS:absent",
+    "Absent vote (outside state)": "KS:absent",
+    "Absent vote outside state": "KS:absent",
+    "Federal service vote": "KS:federal",
+    "Fedl. service vote": "KS:federal",
+    "Federal service": "KS:federal",
+    "Soldier vote": "KS:federal"
+  },
   "contests": {
     "president": {
       "year": 1924,
@@ -87,6 +99,14 @@
       "special": false,
       "state": "KS",
       "district": 8
+    },
+    "governor": {
+      "year": 1924,
+      "chamber": "governor",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "KS",
+      "district": null
     }
   },
   "pages": [
@@ -418,6 +438,124 @@
         0.805
       ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen. Republican.",
+          "contest": "governor",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "Jonathan M. Davis. Democrat.",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "M. L. Phillips. Socialist.",
+          "contest": "governor",
+          "candidate": "M. L. Phillips"
+        },
+        {
+          "label": "Wm. Allen White. Independent.",
+          "contest": "governor",
+          "candidate": "William Allen White"
+        },
+        {
+          "label": "D. A. N. Chase. Republican.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Doerr. Democrat.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sheridan Green. Socialist.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carr W. Taylor. Independent.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.128,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2076
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Ben S. Paulen, Republican",
+          "contest": "governor",
+          "candidate": "Ben S. Paulen"
+        },
+        {
+          "label": "Jonathan M. Davis, Democrat",
+          "contest": "governor",
+          "candidate": "Jonathan M. Davis"
+        },
+        {
+          "label": "M. L. Phillips, Socialist",
+          "contest": "governor",
+          "candidate": "M. L. Phillips"
+        },
+        {
+          "label": "Wm. Allen White, Independent",
+          "contest": "governor",
+          "candidate": "William Allen White"
+        },
+        {
+          "label": "D. A. N. Chase, Republican",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. A. Doerr, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sheridan Green, Socialist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carr W. Taylor, Independent",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.12,
+        0.918,
+        0.809
+      ],
+      "hint": "Read only the table headed 'GOVERNOR AND LIEUTENANT GOVERNOR\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2787
+      ]
     },
     {
       "page": 45,

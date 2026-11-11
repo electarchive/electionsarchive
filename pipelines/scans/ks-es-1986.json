@@ -133,8 +133,8 @@
         },
         {
           "label": "Hayden and Walker Rep.",
-          "contest": "governor",
-          "candidate": "Mike Hayden"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Jones and Burke Rep.",
@@ -158,8 +158,8 @@
         },
         {
           "label": "Docking and Montgomery Dem.",
-          "contest": "governor",
-          "candidate": "Thomas R. Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -192,8 +192,8 @@
         },
         {
           "label": "Hayden and Walker Rep",
-          "contest": "governor",
-          "candidate": "Mike Hayden"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "Jones and Burke Rep.",
@@ -217,8 +217,8 @@
         },
         {
           "label": "Docking and Montgomery Dem.",
-          "contest": "governor",
-          "candidate": "Thomas R. Docking"
+          "contest": null,
+          "candidate": ""
         }
       ],
       "orientation": "counties_down",
@@ -329,12 +329,12 @@
         {
           "label": "Hayden and Walker Rep.",
           "contest": "governor",
-          "candidate": "Mike Hayden"
+          "candidate": "Mike Hayden/Jack D. Walker"
         },
         {
           "label": "Docking and Montgomery Dem.",
           "contest": "governor",
-          "candidate": "Thomas R. Docking"
+          "candidate": "Thomas Docking/John G. Montgomery"
         }
       ],
       "orientation": "counties_down",
@@ -358,12 +358,12 @@
         {
           "label": "Hayden and Walker Rep",
           "contest": "governor",
-          "candidate": "Mike Hayden"
+          "candidate": "Mike Hayden/Jack D. Walker"
         },
         {
           "label": "Docking and Montgomery Dem",
           "contest": "governor",
-          "candidate": "Thomas R. Docking"
+          "candidate": "Thomas Docking/John G. Montgomery"
         }
       ],
       "orientation": "counties_down",
