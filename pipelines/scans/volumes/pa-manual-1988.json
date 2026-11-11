@@ -1,0 +1,22 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Department of State",
+  "title": "The Pennsylvania Manual 1989 (vol. 109), county returns of the general election 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0270/micro_IA40706939_0270.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0270"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors)",
+    "senate": "U.S. Senator"
+  },
+  "hint": "One table per office with county rows and a TOTALS row; copy the state total row as printed_total. Skip registration, primary, and referendum tables.",
+  "leaves": [
+    650,
+    651
+  ]
+}

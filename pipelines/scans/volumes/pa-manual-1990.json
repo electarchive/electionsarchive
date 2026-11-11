@@ -1,0 +1,20 @@
+{
+  "year": 1990,
+  "day": "1990-11-06",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Department of State",
+  "title": "The Pennsylvania Manual 1991 (vol. 110), county returns of the general election 1990-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706943_0004/micro_IA40706943_0004.pdf",
+    "item": "https://archive.org/details/micro_IA40706943_0004"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor and Lieutenant Governor (the ticket's vote)"
+  },
+  "hint": "One table per office with county rows and a TOTALS row; copy the state total row as printed_total. Skip registration, primary, and referendum tables.",
+  "leaves": [
+    649
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Vote: General Election, November 8, 1988, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0313/micro_IA40706932_0313.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0313"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors, one column per party line)",
+    "senate": "U.S. Senator (one column per party line)"
+  },
+  "hint": "Leaves 4 and 5 are one president table split by columns: leaf 4 holds the first seven party columns and leaf 5 the rest with the same county rows. Leaves 6 and 7 are the same split for U.S. Senator. Rows are the 62 counties plus subtotals; copy TOTAL ENTIRE STATE as printed_total. Print is faint and the right edge is clipped on leaf 4.",
+  "leaves": [
+    4,
+    5,
+    6,
+    7
+  ]
+}
