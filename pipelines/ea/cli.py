@@ -93,6 +93,9 @@ def main() -> None:
         help="build the US House, UK, French, and Turkish cartogram and tile layouts, then the other hex tile maps",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser(
+        "release", help="write the bulk release bundles (Parquet, CSV, and GeoParquet) to data/releases/"
+    ).add_argument("--calver", help="release label, today's date by default")
     commands.add_parser("bounties", help="sync the bounties from the known coverage gaps")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
@@ -280,6 +283,10 @@ def main() -> None:
             print(hexes.build_tiles())
         case "search":
             print(search.build())
+        case "release":
+            from ea import release
+
+            print(release.build(args.calver))
         case "bounties":
             from ea import bounties
 
