@@ -12,6 +12,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.labelpoint import label_point
 from ea.store import DATA, connect
 
 SOURCE = "us.in_local"
@@ -307,7 +308,7 @@ def emit() -> Path:
                     area_id=area,
                     valid_from=None,
                     geom=geom,
-                    label_point=None,
+                    label_point=label_point(geom),
                     quality="official",
                     source_id=census,
                 )

@@ -14,6 +14,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.labelpoint import label_point
 from ea.sources.us.enr_clarity import _label, _title
 from ea.store import DATA, connect
 
@@ -947,7 +948,7 @@ def emit() -> Path:
                 area_id=area,
                 valid_from=None,
                 geom=geom,
-                label_point=None,
+                label_point=label_point(geom),
                 quality="official",
                 source_id=census,
             )

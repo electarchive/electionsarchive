@@ -21,6 +21,7 @@ import shapefile
 from ea import portals, raw
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.encoding import DOUBLED, repair, restorer, sweep
+from ea.labelpoint import label_point
 from ea.offices import Offices
 from ea.store import DATA, connect
 
@@ -2121,7 +2122,7 @@ def emit(
                     area_id=area,
                     valid_from=None,
                     geom=geom,
-                    label_point=None,
+                    label_point=label_point(geom),
                     quality="official",
                     source_id=census,
                 )
