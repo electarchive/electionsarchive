@@ -2,6 +2,7 @@ import csv
 import html
 import io
 import re
+import unicodedata
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
@@ -13,7 +14,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.maricopa"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 FOLDERS = [Path(__file__).parents[4] / "data/inbox/manual" / mf for mf in ("MF-081", "MF-082")]
 URL = "https://elections.maricopa.gov/results-and-data/historic-results.html?year={year}#{name}"
@@ -1142,6 +1143,34 @@ def emit() -> Path:
                 held.add((entity, fixed, lang, kind))
                 cs.add("name", entity_id=entity, text=fixed, lang=lang, kind=kind, is_preferred=preferred)
             report["renamed people"] = report.get("renamed people", 0) + 1
+        twins: dict[tuple[str, str], list[tuple[UUID, str, int]]] = {}
+        for person, label, body, count in conn.execute(
+            """select p.id, n.text, split_part(x.value, ':', 3),
+                      (select count(*) from candidacy y where y.person_id = p.id)
+               from person p join entity e on e.id = p.id and e.retired_by is null
+               join external_id x on x.entity_id = p.id and x.scheme = %s
+               join name n on n.entity_id = p.id and n.is_preferred and n.kind = 'official'""",
+            [f"{SOURCE}.person"],
+        ).fetchall():
+            if person not in cs.survivors:
+                twins.setdefault(
+                    (
+                        re.sub(
+                            r"[^a-z]",
+                            "",
+                            unicodedata.normalize("NFKD", label.lower()).encode("ascii", "ignore").decode(),
+                        ),
+                        body,
+                    ),
+                    [],
+                ).append((person, label, count))
+        for group in twins.values():
+            ranked = sorted(
+                set(group), key=lambda item: (item[1].isascii(), -sum(c.isupper() for c in item[1]), -item[2])
+            )
+            for person, _, _ in ranked[1:]:
+                cs.merge(person, ranked[0][0])
+                report["merged twins"] = report.get("merged twins", 0) + 1
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))
