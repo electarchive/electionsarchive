@@ -54,6 +54,7 @@
   import Cached from "./cached.svelte";
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
+  import CountingNote from "./counting-note.svelte";
   import ElectionTitle from "./election-title.svelte";
   import Electors from "./electors.svelte";
   import Gains from "./gains.svelte";
@@ -93,6 +94,7 @@
     path,
     query,
     chosen,
+    live,
   }: {
     id: string;
     path: string;
@@ -105,6 +107,7 @@
     ledger: Opened["ledger"];
     sameDay: Extract<PageServerData, { kind: "election" }>["sameDay"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
+    live: Extract<PageServerData, { kind: "election" }>["live"];
   } = $props();
 
   const known = createQuery(() =>
@@ -2239,6 +2242,10 @@
     </Await>
   </div>
 </header>
+
+{#if live != null}
+  <CountingNote {live} />
+{/if}
 
 {@render ticket()}
 

@@ -249,6 +249,7 @@
         standing={data.standing}
         crowned={data.crowned}
         match={data.match}
+        live={data.live}
       />
     {:else if data.kind === "election"}
       {#key `${data.id}${query}`}
@@ -263,6 +264,7 @@
           primed={data.primed}
           sameDay={data.sameDay}
           sections={data.sections}
+          live={data.live}
         />
       {/key}
     {:else if data.kind === "day"}

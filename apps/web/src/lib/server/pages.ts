@@ -19,6 +19,7 @@ import {
 import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
+import { countedContest, countedElection } from "#lib/server/counted.js";
 import { counting, liveOf } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
@@ -1449,9 +1450,12 @@ export async function archive(path: string, search: URLSearchParams) {
       })
       .catch(() => null);
     void body.catch(() => null);
-    const [head, isMerged] = await Promise.all([
+    const [head, isMerged, live] = await Promise.all([
       found(call(router.contests.head, { id: slug.entity_id, unit })),
       merged.then((found) => found != null),
+      countedContest(slug.entity_id, slug.current ?? slug.path).catch(
+        () => null,
+      ),
     ]);
     return {
       kind: "contest" as const,
@@ -1462,6 +1466,7 @@ export async function archive(path: string, search: URLSearchParams) {
         : head,
       match,
       within,
+      live,
       body,
       ballot,
       standing,
@@ -1587,6 +1592,7 @@ export async function archive(path: string, search: URLSearchParams) {
       race,
       scope,
       head,
+      live: await countedElection(slug.entity_id).catch(() => null),
       body,
       sameDay,
       sections: {

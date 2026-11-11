@@ -1430,6 +1430,13 @@
   "polity_counting": "Counting now",
   "polity_counting_body": "Votes are still being counted. Until the results are certified, follow the live count; the archive adds the certified results here when they are published.",
   "polity_counting_short": "Counting",
+  "counting_title": "Counting is still under way",
+  "counting_contest": "These are the latest unofficial figures from {publisher}, as of {time}. They are not certified.",
+  "counting_election": "{count} contests in this election are still being counted. The latest figures, from {time}, are unofficial and not certified.",
+  "counting_election_one": "One contest in this election is still being counted. The latest figures, from {time}, are unofficial and not certified.",
+  "counting_reporting": "{reporting} of {expected} units reporting",
+  "counting_link": "Follow the live count",
+  "counting_admin": "Live results are switched off for readers, so only admins see this link.",
   "polity_next_races": [
     {
       "declarations": [

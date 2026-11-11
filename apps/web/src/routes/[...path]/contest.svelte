@@ -28,6 +28,7 @@
     standing,
     crowned,
     match,
+    live,
   }: {
     id: string;
     talk: { id: string; open: number } | null;
@@ -39,6 +40,7 @@
     standing: Extract<PageServerData, { kind: "contest" }>["standing"];
     crowned: Extract<PageServerData, { kind: "contest" }>["crowned"];
     match: string;
+    live: Extract<PageServerData, { kind: "contest" }>["live"];
   } = $props();
 
   if (!browser) {
@@ -138,6 +140,7 @@
       {standing}
       {crowned}
       sameDay={opened.sameDay}
+      {live}
     />
   {/snippet}
   {#snippet pending(skeleton)}

@@ -22,6 +22,7 @@
     primed,
     sameDay,
     sections,
+    live,
   }: {
     id: string;
     path: string;
@@ -33,6 +34,7 @@
     primed: Primed | Promise<Primed>;
     sameDay: Extract<PageServerData, { kind: "election" }>["sameDay"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
+    live: Extract<PageServerData, { kind: "election" }>["live"];
   } = $props();
 
   if (!browser) {
@@ -61,6 +63,7 @@
       ledger={opened.ledger}
       {sameDay}
       {sections}
+      {live}
     />
   {/snippet}
   {#snippet pending(skeleton)}

@@ -4,6 +4,7 @@ import { READ_ONLY } from "$app/env/public";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import type { Column, Counts, Tier } from "#lib/coverage.js";
+import type { Counted } from "#lib/server/counted.js";
 import type { Counting } from "#lib/server/counting.js";
 import { tally } from "#lib/atlas/electors.js";
 import { ending, partyOn, segments, stand } from "#lib/caucus.js";
@@ -345,6 +346,7 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
       surround: body.surround,
       match: data.match,
       within: data.within,
+      live: data.live,
       standing,
       sameDay: body.sameDay,
     };
@@ -396,6 +398,7 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
       ledger: body.ledger,
     },
     within: data.within,
+    live: data.live,
   };
 }
 
@@ -882,7 +885,7 @@ function markdown(
           data.hexes,
           data.states,
           link,
-        ),
+        ).toSpliced(2, 0, ...countingMarkdown(data.live, link)),
         ...(data.indices == null ? [] : indicesMarkdown(data.indices, link)),
         ...(data.sameDay?.races.some((race) => !race.isOwn) === true
           ? sameDayMarkdown(data.sameDay, link)
@@ -1040,7 +1043,7 @@ function markdown(
           data.standing,
           link,
           ledger,
-        ),
+        ).toSpliced(2, 0, ...countingMarkdown(data.live, link)),
         ...(data.sameDay != null && data.sameDay.races.length > 1
           ? sameDayMarkdown(data.sameDay, link)
           : []),
@@ -1048,6 +1051,52 @@ function markdown(
       ];
     }
   }
+}
+
+function countingMarkdown(live: Counted | null, link: Link) {
+  if (live == null) {
+    return [];
+  }
+  const { tally } = live;
+  return [
+    `## ${m.counting_title()}`,
+    tally != null
+      ? [
+          m.counting_contest({
+            publisher:
+              tally.url == null
+                ? tally.publisher
+                : `[${tally.publisher}](${tally.url})`,
+            time: dated(tally.at),
+          }),
+          tally.reporting == null || tally.expected == null
+            ? null
+            : m.counting_reporting({
+                reporting: count(tally.reporting),
+                expected: count(tally.expected),
+              }),
+        ]
+          .filter((part) => part != null)
+          .join(" ")
+      : live.at != null
+        ? (live.contests === 1 ? m.counting_election_one : m.counting_election)(
+            { count: count(live.contests), time: dated(live.at) },
+          )
+        : m.counting_admin(),
+    ...(tally == null || tally.rows.length === 0
+      ? []
+      : [
+          table(
+            [m.col_option(), m.col_party(), m.col_votes()],
+            tally.rows.map((row) => [
+              row.label,
+              row.party ?? "",
+              count(row.votes),
+            ]),
+          ),
+        ]),
+    link(m.counting_link(), live.path),
+  ];
 }
 
 function indicesMarkdown(indices: Indices["election"], link: Link) {

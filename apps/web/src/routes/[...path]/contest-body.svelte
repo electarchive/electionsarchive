@@ -46,6 +46,7 @@
   import Changes from "./changes.svelte";
   import ContestTitle from "./contest-title.svelte";
   import Count from "./count.svelte";
+  import CountingNote from "./counting-note.svelte";
   import Crowns from "./crowns.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
@@ -88,6 +89,7 @@
     standing,
     crowned,
     sameDay,
+    live,
   }: {
     id: string;
     talk: { id: string; open: number } | null;
@@ -129,6 +131,7 @@
     sameDay: Awaited<
       Extract<PageServerData, { kind: "contest" }>["body"]
     >["sameDay"];
+    live: Extract<PageServerData, { kind: "contest" }>["live"];
   } = $props();
 
   const DAY: Record<string, () => string> = {
@@ -1741,6 +1744,10 @@
     </ul>
   </div>
 {/snippet}
+
+{#if live != null}
+  <CountingNote {live} />
+{/if}
 
 {#if contest.nomination != null}
   <p class="col-span-12 bg-card px-3.5 py-3 text-[0.9375rem] font-semibold">
