@@ -607,6 +607,16 @@ VICE_TABLES = {
     "1864:democratic:vp": {"item": "officialproceed00demo", "leaves": (52,), "ballot": 1, "transcribed": "conventions_chicago_1864_vp.tsv"},
     "1872:democratic:vp": {"item": "officialproceed01convgoog", "leaves": (71,), "ballot": 1, "transcribed": "conventions_baltimore_1872_vp.tsv"},
     "1876:democratic:vp": {"item": "officialproc00demo", "leaves": (179, 180), "ballot": 1, "transcribed": "conventions_st_louis_1876_vp.tsv"},
+    "1856:republican:vp": {"item": "proceedingsoffir00inrepu", "leaves": (70,), "ballot": 1, "transcribed": "conventions_philadelphia_1856_vp.tsv"},
+    "1860:republican:vp-b1": {"item": "proceedingsoffir00inrepu", "leaves": (165, 166), "ballot": 1, "transcribed": "conventions_chicago_1860_vp.tsv"},
+    "1860:republican:vp-b2": {"item": "proceedingsoffir00inrepu", "leaves": (166,), "ballot": 2, "transcribed": "conventions_chicago_1860_vp.tsv"},
+    "1864:republican:vp": {"item": "proceedingsoffir00inrepu", "leaves": (247,), "ballot": 1, "transcribed": "conventions_baltimore_1864_vp.tsv"},
+    "1868:republican:vp-b1": {"item": "presidentialelec00repu", "leaves": (127,), "ballot": 1, "transcribed": "conventions_chicago_1868_vp.tsv"},
+    "1868:republican:vp-b2": {"item": "presidentialelec00repu", "leaves": (129,), "ballot": 2, "transcribed": "conventions_chicago_1868_vp.tsv"},
+    "1868:republican:vp-b3": {"item": "presidentialelec00repu", "leaves": (132,), "ballot": 3, "transcribed": "conventions_chicago_1868_vp.tsv", "short": True},
+    "1880:republican:vp": {"item": "proceedingsofrep00inrepu", "leaves": (311,), "ballot": 1, "transcribed": "conventions_chicago_1880_vp.tsv", "short": True},
+    "1884:republican:vp": {"item": "proceedingsofeig00repu", "leaves": (186, 187), "ballot": 1, "transcribed": "conventions_chicago_1884_vp.tsv", "short": True},
+    "1888:republican:vp": {"item": "officialproceedi00repu_0", "leaves": (449, 450), "ballot": 1, "transcribed": "conventions_chicago_1888_vp.tsv", "short": True},
 }  # fmt: skip
 TABLES += [{"table": name} | spec for name, spec in VICE_TABLES.items()]
 TABLES += [
@@ -682,16 +692,28 @@ NILES_1835_VICE = (
     "state-by-state table of the ballot for vice president as Niles' Weekly Register printed it (page 228). The "
     "table gives no votes held by each delegation. Two-thirds of the 265 votes given, 177, were needed to nominate."
 )
+PROCEEDINGS_VICE = VICE_METHOD.format("the convention's official proceedings")
+REPUBLICAN_VICE_1856 = "The informal ballot before this one is printed only as totals, without a count by state, so it is not stored: William L. Dayton 253, Abraham Lincoln 110, Nathaniel P. Banks 46, David Wilmot 43, Charles Sumner 35, Jacob Collamer 15, John A. King 9, Samuel C. Pomeroy 8, Thomas H. Ford 7, Cassius M. Clay 3, Henry C. Carey 3, Joshua R. Giddings 2, W. S. Johnson 2, Henry Wilson 2, and Aaron S. Pennington 1. The table stored here is the formal ballot as called; Pennsylvania's 2 scattering votes are not stored. The delegations that had voted for others then changed their votes, and Dayton was declared nominated unanimously, with 561 votes. The proceedings print no totals for this table and no figure needed to nominate."
+REPUBLICAN_VICE_1860 = (
+    "The proceedings print no figure needed to nominate. Hannibal Hamlin was declared nominated on the second ballot."
+)
+REPUBLICAN_VICE_1864 = "The table is the ballot after the delegations' corrections; Andrew Johnson was then declared nominated. The proceedings print no figure needed to nominate."
+REPUBLICAN_VICE_1868 = {
+    1: "The figure needed stored here, 325, is the one the proceedings give with the final vote, a majority of the 648 votes cast.",
+    2: "The figure needed stored here, 325, is the one the proceedings give with the final vote, a majority of the 648 votes cast. The proceedings narrate the changes of vote that followed this roll call but print no further count by state until the final vote.",
+    3: "This is the final vote after changes, which the proceedings tabulate by state; it is numbered 3 here because it is the third count by state the volume prints, and other accounts number the ballots differently. Of 650 votes, 648 were cast and 325 were needed; Alabama cast 16 of its 18.",
+}
+REPUBLICAN_VICE_SHORT = "Some delegations cast fewer votes than they held; the difference is not stored."
 PROCEEDINGS: list[dict[str, Any]] = [
-    {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2},
-    {"tables": {1: "1864:republican"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "Third", "city": "Baltimore", "days": (date(1864, 6, 7), date(1864, 6, 8)), "ballots": {1: date(1864, 6, 8)}, "deciding": 1},
+    {"tables": {1: "1856:republican:informal", 2: "1856:republican:formal"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "First", "city": "Philadelphia", "days": (date(1856, 6, 17), date(1856, 6, 19)), "ballots": {1: date(1856, 6, 18), 2: date(1856, 6, 19)}, "deciding": 2, "vice": {"tables": {1: "1856:republican:vp"}, "ballots": {1: date(1856, 6, 19)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1856}},
+    {"tables": {1: "1864:republican"}, "title": "Proceedings of the First Three Republican National Conventions of 1856, 1860 and 1864", "publisher": "Charles W. Johnson", "ordinal": "Third", "city": "Baltimore", "days": (date(1864, 6, 7), date(1864, 6, 8)), "ballots": {1: date(1864, 6, 8)}, "deciding": 1, "vice": {"tables": {1: "1864:republican:vp"}, "ballots": {1: date(1864, 6, 8)}, "deciding": 1, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1864}},
     {"tables": {1: "1872:republican"}, "ordinal": "Fifth", "city": "Philadelphia", "days": (date(1872, 6, 5), date(1872, 6, 6)), "ballots": {1: date(1872, 6, 6)}, "deciding": 1, "held": 1},
-    {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
-    {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
+    {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1, "vice": {"tables": {n: f"1868:republican:vp-b{n}" for n in (1, 2, 3)}, "ballots": dict.fromkeys((1, 2, 3), date(1868, 5, 21)), "deciding": 3, "required": 325, "method": PROCEEDINGS_VICE, "caveat": REPUBLICAN_VICE_1868}},
+    {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3, "vice": {"tables": {1: "1860:republican:vp-b1", 2: "1860:republican:vp-b2"}, "ballots": dict.fromkeys((1, 2), date(1860, 5, 18)), "deciding": 2, "method": PROCEEDINGS_VICE, "caveat": {2: REPUBLICAN_VICE_1860}}},
     {"tables": {n: f"1876:republican:b{n}" for n in range(1, 8)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
-    {"tables": {n: f"1884:republican:b{n}" for n in range(1, 5)}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4},
-    {"tables": {n: f"1880:republican:b{n}" for n in range(1, 37)}, "ordinal": "Seventh", "city": "Chicago", "days": (date(1880, 6, 2), date(1880, 6, 8)), "ballots": dict.fromkeys(range(1, 29), date(1880, 6, 7)) | dict.fromkeys(range(29, 37), date(1880, 6, 8)), "deciding": 36, "held": 36},
-    {"tables": {n: f"1888:republican:b{n}" for n in (1, 2, 3, 4, 5, 6, 7, 8)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
+    {"tables": {n: f"1884:republican:b{n}" for n in range(1, 5)}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4, "vice": {"tables": {1: "1884:republican:vp"}, "ballots": {1: date(1884, 6, 6)}, "deciding": 1, "required": 411, "method": PROCEEDINGS_VICE, "caveat": "Of 820 votes, 780 were cast and 411 were needed, the figures the proceedings give. " + REPUBLICAN_VICE_SHORT}},
+    {"tables": {n: f"1880:republican:b{n}" for n in range(1, 37)}, "ordinal": "Seventh", "city": "Chicago", "days": (date(1880, 6, 2), date(1880, 6, 8)), "ballots": dict.fromkeys(range(1, 29), date(1880, 6, 7)) | dict.fromkeys(range(29, 37), date(1880, 6, 8)), "deciding": 36, "held": 36, "vice": {"tables": {1: "1880:republican:vp"}, "ballots": {1: date(1880, 6, 8)}, "deciding": 1, "required": 376, "method": PROCEEDINGS_VICE, "caveat": "Of 756 votes, 751 were cast and 376 were needed, the figures the proceedings give. " + REPUBLICAN_VICE_SHORT}},
+    {"tables": {n: f"1888:republican:b{n}" for n in (1, 2, 3, 4, 5, 6, 7, 8)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8, "vice": {"tables": {1: "1888:republican:vp"}, "ballots": {1: date(1888, 6, 25)}, "deciding": 1, "required": 414, "method": PROCEEDINGS_VICE, "caveat": "Of 832 votes, 826 were cast and 414 were needed, the figures the proceedings give. " + REPUBLICAN_VICE_SHORT}},
     {"tables": {1: "1896:republican"}, "ordinal": "Eleventh", "city": "St. Louis", "days": (date(1896, 6, 16), date(1896, 6, 18)), "ballots": {1: date(1896, 6, 18)}, "deciding": 1, "caveat": "The table gives no votes held by each delegation, so none are stored. Its footnotes say the delegations of Colorado and Idaho had bolted the convention, Montana's other five votes were four blank and one for J. Donald Cameron, three of Nevada's delegates were absent, and one New York vote was passed; those votes are not in the table's columns and are not stored."},
     {"tables": {1: "1900:republican"}, "ordinal": "Twelfth", "city": "Philadelphia", "days": (date(1900, 6, 19), date(1900, 6, 21)), "ballots": {1: date(1900, 6, 21)}, "deciding": 1},
     {"tables": {1: "1892:republican"}, "ordinal": "Tenth", "city": "Minneapolis", "days": (date(1892, 6, 7), date(1892, 6, 10)), "ballots": {1: date(1892, 6, 10)}, "deciding": 1},
@@ -754,7 +776,6 @@ FOURTH_1848 = (
     "proceedings then give the whole ballot as 254 votes, 242 for Cass, 8 for Levi Woodbury, and 4 for James "
     "Buchanan. The rows stored here are the 179 as printed in the table."
 )
-PROCEEDINGS_VICE = VICE_METHOD.format("the convention's official proceedings")
 VICE_1848 = {
     1: "New York's delegation declined to vote. The proceedings give 252 votes and 168 needed to nominate.",
     2: "The table is the roll as first called, with New York not voting and Virginia's delegation withdrawn for consultation. Pennsylvania then changed its 26 votes to William O. Butler and Virginia announced its 17 for him, and the convention declared Butler unanimously nominated. The proceedings print no figure needed for this ballot; the one stored here, 158, is two-thirds of the 236 votes in the table.",
@@ -801,6 +822,40 @@ REPORTS = {
     "democratic": "the convention's official proceedings",
 }
 CANDIDATES = {
+    "1856:republican:Lincoln": ("Abraham Lincoln", "Q91"),
+    "1856:republican:King": ("John A. King", "Q443879"),
+    "1856:republican:Ford": ("Thomas H. Ford", None),
+    "1860:republican:Clay": ("Cassius M. Clay", None),
+    "1860:republican:Reeder": ("Andrew H. Reeder", "Q505177"),
+    "1860:republican:Hickman": ("John Hickman", None),
+    "1860:republican:Hamlin": ("Hannibal Hamlin", "Q273546"),
+    "1860:republican:Read": ("John M. Read", None),
+    "1860:republican:Davis": ("Henry Winter Davis", "Q1027386"),
+    "1860:republican:Houston": ("Sam Houston", "Q216547"),
+    "1864:republican:Johnson": ("Andrew Johnson", "Q8612"),
+    "1864:republican:Dickinson": ("Daniel S. Dickinson", "Q1162460"),
+    "1864:republican:Hamlin": ("Hannibal Hamlin", "Q273546"),
+    "1864:republican:Tod": ("David Tod", "Q880651"),
+    "1868:republican:Wilson": ("Henry Wilson", "Q313302"),
+    "1868:republican:Colfax": ("Schuyler Colfax", "Q310852"),
+    "1868:republican:Fenton": ("Reuben E. Fenton", "Q443870"),
+    "1868:republican:Hamlin": ("Hannibal Hamlin", "Q273546"),
+    "1868:republican:Curtin": ("Andrew G. Curtin", "Q504966"),
+    "1868:republican:Harlan": ("James Harlan", "Q376747"),
+    "1868:republican:Pomeroy": ("Samuel C. Pomeroy", "Q6053012"),
+    "1868:republican:Kelley": ("William D. Kelley", "Q3568533"),
+    "1868:republican:Speed": ("James Speed", None),
+    "1868:republican:Creswell": ("John A. J. Creswell", "Q1298209"),
+    "1880:republican:Woodford": ("Stewart L. Woodford", "Q428605"),
+    "1880:republican:Maynard": ("Horace Maynard", "Q132330"),
+    "1880:republican:Settle": ("Thomas Settle", None),
+    "1880:republican:Bruce": ("Blanche K. Bruce", "Q881412"),
+    "1880:republican:Davis": ("Edmund J. Davis", "Q729594"),
+    "1880:republican:Alcorn": ("James L. Alcorn", "Q886035"),
+    "1888:republican:Morton": ("Levi P. Morton", "Q298997"),
+    "1888:republican:Bradley": ("William O. Bradley", None),
+    "1888:republican:Bruce": ("Blanche K. Bruce", "Q881412"),
+    "1888:republican:Thomas": ("Walter S. Thomas", None),
     "2024:democratic:Harris": ("Kamala Harris", "Q10853588"),
     "2008:democratic:Clinton": ("Hillary Clinton", "Q6294"),
     "2008:democratic:Obama": ("Barack Obama", "Q76"),
@@ -1902,6 +1957,25 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1860:republican:vp-b1": (
+        "The printed totals give Cassius M. Clay 101\u00bd and John Hickman 58, against 100\u00bd and 57 in the state rows. The rows are stored as printed.",
+        {
+            "column Clay": (101.5, 100.5, "the state figures add to 100\u00bd"),
+            "column Hickman": (58, 57, "the state figures add to 57"),
+        },
+    ),
+    "1860:republican:vp-b2": (
+        "The printed total for Hannibal Hamlin is 357, against 367 in the state rows. The rows are stored as printed.",
+        {"column Hamlin": (357, 367, "the state figures add to 367")},
+    ),
+    "1864:republican:vp": (
+        "The printed total for Andrew Johnson is 494, against 492 in the state rows. The rows are stored as printed.",
+        {"column Johnson": (494, 492, "the state figures add to 492")},
+    ),
+    "1884:republican:vp": (
+        "The printed total for John A. Logan is 773, against 779 in the state rows. The rows are stored as printed.",
+        {"column Logan": (773, 779, "the state figures add to 779")},
+    ),
     "1848:democratic:vp-b1": (
         "The printed totals give William O. Butler 114 and John A. Quitman 74, against 123 and 65 in the state rows, which add to the same 252 votes; a row's 9 votes appear to be set in the wrong column. The rows are stored as printed.",
         {
@@ -2875,7 +2949,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the Democratic vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876 and the Republican ones of 1856, 1860, 1864, 1868, 1880, 1884, and 1888, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
