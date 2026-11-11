@@ -11,6 +11,7 @@ import polars as pl
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import contingent
 from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.elstats import FORMER, GAZETTEER, HELD, SEARCH, SUFFIXES, TENANTS, TITLE, plain
 from ea.store import DATA, connect
@@ -361,6 +362,7 @@ def emit() -> Path:
         fptp, two_round = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "two_round")
         if cs.minted & {fptp, two_round}:
             raise ValueError("the fptp and two-round systems must exist")
+        majority = contingent.systems(cs, name)
         firsts: dict[tuple[str, str], UUID] = {}
         published: dict[UUID, UUID | None] = dict(
             conn.execute(
@@ -439,13 +441,37 @@ def emit() -> Path:
                     name(parties[f"{state}:{text}:{era}"], text)
             return parties[f"{state}:{text}:{era}"]
 
+        foreign = {
+            entity
+            for (entity,) in conn.execute(
+                """select distinct n.entity_id from name n join person p on p.id = n.entity_id
+                   join changeset c on c.id = n.changeset_id
+                   where n.lang = 'en' and n.kind = 'official' and n.is_preferred and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        for dropped, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join person p on p.id = n.entity_id
+               join changeset c on c.id = n.changeset_id and c.pipeline = %s
+               where n.lang = 'en' and n.kind = 'official' and n.is_preferred and n.entity_id = any(%s)""",
+            [SOURCE, list(foreign)],
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=dropped,
+                entity_id=entity,
+                text=text,
+                reason="another pipeline's preferred name stands for this person",
+            )
+
         def person(state: str, text: str) -> UUID:
             if (state, slug(text)) not in persons:
                 id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
                 if id not in persons.values():
                     cs.add("person", id=id)
                 persons[(state, slug(text))] = id
-                name(id, text)
+                if id in cs.minted or id not in foreign:
+                    name(id, text)
             return persons[(state, slug(text))]
 
         folds: dict[UUID, list[UUID]] = {}
@@ -508,7 +534,9 @@ def emit() -> Path:
                     previous_round_id=firsts.get((state, primary)) if runoff and primary is not None else None,
                     electoral_system_id=two_round
                     if primary is not None and (runoff or (state == "VA" and 1953 <= day.year <= 1969))
-                    else fptp,
+                    else fptp
+                    if primary is not None or (rule := contingent.governor(state, day.year)) is None
+                    else majority(rule),
                     default_result_kind="counted",
                 )
                 name(
