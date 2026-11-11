@@ -927,20 +927,29 @@ ABSTRACT_READS = {
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
-UNREAD = {
-    (1918, "treasurer"),
+BATCH_OFFICES = {
+    (1920, "lieutenant-governor"),
     (1920, "attorney-general"),
     (1920, "insurance-commissioner"),
-    (1922, "public-service-commissioner"),
     (1924, "auditor"),
-    (1924, "treasurer"),
     (1924, "attorney-general"),
+}
+BATCH_FIXES = {
+    (1920, 13, "mountrail"): 3076,
+    (1920, 14, "stutsman"): 3333,
+    (1924, 6, "barnes"): 3016,
+    (1924, 10, "burleigh"): 3146,
+    (1924, 10, "stutsman"): 3807,
+}
+UNREAD = {
+    (1918, "treasurer"),
+    (1922, "public-service-commissioner"),
+    (1924, "treasurer"),
     (1924, "public-service-commissioner"),
     (1926, "lieutenant-governor"),
     (1926, "insurance-commissioner"),
     (1926, "public-service-commissioner"),
 }
-BATCH_READ = {(1920, "lieutenant-governor")}
 CUTS = {1928: 870, 1920: 960, 1922: 800}
 LABELS = {1924: 400}
 PRINTED = {(1926, 7): 127506}
@@ -1333,10 +1342,13 @@ def parse() -> None:
             if (year, office) in UNREAD:
                 continue
             printed = PRINTED.get((year, column)) or cells[(len(keys), column)]
-            if (year, office) in BATCH_READ:
+            if (year, office) in BATCH_OFFICES:
                 for line, amount in enumerate(batch_column(year, column, len(keys) + 1)):
                     if amount is not None:
                         cells[(line, column)] = amount
+                for (when, number, county), amount in BATCH_FIXES.items():
+                    if when == year and number == column:
+                        cells[(keys.index(county), column)] = amount
             gaps = [
                 line
                 for line in range(len(keys))
