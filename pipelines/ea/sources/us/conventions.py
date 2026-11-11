@@ -104,6 +104,22 @@ LISTED_2024 = (
     "voting for either are stored as abstentions. The Chair announced 2,387 votes for Trump, while the delegations' "
     "votes add up to 2,388, as stored here."
 )
+CAPTIONS_2020 = (
+    "https://vimarsana.com/article/cspan-20200824-132500-republican-national-convention-nomination-vote-in-charlotte-nc",
+    "https://vimarsana.com/article/cspan-20200825-070700-republican-national-convention-nomination-vote-in-charlotte-nc-part-2",
+)
+CAPTIONS_METHOD = (
+    "The roll call of the states on the presidential nomination, one ballot per contest, with each delegation's "
+    "votes as the convention secretary announced them. The party has published no official report of the proceedings "
+    "or per-state tally for this convention, so the votes are read from the caption transcript of C-SPAN's broadcast "
+    "of the roll call, in which each delegation chair and then the secretary state the delegation's votes, until an "
+    "official tally is found. Every delegation voted for the one candidate, so its total is its votes."
+)
+CAPTIONS_CAVEAT = (
+    "The captions garble some names and numbers, so each delegation's votes are the figure the secretary's "
+    "announcement and the delegation chair's statement agree on; New Mexico's secretary announcement dropped the "
+    "number, and its chair's 22 is stored. The 56 delegations add up to the 2,550 votes the chair announced."
+)
 CONVENTIONS: list[dict[str, Any]] = [
     {
         "key": "2016-02-01:president:republican",
@@ -164,6 +180,19 @@ CONVENTIONS: list[dict[str, Any]] = [
         "nominee": "Trump",
         "city": "Milwaukee",
         "caveat": LISTED_2024,
+    },
+    {
+        "key": "2020-02-03:president:republican",
+        "party": "republican",
+        "title": "2020 Republican National Convention",
+        "captions": CAPTIONS_2020,
+        "tsv": "conventions_rnc_2020.tsv",
+        "days": (date(2020, 8, 24), date(2020, 8, 27)),
+        "ballots": [date(2020, 8, 24)],
+        "required": 1276,
+        "nominee": "Trump",
+        "city": "Charlotte",
+        "caveat": CAPTIONS_CAVEAT,
     },
 ]
 ABROAD = "DA"
@@ -2119,7 +2148,10 @@ FRACTION = re.compile(r"\s*(?:([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])|1/2
 
 def fetch() -> None:
     for convention in CONVENTIONS:
-        raw.fetch(SOURCE, page(convention["title"]), suffix=".json")
+        for url in convention.get("captions", ()):
+            raw.fetch(SOURCE, url, suffix=".html")
+        if "captions" not in convention:
+            raw.fetch(SOURCE, page(convention["title"]), suffix=".json")
     from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 
     from ea import batch, scans
@@ -2748,13 +2780,20 @@ def emit() -> Path:
                     [root[0]],
                 ).fetchall()
             )
-            artifact = raw.cached(SOURCE, page(title))
-            parsed = json.loads(artifact.path.read_text())["parse"]
-            labels, roll = (
-                listed_roll_call(parsed["wikitext"], convention["marker"])
-                if "marker" in convention
-                else roll_call(parsed["wikitext"], convention["table"])
-            )
+            captions = convention.get("captions")
+            if captions:
+                artifacts = [raw.cached(SOURCE, url) for url in captions]
+                rows = pl.read_csv(Path(__file__).with_name(convention["tsv"]), separator="\t")
+                labels = [f"Donald {convention['nominee']}", "Abstain"]
+                roll = {row["state"]: [row["votes"], 0] for row in rows.iter_rows(named=True)}
+            else:
+                artifact = raw.cached(SOURCE, page(title))
+                parsed = json.loads(artifact.path.read_text())["parse"]
+                labels, roll = (
+                    listed_roll_call(parsed["wikitext"], convention["marker"])
+                    if "marker" in convention
+                    else roll_call(parsed["wikitext"], convention["table"])
+                )
             expected = set(units) - {ABROAD} | ({ABROAD} if ABROAD in roll else set())
             if set(roll) != expected:
                 raise ValueError(f"{title}: delegations {sorted(expected ^ set(roll))} do not match the states")
@@ -2771,17 +2810,34 @@ def emit() -> Path:
                         kind="abroad_mission",
                     )
                     name(units[ABROAD], "Democrats Abroad")
-            source = cs.source("Wikipedia", f"{title}, revision {parsed['revid']}")
-            cs.add(
-                "source",
-                id=source,
-                kind="community",
-                publisher="Wikipedia",
-                title=f"{title}, revision {parsed['revid']}",
-                url=f"https://en.wikipedia.org/w/index.php?title={title.replace(' ', '_')}&oldid={parsed['revid']}",
-                license="CC BY-SA 4.0",
-            )
-            cs.artifact(artifact, source)
+            if captions:
+                source_title = (
+                    "CSPAN Republican National Convention Nomination Vote in Charlotte, NC (caption transcript)"
+                )
+                source = cs.source("C-SPAN", source_title)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="news_agency",
+                    publisher="C-SPAN",
+                    title=source_title,
+                    url=captions[0],
+                    license=NEWS_LICENSE,
+                )
+                for artifact in artifacts:
+                    cs.artifact(artifact, source)
+            else:
+                source = cs.source("Wikipedia", f"{title}, revision {parsed['revid']}")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="community",
+                    publisher="Wikipedia",
+                    title=f"{title}, revision {parsed['revid']}",
+                    url=f"https://en.wikipedia.org/w/index.php?title={title.replace(' ', '_')}&oldid={parsed['revid']}",
+                    license="CC BY-SA 4.0",
+                )
+                cs.artifact(artifact, source)
             first, last = convention["days"]
             election = cs.key("us.election", f"{first}:{party}-national-convention")
             cs.add(
@@ -2836,7 +2892,8 @@ def emit() -> Path:
                     "note",
                     entity_id=result_set,
                     kind="methodology",
-                    body_md=METHOD + f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}; "
+                    body_md=(CAPTIONS_METHOD if captions else METHOD)
+                    + f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}; "
                     f"{convention['required']:,} votes, a majority of the delegates, were needed to nominate.",
                 )
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=convention["caveat"])
