@@ -1007,7 +1007,7 @@ CANDIDATES = {
     "Banks": ("Nathaniel P. Banks", "Q714106"),
     "1888:Grant": ("Frederick Dent Grant", None),
     "1888:Douglas": ("Frederick Douglass", None),
-    "1860:Reed": ("Andrew H. Reeder", None),
+    "1860:Reed": ("John M. Read", None),
     "Seward": ("William H. Seward", "Q297308"),
     "Cameron": ("Simon Cameron", "Q1348975"),
     "republican:Chase": ("Salmon P. Chase", "Q433051"),
