@@ -22,7 +22,7 @@ from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ak_sovc, ca_catb, fl_sos, gov_counties, ri_countbook
+from ea.sources.us import ak_sovc, ca_catb, fl_sos, gov_counties, measure_rules, ri_countbook
 from ea.sources.us.ca_catb_early import (
     CA_CATB_EARLY,
     CA_CATB_EARLY_INITIATIVES,
@@ -2169,6 +2169,8 @@ SD_2012 = {
     ),
 }
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000, ("OH", date(2010, 5, 4), "2", "YES"): 11}
+FL_SIXTY_FROM = date(2007, 1, 1)
+
 MISREPORTED = {
     ("ME", date(2005, 11, 8), "6"),
     ("LA", date(2010, 10, 2), "2"),
@@ -7998,6 +8000,7 @@ def emit() -> Path:
                 height=height,
             )
         system = cs.key("us.electoral_system", "referendum")
+        florida = measure_rules.systems(cs, {"referendum-fl-60"})["referendum-fl-60"]
         states: dict[str, tuple[UUID, str]] = {}
         fips: dict[str, str] = {}
         for abbreviation, area, code, text in conn.execute(
@@ -8146,7 +8149,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="ballot_question",
                 district_area_id=states[state][0],
-                electoral_system_id=system,
+                electoral_system_id=florida if state == "FL" and day >= FL_SIXTY_FROM else system,
                 round_number=1,
                 default_result_kind="counted",
             )
@@ -8236,7 +8239,8 @@ def emit() -> Path:
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
             passed = entry["passed"] != ((state, day, entry["number"]) in MISREPORTED)
-            if passed != (yes > no):
+            needed = 0.6 if state == "FL" and day >= FL_SIXTY_FROM else 0.5
+            if passed != (yes > no if needed == 0.5 else yes >= needed * (yes + no)):
                 print(f"{contest_key}: NCSL says {'passed' if entry['passed'] else 'failed'} at {yes} to {no}")
             cs.add(
                 "outcome",
