@@ -597,6 +597,18 @@ TABLES += [
         )
     ),
 ]
+VICE_TABLES = {
+    "1848:democratic:vp-b1": {"gbooks": "tQIbAAAAYAAJ", "pdf_page": {17: 24}, "leaves": (17,), "ballot": 1, "transcribed": "conventions_baltimore_1848_vp.tsv"},
+    "1848:democratic:vp-b2": {"gbooks": "tQIbAAAAYAAJ", "pdf_page": {18: 25}, "leaves": (18,), "ballot": 2, "transcribed": "conventions_baltimore_1848_vp.tsv"},
+    "1852:democratic:vp-b1": {"item": "proceedingsofde00demo", "leaves": (67,), "ballot": 1, "transcribed": "conventions_baltimore_1852_vp.tsv"},
+    "1852:democratic:vp-b2": {"item": "proceedingsofde00demo", "leaves": (67, 68), "ballot": 2, "transcribed": "conventions_baltimore_1852_vp.tsv"},
+    "1856:democratic:vp": {"item": "officialproceedi00indemo", "leaves": (65,), "ballot": 1, "transcribed": "conventions_cincinnati_1856_vp.tsv"},
+    "1860:democratic:vp": {"item": "officialpr00demo", "leaves": (178,), "ballot": 1, "transcribed": "conventions_baltimore_1860_vp.tsv"},
+    "1864:democratic:vp": {"item": "officialproceed00demo", "leaves": (52,), "ballot": 1, "transcribed": "conventions_chicago_1864_vp.tsv"},
+    "1872:democratic:vp": {"item": "officialproceed01convgoog", "leaves": (71,), "ballot": 1, "transcribed": "conventions_baltimore_1872_vp.tsv"},
+    "1876:democratic:vp": {"item": "officialproc00demo", "leaves": (179, 180), "ballot": 1, "transcribed": "conventions_st_louis_1876_vp.tsv"},
+}  # fmt: skip
+TABLES += [{"table": name} | spec for name, spec in VICE_TABLES.items()]
 TABLES += [
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
     {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295), "rotate": True},
@@ -742,20 +754,31 @@ FOURTH_1848 = (
     "proceedings then give the whole ballot as 254 votes, 242 for Cass, 8 for Levi Woodbury, and 4 for James "
     "Buchanan. The rows stored here are the 179 as printed in the table."
 )
+PROCEEDINGS_VICE = VICE_METHOD.format("the convention's official proceedings")
+VICE_1848 = {
+    1: "New York's delegation declined to vote. The proceedings give 252 votes and 168 needed to nominate.",
+    2: "The table is the roll as first called, with New York not voting and Virginia's delegation withdrawn for consultation. Pennsylvania then changed its 26 votes to William O. Butler and Virginia announced its 17 for him, and the convention declared Butler unanimously nominated. The proceedings print no figure needed for this ballot; the one stored here, 158, is two-thirds of the 236 votes in the table.",
+}
+VICE_1852 = "The proceedings list each candidate's votes by state. South Carolina did not vote, and 286 votes were cast on the first ballot; the figure needed stored here, 192, is the one the proceedings give."
+VICE_1856 = "Only the first ballot is stored. Maine's 8 votes and New Hampshire's 5 were changed to John C. Breckinridge before the vote was announced; the rows stored here give them to Breckinridge, as the printed totals do. The second ballot is narrated only, as unanimous for Breckinridge with 296 votes, with no count by state, so it is not stored. The needed figure stored here, 198, is two-thirds of the 296 votes."
+VICE_1860 = "The ballot was taken at Baltimore after the withdrawn delegations had left. Pennsylvania cast one blank vote, so 199\u00bd votes were cast and 198\u00bd went to Benjamin Fitzpatrick. Fitzpatrick declined the nomination, and Herschel V. Johnson was named in his place."
+VICE_1864 = "Only the first ballot is tabulated, of 226 votes with 151 needed. Massachusetts' row includes \u00bd vote blank, which is not stored. After withdrawals the second ballot was unanimous for George H. Pendleton; no count by state of it is printed, so it is not stored."
+VICE_1872 = "The table gives 732 votes, 713 for B. Gratz Brown and 6 for John W. Stevenson (Delaware). Florida cast 2 votes blank, New Jersey 9, and West Virginia 2; the blank votes are not stored. The figure needed stored here, 488, is two-thirds of the 732 votes."
+VICE_1876 = "Ohio cast 8 of its 44 votes blank; the blank votes are not stored. Thomas A. Hendricks received 730 of the 738 votes, and the figure needed stored here, 492, is two-thirds of the 738."
 PROCEEDINGS += [
-    {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}},
+    {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}, "vice": {"tables": {1: "1848:democratic:vp-b1", 2: "1848:democratic:vp-b2"}, "ballots": dict.fromkeys((1, 2), date(1848, 5, 25)), "deciding": 2, "shifted": True, "required": {1: 168, 2: 158}, "method": PROCEEDINGS_VICE, "caveat": VICE_1848}},
     {"party": "democratic", "tables": {1: "1908:democratic"}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Denver, Colorado, July 7, 8, 9 and 10, 1908", "publisher": "Western Newspaper Union", "city": "Denver", "days": (date(1908, 7, 7), date(1908, 7, 10)), "ballots": {1: date(1908, 7, 10)}, "deciding": 1, "caveat": DENVER_1908},
     {"party": "democratic", "tables": {4: "1932:democratic:b4"}, "title": "The Evening Star (Washington, D.C.), July 2, 1932: Fourth Ballot", "publisher": "The Evening Star", "kind": "news_agency", "city": "Chicago", "days": (date(1932, 6, 27), date(1932, 7, 2)), "ballots": {4: date(1932, 7, 2)}, "deciding": 4, "required": 770, "caveat": EVENING_STAR_1932_CAVEAT},
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835, "vice": {"tables": {1: "1835:democratic:vp"}, "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "required": 177, "method": VICE_METHOD.format("Niles' Weekly Register's reprint of the official statement"), "caveat": NILES_1835_VICE}},
     {"party": "democratic", "tables": {}, "vice": {"tables": {1: "1832:democratic:vp"}, "ballots": {1: date(1832, 5, 22)}, "deciding": 1, "required": 189, "method": VICE_METHOD.format("the convention's summary of its proceedings"), "caveat": BALTIMORE_1832}, "title": "Summary of the Proceedings of a Convention of Republican Delegates, from the Several States in the Union, for the Purpose of Nominating a Candidate for the Office of Vice-President of the United States; Held at Baltimore, in the State of Maryland, May, 1832", "publisher": "Packard and Van Benthuysen", "city": "Baltimore", "days": (date(1832, 5, 21), date(1832, 5, 23))},
     {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
-    {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
-    {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
-    {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING)},
-    {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
+    {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852, "vice": {"tables": {1: "1852:democratic:vp-b1", 2: "1852:democratic:vp-b2"}, "ballots": dict.fromkeys((1, 2), date(1852, 6, 5)), "deciding": 2, "required": 192, "method": PROCEEDINGS_VICE, "caveat": VICE_1852}},
+    {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1, "vice": {"tables": {1: "1856:democratic:vp"}, "ballots": {1: date(1856, 6, 6)}, "deciding": 2, "required": 198, "method": PROCEEDINGS_VICE, "caveat": VICE_1856}},
+    {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING), "vice": {"tables": {1: "1860:democratic:vp"}, "ballots": {1: date(1860, 6, 23)}, "cities": {1: "Baltimore"}, "deciding": 1, "required": 133, "method": PROCEEDINGS_VICE, "caveat": VICE_1860}},
+    {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864, "vice": {"tables": {1: "1864:democratic:vp"}, "ballots": {1: date(1864, 8, 31)}, "deciding": 2, "required": 151, "method": PROCEEDINGS_VICE, "caveat": VICE_1864}},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
-    {"party": "democratic", "tables": {1: "1872:democratic"}, "title": DNC + "at Baltimore, July 9, 1872", "publisher": "Rockwell & Churchill", "city": "Baltimore", "days": (date(1872, 7, 9), date(1872, 7, 10)), "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "caveat": "The scattering list prints 'Groesbeck 2' on its own line under 'West Virginia, blank 2', without a state; those 2 votes are not stored."},
-    {"party": "democratic", "tables": {1: "1876:democratic:b1", 2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
+    {"party": "democratic", "tables": {1: "1872:democratic"}, "title": DNC + "at Baltimore, July 9, 1872", "publisher": "Rockwell & Churchill", "city": "Baltimore", "days": (date(1872, 7, 9), date(1872, 7, 10)), "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "caveat": "The scattering list prints 'Groesbeck 2' on its own line under 'West Virginia, blank 2', without a state; those 2 votes are not stored.", "vice": {"tables": {1: "1872:democratic:vp"}, "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "required": 488, "method": PROCEEDINGS_VICE, "caveat": VICE_1872}},
+    {"party": "democratic", "tables": {1: "1876:democratic:b1", 2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2, "vice": {"tables": {1: "1876:democratic:vp"}, "ballots": {1: date(1876, 6, 29)}, "deciding": 1, "required": 492, "method": PROCEEDINGS_VICE, "caveat": VICE_1876}},
     {"party": "democratic", "tables": {1: "1880:democratic:b1", 2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
     {"party": "democratic", "tables": {1: "1884:democratic:b1", 2: "1884:democratic:b2"}, "title": DNC + "in Chicago, Ill., July 8th, 9th, 10th and 11th, 1884", "publisher": "Nabu Press", "city": "Chicago", "days": (date(1884, 7, 8), date(1884, 7, 11)), "ballots": {1: date(1884, 7, 10), 2: date(1884, 7, 11)}, "deciding": 2, "shifted": True, "caveat": "Cleveland's count here is the second roll call as called, short of the two-thirds needed; delegations then changed their votes before the nomination was declared, and those changes are not stored in the table."},
     {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
@@ -916,6 +939,39 @@ CANDIDATES = {
     "1848:democratic:Dallas": ("George M. Dallas", None),
     "1848:democratic:Worth": ("William J. Worth", None),
     "1848:democratic:Butler": ("William O. Butler", "Q693499"),
+    "1848:democratic:Quitman": ("John A. Quitman", "Q441838"),
+    "1848:democratic:Mason": ("John Y. Mason", "Q1258123"),
+    "1848:democratic:King": ("William R. King", "Q298985"),
+    "1848:democratic:Davis": ("Jefferson Davis", "Q162269"),
+    "1848:democratic:McKay": ("James Iver McKay", "Q1358019"),
+    "1852:democratic:Downs": ("Solomon W. Downs", "Q2299278"),
+    "1852:democratic:Pillow": ("Gideon J. Pillow", "Q2603914"),
+    "1852:democratic:Atchison": ("David R. Atchison", "Q1176322"),
+    "1852:democratic:Strange": ("Robert Strange", "Q1728001"),
+    "1852:democratic:Rusk": ("Thomas J. Rusk", "Q2290948"),
+    "1852:democratic:Davis": ("Jefferson Davis", "Q162269"),
+    "1852:democratic:Cobb": ("Howell Cobb", "Q878291"),
+    "1856:democratic:Quitman": ("John A. Quitman", "Q441838"),
+    "1856:democratic:Boyd": ("Linn Boyd", "Q1826895"),
+    "1856:democratic:Fitzpatrick": ("Benjamin Fitzpatrick", "Q817483"),
+    "1856:democratic:Brown": ("Aaron V. Brown", "Q302874"),
+    "1856:democratic:Dobbin": ("James C. Dobbin", "Q373382"),
+    "1856:democratic:Johnson": ("Herschel V. Johnson", "Q357353"),
+    "1856:democratic:Breckinridge": ("John C. Breckinridge", "Q273212"),
+    "1856:democratic:Bayard": ("James A. Bayard Jr.", "Q1665539"),
+    "1856:democratic:Polk": ("Trusten Polk", "Q377459"),
+    "1856:democratic:Butler": ("William O. Butler", "Q693499"),
+    "1856:democratic:Rusk": ("Thomas J. Rusk", "Q2290948"),
+    "1860:democratic:Fitzpatrick": ("Benjamin Fitzpatrick", "Q817483"),
+    "1864:democratic:Voorhees": ("Daniel W. Voorhees", "Q5219007"),
+    "1864:democratic:Cass": ("George W. Cass", "Q5545951"),
+    "1864:democratic:Guthrie": ("James Guthrie", "Q1680480"),
+    "1864:democratic:Dodge": ("Augustus C. Dodge", "Q770219"),
+    "1864:democratic:Caton": ("John D. Caton", "Q6228117"),
+    "1864:democratic:Powell": ("Lazarus W. Powell", "Q734742"),
+    "1864:democratic:Phelps": ("John S. Phelps", "Q181083"),
+    "1872:democratic:Brown": ("B. Gratz Brown", "Q376825"),
+    "1872:democratic:Stevenson": ("John W. Stevenson", "Q359526"),
     "1852:democratic:Cass": ("Lewis Cass", "Q503119"),
     "1852:democratic:Buchanan": ("James Buchanan", "Q12325"),
     "1852:democratic:Marcy": ("William L. Marcy", "Q389258"),
@@ -1846,6 +1902,25 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1848:democratic:vp-b1": (
+        "The printed totals give William O. Butler 114 and John A. Quitman 74, against 123 and 65 in the state rows, which add to the same 252 votes; a row's 9 votes appear to be set in the wrong column. The rows are stored as printed.",
+        {
+            "column Butler": (114, 123, "the state figures add to 123"),
+            "column Quitman": (74, 65, "the state figures add to 65"),
+        },
+    ),
+    "1856:democratic:vp": (
+        "The printed totals give John A. Quitman 59, John C. Breckinridge 51, and James C. Dobbin 13, against 49, 50, and 14 in the state rows; Florida's row gives Dobbin 4 of its 3 votes, and New York's row lists 25 of its 35. The rows are stored as printed.",
+        {
+            "column Quitman": (59, 49, "the state figures add to 49"),
+            "column Breckinridge": (51, 50, "the state figures add to 50"),
+            "column Dobbin": (13, 14, "the state figures add to 14"),
+        },
+    ),
+    "1864:democratic:vp": (
+        "The printed total for George H. Pendleton is 55\u00bd, against 55 in the state rows. The rows are stored as printed.",
+        {"column Pendleton": (55.5, 55, "the state figures add to 55")},
+    ),
     "1844:democratic:b1": (
         "North Carolina's row adds to 12 against its 11 votes and Georgia's to 9 against its 10. The rows are stored as printed.",
         {"NC": (11, 12, "the row adds to 12"), "GA": (10, 9, "the row adds to 9")},
@@ -2800,7 +2875,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the vice-presidential ballots of 1832 and 1835, and the 2012, 2016, 2020, and 2024 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1856 to 1988, the Democratic conventions from 1832 to 1956 and 2008, with the vice-presidential ballots of 1832, 1835, 1848, 1852, 1856, 1860, 1864, 1872, and 1876, and the 2012, 2016, 2020, and 2024 conventions",
             polity="US",
         )
 
