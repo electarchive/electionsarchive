@@ -10,15 +10,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.enr_2026 import TAGS
 from ea.sources.us.oe_primaries_2026 import BROWSER, OK_BASE, plain, title
 from ea.store import connect
 
 SOURCE = "us.ok_statewide_2026"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Oklahoma State Election Board"
 PAGE = "https://results.okelections.gov/OKER/"
 PRIMARY = date(2026, 6, 16)
 RUNOFF = date(2026, 8, 25)
+GENERAL = date(2026, 11, 3)
 EXEC = {
     "LIEUTENANT GOVERNOR": ("lieutenant-governor", "lieutenant gubernatorial"),
     "ATTORNEY GENERAL": ("attorney-general", "attorney general"),
@@ -28,6 +30,19 @@ EXEC = {
     "INSURANCE COMMISSIONER": ("insurance-commissioner", "insurance commissioner"),
     "CORPORATION COMMISSIONER": ("corporation-commissioner", "corporation commissioner"),
 }
+RETAINED = {
+    20001: "justice-of-the-supreme-court:district-1:john-kane",
+    20006: "justice-of-the-supreme-court:district-6:dana-kuehn",
+    20009: "justice-of-the-supreme-court:district-9:richard-darby",
+    20011: "judge-of-the-court-of-criminal-appeals:district-2:rob-l-hudson",
+    20015: "judge-of-the-court-of-civil-appeals:district-1-office-1:stacie-hixon",
+    20016: "judge-of-the-court-of-civil-appeals:district-1-office-2:jane-wiseman",
+    20017: "judge-of-the-court-of-civil-appeals:district-2-office-1:deborah-barnes",
+    20018: "judge-of-the-court-of-civil-appeals:district-2-office-2:james-huber",
+}
+GENERAL_QUESTIONS = {30001: "845", 30002: "847"}
+OFFICE_ROW = re.compile(r"FOR UNITED STATES REPRESENTATIVE DISTRICT 0?(\d+)")
+SEAT_ROW = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)( \(UNEXPIRED TERM\))?")
 RACES = {
     "20260616": (12002, 12004, 12005, 12006, 12007, 12008, 12009, 12040, 13006, 13009, 30001),
     "20260825": (12006, 12007, 12008, 12040, 30002, 30003),
@@ -49,6 +64,33 @@ def url(day: str, race: str) -> str:
     )
 
 
+def general_races(day: str) -> tuple[int, ...]:
+    index = json.loads(raw.cached(SOURCE, url(day, "getelec")).path.read_text())
+    return tuple(
+        entry["raceID"]
+        for entry in index["races"]
+        if entry["raceID"] < 10141 or entry["raceID"] in RETAINED or entry["raceID"] in GENERAL_QUESTIONS
+    )
+
+
+def general_key(race: int, header: str) -> str:
+    if race in RETAINED:
+        return f"{GENERAL}:OK:{RETAINED[race]}"
+    if race in GENERAL_QUESTIONS:
+        return f"{GENERAL}:OK:question:state-question-{GENERAL_QUESTIONS[race]}"
+    if found := OFFICE_ROW.fullmatch(header):
+        return f"{GENERAL}:OK:house:{found[1]}"
+    if found := SEAT_ROW.fullmatch(header):
+        chamber = "senate" if found[1] == "SENATOR" else "house"
+        return f"{GENERAL}:OK:{chamber}:{found[2]}:{'gs' if found[3] else 'g'}"
+    office = re.fullmatch(r"FOR (.+)", header)[1]
+    if office == "UNITED STATES SENATOR":
+        return f"{GENERAL}:OK:senate"
+    if office == "GOVERNOR":
+        return f"{GENERAL}:OK:governor"
+    return f"{GENERAL}:OK:{EXEC[office][0]}"
+
+
 def fetch() -> None:
     token = httpx.put(
         OK_BASE + "enrapi/login/",
@@ -56,23 +98,29 @@ def fetch() -> None:
         headers=BROWSER,
         timeout=60,
     ).json()[1:]
+
+    def get(target: str) -> None:
+        try:
+            raw.cached(SOURCE, target)
+        except LookupError:
+            content = httpx.get(target, headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300).content
+            raw.store(
+                SOURCE,
+                target,
+                content,
+                suffix=".json",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/json",
+            )
+
     for day, races in RACES.items():
         for race in ("getelec", *map(str, races)):
-            target = url(day, race)
-            try:
-                raw.cached(SOURCE, target)
-            except LookupError:
-                content = httpx.get(
-                    target, headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300
-                ).content
-                raw.store(
-                    SOURCE,
-                    target,
-                    content,
-                    suffix=".json",
-                    retrieved_at=datetime.now(UTC),
-                    media_type="application/json",
-                )
+            get(url(day, race))
+    get(url("20261103", "getelec"))
+    if not json.loads(raw.cached(SOURCE, url("20261103", "getelec")).path.read_text())["isOfficial"]:
+        raise ValueError("the November 3 results are not yet official")
+    for race in general_races("20261103"):
+        get(url("20261103", str(race)))
 
 
 def load(day: str) -> tuple[dict[int, dict], dict[int, dict]]:
@@ -102,7 +150,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's 2026 statewide executive primaries and runoffs, the District 17 Senate special primary and runoff, and State Questions 832, 844, and 846, by county",
+            summary="Oklahoma's 2026 statewide executive primaries and runoffs, the District 17 Senate special primary and runoff, State Questions 832, 844, and 846, and the certified November 3 general election, by county",
             polity="US-OK",
         )
 
@@ -157,7 +205,7 @@ def emit() -> Path:
             return id
 
         sources: dict[date, UUID] = {}
-        for day in (PRIMARY, RUNOFF):
+        for day in (PRIMARY, RUNOFF, GENERAL):
             label = day.strftime("%B %-d, %Y")
             sources[day] = cs.source(PUBLISHER, f"Oklahoma {label} election results")
             cs.add(
@@ -192,19 +240,29 @@ def emit() -> Path:
             )
 
         made = 0
-        for day_text, races in RACES.items():
+        for day_text, races in {**RACES, "20261103": general_races("20261103")}.items():
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
             meta, totals = load(day_text)
             runoff = day == RUNOFF
+            general = day == GENERAL
             for race in races:
                 entry = meta[race]
                 header = entry["raceTitle"]
                 party = {"Republican": "republican", "Democrat": "democratic"}.get(entry["raceTitle2"])
-                question = QUESTIONS.get(race)
+                question = ("general", "") if general and race >= 20000 else QUESTIONS.get(race)
                 senate = re.fullmatch(r"FOR STATE SENATOR DISTRICT (\d+) \(UNEXPIRED TERM\)", header)
-                office = None if question is not None else re.fullmatch(r"FOR (.+)", header)[1]
+                office = None if question is not None or general else re.fullmatch(r"FOR (.+)", header)[1]
                 by_candidate = counties(day_text, race, entry, totals[race])
-                if question is not None:
+                if general:
+                    contest_key = general_key(race, header)
+                    contest = cs.key("us.contest", contest_key)
+                    if contest in cs.minted:
+                        raise ValueError(f"{contest_key} is not in the archive")
+                    elections[day] = conn.execute(
+                        "select election_id from contest where id = %s", [contest]
+                    ).fetchone()[0]
+                    answers = {name: ("Yes" if name.endswith("YES") else "No") for name in by_candidate}
+                elif question is not None:
                     kind, number = question
                     tail = f"question:state-question-{number}"
                     contest_key = f"{day}:OK:{tail}"
@@ -291,13 +349,18 @@ def emit() -> Path:
                 needs_runoff = (
                     question is None
                     and not runoff
+                    and not general
                     and len(ranked) > 1
                     and sum(by_candidate[ranked[0]].values()) * 2 <= everyone
                 )
                 options = {}
                 for position, name in enumerate(by_candidate):
-                    label_text = answers[name] if question is not None else title(name)
+                    label_text = answers[name] if question is not None else title(TAGS.sub("", name).strip())
                     options[name] = cs.key("us.option", f"{contest_key}:{slug(label_text)}")
+                    if general:
+                        if options[name] in cs.minted:
+                            raise ValueError(f"{contest_key}: {label_text} is not an option")
+                        continue
                     cs.add(
                         "contest_option",
                         id=options[name],
