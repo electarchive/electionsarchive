@@ -174,6 +174,13 @@ def main() -> None:
     )
     living.add_argument("--poller", default="fsn1", help="which feeds to poll, by their poller column")
     living.add_argument("--once", action="store_true", help="poll each due feed once and stop")
+    living.add_argument(
+        "--feed", help="with check: print one feed's frame totals and unresolved issues, not the readiness table"
+    )
+    living.add_argument(
+        "--contest",
+        help="with check --feed: contest path or path prefix to total (us/ar/junction-city/2026-11-03-general/...)",
+    )
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -221,7 +228,7 @@ def main() -> None:
             if args.action == "check":
                 from ea import live_check
 
-                raise SystemExit(live_check.run())
+                raise SystemExit(live_check.feed_view(args.feed, args.contest) if args.feed else live_check.run())
             if args.action == "run":
                 live.run(args.poller, args.once)
             else:

@@ -336,6 +336,37 @@ def verdict(ok: bool, waiting: bool = False) -> str:
     return "yellow" if waiting else "green"
 
 
+def feed_view(feed_id: str, contest: str | None) -> int:
+    with connect() as conn:
+        if conn.execute("select 1 from live.feed where id = %s", [feed_id]).fetchone() is None:
+            print(f"no feed {feed_id}")
+            return 1
+        frames = conn.execute(
+            """select s.path, f.as_of, f.reporting, f.expected, sum(v.votes), count(distinct v.option_id)
+               from (select distinct on (contest_id) * from live.frame
+                     where feed_id = %s and status = 'active' order by contest_id, as_of desc) f
+               join slug s on s.entity_id = f.contest_id and s.is_current
+               left join live.value v on v.frame_k = f.k
+               where %s::text is null or s.path = %s or s.path like %s
+               group by s.path, f.as_of, f.reporting, f.expected order by s.path""",
+            [feed_id, contest, contest, f"{contest}%" if contest else None],
+        ).fetchall()
+        issues = conn.execute(
+            "select kind, seen_at, detail from live.issue where feed_id = %s and not resolved order by id",
+            [feed_id],
+        ).fetchall()
+    print(f"{feed_id}: {len(frames)} contests with an active frame" + (f" under {contest}" if contest else ""))
+    for path, as_of, reporting, expected, total, options in frames:
+        print(
+            f"  {path}  as of {as_of:%Y-%m-%d %H:%M %Z}  reporting {reporting}/{expected}  "
+            f"total {total if total is not None else 0:,} votes over {options} options"
+        )
+    print(f"\n{len(issues)} unresolved issues")
+    for kind, seen, detail in issues:
+        print(f"  {kind}  {seen:%Y-%m-%d %H:%M}  {detail.splitlines()[0][:200] if detail else ''}")
+    return 0 if frames else 1
+
+
 def run() -> int:
     feeds = tomllib.loads(FEEDS.read_text())["feed"]
     rows: list[tuple[str, str, str]] = []
