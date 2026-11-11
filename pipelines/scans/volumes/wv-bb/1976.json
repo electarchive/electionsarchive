@@ -1,0 +1,27 @@
+{
+  "year": 1976,
+  "day": "1976-11-02",
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1977, election returns (general election 1976-11-02)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1977.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1977.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "offices": {
+    "president": "President (votes for presidential electors, by party when printed one page per party); only the 1976 columns: columns for any other year printed beside them are office other",
+    "senate": "U.S. Senator; only the 1976 columns: columns for any other year printed beside them are office other",
+    "governor": "Governor; only the 1976 columns: columns for any other year printed beside them are office other",
+    "house": "U.S. Representative in Congress, one table per congressional district; only the 1976 columns: columns for any other year printed beside them are office other"
+  },
+  "leaves": [
+    650,
+    651,
+    652,
+    653,
+    654,
+    655
+  ]
+}

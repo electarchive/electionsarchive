@@ -1,0 +1,26 @@
+{
+  "year": 1934,
+  "day": "1934-11-06",
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1935, election returns (general election 1934-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1935.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1935.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "offices": {
+    "president": "President (votes for presidential electors, by party when printed one page per party); only the 1934 columns: columns for any other year printed beside them are office other",
+    "senate": "U.S. Senator; only the 1934 columns: columns for any other year printed beside them are office other",
+    "governor": "Governor; only the 1934 columns: columns for any other year printed beside them are office other",
+    "house": "U.S. Representative in Congress, one table per congressional district; only the 1934 columns: columns for any other year printed beside them are office other"
+  },
+  "leaves": [
+    747,
+    748,
+    749,
+    750,
+    751
+  ]
+}

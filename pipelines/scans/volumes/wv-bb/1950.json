@@ -1,0 +1,24 @@
+{
+  "year": 1950,
+  "day": "1950-11-07",
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1951, election returns (general election 1950-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1951.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1951.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "offices": {
+    "president": "President (votes for presidential electors, by party when printed one page per party); only the 1950 columns: columns for any other year printed beside them are office other",
+    "senate": "U.S. Senator; only the 1950 columns: columns for any other year printed beside them are office other",
+    "governor": "Governor; only the 1950 columns: columns for any other year printed beside them are office other",
+    "house": "U.S. Representative in Congress, one table per congressional district; only the 1950 columns: columns for any other year printed beside them are office other"
+  },
+  "leaves": [
+    337,
+    338,
+    339
+  ]
+}

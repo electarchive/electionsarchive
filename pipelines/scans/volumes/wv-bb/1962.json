@@ -1,0 +1,25 @@
+{
+  "year": 1962,
+  "day": "1962-11-06",
+  "polity": "US-WV",
+  "publisher": "West Virginia Legislature",
+  "title": "West Virginia Blue Book 1963, election returns (general election 1962-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1963.pdf",
+    "item": "https://www.wvlegislature.gov/legisdocs/publications/bluebook/WVS_Bluebook_1963.pdf"
+  },
+  "raw_source": "us.wv_bluebook",
+  "offices": {
+    "president": "President (votes for presidential electors, by party when printed one page per party); only the 1962 columns: columns for any other year printed beside them are office other",
+    "senate": "U.S. Senator; only the 1962 columns: columns for any other year printed beside them are office other",
+    "governor": "Governor; only the 1962 columns: columns for any other year printed beside them are office other",
+    "house": "U.S. Representative in Congress, one table per congressional district; only the 1962 columns: columns for any other year printed beside them are office other"
+  },
+  "leaves": [
+    450,
+    451,
+    452,
+    453
+  ]
+}

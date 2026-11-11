@@ -398,6 +398,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
     }
     manifest["contests"] = contests
     manifest["pages"] = sections
+    (scans.MANIFESTS / f"{name}.json").parent.mkdir(parents=True, exist_ok=True)
     (scans.MANIFESTS / f"{name}.json").write_text(json.dumps(manifest, indent=2))
     report = [f"# layout {name}", "", f"{len(contests)} contests, {len(sections)} sections", ""]
     report += [f"- {label}: unmatched columns {missed}" for label, missed in unmatched.items() if missed]

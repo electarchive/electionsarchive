@@ -1149,16 +1149,19 @@ def finalize(
 
 def status() -> str:
     out = []
-    for path in sorted(MANIFESTS.glob("*.json")):
-        folder = WORK / path.stem
+    for path in sorted(MANIFESTS.rglob("*.json")):
+        name = str(path.relative_to(MANIFESTS).with_suffix(""))
+        if name.startswith("volumes/"):
+            continue
+        folder = WORK / name
         review = json.loads((folder / "review.json").read_text()) if (folder / "review.json").exists() else None
         waiting = [
-            job["name"].removeprefix(f"{path.stem}/")
-            for job in batch.jobs(f"{SOURCE}/{path.stem}")
+            job["name"].removeprefix(f"{name}/")
+            for job in batch.jobs(f"{SOURCE}/{name}")
             if any("ended" not in sent for sent in job["batches"])
         ]
         out.append(
-            f"{path.stem}: {f'batches waiting {waiting}, ' if waiting else ''}"
+            f"{name}: {f'batches waiting {waiting}, ' if waiting else ''}"
             f"{'tables' if (folder / 'tables.parquet').exists() else 'no tables yet'}"
             f"{'' if review is None else f', {len(review)} in review'}"
         )
