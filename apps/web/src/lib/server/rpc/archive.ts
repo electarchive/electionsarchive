@@ -13470,14 +13470,14 @@ async function turnout(contest: string | null, ks: Array<number>) {
           select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
         ),
         held as materialized (
-          select e.id, e.polity_id, e.date_from, p.kind from election e
-          join polity p on p.id = e.polity_id
+          select e.id, e.polity_id, e.date_from from election e
           cross join day d
           where e.date_from = d.date_from and e.kind = d.kind
         ),
         sets as materialized (
-          select rs.k, rs.election_id, h.kind from held h
+          select rs.k, rs.election_id, p.kind from held h
           join result_set rs on rs.election_id = h.id and rs.contest_id is null
+          join polity p on p.id = h.polity_id
           where ${latest("rs")}
         ),
         facts as materialized (
@@ -13496,7 +13496,8 @@ async function turnout(contest: string | null, ks: Array<number>) {
         ),
         expected as materialized (
           select h.id as election, pt.area_id as area
-          from (select * from held where kind in (select kind from sets) offset 0) h
+          from held h
+          join (select id from polity where kind in (select kind from sets) offset 0) p on p.id = h.polity_id
           join polity_territory pt on pt.polity_id = h.polity_id and pt.valid @> h.date_from
         ),
         up(origin, id, depth) as (
