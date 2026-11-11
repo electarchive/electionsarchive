@@ -1170,48 +1170,48 @@ export async function paths(ids: Array<string>) {
 
 const COURT = /\b(?:Judge|Justice|Court|Surrogate|Magistrate)\b/u;
 
-const crumbIds = (polity: string, keep: string | null) =>
+const crumbIds = async (polity: string, keep: string | null) =>
   remember(
     `crumbs:${polity}:${keep ?? ""}`,
     async () => {
       const result = await db.execute<{ id: string }>(sql`
-    with recursive chain(id, depth) as (
-      select ${polity}::uuid, 0
-      union all
-      select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
-    ),
-    county as (
-      select id from (
-        select c.id, st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom))) as holds,
-          count(*) filter (where st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))) over () as inside
-        from polity y
-        join polity_parent pp on pp.polity_id = y.id
-        join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
-        join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
-        join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
-        join polity_parent cp on cp.parent_id = pp.parent_id
-        join polity c on c.id = cp.polity_id and c.kind = 'county'
-        join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
-        join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
-        where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
-          and cg.geom && g.geom
-      ) x
-      where holds and inside < 2
-      limit 1
-    )
-    select id from (
-      select chain.id, chain.depth::numeric as depth from chain join polity y on y.id = chain.id
-      where chain.id = ${polity}::uuid or y.kind <> 'supranational'
-        or ${keep}::text = 'all'
-        or exists (
-          select from election e join election up on up.id = e.parent_id
-          where e.id::text = ${keep}::text and up.polity_id = chain.id
+        with recursive chain(id, depth) as (
+          select ${polity}::uuid, 0
+          union all
+          select p.parent_id, chain.depth + 1 from polity_parent p join chain on p.polity_id = chain.id where chain.depth < 8
+        ),
+        county as (
+          select id from (
+            select c.id, st_contains(cg.geom, coalesce(g.label_point, st_pointonsurface(g.geom))) as holds,
+              count(*) filter (where st_contains(g.geom, coalesce(cg.label_point, st_pointonsurface(cg.geom)))) over () as inside
+            from polity y
+            join polity_parent pp on pp.polity_id = y.id
+            join polity s on s.id = pp.parent_id and s.kind = 'federal_unit'
+            join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
+            join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+            join polity_parent cp on cp.parent_id = pp.parent_id
+            join polity c on c.id = cp.polity_id and c.kind = 'county'
+            join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
+            join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
+            where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
+              and cg.geom && g.geom
+          ) x
+          where holds and inside < 2
+          limit 1
         )
-      union all
-      select id, 0.5 from county
-    ) x
-    group by id order by max(depth) desc
-  `);
+        select id from (
+          select chain.id, chain.depth::numeric as depth from chain join polity y on y.id = chain.id
+          where chain.id = ${polity}::uuid or y.kind <> 'supranational'
+            or ${keep}::text = 'all'
+            or exists (
+              select from election e join election up on up.id = e.parent_id
+              where e.id::text = ${keep}::text and up.polity_id = chain.id
+            )
+          union all
+          select id, 0.5 from county
+        ) x
+        group by id order by max(depth) desc
+      `);
       return result.rows.map((row) => row.id);
     },
     true,
@@ -6340,42 +6340,42 @@ async function atlas(input: {
     db.execute<{ id: string; date: string; named: string }>(
       group != null
         ? sql`
-        with recursive tops(top, id, date) as (
-          select e.id, e.id, e.date_from from election e
-          where e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
-            and e.parent_id is not distinct from (select parent_id from election where id = ${contest.election}::uuid)
-            and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
-          union all
-          select tops.top, k.id, tops.date from election k join tops on k.parent_id = tops.id
-        )
-        select (array_agg(c.id order by c.term is not null, c.id))[1]::text as id, tops.date::text as date, tops.top as named
-        from tops
-        join contest c on c.election_id = tops.id
-        join contest me on me.id = ${contest.id}::uuid
-        where coalesce(c.body_id, c.office_id) = coalesce(me.body_id, me.office_id) and c.kind = me.kind
-          and not exists (
-            select from contest pr join tops t on t.id = pr.election_id and t.top = tops.top where pr.id = c.previous_round_id
+          with recursive tops(top, id, date) as (
+            select e.id, e.id, e.date_from from election e
+            where e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
+              and e.parent_id is not distinct from (select parent_id from election where id = ${contest.election}::uuid)
+              and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
+            union all
+            select tops.top, k.id, tops.date from election k join tops on k.parent_id = tops.id
           )
-          and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
-        group by tops.top, tops.date
-        having count(*) * 2 >= ${group.ids.length}
-        order by tops.date desc, tops.top
-        limit 16
-      `
+          select (array_agg(c.id order by c.term is not null, c.id))[1]::text as id, tops.date::text as date, tops.top as named
+          from tops
+          join contest c on c.election_id = tops.id
+          join contest me on me.id = ${contest.id}::uuid
+          where coalesce(c.body_id, c.office_id) = coalesce(me.body_id, me.office_id) and c.kind = me.kind
+            and not exists (
+              select from contest pr join tops t on t.id = pr.election_id and t.top = tops.top where pr.id = c.previous_round_id
+            )
+            and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
+          group by tops.top, tops.date
+          having count(*) * 2 >= ${group.ids.length}
+          order by tops.date desc, tops.top
+          limit 16
+        `
         : sql`
-        select c.id, e.date_from::text as date, c.id as named
-        from contest c
-        join election e on e.id = c.election_id
-        join contest me on me.id = ${contest.root}::uuid
-          and c.office_id is not distinct from me.office_id and c.body_id is not distinct from me.body_id and c.kind = me.kind
-        where c.allocation_parent_id is null and c.id <> ${contest.root}::uuid
-          and e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
-          and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
-          and (e.kind = 'indirect') = ${contest.indirect}
-          and ${serial("c", "e")} = ${contest.series}
-        order by e.date_from desc, c.id
-        limit 16
-      `,
+          select c.id, e.date_from::text as date, c.id as named
+          from contest c
+          join election e on e.id = c.election_id
+          join contest me on me.id = ${contest.root}::uuid
+            and c.office_id is not distinct from me.office_id and c.body_id is not distinct from me.body_id and c.kind = me.kind
+          where c.allocation_parent_id is null and c.id <> ${contest.root}::uuid
+            and e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
+            and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
+            and (e.kind = 'indirect') = ${contest.indirect}
+            and ${serial("c", "e")} = ${contest.series}
+          order by e.date_from desc, c.id
+          limit 16
+        `,
     ),
     branches(day),
     chain.length === 0 || input.isLean === true
@@ -8906,10 +8906,10 @@ export const contests = {
         sets.rows.every((row) => row.status !== "active") &&
         rowsOf(
           await db.execute<{ found: boolean }>(sql`
-                select exists (
-                  select from label where entity_id = ${contest.id}::uuid and kind = 'ballot' and value = 'no_candidate_qualified'
-                ) as found
-              `),
+            select exists (
+              select from label where entity_id = ${contest.id}::uuid and kind = 'ballot' and value = 'no_candidate_qualified'
+            ) as found
+          `),
         )[0]?.found === true;
       const listedNames = await names(
         listed.rows.flatMap((row) =>
