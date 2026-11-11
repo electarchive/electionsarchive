@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { db } from "#lib/server/db/index.js";
 
 const FRESH_MS = 300_000;
+const FRESH_DAYS = 90;
 
 export type Counting = {
   elections: Map<string, { path: string; date: string; polity: string }>;
@@ -21,7 +22,7 @@ async function load(): Promise<Counting> {
   }>(sql`
     with recursive lit as materialized (
       select c.id, c.election_id from contest c join election e on e.id = c.election_id
-      where e.date_from between current_date - 90 and current_date
+      where e.date_from between current_date - ${FRESH_DAYS}::int and current_date
         and exists (select from live.switch w where w.name = 'results' and w.shown)
         and exists (select from live.frame f where f.contest_id = c.id and f.status = 'active')
         and not exists (
@@ -81,6 +82,13 @@ export async function counting() {
 const LIVE =
   /^us\/(?:\d{4}-\d{2}-\d{2}-general|[a-z]{2}\/\d{4}-\d{2}-\d{2}-general(?:\/[^/]+)?)$/u;
 
+export function isFresh(path: string) {
+  const day = /(?:^|\/)(\d{4}-\d{2}-\d{2})-/u.exec(path)?.[1];
+  return (
+    day != null && Date.now() - Date.parse(day) <= (FRESH_DAYS + 1) * 86_400_000
+  );
+}
+
 export function liveOf(now: Counting, path: string | null) {
   return path != null && LIVE.test(path) && now.paths.has(path)
     ? `live/${path}`
@@ -88,5 +96,7 @@ export function liveOf(now: Counting, path: string | null) {
 }
 
 export async function liveFor(path: string) {
-  return liveOf(await counting(), path);
+  return LIVE.test(path) && isFresh(path)
+    ? liveOf(await counting(), path)
+    : null;
 }

@@ -20,7 +20,7 @@ import { m } from "#lib/paraglide/messages.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
 import { countedContest, countedElection } from "#lib/server/counted.js";
-import { counting, liveOf } from "#lib/server/counting.js";
+import { counting, isFresh, liveOf } from "#lib/server/counting.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
@@ -1453,9 +1453,11 @@ export async function archive(path: string, search: URLSearchParams) {
     const [head, isMerged, live] = await Promise.all([
       found(call(router.contests.head, { id: slug.entity_id, unit })),
       merged.then((found) => found != null),
-      countedContest(slug.entity_id, slug.current ?? slug.path).catch(
-        () => null,
-      ),
+      isFresh(slug.current ?? slug.path)
+        ? countedContest(slug.entity_id, slug.current ?? slug.path).catch(
+            () => null,
+          )
+        : null,
     ]);
     return {
       kind: "contest" as const,
@@ -1592,7 +1594,9 @@ export async function archive(path: string, search: URLSearchParams) {
       race,
       scope,
       head,
-      live: await countedElection(slug.entity_id).catch(() => null),
+      live: isFresh(slug.current ?? slug.path)
+        ? await countedElection(slug.entity_id).catch(() => null)
+        : null,
       body,
       sameDay,
       sections: {
