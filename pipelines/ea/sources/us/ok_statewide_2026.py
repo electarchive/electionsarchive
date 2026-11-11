@@ -1,7 +1,7 @@
 import json
 import re
 from collections import defaultdict
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -10,12 +10,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import ok_pri_judicial
 from ea.sources.us.enr_2026 import TAGS
 from ea.sources.us.oe_primaries_2026 import BROWSER, OK_BASE, plain, title
 from ea.store import connect
 
 SOURCE = "us.ok_statewide_2026"
-VERSION = "2"
+VERSION = "3"
 PUBLISHER = "Oklahoma State Election Board"
 PAGE = "https://results.okelections.gov/OKER/"
 PRIMARY = date(2026, 6, 16)
@@ -40,6 +41,8 @@ RETAINED = {
     20017: "judge-of-the-court-of-civil-appeals:district-2-office-1:deborah-barnes",
     20018: "judge-of-the-court-of-civil-appeals:district-2-office-2:james-huber",
 }
+NEW_RETENTION = {20004: ("district-4", "Travis Jett")}
+JUDGE_ROW = re.compile(r"FOR (DISTRICT JUDGE DISTRICT (\d+), OFFICE (\d+)|ASSOCIATE DISTRICT JUDGE (.+) COUNTY)")
 GENERAL_QUESTIONS = {30001: "845", 30002: "847"}
 OFFICE_ROW = re.compile(r"FOR UNITED STATES REPRESENTATIVE DISTRICT 0?(\d+)")
 SEAT_ROW = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)( \(UNEXPIRED TERM\))?")
@@ -69,13 +72,24 @@ def general_races(day: str) -> tuple[int, ...]:
     return tuple(
         entry["raceID"]
         for entry in index["races"]
-        if entry["raceID"] < 10141 or entry["raceID"] in RETAINED or entry["raceID"] in GENERAL_QUESTIONS
+        if entry["raceID"] < 10141
+        or entry["raceID"] in RETAINED
+        or entry["raceID"] in GENERAL_QUESTIONS
+        or entry["raceID"] in NEW_RETENTION
+        or JUDGE_ROW.fullmatch(entry["raceTitle"])
     )
 
 
-def general_key(race: int, header: str) -> str:
+def general_key(race: int, header: str, fips: dict[str, str]) -> str:
     if race in RETAINED:
         return f"{GENERAL}:OK:{RETAINED[race]}"
+    if race in NEW_RETENTION:
+        district, name = NEW_RETENTION[race]
+        return f"{GENERAL}:OK:justice-of-the-supreme-court:{district}:{slug(name)}"
+    if found := JUDGE_ROW.fullmatch(header):
+        if found[2]:
+            return f"{GENERAL}:OK:district-judge:{found[2]}:office-{found[3]}"
+        return f"{GENERAL}:OK:associate-district-judge:{fips[plain(found[4])]}"
     if race in GENERAL_QUESTIONS:
         return f"{GENERAL}:OK:question:state-question-{GENERAL_QUESTIONS[race]}"
     if found := OFFICE_ROW.fullmatch(header):
@@ -185,6 +199,29 @@ def emit() -> Path:
             """select electoral_system_id from contest c join external_id x on x.entity_id = c.id
                where x.scheme = 'us.contest' and x.value = '2026-11-03:OK:question:state-question-845'"""
         ).fetchone()[0]
+        counties_by_name = {
+            plain(text): (code, area)
+            for code, area, text in conn.execute(
+                """select u.code, u.area_id, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '40%%'"""
+            ).fetchall()
+        }
+        fips_of = {name: code for name, (code, _) in counties_by_name.items()}
+        state_polity = cs.polity("US-OK")
+        state_area = conn.execute(
+            """select u.area_id from reporting_unit u join polity p on p.id = u.polity_id
+               where p.iso_code = 'US-OK' and u.scheme_code = 'us.state'"""
+        ).fetchone()[0]
+        districts: dict[str, tuple[UUID, UUID]] = {}
+        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ok/%%'").fetchall()}
+        offices: set[UUID] = set()
+        memberships: set[tuple[UUID, UUID]] = set()
+        fptp = cs.key("us.electoral_system", "fptp")
+        general_election = conn.execute(
+            """select c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+               where x.value = '2026-11-03:OK:governor'"""
+        ).fetchone()[0]
         pool: dict[str, set[UUID]] = defaultdict(set)
         for person, text in conn.execute(
             """select cy.person_id, n.text from candidacy cy join contest_option o on o.id = cy.option_id
@@ -253,15 +290,81 @@ def emit() -> Path:
                 senate = re.fullmatch(r"FOR STATE SENATOR DISTRICT (\d+) \(UNEXPIRED TERM\)", header)
                 office = None if question is not None or general else re.fullmatch(r"FOR (.+)", header)[1]
                 by_candidate = counties(day_text, race, entry, totals[race])
+                judicial = False
                 if general:
-                    contest_key = general_key(race, header)
+                    contest_key = general_key(race, header, fips_of)
                     contest = cs.key("us.contest", contest_key)
-                    if contest in cs.minted:
+                    judicial = race in NEW_RETENTION or JUDGE_ROW.fullmatch(header) is not None
+                    if contest in cs.minted and not judicial:
                         raise ValueError(f"{contest_key} is not in the archive")
-                    elections[day] = conn.execute(
-                        "select election_id from contest where id = %s", [contest]
-                    ).fetchone()[0]
+                    elections[day] = general_election
                     answers = {name: ("Yes" if name.endswith("YES") else "No") for name in by_candidate}
+                    if judicial:
+                        retention = race in NEW_RETENTION
+                        if retention:
+                            district, justice = NEW_RETENTION[race]
+                            shape = template("2026-11-03:OK:justice-of-the-supreme-court:district-1:john-kane")
+                            area = shape[2]
+                            label = f"2026 OK Justice of the Supreme Court, {district.replace('district-', 'District ')} retention election"
+                            path = f"justice-of-the-supreme-court-{district}-{slug(justice)}"
+                            office_id = shape[0]
+                        else:
+                            found = JUDGE_ROW.fullmatch(header)
+                            if found[2]:
+                                _, area = ok_pri_judicial.place(
+                                    cs, districts, taken, state_polity, state_area, "dj", int(found[2])
+                                )
+                                label = f"2026 Oklahoma District Judge general, District {found[2]}, Office {found[3]}"
+                                path = f"district-judge-{found[2]}-office-{found[3]}"
+                                office_key = f"district-judge:OK:{found[2]}"
+                                office_name = f"Oklahoma District Judge, District {found[2]}"
+                                office_polity = districts[f"OK:dj-{found[2]}"][0]
+                            else:
+                                fips = fips_of[plain(found[4])]
+                                area = counties_by_name[plain(found[4])][1]
+                                label = f"2026 Oklahoma Associate District Judge general, {found[4].title()} County"
+                                path = f"associate-district-judge-{slug(found[4])}-county"
+                                office_key = f"associate-district-judge:OK:{fips}"
+                                office_name = f"Oklahoma Associate District Judge, {found[4].title()} County"
+                                office_polity = state_polity
+                            office_id = cs.key("us.office", office_key)
+                            if office_id not in offices:
+                                offices.add(office_id)
+                                cs.add("office", id=office_id, polity_id=office_polity, kind="other")
+                                if office_id in cs.minted:
+                                    cs.add(
+                                        "name",
+                                        entity_id=office_id,
+                                        text=office_name,
+                                        lang="en",
+                                        kind="official",
+                                        is_preferred=True,
+                                    )
+                        cs.add(
+                            "contest",
+                            id=contest,
+                            election_id=general_election,
+                            kind="office",
+                            office_id=office_id,
+                            body_id=shape[1] if retention else None,
+                            district_area_id=area,
+                            party_scope_id=None,
+                            term="full",
+                            magnitude=1,
+                            round_number=1,
+                            electoral_system_id=shape[7] if retention else fptp,
+                            default_result_kind="counted",
+                        )
+                        cs.add("name", entity_id=contest, text=label, lang="en", kind="official", is_preferred=True)
+                        if contest in cs.minted:
+                            base = f"us/ok/2026-11-03-general/{path}"
+                            final, count = base, 1
+                            while final in taken:
+                                count += 1
+                                final = f"{base}-{count}"
+                            taken.add(final)
+                            cs.add("slug", path=final, entity_id=contest)
+                        cs.add("citation", entity_id=contest, source_id=sources[day])
                 elif question is not None:
                     kind, number = question
                     tail = f"question:state-question-{number}"
@@ -357,7 +460,7 @@ def emit() -> Path:
                 for position, name in enumerate(by_candidate):
                     label_text = answers[name] if question is not None else title(TAGS.sub("", name).strip())
                     options[name] = cs.key("us.option", f"{contest_key}:{slug(label_text)}")
-                    if general:
+                    if general and not judicial:
                         if options[name] in cs.minted:
                             raise ValueError(f"{contest_key}: {label_text} is not an option")
                         continue
@@ -366,11 +469,22 @@ def emit() -> Path:
                         id=options[name],
                         contest_id=contest,
                         kind="answer" if question is not None else "candidate",
-                        party_id=None if question is not None else scope[1],
+                        party_id=None if question is not None or judicial else scope[1],
                         ballot_position=position + 1 if question is not None else None,
                         ballot_label=label_text,
                     )
-                    if question is None:
+                    if general and question is not None:
+                        if label_text == "Yes" and race in NEW_RETENTION:
+                            cs.add(
+                                "candidacy",
+                                id=cs.key("us.candidacy", f"{contest_key}:{slug(justice)}"),
+                                person_id=person_of(justice),
+                                option_id=options[name],
+                                role="head",
+                                ballot_name=justice,
+                                is_independent=False,
+                            )
+                    elif question is None:
                         cs.add(
                             "candidacy",
                             id=cs.key("us.candidacy", f"{contest_key}:{slug(label_text)}"),
@@ -394,6 +508,8 @@ def emit() -> Path:
                 rows = []
                 for name, by_unit in by_candidate.items():
                     for fips, votes in by_unit.items():
+                        if judicial and not retention and found[2]:
+                            memberships.add((cs.unit("us.county", fips), area))
                         by_place[fips] += votes
                         rows.append(
                             (str(result), str(cs.unit("us.county", fips)), str(options[name]), 0, 1, 0, 0, votes)
@@ -405,5 +521,13 @@ def emit() -> Path:
                 frame(result, rows)
                 made += 1
                 print(day, race, header, everyone)
+        for unit, area in memberships:
+            cs.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=area,
+                valid_from=GENERAL,
+                valid_to=GENERAL + timedelta(days=1),
+            )
         print(made)
         return cs.write()
