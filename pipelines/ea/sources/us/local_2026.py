@@ -13534,6 +13534,32 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     date_to=date_to,
                     status="held",
                 )
+            added = {row["id"] for row in cs.rows.get("election", [])}
+            for id, polity_id, parent_id, kind, date_from, date_to, contested in conn.execute(
+                """select e.id, e.polity_id, e.parent_id, e.kind, e.date_from, e.date_to,
+                          exists (select from contest co join entity ce on ce.id = co.id and ce.retired_by is null
+                                  where co.election_id = e.id) as contested
+                   from election e join changeset c on c.id = e.changeset_id
+                   join entity en on en.id = e.id and en.retired_by is null
+                   join slug s on s.entity_id = e.polity_id and s.is_current
+                   where c.pipeline = %s and e.status = 'scheduled' and e.date_from = %s
+                     and not exists (select from entity_merge m where m.entity_id = e.id)
+                     and s.path like %s and e.id <> all(%s::uuid[])""",
+                [SOURCE, DAY, f"us/{state.lower()}/%", [str(id) for id in election_feeds.keys() | added]],
+            ).fetchall():
+                if contested:
+                    cs.add(
+                        "election",
+                        id=id,
+                        polity_id=polity_id,
+                        parent_id=parent_id,
+                        kind=kind,
+                        date_from=date_from,
+                        date_to=date_to,
+                        status="held",
+                    )
+                else:
+                    cs.add("entity_retirement", entity_id=id, reason="No contest is on this election's ballot")
         for row in cs.rows.get("election", []):
             if election_feeds.get(row["id"], {None}) <= CANCELLATION_FEEDS:
                 row["status"] = "canceled"
