@@ -262,6 +262,31 @@ def counties_of() -> dict[str, UUID]:
         }
 
 
+def registry() -> list[dict[str, str]]:
+    with connect() as conn:
+        return [
+            {
+                "state": state,
+                "county_fips": fips,
+                "county": county,
+                "platform": platform,
+                "tenant": tenant,
+                "status": "listed",
+                "evidence": evidence or tenant,
+            }
+            for state, fips, county, platform, tenant, evidence in conn.execute(
+                """select g.state, g.county, coalesce(n.text, g.name), r.platform, r.url_pattern, r.evidence
+                   from results_access r
+                   join coverage_government g on g.polity_id = r.polity_id and g.county is not null
+                   left join lateral (
+                     select s.text from reporting_unit u join name s on s.entity_id = u.area_id and s.kind = 'short'
+                     where u.scheme_code = 'us.county' and u.code = g.county limit 1) n on true
+                   where r.access = 'open'
+                   order by g.county, r.platform, r.url_pattern"""
+            ).fetchall()
+        ]
+
+
 def entry(found: dict[str, str], polity: UUID) -> dict[str, object]:
     def day(text: str) -> date | None:
         return date.fromisoformat(text) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text or "") else None

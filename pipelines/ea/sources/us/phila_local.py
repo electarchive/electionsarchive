@@ -8,12 +8,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import display
 from ea.sources.us.phila_returns import LISTING, METHOD, PARSED, PUBLISHER, TITLE
 from ea.sources.us.phila_returns import SOURCE as RETURNS
 from ea.store import connect
 
 SOURCE = "us.phila_local"
-VERSION = "8"
+VERSION = "9"
 FIPS = "42101"
 PLACE = "4260000"
 SPECIAL_DAYS = {
@@ -88,12 +89,7 @@ NOTE = (
 
 def tidy(text: str) -> str:
     if text.isupper():
-        text = re.sub(
-            r"[A-Za-z']+",
-            lambda m: m[0] if m[0] in ("II", "III", "IV") else m[0][0] + m[0][1:].lower(),
-            text,
-        )
-        text = re.sub(r"\b(Mc|O'|D')([a-z])", lambda m: m[1] + m[2].upper(), text)
+        text = display(text)
     return re.sub(r"\b([A-Z])\b(?![.'])", r"\1.", text)
 
 
@@ -273,6 +269,7 @@ def emit() -> Path:
         minted: dict[str, date] = {}
         report: dict[str, int] = defaultdict(int)
 
+        named: set[UUID] = set()
         names = dict(
             conn.execute(
                 """select n.entity_id, n.id from name n join changeset c on c.id = n.changeset_id
@@ -294,6 +291,9 @@ def emit() -> Path:
         )
 
         def name(entity: UUID, text: str) -> None:
+            if entity in named:
+                return
+            named.add(entity)
             cs.add(
                 "name", id=names.get(entity), entity_id=entity, text=text, lang="en", kind="official", is_preferred=True
             )

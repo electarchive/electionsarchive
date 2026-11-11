@@ -11,7 +11,7 @@ from ea import raw
 from ea.sources.us import enr_clarity
 
 SOURCE = "us.oh_franklin"
-VERSION = "1"
+VERSION = "2"
 PLATFORM = "oh_franklin"
 SITE = "https://vote.franklincountyohio.gov"
 ARCHIVES = SITE + "/election-info/archives"
@@ -114,7 +114,7 @@ def wide(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
         ]
         choices = []
         for index, column in enumerate(candidates):
-            name = html.unescape(str(rows[2][column])).strip()
+            name = re.sub(r"Â\s*", " ", html.unescape(str(rows[2][column]))).strip()
             found = PARTY.match(name)
             choices.append(
                 {
@@ -233,7 +233,7 @@ def legacy(rows: list[list[Any]]) -> Iterator[dict[str, Any]]:
         ballots = block_total(ballots, nxt)
     candidates = []
     for index, c in enumerate(cells):
-        label = str(head[names][c]).strip()
+        label = re.sub(r"Â\s*", " ", str(head[names][c])).strip()
         if re.search(r"(?i)ballots cast|registered|voters", label) or label.upper() == "RACE TOTAL":
             continue
         end = cells[index + 1] if index + 1 < len(cells) else width

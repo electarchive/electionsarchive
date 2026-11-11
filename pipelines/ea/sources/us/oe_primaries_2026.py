@@ -17,6 +17,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import display
 from ea.sources.us import elstats
 from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
@@ -1933,17 +1934,7 @@ def rows(code: str, path: Path, file: str = ""):
 
 
 def title(text: str) -> str:
-    if text != text.upper():
-        return text
-    words = []
-    for word in text.split():
-        if re.fullmatch(r"(II|III|IV|VI)", word):
-            words.append(word)
-        elif re.match(r"MC[A-Z]{2}", word):
-            words.append("Mc" + word[2:].capitalize())
-        else:
-            words.append(re.sub(r"[A-Za-z]+", lambda match: match[0].capitalize(), word))
-    return " ".join(words)
+    return display(text) if text == text.upper() else text
 
 
 def fetch() -> None:

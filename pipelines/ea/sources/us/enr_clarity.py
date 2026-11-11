@@ -1,4 +1,3 @@
-import csv
 import importlib.util
 import io
 import json
@@ -430,12 +429,7 @@ OFFICER_KEYS = {"judge-of-elections", "inspector-of-elections"}
 
 
 def tenants(platform: str = "clarity") -> list[dict[str, str]]:
-    with portals.REGISTRY.open() as file:
-        return [
-            row
-            for row in csv.DictReader(file)
-            if row["platform"] == platform and row["status"] == "listed" and row["tenant"].startswith("https://")
-        ]
+    return [row for row in portals.registry() if row["platform"] == platform and row["tenant"].startswith("https://")]
 
 
 def fetch_shapes(source: str, states: set[str]) -> None:
@@ -500,6 +494,7 @@ def _party(value: str | None) -> str | None:
 
 
 def _label(label: str) -> tuple[str, str | None]:
+    label = re.sub(r"Â\s*", " ", label)
     label = re.sub(r"^\(\d+\)\s+|\s+\(\d+\)$", "", label)
     label = re.sub(r"(?i)\s*\((?:w|wi|w/i|write[- ]?ins?)\)$|\s+w/i$", "", label)
     lines = []
@@ -1810,11 +1805,7 @@ def emit(
         if added_counties:
             grouped = {keys: rows for keys, rows in lines.group_by("county", "election", "contest")}
             tenants_of = set(contests.filter(pl.col("county").is_in(list(added_counties)))["tenant"].to_list())
-            with portals.REGISTRY.open() as file:
-                listed = [
-                    *listed,
-                    *(row for row in csv.DictReader(file) if row["tenant"] in tenants_of),
-                ]
+            listed = [*listed, *(row for row in portals.registry() if row["tenant"] in tenants_of)]
             county_names = {row["county_fips"]: row["county"].upper() for row in listed}
             counties_listed = sorted(set(contests["county"].to_list()))
         polities: dict[str, tuple[UUID, str, str]] = {}
