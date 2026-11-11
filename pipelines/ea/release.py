@@ -91,7 +91,7 @@ TYPES: dict[str, pl.DataType] = {
 CAST = {"USER-DEFINED", "ARRAY", "jsonb", "boolean"}
 MIN_ROWS = 2_000_000
 GEOMETRY_SOFT = 512 << 20
-GEOMETRY_HARD = 1 << 30
+GEOMETRY_HARD = 768 << 20
 MAX_BYTES = 2 << 30
 MAX_FILES = 1000
 
@@ -175,22 +175,22 @@ class Writer:
         with scratch.open("wb") as file, self.conn.cursor().copy(select) as copy:
             for chunk in copy:
                 file.write(chunk)
-        frame = pl.read_csv(scratch, schema={name: kind for name, _, kind in columns})
-        if not frame.height:
-            scratch.unlink()
-            return 0
-        frame = frame.with_columns(
-            pl.col(name).dt.replace_time_zone("UTC") for name, _, kind in columns if kind == pl.Datetime("us")
-        )
         parquet = self.folder / f"{stem}.parquet"
-        frame.write_parquet(parquet, compression="zstd", statistics=True)
-        self._record(parquet, bundle, table, part, frame.height)
+        pl.scan_csv(scratch, schema={name: kind for name, _, kind in columns}).with_columns(
+            pl.col(name).dt.replace_time_zone("UTC") for name, _, kind in columns if kind == pl.Datetime("us")
+        ).sink_parquet(parquet, compression="zstd", statistics=True)
+        rows = pl.scan_parquet(parquet).select(pl.len()).collect().item()
+        if not rows:
+            scratch.unlink()
+            parquet.unlink()
+            return 0
+        self._record(parquet, bundle, table, part, rows)
         csv = self.folder / f"{stem}.csv.gz"
         with scratch.open("rb") as source, gzip.open(csv, "wb", compresslevel=6) as target:
             shutil.copyfileobj(source, target, 1 << 24)
         scratch.unlink()
-        self._record(csv, bundle, table, part, frame.height)
-        return frame.height
+        self._record(csv, bundle, table, part, rows)
+        return rows
 
     def geometry(self, bundle: str, scheme: str, years: tuple[str, str], rows: list[tuple]) -> None:
         part = scheme + "_" + (years[0] if years[0] == years[1] else f"{years[0]}-{years[1]}")
