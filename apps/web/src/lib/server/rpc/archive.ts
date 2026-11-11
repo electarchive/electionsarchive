@@ -4420,20 +4420,16 @@ async function places(
           where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k
             and v.measure = any(${COUNTED})
         ) as "isDefault"
-      from reporting_unit u join scheme s on s.code = u.scheme_code
-      where u.k in (
-          select x.k from reporting_unit x where x.area_relation = 'within' and x.area_id = any(${sql.param(within)}::uuid[])
-          union
-          select x.k from reporting_unit_area m join reporting_unit x on x.id = m.unit_id
-          where x.area_relation = 'within' and m.area_id = any(${sql.param(within)}::uuid[])
-          union
-          select v.unit_k from result_value v join reporting_unit x on x.k = v.unit_k and x.area_id is null and x.kind <> 'standard'
-          where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[])
-        )
-        and exists (
-          select from result_value v
-          where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k
-            and v.measure = any(${COUNTED})
+      from (
+        select distinct v.unit_k from result_value v
+        where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.measure = any(${COUNTED})
+      ) v
+      join reporting_unit u on u.k = v.unit_k
+      join scheme s on s.code = u.scheme_code
+      where u.area_id is null and u.kind <> 'standard'
+        or u.area_relation = 'within' and (
+          u.area_id = any(${sql.param(within)}::uuid[])
+          or exists (select from reporting_unit_area m where m.unit_id = u.id and m.area_id = any(${sql.param(within)}::uuid[]))
         )
     `);
     let schemes: Array<typeof units.rows> = [];
