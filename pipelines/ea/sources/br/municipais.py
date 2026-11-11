@@ -364,7 +364,7 @@ def emit() -> Path:
         ]
 
         dates = dict(places.group_by("round").agg(pl.col("day").min()).iter_rows())
-        first, last = dates["1"], dates.get("2", dates["1"])
+        first, last = dates["1"], places["day"].max()
         umbrella = cs.key("br.election", f"{first}:municipal-elections")
         cs.add("election", id=umbrella, polity_id=brazil, kind="local", date_from=first, date_to=last, status="held")
         name(umbrella, f"{year} Brazilian municipal elections", "en")
@@ -487,9 +487,18 @@ def emit() -> Path:
 
         alliances: dict[str, UUID] = {}
         for coalition_code, label, members in (
-            candidates.filter(pl.col("coalition").is_not_null())
-            .select("coalition", "coalition_label", "coalition_members")
-            .unique("coalition")
+            pl.concat(
+                [
+                    candidates.select("coalition", "coalition_label", "coalition_members"),
+                    legends.select(
+                        "coalition",
+                        coalition_label=pl.lit(None, pl.String),
+                        coalition_members=pl.lit(None, pl.String),
+                    ),
+                ]
+            )
+            .filter(pl.col("coalition").is_not_null())
+            .unique("coalition", keep="first", maintain_order=True)
             .sort("coalition")
             .iter_rows()
         ):
