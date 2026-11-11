@@ -11,6 +11,7 @@ from uuid import UUID, uuid5
 import httpx
 import polars as pl
 import shapefile
+from psycopg import Connection
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
@@ -242,23 +243,31 @@ def emit() -> Path:
 
         polities: dict[str, tuple[UUID, str, str, str, str]] = {}
 
+        plain = {re.sub(r"[^A-Z0-9 ]", "", re.sub(r" \(.+\)$", "", name)): value for name, value in places.items()} | {
+            re.sub(r"[^A-Z0-9 ]", "", name): value for name, value in places.items()
+        }
+
         def resolve(area: str, contest: str) -> tuple[str, str | None]:
             found = re.fullmatch(r"(?:\d+ - )?(.+?)(?: - (District \d+))?", area)
             base = found[1].upper() if found else area.upper()
             seat = found[2] if found else None
-            base = re.sub(r"^(?:CITY|TOWN) OF ", "", base)
-            if base in counties:
+            city = re.match(r"(?:(?:CITY|TOWN) OF|CITY) ", base)
+            base = base[city.end() :] if city else base
+            if base in counties and not city:
                 return counties[base][0], seat
-            if base in places:
-                return places[base][0], seat
-            ward = re.fullmatch(r"(.+?) (Ward \d+)", base, re.IGNORECASE)
-            if ward and ward[1].upper() in places:
-                return places[ward[1].upper()][0], seat or ward[2].title()
-            return f"special:{slug(area)}", seat
+            ward = re.fullmatch(r"(.+?)[ -](WARD \d+)|(WARD \d+)-(.+)", base)
+            if ward:
+                base, seat = ward[1] or ward[4], seat or (ward[2] or ward[3]).title()
+            for town in (base, re.sub(r" CITY$", "", base), *([f"{base} CITY"] if city else [])):
+                if re.sub(r"[^A-Z0-9 ]", "", town) in plain:
+                    return plain[re.sub(r"[^A-Z0-9 ]", "", town)][0], seat
+            return f"special:{slug(area)}", found[2] if found else None
 
         owners: dict[tuple[str, str], UUID] = {}
         offices = Offices(conn)
         persons: dict[UUID, str] = {}
+        people: set[str] = set()
+        staged: set[UUID] = set()
         elections: dict[tuple[date, str, str], UUID] = {}
         districts: set[str] = set()
         paths: set[str] = set()
@@ -483,6 +492,7 @@ def emit() -> Path:
             if contest_path in foreign["contest"]:
                 continue
             contest = cs.key("us.contest", contest_key)
+            staged.add(contest)
             magnitude = item["allowed"] or 1
             cs.add(
                 "contest",
@@ -574,6 +584,7 @@ def emit() -> Path:
                 else:
                     ranked += 1
                     who = cs.key(f"{SOURCE}.person", f"{code}:{slug(candidate)}")
+                    people.add(f"{code}:{slug(candidate)}")
                     if who not in persons:
                         persons[who] = candidate
                         cs.add("person", id=who)
@@ -609,4 +620,145 @@ def emit() -> Path:
                     flags=0,
                     value=votes,
                 )
+        moved = {
+            f"special:{slug(area)}": (resolved, seat)
+            for area in frame["area"].unique().to_list()
+            for resolved, seat in [resolve(area, "")]
+            if not resolved.startswith("special:")
+        }
+        fold(conn, cs, moved, polities, elections, owners, districts, people, order, staged)
         return cs.write()
+
+
+def fold(
+    conn: Connection,
+    cs: Changeset,
+    moved: dict[str, tuple[str, str | None]],
+    polities: dict[str, tuple[UUID, str, str, str, str]],
+    elections: dict[tuple[date, str, str], UUID],
+    owners: dict[tuple[str, str], UUID],
+    districts: set[str],
+    people: set[str],
+    order: list[dict[str, Any]],
+    staged: set[UUID],
+) -> None:
+    reason = 'North Dakota\'s results portal names some cities\' contests under areas such as "City of Bowman" or "Bottineau City Ward 1", which earlier versions of this source read as separate districts or as the county; the city\'s own contests carry the same returns.'
+    totals: dict[date, set[int]] = {}
+    for item in order:
+        totals.setdefault(item["day"], set()).add(int(item["rows"]["votes"].sum()))
+    retiring: set[UUID] = set()
+    unmatched = 0
+    for contest, day, votes in conn.execute(
+        """select c.id, e.date_from,
+                  (select coalesce(sum(v.value), 0) from result_set r join result_value v on v.result_set_k = r.k
+                   where r.contest_id = c.id and r.is_default)
+           from contest c join election e on e.id = c.election_id join changeset w on w.id = c.changeset_id
+           where w.pipeline = %s and not exists (select from entity_merge m where m.entity_id = c.id)""",
+        [SOURCE],
+    ).fetchall():
+        if contest in staged:
+            continue
+        if votes not in totals.get(day, set()):
+            unmatched += 1
+        retiring.add(contest)
+        cs.add("entity_retirement", entity_id=contest, reason=reason)
+    merged: set[UUID] = set()
+    for value, polity in conn.execute(
+        """select x.value, x.entity_id from external_id x join polity p on p.id = x.entity_id
+           join changeset c on c.id = p.changeset_id
+           where x.scheme = 'us.polity' and x.value like 'special:special:%%' and c.pipeline = %s
+             and p.kind = 'special_district'
+             and not exists (select from entity_merge m where m.entity_id = p.id)""",
+        [SOURCE],
+    ).fetchall():
+        code = value.removeprefix("special:")
+        if code not in moved:
+            continue
+        target = moved[code][0]
+        scheme = "us.county" if polities[target][3] == "county" else "us.place"
+        for election, day, kind in conn.execute(
+            """select e.id, e.date_from, e.kind::text from election e where e.polity_id = %s
+               and not exists (select from entity_merge m where m.entity_id = e.id)""",
+            [polity],
+        ).fetchall():
+            if (day, target, kind) in elections:
+                cs.merge(election, elections[(day, target, kind)])
+                merged.add(election)
+        for owner, key in conn.execute(
+            """select x.entity_id, x.value from external_id x
+               where x.scheme in ('us.body', 'us.office') and x.value like %s
+                 and x.entity_id in (select id from body where polity_id = %s union select id from office where polity_id = %s)""",
+            [f"ND:{code}:%", polity, polity],
+        ).fetchall():
+            if (target, key.removeprefix(f"ND:{code}:")) in owners:
+                cs.merge(owner, owners[(target, key.removeprefix(f"ND:{code}:"))])
+                merged.add(owner)
+        for person, key in conn.execute(
+            """select x.entity_id, x.value from external_id x join person p on p.id = x.entity_id
+               where x.scheme = %s and x.value like %s""",
+            [f"{SOURCE}.person", f"{code}:%"],
+        ).fetchall():
+            if f"{target}:{key.removeprefix(f'{code}:')}" in people:
+                cs.merge(person, cs.key(f"{SOURCE}.person", f"{target}:{key.removeprefix(f'{code}:')}"))
+                merged.add(person)
+        for district, area in conn.execute(
+            "select code, area_id from area_code where code like %s", [f"38:{code}:%"]
+        ).fetchall():
+            twin = f"38:{target}:{district.removeprefix(f'38:{code}:')}"
+            if twin not in districts:
+                raise ValueError(f"{district} has no counterpart under {target}")
+            cs.merge(area, cs.area("us.local_district", twin))
+            cs.merge(cs.unit("us.local_district", district), cs.unit("us.local_district", twin))
+        cs.merge(cs.unit("us.special_district", code), cs.unit(scheme, target))
+        cs.merge(cs.area("us.special_district", code), cs.area(scheme, target))
+        cs.merge(polity, polities[target][0])
+    kept = {*elections.values(), *owners.values()}
+    others = 0
+    for table, column, query in (
+        (
+            "election",
+            "election_id",
+            "select e.id from election e join changeset w on w.id = e.changeset_id where w.pipeline = %s",
+        ),
+        ("body", "body_id", "select b.id from body b join changeset w on w.id = b.changeset_id where w.pipeline = %s"),
+        (
+            "office",
+            "office_id",
+            "select f.id from office f join changeset w on w.id = f.changeset_id where w.pipeline = %s",
+        ),
+    ):
+        held = {
+            owner
+            for owner, contest in conn.execute(
+                f"select c.{column}, c.id from contest c where c.{column} in ({query})", [SOURCE]
+            ).fetchall()
+            if contest not in retiring
+        }
+        for (entity,) in conn.execute(
+            f"select id from ({query}) q where not exists (select from entity_merge m where m.entity_id = q.id)",
+            [SOURCE],
+        ).fetchall():
+            if entity not in kept and entity not in merged and entity not in held:
+                cs.add("entity_retirement", entity_id=entity, reason=reason)
+                others += 1
+    held = {
+        person
+        for person, contest in conn.execute(
+            """select d.person_id, o.contest_id from candidacy d join contest_option o on o.id = d.option_id
+               where d.person_id in (select entity_id from external_id where scheme = %s)""",
+            [f"{SOURCE}.person"],
+        ).fetchall()
+        if contest not in retiring
+    }
+    for person, key in conn.execute(
+        """select x.entity_id, x.value from external_id x where x.scheme = %s
+           and not exists (select from entity_merge m where m.entity_id = x.entity_id)""",
+        [f"{SOURCE}.person"],
+    ).fetchall():
+        if key not in people and person not in merged and person not in held:
+            cs.add("entity_retirement", entity_id=person, reason=reason)
+            others += 1
+    print(
+        f"folded: {len(retiring)} contests retired ({unmatched} without a same-day contest of equal votes), "
+        f"{others} other retirements, {len(merged)} merges"
+    )
