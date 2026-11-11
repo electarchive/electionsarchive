@@ -4450,12 +4450,6 @@ async function places(
   strays.catch(() => null);
   const day = contest.date ?? "infinity";
   const surveying = surveyed(contest.id, area, isRoot, day, undefined, true);
-  const naming = labeled(
-    surveying,
-    childrenKey(contest.id, area, isRoot, day, undefined, true),
-    day,
-  );
-  naming.catch(() => null);
   const found = await surveying;
   const electoral = found.filter((kid) => kid.kind === "electoral_district");
   const loose =
@@ -4784,6 +4778,24 @@ async function places(
     .filter((kid) => kid.scheme === level.code && !loose.has(kid.k))
     .map((kid) => kid.k)
     .toSorted((x, y) => x - y);
+  const parented = new Set(
+    found
+      .filter((kid) => kid.scheme === level.code && !loose.has(kid.k))
+      .map((kid) => kid.parent ?? kid.id),
+  );
+  const naming = remember(
+    `children:${childrenKey(contest.id, area, isRoot, day, undefined, true)}:${level.code}`,
+    async () =>
+      label(
+        found.filter(
+          (kid) =>
+            parented.has(kid.id) ||
+            (kid.scheme === level.code && !loose.has(kid.k)),
+        ),
+        day,
+      ),
+  );
+  naming.catch(() => null);
   const pooling = across(
     round != null,
     () =>
