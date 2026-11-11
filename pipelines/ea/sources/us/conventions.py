@@ -188,6 +188,11 @@ LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
 EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
 GBOOKS = "https://books.google.com/books?id={gbooks}&pg=PA{leaf}"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
+DNC_2024_IMAGE = "https://democrats.org/wp-content/uploads/2024/08/StatebyStateBreakdown.jpg"
+DNC_2024_RELEASE = (
+    "https://democrats.org/news/dnc-chair-harrison-and-dncc-chair-moore-announce-roll-call-voting-window-has-closed-"
+    "lay-out-next-steps-for-vp-harris-to-officially-clinch-nomination/"
+)
 SHEET_2008 = "https://www.thegreenpapers.com/P08/D-VoteTallySheet-2008-09-02.pdf"
 RNC = "sim_republican-national-convention-proceedings_{}"
 TABLES: list[dict[str, Any]] = [
@@ -215,6 +220,15 @@ TABLES: list[dict[str, Any]] = [
         "leaves": (1,),
         "ballot": 1,
         "transcribed": "conventions_denver_2008.tsv",
+        "short": True,
+    },
+    {
+        "table": "2024:democratic",
+        "image": DNC_2024_IMAGE,
+        "release": DNC_2024_RELEASE,
+        "leaves": (1,),
+        "ballot": 1,
+        "transcribed": "conventions_dnc_2024.tsv",
         "short": True,
     },
 ]
@@ -601,6 +615,19 @@ SHEET_CAVEAT = (
     "Abroad is stored as an unlocated delegation, apart from the states and territories, and its 11 votes include "
     "half votes. Where a delegation cast fewer votes than it was allocated, the difference is its abstentions."
 )
+DNC_2024_METHOD = (
+    "The electronic roll call of the delegates on the presidential nomination, as the Democratic National Committee "
+    "published it on August 5, 2024, when the voting window closed: one image, State by State Breakdown, read by eye "
+    "and checked against its printed totals. It gives each jurisdiction's ballots cast for Kamala Harris and its "
+    "total ballots cast."
+)
+DNC_2024_CAVEAT = (
+    "The table gives no split of the ballots not cast for Harris, so the rest of each delegation's total ballots cast "
+    "are stored as abstentions: they were present votes and other choices that the release does not itemize. The "
+    "ballots cast add up to 4,619, of which 4,567 were for Harris, the figure the release announces. Democrats "
+    "Abroad is stored as an unlocated delegation, apart from the states and territories. The convention's "
+    "ceremonial roll call on August 6, 2024, in Chicago did not change the result."
+)
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 NEWS_LICENSE = "All rights reserved: a news article cited for one fact, not redistributed"
 BALTIMORE_1848 = (
@@ -641,6 +668,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1944:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Chicago, Illinois, July 19–21, 1944", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1944, 7, 19), date(1944, 7, 21)), "ballots": {1: date(1944, 7, 20)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "2008:democratic"}, "title": "Roll Call Vote for President of the United States, 2008 Democratic National Convention: Final Vote Tally, as compiled by the Office of the Secretary", "publisher": "Democratic National Committee, Office of the Secretary", "city": "Denver", "days": (date(2008, 8, 25), date(2008, 8, 28)), "ballots": {1: date(2008, 8, 27)}, "deciding": 1, "method": SHEET_METHOD, "caveat": SHEET_CAVEAT},
+    {"party": "democratic", "tables": {1: "2024:democratic"}, "title": "2024 Electronic Roll Call: State by State Breakdown", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(2024, 8, 19), date(2024, 8, 22)), "ballots": {1: date(2024, 8, 5)}, "deciding": 1, "required": None, "method": DNC_2024_METHOD, "caveat": DNC_2024_CAVEAT},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
@@ -649,6 +677,7 @@ REPORTS = {
     "democratic": "the convention's official proceedings",
 }
 CANDIDATES = {
+    "2024:democratic:Harris": ("Kamala Harris", "Q10853588"),
     "2008:democratic:Clinton": ("Hillary Clinton", "Q6294"),
     "2008:democratic:Obama": ("Barack Obama", "Q76"),
     "Nixon": ("Richard M. Nixon", "Q9588"),
@@ -2138,6 +2167,8 @@ def sheet(spec: dict[str, Any], fetch: bool) -> raw.Artifact:
 
 
 def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
+    if "image" in spec:
+        return raw.fetch(SOURCE, spec["image"], suffix=".jpg") if fetch else raw.cached(SOURCE, spec["image"])
     if "pdf" in spec:
         return sheet(spec, fetch)
     if "uky" in spec:
@@ -2873,7 +2904,9 @@ def emit() -> Path:
             scope = cs.key("us.party", f"{party}-party")
             first_spec = next(iter(specs.values()))
             source_url = (
-                first_spec["pdf"]
+                first_spec["release"]
+                if "release" in first_spec
+                else first_spec["pdf"]
                 if "pdf" in first_spec
                 else f"https://books.google.com/books?id={first_spec['gbooks']}"
                 if "gbooks" in first_spec
