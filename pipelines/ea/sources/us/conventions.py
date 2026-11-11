@@ -1039,6 +1039,9 @@ LABELS = {
 }
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1968:republican:first": [
+        (410, "OH", (0.17, 0.362, 0.8, 0.382), {"Stassen": 1, "Lindsay": 0}, "1 for Stassen, set under Lindsay in one read; the printed totals (Stassen 2, Lindsay 1) and the Minnesota row give Lindsay only Minnesota's 1"),
+    ],
     "1852:democratic:b49": [
         (65, "LA", (0.2, 0.822, 0.59, 0.885), {"Cass": 0, "Douglas": 0, "Butler": 0, "Houston": 0}, "none; both reads set Ohio's scattering votes one column early, under Louisiana"),
         (65, "OH", (0.2, 0.822, 0.42, 0.838), {"Cass": 2}, "2, printed for Ohio"),
