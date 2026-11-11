@@ -41,6 +41,7 @@ STATES = (
     else None
 )
 GROUPS = None if STATES is None else STATES | ({"ceda"} if "CA" in STATES else set())
+CANCELLATION_FEEDS = {"AZ-04019-cc", "TX-48209-udc", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud"}
 CITED_SEATS = {
     row["tail"]: row
     for row in csv.DictReader(
@@ -12656,6 +12657,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             else {}
         )
         elections: dict[tuple[str, UUID], UUID] = {}
+        election_feeds: dict[UUID, set[str]] = {}
         owners: dict[str, UUID] = {}
         counts = {
             "contests": 0,
@@ -13222,6 +13224,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 system = plurality[magnitude > 1]
             if state == "LA" and magnitude is not None:
                 system = cs.key("us.electoral_system", "two_round") if magnitude == 1 else plurality[True]
+            election_feeds.setdefault(elections[claim], set()).add(str(group["feed"][0]))
             cs.add(
                 "contest",
                 id=contest,
@@ -13513,6 +13516,9 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             print("retiring empty body", value)
             cs.add("entity_retirement", entity_id=body, reason="No contest on this ballot remains on this body")
             counts["empty bodies"] = counts.get("empty bodies", 0) + 1
+        for row in cs.rows.get("election", []):
+            if election_feeds.get(row["id"], {None}) <= CANCELLATION_FEEDS:
+                row["status"] = "canceled"
         used = {str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
         retiring = [str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])]
         for person, value in conn.execute(
