@@ -1207,6 +1207,47 @@
           "minimum": 2,
           "default": 2
         },
+        "minimum": {
+          "type": "object",
+          "properties": {
+            "share": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "of": {
+              "enum": [
+                "registered"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "share",
+            "of"
+          ]
+        },
+        "qualify": {
+          "type": "object",
+          "properties": {
+            "share": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "of": {
+              "enum": [
+                "registered",
+                "valid"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "share",
+            "of"
+          ]
+        },
         "tieBreak": {
           "enum": [
             "votes",

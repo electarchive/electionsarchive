@@ -461,7 +461,17 @@ def emit() -> Path:
             )
 
         system = cs.key(f"{SOURCE}.electoral_system", "binomial-two-round")
-        cs.add("electoral_system", id=system, polity_id=france, rules={"formula": "two_round"}, rules_version=1)
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=france,
+            rules={
+                "formula": "two_round",
+                "minimum": {"share": 0.25, "of": "registered"},
+                "qualify": {"share": 0.125, "of": "registered"},
+            },
+            rules_version=1,
+        )
         name(system, "French departmental binomial two-round system", "en")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
 

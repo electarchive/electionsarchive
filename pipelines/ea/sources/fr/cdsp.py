@@ -374,6 +374,11 @@ PRESIDENT = (
     "the first round is elected; otherwise the two leading candidates go to a second round two weeks later, and the "
     "one with more votes wins."
 )
+FIRST_ROUND = (
+    "A candidate wins in the first round with more than half of the valid votes, provided that is at least a quarter "
+    "of registered voters."
+)
+SECOND_ROUND = "The candidate with the most votes in the second round wins; in a tie, the older candidate wins."
 THRESHOLDS = {
     1958: "Any first-round candidate with at least 5 percent of the valid votes could stand in the second round.",
     1967: "Any first-round candidate with at least 10 percent of registered voters could stand in the second round.",
@@ -897,6 +902,27 @@ def emit() -> Path:
             name(whole, "France", "en")
         assembly = existing("fr.body", "national-assembly")
         legislative = existing("fr.electoral_system", "legislative-two-round")
+        earlier: dict[int, UUID] = {}
+        for since, until, qualify in ((1958, 1966, (0.05, "valid")), (1967, 1973, (0.1, "registered"))):
+            earlier[since] = cs.key("fr.electoral_system", f"legislative-two-round-{since}")
+            cs.add(
+                "electoral_system",
+                id=earlier[since],
+                polity_id=france,
+                rules={
+                    "formula": "two_round",
+                    "minimum": {"share": 0.25, "of": "registered"},
+                    "qualify": {"share": qualify[0], "of": qualify[1]},
+                },
+                rules_version=1,
+            )
+            name(earlier[since], f"French legislative two-round system ({since}–{until})", "en")
+            cs.add(
+                "note",
+                entity_id=earlier[since],
+                kind="methodology",
+                body_md=f"{FIRST_ROUND} {THRESHOLDS[since].replace('could', 'may')} {SECOND_ROUND}",
+            )
         office = cs.key("fr.office", "president")
         if office in cs.minted:
             cs.add("office", id=office, polity_id=france, kind="head_of_state")
@@ -1071,13 +1097,14 @@ def emit() -> Path:
         )
 
         persons: dict[str, UUID] = {}
+        displays: dict[UUID, set[str]] = {}
 
         def person_of(key: str, display: str, sex: str | None) -> UUID:
             if key not in persons:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
                 if persons[key] in cs.minted:
                     cs.add("person", id=persons[key], gender={"F": "female", "M": "male"}.get(sex or ""))
-                name(persons[key], display)
+                displays.setdefault(persons[key], set()).add(display)
             return persons[key]
 
         def value_row(result_set: UUID, unit: UUID, option: UUID | None, measure: int, value: int) -> None:
@@ -1268,7 +1295,7 @@ def emit() -> Path:
                             magnitude=1,
                             round_number=number,
                             previous_round_id=previous.get(circ),
-                            electoral_system_id=legislative,
+                            electoral_system_id=legislative if year >= 1978 else earlier[1958 if year < 1967 else 1967],
                             default_result_kind="counted",
                         )
                         previous[circ] = contest
@@ -1374,4 +1401,16 @@ def emit() -> Path:
                                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=line["outcome"])
                             if fresh:
                                 value_row(result_set, unit, option, VOTES, line["votes"])
+        dropped = set(
+            conn.execute("select entity_id, text from name_drop where entity_id = any(%s)", [list(displays)]).fetchall()
+        )
+        for person, texts in displays.items():
+            stripped = {
+                unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+                for text in texts
+                if not text.isascii()
+            }
+            for text in sorted(texts - stripped):
+                if (person, text) not in dropped:
+                    name(person, text)
         return cs.write()

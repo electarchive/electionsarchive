@@ -591,7 +591,17 @@ def emit() -> Path:
         name(assembly, "Assemblée nationale", "fr", "native")
         cs.add("body_size", body_id=assembly, seats=577, valid_from=date(1986, 3, 16))
         system = cs.key("fr.electoral_system", "legislative-two-round")
-        cs.add("electoral_system", id=system, polity_id=france, rules={"formula": "two_round"}, rules_version=1)
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=france,
+            rules={
+                "formula": "two_round",
+                "minimum": {"share": 0.25, "of": "registered"},
+                "qualify": {"share": 0.125, "of": "registered"},
+            },
+            rules_version=1,
+        )
         name(system, "French legislative two-round system", "en")
         cs.add("note", entity_id=system, kind="methodology", body_md=METHODOLOGY)
         cycle = cs.key("fr.election", f"{ROUNDS[1]}:legislative")

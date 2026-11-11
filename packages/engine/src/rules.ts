@@ -143,6 +143,18 @@ export const rules = v.variant("formula", [
     formula: v.literal("two_round"),
     majority: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1)), 0.5),
     advance: v.optional(v.pipe(v.number(), v.integer(), v.minValue(2)), 2),
+    minimum: v.optional(
+      v.object({
+        share: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+        of: v.picklist(["registered"]),
+      }),
+    ),
+    qualify: v.optional(
+      v.object({
+        share: v.pipe(v.number(), v.minValue(0), v.maxValue(1)),
+        of: v.picklist(["registered", "valid"]),
+      }),
+    ),
     tieBreak,
   }),
   v.object({

@@ -24,3 +24,4 @@ export {
   rulesJsonSchema,
   type Threshold,
 } from "./rules.ts";
+export { advance } from "./runoff.ts";
