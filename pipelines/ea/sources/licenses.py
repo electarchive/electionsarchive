@@ -6,7 +6,7 @@ from ea.sources.us import elstats
 from ea.store import connect
 
 SOURCE = "licenses"
-VERSION = "7"
+VERSION = "8"
 PUBLIC_RECORD = "Public record"
 UNLICENSED = "No license stated: facts published with attribution, raw files not redistributed"
 NEWS = "All rights reserved: a news article cited for one fact, not redistributed"
@@ -34,6 +34,21 @@ PUBLISHERS = {
     "Iowa Democratic Party": UNLICENSED,
     "IBGE": UNLICENSED,
     "Tapu ve Kadastro Genel Müdürlüğü": UNLICENSED,
+    "Wikipedia": "CC BY-SA 4.0",
+    "U.S. Census Bureau": "Public domain",
+    "House of Commons Library": "Open Parliament Licence v3.0",
+    "Tribunal Superior Eleitoral": "Creative Commons Attribution",
+    "Tribunal Superior Eleitoral, Seção de Arquivo": "Creative Commons Attribution",
+    "Yüksek Seçim Kurulu": TURKISH_OFFICIAL_ACTS,
+    "Alberta King's Printer": UNLICENSED,
+}
+KINDS = {
+    "official_body": PUBLIC_RECORD,
+    "news_agency": NEWS,
+    "academic": UNLICENSED,
+    "aggregator": UNLICENSED,
+    "community": UNLICENSED,
+    "compendium": UNLICENSED,
 }
 ATTRIBUTIONS = {
     "City of Chicago": "This site provides applications using data that has been modified for use from its original source, "
@@ -68,14 +83,14 @@ def emit() -> Path | None:
         changed = []
         for values in conn.execute(
             "select id, kind, publisher, title, url, license, license_url, attribution, notes from source "
-            "where (publisher = any(%s) and (license is null or license like 'No license stated%%'))"
+            "where license is null or (publisher = any(%s) and license like 'No license stated%%')"
             " or publisher = any(%s) or url = any(%s)",
             [list(PUBLISHERS), list(ATTRIBUTIONS), list(RESTAMPS)],
         ).fetchall():
             row = dict(zip(COLUMNS, values, strict=True))
             fixed = {
                 **row,
-                "license": PUBLISHERS.get(values[2], values[5]),
+                "license": PUBLISHERS.get(values[2], values[5]) or KINDS[values[1]],
                 "attribution": ATTRIBUTIONS.get(values[2], values[7]),
                 **RESTAMPS.get(values[4], {}),
             }
