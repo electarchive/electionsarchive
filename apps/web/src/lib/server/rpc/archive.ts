@@ -21516,18 +21516,51 @@ export async function record(input: { id: string; body?: string }) {
         and not exists (select from office where polity_id = ${input.id}::uuid)
         and exists (select from polity_parent pp join slug ps on ps.entity_id = pp.parent_id and ps.is_current and ps.path = 'ca' where pp.polity_id = p.id)))) as yes
     ),
+    picked as materialized (
+      select x.id, x.election_id, x.body_id, x.office_id, x.seat_id, x.district_area_id, x.previous_round_id, x.kind, x.term,
+        bool_or(x.own) as own, bool_or(x."ownBody") as "ownBody"
+      from (
+        select c.id, c.election_id, c.body_id, c.office_id, c.seat_id, c.district_area_id, c.previous_round_id, c.kind, c.term,
+          c.allocation_parent_id, c.party_scope_id, c.notional, true as own, true as "ownBody"
+        from body b join contest c on c.body_id = b.id where b.polity_id = ${input.id}::uuid
+        union all
+        select c.id, c.election_id, c.body_id, c.office_id, c.seat_id, c.district_area_id, c.previous_round_id, c.kind, c.term,
+          c.allocation_parent_id, c.party_scope_id, c.notional, false, false
+        from body b join contest c on c.body_id = b.id where (select yes from bare) and b.polity_id in (select id from anc)
+        union all
+        select c.id, c.election_id, c.body_id, c.office_id, c.seat_id, c.district_area_id, c.previous_round_id, c.kind, c.term,
+          c.allocation_parent_id, c.party_scope_id, c.notional, c.body_id is null, false
+        from office o join contest c on c.office_id = o.id where o.polity_id = ${input.id}::uuid
+        union all
+        select c.id, c.election_id, c.body_id, c.office_id, c.seat_id, c.district_area_id, c.previous_round_id, c.kind, c.term,
+          c.allocation_parent_id, c.party_scope_id, c.notional, false, false
+        from election y join contest c on c.election_id = y.id where y.polity_id = ${input.id}::uuid
+      ) x
+      where x.allocation_parent_id is null and x.party_scope_id is null and not x.notional
+        and x.kind in ('body_seats', 'list_allocation', 'office')
+      group by x.id, x.election_id, x.body_id, x.office_id, x.seat_id, x.district_area_id, x.previous_round_id, x.kind, x.term
+    ),
+    held as materialized (
+      select e.id, e.kind, e.date_from, e.polity_id, g.id as top, g.polity_id as "topPolity", g.kind as "topKind", pt.area_id,
+        ${CYCLE} as year,
+        case when g.polity_id = ${input.id}::uuid and g.id <> e.id then array(
+          select l.seat from later l where l.parent = g.id and l.election <> e.id
+        ) end as reruns
+      from election e
+      join election g on g.id = coalesce(e.parent_id, e.id)
+      left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+      where e.id in (select election_id from picked) and e.kind in ('general', 'local', 'primary')
+    ),
     roots as materialized (
       select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
         c.kind = 'list_allocation' as "isList", coalesce(c.term = 'remainder', false) as "isRemainder",
-        coalesce((select bp.kind = 'supranational' from body b join polity bp on bp.id = b.polity_id where b.id = c.body_id), false) as "isAbroad",
-        e.date_from as date, ${CYCLE} as year, a.k as area,
-        case when g.polity_id = ${input.id}::uuid and g.id <> e.id and exists (
-            select from later l
-            where l.parent = g.id and l.election <> e.id and l.seat = coalesce(c.office_id, c.body_id)
-          ) then g.id
-          when e.polity_id = ${input.id}::uuid and g.polity_id = e.polity_id and g.kind = e.kind then g.id
+        case when c."ownBody" then (select p.kind = 'supranational' from polity p where p.id = ${input.id}::uuid)
+          else coalesce((select bp.kind = 'supranational' from body b join polity bp on bp.id = b.polity_id where b.id = c.body_id), false) end as "isAbroad",
+        e.date_from as date, e.year, a.k as area,
+        case when coalesce(c.office_id, c.body_id) = any(e.reruns) then e.top
+          when e.polity_id = ${input.id}::uuid and e."topPolity" = e.polity_id and e."topKind" = e.kind then e.top
           when e.polity_id = ${input.id}::uuid then e.id
-          when g.polity_id = ${input.id}::uuid then g.id
+          when e."topPolity" = ${input.id}::uuid then e.top
           when (select yes from bare) then e.id
           else (
             select n.id from election n
@@ -21535,23 +21568,10 @@ export async function record(input: { id: string; body?: string }) {
               and extract(year from n.date_from) = extract(year from e.date_from) and not exists (select from entity_merge m where m.entity_id = n.id)
             order by n.parent_id is null desc, abs(n.date_from - e.date_from) limit 1
           ) end as link
-      from (
-        select x.id from body b join contest x on x.body_id = b.id where b.polity_id = ${input.id}::uuid
-        union
-        select x.id from body b join contest x on x.body_id = b.id
-        where (select yes from bare) and b.polity_id in (select id from anc)
-        union
-        select x.id from office o join contest x on x.office_id = o.id where o.polity_id = ${input.id}::uuid
-        union
-        select x.id from election y join contest x on x.election_id = y.id where y.polity_id = ${input.id}::uuid
-      ) k
-      join contest c on c.id = k.id
-      join election e on e.id = c.election_id
-      join election g on g.id = coalesce(e.parent_id, e.id)
-      left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-      left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
-      where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
-        and (e.kind in ('general', 'local') or (
+      from picked c
+      join held e on e.id = c.election_id
+      left join area a on a.id = coalesce(c.district_area_id, e.area_id)
+      where (e.kind in ('general', 'local') or (
           e.kind = 'primary'
           and not exists (select from contest n where n.previous_round_id = c.id)
           and not exists (
@@ -21560,7 +21580,7 @@ export async function record(input: { id: string; body?: string }) {
               and ne.kind in ('general', 'local', 'runoff', 'special') and ne.date_from > e.date_from and ne.date_from < e.date_from + 365
           )
           and exists (select from result_set rs join outcome o on o.result_set_id = rs.id where rs.contest_id = c.id and o.kind = 'elected')
-        )) and c.kind in ('body_seats', 'list_allocation', 'office')
+        ))
         and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
         and not exists (
           select from contest pc join election pe on pe.id = pc.election_id
@@ -21571,10 +21591,7 @@ export async function record(input: { id: string; body?: string }) {
             and f.body_id is not distinct from c.body_id and f.office_id is not distinct from c.office_id
             and f.seat_id is not distinct from c.seat_id and f.district_area_id is not distinct from c.district_area_id
         ))
-        and (coalesce(
-          (select polity_id from body where id = c.body_id),
-          (select polity_id from office where id = c.office_id)
-        ) = ${input.id}::uuid or (
+        and (c.own or (
           e.polity_id = ${input.id}::uuid and exists (
             select from body b join polity bp on bp.id = b.polity_id
             where b.id = c.body_id and bp.kind = 'supranational'
@@ -21595,36 +21612,36 @@ export async function record(input: { id: string; body?: string }) {
         ))
     ),
     rounds as (
-      select r.id as root, r.id from roots r
+      select r.id as root, r.id, false as scoped, false as nested from roots r
       union all
-      select r.id, c.id from roots r join contest c on c.previous_round_id = r.id
+      select r.id, c.id, c.party_scope_id is not null, c.allocation_parent_id is not null
+      from roots r join contest c on c.previous_round_id = r.id
     ),
-    tree(root, id) as (
-      select root, id from rounds
+    tree(root, id, parent, scoped, nested) as (
+      select root, id, null::uuid, scoped, nested from rounds
       union all
-      select tree.root, c.id from contest c join tree on c.allocation_parent_id = tree.id
+      select tree.root, c.id, c.allocation_parent_id, c.party_scope_id is not null, true
+      from contest c join tree on c.allocation_parent_id = tree.id
     ),
     winners as materialized (
-      select t.root, t.id as contest, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
+      select t.root, t.id as contest, t.nested, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
       from tree t
       cross join lateral (
-        select o.id, o.party_id, o.kind, o.parent_option_id, x.seats
-        from contest_option o
-        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-        join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-        where o.contest_id = t.id
+        select o.id, o.party_id, o.kind, o.parent_option_id, x.seats, bool_or(o.kind = 'list') over () as "hasList"
+        from (
+          select rs.id from result_set rs
+          where rs.contest_id = t.id and rs.is_default and rs.stage <> 'notional' and ${served("rs")}
+          order by array_position(${STAGES}, rs.stage) limit 1
+        ) rs
+        join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+        join contest_option o on o.id = x.option_id and o.contest_id = t.id
         offset 0
       ) o
-      where not exists (select from contest k where k.allocation_parent_id = t.id and k.party_scope_id is null offset 0)
-        and (t.id = t.root or not exists (select from contest sc where sc.id = t.id and sc.party_scope_id is not null offset 0))
+      where not exists (select from tree k where k.parent = t.id and not k.scoped)
+        and (t.id = t.root or not t.scoped)
         and not (o.kind = 'list' and ${pooled(sql`o.id`)})
-        and not (o.kind = 'candidate' and not ${pooled(sql`o.parent_option_id`)} and exists (
-          select from contest_option l
-          join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
-          join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
-          where l.contest_id = t.id and l.kind = 'list'
-        ))
-      group by t.root, t.id, o.id, o.party_id
+        and not (o.kind = 'candidate' and o."hasList" and not ${pooled(sql`o.parent_option_id`)})
+      group by t.root, t.id, t.nested, o.id, o.party_id
     ),
     lines as materialized (
       select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id, a.k as area
@@ -21647,7 +21664,7 @@ export async function record(input: { id: string; body?: string }) {
       order by l.parent, y.value desc
     ),
     won as materialized (
-      select w.root, w.contest, w.id, w.seats,
+      select w.root, w.contest, w.nested, w.id, w.seats,
         coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id,
           (select min(cn.party_id::text)::uuid from candidacy cy
             join candidacy_nomination cn on cn.candidacy_id = cy.id and cn.kind = 'nominated'
@@ -21704,8 +21721,8 @@ export async function record(input: { id: string; body?: string }) {
         (array_agg(r.link))[1] as link,
         min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
         w.party, bool_or(w.independent) as independent, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
-        case when count(distinct r.id) = 1 then (array_agg(w.person order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as winner,
-        case when count(distinct r.id) = 1 then (array_agg(w.contest order by w.contest <> w.root, exists (select from contest k where k.id = w.contest and k.allocation_parent_id is not null), w.person))[1] end as decider,
+        case when count(distinct r.id) = 1 then (array_agg(w.person order by w.contest <> w.root, w.nested, w.person, w.contest))[1] end as winner,
+        case when count(distinct r.id) = 1 then (array_agg(w.contest order by w.contest <> w.root, w.nested, w.person, w.contest))[1] end as decider,
         bool_or(w.contest <> w.root) as runoff, bool_and(r."isRemainder") as remainder,
         coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed,
         array_agg(distinct r.area) filter (where r.area is not null) as areas
