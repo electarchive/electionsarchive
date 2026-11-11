@@ -151,6 +151,26 @@ Every column that a page looks rows up by needs a btree index. The migration `20
 
 To find another missing index, run the benchmark and then look at `seq_scan` and `seq_tup_read` in `pg_stat_user_tables`.
 
+### After a bulk update to area_geometry
+
+Applying a changeset that updates many `area_geometry` rows leaves the updated heap pages not all-visible. Changeset `01a1c94f` (`us.label_points`) is one: it updates 6,029 `us.place` and `us.town` rows. Autovacuum won't clean up after it, because the table has 4.1 million rows and its thresholds scale with table size. The `shaped_id` check in the `elections.winners` crown query probes `area_geometry_pkey` with an index-only scan. On pages that aren't all-visible, every cold call fetches heap pages.
+
+After the ship applies the changeset, run this once on production:
+
+```sql
+vacuum (index_cleanup on) area_geometry;
+```
+
+Keep `index_cleanup on`. With the default setting, Postgres skips the index pass when few pages hold dead items. Pages that keep dead line pointers are never marked all-visible, and the heap fetches stay.
+
+To check the result, run this against production:
+
+```sql
+explain (analyze, buffers) select 1 from area_geometry where area_id = '<an updated place id>';
+```
+
+The plan should show an Index Only Scan with `Heap Fetches: 0`. Before the vacuum, it shows heap fetches. Before vacuuming, look at `pg_stat_activity` for the oldest `backend_xmin`. A long transaction older than the update stops VACUUM from marking those pages all-visible, so wait for it to end before you vacuum. Rerun the vacuum after any later bulk rewrite of the table.
+
 ## Heavy geometry
 
 Some boundaries have more than a million points, Nunavut's among them. Intersecting two such shapes takes seconds. `ea coarse` keeps a simplified copy of every area geometry with more than 20,000 points in `display.coarse`. The tolerance is 0.0002 times the square root of the shape's area. A copy is kept only when it has fewer than half the points and its area is within 0.5% of the original; otherwise the row holds no geometry, and queries fall back to the full shape. `ea tiles` refreshes the table, and rows are dropped when their source geometry changes.
