@@ -1,5 +1,7 @@
 import registry from "@ea/db/projections";
 import { sql } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
+import { createHash } from "node:crypto";
 import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 
@@ -26,6 +28,8 @@ const {
   schemes: Record<string, string>;
   fallback: string;
 } = registry;
+
+const dialect = new PgDialect();
 
 const inside = (boxes: Array<Array<number>>) =>
   boxes
@@ -179,37 +183,46 @@ export const parted = async (
   if (insets.length === 0) {
     return;
   }
+  const spread = sql`
+    select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y,
+      lower(g.valid)::text as "from", upper(g.valid)::text as until
+    from (
+      select g.area_id, g.geom, g.valid from area_geometry g
+      where (${sql.raw(
+        insets
+          .flatMap((inset) => inset.within)
+          .map(
+            ([west, south, east, north]) =>
+              `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+          )
+          .join(" or "),
+      )}) and not isempty(g.valid)
+      offset 0
+    ) g
+    join area a on a.id = g.area_id
+    cross join lateral (select ST_PointOnSurface(g.geom) as point) o
+    where a.scheme_code = ${scheme}
+  `;
   const [everyDay, own, held] = await Promise.all([
-    remember(`parted:${scheme}`, async () => {
-      const found = await db.execute<{
-        k: number;
-        part: number;
-        x: number;
-        y: number;
-        from: string | null;
-        until: string | null;
-      }>(sql`
-        select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y,
-          lower(g.valid)::text as "from", upper(g.valid)::text as until
-        from (
-          select g.area_id, g.geom, g.valid from area_geometry g
-          where (${sql.raw(
-            insets
-              .flatMap((inset) => inset.within)
-              .map(
-                ([west, south, east, north]) =>
-                  `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
-              )
-              .join(" or "),
-          )}) and not isempty(g.valid)
-          offset 0
-        ) g
-        join area a on a.id = g.area_id
-        cross join lateral (select ST_PointOnSurface(g.geom) as point) o
-        where a.scheme_code = ${scheme}
-      `);
-      return found.rows;
-    }),
+    remember(
+      `parted:${scheme}`,
+      async () =>
+        (
+          await db.execute<{
+            k: number;
+            part: number;
+            x: number;
+            y: number;
+            from: string | null;
+            until: string | null;
+          }>(spread)
+        ).rows,
+      false,
+      `parted-${createHash("sha256")
+        .update(JSON.stringify(dialect.sqlToQuery(spread)))
+        .digest("base64url")}-undated`,
+      true,
+    ),
     db.execute<{ mine: number | null }>(sql`
       select ${part(scheme, "me.geom")} as mine from (
         select geom from area_geometry where area_id = ${area}::uuid
