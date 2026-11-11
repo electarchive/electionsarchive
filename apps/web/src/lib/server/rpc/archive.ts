@@ -22017,7 +22017,7 @@ export async function record(input: { id: string; body?: string }) {
       join area a on a.id = coalesce(c.district_area_id, pt.area_id)
       where w.party_id is null and ch.party_id is not null
     ),
-    leads as (
+    leads as materialized (
       select distinct on (l.parent) l.parent, l.party_id
       from lines l
       join result_set rs on rs.contest_id = l.contest_id and ${latest("rs")}
@@ -22028,6 +22028,30 @@ export async function record(input: { id: string; body?: string }) {
       where y.value is not null
       order by l.parent, y.value desc
     ),
+    merged as materialized (
+      select m.entity_id, m.into_id from entity_merge m
+      where m.entity_id in (select party_id from winners union select party_id from leads)
+    ),
+    alone as materialized (
+      select distinct w.id, c.id as contest, c.election_id, c.body_id
+      from winners w join contest c on c.id = w.contest
+      where exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
+    ),
+    partisan as materialized (
+      select a.id from alone a
+      join (
+        select g.election_id, g.body_id, g.contest,
+          exists (select from contest_option k left join candidacy cy on cy.option_id = k.id
+            where k.contest_id in (select g.contest union all select c2.id from contest c2
+              where c2.body_id = g.body_id and c2.election_id = g.election_id)
+              and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
+                or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id))) as yes
+        from (select distinct election_id, body_id, case when body_id is null then contest end as contest from alone) g
+        offset 0
+      ) p on p.election_id = a.election_id and p.body_id is not distinct from a.body_id
+        and (p.contest is null or p.contest = a.contest)
+      where p.yes
+    ),
     won as materialized (
       select w.root, w.contest, w.nested, w.id, w.seats,
         coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id,
@@ -22037,12 +22061,7 @@ export async function record(input: { id: string; body?: string }) {
           (select coalesce(min(cy.member_of_party_id::text)::uuid, o.alliance_id) from contest_option o
             left join candidacy cy on cy.option_id = o.id
             where o.id = w.id and o.alliance_id is not null group by o.alliance_id)) as party,
-        exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
-          and exists (select from contest_option k left join candidacy cy on cy.option_id = k.id
-            where k.contest_id in (select w.contest union all select c2.id from contest c0
-              join contest c2 on c2.body_id = c0.body_id and c2.election_id = c0.election_id where c0.id = w.contest)
-              and (k.party_id is not null or k.alliance_id is not null or cy.member_of_party_id is not null
-                or exists (select from candidacy_nomination cn where cn.candidacy_id = cy.id)))
+        w.id in (select id from partisan)
           or exists (select from contest_option o where o.id = w.id and o.party_id is null and o.alliance_id is null
             /* contest_option_independent_label_idx: its predicate must match this regex byte for byte */
             and o.ballot_label ~* '^(independent|bağımsız|indépendant|unabhängig|indipendent)') as independent,
@@ -22052,7 +22071,7 @@ export async function record(input: { id: string; body?: string }) {
       from winners w
       join roots r on r.id = w.root
       left join leads ld on ld.parent = w.id
-      left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+      left join merged pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
       left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
         and br.kind = 'regional_branch' and br.valid @> r.date
       left join entity_merge bm on bm.entity_id = br.parent_party_id
@@ -22099,7 +22118,7 @@ export async function record(input: { id: string; body?: string }) {
     sized as (
       select t.*, sum(t.seats) over b as total, sum(t.listed) over b as lists, bool_and(t.remainder) over b as "isBy",
         case when (select yes from bare) then sum(t.seats) over b else (select z.seats from body_size z
-          where z.body_id = t.seat and (z.valid @> t.day or lower(z.valid) between t.day and t.day + 400)
+          where z.body_id = t.seat and z.valid && daterange(t.day, t.day + 400, '[]')
           order by lower(z.valid) desc limit 1) end as size
       from seated t window b as (partition by t.seat, t.bucket)
     ),
