@@ -14227,7 +14227,19 @@ async function universe(
 
 const framed = new Map<string, ReturnType<typeof framing>>();
 
-async function framing(area: string, day: string, ks: Array<number> = []) {
+function framing(area: string, day: string, ks: Array<number> = []) {
+  return ks.length === 0
+    ? remember(
+        `framing:${area}:${day}`,
+        () => framingBox(area, day, ks),
+        false,
+        undefined,
+        true,
+      )
+    : framingBox(area, day, ks);
+}
+
+async function framingBox(area: string, day: string, ks: Array<number>) {
   const found = await db.execute<{
     west: number;
     south: number;
