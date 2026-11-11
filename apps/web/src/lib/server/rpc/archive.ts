@@ -19228,9 +19228,9 @@ export const elections = {
                       left join lateral (
                         select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
                           (select f.kind::text from office f where f.id = c.office_id) as office,
-                          coalesce(tl.persons[array_position(tl.options, o.id)], (
+                          coalesce(tl.persons[at.i], (
                             select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-                            where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1
+                            where cy.option_id = pick.id and cy.role = 'head' order by cy.id limit 1
                           )) as person,
                           ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
                           tl.votes
@@ -19250,6 +19250,7 @@ export const elections = {
                         cross join lateral (
                           select json_agg(json_build_array(coalesce(qm.into_id, q.party_id), qp.person, t.value)) as votes,
                             array_agg(q.id) as options, array_agg(qp.person) as persons,
+                            array_agg(q.party_id) as parties, array_agg(q.ballot_label) as labels,
                             (array_agg(q.id order by t.value desc))[1] as top
                           from (
                             select y.option_k, sum(y.value)::float8 as value
@@ -19279,7 +19280,12 @@ export const elections = {
                           (select tl.top, true where tl.top is not null)
                           limit 1
                         ) pick
-                        join contest_option o on o.id = pick.id
+                        cross join lateral (select array_position(tl.options, pick.id) as i) at
+                        cross join lateral (
+                          select tl.parties[at.i] as party_id, tl.labels[at.i] as ballot_label where at.i is not null
+                          union all
+                          select o.party_id, o.ballot_label from contest_option o where o.id = pick.id and at.i is null
+                        ) o
                         left join entity_merge pm on pm.entity_id = o.party_id
                         where c.election_id = k.id and c.kind = 'office'
                         order by c.id limit 1
