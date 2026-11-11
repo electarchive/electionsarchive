@@ -13516,6 +13516,24 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             print("retiring empty body", value)
             cs.add("entity_retirement", entity_id=body, reason="No contest on this ballot remains on this body")
             counts["empty bodies"] = counts.get("empty bodies", 0) + 1
+        if DAY <= datetime.now(UTC).date():
+            added = {row["id"] for row in cs.rows.get("election", [])}
+            for id, polity_id, parent_id, kind, date_from, date_to in conn.execute(
+                """select e.id, e.polity_id, e.parent_id, e.kind, e.date_from, e.date_to
+                   from election e join changeset c on c.id = e.changeset_id
+                   where e.id = any(%s::uuid[]) and c.pipeline = %s and e.status = 'scheduled'""",
+                [[str(id) for id in election_feeds if id not in added], SOURCE],
+            ).fetchall():
+                cs.add(
+                    "election",
+                    id=id,
+                    polity_id=polity_id,
+                    parent_id=parent_id,
+                    kind=kind,
+                    date_from=date_from,
+                    date_to=date_to,
+                    status="held",
+                )
         for row in cs.rows.get("election", []):
             if election_feeds.get(row["id"], {None}) <= CANCELLATION_FEEDS:
                 row["status"] = "canceled"
