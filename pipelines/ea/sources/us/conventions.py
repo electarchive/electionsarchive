@@ -514,6 +514,18 @@ TABLES += [
     }
     for n, leaves_ in {1: (13,), 2: (14,), 3: (14,), 4: (15,)}.items()
 ]
+TABLES += [
+    {
+        "table": "1908:democratic",
+        "gbooks": "BZ1PAAAAYAAJ",
+        "mf": "MF-609",
+        "pdf_page": {246: 263, 247: 264},
+        "leaves": (246, 247),
+        "ballot": 1,
+        "transcribed": "conventions_denver_1908.tsv",
+        "short": True,
+    }
+]
 NILES = "sim_niles-national-register_{}"
 TABLES += [
     {
@@ -628,6 +640,11 @@ DNC_2024_CAVEAT = (
     "Abroad is stored as an unlocated delegation, apart from the states and territories. The convention's "
     "ceremonial roll call on August 6, 2024, in Chicago did not change the result."
 )
+DENVER_1908 = (
+    "The roll call is the printed tally of the first ballot. Pennsylvania's 68 votes were polled: 49½ for Bryan, 9½ "
+    "for Gray, and 3 for Johnson, with 6 not cast; Vermont's 8 included one not voting. The printed totals are "
+    "888½ for William Jennings Bryan, 46 for John A. Johnson, and 59½ for George Gray, of 1,002 delegates, 8 not voting."
+)
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 NEWS_LICENSE = "All rights reserved: a news article cited for one fact, not redistributed"
 BALTIMORE_1848 = (
@@ -646,6 +663,7 @@ FOURTH_1848 = (
 )
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1848:democratic:b{n}" for n in range(1, 5)}, "title": "The Proceedings of the Democratic National Convention, Held at Baltimore, May 22, 1848", "publisher": "Democratic National Convention", "city": "Baltimore", "days": (date(1848, 5, 22), date(1848, 5, 25)), "ballots": dict.fromkeys(range(1, 5), date(1848, 5, 25)), "deciding": 4, "required": {1: 168, 2: 168, 3: 170, 4: 170}, "caveat": {1: BALTIMORE_1848, 2: BALTIMORE_1848, 3: BALTIMORE_1848, 4: BALTIMORE_1848 + FOURTH_1848}},
+    {"party": "democratic", "tables": {1: "1908:democratic"}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Denver, Colorado, July 7, 8, 9 and 10, 1908", "publisher": "Western Newspaper Union", "city": "Denver", "days": (date(1908, 7, 7), date(1908, 7, 10)), "ballots": {1: date(1908, 7, 10)}, "deciding": 1, "caveat": DENVER_1908},
     {"party": "democratic", "tables": {1: "1835:democratic"}, "title": "Niles' Weekly Register, May 30, 1835: Presidential Convention", "publisher": "Niles' Weekly Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1835, 5, 20), date(1835, 5, 22)), "ballots": {1: date(1835, 5, 22)}, "deciding": 1, "caveat": NILES_1835},
     {"party": "democratic", "tables": {n: f"1844:democratic:b{n}" for n in range(1, 10)}, "title": "Niles' National Register, June 1, 1844: Democratic National Convention", "publisher": "Niles' National Register", "kind": "news_agency", "city": "Baltimore", "days": (date(1844, 5, 27), date(1844, 5, 30)), "ballots": dict.fromkeys(range(1, 8), date(1844, 5, 28)) | dict.fromkeys(range(8, 10), date(1844, 5, 29)), "deciding": 9, "caveat": NILES_1844},
     {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
@@ -972,6 +990,8 @@ CANDIDATES = {
     "1904:Parker": ("Alton B. Parker", "Q443866"),
     "1904:Hearst": ("William Randolph Hearst", "Q294931"),
     "1904:Gray": ("George Gray", "Q249041"),
+    "1908:democratic:Gray": ("George Gray", "Q249041"),
+    "1908:democratic:Johnson": ("John A. Johnson", None),
     "1904:Miles": ("Nelson A. Miles", "Q549005"),
     "1904:Cockrell": ("Francis M. Cockrell", "Q1259413"),
     "1904:Olney": ("Richard Olney", None),
@@ -2181,7 +2201,7 @@ def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
         except LookupError:
             if not fetch:
                 raise
-        return render_page(url, spec["pdf_page"][leaf])
+        return render_page(url, spec["pdf_page"][leaf], spec.get("mf", "MF-607"))
     if "htid" not in spec:
         url = LEAF.format(item=spec["item"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
@@ -2193,11 +2213,11 @@ def scan(spec: dict[str, Any], leaf: int, fetch: bool = False) -> raw.Artifact:
     return render(spec, leaf)
 
 
-def render_page(url: str, page_number: int) -> raw.Artifact:
+def render_page(url: str, page_number: int, folder_name: str) -> raw.Artifact:
     import subprocess
     import tempfile
 
-    (pdf,) = (DATA / "inbox" / "manual").glob("MF-607/*.pdf")
+    (pdf,) = (DATA / "inbox" / "manual").glob(f"{folder_name}/*.pdf")
     with tempfile.TemporaryDirectory() as folder:
         out = Path(folder) / "page"
         subprocess.run(
