@@ -9640,14 +9640,17 @@ export const contests = {
                        join election e on e.id = c.election_id
                        cross join lateral (
                          select coalesce(t.party, (
-                           select coalesce(pm.into_id, o.party_id)
-                           from candidacy cy
-                           join contest_option o on o.id = cy.option_id and o.party_id is not null
-                           left join entity_merge pm on pm.entity_id = o.party_id
-                           join contest oc on oc.id = o.contest_id
-                           join election oe on oe.id = oc.election_id
-                           where cy.person_id = any(array(select t.person union all select entity_id from entity_merge where into_id = t.person))
-                           order by abs(oe.date_from - e.date_from) limit 1
+                           select y.party from (
+                             select coalesce(pm.into_id, o.party_id) as party, o.contest_id
+                             from candidacy cy
+                             join contest_option o on o.id = cy.option_id and o.party_id is not null
+                             left join entity_merge pm on pm.entity_id = o.party_id
+                             where cy.person_id = any(array(select t.person union all select entity_id from entity_merge where into_id = t.person))
+                           ) y
+                           order by case when min(y.party::text) over () <> max(y.party::text) over () then (
+                             select abs(oe.date_from - e.date_from) from contest oc join election oe on oe.id = oc.election_id where oc.id = y.contest_id
+                           ) end
+                           limit 1
                          )) as party
                          offset 0
                        ) x
