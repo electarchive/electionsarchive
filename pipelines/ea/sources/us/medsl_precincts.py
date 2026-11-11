@@ -21,7 +21,34 @@ METHOD = (
     "the others are placed within their county."
 )
 
-RESTAGED = ["OH", "MI"]
+RESTAGED = [
+    "AL",
+    "AZ",
+    "FL",
+    "GA",
+    "ID",
+    "IL",
+    "IN",
+    "KS",
+    "LA",
+    "MI",
+    "MO",
+    "MS",
+    "NC",
+    "NE",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OR",
+    "PA",
+    "SC",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+]
 
 
 def fetch() -> None:
@@ -87,9 +114,9 @@ def parse() -> None:
         )
     )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame.filter(pl.col("kind") == "precinct").group_by("code").agg(
-        pl.col("state").first(), pl.col("county").first(), pl.col("day").min()
-    ).sort("code").write_parquet(PARSED / "units.parquet")
+    frame.filter(pl.col("kind") == "precinct").group_by("code", "day").agg(
+        pl.col("state").first(), pl.col("county").first()
+    ).sort("code", "day").write_parquet(PARSED / "units.parquet")
     returns = frame.group_by(
         "year",
         "chamber",
