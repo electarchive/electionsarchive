@@ -1,0 +1,22 @@
+{
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-NC",
+  "publisher": "North Carolina State Board of Elections",
+  "title": "State of North Carolina, Certification of Votes Cast for Members of Congress in the General Election, November 2, 1982",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0191/micro_IA40706913_0191.pdf",
+    "item": "https://archive.org/details/micro_IA40706913_0191"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "house": "Representative in Congress, one table per congressional district, county rows; a county split between districts is marked (Part)"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-NC",
+  "publisher": "North Carolina State Board of Elections",
+  "title": "State of North Carolina, Abstract of Votes Cast in the General Election Held November 8, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0327/micro_IA40706932_0327.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0327"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President)",
+    "house": "Representative in Congress, one table per congressional district, county rows; a county split between districts is marked (Part)",
+    "governor": "Governor; Lieutenant Governor columns printed beside it are office other"
+  },
+  "leaves": [
+    5,
+    6,
+    7,
+    8,
+    19,
+    20
+  ]
+}

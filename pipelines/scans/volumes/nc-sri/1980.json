@@ -1,0 +1,30 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-NC",
+  "publisher": "North Carolina State Board of Elections",
+  "title": "State of North Carolina, Certification of Votes Cast in the General Election Conducted on November 4, 1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706906_0089/micro_IA40706906_0089.pdf",
+    "item": "https://archive.org/details/micro_IA40706906_0089"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President)",
+    "senate": "U.S. Senator",
+    "house": "Representative in Congress, one table per congressional district, county rows; a county split between districts is marked (Part)",
+    "governor": "Governor; Lieutenant Governor columns printed beside it are office other"
+  },
+  "leaves": [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ]
+}

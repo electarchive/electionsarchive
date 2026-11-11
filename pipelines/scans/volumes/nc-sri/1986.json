@@ -1,0 +1,25 @@
+{
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-NC",
+  "publisher": "North Carolina State Board of Elections",
+  "title": "State of North Carolina, Abstract of Votes Cast in the General Election Held November 4, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706926_0020/micro_IA40706926_0020.pdf",
+    "item": "https://archive.org/details/micro_IA40706926_0020"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "senate": "U.S. Senator for the regular six-year term",
+    "house": "Representative in Congress, one table per congressional district, county rows; a county split between districts is marked (Part); the Sixth District table on the House pages prints no votes (certification deferred pending a hearing) and is office other, while the separate certification page that follows prints its votes"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ]
+}
