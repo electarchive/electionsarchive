@@ -17,7 +17,7 @@ import polars as pl
 from ea import raw, readiness, statewide_table
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.names import initials
-from ea.sources.us import oh_general_2026
+from ea.sources.us import contingent, oh_general_2026
 from ea.sources.us.oe_primaries_2026 import FIPS
 from ea.store import DATA, connect
 
@@ -2088,6 +2088,7 @@ def emit() -> Path:
         cs.add("slug", path=f"us/{DAY}-general", entity_id=national)
 
         systems = {key: cs.key("us.electoral_system", key) for key in SYSTEM_OVERRIDES.values()}
+        majority = contingent.systems(cs, name)
         elections: dict[str, UUID] = {}
 
         templates = conn.execute(
@@ -2748,6 +2749,8 @@ def emit() -> Path:
                 if state == "AK" or (state in SYSTEM_OVERRIDES and chamber in ("house", "senate"))
                 else cs.key("us.electoral_system", "block")
                 if chamber != "legislative" and (magnitude or 1) > 1
+                else majority(rule)
+                if chamber == "governor" and (rule := contingent.governor(state, DAY.year)) is not None
                 else system,
                 default_result_kind="tacit"
                 if key.split(":", 2)[2] in TACIT.get(state, {}) or key in uncontested
