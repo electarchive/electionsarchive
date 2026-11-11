@@ -811,8 +811,10 @@ const Places = v.nullable(
   }),
 );
 
-const Crowned = v.object({
-  ...v.unwrap(Places).entries,
+const { legend: fullLegend, ...leanEntries } = v.unwrap(Places).entries;
+
+const Lean = v.object({
+  ...leanEntries,
   rows: v.array(
     v.object({
       ...PlaceRow.pipe[0].entries,
@@ -821,6 +823,8 @@ const Crowned = v.object({
     }),
   ),
 });
+
+const Crowned = v.object({ ...Lean.entries, legend: fullLegend });
 
 const Parted = v.object({
   isOnly: v.boolean(),
@@ -19032,13 +19036,25 @@ export const elections = {
         noun: v.nullable(v.string()),
         before: v.nullable(v.object({ path: v.string(), date: v.string() })),
         groups: v.array(
+          v.object({ k: v.nullable(v.number()), name: v.string() }),
+        ),
+        entries: v.array(
           v.object({
-            id: v.string(),
-            k: v.nullable(v.number()),
-            name: v.string(),
+            party: v.optional(v.string()),
+            short: v.optional(v.string()),
+            color: v.optional(v.string()),
           }),
         ),
-        maps: v.array(v.object({ places: Crowned, map: Sketch })),
+        legend: v.array(
+          v.object({
+            label: v.string(),
+            short: v.optional(v.string()),
+            color: v.optional(v.string()),
+            person: v.optional(v.string()),
+            party: v.optional(v.string()),
+          }),
+        ),
+        maps: v.array(v.object({ places: Lean, map: Sketch })),
         parties: v.array(
           v.object({
             key: v.string(),
@@ -19070,17 +19086,15 @@ export const elections = {
           v.object({
             path: v.string(),
             at: v.nullable(v.number()),
-            group: v.nullable(v.string()),
+            group: v.nullable(v.number()),
             tier: v.picklist(TIERS),
-            person: v.nullable(v.string()),
-            party: v.nullable(v.string()),
+            person: v.optional(v.string()),
+            entry: v.number(),
             label: v.nullable(v.string()),
-            short: v.nullable(v.string()),
-            color: v.nullable(v.string()),
             isLed: v.boolean(),
             share: v.nullable(v.number()),
             margin: v.nullable(v.number()),
-            prior: v.nullable(v.string()),
+            prior: v.optional(v.number()),
           }),
         ),
       }),
@@ -19263,6 +19277,8 @@ export const elections = {
         noun: null,
         before: null,
         groups: [],
+        entries: [],
+        legend: [],
         maps: [],
         parties: [],
         tiers: [],
@@ -19723,7 +19739,6 @@ export const elections = {
                             },
                           ],
                           level: first.scheme,
-                          legend,
                           sources: [],
                           rows: level.flatMap(({ row, at }) => {
                             const place = area.get(at);
@@ -19788,6 +19803,27 @@ export const elections = {
                     ];
               }),
             );
+      const ordered = groups
+        .map((id) => ({
+          id,
+          k: area.get(id)?.k ?? null,
+          name: labels.full.get(id) ?? "",
+        }))
+        .toSorted((a, b) => a.name.localeCompare(b.name, "tr"));
+      const index = new Map(ordered.map((entry, at) => [entry.id, at]));
+      const pool: Array<{ party?: string; short?: string; color?: string }> =
+        [];
+      const slots = new Map<string, number>();
+      const slot = (party?: string, short?: string, color?: string) => {
+        const id = `${party}|${short}|${color}`;
+        const found = slots.get(id);
+        if (found != null) {
+          return found;
+        }
+        pool.push({ party, short, color });
+        slots.set(id, pool.length - 1);
+        return pool.length - 1;
+      };
       const counts = (crowned: typeof rows) => {
         const found = new Map<string, Array<number>>();
         for (const row of crowned) {
@@ -19878,10 +19914,44 @@ export const elections = {
             (b.share ?? 0) - (a.share ?? 0) ||
             all(b.won) - all(a.won),
         );
+      const listed = rows.map((row) => {
+        const old = then.get(row.place);
+        const { share, margin } = split(row.tally, key(row));
+        return {
+          path: row.path,
+          at: area.get(row.shaped ?? "")?.k ?? null,
+          group: row.group == null ? null : (index.get(row.group) ?? null),
+          tier: row.tier,
+          person: row.party == null ? (row.person ?? undefined) : undefined,
+          entry: slot(
+            row.party ?? undefined,
+            labels.short.get(row.party ?? "") ??
+              labels.full.get(row.party ?? "") ??
+              undefined,
+            row.color ?? undefined,
+          ),
+          label:
+            labels.full.get(row.person ?? "") ??
+            labels.full.get(row.party ?? "") ??
+            row.label,
+          isLed: row.led === true,
+          share: share == null ? null : Math.round(share * 1e5) / 1e5,
+          margin: margin == null ? null : Math.round(margin * 1e5) / 1e5,
+          prior: old?.label == null ? undefined : slot(old.party ?? undefined),
+        };
+      });
       return {
         noun: nouns.rows[0]?.noun ?? null,
         before:
           before == null ? null : { path: before.path, date: before.date },
+        entries: pool,
+        legend: legend.map((item) => ({
+          label: item.label,
+          short: item.short ?? undefined,
+          color: item.color ?? undefined,
+          person: item.person ?? undefined,
+          party: item.party ?? undefined,
+        })),
         maps: maps.flat(),
         parties,
         tiers: (isLayered ? TIERS : [])
@@ -19899,38 +19969,8 @@ export const elections = {
                 councils: measure.councils,
                 valid: measure.valid,
               },
-        groups: groups
-          .map((id) => ({
-            id,
-            k: area.get(id)?.k ?? null,
-            name: labels.full.get(id) ?? "",
-          }))
-          .toSorted((a, b) => a.name.localeCompare(b.name, "tr")),
-        rows: rows.map((row) => {
-          const old = then.get(row.place);
-          const { share, margin } = split(row.tally, key(row));
-          return {
-            path: row.path,
-            at: area.get(row.shaped ?? "")?.k ?? null,
-            group: row.group,
-            tier: row.tier,
-            person: row.person,
-            party: row.party,
-            label:
-              labels.full.get(row.person ?? "") ??
-              labels.full.get(row.party ?? "") ??
-              row.label,
-            short:
-              labels.short.get(row.party ?? "") ??
-              labels.full.get(row.party ?? "") ??
-              null,
-            color: row.color,
-            isLed: row.led === true,
-            share,
-            margin,
-            prior: old?.label == null ? null : key(old),
-          };
-        }),
+        groups: ordered.map(({ k, name }) => ({ k, name })),
+        rows: listed,
       };
     }),
   local: os

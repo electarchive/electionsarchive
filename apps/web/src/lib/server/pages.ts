@@ -6,6 +6,7 @@ import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
 import { compactPlaces } from "#lib/compare.js";
 import { headline } from "#lib/coverage.js";
+import { withLegend } from "#lib/crowned.js";
 import { dated } from "#lib/live/format.js";
 import { estimateAt } from "#lib/live/history.js";
 import { isContested, toward } from "#lib/live/standing.js";
@@ -1441,7 +1442,7 @@ export async function archive(path: string, search: URLSearchParams) {
             found.maps.length === 0
               ? null
               : {
-                  maps: found.maps,
+                  maps: withLegend(found),
                   since: found.before?.date.slice(0, 4) ?? null,
                 },
           ),

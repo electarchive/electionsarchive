@@ -31,6 +31,7 @@ import {
   TIER_LABELS,
   US_COLUMNS,
 } from "#lib/coverage.js";
+import { withEntries } from "#lib/crowned.js";
 import {
   capitalize,
   count,
@@ -873,7 +874,7 @@ function markdown(
         ]),
       );
       const regions = new Map(
-        (winners?.groups ?? []).map((group) => [group.id, group.name]),
+        (winners?.groups ?? []).map((group, at) => [at, group.name]),
       );
       const noun = winners?.noun ?? "";
       return [
@@ -914,10 +915,10 @@ function markdown(
               ].join(" "),
               table(
                 [capitalize(noun), m.col_name(), m.col_option(), m.col_party()],
-                winners.rows
+                withEntries(winners)
                   .map((row) => ({
                     ...row,
-                    region: regions.get(row.group ?? "") ?? "",
+                    region: regions.get(row.group ?? -1) ?? "",
                     place: named.get(row.path) ?? row.path,
                   }))
                   .toSorted(
@@ -933,7 +934,7 @@ function markdown(
                       : row.isLed
                         ? `${row.label} (${m.winners_led()})`
                         : row.label,
-                    row.short,
+                    row.short ?? "",
                   ]),
               ),
             ]),

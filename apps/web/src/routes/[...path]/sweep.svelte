@@ -2,6 +2,7 @@
   import type { ComponentProps } from "svelte";
   import { createQuery } from "@tanstack/svelte-query";
   import Name from "#lib/components/name.svelte";
+  import { withEntries, withLegend } from "#lib/crowned.js";
   import { capitalize, count, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -118,16 +119,16 @@
   });
 
   const regions = $derived(
-    new Map((data?.groups ?? []).map((group) => [group.id, group.name])),
+    new Map((data?.groups ?? []).map((group, at) => [at, group.name])),
   );
-  const seated = (row: { party: string | null; label: string | null }) =>
+  const seated = (row: { party?: string; label: string | null }) =>
     row.label == null
       ? "none"
       : row.party == null
         ? "independent"
         : `party:${row.party}`;
   const provinces = $derived(
-    (data?.rows ?? [])
+    withEntries(data)
       .filter((row) => row.tier === "metro" || row.tier === "seat")
       .map((row) => {
         const key = seated(row);
@@ -141,7 +142,7 @@
           ...row,
           key,
           before: prior,
-          name: regions.get(row.group ?? "") ?? row.path,
+          name: regions.get(row.group ?? -1) ?? row.path,
           tone: byKey.get(key)?.tone ?? swatch(row.color, key),
           isMetro: row.tier === "metro",
         };
@@ -474,7 +475,7 @@
       {/if}
     </div>
 
-    <Crowns maps={data?.maps ?? []} {hexes} {since} {year} bind:focus />
+    <Crowns maps={withLegend(data)} {hexes} {since} {year} bind:focus />
 
     {#if since != null}
       <div class="grid gap-2">

@@ -4,7 +4,7 @@
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
-  import { crowned } from "#lib/crowned.js";
+  import { crowned, withEntries, withLegend } from "#lib/crowned.js";
   import { capitalize, count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -52,7 +52,8 @@
   const places = $derived(
     new Map((named ?? []).map((part) => [part.path, part.place ?? part.name])),
   );
-  const maps = $derived(winners.data?.maps ?? []);
+  const maps = $derived(withLegend(winners.data));
+  const listed = $derived(withEntries(winners.data));
   const shape = $derived(
     maps.find((entry) => entry.places.level === level) ?? maps[0],
   );
@@ -63,7 +64,7 @@
       : (shape.places.levels[0]?.noun ?? winners.data?.noun ?? ""),
   );
   const provinces = $derived(
-    new Map((winners.data?.groups ?? []).map((group) => [group.id, group])),
+    new Map((winners.data?.groups ?? []).map((group, at) => [at, group])),
   );
   const finer = $derived(
     shape == null || shape === maps[0]
@@ -72,17 +73,15 @@
   );
   const groups = $derived(
     Map.groupBy(
-      (named == null ? [] : (winners.data?.rows ?? [])).filter(
-        (row) => row.group != null,
-      ),
+      (named == null ? [] : listed).filter((row) => row.group != null),
       (row) =>
         finer != null && row.at != null && finer.has(row.at)
           ? `k:${row.at}`
-          : (row.group ?? ""),
+          : `g:${row.group}`,
     )
       .entries()
       .map(([key, members]) => {
-        const province = provinces.get(members[0]?.group ?? "");
+        const province = provinces.get(members[0]?.group ?? -1);
         const at = key.startsWith("k:") ? Number(key.slice(2)) : null;
         const rows = members
           .map((row) => ({
@@ -130,9 +129,7 @@
           a.name.localeCompare(b.name, "tr"),
       ),
   );
-  const led = $derived(
-    (winners.data?.rows ?? []).filter((row) => row.isLed).length,
-  );
+  const led = $derived(listed.filter((row) => row.isLed).length);
   const shown = $derived.by(() => {
     const needle = query.trim().toLocaleLowerCase("tr");
     return needle === ""
@@ -160,10 +157,7 @@
           {m.winners_title({ noun })}
         </h2>
         <p class="text-[0.8125rem] text-pretty text-muted-foreground">
-          {m.winners_lede({
-            count: count(winners.data?.rows.length ?? 0),
-            noun,
-          })}
+          {m.winners_lede({ count: count(listed.length), noun })}
           {#if led > 0}
             {m.winners_led_note({ count: count(led) })}
           {/if}
