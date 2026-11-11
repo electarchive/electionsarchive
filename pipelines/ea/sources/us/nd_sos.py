@@ -22,6 +22,9 @@ HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-r
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
+    1904: "1904-pres-congress-gov",
+    1910: "1910-general",
+    1912: "1912-11-05-general",
     1918: "1918-11-05-general",
     1920: "1920-11-02-general",
     1922: "1922-11-07-general",
@@ -56,6 +59,9 @@ FILES = {
     1990: "1990-11-06-general",
 }
 DAYS = {
+    1904: date(1904, 11, 8),
+    1910: date(1910, 11, 8),
+    1912: date(1912, 11, 5),
     1918: date(1918, 11, 5),
     1920: date(1920, 11, 2),
     1922: date(1922, 11, 7),
@@ -804,6 +810,119 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
         },
     ),
 }
+PAGES: dict[int, dict[int, dict[int, tuple[str, str, str | None]]]] = {
+    1904: {
+        2: {
+            4: ("governor", "Elmore Y. Sarles", "REP"),
+            5: ("governor", "M. F. Hegge", "DEM"),
+            6: ("governor", "Arthur Basset", None),
+            7: ("governor", "Hans H. Aaker", None),
+        },
+    },
+    1910: {
+        2: {
+            0: ("governor", "C. A. Johnson", "REP"),
+            1: ("governor", "John Burke", "DEM"),
+            2: ("governor", "I. S. Lampman", None),
+            3: ("lieutenant-governor", "U. L. Burdick", "REP"),
+            4: ("lieutenant-governor", "W. L. Richards", "DEM"),
+            5: ("lieutenant-governor", "J. E. Kulstad", None),
+        },
+        3: {
+            0: ("secretary-of-state", "P. D. Norton", "REP"),
+            1: ("secretary-of-state", "W. F. Robertson", "DEM"),
+            2: ("secretary-of-state", "G. A. Esval", None),
+            3: ("auditor", "D. K. Brightbill", "REP"),
+            4: ("auditor", "Peter G. Rooks", "DEM"),
+            5: ("auditor", "Jos. Scholleart", None),
+        },
+        4: {
+            0: ("treasurer", "Gunder Olson", "REP"),
+            1: ("treasurer", "H. L. Halvorson", "DEM"),
+            2: ("treasurer", "M. C. Wartenbe", None),
+            3: ("superintendent-of-public-instruction", "Edwin J. Taylor", "REP"),
+            4: ("superintendent-of-public-instruction", "Mrs. E. C. Paine", None),
+            5: ("attorney-general", "Andrew Miller", "REP"),
+            6: ("attorney-general", "S. L. Nuchols", "DEM"),
+            7: ("attorney-general", "Arthur LeSueur", None),
+        },
+        5: {
+            0: ("insurance-commissioner", "Walter C. Taylor", "REP"),
+            1: ("insurance-commissioner", "C. S. Whittlesey", "DEM"),
+            2: ("insurance-commissioner", "C. W. Maude", None),
+            3: ("commissioner-of-agriculture", "W. C. Gilbreath", "REP"),
+            4: ("commissioner-of-agriculture", "Alex Morrison", "DEM"),
+            5: ("commissioner-of-agriculture", "E. A. Meyer", None),
+        },
+        6: {
+            0: ("railroad-commissioner", "O. P. N. Anderson", "REP"),
+            1: ("railroad-commissioner", "W. H. Mann", "REP"),
+            2: ("railroad-commissioner", "W. H. Stutsman", "REP"),
+            3: ("railroad-commissioner", "J. I. Hanson", None),
+            4: ("railroad-commissioner", "Geo. L. Mateer", "DEM"),
+            5: ("railroad-commissioner", "F. L. Walker", None),
+            6: ("railroad-commissioner", "S. A. Johnson", None),
+            7: ("railroad-commissioner", "William Tarns", None),
+            8: ("railroad-commissioner", "H. N. Fisher", None),
+        },
+    },
+    1912: {
+        7: {
+            0: ("governor", "L. B. Hanna", "REP"),
+            1: ("governor", "F. O. Hellstrom", "DEM"),
+            2: ("governor", "A. E. Bowen Jr.", None),
+            3: ("governor", "W. D. Sweet", None),
+            4: ("lieutenant-governor", "A. T. Kraabel", "REP"),
+            5: ("lieutenant-governor", "F. L. Brandt", "DEM"),
+            6: ("lieutenant-governor", "A. G. Brastrup", None),
+        },
+        8: {
+            0: ("secretary-of-state", "Thos. Hall", "REP"),
+            1: ("secretary-of-state", "C. A. Berg", None),
+            2: ("auditor", "C. O. Jorgenson", "REP"),
+            3: ("auditor", "Frank Shanley", "DEM"),
+            4: ("auditor", "Howard Elliott", None),
+            5: ("treasurer", "Gunder Olson", "REP"),
+            6: ("treasurer", "Frank Lish", "DEM"),
+            7: ("treasurer", "Arthur Bassett", None),
+        },
+        9: {
+            0: ("attorney-general", "Andrew Miller", "REP"),
+            1: ("attorney-general", "John F. Sullivan", "DEM"),
+            2: ("attorney-general", "R. Goer", None),
+            3: ("superintendent-of-public-instruction", "E. J. Taylor", "REP"),
+            4: ("superintendent-of-public-instruction", "Marie Baxter", None),
+        },
+        10: {
+            0: ("insurance-commissioner", "W. C. Taylor", "REP"),
+            1: ("insurance-commissioner", "C. S. Whittlessy", "DEM"),
+            2: ("insurance-commissioner", "J. E. Kulstad", None),
+            3: ("commissioner-of-agriculture", "W. C. Gilbreath", "REP"),
+            4: ("commissioner-of-agriculture", "Alex. Morrison", "DEM"),
+            5: ("commissioner-of-agriculture", "H. B. Thompson", None),
+            6: ("commissioner-of-agriculture", "M. Jacobsan", None),
+        },
+        11: {
+            0: ("railroad-commissioner", "O. P. N. Anderson", "REP"),
+            1: ("railroad-commissioner", "W. H. Mann", "REP"),
+            2: ("railroad-commissioner", "W. H. Stutsman", "REP"),
+            3: ("railroad-commissioner", "Chas. D. Perry", "DEM"),
+            4: ("railroad-commissioner", "Jas. W. McHose", "DEM"),
+            5: ("railroad-commissioner", "W. J. Bailey", "DEM"),
+            6: ("railroad-commissioner", "Z. R. Davidson", None),
+            7: ("railroad-commissioner", "E. A. Meyer", None),
+            8: ("railroad-commissioner", "Olaf O. Bjorke", None),
+        },
+    },
+}
+WIDTHS = {(1904, 2): 8}
+DIGITS = r"(?=.*\d)[\dlI][\d,.lI]*['`]?"
+ABSTRACT_READS = {
+    (1910, "cavalier", "U. L. Burdick"): 1819,
+    (1910, "walsh", "Gunder Olson"): 1814,
+    (1910, "walsh", "H. L. Halvorson"): 1309,
+    (1910, "walsh", "M. C. Wartenbe"): 100,
+}
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
@@ -885,7 +1004,101 @@ TITLES = {
     "tax-commissioner": "Tax Commissioner",
     "commissioner-of-labor": "Labor Commissioner",
     "justice-of-the-supreme-court": "Justice of the Supreme Court",
+    "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+    "railroad-commissioner": "Railroad Commissioner",
 }
+
+
+def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
+    path = str(raw.cached(SOURCE, url(year)).path)
+    rows: list[dict[str, object]] = []
+    for page, columns in PAGES[year].items():
+        html = subprocess.run(
+            ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), path, "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        lines: list[list] = []
+        for a, b, c, d, text in sorted(
+            (
+                (float(a), float(b), float(c), float(d), unescape(t))
+                for a, b, c, d, t in re.findall(
+                    r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<', html
+                )
+            ),
+            key=lambda w: w[1] + w[3],
+        ):
+            middle = (b + d) / 2
+            if not lines or abs(lines[-1][0] - middle) >= 2.5:
+                lines.append([middle, []])
+            lines[-1][1].append((a, c, text))
+        cells: dict[str, list[tuple[float, str]]] = {}
+        totals: list[tuple[float, str]] = []
+        for _, words in lines:
+            words.sort()
+            key = plain("".join(text for _, _, text in words if not re.fullmatch(DIGITS, text)))
+            numbers: list[tuple[float, str]] = []
+            right = 0.0
+            for a, c, text in words:
+                if not re.fullmatch(DIGITS, text):
+                    continue
+                text = re.sub(r"[lI]", "1", text.rstrip("'`"))
+                if (
+                    numbers
+                    and a - right < 5
+                    and re.fullmatch(r"\d{1,2}", numbers[-1][1])
+                    and re.fullmatch(r",?\d{3}", text)
+                ):
+                    numbers[-1] = ((numbers[-1][0] + (a + c) / 2) / 2, numbers[-1][1] + text.lstrip(","))
+                else:
+                    numbers.append(((a + c) / 2, text))
+                right = c
+            if key.startswith("total"):
+                totals = numbers
+                break
+            for typo, fixed in TYPOS.items():
+                key = fixed + key.removeprefix(typo) if key.startswith(typo) else key
+            county = next((name for name in codes if key.startswith(name)), None)
+            if county and numbers:
+                cells[county] = numbers
+        if len(totals) != WIDTHS.get((year, page), len(columns)):
+            raise ValueError(f"{year} page {page}: {len(totals)} totals")
+        votes: dict[int, dict[str, int]] = {column: {} for column in columns}
+        for county, numbers in cells.items():
+            for x, text in numbers:
+                column = min(range(len(totals)), key=lambda i: abs(totals[i][0] - x))
+                if column not in columns:
+                    continue
+                if county in votes[column]:
+                    raise ValueError(f"{year} page {page}: two numbers for {county} in column {column}")
+                votes[column][county] = int(re.sub(r"[,.]", "", text))
+        held: set[str] = set()
+        for column, (office, candidate, _) in columns.items():
+            for (when, county, name), amount in ABSTRACT_READS.items():
+                if when == year and name == candidate:
+                    votes[column][county] = amount
+            printed = int(re.sub(r"[,.]", "", totals[column][1]))
+            counted = sum(votes[column].values())
+            if counted != printed:
+                print(f"{year} {candidate}: counties sum to {counted}, printed total {printed}")
+                if abs(counted - printed) > max(20, printed // 100):
+                    held.add(office)
+        for column, (office, candidate, code) in columns.items():
+            if office in held:
+                continue
+            rows.extend(
+                {
+                    "day": DAYS[year],
+                    "office": office,
+                    "code": code,
+                    "candidate": candidate,
+                    "county": codes[county],
+                    "votes": amount,
+                }
+                for county, amount in votes[column].items()
+            )
+    return rows
 
 
 def url(year: int) -> str:
@@ -1131,6 +1344,8 @@ def parse() -> None:
                 }
                 for key, value in zip(keys, values, strict=True)
             )
+    for year in PAGES:
+        rows.extend(abstract(year, codes))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "lines.parquet")
 
@@ -1143,7 +1358,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="North Dakota's president, U.S. Senate, governor, and other statewide offices by county "
-            "1918–1998 from the Secretary of State's official abstracts",
+            "1904–1998 from the Secretary of State's official abstracts",
             polity="US",
         )
 
@@ -1231,7 +1446,7 @@ def emit() -> Path:
         made: set[UUID] = set()
         for (day, office), lines in frame.sort("day").group_by("day", "office", maintain_order=True):
             year = day.year
-            seats = 3 if office == "public-service-commissioner" and year < 1928 else 1
+            seats = 3 if office in ("public-service-commissioner", "railroad-commissioner") and year < 1928 else 1
             key = f"{day}:ND:{office}"
             election = elections[f"{day}:ND"]
             contest = contests.get(key)
