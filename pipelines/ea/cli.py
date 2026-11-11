@@ -81,8 +81,12 @@ def main() -> None:
         nargs="?",
         help="scheme_code prefix, or one set as scheme/vintage, such as us.precinct/2024; omit to build every set",
     )
-    commands.add_parser("basemap", help="build a polity's planar basemap from the latest Protomaps build").add_argument(
-        "scheme", choices=sorted(basemap.COUNTRIES), help="polity scheme, such as us"
+    base = commands.add_parser("basemap", help="build polities' planar basemaps from the latest Protomaps build")
+    base.add_argument("scheme", nargs="+", choices=sorted(basemap.COUNTRIES), help="polity schemes, such as us")
+    base.add_argument(
+        "--historical",
+        metavar="DATE",
+        help="build only the OpenHistoricalMap layers from the daily planet of DATE (YYMMDD, such as 261111)",
     )
     commands.add_parser("glyphs", help="build the basemap label glyphs the app serves")
     commands.add_parser(
@@ -286,7 +290,11 @@ def main() -> None:
         case "rasters":
             print(rasters.build(args.scheme))
         case "basemap":
-            print(basemap.build(args.scheme))
+            if args.historical is not None:
+                print(basemap.historical(args.scheme, args.historical))
+            else:
+                for scheme in args.scheme:
+                    print(basemap.build(scheme))
         case "glyphs":
             print(basemap.glyphs())
         case "hexes":
