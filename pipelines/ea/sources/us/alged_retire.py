@@ -8,7 +8,7 @@ from ea.sources.us import alged
 from ea.store import connect
 
 SOURCE = "us.alged_retire"
-VERSION = "1"
+VERSION = "2"
 
 
 def emit() -> Path:
@@ -50,5 +50,26 @@ def emit() -> Path:
                 entity_id=entity,
                 reason="Held only a retired ALGED placeholder contest",
             )
-        print(f"{len(contests)} contests, {len(elections)} elections")
+        hollow = [
+            election
+            for (election,) in conn.execute(
+                """select e.id from election e join entity n on n.id = e.id and n.retired_by is null
+                   join changeset h on h.id = e.changeset_id and h.pipeline = %s
+                   where not exists (select from contest c where c.election_id = e.id)
+                     and not exists (select from election k where k.parent_id = e.id)
+                     and not exists (select from result_set r where r.election_id = e.id)
+                     and not exists (select from entity_merge m where m.entity_id = e.id)
+                     and not exists (select from entity_retirement t where t.entity_id = e.id)
+                   order by 1""",
+                [alged.SOURCE],
+            ).fetchall()
+            if election not in elections
+        ]
+        for entity in hollow:
+            cs.add(
+                "entity_retirement",
+                entity_id=entity,
+                reason="Every contest of this election was withdrawn as a twin of a day-dated contest from another pipeline",
+            )
+        print(f"{len(contests)} contests, {len(elections)} elections, {len(hollow)} hollow elections")
         return cs.write()
