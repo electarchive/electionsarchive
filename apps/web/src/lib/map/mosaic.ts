@@ -259,6 +259,10 @@ export class Mosaic {
     this.#map.triggerRepaint();
   }
 
+  forget() {
+    this.#gl = null;
+  }
+
   #setup(gl: WebGL2RenderingContext) {
     if (this.#gl === gl) {
       return;

@@ -448,7 +448,7 @@
               ],
             },
           },
-          "focus",
+          "lines",
           { group: "live-layers" },
         );
       }

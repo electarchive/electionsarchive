@@ -579,6 +579,16 @@ export class Engine {
       gl.once("idle", () => {
         this.isLoaded = true;
       });
+      gl.on("webglcontextlost", () => {
+        this.gl = null;
+        this.#mosaic?.forget();
+      });
+      gl.on("webglcontextrestored", () => {
+        gl.once("style.load", () => {
+          this.gl = gl;
+          this.#revive(gl);
+        });
+      });
     });
     const bump = () =>
       requestAnimationFrame(() => {
@@ -749,6 +759,22 @@ export class Engine {
     if (this.#tinted.size > 0) {
       this.tint(this.#tinted);
     }
+  }
+
+  #revive(gl: Maplibre.Map) {
+    const lost = [...this.#layers].filter(
+      ([id, layer]) => layer.spec.type === "custom" && gl.getLayer(id) == null,
+    );
+    for (const [id] of lost) {
+      this.#layers.delete(id);
+    }
+    for (const [id, layer] of lost) {
+      const slot = this.#slots.get(id);
+      if (slot != null) {
+        this.add(layer.spec, slot, { group: layer.group, rank: layer.rank });
+      }
+    }
+    this.#restyle();
   }
 
   #hold(gl: Maplibre.Map) {
