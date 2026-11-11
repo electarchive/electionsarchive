@@ -24681,8 +24681,8 @@ export const bodies = {
           )::text as closed
         from body b
         cross join lateral (
-          select min(e.date_from) as first, max(e.date_from) as last from contest c join election e on e.id = c.election_id
-          where c.body_id = b.id and e.date_from <= current_date
+          select min(e.date_from) as first, max(e.date_from) as last from election e
+          where e.id in (select c.election_id from contest c where c.body_id = b.id) and e.date_from <= current_date
         ) s
         where b.id = ${input.id}::uuid
       `);
@@ -24701,6 +24701,8 @@ export const bodies = {
         upcoming,
         changes,
         late,
+        apportioned,
+        pairs,
       ] = await Promise.all([
         names([input.id, body.polity]),
         paths([body.polity]),
@@ -24780,8 +24782,8 @@ export const bodies = {
             from (
               select d.id, d.person_id, c.cid from (
                 select t.id, t.person_id, t.contest_id from t
-                where (select count(*) from tenure_affiliation q where q.tenure_id = t.id and q.kind = 'party') > 1
-                offset 0
+                join tenure_affiliation q on q.tenure_id = t.id and q.kind = 'party'
+                group by t.id, t.person_id, t.contest_id having count(*) > 1
               ) d
               cross join lateral (
                 select d.contest_id as cid
@@ -24930,8 +24932,8 @@ export const bodies = {
             from (
               select d.id, d.person_id, c.cid from (
                 select t.id, t.person_id, t.contest_id from t
-                where (select count(*) from tenure_affiliation q where q.tenure_id = t.id and q.kind = 'party') > 1
-                offset 0
+                join tenure_affiliation q on q.tenure_id = t.id and q.kind = 'party'
+                group by t.id, t.person_id, t.contest_id having count(*) > 1
               ) d
               cross join lateral (
                 select d.contest_id as cid
@@ -25053,6 +25055,40 @@ export const bodies = {
           where t.body_id = ${input.id}::uuid and ${voting("t")}
             and (${undated("t")} or t.id in (select v.id from (${vacated(sql`${input.id}::uuid`)}) v where v.shadow))
         `),
+        db.execute<{ start: string; seats: number; seceded: number }>(sql`
+          select s.start::text as start, sum(a.seats)::int as seats,
+            coalesce(sum(greatest(0, a.seats - (
+              select count(distinct t.seat_id) from tenure t join seat st on st.id = t.seat_id
+              where t.body_id = a.body_id and st.voting and st.apportioned_area_id = a.area_id
+                and t.from_date <= s.start and (t.to_date is null or t.to_date > s.start)
+            ))) filter (where exists (
+              select from representation_gap g where g.body_id = a.body_id and g.area_id = a.area_id and g.valid @> s.start
+            )), 0)::int as seceded
+          from (${sittings(sql`${input.id}::uuid`)}) s
+          join body_apportionment a on a.body_id = ${input.id}::uuid and a.valid @> s.start
+          group by s.start
+        `),
+        db
+          .execute<{ id: string; date: string }>(
+            sql`
+              with e as materialized (
+                select e.id, e.date_from from election e
+                where e.kind = 'general' and e.id in (select c.election_id from contest c where c.body_id = ${input.id}::uuid)
+              )
+              select c.id, e.date_from::text as date from contest c join e on e.id = c.election_id
+              where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
+                and c.party_scope_id is null and not c.notional
+                and e.date_from = (select max(m.date_from) from e m)
+            `,
+          )
+          .then(async (last) =>
+            last.rows.length === 0
+              ? null
+              : sisters(
+                  last.rows.map((row) => row.id),
+                  last.rows[0]?.date ?? "infinity",
+                ),
+          ),
       ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [
@@ -25073,52 +25109,19 @@ export const bodies = {
           ),
         ]),
       ];
-      const starts = [...new Set(makeup.rows.map((row) => row.start))];
-      const apportioned = await db.execute<{
-        start: string;
-        seats: number;
-        seceded: number;
-      }>(sql`
-        select s.start::text as start, sum(a.seats)::int as seats,
-          coalesce(sum(greatest(0, a.seats - (
-            select count(distinct t.seat_id) from tenure t join seat st on st.id = t.seat_id
-            where t.body_id = a.body_id and st.voting and st.apportioned_area_id = a.area_id
-              and t.from_date <= s.start and (t.to_date is null or t.to_date > s.start)
-          ))) filter (where exists (
-            select from representation_gap g where g.body_id = a.body_id and g.area_id = a.area_id and g.valid @> s.start
-          )), 0)::int as seceded
-        from unnest(${sql.param(starts)}::date[]) s(start)
-        join body_apportionment a on a.body_id = ${input.id}::uuid and a.valid @> s.start
-        group by s.start
-      `);
       const next = upcoming.rows[0];
       const [nextNames, nextPaths] =
         next == null
           ? [null, null]
           : await Promise.all([names([next.id]), paths([next.id])]);
       const entitled = new Map(apportioned.rows.map((row) => [row.start, row]));
-      const last = await db.execute<{ id: string; date: string }>(sql`
-        select c.id, e.date_from::text as date from contest c join election e on e.id = c.election_id
-        where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
-          and c.party_scope_id is null and e.kind = 'general' and not c.notional
-          and e.date_from = (
-            select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
-            where c2.body_id = ${input.id}::uuid and e2.kind = 'general'
-          )
-      `);
-      const [colors, positions, pairs] = await Promise.all([
+      const [colors, positions] = await Promise.all([
         refs(held),
         db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
           where party_id = any(${sql.param(held)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
-        last.rows.length === 0
-          ? null
-          : sisters(
-              last.rows.map((row) => row.id),
-              last.rows[0]?.date ?? "infinity",
-            ),
       ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
