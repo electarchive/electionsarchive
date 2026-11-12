@@ -5,6 +5,7 @@ import shutil
 import subprocess
 from multiprocessing import Pool
 from pathlib import Path
+from typing import NamedTuple
 
 import httpx
 import mapbox_vector_tile
@@ -87,7 +88,19 @@ MUTED = {
     "keep": ["earth", "bounds", "water"],
 }
 
-zones: list[tuple[list[list[float]], list[float] | None, Transformer, list[float] | None]] = []
+REACH = 0.02
+
+
+class Zone(NamedTuple):
+    within: list[list[float]]
+    project: Transformer
+    scaling: list[float] | None
+    own: BaseGeometry | None = None
+    held: PreparedGeometry | None = None
+    edge: PreparedGeometry | None = None
+
+
+zones: list[Zone] = []
 land: BaseGeometry
 inside: PreparedGeometry
 near: PreparedGeometry
@@ -96,20 +109,36 @@ near: PreparedGeometry
 def setup(scheme: str) -> None:
     global land, inside, near
     entry = REGISTRY["projections"][REGISTRY["schemes"][scheme]]
-    zones.clear()
-    for part in [*entry.get("insets", []), entry]:
-        project = Transformer.from_crs("EPSG:4326", f"EPSG:{part['srid']}", always_xy=True)
-        zones.append((part["within"], part.get("clip"), project, part.get("affine")))
     admin = raw.fetch("world.natural_earth", ADMIN, suffix=".geojson")
-    land = unary_union(
-        [
-            shape(f["geometry"])
-            for f in json.loads(admin.path.read_text())["features"]
-            if f["properties"]["ADM0_A3"] in COUNTRIES[scheme]
-        ]
-    ).buffer(0.02)
+    countries = [
+        (f["properties"]["ADM0_A3"] in COUNTRIES[scheme], shape(f["geometry"]))
+        for f in json.loads(admin.path.read_text())["features"]
+    ]
+    home = unary_union([geom for mine, geom in countries if mine])
+    land = home.buffer(REACH)
     inside = prep(land)
-    near = prep(unary_union([box(*b) for zone in zones for b in zone[0]] + surround(framed=True)))
+    zones.clear()
+    taken: list[BaseGeometry] = []
+    for part in entry.get("insets", []):
+        area = unary_union([box(*b) for b in part["within"]])
+        region = area.difference(unary_union(taken))
+        taken.append(area)
+        if "clip" in part:
+            region = region.intersection(box(*part["clip"]))
+        around = region.buffer(4 * REACH)
+        foreign = unary_union(
+            [geom.intersection(around) for mine, geom in countries if not mine and geom.intersects(around)]
+        )
+        halo = foreign.buffer(REACH)
+        claim = home.intersection(around).buffer(REACH / 2).difference(foreign)
+        own = region.difference(halo.difference(claim))
+        zones.append(Zone(part["within"], projector(part["srid"]), part["affine"], own, prep(own), prep(halo)))
+    zones.append(Zone(entry["within"], projector(entry["srid"]), None))
+    near = prep(unary_union([box(*b) for zone in zones for b in zone.within] + surround(framed=True)))
+
+
+def projector(srid: int) -> Transformer:
+    return Transformer.from_crs("EPSG:4326", f"EPSG:{srid}", always_xy=True)
 
 
 def tiles(z: int, w: float, s: float, e: float, n: float) -> list[tuple[int, int, int]]:
@@ -128,7 +157,7 @@ def cell(z: int, x: int, y: int) -> BaseGeometry:
 
 
 def surround(framed: bool) -> list[BaseGeometry]:
-    within, _, project, _ = zones[-1]
+    within, project = zones[-1].within, zones[-1].project
     back = Transformer.from_crs(project.target_crs, "EPSG:4326", always_xy=True)
     bounds = [project.transform_bounds(*b, densify_pts=64) for b in within]
     x0, y0 = min(b[0] for b in bounds), min(b[1] for b in bounds)
@@ -163,16 +192,16 @@ def emit(
     props: dict,
     zooms: tuple[int, int],
     outside: bool = False,
-) -> str | None:
+) -> list[str]:
     span, extent = 2**z, 4096
     raw_shape = geometry if isinstance(geometry, BaseGeometry) else shape(geometry)
     if raw_shape.geom_type == "Point":
         if not (0 <= raw_shape.x < extent and 0 <= raw_shape.y < extent):
-            return None
+            return []
     else:
         raw_shape = clip_by_rect(raw_shape if raw_shape.is_valid else make_valid(raw_shape), 0, 0, extent, extent)
         if raw_shape.is_empty or raw_shape.geom_type == "GeometryCollection":
-            return None
+            return []
     geom = affinity.affine_transform(
         raw_shape, [360 / extent / span, 0, 0, 1 / extent / span, 360 * x / span - 180, y / span]
     )
@@ -188,38 +217,50 @@ def emit(
     return settle(geom, layer, props, zooms, outside)
 
 
-def settle(geom: BaseGeometry, layer: str, props: dict, zooms: tuple[int, int], outside: bool = False) -> str | None:
+def settle(geom: BaseGeometry, layer: str, props: dict, zooms: tuple[int, int], outside: bool = False) -> list[str]:
+    english = props.get("en")
+    if outside:
+        props = {key: value for key, value in props.items() if key != "en"}
+    rows = []
+    for index, zone in enumerate(zones[:-1]):
+        if zone.held is None or zone.own is None or not zone.held.intersects(geom):
+            continue
+        part = geom if zone.held.contains(geom) else alike(make_valid(geom).intersection(zone.own), geom)
+        if layer == "bounds" and zone.edge is not None:
+            part = unary_union([line for line in getattr(part, "geoms", [part]) if not zone.edge.contains(line)])
+        if not part.is_empty:
+            rows.append(draw(part, layer, props | {"inset": index + 1}, zooms, zone))
     w, s, e, n = geom.bounds
     cx, cy = (w + e) / 2, (s + n) / 2
     zone = next(
-        (zone for zone in zones if any(bw <= cx <= be and bs <= cy <= bn for bw, bs, be, bn in zone[0])),
+        (zone for zone in zones if any(bw <= cx <= be and bs <= cy <= bn for bw, bs, be, bn in zone.within)),
         None,
     )
-    if zone is None:
-        if not outside:
-            return None
-        zone = zones[-1]
-    _, clip, project, scaling = zone
-    if clip is not None:
-        geom = clip_by_rect(geom, *clip)
+    if zone is not zones[-1] and (zone is not None or not outside):
+        return rows
     if outside:
-        english = props.get("en")
-        props = {key: value for key, value in props.items() if key != "en"}
         if "name" in props and not inside.contains(geom):
             props |= {"out": 1, "name": english or props["name"]}
     elif not inside.contains(geom):
         if not inside.intersects(geom):
-            return None
-        geom = make_valid(geom).intersection(land)
-    if geom.is_empty or geom.geom_type == "GeometryCollection":
-        return None
-    if zone is not zones[-1]:
-        props = props | {"inset": 1}
+            return rows
+        geom = alike(make_valid(geom).intersection(land), geom)
+    if not geom.is_empty:
+        rows.append(draw(geom, layer, props, zooms, zones[-1]))
+    return rows
 
+
+def alike(piece: BaseGeometry, like: BaseGeometry) -> BaseGeometry:
+    if piece.geom_type != "GeometryCollection":
+        return piece
+    return unary_union([part for part in piece.geoms if get_dimensions(part) == get_dimensions(like)])
+
+
+def draw(geom: BaseGeometry, layer: str, props: dict, zooms: tuple[int, int], zone: Zone) -> str:
     def place(p):
-        px, py = project.transform(p[0], p[1])
-        if scaling is not None:
-            px, py = scaling[0] * px + scaling[1], scaling[0] * py + scaling[2]
+        px, py = zone.project.transform(p[0], p[1])
+        if zone.scaling is not None:
+            px, py = zone.scaling[0] * px + zone.scaling[1], zone.scaling[0] * py + zone.scaling[2]
         return [round(px, 1), round(py, 1)]
 
     planar = {"type": geom.geom_type, "coordinates": walk(mapping(geom)["coordinates"], place)}
@@ -255,9 +296,9 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
             bands.append((high + 1, 12, piece))
         for start, end, part in bands:
             if max(start, minzoom) <= end and not part.is_empty:
-                row = emit(part, z, x, y, layer, props, (max(start, minzoom), end), outside)
-                if row is not None:
-                    out.append((layer, row))
+                out.extend(
+                    (layer, row) for row in emit(part, z, x, y, layer, props, (max(start, minzoom), end), outside)
+                )
 
     for feature in tile.get("places", {}).get("features", []):
         p = feature["properties"]
@@ -274,15 +315,13 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
                 "tier": tier,
                 "mz": mz,
             }
-            row = emit(feature["geometry"], z, x, y, "places", props, (min(12, max(0, math.floor(mz) - 1)), 12), True)
-            if row is not None:
-                out.append(("places", row))
+            zooms = (min(12, max(0, math.floor(mz) - 1)), 12)
+            out.extend(("places", row) for row in emit(feature["geometry"], z, x, y, "places", props, zooms, True))
         elif p.get("kind") in ("neighbourhood", "macrohood") and metro:
             pop = int(p.get("population") or 0)
             props = {"name": name, "kind": "district" if pop >= 250_000 else p["kind"], "pop": pop}
-            row = emit(feature["geometry"], z, x, y, "hoods", props, (8 if pop >= 250_000 else 10, 14))
-            if row is not None:
-                out.append(("hoods", row))
+            zooms = (8 if pop >= 250_000 else 10, 14)
+            out.extend(("hoods", row) for row in emit(feature["geometry"], z, x, y, "hoods", props, zooms))
     earth = (
         [] if metro else [f for f in tile.get("earth", {}).get("features", []) if "Polygon" in f["geometry"]["type"]]
     )
@@ -355,7 +394,7 @@ def build(scheme: str) -> str:
         if old != folder:
             shutil.rmtree(old)
     country = folder / f"{scheme}.pmtiles"
-    core = [b for zone in zones for b in zone[0]]
+    core = [b for zone in zones for b in zone.within]
     extract(key, country, unary_union([box(*b) for b in core]), 0, 10)
     wide = unary_union([box(*b) for b in core] + surround(framed=False))
     broad = folder / f"{scheme}.wide.pmtiles"
@@ -377,7 +416,7 @@ def build(scheme: str) -> str:
     found = []
     with open(country, "rb") as f:
         reader = Reader(MmapSource(f))
-        for z, x, y in {t for zone in zones for b in zone[0] for t in tiles(8, *b)}:
+        for z, x, y in {t for zone in zones for b in zone.within for t in tiles(8, *b)}:
             data = reader.get(z, x, y)
             if not data:
                 continue
@@ -434,8 +473,7 @@ def build(scheme: str) -> str:
         handle.close()
     with (staging / "water.geojsons").open("w") as handle:
         for lake in (lake for part in getattr(wide, "geoms", [wide]) for lake in display.lakes(part.bounds)):
-            row = settle(shape(lake), "water", {}, (0, 12), True)
-            if row is not None:
+            for row in settle(shape(lake), "water", {}, (0, 12), True):
                 handle.write(row + "\n")
     OUT.mkdir(parents=True, exist_ok=True)
     sizes = []
@@ -563,14 +601,12 @@ def historical(schemes: list[str], date: str) -> str:
         with (staging / "rail.geojsons").open("w") as out, (staging / "rail.wgs").open() as source:
             for line in source:
                 item = json.loads(line)
-                row = settle(shape(item["g"]), "rail", item["p"], (item["z"], 12), True)
-                if row is not None:
+                for row in settle(shape(item["g"]), "rail", item["p"], (item["z"], 12), True):
                     out.write(row + "\n")
                     written["rail"] += 1
         with (staging / "borders.geojsons").open("w") as out:
             for geometry, props in borders[scheme]:
-                row = settle(geometry, "borders", props, (0 if props["level"] == 2 else 4, 12), True)
-                if row is not None:
+                for row in settle(geometry, "borders", props, (0 if props["level"] == 2 else 4, 12), True):
                     out.write(row + "\n")
                     written["borders"] += 1
         target = OUT / f"{scheme}.historical.pmtiles"
