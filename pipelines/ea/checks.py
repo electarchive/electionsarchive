@@ -327,16 +327,19 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                        and not exists (select from {outcomes} w where w.result_set_id = t.result_set_id
                                        and w.option_id = t.option_id and w.kind = 'withdrew')
                      group by 1
-                   )
+                   ),
+                   n as (select result_set_id, sum(votes) as total from t group by 1)
                    select o.option_id, o.result_set_id, jsonb_build_object('votes', t.votes, 'top', m.top)
                    from {outcomes} o
                    join {result_sets} r on r.id = o.result_set_id
                    join {contests} c on c.id = r.contest_id
                    left join {systems} s on s.id = c.electoral_system_id
                    join m on m.result_set_id = o.result_set_id
+                   join n on n.result_set_id = o.result_set_id
                    left join t on t.result_set_id = o.result_set_id and t.option_id = o.option_id
                    where o.kind in ('elected', 'won') and c.magnitude = 1 and t.votes is distinct from m.top
-                     and s.rules ->> 'formula' is distinct from 'irv'"""
+                     and s.rules ->> 'formula' is distinct from 'irv'
+                     and not (s.rules ->> 'formula' = 'contingent' and m.top * 2 <= n.total)"""
             ).format(
                 facts=stage.staged("result_value"),
                 options=stage.either("contest_option", "id", "parent_option_id", "kind"),
