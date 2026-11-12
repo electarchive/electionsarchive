@@ -1,10 +1,12 @@
 import html
 import re
 import subprocess
-from datetime import date
+import zipfile
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -24,6 +26,12 @@ PAGES = {
         "neighbourhood-plan-referendum-results"
     ),
     "E07000084": "https://www.basingstoke.gov.uk/NP-referendum-results",
+}
+DOCUMENTS = "https://elections.wiltshire.gov.uk/Home/Document/"
+OFFICE = {
+    "application/pdf": ".pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+    "application/vnd.oasis.opendocument.text": ".odt",
 }
 HTML = (
     "/declaration-result-poll-clapham-cum-newby-neighbourhood-plan-area",
@@ -53,20 +61,45 @@ def is_page(url: str) -> bool:
     return url in PAGES.values() or "/w/" in url or url.startswith(STRATFORD_PAGES) or url.endswith(HTML)
 
 
+def document(url: str) -> None:
+    try:
+        raw.cached(SOURCE, url)
+    except LookupError:
+        response = httpx.get(url, headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=600)
+        response.raise_for_status()
+        media_type = response.headers["content-type"].split(";")[0]
+        raw.store(
+            SOURCE,
+            url,
+            response.content,
+            suffix=OFFICE[media_type],
+            retrieved_at=datetime.now(UTC),
+            media_type=media_type,
+        )
+
+
 def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     for url in pl.read_csv(ROWS, separator="\t", infer_schema=False)["url"]:
-        raw.fetch(SOURCE, url, suffix=".html" if is_page(url) else ".pdf")
+        if url.startswith(DOCUMENTS):
+            document(url)
+        else:
+            raw.fetch(SOURCE, url, suffix=".html" if is_page(url) else ".pdf")
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
     path = raw.cached(SOURCE, url).path
-    pdf = path.suffix == ".pdf"
-    if pdf:
+    pdf = path.suffix in OFFICE.values()
+    if path.suffix == ".pdf":
         text = subprocess.run(
             ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
         ).stdout
+    elif pdf:
+        with zipfile.ZipFile(path) as archive:
+            xml = archive.read("word/document.xml" if path.suffix == ".docx" else "content.xml").decode()
+        xml = re.sub(r"</w:p>|</text:p>|<w:tab/>|<text:tab/>|<text:s/>|</w:tc>|</table:table-cell>", " ", xml)
+        text = html.unescape(re.sub(r"<[^>]+>", "", xml))
     else:
         text = html.unescape(re.sub(r"(?s)<(script|style).*?</\1>|<[^>]+>", " ", path.read_text()))
     text = re.sub(r"\s+", " ", text)
