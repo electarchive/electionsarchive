@@ -344,7 +344,11 @@ def options(row: dict | None, label: str) -> list[int]:
         return []
     if label in row.get("final", {}):
         return [row["final"][label][0]]
-    found = [row["cells"].get(label, {}).get("value"), *row.get("reads", {}).get(label, [])]
+    found = [
+        row["cells"].get(label, {}).get("value"),
+        *row.get("reads", {}).get(label, []),
+        *row.get("vision", {}).get(label, []),
+    ]
     tally = Counter(v for v in found if v is not None)
     return [v for v, _ in tally.most_common()]
 
@@ -356,6 +360,9 @@ def agreed(row: dict, label: str) -> int | None:
     reads = [
         v for v in [row["cells"].get(label, {}).get("value"), *row.get("reads", {}).get(label, [])] if v is not None
     ]
+    seen = row.get("vision", {}).get(label, [])
+    if len(seen) == 2 and seen[0] is not None and seen[0] == seen[1] and seen[0] in found:
+        return seen[0]
     return reads[0] if len(found) == 1 and len(reads) >= 2 else None
 
 
@@ -473,7 +480,7 @@ def clean(text: str) -> bool:
 
 
 def label(row: dict) -> str:
-    for text in (row["name"], row.get("read", "")):
+    for text in (row["name"], row.get("read", ""), row.get("seen", "")):
         if clean(tidy(text)):
             return tidy(text)
     return tidy(re.sub(r"[^A-Za-zÇĞİÖŞÜÂÎÛçğıöşüâîû ()\-]", "", row["name"]))
@@ -484,6 +491,95 @@ def stem(text: str) -> str:
     words = [w for w in words if not re.match(r"top|ton|.{0,3}[çc]e[sc][iı]|buca|i?l[iı]?$|[şs]eh[iı]r", fold(w))]
     kept = [re.sub(r"[iİı]?[lt][çc]es[iı]$", "", w) if len(w) > 8 else w for w in words if len(w) > 1]
     return " ".join(kept).strip()
+
+
+PROMPT = (
+    "This image is one row of a table in a 1963 Turkish statistics book on the muhtar elections. From left to "
+    "right it prints a place name (a köy, or a bucak, ilçe, or province total), then five numbers: population, "
+    "ballot boxes, registered voters, voters who voted, and valid votes. Transcribe exactly what is printed, "
+    "digit by digit; never compute, correct, or guess a number. Thousands may be split by a space or a dot; "
+    "give whole numbers. Use null for a cell that is blank, a dash, or illegible, and for an illegible name. "
+    "Keep Turkish letters in the name. Reply with only a JSON object with the keys name, population, boxes, "
+    "registered, voters, and valid."
+)
+
+
+def vision(rows: list[dict]) -> bool:
+    import base64
+    import json
+
+    from ea import batch
+
+    wanted, targets = {}, {}
+    for row in rows:
+        missing = [label for label in ("registered", "voters", "valid") if label not in row.get("final", {})]
+        nameless = row["kind"] == "koy" and not re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]{2}", label(row) or row["name"])
+        if not missing and not nameless:
+            continue
+        if not missing and all(options(row, column) == [] for column in COLUMNS):
+            continue
+        gray = image(row["page"])
+        box = (
+            int(150 * SCALE),
+            int((row["y"][0] - 8) * SCALE),
+            int((row["rights"][4] + 24) * SCALE),
+            int((row["y"][1] + 8) * SCALE),
+        )
+        for variant, (scale, threshold) in enumerate(((1, None), (1.5, 165))):
+            crop = gray.crop(box)
+            if threshold is not None:
+                crop = crop.point(lambda v, t=threshold: 0 if v < t else 255)
+            crop = crop.resize((int(crop.width * scale), int(crop.height * scale)), Image.Resampling.LANCZOS)
+            buffer = io.BytesIO()
+            crop.save(buffer, "PNG")
+            key = f"{row['page']}:{row['index']}:{variant}"
+            targets.setdefault((row["page"], row["index"]), (row, missing, nameless, []))[3].append(key)
+            params = {
+                "model": "claude-haiku-5-5",
+                "max_tokens": 200,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": base64.b64encode(buffer.getvalue()).decode(),
+                                },
+                            },
+                            {"type": "text", "text": PROMPT},
+                        ],
+                    }
+                ],
+            }
+            wanted[key] = (params, (crop.width * crop.height / 750 + 300) * 0.05e-6 + 80 * 0.25e-6)
+    ready, note = batch.ensure(SOURCE, "rows", wanted)
+    print(f"{len(targets)} rows for vision reads: {note}")
+    if not ready:
+        return False
+    for row, missing, nameless, keys in targets.values():
+        reads = []
+        for key in keys:
+            try:
+                message = json.loads(raw.cached(SOURCE, key).path.read_text())
+                text = "".join(part.get("text", "") for part in message["content"])
+                match = re.search(r"\{.*\}", text, re.DOTALL)
+                found = json.loads(match.group(0)) if match else {}
+            except LookupError, AttributeError, ValueError:
+                found = {}
+            reads.append(found if isinstance(found, dict) else {})
+        for column in missing:
+            values = [read.get(column) for read in reads]
+            row.setdefault("vision", {})[column] = [
+                int(re.sub(r"[ .,]", "", str(v))) if re.fullmatch(r"\d+([ .,]\d{3})*", str(v)) else None for v in values
+            ]
+        if nameless:
+            names = [tidy(str(read.get("name") or "")) for read in reads]
+            if len(names) == 2 and names[0] and fold(names[0]) == fold(names[1]) and clean(names[0]):
+                row["seen"] = names[0]
+    return True
 
 
 def parse() -> None:
@@ -528,8 +624,13 @@ def parse() -> None:
         return found
 
     with ThreadPoolExecutor(10) as pool:
-        rows = [row for found in pool.map(read, jobs) for row in found]
+        rows = [{**row, "index": index} for found in pool.map(read, jobs) for index, row in enumerate(found)]
     places = tree(rows)
+    settle(places)
+    if not vision(rows):
+        return
+    for row in rows:
+        row.pop("final", None)
     settle(places)
     out, register = [], []
     for place in places:
