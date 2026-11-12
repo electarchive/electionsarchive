@@ -5,7 +5,16 @@ const server = await createServer({
   logLevel: "error",
   server: { middlewareMode: true, hmr: false, ws: false },
 });
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled rejection:", error);
+});
 try {
+  const { db: pool } = await server.ssrLoadModule(
+    "/src/lib/server/db/index.ts",
+  );
+  pool.$client.options.connectionTimeoutMillis = Number(
+    process.env.PARTY_PAGE_CONNECT_TIMEOUT_MS ?? 300_000,
+  );
   const { rebuild } = await server.ssrLoadModule(
     "/src/lib/server/party-pages.ts",
   );

@@ -2,6 +2,14 @@ import { sql } from "drizzle-orm";
 import { db } from "#lib/server/db/index.js";
 import { contents } from "#lib/server/pages.js";
 
+function busy(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.message.includes("timeout exceeded when trying to connect") ||
+      busy(error.cause))
+  );
+}
+
 export async function rebuild() {
   const started = Date.now();
   const listed = await db.execute<{
@@ -111,7 +119,17 @@ export async function rebuild() {
   async function build(id: string) {
     try {
       const read = new Date().toISOString();
-      const page = await contents(id);
+      let page: Awaited<ReturnType<typeof contents>> | undefined;
+      for (let attempt = 1; page == null; attempt += 1) {
+        try {
+          page = await contents(id);
+        } catch (error) {
+          if (attempt === 4 || !busy(error)) {
+            throw error;
+          }
+          await new Promise((resolve) => setTimeout(resolve, attempt * 10_000));
+        }
+      }
       await db.execute(sql`
         insert into party_page (party_id, page, built_at)
         values (${id}::uuid, ${JSON.stringify(page)}::jsonb, ${read}::timestamptz)
