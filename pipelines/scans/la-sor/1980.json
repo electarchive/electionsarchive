@@ -36,7 +36,8 @@
         {
           "label": "American Independent Party",
           "contest": "president",
-          "candidate": "American Independent"
+          "candidate": "American Independent",
+          "official": 10333
         },
         {
           "label": "Citizens Party",
@@ -46,7 +47,8 @@
         {
           "label": "Independent",
           "contest": "president",
-          "candidate": "John Anderson (Independent)"
+          "candidate": "John Anderson (Independent)",
+          "official": 26345
         },
         {
           "label": "Libertarians",
