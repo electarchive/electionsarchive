@@ -643,9 +643,43 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
         for entry in entries:
             if id(entry) not in paired:
                 unpaired.setdefault(key[:4], []).append((entry, id(entry) in differ))
+    carried = {
+        (entity, value)
+        for entity, value in conn.execute(
+            """select x.entity_id, x.value from external_id x
+               where x.scheme = 'us.contest' and x.value like 'ceda:%%' and x.entity_id = any(%s)
+                 and exists (select from result_set r join source s on s.id = r.source_id
+                             where r.contest_id = x.entity_id and r.is_default and r.status = 'active' and s.title = %s)
+                 and not exists (select from result_set w where w.contest_id = x.entity_id and w.status = 'withdrawn')""",
+            [ids, TITLE],
+        ).fetchall()
+    }
     for pool, leftovers in unpaired.items():
         used = {id(race) for _, _, race, _ in paired_pairs}
         pool_races = [race for key, others in races.items() if key[:4] == pool for race in others]
+        direct = []
+        for entry, _ in leftovers:
+            names = {option["surname"] for option in entry["options"]}
+            fits = [
+                (race, mapping)
+                for race in pool_races
+                if id(race) not in used
+                and (entry["contest"], f"ceda:{race['race']}") in carried
+                and race["magnitude"] == entry["magnitude"]
+                and len(mapping := align(race, entry)) == len(race["votes"])
+                and set(mapping.values()) == names
+            ]
+            if len(fits) == 1:
+                direct.append((entry, *fits[0]))
+        if (
+            direct
+            and any(key[:4] == pool for key, *_ in paired_pairs)
+            and len(direct) == len(leftovers)
+            and len({id(race) for _, race, _ in direct}) == len(direct)
+        ):
+            paired_pairs += [(pool, *pair) for pair in direct]
+            leftovers.clear()
+            continue
         if len(pool_races) < 2 or len(pool_races) != len(leftovers) or any(id(race) in used for race in pool_races):
             continue
         fitted = []
@@ -967,6 +1001,16 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             old_options.setdefault(contest, set()).add(option)
+        bare = {
+            option
+            for (option,) in conn.execute(
+                """select o.id from contest_option o
+                   join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest' and x.value like 'ceda:%%'
+                   join result_set r on r.contest_id = o.contest_id and r.is_default and r.status = 'active'
+                   where o.kind = 'candidate'
+                     and not exists (select from result_value v where v.result_set_k = r.k and v.option_k = o.k)"""
+            ).fetchall()
+        }
         held = set(
             conn.execute(
                 """select x.value, extract(year from e.date_from)::int, extract(month from e.date_from)::int
@@ -1399,7 +1443,15 @@ def emit() -> Path:
                 entries.append((option, "write-ins", writeins))
             emitted.add(contest)
             restage = bool(old_options.get(contest, set()) - kept_options)
-            for option, candidate_id, votes in entries if result_set in cs.minted or race in merged or restage else []:
+            for option, candidate_id, votes in (
+                entries
+                if result_set in cs.minted
+                or race in merged
+                or restage
+                or str(result_set) in emptied
+                or any(option in bare for option, _, _ in entries)
+                else []
+            ):
                 if reported is None:
                     values.append((str(result_set), str(unit), str(option), votes))
                     continue
