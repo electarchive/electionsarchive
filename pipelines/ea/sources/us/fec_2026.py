@@ -2751,6 +2751,14 @@ def emit() -> Path:
                 if chamber != "legislative" and (magnitude or 1) > 1
                 else majority(rule)
                 if chamber == "governor" and (rule := contingent.governor(state, DAY.year)) is not None
+                else majority(rule)
+                if chamber not in ("house", "senate", "legislative", "governor")
+                and (
+                    rule := contingent.statewide(
+                        state, chamber.replace("-", " ").title().replace(" Of ", " of "), DAY.year
+                    )
+                )
+                is not None
                 else system,
                 default_result_kind="tacit"
                 if key.split(":", 2)[2] in TACIT.get(state, {}) or key in uncontested
