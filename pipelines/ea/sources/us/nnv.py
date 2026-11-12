@@ -14,6 +14,7 @@ from psycopg.types.range import Range
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import contingent
 from ea.sources.us.clerk import LEGISLATORS, plain
 from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
@@ -943,20 +944,23 @@ def emit() -> Path:
                 rules_version=1,
             )
             named(systems["majority"], "Majority of votes cast, with repeated trials")
+        contingent_system = contingent.systems(cs, named)
         published: dict[UUID, list[str]] = {}
         magnitudes: dict[UUID, int | None] = {}
-        for contest_id, magnitude, labels in conn.execute(
-            """select c.id, c.magnitude,
+        rules_on_file: dict[UUID, UUID | None] = {}
+        for contest_id, magnitude, rules_id, labels in conn.execute(
+            """select c.id, c.magnitude, c.electoral_system_id,
                       array_agg(o.ballot_label order by o.ballot_label) filter (where o.id is not null)
                from contest c join entity n on n.id = c.id join changeset s on s.id = n.changeset_id
                left join result_set r on r.contest_id = c.id and r.is_default
                left join outcome oc on oc.result_set_id = r.id and oc.kind = 'elected'
                left join contest_option o on o.id = oc.option_id
-               where s.pipeline = %s group by c.id, c.magnitude""",
+               where s.pipeline = %s group by c.id, c.magnitude, c.electoral_system_id""",
             [SOURCE],
         ).fetchall():
             published[contest_id] = sorted(labels or [])
             magnitudes[contest_id] = magnitude
+            rules_on_file[contest_id] = rules_id
         old_sets: dict[str, dict[str, object]] = {}
         for value, *fields in conn.execute(
             """select x.value, r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness
@@ -1330,7 +1334,7 @@ def emit() -> Path:
                     tally["winners marked are not the top vote-getters (electoral system left open)"] += 1
                 if not chosen and body_label not in SINGLE:
                     magnitude = None
-                row = {
+                contest_row = {
                     "id": contest,
                     "election_id": election,
                     "seat_id": None,
@@ -1340,20 +1344,29 @@ def emit() -> Path:
                     "previous_round_id": previous,
                     "electoral_system_id": None
                     if magnitude is None or not ranked
+                    else contingent_system(rule)
+                    if body_label == "governor" and (rule := contingent.governor(postal, row["year"])) is not None
                     else systems["majority" if postal in MAJORITY else "block" if magnitude > 1 else "fptp"],
                     "default_result_kind": "counted",
                     **fields,
                 }
                 if existing and not revise and not reopen:
                     if magnitude is not None and contest in magnitudes and magnitudes[contest] is None:
-                        cs.add("contest", **row)
+                        cs.add("contest", **contest_row)
                         tally["NNV trials on file with an open magnitude, given their declared winners' count"] += 1
+                    elif (
+                        body_label == "governor"
+                        and contest in rules_on_file
+                        and contest_row["electoral_system_id"] not in (None, rules_on_file[contest])
+                    ):
+                        cs.add("contest", **contest_row)
+                        tally["NNV governor races on file, given their state's fallback rule"] += 1
                     tally["NNV trials already on file, from THEA or an earlier emit"] += 1
                     filled += len([line for line in lines.get(record, []) if line["elected"]])
                     previous = contest
                     continue
                 filled += len([line for line in lines.get(record, []) if line["elected"]])
-                cs.add("contest", **row)
+                cs.add("contest", **contest_row)
                 named(
                     contest,
                     f"{day.year} {title}"
