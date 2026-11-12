@@ -1,0 +1,31 @@
+{
+ "year": 1906,
+ "day": "1906-11-06",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Blue Book of the State of Wisconsin 1907, vote by counties (general election 1906-11-06)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/bluebookforstat00unkngoog/bluebookforstat00unkngoog.pdf",
+  "item": "https://archive.org/details/bluebookforstat00unkngoog"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "governor": "Governor, 1906 general election only; columns for any other year printed beside them are office other",
+  "house": "U.S. Representative in Congress, 1906 general election, one county summary table per congressional district; a table of towns, cities, and election districts, a special election, or a gubernatorial summary by congressional district is office other"
+ },
+ "leaves": [
+  514,
+  534,
+  542,
+  547,
+  548,
+  550,
+  554,
+  559,
+  564,
+  567,
+  574,
+  581
+ ]
+}

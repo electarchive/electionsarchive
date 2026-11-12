@@ -1,0 +1,19 @@
+{
+ "year": 1904,
+ "day": "1904-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Blue Book of the State of Wisconsin 1907, vote by counties (general election 1904-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/bluebookforstat00unkngoog/bluebookforstat00unkngoog.pdf",
+  "item": "https://archive.org/details/bluebookforstat00unkngoog"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "governor": "Governor, 1904 general election only; columns for any other year printed beside them are office other"
+ },
+ "leaves": [
+  684
+ ]
+}

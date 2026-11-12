@@ -1,0 +1,19 @@
+{
+ "year": 1904,
+ "day": "1904-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Blue Book of the State of Wisconsin 1911, vote by counties (general election 1904-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/bluebookstatewi00statgoog/bluebookstatewi00statgoog.pdf",
+  "item": "https://archive.org/details/bluebookstatewi00statgoog"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "president": "President (presidential electors), 1904 general election only, one column per candidate; columns for any other year printed beside them are office other"
+ },
+ "leaves": [
+  222
+ ]
+}

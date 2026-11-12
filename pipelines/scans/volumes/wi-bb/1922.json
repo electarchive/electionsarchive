@@ -1,0 +1,25 @@
+{
+ "year": 1922,
+ "day": "1922-11-07",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Secretary of State",
+ "title": "The Wisconsin Blue Book 1923, vote by counties (general election 1922-11-07)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/wisconsinblueboo1923unse/wisconsinblueboo1923unse.pdf",
+  "item": "https://archive.org/details/wisconsinblueboo1923unse"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "senate": "U.S. Senator, 1922 general election only",
+  "house": "U.S. Representative in Congress, 1922 general election, one county summary table per congressional district; a table of towns, cities, and election districts, a special election, or a gubernatorial summary by congressional district is office other"
+ },
+ "leaves": [
+  608,
+  616,
+  617,
+  618,
+  619,
+  620
+ ]
+}
