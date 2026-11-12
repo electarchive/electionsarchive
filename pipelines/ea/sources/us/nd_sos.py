@@ -29,6 +29,8 @@ BLUE_BOOKS = {
     1908: (date(1908, 11, 3), "northdakotablue01statgoog", 1909),
 }
 FILES = {
+    1902: "1902-congressgovernor",
+    1908: "1908-11-03-general",
     1904: "1904-pres-congress-gov",
     1910: "1910-general",
     1912: "1912-11-05-general",
@@ -68,6 +70,8 @@ FILES = {
     1990: "1990-11-06-general",
 }
 DAYS = {
+    1902: date(1902, 11, 4),
+    1908: date(1908, 11, 3),
     1904: date(1904, 11, 8),
     1910: date(1910, 11, 8),
     1912: date(1912, 11, 5),
@@ -822,6 +826,23 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
     ),
 }
 PAGES: dict[int, dict[int, dict[int, tuple[str, str, str | None]]]] = {
+    1902: {
+        1: {
+            5: ("governor", "Frank White", "REP"),
+            6: ("governor", "J. Cronan", "DEM"),
+            7: ("governor", "Robert Grant", "SOC"),
+        },
+    },
+    1908: {
+        4: {
+            2: ("governor", "C. A. Johnson", "REP"),
+            3: ("governor", "John Burke", "DEM"),
+            4: ("governor", "L. F. Dow", None),
+            5: ("lieutenant-governor", "S. Lewis", "REP"),
+            6: ("lieutenant-governor", "H. D. Mack", "DEM"),
+            7: ("lieutenant-governor", "Valdomar Gram", None),
+        },
+    },
     1904: {
         2: {
             4: ("governor", "Elmore Y. Sarles", "REP"),
@@ -926,9 +947,12 @@ PAGES: dict[int, dict[int, dict[int, tuple[str, str, str | None]]]] = {
         },
     },
 }
-WIDTHS = {(1904, 2): 8}
-DIGITS = r"(?=.*\d)[\dlI][\d,.lI]*['`]?"
+SKEWED = {1902, 1908}
+WIDTHS = {(1902, 1): 8, (1904, 2): 8, (1908, 4): 8}
+DIGITS = r"(?=.*\d)[\dlI][\d,.lI]*['`]?\|?"
 ABSTRACT_READS = {
+    (1908, "walsh", "John Burke"): 2075,
+    (1902, "traill", "Robert Grant"): 33,
     (1910, "cavalier", "U. L. Burdick"): 1819,
     (1910, "walsh", "Gunder Olson"): 1814,
     (1910, "walsh", "H. L. Halvorson"): 1309,
@@ -1074,7 +1098,7 @@ def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
             check=True,
         ).stdout
         lines: list[list] = []
-        for a, b, c, d, text in sorted(
+        found = sorted(
             (
                 (float(a), float(b), float(c), float(d), unescape(t))
                 for a, b, c, d, t in re.findall(
@@ -1082,8 +1106,21 @@ def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
                 )
             ),
             key=lambda w: w[1] + w[3],
-        ):
+        )
+        anchors: list[float] = []
+        if year in SKEWED:
+            for a, b, _, d, text in found:
+                if a < 130 and re.match(r"[A-Za-z]", text) and (not anchors or (b + d) / 2 - anchors[-1] >= 2.5):
+                    anchors.append((b + d) / 2)
+        for a, b, c, d, text in found:
             middle = (b + d) / 2
+            if anchors:
+                if year == 1908 and 238 < a < 250:
+                    middle -= 1.5
+                nearest = min(anchors, key=lambda y: abs(y - middle))
+                if abs(nearest - middle) > 4.5:
+                    continue
+                middle = nearest
             if not lines or abs(lines[-1][0] - middle) >= 2.5:
                 lines.append([middle, []])
             lines[-1][1].append((a, c, text))
@@ -1097,7 +1134,7 @@ def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
             for a, c, text in words:
                 if not re.fullmatch(DIGITS, text):
                     continue
-                text = re.sub(r"[lI]", "1", text.rstrip("'`"))
+                text = re.sub(r"[lI]", "1", text.rstrip("'`|"))
                 if (
                     numbers
                     and a - right < 5
@@ -1662,7 +1699,8 @@ def emit() -> Path:
             for row in conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchall():
-                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+                if row[0] != result_set:
+                    cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
             outcomes = conn.execute(
                 """select o.option_id, o.kind, o.seats from outcome o
                    join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
