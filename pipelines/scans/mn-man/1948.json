@@ -8,6 +8,180 @@
     "item": "https://www.lrl.mn.gov/mngov/electionresults"
   },
   "raw_source": "us.mn_lrl",
-  "contests": {},
-  "pages": []
+  "contests": {
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1948,
+      "chamber": "senate",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1948,
+      "chamber": "governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 190,
+      "id": "190-0",
+      "columns": [
+        {
+          "label": "Republican Dewey and Warren",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Democratic-Farmer-Labor Truman and Barkley",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "Industrial Government Teichert and Emery",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "Socialist Workers Dobbs and Carlson",
+          "contest": "president",
+          "candidate": "Socialist-Workers"
+        },
+        {
+          "label": "Progressive Wallace and Taylor",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "Socialist Thomas and Smith",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)",
+          "official": 4646
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.287,
+        0.041,
+        0.458,
+        0.98
+      ],
+      "hint": "Read only the table headed 'President: Presidential Electors (general election 1948)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.3248
+      ]
+    },
+    {
+      "page": 190,
+      "id": "190-1",
+      "columns": [
+        {
+          "label": "Joseph H. Ball Republican",
+          "contest": "senate",
+          "candidate": "Joseph H. Ball"
+        },
+        {
+          "label": "Hubert H. Humphrey Democratic-Farmer-Labor",
+          "contest": "senate",
+          "candidate": "Hubert H. Humphrey"
+        },
+        {
+          "label": "Vincent R. Dunne Socialist Workers",
+          "contest": "senate",
+          "candidate": "Vincent R. Dunne"
+        },
+        {
+          "label": "Shipstead",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stafford King",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter Judd",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jos. Shields",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.448,
+        0.041,
+        0.549,
+        0.98
+      ],
+      "hint": "Read only the table headed 'U.S. Senator in Congress (general election 1948)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.3248
+      ]
+    },
+    {
+      "page": 190,
+      "id": "190-2",
+      "columns": [
+        {
+          "label": "Luther W. Youngdahl Republican",
+          "contest": "governor",
+          "candidate": "Luther W. Youngdahl"
+        },
+        {
+          "label": "Charles L. Halsted Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Charles L. Halsted"
+        },
+        {
+          "label": "Rudolph Gustafson Industrial Government (SLP) Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Rudolph Gustafson"
+        },
+        {
+          "label": "Orville E. Olson Progressive Nominated by Petition",
+          "contest": "governor",
+          "candidate": "Orville Olson"
+        },
+        {
+          "label": "Stafford King",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.538,
+        0.041,
+        0.64,
+        0.98
+      ],
+      "hint": "Read only the table headed 'Governor (general election 1948)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.3248
+      ]
+    }
+  ]
 }

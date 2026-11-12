@@ -8,6 +8,159 @@
     "item": "https://www.lrl.mn.gov/mngov/electionresults"
   },
   "raw_source": "us.mn_lrl",
-  "contests": {},
-  "pages": []
+  "contests": {
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "senate": {
+      "year": 1952,
+      "chamber": "senate",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 186,
+      "id": "186-0",
+      "columns": [
+        {
+          "label": "Republican EISENHOWER and NIXON",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Democratic-Farmer-Labor STEVENSON and SPARKMAN",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Industrial Government (SLP) HASS and EMERY",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Progressive HALLINAN and BASS",
+          "contest": "president",
+          "candidate": "Vincent Hallinan (Progressive)"
+        },
+        {
+          "label": "Socialist Workers DOBBS and WEISS",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "Prohibition HAMBLEN and HOLTWICK",
+          "contest": "president",
+          "candidate": "Stuart Hamblen (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.384,
+        0.082,
+        0.516,
+        0.738
+      ],
+      "hint": "Read only the table headed 'Presidential Electors'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2713
+      ]
+    },
+    {
+      "page": 186,
+      "id": "186-1",
+      "columns": [
+        {
+          "label": "Edward J. Thye Republican",
+          "contest": "senate",
+          "candidate": "Edward J. Thye"
+        },
+        {
+          "label": "William E. (Bill) Carlson Democratic-Farmer-Labor",
+          "contest": "senate",
+          "candidate": "William E. (Bill) Carlson"
+        },
+        {
+          "label": "Marian LeSueur Progressive",
+          "contest": "senate",
+          "candidate": "Marian LeSueur"
+        },
+        {
+          "label": "Vincent R. Dunne Socialist Workers",
+          "contest": "senate",
+          "candidate": "Vincent R. Dunne"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.512,
+        0.082,
+        0.575,
+        0.738
+      ],
+      "hint": "Read only the table headed 'For United States Senator in Congress'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2713
+      ]
+    },
+    {
+      "page": 186,
+      "id": "186-2",
+      "columns": [
+        {
+          "label": "C. Elmer Anderson Republican",
+          "contest": "governor",
+          "candidate": "C. Elmer Anderson"
+        },
+        {
+          "label": "Orville L. Freeman Democratic-Farmer-Labor",
+          "contest": "governor",
+          "candidate": "Orville L. Freeman"
+        },
+        {
+          "label": "Eldrid H. Bauers Industrial Government (SLP)",
+          "contest": "governor",
+          "candidate": "Eldrid Bauers"
+        },
+        {
+          "label": "Martin Fredrickson Progressive",
+          "contest": "governor",
+          "candidate": "Martin Fredrickson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.571,
+        0.082,
+        0.641,
+        0.738
+      ],
+      "hint": "Read only the table headed 'For Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2713
+      ]
+    }
+  ]
 }
