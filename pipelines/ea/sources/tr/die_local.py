@@ -438,6 +438,8 @@ ERRATA_1963 = {
     (1174, "registered", 18264): 18624,
 }
 NOT_ILCE = {("01", "Mustafabeyli"), ("42", "Akçaşehir"), ("44", "Erkenek")}
+LEFT_EDGES_1963 = {1081: 171}
+SPANS_1963 = {1081: [(896, 930), (1071, 1106), (1245, 1279), (1416, 1451), (1591, 1627), (1767, 1801), (1941, 1976)]}
 NAMES_1963 = {(796, 3): "Çukurca Şehir", (602, 1): "Elazığ Şehir", (604, 1): "Elazığ Şehir"}
 
 
@@ -506,6 +508,7 @@ def sheet_1963(number: int, columns: tuple[str, ...], fixed: dict | None = None)
         best, angle = -1.0, 0.0
         for step in range(-40, 41):
             ink = np.asarray(small.rotate(step / 20, fillcolor=255, resample=Image.Resampling.BILINEAR)) < 140
+            ink = ink[:, small.width // 10 : small.width * 9 // 10]
             score = float((ink.sum(axis=1).astype(np.float64) ** 2).sum())
             if score > best:
                 best, angle = score, step / 20
@@ -519,11 +522,13 @@ def sheet_1963(number: int, columns: tuple[str, ...], fixed: dict | None = None)
         rules = [r for r in runs(lines > 0.4) if r[0] < height * 0.35]
         if len(rules) < 2:
             raise ValueError(f"page {number}: rules {rules}")
-        top, head = rules[0], rules[-1]
+        head = rules[-1]
+        top = max(rules[:-1], key=lambda r: r[1] - r[0])
         floor = [r for r in runs(lines > 0.4) if r[0] > height * 0.8]
         body0, body1 = head[1] + 4, (floor[0][0] - 5 if floor else int(height * 0.97))
         edge = ink.mean(axis=0) > 0.5
         x0, x1 = max(runs(ink[head[0] - 2 : head[1] + 3].any(axis=0) & ~edge, 60), key=lambda r: r[1] - r[0])
+        x0 = LEFT_EDGES_1963.get(number, x0)
         scores = []
         for block, scale in (
             (ink[top[1] + 3 : head[0] - 2, x0 + 25 : x1 - 25], max(head[0] - top[1], 1) / 2.5),
@@ -564,6 +569,7 @@ def sheet_1963(number: int, columns: tuple[str, ...], fixed: dict | None = None)
             for cluster in clusters
             if len(cluster) >= 2 and any(m[3] == 0 for m in cluster)
         ]
+        spans = SPANS_1963.get(number, spans)
     else:
         edges, spans, body0, body1 = fixed["edges"], fixed["spans"], 0, 0
     rows = []
@@ -666,7 +672,16 @@ def spread_1963(left: int, table: str) -> dict:
             )
             i, j = i + 1, j + 1
         elif score[i][j] == score[i + 1][j]:
-            print(f"1963 page {left}: left row at {lrows[i]['y']} unmatched")
+            print(f"1963 page {left}: left row at {lrows[i]['y']} kept without its right half")
+            rows.append(
+                {
+                    "name": lrows[i]["name"],
+                    "ly": lrows[i]["y"],
+                    "ry": None,
+                    **lrows[i]["cells"],
+                    **{label: [None] for label in RIGHT_1963},
+                }
+            )
             i += 1
         else:
             print(f"1963 page {left + 1}: right row at {rrows[j]['y']} unmatched")
@@ -896,7 +911,7 @@ def parse() -> None:
             plate += 1
             previous = None
         table = lt if lt in TABLES_1963 else rt if rt in ("mayor", "meclis") else previous
-        if lt in TABLES_1963 and rt in ("mayor", "meclis") and rt != lt:
+        if lt in TABLES_1963 and rt in ("mayor", "meclis") and rt != lt and (lt != "genel" or rt == "mayor"):
             print(f"1963 spread {number}: left page {lt}, right page {rt}, left out")
         else:
             spreads_1963.append((plate, number, table))
@@ -919,9 +934,10 @@ def parse() -> None:
             print(f"1963 spread {number} ({table}): rows found {data['counts']}, left out")
             continue
         if not data.get("reread"):
-            wanted = [row for row in data["rows"] if choose_1963(row)["status"] != "sum"]
+            wanted_all = [row for row in data["rows"] if choose_1963(row)["status"] != "sum"]
             jobs = []
             for side, columns, key in ((0, LEFT_1963, "ly"), (1, RIGHT_1963, "ry")):
+                wanted = [row for row in wanted_all if row[key] is not None]
                 sheet = sheet_1963(
                     number + side,
                     columns,
