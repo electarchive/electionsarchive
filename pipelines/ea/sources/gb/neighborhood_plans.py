@@ -20,10 +20,12 @@ ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
 SHARE_ONLY = 4
-STRATFORD_PAGES = (
+PAGE_PREFIXES = (
     "https://www.stratford.gov.uk/news/",
     "https://www.stratford.gov.uk/planning-building/",
     "https://www.west-norfolk.gov.uk/info/",
+    "https://somerset.gov.uk/news/",
+    "https://netherstowey-pc.gov.uk/news/",
 )
 PAGES = {
     "E06000052": (
@@ -70,7 +72,7 @@ WITHIN = (
 
 
 def is_page(url: str) -> bool:
-    return url in PAGES.values() or "/w/" in url or url.startswith(STRATFORD_PAGES) or url.endswith(HTML)
+    return url in PAGES.values() or "/w/" in url or url.startswith(PAGE_PREFIXES) or url.endswith(HTML)
 
 
 def document(url: str) -> None:
@@ -97,13 +99,15 @@ def fetch() -> None:
         if url.startswith(DOCUMENTS):
             document(url)
         else:
-            raw.fetch(SOURCE, url, suffix=".html" if is_page(url) else ".pdf")
+            raw.fetch(SOURCE, url, suffix=".jpg" if url.endswith(".jpg") else ".html" if is_page(url) else ".pdf")
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
     path = raw.cached(SOURCE, url).path
-    pdf = path.suffix in OFFICE.values()
-    if path.suffix == ".pdf":
+    pdf = path.suffix in OFFICE.values() or path.suffix == ".jpg"
+    if path.suffix == ".jpg":
+        text = subprocess.run(["tesseract", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    elif path.suffix == ".pdf":
         text = subprocess.run(
             ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
         ).stdout
