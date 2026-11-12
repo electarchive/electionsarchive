@@ -1,0 +1,144 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1972, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/reportofofficial1972montrich/reportofofficial1972montrich.pdf",
+  "item": "https://archive.org/details/reportofofficial1972montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1972,
+   "chamber": "president",
+   "day": "1972-11-07",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "senate": {
+   "year": 1972,
+   "chamber": "senate",
+   "day": "1972-11-07",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1972,
+   "chamber": "house",
+   "day": "1972-11-07",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1972,
+   "chamber": "house",
+   "day": "1972-11-07",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1972,
+   "chamber": "governor",
+   "day": "1972-11-07",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.143,
+    0.45,
+    0.962
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.2833
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Total Vote Cast",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "McGovern Dem.",
+     "contest": "president",
+     "candidate": "McGovern (Democratic)"
+    },
+    {
+     "label": "Nixon Rep.",
+     "contest": "president",
+     "candidate": "Nixon (Republican)"
+    },
+    {
+     "label": "Schmitz American",
+     "contest": "president",
+     "candidate": "Schmitz (American Independent)"
+    },
+    {
+     "label": "Lee Metcalf",
+     "contest": "senate",
+     "candidate": "Lee Metcalf"
+    },
+    {
+     "label": "Henry S. (Hank) Hibbard",
+     "contest": "senate",
+     "candidate": "Henry S. (Hank) Hibbard"
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "Dick Shoup",
+     "contest": "house1",
+     "candidate": "Dick Shoup"
+    },
+    {
+     "label": "John Melcher",
+     "contest": "house2",
+     "candidate": "John Melcher"
+    },
+    {
+     "label": "Dick Forester",
+     "contest": "house2",
+     "candidate": "Dick Forester"
+    },
+    {
+     "label": "Thomas L. Judge",
+     "contest": "governor",
+     "candidate": "Thomas L. Judge"
+    },
+    {
+     "label": "Ed Smith",
+     "contest": "governor",
+     "candidate": "Ed Smith"
+    }
+   ]
+  }
+ ]
+}

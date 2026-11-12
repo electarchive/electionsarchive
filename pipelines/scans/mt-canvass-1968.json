@@ -1,0 +1,146 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1968, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1968montrich/officialmontanag1968montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1968montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1968,
+   "chamber": "president",
+   "day": "1968-11-05",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1968,
+   "chamber": "house",
+   "day": "1968-11-05",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1968,
+   "chamber": "house",
+   "day": "1968-11-05",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1968,
+   "chamber": "governor",
+   "day": "1968-11-05",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.141,
+    0.687,
+    0.985
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.25
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Total Vote Cast",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Humphrey Dem.",
+     "contest": "president",
+     "candidate": "Hubert H. Humphrey (Democratic)"
+    },
+    {
+     "label": "Nixon Rep.",
+     "contest": "president",
+     "candidate": "Richard Nixon (Republican)"
+    },
+    {
+     "label": "Halstead Soc. Workers",
+     "contest": "president",
+     "candidate": "Socialist Workers"
+    },
+    {
+     "label": "Munn Prohib.",
+     "contest": "president",
+     "candidate": "Prohibition"
+    },
+    {
+     "label": "Wallace American",
+     "contest": "president",
+     "candidate": "George Wallace (American Independent)"
+    },
+    {
+     "label": "New Reform",
+     "contest": "president",
+     "candidate": "New Reform"
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "Dick Smiley",
+     "contest": "house1",
+     "candidate": "Dick Smiley"
+    },
+    {
+     "label": "Robert L. Kelleher",
+     "contest": "house2",
+     "candidate": "Robert L. Kelleher"
+    },
+    {
+     "label": "James F. Battin",
+     "contest": "house2",
+     "candidate": "James F. Battin"
+    },
+    {
+     "label": "Forrest H. Anderson",
+     "contest": "governor",
+     "candidate": "Forrest H. Anderson"
+    },
+    {
+     "label": "Tim Babcock",
+     "contest": "governor",
+     "candidate": "Tim M. Babcock"
+    },
+    {
+     "label": "Wayne Montgomery",
+     "contest": "governor",
+     "candidate": "Wayne Montgomery"
+    }
+   ]
+  }
+ ]
+}

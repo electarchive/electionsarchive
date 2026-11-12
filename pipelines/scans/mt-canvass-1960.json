@@ -1,0 +1,144 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1960, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1960montrich/officialmontanag1960montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1960montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1960,
+   "chamber": "president",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "senate": {
+   "year": 1960,
+   "chamber": "senate",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1960,
+   "chamber": "house",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1960,
+   "chamber": "house",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1960,
+   "chamber": "governor",
+   "day": "1960-11-08",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.119,
+    0.452,
+    0.99
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.3433
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kennedy Dem.",
+     "contest": "president",
+     "candidate": "John F. Kennedy (Democratic)"
+    },
+    {
+     "label": "Nixon Rep.",
+     "contest": "president",
+     "candidate": "Richard Nixon (Republican)"
+    },
+    {
+     "label": "Prohibition",
+     "contest": "president",
+     "candidate": "Prohibition"
+    },
+    {
+     "label": "Socialist Workers",
+     "contest": "president",
+     "candidate": "Socialist Workers"
+    },
+    {
+     "label": "Lee Metcalf",
+     "contest": "senate",
+     "candidate": "Lee Metcalf"
+    },
+    {
+     "label": "Orvin B. Fjare",
+     "contest": "senate",
+     "candidate": "Orvin B. Fjare"
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "George P. Sarsfield",
+     "contest": "house1",
+     "candidate": "George P. Sarsfield"
+    },
+    {
+     "label": "Leo Graybill, Jr.",
+     "contest": "house2",
+     "candidate": "Leo Graybill, Jr."
+    },
+    {
+     "label": "James F. Battin",
+     "contest": "house2",
+     "candidate": "James F. Battin"
+    },
+    {
+     "label": "Paul Cannon",
+     "contest": "governor",
+     "candidate": "Paul Cannon"
+    },
+    {
+     "label": "Donald G. Nutter",
+     "contest": "governor",
+     "candidate": "Donald G. Nutter"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,149 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1976, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/reportofofficial1976montrich/reportofofficial1976montrich.pdf",
+  "item": "https://archive.org/details/reportofofficial1976montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1976,
+   "chamber": "president",
+   "day": "1976-11-02",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "senate": {
+   "year": 1976,
+   "chamber": "senate",
+   "day": "1976-11-02",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1976,
+   "chamber": "house",
+   "day": "1976-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1976,
+   "chamber": "house",
+   "day": "1976-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1976,
+   "chamber": "governor",
+   "day": "1976-11-02",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.152,
+    0.662,
+    0.971
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.2564
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Total Vote Cast",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Carter Dem.",
+     "contest": "president",
+     "candidate": "Jimmy Carter (Democratic)"
+    },
+    {
+     "label": "Ford Rep.",
+     "contest": "president",
+     "candidate": "Gerald Ford (Republican)"
+    },
+    {
+     "label": "Anderson Amer'n",
+     "contest": "president",
+     "candidate": "American"
+    },
+    {
+     "label": "John Melcher",
+     "contest": "senate",
+     "candidate": "John Melcher"
+    },
+    {
+     "label": "Stanley C. Burger",
+     "contest": "senate",
+     "candidate": "Stanley C. Burger"
+    },
+    {
+     "label": "Max Baucus",
+     "contest": "house1",
+     "candidate": "Max Baucus"
+    },
+    {
+     "label": "W. D. (Bill) Diehl",
+     "contest": "house1",
+     "candidate": "W. D. \"Bill\" Diehl"
+    },
+    {
+     "label": "Thomas E. (Tom) Towe",
+     "contest": "house2",
+     "candidate": "Thomas E. \"Tom\" Towe"
+    },
+    {
+     "label": "Ron Marlenee",
+     "contest": "house2",
+     "candidate": "Ron Marlenee"
+    },
+    {
+     "label": "Thomas L. Judge",
+     "contest": "governor",
+     "candidate": "Thomas L. Judge"
+    },
+    {
+     "label": "Bob Woodahl",
+     "contest": "governor",
+     "candidate": "Bob Woodahl"
+    },
+    {
+     "label": "C. Mahoney E. Morrow Write-In",
+     "contest": "governor",
+     "candidate": "Charlie Mahoney"
+    }
+   ]
+  }
+ ]
+}

@@ -17,9 +17,7 @@
   "house": "U.S. Representative; one column per candidate, district noted in the header"
  },
  "leaves": [
-  1,
-  2,
-  3,
-  4
- ]
+  2
+ ],
+ "mixed": true
 }

@@ -1,0 +1,85 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1974, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/reportofofficial1974montrich/reportofofficial1974montrich.pdf",
+  "item": "https://archive.org/details/reportofofficial1974montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "house1": {
+   "year": 1974,
+   "chamber": "house",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1974,
+   "chamber": "house",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.175,
+    0.293,
+    0.948
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.2264
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Total Vote Cast",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Max S. Baucus",
+     "contest": "house1",
+     "candidate": "Max S. Baucus"
+    },
+    {
+     "label": "Dick Shoup",
+     "contest": "house1",
+     "candidate": "Dick Shoup"
+    },
+    {
+     "label": "John Melcher",
+     "contest": "house2",
+     "candidate": "John Melcher"
+    },
+    {
+     "label": "John J. (Jack) McDonald",
+     "contest": "house2",
+     "candidate": "John J. (Jack) McDonald"
+    }
+   ]
+  }
+ ]
+}

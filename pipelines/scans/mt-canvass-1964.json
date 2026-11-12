@@ -1,0 +1,154 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1964, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1964montrich/officialmontanag1964montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1964montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1964,
+   "chamber": "president",
+   "day": "1964-11-03",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "senate": {
+   "year": 1964,
+   "chamber": "senate",
+   "day": "1964-11-03",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1964,
+   "chamber": "house",
+   "day": "1964-11-03",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1964,
+   "chamber": "house",
+   "day": "1964-11-03",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "governor": {
+   "year": 1964,
+   "chamber": "governor",
+   "day": "1964-11-03",
+   "special": false,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.137,
+    0.452,
+    0.96
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.272
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Johnson Dem.",
+     "contest": "president",
+     "candidate": "Lyndon B. Johnson (Democratic)"
+    },
+    {
+     "label": "Goldwater Rep.",
+     "contest": "president",
+     "candidate": "Barry Goldwater (Republican)"
+    },
+    {
+     "label": "Kasper Nat. St. Rights",
+     "contest": "president",
+     "candidate": "National States Rights"
+    },
+    {
+     "label": "Munn Prohib.",
+     "contest": "president",
+     "candidate": "Prohibition"
+    },
+    {
+     "label": "DeBerry Soc. Workers",
+     "contest": "president",
+     "candidate": "Socialist Workers"
+    },
+    {
+     "label": "Mike Mansfield",
+     "contest": "senate",
+     "candidate": "Mike Mansfield"
+    },
+    {
+     "label": "Alex Blewett",
+     "contest": "senate",
+     "candidate": "Alex Blewett"
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "Wayne Montgomery",
+     "contest": "house1",
+     "candidate": "Wayne Montgomery"
+    },
+    {
+     "label": "Jack Gunderson",
+     "contest": "house1",
+     "candidate": "Jack Gunderson"
+    },
+    {
+     "label": "Jack C. Toole",
+     "contest": "house2",
+     "candidate": "Jack C. Toole"
+    },
+    {
+     "label": "James F. Battin",
+     "contest": "house2",
+     "candidate": "James F. Battin"
+    },
+    {
+     "label": "Roland Renne",
+     "contest": "governor",
+     "candidate": "Roland Renne"
+    },
+    {
+     "label": "Tim Babcock",
+     "contest": "governor",
+     "candidate": "Tim M. Babcock"
+    }
+   ]
+  }
+ ]
+}

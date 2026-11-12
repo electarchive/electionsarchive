@@ -1,0 +1,103 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1970, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/reportofofficial1970montrich/reportofofficial1970montrich.pdf",
+  "item": "https://archive.org/details/reportofofficial1970montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "senate": {
+   "year": 1970,
+   "chamber": "senate",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1970,
+   "chamber": "house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1970,
+   "chamber": "house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.137,
+    0.357,
+    0.968
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.2563
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Total Votes Cast",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mike Mansfield",
+     "contest": "senate",
+     "candidate": "Mike Mansfield"
+    },
+    {
+     "label": "Harold E. (Bud) Wallace",
+     "contest": "senate",
+     "candidate": "Harold E. (Bud) Wallace"
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "Richard G. (Dick) Shoup",
+     "contest": "house1",
+     "candidate": "Richard G. (Dick) Shoup"
+    },
+    {
+     "label": "John Melcher",
+     "contest": "house2",
+     "candidate": "John Melcher"
+    },
+    {
+     "label": "Jack Rehberg",
+     "contest": "house2",
+     "candidate": "Jack Rehberg"
+    }
+   ]
+  }
+ ]
+}

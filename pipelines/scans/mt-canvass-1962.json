@@ -1,0 +1,80 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1962, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1962montrich/officialmontanag1962montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1962montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "house1": {
+   "year": 1962,
+   "chamber": "house",
+   "day": "1962-11-06",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1962,
+   "chamber": "house",
+   "day": "1962-11-06",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-0",
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.137,
+    0.425,
+    0.944
+   ],
+   "bands": 3,
+   "header": [
+    0.0,
+    0.2255
+   ],
+   "hint": "Read only the columns listed, from the county column through the last listed column; the table continues to the right with other offices, which you leave out.",
+   "columns": [
+    {
+     "label": "Precincts",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Registration",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Arnold Olsen",
+     "contest": "house1",
+     "candidate": "Arnold Olsen"
+    },
+    {
+     "label": "Wayne Montgomery",
+     "contest": "house1",
+     "candidate": "Wayne Montgomery"
+    },
+    {
+     "label": "Leo Graybill, Jr.",
+     "contest": "house2",
+     "candidate": "Leo Graybill, Jr."
+    },
+    {
+     "label": "James F. Battin",
+     "contest": "house2",
+     "candidate": "James F. Battin"
+    }
+   ]
+  }
+ ]
+}
