@@ -81,7 +81,7 @@
         0.906,
         0.919
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'OFFICIAL VOTE—Continued November Election, 1896'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -159,7 +159,7 @@
         0.898,
         0.922
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1896'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'OFFICIAL VOTE—Continued November Election, 1896'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -255,5 +255,16 @@
       ]
     }
   ],
-  "empty": true
+  "empty": true,
+  "unit_codes": {
+    "Unorganized counties to Butte": "SD:unorganized-butte",
+    "Unorganized to Butte": "SD:unorganized-butte",
+    "Delano": "SD:delano",
+    "Presho": "SD:presho",
+    "Nowlin": "SD:nowlin",
+    "Nowliin": "SD:nowlin",
+    "Pratt": "SD:pratt",
+    "Scobey": "SD:scobey",
+    "Sterling": "SD:sterling"
+  }
 }

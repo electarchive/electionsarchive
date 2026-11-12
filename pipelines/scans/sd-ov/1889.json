@@ -20,11 +20,10 @@
     "governor": {
       "year": 1889,
       "chamber": "governor",
-      "day": "1889-10",
+      "day": "1889",
       "special": false,
       "state": "SD",
-      "district": null,
-      "create": true
+      "district": null
     }
   },
   "pages": [

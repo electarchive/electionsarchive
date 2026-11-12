@@ -107,7 +107,7 @@
         0.922,
         0.903
       ],
-      "hint": "Read only the table headed 'OFFICIAL VOTE\u2014Continued November Election, 1898'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'OFFICIAL VOTE—Continued November Election, 1898'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -115,5 +115,14 @@
       ]
     }
   ],
-  "empty": true
+  "empty": true,
+  "unit_codes": {
+    "Unorganized counties to Butte": "SD:unorganized-butte",
+    "Unorganized to Butte": "SD:unorganized-butte",
+    "Delano and Scobey": "SD:delano-and-scobey",
+    "Jackson, Nowlin and Sterling": "SD:jackson-nowlin-and-sterling",
+    "Jackson, Nowlin and Sterling.": "SD:jackson-nowlin-and-sterling",
+    "Pratt": "SD:pratt",
+    "Presho": "SD:presho"
+  }
 }

@@ -1377,7 +1377,10 @@ def passed(name: str, ids: dict[str, UUID]) -> tuple[Manifest, pl.DataFrame, dic
         file=pl.lit(0),
     ).with_columns(
         year=pl.col("year").cast(pl.Int32),
-        day=pl.col("day").str.to_date(),
+        day=pl.col("day")
+        .str.replace(r"^(\d{4})$", "${1}-01-01")
+        .str.replace(r"^(\d{4}-\d{2})$", "${1}-01")
+        .str.to_date(),
         district=pl.col("district").cast(pl.Int16),
     )
     caveats = {
