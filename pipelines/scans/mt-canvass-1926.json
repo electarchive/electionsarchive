@@ -1,0 +1,85 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1926, by county (official abstract dated December 6, 1926, scanned in the Internet Archive item labeled 1924)",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1924montrich/officialmontanag1924montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1924montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "house1": {
+   "year": 1926,
+   "chamber": "house",
+   "day": "1926-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1926,
+   "chamber": "house",
+   "day": "1926-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-house",
+   "columns": [
+    {
+     "label": "John M. Evans",
+     "contest": "house1",
+     "candidate": "John M. Evans"
+    },
+    {
+     "label": "Harry B. Mitchell",
+     "contest": "house2",
+     "candidate": "Harry B. Mitchell"
+    },
+    {
+     "label": "Ronald Higgins",
+     "contest": "house1",
+     "candidate": "Ronald Higgins"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "Clair Stoner",
+     "contest": "house2",
+     "candidate": "Clair Stoner"
+    },
+    {
+     "label": "Geo. H. Ambrose",
+     "contest": "house1",
+     "candidate": "George H. Ambrose"
+    },
+    {
+     "label": "J. M. Kruse",
+     "contest": "house2",
+     "candidate": "J. M. Kruse"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.19,
+    0.375,
+    0.945
+   ],
+   "bands": 2,
+   "header": [
+    0.0,
+    0.31
+   ],
+   "hint": "Read only the Representative in Congress table, seven columns: Democratic First Dist., Democratic Second Dist., Republican First Dist., Republican Second Dist., Farmer-Labor Second Dist., Socialist First Dist., and Socialist Second Dist. Blank or dotted cells are empty strings."
+  }
+ ]
+}

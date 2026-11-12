@@ -1,0 +1,128 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1930, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1930montrich/officialmontanag1930montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1930montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "senate": {
+   "year": 1930,
+   "chamber": "senate",
+   "day": "1930-11-04",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1930,
+   "chamber": "house",
+   "day": "1930-11-04",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1930,
+   "chamber": "house",
+   "day": "1930-11-04",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-fed",
+   "columns": [
+    {
+     "label": "Thomas J. Walsh",
+     "contest": "senate",
+     "candidate": "Thomas J. Walsh"
+    },
+    {
+     "label": "Albert J. Galen",
+     "contest": "senate",
+     "candidate": "Albert J. Galen"
+    },
+    {
+     "label": "Charles E. Taylor",
+     "contest": "senate",
+     "candidate": "Charles E. Taylor"
+    },
+    {
+     "label": "John F. McKay",
+     "contest": "senate",
+     "candidate": "John F. McKay"
+    },
+    {
+     "label": "Willis L. Wright",
+     "contest": "senate",
+     "candidate": "Willis L. Wright"
+    },
+    {
+     "label": "John M. Evans",
+     "contest": "house1",
+     "candidate": "John M. Evans"
+    },
+    {
+     "label": "Mark D. Fitzgarrald",
+     "contest": "house1",
+     "candidate": "Mark D. Fitzgarrald"
+    },
+    {
+     "label": "Charles Squires",
+     "contest": "house1",
+     "candidate": "Charles Squires"
+    },
+    {
+     "label": "J. P. Cavanaugh",
+     "contest": "house1",
+     "candidate": "J. P. Cavanaugh"
+    },
+    {
+     "label": "Tom Stout",
+     "contest": "house2",
+     "candidate": "Tom Stout"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "James Ostby",
+     "contest": "house2",
+     "candidate": "James Ostby"
+    },
+    {
+     "label": "Jacob M. Kruse",
+     "contest": "house2",
+     "candidate": "Jacob M. Kruse"
+    },
+    {
+     "label": "Wayne LaGrange",
+     "contest": "house2",
+     "candidate": "Wayne La Grange"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.16,
+    0.54,
+    0.885
+   ],
+   "bands": 2,
+   "header": [
+    0.0,
+    0.317
+   ],
+   "hint": "Read only the 14 columns of the United States Senator table (five columns) and the Representative in Congress tables, First Congressional District (four columns) and Second Congressional District (five columns). Skip the Pluralities line. Blank or dotted cells are empty strings."
+  }
+ ]
+}
