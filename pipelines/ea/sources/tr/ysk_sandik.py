@@ -51,7 +51,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "20"
+VERSION = "21"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -120,6 +120,9 @@ YSK = {
         )
     },
 }
+MUHTARLIK_SLUGS = {"2024-yerel-belediye-baskanlık-secimleri": 0, "2024-yerel-il-genel-meclis-uyeligi-secimleri": 1}
+MUHTARLIK_DAY = date(2024, 3, 31)
+REGISTER = Path(__file__).with_name("muhtarlik_2024.tsv")
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
     {upper(short): full for full, short, *_ in PARTIES}
@@ -250,10 +253,12 @@ def parse() -> None:
         pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars()
     )
     official = []
+    registers = []
     keys = ["plate", "district", "neighborhood"]
     for slug, (url, _) in YSK.items():
         headers: dict[tuple[str, int], dict[str, str]] = {}
         rows = []
+        muhtarliks = []
         with gzip.open(raw.cached(SOURCE, url).path, "rt") as file:
             for line in file:
                 data = json.loads(line)
@@ -282,8 +287,21 @@ def parse() -> None:
                 }
                 if sum(votes.values()) != data.get("gecerli_OY_TOPLAMI", 0):
                     raise ValueError(f"{slug} {data['sandik_ID']}: votes do not sum to valid votes")
-                base = data["ilce_ADI"].partition(" - ")[0]
+                base, _, belde = data["ilce_ADI"].partition(" - ")
                 district = "MERKEZ" if base in (f"{data['il_ADI']} MERKEZ", "MERKEZEFENDİ") else base
+                if "muhtarlik_ID" in data:
+                    muhtarliks.append(
+                        (
+                            f"{data['il_ID']:02}",
+                            district,
+                            data["muhtarlik_ADI"],
+                            data["muhtarlik_ID"],
+                            base,
+                            data.get("belde_ID") or None,
+                            belde or None,
+                            data.get("secmen_SAYISI") or 0,
+                        )
+                    )
                 rows += [
                     (
                         f"{data['il_ID']:02}",
@@ -338,6 +356,22 @@ def parse() -> None:
             .with_columns(neighborhood=pl.coalesce("neighborhood_mirror", "neighborhood"))
             .drop("neighborhood_mirror")
         )
+        if slug in MUHTARLIK_SLUGS:
+            registers.append(
+                pl.DataFrame(
+                    muhtarliks,
+                    schema=[*keys, "muhtarlik_id", "ilce", "belde_id", "belde", "voters"],
+                    schema_overrides={"belde_id": pl.Int64, "belde": pl.String},
+                    orient="row",
+                )
+                .with_columns(pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars())
+                .with_columns(name=pl.col("neighborhood"), prison=pl.col("neighborhood").str.contains(PRISON))
+                .filter(~pl.col("prison") | (pl.len().over("muhtarlik_id") == pl.len().over("muhtarlik_id", "name")))
+                .join(renamed, on=keys, how="left")
+                .with_columns(neighborhood=pl.coalesce("neighborhood_mirror", "neighborhood"), slug=pl.lit(slug))
+                .group_by("muhtarlik_id", "slug", *keys, "name", "ilce", "belde_id", "belde")
+                .agg(pl.col("voters").sum())
+            )
         official += [
             boxes.with_columns(slug=pl.lit(slug), scope=pl.lit("neighborhood")),
             boxes.group_by("plate", "district", "label")
@@ -404,6 +438,19 @@ def parse() -> None:
             frame.join(missing.filter(pl.col("slug").str.contains("yerel")), on=places, how="semi"),
         ]
     ).filter(pl.col("slug").is_in(LOCAL)).drop("scope").write_parquet(PARSED / "local.parquet")
+    register = (
+        pl.concat(registers)
+        .sort(pl.col("slug").replace_strict(MUHTARLIK_SLUGS, return_dtype=pl.Int64), "muhtarlik_id")
+        .unique(subset="muhtarlik_id", keep="first", maintain_order=True)
+        .with_columns(
+            kind=pl.when(pl.col("name").str.ends_with(" MAH.")).then(pl.lit("mahalle")).otherwise(pl.lit("köy"))
+        )
+        .sort("muhtarlik_id")
+    )
+    if register["muhtarlik_id"].n_unique() != register.select("plate", "district", "neighborhood").n_unique():
+        raise ValueError("a muhtarlık sits on two places, or two muhtarlıks on one")
+    register.write_parquet(PARSED / "muhtarlik.parquet")
+    print(register.group_by("kind", belde=pl.col("belde_id").is_not_null()).len())
     pl.DataFrame(
         unattributed, schema=["slug", "plate", "district", "neighborhood", "votes"], orient="row"
     ).with_columns(pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars()).write_parquet(
@@ -540,6 +587,7 @@ def emit() -> Path:
         seats_2015: dict[str, str] = {}
         seats_2011: dict[str, str] = {}
         added: list[str] = []
+        areas: dict[tuple[str, str, str], tuple[UUID, str]] = {}
         rows: list[dict[str, object]] = []
         for plate, district, neighborhood in (
             pl.concat(
@@ -629,6 +677,8 @@ def emit() -> Path:
             unit = cs.unit(scheme, code)
             place = f"{plate}\x1f{district}\x1f{neighborhood}"
             units[place] = str(unit)
+            if not prison:
+                areas[(plate, district, neighborhood)] = (area, code)
             seats[place] = sorted_into.get(f"{plate}:{district_names[ilce_id]}", plate)
             seats_2015[place] = sorted_2015.get(f"{plate}:{district_names[ilce_id]}", plate)
             seats_2011[place] = sorted_2011.get(f"{plate}:{district_names[ilce_id]}", plate)
@@ -653,6 +703,34 @@ def emit() -> Path:
             for area in former:
                 cs.add("area_event_member", event_id=event, area_id=area, role="from")
         print(f"{len(units)} units, {len(added)} neighborhoods not in Oy ve Ötesi's list: {added}")
+        register = pl.read_parquet(PARSED / "muhtarlik.parquet")
+        places = [tuple(place) for place in register.select("plate", "district", "neighborhood").iter_rows()]
+        if unplaced := [place for place in places if place not in areas]:
+            raise ValueError(f"{len(unplaced)} muhtarlıks with no area: {unplaced[:20]}")
+        register = register.with_columns(area=pl.Series([areas[place][1] for place in places]))
+        coded = {areas[place][0]: id for id, place in zip(register["muhtarlik_id"], places, strict=True)}
+        if len(coded) != register.height:
+            raise ValueError("two muhtarlıks share an area")
+        cs.frame(
+            "area_code",
+            pl.DataFrame(
+                {
+                    "area_id": [str(area) for area in coded],
+                    "code": [str(id) for id in coded.values()],
+                    "valid_from": [MUHTARLIK_DAY] * len(coded),
+                }
+            ),
+        )
+        register.select(
+            muhtarlik_id="muhtarlik_id",
+            plate="plate",
+            ilce="ilce",
+            belde="belde",
+            name="name",
+            kind="kind",
+            registered_voters="voters",
+            area="area",
+        ).sort("plate", "ilce", "belde", "name", nulls_last=False).write_csv(REGISTER, separator="\t")
 
         place = pl.concat_str("plate", "district", pl.col("neighborhood").fill_null(""), separator="\x1f")
         parliament = pl.col("slug").str.contains("milletvekilligi")
