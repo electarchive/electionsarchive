@@ -12617,41 +12617,92 @@ export const contests = {
       `);
       const parents = new Set(found.rows.map((row) => row.parent));
       const kept = found.rows.filter((row) => !parents.has(row.id));
-      const labels = await names(
-        kept.map((row) => row.id),
-        contest.date,
-      );
-      const locate = async (row: (typeof kept)[number]) => {
-        const other = await find(row.id);
-        if (other.place == null) {
-          return null;
+      const [labels, others] = await Promise.all([
+        names(
+          kept.map((row) => row.id),
+          contest.date,
+        ),
+        Promise.all(kept.map(async (row) => find(row.id))),
+      ]);
+      const placed = kept.flatMap((row, index) => {
+        const place = others[index]?.place;
+        return place == null ? [] : [{ row, place, lane: index % 4 }];
+      });
+      const away = placed.filter(({ place }) => place.k !== area.k);
+      const near =
+        away.length === 0
+          ? new Set<string>()
+          : new Set(
+              rowsOf(
+                await db.execute<{ id: string }>(sql`
+                  with asked as materialized (
+                    select * from unnest(
+                      ${sql.param(away.map(({ row }) => row.id))}::uuid[],
+                      ${sql.param(away.map(({ place }) => place.id))}::uuid[]
+                    ) as t(id, place)
+                  ),
+                  me as materialized (
+                    select a.k, a.scheme_code = 'world.country' as abroad,
+                      array(select p.parent_id from area_parent p where p.area_id = a.id and p.valid @> ${day}::date) as parents
+                    from area a where a.id = ${area.id}::uuid
+                  )
+                  select asked.id from asked cross join me
+                  where me.abroad or cardinality(me.parents) = 0
+                    or asked.place = any(me.parents)
+                    or exists (
+                      select from unnest(me.parents) as up(id)
+                      join area_parent q on q.area_id = up.id and q.parent_id = asked.place and q.valid @> ${day}::date
+                    )
+                    or not exists (
+                      with recursive anc(id) as (
+                        select asked.place
+                        union
+                        select p.parent_id from area_parent p join anc on p.area_id = anc.id
+                      )
+                      select from anc where anc.id = ${area.id}::uuid
+                    )
+                    or exists (select from contest c where c.id = asked.id and c.kind = 'delegate_allocation')
+                    or exists (
+                      with recursive grp(id) as (
+                        select asked.id
+                        union all
+                        select c.id from contest c join grp on c.allocation_parent_id = grp.id
+                      )
+                      select from grp
+                      cross join lateral (select x.k from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) x
+                      cross join lateral (select u.unit_k from result_rollup_unit u where u.result_set_k = x.k and u.area_k = me.k offset 0) u
+                      cross join lateral (select ru.id from reporting_unit ru where ru.k = u.unit_k offset 0) ru
+                      cross join lateral (
+                        select from reporting_unit_area m
+                        where m.unit_id = ru.id and m.area_id = asked.place and m.valid @> ${day}::date offset 0
+                      ) m
+                    )
+                `),
+              ).map((row) => row.id),
+            );
+      const locate = async ({ row, place }: (typeof placed)[number]) => {
+        if (place.k === area.k) {
+          return { row, unit: "" };
         }
         if (
-          other.place.k !== area.k &&
-          !row.voted &&
-          !(await reaches(other.place.id, area.id, day))
+          !near.has(row.id) ||
+          (!row.voted && !(await reaches(place.id, area.id, day)))
         ) {
           return null;
         }
-        const kids =
-          other.place.k === area.k
-            ? []
-            : await children(row.id, other.place, true, day);
-        const unit =
-          other.place.k === area.k
-            ? ""
-            : kids.find((kid) => kid.k === area.k)?.segment;
+        const kids = await children(row.id, place, true, day);
+        const unit = kids.find((kid) => kid.k === area.k)?.segment;
         return unit == null ? null : { row, unit };
       };
-      const lanes = Map.groupBy(kept, (_row, index) => index % 4)
+      const lanes = Map.groupBy(placed, (entry) => entry.lane)
         .values()
         .toArray();
       const [located, lineage] = await Promise.all([
         Promise.all(
           lanes.map(async (lane) => {
             const done: Array<Awaited<ReturnType<typeof locate>>> = [];
-            for (const row of lane) {
-              done.push(await locate(row));
+            for (const entry of lane) {
+              done.push(await locate(entry));
             }
             return done;
           }),
