@@ -22204,7 +22204,7 @@ export async function record(input: { id: string; body?: string }) {
       where e.id in (select election_id from picked) and e.kind in ('general', 'local', 'primary')
     ),
     ak as materialized (
-      select a.id, a.k from area a
+      select jsonb_object_agg(a.id, a.k) as k from area a
       where a.id = any(array(select distinct coalesce(c.district_area_id, e.area_id) from picked c join held e on e.id = c.election_id))
     ),
     roots as materialized (
@@ -22212,7 +22212,7 @@ export async function record(input: { id: string; body?: string }) {
         c.kind = 'list_allocation' as "isList", coalesce(c.term = 'remainder', false) as "isRemainder",
         case when c."ownBody" then (select p.kind = 'supranational' from polity p where p.id = ${input.id}::uuid)
           else coalesce((select bp.kind = 'supranational' from body b join polity bp on bp.id = b.polity_id where b.id = c.body_id), false) end as "isAbroad",
-        e.date_from as date, e.year, a.k as area,
+        e.date_from as date, e.year, ((select k from ak) ->> coalesce(c.district_area_id, e.area_id)::text)::int as area,
         case when coalesce(c.office_id, c.body_id) = any(e.reruns) then e.top
           when e.polity_id = ${input.id}::uuid and e."topPolity" = e.polity_id and e."topKind" = e.kind then e.top
           when e.polity_id = ${input.id}::uuid then e.id
@@ -22226,16 +22226,15 @@ export async function record(input: { id: string; body?: string }) {
           ) end as link
       from picked c
       join held e on e.id = c.election_id
-      left join ak a on a.id = coalesce(c.district_area_id, e.area_id)
       where (e.kind in ('general', 'local') or (
           e.kind = 'primary'
           and not exists (select from contest n where n.previous_round_id = c.id)
+          and exists (select from result_set rs join outcome o on o.result_set_id = rs.id where rs.contest_id = c.id and o.kind = 'elected')
           and not exists (
             select from contest n join election ne on ne.id = n.election_id
             where coalesce(n.office_id, n.body_id) = coalesce(c.office_id, c.body_id) and n.seat_id is not distinct from c.seat_id
               and ne.kind in ('general', 'local', 'runoff', 'special') and ne.date_from > e.date_from and ne.date_from < e.date_from + 365
           )
-          and exists (select from result_set rs join outcome o on o.result_set_id = rs.id where rs.contest_id = c.id and o.kind = 'elected')
         ))
         and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
         and not exists (
