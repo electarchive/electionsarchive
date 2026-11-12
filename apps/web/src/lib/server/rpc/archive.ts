@@ -14433,11 +14433,11 @@ async function universe(
 
 const framed = new Map<string, ReturnType<typeof framing>>();
 
-function framing(area: string, day: string, ks: Array<number> = []) {
+async function framing(area: string, day: string, ks: Array<number> = []) {
   return ks.length === 0
     ? remember(
         `framing:${area}:${day}`,
-        () => framingBox(area, day, ks),
+        async () => framingBox(area, day, ks),
         false,
         undefined,
         true,
