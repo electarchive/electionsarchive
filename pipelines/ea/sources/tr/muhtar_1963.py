@@ -653,36 +653,47 @@ def emit() -> Path:
         def key(text: str) -> str:
             return norm(re.sub(r"\s*[İIi]l[cç]es[iı]\s*$", "", text or ""))
 
-        units: dict[str, dict[tuple[int, str], tuple[str, str | None]]] = {"ilce": {}, "sehir": {}}
-        order: dict[tuple[str, int], list[tuple[str, str | None]]] = defaultdict(list)
+        order: dict[tuple[str, int], list[tuple[str, tuple[str, str | None]]]] = defaultdict(list)
         for record in located.filter(pl.col("level") == "district").sort("seq").iter_rows(named=True):
             role = "ilce" if record["table"] == "il_genel" else "sehir"
             held = (record["unit"], record["area"])
-            if held not in order[role, record["plate"]]:
-                order[role, record["plate"]].append(held)
-                units[role].setdefault((record["plate"], "merkez"), held)
-            units[role][record["plate"], key(record["name"])] = held
+            if held not in [at for _, at in order[role, record["plate"]]]:
+                order[role, record["plate"]].append((key(record["name"]), held))
         wanted = rows.filter(pl.col("level").is_in(["ilce", "sehir"])).sort("plate", "seq")
-        ordinal = {
-            (role, plate, seq): index
-            for (role, plate), part in wanted.group_by("level", "plate")
-            for index, seq in enumerate(part.sort("seq")["seq"])
-        }
-        counts = {(role, plate): part.height for (role, plate), part in wanted.group_by("level", "plate")}
 
-        def find(role: str, plate: int, text: str, seq: int) -> tuple[str, str | None] | None:
-            table = units[role]
-            if (plate, key(text)) in table:
-                return table[plate, key(text)]
-            scored = sorted(
-                (difflib.SequenceMatcher(None, key(text), other).ratio(), other) for at, other in table if at == plate
-            )
-            if scored and scored[-1][0] >= 0.8 and (len(scored) < 2 or scored[-2][0] < scored[-1][0]):
-                return table[plate, scored[-1][1]]
+        def align(printed: list[str], held: list[str]) -> dict[int, int]:
+            best = [[0.0] * (len(held) + 1) for _ in range(len(printed) + 1)]
+            for i, left in enumerate(printed, 1):
+                for j, right in enumerate(held, 1):
+                    ratio = 1.0 if i == j == 1 else difflib.SequenceMatcher(None, left, right).ratio()
+                    if min(len(left), len(right)) >= 4 and (left.startswith(right) or right.startswith(left)):
+                        ratio = max(ratio, 0.9)
+                    best[i][j] = max(
+                        best[i - 1][j], best[i][j - 1], best[i - 1][j - 1] + (ratio if ratio >= 0.75 else -1)
+                    )
+            pairs: dict[int, int] = {}
+            i, j = len(printed), len(held)
+            while i and j:
+                if best[i][j] == best[i - 1][j]:
+                    i -= 1
+                elif best[i][j] == best[i][j - 1]:
+                    j -= 1
+                else:
+                    pairs[i - 1] = j - 1
+                    i, j = i - 1, j - 1
+            edges = [(-1, -1), *sorted(pairs.items()), (len(printed), len(held))]
+            for (i0, j0), (i1, j1) in itertools.pairwise(edges):
+                if i1 - i0 == j1 - j0 > 1:
+                    pairs.update({i0 + step: j0 + step for step in range(1, i1 - i0)})
+            return pairs
+
+        placed: dict[tuple[str, int, int], tuple[str, str | None] | None] = {}
+        for (role, plate), part in wanted.group_by("level", "plate"):
+            part = part.sort("seq")
             listed = order[role, plate]
-            if counts.get((role, plate)) == len(listed):
-                return listed[ordinal[role, plate, seq]]
-            return None
+            pairs = align([key(text) for text in part["ilce"]], [at for at, _ in listed])
+            for index, seq in enumerate(part["seq"]):
+                placed[role, plate, seq] = listed[pairs[index]][1] if index in pairs else None
 
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -732,13 +743,7 @@ def emit() -> Path:
         unread = Counter()
         missing: list[str] = []
         codes: set[str] = set()
-        current: dict[str, tuple[str, str | None] | None] = {}
-        placed = {
-            (row["level"], row["plate"], row["seq"]): find(row["level"], row["plate"], row["ilce"], row["seq"])
-            for row in wanted.iter_rows(named=True)
-        }
-        claims = Counter(found for found in placed.values() if found is not None)
-        placed = {at: found if found is not None and claims[found] == 1 else None for at, found in placed.items()}
+        current: dict[str, tuple[str | None, str | None] | None] = {}
         for row in rows.sort("plate", "seq").iter_rows(named=True):
             level, plate = row["level"], row["plate"]
             if level not in LEVELS:
@@ -748,6 +753,9 @@ def emit() -> Path:
             elif level == "ilce":
                 current["ilce"] = placed["ilce", plate, row["seq"]]
                 if current["ilce"] is None:
+                    current["ilce"] = placed.get(("sehir", plate, row["seq"] + 1))
+                    if current["ilce"] is not None:
+                        current["ilce"] = (None, current["ilce"][1])
                     missing.append(f"{plate:02} {row['ilce']} (ilçe)")
                     continue
                 unit = UUID(current["ilce"][0])
