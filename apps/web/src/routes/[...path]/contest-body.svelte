@@ -35,6 +35,7 @@
   import { marginSafety, marginShade } from "#lib/shade.js";
   import { cn } from "#lib/utils.js";
   import {
+    contingency,
     isQuestion,
     isSeated,
     verdict as lede,
@@ -963,6 +964,7 @@
       )
       .toArray()
       .concat(
+        contest.contingent == null ? [] : [contingency(contest.contingent)],
         contest.partial == null
           ? []
           : [m.race_partial_counties(contest.partial)],

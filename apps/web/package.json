@@ -21,6 +21,7 @@
     "@better-auth/i18n": "catalog:",
     "@ea/analytics": "workspace:*",
     "@ea/db": "workspace:*",
+    "@ea/engine": "workspace:*",
     "@ea/view-spec": "workspace:*",
     "@fontsource-variable/noto-naskh-arabic": "catalog:",
     "@fontsource-variable/piazzolla": "catalog:",

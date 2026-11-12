@@ -498,3 +498,13 @@ export function recordLede(
     next,
   };
 }
+
+export function contingency(held: NonNullable<Page["contest"]["contingent"]>) {
+  const values = { count: count(held.finalists) };
+  return {
+    legislature: m.contingent_legislature,
+    lower_house: m.contingent_lower_house,
+    house_delegations: m.contingent_house_delegations,
+    senate: m.contingent_senate,
+  }[held.chooser](values);
+}

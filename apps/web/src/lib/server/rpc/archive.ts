@@ -1,6 +1,7 @@
 import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
 import { ancestry, compare, keying } from "@ea/analytics";
+import { elect, rules } from "@ea/engine";
 import { openapi } from "@orpc/openapi";
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
@@ -8113,6 +8114,19 @@ export const contests = {
         rule: v.optional(v.nullable(Rule)),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
+        contingent: v.optional(
+          v.nullable(
+            v.object({
+              chooser: v.picklist([
+                "legislature",
+                "lower_house",
+                "house_delegations",
+                "senate",
+              ]),
+              finalists: v.number(),
+            }),
+          ),
+        ),
         logos: LogoMap,
         explanations: v.array(
           v.object({
@@ -8437,6 +8451,7 @@ export const contests = {
         counted,
         split,
         explanations,
+        contingent,
       ] = await Promise.all([
         db.execute<{ id: string }>(sql`
           select id from contest where allocation_parent_id = ${contest.id}::uuid
@@ -8550,6 +8565,7 @@ export const contests = {
           having (select count(distinct channel) from facts) > 1
         `),
         isRoot ? explain(contest, contest.place?.k ?? null) : [],
+        contingency(contest.id),
       ]);
       const [
         { last, round, derived, seats: elects, isShallow } = {
@@ -9218,6 +9234,7 @@ export const contests = {
         quorum: roll.quorum,
         rule: roll.rule,
         explanations,
+        contingent,
         ballot: roll.ballot,
         isStv: roll.isStv,
         channels: Map.groupBy(split.rows, (row) => row.channel)
@@ -13907,6 +13924,76 @@ async function poll(contest: string | null, k: number | null, isAsked = true) {
     ballot: row?.ballot != null && row.ballot > 1 ? row.ballot : null,
     isStv: row?.isStv ?? false,
   };
+}
+
+async function contingency(contest: string) {
+  const found = await db.execute<{
+    rules: unknown;
+    area: number;
+    option: number | null;
+    measure: number;
+    value: number;
+  }>(sql`
+    with own as (
+      select coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}') as rules
+      from contest c left join electoral_system es on es.id = c.electoral_system_id
+      where c.id = ${contest}::uuid
+        and (coalesce(es.rules, '{}') || coalesce(c.rules_override, '{}')) ->> 'formula' = 'contingent'
+    ),
+    chosen as (
+      select rs.k from result_set rs
+      where rs.contest_id = ${contest}::uuid and ${latest("rs")} and exists (select from own)
+      order by array_position(${STAGES}, rs.stage)
+      limit 1
+    )
+    select (select rules from own) as rules, x.area_k as area, x.option_k as option, x.measure::int as measure,
+      sum(x.value)::float8 as value
+    from chosen cross join lateral (
+      select y.area_k, y.option_k, y.measure, y.value from result_rollup y
+      where y.result_set_k = chosen.k and y.measure in (1, 2, 11) and y.count_round = 0 offset 0
+    ) x
+    group by 2, 3, 4
+  `);
+  const parsed = v.safeParse(rules, found.rows[0]?.rules);
+  if (!parsed.success || parsed.output.formula !== "contingent") {
+    return null;
+  }
+  const counted = found.rows.some((row) => row.measure === 11) ? 11 : 1;
+  const totals = new Map<number, number>();
+  for (const row of found.rows) {
+    if (row.measure === counted && row.option != null && row.option !== 0) {
+      totals.set(row.area, (totals.get(row.area) ?? 0) + row.value);
+    }
+  }
+  const root = totals
+    .entries()
+    .toArray()
+    .toSorted(([, a], [, b]) => b - a)[0]?.[0];
+  if (root == null) {
+    return null;
+  }
+  const options = found.rows
+    .filter(
+      (row) =>
+        row.area === root &&
+        row.measure === counted &&
+        row.option != null &&
+        row.option !== 0,
+    )
+    .map((row) => ({ id: String(row.option), votes: row.value }));
+  let appointed = 0;
+  for (const row of found.rows) {
+    if (row.area === root && row.measure === 2) {
+      appointed += row.value;
+    }
+  }
+  const decided = elect(
+    { ...parsed.output, districts: false },
+    { options, appointed: appointed > 0 ? appointed : (totals.get(root) ?? 0) },
+  );
+  return decided.outcome === "contingent"
+    ? { chooser: decided.chooser, finalists: decided.finalists.length }
+    : null;
 }
 
 async function explain(

@@ -460,6 +460,9 @@ importers:
       '@ea/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ea/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
       '@ea/view-spec':
         specifier: workspace:*
         version: link:../../packages/view-spec

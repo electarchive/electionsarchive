@@ -85,7 +85,7 @@ import {
   supplyLabels,
   years,
 } from "#lib/source-kinds.js";
-import { comeback, recordLede, verdict } from "#lib/verdict.js";
+import { comeback, contingency, recordLede, verdict } from "#lib/verdict.js";
 
 type Data = Awaited<ReturnType<typeof load>>;
 type Ledger = InferRouterOutputs<typeof router>["contests"]["ledger"];
@@ -6402,7 +6402,7 @@ function resultsMarkdown(
         contest.turnout == null || contest.turnout.registered === 0
           ? ""
           : `\n\n${m.stat_turnout()}: ${percent(contest.turnout.voters / contest.turnout.registered)} (${m.stat_turnout_count({ voters: count(contest.turnout.voters), registered: count(contest.turnout.registered) })})${contest.turnout.basis === "rejected" ? ` ${m.turnout_basis_rejected()}` : contest.turnout.basis === "valid" ? ` ${m.turnout_basis_valid()}` : ""}`
-      }${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
+      }${contest.contingent == null ? "" : `\n\n${contingency(contest.contingent)}`}${contest.partial == null ? "" : `\n\n${m.race_partial_counties(contest.partial)}`}${contest.rows
         .flatMap((row) =>
           row.current == null || row.supported.length === 0
             ? []
