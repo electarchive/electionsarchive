@@ -1,0 +1,32 @@
+{
+ "year": 1936,
+ "day": "1936-11-03",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1937, vote by counties (general election 1936-11-03)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AXHRYO3YEVDUIK8X",
+  "item": "https://search.library.wisc.edu/digital/AXHRYO3YEVDUIK8X"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1936 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1936 general election only (not a special election of another year)",
+  "governor": "Governor, 1936 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1936 general election, one table per congressional district"
+ },
+ "leaves": [
+  440,
+  441,
+  442,
+  443,
+  444,
+  445,
+  446,
+  447,
+  448,
+  449,
+  450
+ ]
+}

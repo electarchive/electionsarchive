@@ -1,0 +1,28 @@
+{
+ "year": 1976,
+ "day": "1976-11-02",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1977, vote by counties (general election 1976-11-02)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D",
+  "item": "https://search.library.wisc.edu/digital/AXFTVPSYH4JPMZ8D"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1976 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1976 general election only (not a special election of another year)",
+  "governor": "Governor, 1976 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1976 general election, one table per congressional district"
+ },
+ "leaves": [
+  921,
+  922,
+  923,
+  924,
+  925,
+  926
+ ],
+ "mixed": true
+}

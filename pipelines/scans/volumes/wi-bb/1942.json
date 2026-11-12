@@ -1,0 +1,29 @@
+{
+ "year": 1942,
+ "day": "1942-11-03",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1944, vote by counties (general election 1942-11-03)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A5MPC2C75NJZEK8Z",
+  "item": "https://search.library.wisc.edu/digital/A5MPC2C75NJZEK8Z"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1942 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1942 general election only (not a special election of another year)",
+  "governor": "Governor, 1942 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1942 general election, one table per congressional district"
+ },
+ "leaves": [
+  595,
+  596,
+  597,
+  598,
+  599,
+  600,
+  601,
+  602
+ ]
+}

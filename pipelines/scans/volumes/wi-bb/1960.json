@@ -1,0 +1,27 @@
+{
+ "year": 1960,
+ "day": "1960-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1962, vote by counties (general election 1960-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O",
+  "item": "https://search.library.wisc.edu/digital/A5BZZBS2FDP3LV8O"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1960 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1960 general election only (not a special election of another year)",
+  "governor": "Governor, 1960 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1960 general election, one table per congressional district"
+ },
+ "leaves": [
+  879,
+  882,
+  883,
+  884,
+  885
+ ],
+ "mixed": true
+}

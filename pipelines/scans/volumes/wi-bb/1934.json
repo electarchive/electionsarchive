@@ -1,0 +1,26 @@
+{
+ "year": 1934,
+ "day": "1934-11-06",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1935, vote by counties (general election 1934-11-06)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/APK3IJRHBGDIWA8L",
+  "item": "https://search.library.wisc.edu/digital/APK3IJRHBGDIWA8L"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1934 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1934 general election only (not a special election of another year)",
+  "governor": "Governor, 1934 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1934 general election, one table per congressional district"
+ },
+ "leaves": [
+  658,
+  663,
+  664,
+  665,
+  666
+ ]
+}

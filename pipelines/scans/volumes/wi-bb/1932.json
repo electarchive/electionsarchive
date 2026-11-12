@@ -1,0 +1,27 @@
+{
+ "year": 1932,
+ "day": "1932-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1933, vote by counties (general election 1932-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AWPG6E4D5P7OSQ82",
+  "item": "https://search.library.wisc.edu/digital/AWPG6E4D5P7OSQ82"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1932 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1932 general election only (not a special election of another year)",
+  "governor": "Governor, 1932 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1932 general election, one table per congressional district"
+ },
+ "leaves": [
+  544,
+  545,
+  546,
+  564,
+  565,
+  566
+ ]
+}

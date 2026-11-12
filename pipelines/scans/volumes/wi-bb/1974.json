@@ -1,0 +1,29 @@
+{
+ "year": 1974,
+ "day": "1974-11-05",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1975, vote by counties (general election 1974-11-05)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AK4UW47RO2T4A38E",
+  "item": "https://search.library.wisc.edu/digital/AK4UW47RO2T4A38E"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1974 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1974 general election only (not a special election of another year)",
+  "governor": "Governor, 1974 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1974 general election, one table per congressional district"
+ },
+ "leaves": [
+  833,
+  834,
+  835,
+  836,
+  837,
+  838,
+  839
+ ],
+ "mixed": true
+}

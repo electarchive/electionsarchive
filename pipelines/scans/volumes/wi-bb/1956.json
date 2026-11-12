@@ -1,0 +1,29 @@
+{
+ "year": 1956,
+ "day": "1956-11-06",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1958, vote by counties (general election 1956-11-06)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A2BH4FP76N6HMK8V",
+  "item": "https://search.library.wisc.edu/digital/A2BH4FP76N6HMK8V"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1956 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1956 general election only (not a special election of another year)",
+  "governor": "Governor, 1956 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1956 general election, one table per congressional district"
+ },
+ "leaves": [
+  785,
+  788,
+  789,
+  790,
+  791,
+  793,
+  794
+ ],
+ "mixed": true
+}

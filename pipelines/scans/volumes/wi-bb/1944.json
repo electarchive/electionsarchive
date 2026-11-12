@@ -1,0 +1,32 @@
+{
+ "year": 1944,
+ "day": "1944-11-07",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1946, vote by counties (general election 1944-11-07)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AQVJ6L7MLLNNJK8H",
+  "item": "https://search.library.wisc.edu/digital/AQVJ6L7MLLNNJK8H"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1944 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1944 general election only (not a special election of another year)",
+  "governor": "Governor, 1944 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1944 general election, one table per congressional district"
+ },
+ "leaves": [
+  687,
+  688,
+  689,
+  690,
+  691,
+  692,
+  693,
+  694,
+  695,
+  696,
+  697
+ ]
+}

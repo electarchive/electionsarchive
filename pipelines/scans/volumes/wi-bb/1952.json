@@ -1,0 +1,30 @@
+{
+ "year": 1952,
+ "day": "1952-11-04",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1954, vote by counties (general election 1952-11-04)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z",
+  "item": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1952 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1952 general election only (not a special election of another year)",
+  "governor": "Governor, 1952 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1952 general election, one table per congressional district"
+ },
+ "leaves": [
+  771,
+  772,
+  773,
+  774,
+  775,
+  776,
+  777,
+  778
+ ],
+ "mixed": true
+}

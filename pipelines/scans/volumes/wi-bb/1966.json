@@ -1,0 +1,25 @@
+{
+ "year": 1966,
+ "day": "1966-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1968, vote by counties (general election 1966-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AW5GGNB5NK26Z38S",
+  "item": "https://search.library.wisc.edu/digital/AW5GGNB5NK26Z38S"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1966 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1966 general election only (not a special election of another year)",
+  "governor": "Governor, 1966 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1966 general election, one table per congressional district"
+ },
+ "leaves": [
+  737,
+  738,
+  739
+ ],
+ "mixed": true
+}

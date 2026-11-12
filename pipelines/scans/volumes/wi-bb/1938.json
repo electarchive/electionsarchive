@@ -1,0 +1,30 @@
+{
+ "year": 1938,
+ "day": "1938-11-08",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1940, vote by counties (general election 1938-11-08)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A5YLAAJEI53TTB8Q",
+  "item": "https://search.library.wisc.edu/digital/A5YLAAJEI53TTB8Q"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1938 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1938 general election only (not a special election of another year)",
+  "governor": "Governor, 1938 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1938 general election, one table per congressional district"
+ },
+ "leaves": [
+  629,
+  630,
+  631,
+  632,
+  633,
+  634,
+  635,
+  636,
+  637
+ ]
+}

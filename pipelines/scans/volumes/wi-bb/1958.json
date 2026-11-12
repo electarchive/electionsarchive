@@ -1,0 +1,27 @@
+{
+ "year": 1958,
+ "day": "1958-11-04",
+ "polity": "US-WI",
+ "publisher": "Wisconsin Legislative Reference Bureau",
+ "title": "The Wisconsin Blue Book 1960, vote by counties (general election 1958-11-04)",
+ "license": "Public record",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ALRZ6UQ3SNASLD9C",
+  "item": "https://search.library.wisc.edu/digital/ALRZ6UQ3SNASLD9C"
+ },
+ "raw_source": "us.county_volumes",
+ "offices": {
+  "president": "President (presidential electors), 1958 general election only, one column per candidate",
+  "senate": "U.S. Senator, 1958 general election only (not a special election of another year)",
+  "governor": "Governor, 1958 general election only; a column for a joint governor and lieutenant governor ticket counts as governor",
+  "house": "U.S. Representative in Congress, 1958 general election, one table per congressional district"
+ },
+ "leaves": [
+  711,
+  712,
+  713,
+  714,
+  715
+ ],
+ "mixed": true
+}
