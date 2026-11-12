@@ -1,3 +1,4 @@
+import html
 import json
 import re
 import sys
@@ -38,6 +39,39 @@ NOTE = (
     "can hold a community meeting (s. 27). ONS does not say which parishes have a council rather than only a "
     "meeting, and it publishes no parish wards, so neither councils nor parish wards are recorded here."
 )
+PRECEPTS = (
+    "https://statswales.gov.wales/Catalogue/Local-Government/Finance/Council-Tax/Levels/"
+    "community-council-precepts-by-community-council"
+)
+PRECEPTS_COPY = f"https://web.archive.org/web/20250910183531id_/{PRECEPTS}"
+PRECEPTS_NOTE = (
+    "StatsWales table LGFS0036, community council precepts and tax bases for 2019-20 to 2022-23, read from the "
+    "copy archived on 10 September 2025 after the table stopped being updated. Each council with a 2022-23 precept "
+    "is a council body of the community it serves; councils that served a group of communities are not recorded."
+)
+AUTHORITIES = {"Rhondda Cynon Taff": "Rhondda Cynon Taf"}
+RENAMED = {
+    ("Flintshire", "Gwernaffield"): "Gwernaffield with Pantymwyn",
+    ("Flintshire", "Leeswood"): "Leeswood and Pontblyddyn",
+    ("Gwynedd", "Abergwyngregyn"): "Aber",
+    ("Gwynedd", "Clynnog Fawr"): "Clynnog",
+    ("Gwynedd", "Llangelynin"): "Llangelynnin",
+    ("Gwynedd", "Llangywair"): "Llangywer",
+    ("Monmouthshire", "Llanover"): "Gobion Fawr",
+    ("Monmouthshire", "Tintern"): "Tyndyrn",
+    ("Neath Port Talbot", "Gwaencaegurwen"): "Gwaun-Cae-Gurwen",
+    ("Newport", "Michaelstone"): "Michaelstone-y-Fedw",
+    ("Pembrokeshire", "Scleddau (merged with Trecwn)"): "Scleddau",
+    ("Vale of Glamorgan", "Michaelston"): "Michaelston-le-Pit and Leckwith",
+    ("Vale of Glamorgan", "St George's and St Bride's Super Ely"): "St. Georges-super-Ely",
+    ("Vale of Glamorgan", "Sully"): "Sully and Lavernock",
+}
+GROUPED = {
+    ("Denbighshire", "Tremeirchion/Cwm/Waen"),
+    ("Torfaen", "Croesyceiliog & Llanyrafon"),
+    ("Torfaen", "Cwmbran"),
+    ("Torfaen", "Pontypool"),
+}
 
 
 def pages(year: int) -> list[str]:
@@ -53,6 +87,35 @@ def fetch() -> None:
     for year in LAYERS:
         for url in pages(year):
             raw.fetch(SOURCE, url, suffix=".geojson")
+    raw.fetch(SOURCE, PRECEPTS_COPY, suffix=".html")
+
+
+def parse_precepts() -> pl.DataFrame:
+    text = re.sub(
+        r"<script.*?</script>|<style.*?</style>",
+        "",
+        raw.cached(SOURCE, PRECEPTS_COPY).path.read_text(),
+        flags=re.DOTALL,
+    )
+    cells = [cell.strip() for cell in re.split(r"(?:\s*\|\s*)+", html.unescape(re.sub(r"<[^>]+>", "|", text)))]
+    figure = re.compile(r"[\d,.]+|\.")
+    rows = []
+    for index, cell in enumerate(cells):
+        values = cells[index + 1 : index + 13]
+        if " - " in cell and len(values) == 12 and all(figure.fullmatch(value) for value in values):
+            authority, name = cell.split(" - ", 1)
+            if values[3] != ".":
+                rows.append(
+                    {
+                        "authority": AUTHORITIES.get(authority, authority),
+                        "council": re.sub(r"\s+", " ", name),
+                        "precept": int(values[3].replace(",", "")),
+                        "tax_base": int(values[7].replace(",", "")),
+                    }
+                )
+    if len(rows) != 728:
+        raise ValueError(f"{len(rows)} community councils with a 2022-23 precept, expected 728")
+    return pl.DataFrame(rows)
 
 
 def parse() -> None:
@@ -118,11 +181,16 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "parishes.parquet")
+    parse_precepts().write_parquet(PARSED / "councils.parquet")
 
 
 def slug(text: str) -> str:
     folded = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
     return re.sub(r"[^a-z0-9]+", "-", folded.replace("&", " and ")).strip("-")
+
+
+def fold(text: str) -> str:
+    return re.sub(r"\b(?:town|city|and)\b|-", "", slug(text))
 
 
 def emit() -> Path:
@@ -152,6 +220,13 @@ def emit() -> Path:
                    where st_intersects(g.geom, st_geomfromewkb(decode(f.point, 'hex')))
                    order by f.code, st_distance(st_centroid(g.geom), st_geomfromewkb(decode(f.point, 'hex')))""",
                 [[orphan[index] for orphan in orphans] for index in range(3)],
+            ).fetchall()
+        )
+        lads |= dict(
+            conn.execute(
+                """select c.code, l.code from area a join area_code c on c.area_id = a.id
+                   join area_parent p on p.area_id = a.id join area_code l on l.area_id = p.parent_id
+                   where a.scheme_code = 'gb.parish'"""
             ).fetchall()
         )
         lads |= {code: row["lad"] for code, row in latest.items() if row["lad"] is not None}
@@ -267,6 +342,52 @@ def emit() -> Path:
             f"{len(spans)} areas, {len(polities)} polities, {len(successor)} codes succeeded by a namesake",
             file=sys.stderr,
         )
+        authorities = dict(
+            conn.execute(
+                """select n.text, c.code from area a join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.lang = 'en' and n.is_preferred
+                   where a.scheme_code = 'gb.lad' and c.code like 'W06%%'"""
+            ).fetchall()
+        )
+        communities: dict[tuple[str, str], set[str]] = {}
+        for code, english, welsh in (
+            frame.filter(pl.col("code").str.starts_with("W04")).select("code", "name", "name_cy").rows()
+        ):
+            for text in (english, welsh):
+                if text:
+                    communities.setdefault((lads[code], fold(text)), set()).add(root[code])
+        precepts = cs.source("Welsh Government", "Community council precepts by community council")
+        cs.add(
+            "source",
+            id=precepts,
+            kind="official_body",
+            publisher="Welsh Government",
+            title="Community council precepts by community council",
+            url=PRECEPTS,
+            license=LICENSE,
+            license_url=LICENSE_URL,
+            attribution="Contains public sector information licensed under the Open Government Licence v3.0",
+            notes=PRECEPTS_NOTE,
+        )
+        cs.artifact(raw.cached(SOURCE, PRECEPTS_COPY), precepts)
+        served: dict[str, str] = {}
+        for authority, council in pl.read_parquet(PARSED / "councils.parquet").select("authority", "council").rows():
+            if (authority, council) in GROUPED:
+                continue
+            keys = communities.get((authorities[authority], fold(RENAMED.get((authority, council), council))), set())
+            if len(keys) != 1:
+                raise ValueError(f"{authority} - {council}: {len(keys)} communities")
+            key = keys.pop()
+            if key in served:
+                raise ValueError(f"{authority} - {council} and {served[key]} serve one community")
+            served[key] = council
+            body = cs.key("gb.body", key)
+            if body in cs.minted:
+                cs.add("body", id=body, polity_id=polities[key], kind="council")
+            style = re.search(r"\b(Town|City)$", council)
+            base = re.sub(r"\s+(Town|City)$", "", council)
+            name(body, f"{base} {style.group(1) if style else 'Community'} Council")
+        print(f"{len(served)} community councils, {len(GROUPED)} grouped councils left out", file=sys.stderr)
         plans = {
             vintage: id
             for id, vintage in conn.execute(
