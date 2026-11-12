@@ -1442,5 +1442,22 @@ def emit() -> Path:
             ).fetchall()
         for (entity,) in junk:
             cs.add("entity_retirement", entity_id=entity, reason=reason)
+        for (option,) in conn.execute(
+            """select o.id from contest_option o join contest k on k.id = o.contest_id
+               join external_id x on x.entity_id = k.id and x.scheme = %s and x.value = any(%s)
+               join entity e on e.id = o.id and e.retired_by is null
+               where o.id <> all(%s::uuid[])
+                 and not exists (select from entity_merge m where m.entity_id = o.id)
+                 and not exists (select from candidacy where option_id = o.id)
+                 and not exists (select from outcome where option_id = o.id)
+                 and not exists (select from result_value v join result_set r on r.k = v.result_set_k
+                                 where r.contest_id = o.contest_id and v.option_k = o.k)""",
+            ["us.contest", list(RESEATED.values()), list(ids)],
+        ).fetchall():
+            cs.add(
+                "entity_retirement",
+                entity_id=option,
+                reason="The option belonged to the other race of a split same-day special",
+            )
         cs.pool("A write-in line in the Clerk's statistics read as a candidate")
         return cs.write()
