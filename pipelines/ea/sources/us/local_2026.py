@@ -1551,6 +1551,12 @@ FILLER = {
     "seat",
 }
 NO_FILING = "No Candidate Filed"
+AR_OFF_BALLOT = {
+    ("AR-05131", "Sebastian County Justice of the Peace District 10", "Cozax M. Lee"),
+    ("AR-05051", "Garland County Justice of the Peace District 4", "Brianna Otero"),
+    ("AR-05035", "Crittenden County Justice of the Peace District 11", "Ray Nassar"),
+    ("AR-05111", "Poinsett County Circuit Clerk", "Misty Russell"),
+}
 RETENTION = frozenset({"MP:69:justice"})
 ROLES = frozenset(
     [
@@ -10862,17 +10868,25 @@ def parse() -> None:
     if unknown:
         raise ValueError("party not in the archive:\n" + "\n".join(unknown))
 
+    listed = {(row["key"], row["contest"]) for _, _, row in tsv_rows if row["key"].startswith("AR-")}
     for _, _, row in tsv_rows:
+        if (row["key"], row["contest"], row["name"]) in AR_OFF_BALLOT:
+            continue
+        folded = (
+            row["key"].removesuffix("-enr")
+            if (row["key"].removesuffix("-enr"), row["contest"]) in listed
+            else FOLDED.get(row["key"], row["key"])
+        )
         named, independent = (row["party"], False) if ":" in row["party"] else party(row["party"])
         feeds[
             f"NY-{row['county']}"
             if row["key"] == "NY"
             else row["key"] + "-s"
             if row["key"] + "-s" in NE_SOURCES and "Board of Education" in row["contest"]
-            else FOLDED.get(row["key"], row["key"])
+            else folded
         ].append(
             {
-                **({"feed": row["key"]} if row["key"] in FOLDED else {}),
+                **({"feed": row["key"]} if folded != row["key"] else {}),
                 "county": row.get("county") or row["contest"].split(" County")[0],
                 "contest": row["contest"],
                 "seats": int(row.get("seats") or 1),
@@ -11536,6 +11550,13 @@ def parse() -> None:
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0] or (
                     "Carson City" if row["fips"] == "32510" else ""
                 )
+                if (
+                    state == "AR"
+                    and (key.endswith("-enr") or template is None)
+                    and (constable := re.fullmatch(r".+? County Constable (.+)", str(row["contest"])))
+                ):
+                    template, tail = "", f"AR:{row['fips']}:constable:{slug(constable[1])}"
+                    minted[tail] = (f"Constable, {constable[1]}", place, "", "")
                 if row.get("area") or row.get("whole"):
                     office = re.sub(r"\s+", " ", str(row["contest"])).strip()
                     if row.get("whole"):
