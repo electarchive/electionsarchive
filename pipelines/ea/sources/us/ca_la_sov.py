@@ -434,12 +434,33 @@ def seat_counts() -> tuple[dict[tuple[date, bool], list[tuple[str, int]]], set[t
     return counts, primaries, artifacts
 
 
+def measure_letters() -> dict[str, str]:
+    letters: dict[str, str] = {}
+    for year in json.loads(raw.cached(SOURCE, f"{RESULTS}/GetMenuYears").path.read_bytes())["Data"]:
+        listing = raw.cached(SOURCE, f"{RESULTS}/GetMenuElections?year={year}").path
+        for found in json.loads(listing.read_bytes())["Data"]:
+            data = json.loads(
+                raw.cached(SOURCE, f"{RESULTS}/GetElectionData?electionID={found['ID']}").path.read_bytes()
+            )
+            for group in data["Data"]["ContestGroups"]:
+                for contest in group["Contests"]:
+                    titled = re.search(r"\bMEASURE ([A-Z0-9]+)$", contest["Title"].strip().upper())
+                    if titled is not None:
+                        letters[str(contest["ID"])] = titled[1]
+    return letters
+
+
 def parse() -> None:
     rows = pl.read_parquet(ca_la_svc.PARSED / "rows.parquet")
+    letters = measure_letters()
     labels = []
     skipped = set()
     for day, url, contest in rows.select("day", "url", "contest").unique().iter_rows():
         found = classify(contest)
+        if found is not None and found.get("code") == "MEAS":
+            numbered = re.search(r"(\d+)\.xls$", contest)
+            letter = letters.get(numbered[1]) if numbered is not None else None
+            found = None if letter is None else found | {"code": letter}
         if found is None:
             skipped.add(contest.rsplit("/", 1)[-1].split("_by_Precinct")[0])
             continue

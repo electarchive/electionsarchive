@@ -145,7 +145,9 @@ def emit(only: frozenset[str] | None = None) -> Path:
             entity: (id, text)
             for entity, id, text in conn.execute(
                 """select n.entity_id, n.id, n.text from name n join contest c on c.id = n.entity_id
-                   where n.is_preferred and n.lang = 'en' and c.kind = 'ballot_question'"""
+                   join changeset ch on ch.id = n.changeset_id
+                   where n.is_preferred and n.lang = 'en' and c.kind = 'ballot_question' and ch.pipeline = %s""",
+                [SOURCE],
             ).fetchall()
         }
         source = cs.source(ceda.PUBLISHER, ceda.TITLE)
@@ -318,7 +320,7 @@ def emit(only: frozenset[str] | None = None) -> Path:
                 cs.add(
                     "name", id=current[0], entity_id=contest, text=text, lang="en", kind="official", is_preferred=True
                 )
-            else:
+            elif contest in cs.minted:
                 name(contest, text)
             if contest in cs.minted:
                 contest_path = held.get(contest)
