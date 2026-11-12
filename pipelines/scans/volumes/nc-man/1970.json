@@ -1,0 +1,32 @@
+{
+  "year": 1970,
+  "day": "1970-11-03",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1971, votes by county for U.S. House, general election 1970-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1971nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1971nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "house": "U.S. Representative, one table per district, counties down; the table may carry columns for several election years under year headings, read only the columns under 1970"
+  },
+  "leaves": [
+    356,
+    357,
+    358,
+    359,
+    360,
+    361,
+    362,
+    363,
+    364,
+    365,
+    366,
+    367,
+    368
+  ]
+}

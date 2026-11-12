@@ -1,0 +1,39 @@
+{
+  "year": 1974,
+  "day": "1974-11-05",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1975, votes by county for U.S. Senator and U.S. House, general election 1974-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1975nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1975nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "senate": "U.S. Senator, counties down; the table may carry columns for several election years under year headings, read only the columns under 1974",
+    "house": "U.S. Representative, one table per district, counties down; the table may carry columns for several election years under year headings, read only the columns under 1974"
+  },
+  "leaves": [
+    802,
+    803,
+    804,
+    805,
+    806,
+    807,
+    808,
+    809,
+    810,
+    811,
+    812,
+    813,
+    814,
+    815,
+    816,
+    817,
+    818,
+    819,
+    820
+  ]
+}

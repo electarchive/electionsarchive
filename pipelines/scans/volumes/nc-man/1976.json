@@ -1,0 +1,22 @@
+{
+  "year": 1976,
+  "day": "1976-11-02",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1977, votes by county for Governor, general election 1976-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1977nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1977nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "governor": "Governor, counties down, candidates across; the table may carry columns for several election years under year headings, read only the columns under 1976"
+  },
+  "leaves": [
+    786,
+    787,
+    788
+  ]
+}
