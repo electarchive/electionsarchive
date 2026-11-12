@@ -1,0 +1,299 @@
+{
+  "polity": "US-OR",
+  "publisher": "Oregon Secretary of State",
+  "title": "Official Abstract of Votes, General Election, November 6, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0266/micro_IA40706939_0266.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0266"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": null
+    },
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": 5
+    },
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "OR",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "*Hatfield, Mark O. (R)",
+          "contest": "senate",
+          "candidate": "Mark O. Hatfield"
+        },
+        {
+          "label": "Lonsdale, Harry (D)",
+          "contest": "senate",
+          "candidate": "Harry Lonsdale"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.054,
+        0.907,
+        0.733
+      ],
+      "hint": "Read only the table headed 'U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2003
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "* AuCoin, Les (D)",
+          "contest": "house1",
+          "candidate": "Les Aucoin"
+        },
+        {
+          "label": "Livingston, Rick (I)",
+          "contest": "house1",
+          "candidate": "Rick Livingston"
+        },
+        {
+          "label": "Molander, Earl (R)",
+          "contest": "house1",
+          "candidate": "Earl Molander"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.102,
+        0.926,
+        0.303
+      ],
+      "hint": "Read only the table headed '1st Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "Smiley, Jim (D)",
+          "contest": "house2",
+          "candidate": "Jim Smiley"
+        },
+        {
+          "label": "* Smith, Robert F. (Bob) (R)",
+          "contest": "house2",
+          "candidate": "Robert F. (Bob) Smith"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.295,
+        0.926,
+        0.669
+      ],
+      "hint": "Read only the table headed '2nd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Mooney, Phil (R)",
+          "contest": "house3",
+          "candidate": "Philip E. Mooney"
+        },
+        {
+          "label": "* Wyden, Ron (D)",
+          "contest": "house3",
+          "candidate": "Ron Wyden"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.104,
+        0.91,
+        0.221
+      ],
+      "hint": "Read only the table headed '3rd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "* DeFazio, Peter (D)",
+          "contest": "house4",
+          "candidate": "Peter A. DeFazio"
+        },
+        {
+          "label": "Nathan, Tonie (L)",
+          "contest": "house4",
+          "candidate": "Tonie Nathan"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.213,
+        0.91,
+        0.451
+      ],
+      "hint": "Read only the table headed '4th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-2",
+      "columns": [
+        {
+          "label": "* Kopetski, Mike (D)",
+          "contest": "house5",
+          "candidate": "Mike Kopetski"
+        },
+        {
+          "label": "Smith, Denny (R)",
+          "contest": "house5",
+          "candidate": "Denny Smith"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.443,
+        0.91,
+        0.603
+      ],
+      "hint": "Read only the table headed '5th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "Frohnmayer, Dave (R)",
+          "contest": "governor",
+          "candidate": "Dave Frohnmayer"
+        },
+        {
+          "label": "Mobley, Al (I)",
+          "contest": "governor",
+          "candidate": "Al Mobley"
+        },
+        {
+          "label": "Oerther, Fred (L)",
+          "contest": "governor",
+          "candidate": "Fred Oerther"
+        },
+        {
+          "label": "* Roberts, Barbara (D)",
+          "contest": "governor",
+          "candidate": "Barbara Roberts"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.048,
+        0.908,
+        0.69
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.148
+      ]
+    }
+  ]
+}

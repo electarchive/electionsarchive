@@ -1,0 +1,281 @@
+{
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Returns, General Election, November 6, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0420/micro_IA40706939_0420.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0420"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 8
+    }
+  },
+  "pages": [
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "Sullivan (D)",
+          "contest": "house1",
+          "candidate": "Cynthia Sullivan"
+        },
+        {
+          "label": "Miller (R)",
+          "contest": "house1",
+          "candidate": "John Miller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.152,
+        0.623,
+        0.342
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 12,
+      "id": "12-1",
+      "columns": [
+        {
+          "label": "Swift (D)",
+          "contest": "house2",
+          "candidate": "Al Swift"
+        },
+        {
+          "label": "Smith (R)",
+          "contest": "house2",
+          "candidate": "Doug Smith"
+        },
+        {
+          "label": "McCord (L)",
+          "contest": "house2",
+          "candidate": "William L. McCord"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.334,
+        0.664,
+        0.619
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Unsoeld (D)",
+          "contest": "house3",
+          "candidate": "Jolene Unsoeld"
+        },
+        {
+          "label": "Williams (R)",
+          "contest": "house3",
+          "candidate": "Bob Williams"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.157,
+        0.613,
+        0.371
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 3rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 13,
+      "id": "13-1",
+      "columns": [
+        {
+          "label": "Hougen (D)",
+          "contest": "house4",
+          "candidate": "Ole H. Hougen"
+        },
+        {
+          "label": "Morrison (R)",
+          "contest": "house4",
+          "candidate": "Sid W. Morrison"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.363,
+        0.632,
+        0.636
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Foley (D)",
+          "contest": "house5",
+          "candidate": "Thomas S. Foley"
+        },
+        {
+          "label": "Derby (R)",
+          "contest": "house5",
+          "candidate": "Marlyn Derby"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.151,
+        0.558,
+        0.439
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 14,
+      "id": "14-1",
+      "columns": [
+        {
+          "label": "Dicks (D)",
+          "contest": "house6",
+          "candidate": "Norman Dicks"
+        },
+        {
+          "label": "Mueller (R)",
+          "contest": "house6",
+          "candidate": "Norbert Mueller"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.431,
+        0.568,
+        0.616
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "McDermott (D)",
+          "contest": "house7",
+          "candidate": "James A. McDermott"
+        },
+        {
+          "label": "Penberthy (R)",
+          "contest": "house7",
+          "candidate": "Larry Penberthy"
+        },
+        {
+          "label": "Scherr (SW)",
+          "contest": "house7",
+          "candidate": "Robbie Scherr"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.159,
+        0.643,
+        0.317
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 15,
+      "id": "15-1",
+      "columns": [
+        {
+          "label": "Giles (D)",
+          "contest": "house8",
+          "candidate": "David E. Giles"
+        },
+        {
+          "label": "Chandler (R)",
+          "contest": "house8",
+          "candidate": "Rod Chandler"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.309,
+        0.503,
+        0.479
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 8th District'; ignore any other table visible in the image."
+    }
+  ]
+}

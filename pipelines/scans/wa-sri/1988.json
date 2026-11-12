@@ -1,0 +1,421 @@
+{
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Returns, State General Election, November 8, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706933_0132/micro_IA40706933_0132.pdf",
+    "item": "https://archive.org/details/micro_IA40706933_0132"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": null
+    },
+    "house1": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": 8
+    },
+    "governor": {
+      "year": 1988,
+      "chamber": "governor",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "WA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Bush/ Quayle (R)",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Dukakis/ Bentsen (D)",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Holmes/ LaRiva (WW)",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "Warren/ Mickells (SW)",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "Fulani/ Burke (NA)",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.106,
+        0.744,
+        0.742
+      ],
+      "hint": "Read only the table headed 'UNITED STATES PRESIDENT/VICE PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1258
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "Paul/ Marrou (L)",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "LaRouche/ Freeman (IC)",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.229,
+        0.471,
+        0.79
+      ],
+      "hint": "Read only the table headed 'UNITED STATES PRESIDENT/VICE PRESIDENT Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.025
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "Gorton (R)",
+          "contest": "senate",
+          "candidate": "Slade Gorton"
+        },
+        {
+          "label": "Lowry (D)",
+          "contest": "senate",
+          "candidate": "Michael E. Lowry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.105,
+        0.442,
+        0.732
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1005
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "Miller (R)",
+          "contest": "house1",
+          "candidate": "John Miller"
+        },
+        {
+          "label": "Lindquist (D)",
+          "contest": "house1",
+          "candidate": "Reese Malcolm Lindquist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.119,
+        0.474,
+        0.305
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "Swift (D)",
+          "contest": "house2",
+          "candidate": "Al Swift"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.297,
+        0.376,
+        0.632
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-2",
+      "columns": [
+        {
+          "label": "Wight (R)",
+          "contest": "house3",
+          "candidate": "Bill Wight"
+        },
+        {
+          "label": "Unsoeld (D)",
+          "contest": "house3",
+          "candidate": "Jolene Unsoeld"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.123,
+        0.624,
+        0.548,
+        0.875
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 3rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Morrison (R)",
+          "contest": "house4",
+          "candidate": "Sid W. Morrison"
+        },
+        {
+          "label": "Golob (D)",
+          "contest": "house4",
+          "candidate": "J. Richard Golob"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.099,
+        0.466,
+        0.406
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-1",
+      "columns": [
+        {
+          "label": "Derby (R)",
+          "contest": "house5",
+          "candidate": "Marlyn Derby"
+        },
+        {
+          "label": "Foley (D)",
+          "contest": "house5",
+          "candidate": "Thomas S. Foley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.398,
+        0.464,
+        0.687
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "Cook (R)",
+          "contest": "house6",
+          "candidate": "Kevin P. Cook"
+        },
+        {
+          "label": "Dicks (D)",
+          "contest": "house6",
+          "candidate": "Norman Dicks"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.124,
+        0.469,
+        0.301
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-1",
+      "columns": [
+        {
+          "label": "Edwards (R)",
+          "contest": "house7",
+          "candidate": "Robert Edwards"
+        },
+        {
+          "label": "McDermott (D)",
+          "contest": "house7",
+          "candidate": "James A. McDermott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.293,
+        0.512,
+        0.495
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 18,
+      "id": "18-2",
+      "columns": [
+        {
+          "label": "Chandler (R)",
+          "contest": "house8",
+          "candidate": "Rod Chandler"
+        },
+        {
+          "label": "Kean (D)",
+          "contest": "house8",
+          "candidate": "Jim Kean"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.487,
+        0.469,
+        0.652
+      ],
+      "hint": "Read only the table headed 'U.S REPRESENTATIVE, 8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Williams (R)",
+          "contest": "governor",
+          "candidate": "Bob Williams"
+        },
+        {
+          "label": "Gardner (D)",
+          "contest": "governor",
+          "candidate": "Booth Gardner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.103,
+        0.495,
+        0.731
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0987
+      ]
+    }
+  ]
+}

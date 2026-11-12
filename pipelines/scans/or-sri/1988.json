@@ -1,0 +1,247 @@
+{
+  "polity": "US-OR",
+  "publisher": "Oregon Secretary of State",
+  "title": "Official Abstract of Votes, General Election, November 8, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0395/micro_IA40706932_0395.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0395"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": null
+    },
+    "house1": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": 1
+    },
+    "house2": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": 2
+    },
+    "house3": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": 3
+    },
+    "house4": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": 4
+    },
+    "house5": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "OR",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "Bush, George (R)",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "* Dukakis, Michael S. (D)",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "Fulani, Lenora B. (IND)",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "Paul, Ron (LIB)",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.137,
+        0.713,
+        0.774
+      ],
+      "hint": "Read only the table headed 'UNITED STATES PRESIDENT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1695
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "* AuCoin, Les (D)",
+          "contest": "house1",
+          "candidate": "Les Aucoin"
+        },
+        {
+          "label": "Molander, Earl (R)",
+          "contest": "house1",
+          "candidate": "Earl Molander"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.136,
+        0.876,
+        0.32
+      ],
+      "hint": "Read only the table headed '1st Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 16,
+      "id": "16-1",
+      "columns": [
+        {
+          "label": "* Smith, Robert F. (Bob) (R)",
+          "contest": "house2",
+          "candidate": "Robert F. (Bob) Smith"
+        },
+        {
+          "label": "Tuttle, Larry (D)",
+          "contest": "house2",
+          "candidate": "Larry Tuttle"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.312,
+        0.876,
+        0.67
+      ],
+      "hint": "Read only the table headed '2nd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "* Wyden, Ron (D)",
+          "contest": "house3",
+          "candidate": "Ron Wyden"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.144,
+        0.782,
+        0.251
+      ],
+      "hint": "Read only the table headed '3rd Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-1",
+      "columns": [
+        {
+          "label": "* DeFazio, Peter (D)",
+          "contest": "house4",
+          "candidate": "Peter A. DeFazio"
+        },
+        {
+          "label": "Howard, Jim (R)",
+          "contest": "house4",
+          "candidate": "Jim Howard"
+        },
+        {
+          "label": "Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.243,
+        0.89,
+        0.466
+      ],
+      "hint": "Read only the table headed '4th Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 17,
+      "id": "17-2",
+      "columns": [
+        {
+          "label": "\u00b9 Kopetski, Mike (D)",
+          "contest": "house5",
+          "candidate": "Mike Kopetski"
+        },
+        {
+          "label": "* \u00b9Smith, Denny (R)",
+          "contest": "house5",
+          "candidate": "Denny Smith"
+        },
+        {
+          "label": "\u00b9Miscellaneous",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.458,
+        0.89,
+        0.6
+      ],
+      "hint": "Read only the table headed '5th Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

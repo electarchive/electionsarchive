@@ -1,0 +1,333 @@
+{
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "County-by-County Abstract of the 1982 State General Election",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0403/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/micro_IA40706913_0403"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": null
+    },
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "WA",
+      "district": 8
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Jewett (R)",
+          "contest": "senate",
+          "candidate": "Doug Jewett"
+        },
+        {
+          "label": "Jackson (D)",
+          "contest": "senate",
+          "candidate": "Henry M. Jackson"
+        },
+        {
+          "label": "Lysen (IC)",
+          "contest": "senate",
+          "candidate": "King Lysen"
+        },
+        {
+          "label": "Chiang (IC)",
+          "contest": "senate",
+          "candidate": "Jesse Chiang"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.096,
+        0.826,
+        0.687
+      ],
+      "hint": "Read only the table headed 'United States Senate'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1083
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Pritchard (R)",
+          "contest": "house1",
+          "candidate": "Joel Pritchard"
+        },
+        {
+          "label": "Long (D)",
+          "contest": "house1",
+          "candidate": "Brian Long"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.114,
+        0.658,
+        0.311
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 1'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-1",
+      "columns": [
+        {
+          "label": "Houchen (R)",
+          "contest": "house2",
+          "candidate": "Joan Houchen"
+        },
+        {
+          "label": "Swift (D)",
+          "contest": "house2",
+          "candidate": "Al Swift"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.303,
+        0.658,
+        0.626
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 2'; ignore any other table visible in the image."
+    },
+    {
+      "page": 4,
+      "id": "4-2",
+      "columns": [
+        {
+          "label": "Quigg (R)",
+          "contest": "house3",
+          "candidate": "J.T. Quigg"
+        },
+        {
+          "label": "Bonker (D)",
+          "contest": "house3",
+          "candidate": "Donald L. Bonker"
+        },
+        {
+          "label": "Williamson (IC)",
+          "contest": "house3",
+          "candidate": "O'Dean Williamson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.618,
+        0.711,
+        0.881
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 3'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Morrison (R)",
+          "contest": "house4",
+          "candidate": "Sid Morrison"
+        },
+        {
+          "label": "Kilbury (D)",
+          "contest": "house4",
+          "candidate": "Charles D. Kilbury"
+        },
+        {
+          "label": "Burns (FP)",
+          "contest": "house4",
+          "candidate": "Michael Leroy Burns"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.141,
+        0.69,
+        0.462
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 4'; ignore any other table visible in the image."
+    },
+    {
+      "page": 5,
+      "id": "5-1",
+      "columns": [
+        {
+          "label": "Sonneland (R)",
+          "contest": "house5",
+          "candidate": "John Sonneland"
+        },
+        {
+          "label": "Foley (D)",
+          "contest": "house5",
+          "candidate": "Thomas S. Foley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.454,
+        0.667,
+        0.788
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 5'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "Haley (R)",
+          "contest": "house6",
+          "candidate": "Ted Haley"
+        },
+        {
+          "label": "Dicks (D)",
+          "contest": "house6",
+          "candidate": "Norman D. Dicks"
+        },
+        {
+          "label": "Anderson (IC)",
+          "contest": "house6",
+          "candidate": "Jayne H. Anderson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.139,
+        0.712,
+        0.36
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 6'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-1",
+      "columns": [
+        {
+          "label": "Dorse (R)",
+          "contest": "house7",
+          "candidate": "Bob Dorse"
+        },
+        {
+          "label": "Lowry (D)",
+          "contest": "house7",
+          "candidate": "Mike Lowry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.352,
+        0.667,
+        0.58
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 7'; ignore any other table visible in the image."
+    },
+    {
+      "page": 6,
+      "id": "6-2",
+      "columns": [
+        {
+          "label": "Chandler (R)",
+          "contest": "house8",
+          "candidate": "Rod Chandler"
+        },
+        {
+          "label": "Bland (D)",
+          "contest": "house8",
+          "candidate": "Beth Bland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.572,
+        0.667,
+        0.778
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 8'; ignore any other table visible in the image."
+    }
+  ]
+}

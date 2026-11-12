@@ -1,0 +1,409 @@
+{
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Abstract of the Results of the November 6, 1984 General Election",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706920_0022/micro_IA40706920_0022.pdf",
+    "item": "https://archive.org/details/micro_IA40706920_0022"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": null
+    },
+    "house1": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": 8
+    },
+    "governor": {
+      "year": 1984,
+      "chamber": "governor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "WA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Serrette Ross (NA)",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "Mason Zimmerman (SW)",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Bergland Lewis (LIB)",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Johnson Walton (CIT)",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.111,
+        0.258,
+        0.858,
+        0.882
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT OF THE UNITED STATES (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0208
+      ]
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "LaRouche Davis (IC)",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "Hall Davis (COM)",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "Holmes LaRiva (WW)",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "Richards Salaman (POP)",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.13,
+        0.267,
+        0.897,
+        0.882
+      ],
+      "hint": "Read only the table headed 'PRESIDENT/VICE-PRESIDENT OF THE UNITED STATES (continued)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0244
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Miller (R)",
+          "contest": "house1",
+          "candidate": "John Miller"
+        },
+        {
+          "label": "Evans (D)",
+          "contest": "house1",
+          "candidate": "Michael Brock Evans"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.106,
+        0.147,
+        0.853,
+        0.323
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 1st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 37,
+      "id": "37-1",
+      "columns": [
+        {
+          "label": "Klauder (R)",
+          "contest": "house2",
+          "candidate": "James Klauder"
+        },
+        {
+          "label": "Swift (D)",
+          "contest": "house2",
+          "candidate": "Al Swift"
+        },
+        {
+          "label": "Franco (POP)",
+          "contest": "house2",
+          "candidate": "Gary Franco"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.315,
+        0.865,
+        0.615
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 2nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 37,
+      "id": "37-2",
+      "columns": [
+        {
+          "label": "Elder (R)",
+          "contest": "house3",
+          "candidate": "Herb Elder"
+        },
+        {
+          "label": "Bonker (D)",
+          "contest": "house3",
+          "candidate": "Don L. Bonker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.607,
+        0.846,
+        0.859
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 3rd district'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "Morrison (R)",
+          "contest": "house4",
+          "candidate": "Sid W. Morrison"
+        },
+        {
+          "label": "Epperson (D)",
+          "contest": "house4",
+          "candidate": "Mark Epperson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.181,
+        0.864,
+        0.494
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 4th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 38,
+      "id": "38-1",
+      "columns": [
+        {
+          "label": "Hebner (R)",
+          "contest": "house5",
+          "candidate": "Jack Hebner"
+        },
+        {
+          "label": "Foley (D)",
+          "contest": "house5",
+          "candidate": "Thomas S. Foley"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.109,
+        0.486,
+        0.85,
+        0.785
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 5th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Lonergan (R)",
+          "contest": "house6",
+          "candidate": "Michael H. Lonergan"
+        },
+        {
+          "label": "Dicks (D)",
+          "contest": "house6",
+          "candidate": "Norman Dicks"
+        },
+        {
+          "label": "Blachly (LIB)",
+          "contest": "house6",
+          "candidate": "Dan Blachly"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.171,
+        0.845,
+        0.341
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 6th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 39,
+      "id": "39-1",
+      "columns": [
+        {
+          "label": "Dorse (R)",
+          "contest": "house7",
+          "candidate": "Robert O. Dorse"
+        },
+        {
+          "label": "Lowry (D)",
+          "contest": "house7",
+          "candidate": "Mike Lowry"
+        },
+        {
+          "label": "Manning (SW)",
+          "contest": "house7",
+          "candidate": "Mark Manning"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.333,
+        0.845,
+        0.519
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 7th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 39,
+      "id": "39-2",
+      "columns": [
+        {
+          "label": "Chandler (R)",
+          "contest": "house8",
+          "candidate": "Rod Chandler"
+        },
+        {
+          "label": "Lamson (D)",
+          "contest": "house8",
+          "candidate": "Robert D. (Bob) Lamson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.511,
+        0.833,
+        0.688
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE, 8th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Spellman (R)",
+          "contest": "governor",
+          "candidate": "John D. Spellman"
+        },
+        {
+          "label": "Gardner (D)",
+          "contest": "governor",
+          "candidate": "Booth Gardner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.205,
+        0.848,
+        0.874
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0523
+      ]
+    }
+  ]
+}
