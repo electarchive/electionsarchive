@@ -191,7 +191,7 @@ class Province(NamedTuple):
     publisher: str
     page: str
     title: str
-    lists: dict[str, tuple[str, str, Parser]]
+    lists: dict[str, tuple[str, str, Parser | None]]
     method: str
     belde_ilce: bool = False
 
@@ -336,6 +336,139 @@ PROVINCES = {
             "office after a by-election may be listed instead of the 2024 winner."
         ),
     ),
+    "01": Province(
+        name="Adana",
+        publisher="T.C. Adana Valiliği",
+        page="https://www.adana.gov.tr/idare-ve-denetim-mudurlugu",
+        title="Belediye başkanı, meclis üyesi ve muhtar bilgileri (31 Mart 2024 dönemi)",
+        lists={
+            "all": (
+                "https://www.adana.gov.tr/kurumlar/adana.gov.tr/IcSite/muhtarlar/2026/BldBskMeclis-Uyesi-ve-Muhtar-Bilgileri_22062026_.xlsx",
+                "457aa8c55cd7a5eb49d173c96dd6e7997da949dafbaa08b3327e1628cd15d45b",
+                None,
+            ),
+        },
+        method=(
+            "Adana's mahalle muhtars as the governorate lists them in its spreadsheet of mayors, council members, "
+            "and muhtars for the 31 March 2024 term (file dated 22 June 2026, names-only extract sha256 {all}); "
+            "the sheet marks each row Asil or Vekil, and the four Vekil rows are left out. The sheet also prints "
+            "phone numbers, which the archive does not store. The file was compiled in 2026, so a muhtar who took "
+            "office after a by-election may be listed instead of the 2024 winner."
+        ),
+    ),
+    "08": Province(
+        name="Artvin",
+        publisher="T.C. Artvin Valiliği",
+        page="https://www.artvin.gov.tr/artvin-koy-muhtarlari",
+        title="Artvin ve ilçeleri mahalle ve köy muhtarları",
+        lists={
+            "all": (
+                "https://www.artvin.gov.tr/artvin-koy-muhtarlari",
+                "6acb3327aafc9790f8936b3e47a2402f42c99ba52cf044a3d7716c63ee1d6fc3",
+                None,
+            ),
+        },
+        method=(
+            "Artvin's mahalle and köy muhtars as the governorate lists them on one page per ilçe (eight ilçes, "
+            "names-only extract sha256 {all}); Kemalpaşa has no page, so its muhtarlıks are not listed. The pages "
+            "are unlabeled and also print phone numbers, which the archive does not store. The pages were read in "
+            "2026, so a muhtar who took office after a by-election may be listed instead of the 2024 winner."
+        ),
+    ),
+    "23": Province(
+        name="Elazığ",
+        publisher="T.C. Elazığ Valiliği",
+        page="https://www.elazig.gov.tr/muhtarlarimiz",
+        title="2024 yılında seçilen Elazığ Merkez mahalle ve köy muhtarları listesi",
+        lists={
+            "mahalle": (
+                "https://www.elazig.gov.tr/muhtarlarimiz#DOC006.pdf",
+                "58ad8964550ddffb54608206485f19491d192a3ab261c8f5fb8c20187afab5a9",
+                None,
+            ),
+            "köy": (
+                "https://www.elazig.gov.tr/muhtarlarimiz#DOC007.pdf",
+                "4c26d8c53bbd9c1a86d85670e27bc3e65973248aece5f11600ce4ac6bfd4a599",
+                None,
+            ),
+        },
+        method=(
+            "Elazığ Merkez's muhtars as the governorate lists them in two scanned lists headed 2024 yılında "
+            "seçilen, one for mahalles (sha256 {mahalle} of the names-only extract) and one for köys (sha256 "
+            "{köy}), scanned 3 September 2025. Only Merkez is listed. The scans were read with OCR and every name "
+            "was checked against the page image. The lists also print phone numbers, which the archive does not "
+            "store."
+        ),
+    ),
+    "24": Province(
+        name="Erzincan",
+        publisher="T.C. Erzincan Valiliği",
+        page="https://www.erzincan.gov.tr/mahalle-muhtarliklari",
+        title="Mahalle ve köy muhtarlıkları",
+        lists={
+            "mahalle": (
+                "https://www.erzincan.gov.tr/mahalle-muhtarliklari",
+                "1b7927e647ec086c0df5648fe8caeeab00f44d4e9ddf41f2b30640a668bc7d39",
+                None,
+            ),
+            "köy": (
+                "https://www.erzincan.gov.tr/koy-muhtarliklari",
+                "ca4de2d58a2d62d3c6eda70e3b727338c80c9629727e8b750a6fcb76e8dd61aa",
+                None,
+            ),
+        },
+        method=(
+            "Erzincan's mahalle and köy muhtars as the governorate lists them on two pages, one for mahalles "
+            "(names-only extract sha256 {mahalle}) and one for köys (sha256 {köy}); rows marked Vekil are left "
+            "out. The pages are unlabeled and also print phone numbers, which the archive does not store. The "
+            "pages were read in 2026, so a muhtar who took office after a by-election may be listed instead of "
+            "the 2024 winner."
+        ),
+    ),
+    "60": Province(
+        name="Tokat",
+        publisher="T.C. Tokat Valiliği",
+        page="https://www.tokat.gov.tr/tokat-mahalle-muhtarlari-iletisim-bilgileri",
+        title="Tokat ili ve ilçeleri mahalle ve köy muhtarları bilgi listesi",
+        lists={
+            "mahalle": (
+                "https://www.tokat.gov.tr/tokat-mahalle-muhtarlari-iletisim-bilgileri",
+                "23b2af6b3f1bdaa5ef7525e491a1cb5b57e0546774d023a433e3563d37069495",
+                None,
+            ),
+            "köy": (
+                "https://www.tokat.gov.tr/tokat-koy-muhtarlari-iletisim-bilgileri",
+                "16c5ad5cd547f82c48c0ca8dae85bbb479011e578182a554b041d8aa8ef4c8fd",
+                None,
+            ),
+        },
+        method=(
+            "Tokat's mahalle and köy muhtars as the governorate lists them on two pages, both with report date 7 "
+            "June 2026 (names-only extracts sha256 {mahalle} and {köy}). The pages are a current list, not "
+            "labeled as the 2024 result, and also print phone numbers, which the archive does not store. A muhtar "
+            "who took office after a by-election may be listed instead of the 2024 winner."
+        ),
+    ),
+    "63": Province(
+        name="Şanlıurfa",
+        publisher="T.C. Şanlıurfa Valiliği",
+        page="https://www.sanliurfa.gov.tr/idare-ve-denetim-mudurlugu",
+        title="2024 yılı Şanlıurfa ili mahalle muhtarları icmal listesi",
+        lists={
+            "all": (
+                "https://www.sanliurfa.gov.tr/kurumlar/sanliurfa.gov.tr/Valilik Birimlerimiz/Idare-ve-Denetim-Mud/2026-YILI-MUHTAR-İLETİŞİM-LİSTESİ.xlsx",
+                "ace4b95e30353b9ac63cb6cbc2c56b009141ad385e6920d40f4066382e395474",
+                None,
+            ),
+        },
+        method=(
+            "Şanlıurfa's mahalle muhtars as the governorate lists them in its 2026 contact spreadsheet, whose "
+            "sheet is titled 2024 YILI ŞANLIURFA İLİ MAHALLE MUHTARLARI İCMAL LİSTESİ (names-only extract sha256 "
+            "{all}); rows marked Vekil are left out. The sheet also prints phone numbers, which the archive does "
+            "not store. The file was compiled in 2026, so a muhtar who took office after a by-election may be "
+            "listed instead of the 2024 winner."
+        ),
+    ),
 }
 
 
@@ -361,6 +494,8 @@ def extract(url: str, kind: str, parse: Parser, content: bytes) -> bytes:
 def fetch() -> None:
     for config in PROVINCES.values():
         for kind, (url, digest, parse) in config.lists.items():
+            if parse is None:
+                continue
             request = urllib.request.Request(url, headers={"User-Agent": BROWSER})
             content = urllib.request.urlopen(request, timeout=120).read()
             names = extract(url, kind, parse, content)
