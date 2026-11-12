@@ -44,6 +44,7 @@ ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
 DIVISIONS = {2018, 2019, 2023, 2024, 2025}
 TACIT = {2018, 2019}
+RERUN = "https://elections.democracyclub.org.uk/api/elections/{ballot}/"
 BALLOT = "https://candidates.democracyclub.org.uk/api/next/ballots/{ballot}/"
 CROSS_CHECKS: set[int] = set()
 API = "https://candidates.democracyclub.org.uk/api/next/results/?election_date={day}"
@@ -383,12 +384,27 @@ def by_ballot_pages(year: int, get: Callable[[str], raw.Artifact] = lambda url: 
     return pages
 
 
+def rerun_urls(year: int) -> list[str]:
+    if year not in DAYS:
+        return []
+    ids = set()
+    for url in ballot_pages(year):
+        for record in json.loads(raw.cached(SOURCE, url).path.read_text())["results"]:
+            rerun = record["replaced_by"]
+            if record["identifier_type"] == "ballot" and rerun and ".by." not in rerun:
+                ids.add(rerun)
+    return [RERUN.format(ballot=id) for id in sorted(ids)]
+
+
 def by_records(year: int) -> list[dict[str, object]]:
     records = []
-    for url in by_ballot_pages(year):
+    pages = [json.loads(raw.cached(SOURCE, url).path.read_text()) for url in by_ballot_pages(year)]
+    for url in rerun_urls(year):
         page = json.loads(raw.cached(SOURCE, url).path.read_text())
+        pages.append({"count": 1, "results": [page]})
+    for page in pages:
         if page["count"] != len(page["results"]):
-            raise ValueError(f"{url}: {page['count']} elections, {len(page['results'])} on the page")
+            raise ValueError(f"{page['count']} elections, {len(page['results'])} on the page")
         records += [
             {
                 "ballot": record["election_id"],
@@ -459,6 +475,8 @@ def fetch() -> None:
     if "DC_BY" in os.environ:
         for year in by_years():
             by_ballot_pages(year, lambda url: polite(url, ".json"))
+            for url in rerun_urls(year):
+                polite(url, ".json")
             for day in by_days(year):
                 polite(f"{API.format(day=day)}&page_size=200&page=1", ".json")
                 for url in day_pages(day):
