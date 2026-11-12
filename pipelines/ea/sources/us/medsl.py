@@ -1062,6 +1062,14 @@ def attach(
                     [result_set],
                 ).fetchone()
                 is not None
+                or parted
+                and conn.execute(
+                    """select 1 from result_set r join result_value v on v.result_set_k = r.k
+                       join reporting_unit u on u.k = v.unit_k and u.scheme_code in ('us.county', 'us.place')
+                       where r.id = %s limit 1""",
+                    [result_set],
+                ).fetchone()
+                is not None
             )
         held = (
             conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone()
