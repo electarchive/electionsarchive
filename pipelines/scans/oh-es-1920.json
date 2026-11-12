@@ -256,8 +256,8 @@
         },
         {
           "label": "Soc. Clarence M. Ganger.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "Clarence M. Gauger"
         }
       ],
       "orientation": "counties_down",

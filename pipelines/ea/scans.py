@@ -53,6 +53,7 @@ class Page(TypedDict):
     orientation: NotRequired[str]
     url: NotRequired[str]
     start: NotRequired[Literal["second"]]
+    wards: NotRequired[str]
 
 
 class Contest(TypedDict):
@@ -155,11 +156,14 @@ IMAGE_LIMIT = 4_500_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
 HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
-SUBTOTAL = re.compile(r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$")
+SUBTOTAL = re.compile(
+    r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$|^(.*\s)?(pluralit(y|ies)|majorit(y|ies))$"
+)
 TOTAL = re.compile(r"^(state ?wide |state |grand |county |district )?totals?\b|^state ?wide$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
 EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
+WARDED = re.compile(r"\b(wards?|soldiers?'?)\b", re.IGNORECASE)
 WARD = re.compile(r"[\s,.:\-]*\b(wards?|precincts?)\b.*$", re.IGNORECASE)
 SCHEMA: dict[str, object] = {
     "type": "object",
@@ -620,7 +624,12 @@ def cells(
             else re.sub(
                 r"\s+county$",
                 "",
-                re.sub(r"\s*[(\[]+\s*part(\s+of)?\s*[)\]]*$", "", label, flags=re.IGNORECASE),
+                re.sub(
+                    r"[\s,—–-]*[(\[]*\s*\bpart(\s+of)?\s*[)\]]*$",
+                    "",
+                    re.sub(r"^.*\bdistrict\s*[-—–]+\s*|[\s,.;:]+$", "", label, flags=re.IGNORECASE),
+                    flags=re.IGNORECASE,
+                ),
                 flags=re.IGNORECASE,
             )
         ).replace(" ", "")
@@ -634,6 +643,8 @@ def cells(
         return code
 
     def place(label: str) -> tuple[str | None, str | None]:
+        if wards is not None and WARDED.search(label):
+            return wards, None
         stem = stem_of(label)
         if stem in extra:
             return extra[stem], None
@@ -648,8 +659,10 @@ def cells(
                 return code, owner
         return None, None
 
+    wards: str | None = None
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
+        wards = spec.get("wards")
         (x0, y0, x1, y1), _, _ = framing(spec, reader)
         number = str(spec.get("id", spec["page"]))
         for custom, request in plan.items():
@@ -660,6 +673,8 @@ def cells(
                 errors[number] = f"{custom}: {table}"
                 continue
             header, rows = table["header"], table["rows"]
+            if not header and not rows:
+                continue
             labels = [index for index, entry in enumerate(header) if LABEL.match(slug(entry["label"]))]
             if labels:
                 rows = [
@@ -733,7 +748,13 @@ def cells(
                             f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
                         )
                         break
-                    unit = slug(label).replace(" ", "") if folded else code if owner is None else f"{owner}+{code}"
+                    unit = (
+                        slug(label).replace(" ", "")
+                        if folded or (wards is not None and WARDED.search(label))
+                        else code
+                        if owner is None
+                        else f"{owner}+{code}"
+                    )
                     home[unit] = owner or code
                     left, right, top, bottom = (
                         min(1.0, max(0.0, a * v + b))
@@ -839,10 +860,14 @@ def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int 
         return []
     rows = conn.execute(
         """select coalesce(o.ballot_label, ''), coalesce(n.text, ''),
-                  (select sum(v.value)::bigint from result_value v
-                   where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
-                     and v.count_round = (select min(count_round) from result_value
-                                          where result_set_k = rs.k))
+                  coalesce(
+                    (select sum(v.value)::bigint from result_value v
+                     where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
+                       and v.count_round = (select min(count_round) from result_value where result_set_k = rs.k)),
+                    (select sum(v.value)::bigint from result_value v
+                     join contest_option p on p.k = v.option_k and p.parent_option_id = o.id
+                     where v.result_set_k = rs.k and v.measure = 1
+                       and v.count_round = (select min(count_round) from result_value where result_set_k = rs.k)))
            from contest_option o
            left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
            left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
@@ -1403,6 +1428,13 @@ def emit(name: str) -> Path:
             empty=bool(manifest.get("empty")),
             restage=bool(manifest.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
         )
+        warded = {
+            key_of(contests[column["contest"]])
+            for spec in manifest["pages"]
+            if spec.get("wards")
+            for column in spec.get("columns", [])
+            if column["contest"] is not None
+        }
         targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
         for held, contest in conn.execute(
             "select id, contest_id from result_set where source_id = %s and contest_id = any(%s)",
@@ -1422,6 +1454,11 @@ def emit(name: str) -> Path:
                 + (
                     " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
                     if towns
+                    else ""
+                )
+                + (
+                    " The county's votes are the sum of its wards' returns, with any soldiers' vote, and the box is the first ward's."
+                    if found is not None and found[0] in warded
                     else ""
                 )
                 + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else "")

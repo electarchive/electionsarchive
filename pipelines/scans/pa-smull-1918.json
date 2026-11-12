@@ -263,12 +263,20 @@
       "page": 941,
       "id": "941-0",
       "columns": [
-        { "label": "William S. Vare, Rep.", "contest": null, "candidate": "" },
-        { "label": "William S. Vare, Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "William S. Vare, Rep.",
+          "contest": "house1",
+          "candidate": "William S. Vare"
+        },
+        {
+          "label": "William S. Vare, Wash.",
+          "contest": "house1",
+          "candidate": "William S. Vare"
+        },
         {
           "label": "William S. Vare, T. Meet.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "William S. Vare"
         },
         {
           "label": "Paul B. Cassidy, Dem.",
@@ -280,27 +288,40 @@
           "contest": "house1",
           "candidate": "John Leonard Silvey"
         },
-        { "label": "Harvey McCort, Pro.", "contest": null, "candidate": "" },
-        { "label": "Harvey McCort, R. Prog.", "contest": null, "candidate": "" }
+        {
+          "label": "Harvey McCort, Pro.",
+          "contest": "house1",
+          "candidate": "Harvey McCort"
+        },
+        {
+          "label": "Harvey McCort, R. Prog.",
+          "contest": "house1",
+          "candidate": "Harvey McCort"
+        }
       ],
       "orientation": "counties_down",
       "crop": [0.087, 0.368, 0.948, 0.572],
-      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 941,
       "id": "941-1",
       "columns": [
-        { "label": "George S. Graham, Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "George S. Graham, Rep.",
+          "contest": "house2",
+          "candidate": "George S. Graham"
+        },
         {
           "label": "George S. Graham, Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house2",
+          "candidate": "George S. Graham"
         },
         {
           "label": "George S. Graham, T. Meet.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house2",
+          "candidate": "George S. Graham"
         },
         {
           "label": "John H. Berkley, Dem.",
@@ -320,23 +341,32 @@
       ],
       "orientation": "counties_down",
       "crop": [0.087, 0.564, 0.948, 0.934],
-      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 942,
       "id": "942-0",
       "columns": [
-        { "label": "J. Hampton Moore, Rep.", "contest": null, "candidate": "" },
-        { "label": "J. Hampton Moore, Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "J. Hampton Moore, Rep.",
+          "contest": "house3",
+          "candidate": "J. Hampton Moore"
+        },
+        {
+          "label": "J. Hampton Moore, Pro.",
+          "contest": "house3",
+          "candidate": "J. Hampton Moore"
+        },
         {
           "label": "J. Hampton Moore, Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "J. Hampton Moore"
         },
         {
           "label": "J. Hampton Moore, T. Meet.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "J. Hampton Moore"
         },
         {
           "label": "William A. Hayes, Dem.",
@@ -351,7 +381,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.049, 0.049, 0.908, 0.449],
-      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'THIRD DISTRICT.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 942,
@@ -359,18 +390,18 @@
       "columns": [
         {
           "label": "George W. Edmonds, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "George Washington Edmonds"
         },
         {
           "label": "George W. Edmonds, Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "George Washington Edmonds"
         },
         {
           "label": "George W. Edmonds, T. Meet.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "George Washington Edmonds"
         },
         {
           "label": "Joseph E. Fabian, Dem.",
@@ -390,7 +421,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.049, 0.441, 0.91, 0.791],
-      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FOURTH DISTRICT.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 943,
@@ -398,13 +430,13 @@
       "columns": [
         {
           "label": "Peter E. Costello, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house5",
+          "candidate": "Peter Edward Costello"
         },
         {
           "label": "Peter E. Costello, Soc.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house5",
+          "candidate": "Peter Edward Costello"
         },
         {
           "label": "Emanuel R. Clinton, Dem.",
@@ -414,26 +446,48 @@
       ],
       "orientation": "counties_down",
       "crop": [0.07, 0.055, 0.93, 0.379],
-      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'FIFTH DISTRICT.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 943,
       "id": "943-1",
       "columns": [
-        { "label": "George P. Darrow, Rep.", "contest": null, "candidate": "" },
-        { "label": "George P. Darrow, Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "George P. Darrow, Rep.",
+          "contest": "house6",
+          "candidate": "George P. Darrow"
+        },
+        {
+          "label": "George P. Darrow, Pro.",
+          "contest": "house6",
+          "candidate": "George P. Darrow"
+        },
         {
           "label": "John K. Laughlin, Dem.",
           "contest": "house6",
           "candidate": "John K Laughlin"
         },
-        { "label": "John Fisler, Wash.", "contest": null, "candidate": "" },
-        { "label": "John Fisler, R. Prog.", "contest": null, "candidate": "" },
-        { "label": "John Fisler, T. Meet.", "contest": null, "candidate": "" }
+        {
+          "label": "John Fisler, Wash.",
+          "contest": "house6",
+          "candidate": "John Fisler"
+        },
+        {
+          "label": "John Fisler, R. Prog.",
+          "contest": "house6",
+          "candidate": "John Fisler"
+        },
+        {
+          "label": "John Fisler, T. Meet.",
+          "contest": "house6",
+          "candidate": "John Fisler"
+        }
       ],
       "orientation": "counties_down",
       "crop": [0.059, 0.371, 0.921, 0.717],
-      "hint": "Read only the table headed 'SIXTH DISTRICT.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'SIXTH DISTRICT.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 943,
@@ -474,11 +528,15 @@
           "contest": "house8",
           "candidate": "Henry Winfield Watson"
         },
-        { "label": "Harry E. Grim. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Harry E. Grim. Dem.",
+          "contest": "house8",
+          "candidate": "Harry E. Grim"
+        },
         {
           "label": "Harry E. Grim. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house8",
+          "candidate": "Harry E. Grim"
         },
         {
           "label": "Elmer H. Young. Soc.",
@@ -524,14 +582,30 @@
       "page": 944,
       "id": "944-2",
       "columns": [
-        { "label": "John R. Farr. Rep.", "contest": null, "candidate": "" },
-        { "label": "John R. Farr. Pro.", "contest": null, "candidate": "" },
-        { "label": "John R. Farr. Wash.", "contest": null, "candidate": "" },
-        { "label": "Patrick McLane. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "John R. Farr. Rep.",
+          "contest": "house10",
+          "candidate": "John R. Farr"
+        },
+        {
+          "label": "John R. Farr. Pro.",
+          "contest": "house10",
+          "candidate": "John R. Farr"
+        },
+        {
+          "label": "John R. Farr. Wash.",
+          "contest": "house10",
+          "candidate": "John R. Farr"
+        },
+        {
+          "label": "Patrick McLane. Dem.",
+          "contest": "house10",
+          "candidate": "Patrick McLane"
+        },
         {
           "label": "Patrick McLane. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house10",
+          "candidate": "Patrick McLane"
         },
         {
           "label": "Edward Robling. Soc.",
@@ -549,30 +623,38 @@
       "columns": [
         {
           "label": "Edmund N. Carpenter. Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house11",
+          "candidate": "Edmund N. Carpenter"
         },
         {
           "label": "Edmund N. Carpenter. Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house11",
+          "candidate": "Edmund N. Carpenter"
         },
         {
           "label": "Edmund N. Carpenter. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house11",
+          "candidate": "Edmund N. Carpenter"
         },
-        { "label": "John J. Casey. Dem.", "contest": null, "candidate": "" },
-        { "label": "John J. Casey. Soc.", "contest": null, "candidate": "" },
+        {
+          "label": "John J. Casey. Dem.",
+          "contest": "house11",
+          "candidate": "John J. Casey"
+        },
+        {
+          "label": "John J. Casey. Soc.",
+          "contest": "house11",
+          "candidate": "John J. Casey"
+        },
         {
           "label": "John J. Casey. R. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house11",
+          "candidate": "John J. Casey"
         },
         {
           "label": "John J. Casey. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house11",
+          "candidate": "John J. Casey"
         }
       ],
       "orientation": "counties_down",
@@ -588,11 +670,15 @@
           "contest": "house12",
           "candidate": "John Reber"
         },
-        { "label": "James J. Moran. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "James J. Moran. Dem.",
+          "contest": "house12",
+          "candidate": "James J. Moran"
+        },
         {
           "label": "James J. Moran. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house12",
+          "candidate": "James J. Moran"
         },
         {
           "label": "F. C. Clarke. Soc.",
@@ -608,22 +694,30 @@
       "page": 945,
       "id": "945-2",
       "columns": [
-        { "label": "J. Wilmer Fisher. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "J. Wilmer Fisher. Rep.",
+          "contest": "house13",
+          "candidate": "J. Wilmer Fisher"
+        },
         {
           "label": "J. Wilmer Fisher. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house13",
+          "candidate": "J. Wilmer Fisher"
         },
         {
           "label": "J. Wilmer Fisher. R. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house13",
+          "candidate": "J. Wilmer Fisher"
         },
-        { "label": "Arthur G. Dewalt. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Arthur G. Dewalt. Dem.",
+          "contest": "house13",
+          "candidate": "Arthur Granville Dewalt"
+        },
         {
           "label": "Arthur G. Dewalt. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house13",
+          "candidate": "Arthur Granville Dewalt"
         },
         {
           "label": "L. Birch Wilson, Jr. Soc.",
@@ -674,8 +768,16 @@
       "page": 946,
       "id": "946-1",
       "columns": [
-        { "label": "Edgar R. Kiess. Rep.", "contest": null, "candidate": "" },
-        { "label": "Edgar R. Kiess. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Edgar R. Kiess. Rep.",
+          "contest": "house15",
+          "candidate": "Edgar R. Kiess"
+        },
+        {
+          "label": "Edgar R. Kiess. Pro.",
+          "contest": "house15",
+          "candidate": "Edgar R. Kiess"
+        },
         {
           "label": "Charles E. Spotts. Dem.",
           "contest": "house15",
@@ -731,8 +833,16 @@
           "contest": "house17",
           "candidate": "Benjamin Kurtz Focht"
         },
-        { "label": "Scott S. Leiby. Dem.", "contest": null, "candidate": "" },
-        { "label": "Scott S. Leiby. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Scott S. Leiby. Dem.",
+          "contest": "house17",
+          "candidate": "Scott S. Leiby"
+        },
+        {
+          "label": "Scott S. Leiby. Pro.",
+          "contest": "house17",
+          "candidate": "Scott S. Leiby"
+        },
         {
           "label": "George Bingham. Soc.",
           "contest": "house17",
@@ -773,10 +883,26 @@
       "page": 947,
       "id": "947-2",
       "columns": [
-        { "label": "John M. Rose. Rep.", "contest": null, "candidate": "" },
-        { "label": "John M. Rose. Pro.", "contest": null, "candidate": "" },
-        { "label": "John M. Rose. Wash.", "contest": null, "candidate": "" },
-        { "label": "John M. Rose. R. Prog.", "contest": null, "candidate": "" },
+        {
+          "label": "John M. Rose. Rep.",
+          "contest": "house19",
+          "candidate": "John M. Rose"
+        },
+        {
+          "label": "John M. Rose. Pro.",
+          "contest": "house19",
+          "candidate": "John M. Rose"
+        },
+        {
+          "label": "John M. Rose. Wash.",
+          "contest": "house19",
+          "candidate": "John M. Rose"
+        },
+        {
+          "label": "John M. Rose. R. Prog.",
+          "contest": "house19",
+          "candidate": "John M. Rose"
+        },
         {
           "label": "Bernard J. Clark. Dem.",
           "contest": "house19",
@@ -796,21 +922,25 @@
       "page": 948,
       "id": "948-0",
       "columns": [
-        { "label": "Edward S. Brooks. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "Edward S. Brooks. Rep.",
+          "contest": "house20",
+          "candidate": "Edward Schroeder Brooks"
+        },
         {
           "label": "Edward S. Brooks. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house20",
+          "candidate": "Edward Schroeder Brooks"
         },
         {
           "label": "Andrew R. Brodbeck. Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house20",
+          "candidate": "Andrew R. Brodbeck"
         },
         {
           "label": "Andrew R. Brodbeck. Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house20",
+          "candidate": "Andrew R. Brodbeck"
         },
         {
           "label": "C. Wm. Thompson. Soc.",
@@ -827,9 +957,21 @@
       "page": 948,
       "id": "948-1",
       "columns": [
-        { "label": "Evan J. Jones. Rep.", "contest": null, "candidate": "" },
-        { "label": "Evan J. Jones. Soc.", "contest": null, "candidate": "" },
-        { "label": "Evan J. Jones. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "Evan J. Jones. Rep.",
+          "contest": "house21",
+          "candidate": "Evan J. Jones"
+        },
+        {
+          "label": "Evan J. Jones. Soc.",
+          "contest": "house21",
+          "candidate": "Evan J. Jones"
+        },
+        {
+          "label": "Evan J. Jones. Wash.",
+          "contest": "house21",
+          "candidate": "Evan J. Jones"
+        },
         {
           "label": "William E. Tobias. Dem.",
           "contest": "house21",
@@ -852,23 +994,23 @@
       "columns": [
         {
           "label": "Edward E. Robbins. Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house22",
+          "candidate": "Edward Everett Robbins"
         },
         {
           "label": "Edward E. Robbins. Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house22",
+          "candidate": "Edward Everett Robbins"
         },
         {
           "label": "George H. McWherter. Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house22",
+          "candidate": "George H. McWherter"
         },
         {
           "label": "George H. McWherter. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house22",
+          "candidate": "George H. McWherter"
         },
         {
           "label": "Max Cenis. Soc.",
@@ -891,13 +1033,13 @@
         },
         {
           "label": "Bruce F. Sterling. Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house23",
+          "candidate": "Bruce F. Sterling"
         },
         {
           "label": "Bruce F. Sterling, Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house23",
+          "candidate": "Bruce F. Sterling"
         },
         {
           "label": "Louis S. Mellinger. Soc.",
@@ -913,8 +1055,16 @@
       "page": 949,
       "id": "949-1",
       "columns": [
-        { "label": "Henry W. Temple. Rep.", "contest": null, "candidate": "" },
-        { "label": "Henry W. Temple. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Henry W. Temple. Rep.",
+          "contest": "house24",
+          "candidate": "Henry W. Temple"
+        },
+        {
+          "label": "Henry W. Temple. Pro.",
+          "contest": "house24",
+          "candidate": "Henry W. Temple"
+        },
         {
           "label": "William M. Hartman. Dem.",
           "contest": "house24",
@@ -934,16 +1084,20 @@
       "page": 949,
       "id": "949-2",
       "columns": [
-        { "label": "Milton W. Shreve. Rep.", "contest": null, "candidate": "" },
+        {
+          "label": "Milton W. Shreve. Rep.",
+          "contest": "house25",
+          "candidate": "Milton W. Shreve"
+        },
         {
           "label": "Milton W. Shreve. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house25",
+          "candidate": "Milton W. Shreve"
         },
         {
           "label": "Milton W. Shreve. R. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house25",
+          "candidate": "Milton W. Shreve"
         },
         {
           "label": "Charles N. Crosby. Dem.",
@@ -972,19 +1126,23 @@
       "columns": [
         {
           "label": "Francis A. March, Jr. Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house26",
+          "candidate": "Francis A. Jr. March"
         },
         {
           "label": "Francis A. March, Jr. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house26",
+          "candidate": "Francis A. Jr. March"
         },
-        { "label": "Henry J. Steele. Dem.", "contest": null, "candidate": "" },
+        {
+          "label": "Henry J. Steele. Dem.",
+          "contest": "house26",
+          "candidate": "Henry Joseph Steele"
+        },
         {
           "label": "Henry J. Steele. Fair Play.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house26",
+          "candidate": "Henry Joseph Steele"
         },
         {
           "label": "John B. Lerch. Soc.",
@@ -993,13 +1151,13 @@
         },
         {
           "label": "Delbert Strader Bachman. Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house26",
+          "candidate": "Delbert Strader Bachman"
         },
         {
           "label": "Delbert Strader Bachman. I. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house26",
+          "candidate": "Delbert Strader Bachman"
         }
       ],
       "orientation": "counties_down",
@@ -1010,8 +1168,16 @@
       "page": 950,
       "id": "950-1",
       "columns": [
-        { "label": "Nathan L. Strong. Rep.", "contest": null, "candidate": "" },
-        { "label": "Nathan L. Strong. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Nathan L. Strong. Rep.",
+          "contest": "house27",
+          "candidate": "Nathan Leroy Strong"
+        },
+        {
+          "label": "Nathan L. Strong. Pro.",
+          "contest": "house27",
+          "candidate": "Nathan Leroy Strong"
+        },
         {
           "label": "Don C. Corbett. Dem.",
           "contest": "house27",
@@ -1034,16 +1200,24 @@
       "columns": [
         {
           "label": "Willis J. Hulings. Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house28",
+          "candidate": "Willis James Hulings"
         },
         {
           "label": "Willis J. Hulings. Wash.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house28",
+          "candidate": "Willis James Hulings"
         },
-        { "label": "Earl H. Beshlin. Dem.", "contest": null, "candidate": "" },
-        { "label": "Earl H. Beshlin. Pro.", "contest": null, "candidate": "" },
+        {
+          "label": "Earl H. Beshlin. Dem.",
+          "contest": "house28",
+          "candidate": "Earl H. Beshlin"
+        },
+        {
+          "label": "Earl H. Beshlin. Pro.",
+          "contest": "house28",
+          "candidate": "Earl H. Beshlin"
+        },
         {
           "label": "M. V. Ball. Soc.",
           "contest": "house28",
@@ -1062,17 +1236,17 @@
         {
           "label": "Stephen G. Porter. Rep.",
           "contest": "house29",
-          "candidate": "C G Porter"
+          "candidate": "Stephen G. Porter"
         },
         {
           "label": "Stephen G. Porter. Dem.",
           "contest": "house29",
-          "candidate": "C G Porter"
+          "candidate": "Stephen G. Porter"
         },
         {
           "label": "Stephen G. Porter. Wash.",
           "contest": "house29",
-          "candidate": "C G Porter"
+          "candidate": "Stephen G. Porter"
         },
         {
           "label": "Henry Peter. Soc.",
@@ -1093,14 +1267,30 @@
       "page": 951,
       "id": "951-1",
       "columns": [
-        { "label": "M. Clyde Kelly. Rep.", "contest": null, "candidate": "" },
-        { "label": "M. Clyde Kelly. Dem.", "contest": null, "candidate": "" },
-        { "label": "M. Clyde Kelly. Pro.", "contest": null, "candidate": "" },
-        { "label": "M. Clyde Kelly. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "M. Clyde Kelly. Rep.",
+          "contest": "house30",
+          "candidate": "Melville Clyde Kelly"
+        },
+        {
+          "label": "M. Clyde Kelly. Dem.",
+          "contest": "house30",
+          "candidate": "Melville Clyde Kelly"
+        },
+        {
+          "label": "M. Clyde Kelly. Pro.",
+          "contest": "house30",
+          "candidate": "Melville Clyde Kelly"
+        },
+        {
+          "label": "M. Clyde Kelly. Wash.",
+          "contest": "house30",
+          "candidate": "Melville Clyde Kelly"
+        },
         {
           "label": "M. Clyde Kelly. R. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house30",
+          "candidate": "Melville Clyde Kelly"
         },
         {
           "label": "H. J. Lohr. Soc.",
@@ -1116,13 +1306,25 @@
       "page": 951,
       "id": "951-2",
       "columns": [
-        { "label": "John M. Morin. Rep.", "contest": null, "candidate": "" },
-        { "label": "John M. Morin. Dem.", "contest": null, "candidate": "" },
-        { "label": "John M. Morin. Wash.", "contest": null, "candidate": "" },
+        {
+          "label": "John M. Morin. Rep.",
+          "contest": "house31",
+          "candidate": "John M. Morin"
+        },
+        {
+          "label": "John M. Morin. Dem.",
+          "contest": "house31",
+          "candidate": "John M. Morin"
+        },
+        {
+          "label": "John M. Morin. Wash.",
+          "contest": "house31",
+          "candidate": "John M. Morin"
+        },
         {
           "label": "John M. Morin. R. Prog.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house31",
+          "candidate": "John M. Morin"
         },
         {
           "label": "William A. Prosser. Soc.",

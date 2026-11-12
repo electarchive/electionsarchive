@@ -290,8 +290,8 @@
         },
         {
           "label": "Dem. William E. Touvelle.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "William Ellsworth Tou Velle"
         },
         {
           "label": "Soc. John Henry Stedke.",
@@ -454,8 +454,8 @@
         },
         {
           "label": "Dem. Isaac R. Sherwood.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house9",
+          "candidate": "Isaac R. Sherwood"
         },
         {
           "label": "Soc. Chas. H. Miller.",
@@ -469,8 +469,8 @@
         },
         {
           "label": "Ind. Isaac R. Sherwood.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house9",
+          "candidate": "Isaac R. Sherwood"
         },
         { "label": "Peo.", "contest": null, "candidate": "" },
         { "label": "Soc. Lab.", "contest": null, "candidate": "" }
@@ -701,18 +701,26 @@
           "contest": "house16",
           "candidate": "N A McCombs"
         },
-        { "label": "Soc. Mark Lister.", "contest": null, "candidate": "" },
+        {
+          "label": "Soc. Mark Lister.",
+          "contest": "house16",
+          "candidate": "Mark Lister"
+        },
         {
           "label": "Pro. Robert J. Johnson.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house16",
+          "candidate": "Robert J. Johnson"
         },
         {
           "label": "Soc. Robert J. Johnson.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house16",
+          "candidate": "Robert J. Johnson"
         },
-        { "label": "Pro. Mark Lister.", "contest": null, "candidate": "" },
+        {
+          "label": "Pro. Mark Lister.",
+          "contest": "house16",
+          "candidate": "Mark Lister"
+        },
         { "label": "Lab. Soc.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",

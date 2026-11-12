@@ -228,7 +228,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.152, 0.239, 0.873, 0.443],
-      "hint": "Read only the table headed 'First District\u2014Philadelphia.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'First District\u2014Philadelphia.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 298,
@@ -247,7 +248,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.152, 0.435, 0.873, 0.672],
-      "hint": "Read only the table headed 'Second District--Philadelphia.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Second District--Philadelphia.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 298,
@@ -266,7 +268,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.152, 0.664, 0.873, 0.897],
-      "hint": "Read only the table headed 'Third District--Philadelphia.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Third District--Philadelphia.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 299,
@@ -277,11 +280,16 @@
           "contest": "house4",
           "candidate": "William Darrah Kelley"
         },
-        { "label": "J. T. Scheel, D.", "contest": null, "candidate": "" }
+        {
+          "label": "J. T. Scheel, D.",
+          "contest": "house4",
+          "candidate": "J. T. School"
+        }
       ],
       "orientation": "counties_down",
       "crop": [0.152, 0.117, 0.874, 0.334],
-      "hint": "Read only the table headed 'Fourth District--Philadelphia.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fourth District--Philadelphia.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 299,
@@ -300,7 +308,8 @@
       ],
       "orientation": "counties_down",
       "crop": [0.149, 0.326, 0.87, 0.565],
-      "hint": "Read only the table headed 'Fifth District--Philadelphia.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Fifth District--Philadelphia.'; ignore any other table visible in the image.",
+      "wards": "42101"
     },
     {
       "page": 299,
@@ -499,7 +508,11 @@
       "page": 301,
       "id": "301-0",
       "columns": [
-        { "label": "E. Overton, R.", "contest": null, "candidate": "" },
+        {
+          "label": "E. Overton, R.",
+          "contest": "house15",
+          "candidate": "Edward Overton Jr"
+        },
         {
           "label": "Jos. Powell, D.",
           "contest": "house15",
@@ -638,7 +651,11 @@
           "contest": "house24",
           "candidate": "William Shadrack Shallenberger"
         },
-        { "label": "R. B. M'Comb, D.", "contest": null, "candidate": "" },
+        {
+          "label": "R. B. M'Comb, D.",
+          "contest": "house24",
+          "candidate": "R. B. McComb"
+        },
         {
           "label": "J. D. Glenn, PRO.",
           "contest": "house24",
