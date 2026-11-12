@@ -51,7 +51,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "22"
+VERSION = "23"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -122,6 +122,7 @@ YSK = {
 }
 MUHTARLIK_SLUGS = {"2024-yerel-belediye-baskanlık-secimleri": 0, "2024-yerel-il-genel-meclis-uyeligi-secimleri": 1}
 REGISTER = Path(__file__).with_name("muhtarlik_2024.tsv")
+TUIK = Path(__file__).with_name("muhtarlik_2024_tuik.tsv")
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
     {upper(short): full for full, short, *_ in PARTIES}
@@ -766,6 +767,16 @@ def emit() -> Path:
                 ]
             ),
         )
+        tuik = pl.read_csv(TUIK, separator="\t", infer_schema_length=0).filter(pl.col("tuik_code").is_not_null())
+        cs.frame(
+            "external_id",
+            tuik.select(
+                entity_id=pl.col("muhtarlik_id").cast(pl.Int64).replace_strict(current),
+                scheme=pl.lit("tr.tuik.") + pl.col("kind").replace_strict({"mah": "mahalle", "koy": "koy"}),
+                value=pl.col("tuik_code").str.slice(1),
+            ),
+        )
+        print(f"{tuik.height} TÜİK unit codes on 2024 muhtarlıks")
         register.select(
             muhtarlik_id="muhtarlik_id",
             plate="plate",
