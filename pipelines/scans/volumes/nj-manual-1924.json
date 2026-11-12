@@ -1,0 +1,24 @@
+{
+  "year": 1924,
+  "day": "1924-11-04",
+  "polity": "US-NJ",
+  "publisher": "New Jersey Legislature",
+  "title": "Manual of the Legislature of New Jersey, 1925: election returns, 1924",
+  "license": "Public record",
+  "file": {
+    "url": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806004",
+    "item": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806004"
+  },
+  "raw_source": "us.county_volumes",
+  "offices": {
+    "president": "President, county totals, counties down and electors across",
+    "senate": "U.S. Senator, state and county totals, counties down and candidates across",
+    "house": "U.S. Representative, district totals: House pages print one block per congressional district with the district's counties across and one row per candidate with party; copy the Total column."
+  },
+  "hint": "Leaf 1 is President and Vice President (electoral vote by county), leaf 2 U.S. Senator, leaf 3 Congressional vote by district. Copy the Total row as printed_total.",
+  "leaves": [
+    1,
+    2,
+    3
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "year": 1926,
+  "day": "1926-11-02",
+  "polity": "US-NJ",
+  "publisher": "New Jersey Legislature",
+  "title": "Manual of the Legislature of New Jersey, 1927: election returns, 1926",
+  "license": "Public record",
+  "file": {
+    "url": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806020",
+    "item": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112110806020"
+  },
+  "raw_source": "us.county_volumes",
+  "offices": {
+    "house": "U.S. Representative, district totals: House pages print one block per congressional district with the district's counties across and one row per candidate with party; copy the Total column."
+  },
+  "hint": "Leaf 1 is the Congressional vote by district. New Jersey held no U.S. Senate or governor election in 1926.",
+  "leaves": [
+    1
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "year": 1922,
+  "day": "1922-11-07",
+  "polity": "US-NJ",
+  "publisher": "New Jersey Legislature",
+  "title": "Manual of the Legislature of New Jersey, 1923: election returns, 1922",
+  "license": "Public record",
+  "file": {
+    "url": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112109887148",
+    "item": "https://babel.hathitrust.org/cgi/pt?id=uiug.30112109887148"
+  },
+  "raw_source": "us.county_volumes",
+  "offices": {
+    "senate": "U.S. Senator, state and county totals, counties down and candidates across",
+    "governor": "Governor, state and county totals, counties down and candidates across",
+    "house": "U.S. Representative, district totals: House pages print one block per congressional district with the district's counties across and one row per candidate with party; copy the Total column."
+  },
+  "hint": "Leaf 1 is U.S. Senator, leaf 2 Governor, leaf 3 Congressional vote by district. Copy the Total row as printed_total.",
+  "leaves": [
+    1,
+    2,
+    3
+  ]
+}
