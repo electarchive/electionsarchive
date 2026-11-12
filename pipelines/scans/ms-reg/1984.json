@@ -1,0 +1,303 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1984-1988, general election returns of 1984-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0183/micro_IA40706919_0183.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0183"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "house1": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 490,
+      "id": "490-0",
+      "columns": [
+        {
+          "label": "Walter Mondale and Geraldine Ferraro (D)",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "Ronald Reagan and George Bush (R)",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "David Bergland and Jim Lewis (L)",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "Larry Holmes and Gloria LaRiva (I)",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "Lyndon LaRouche and Billy M. Davis (I)",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche"
+        },
+        {
+          "label": "Mel Mason and Matilde Zimmermann (I)",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "Bob Richards and Maurine Salaman (I)",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "Dennis Serrette and * (I)",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.222,
+        0.855,
+        1.0
+      ],
+      "hint": "Read only the table headed 'President and Vice President'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.09
+      ]
+    },
+    {
+      "page": 491,
+      "id": "491-0",
+      "columns": [
+        {
+          "label": "William Winter (D)",
+          "contest": "senate",
+          "candidate": "William Winter"
+        },
+        {
+          "label": "Thad Cochran (R)",
+          "contest": "senate",
+          "candidate": "Thad Cochran"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.434,
+        0.826,
+        1.0
+      ],
+      "hint": "Read only the table headed 'United States Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1537
+      ]
+    },
+    {
+      "page": 492,
+      "id": "492-0",
+      "columns": [
+        {
+          "label": "William Winter (D)",
+          "contest": "senate",
+          "candidate": "William Winter"
+        },
+        {
+          "label": "Thad Cochran (R)",
+          "contest": "senate",
+          "candidate": "Thad Cochran"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.0,
+        0.826,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 493,
+      "id": "493-0",
+      "columns": [
+        {
+          "label": "Jamie L. Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "John Hargett(I)",
+          "contest": "house1",
+          "candidate": "John Hargett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.161,
+        0.83,
+        0.479
+      ],
+      "hint": "Read only the table headed 'First District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 493,
+      "id": "493-1",
+      "columns": [
+        {
+          "label": "Robert G. Clark (D)",
+          "contest": "house2",
+          "candidate": "Robert G. Clark"
+        },
+        {
+          "label": "Webb Franklin (R)",
+          "contest": "house2",
+          "candidate": "Webb Franklin"
+        },
+        {
+          "label": "Hardy Caraway (I)",
+          "contest": "house2",
+          "candidate": "Hardy Caraway"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.471,
+        0.828,
+        0.781
+      ],
+      "hint": "Read only the table headed 'Second District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 494,
+      "id": "494-0",
+      "columns": [
+        {
+          "label": "G. V. Montgomery (D)",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.195,
+        0.11,
+        0.856,
+        0.401
+      ],
+      "hint": "Read only the table headed 'Third District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 494,
+      "id": "494-1",
+      "columns": [
+        {
+          "label": "Wayne Dowdy (D)",
+          "contest": "house4",
+          "candidate": "Wayne Dowdy"
+        },
+        {
+          "label": "David Armstrong (R)",
+          "contest": "house4",
+          "candidate": "David Armstrong"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.195,
+        0.393,
+        0.856,
+        0.668
+      ],
+      "hint": "Read only the table headed 'Fourth District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 494,
+      "id": "494-2",
+      "columns": [
+        {
+          "label": "Arlon Coate (D)",
+          "contest": "house5",
+          "candidate": "Arlon (Blackie) Coate"
+        },
+        {
+          "label": "Trent Lott (R)",
+          "contest": "house5",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.195,
+        0.66,
+        0.856,
+        0.885
+      ],
+      "hint": "Read only the table headed 'Fifth District'; ignore any other table visible in the image."
+    }
+  ]
+}

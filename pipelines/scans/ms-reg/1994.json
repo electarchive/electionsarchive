@@ -1,0 +1,120 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Elections Spreadsheet Summary, 1994 General Election, general election returns of 1994-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706953_0014/micro_IA40706953_0014.pdf",
+    "item": "https://archive.org/details/micro_IA40706953_0014"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1994,
+      "chamber": "senate",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "MS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "KEN HARPER (D)",
+          "contest": "senate",
+          "candidate": "Ken Harper"
+        },
+        {
+          "label": "TRENT LOTT (R)",
+          "contest": "senate",
+          "candidate": "Trent Lott"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.091,
+        0.96,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ELECTIONS SPREADSHEET SUMMARY - OFFICE: U S SENATOR 1 - 1994 GENERAL ELECTION (11/08/1994)'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1144
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "(D) KEN HARPER",
+          "contest": "senate",
+          "candidate": "Ken Harper"
+        },
+        {
+          "label": "(R) TRENT LOTT",
+          "contest": "senate",
+          "candidate": "Trent Lott"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.021,
+        0.13,
+        0.963,
+        1.0
+      ],
+      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0724
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "(D) KEN HARPER",
+          "contest": "senate",
+          "candidate": "Ken Harper"
+        },
+        {
+          "label": "(R) TRENT LOTT",
+          "contest": "senate",
+          "candidate": "Trent Lott"
+        },
+        {
+          "label": "TOTALS",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.025,
+        0.218,
+        0.967,
+        0.488
+      ],
+      "hint": "Read only the table headed \"OFFICE: U S SENATOR 1 (cont'd)\"; ignore any other table visible in the image."
+    }
+  ]
+}

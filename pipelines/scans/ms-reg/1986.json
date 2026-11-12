@@ -1,0 +1,175 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1986-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house1": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 432,
+      "id": "432-0",
+      "columns": [
+        {
+          "label": "Jamie L. Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "Larry Cobb(R)",
+          "contest": "house1",
+          "candidate": "Larry Cobb"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.113,
+        0.853,
+        0.232
+      ],
+      "hint": "Read only the table headed 'County returns continued from earlier page (First Congressional District)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 432,
+      "id": "432-1",
+      "columns": [
+        {
+          "label": "Mike Espy (D)",
+          "contest": "house2",
+          "candidate": "Mike Espy"
+        },
+        {
+          "label": "Webb Franklin (R)",
+          "contest": "house2",
+          "candidate": "Webb Franklin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.224,
+        0.857,
+        0.597
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 432,
+      "id": "432-2",
+      "columns": [
+        {
+          "label": "G. V. (Sonny) Montgomery",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        },
+        {
+          "label": "Unopposed",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.589,
+        0.861,
+        0.67
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 432,
+      "id": "432-3",
+      "columns": [
+        {
+          "label": "Wayne Dowdy (D)",
+          "contest": "house4",
+          "candidate": "Wayne Dowdy"
+        },
+        {
+          "label": "Gail Healy (R)",
+          "contest": "house4",
+          "candidate": "Gail Healy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.662,
+        0.86,
+        0.934
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 433,
+      "id": "433-0",
+      "columns": [
+        {
+          "label": "Larry L. Albritton (D)",
+          "contest": "house5",
+          "candidate": "Larry L. Albritton"
+        },
+        {
+          "label": "Trent Lott (R)",
+          "contest": "house5",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.065,
+        0.848,
+        0.289
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

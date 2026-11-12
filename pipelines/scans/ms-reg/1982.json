@@ -1,0 +1,222 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1984-1988, general election returns of 1982-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0183/micro_IA40706919_0183.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0183"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "house1": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 389,
+      "id": "389-0",
+      "columns": [
+        {
+          "label": "John C. Stennis (D)",
+          "contest": "senate",
+          "candidate": "John C. Stennis"
+        },
+        {
+          "label": "Haley Barbour (R)",
+          "contest": "senate",
+          "candidate": "Haley Barbour"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.191,
+        0.096,
+        0.85,
+        0.83
+      ],
+      "hint": "Read only the table headed ''; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0463
+      ]
+    },
+    {
+      "page": 390,
+      "id": "390-0",
+      "columns": [
+        {
+          "label": "Jamie L. Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "Fran Fawcett (R)",
+          "contest": "house1",
+          "candidate": "Fran Fawcett"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.209,
+        0.842,
+        0.507
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 390,
+      "id": "390-1",
+      "columns": [
+        {
+          "label": "Robert Clark (D)",
+          "contest": "house2",
+          "candidate": "Robert G. Clark"
+        },
+        {
+          "label": "Webb Franklin (R)",
+          "contest": "house2",
+          "candidate": "Webb Franklin"
+        },
+        {
+          "label": "William V. Harris (I)",
+          "contest": "house2",
+          "candidate": "William V. Harris"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.19,
+        0.499,
+        0.847,
+        0.807
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 391,
+      "id": "391-0",
+      "columns": [
+        {
+          "label": "G.V. Montgomery (D)",
+          "contest": "house3",
+          "candidate": "G. V. \"Sonny\" Montgomery"
+        },
+        {
+          "label": "James Bradshaw (I)",
+          "contest": "house3",
+          "candidate": "James Bradshaw"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.085,
+        0.824,
+        0.356
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 391,
+      "id": "391-1",
+      "columns": [
+        {
+          "label": "Wayne Dowdy (D)",
+          "contest": "house4",
+          "candidate": "Wayne Dowdy"
+        },
+        {
+          "label": "Liles Williams (R)",
+          "contest": "house4",
+          "candidate": "Liles Williams"
+        },
+        {
+          "label": "Eddie L. McBride (I)",
+          "contest": "house4",
+          "candidate": "Eddie L. McBride"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.348,
+        0.825,
+        0.63
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 391,
+      "id": "391-2",
+      "columns": [
+        {
+          "label": "Arlon Coate (D)",
+          "contest": "house5",
+          "candidate": "Arlon \"Blackie\" Coate"
+        },
+        {
+          "label": "Trent Lott (R)",
+          "contest": "house5",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.166,
+        0.622,
+        0.825,
+        0.854
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

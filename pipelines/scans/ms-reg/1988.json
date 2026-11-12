@@ -1,0 +1,361 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "house1": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 554,
+      "id": "554-0",
+      "columns": [
+        {
+          "label": "(D) Michael S. Dukakis and Lloyd M. Bentsen",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "(R) George Bush and Dan Quayle",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "(L) Ron Paul and Andre V. Marrou",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "(I) David Duke and Floyd C. Parker",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "(I) Lenora B. Fulani and Mamie Moore",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.101,
+        0.902,
+        1.0
+      ],
+      "hint": "Read only the table headed 'President and Vice President'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1057
+      ]
+    },
+    {
+      "page": 555,
+      "id": "555-0",
+      "columns": [
+        {
+          "label": "(D) Michael S. Dukakis and Lloyd M. Bentsen",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "(R) George Bush and Dan Quayle",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "(L) Ron Paul and Andre V. Marrou",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "(I) David Duke and Floyd C. Parker",
+          "contest": "president",
+          "candidate": "David E. Duke"
+        },
+        {
+          "label": "(I) Lenora B. Fulani and Mamie Moore",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.096,
+        0.888,
+        0.532
+      ],
+      "hint": "Read only the table headed ''; ignore any other table visible in the image."
+    },
+    {
+      "page": 555,
+      "id": "555-1",
+      "columns": [
+        {
+          "label": "(D) Wayne Dowdy",
+          "contest": "senate",
+          "candidate": "Wayne Dowdy"
+        },
+        {
+          "label": "(R) Trent Lott",
+          "contest": "senate",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.524,
+        0.895,
+        1.0
+      ],
+      "hint": "Read only the table headed 'United States Senate'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1765
+      ]
+    },
+    {
+      "page": 556,
+      "id": "556-0",
+      "columns": [
+        {
+          "label": "(D) Wayne Dowdy",
+          "contest": "senate",
+          "candidate": "Wayne Dowdy"
+        },
+        {
+          "label": "(R) Trent Lott",
+          "contest": "senate",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.0,
+        0.895,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 557,
+      "id": "557-0",
+      "columns": [
+        {
+          "label": "(D) Jamie L. Whitten",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "(R) Jim Bush",
+          "contest": "house1",
+          "candidate": "Jim Bush"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.112,
+        0.878,
+        0.504
+      ],
+      "hint": "Read only the table headed 'First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 557,
+      "id": "557-1",
+      "columns": [
+        {
+          "label": "(D) Mike Espy",
+          "contest": "house2",
+          "candidate": "Mike Espy"
+        },
+        {
+          "label": "(R) Jack Coleman",
+          "contest": "house2",
+          "candidate": "Jack Coleman"
+        },
+        {
+          "label": "(I) Dorothy Benford",
+          "contest": "house2",
+          "candidate": "Dorothy Benford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.496,
+        0.89,
+        0.886
+      ],
+      "hint": "Read only the table headed 'Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 558,
+      "id": "558-0",
+      "columns": [
+        {
+          "label": "(D) G. V. (Sonny) Montgomery",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        },
+        {
+          "label": "(R) Jimmie Ray Bourland",
+          "contest": "house3",
+          "candidate": "Jimmie Ray Bourland"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.066,
+        0.899,
+        0.413
+      ],
+      "hint": "Read only the table headed 'Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 558,
+      "id": "558-1",
+      "columns": [
+        {
+          "label": "(D) Mike Parker",
+          "contest": "house4",
+          "candidate": "Mike Parker"
+        },
+        {
+          "label": "(R) Thomas Collins",
+          "contest": "house4",
+          "candidate": "Thomas Collins"
+        },
+        {
+          "label": "(I) Liz Gilchrist",
+          "contest": "house4",
+          "candidate": "Liz Gilchrist"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.405,
+        0.902,
+        0.735
+      ],
+      "hint": "Read only the table headed 'Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 558,
+      "id": "558-2",
+      "columns": [
+        {
+          "label": "(D) Gene Taylor",
+          "contest": "house5",
+          "candidate": "Gene Taylor"
+        },
+        {
+          "label": "(R) Larkin Smith",
+          "contest": "house5",
+          "candidate": "Larkin Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.727,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 559,
+      "id": "559-0",
+      "columns": [
+        {
+          "label": "(D) Gene Taylor",
+          "contest": "house5",
+          "candidate": "Gene Taylor"
+        },
+        {
+          "label": "(R) Larkin Smith",
+          "contest": "house5",
+          "candidate": "Larkin Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.0,
+        0.903,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    }
+  ]
+}

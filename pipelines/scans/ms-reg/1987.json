@@ -1,0 +1,81 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1988-1992, general election returns of 1987-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0204/micro_IA40706932_0204.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0204"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1987,
+      "chamber": "governor",
+      "day": "1987-11-03",
+      "special": false,
+      "state": "MS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 494,
+      "id": "494-0",
+      "columns": [
+        {
+          "label": "(D) Ray Mabus",
+          "contest": "governor",
+          "candidate": "Ray Mabus"
+        },
+        {
+          "label": "(R) Jack Reed",
+          "contest": "governor",
+          "candidate": "Jack R. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.365,
+        0.853,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0945
+      ]
+    },
+    {
+      "page": 495,
+      "id": "495-0",
+      "columns": [
+        {
+          "label": "(D) Ray Mabus",
+          "contest": "governor",
+          "candidate": "Ray Mabus"
+        },
+        {
+          "label": "(R) Jack Reed",
+          "contest": "governor",
+          "candidate": "Jack R. Reed"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.064,
+        0.869,
+        0.662
+      ],
+      "hint": "Read only the table headed ''; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0569
+      ]
+    }
+  ]
+}

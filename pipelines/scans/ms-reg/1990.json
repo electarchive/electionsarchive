@@ -1,0 +1,222 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1992-1996, general election returns of 1990-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706949_0143/micro_IA40706949_0143.pdf",
+    "item": "https://archive.org/details/micro_IA40706949_0143"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "house1": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 366,
+      "id": "366-0",
+      "columns": [
+        {
+          "label": "Thad Cochran(R)",
+          "contest": "senate",
+          "candidate": "Thad Cochran"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.104,
+        0.585,
+        0.909
+      ],
+      "hint": "Read only the table headed 'United States Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0137
+      ]
+    },
+    {
+      "page": 367,
+      "id": "367-0",
+      "columns": [
+        {
+          "label": "Jamie L. Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "Bill Bowlin (R)",
+          "contest": "house1",
+          "candidate": "Bill Bowlin"
+        },
+        {
+          "label": "Totals",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.046,
+        0.834,
+        0.325
+      ],
+      "hint": "Read only the table headed 'United States Representative, First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 367,
+      "id": "367-1",
+      "columns": [
+        {
+          "label": "Mike Espy (D)",
+          "contest": "house2",
+          "candidate": "Mike Espy"
+        },
+        {
+          "label": "Dorothy Benford (R)",
+          "contest": "house2",
+          "candidate": "Dorothy Benford"
+        },
+        {
+          "label": "Totals",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.317,
+        0.848,
+        0.625
+      ],
+      "hint": "Read only the table headed 'United States Representative, Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 367,
+      "id": "367-2",
+      "columns": [
+        {
+          "label": "G.V. (Sonny) Montgomery (D)",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.617,
+        0.723,
+        0.876
+      ],
+      "hint": "Read only the table headed 'United States Representative, Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 368,
+      "id": "368-0",
+      "columns": [
+        {
+          "label": "Mike Parker (D)",
+          "contest": "house4",
+          "candidate": "Mike Parker"
+        },
+        {
+          "label": "Jerry Parks (R)",
+          "contest": "house4",
+          "candidate": "Jerry Parks"
+        },
+        {
+          "label": "Totals",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.052,
+        0.818,
+        0.284
+      ],
+      "hint": "Read only the table headed 'United States Representative, Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 368,
+      "id": "368-1",
+      "columns": [
+        {
+          "label": "Gene Taylor (D)",
+          "contest": "house5",
+          "candidate": "Gene Taylor"
+        },
+        {
+          "label": "Sheila Smith (R)",
+          "contest": "house5",
+          "candidate": "Sheila Smith"
+        },
+        {
+          "label": "Totals",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.276,
+        0.814,
+        0.478
+      ],
+      "hint": "Read only the table headed 'United States Representative, Fifth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

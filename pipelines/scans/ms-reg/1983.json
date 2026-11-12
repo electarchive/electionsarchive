@@ -1,0 +1,67 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1984-1988, general election returns of 1983-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0183/micro_IA40706919_0183.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0183"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1983,
+      "chamber": "governor",
+      "day": "1983-11-08",
+      "special": false,
+      "state": "MS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 441,
+      "id": "441-0",
+      "columns": [
+        {
+          "label": "William A. (Bill) Allain (D)",
+          "contest": "governor",
+          "candidate": "William A. Allain"
+        },
+        {
+          "label": "Leon Bramlett (R)",
+          "contest": "governor",
+          "candidate": "Leon Bramlett"
+        },
+        {
+          "label": "Charles Evers (I)",
+          "contest": "governor",
+          "candidate": "Charles Evers"
+        },
+        {
+          "label": "Billy H. Taylor (I)",
+          "contest": "governor",
+          "candidate": "Billie H. Taylor"
+        },
+        {
+          "label": "Helen McMullen Williams (I)",
+          "contest": "governor",
+          "candidate": "Henry McMullen Williams"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.154,
+        0.093,
+        0.812,
+        0.931
+      ],
+      "hint": "Read only the table headed 'County'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0525
+      ]
+    }
+  ]
+}

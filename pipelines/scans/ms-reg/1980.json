@@ -1,0 +1,148 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1980-1984, general election returns of 1980-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0434/micro_IA40706905_0434.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0434"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house2": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 564,
+      "id": "564-0",
+      "columns": [
+        {
+          "label": "David R. Bowen (D)",
+          "contest": "house2",
+          "candidate": "David R. Bowen"
+        },
+        {
+          "label": "Frank Drake (R)",
+          "contest": "house2",
+          "candidate": "Frank Drake"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.295,
+        0.867,
+        0.572
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 564,
+      "id": "564-1",
+      "columns": [
+        {
+          "label": "G. V. (Sonny) Montgomery (D)",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.161,
+        0.564,
+        0.882,
+        0.904
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 565,
+      "id": "565-0",
+      "columns": [
+        {
+          "label": "Britt R. Singletary (D)",
+          "contest": "house4",
+          "candidate": "Britt R. Singletary"
+        },
+        {
+          "label": "Jon C. Hinson (R)",
+          "contest": "house4",
+          "candidate": "Jon C. Henson"
+        },
+        {
+          "label": "John Wayne McInerney (I)",
+          "contest": "house4",
+          "candidate": "John Wayne McInerney"
+        },
+        {
+          "label": "Lester Burl McLemore (I)",
+          "contest": "house4",
+          "candidate": "Leslie Burl McLemore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.094,
+        0.847,
+        0.311
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 565,
+      "id": "565-1",
+      "columns": [
+        {
+          "label": "Jimmy McVeay (D)",
+          "contest": "house5",
+          "candidate": "Jimmy McVeay"
+        },
+        {
+          "label": "Trent Lott (R)",
+          "contest": "house5",
+          "candidate": "Trent Lott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.303,
+        0.827,
+        0.524
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1992-1996, general election returns of 1992-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706949_0143/micro_IA40706949_0143.pdf",
+    "item": "https://archive.org/details/micro_IA40706949_0143"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": null
+    },
+    "house1": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "house2": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "house3": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "house4": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    },
+    "house5": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "MS",
+      "district": 5
+    }
+  },
+  "pages": [
+    {
+      "page": 462,
+      "id": "462-0",
+      "columns": [
+        {
+          "label": "Bill Clinton(D)",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "George Bush(R)",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Andre Marrou(O)",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "Howard Phillips(O)",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        },
+        {
+          "label": "Lenora Fulani(I)",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        },
+        {
+          "label": "Bo Gritz(I)",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "John Hagelin(I)",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        },
+        {
+          "label": "Ross Perot(I)",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.092,
+        0.871,
+        0.932
+      ],
+      "hint": "Read only the table headed 'President/Vice President'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0405
+      ]
+    },
+    {
+      "page": 463,
+      "id": "463-0",
+      "columns": [
+        {
+          "label": "Jamie Whitten (D)",
+          "contest": "house1",
+          "candidate": "Jamie L. Whitten"
+        },
+        {
+          "label": "Clyde Whitaker (R)",
+          "contest": "house1",
+          "candidate": "Clyde E. Whitaker"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.056,
+        0.628,
+        0.409
+      ],
+      "hint": "Read only the table headed 'United States House of Representatives First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 463,
+      "id": "463-1",
+      "columns": [
+        {
+          "label": "Mike Espy (D)",
+          "contest": "house2",
+          "candidate": "Mike Espy"
+        },
+        {
+          "label": "Dorothy (Dot) Benford (R)",
+          "contest": "house2",
+          "candidate": "Dorothy (Dot) Benford"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.401,
+        0.672,
+        0.752
+      ],
+      "hint": "Read only the table headed 'United States House of Representatives Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 464,
+      "id": "464-0",
+      "columns": [
+        {
+          "label": "G. V. (Sonny) Montgomery (D)",
+          "contest": "house3",
+          "candidate": "G.V. (Sonny) Montgomery"
+        },
+        {
+          "label": "Michael E. Williams (R)",
+          "contest": "house3",
+          "candidate": "Michael E. Williams"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.06,
+        0.702,
+        0.361
+      ],
+      "hint": "Read only the table headed 'United States House of Representatives Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 464,
+      "id": "464-1",
+      "columns": [
+        {
+          "label": "Mike Parker (D)",
+          "contest": "house4",
+          "candidate": "Mike Parker"
+        },
+        {
+          "label": "Jack McMillan (R)",
+          "contest": "house4",
+          "candidate": "Jack L. McMillan"
+        },
+        {
+          "label": "Liz Gilchrist (I)",
+          "contest": "house4",
+          "candidate": "Liz Gilchrist"
+        },
+        {
+          "label": "James Meredith (I)",
+          "contest": "house4",
+          "candidate": "James H. Meredith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.061,
+        0.353,
+        0.855,
+        0.621
+      ],
+      "hint": "Read only the table headed 'United States House of Representatives Fourth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 464,
+      "id": "464-2",
+      "columns": [
+        {
+          "label": "Gene Taylor (D)",
+          "contest": "house5",
+          "candidate": "Gene Taylor"
+        },
+        {
+          "label": "Paul Harvey (R)",
+          "contest": "house5",
+          "candidate": "Paul Harvey"
+        },
+        {
+          "label": "Shawn O'Hara (I)",
+          "contest": "house5",
+          "candidate": "Shawn"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.613,
+        0.758,
+        0.829
+      ],
+      "hint": "Read only the table headed 'United States House of Representatives Fifth Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Mississippi Official and Statistical Register 1992-1996, general election returns of 1991-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706949_0143/micro_IA40706949_0143.pdf",
+    "item": "https://archive.org/details/micro_IA40706949_0143"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1991,
+      "chamber": "governor",
+      "day": "1991-11-05",
+      "special": false,
+      "state": "MS",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 406,
+      "id": "406-0",
+      "columns": [
+        {
+          "label": "Ray Mabus (D)",
+          "contest": "governor",
+          "candidate": "Ray Mabus"
+        },
+        {
+          "label": "Kirk Fordice (R)",
+          "contest": "governor",
+          "candidate": "Kirk Fordice"
+        },
+        {
+          "label": "Shawn O'Hara (I)",
+          "contest": "governor",
+          "candidate": "Shawn O'Hara"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.053,
+        0.866,
+        0.933
+      ],
+      "hint": "Read only the table headed 'General Election, November 5, 1991'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0955
+      ]
+    }
+  ]
+}
