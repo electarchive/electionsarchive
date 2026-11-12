@@ -2529,7 +2529,8 @@ for _key in sorted(
 for _key in sorted(
     {
         _line.split("\t")[0]
-        for _line in Path(__file__).with_name("local_2026_states.tsv").read_text().splitlines()
+        for _name in ("local_2026_states.tsv", "local_2026_nov3_districts.tsv")
+        for _line in Path(__file__).with_name(_name).read_text().splitlines()
         if _line.startswith("AR-") and _line.split("\t")[0].endswith("-enr")
     }
 ):
