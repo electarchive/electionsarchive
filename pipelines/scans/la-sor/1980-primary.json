@@ -1,0 +1,380 @@
+{
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "Report of the Secretary of State, 1979\u20131980",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0363"
+  },
+  "raw_source": "us.la_sos",
+  "contests": {
+    "senate": {
+      "year": 1980,
+      "chamber": "senate",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": null
+    },
+    "house1": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 6
+    },
+    "house8": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-09-13",
+      "special": false,
+      "state": "LA",
+      "district": 8
+    }
+  },
+  "pages": [
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Jerry C. Bardwell (Republican)",
+          "contest": "senate",
+          "candidate": "Jerry C. Bardwell"
+        },
+        {
+          "label": "Naomi Bracey (No Party)",
+          "contest": "senate",
+          "candidate": "Naomi Bracey"
+        },
+        {
+          "label": "Louis \"Woody\" Jenkins (Democrat)",
+          "contest": "senate",
+          "candidate": "Louis Woody Jenkins"
+        },
+        {
+          "label": "Russell B. Long (Democrat)",
+          "contest": "senate",
+          "candidate": "Russell B. Long"
+        },
+        {
+          "label": "Robert Max Ross (Republican)",
+          "contest": "senate",
+          "candidate": "Robert Max Ross"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.226,
+        0.963,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICIAL RETURNS OF OPEN PRIMARY ELECTION SEPTEMBER 13, 1980 For United States Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.5181
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Jerry C. Bardwell (Republican)",
+          "contest": "senate",
+          "candidate": "Jerry C. Bardwell"
+        },
+        {
+          "label": "Naomi Bracey (No Party)",
+          "contest": "senate",
+          "candidate": "Naomi Bracey"
+        },
+        {
+          "label": "Louis \"Woody\" Jenkins (Democrat)",
+          "contest": "senate",
+          "candidate": "Louis Woody Jenkins"
+        },
+        {
+          "label": "Russell B. Long (Democrat)",
+          "contest": "senate",
+          "candidate": "Russell B. Long"
+        },
+        {
+          "label": "Robert Max Ross (Republican)",
+          "contest": "senate",
+          "candidate": "Robert Max Ross"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.0,
+        0.963,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Tristan P. Junius (No Party)",
+          "contest": "house1",
+          "candidate": "Tristan P. Junius"
+        },
+        {
+          "label": "Robert L. \"Bob\" Livingston (Republican)",
+          "contest": "house1",
+          "candidate": "Robert L. \"Bob\" Livingston"
+        },
+        {
+          "label": "Michael J. Musmeci, Sr. (Democrat)",
+          "contest": "house1",
+          "candidate": "Michael J. Musmeci Sr"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.199,
+        0.852,
+        0.463
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives First Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-1",
+      "columns": [
+        {
+          "label": "Clyde F. Bel, Jr. (Democrat)",
+          "contest": "house2",
+          "candidate": "Clyde F. Bel Jr"
+        },
+        {
+          "label": "Lindy \"Mrs. Hale\" Boggs (Democrat)",
+          "contest": "house2",
+          "candidate": "Lindy (Mrs. Hale) Boggs"
+        },
+        {
+          "label": "Rob Couhig (Republican)",
+          "contest": "house2",
+          "candidate": "Rob Couhig"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.182,
+        0.455,
+        0.852,
+        0.732
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives Second Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "Bob Namer (Democrat)",
+          "contest": "house3",
+          "candidate": "Bob Namer"
+        },
+        {
+          "label": "W. J. \"Billy\" Tauzin (Democrat)",
+          "contest": "house3",
+          "candidate": "W. J. \"Billy\" Tauzin"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.241,
+        0.823,
+        0.647
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives Third Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "Foster Campbell (Democrat)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. Kay Carter (Democrat)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Forrest Dunn (Democrat)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Claude \"Buddy\" Leach (Democrat)",
+          "contest": "house4",
+          "candidate": "Claude \"Buddy\" Leach"
+        },
+        {
+          "label": "Buddy Roemer (Democrat)",
+          "contest": "house4",
+          "candidate": "Buddy Roemer"
+        },
+        {
+          "label": "Jimmy Wilson (Republican)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.428,
+        0.205,
+        0.755,
+        0.859
+      ],
+      "hint": "Read only the table headed 'OFFICIAL RETURNS OF OPEN PRIMARY ELECTION SEPTEMBER 13, 1980 For Member of the United States House of Representatives Fourth Congressional District'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4969
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Jerry Huckaby (Democrat)",
+          "contest": "house5",
+          "candidate": "Jerry Huckaby"
+        },
+        {
+          "label": "L. D. \"None of the Above\" Knox (Democrat)",
+          "contest": "house5",
+          "candidate": "L.D. Knox"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.157,
+        0.833,
+        0.606
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives Fifth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 31,
+      "id": "31-1",
+      "columns": [
+        {
+          "label": "Alice Brooks (Democrat)",
+          "contest": "house6",
+          "candidate": "Alice Brooks"
+        },
+        {
+          "label": "W. Henson Moore (Republican)",
+          "contest": "house6",
+          "candidate": "W. Henson Moore"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.163,
+        0.598,
+        0.833,
+        0.878
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives Sixth Congressional District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Clyde C. Holloway (Republican)",
+          "contest": "house8",
+          "candidate": "Clyde C. Holloway"
+        },
+        {
+          "label": "Gillis W. Long (Democrat)",
+          "contest": "house8",
+          "candidate": "Gillis Long"
+        },
+        {
+          "label": "Robert H. Mitchell (Republican)",
+          "contest": "house8",
+          "candidate": "Robert H. Mitchell"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.191,
+        0.265,
+        0.859,
+        0.617
+      ],
+      "hint": "Read only the table headed 'For Member of the United States House of Representatives Eighth Congressional District'; ignore any other table visible in the image."
+    }
+  ],
+  "unit_codes": {
+    "W. Baton Rouge": "22121",
+    "E. B. Rouge": "22033",
+    "E. Baton Rouge": "22033",
+    "Washington Parish": "22117",
+    "W. Carroll": "22123",
+    "E. Carroll": "22035",
+    "W. Feliciana": "22125",
+    "E. Feliciana": "22037"
+  }
+}
