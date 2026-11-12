@@ -463,7 +463,7 @@ const covered = (contests: SQL) => sql`
     select c.id, coalesce(c.office_id, pc.office_id) as office_id, c.body_id, e.date_from as d
     from contest c join election e on e.id = c.election_id
     left join contest pc on pc.id = c.allocation_parent_id
-    where c.id in (${contests})
+    where c.id = any(array(${contests}))
   ),
   tp as (select distinct office_id, body_id, d from tk),
   th as (
@@ -2745,14 +2745,15 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
             independent: boolean;
             incumbent: boolean;
           }>(sql`
-            with newest as materialized (
-              select rs.id from result_set rs
-              where rs.contest_id in (select contest_id from contest_option where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[]))
-                and ${latest("rs")}
-            ), covered as (${covered(sql`
-              select contest_id from contest_option
+            with base as materialized (
+              select k, id, contest_id, kind, party_id, ballot_label, candidate_count, alliance_id, parent_option_id from contest_option
               where k = any(${optionKs}::int[]) or contest_id = any(${outcomes}::uuid[])
-            `)})
+            ), held as materialized (
+              select distinct contest_id as id from base
+            ), newest as materialized (
+              select rs.id from held h
+              cross join lateral (select rs.id from result_set rs where rs.contest_id = h.id and ${latest("rs")} offset 0) rs
+            ), covered as (${covered(sql`select id from held`)})
             select o.k, o.id, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, o.candidate_count as candidates,
               o.alliance_id as alliance, o.parent_option_id is not null as is_line,
               exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent offset 0) as independent,
@@ -2782,7 +2783,7 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                   where y.result_set_id in (select id from newest) and y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
                   offset 0
                 ) then oc.seats end as seats
-            from contest_option o
+            from base o
             left join entity_merge pm on pm.entity_id = o.party_id
             left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`)}) pf on true
             left join lateral (
@@ -2797,8 +2798,7 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                   select from contest_option lp where lp.id = o.parent_option_id and lp.kind = 'list'
                 ))
             ) oc on true
-            where (o.k = any(${optionKs}::int[]) or o.contest_id = any(${outcomes}::uuid[]))
-              and (o.k = any(${optionKs}::int[]) or oc.kind is not null)
+            where (o.k = any(${optionKs}::int[]) or oc.kind is not null)
               and not (o.id = any(pf.ids))
             order by o.k
           `),
