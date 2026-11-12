@@ -1,0 +1,534 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1923, vote by counties (general election 1922-11-07)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/wisconsinblueboo1923unse/wisconsinblueboo1923unse.pdf",
+    "item": "https://archive.org/details/wisconsinblueboo1923unse"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1922,
+      "chamber": "senate",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 608,
+      "id": "608-0",
+      "columns": [
+        {
+          "label": "Adolph R. Bucknam Prohibition",
+          "contest": "senate",
+          "candidate": "Adolph R. Bucknam"
+        },
+        {
+          "label": "Robert M. La Follette Republican",
+          "contest": "senate",
+          "candidate": "Robert M. La Follette"
+        },
+        {
+          "label": "Jessie Jack Hooper Ind. Dem.",
+          "contest": "senate",
+          "candidate": "Jessie Jack Hooper"
+        },
+        {
+          "label": "Richard Koeppel, Ind.Soc.Lbr.",
+          "contest": "senate",
+          "candidate": "Richard Koeppel"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.131,
+        0.919,
+        0.942
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE FOR U. S. SENATOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0641
+      ]
+    },
+    {
+      "page": 616,
+      "id": "616-0",
+      "columns": [
+        {
+          "label": "Henry Allen Cooper, Republican",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "Niels P. Nielsen, Socialist",
+          "contest": "house1",
+          "candidate": "Niels P. Nielsen"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.131,
+        0.938,
+        0.326
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-1",
+      "columns": [
+        {
+          "label": "William F. Schanen, Democrat",
+          "contest": "house2",
+          "candidate": "William F. Schanen"
+        },
+        {
+          "label": "Edward Voight, Republican",
+          "contest": "house2",
+          "candidate": "Edward Voigt"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.318,
+        0.938,
+        0.534
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-2",
+      "columns": [
+        {
+          "label": "John M. Nelson, Republican",
+          "contest": "house3",
+          "candidate": "John M. Nelson"
+        },
+        {
+          "label": "Martha Riley, Ind. Dem.",
+          "contest": "house3",
+          "candidate": "Martha Riley"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.526,
+        0.938,
+        0.752
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 616,
+      "id": "616-3",
+      "columns": [
+        {
+          "label": "Joseph F. Drezdzon, Democrat",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John G. Schaefer, Republican",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        },
+        {
+          "label": "Edmund T. Melms, Socialist",
+          "contest": "house4",
+          "candidate": "Edmund T. Melms"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.744,
+        0.942,
+        0.897
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 617,
+      "id": "617-0",
+      "columns": [
+        {
+          "label": "Wm. H. Stafford, Republican",
+          "contest": "house5",
+          "candidate": "William H. Stafford"
+        },
+        {
+          "label": "Victor L. Berger Socialist",
+          "contest": "house5",
+          "candidate": "Victor L. Berger"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.083,
+        0.895,
+        0.239
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 617,
+      "id": "617-1",
+      "columns": [
+        {
+          "label": "Florian Lampert, Republican",
+          "contest": "house6",
+          "candidate": "Florian Lampert"
+        },
+        {
+          "label": "Wm. E. Cavanaugh, Ind. Dem.",
+          "contest": "house6",
+          "candidate": "W. E. Cavanaugh"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.231,
+        0.895,
+        0.458
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 617,
+      "id": "617-2",
+      "columns": [
+        {
+          "label": "Joseph D. Beck, Republican",
+          "contest": "house7",
+          "candidate": "Joseph D. Beck"
+        },
+        {
+          "label": "Bert A. Jolivette, Ind. Dem.",
+          "contest": "house7",
+          "candidate": "Bert A. Jollivette"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.45,
+        0.894,
+        0.699
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 617,
+      "id": "617-3",
+      "columns": [
+        {
+          "label": "Edward E. Browne, Republican",
+          "contest": "house8",
+          "candidate": "Edward E. Browne"
+        },
+        {
+          "label": "Herman A. Marth, Ind.Socialist",
+          "contest": "house8",
+          "candidate": "Herman A. Marth"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.691,
+        0.893,
+        0.896
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 618,
+      "id": "618-0",
+      "columns": [
+        {
+          "label": "George J. Schneider Republican",
+          "contest": "house9",
+          "candidate": "George J. Schneider"
+        },
+        {
+          "label": "Henry Graass Ind. Rep.",
+          "contest": "house9",
+          "candidate": "Henry Graass"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.101,
+        0.933,
+        0.342
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 618,
+      "id": "618-1",
+      "columns": [
+        {
+          "label": "James A. Frear, Republican",
+          "contest": "house10",
+          "candidate": "James A. Frear"
+        },
+        {
+          "label": "Olin Swenson Socialist",
+          "contest": "house10",
+          "candidate": "Olin Swenson"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.334,
+        0.933,
+        0.611
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 618,
+      "id": "618-2",
+      "columns": [
+        {
+          "label": "Hubert H. Peavey, Republican",
+          "contest": "house11",
+          "candidate": "Hubert H. Peavey"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.603,
+        0.935,
+        0.896
+      ],
+      "hint": "Read only the table headed 'ELEVENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

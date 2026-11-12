@@ -1,0 +1,159 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Blue Book of the State of Wisconsin 1911, vote by counties (general election 1908-11-03)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/bluebookstatewi00statgoog/bluebookstatewi00statgoog.pdf",
+    "item": "https://archive.org/details/bluebookstatewi00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 223,
+      "id": "223-0",
+      "columns": [
+        {
+          "label": "Population, 1900.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. J. Bryan Dem.",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "E. W. Chafin Pro.",
+          "contest": "president",
+          "candidate": "Eugene Chafin (Prohibition)"
+        },
+        {
+          "label": "Wm. H. Taft Rep.",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "E. V. Debs Soc. Dem.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "August Gillhaus Soc. Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.133,
+        0.826,
+        0.976
+      ],
+      "hint": "Read only the table headed 'COMPARATIVE VOTE FOR PRESIDENT, 1904 AND 1908, BY COUNTIES, WITH POPULATION, 1900.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0783
+      ]
+    },
+    {
+      "page": 312,
+      "id": "312-0",
+      "columns": [
+        {
+          "label": "Population, 1905",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aylward, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Aylward"
+        },
+        {
+          "label": "Cox, Pro.",
+          "contest": "governor",
+          "candidate": "Winfred D. Cox"
+        },
+        {
+          "label": "Davidson, Rep.",
+          "contest": "governor",
+          "candidate": "James O. Davidson"
+        },
+        {
+          "label": "Brown, Soc. Dem.",
+          "contest": "governor",
+          "candidate": "Harvey Dee Brown"
+        },
+        {
+          "label": "Bottoma, Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Herman Bottema"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.124,
+        0.12,
+        0.844,
+        0.956
+      ],
+      "hint": "Read only the table headed 'POPULATION 1905, VOTE AND PLURALITIES FOR GOVERNOR, 1908'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0837
+      ]
+    }
+  ]
+}

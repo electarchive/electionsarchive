@@ -1,0 +1,537 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Wisconsin Blue Book 1919, vote by counties (general election 1918-11-05)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/wisconsinblueboo00wisc_1/wisconsinblueboo00wisc_1.pdf",
+    "item": "https://archive.org/details/wisconsinblueboo00wisc_1"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1918,
+      "chamber": "governor",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 157,
+      "id": "157-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Moehlen-pah",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dean",
+          "contest": "governor",
+          "candidate": "William C. Dean"
+        },
+        {
+          "label": "Philipp",
+          "contest": "governor",
+          "candidate": "Emanuel L. Philipp"
+        },
+        {
+          "label": "Seidel",
+          "contest": "governor",
+          "candidate": "Emil Seidel"
+        },
+        {
+          "label": "Scatter-ing",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.101,
+        0.918,
+        0.967
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0473
+      ]
+    },
+    {
+      "page": 162,
+      "id": "162-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stewart, Dem.",
+          "contest": "house1",
+          "candidate": "Stewart"
+        },
+        {
+          "label": "Randall, Rep.",
+          "contest": "house1",
+          "candidate": "Clifford Ellsworth Randall"
+        },
+        {
+          "label": "Walkup, Soc.",
+          "contest": "house1",
+          "candidate": "Walkup"
+        },
+        {
+          "label": "Cooper, Ind.",
+          "contest": "house1",
+          "candidate": "Cooper"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.101,
+        0.924,
+        0.356
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. FIRST DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 162,
+      "id": "162-1",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clifford, Dem.",
+          "contest": "house2",
+          "candidate": "Clifford"
+        },
+        {
+          "label": "Voigt, Rep.",
+          "contest": "house2",
+          "candidate": "Edward Voigt"
+        },
+        {
+          "label": "Ameringer, Soc.",
+          "contest": "house2",
+          "candidate": "Ameringer"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.348,
+        0.924,
+        0.649
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. SECOND DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 162,
+      "id": "162-2",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Monahan, Rep.",
+          "contest": "house3",
+          "candidate": "James Gideon Monahan"
+        },
+        {
+          "label": "Warner, Ind.",
+          "contest": "house3",
+          "candidate": "Warner"
+        },
+        {
+          "label": "Reynolds, Ind.",
+          "contest": "house3",
+          "candidate": "Reynolds"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.641,
+        0.918,
+        0.922
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. THIRD DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kleczka, Rep.",
+          "contest": "house4",
+          "candidate": "John Casimir Kleczka"
+        },
+        {
+          "label": "Melms, Soc.",
+          "contest": "house4",
+          "candidate": "Melms"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.178,
+        0.916,
+        0.371
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. FOURTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-1",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carney, Dem.",
+          "contest": "house5",
+          "candidate": "Carney"
+        },
+        {
+          "label": "Stafford, Rep.",
+          "contest": "house5",
+          "candidate": "Stafford"
+        },
+        {
+          "label": "Berger, Soc.",
+          "contest": "house5",
+          "candidate": "Victor Luitpold Berger"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.363,
+        0.916,
+        0.624
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. FIFTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 165,
+      "id": "165-2",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Husting, Dem.",
+          "contest": "house6",
+          "candidate": "Husting"
+        },
+        {
+          "label": "Van Keuren, Pro.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lampert, Rep.",
+          "contest": "house6",
+          "candidate": "Florian Lampert"
+        },
+        {
+          "label": "Thompson, Soc.",
+          "contest": "house6",
+          "candidate": "Thompson"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.616,
+        0.916,
+        0.874
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. SIXTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bentley, Dem.",
+          "contest": "house7",
+          "candidate": "Bentley"
+        },
+        {
+          "label": "Needham, Pro.",
+          "contest": "house7",
+          "candidate": "Needham"
+        },
+        {
+          "label": "Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.106,
+        0.903,
+        0.378
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. SEVENTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-1",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Brown, Dem.",
+          "contest": "house8",
+          "candidate": "Brown"
+        },
+        {
+          "label": "Browne, Rep.",
+          "contest": "house8",
+          "candidate": "Edward Everts Browne"
+        },
+        {
+          "label": "Krzycki, Soc.",
+          "contest": "house8",
+          "candidate": "Krzycki"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.37,
+        0.903,
+        0.663
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. EIGHTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 166,
+      "id": "166-2",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McDonald, Dem.",
+          "contest": "house9",
+          "candidate": "McDonald"
+        },
+        {
+          "label": "Classon, Rep.",
+          "contest": "house9",
+          "candidate": "David Guy Classon"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.655,
+        0.908,
+        0.937
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. NINTH DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 167,
+      "id": "167-0",
+      "columns": [
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frear, Rep.",
+          "contest": "house10",
+          "candidate": "James Archibald Frear"
+        },
+        {
+          "label": "Frawley, Ind.",
+          "contest": "house10",
+          "candidate": "Frawley"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.178,
+        0.884,
+        0.465
+      ],
+      "hint": "Read only the table headed 'VOTE FOR MEMBER OF CONGRESS, GENERAL ELECTION, 1918. TENTH DISTRICT.'; ignore any other table visible in the image."
+    }
+  ]
+}

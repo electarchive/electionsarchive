@@ -1,0 +1,958 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Blue Book of the State of Wisconsin 1907, vote by counties (general election 1906-11-06)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/bluebookforstat00unkngoog/bluebookforstat00unkngoog.pdf",
+    "item": "https://archive.org/details/bluebookforstat00unkngoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1906,
+      "chamber": "governor",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    },
+    "house11": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "WI",
+      "district": 11
+    }
+  },
+  "pages": [
+    {
+      "page": 514,
+      "id": "514-0",
+      "columns": [
+        {
+          "label": "Population, 1905",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aylward, Dem.",
+          "contest": "governor",
+          "candidate": "John A. Aylward"
+        },
+        {
+          "label": "Eaton, Pro.",
+          "contest": "governor",
+          "candidate": "Ephraim L. Eaton"
+        },
+        {
+          "label": "Davidson, Rep.",
+          "contest": "governor",
+          "candidate": "James O. Davidson"
+        },
+        {
+          "label": "Gaylord, Soc. Dem.",
+          "contest": "governor",
+          "candidate": "Winfield R. Gaylord"
+        },
+        {
+          "label": "Rosasa, Soc. Lab.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.108,
+        0.852,
+        0.923
+      ],
+      "hint": "Read only the table headed 'POPULATION, 1906, VOTE AND PLURALITIES FOR GOVERNOR, 1906.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0663
+      ]
+    },
+    {
+      "page": 534,
+      "id": "534-0",
+      "columns": [
+        {
+          "label": "John J. Cunningham, Dem.",
+          "contest": "house1",
+          "candidate": "John J. Cunningham"
+        },
+        {
+          "label": "Henry Allen Cooper, Rep.",
+          "contest": "house1",
+          "candidate": "Henry Allen Cooper"
+        },
+        {
+          "label": "Moses Hull, So. Dem.",
+          "contest": "house1",
+          "candidate": "Moses Hull"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.493,
+        0.838,
+        0.692
+      ],
+      "hint": "Read only the table headed 'Summary of votes in first congressional district'; ignore any other table visible in the image."
+    },
+    {
+      "page": 542,
+      "id": "542-0",
+      "columns": [
+        {
+          "label": "Geo. W. Levis, Dem.",
+          "contest": "house2",
+          "candidate": "George W. Levis"
+        },
+        {
+          "label": "William L. Dibble, Pro.",
+          "contest": "house2",
+          "candidate": "William L. Dibble"
+        },
+        {
+          "label": "John M. Nelson, Rep.",
+          "contest": "house2",
+          "candidate": "John Mandt Nelson"
+        },
+        {
+          "label": "W. A. Hall, Sr., So Dem.",
+          "contest": "house2",
+          "candidate": "W. A. Sr. Hall"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.126,
+        0.841,
+        0.505
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SECOND DISTRICT, 1906.\u2014Continued.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 542,
+      "id": "542-1",
+      "columns": [
+        {
+          "label": "Geo. W. Levis, Dem.",
+          "contest": "house2",
+          "candidate": "George W. Levis"
+        },
+        {
+          "label": "William L. Dibble, Pro.",
+          "contest": "house2",
+          "candidate": "William L. Dibble"
+        },
+        {
+          "label": "John M. Nelson, Rep.",
+          "contest": "house2",
+          "candidate": "John Mandt Nelson"
+        },
+        {
+          "label": "W. A. Hall, Sr., Soc. Dem.",
+          "contest": "house2",
+          "candidate": "W. A. Sr. Hall"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.126,
+        0.497,
+        0.841,
+        0.779
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 547,
+      "id": "547-0",
+      "columns": [
+        {
+          "label": "James W. Murphy, Dem.",
+          "contest": "house3",
+          "candidate": "James William Murphy"
+        },
+        {
+          "label": "Herbert James Noyes, Pro.",
+          "contest": "house3",
+          "candidate": "Herbert James Noyes"
+        },
+        {
+          "label": "Joseph W. Babcock, Rep.",
+          "contest": "house3",
+          "candidate": "Joseph W. Babcock"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.197,
+        0.493,
+        0.914,
+        0.714
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN THIRD CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 548,
+      "id": "548-0",
+      "columns": [
+        {
+          "label": "Thomas J. Fleming, Dem.",
+          "contest": "house4",
+          "candidate": "Thomas J. Fleming"
+        },
+        {
+          "label": "William J. Cary, Rep.",
+          "contest": "house4",
+          "candidate": "William Joseph Cary"
+        },
+        {
+          "label": "Edmund T. Melms, Soc. Dem.",
+          "contest": "house4",
+          "candidate": "Edmund T. Melms"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.586,
+        0.802,
+        0.901
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN FOURTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 550,
+      "id": "550-0",
+      "columns": [
+        {
+          "label": "Joseph G. Donnelly Dem.",
+          "contest": "house5",
+          "candidate": "Joseph G. Donnelly"
+        },
+        {
+          "label": "Chas. F. Everett Pro.",
+          "contest": "house5",
+          "candidate": "Chas F. Everett"
+        },
+        {
+          "label": "Wm. H. Stafford Rep.",
+          "contest": "house5",
+          "candidate": "William Henry Stafford"
+        },
+        {
+          "label": "Albert J. Welch Soc. Dem.",
+          "contest": "house5",
+          "candidate": "Albert J. Welch"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.096,
+        0.857,
+        0.441
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN FIFTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 550,
+      "id": "550-1",
+      "columns": [
+        {
+          "label": "Chas. W. Weisse Dem.",
+          "contest": "house6",
+          "candidate": "Charles Herman Weisse"
+        },
+        {
+          "label": "Alvin Dreger Rep.",
+          "contest": "house6",
+          "candidate": "Alvin Dreger"
+        },
+        {
+          "label": "George C. Damrow Soc. Dem.",
+          "contest": "house6",
+          "candidate": "George C. Damrow"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.141,
+        0.433,
+        0.857,
+        1.0
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SIXTH DISTRICT, 1906.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2011
+      ]
+    },
+    {
+      "page": 554,
+      "id": "554-0",
+      "columns": [
+        {
+          "label": "Chas. W. Weisse, Dem.",
+          "contest": "house6",
+          "candidate": "Charles Herman Weisse"
+        },
+        {
+          "label": "Alvin Dreger, Rep.",
+          "contest": "house6",
+          "candidate": "Alvin Dreger"
+        },
+        {
+          "label": "Geo. C. Damrow, Soc. Dem.",
+          "contest": "house6",
+          "candidate": "George C. Damrow"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.119,
+        0.881,
+        0.309
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SIXTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 559,
+      "id": "559-0",
+      "columns": [
+        {
+          "label": "Charles F. Hile, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.213,
+        0.893,
+        0.392
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, SEVENTH DISTRICT, 1906.\u2014Continued'; ignore any other table visible in the image."
+    },
+    {
+      "page": 559,
+      "id": "559-1",
+      "columns": [
+        {
+          "label": "Charles F. Hile, Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John J. Esch, Rep.",
+          "contest": "house7",
+          "candidate": "John Jacob Esch"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.179,
+        0.384,
+        0.895,
+        0.64
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 564,
+      "id": "564-0",
+      "columns": [
+        {
+          "label": "John E. McMiller, Dem.",
+          "contest": "house8",
+          "candidate": "John E. McMuller"
+        },
+        {
+          "label": "Chas. H. Forward, Rep.",
+          "contest": "house8",
+          "candidate": "Chas H. Forward"
+        },
+        {
+          "label": "J. H. Davidson, Rep.",
+          "contest": "house8",
+          "candidate": "James Henry Davidson"
+        },
+        {
+          "label": "John J. Pitz, Soc. Dem.",
+          "contest": "house8",
+          "candidate": "John J. Pitz"
+        },
+        {
+          "label": "Wm. B. Minnahan, Ind. Rep.",
+          "contest": "house8",
+          "candidate": "William B. Minnahan"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.105,
+        0.832,
+        0.368
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTE IN EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 564,
+      "id": "564-1",
+      "columns": [
+        {
+          "label": "Phillip A. Badour, Dem.",
+          "contest": "house9",
+          "candidate": "Phillip A. Badour"
+        },
+        {
+          "label": "Gustav Kuestermann, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph E. Harris, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "Joseph E. Harris"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.36,
+        0.832,
+        0.903
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE, NINTH DISTRICT, 1906'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1915
+      ]
+    },
+    {
+      "page": 567,
+      "id": "567-0",
+      "columns": [
+        {
+          "label": "Phillip A. Badour, Dem.",
+          "contest": "house9",
+          "candidate": "Phillip A. Badour"
+        },
+        {
+          "label": "Gustav Kuester-mann, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph E. Harris, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "Joseph E. Harris"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.173,
+        0.107,
+        0.89,
+        0.712
+      ],
+      "hint": "Read only the table headed 'CONGRESSIONAL VOTE NINTH DISTRICT, 1906.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1421
+      ]
+    },
+    {
+      "page": 567,
+      "id": "567-1",
+      "columns": [
+        {
+          "label": "Phillip A. Badour, Dem.",
+          "contest": "house9",
+          "candidate": "Phillip A. Badour"
+        },
+        {
+          "label": "Gustav Kuester-mann, Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph E. Harris, Soc. Dem.",
+          "contest": "house9",
+          "candidate": "Joseph E. Harris"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.173,
+        0.704,
+        0.89,
+        0.911
+      ],
+      "hint": "Read only the table headed 'SUMMARY OF VOTES IN NINTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 574,
+      "id": "574-0",
+      "columns": [
+        {
+          "label": "Dennis D. Conway, Dem.",
+          "contest": "house10",
+          "candidate": "Dennis D. Conway"
+        },
+        {
+          "label": "E. A. Morse, Rep.",
+          "contest": "house10",
+          "candidate": "Elmer Addison Morse"
+        },
+        {
+          "label": "James E. Coxe, Soc. Dem.",
+          "contest": "house10",
+          "candidate": "James I. Coxe"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.179,
+        0.838,
+        0.649
+      ],
+      "hint": "Read only the table headed 'Congressional vote, tenth district, 1906.\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0064
+      ]
+    },
+    {
+      "page": 574,
+      "id": "574-1",
+      "columns": [
+        {
+          "label": "Dennis D. Conway, Dem.",
+          "contest": "house10",
+          "candidate": "Dennis D. Conway"
+        },
+        {
+          "label": "E. A. Morse, Rep.",
+          "contest": "house10",
+          "candidate": "Elmer Addison Morse"
+        },
+        {
+          "label": "James I. Coxe, Soc. Dem.",
+          "contest": "house10",
+          "candidate": "James I. Coxe"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.12,
+        0.641,
+        0.838,
+        0.907
+      ],
+      "hint": "Read only the table headed 'Summary of vote in tenth congressional district'; ignore any other table visible in the image."
+    },
+    {
+      "page": 581,
+      "id": "581-0",
+      "columns": [
+        {
+          "label": "Francis J. Maguire, Dem.",
+          "contest": "house11",
+          "candidate": "Francis J. Maguire"
+        },
+        {
+          "label": "John J. Jenkins, Rep.",
+          "contest": "house11",
+          "candidate": "John James Jenkins"
+        },
+        {
+          "label": "Chas. W. Swanson, Soc. Dem.",
+          "contest": "house11",
+          "candidate": "Chas W. Swanson"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.176,
+        0.41,
+        0.893,
+        0.661
+      ],
+      "hint": "Read only the table headed 'Summary of Vote in Eleventh Congressional District'; ignore any other table visible in the image."
+    }
+  ]
+}

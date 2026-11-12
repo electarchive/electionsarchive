@@ -1,0 +1,87 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Blue Book of the State of Wisconsin 1911, vote by counties (general election 1904-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/bluebookstatewi00statgoog/bluebookstatewi00statgoog.pdf",
+    "item": "https://archive.org/details/bluebookstatewi00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1904,
+      "chamber": "president",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 222,
+      "id": "222-0",
+      "columns": [
+        {
+          "label": "Population in 1900",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Parker, Dem.",
+          "contest": "president",
+          "candidate": "Alton B. Parker (Democratic)"
+        },
+        {
+          "label": "Swallow, Pro.",
+          "contest": "president",
+          "candidate": "Silas Swallow (Prohibition)"
+        },
+        {
+          "label": "Roosevelt, Rep.",
+          "contest": "president",
+          "candidate": "Theodore Roosevelt (Republican)"
+        },
+        {
+          "label": "Debs, So. Dem.",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "People's party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc. Lab. party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dem. Plu.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep. Plu.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.188,
+        0.109,
+        0.912,
+        0.978
+      ],
+      "hint": "Read only the table headed 'Comparative vote for President, 1904 and 1908, by counties, with population, 1900'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1208
+      ]
+    }
+  ]
+}

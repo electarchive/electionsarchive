@@ -1,0 +1,87 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Blue Book of the State of Wisconsin 1911, vote by counties (general election 1910-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/bluebookstatewi00statgoog/bluebookstatewi00statgoog.pdf",
+    "item": "https://archive.org/details/bluebookstatewi00statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1910,
+      "chamber": "governor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 313,
+      "id": "313-0",
+      "columns": [
+        {
+          "label": "Population 1905",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Schmitz Dem.",
+          "contest": "governor",
+          "candidate": "Adolph H. Schmitz"
+        },
+        {
+          "label": "Van Keuren Pro.",
+          "contest": "governor",
+          "candidate": "Byron E. Van Keuren"
+        },
+        {
+          "label": "McGovern Rep.",
+          "contest": "governor",
+          "candidate": "Francis E. McGovern"
+        },
+        {
+          "label": "Jacobs Soc. Dem.",
+          "contest": "governor",
+          "candidate": "William A. Jacobs"
+        },
+        {
+          "label": "Kremer Ind. Soc. Lab.",
+          "contest": "governor",
+          "candidate": "Fred G. Kremer"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.113,
+        0.874,
+        0.952
+      ],
+      "hint": "Read only the table headed 'POPULATION 1905, VOTE AND PLURALITIES FOR GOVERNOR, 1910.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.087
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Secretary of State",
+  "title": "The Blue Book of the State of Wisconsin 1907, vote by counties (general election 1904-11-08)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/bluebookforstat00unkngoog/bluebookforstat00unkngoog.pdf",
+    "item": "https://archive.org/details/bluebookforstat00unkngoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1904,
+      "chamber": "governor",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "WI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 684,
+      "id": "684-0",
+      "columns": [
+        {
+          "label": "Population, 1900.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Peck Dem.",
+          "contest": "governor",
+          "candidate": "George W. Peck"
+        },
+        {
+          "label": "Scofield Nat. Rep.",
+          "contest": "governor",
+          "candidate": "Edward Scofield"
+        },
+        {
+          "label": "Clark Pro.",
+          "contest": "governor",
+          "candidate": "William H. Clark"
+        },
+        {
+          "label": "La Follette Rep.",
+          "contest": "governor",
+          "candidate": "Robert M. La Follette"
+        },
+        {
+          "label": "Arnold Soc Dem.",
+          "contest": "governor",
+          "candidate": "William A. Arnold"
+        },
+        {
+          "label": "Minkley Soc. Labor.",
+          "contest": "governor",
+          "candidate": "Charles M. Minkley"
+        },
+        {
+          "label": "Total.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality Rep.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.139,
+        0.116,
+        0.863,
+        0.904
+      ],
+      "hint": "Read only the table headed 'POPULATION, 1900, VOTE AND PLURALITIES FOR GOVERNOR, 1904'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0761
+      ]
+    }
+  ]
+}
