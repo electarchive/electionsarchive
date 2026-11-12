@@ -27,6 +27,7 @@ PUBLISHER = "New Jersey Division of Elections"
 DIGITIZED = 8
 PEOPLE = ("candidate", "ticket", "legend")
 DERIVED = 1
+CORRECTED = {(1946, "Smith", "Hudson"): 92991, (1946, "Brunner", "Hudson"): 155366}
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
@@ -34,6 +35,15 @@ URL = "https://www.nj.gov/state/elections/assets/pdf/election-results/1920-1970/
 YEARS = [1925, 1927, 1928, *range(1930, 1941), *range(1942, 1980)]
 MODEL = "claude-haiku-5-5"
 JOB = "tables"
+RETRY = "tables2"
+RETRIES = {
+    (1949, 5, 1): "Governor",
+    (1954, 2, 1): "United States Senator",
+    (1958, 3, 1): "United States Senator",
+    (1973, 3, 0): "Governor",
+    (1976, 3, 0): "President and Vice-President",
+    (1977, 3, 0): "Governor",
+}
 DPI = 300
 PIXELS = 1_150_000
 READS = ("gray", "ink")
@@ -197,7 +207,133 @@ def ensure() -> bool:
     return ready
 
 
+def tiles(year: int, number: int, block: int) -> list[bytes]:
+    box = layout()[(year, number)][block]
+    part = page(year, number).crop(box)
+    turn = _words(year, number)[1]
+    if turn:
+        part = part.rotate(turn, expand=True)
+    small = part.resize((part.width // 3, part.height // 3))
+    angle = max(
+        (a / 4 for a in range(-16, 17)),
+        key=lambda a: float(
+            (np.asarray(small.rotate(a, expand=False, fillcolor=255)) < 128).sum(axis=1).astype(float).var()
+        ),
+    )
+    part = part.rotate(angle, expand=False, fillcolor=255, resample=Image.Resampling.BICUBIC)
+    ink = np.asarray(part) < 128
+    band = ink[int(part.height * 0.6) : int(part.height * 0.8)]
+    sums = band.sum(axis=0)
+    rows = sums > max(2, 0.15 * np.percentile(sums, 90))
+    edges = np.flatnonzero(np.diff(np.concatenate([[False], rows, [False]]).astype(int)))
+    runs = [(int(a), int(b)) for a, b in zip(edges[::2], edges[1::2])]
+    clusters: list[list[int]] = []
+    for a, b in runs:
+        if clusters and a - clusters[-1][1] < 22:
+            clusters[-1][1] = b
+        else:
+            clusters.append([a, b])
+    clusters = [c for c in clusters if c[1] - c[0] >= 25]
+    label, columns = clusters[0], clusters[1:]
+    out = []
+    for start in range(0, len(columns), 3):
+        group = columns[start : start + 3]
+        left = max(label[1] if start == 0 else (columns[start - 1][1] + group[0][0]) // 2, 0)
+        right = min(
+            group[-1][1] + 30 if start + 3 >= len(columns) else (group[-1][1] + columns[start + 3][0]) // 2, part.width
+        )
+        first = part.crop((0, 0, label[1] + 15, part.height))
+        rest = part.crop((max(left, label[1] + 15), 0, right, part.height))
+        tile = Image.new("L", (first.width + 40 + rest.width, part.height), 255)
+        tile.paste(first, (0, 0))
+        tile.paste(rest, (first.width + 40, 0))
+        out.append(tile)
+    images = []
+    for tile in out:
+        scale = min(1.0, (PIXELS * 1.4 / (tile.width * tile.height)) ** 0.5, 1568 / max(tile.size))
+        tile = tile.resize((round(tile.width * scale), round(tile.height * scale)), Image.Resampling.LANCZOS)
+        buffer = io.BytesIO()
+        tile.save(buffer, "PNG")
+        images.append(buffer.getvalue())
+    return images
+
+
+def retry_key(year: int, number: int, block: int, tile: int, read: str) -> str:
+    return f"{SOURCE}/{RETRY}/{year}/{number}/{block}/{tile}/{read}"
+
+
+def retry() -> bool:
+    wanted: dict[str, batch.Want] = {}
+    for (year, number, block), title in RETRIES.items():
+        for index, data in enumerate(tiles(year, number, block)):
+            for read in READS:
+                if read == "ink":
+                    with Image.open(io.BytesIO(data)) as im:
+                        buffer = io.BytesIO()
+                        im.point(lambda v: 0 if v < 150 else 255).save(buffer, "PNG")
+                        data_read = buffer.getvalue()
+                else:
+                    data_read = data
+                text = (
+                    PROMPT.format(year=year)
+                    + f" The image is a strip of one table of votes for {title}: the county label column and some of its "
+                    f'columns. Transcribe it as one table with the title "{title}".'
+                )
+                content: list[ImageBlockParam | TextBlockParam] = [
+                    ImageBlockParam(
+                        type="image",
+                        source={
+                            "type": "base64",
+                            "media_type": "image/png",
+                            "data": base64.b64encode(data_read).decode(),
+                        },
+                    ),
+                    TextBlockParam(type="text", text=text),
+                ]
+                wanted[retry_key(year, number, block, index, read)] = (
+                    MessageCreateParamsNonStreaming(
+                        model=MODEL, max_tokens=12000, messages=[MessageParam(role="user", content=content)]
+                    ),
+                    0.004,
+                )
+    ready, note = batch.ensure(SOURCE, RETRY, wanted)
+    print(note)
+    return ready
+
+
+def joined(year: int, number: int, block: int, read: str) -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    index = 0
+    while True:
+        try:
+            message = json.loads(raw.cached(SOURCE, retry_key(year, number, block, index, read)).path.read_text())
+        except LookupError:
+            break
+        text = next((b["text"] for b in message["content"] if b.get("type") == "text"), "")
+        match = re.search(r"\[.*\]", text, re.DOTALL)
+        try:
+            tables = json.loads(match[0]) if match else []
+        except json.JSONDecodeError:
+            tables = []
+        found.append(next((t for t in tables if isinstance(t, dict) and t.get("rows")), {}))
+        index += 1
+    if not found or any(not t for t in found) or len({len(t["rows"]) for t in found}) != 1:
+        return []
+    merged: dict[str, object] = {
+        "title": RETRIES[(year, number, block)],
+        "district": None,
+        "columns": [c for t in found for c in t.get("columns", [])],
+        "rows": [
+            {"label": t0["label"], "values": [v for t in found for v in t["rows"][i]["values"]]}
+            for i, t0 in enumerate(found[0]["rows"])
+        ],
+    }
+    return [merged]
+
+
 def seen(year: int, number: int, block: int, read: str) -> list[dict[str, object]]:
+    if (year, number, block) in RETRIES:
+        return joined(year, number, block, read)
     message = json.loads(raw.cached(SOURCE, key(year, number, block, read)).path.read_text())
     text = next((b["text"] for b in message["content"] if b.get("type") == "text"), "")
     found = re.search(r"\[.*\]", text, re.DOTALL)
@@ -208,8 +344,8 @@ def seen(year: int, number: int, block: int, read: str) -> list[dict[str, object
 
 
 def parse() -> None:
-    if not ensure():
-        raise SystemExit(f"waiting for batch:{SOURCE}/{JOB}")
+    if not ensure() or not retry():
+        raise SystemExit(f"waiting for batch:{SOURCE}/{JOB} or {RETRY}")
     rows: list[dict[str, object]] = []
     failed: list[str] = []
     for (year, number), boxes in sorted(layout().items()):
@@ -257,6 +393,10 @@ def parse() -> None:
                     failed.extend(f"{where}: {p}" for p in problems)
                     continue
                 located = _locate(settled, inside, frame, first.across)
+                for k, (votes, status, unit, label) in list(settled.items()):
+                    for (y, name, county), fixed in CORRECTED.items():
+                        if y == year and name in label and county == unit and first.office == "senate":
+                            settled[k] = (fixed, "corrected", unit, label)
                 for (r, c), (votes, status, unit, label) in settled.items():
                     found, how = located[(r, c)]
                     rows.append(
@@ -495,6 +635,8 @@ def _settle(
         status = "agreed" if second is not None else "single"
         if not fits and not disputed and not ruled and second is not None:
             fits, status = [tuple(v[0] for v in values)], "unbalanced"
+            if all(str(v) in printed for v in fits[0][: len(units)] if v is not None):
+                status = "printed"
         if len(fits) != 1:
             problems.append(f"{name}: {len(fits)} ways to balance {values}")
             continue
