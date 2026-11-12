@@ -3684,13 +3684,25 @@ def emit() -> Path:
             polity="US",
         )
         restore = restorer(conn)
-        lost = {
-            text: re.sub(r"(?<=[^\W\d_])\?(?=[^\W\d_])", GARBLED, text) for text in lines["choice"].unique().to_list()
-        }
-        lines = lines.with_columns(pl.col("choice").replace(lost))
-        garbled = {text: restore(text) for text in lines["choice"].unique().to_list() if restore(text) != text}
+        garbled = {}
+        for text in lines["choice"].unique().to_list():
+            fixed = restore(re.sub(r"(?<=[^\W\d_])\?(?=[^\W\d_])", GARBLED, text))
+            if fixed != text:
+                garbled[text] = fixed
         for text, fixed in garbled.items():
             cs.renamed.setdefault(slug(fixed), slug(text))
+        restored = {fixed: text for text, fixed in garbled.items()}
+        old_people: dict[UUID, UUID] = {}
+
+        def retire(scheme: str, value: str, into: UUID) -> UUID | None:
+            row = conn.execute(
+                "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+            ).fetchone()
+            if row is None or row[0] == into:
+                return None
+            cs.merge(row[0], into)
+            return row[0]
+
         lines = lines.with_columns(pl.col("choice").replace(garbled))
 
         def name(entity: UUID, text: str) -> None:
@@ -4273,10 +4285,16 @@ def emit() -> Path:
                             cs.add("person", id=person)
                             name(person, initials(text))
                     persons[local] = person
+                    if text in restored and (
+                        gone := retire(f"{SOURCE}.person", local.replace(slug(text), slug(restored[text])), person)
+                    ):
+                        old_people[person] = gone
                     if role == "head":
                         nominated[choice] = len(found) == 1
                     people.append((role, text, person))
                 option = cs.key("us.option", f"{base}:{people[0][2]}")
+                if people[0][2] in old_people:
+                    retire("us.option", f"{base}:{old_people[people[0][2]]}", option)
                 cs.add(
                     "contest_option",
                     id=option,
@@ -4286,9 +4304,12 @@ def emit() -> Path:
                     ballot_label=initials(choice),
                 )
                 for role, text, person in people:
+                    candidacy = cs.key("us.candidacy", f"{base}:{person}:{role}")
+                    if person in old_people:
+                        retire("us.candidacy", f"{base}:{old_people[person]}:{role}", candidacy)
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{base}:{person}:{role}"),
+                        id=candidacy,
                         person_id=person,
                         option_id=option,
                         role=role,
