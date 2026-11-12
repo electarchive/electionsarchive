@@ -11209,18 +11209,32 @@ export const contests = {
         select rs.k from grp cross join lateral (select x.k from result_set x where x.contest_id = grp.id and x.status = 'active' and ${served("x")} offset 0) rs
       `);
       const ks = sets.rows.map((row) => row.k);
-      const valued = await db.execute<{ set: number; k: number }>(sql`
-        select s.k as set, u.k from unnest(${sql.param(ks)}::int[]) s(k)
-        cross join lateral (
-          select distinct v.unit_k as k from result_value v where v.result_set_k = s.k limit ${CAP + 1}
-        ) u
-      `);
-      const finest = Map.groupBy(valued.rows, (row) => row.set)
-        .values()
-        .toArray()
-        .toSorted((a, b) => b.length - a.length)[0];
+      const oversized = rowsOf(
+        await db.execute<{ over: boolean }>(sql`
+          select exists (
+            select from unnest(${sql.param(ks)}::int[]) s(k)
+            where (select count(*) from (select 1 from result_rollup_unit r where r.result_set_k = s.k limit ${CAP + 1}) q) > ${CAP}
+          ) as over
+        `),
+      )[0]?.over;
+      const finest = oversized
+        ? null
+        : Map.groupBy(
+            (
+              await db.execute<{ set: number; k: number }>(sql`
+                select s.k as set, u.k from unnest(${sql.param(ks)}::int[]) s(k)
+                cross join lateral (
+                  select distinct v.unit_k as k from result_value v where v.result_set_k = s.k limit ${CAP + 1}
+                ) u
+              `)
+            ).rows,
+            (row) => row.set,
+          )
+            .values()
+            .toArray()
+            .toSorted((a, b) => b.length - a.length)[0];
       const candidates =
-        finest == null || finest.length <= CAP
+        !oversized && (finest == null || finest.length <= CAP)
           ? (finest ?? []).map((row) => row.k)
           : chain.length === 0
             ? null
