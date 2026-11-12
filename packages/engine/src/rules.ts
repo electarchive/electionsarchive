@@ -50,6 +50,14 @@ const threshold = v.object({
   members: v.optional(v.picklist(["any", "coalition", "standalone"])),
   bestLoser: v.optional(v.boolean()),
   requires: v.optional(v.object({ percent })),
+  floor: v.optional(v.object({ percent })),
+  alternative: v.optional(
+    v.object({
+      percent,
+      scope: v.literal("region"),
+      lists: v.optional(v.array(v.string())),
+    }),
+  ),
 });
 
 const thresholds = v.optional(

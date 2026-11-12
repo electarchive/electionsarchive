@@ -73,6 +73,42 @@
                   "required": [
                     "percent"
                   ]
+                },
+                "floor": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "percent"
+                  ]
+                },
+                "alternative": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "scope": {
+                      "const": "region"
+                    },
+                    "lists": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "percent",
+                    "scope"
+                  ]
                 }
               },
               "required": [
@@ -139,6 +175,42 @@
                     },
                     "required": [
                       "percent"
+                    ]
+                  },
+                  "floor": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "percent"
+                    ]
+                  },
+                  "alternative": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "scope": {
+                        "const": "region"
+                      },
+                      "lists": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "percent",
+                      "scope"
                     ]
                   }
                 },
@@ -467,6 +539,42 @@
                   "required": [
                     "percent"
                   ]
+                },
+                "floor": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "percent"
+                  ]
+                },
+                "alternative": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "scope": {
+                      "const": "region"
+                    },
+                    "lists": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "percent",
+                    "scope"
+                  ]
                 }
               },
               "required": [
@@ -533,6 +641,42 @@
                     },
                     "required": [
                       "percent"
+                    ]
+                  },
+                  "floor": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "percent"
+                    ]
+                  },
+                  "alternative": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "scope": {
+                        "const": "region"
+                      },
+                      "lists": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "percent",
+                      "scope"
                     ]
                   }
                 },
@@ -838,6 +982,42 @@
                   "required": [
                     "percent"
                   ]
+                },
+                "floor": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  },
+                  "required": [
+                    "percent"
+                  ]
+                },
+                "alternative": {
+                  "type": "object",
+                  "properties": {
+                    "percent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "scope": {
+                      "const": "region"
+                    },
+                    "lists": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "percent",
+                    "scope"
+                  ]
                 }
               },
               "required": [
@@ -904,6 +1084,42 @@
                     },
                     "required": [
                       "percent"
+                    ]
+                  },
+                  "floor": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "percent"
+                    ]
+                  },
+                  "alternative": {
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "scope": {
+                        "const": "region"
+                      },
+                      "lists": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "percent",
+                      "scope"
                     ]
                   }
                 },

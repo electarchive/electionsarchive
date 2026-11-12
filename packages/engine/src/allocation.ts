@@ -384,17 +384,52 @@ export type Apportionment = Allocation & {
   bonus: number;
 };
 
+export type Region = {
+  entries: Array<Entry & { group?: string | undefined }>;
+  valid?: number | undefined;
+};
+
 export function apportion(
   rules: Proportional,
   seats: number,
   entries: Array<Entry & { group?: string }>,
-  { valid, round = 1 }: { valid?: number; round?: number } = {},
+  {
+    valid,
+    round = 1,
+    national,
+  }: { valid?: number; round?: number; national?: Array<Region> } = {},
 ): Apportionment {
   let total = 0;
   for (const { votes } of entries) total += votes;
   const base = valid ?? total;
   const reaches = (votes: number, percent: number) =>
     votes * 100 >= percent * base;
+  const regions = national ?? [{ entries, valid }];
+  const nationalVotes = new Map<string, number>();
+  const nationalGroups = new Map<string, string>();
+  const regionShares: Array<Map<string, number>> = [];
+  let nationalBase = 0;
+  for (const region of regions) {
+    let sum = 0;
+    for (const { votes } of region.entries) sum += votes;
+    const regionBase = region.valid ?? sum;
+    nationalBase += regionBase;
+    const shares = new Map<string, number>();
+    for (const { id, votes, group } of region.entries) {
+      nationalVotes.set(id, (nationalVotes.get(id) ?? 0) + votes);
+      if (group != null) nationalGroups.set(id, group);
+      shares.set(id, regionBase > 0 ? (votes * 100) / regionBase : 0);
+    }
+    regionShares.push(shares);
+  }
+  const contestVotes = new Map<string, number>();
+  for (const { id, votes } of entries) contestVotes.set(id, votes);
+  const isNational = (threshold: Threshold) =>
+    national != null && threshold.scope === "national";
+  const passes = (threshold: Threshold, id: string, percent: number) =>
+    isNational(threshold)
+      ? (nationalVotes.get(id) ?? 0) * 100 >= percent * nationalBase
+      : reaches(contestVotes.get(id) ?? 0, percent);
   const thresholds =
     rules.threshold == null
       ? []
@@ -404,6 +439,31 @@ export function apportion(
   const isExempt = (threshold: Threshold, id: string, group?: string) =>
     threshold.exempt?.includes(id) === true ||
     (group != null && threshold.exempt?.includes(group) === true);
+  const listThresholds = thresholds.filter(
+    ({ level }) => level === "list" || level === "party",
+  );
+  const coalitionThresholds = thresholds.filter(
+    ({ level }) => level === "coalition" || level === "alliance",
+  );
+  const isAlternative = (threshold: Threshold, id: string) => {
+    const { alternative } = threshold;
+    return (
+      alternative != null &&
+      (alternative.lists == null || alternative.lists.includes(id)) &&
+      regionShares.some(
+        (shares) => (shares.get(id) ?? 0) >= alternative.percent,
+      )
+    );
+  };
+  const isRegional = (id: string) =>
+    listThresholds.some((threshold) => isAlternative(threshold, id));
+  const counts = (id: string) =>
+    isRegional(id) ||
+    coalitionThresholds.every(
+      (threshold) =>
+        threshold.floor == null ||
+        passes(threshold, id, threshold.floor.percent),
+    );
   const coalitions = new Map<string, Array<Entry>>();
   for (const { id, votes, won, group } of entries)
     if (group != null)
@@ -414,29 +474,39 @@ export function apportion(
   const pooled = new Map<string, number>();
   for (const [group, members] of coalitions) {
     let votes = 0;
-    for (const member of members) votes += member.votes;
+    for (const member of members) if (counts(member.id)) votes += member.votes;
     pooled.set(group, votes);
   }
+  const nationalMembers = new Map<string, Array<string>>();
+  for (const [id, group] of nationalGroups)
+    nationalMembers.set(group, [...(nationalMembers.get(group) ?? []), id]);
   const standing = new Set<string>();
   for (const [group, members] of coalitions) {
-    const isStanding = thresholds
-      .filter(({ level }) => level === "coalition" || level === "alliance")
-      .every(
-        (threshold) =>
-          isExempt(threshold, group) ||
-          (reaches(pooled.get(group) ?? 0, threshold.percent) &&
-            (threshold.requires == null ||
-              members.some(({ votes }) =>
-                reaches(votes, threshold.requires?.percent ?? 0),
-              ))),
+    const ids = nationalMembers.get(group) ?? [];
+    const isStanding = coalitionThresholds.every((threshold) => {
+      if (isExempt(threshold, group)) return true;
+      const scoped = isNational(threshold) ? ids : members.map(({ id }) => id);
+      let votes = 0;
+      for (const id of scoped)
+        if (counts(id))
+          votes += isNational(threshold)
+            ? (nationalVotes.get(id) ?? 0)
+            : (contestVotes.get(id) ?? 0);
+      const share = isNational(threshold) ? nationalBase : base;
+      return (
+        votes * 100 >= threshold.percent * share &&
+        (threshold.requires == null ||
+          scoped.some(
+            (id) =>
+              passes(threshold, id, threshold.requires?.percent ?? 0) ||
+              isRegional(id),
+          ))
       );
+    });
     if (isStanding) standing.add(group);
   }
   const qualified = new Set<string>();
-  const listThresholds = thresholds.filter(
-    ({ level }) => level === "list" || level === "party",
-  );
-  for (const { id, votes, group } of entries) {
+  for (const { id, group } of entries) {
     const isInCoalition = group != null && standing.has(group);
     const isPasses = listThresholds
       .filter(
@@ -445,9 +515,11 @@ export function apportion(
       )
       .every(
         (threshold) =>
-          isExempt(threshold, id, group) || reaches(votes, threshold.percent),
+          isExempt(threshold, id, group) ||
+          passes(threshold, id, threshold.percent) ||
+          isAlternative(threshold, id),
       );
-    if (isPasses) qualified.add(id);
+    if (isPasses && (!isInCoalition || counts(id))) qualified.add(id);
   }
   for (const threshold of listThresholds) {
     if (!threshold.bestLoser) continue;
