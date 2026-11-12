@@ -14686,38 +14686,153 @@ function beneath(from: SQL) {
 
 const framed = new Map<string, ReturnType<typeof framing>>();
 
-async function framing(area: string, day: string, ks: Array<number> = []) {
+type FramingPart = {
+  k: number;
+  size: number;
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+  left: number | null;
+  bottom: number | null;
+  right: number | null;
+  top: number | null;
+};
+
+const framingKey = (ks: Array<number>) =>
+  createHash("sha1").update(JSON.stringify(ks)).digest("hex");
+
+async function framing(
+  area: string,
+  day: string,
+  ks: Array<number> = [],
+  early: Promise<Array<FramingPart>> | null = null,
+) {
   const kept = [...new Set(ks)].toSorted((a, b) => a - b);
   return remember(
     kept.length === 0
       ? `framing:${area}:${day}`
-      : `framing:${area}:${day}:${createHash("sha1").update(JSON.stringify(kept)).digest("hex")}`,
-    async () => framingBox(area, day, kept),
+      : `framing:${area}:${day}:${framingKey(kept)}`,
+    async () =>
+      (early == null || kept.length === 0
+        ? null
+        : await framingMerged(day, kept, await early)) ??
+      framingBox(area, day, kept),
     false,
     undefined,
     true,
   );
 }
 
-async function framingBox(area: string, day: string, ks: Array<number>) {
+function framingEarly(
+  day: string,
+  ks: Array<number>,
+): Promise<Array<FramingPart>> | null {
+  const kept = [...new Set(ks)].toSorted((a, b) => a - b);
+  return kept.length === 0 || kept.length > 5000
+    ? null
+    : remember(
+        `framing-parts:${day}:${framingKey(kept)}`,
+        async () => {
+          const step = Math.ceil(
+            kept.length / Math.min(3, Math.ceil(kept.length / 200)),
+          );
+          const chunks = await Promise.all(
+            Array.from(
+              { length: Math.ceil(kept.length / step) },
+              async (_, index) =>
+                framingParts(
+                  day,
+                  kept.slice(index * step, (index + 1) * step),
+                  step < kept.length ? kept : null,
+                ),
+            ),
+          );
+          return chunks.flat();
+        },
+        false,
+        undefined,
+        true,
+      ).catch(() => []);
+}
+
+async function framingMerged(
+  day: string,
+  ks: Array<number>,
+  early: Array<FramingPart>,
+) {
+  const first = early[0];
+  if (first == null) {
+    return null;
+  }
+  const known = new Map(early.map((row) => [row.k, row]));
+  const missing = ks.filter((k) => !known.has(k));
+  const extra =
+    missing.length === 0 ? [] : await framingParts(day, missing, ks);
+  const rows = [...ks.flatMap((k) => known.get(k) ?? []), ...extra];
+  const shown = rows.flatMap((row) =>
+    row.left == null ||
+    row.bottom == null ||
+    row.right == null ||
+    row.top == null
+      ? []
+      : [
+          {
+            left: row.left,
+            bottom: row.bottom,
+            right: row.right,
+            top: row.top,
+          },
+        ],
+  );
+  const size =
+    (Math.max(...rows.map((row) => row.east)) -
+      Math.min(...rows.map((row) => row.west))) *
+    (Math.max(...rows.map((row) => row.north)) -
+      Math.min(...rows.map((row) => row.south)));
+  if (
+    shown.length === 0 ||
+    size <= 4 ||
+    size <= 400 !== first.size <= 400 ||
+    extra.some((row) => row.size !== size)
+  ) {
+    return null;
+  }
   const found = await db.execute<{
     west: number;
     south: number;
     east: number;
     north: number;
   }>(sql`
-    with shapes as (
-      select a.id, a.scheme_code as scheme, g.valid, g.geom
-      from area a
-      cross join lateral (
-        select g.valid, g.geom from area_geometry g where g.area_id = a.id
-        order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
-      ) g
-      where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
-    ),
+    select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north
+    from (
+      select ST_Transform(ST_SetSRID(ST_MakeBox2D(
+        ST_Point(${Math.min(...shown.map((row) => row.left))}::float8, ${Math.min(...shown.map((row) => row.bottom))}::float8),
+        ST_Point(${Math.max(...shown.map((row) => row.right))}::float8, ${Math.max(...shown.map((row) => row.top))}::float8)
+      )::geometry, 3857), 4326) as box
+    ) f
+  `);
+  return found.rows[0] ?? null;
+}
+
+function framingShapes(day: string, where: SQL) {
+  return sql`
+    select a.id, a.k, a.scheme_code as scheme, g.valid, g.geom
+    from area a
+    cross join lateral (
+      select g.valid, g.geom from area_geometry g where g.area_id = a.id
+      order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
+    ) g
+    where ${where}
+  `;
+}
+
+function framingPieces(day: string, where: SQL, span: SQL | null = null) {
+  return sql`
+    with shapes as (${framingShapes(day, where)}),
     extent as materialized (
       select box, (ST_XMax(box) - ST_XMin(box)) * (ST_YMax(box) - ST_YMin(box)) as size
-      from (select ST_SetSRID(ST_Extent(geom)::geometry, 4326) as box from shapes) e
+      from (select ST_SetSRID(ST_Extent(geom)::geometry, 4326) as box from ${span == null ? sql`shapes` : sql`(${framingShapes(day, span)})`} s) e
     ),
     bounds as (
       select box, least(greatest(ST_XMax(box) - ST_XMin(box), ST_YMax(box) - ST_YMin(box)) / 500, 0.01) as t
@@ -14762,10 +14877,45 @@ async function framingBox(area: string, day: string, ks: Array<number>) {
       select id, ST_Area(geom) as area, ST_ConvexHull(geom) as hull from ranked where anchor
     ),
     kept as (
-      select p.geom, p.scheme from ranked p
+      select p.id, p.geom, p.scheme from ranked p
       join anchors x on x.id = p.id
       where ST_Area(p.geom) >= x.area * 0.05 or ST_DWithin(p.geom, x.hull, 2)
+    )
+  `;
+}
+
+async function framingParts(
+  day: string,
+  ks: Array<number>,
+  span: Array<number> | null = null,
+) {
+  const found = await db.execute<FramingPart>(sql`
+    ${framingPieces(day, sql`a.k = any(${sql.param(ks)}::int[])`, span == null ? null : sql`a.k = any(${sql.param(span)}::int[])`)},
+    spans as (
+      select k, ST_Extent(geom) as box from shapes group by id, k
     ),
+    drawn as (
+      select id, ST_Extent(${plane("geom", "scheme")}) as box from kept group by id
+    )
+    select s.k, (select size from extent) as size,
+      ST_XMin(r.box) as west, ST_YMin(r.box) as south, ST_XMax(r.box) as east, ST_YMax(r.box) as north,
+      ST_XMin(d.box) as "left", ST_YMin(d.box) as bottom, ST_XMax(d.box) as "right", ST_YMax(d.box) as top
+    from shapes s
+    join spans r on r.k = s.k
+    left join drawn d on d.id = s.id
+    where (select size from extent) > 4
+  `);
+  return found.rows;
+}
+
+async function framingBox(area: string, day: string, ks: Array<number>) {
+  const found = await db.execute<{
+    west: number;
+    south: number;
+    east: number;
+    north: number;
+  }>(sql`
+    ${framingPieces(day, ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`)},
     framed as materialized (
       select ST_Transform(ST_SetSRID(ST_Extent(${plane("geom", "scheme")})::geometry, 3857), 4326) as box
       from kept
@@ -14797,6 +14947,7 @@ async function sketch(
         group by bs.id order by count(*) desc, bs.valid_from desc nulls last limit 1
       `);
   const day = drawn?.rows[0]?.day ?? held;
+  const early = framingEarly(day, ks);
   const whole =
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
@@ -14817,6 +14968,7 @@ async function sketch(
         ...ks,
         ...whole.filter((row) => !row.outside).map((row) => row.k),
       ].filter((k) => !off.has(k)),
+      early,
     ),
     db.execute<{
       scheme: string;
