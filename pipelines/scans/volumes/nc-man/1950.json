@@ -1,0 +1,31 @@
+{
+  "year": 1950,
+  "day": "1950-11-07",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1969, votes by county for U.S. House, general election 1950-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1969nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1969nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "house": "U.S. Representative, one table per district, counties down; the table carries columns for several election years under year headings, read only the columns under 1950"
+  },
+  "leaves": [
+    318,
+    319,
+    320,
+    321,
+    322,
+    323,
+    324,
+    325,
+    326,
+    327,
+    328,
+    329
+  ]
+}

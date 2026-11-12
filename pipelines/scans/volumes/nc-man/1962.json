@@ -1,0 +1,25 @@
+{
+  "year": 1962,
+  "day": "1962-11-06",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1969, votes by county for U.S. House, general election 1962-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1969nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1969nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "house": "U.S. Representative, one table per district, counties down; the table carries columns for several election years under year headings, read only the columns under 1962"
+  },
+  "leaves": [
+    330,
+    331,
+    332,
+    333,
+    334,
+    335
+  ]
+}

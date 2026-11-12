@@ -1,0 +1,26 @@
+{
+  "year": 1944,
+  "day": "1944-11-07",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1965, votes by county for President, Governor, general election 1944-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1965nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1965nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across; the table carries columns for several election years under year headings, read only the columns under 1944",
+    "governor": "Governor, counties down, candidates across; the table carries columns for several election years under year headings, read only the columns under 1944"
+  },
+  "leaves": [
+    275,
+    276,
+    277,
+    281,
+    282,
+    283
+  ]
+}

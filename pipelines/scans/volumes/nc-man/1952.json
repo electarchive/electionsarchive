@@ -1,0 +1,39 @@
+{
+  "year": 1952,
+  "day": "1952-11-04",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual 1969, votes by county for President, Governor, U.S. House, general election 1952-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1969nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1969nort"
+  },
+  "raw_source": "us.scans",
+  "autorotate": true,
+  "offices": {
+    "president": "President and Vice President, counties down, candidates across; the table carries columns for several election years under year headings, read only the columns under 1952",
+    "governor": "Governor, counties down, candidates across; the table carries columns for several election years under year headings, read only the columns under 1952",
+    "house": "U.S. Representative, one table per district, counties down; the table carries columns for several election years under year headings, read only the columns under 1952"
+  },
+  "leaves": [
+    283,
+    284,
+    285,
+    288,
+    289,
+    290,
+    318,
+    319,
+    320,
+    321,
+    322,
+    323,
+    324,
+    325,
+    326,
+    327,
+    328,
+    329
+  ]
+}
