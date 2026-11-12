@@ -120,6 +120,14 @@
       "special": false,
       "state": "IN",
       "district": null
+    },
+    "senate_special": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": true,
+      "state": "IN",
+      "district": null
     }
   },
   "pages": [
@@ -275,18 +283,18 @@
       "columns": [
         {
           "label": "William E. Jenner, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "William E. Jenner"
         },
         {
           "label": "Cornelius O'Brien, Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "Cornelius O'Brien"
         },
         {
           "label": "Carl W. Thompson, Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "Carl W. Thompson"
         }
       ],
       "orientation": "counties_down",
@@ -309,18 +317,18 @@
       "columns": [
         {
           "label": "William E. Jenner, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "William E. Jenner"
         },
         {
           "label": "Cornelius O'Brien, Dem.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "Cornelius O'Brien"
         },
         {
           "label": "Carl W. Thompson, Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "senate_special",
+          "candidate": "Carl W. Thompson"
         }
       ],
       "orientation": "counties_down",
