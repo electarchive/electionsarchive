@@ -65,6 +65,8 @@ NC_OFFICE = re.compile(
     r"BOARD OF COMMISSIONERS|BOARD OF EDUCATION|SHERIFF|CLERK OF SUPERIOR COURT|REGISTER OF DEEDS|SOIL AND WATER[A-Z ]*?(?= DISTRICT|$)"
 )
 NC_TOWN = re.compile(r"(?:CITY|TOWN|VILLAGE) OF (.+?) (MAYOR|COUNCIL(?: MEMBER)?(?: [A-Z ]+)?|COMMISSIONER[A-Z ]*)")
+KY_PARTY = re.compile(r"^(?:DEM|REP|IND|LIB|GRN|CON)\s+")
+KY_PARTICLE = re.compile(r"\b(de|del|di|da|du|la|le|van|von)(?=[A-Z]{2})")
 KY_DIR = DATA / "inbox" / "manual" / "MF-606"
 KY_FILES = ("Gen26_Results.pdf", "26general_sovc_2.pdf")
 KY_TOWN = re.compile(r"\s*([A-Z][A-Z ]+?) (MAYOR|COMMISSIONER|COUNCILMEMBER|COUNCIL) \1")
@@ -176,7 +178,7 @@ def rows(state: str, url: str, path):
                     "contest": f"{town[1].title()} {'Mayor' if town[2] == 'MAYOR' else 'Council'}",
                     "geo": "",
                     "county": "21111",
-                    "candidate": name,
+                    "candidate": KY_PARTY.sub("", KY_PARTICLE.sub(r"\1 ", name)),
                     "write_in": name == "Write-In Totals",
                     "votes": votes,
                     "reporting": None,
