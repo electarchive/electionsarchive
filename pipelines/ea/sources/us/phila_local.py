@@ -290,10 +290,10 @@ def emit() -> Path:
             }
         )
 
-        foreign = foreign_preferred(conn, cs, SOURCE)
+        outranked = foreign_preferred(conn, cs, SOURCE)
 
         def name(entity: UUID, text: str) -> None:
-            if entity in foreign and entity not in cs.minted:
+            if entity in outranked and entity not in cs.minted:
                 return
             if entity in named:
                 return

@@ -483,10 +483,10 @@ def emit() -> Path:
             polity="US-NC",
         )
 
-        foreign = foreign_preferred(conn, cs, SOURCE)
+        outranked = foreign_preferred(conn, cs, SOURCE)
 
         def name(entity: UUID, text: str) -> None:
-            if entity in foreign and entity not in cs.minted:
+            if entity in outranked and entity not in cs.minted:
                 return
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
