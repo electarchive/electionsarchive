@@ -41,7 +41,7 @@ POLLING_PLACES = {
 }
 SECTIONS = {key: f"{TSE}votacao_secao/votacao_secao_2026_{key}.zip" for key in ("BR", *UFS)}
 SECTION_DETAIL = f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_2026.zip"
-SECTION_OFFICES = ("1", "3", "5")
+SECTION_OFFICES = ("1", "3", "5", "6", "7", "8")
 COUNTRIES = {
     "BOSNIAEHERZ": "BIH",
     "BRAZZAVILLE": "COG",
@@ -583,9 +583,19 @@ def sections() -> None:
         .then(pl.lit("blank"))
         .when(pl.col("choice") == "96")
         .then(pl.lit("null"))
+        .when(pl.col("candidate") == "-3")
+        .then(pl.lit("legend"))
         .otherwise(pl.lit("nominal"))
     )
     tally = pl.scan_parquet(parts).with_columns(kind=kind)
+    stray = (
+        tally.filter((pl.col("kind") == "nominal") & pl.col("candidate").str.starts_with("-"))
+        .select("contest", "choice", "candidate")
+        .unique()
+        .collect(engine="streaming")
+    )
+    if stray.height:
+        raise ValueError(f"section choices that are neither candidates, legends, blank, nor null: {stray}")
     repeated = (
         tally.group_by("contest", "section", "choice").len().filter(pl.col("len") > 1).collect(engine="streaming")
     )
@@ -597,6 +607,7 @@ def sections() -> None:
         "nominal": "QT_VOTOS_NOMINAIS",
         "blank": "QT_VOTOS_BRANCOS",
         "null": "QT_VOTOS_NULOS",
+        "legend": "QT_VOTOS_LEGENDA",
     }
     frames: list[pl.DataFrame] = []
     for path in unpack(SECTION_DETAIL, "_BRASIL.csv"):
@@ -624,15 +635,73 @@ def sections() -> None:
 
     keys = ["contest", "section", "kind"]
     expected = sheet.unpivot(
-        on=["nominal", "blank", "null"], index=["contest", "section"], variable_name="kind", value_name="sum"
+        on=["nominal", "blank", "null", "legend"], index=["contest", "section"], variable_name="kind", value_name="sum"
     )
     summed = tally.group_by(keys).agg(pl.col("votes").sum()).collect(engine="streaming")
     mismatched = expected.join(summed, on=keys, how="left").filter(pl.col("sum") != pl.col("votes").fill_null(0))
     unmatched = summed.join(expected, on=keys, how="anti")
+    scope = list(sheet["contest"].unique())
+    legends = pl.read_parquet(PARSED / "legends.parquet")
+    pooled = (
+        tally.filter(pl.col("kind") == "legend")
+        .group_by("contest", "municipality", "choice")
+        .agg(pl.col("votes").sum())
+        .collect(engine="streaming")
+    )
+    held = (
+        legends.filter(pl.col("contest").is_in(scope))
+        .group_by("contest", choice="party_number")
+        .agg(municipal=pl.col("votes").sum())
+    )
+    void_legends = (
+        pooled.group_by("contest", "choice")
+        .agg(pl.col("votes").sum())
+        .join(held, on=["contest", "choice"], how="left")
+        .filter(pl.col("municipal").fill_null(0) == 0)
+        .select("contest", "choice", void=pl.lit(True))
+    )
+    unmatched = pl.concat(
+        [
+            unmatched,
+            legends.filter(pl.col("contest").is_in(scope) & (pl.col("votes") > 0))
+            .select("contest", "municipality", choice="party_number", municipal="votes")
+            .join(
+                pooled.join(void_legends, on=["contest", "choice"], how="anti"),
+                on=["contest", "municipality", "choice"],
+                how="full",
+                coalesce=True,
+            )
+            .filter(pl.col("municipal").fill_null(0) != pl.col("votes").fill_null(0))
+            .select("contest", section="municipality", kind="choice", votes=pl.col("votes").fill_null(0)),
+        ],
+        how="vertical_relaxed",
+    )
+    absent = void_legends.join(held, on=["contest", "choice"], how="anti")
+    if absent.height:
+        named = (
+            legends.filter(pl.col("contest").str.starts_with("2026:"))
+            .unique("party_number")
+            .select("party_number", "party_abbreviation", "party_label")
+        )
+        filler = (
+            absent.join(pooled.unique(["contest", "choice"]), on=["contest", "choice"])
+            .join(named, left_on="choice", right_on="party_number")
+            .select(
+                "contest",
+                "municipality",
+                party_number="choice",
+                votes=pl.lit(0, pl.Int64),
+                party_abbreviation="party_abbreviation",
+                party_label="party_label",
+                coalition=pl.lit(None, pl.String),
+            )
+        )
+        if filler.height != absent.height:
+            raise ValueError(f"legend votes for parties with no 2026 name: {absent}")
+        pl.concat([legends, filler]).write_parquet(PARSED / "legends.parquet")
     if mismatched.height or unmatched.height:
         raise ValueError(f"section votes differ from the section details: {mismatched.head(5)} {unmatched.head(5)}")
 
-    scope = list(sheet["contest"].unique())
     votes = pl.scan_parquet(PARSED / "votes.parquet").filter(pl.col("contest").is_in(scope)).collect()
     detail = pl.scan_parquet(PARSED / "detail.parquet").filter(pl.col("contest").is_in(scope)).collect()
     municipal = (
@@ -690,17 +759,26 @@ def sections() -> None:
     )
     if void.filter((pl.col("valid") > 0) & (pl.col("void") > 0)).height:
         raise ValueError(f"candidates with both valid and annulled votes: {void}")
-    annulled = pl.concat([void.filter(pl.col("void") > 0).select("contest", "candidate"), missing]).with_columns(
-        annulled=pl.lit(True)
-    )
+    annulled = pl.concat(
+        [
+            void.filter(pl.col("void") > 0).select("contest", "candidate"),
+            missing,
+            void_legends.select("contest", candidate="legend:" + pl.col("choice")),
+        ]
+    ).with_columns(annulled=pl.lit(True))
     values = pl.concat(
         [
             tally.filter(pl.col("votes") > 0)
+            .with_columns(
+                candidate=pl.when(pl.col("kind") == "legend")
+                .then("legend:" + pl.col("choice"))
+                .otherwise(pl.col("candidate"))
+            )
             .join(annulled.lazy(), on=["contest", "candidate"], how="left")
             .select(
                 "contest",
                 "section",
-                candidate=pl.when(pl.col("kind") == "nominal").then(pl.col("candidate")),
+                candidate=pl.when(pl.col("kind").is_in(["nominal", "legend"])).then(pl.col("candidate")),
                 measure=pl.when(pl.col("kind") == "blank")
                 .then(6)
                 .when((pl.col("kind") == "null") | pl.col("annulled").fill_null(False))
@@ -782,7 +860,11 @@ def emit() -> Path:
     section_values = pl.scan_parquet(PARSED / "section_values.parquet")
     section_events = pl.read_parquet(PARSED / "section_events.parquet")
     by_section = set(section_values.select(pl.col("contest").unique()).collect()["contest"])
-    section_values = section_values.filter(pl.col("contest").str.split(":").list.get(2).is_in(offices))
+    states = os.environ.get("BR_SECTION_STATES", ",".join(["BR", *UFS])).split(",")
+    section_values = section_values.filter(
+        pl.col("contest").str.split(":").list.get(2).is_in(offices)
+        & pl.col("contest").str.split(":").list.get(3).is_in(states)
+    )
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -790,7 +872,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Brazil's general elections from 1994 to 2026 by municipality, and in 2026 by polling section for "
-                "president, governors, and senators"
+                "president, governors, senators, and deputies"
             ),
             polity="BR",
         )
