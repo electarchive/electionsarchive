@@ -645,6 +645,31 @@ def place_divisions(found: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
     ).drop("county", "county_name", "division_name")
 
 
+def name_divisions(found: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
+    names = (
+        held.with_columns(
+            council=pl.col("county_name").map_elements(slug, return_dtype=pl.String),
+            key=pl.col("name").map_elements(division_key, return_dtype=pl.String),
+        )
+        .filter(pl.struct("council", "key").is_duplicated().not_())
+        .select("council", "key", named="code")
+    )
+    return (
+        found.with_columns(
+            council=pl.col("ballot").str.split(".").list.get(1),
+            key=pl.col("division").map_elements(division_key, return_dtype=pl.String),
+        )
+        .join(names, on=["council", "key"], how="left", maintain_order="left")
+        .with_columns(
+            ward_code=pl.when(pl.col("coded").not_() & pl.col("named").is_not_null())
+            .then("named")
+            .otherwise("ward_code"),
+            coded=pl.col("coded") | pl.col("named").is_not_null(),
+        )
+        .drop("council", "key", "named")
+    )
+
+
 def statuses(council_file: pl.Expr) -> pl.Expr:
     press = pl.col("source").str.to_lowercase().str.contains("|".join(PRESS).replace(".", r"\."))
     return (
@@ -712,6 +737,8 @@ def parse_by() -> None:
     lookups_held = {held: set(codes) for held, codes in lookup.group_by("year").agg("ward_code").iter_rows()}
     wards_held = {int(key[2:]) + 2000: layer_codes(key) for key in LAYERS if key.startswith("wd")}
     councils_held = {int(key[3:]) + 2000: layer_codes(key) for key in LAYERS if key.startswith("lad")}
+    held = held_divisions()
+    ced = divisions() if 2026 in by_years() else None
     BY.mkdir(parents=True, exist_ok=True)
     for year in by_years():
         records = by_records(year)
@@ -767,6 +794,9 @@ def parse_by() -> None:
                 ),
             )
         )
+        found = name_divisions(found, held)
+        found = locate_divisions(found, ced) if year == 2026 and ced is not None else found
+        found = place_divisions(found, held)
         found = found.with_columns(
             status=pl.when(pl.col("winners").is_null())
             .then(pl.lit("no Democracy Club result"))
