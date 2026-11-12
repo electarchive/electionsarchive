@@ -933,6 +933,8 @@ ABSTRACT_READS = {
     (1910, "walsh", "Gunder Olson"): 1814,
     (1910, "walsh", "H. L. Halvorson"): 1309,
     (1910, "walsh", "M. C. Wartenbe"): 100,
+    (1910, "barnes", "Andrew Miller"): 1713,
+    (1910, "wells", "J. I. Hanson"): 365,
 }
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
@@ -1002,6 +1004,9 @@ ERRATA = {
     (1906, "D. C. Greenleaf"),
     (1906, "A. J. Evans"),
     (1906, "Arthur LeSueur"),
+    (1910, "Gunder Olson"),
+    (1912, "A. T. Kraabel"),
+    (1912, "Alex. Morrison"),
     (1914, "C. O. Jorgenson"),
     (1914, "C. H. Starke"),
     (1914, "Dorr Carroll"),
@@ -1131,7 +1136,7 @@ def abstract(year: int, codes: dict[str, str]) -> list[dict[str, object]]:
             counted = sum(votes[column].values())
             if counted != printed:
                 print(f"{year} {candidate}: counties sum to {counted}, printed total {printed}")
-                if abs(counted - printed) > max(20, printed // 100):
+                if abs(counted - printed) > max(20, printed // 100) and (year, candidate) not in ERRATA:
                     held.add(office)
         for column, (office, candidate, code) in columns.items():
             if office in held:
