@@ -119,6 +119,11 @@
       "title": "Camera dei deputati 1958: risultati per comune",
       "publisher": "Ministero dell'Interno, DAIT (open data)",
       "url": "https://dait.interno.gov.it/documenti/opendata/camera/camera-19580525.zip"
+    },
+    "vda-regionali": {
+      "title": "Elezioni: dati e risultati, elezioni regionali (each election's list votes page; saved 2026-11-12)",
+      "publisher": "Regione autonoma Valle d'Aosta",
+      "url": "https://www.regione.vda.it/amministrazione/Elezioni/Dati_e_risultati/Risultati/Elezioni_regionali/default_i.aspx"
     }
   },
   "levels": [
@@ -666,6 +671,15 @@
           "quote": "Regionali 11/11/2001, Area ITALIA, Regione: MOLISE"
         },
         {
+          "date": "2003-06-08",
+          "contests": 1,
+          "regions": {
+            "02": 1
+          },
+          "source": "vda-regionali",
+          "quote": "ELEZIONI REGIONALI 2003"
+        },
+        {
           "date": "2005-04-03",
           "contests": 13,
           "regions": {
@@ -703,6 +717,15 @@
           },
           "source": "eligendo-regionali",
           "quote": "Regionali 05/11/2006, Area ITALIA, Regione: MOLISE"
+        },
+        {
+          "date": "2008-05-25",
+          "contests": 1,
+          "regions": {
+            "02": 1
+          },
+          "source": "vda-regionali",
+          "quote": "ELEZIONI REGIONALI 2008"
         },
         {
           "date": "2008-12-14",
@@ -753,6 +776,15 @@
           },
           "source": "eligendo-regionali",
           "quote": "Regionali 24/02/2013, Area ITALIA, Regione: LAZIO, LOMBARDIA, MOLISE"
+        },
+        {
+          "date": "2013-05-26",
+          "contests": 1,
+          "regions": {
+            "02": 1
+          },
+          "source": "vda-regionali",
+          "quote": "ELEZIONI REGIONALI 2013"
         },
         {
           "date": "2013-11-17",
@@ -809,6 +841,15 @@
           "quote": "Regionali 04/03/2018, Area ITALIA, Regione: LAZIO, LOMBARDIA"
         },
         {
+          "date": "2018-05-20",
+          "contests": 1,
+          "regions": {
+            "02": 1
+          },
+          "source": "vda-regionali",
+          "quote": "ELEZIONI REGIONALI 2018"
+        },
+        {
           "date": "2019-02-10",
           "contests": 1,
           "regions": {
@@ -856,16 +897,18 @@
         },
         {
           "date": "2020-09-20",
-          "contests": 5,
+          "contests": 6,
           "regions": {
             "15": 1,
             "07": 1,
             "16": 1,
             "09": 1,
-            "05": 1
+            "05": 1,
+            "02": 1
           },
           "source": "eligendo-regionali",
-          "quote": "Regionali 20/09/2020, Area ITALIA, Regione: CAMPANIA, LIGURIA, PUGLIA, TOSCANA, VENETO"
+          "quote": "Regionali 20/09/2020, Area ITALIA, Regione: CAMPANIA, LIGURIA, PUGLIA, TOSCANA, VENETO",
+          "note": "The Aosta Valley contest is counted from the region's results pages (vda-regionali: \"ELEZIONI REGIONALI 20 E 21 SETTEMBRE 2020\"), not Eligendo."
         },
         {
           "date": "2021-10-03",
@@ -933,6 +976,15 @@
           "quote": "Regionali 17/11/2024, Area ITALIA, Regione: EMILIA-ROMAGNA, UMBRIA"
         },
         {
+          "date": "2025-09-28",
+          "contests": 1,
+          "regions": {
+            "02": 1
+          },
+          "source": "vda-regionali",
+          "quote": "ELEZIONI REGIONALI 28 SETTEMBRE 2025"
+        },
+        {
           "date": "2025-10-05",
           "contests": 1,
           "regions": {
@@ -962,7 +1014,7 @@
           "quote": "Regionali 23/11/2025, Area ITALIA, Regione: CAMPANIA, PUGLIA, VENETO"
         }
       ],
-      "note": "Counted per region: each regional council election counts once, from the Interior Ministry's historical archive (Eligendo), which lists the 15 ordinary-statute regions' elections since 1970. Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them, so they aren't counted yet. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023."
+      "note": "Counted per region: each regional council election counts once. The 15 ordinary-statute regions' elections since 1970 come from the Interior Ministry's historical archive (Eligendo). Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them; of these, only the Aosta Valley elections since 2003, from the region's own results pages, are counted so far. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023."
     },
     {
       "key": "referendums",
