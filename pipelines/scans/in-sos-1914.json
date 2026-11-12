@@ -1,0 +1,732 @@
+{
+  "polity": "US-IN",
+  "publisher": "Indiana Secretary of State",
+  "title": "Biennial report of the Secretary of State of the State of Indiana for the fiscal term ending September 30, 1914: vote by counties, November election, 1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/biennialreports04statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/biennialreports04statgoog"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1914,
+      "chamber": "senate",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": null
+    },
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 2
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 3
+    },
+    "house4": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 4
+    },
+    "house5": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 5
+    },
+    "house6": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 6
+    },
+    "house7": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 7
+    },
+    "house8": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 8
+    },
+    "house9": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 9
+    },
+    "house10": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 10
+    },
+    "house11": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 11
+    },
+    "house12": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 12
+    },
+    "house13": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "IN",
+      "district": 13
+    }
+  },
+  "pages": [
+    {
+      "page": 143,
+      "id": "143-0",
+      "columns": [
+        {
+          "label": "Benjamin F. Shively, Dem.",
+          "contest": "senate",
+          "candidate": "Benjamin Franklin Shively"
+        },
+        {
+          "label": "Hugh Th. Miller, Rep.",
+          "contest": "senate",
+          "candidate": "Hugh T. Miller"
+        },
+        {
+          "label": "Albert J. Beveridge, Prog.",
+          "contest": "senate",
+          "candidate": "Albert J. Beveridge"
+        },
+        {
+          "label": "Sumner W. Haynes, Proh.",
+          "contest": "senate",
+          "candidate": "Sumner W. Haynes"
+        },
+        {
+          "label": "Stephen M. Reynolds, Soc.",
+          "contest": "senate",
+          "candidate": "Stephen Reynolds"
+        },
+        {
+          "label": "James Mathews, Soc. L.",
+          "contest": "senate",
+          "candidate": "James Matthews"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.19,
+        0.87,
+        1.0
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0815
+      ]
+    },
+    {
+      "page": 144,
+      "id": "144-0",
+      "columns": [
+        {
+          "label": "Benjamin F. Shively, Dem.",
+          "contest": "senate",
+          "candidate": "Benjamin Franklin Shively"
+        },
+        {
+          "label": "Hugh Th. Miller, Rep.",
+          "contest": "senate",
+          "candidate": "Hugh T. Miller"
+        },
+        {
+          "label": "Albert J. Beveridge, Prog.",
+          "contest": "senate",
+          "candidate": "Albert J. Beveridge"
+        },
+        {
+          "label": "Sumner W. Haynes, Proh.",
+          "contest": "senate",
+          "candidate": "Sumner W. Haynes"
+        },
+        {
+          "label": "Stephen M. Reynolds, Soc.",
+          "contest": "senate",
+          "candidate": "Stephen Reynolds"
+        },
+        {
+          "label": "James Mathews, Soc. L.",
+          "contest": "senate",
+          "candidate": "James Matthews"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.186,
+        0.869,
+        0.674
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0328
+      ]
+    },
+    {
+      "page": 173,
+      "id": "173-0",
+      "columns": [
+        {
+          "label": "Charles Lieb, Dem.",
+          "contest": "house1",
+          "candidate": "Charles Lieb"
+        },
+        {
+          "label": "S. Wallace Cook, Rep.",
+          "contest": "house1",
+          "candidate": "S. Wallace Cook"
+        },
+        {
+          "label": "U. H. Seider, Prog.",
+          "contest": "house1",
+          "candidate": "U. H. Seider"
+        },
+        {
+          "label": "Amos Legler, Proh.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. H. Rainey, Soc.",
+          "contest": "house1",
+          "candidate": "W. H. Rainey"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.171,
+        0.907,
+        0.376
+      ],
+      "hint": "Read only the table headed 'First District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 173,
+      "id": "173-1",
+      "columns": [
+        {
+          "label": "W. A. Cullop, Dem.",
+          "contest": "house2",
+          "candidate": "William Allen Cullop"
+        },
+        {
+          "label": "O. E. Bland, Rep.",
+          "contest": "house2",
+          "candidate": "O. E. Bland"
+        },
+        {
+          "label": "J. B. Wilson, Prog.",
+          "contest": "house2",
+          "candidate": "J. B. Wilson"
+        },
+        {
+          "label": "George Scruggs, Proh.",
+          "contest": "house2",
+          "candidate": "George Scruggs"
+        },
+        {
+          "label": "W. J. Trout, Soc.",
+          "contest": "house2",
+          "candidate": "W. J. Trout"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.368,
+        0.907,
+        0.625
+      ],
+      "hint": "Read only the table headed 'Second District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 173,
+      "id": "173-2",
+      "columns": [
+        {
+          "label": "Wm. E. Cox, Dem.",
+          "contest": "house3",
+          "candidate": "William Elijah Cox"
+        },
+        {
+          "label": "Edgar D. Bush, Rep.",
+          "contest": "house3",
+          "candidate": "Edgar D. Bush"
+        },
+        {
+          "label": "Lawson Mace, Prog.",
+          "contest": "house3",
+          "candidate": "Lawson Mace"
+        },
+        {
+          "label": "C. H. Noblett, Proh.",
+          "contest": "house3",
+          "candidate": "C. H. Noblett"
+        },
+        {
+          "label": "Soc.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.174,
+        0.617,
+        0.898,
+        0.874
+      ],
+      "hint": "Read only the table headed 'Third District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 174,
+      "id": "174-0",
+      "columns": [
+        {
+          "label": "Lincoln Dixon, Dem.",
+          "contest": "house4",
+          "candidate": "Lincoln Dixon"
+        },
+        {
+          "label": "M. D. Wilson, Rep.",
+          "contest": "house4",
+          "candidate": "M. D. Wilson"
+        },
+        {
+          "label": "Roy W. Ewing, Prog.",
+          "contest": "house4",
+          "candidate": "Roy W. Ewing"
+        },
+        {
+          "label": "Ben F. Gaston, Proh.",
+          "contest": "house4",
+          "candidate": "Ben F. Gaston"
+        },
+        {
+          "label": "Wm. Carmichael, Soc.",
+          "contest": "house4",
+          "candidate": "William Carmichael"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.087,
+        0.853,
+        0.348
+      ],
+      "hint": "Read only the table headed 'Fourth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 174,
+      "id": "174-1",
+      "columns": [
+        {
+          "label": "Ralph W. Moss, Dem.",
+          "contest": "house5",
+          "candidate": "Ralph Wilbur Moss"
+        },
+        {
+          "label": "R. L. Shattuck, Rep.",
+          "contest": "house5",
+          "candidate": "R. L. Shattuck"
+        },
+        {
+          "label": "Otis E. Gulley, Prog.",
+          "contest": "house5",
+          "candidate": "Otis E. Gulley"
+        },
+        {
+          "label": "E. G. Shouse, Proh.",
+          "contest": "house5",
+          "candidate": "E. G. Shouse"
+        },
+        {
+          "label": "James O'Neil, Soc.",
+          "contest": "house5",
+          "candidate": "James Oneil"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.34,
+        0.853,
+        0.554
+      ],
+      "hint": "Read only the table headed 'Fifth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 174,
+      "id": "174-2",
+      "columns": [
+        {
+          "label": "F. H. Gray, Dem.",
+          "contest": "house6",
+          "candidate": "Finly Hutchinson Gray"
+        },
+        {
+          "label": "P. J. Lynch, Rep.",
+          "contest": "house6",
+          "candidate": "P. J. Lynch"
+        },
+        {
+          "label": "Elbert Russell, Prog.",
+          "contest": "house6",
+          "candidate": "Elbert Russell"
+        },
+        {
+          "label": "E. E. Worth, Proh.",
+          "contest": "house6",
+          "candidate": "E. E. Worth"
+        },
+        {
+          "label": "R. F. Vanvoorhis, Soc.",
+          "contest": "house6",
+          "candidate": "R. F. Vanvoorhis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.546,
+        0.851,
+        0.787
+      ],
+      "hint": "Read only the table headed 'Sixth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 174,
+      "id": "174-3",
+      "columns": [
+        {
+          "label": "Chas. S. Korbly, Dem.",
+          "contest": "house7",
+          "candidate": "Charles S. Korbly"
+        },
+        {
+          "label": "Merrill Moores, Rep.",
+          "contest": "house7",
+          "candidate": "Merrill Moores"
+        },
+        {
+          "label": "Paxton Hibben, Prog.",
+          "contest": "house7",
+          "candidate": "Paxton Hibben"
+        },
+        {
+          "label": "E. W. Clark, Proh.",
+          "contest": "house7",
+          "candidate": "E. W. Clark"
+        },
+        {
+          "label": "W. H. Henry, Soc.",
+          "contest": "house7",
+          "candidate": "W. H. Henry"
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.112,
+        0.779,
+        0.853,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Seventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 175,
+      "id": "175-0",
+      "columns": [
+        {
+          "label": "J. A. M. Adair, Dem.",
+          "contest": "house8",
+          "candidate": "John Alfred McDowell Adair"
+        },
+        {
+          "label": "A. H. Vestal, Rep.",
+          "contest": "house8",
+          "candidate": "A. H. Vestal"
+        },
+        {
+          "label": "H. L. Kitselman, Prog.",
+          "contest": "house8",
+          "candidate": "H. L. Kitselman"
+        },
+        {
+          "label": "J. W. Gibson, Proh.",
+          "contest": "house8",
+          "candidate": "J. W. Gibson"
+        },
+        {
+          "label": "M E. Mathews, Soc.",
+          "contest": "house8",
+          "candidate": "M. E. Mathews"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.096,
+        0.881,
+        0.277
+      ],
+      "hint": "Read only the table headed 'Eighth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 175,
+      "id": "175-1",
+      "columns": [
+        {
+          "label": "M. A. Morrison, Dem.",
+          "contest": "house9",
+          "candidate": "Martin Andrew Morrison"
+        },
+        {
+          "label": "F. S. Purnell, Rep.",
+          "contest": "house9",
+          "candidate": "F. S. Purnell"
+        },
+        {
+          "label": "C. A. Ford, Prog.",
+          "contest": "house9",
+          "candidate": "C. A. Ford"
+        },
+        {
+          "label": "A. W. Jackman, Proh.",
+          "contest": "house9",
+          "candidate": "A. W. Jackman"
+        },
+        {
+          "label": "O. H. Rash, Soc.",
+          "contest": "house9",
+          "candidate": "O. H. Rash"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.269,
+        0.894,
+        0.496
+      ],
+      "hint": "Read only the table headed 'Ninth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 175,
+      "id": "175-2",
+      "columns": [
+        {
+          "label": "J. B. Peterson, Dem.",
+          "contest": "house10",
+          "candidate": "John B. Peterson"
+        },
+        {
+          "label": "Wm. R. Wood, Rep.",
+          "contest": "house10",
+          "candidate": "William Robert Wood"
+        },
+        {
+          "label": "Wm. H. Ade, Prog.",
+          "contest": "house10",
+          "candidate": "William H. Ade"
+        },
+        {
+          "label": "E. A. Bush, Proh.",
+          "contest": "house10",
+          "candidate": "E. A. Bush"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.488,
+        0.881,
+        0.714
+      ],
+      "hint": "Read only the table headed 'Tenth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 175,
+      "id": "175-3",
+      "columns": [
+        {
+          "label": "Geo. W. Rauch, Dem.",
+          "contest": "house11",
+          "candidate": "George Washington Rauch"
+        },
+        {
+          "label": "S. L. Strickler, Rep.",
+          "contest": "house11",
+          "candidate": "S. L. Strickler"
+        },
+        {
+          "label": "B. B. Shively, Prog.",
+          "contest": "house11",
+          "candidate": "B. B. Shively"
+        },
+        {
+          "label": "B. W. Ayres, Proh.",
+          "contest": "house11",
+          "candidate": "B. W. Ayres"
+        },
+        {
+          "label": "Ernest Malott, Soc.",
+          "contest": "house11",
+          "candidate": "Ernest Malott"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.158,
+        0.706,
+        0.894,
+        0.899
+      ],
+      "hint": "Read only the table headed 'Eleventh District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 176,
+      "id": "176-0",
+      "columns": [
+        {
+          "label": "Cyrus Cline, Dem.",
+          "contest": "house12",
+          "candidate": "Cyrus Cline"
+        },
+        {
+          "label": "Chas. R. Lane, Rep.",
+          "contest": "house12",
+          "candidate": "Charles R. Lane"
+        },
+        {
+          "label": "Jacob G. Wise, Prog.",
+          "contest": "house12",
+          "candidate": "Jacob G. Wise"
+        },
+        {
+          "label": "H. M. Widney, Proh.",
+          "contest": "house12",
+          "candidate": "H. M. Widney"
+        },
+        {
+          "label": "Wm. F. Dibble, Soc.",
+          "contest": "house12",
+          "candidate": "William F. Dibble"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.096,
+        0.871,
+        0.283
+      ],
+      "hint": "Read only the table headed 'Twelfth District.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 176,
+      "id": "176-1",
+      "columns": [
+        {
+          "label": "H. A. Barnhart, Dem.",
+          "contest": "house13",
+          "candidate": "Henry A. Barnhart"
+        },
+        {
+          "label": "A. J. Hickney, Rep.",
+          "contest": "house13",
+          "candidate": "A. J. Hickney"
+        },
+        {
+          "label": "R. S. Stephens, Prog.",
+          "contest": "house13",
+          "candidate": "R. S. Stephens"
+        },
+        {
+          "label": "C. H. Tuesburg, Proh.",
+          "contest": "house13",
+          "candidate": "C. H. Tuesburg"
+        },
+        {
+          "label": "E. W. Berry, Soc.",
+          "contest": "house13",
+          "candidate": "E. W. Berry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.275,
+        0.866,
+        0.468
+      ],
+      "hint": "Read only the table headed 'Thirteenth District.'; ignore any other table visible in the image."
+    }
+  ]
+}
