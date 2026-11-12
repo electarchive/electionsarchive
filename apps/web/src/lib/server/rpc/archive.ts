@@ -1026,6 +1026,11 @@ const datedMemo = {
   entries: new Map<string, { label: string; short: string | null }>(),
 };
 
+const datedRunning = new Map<
+  string,
+  Promise<{ label: string; short: string | null }>
+>();
+
 const datedTogether = together(
   async (
     asks: Array<{
@@ -1048,6 +1053,7 @@ const datedTogether = together(
         short: null,
       };
     const unique: Array<{ id: string; on: string | null; h: boolean }> = [];
+    const waits: Array<Promise<void>> = [];
     for (const pair of asks.flatMap((ask) =>
       ask.pairs.map((pair) => ({ ...pair, h: ask.historical })),
     )) {
@@ -1059,17 +1065,44 @@ const datedTogether = together(
         version === "" ? undefined : datedMemo.entries.get(scope + key);
       if (hit == null) {
         found.set(key, { label: "", short: null });
-        unique.push(pair);
+        const running = datedRunning.get(scope + key);
+        if (running == null) {
+          unique.push(pair);
+        } else {
+          waits.push(
+            running.then((entry) => {
+              found.set(key, entry);
+            }),
+          );
+        }
       } else {
         found.set(key, hit);
       }
     }
     if (unique.length === 0) {
+      await Promise.all(waits);
       return (at: number) => lookup(asks[at]?.historical ?? false);
     }
     const ids = [...new Set(unique.map((pair) => pair.id))];
     const withHistory = unique.some((pair) => pair.h);
-    const result = await db.execute<{
+    const finished = Promise.withResolvers<void>();
+    const keys = unique.map((pair) => ({
+      slot: `${scope}${pair.h}|${pair.id}|${pair.on ?? ""}`,
+      key: `${pair.h}|${pair.id}|${pair.on ?? ""}`,
+    }));
+    const release = () => {
+      for (const { slot } of keys) {
+        datedRunning.delete(slot);
+      }
+    };
+    for (const { slot, key } of keys) {
+      const settled = finished.promise.then(
+        () => found.get(key) ?? { label: "", short: null },
+      );
+      settled.catch(() => {});
+      datedRunning.set(slot, settled);
+    }
+    const query = db.execute<{
       entity_id: string;
       historical: boolean;
       on: string | null;
@@ -1083,7 +1116,7 @@ const datedTogether = together(
         select id, entity_id, kind, text, lang, script, valid, is_preferred, recorded_from
         from name
         where entity_id = any(${sql.param(ids)}::uuid[])
-          and (kind in ('official', 'english') or (${withHistory} and kind = 'historical'))
+          and (kind in ('official', 'english', 'short', 'abbreviation') or (${withHistory} and kind = 'historical'))
       ),
       l as (
         select distinct on (entity_id) entity_id, lang from c
@@ -1094,6 +1127,7 @@ const datedTogether = together(
         select distinct on (p.entity_id, p.on_date, p.h) p.entity_id, p.on_date, p.h, c.kind::text as kind, c.text
         from p
         join c on c.entity_id = p.entity_id
+          and c.kind in ('official', 'english', 'historical')
           and (c.kind <> 'historical' or p.h)
           and (c.kind in ('official', 'english')
             or (p.on_date is not null and c.valid @> p.on_date and not (lower_inf(c.valid) and upper_inf(c.valid))))
@@ -1128,9 +1162,14 @@ const datedTogether = together(
       select p.entity_id, p.h, p.on_date::text, 'abbreviation', short.text
       from p
       cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
-      where p.entity_id = any(array(select entity_id from name where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('short', 'abbreviation')))
+      where p.entity_id = any(array(select entity_id from c where kind in ('short', 'abbreviation')))
         and short.text is not null
     `);
+    const result = await query.catch((error: unknown) => {
+      release();
+      finished.reject(error);
+      throw error;
+    });
     for (const row of result.rows) {
       const key = `${row.historical}|${row.entity_id}|${row.on ?? ""}`;
       const entry = found.get(key) ?? { label: "", short: null };
@@ -1156,6 +1195,9 @@ const datedTogether = together(
         datedMemo.entries.delete(oldest);
       }
     }
+    release();
+    finished.resolve();
+    await Promise.all(waits);
     return (at: number) => lookup(asks[at]?.historical ?? false);
   },
   { shape: ({ common }) => JSON.stringify(common), size: 2000 },
