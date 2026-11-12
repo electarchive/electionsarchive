@@ -7,7 +7,7 @@ from xml.etree import ElementTree
 import httpx
 import polars as pl
 
-from ea.sources.us.enr_2026 import table
+from ea.sources.us.enr_2026 import ballot_channel, table
 
 STAMP = re.compile(r"(.+) ([ECMP])([SD])T")
 LOCAL = re.compile(
@@ -48,22 +48,32 @@ def frame(state: str, county: str, paths: dict[str, Path]) -> pl.DataFrame:
                 name = re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip()
                 if name.lower() in ("over votes", "under votes"):
                     continue
-                found.append(
-                    {
-                        "state": state,
-                        "page": url,
-                        "scope": "",
-                        "contest": title,
-                        "office": "other",
-                        "district": "",
-                        "party": None,
-                        "county": county,
-                        "candidate": name,
-                        "write_in": "write-in" in name.lower(),
-                        "votes": int(choice.get("totalVotes") or 0),
-                        "as_of": stamp,
-                        "reporting": int(contest.get("precinctsReported") or 0),
-                        "total": int(contest.get("precinctsReporting") or 0),
-                    }
-                )
-    return pl.DataFrame(found, schema=table({}).schema)
+                kinds = list(choice.iter("VoteType"))
+                total = int(choice.get("totalVotes") or 0)
+                groups = [
+                    (kind.get("name") or "", int(raw) if (raw := kind.get("votes") or "").isdigit() else -1)
+                    for kind in kinds
+                ]
+                for ballot, votes in (
+                    groups if len(groups) > 1 and sum(count for _, count in groups) == total else [("", total)]
+                ):
+                    found.append(
+                        {
+                            "state": state,
+                            "page": url,
+                            "scope": "",
+                            "contest": title,
+                            "office": "other",
+                            "district": "",
+                            "party": None,
+                            "county": county,
+                            "candidate": name,
+                            "write_in": "write-in" in name.lower(),
+                            "votes": votes,
+                            "ballot": ballot,
+                            "as_of": stamp,
+                            "reporting": int(contest.get("precinctsReported") or 0),
+                            "total": int(contest.get("precinctsReporting") or 0),
+                        }
+                    )
+    return pl.DataFrame(found, schema=table({}).schema).with_columns(channel=ballot_channel())

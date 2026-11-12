@@ -8,7 +8,7 @@ from pathlib import Path
 
 import httpx
 
-from ea.sources.us.enr_2026 import EV_OFFICES, TAGS, WRITE_IN, get, office_name
+from ea.sources.us.enr_2026 import EV_OFFICES, TAGS, WRITE_IN, ev_groups, get, office_name
 
 CDN = "https://app.enhancedvoting.com/cdn/results/"
 EXPORTS = {
@@ -153,17 +153,19 @@ def rows(url: str, path: Path):
         if found is None:
             continue
         for option in item["ballotOptions"]:
-            yield {
-                "office": "senate" if found["senate"] else "governor" if found["governor"] else "house",
-                "contest": "",
-                "district": found["district"] or "",
-                "party": (option["politicalParty"] or "").removesuffix(" Party"),
-                "county": county,
-                "candidate": TAGS.sub("", option["name"]).strip(),
-                "write_in": bool(WRITE_IN.search(option["name"])),
-                "votes": int(option["voteCount"] or 0),
-                "as_of": export["createdAt"],
-                "reporting": item["precinctsReporting"],
-                "total": item["precinctsParticipating"],
-                "scope": found["party0"] or found["party1"] or "",
-            }
+            for ballot, count in ev_groups(option):
+                yield {
+                    "office": "senate" if found["senate"] else "governor" if found["governor"] else "house",
+                    "contest": "",
+                    "district": found["district"] or "",
+                    "party": (option["politicalParty"] or "").removesuffix(" Party"),
+                    "county": county,
+                    "candidate": TAGS.sub("", option["name"]).strip(),
+                    "write_in": bool(WRITE_IN.search(option["name"])),
+                    "votes": count,
+                    "ballot": ballot,
+                    "as_of": export["createdAt"],
+                    "reporting": item["precinctsReporting"],
+                    "total": item["precinctsParticipating"],
+                    "scope": found["party0"] or found["party1"] or "",
+                }

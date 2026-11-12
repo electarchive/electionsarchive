@@ -254,6 +254,7 @@ CHANNELS = {
     "election day votes": 1,
     "election day total votes": 1,
     "polling": 1,
+    "polling place (pp)": 1,
     "precinct votes": 1,
     "early": 2,
     "early vote": 2,
@@ -280,6 +281,7 @@ CHANNELS = {
     "ev mail": 3,
     "vbm": 3,
     "vote by mail": 3,
+    "vote by mail (vbm)": 3,
     "post-election": 3,
     "provisional": 5,
     "provionsal": 5,
@@ -288,6 +290,8 @@ CHANNELS = {
     "failsafe": 5,
     "failsafe provisional": 5,
 }
+NC_BALLOTS = ("Election Day", "Early Voting", "Absentee by Mail", "Provisional")
+PA_BALLOTS = {"ElectionDayVotes": "election day", "MailInVotes": "mail-in", "ProvisionalVotes": "provisional"}
 STATE_CHANNELS = {("AZ", "early voting"): 3, ("AZ", "late early*"): 3, ("AZ", "early a.r.s. 16-579"): 3}
 
 
@@ -857,6 +861,12 @@ def ev_seat(state: str, name: str) -> dict[str, str]:
     }
 
 
+def ev_groups(option: dict) -> list[tuple[str, int]]:
+    votes = int(option["voteCount"] or 0)
+    groups = [(group["groupName"], int(group["voteCount"] or 0)) for group in option.get("groupResults") or []]
+    return groups if len(groups) > 1 and sum(count for _, count in groups) == votes else [("", votes)]
+
+
 def ev_export(state: str, path: Path):
     with zipfile.ZipFile(path) as archive:
         export = json.loads(archive.read("export.json"))
@@ -885,13 +895,7 @@ def ev_export(state: str, path: Path):
             seat = ev_seat(state, name)
             reporting, total = precincts[item["id"]]
             for option in item["ballotOptions"]:
-                votes = int(option["voteCount"] or 0)
-                groups = [
-                    (group["groupName"], int(group["voteCount"] or 0)) for group in option.get("groupResults") or []
-                ]
-                for ballot, count in (
-                    groups if len(groups) > 1 and sum(count for _, count in groups) == votes else [("", votes)]
-                ):
+                for ballot, count in ev_groups(option):
                     yield {
                         **seat,
                         "party": option["politicalParty"] or "",
@@ -1339,12 +1343,13 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                     }
         return
     if state == "NC":
-        totals: dict[tuple[str, str, str, str], int] = {}
+        totals: dict[tuple[str, str, str, str, str], int] = {}
         with zipfile.ZipFile(path) as archive, archive.open(archive.namelist()[0]) as handle:
             for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
                 key = (row["Contest Name"].strip(), row["County"], row["Choice"].strip(), row["Choice Party"].strip())
-                totals[key] = totals.get(key, 0) + int(row["Total Votes"] or 0)
-        for (contest, county, choice, party), votes in totals.items():
+                for ballot in NC_BALLOTS:
+                    totals[(*key, ballot)] = totals.get((*key, ballot), 0) + int(row[ballot] or 0)
+        for (contest, county, choice, party, ballot), votes in totals.items():
             found = NC_CONTEST.fullmatch(contest)
             yield {
                 "office": "other"
@@ -1361,6 +1366,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                 "candidate": choice,
                 "write_in": choice.lower().startswith("write-in"),
                 "votes": votes,
+                "ballot": ballot,
                 "as_of": None,
                 "reporting": None,
                 "total": None,
@@ -1402,18 +1408,22 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
             for county in counties:
                 for name, candidates in county.items():
                     for candidate in candidates:
-                        yield {
-                            "office": PA_OFFICES[found[1]],
-                            "district": number[1] if number else "",
-                            "party": candidate["PartyName"],
-                            "county": name.title(),
-                            "candidate": candidate["CandidateName"].strip(),
-                            "write_in": "write-in" in candidate["CandidateName"].lower(),
-                            "votes": int(candidate["Votes"] or 0),
-                            "as_of": None,
-                            "reporting": None,
-                            "total": None,
-                        }
+                        votes = int(candidate["Votes"] or 0)
+                        split = {ballot: int(candidate.get(key) or 0) for key, ballot in PA_BALLOTS.items()}
+                        for ballot, count in split.items() if sum(split.values()) == votes else {"": votes}.items():
+                            yield {
+                                "office": PA_OFFICES[found[1]],
+                                "district": number[1] if number else "",
+                                "party": candidate["PartyName"],
+                                "county": name.title(),
+                                "candidate": candidate["CandidateName"].strip(),
+                                "write_in": "write-in" in candidate["CandidateName"].lower(),
+                                "votes": count,
+                                "ballot": ballot,
+                                "as_of": None,
+                                "reporting": None,
+                                "total": None,
+                            }
         return
     if state == "OK":
         stored = json.loads(path.read_bytes())
