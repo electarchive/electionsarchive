@@ -465,10 +465,6 @@ def finish(
         raise ValueError(f"{year} {dea}: {sum(flagged)} marked elected for {seats} seats")
     if sum(flagged) < seats:
         vacancies = seats - sum(flagged)
-        if stages > tied:
-            raise ValueError(
-                f"{year} {dea}: {vacancies} seats unmarked and the count is tied through stage {tied} of {stages}"
-            )
         continuing = [index for index, amount in enumerate(last) if amount > 0 and not flagged[index]]
         if len(continuing) < vacancies or len(continuing) > vacancies + 1:
             raise ValueError(f"{year} {dea}: {len(continuing)} continuing for {vacancies} vacancies")
@@ -731,6 +727,7 @@ ARK = {
     1977: "lg77",
     1973: "lg73",
 }
+ELECTED = r"e|elected|e\d+|e'.*|.*stage e|e\s*\(.*"
 WP_PARTIES: dict[str, list[tuple[str, str]]] = json.loads((Path(__file__).parent / "ni_council_wp.json").read_text())
 FULL_NAMES: dict[str, list[str]] = json.loads((Path(__file__).parent / "ni_council_names.json").read_text())
 
@@ -767,8 +764,14 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
             sheet = grid_sheet(grid, dea, 40, 80)
             if sheet["tied"] < 1:
                 raise ValueError("first preferences do not add up to the valid votes")
+            if sheet["tied"] < sheet["stages"] and sum(
+                re.fullmatch(ELECTED, c["flag"]) is not None for c in sheet["candidates"]
+            ) < int(sheet["facts"]["seats"]):
+                raise ValueError(
+                    f"seats unmarked and the count is tied through stage {sheet['tied']} of {sheet['stages']}"
+                )
             candidates = [
-                {**c, "elected": re.fullmatch(r"e|elected|e\d+|e'.*|.*stage e|e\s*\(.*", c["flag"]) is not None}
+                {**c, "elected": re.fullmatch(ELECTED, c["flag"]) is not None}
                 for c in sheet["candidates"]
                 if re.search("[A-Za-z]", c["name"])
             ]
