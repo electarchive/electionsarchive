@@ -1,0 +1,753 @@
+{
+  "polity": "US-WI",
+  "publisher": "Wisconsin Legislative Reference Bureau",
+  "title": "The Wisconsin Blue Book 1954, vote by counties (general election 1952-11-04)",
+  "license": "Public record",
+  "file": {
+    "url": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z",
+    "item": "https://search.library.wisc.edu/digital/AN6Q3X3SXGLMTH8Z"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "senate": {
+      "year": 1952,
+      "chamber": "senate",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": null
+    },
+    "house1": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 1
+    },
+    "house2": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 2
+    },
+    "house3": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 3
+    },
+    "house4": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 4
+    },
+    "house5": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 5
+    },
+    "house6": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 6
+    },
+    "house7": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 7
+    },
+    "house8": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 8
+    },
+    "house9": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 9
+    },
+    "house10": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "WI",
+      "district": 10
+    }
+  },
+  "pages": [
+    {
+      "page": 771,
+      "id": "771-0",
+      "columns": [
+        {
+          "label": "Stevenson and Sparkman (Dem.)",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Eisenhower and Nixon (Rep.)",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Hallinan and Bass (Ind. Prog.)",
+          "contest": "president",
+          "candidate": "Vincent Hallinan (Progressive)"
+        },
+        {
+          "label": "Hoopes and Friedman (Ind. Soc.)",
+          "contest": "president",
+          "candidate": "Darlington Hoopes"
+        },
+        {
+          "label": "Hass and Emery (Ind. Soc. Labor)",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Dobbs and Weiss (Ind. Soc. Work.)",
+          "contest": "president",
+          "candidate": "Farrell Dobbs"
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.099,
+        0.911,
+        0.902
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT AND VICE PRESIDENT BY COUNTIES November 4, 1952'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.127
+      ]
+    },
+    {
+      "page": 772,
+      "id": "772-0",
+      "columns": [
+        {
+          "label": "Stevenson (Dem.)",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Eisenhower (Rep.)",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Hallinan (Prog.) (Amer. Labor)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hamblen (Prohibition)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hoopes (Soc.)",
+          "contest": "president",
+          "candidate": "Darlington Hoopes"
+        },
+        {
+          "label": "Hass (Soc. Labor)",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Dobbs (Soc. Worker)",
+          "contest": "president",
+          "candidate": "Farrell Dobbs"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Steven-son (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eisen-hower (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.091,
+        0.114,
+        0.907,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTES FOR PRESIDENT, NOVEMBER 4, 1952* By States'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1682
+      ]
+    },
+    {
+      "page": 773,
+      "id": "773-0",
+      "columns": [
+        {
+          "label": "Stevenson (Dem.)",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "Eisenhower (Rep.)",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "Hallinan (Prog.) (Amer. Labor)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hamblen (Prohibition)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hoopes (Soc.)",
+          "contest": "president",
+          "candidate": "Darlington Hoopes"
+        },
+        {
+          "label": "Hass (Soc. Labor)",
+          "contest": "president",
+          "candidate": "Eric Hass (Socialist Labor)"
+        },
+        {
+          "label": "Dobbs (Soc. Worker)",
+          "contest": "president",
+          "candidate": "Farrell Dobbs"
+        },
+        {
+          "label": "Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Stevenson (Dem.) electoral vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eisenhower (Rep.) electoral vote",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.294,
+        0.913,
+        0.523
+      ],
+      "hint": "Read only the table headed 'VOTES FOR PRESIDENT, NOVEMBER 4, 1952\u2014Continued By States'; ignore any other table visible in the image."
+    },
+    {
+      "page": 774,
+      "id": "774-0",
+      "columns": [
+        {
+          "label": "Proxmire (Dem.)",
+          "contest": "governor",
+          "candidate": "William Proxmire"
+        },
+        {
+          "label": "Essin (Ind.)",
+          "contest": "governor",
+          "candidate": "M. Michael Essin"
+        },
+        {
+          "label": "Kohler (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter J. Jr. Kohler"
+        },
+        {
+          "label": "Roang (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kurki (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jessen (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Zimmerman (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doyle (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walstead (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomson (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.146,
+        0.9,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS BY COUNTIES, GENERAL ELECTION, NOVEMBER 4, 1952'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1136
+      ]
+    },
+    {
+      "page": 775,
+      "id": "775-0",
+      "columns": [
+        {
+          "label": "Proxmire (Dem.)",
+          "contest": "governor",
+          "candidate": "William Proxmire"
+        },
+        {
+          "label": "Essin (Ind.)",
+          "contest": "governor",
+          "candidate": "M. Michael Essin"
+        },
+        {
+          "label": "Kohler (Rep.)",
+          "contest": "governor",
+          "candidate": "Walter J. Jr. Kohler"
+        },
+        {
+          "label": "Roang (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kurki (Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jessen (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Zimmerman (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Doyle (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walstead (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomson (Rep.)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.293,
+        0.903,
+        0.848
+      ],
+      "hint": "Read only the table headed 'VOTE FOR STATE OFFICERS BY COUNTIES, GENERAL ELECTION, NOVEMBER 4, 1952\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0414
+      ]
+    },
+    {
+      "page": 776,
+      "id": "776-0",
+      "columns": [
+        {
+          "label": "Fairchild (Dem.)",
+          "contest": "senate",
+          "candidate": "Thomas E. Fairchild"
+        },
+        {
+          "label": "McCarthy (Rep.)",
+          "contest": "senate",
+          "candidate": "Joseph R. McCarthy"
+        },
+        {
+          "label": "Boulton (Ind.)",
+          "contest": "senate",
+          "candidate": "James E. Boulton"
+        },
+        {
+          "label": "Easterday (Ind.)",
+          "contest": "senate",
+          "candidate": "Alfred L. Easterday"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.101,
+        0.853,
+        0.9
+      ],
+      "hint": "Read only the table headed 'VOTE FOR U. S. SENATOR BY COUNTIES, GENERAL ELECTION November 4, 1952'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1064
+      ]
+    },
+    {
+      "page": 777,
+      "id": "777-0",
+      "columns": [
+        {
+          "label": "Agnew (Dem.)",
+          "contest": "house1",
+          "candidate": "Arnie W. Agnew"
+        },
+        {
+          "label": "Smith (Rep.)",
+          "contest": "house1",
+          "candidate": "Lawrence H. Smith"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.152,
+        0.908,
+        0.309
+      ],
+      "hint": "Read only the table headed 'FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-1",
+      "columns": [
+        {
+          "label": "Wilkie (Dem.)",
+          "contest": "house2",
+          "candidate": "Horace W. Wilkie"
+        },
+        {
+          "label": "Davis (Rep.)",
+          "contest": "house2",
+          "candidate": "Glenn R. Davis"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.301,
+        0.908,
+        0.451
+      ],
+      "hint": "Read only the table headed 'SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-2",
+      "columns": [
+        {
+          "label": "Bowen (Dem.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Withrow (Rep.)",
+          "contest": "house3",
+          "candidate": "Gardner R. Withrow"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.443,
+        0.908,
+        0.649
+      ],
+      "hint": "Read only the table headed 'THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-3",
+      "columns": [
+        {
+          "label": "Zablocki (Dem.)",
+          "contest": "house4",
+          "candidate": "Clement J. Zablocki"
+        },
+        {
+          "label": "Schafer (Rep.)",
+          "contest": "house4",
+          "candidate": "John C. Schafer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.641,
+        0.908,
+        0.751
+      ],
+      "hint": "Read only the table headed 'FOURTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-4",
+      "columns": [
+        {
+          "label": "Biemiller (Dem.)",
+          "contest": "house5",
+          "candidate": "Andrew J. Biemiller"
+        },
+        {
+          "label": "Kersten (Rep.)",
+          "contest": "house5",
+          "candidate": "Charles J. Kersten"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.743,
+        0.908,
+        0.849
+      ],
+      "hint": "Read only the table headed 'FIFTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 777,
+      "id": "777-5",
+      "columns": [
+        {
+          "label": "Norem (Dem.)",
+          "contest": "house6",
+          "candidate": "Ralph A. Norem"
+        },
+        {
+          "label": "Van Pelt (Rep.)",
+          "contest": "house6",
+          "candidate": "William K. Van Pelt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.151,
+        0.841,
+        0.908,
+        0.993
+      ],
+      "hint": "Read only the table headed 'SIXTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-0",
+      "columns": [
+        {
+          "label": "Kluck (Dem.)",
+          "contest": "house7",
+          "candidate": "Ernest Kluck"
+        },
+        {
+          "label": "Laird (Rep.)",
+          "contest": "house7",
+          "candidate": "Melvin R. Laird"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.135,
+        0.831,
+        0.315
+      ],
+      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-1",
+      "columns": [
+        {
+          "label": "Schultz (Dem.)",
+          "contest": "house8",
+          "candidate": "Robert C. Schultz"
+        },
+        {
+          "label": "Byrnes (Rep.)",
+          "contest": "house8",
+          "candidate": "John W. Byrnes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.307,
+        0.831,
+        0.491
+      ],
+      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-2",
+      "columns": [
+        {
+          "label": "Pillsbury (Dem.)",
+          "contest": "house9",
+          "candidate": "Kent L. Pillsbury"
+        },
+        {
+          "label": "Hull (Rep.)",
+          "contest": "house9",
+          "candidate": "Merlin Hull"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.483,
+        0.831,
+        0.683
+      ],
+      "hint": "Read only the table headed 'NINTH DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 778,
+      "id": "778-3",
+      "columns": [
+        {
+          "label": "Kannenberg (Dem.)",
+          "contest": "house10",
+          "candidate": "Roland Kannenberg"
+        },
+        {
+          "label": "O'Konski (Rep.)",
+          "contest": "house10",
+          "candidate": "Alvin E. O'Konski"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.077,
+        0.675,
+        0.831,
+        0.889
+      ],
+      "hint": "Read only the table headed 'TENTH DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}
