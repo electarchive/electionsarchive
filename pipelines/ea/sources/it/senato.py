@@ -1599,9 +1599,117 @@ def emit() -> Path:
             ).fetchall()
         }
         bound: dict[tuple[str, str], UUID] = {}
+        minted_people = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
+
+        def full_name(surname: str, forename: str) -> str:
+            text = unicodedata.normalize("NFKD", f"{surname} {forename}".upper())
+            return " ".join("".join(char for char in text if not unicodedata.combining(char)).split())
+
+        def twin_of(row: dict, day: date, region: str, label: str | None) -> tuple[str, str] | None:
+            full = full_name(row["surname"], row["forename"])
+            if day >= MATTARELLA or not any(char.isalpha() for char in full):
+                return None
+            return ("twin", f"{day}:{region}:{label}:{full}")
+
+        def minted_of(row: dict, day: date, region: str) -> UUID | None:
+            entity = minted_people.get(f"{day}:{region}:{row.get('key')}:{row['surname']}:{row['forename']}")
+            return None if entity is None else cs.survivors.get(entity, entity)
+
+        early = candidates.filter(pl.col("day") < MATTARELLA).to_dicts()
+        evidence: dict[UUID, set[str]] = {}
+        for entity, scheme, value in conn.execute(
+            "select entity_id, scheme, value from external_id where entity_id = any(%s) and scheme <> %s",
+            [list({cs.survivors.get(entity, entity) for entity in minted_people.values()}), f"{SOURCE}.person"],
+        ).fetchall():
+            evidence.setdefault(entity, set()).add(f"{scheme}:{value}")
+        members: dict[tuple[str, str], set[UUID]] = {}
+        elected: dict[tuple[str, str], set[str]] = {}
+        for row in early:
+            twin = twin_of(row, row["day"], row["region"], row["label"])
+            if twin is None:
+                continue
+            if row["senator"] is not None:
+                elected.setdefault(twin, set()).add(row["senator"])
+            elif (entity := minted_of(row, row["day"], row["region"])) is not None:
+                members.setdefault(twin, set()).add(entity)
+        for held, region, senator in (
+            unplaced.filter(pl.col("day") < MATTARELLA).select("day", "region", "senator").iter_rows()
+        ):
+            full = full_name(record[senator]["surname"], record[senator]["forename"])
+            labels = {
+                row["label"]
+                for row in early
+                if row["day"] == held
+                and row["region"] == region
+                and row["senator"] is None
+                and full_name(row["surname"], row["forename"]) == full
+            }
+            if len(labels) == 1:
+                twin = twin_of(record[senator], held, region, labels.pop())
+                if twin is not None:
+                    elected.setdefault(twin, set()).add(senator)
+        seated = {
+            value: cs.survivors.get(entity, entity)
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'it.senato.senatore'"
+            ).fetchall()
+        }
+        seats_of: dict[UUID, set[str]] = {}
+        for value, entity in seated.items():
+            seats_of.setdefault(entity, set()).add(value)
+        parent: dict[object, object] = {}
+
+        def root(node: object) -> object:
+            while parent.setdefault(node, node) != node:
+                parent[node] = parent[parent[node]]
+                node = parent[node]
+            return node
+
+        for twin in members.keys() | elected.keys():
+            nodes = [*members.get(twin, set()), *(seated.get(senator, senator) for senator in elected.get(twin, set()))]
+            for node in nodes:
+                parent[root(node)] = root(nodes[0])
+        components: dict[object, set[object]] = {}
+        for node in list(parent):
+            components.setdefault(root(node), set()).add(node)
+        chosen: dict[object, UUID | str | None] = {}
+        for head, nodes in components.items():
+            senators = {node for node in nodes if isinstance(node, str)} | {
+                senator for node in nodes if isinstance(node, UUID) for senator in seats_of.get(node, set())
+            }
+            named = {node for node in nodes if isinstance(node, UUID) and evidence.get(node)}
+            if len(senators) == 1:
+                senator = senators.pop()
+                chosen[head] = senator if senator in record else seated[senator]
+            elif senators or len(named) > 1:
+                chosen[head] = None
+            elif named:
+                chosen[head] = named.pop()
+            else:
+                chosen[head] = min((node for node in nodes if isinstance(node, UUID)), key=str)
+        twins: dict[tuple[str, str], UUID | str | None] = {}
+        for twin in members.keys() | elected.keys():
+            nodes = [*members.get(twin, set()), *(seated.get(senator, senator) for senator in elected.get(twin, set()))]
+            twins[twin] = chosen[root(nodes[0])]
+        print(f"{SOURCE}: {sum(choice is None for choice in twins.values())} same-name groups left apart")
 
         def person_of(row: dict, day: date, region: str) -> UUID:
-            senator = record.get(row.get("senator") or "")
+            twin = None
+            if row.get("birth") is None and not row.get("senator"):
+                twin = twin_of(row, day, region, row.get("label"))
+            choice = twins.get(twin, "") if twin is not None else ""
+            if choice is None:
+                twin = None
+            senator = record.get(row.get("senator") or (choice if isinstance(choice, str) else "") or "")
+            entity = choice if isinstance(choice, UUID) else bound.get(twin) if twin is not None else None
+            if twin is not None and senator is None and entity is not None:
+                duplicate = minted_of(row, day, region)
+                if duplicate is not None and duplicate != entity:
+                    cs.merge(duplicate, entity)
+                bound[twin] = entity
+                return entity
             keys = []
             if senator is not None:
                 keys.append(("it.senato.senatore", senator["senator"]))
@@ -1641,6 +1749,11 @@ def emit() -> Path:
                 ):
                     cs.add("external_id", entity_id=entity, scheme=key[0], value=key[1])
                 bound[key] = entity
+            if twin is not None:
+                bound.setdefault(twin, entity)
+                duplicate = minted_of(row, day, region)
+                if duplicate is not None and duplicate != entity:
+                    cs.merge(duplicate, entity)
             return entity
 
         colleges: dict[tuple[str, str], tuple[UUID, UUID]] = {}
