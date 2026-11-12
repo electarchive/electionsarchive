@@ -458,6 +458,11 @@ OFFICIAL = {
         "https://arkansas.tally-enr.com/",
         "county results from the state's election night reporting site",
     ),
+    "AZ": (
+        "Arizona Secretary of State",
+        "https://results.arizona.vote/",
+        "county results from the state's election night reporting site",
+    ),
     "AL": (
         "Alabama Secretary of State",
         "https://www.sos.alabama.gov/alabama-votes/voter/election-data",
