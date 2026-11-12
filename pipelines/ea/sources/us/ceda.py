@@ -612,6 +612,8 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
                 mapping[name] = name if name in names else close[0]
         return mapping
 
+    unpaired: dict[tuple[object, ...], list[tuple[Entry, bool]]] = {}
+    paired_pairs: list[tuple[tuple[object, ...], Entry, Race, dict[str, str]]] = []
     for key, entries in contests.items():
         candidates = races.get(key, [])
         pairs = []
@@ -636,13 +638,57 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
                         fits.append((race, mapping))
                 if len(fits) == 1 and not any(fits[0][0] is other for _, other, _ in pairs):
                     pairs.append((entry, *fits[0]))
+        paired_pairs += [(key, *pair) for pair in pairs]
         paired = {id(entry) for entry, _, _ in pairs}
-        if len(paired) < len(entries):
-            for race in candidates:
-                if not any(race is other for _, other, _ in pairs):
-                    held.add(race["race"])
         for entry in entries:
             if id(entry) not in paired:
+                unpaired.setdefault(key[:4], []).append((entry, id(entry) in differ))
+    for pool, leftovers in unpaired.items():
+        used = {id(race) for _, _, race, _ in paired_pairs}
+        pool_races = [race for key, others in races.items() if key[:4] == pool for race in others]
+        if len(pool_races) < 2 or len(pool_races) != len(leftovers) or any(id(race) in used for race in pool_races):
+            continue
+        fitted = []
+        lumps = []
+        for entry, differs in leftovers:
+            names = {option["surname"] for option in entry["options"]}
+            fits = []
+            for race in pool_races:
+                mapping = align(race, entry)
+                if (
+                    race["magnitude"] == entry["magnitude"]
+                    and len(mapping) == len(race["votes"])
+                    and set(mapping.values()) == names
+                ):
+                    fits.append((race, mapping))
+            if len(fits) == 1:
+                fitted.append((entry, *fits[0]))
+            else:
+                lumps.append(entry)
+        rest = [race for race in pool_races if not any(race is other for _, other, _ in fitted)]
+        if len(lumps) != 1 or len(rest) != 1 or len(fitted) != len(leftovers) - 1:
+            continue
+        mapping = align(rest[0], lumps[0])
+        union = {name for _, _, other in fitted for name in other.values()} | set(mapping.values())
+        if (
+            len(mapping) == len(rest[0]["votes"])
+            and rest[0]["magnitude"] == lumps[0]["magnitude"]
+            and union == {option["surname"] for option in lumps[0]["options"]}
+        ):
+            paired_pairs += [(pool, *pair) for pair in [*fitted, (lumps[0], rest[0], mapping)]]
+            leftovers.clear()
+    owners = {id(entry): key for key, entries in contests.items() for entry in entries}
+    paired_ids = {id(entry) for _, entry, _, _ in paired_pairs}
+    used = {id(race) for _, _, race, _ in paired_pairs}
+    for key, entries in contests.items():
+        candidates = races.get(key, [])
+        if any(id(entry) not in paired_ids for entry in entries):
+            for race in candidates:
+                if id(race) not in used:
+                    held.add(race["race"])
+        for entry in entries:
+            if id(entry) not in paired_ids:
+                differ = (entry, True) in unpaired.get(key[:4], [])
                 report.append(
                     {
                         "owner": key[0],
@@ -651,58 +697,53 @@ def takeovers(conn, frame: pl.DataFrame) -> tuple[dict[str, Taken], set[str], pl
                         "district": key[4],
                         "alged": entry["value"],
                         "race": None,
-                        "status": "candidates differ"
-                        if id(entry) in differ
-                        else "ambiguous"
-                        if candidates
-                        else "no CEDA race",
+                        "status": "candidates differ" if differ else "ambiguous" if candidates else "no CEDA race",
                         "detail": ", ".join(sorted(option["surname"] for option in entry["options"])),
                     }
                 )
-        for entry, race, mapping in pairs:
-            votes = {mapping.get(name, name): value for name, value in race["votes"].items()}
-            elected = {mapping.get(name, name) for name in race["elected"]}
-            winners = {option["surname"] for option in entry["options"] if option["elected"]}
-            off = [
-                f"{option['surname']} {option['votes']}/{votes[option['surname']]}"
-                for option in entry["options"]
-                if option["surname"] in votes
-                and abs(option["votes"] - votes[option["surname"]])
-                > 0.01 * max(option["votes"], votes[option["surname"]])
-            ]
-            missing = sorted({option["surname"] for option in entry["options"]} - set(votes))
-            disagree = (winners and winners != elected) or off
-            kind = (
-                "primary leader"
-                if winners and not elected and not off
-                else "ranked-choice rounds"
-                if off and race["rcv"]
-                else "winner"
-                if winners and winners != elected
-                else "votes"
+    for key, entry, race, mapping in paired_pairs:
+        votes = {mapping.get(name, name): value for name, value in race["votes"].items()}
+        elected = {mapping.get(name, name) for name in race["elected"]}
+        winners = {option["surname"] for option in entry["options"] if option["elected"]}
+        off = [
+            f"{option['surname']} {option['votes']}/{votes[option['surname']]}"
+            for option in entry["options"]
+            if option["surname"] in votes
+            and abs(option["votes"] - votes[option["surname"]]) > 0.01 * max(option["votes"], votes[option["surname"]])
+        ]
+        missing = sorted({option["surname"] for option in entry["options"]} - set(votes))
+        disagree = (winners and winners != elected) or off
+        kind = (
+            "primary leader"
+            if winners and not elected and not off
+            else "ranked-choice rounds"
+            if off and race["rcv"]
+            else "winner"
+            if winners and winners != elected
+            else "votes"
+        )
+        detail = "; ".join(
+            part
+            for part in (
+                f"winners ALGED {sorted(winners)} CEDA {sorted(elected)}" if winners and winners != elected else "",
+                "votes " + ", ".join(off) if off else "",
+                "ALGED only " + ", ".join(missing) if missing else "",
             )
-            detail = "; ".join(
-                part
-                for part in (
-                    f"winners ALGED {sorted(winners)} CEDA {sorted(elected)}" if winners and winners != elected else "",
-                    "votes " + ", ".join(off) if off else "",
-                    "ALGED only " + ", ".join(missing) if missing else "",
-                )
-                if part
-            )
-            matched[race["race"]] = Taken(**entry, disagree=detail if disagree else None, surnames=mapping)
-            report.append(
-                {
-                    "owner": key[0],
-                    "year": key[1],
-                    "month": key[2],
-                    "district": key[4],
-                    "alged": entry["value"],
-                    "race": race["race"],
-                    "status": f"disagrees: {kind}" if disagree else "matched",
-                    "detail": detail or None,
-                }
-            )
+            if part
+        )
+        matched[race["race"]] = Taken(**entry, disagree=detail if disagree else None, surnames=mapping)
+        report.append(
+            {
+                "owner": owners[id(entry)][0],
+                "year": owners[id(entry)][1],
+                "month": owners[id(entry)][2],
+                "district": owners[id(entry)][4],
+                "alged": entry["value"],
+                "race": race["race"],
+                "status": f"disagrees: {kind}" if disagree else "matched",
+                "detail": detail or None,
+            }
+        )
     for race, (_, value) in WRITE_IN_WON.items():
         entry = next((entry for entries in contests.values() for entry in entries if entry["value"] == value), None)
         found = next((other for others in races.values() for other in others if other["race"] == race), None)
@@ -1162,10 +1203,18 @@ def emit() -> Path:
                 unit = taken_over["unit"] or unit
             contest_key = (
                 taken_over["value"]
-                if taken_over is not None and (taken_over["value"] in sets or f"ceda:{race}" not in own)
+                if taken_over is not None
+                and (
+                    taken_over["value"] in sets
+                    or f"ceda:{race}" not in own
+                    or own[f"ceda:{race}"]
+                    in {other["contest"] for other in takeover.values()} - {taken_over["contest"]}
+                )
                 else f"ceda:{race}"
             )
             contest = cs.key("us.contest", contest_key)
+            if (displaced := own.get(f"ceda:{race}")) is not None and displaced != contest and taken_over is not None:
+                cs.add("external_id", entity_id=contest, scheme="us.contest", value=f"ceda:{race}")
             used.add(election)
             magnitude = first["magnitude"]
             rcv = rows["rcv"].any()
