@@ -1557,6 +1557,9 @@ AR_OFF_BALLOT = {
     ("AR-05035", "Crittenden County Justice of the Peace District 11", "Ray Nassar"),
     ("AR-05111", "Poinsett County Circuit Clerk", "Misty Russell"),
 }
+FL_VF_RUNOFF = {
+    ("jackson_19", "School Board Member District 5"): ("Phyllis T. Daniels", 'Michael "MJ" Jackson'),
+}
 RETENTION = frozenset({"MP:69:justice"})
 ROLES = frozenset(
     [
@@ -10919,6 +10922,8 @@ def parse() -> None:
                 offices[str(post)].append((found[1] if found else name, found[2] if found else "", status[1].strip()))
         for post, people in offices.items():
             on = [person for person in people if person[2] in ("Qualified", "Advanced", "Runoff")]
+            if advancing := FL_VF_RUNOFF.get((group, post)):
+                on = [(name, "", "Runoff") for name in advancing]
             parties = Counter(person[1] for person in on if person[1] in ("REP", "DEM"))
             title = re.sub(
                 r"(?i)\bsch\b",
