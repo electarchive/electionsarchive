@@ -1,0 +1,1045 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "State of Texas, General Election Returns, November 2, 1982 (Secretary of State)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0346/micro_IA40706913_0346.pdf",
+    "item": "https://archive.org/details/micro_IA40706913_0346"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "governor": {
+      "year": 1982,
+      "chamber": "governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.271,
+        0.917,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1564
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.24,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1842
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.251,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1883
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN S. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.246,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2109
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.246,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2042
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTIE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.063,
+        0.263,
+        0.922,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1588
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "0/0 OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.264,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1984
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "JIM COLLINS--R",
+          "contest": "senate",
+          "candidate": "Jim Collins"
+        },
+        {
+          "label": "LLOYD BENTSEN--D",
+          "contest": "senate",
+          "candidate": "Lloyd Bentsen"
+        },
+        {
+          "label": "JOHN E. FORD--L",
+          "contest": "senate",
+          "candidate": "John E. Ford"
+        },
+        {
+          "label": "LINEAUS HOOPER LORETTE--C",
+          "contest": "senate",
+          "candidate": "Lineaus Hooper Lorette"
+        },
+        {
+          "label": "DARRYL ANDERSON--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.283,
+        0.913,
+        0.626
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image."
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--P",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. SIMS--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.22,
+        0.932,
+        0.615
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. SIMS--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.216,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1837
+      ]
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. SIMS--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.21,
+        0.926,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1835
+      ]
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. SIMS--W-T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.046,
+        0.208,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1919
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZFELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. STIMS--W-T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "0/0 OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.205,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1962
+      ]
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "DON PUTEFI--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. STMS--W-1",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.188,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.181
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "ACE POTLET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. SIMS--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 1982",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PERCENT OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.191,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1842
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. CLEMENTS, JR.--R",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "MARK WHITE--D",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "DAVID HUTZELMAN--L",
+          "contest": "governor",
+          "candidate": "David Hutzelman"
+        },
+        {
+          "label": "BOB POTEET--C",
+          "contest": "governor",
+          "candidate": "Bob Poteet"
+        },
+        {
+          "label": "L. A. STAMS--W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL OTHER CANDIDATES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REGISTERED VOTERS 11/82",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C/O OF VOTER TURNOUT",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.034,
+        0.2,
+        0.934,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1875
+      ]
+    }
+  ]
+}

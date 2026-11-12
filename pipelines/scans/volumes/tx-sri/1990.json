@@ -1,0 +1,39 @@
+{
+  "year": 1990,
+  "day": "1990-11-06",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "General Election Returns by County, November 6, 1990 (Texas Secretary of State)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706943_0094/micro_IA40706943_0094.pdf",
+    "item": "https://archive.org/details/micro_IA40706943_0094"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "governor": "Governor; the table is printed in two halves on alternating pages (columns A-L, then M-V with total, registered voters, and percent); columns are lettered by the candidate key at the foot of the page (A Clayton Williams, B Ann W. Richards, C Jeff Daiell, the rest write-ins); total, registered voters, and percent columns are office other",
+    "senate": "U.S. Senator; total, voters, and turnout columns are office other"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    32,
+    33,
+    34,
+    35,
+    36
+  ]
+}

@@ -1,0 +1,1591 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "General Election Returns by County, November 6, 1990 (Texas Secretary of State)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706943_0094/micro_IA40706943_0094.pdf",
+    "item": "https://archive.org/details/micro_IA40706943_0094"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "governor": {
+      "year": 1990,
+      "chamber": "governor",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "senate": {
+      "year": 1990,
+      "chamber": "senate",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "A = Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B = Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C = Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D = James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E = Ira Calkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F = Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G = William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H = Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I = Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J = Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K = Carl Nickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L = William M. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.085,
+        0.904,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1005
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "H",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% Of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.029,
+        0.09,
+        0.977,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1011
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Therese Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William H. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.03,
+        0.077,
+        0.898,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0943
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.162,
+        0.968,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0119
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "A Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Ira Calkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L William H. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.162,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election Returns by County - Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0072
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% Of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.071,
+        0.97,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.098
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "A Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Ira C lkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L William N. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.209,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0177
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "X Of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.033,
+        0.095,
+        0.973,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0972
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "A Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Ira Calkins (U)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F Bubbles Cash (U)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L William M. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.096,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0929
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% Of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.038,
+        0.185,
+        0.975,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.011
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "A Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E Ira Calkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L William M. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.121,
+        0.908,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0353
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "% of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.156,
+        0.978,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0107
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "A - Clayton Williams (R)",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B - Ann W. Richards (D)",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C - Jeff Daiell (L)",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D - James Bridges (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E - Ira Calkins (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F - Bubbles Cash (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G - William Christopher (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H - Evelynn deHart Fain (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I - Robert Louis Garrett, Jr. (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J - Theresa Hearn-Haynes (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K - Carl Hickerson-Bull (W)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L - William H. Landry (W)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.038,
+        0.211,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0203
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "M",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Q",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "V",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Registered Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Of Total",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.04,
+        0.103,
+        0.978,
+        1.0
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0981
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Clayton Williams"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Ann Richards"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Jeff Daiell"
+        },
+        {
+          "label": "D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "K",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.043,
+        0.151,
+        0.912,
+        0.544
+      ],
+      "hint": "Read only the table headed 'GENERAL ELECTION RETURNS BY COUNTY Governor'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Phil Gramm (R)",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "Hugh Parmer (D)",
+          "contest": "senate",
+          "candidate": "Hugh Parmer"
+        },
+        {
+          "label": "Gary Johnson (L)",
+          "contest": "senate",
+          "candidate": "Gary Johnson"
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": "senate",
+          "candidate": "Ira Calkins"
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T/O",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.108,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election Returns/County by County Totals Report November 27 1990 U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0919
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Phil Gramm (R)",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "Hugh Parmer (D)",
+          "contest": "senate",
+          "candidate": "Hugh Parmer"
+        },
+        {
+          "label": "Gary Johnson (L)",
+          "contest": "senate",
+          "candidate": "Gary Johnson"
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": "senate",
+          "candidate": "Ira Calkins"
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T/O",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.075,
+        0.116,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election Returns/County by County Totals Report November 27 1990 U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0962
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Phil Gramm (R)",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "Hugh Parmer (D)",
+          "contest": "senate",
+          "candidate": "Hugh Parmer"
+        },
+        {
+          "label": "Gary Johnson (L)",
+          "contest": "senate",
+          "candidate": "Gary Johnson"
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": "senate",
+          "candidate": "Ira Calkins"
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T/O",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.072,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election Returns/County by County Totals Report November 27 1990 U.S. Senator'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.097
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Phil Gramm (R)",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "Hugh Parmer (D)",
+          "contest": "senate",
+          "candidate": "Hugh Parmer"
+        },
+        {
+          "label": "Gary Johnson (L)",
+          "contest": "senate",
+          "candidate": "Gary Johnson"
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": "senate",
+          "candidate": "Ira Calkins"
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T/O",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.098,
+        0.922,
+        1.0
+      ],
+      "hint": "Read only the table headed 'General Election Returns/County by County Totals Report November 27 1990 U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0953
+      ]
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Phil Gramm (R)",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "Hugh Parmer (D)",
+          "contest": "senate",
+          "candidate": "Hugh Parmer"
+        },
+        {
+          "label": "Gary Johnson (L)",
+          "contest": "senate",
+          "candidate": "Gary Johnson"
+        },
+        {
+          "label": "Ira Calkins (W)",
+          "contest": "senate",
+          "candidate": "Ira Calkins"
+        },
+        {
+          "label": "E",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Voters",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T/O",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.087,
+        0.925,
+        0.886
+      ],
+      "hint": "Read only the table headed 'General Election Returns/County by County Totals Report November 27 1990 U. S. Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1064
+      ]
+    }
+  ]
+}

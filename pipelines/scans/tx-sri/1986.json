@@ -1,0 +1,672 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Office of the Secretary of State, Official General Election Returns, November 4, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706926_0170/micro_IA40706926_0170.pdf",
+    "item": "https://archive.org/details/micro_IA40706926_0170"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "governor": {
+      "year": 1986,
+      "chamber": "governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "TX",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.26,
+        0.967,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0649
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.146,
+        0.964,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1581
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "Mark White",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "Bill Clements",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "Theresa Doyle",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "Charles Lee",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "J. Muriel",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.051,
+        0.125,
+        0.974,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1646
+      ]
+    },
+    {
+      "page": 18,
+      "id": "18-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.146,
+        0.966,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1569
+      ]
+    },
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.146,
+        0.966,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1674
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.298,
+        0.971,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0285
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.312,
+        0.971,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0073
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.166,
+        0.965,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1595
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.041,
+        0.262,
+        0.971,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0298
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.041,
+        0.171,
+        0.972,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1628
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "A",
+          "contest": "governor",
+          "candidate": "Mark White"
+        },
+        {
+          "label": "B",
+          "contest": "governor",
+          "candidate": "Bill Clements"
+        },
+        {
+          "label": "C",
+          "contest": "governor",
+          "candidate": "Theresa S. Doyle"
+        },
+        {
+          "label": "D",
+          "contest": "governor",
+          "candidate": "Charles Lee"
+        },
+        {
+          "label": "E",
+          "contest": "governor",
+          "candidate": "J. Muriel"
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REG. VOTERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PCT. VOTED",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.181,
+        0.971,
+        0.634
+      ],
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3157
+      ]
+    }
+  ]
+}

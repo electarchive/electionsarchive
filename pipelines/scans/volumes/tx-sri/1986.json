@@ -1,0 +1,29 @@
+{
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "Office of the Secretary of State, Official General Election Returns, November 4, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706926_0170/micro_IA40706926_0170.pdf",
+    "item": "https://archive.org/details/micro_IA40706926_0170"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "governor": "Governor; columns are lettered by the candidate key at the top of the page (A Mark White, B Bill Clements, C Theresa Doyle, D Charles Lee, E J. Muriel); total and registered voters columns are office other"
+  },
+  "leaves": [
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ]
+}

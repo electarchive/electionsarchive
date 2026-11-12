@@ -1,0 +1,27 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "State of Texas, General Election Returns, November 4, 1980 (Secretary of State)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706906_0226/micro_IA40706906_0226.pdf",
+    "item": "https://archive.org/details/micro_IA40706906_0226"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President); the precincts, total votes cast, registered voters, and turnout columns are office other"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    9,
+    10,
+    11,
+    12
+  ]
+}
