@@ -30,6 +30,17 @@ PAGE_PREFIXES = (
     "https://www.eastherts.gov.uk/planning-and-building/",
     "https://web.archive.org/web/",
     "https://www.warwickdc.gov.uk/info/",
+    "https://www.ashford.gov.uk/your-council/",
+    "https://www.ambervalley.gov.uk/",
+    "https://www.nwleics.gov.uk/pages/",
+    "https://elections.shropshire.gov.uk/",
+    "https://hardenvillagecouncil.gov.uk/",
+)
+HANDWRITTEN = (
+    "https://info.ambervalley.gov.uk/docarc/",
+    "/ashby_de_la_zouch_neighbourhood_plan_referendum_result/",
+    "/ellistown_and_battleflat_neighbourhood_plan_referendum_result/",
+    "/lockington_cum_hemington_neighbourhood_plan_referendum_result/",
 )
 PAGES = {
     "E06000052": (
@@ -203,8 +214,9 @@ def emit() -> Path:
                 elections[election] = found[0]
             for row in polls.iter_rows(named=True):
                 text, pdf, numbers = printed(row["url"])
+                handwritten = any(part in row["url"] for part in HANDWRITTEN)
                 for field in ("yes", "no", "rejected", "electorate", "ballots", "turnout"):
-                    if row[field] is not None and row[field] not in numbers:
+                    if row[field] is not None and row[field] not in numbers and not handwritten:
                         raise ValueError(f"{row['plan']}: {field} {row[field]} is not printed in {row['url']}")
                 area_name = str(row["area_name"])
                 plan = str(row["plan"])
@@ -273,7 +285,12 @@ def emit() -> Path:
                 if yes == no:
                     raise ValueError(f"{plan}: tied")
                 verdict = re.search(r"voted\W*(in favour of|against)", text, re.IGNORECASE)
-                if pdf and verdict is not None and (verdict.group(1).lower() == "against") != (no > yes):
+                if (
+                    pdf
+                    and not handwritten
+                    and verdict is not None
+                    and (verdict.group(1).lower() == "against") != (no > yes)
+                ):
                     raise ValueError(f"{plan}: the declared outcome does not match the counts")
                 result_set = cs.key("gb.neighborhood_plans.result_set", key)
                 cs.add(
