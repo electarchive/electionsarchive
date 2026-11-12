@@ -1,0 +1,243 @@
+import html
+import re
+import subprocess
+from datetime import date
+from pathlib import Path
+from uuid import UUID
+
+import polars as pl
+
+from ea import raw
+from ea.changeset import Changeset, slug
+from ea.store import connect
+
+SOURCE = "gb.neighborhood_plans"
+VERSION = "1"
+ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
+SCHEME = "gb.neighborhood_area"
+VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
+SHARE_ONLY = 4
+PAGES = {
+    "E06000052": (
+        "https://www.cornwall.gov.uk/the-council-and-democracy/elections/elections-and-referendums/"
+        "neighbourhood-plan-referendum-results"
+    ),
+    "E07000084": "https://www.basingstoke.gov.uk/NP-referendum-results",
+}
+CONTEXT = {
+    "residential": (
+        "A neighborhood planning referendum under Schedule 4B of the Town and Country Planning Act 1990 and the "
+        "Neighbourhood Planning (Referendums) Regulations 2012. Voters registered in the neighborhood area were "
+        "asked whether {council} should use the neighborhood plan to help it decide planning applications there; "
+        "the council makes the plan part of its development plan if more than half of those voting say Yes."
+    ),
+    "business": (
+        "A business referendum under Schedule 4B of the Town and Country Planning Act 1990, held with the "
+        "residential referendum in a neighborhood area designated as a business area. Non-domestic ratepayers in "
+        "the area were asked whether {council} should use the neighborhood plan to help it decide planning "
+        "applications there."
+    ),
+}
+WITHIN = (
+    "The neighborhood area is not a single parish, so it is shown within {council}'s area rather than drawn on its own."
+)
+
+
+def fetch() -> None:
+    for url in PAGES.values():
+        raw.fetch(SOURCE, url, suffix=".html")
+    for url in pl.read_csv(ROWS, separator="\t", infer_schema=False)["url"]:
+        raw.fetch(SOURCE, url, suffix=".html" if url in PAGES.values() or "/w/" in url else ".pdf")
+
+
+def printed(url: str) -> tuple[str, bool, set[str]]:
+    path = raw.cached(SOURCE, url).path
+    pdf = path.suffix == ".pdf"
+    if pdf:
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+    else:
+        text = html.unescape(re.sub(r"(?s)<(script|style).*?</\1>|<[^>]+>", " ", path.read_text()))
+    text = re.sub(r"\s+", " ", text)
+    return text, pdf, set(re.findall(r"\d+(?:\.\d+)?", re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)))
+
+
+def emit() -> Path:
+    table = pl.read_csv(ROWS, separator="\t", infer_schema=False)
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Neighborhood planning referendums in England, from the counting officers' declarations of result",
+            polity="GB",
+        )
+
+        def name(entity: UUID, text: str) -> None:
+            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        system = cs.key("gb.electoral_system", "referendum")
+        if system in cs.minted:
+            raise ValueError("publish gb.referendums first")
+        gb = cs.polity("GB")
+        if conn.execute("select 1 from scheme where code = %s", [SCHEME]).fetchone() is None:
+            cs.add("scheme", code=SCHEME, polity_id=gb, kind="electoral_district", rank=4, noun="neighborhood area")
+        councils: dict[str, tuple[str, str]] = {}
+        for code in sorted(set(table["council"])):
+            polity = cs.key("gb.polity", code)
+            if polity in cs.minted:
+                raise ValueError(f"{code}: the council must exist")
+            found = conn.execute(
+                "select n.text, s.path from name n join slug s on s.entity_id = n.entity_id"
+                " where n.entity_id = %s and n.is_preferred order by s.is_current desc limit 1",
+                [polity],
+            ).fetchone()
+            if found is None:
+                raise ValueError(f"{code}: the council has no name or slug")
+            councils[code] = (found[0], found[1])
+        elections: dict[UUID, str] = {}
+        added: set[UUID] = set()
+        for (day, code), polls in table.group_by(["day", "council"], maintain_order=True):
+            council_name, path = councils[str(code)]
+            place = council_name.removesuffix(" City Council").removesuffix(" Council")
+            election = cs.key("gb.election", f"{day}:local:{code}")
+            if election in cs.minted:
+                national = conn.execute(
+                    "select entity_id from external_id where scheme = 'gb.election' and value = %s",
+                    [f"{day}:local:gb"],
+                ).fetchone()
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=cs.key("gb.polity", str(code)),
+                    parent_id=None if national is None else national[0],
+                    kind="referendum",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                plural = "s" if polls.height > 1 else ""
+                name(
+                    election,
+                    f"{place} neighborhood planning referendum{plural}, {date.fromisoformat(str(day)):%-d %B %Y}",
+                )
+                elections[election] = f"{path}/{day}-referendum"
+                cs.add("slug", path=elections[election], entity_id=election)
+            elif election not in elections:
+                found = conn.execute(
+                    "select path from slug where entity_id = %s order by is_current desc limit 1", [election]
+                ).fetchone()
+                if found is None:
+                    raise ValueError(f"{day} {code}: the election has no slug")
+                elections[election] = found[0]
+            for row in polls.iter_rows(named=True):
+                text, pdf, numbers = printed(row["url"])
+                for field in ("yes", "no", "rejected", "electorate", "ballots", "turnout"):
+                    if row[field] is not None and row[field] not in numbers:
+                        raise ValueError(f"{row['plan']}: {field} {row[field]} is not printed in {row['url']}")
+                area_name = str(row["area_name"])
+                plan = str(row["plan"])
+                key = f"{day}:neighborhood:{code}:{slug(plan)}:{row['kind']}"
+                title = (
+                    f"Declaration of result of poll: {plan} {row['kind']} referendum, {day}"
+                    if pdf
+                    else "Neighbourhood plan referendum results"
+                    if row["url"] in PAGES.values()
+                    else f"{plan} referendum results"
+                )
+                source = cs.source(council_name, title)
+                if source in cs.minted and source not in added:
+                    added.add(source)
+                    cs.add(
+                        "source", id=source, kind="official_body", publisher=council_name, title=title, url=row["url"]
+                    )
+                    cs.artifact(raw.cached(SOURCE, row["url"]), source)
+                unit_code = f"{code}:{slug(re.sub(r'(?i) neighbourhood (plan )?area$', '', area_name))}"
+                unit = cs.unit(SCHEME, unit_code)
+                if unit in cs.minted and unit not in added:
+                    added.add(unit)
+                    parish = row["area"]
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=cs.key("gb.polity", str(code)),
+                        scheme_code=SCHEME,
+                        code=unit_code,
+                        area_relation="within" if parish is None else "equals",
+                        area_id=cs.area("gb.lad", str(code)) if parish is None else cs.area("gb.parish", parish),
+                        kind="standard",
+                        valid_from=None,
+                    )
+                    name(unit, area_name[0].upper() + area_name[1:])
+                contest = cs.key("gb.contest", key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="ballot_question",
+                    district_area_id=None if row["area"] is None else cs.area("gb.parish", row["area"]),
+                    electoral_system_id=system,
+                    round_number=1,
+                    default_result_kind="counted",
+                )
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+                label = plan if row["kind"] == "residential" else f"{plan} (business referendum)"
+                name(contest, label)
+                cs.add("slug", path=f"{elections[election]}/{slug(label)}", entity_id=contest)
+                context = CONTEXT[str(row["kind"])].format(council=council_name)
+                if row["area"] is None:
+                    context = f"{context} {WITHIN.format(council=council_name)}"
+                cs.add("note", entity_id=contest, kind="context", body_md=context)
+                options = [cs.key("gb.neighborhood_plans.option", f"{key}:{position}") for position in range(2)]
+                for position, (option, answer) in enumerate(zip(options, ("Yes", "No"), strict=True)):
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="answer",
+                        ballot_position=position + 1,
+                        ballot_label=answer,
+                    )
+                yes, no = int(row["yes"]), int(row["no"])
+                if yes == no:
+                    raise ValueError(f"{plan}: tied")
+                verdict = re.search(r"voted\W*(in favour of|against)", text, re.IGNORECASE)
+                if pdf and verdict is not None and (verdict.group(1).lower() == "against") != (no > yes):
+                    raise ValueError(f"{plan}: the declared outcome does not match the counts")
+                result_set = cs.key("gb.neighborhood_plans.result_set", key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                )
+                cs.add("citation", entity_id=result_set, source_id=source)
+                cs.add("outcome", result_set_id=result_set, option_id=options[no > yes], kind="won")
+                for option, measure, value in (
+                    (options[0], VOTES, row["yes"]),
+                    (options[1], VOTES, row["no"]),
+                    (None, INVALID, row["rejected"]),
+                    (None, REGISTERED, row["electorate"]),
+                    (None, BALLOTS, row["ballots"]),
+                    (None, VOTERS, row["turnout"]),
+                ):
+                    if value is not None:
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            flags=SHARE_ONLY if measure == VOTERS else 0,
+                            value=round(float(value) / 100, 4) if measure == VOTERS else int(value),
+                        )
+        return cs.write()
