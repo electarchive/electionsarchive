@@ -33,8 +33,8 @@
       "columns": [
         {
           "label": "Abby, H. S. P.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Alson Streeter (Union Labor)"
         },
         {
           "label": "Foster, S. T.",
@@ -127,107 +127,13 @@
       ]
     },
     {
-      "page": 187,
-      "id": "187-0",
-      "columns": [
-        {
-          "label": "Abby, H. S. P.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Foster, S. T.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Jones, G. W.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Weyman, B. H.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Smith, E. J.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Carothers, A. J.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Durham, W. W.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Etheredge, W. G.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "O'Byrne, John, Jr.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Denson, James",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "McKenna, John",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Jones, E. F.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Edwards, A.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Rankin, J. D.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Humphreys, B. M.",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "Scattering",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.091,
-        0.0,
-        0.826,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
-    },
-    {
       "page": 188,
       "id": "188-0",
       "columns": [
         {
           "label": "Knowles, W. D.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Clinton Fisk (Prohibition)"
         },
         {
           "label": "Link, J. B.",
@@ -315,8 +221,8 @@
       "columns": [
         {
           "label": "Knowles, W. D.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Clinton Fisk (Prohibition)"
         },
         {
           "label": "Link, J. B.",
@@ -404,8 +310,8 @@
       "columns": [
         {
           "label": "Knowles, W. D.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Clinton Fisk (Prohibition)"
         },
         {
           "label": "Link, J. B.",
@@ -516,54 +422,6 @@
         0.0,
         0.22
       ]
-    },
-    {
-      "page": 198,
-      "id": "198-0",
-      "columns": [
-        {
-          "label": "Ross, L. S.",
-          "contest": "governor",
-          "candidate": "Lawrence S. Ross"
-        },
-        {
-          "label": "Martin, Marion",
-          "contest": "governor",
-          "candidate": "Francis Marion Martin"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.209,
-        0.0,
-        0.277,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
-    },
-    {
-      "page": 199,
-      "id": "199-0",
-      "columns": [
-        {
-          "label": "Ross, L. S.",
-          "contest": "governor",
-          "candidate": "Lawrence S. Ross"
-        },
-        {
-          "label": "Martin, Marion",
-          "contest": "governor",
-          "candidate": "Francis Marion Martin"
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.209,
-        0.0,
-        0.277,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings."
     }
   ]
 }
