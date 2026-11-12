@@ -777,6 +777,34 @@ def ark_url(year: int) -> str:
     return f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/lgov/{year}.rar"
 
 
+def uncontested_sheet(grid: list[list[str | None]]) -> dict[str, object] | None:
+    candidates = []
+    facts: dict[str, float | None] = {}
+    for row in grid:
+        cells = [(cell or "").strip() for cell in row]
+        if cells[0] == "E" and number(cells[1]) is not None and cells[2]:
+            if any(number(cell) is not None for cell in cells[4:]):
+                return None
+            candidates.append({"name": cells[2], "party": cells[3], "flag": "e", "totals": [0.0], "elected": True})
+        for index, label in enumerate(cells):
+            lowered = label.lower()
+            key = (
+                "electorate"
+                if lowered.startswith("no. of electors")
+                else "seats"
+                if lowered.startswith(("number of members to be elected", "number to be elected"))
+                else "valid"
+                if lowered.startswith("valid votes")
+                else None
+            )
+            if key is not None:
+                facts[key] = next((number(c) for c in cells[index + 1 :] if number(c) is not None), None)
+    if not candidates or facts.get("seats") != len(candidates) or facts.get("valid") is not None:
+        return None
+    facts.pop("valid", None)
+    return {"facts": facts, "candidates": candidates}
+
+
 def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     url = ark_url(year)
     folder = PARSED / f"ark-{year}"
@@ -795,6 +823,29 @@ def parse_ark(year: int) -> tuple[list[dict[str, object]], list[dict[str, object
         grid = [list(row) for row in pl.read_excel(path, has_header=False, infer_schema_length=0).iter_rows()]
         dea, code, abbr = ark_workbook(year, path, grid)
         try:
+            sheet = uncontested_sheet(grid)
+            if sheet is not None:
+                unit, rows = finish(
+                    year, dea, sheet["facts"], sheet["candidates"], [], 1, url, {squeeze(dea): (code, dea, abbr)}
+                )
+                unit["tacit"] = True
+                unit["note"] = " ".join(
+                    filter(
+                        None,
+                        [
+                            unit["note"],
+                            (
+                                "The sheet lists as many candidates as seats, all marked elected, and prints no votes: "
+                                "the seats were filled unopposed."
+                            ),
+                            f"Workbook {path.name} in the ARK archive.",
+                        ],
+                    )
+                )
+                read.add(path.name.lower().replace("-corrected", ""))
+                units.append(unit)
+                totals.extend({**row, "votes": None} for row in rows if row["number"] > 0)
+                continue
             sheet = grid_sheet(grid, dea, 40, 80)
             if sheet["tied"] < 1:
                 raise ValueError("first preferences do not add up to the valid votes")
@@ -1187,7 +1238,7 @@ def parse() -> None:
         units += ark_units
         totals += ark_totals
     scanned = DATA / "parsed" / "gb.ni_scans"
-    units = pl.DataFrame(units, infer_schema_length=None)
+    units = pl.DataFrame([{"tacit": False, **unit} for unit in units], infer_schema_length=None)
     totals = pl.DataFrame(totals, infer_schema_length=None)
     units.write_parquet(PARSED / "native.parquet")
     if (scanned / "units.parquet").exists():
@@ -1478,6 +1529,7 @@ def emit() -> Path:
                     files[url] = cs.artifact(stored, sources[url])
                     files[url, "sha"] = stored.sha256
                 seats = int(unit_row["seats"])
+                result_kind = "tacit" if unit_row.get("tacit") else "counted"
                 contest_key = f"{day}:local:{dea_code}"
                 contest = cs.key("gb.contest", contest_key)
                 cs.add(
@@ -1490,7 +1542,7 @@ def emit() -> Path:
                     magnitude=seats,
                     round_number=1,
                     electoral_system_id=system,
-                    default_result_kind="counted",
+                    default_result_kind=result_kind,
                 )
                 name(contest, f"{label} district electoral area, {councils[code]}, {year}")
                 cs.add("slug", path=f"{paths[code]}/{day}-local/{slug(label)}", entity_id=contest)
@@ -1501,7 +1553,7 @@ def emit() -> Path:
                     election_id=election,
                     contest_id=contest,
                     stage="official",
-                    kind="counted",
+                    kind=result_kind,
                     status="active",
                     source_id=sources[url],
                     is_default=True,
@@ -1587,7 +1639,7 @@ def emit() -> Path:
                         else {}
                     )
                     for stage in sorted(series):
-                        if eliminated:
+                        if eliminated or result_kind == "tacit":
                             break
                         amount = series[stage]
                         if stage in located:
