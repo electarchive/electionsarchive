@@ -56,12 +56,25 @@ PDF = (
     "https://sdsos.gov/elections-voting/assets/Archive/2012%20Assets/2012generalelectionstatewidecandidatesbycounty.pdf"
 )
 PDF_DAY = date(2012, 11, 6)
+ARCHIVE = "https://sdsos.gov/elections-voting/assets/Archive/"
+PRIMARY_PDFS = {
+    ARCHIVE + "2020%20Assests/2020PrimaryStateCanvassReportandCertificate.pdf": (
+        date(2020, 6, 2),
+        ["MIKE ROUNDS", "SCYLLER J. BORGLUM"],
+    ),
+    ARCHIVE + "2022%20Assets/2022PrimaryStateCanvassReport.pdf": (
+        date(2022, 6, 7),
+        ["JOHN R. THUNE", "BRUCE WHALEN", "MARK MOWRY"],
+    ),
+}
 
 
 def fetch() -> None:
     for path in [*WIDE, *LONG]:
         raw.fetch(SOURCE, url(path), suffix=".html")
     raw.fetch(SOURCE, PDF, suffix=".pdf")
+    for link in PRIMARY_PDFS:
+        raw.fetch(SOURCE, link, suffix=".pdf")
 
 
 def parse() -> None:
@@ -131,6 +144,33 @@ def parse() -> None:
                     for code, values in counties
                     for k, name in enumerate(names)
                 )
+    for link, (day, names) in PRIMARY_PDFS.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"],
+            capture_output=True,
+            check=True,
+            text=True,
+        ).stdout
+        block = text.split("United States Senator", 1)[1].split("United States Representative", 1)[0]
+        counties = []
+        for line in block.splitlines():
+            row = re.match(r"^([A-Z][A-Za-z .]*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", line.strip())
+            if row is None or len(row[2].split()) != len(names):
+                continue
+            numbers = [int(value.replace(",", "")) for value in row[2].split()]
+            if row[1] == "Total":
+                sums = [sum(values[k] for _, values in counties) for k in range(len(names))]
+                if len(counties) != 66 or sums != numbers:
+                    raise ValueError(f"{day} senate: {len(counties)} counties sum to {sums}, printed {numbers}")
+                break
+            counties.append((fips[re.sub(r"[^a-z]", "", row[1].lower())], numbers))
+        else:
+            raise ValueError(f"{day} senate: no total line")
+        rows.extend(
+            (day, "senate:republican", code, name, values[k])
+            for code, values in counties
+            for k, name in enumerate(names)
+        )
     frame = pl.DataFrame(
         rows,
         schema={"day": pl.Date, "chamber": pl.String, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
@@ -157,7 +197,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Dakota's U.S. House generals 2000-2012 and federal primaries 2000-2010 by county "
+            summary="South Dakota's U.S. House generals 2000-2012 and federal primaries 2000-2010 and Republican Senate primaries 2020 and 2022 by county "
             "(Secretary of State election history)",
             polity="US-SD",
         )
@@ -175,5 +215,14 @@ def emit() -> Path:
         for path in [*WIDE, *LONG]:
             cs.artifact(raw.cached(SOURCE, url(path)), source)
         cs.artifact(raw.cached(SOURCE, PDF), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"SD": source}, strict=True)
+        for link in PRIMARY_PDFS:
+            cs.artifact(raw.cached(SOURCE, link), source)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet"),
+            {"SD": source},
+            strict=True,
+            authoritative="Source: the Secretary of State's official state canvass.",
+        )
         return cs.write()
