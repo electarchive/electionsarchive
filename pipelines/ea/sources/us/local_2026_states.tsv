@@ -5261,19 +5261,19 @@ AR-05119-pulaski	City of Alexander City Council	0	Trevis Bentley	Nonpartisan	Pul
 AR-05119-pulaski	City of Jacksonville Mayor	0	James E Bolden III	Nonpartisan	Pulaski	1
 AR-05119-pulaski	City of Jacksonville Mayor	0	Jeff Elmore	Nonpartisan	Pulaski	1
 AR-05119-pulaski	City of Jacksonville Mayor	0	Kevin Cole	Nonpartisan	Pulaski	1
-AR-05119-pulaski	City of Jacksonville City Council	0	Lezlie Lovercheck	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Cheesa Williams	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Michael D. Dietz	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Jim Moore	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Kevin McCleary	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Brian Blevins	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Vivian Brittenum	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Reedie Ray	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Susan Davitt	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Kara Woller	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Berlinda Helms	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	Joy Kinman	Nonpartisan	Pulaski	5
-AR-05119-pulaski	City of Jacksonville City Council	0	LaConda T. Watson	Nonpartisan	Pulaski	5
+AR-05119-pulaski	City of Jacksonville City Council Ward 1 Position 1	0	Lezlie Lovercheck	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 1 Position 1	0	Cheesa Williams	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 1 Position 1	0	Michael D. Dietz	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 1 Position 1	0	Jim Moore	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 2 Position 1	0	Kevin McCleary	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 2 Position 1	0	Brian Blevins	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 3 Position 1	0	Vivian Brittenum	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 3 Position 1	0	Reedie Ray	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 4 Position 1	0	Susan Davitt	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 4 Position 1	0	Kara Woller	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 4 Position 1	0	Berlinda Helms	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 5 Position 1	0	Joy Kinman	Nonpartisan	Pulaski	1
+AR-05119-pulaski	City of Jacksonville City Council Ward 5 Position 1	0	LaConda T. Watson	Nonpartisan	Pulaski	1
 AR-05119-pulaski	City of Little Rock Mayor	0	Frank Scott, Jr.	Nonpartisan	Pulaski	1
 AR-05119-pulaski	City of Little Rock City Board of Directors	0	Virgil L. Miller, Jr.	Nonpartisan	Pulaski	5
 AR-05119-pulaski	City of Little Rock City Board of Directors	0	Jeremiah Russell	Nonpartisan	Pulaski	5
@@ -6818,6 +6818,10 @@ AR-05077-enr	City of Marianna City Council Ward 3 Position 2	0	Sandra Cooper	Non
 AR-05077-enr	City of Marianna City Council Ward 3 Position 2	0	GiGi Westbrook-Hall	Nonpartisan	Lee	1
 AR-05107-enr	City of Marvell City Council Ward 1 Position 2	0	Pace Hindsley	Nonpartisan	Phillips	1
 AR-05107-enr	City of Marvell City Council Ward 1 Position 2	0	Arnell Craig	Nonpartisan	Phillips	1
+AR-05107-enr	City of Lake View City Council Ward 1 Position 1	0	Brenda Ross	Nonpartisan	Phillips	1
+AR-05107-enr	City of Lake View City Council Ward 1 Position 1	0	Luevenia W. Davis	Nonpartisan	Phillips	1
+AR-05107-enr	City of Lake View Mayor	0	Duante Rose	Nonpartisan	Phillips	1
+AR-05107-enr	City of Lake View Mayor	0	Evelyn Jackson Schmidt	Nonpartisan	Phillips	1
 AR-05041-enr	City of Mitchellville City Council Ward 1 Position 2	0	Phyllis Racy	Nonpartisan	Desha	1
 AR-05041-enr	City of Mitchellville City Council Ward 1 Position 2	0	Michael Thomas, Jr.	Nonpartisan	Desha	1
 AR-05061-enr	City of Nashville City Council Ward 5 Position 2	0	Gynder D. Benson	Nonpartisan	Howard	1
@@ -6882,6 +6886,9 @@ AR-05117-enr	City of Ulm City Council Position 2	0	Kevin Knight	Nonpartisan	Prai
 AR-05117-enr	City of Ulm City Council Position 2	0	Joshua Hunter	Nonpartisan	Prairie	1
 AR-05117-enr	City of Ulm City Council Position 5	0	Robert Floyd	Nonpartisan	Prairie	1
 AR-05117-enr	City of Ulm City Council Position 5	0	Jennifer Short	Nonpartisan	Prairie	1
+AR-05117-enr	City of De Valls Bluff City Council Ward 1 Position 1	0	Raymond Watson	Nonpartisan	Prairie	1
+AR-05117-enr	City of De Valls Bluff City Council Ward 1 Position 1	0	Jackie Adcock	Nonpartisan	Prairie	1
+AR-05117-enr	City of De Valls Bluff Mayor	0	Darlene Connor	Nonpartisan	Prairie	1
 AR-05137-enr	City of Mountain View City Council Ward 1 Position 2	0	Orven Phillips	Nonpartisan	Stone	1
 AR-05137-enr	City of Mountain View City Council Ward 1 Position 2	0	Finis Brewer	Nonpartisan	Stone	1
 AR-05081-enr	City of Wilton City Council Ward 1 Position 2	0	Debra A. Nelson	Nonpartisan	Little River	1
