@@ -1,0 +1,26 @@
+{
+  "year": 1978,
+  "day": "1978-11-07",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1978-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://dlg.galileo.usg.edu/data/dlg/ggpd/pdfs/dlg_ggpd_y-ga-bs700-b-ps1-bs4-b1978-bfolio.pdf",
+    "item": "https://dlg.galileo.usg.edu/id:dlg_ggpd_y-ga-bs700-b-ps1-bs4-b1978-bfolio"
+  },
+  "raw_source": "us.ga_usrep",
+  "offices": {
+    "senate": "U.S. Senator",
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    8,
+    9,
+    10,
+    11,
+    12
+  ]
+}

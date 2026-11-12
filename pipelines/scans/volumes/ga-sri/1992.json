@@ -1,0 +1,29 @@
+{
+  "year": 1992,
+  "day": "1992-11-03",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1992-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706945_0278/micro_IA40706945_0278.pdf",
+    "item": "https://archive.org/details/micro_IA40706945_0278"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    32,
+    37,
+    38,
+    40,
+    41
+  ]
+}

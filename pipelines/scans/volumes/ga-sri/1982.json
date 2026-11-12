@@ -1,0 +1,24 @@
+{
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1982-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706912_0248/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/micro_IA40706912_0248"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    1,
+    8,
+    9,
+    10,
+    12
+  ]
+}

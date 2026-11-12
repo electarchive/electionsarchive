@@ -1,0 +1,30 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1988-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706935_0212/micro_IA40706935_0212.pdf",
+    "item": "https://archive.org/details/micro_IA40706935_0212"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors; each slate prints one column per elector, so use the first elector's column, or the party total if printed)",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    13,
+    14,
+    15
+  ]
+}

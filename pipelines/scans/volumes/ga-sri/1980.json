@@ -1,0 +1,32 @@
+{
+  "year": 1980,
+  "day": "1980-11-04",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1980-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706905_0267/micro_IA40706905_0267.pdf",
+    "item": "https://archive.org/details/micro_IA40706905_0267"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors; each slate prints one column per elector, so use the first elector's column, or the party total if printed)",
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    21,
+    22
+  ]
+}

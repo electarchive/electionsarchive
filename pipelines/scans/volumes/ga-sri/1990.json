@@ -1,0 +1,43 @@
+{
+  "year": 1990,
+  "day": "1990-11-06",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1990-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706942_0080/micro_IA40706942_0080.pdf",
+    "item": "https://archive.org/details/micro_IA40706942_0080"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator",
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103
+  ]
+}

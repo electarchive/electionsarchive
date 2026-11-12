@@ -1,0 +1,27 @@
+{
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1986-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706928_0280/micro_IA40706928_0280.pdf",
+    "item": "https://archive.org/details/micro_IA40706928_0280"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator",
+    "governor": "Governor",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    3,
+    13,
+    14,
+    15,
+    16,
+    17
+  ]
+}

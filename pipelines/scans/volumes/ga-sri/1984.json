@@ -1,0 +1,30 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-GA",
+  "publisher": "Georgia Secretary of State",
+  "title": "Official State of Georgia Tabulation by Counties, general election held 1984-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706922_0078/micro_IA40706922_0078.pdf",
+    "item": "https://archive.org/details/micro_IA40706922_0078"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "president": "President (votes for presidential electors; each slate prints one column per elector, so use the first elector's column, or the party total if printed)",
+    "senate": "U.S. Senator",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    12,
+    13,
+    14,
+    15,
+    16
+  ]
+}
