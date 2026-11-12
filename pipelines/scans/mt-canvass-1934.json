@@ -1,0 +1,136 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1934, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1934montrich/officialmontanag1934montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1934montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "senate": {
+   "year": 1934,
+   "chamber": "senate",
+   "day": "1934-11-06",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1934,
+   "chamber": "house",
+   "day": "1934-11-06",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1934,
+   "chamber": "house",
+   "day": "1934-11-06",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  },
+  "senate_special": {
+   "year": 1934,
+   "chamber": "senate",
+   "day": "1934-11-06",
+   "special": true,
+   "state": "MT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-all",
+   "columns": [
+    {
+     "label": "Democratic Burton K. Wheeler",
+     "contest": "senate",
+     "candidate": "Burton K. Wheeler"
+    },
+    {
+     "label": "Republican Geo. M. Bourquin",
+     "contest": "senate",
+     "candidate": "George M. Bourquin"
+    },
+    {
+     "label": "Socialist William F. Held",
+     "contest": "senate",
+     "candidate": "William F. Held"
+    },
+    {
+     "label": "Communist Raymond F. Gray",
+     "contest": "senate",
+     "candidate": "Raymond F. Gray"
+    },
+    {
+     "label": "Democratic James E. Murray",
+     "contest": "senate_special",
+     "candidate": "James E. Murray"
+    },
+    {
+     "label": "Republican Scott Leavitt",
+     "contest": "senate_special",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "Socialist John F. Duffy",
+     "contest": "senate_special",
+     "candidate": "John F. Duffy"
+    },
+    {
+     "label": "Democratic Joseph P. Monaghan",
+     "contest": "house1",
+     "candidate": "Joseph P. Monaghan"
+    },
+    {
+     "label": "Republican D. D. Evans",
+     "contest": "house1",
+     "candidate": "D. D. Evans"
+    },
+    {
+     "label": "Socialist Charles Schneider",
+     "contest": "house1",
+     "candidate": "Charles Schneider"
+    },
+    {
+     "label": "Communist George Salisbury",
+     "contest": "house1",
+     "candidate": "George Salisbury"
+    },
+    {
+     "label": "Democratic Roy E. Ayers",
+     "contest": "house2",
+     "candidate": "Roy E. Ayers"
+    },
+    {
+     "label": "Republican Stanley E. Felt",
+     "contest": "house2",
+     "candidate": "Stanley E. Felt"
+    },
+    {
+     "label": "Socialist Yale Adams",
+     "contest": "house2",
+     "candidate": "Yale Adams"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.21,
+    0.5,
+    0.955
+   ],
+   "bands": 2,
+   "header": [
+    0.0,
+    0.25
+   ],
+   "hint": "The 14 data columns are U. S. Senator (Six Year Term, four columns), U. S. Senator (Two Year Term, three columns), Representative in Congress First District (four columns), and Second District (three columns). Skip the Pluralities line. Blank or dotted cells are empty strings."
+  }
+ ]
+}

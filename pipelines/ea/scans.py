@@ -516,7 +516,8 @@ def counties(manifest: Manifest) -> dict[str, str]:
             """select n.text, u.code from reporting_unit u
                join name n on n.entity_id = u.area_id
                join polity p on p.id = u.polity_id
-               where u.scheme_code = 'us.county' and p.iso_code = %s""",
+               where u.scheme_code = 'us.county' and p.iso_code = %s
+               order by n.kind <> 'historical'""",
             [manifest["polity"]],
         ).fetchall()
     return {
