@@ -12626,16 +12626,15 @@ export const contests = {
           union all
           select g.id, grp.top from contest g join grp on g.allocation_parent_id = grp.id
         ),
-        here as materialized (
-          select r.result_set_k as k from result_rollup_sum r
-          where r.area_k = ${area.k} and r.measure = any(${COUNTED})
-          union
-          select u.result_set_k from result_rollup_unit u where u.area_k = ${area.k}
-        ),
         matched as materialized (
-          select grp.top, x.k from here
-          join result_set x on x.k = here.k and x.status <> 'withdrawn' and ${served("x")}
-          join grp on grp.id = x.contest_id
+          select grp.top, x.k from grp
+          join result_set x on x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")}
+          where exists (
+            select from result_rollup_sum r
+            where r.result_set_k = x.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+          ) or exists (
+            select from result_rollup_unit u where u.result_set_k = x.k and u.area_k = ${area.k}
+          )
         ),
         hits as (
           select m.top, bool_or(r.voted) as voted from matched m
