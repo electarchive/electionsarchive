@@ -151,12 +151,37 @@ def emit() -> Path:
                left join election e on e.id = ct.election_id
                where a.scheme_code = 'gb.ward' group by a.id, c.code"""
         ).fetchall()
+        held = dict(
+            conn.execute(
+                """select g.area_id, min(g.valid_from) from area_geometry g join changeset c on c.id = g.changeset_id
+                   where c.pipeline = %s group by g.area_id""",
+                (SOURCE,),
+            ).fetchall()
+        )
+        foreign = {
+            area
+            for (area,) in conn.execute(
+                """select g.area_id from area_geometry g join changeset c on c.id = g.changeset_id
+                   where c.pipeline <> %s and g.valid_from <= %s and (g.valid_to is null or g.valid_to > %s)""",
+                (SOURCE, POLLS[2022], POLLS[2021]),
+            ).fetchall()
+        }
+        later = dict(
+            conn.execute(
+                "select area_id, min(valid_from) from area_geometry where valid_from > %s group by area_id",
+                (POLLS[2022],),
+            ).fetchall()
+        )
         councils = conn.execute(
             """select a.id, c.code from area a join area_code c on c.area_id = a.id where a.scheme_code = 'gb.lad'"""
         ).fetchall()
         missing: list[str] = []
         for area, code, years in wards:
             first = min(year for year in years if year is not None)
+            if area in foreign or (first not in POLLS and area not in held):
+                continue
+            start = held.get(area, POLLS.get(first))
+            first = start.year
             layer = next(
                 (
                     key
@@ -170,19 +195,21 @@ def emit() -> Path:
             if layer is None:
                 missing.append(f"{code} ({first})")
                 continue
-            ends = first == 2021 and ("wd22", code) not in shapes
+            ends = layer != "ced23" and first == 2021 and ("wd22", code) not in shapes
             geom, point = shapes[(layer, code)]
             cs.add(
                 "area_geometry",
                 area_id=area,
-                valid_from=POLLS[first],
-                valid_to=POLLS[2022] if ends else None,
+                valid_from=start,
+                valid_to=POLLS[2022] if ends else later.get(area),
                 geom=geom,
                 label_point=point,
                 quality="official",
                 source_id=sources[layer],
             )
         for area, code in councils:
+            if area in foreign:
+                continue
             layer = next(
                 (key for key in ("cty21", "lad21", "lad22", "lad23") if (key, code) in shapes),
                 None,
@@ -195,7 +222,7 @@ def emit() -> Path:
                 "area_geometry",
                 area_id=area,
                 valid_from=POLLS[2021] if layer in ("cty21", "lad21") else POLLS[2022],
-                valid_to=None,
+                valid_to=later.get(area),
                 geom=geom,
                 label_point=point,
                 quality="official",
