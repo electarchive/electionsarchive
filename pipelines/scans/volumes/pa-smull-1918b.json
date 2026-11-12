@@ -1,0 +1,24 @@
+{
+  "year": 1918,
+  "day": "1918-11-05",
+  "polity": "US-PA",
+  "publisher": "Pennsylvania Senate (Smull's Legislative Hand Book)",
+  "title": "Smull's Legislative Hand Book, 1919, general election 1918-11-05, Representatives in Congress at large by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/smullslegislativ1919unse/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/smullslegislativ1919unse"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "Four Representatives in Congress at large, counties down (printed sideways), a column per candidate and party line; Washington and Fair Play party-line columns for one candidate are fused"
+  },
+  "leaves": [
+    809,
+    810,
+    811,
+    812
+  ],
+  "autorotate": true,
+  "at_large": true
+}
