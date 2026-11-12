@@ -179,6 +179,16 @@ def aksaray_html(page: str, _: str) -> list[dict[str, str]]:
     return rows
 
 
+def malatya_html(page: str, _: str) -> list[dict[str, str]]:
+    heads = list(re.finditer(r">\s*([^<>\s]+) İlçesi Mahalle Muhtarlıkları", page))
+    rows = []
+    for head, nxt in zip(heads, [*heads[1:], None], strict=True):
+        for c in cells(page[head.end() : nxt.start() if nxt else len(page)]):
+            if len(c) == 5 and c[0].isdigit():
+                rows.append(line(c[0], head.group(1), "", "", c[1], f"{c[2]} {c[3]}"))
+    return rows
+
+
 KIRIKKALE = (
     "https://www.kirikkale.gov.tr/kurumlar/kirikkale.gov.tr/site/site_files/il_idare_ve_denetim/"
     "ilGeneliMuhtarListesi_2026ekim.pdf"
@@ -316,6 +326,26 @@ PROVINCES = {
             "2026, so a muhtar who took office after a by-election may be listed instead of the 2024 winner."
         ),
         belde_ilce=True,
+    ),
+    "44": Province(
+        name="Malatya",
+        publisher="T.C. Malatya Valiliği",
+        page="https://www.malatya.gov.tr/muhtarliklarimiz",
+        title="Muhtarlıklarımız: mahalle muhtarlıkları by ilçe",
+        lists={
+            "all": (
+                "https://www.malatya.gov.tr/muhtarliklarimiz",
+                "9243ba74faaf7d4baa1e2f3d6be29c06a49bc2ebed64692d791a0ed42d770434",
+                malatya_html,
+            )
+        },
+        method=(
+            "Malatya's mahalle muhtars as the governorate lists them on its Muhtarlıklarımız page, one table per "
+            "ilçe (names-only extract, sha256 {all}). The page also prints phone numbers, so the archive keeps only "
+            "the names and stores neither the page nor the numbers. The page was read in 2026 and marks acting "
+            "muhtars (vekaleten), whom the extract leaves out, so a muhtar who took office after a by-election may "
+            "be listed instead of the 2024 winner."
+        ),
     ),
     "68": Province(
         name="Aksaray",
