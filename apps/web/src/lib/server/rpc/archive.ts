@@ -3833,6 +3833,11 @@ async function holders(
   keys: Set<string>,
   split: Split | null,
 ) {
+  const gathered = await gather(ids, date);
+  return assign(gathered.options, gathered.labels, lineage, keys, split);
+}
+
+async function gather(ids: Array<string>, date: string | null) {
   const leaves = await db.execute<{ id: string }>(sql`
     with recursive tree(id) as (
       select unnest(${sql.param(ids)}::uuid[])
@@ -3916,7 +3921,7 @@ async function holders(
     ],
     date,
   );
-  return assign(options.values().toArray(), labels, lineage, keys, split);
+  return { options: options.values().toArray(), labels };
 }
 
 async function chamber(
@@ -15631,6 +15636,11 @@ export async function races(
         isSeated &&
         head?.body != null &&
         (head.kind === "body_seats" || head.kind === "list_allocation");
+      const gathering =
+        isBrief || group.length < 2
+          ? null
+          : gather([...new Set([...roots, ...counted])], day);
+      gathering?.catch(() => null);
       const lay = async (isLaid: boolean) =>
         Promise.all([
           single == null || !isLaid
@@ -16286,14 +16296,16 @@ export async function races(
                 head?.id ?? null,
               ),
           sequel(group, isBrief, place.k, lineage),
-          isBrief || filled === 0 || group.length < 2
+          gathering == null || filled === 0
             ? null
-            : holders(
-                [...new Set([...roots, ...counted])],
-                day,
-                lineage,
-                new Set(results.map((row) => row.key)),
-                null,
+            : gathering.then((gathered) =>
+                assign(
+                  gathered.options,
+                  gathered.labels,
+                  lineage,
+                  new Set(results.map((row) => row.key)),
+                  null,
+                ),
               ),
           poll(single?.id ?? null, place.k, head?.kind === "ballot_question"),
           isBrief ||
