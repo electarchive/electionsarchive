@@ -17,6 +17,7 @@ ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
 SHARE_ONLY = 4
+STRATFORD_PAGES = ("https://www.stratford.gov.uk/news/", "https://www.stratford.gov.uk/planning-building/")
 PAGES = {
     "E06000052": (
         "https://www.cornwall.gov.uk/the-council-and-democracy/elections/elections-and-referendums/"
@@ -43,11 +44,15 @@ WITHIN = (
 )
 
 
+def is_page(url: str) -> bool:
+    return url in PAGES.values() or "/w/" in url or url.startswith(STRATFORD_PAGES)
+
+
 def fetch() -> None:
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     for url in pl.read_csv(ROWS, separator="\t", infer_schema=False)["url"]:
-        raw.fetch(SOURCE, url, suffix=".html" if url in PAGES.values() or "/w/" in url else ".pdf")
+        raw.fetch(SOURCE, url, suffix=".html" if is_page(url) else ".pdf")
 
 
 def printed(url: str) -> tuple[str, bool, set[str]]:
