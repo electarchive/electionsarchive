@@ -1,11 +1,13 @@
 import json
+import sys
+import time
 from dataclasses import dataclass, field
 from typing import LiteralString
 from uuid import UUID
 
 from jsonschema import Draft7Validator
 from jsonschema.exceptions import best_match
-from psycopg import sql
+from psycopg import errors, sql
 
 from ea.names import ACRONYMS, ROMAN
 from ea.store import LAUNCHED_AT, ROOT, Connection
@@ -26,6 +28,7 @@ SWEEPABLE = {
     "election_cadence": "id",
     "results_access": "id",
 }
+TIMEOUT = "20min"
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -171,13 +174,17 @@ class Stage:
             ),
         )
 
-    def either(self, table: str, *columns: LiteralString) -> sql.Composable:
+    def either(
+        self, table: str, *columns: LiteralString, among: tuple[LiteralString, sql.Composable] | None = None
+    ) -> sql.Composable:
         listed = sql.SQL(", ").join(map(sql.Identifier, columns))
-        public = sql.SQL("select {} from public.{} p").format(listed, sql.Identifier(table))
+        public = sql.SQL("select {} from public.{} p where true").format(listed, sql.Identifier(table))
+        if among is not None:
+            public = sql.SQL("{} and p.{} in ({})").format(public, sql.Identifier(among[0]), among[1])
         if table not in self.tables:
             return sql.SQL("({})").format(public)
         if columns[0] == "id":
-            public = sql.SQL("{} where not exists (select from {} x where x.id = p.id)").format(
+            public = sql.SQL("{} and not exists (select from {} x where x.id = p.id)").format(
                 public, self.staged(table)
             )
         staged = sql.SQL(", ").join(
@@ -220,8 +227,12 @@ def _accounting(stage: Stage) -> list[tuple[str, sql.Composed]]:
     if "result_value" not in stage.tables:
         return empty
     facts = stage.staged("result_value")
-    contests = stage.either("contest", "id", "magnitude")
-    result_sets = stage.either("result_set", "id", "contest_id")
+    result_sets = stage.either(
+        "result_set", "id", "contest_id", among=("id", sql.SQL("select distinct result_set_id from {}").format(facts))
+    )
+    contests = stage.either(
+        "contest", "id", "magnitude", among=("id", sql.SQL("select contest_id from {}").format(result_sets))
+    )
     return [
         *empty,
         (
@@ -280,6 +291,7 @@ def _accounting(stage: Stage) -> list[tuple[str, sql.Composed]]:
 def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
     if "outcome" not in stage.tables:
         return []
+    outcomes = stage.staged("outcome")
     members = (
         [
             (
@@ -293,7 +305,7 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                from m join {outcomes} w on w.result_set_id = m.result_set_id and w.option_id = m.option_id
                  and w.candidacy_id is null and w.seats is not null
                where m.members > w.seats"""
-                ).format(outcomes=stage.staged("outcome")),
+                ).format(outcomes=outcomes),
             ),
             (
                 "outcomes.member_off_list",
@@ -301,7 +313,15 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                     """select o.option_id, o.result_set_id, jsonb_build_object('kind', p.kind, 'candidacy', o.candidacy_id)
                from {outcomes} o join {options} p on p.id = o.option_id
                where o.candidacy_id is not null and p.kind not in ('list', 'independents', 'others')"""
-                ).format(outcomes=stage.staged("outcome"), options=stage.either("contest_option", "id", "kind")),
+                ).format(
+                    outcomes=outcomes,
+                    options=stage.either(
+                        "contest_option",
+                        "id",
+                        "kind",
+                        among=("id", sql.SQL("select distinct option_id from {}").format(outcomes)),
+                    ),
+                ),
             ),
         ]
         if "candidacy_id" in stage.tables["outcome"]
@@ -309,45 +329,71 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
     )
     if "result_value" not in stage.tables:
         return members
+    result_sets = stage.either(
+        "result_set", "id", "contest_id", among=("id", sql.SQL("select result_set_id from {}").format(outcomes))
+    )
     return [
         *members,
         (
             "outcomes.winner",
             sql.SQL(
-                """with t as (
-                     select v.result_set_id, coalesce(p.parent_option_id, v.option_id) as option_id,
-                            sum(v.value) as votes
-                     from {facts} v left join {options} p on p.id = v.option_id
-                     where v.measure = 1 and v.count_round = 0 and v.option_id is not null group by 1, 2
+                """with w as materialized (
+                     select o.option_id, o.result_set_id, s.rules ->> 'formula' as formula
+                     from {outcomes} o
+                     join {result_sets} r on r.id = o.result_set_id
+                     join {contests} c on c.id = r.contest_id
+                     left join {systems} s on s.id = c.electoral_system_id
+                     where o.kind in ('elected', 'won') and c.magnitude = 1 and s.rules ->> 'formula' is distinct from 'irv'
                    ),
-                   m as (
-                     select t.result_set_id, max(t.votes) as top from t join {options} p on p.id = t.option_id
+                   f as materialized (
+                     select v.result_set_id, v.option_id, v.value from {facts} v
+                     where v.measure = 1 and v.count_round = 0 and v.option_id is not null
+                       and v.result_set_id in (select result_set_id from w)
+                   ),
+                   t as materialized (
+                     select f.result_set_id, coalesce(p.parent_option_id, f.option_id) as option_id, sum(f.value) as votes
+                     from f left join {options} p on p.id = f.option_id group by 1, 2
+                   ),
+                   m as materialized (
+                     select t.result_set_id, max(t.votes) as top from t join {kinds} p on p.id = t.option_id
                      where p.kind not in ('others', 'independents', 'none_of_the_above', 'uncommitted')
                        and (p.kind <> 'write_in' or exists (select from {candidacies} x where x.option_id = t.option_id))
-                       and not exists (select from {outcomes} w where w.result_set_id = t.result_set_id
-                                       and w.option_id = t.option_id and w.kind = 'withdrew')
+                       and not exists (select from {outcomes} o where o.result_set_id = t.result_set_id
+                                       and o.option_id = t.option_id and o.kind = 'withdrew')
                      group by 1
                    ),
-                   n as (select result_set_id, sum(votes) as total from t group by 1)
-                   select o.option_id, o.result_set_id, jsonb_build_object('votes', t.votes, 'top', m.top)
-                   from {outcomes} o
-                   join {result_sets} r on r.id = o.result_set_id
-                   join {contests} c on c.id = r.contest_id
-                   left join {systems} s on s.id = c.electoral_system_id
-                   join m on m.result_set_id = o.result_set_id
-                   join n on n.result_set_id = o.result_set_id
-                   left join t on t.result_set_id = o.result_set_id and t.option_id = o.option_id
-                   where o.kind in ('elected', 'won') and c.magnitude = 1 and t.votes is distinct from m.top
-                     and s.rules ->> 'formula' is distinct from 'irv'
-                     and not (s.rules ->> 'formula' = 'contingent' and m.top * 2 <= n.total)"""
+                   n as materialized (select result_set_id, sum(votes) as total from t group by 1)
+                   select w.option_id, w.result_set_id, jsonb_build_object('votes', t.votes, 'top', m.top)
+                   from w
+                   join m on m.result_set_id = w.result_set_id
+                   join n on n.result_set_id = w.result_set_id
+                   left join t on t.result_set_id = w.result_set_id and t.option_id = w.option_id
+                   where t.votes is distinct from m.top
+                     and not (w.formula = 'contingent' and m.top * 2 <= n.total)"""
             ).format(
-                facts=stage.staged("result_value"),
-                options=stage.either("contest_option", "id", "parent_option_id", "kind"),
-                candidacies=stage.either("candidacy", "id", "option_id"),
-                outcomes=stage.staged("outcome"),
-                result_sets=stage.either("result_set", "id", "contest_id"),
-                contests=stage.either("contest", "id", "magnitude", "electoral_system_id"),
+                outcomes=outcomes,
+                result_sets=result_sets,
+                contests=stage.either(
+                    "contest",
+                    "id",
+                    "magnitude",
+                    "electoral_system_id",
+                    among=("id", sql.SQL("select contest_id from {}").format(result_sets)),
+                ),
                 systems=stage.either("electoral_system", "id", "rules"),
+                facts=stage.staged("result_value"),
+                options=stage.either(
+                    "contest_option",
+                    "id",
+                    "parent_option_id",
+                    among=("id", sql.SQL("select distinct option_id from f")),
+                ),
+                kinds=stage.either(
+                    "contest_option", "id", "kind", among=("id", sql.SQL("select distinct option_id from t"))
+                ),
+                candidacies=stage.either(
+                    "candidacy", "id", "option_id", among=("option_id", sql.SQL("select distinct option_id from t"))
+                ),
             ),
         ),
     ]
@@ -419,7 +465,16 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                             column=sql.Literal(column),
                             facts=stage.staged(table),
                             key=sql.Identifier(column),
-                            targets=stage.either(KEYS[column], "id"),
+                            targets=stage.either(
+                                KEYS[column],
+                                "id",
+                                among=(
+                                    "id",
+                                    sql.SQL("select distinct {} from {}").format(
+                                        sql.Identifier(column), stage.staged(table)
+                                    ),
+                                ),
+                            ),
                         ),
                     )
                 )
@@ -499,7 +554,12 @@ def _kinds(stage: Stage) -> list[tuple[str, sql.Composed]]:
                    where not exists (select from {schemes} s where s.code = a.scheme_code and s.kinds ? k.kind)"""
             ).format(
                 kinds=stage.staged("area_kind"),
-                areas=stage.either("area", "id", "scheme_code"),
+                areas=stage.either(
+                    "area",
+                    "id",
+                    "scheme_code",
+                    among=("id", sql.SQL("select area_id from {}").format(stage.staged("area_kind"))),
+                ),
                 schemes=stage.either("scheme", "code", "kinds"),
             ),
         )
@@ -617,7 +677,17 @@ def _memberships(stage: Stage) -> list[tuple[str, sql.Composed]]:
                                      where (f.party_id, f.parent_party_id) in ((o.party_id, o.other), (o.other, o.party_id)))"""
             ).format(
                 staged=stage.staged("person_party_membership"),
-                either=stage.either("person_party_membership", "person_id", "party_id", "valid_from", "valid_to"),
+                either=stage.either(
+                    "person_party_membership",
+                    "person_id",
+                    "party_id",
+                    "valid_from",
+                    "valid_to",
+                    among=(
+                        "person_id",
+                        sql.SQL("select person_id from {}").format(stage.staged("person_party_membership")),
+                    ),
+                ),
             ),
         )
     ]
@@ -627,16 +697,22 @@ def _founding(stage: Stage) -> list[tuple[str, sql.Composed]]:
     founded = """(select p.id as party_id, coalesce(f.date, n.day) as day
                    from public.party p
                    left join public.party_founding f on f.party_id = p.id
-                   left join (select entity_id, min(valid_from) as day from public.name
-                              where valid_from is not null group by 1) n
-                     on n.entity_id = p.id
-                     and not exists (select from public.name o where o.entity_id = p.id and o.valid_from is null)
-                   where coalesce(f.date, n.day) is not null
+                   left join lateral (select min(valid_from) as day from public.name
+                                      where entity_id = p.id and valid_from is not null
+                                        and not exists (select from public.name o
+                                                        where o.entity_id = p.id and o.valid_from is null)) n on true
+                   where p.id in (select party_id from {staged}) and coalesce(f.date, n.day) is not null
                      and not exists (select from public.party_relation r
                                      where p.id in (r.from_party_id, r.to_party_id)
                                        and r.kind in ('successor_of', 'refounded_as', 'split_from', 'merged_into')))"""
     queries: list[tuple[str, sql.Composed]] = []
     if {"party_id", "contest_id"} <= set(stage.tables.get("contest_option", [])):
+        contests = stage.either(
+            "contest",
+            "id",
+            "election_id",
+            among=("id", sql.SQL("select contest_id from {}").format(stage.staged("contest_option"))),
+        )
         queries.append(
             (
                 "party.before_founding",
@@ -649,9 +725,14 @@ def _founding(stage: Stage) -> list[tuple[str, sql.Composed]]:
                        where e.date_from < f.day"""
                 ).format(
                     options=stage.staged("contest_option"),
-                    contests=stage.either("contest", "id", "election_id"),
-                    elections=stage.either("election", "id", "date_from"),
-                    founded=sql.SQL(founded),
+                    contests=contests,
+                    elections=stage.either(
+                        "election",
+                        "id",
+                        "date_from",
+                        among=("id", sql.SQL("select election_id from {}").format(contests)),
+                    ),
+                    founded=sql.SQL(founded).format(staged=stage.staged("contest_option")),
                 ),
             )
         )
@@ -663,7 +744,10 @@ def _founding(stage: Stage) -> list[tuple[str, sql.Composed]]:
                     """select a.tenure_id, null::uuid, jsonb_build_object('party', a.party_id, 'founded', f.day, 'from', a.valid_from)
                        from {staged} a join {founded} f on f.party_id = a.party_id
                        where a.valid_from < f.day"""
-                ).format(staged=stage.staged("tenure_affiliation"), founded=sql.SQL(founded)),
+                ).format(
+                    staged=stage.staged("tenure_affiliation"),
+                    founded=sql.SQL(founded).format(staged=stage.staged("tenure_affiliation")),
+                ),
             )
         )
     return queries
@@ -794,7 +878,12 @@ def _capitals(stage: Stage) -> list[tuple[str, sql.Composed]]:
                      where w[1] ~ '^[[:upper:]]{{3,}}$' and w[1] <> all({known}))"""
             ).format(
                 names=stage.staged("name"),
-                entities=stage.either("entity", "id", "type"),
+                entities=stage.either(
+                    "entity",
+                    "id",
+                    "type",
+                    among=("id", sql.SQL("select entity_id from {}").format(stage.staged("name"))),
+                ),
                 known=sql.Literal(sorted(ACRONYMS | ROMAN)),
             ),
         )
@@ -924,22 +1013,8 @@ def _figures(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
-def run(conn: Connection, stage: Stage) -> list[Finding]:
-    findings: list[Finding] = []
-    if "electoral_system" in stage.tables:
-        for system, rules in conn.execute(sql.SQL("select id, rules from {}").format(stage.staged("electoral_system"))):
-            error = best_match(RULES.iter_errors(rules))
-            if error is not None:
-                findings.append(
-                    Finding(
-                        "rules.schema",
-                        "error",
-                        system,
-                        None,
-                        {"path": list(error.absolute_path), "message": error.message},
-                    )
-                )
-    for code, query in [
+def queries(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
+    return [
         *_references(conn, stage),
         *_accounting(stage),
         *_outcomes(stage),
@@ -955,7 +1030,36 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_held_translations(stage),
         *_cadence(stage),
         *_figures(stage),
-    ]:
+    ]
+
+
+def run(conn: Connection, stage: Stage) -> list[Finding]:
+    findings: list[Finding] = []
+    if "electoral_system" in stage.tables:
+        for system, rules in conn.execute(sql.SQL("select id, rules from {}").format(stage.staged("electoral_system"))):
+            error = best_match(RULES.iter_errors(rules))
+            if error is not None:
+                findings.append(
+                    Finding(
+                        "rules.schema",
+                        "error",
+                        system,
+                        None,
+                        {"path": list(error.absolute_path), "message": error.message},
+                    )
+                )
+    changeset = UUID(stage.schema.removeprefix("cs_"))
+    (previous,) = conn.execute("select current_setting('statement_timeout')").fetchone() or ("0",)
+    for code, query in queries(conn, stage):
+        conn.execute("select set_config('statement_timeout', %s, true)", [TIMEOUT])
+        started = time.monotonic()
+        try:
+            rows = conn.execute(query).fetchall()
+        except errors.QueryCanceled as error:
+            raise TimeoutError(f"check {code} on changeset {changeset} ran over {TIMEOUT}") from error
+        finally:
+            print(f"check {code}: {time.monotonic() - started:.1f}s", file=sys.stderr, flush=True)
+        conn.execute("select set_config('statement_timeout', %s, true)", [previous])
         findings.extend(
             Finding(
                 code,
@@ -966,7 +1070,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
                 result_set_id,
                 details,
             )
-            for entity_id, result_set_id, details in conn.execute(query).fetchall()
+            for entity_id, result_set_id, details in rows
         )
     return findings
 
