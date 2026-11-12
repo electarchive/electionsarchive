@@ -7975,6 +7975,24 @@ def contest_rows(conn, states: set[str]) -> dict[str, list[tuple[str, str]]]:
     return rows
 
 
+def sitting(conn, state: str) -> tuple[dict[frozenset[str], str], set[str]]:
+    races: dict[frozenset[str], list[str]] = defaultdict(list)
+    for tail, names in conn.execute(
+        """select regexp_replace(x.value, '^[0-9-]+:', ''), array_agg(coalesce(ca.ballot_name, o.ballot_label))
+           from external_id x join contest co on co.id = x.entity_id join entity e on e.id = co.id and e.retired_by is null
+           join changeset c on c.id = co.changeset_id and c.pipeline = %s
+           join contest_option o on o.contest_id = co.id
+           join candidacy ca on ca.option_id = o.id join entity ce on ce.id = ca.id and ce.retired_by is null
+           where x.scheme = 'us.contest' and x.value ~ %s
+           group by 1""",
+        [SOURCE, f"^{DAY}:({'CA|ceda' if state == 'CA' else state}):"],
+    ).fetchall():
+        races[frozenset(slug(name) for name in names if name)].append(tail)
+    return {names: tails[0] for names, tails in races.items() if len(tails) == 1}, {
+        tail for tails in races.values() for tail in tails
+    }
+
+
 def resolve(
     state: str, wanted: set[tuple[str, str]], rows: list[tuple[str, str]], places: dict[str, frozenset[str]]
 ) -> dict[tuple[str, str], tuple[str, str]]:
@@ -11341,6 +11359,7 @@ def parse() -> None:
             conn, {key.split("-")[0] for key in feeds if STATES is None or key.split("-")[0] in STATES}
         )
         places_named = place_words(conn)
+        held_races: dict[str, tuple[dict[frozenset[str], str], set[str]]] = {}
         for key, found in feeds.items():
             state = key.split("-")[0]
             if STATES is not None and state not in STATES:
@@ -11383,6 +11402,25 @@ def parse() -> None:
                 state_rows[state],
                 places_named,
             )
+            if state not in held_races:
+                held_races[state] = sitting(conn, state)
+            people: dict[tuple[str, str], set[str]] = defaultdict(set)
+            for row in found:
+                if row.get("tail") is None and not row.get("mint"):
+                    people[(str(row["fips"]), str(row["contest"]))].add(slug(str(row["name"])))
+            pooled = {tail for tail, _ in state_rows[state]}
+            for wanted_key, names in people.items():
+                kept = held_races[state][0].get(frozenset(names))
+                if (
+                    kept
+                    and wanted_key in tails
+                    and tails[wanted_key][1] not in held_races[state][1]
+                    and kept.split(":")[0] != tails[wanted_key][1].split(":")[0]
+                ):
+                    if kept in pooled:
+                        tails[wanted_key] = (kept, kept)
+                    else:
+                        del tails[wanted_key]
             used: dict[str, str] = {}
             missed: set[str] = set()
             for row in [row for row in found if row.get("district")]:
@@ -13300,6 +13338,8 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                 and system in plurality.values()
             ):
                 system = plurality[magnitude > 1]
+            if state in ("CA", "ceda") and magnitude == 1 and system == cs.key("us.electoral_system", "two_round"):
+                system = plurality[False]
             if state == "LA" and magnitude is not None:
                 system = cs.key("us.electoral_system", "two_round") if magnitude == 1 else plurality[True]
             election_feeds.setdefault(elections[claim], set()).add(str(group["feed"][0]))
