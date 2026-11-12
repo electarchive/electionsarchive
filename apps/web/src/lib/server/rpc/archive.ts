@@ -548,7 +548,7 @@ const sistersTogether = together(
         cross join lateral (
           select o.id, o.party_id from contest_option o where o.contest_id = t.id and o.party_id is not null offset 0
         ) o
-        left join entity_merge pm on pm.entity_id = o.party_id
+        left join lateral (select m.into_id from entity_merge m where m.entity_id = o.party_id offset 0) pm on true
         left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
           and b.kind = 'regional_branch' and b.valid @> ${day}::date
         left join entity_merge bm on bm.entity_id = b.parent_party_id
@@ -1147,6 +1147,7 @@ const datedTogether = together(
         select o.id, o.date_from, o.polity_id from election o
         where n.text ~ '^[0-9]' and o.id = n.entity_id and o.date_precision = 'day'
           and n.text like extract(year from o.date_from)::int || ' %'
+        limit 1
       ) e on true
       left join lateral (
         select e.date_from as date
