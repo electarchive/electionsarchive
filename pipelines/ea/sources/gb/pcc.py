@@ -76,6 +76,11 @@ BY_ELECTIONS = {"2014-08-21", "2014-10-30", "2021-08-19", "2021-11-25"}
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED = 1, 2, 3, 4, 5, 21
 MEASURES = {"REJECTED": INVALID, "ELECTORATE": REGISTERED, "BALLOTS": BALLOTS}
 READ_FROM_IMAGE = {
+    "https://elections.shropshire.gov.uk/media/akafqaez/form-4.pdf",
+    "https://www.cheshireeast.gov.uk/pdf/council-and-democracy/cheshire-police-and-crime-panel/police-and-crime-commissioner-elections-2021.pdf",
+    "https://web.archive.org/web/20251211091950/https://www.avonpccelection.org.uk/sites/default/files/Summary%20of%20Stage%201%20Count%20Results.pdf",
+    "https://web.archive.org/web/20251211091950/https://www.avonpccelection.org.uk/sites/default/files/Final%20Stage%202%20PCC%20Summary%20Count%20Results.pdf",
+    "https://web.archive.org/web/2024/https://www.southampton.gov.uk/media/tykfhwqf/result-of-first-count.pdf",
     "https://web.archive.org/web/20211201233647/https://www.staffsmoorlands.gov.uk/media/6574/Declaration-of-Result---Staffordshire-Police-Fire-and-Crime-Commissioner/pdf/Declaration_of_Result_PFCC.pdf",
     "https://www.newcastle-staffs.gov.uk/downloads/file/2230/declaration-of-result-staffordshire-police-area",
 }
@@ -90,6 +95,8 @@ PARTIES: dict[str, str | None] = cauth.PARTIES | {
     "Labour": "Labour Party",
     "Liberal Democrat": "Liberal Democrats",
     "UKIP": "UK Independence Party",
+    "Workers Party": "Workers Party of Britain",
+    "Propel; Wales Needs Champions / Propel: Mae Cymru Angen Pencampwyr": "Propel",
     "English Democrat": "English Democrats",
 }
 DESCRIPTIONS = (
@@ -317,7 +324,7 @@ def emit() -> Path:
                         )
                 else:
                     text = html.unescape(re.sub(r"<[^>]+>", " ", path.read_text(errors="replace")))
-                printed_cache[url] = set(re.findall(r"\d+", re.sub(r"(?<=\d)[,.](?=\d{3}\b)", "", text)))
+                printed_cache[url] = set(re.findall(r"\d+", re.sub(r"(?<=\d)[,.] ?(?=\d{3}\b)", "", text)))
             return printed_cache[url]
 
         units: dict[str, UUID] = {}
@@ -369,7 +376,11 @@ def emit() -> Path:
                     figures[MEASURES[row["printed"]]] = (value, row["source"])
                     continue
                 shown = row["round2"] or row["second"]
-                if shown and shown not in printed(row["source2"] or row["source"]):
+                if (
+                    shown
+                    and (row["source2"] or row["source"]) not in READ_FROM_IMAGE
+                    and shown not in printed(row["source2"] or row["source"])
+                ):
                     raise ValueError(
                         f"{day} {code}: {row['printed']} {shown} not printed in {row['source2'] or row['source']}"
                     )
