@@ -14507,9 +14507,9 @@ async function universe(
         cross join peers r
         where (r.party_scope_id is null or r.party_scope_id = b.party_scope_id)
         group by r.district_area_id
+        having exists (select from area_geometry g where g.area_id = r.district_area_id and g.valid @> ${day}::date)
       ) r
       join area a on a.id = r.district_area_id and a.scheme_code = ${level}
-      where exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
     ),
     up(start, id, depth) as (
       select id, id, 0 from candidate
@@ -15174,6 +15174,7 @@ export async function races(
       isCounted: boolean;
       isVoting: boolean;
       isRunoff: boolean;
+      isLocal: boolean;
       previous: string | null;
       party: string | null;
       runoffs: Array<string>;
@@ -15230,7 +15231,7 @@ export async function races(
           select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
         ))) and coalesce(st.voting, true) as "isCounted",
         coalesce(st.voting, true) as "isVoting",
-        e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
+        e.kind = 'runoff' as "isRunoff", e.kind = 'local' as "isLocal", c.previous_round_id as previous, c.party_scope_id as party,
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
         a.id as area, a.k, c.magnitude, a.scheme_code as scheme, sc.noun,
@@ -15505,6 +15506,22 @@ export async function races(
                 };
               })(),
         ]);
+      const size = isInside
+        ? group.filter((row) => row.isCounted).length
+        : (head?.size ?? null);
+      const isTier =
+        head?.body != null &&
+        (head.round ?? 1) === 1 &&
+        (head.kind === "body_seats" || head.kind === "list_allocation") &&
+        groups.some(
+          (other) =>
+            other[0]?.body === head.body &&
+            other[0].election === head.election &&
+            (other[0].round ?? 1) === 1 &&
+            other[0].kind !== head.kind &&
+            (other[0].kind === "body_seats" ||
+              other[0].kind === "list_allocation"),
+        );
       const [
         totals,
         [grid, table],
@@ -15513,6 +15530,8 @@ export async function races(
         [credited, creditNames],
         returned,
         repeated,
+        drafted,
+        outgoing,
       ] = await Promise.all([
         load(
           voting.length > 0 ? voting : roots,
@@ -15651,6 +15670,205 @@ export async function races(
               group by cy.person_id, 1
               having count(distinct c.id) > 1
               order by 2
+            `),
+        single != null ||
+        first?.scheme == null ||
+        districts.length < 2 ||
+        isBrief ||
+        isThin ||
+        isPrimaries
+          ? null
+          : sketch(
+              place,
+              first.scheme,
+              day,
+              districts.map((row) => row.k ?? 0),
+              undefined,
+              head?.id ?? null,
+            ),
+        isBrief ||
+        date == null ||
+        size == null ||
+        head?.owner == null ||
+        head.isOffice
+          ? null
+          : db.execute<{
+              party: string | null;
+              seats: number;
+              doubt: number;
+              notional: boolean;
+              size: number | null;
+              day: string | null;
+            }>(sql`
+              with recursive last as (
+                select max(e.date_from) as day
+                from contest c join election e on e.id = c.election_id
+                where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
+                  and c.allocation_parent_id is null and c.party_scope_id is null
+                  and e.kind = ${head.isLocal ? "local" : "general"}::election_kind and e.date_from < ${date}::date - 120
+              ),
+              nwin as materialized (
+                select o.id, o.contest_id as contest, o.party_id
+                from contest nc
+                join election ne on ne.id = nc.election_id
+                join area na on na.id = nc.district_area_id
+                join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
+                cross join lateral (
+                  select o.id, o.contest_id, o.party_id from contest_option o
+                  cross join lateral (
+                    select sum(y.value) as value from result_rollup y
+                    where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
+                      and y.measure = 1 and y.count_round = 0 offset 0
+                  ) y
+                  where o.contest_id = nc.id and y.value is not null
+                  order by y.value desc limit 1
+                ) o
+                where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
+                  and ne.date_from between (select day from last) - 200 and (select day from last)
+              ),
+              roots as (
+                select c.id, not ${isInside} or ${inside(polity, sql`c.district_area_id`, sql`e.date_from`)} as inside,
+                  (select count(*) from area_parent ap where ap.area_id = c.district_area_id and ap.valid @> e.date_from) as parents
+                from contest c join election e on e.id = c.election_id
+                left join seat st on st.id = c.seat_id
+                where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
+                  and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = ${head.isLocal ? "local" : "general"}::election_kind
+                  and c.notional = exists (
+                    select from contest nc join election ne on ne.id = nc.election_id
+                    where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
+                      and ne.date_from between (select day from last) - 200 and (select day from last)
+                      and nc.district_area_id in (select k.district_area_id from contest k where k.election_id = ${head.election}::uuid)
+                  )
+                  and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+                    select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+                  ))) and coalesce(st.voting, true)
+                  and e.date_from between (select day from last) - 200 and (select day from last)
+                  and not exists (
+                    select from contest pc join election pe on pe.id = pc.election_id
+                    where pc.id = c.previous_round_id and pe.kind = ${head.isLocal ? "local" : "general"}::election_kind
+                  )
+              ),
+              tree(id) as (
+                select id from roots where inside
+                union all
+                select c.id from contest c join roots r on c.previous_round_id = r.id and r.inside
+                union all
+                select c.id from contest c join tree on c.allocation_parent_id = tree.id
+              ),
+              winners as materialized (
+                select o.id, o.contest_id as contest, coalesce(o.party_id, (
+                    select coalesce(
+                      (select min(cn.party_id::text)::uuid from candidacy_nomination cn
+                        where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
+                      cy.member_of_party_id
+                    )
+                    from candidacy cy where cy.option_id = o.id and cy.role = 'head' and o.alliance_id is not null
+                    limit 1
+                  )) as party_id, max(coalesce(x.seats, 1)) as seats
+                from tree t
+                join contest_option o on o.contest_id = t.id
+                cross join lateral (
+                  select x.seats from outcome x
+                  join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                  where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                  offset 0
+                ) x
+                where not exists (select from contest k where k.allocation_parent_id = t.id)
+                  and not (o.kind = 'candidate' and o.parent_option_id is not null and exists (
+                    select from contest_option l
+                    join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
+                    join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
+                    where l.contest_id = o.contest_id and l.kind = 'list'
+                  ) and (o.party_id is null or exists (
+                    select from contest_option l where l.id = o.parent_option_id and l.party_id is not null
+                  )))
+                  and not (o.kind = 'list' and o.party_id is null and exists (
+                    select from contest_option ch
+                    join outcome cx on cx.option_id = ch.id and cx.kind in ('elected', 'won') and cx.candidacy_id is null
+                    join result_set cr on cr.id = cx.result_set_id and ${latest("cr")}
+                    where ch.parent_option_id = o.id and ch.kind = 'candidate' and ch.party_id is not null
+                  ))
+                group by o.id, o.contest_id, o.party_id
+                union all
+                select n.id, n.contest, n.party_id, 1 from nwin n where n.contest in (select id from tree)
+              ),
+              sized as (
+                select z.seats from body_size z
+                where z.body_id = ${head.owner}::uuid and z.valid && daterange((select day from last), (select day from last) + 120)
+                order by lower(z.valid) desc limit 1
+              ),
+              counted as (
+                select w.* from winners w
+                where (select k.kind from contest k where k.id = w.contest) is distinct from 'body_seats'
+                  or (
+                    select coalesce(sum(l.seats), 0) from winners l
+                    join contest lc on lc.id = l.contest and lc.kind = 'list_allocation'
+                  ) < 0.9 * coalesce((select seats from sized), 0)
+              ),
+              leads as (
+                select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
+                from winners w
+                join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id and ch.party_id is not null
+                join contest lc on lc.id = ch.contest_id
+                join election le on le.id = lc.election_id
+                left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
+                join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
+                join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
+                cross join lateral (
+                  select max(y.value) as value from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
+                ) y
+                where w.party_id is null and y.value is not null
+                order by ch.parent_option_id, y.value desc
+              ),
+              now as materialized (
+                select distinct coalesce(m.into_id, o.party_id) as party
+                from contest c
+                join contest_option o on o.contest_id = c.id and o.party_id is not null
+                left join entity_merge m on m.entity_id = o.party_id
+                join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                where c.election_id = ${head.election}::uuid and (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
+              )
+              select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
+                sum(w.seats)::int as seats,
+                (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt,
+                exists (select from roots r join contest n on n.id = r.id where n.notional) as notional,
+                (select seats from sized) as size,
+                (select day::text from last) as day
+              from counted w
+              left join leads ld on ld.parent = w.id
+              left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+              left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
+                and br.kind = 'regional_branch' and br.valid @> (select day from last)
+              left join entity_merge bm on bm.entity_id = br.parent_party_id
+              left join lateral (
+                select n.party from party_relation r
+                cross join lateral (
+                  select case when r.kind in ('successor_of', 'list_vehicle_for') then r.to_party_id else r.from_party_id end as old,
+                    case when r.kind in ('successor_of', 'list_vehicle_for') then r.from_party_id else r.to_party_id end as new
+                ) d
+                left join entity_merge nm on nm.entity_id = d.new
+                cross join lateral (select coalesce(nm.into_id, d.new) as party) n
+                where (
+                    (r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+                      and r.date > (select day from last) and r.date <= ${date}::date + 365)
+                    or (r.kind = 'list_vehicle_for' and r.election_id = ${head.election}::uuid)
+                  )
+                  and d.old = coalesce(pm.into_id, w.party_id, ld.party_id)
+                  and n.party in (select party from now)
+                  and coalesce(pm.into_id, w.party_id, ld.party_id) not in (select party from now)
+                limit 1
+              ) lin on true
+              group by 1
+              union all
+              select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0, false, null::int, null::text
+              from tree t
+              join contest_option o on o.contest_id = t.id and o.party_id is not null
+              left join entity_merge pm on pm.entity_id = o.party_id
+              left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+                and br.kind = 'regional_branch' and br.valid @> (select day from last)
+              left join entity_merge bm on bm.entity_id = br.parent_party_id
             `),
       ]);
       const direct = totals.get(place.k);
@@ -15824,223 +16042,20 @@ export async function races(
       for (const row of results) {
         filled += row.seats ?? 0;
       }
-      const size = isInside
-        ? group.filter((row) => row.isCounted).length
-        : (head?.size ?? null);
-      const isTier =
-        head?.body != null &&
-        (head.round ?? 1) === 1 &&
-        (head.kind === "body_seats" || head.kind === "list_allocation") &&
-        groups.some(
-          (other) =>
-            other[0]?.body === head.body &&
-            other[0].election === head.election &&
-            (other[0].round ?? 1) === 1 &&
-            other[0].kind !== head.kind &&
-            (other[0].kind === "body_seats" ||
-              other[0].kind === "list_allocation"),
-        );
-      const [map, previous, runoff, seated, asked, wards, field, earlier] =
+      const previous =
+        size != null && !isTier && filled < size * 0.9 ? null : outgoing;
+      const [sketched, runoff, seated, asked, wards, field, earlier] =
         await Promise.all([
-          level == null || isBrief || isThin || isPrimaries
+          single == null || level == null || isBrief || isThin || isPrimaries
             ? null
             : sketch(
                 place,
                 level,
                 day,
-                (table ?? grid)?.rows.map((row) => row.k) ?? [],
+                grid?.rows.map((row) => row.k) ?? [],
                 grid?.districts?.map((row) => row.k),
                 head?.id ?? null,
               ),
-          isBrief ||
-          date == null ||
-          size == null ||
-          head?.owner == null ||
-          head.isOffice ||
-          (!isTier && filled < size * 0.9)
-            ? null
-            : db.execute<{
-                party: string | null;
-                seats: number;
-                doubt: number;
-                notional: boolean;
-                size: number | null;
-                day: string | null;
-              }>(sql`
-                with recursive same as (
-                  select case when x.kind = 'local' then 'local' else 'general' end::election_kind as kind
-                  from election x where x.id = ${head.election}::uuid
-                ),
-                last as (
-                  select max(e.date_from) as day
-                  from contest c join election e on e.id = c.election_id
-                  where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
-                    and c.allocation_parent_id is null and c.party_scope_id is null
-                    and e.kind = (select kind from same) and e.date_from < ${date}::date - 120
-                ),
-                nwin as materialized (
-                  select o.id, o.contest_id as contest, o.party_id
-                  from contest nc
-                  join election ne on ne.id = nc.election_id
-                  join area na on na.id = nc.district_area_id
-                  join result_set rs on rs.contest_id = nc.id and rs.is_default and rs.stage = 'notional'
-                  cross join lateral (
-                    select o.id, o.contest_id, o.party_id from contest_option o
-                    cross join lateral (
-                      select sum(y.value) as value from result_rollup y
-                      where y.result_set_k = rs.k and y.area_k = na.k and y.option_k = o.k
-                        and y.measure = 1 and y.count_round = 0 offset 0
-                    ) y
-                    where o.contest_id = nc.id and y.value is not null
-                    order by y.value desc limit 1
-                  ) o
-                  where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
-                    and ne.date_from between (select day from last) - 200 and (select day from last)
-                ),
-                roots as (
-                  select c.id, not ${isInside} or ${inside(polity, sql`c.district_area_id`, sql`e.date_from`)} as inside,
-                    (select count(*) from area_parent ap where ap.area_id = c.district_area_id and ap.valid @> e.date_from) as parents
-                  from contest c join election e on e.id = c.election_id
-                  left join seat st on st.id = c.seat_id
-                  where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
-                    and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = (select kind from same)
-                    and c.notional = exists (
-                      select from contest nc join election ne on ne.id = nc.election_id
-                      where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
-                        and ne.date_from between (select day from last) - 200 and (select day from last)
-                        and nc.district_area_id in (select k.district_area_id from contest k where k.election_id = ${head.election}::uuid)
-                    )
-                    and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
-                      select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
-                    ))) and coalesce(st.voting, true)
-                    and e.date_from between (select day from last) - 200 and (select day from last)
-                    and not exists (
-                      select from contest pc join election pe on pe.id = pc.election_id
-                      where pc.id = c.previous_round_id and pe.kind = (select kind from same)
-                    )
-                ),
-                tree(id) as (
-                  select id from roots where inside
-                  union all
-                  select c.id from contest c join roots r on c.previous_round_id = r.id and r.inside
-                  union all
-                  select c.id from contest c join tree on c.allocation_parent_id = tree.id
-                ),
-                winners as materialized (
-                  select o.id, o.contest_id as contest, coalesce(o.party_id, (
-                      select coalesce(
-                        (select min(cn.party_id::text)::uuid from candidacy_nomination cn
-                          where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
-                        cy.member_of_party_id
-                      )
-                      from candidacy cy where cy.option_id = o.id and cy.role = 'head' and o.alliance_id is not null
-                      limit 1
-                    )) as party_id, max(coalesce(x.seats, 1)) as seats
-                  from tree t
-                  join contest_option o on o.contest_id = t.id
-                  cross join lateral (
-                    select x.seats from outcome x
-                    join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-                    where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                    offset 0
-                  ) x
-                  where not exists (select from contest k where k.allocation_parent_id = t.id)
-                    and not (o.kind = 'candidate' and o.parent_option_id is not null and exists (
-                      select from contest_option l
-                      join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
-                      join result_set lr on lr.id = lx.result_set_id and ${latest("lr")}
-                      where l.contest_id = o.contest_id and l.kind = 'list'
-                    ) and (o.party_id is null or exists (
-                      select from contest_option l where l.id = o.parent_option_id and l.party_id is not null
-                    )))
-                    and not (o.kind = 'list' and o.party_id is null and exists (
-                      select from contest_option ch
-                      join outcome cx on cx.option_id = ch.id and cx.kind in ('elected', 'won') and cx.candidacy_id is null
-                      join result_set cr on cr.id = cx.result_set_id and ${latest("cr")}
-                      where ch.parent_option_id = o.id and ch.kind = 'candidate' and ch.party_id is not null
-                    ))
-                  group by o.id, o.contest_id, o.party_id
-                  union all
-                  select n.id, n.contest, n.party_id, 1 from nwin n where n.contest in (select id from tree)
-                ),
-                sized as (
-                  select z.seats from body_size z
-                  where z.body_id = ${head.owner}::uuid and z.valid && daterange((select day from last), (select day from last) + 120)
-                  order by lower(z.valid) desc limit 1
-                ),
-                counted as (
-                  select w.* from winners w
-                  where (select k.kind from contest k where k.id = w.contest) is distinct from 'body_seats'
-                    or (
-                      select coalesce(sum(l.seats), 0) from winners l
-                      join contest lc on lc.id = l.contest and lc.kind = 'list_allocation'
-                    ) < 0.9 * coalesce((select seats from sized), 0)
-                ),
-                leads as (
-                  select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
-                  from winners w
-                  join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id and ch.party_id is not null
-                  join contest lc on lc.id = ch.contest_id
-                  join election le on le.id = lc.election_id
-                  left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
-                  join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
-                  join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-                  cross join lateral (
-                    select max(y.value) as value from result_rollup y
-                    where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
-                  ) y
-                  where w.party_id is null and y.value is not null
-                  order by ch.parent_option_id, y.value desc
-                ),
-                now as materialized (
-                  select distinct coalesce(m.into_id, o.party_id) as party
-                  from contest c
-                  join contest_option o on o.contest_id = c.id and o.party_id is not null
-                  left join entity_merge m on m.entity_id = o.party_id
-                  join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                  join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-                  where c.election_id = ${head.election}::uuid and (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
-                )
-                select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
-                  sum(w.seats)::int as seats,
-                  (select count(*)::int from roots where ${isInside} and parents <> 1) as doubt,
-                  exists (select from roots r join contest n on n.id = r.id where n.notional) as notional,
-                  (select seats from sized) as size,
-                  (select day::text from last) as day
-                from counted w
-                left join leads ld on ld.parent = w.id
-                left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
-                left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
-                  and br.kind = 'regional_branch' and br.valid @> (select day from last)
-                left join entity_merge bm on bm.entity_id = br.parent_party_id
-                left join lateral (
-                  select n.party from party_relation r
-                  cross join lateral (
-                    select case when r.kind in ('successor_of', 'list_vehicle_for') then r.to_party_id else r.from_party_id end as old,
-                      case when r.kind in ('successor_of', 'list_vehicle_for') then r.from_party_id else r.to_party_id end as new
-                  ) d
-                  left join entity_merge nm on nm.entity_id = d.new
-                  cross join lateral (select coalesce(nm.into_id, d.new) as party) n
-                  where (
-                      (r.kind in ('merged_into', 'absorbed_by', 'successor_of')
-                        and r.date > (select day from last) and r.date <= ${date}::date + 365)
-                      or (r.kind = 'list_vehicle_for' and r.election_id = ${head.election}::uuid)
-                    )
-                    and d.old = coalesce(pm.into_id, w.party_id, ld.party_id)
-                    and n.party in (select party from now)
-                    and coalesce(pm.into_id, w.party_id, ld.party_id) not in (select party from now)
-                  limit 1
-                ) lin on true
-                group by 1
-                union all
-                select distinct coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id), 0, 0, false, null::int, null::text
-                from tree t
-                join contest_option o on o.contest_id = t.id and o.party_id is not null
-                left join entity_merge pm on pm.entity_id = o.party_id
-                left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
-                  and br.kind = 'regional_branch' and br.valid @> (select day from last)
-                left join entity_merge bm on bm.entity_id = br.parent_party_id
-              `),
           sequel(group, isBrief, place.k, lineage),
           isBrief || filled === 0 || group.length < 2
             ? null
@@ -16466,7 +16481,7 @@ export async function races(
         }),
       );
       return {
-        map,
+        map: drafted ?? sketched,
         before,
         first:
           chain == null || chain.first === head?.id || chain.isPrimary
