@@ -9,13 +9,19 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import la_sos, medsl
+from ea.sources.us import la_congress, la_sos, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.la_federal"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [
+    date(1982, 9, 11),
+    date(1984, 9, 29),
+    date(1986, 9, 27),
+    date(1988, 10, 1),
+    date(1988, 11, 8),
+    date(1990, 10, 6),
     date(1992, 10, 3),
     date(1992, 11, 3),
     date(1994, 10, 1),
@@ -39,6 +45,7 @@ DAYS = [
     date(2020, 7, 11),
     date(2020, 12, 5),
 ]
+ACCEPTED = frozenset({"1982-09-11:LA:house:6", "1990-10-06:LA:house:5"})
 
 
 def names() -> list[str]:
@@ -78,11 +85,14 @@ def parse() -> None:
         ]
     if len(fips) != 64:
         raise ValueError("Louisiana needs 64 parishes")
+    chained = set(pl.read_parquet(la_congress.PARSED / "lines.parquet").select("day", "chamber").iter_rows())
     rows = []
     for day in DAYS:
         wanted = {}
         for race in la_sos.many((read(day, "RacesCandidates_Multiparish.htm").get("Races") or {}).get("Race")):
             title = str(race["SpecificTitle"])
+            if day.year < 1992 and (day, la_congress.chamber(race)) in chained:
+                continue
             if race["GeneralTitle"] == "U.S. Senator":
                 wanted[race["ID"]] = ("senate", None, race)
             elif found := re.search(r"(\d+)(?:st|nd|rd|th) Congressional", title):
@@ -160,7 +170,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Louisiana's 1992 to 2020 U.S. Senate, House, and presidential primary contests by parish from the Secretary of State's results",
+            summary="Louisiana's 1982 to 2020 U.S. Senate, House, and presidential primary contests by parish from the Secretary of State's results",
             polity="US-LA",
         )
         source = cs.source(la_sos.PUBLISHER, la_sos.TITLE)
@@ -179,5 +189,12 @@ def emit() -> Path:
                     cs.artifact(raw.cached(SOURCE, la_sos.blob(day, name)), source)
                 except LookupError:
                     continue
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"LA": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet"),
+            {"LA": source},
+            strict=True,
+            accepted=ACCEPTED,
+        )
         return cs.write()
