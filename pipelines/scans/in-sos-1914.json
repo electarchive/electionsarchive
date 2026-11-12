@@ -214,7 +214,7 @@
         0.869,
         0.674
       ],
-      "hint": "Read only the table headed 'UNITED STATES SENATOR\u2014Continued'; ignore any other table visible in the image.",
+      "hint": "Read only the table headed 'UNITED STATES SENATOR—Continued'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
@@ -242,8 +242,8 @@
         },
         {
           "label": "Amos Legler, Proh.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house1",
+          "candidate": "Amos Legler"
         },
         {
           "label": "W. H. Rainey, Soc.",
@@ -728,5 +728,6 @@
       ],
       "hint": "Read only the table headed 'Thirteenth District.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "extend": true
 }
