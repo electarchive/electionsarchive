@@ -1434,7 +1434,8 @@ def emit() -> Path:
                 )
                 cs.artifact(raw.cached(SOURCE, SURREY), ons[SURREY_LAYER])
 
-        paths = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
+        owners = dict(conn.execute("select path, entity_id from slug where path like 'gb/%%'").fetchall())
+        paths = set(owners)
         councils: dict[str, tuple[UUID, UUID, UUID, str, str]] = {}
         national: dict[int, UUID] = {}
         elections: set[UUID] = set()
@@ -1540,7 +1541,8 @@ def emit() -> Path:
                         if year not in days
                         else f"{year} {council_name} {'by-election' if code in only_by else 'election'}",
                     )
-                    cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+                    if owners.get(f"{path}/{day}-local", election) == election:
+                        cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                 display = ward["ons_name"]
                 display = " ".join(
                     word.lower() if index and word in leh.SMALL_WORDS else word
