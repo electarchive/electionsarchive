@@ -197,6 +197,7 @@ RENAMED = {
     (1982, "HI", "Sperk Matsunaga"): "Spark Matsunaga",
     (1982, "IN", "Dati Burton"): "Dan Burton",
     (1982, "KS", "Kent"): "Kent Earnest",
+    (1982, "KS", "Morris Nay"): "Morris Kay",
     (1982, "KS", "William L. Nostar"): "William L. Kostar",
     (1982, "NM", "Bil Richardson"): "Bill Richardson",
     (1982, "NY", '"olm "'): "John J. LaFalce",
@@ -1090,7 +1091,7 @@ SUMMARIZED: dict[object, str] = {"LIB": "LBT", "DFL": "D", (2012, "PA", "D"): "R
 SURNAMES = {"Bloomberg": "P00014530", "Romney": "P80003353"}
 NAMESAKES = {"H8CA52052", "P00014613"}
 FIGURES = {"george-pataki": "P60007572"}
-MOVED_IDS = {"H2IL06090": "IL:niki-conforti"}
+MOVED_IDS = {"H2IL06090": "IL:niki-conforti", "H2KS02044": "KS:morris-kay"}
 RESPELLED = {"H8NY12152": ("us.nyc_general.person", "2018-11-06:NY:house:12:scott-hutchins")}
 MISATTRIBUTED = {"2020:Democratic:P60016342": "P00014613"}
 REUSED_IDS = {
