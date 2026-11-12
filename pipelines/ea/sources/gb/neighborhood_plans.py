@@ -1,5 +1,6 @@
 import html
 import re
+import struct
 import subprocess
 import tempfile
 import zipfile
@@ -12,14 +13,16 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "gb.neighborhood_plans"
 VERSION = "1"
 ROWS = Path(__file__).with_name("neighborhood_referendums.tsv")
+SCANS = Path(__file__).with_name("neighborhood_scans.tsv")
+PAGE_IMAGES = DATA / "pages" / SOURCE
 SCHEME = "gb.neighborhood_area"
 VOTES, REGISTERED, BALLOTS, INVALID, VOTERS = 1, 2, 3, 5, 14
-SHARE_ONLY = 4
+SHARE_ONLY, DIGITIZED = 4, 8
 PAGE_PREFIXES = (
     "https://www.stratford.gov.uk/news/",
     "https://www.stratford.gov.uk/planning-building/",
@@ -169,8 +172,26 @@ def printed(url: str) -> tuple[str, bool, set[str]]:
     return text, pdf, set(re.findall(r"\d+(?:\.\d+)?", re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)))
 
 
+def render(artifact: raw.Artifact, number: int) -> tuple[Path, int, int]:
+    PAGE_IMAGES.mkdir(parents=True, exist_ok=True)
+    image = PAGE_IMAGES / f"{artifact.sha256}-{number}.png"
+    if not image.exists():
+        subprocess.run(
+            ["pdftoppm", "-r", "150", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+            + [str(artifact.path), str(image.with_suffix(""))],
+            check=True,
+        )
+    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+    return image, width, height
+
+
 def emit() -> Path:
     table = pl.read_csv(ROWS, separator="\t", infer_schema=False)
+    boxes: dict[tuple[str, str, str], tuple[int, float, float, float, float]] = {}
+    for row in pl.read_csv(SCANS, separator="\t", infer_schema=False).iter_rows(named=True):
+        x0, y0, x1, y1 = (float(row[corner]) for corner in ("x0", "y0", "x1", "y1"))
+        boxes[row["url"], row["kind"], row["field"]] = (int(row["page"]), x0, y0, x1, y1)
+    scanned = {url for url, _, _ in boxes}
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -204,6 +225,7 @@ def emit() -> Path:
             councils[code] = (found[0], found[1])
         elections: dict[UUID, str] = {}
         added: set[UUID] = set()
+        pages: dict[tuple[str, int], UUID] = {}
         for (day, code), polls in table.group_by(["day", "council"], maintain_order=True):
             council_name, path = councils[str(code)]
             place = council_name.removesuffix(" City Council").removesuffix(" Council")
@@ -238,8 +260,9 @@ def emit() -> Path:
                     raise ValueError(f"{day} {code}: the election has no slug")
                 elections[election] = found[0]
             for row in polls.iter_rows(named=True):
-                text, pdf, numbers = printed(row["url"])
-                handwritten = any(part in row["url"] for part in HANDWRITTEN)
+                scan = row["url"] in scanned
+                text, pdf, numbers = ("", True, set()) if scan else printed(row["url"])
+                handwritten = scan or any(part in row["url"] for part in HANDWRITTEN)
                 for field in ("yes", "no", "rejected", "electorate", "ballots", "turnout"):
                     if row[field] is not None and row[field] not in numbers and not handwritten:
                         raise ValueError(f"{row['plan']}: {field} {row[field]} is not printed in {row['url']}")
@@ -261,7 +284,22 @@ def emit() -> Path:
                     cs.add(
                         "source", id=source, kind="official_body", publisher=council_name, title=title, url=row["url"]
                     )
-                    cs.artifact(raw.cached(SOURCE, row["url"]), source)
+                    artifact = raw.cached(SOURCE, row["url"])
+                    artifact_id = cs.artifact(artifact, source)
+                    for url, kind, field in boxes:
+                        number = boxes[url, kind, field][0]
+                        if url == row["url"] and (url, number) not in pages:
+                            image, width, height = render(artifact, number)
+                            pages[url, number] = cs.page(artifact_id, number)
+                            cs.add(
+                                "source_page",
+                                id=pages[url, number],
+                                artifact_id=artifact_id,
+                                page_number=number,
+                                image_key=f"pages/{SOURCE}/{image.name}",
+                                width=width,
+                                height=height,
+                            )
                 unit_code = f"{code}:{slug(re.sub(r'(?i) neighbourhood (plan )?area$', '', area_name))}"
                 unit = cs.unit(SCHEME, unit_code)
                 if unit in cs.minted and unit not in added:
@@ -334,24 +372,51 @@ def emit() -> Path:
                 )
                 cs.add("citation", entity_id=result_set, source_id=source)
                 cs.add("outcome", result_set_id=result_set, option_id=options[no > yes], kind="won")
-                for option, measure, value in (
-                    (options[0], VOTES, row["yes"]),
-                    (options[1], VOTES, row["no"]),
-                    (None, INVALID, row["rejected"]),
-                    (None, REGISTERED, row["electorate"]),
-                    (None, BALLOTS, row["ballots"]),
-                    (None, VOTERS, row["turnout"]),
+                for field, option, measure in (
+                    ("yes", options[0], VOTES),
+                    ("no", options[1], VOTES),
+                    ("rejected", None, INVALID),
+                    ("electorate", None, REGISTERED),
+                    ("ballots", None, BALLOTS),
+                    ("turnout", None, VOTERS),
                 ):
-                    if value is not None:
+                    value = row[field]
+                    if value is None:
+                        continue
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=(SHARE_ONLY if measure == VOTERS else 0) | (DIGITIZED if scan else 0),
+                        value=round(float(value) / 100, 4) if measure == VOTERS else int(value),
+                    )
+                    if scan:
+                        number, x0, y0, x1, y1 = boxes[row["url"], str(row["kind"]), field]
+                        if (row["url"], number) not in pages:
+                            found = conn.execute(
+                                "select p.id from source_page p join source_artifact a on a.id = p.artifact_id"
+                                " where a.url = %s and p.page_number = %s",
+                                [row["url"], number],
+                            ).fetchone()
+                            if found is None:
+                                raise ValueError(f"{row['url']}: no page {number}")
+                            pages[row["url"], number] = found[0]
                         cs.add(
-                            "result_value",
+                            "value_locator",
                             result_set_id=result_set,
                             unit_id=unit,
                             option_id=option,
                             channel=0,
                             measure=measure,
                             count_round=0,
-                            flags=SHARE_ONLY if measure == VOTERS else 0,
-                            value=round(float(value) / 100, 4) if measure == VOTERS else int(value),
+                            page_id=pages[row["url"], number],
+                            x0=x0,
+                            y0=y0,
+                            x1=x1,
+                            y1=y1,
                         )
         return cs.write()
