@@ -475,7 +475,12 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return { kind: "sources" as const, ...(await listSources()) };
     }
   }
-  const whole = await settle(await archive(segments.join("/"), search));
+  const raw = await archive(segments.join("/"), search);
+  const indexed =
+    raw.kind === "election" && raw.scope == null
+      ? call(router.indices.election, { id: raw.id }).catch(() => null)
+      : null;
+  const whole = await settle(raw);
   const picked =
     whole.kind === "election" && whole.race != null
       ? whole.election.races.find(
@@ -555,9 +560,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
         found.scope == null && parts.length > 0 && parts.length < 40
           ? call(router.elections.states, { id: found.id })
           : null,
-        found.scope == null
-          ? call(router.indices.election, { id: found.id }).catch(() => null)
-          : null,
+        indexed,
       ]);
     return {
       ...found,

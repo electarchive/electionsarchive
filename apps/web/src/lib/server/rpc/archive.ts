@@ -3452,6 +3452,21 @@ const loadTogether = together(fetchLoads, {
   size: 500,
 });
 
+const loading = new Map<string, ReturnType<typeof loadTogether>>();
+
+async function loadShared(ask: LoadAsk) {
+  const key = JSON.stringify(ask);
+  const pending = loading.get(key);
+  if (pending != null) {
+    return pending;
+  }
+  const started = loadTogether(ask).finally(() => {
+    loading.delete(key);
+  });
+  loading.set(key, started);
+  return started;
+}
+
 async function load(
   roots: Array<string>,
   areaKs: Array<number>,
@@ -3483,7 +3498,7 @@ async function load(
   };
   return assembleLoad(
     step == null && only == null
-      ? await loadTogether(ask)
+      ? await loadShared(ask)
       : (await fetchLoads([ask], ask))(0),
     outcomes,
     spread,
