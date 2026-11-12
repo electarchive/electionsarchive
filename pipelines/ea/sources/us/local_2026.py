@@ -2517,6 +2517,19 @@ for _key in sorted(
         "https://www.arcounties.org/site/assets/files/6757/2026candidatesgeneralelection.pdf",
         "ar/aac_2026candidatesgeneralelection.pdf",
     )
+for _key in sorted(
+    {
+        _line.split("\t")[0]
+        for _line in Path(__file__).with_name("local_2026_states.tsv").read_text().splitlines()
+        if _line.startswith("AR-") and _line.split("\t")[0].endswith("-enr")
+    }
+):
+    NE_SOURCES[_key] = (
+        "Arkansas county election commissions",
+        "November 3, 2026 General and Municipal Election: candidate lists, Arkansas election-night results (Tally ENR)",
+        "https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json",
+        "ar/tally_enr_arkansas.json",
+    )
 for page in sorted((DATA / "inbox" / "y26" / "la").glob("*.html")):
     NE_SOURCES[f"LA-{page.stem}"] = (
         "Louisiana Secretary of State",
@@ -8107,7 +8120,7 @@ def fetch() -> None:
                     suffix=DELIVERED[fips].suffix,
                     retrieved_at=datetime.fromtimestamp(DELIVERED[fips].stat().st_mtime, UTC),
                     media_type="application/json"
-                    if fips == "17031c"
+                    if fips == "17031c" or DELIVERED[fips].suffix == ".json"
                     else "text/html"
                     if DELIVERED[fips].suffix == ".html"
                     else "application/zip"
