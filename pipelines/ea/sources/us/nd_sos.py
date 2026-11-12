@@ -947,8 +947,21 @@ BATCH_FIXES = {
     (1924, 10, "burleigh"): 3146,
     (1924, 10, "stutsman"): 3807,
 }
+MANUALS = {
+    (1918, "treasurer"): (
+        "North Dakota Legislative Manual 1919",
+        "https://digitalhorizonsonline.org/digital/api/collection/ndbb/id/22730/download",
+        "https://digitalhorizonsonline.org/digital/collection/ndbb/id/22387",
+    ),
+}
+MANUAL_READS = {
+    (1918, 9, "foster"): 578,
+    (1918, 9, "lamoure"): 1386,
+    (1918, 9, "slope"): 576,
+    (1918, 10, "eddy"): 253,
+    (1918, 10, "ramsey"): 843,
+}
 UNREAD = {
-    (1918, "treasurer"),
     (1922, "public-service-commissioner"),
     (1924, "treasurer"),
     (1924, "public-service-commissioner"),
@@ -1178,6 +1191,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, url(year), suffix=".pdf")
     for year in BLUE_BOOKS:
         raw.fetch(SOURCE, blue_book_url(year), suffix=".pdf")
+    for _, address, _ in MANUALS.values():
+        raw.fetch(SOURCE, address, suffix=".pdf")
 
 
 def plain(text: str) -> str:
@@ -1388,9 +1403,9 @@ def parse() -> None:
                 for line, amount in enumerate(batch_column(year, column, len(keys) + 1)):
                     if amount is not None:
                         cells[(line, column)] = amount
-                for (when, number, county), amount in BATCH_FIXES.items():
-                    if when == year and number == column:
-                        cells[(keys.index(county), column)] = amount
+            for (when, number, county), amount in (BATCH_FIXES | MANUAL_READS).items():
+                if when == year and number == column:
+                    cells[(keys.index(county), column)] = amount
             gaps = [
                 line
                 for line in range(len(keys))
@@ -1475,6 +1490,19 @@ def emit() -> Path:
                 license="Public domain",
             )
             cs.artifact(raw.cached(SOURCE, blue_book_url(year)), books[year])
+        manuals: dict[tuple[int, str], UUID] = {}
+        for pair, (title, address, page) in MANUALS.items():
+            manuals[pair] = cs.source(PUBLISHER, title)
+            cs.add(
+                "source",
+                id=manuals[pair],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=page,
+                license="Public domain",
+            )
+            cs.artifact(raw.cached(SOURCE, address), manuals[pair])
         counties: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.county' and code like '38%%'"
@@ -1684,7 +1712,8 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=books[year] if year in BLUE_BOOKS and office != "governor" else source,
+                source_id=manuals.get((year, office))
+                or (books[year] if year in BLUE_BOOKS and office != "governor" else source),
                 is_default=True,
                 completeness=1,
             )
