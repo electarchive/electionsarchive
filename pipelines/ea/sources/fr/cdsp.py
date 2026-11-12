@@ -1462,9 +1462,6 @@ def emit() -> Path:
                                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=line["outcome"])
                             if fresh or (year, number, circ) in CORRECTED:
                                 value_row(result_set, unit, option, VOTES, line["votes"])
-        dropped = set(
-            conn.execute("select entity_id, text from name_drop where entity_id = any(%s)", [list(displays)]).fetchall()
-        )
         for person, texts in displays.items():
             stripped = {
                 unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
@@ -1472,6 +1469,5 @@ def emit() -> Path:
                 if not text.isascii()
             }
             for text in sorted(texts - stripped):
-                if (person, text) not in dropped:
-                    name(person, text)
+                name(person, text)
         return cs.write()

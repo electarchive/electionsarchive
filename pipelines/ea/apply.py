@@ -2476,6 +2476,32 @@ def apply(folder: Path) -> str:
                     copy.write(buffer.getvalue())
             conn.execute(sql.SQL("analyze {}.{}").format(schema, sql.Identifier(table)))
         stage = _stage(conn, changeset_id)
+        if "name" in stage.tables:
+            preferred = "is_preferred" in stage.tables["name"]
+            for dropper, skipped in conn.execute(
+                sql.SQL(
+                    """with doomed as (
+                         select s.ctid as tid, s.entity_id, {preferred} as preferred, c.pipeline from {staged} s
+                         join lateral (select d.changeset_id from public.name_drop d
+                                       where d.entity_id = s.entity_id and d.text = s.text
+                                       order by d.recorded_from desc limit 1) d on true
+                         join changeset c on c.id = d.changeset_id
+                         where not exists (select from public.name n where n.entity_id = s.entity_id and n.text = s.text)),
+                       skipped as (
+                         delete from {staged} s using doomed x
+                         where s.ctid = x.tid and not (x.preferred
+                           and not exists (select from {staged} o where o.entity_id = x.entity_id and {other}
+                                           and o.ctid not in (select tid from doomed))
+                           and not exists (select from public.name n where n.entity_id = x.entity_id and n.is_preferred))
+                         returning x.pipeline)
+                       select pipeline, count(*) from skipped group by 1 order by 1"""
+                ).format(
+                    staged=stage.staged("name"),
+                    preferred=sql.SQL("s.is_preferred" if preferred else "false"),
+                    other=sql.SQL("o.is_preferred" if preferred else "false"),
+                )
+            ).fetchall():
+                print(f"name: skipped {skipped} staged names that {dropper} dropped")
         if "entity_merge" in stage.tables:
             staged = stage.staged("entity_merge")
             contests = conn.execute(
