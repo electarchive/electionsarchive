@@ -4,6 +4,7 @@ import io
 import itertools
 import re
 import subprocess
+import zipfile
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -17,7 +18,7 @@ from ea.sources.de.btw import CONSTITUENCIES
 from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
@@ -52,6 +53,28 @@ EARLY_BY_SEATS = "https://www.bayern.landtag.de/fileadmin/scripts/get_file/Frakt
 EARLY_BUND = "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/DEHeft_derivate_00021350/StatBer-8-05-010.pdf"
 EARLY_BB = "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/BBHeft_derivate_00014662/SB_B07-03-03_1993j05_BBa.pdf"
 EARLY_BB_SEATS = "https://www.chronik-der-mauer.de/system/files/dokument_pdf/58719_cdm-901014-landtagswahlen.pdf"
+TH = "https://wahlen.thueringen.de"
+TH_1990 = f"{TH}/landtagswahlen/Daten1990/L90_Ergebnisse_Wahlkreise.xlsx"
+TH_1990_ELECTED = f"{TH}/landtagswahlen/Daten1990/L90_gewaehlte.docx"
+TH_YEARBOOK = "https://statistik.thueringen.de/informationen/jahrbuch/2025/pdf/TLS_JB2025_02.pdf"
+TH_YEARS = (1994, 1999, 2004, 2009, 2014, 2019, 2024)
+TH_WAHLKREISE = 44
+TH_PUBLISHER = "Thüringer Landesamt für Statistik"
+TH_TITLE = "Wahlen in Thüringen: Landtagswahlen 1990 bis 2024, endgültige Ergebnisse nach Wahlkreisen"
+TH_URL = f"{TH}/landtagswahlen/lw_wahlergebnisse.asp"
+TH_1990_SEATS = {"CDU": 44, "SPD": 21, "LL-PDS": 9, "FDP": 9, "NFGRDJ": 6}
+TH_1990_NOTE = (
+    "The Bundeswahlleiterin's compilation prints seats for this election that add up to 127. The seats shown are "
+    f"those of the Thüringer Landesamt für Statistik ({TH_YEARBOOK}), which agree with the 44 constituency winners "
+    f"and 45 list members it names ({TH_1990_ELECTED})."
+)
+TH_TITLES = re.compile(r"\b(?:Prof\.|Dr\.|sc\.|med\.|rer\.|nat\.|phil\.|oec\.|habil\.|h\.\s?c\.|Dipl\.-\S+)\s*")
+
+
+def th_page(year: int, wk: int) -> str:
+    return f"{TH}/datenbank/wahl1/wahl.asp?wahlart=LW&wJahr={year}&zeigeErg=WK&wknr={wk:03d}"
+
+
 EARLY_SOURCES = {
     "BY": (
         "Bayerisches Landesamt für Statistik",
@@ -459,8 +482,13 @@ def fetch() -> None:
         for url in urls:
             raw.fetch(SOURCE, url, suffix=f".{url.rsplit('.', 1)[1]}")
     raw.fetch(SOURCE, HISTORY, suffix=".pdf")
-    for url in (EARLY_BY, EARLY_BY_SEATS, EARLY_BUND, EARLY_BB, EARLY_BB_SEATS):
+    for url in (EARLY_BY, EARLY_BY_SEATS, EARLY_BUND, EARLY_BB, EARLY_BB_SEATS, TH_YEARBOOK):
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, TH_1990, suffix=".xlsx")
+    raw.fetch(SOURCE, TH_1990_ELECTED, suffix=".docx")
+    for year in TH_YEARS:
+        for wk in range(1, TH_WAHLKREISE + 1):
+            raw.fetch(SOURCE, th_page(year, wk), suffix=".html")
 
 
 def history_count(text: str) -> int | None:
@@ -664,6 +692,13 @@ def parse_history() -> None:
             results.append(
                 {"index": index, "position": position, "label": label, "votes": votes, "share": None, "seats": seats}
             )
+    for election in elections:
+        if (election["state"], election["day"]) == ("TH", date(1990, 10, 14)):
+            for row in results:
+                if row["index"] == election["index"]:
+                    row["seats"] = TH_1990_SEATS.get(row["label"], 0)
+            election["seats"] = sum(TH_1990_SEATS.values())
+            election["extra"] = TH_1990_NOTE
     election_frame = pl.DataFrame(elections, infer_schema_length=None)
     result_frame = pl.DataFrame(results, infer_schema_length=None)
     problems = []
@@ -702,6 +737,195 @@ def parse_history() -> None:
     election_frame.write_parquet(PARSED / "history_elections.parquet")
     result_frame.write_parquet(PARSED / "history_results.parquet")
     pl.DataFrame(glossary).write_parquet(PARSED / "history_glossary.parquet")
+    parse_th(elections, results)
+
+
+def th_person(text: str) -> tuple[str, str]:
+    family, first = (part.strip() for part in TH_TITLES.sub("", re.sub(r"\s*\([^)]*\)", "", text)).split(",", 1))
+    return family, first
+
+
+def th_tokens(path: Path) -> list[str]:
+    text = html.unescape(re.sub(r"<[^>]+>", "|", re.sub(r"(?i)<br\s*/?>", " ", path.read_bytes().decode("cp1252"))))
+    return [token for token in (part.strip() for part in text.split("|")) if token]
+
+
+def th_count(text: str) -> int:
+    return int(re.sub(r"\s", "", text))
+
+
+def th_ballot(tokens: list[str]) -> tuple[int, int, dict[str, int]]:
+    invalid = th_count(tokens[tokens.index("Ungültige Stimmen") + 1])
+    valid = th_count(tokens[tokens.index("Gültige Stimmen") + 1])
+    counts: dict[str, int] = {}
+    body = tokens[tokens.index("Verteilung der Stimmen") + 1 :]
+    for position in range(len(body) - 2):
+        number, label, count = body[position : position + 3]
+        if number.isdigit() and re.search(r"[^\W\d_]", label) and re.fullmatch(r"[\d\s]+", count):
+            counts[label] = th_count(count)
+    return invalid, valid, counts
+
+
+def parse_th(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> None:
+    cons: list[dict[str, object]] = []
+    votes: list[dict[str, object]] = []
+    members: list[dict[str, object]] = []
+    days = {election["day"].year: election for election in elections if election["state"] == "TH"}
+    sheet = pl.read_excel(raw.cached(SOURCE, TH_1990).path, has_header=False, infer_schema_length=0).rows()
+    header = sheet[3]
+    first_labels = [header[column] for column in range(13, 41, 2)]
+    second_labels = [header[column] for column in range(41, 65, 2)]
+    day = days[1990]["day"]
+    for row in sheet:
+        if row[0] != "K":
+            continue
+        wk = f"{int(row[1]):02d}"
+        cons.append(
+            {
+                "day": day,
+                "wk": wk,
+                "name": re.sub(r"\s+-\s+", " – ", row[4].strip()),
+                "registered": int(row[6]),
+                "voters": int(row[7]),
+                "invalid1": int(row[9]),
+                "valid1": int(row[10]),
+                "invalid2": int(row[11]),
+                "valid2": int(row[12]),
+            }
+        )
+        for ballot, labels, start in ((1, first_labels, 13), (2, second_labels, 41)):
+            for offset, label in enumerate(labels):
+                count = int(row[start + 2 * offset])
+                if count:
+                    label_ = f"Einzelbewerber {offset - 11}" if label == "Einzelbewerber" else label
+                    votes.append({"day": day, "wk": wk, "ballot": ballot, "label": label_, "votes": count})
+    document = zipfile.ZipFile(raw.cached(SOURCE, TH_1990_ELECTED).path).read("word/document.xml").decode()
+    for row_xml in re.findall(r"<w:tr[ >].*?</w:tr>", document, re.DOTALL):
+        cells = [
+            html.unescape("".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", cell)))
+            for cell in re.findall(r"<w:tc>.*?</w:tc>", row_xml, re.DOTALL)
+        ]
+        if len(cells) == 5 and cells[0].isdigit():
+            family, first = th_person(cells[3])
+            members.append(
+                {
+                    "day": day,
+                    "wk": f"{int(cells[0]):02d}",
+                    "kind": "direct",
+                    "party": cells[2],
+                    "family": family,
+                    "first": first,
+                    "position": None,
+                }
+            )
+        elif len(cells) == 3 and cells[2].isdigit():
+            family, first = th_person(cells[1])
+            members.append(
+                {
+                    "day": day,
+                    "wk": None,
+                    "kind": "list",
+                    "party": cells[0],
+                    "family": family,
+                    "first": first,
+                    "position": int(cells[2]),
+                }
+            )
+    for year in TH_YEARS:
+        day = days[year]["day"]
+        for number in range(1, TH_WAHLKREISE + 1):
+            tokens = th_tokens(raw.cached(SOURCE, th_page(year, number)).path)
+            wk = f"{number:02d}"
+            heading = next(
+                match for token in tokens if (match := re.fullmatch(rf"Wahlkreis\s+0*{number}\s+(.+)", token))
+            )
+            first_at, second_at = tokens.index("Wahlkreisstimme"), tokens.index("Landesstimme")
+            invalid1, valid1, first = th_ballot(tokens[first_at:second_at])
+            invalid2, valid2, second = th_ballot(tokens[second_at:])
+            cons.append(
+                {
+                    "day": day,
+                    "wk": wk,
+                    "name": heading[1],
+                    "registered": th_count(tokens[tokens.index("Wahlberechtigte") + 1]),
+                    "voters": th_count(tokens[tokens.index("Wähler") + 1]),
+                    "invalid1": invalid1,
+                    "valid1": valid1,
+                    "invalid2": invalid2,
+                    "valid2": valid2,
+                }
+            )
+            for ballot, counts in ((1, first), (2, second)):
+                votes.extend(
+                    {"day": day, "wk": wk, "ballot": ballot, "label": label, "votes": count}
+                    for label, count in counts.items()
+                )
+            elected = next(token for token in tokens if token.startswith("Gewählt ist:"))
+            match = re.fullmatch(r"Gewählt ist:\s*(.+?)\s*\(([^()]+)\)", elected)
+            if match is None:
+                raise ValueError(f"TH {year} {wk}: winner {elected!r}")
+            family, first_name = th_person(match[1])
+            members.append(
+                {
+                    "day": day,
+                    "wk": wk,
+                    "kind": "direct",
+                    "party": match[2],
+                    "family": family,
+                    "first": first_name,
+                    "position": None,
+                }
+            )
+    cons_frame = pl.DataFrame(cons)
+    vote_frame = pl.DataFrame(votes)
+    problems: list[str] = []
+    for row in cons_frame.iter_rows(named=True):
+        ballots = vote_frame.filter((pl.col("day") == row["day"]) & (pl.col("wk") == row["wk"]))
+        for ballot in (1, 2):
+            total = ballots.filter(pl.col("ballot") == ballot)["votes"].sum()
+            if total != row[f"valid{ballot}"]:
+                problems.append(
+                    f"TH {row['day']} {row['wk']} ballot {ballot}: votes {total} against valid {row[f'valid{ballot}']}"
+                )
+            if row[f"valid{ballot}"] + row[f"invalid{ballot}"] != row["voters"]:
+                problems.append(
+                    f"TH {row['day']} {row['wk']} ballot {ballot}: valid and invalid against voters {row['voters']}"
+                )
+    labels: list[dict[str, object]] = []
+    for year, election in sorted(days.items()):
+        day = election["day"]
+        land = cons_frame.filter(pl.col("day") == day)
+        for field in ("registered", "voters", "invalid", "valid"):
+            column = "invalid2" if field == "invalid" else "valid2" if field == "valid" else field
+            if land[column].sum() != election[field]:
+                problems.append(f"TH {day} {field}: constituencies {land[column].sum()} against Land {election[field]}")
+        totals = {
+            label: count
+            for label, count in vote_frame.filter((pl.col("day") == day) & (pl.col("ballot") == 2))
+            .group_by("label")
+            .agg(pl.col("votes").sum())
+            .iter_rows()
+        }
+        land_rows = {row["label"]: row["votes"] for row in results if row["index"] == election["index"]}
+        for label, count in totals.items():
+            matches = [land_label for land_label, land_count in land_rows.items() if land_count == count]
+            if len(matches) != 1:
+                problems.append(f"TH {day} second vote {label} {count}: Land rows {matches}")
+                continue
+            labels.append({"day": day, "label": label, "land": matches[0]})
+        if len(labels) and len([row for row in labels if row["day"] == day]) != len(land_rows):
+            problems.append(f"TH {day}: {len(land_rows)} Land rows, {len(totals)} constituency labels")
+    for problem in problems:
+        print(problem)
+    if problems:
+        raise ValueError(f"{len(problems)} Thuringian problems")
+    print(
+        cons_frame.height, "Thuringian constituency results,", vote_frame.height, "vote rows,", len(members), "members"
+    )
+    cons_frame.write_parquet(PARSED / "th_constituencies.parquet")
+    vote_frame.write_parquet(PARSED / "th_votes.parquet")
+    pl.DataFrame(members).write_parquet(PARSED / "th_members.parquet")
+    pl.DataFrame(labels).write_parquet(PARSED / "th_labels.parquet")
 
 
 def parse() -> None:
@@ -1075,7 +1299,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, and every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin and the Länder statistical offices",
+            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin and the Länder statistical offices, and Thuringia's elections since 1990 by constituency",
             polity="DE",
         )
 
@@ -1499,6 +1723,180 @@ def emit_history(
                 license_url=None,
             )
             cs.artifact(raw.cached(SOURCE, url), early_sources[abbreviation])
+    fptp = cs.key("de.electoral_system", CONSTITUENCIES[0])
+    th_source = cs.source(TH_PUBLISHER, TH_TITLE)
+    cs.add(
+        "source",
+        id=th_source,
+        kind="official_body",
+        publisher=TH_PUBLISHER,
+        title=TH_TITLE,
+        url=TH_URL,
+        license=None,
+        license_url=None,
+    )
+    for url in (
+        TH_1990,
+        TH_1990_ELECTED,
+        TH_YEARBOOK,
+        *(th_page(year, wk) for year in TH_YEARS for wk in range(1, TH_WAHLKREISE + 1)),
+    ):
+        cs.artifact(raw.cached(SOURCE, url), th_source)
+    th_cons = pl.read_parquet(PARSED / "th_constituencies.parquet")
+    th_votes = pl.read_parquet(PARSED / "th_votes.parquet")
+    th_members = pl.read_parquet(PARSED / "th_members.parquet")
+    th_labels = pl.read_parquet(PARSED / "th_labels.parquet")
+    scheme = "de.th_wahlkreis"
+    cs.add("scheme", code=scheme, polity_id=cs.polity("DE-TH"), kind="electoral_district", rank=2, noun="constituency")
+
+    def folded(text: str) -> str:
+        return re.sub(r"[\W_]", "", text).casefold()
+
+    th_parties: dict[str, UUID] = {}
+    for page_label, land_label in th_labels.select("label", "land").iter_rows():
+        th_parties[folded(page_label)] = party_ids["TH", land_label]
+        th_parties[folded(land_label)] = party_ids["TH", land_label]
+    th_persons: dict[str, UUID] = {}
+
+    def th_person_id(family: str, first: str) -> UUID:
+        key = f"TH:{family}|{first}"
+        if key not in th_persons:
+            th_persons[key] = cs.key(f"{SOURCE}.person", key)
+            if th_persons[key] in cs.minted:
+                cs.add("person", id=th_persons[key])
+                cs.add(
+                    "name",
+                    entity_id=th_persons[key],
+                    text=f"{first} {family}",
+                    lang="de",
+                    kind="official",
+                    is_preferred=True,
+                )
+        return th_persons[key]
+
+    def th_constituencies(
+        day: date,
+        following: date | None,
+        election: UUID,
+        english_name: str,
+        path: str,
+        body: UUID,
+        land_area: UUID,
+        accounting: UUID,
+        root: UUID,
+        list_options: dict[str, UUID],
+        make_set: Any,
+    ) -> list[tuple[UUID, UUID, UUID | None, int, int | None]]:
+        labels = dict(th_labels.filter(pl.col("day") == day).select("label", "land").iter_rows())
+        votes = th_votes.filter(pl.col("day") == day)
+        winners = {
+            row["wk"]: row
+            for row in th_members.filter((pl.col("day") == day) & (pl.col("kind") == "direct")).iter_rows(named=True)
+        }
+        cs.add("boundary_set", scheme_code=scheme, vintage=str(day.year), valid_from=day, valid_to=following, as_of=day)
+        values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
+        for row in th_cons.filter(pl.col("day") == day).sort("wk").iter_rows(named=True):
+            wk = row["wk"]
+            area = cs.area(scheme, wk, day)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=wk, valid_from=day, valid_to=following)
+            cs.add("area_parent", area_id=area, parent_id=land_area, valid_from=day, valid_to=following)
+            cs.add("name", entity_id=area, text=row["name"], lang="de", kind="official", is_preferred=True)
+            unit = cs.unit(scheme, wk, day)
+            cs.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=cs.polity("DE-TH"),
+                scheme_code=scheme,
+                code=wk,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=day,
+                valid_to=following,
+            )
+            values += [
+                (accounting, unit, None, 2, row["registered"]),
+                (accounting, unit, None, 3, row["voters"]),
+                (root, unit, None, 5, row["invalid2"]),
+                (root, unit, None, 4, row["valid2"]),
+            ]
+            for label, count in (
+                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 2)).select("label", "votes").iter_rows()
+            ):
+                values.append((root, unit, list_options[labels[label]], 1, count))
+            contest = cs.key(f"{SOURCE}.contest", f"TH:{day}:{wk}")
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=area,
+                magnitude=1,
+                electoral_system_id=fptp,
+                default_result_kind="counted",
+            )
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{english_name}, constituency {int(wk)} ({row['name']})",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            cs.add("slug", path=f"{path}/wahlkreis-{wk}", entity_id=contest)
+            cs.add("note", entity_id=contest, kind="context", body_md=WINNERS_NOTE)
+            contest_set = make_set(f"wk:{wk}", contest)
+            values += [(contest_set, unit, None, 5, row["invalid1"]), (contest_set, unit, None, 4, row["valid1"])]
+            options: dict[str, UUID] = {}
+            for label, count in (
+                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 1)).select("label", "votes").iter_rows()
+            ):
+                options[folded(label)] = cs.key(f"{SOURCE}.option", f"TH:{day}:{wk}:{label}")
+                cs.add(
+                    "contest_option",
+                    id=options[folded(label)],
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=th_parties.get(folded(label)),
+                    ballot_label=label,
+                )
+                values.append((contest_set, unit, options[folded(label)], 1, count))
+            winner = winners[wk]
+            option = options[folded(winner["party"])]
+            cs.add(
+                "candidacy",
+                id=cs.key(f"{SOURCE}.candidacy", f"TH:{day}:{wk}"),
+                person_id=th_person_id(winner["family"], winner["first"]),
+                option_id=option,
+                role="head",
+                ballot_name=f"{winner['first']} {winner['family']}",
+                member_of_party_id=th_parties[folded(winner["party"])],
+            )
+            cs.add("outcome", result_set_id=contest_set, option_id=option, candidacy_id=None, kind="elected", seats=1)
+        for member in th_members.filter((pl.col("day") == day) & (pl.col("kind") == "list")).iter_rows(named=True):
+            land_label = next(label for label in list_options if folded(label) == folded(member["party"]))
+            candidacy = cs.key(f"{SOURCE}.candidacy", f"TH:{day}:list:{land_label}:{member['position']}")
+            cs.add(
+                "candidacy",
+                id=candidacy,
+                person_id=th_person_id(member["family"], member["first"]),
+                option_id=list_options[land_label],
+                role="list_member",
+                list_position=member["position"],
+                ballot_name=f"{member['first']} {member['family']}",
+                member_of_party_id=th_parties[folded(land_label)],
+            )
+            cs.add(
+                "outcome",
+                result_set_id=root,
+                option_id=list_options[land_label],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+        return values
+
     second_from: dict[str, date] = {}
     for state, notes in elections.select("state", "notes").iter_rows():
         for note in notes:
@@ -1566,7 +1964,13 @@ def emit_history(
             path = f"de/{abbreviation.lower()}/{day}-general"
             cs.add("slug", path=path, entity_id=election)
 
-            row_source = early_sources[abbreviation] if row["source"] is not None else source
+            row_source = (
+                th_source
+                if abbreviation == "TH"
+                else early_sources[abbreviation]
+                if row["source"] is not None
+                else source
+            )
 
             def make_set(
                 key: str,
@@ -1648,6 +2052,11 @@ def emit_history(
                 )
             if abbreviation == "HH" and day.year in (1957, 1961):
                 notes.append("The source prints 360 as the total of seats; the parties' seats add up to 120.")
+            if abbreviation == "TH":
+                notes.append(
+                    "Each voter has two votes, a constituency vote and a list vote (Landesstimme). The votes shown are "
+                    "list votes, which decide the seats; each constituency's contest holds its constituency votes."
+                )
             if row["extra"] is not None:
                 notes.append(row["extra"])
             if row["relabeled"] is not None:
@@ -1676,16 +2085,20 @@ def emit_history(
                 cs.add("note", entity_id=contest, kind="context", body_md=" ".join(notes))
             accounting = make_set("election", None)
             root = make_set("list", contest)
-            unit = str(units[abbreviation])
-            values: list[tuple[UUID, UUID | None, int, int | None]] = [
-                (accounting, None, 2, row["registered"]),
-                (accounting, None, 14 if multiple else 3, row["voters"]),
-                (root, None, 5, row["invalid"]),
-                (root, None, 4, row["valid"]),
-            ]
+            unit = units[abbreviation]
+            values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
+            if abbreviation != "TH":
+                values = [
+                    (accounting, unit, None, 2, row["registered"]),
+                    (accounting, unit, None, 14 if multiple else 3, row["voters"]),
+                    (root, unit, None, 5, row["invalid"]),
+                    (root, unit, None, 4, row["valid"]),
+                ]
+            options: dict[str, UUID] = {}
             for party_row in results.filter(pl.col("index") == row["index"]).sort("position").iter_rows(named=True):
                 label_ = party_row["label"]
                 option = cs.key(f"{SOURCE}.option", f"{abbreviation}:{day}:list:{label_}")
+                options[label_] = option
                 others = label_ in HISTORY_OTHERS
                 cs.add(
                     "contest_option",
@@ -1695,16 +2108,21 @@ def emit_history(
                     party_id=None if others else party_ids[abbreviation, label_],
                     ballot_label=label_,
                 )
-                values.append((root, option, 1, party_row["votes"]))
+                if abbreviation != "TH":
+                    values.append((root, unit, option, 1, party_row["votes"]))
                 if party_row["seats"]:
                     cs.add("outcome", result_set_id=root, option_id=option, kind="won", seats=party_row["seats"])
+            if abbreviation == "TH":
+                values = th_constituencies(
+                    day, following, election, english_name, path, body, land_area, accounting, root, options, make_set
+                )
             cs.frame(
                 "result_value",
                 pl.DataFrame(
                     [
                         {
                             "result_set_id": str(set_id),
-                            "unit_id": unit,
+                            "unit_id": str(unit_id),
                             "option_id": None if option is None else str(option),
                             "channel": 0,
                             "measure": measure,
@@ -1712,7 +2130,7 @@ def emit_history(
                             "flags": 0,
                             "value": value,
                         }
-                        for set_id, option, measure, value in values
+                        for set_id, unit_id, option, measure, value in values
                         if value is not None
                     ],
                     schema_overrides={"value": pl.Int64},
