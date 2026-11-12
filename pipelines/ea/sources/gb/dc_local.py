@@ -27,7 +27,7 @@ DAYS = {
 }
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
-SAMPLED = {2018, 2019, 2026}
+SAMPLED = {2026}
 CROSS_CHECKS: set[int] = set()
 API = "https://candidates.democracyclub.org.uk/api/next/results/?election_date={day}"
 BALLOTS = (
@@ -141,7 +141,27 @@ LAYERS = {
         2000,
         "Local Authority Districts (May 2026) Boundaries UK BGC",
     ),
+    "ced26": (
+        "CED_MAY_2026_EN_BGC",
+        "CED26CD",
+        1396,
+        1000,
+        "County Electoral Division (May 2026) Boundaries EN BGC",
+    ),
 }
+COUNTIES = {
+    "east-sussex": ("E10000011", "East Sussex"),
+    "essex": ("E10000012", "Essex"),
+    "gloucestershire": ("E10000013", "Gloucestershire"),
+    "hampshire": ("E10000014", "Hampshire"),
+    "hertfordshire": ("E10000015", "Hertfordshire"),
+    "norfolk": ("E10000020", "Norfolk"),
+    "suffolk": ("E10000029", "Suffolk"),
+    "surrey": ("E10000030", "Surrey"),
+    "west-sussex": ("E10000032", "West Sussex"),
+}
+SHADOWS = {"east-surrey": ("ESY", "East Surrey"), "west-surrey": ("WSY", "West Surrey")}
+DIVISION_SPELLINGS = {"harlow parndon and toddbrook": "harlow parndon and todbrook"}
 PRESS = (
     "birminghammail.co.uk",
     "chroniclelive.co.uk",
@@ -191,6 +211,8 @@ METHODOLOGY = (
     "Compiled by Democracy Club volunteers from each council's declaration of results; every ballot records the council "
     "page it was copied from, kept on the result set as a citation. Not an official publication: an official set "
     "supersedes it where one is loaded. Seats and ward GSS codes come from Democracy Club's EveryElection register; "
+    "county electoral divisions are matched to ONS's May 2026 division list by code or, where EveryElection gives none, by "
+    "name within the county; the Surrey shadow unitary wards have no ONS code and keep EveryElection's identifier; "
     "ballots whose source is a newspaper, broadcaster, social media post, Wikipedia, or the Local Elections Archive "
     "Project, ballots that cite no page, and ballots whose winners do not equal the seats contested, are not loaded. Votes for the rejected ballots are the printed spoilt ballots."
 )
@@ -261,8 +283,9 @@ def lookup_pages(year: int) -> list[str]:
 
 def layer_pages(key: str) -> list[str]:
     service, field, count, size, _ = LAYERS[key]
+    fields = f"{field},{field[:-2]}NM" if key.startswith("ced") else field
     return [
-        f"{ONS}/{service}/FeatureServer/0/query?where=1%3D1&outFields={field}&outSR=27700&orderByFields={field}"
+        f"{ONS}/{service}/FeatureServer/0/query?where=1%3D1&outFields={fields}&outSR=27700&orderByFields={field}"
         f"&resultOffset={offset}&resultRecordCount={size}&f=geojson"
         for offset in range(0, count, size)
     ]
@@ -293,9 +316,90 @@ def fetch() -> None:
         for url in ballot_pages(year):
             raw.fetch(SOURCE, url, suffix=".json")
             time.sleep(1)
-        for key in (f"wd{year % 100}", f"lad{year % 100}"):
+        for key in (f"wd{year % 100}", f"lad{year % 100}", *(["ced26"] if year == 2026 else [])):
             for url in layer_pages(key):
                 raw.fetch(SOURCE, url, suffix=".geojson")
+
+
+def division_key(text: str) -> str:
+    key = leh.fold(text.replace("-", " ").replace("&", "and"))
+    return DIVISION_SPELLINGS.get(key, key)
+
+
+def divisions() -> pl.DataFrame:
+    features = [
+        feature
+        for url in layer_pages("ced26")
+        for feature in json.loads(raw.cached(SOURCE, url).path.read_text())["features"]
+    ]
+    if len(features) != LAYERS["ced26"][2]:
+        raise ValueError(f"ced26: {len(features)} features")
+    with connect() as conn:
+        conn.execute("create temp table division (code text, name text, geojson text) on commit drop")
+        with conn.cursor() as cursor, cursor.copy("copy division from stdin") as copy:
+            for feature in features:
+                properties = feature["properties"]
+                copy.write_row((properties["CED26CD"], properties["CED26NM"], json.dumps(feature["geometry"])))
+        rows = conn.execute(
+            """select distinct d.code, d.name, c.code
+               from division d join (
+                 select ac.code, g.geom from area a join area_code ac on ac.area_id = a.id
+                 join area_geometry g on g.area_id = a.id
+                 where a.scheme_code = 'gb.lad' and ac.code = any(%s) and upper_inf(g.valid)) c
+               on st_within(st_pointonsurface(st_makevalid(st_force2d(st_setsrid(st_geomfromgeojson(d.geojson), 27700)))),
+                            st_transform(c.geom, 27700))""",
+            [[code for code, _ in COUNTIES.values()]],
+        ).fetchall()
+    frame = pl.DataFrame(rows, schema={"code": pl.String, "name": pl.String, "county": pl.String}, orient="row")
+    if frame["code"].is_duplicated().any():
+        raise ValueError("a county division lies in two counties")
+    frame = frame.with_columns(name=pl.col("name").str.strip_suffix(" ED"))
+    return frame.with_columns(key=pl.col("name").map_elements(division_key, return_dtype=pl.String))
+
+
+def locate_divisions(found: pl.DataFrame, divisions: pl.DataFrame) -> pl.DataFrame:
+    council = pl.col("ballot").str.split(".").list.get(1)
+    shadow = council.is_in(list(SHADOWS)) & pl.col("gss").str.contains(r"^[A-Z]{3}:")
+    found = (
+        found.with_columns(
+            council=council,
+            key=pl.col("division").map_elements(division_key, return_dtype=pl.String),
+            county=council.replace_strict({slug: code for slug, (code, _) in COUNTIES.items()}, default=None),
+        )
+        .join(
+            divisions.select(match="code", county="county", key="key"),
+            on=["county", "key"],
+            how="left",
+            maintain_order="left",
+        )
+        .with_columns(
+            ward_code=pl.when(pl.col("match").is_not_null() & pl.col("coded").not_())
+            .then("match")
+            .otherwise("ward_code")
+        )
+        .join(
+            divisions.select(ward_code="code", ced_name="name", ced_county="county"),
+            on="ward_code",
+            how="left",
+            maintain_order="left",
+        )
+    )
+    in_county = (pl.col("ced_county") == pl.col("county")).fill_null(False)
+    return found.with_columns(
+        la_code=pl.when(in_county)
+        .then("county")
+        .when(shadow)
+        .then(council.replace_strict({slug: code for slug, (code, _) in SHADOWS.items()}, default=None))
+        .otherwise("la_code"),
+        la_name=pl.when(in_county)
+        .then(council.replace_strict({slug: name for slug, (_, name) in COUNTIES.items()}, default=None))
+        .when(shadow)
+        .then(council.replace_strict({slug: name for slug, (_, name) in SHADOWS.items()}, default=None))
+        .otherwise("la_name"),
+        ons_name=pl.when(in_county).then("ced_name").when(shadow).then("division").otherwise("ons_name"),
+        shape=pl.when(in_county).then(pl.lit("ced26")).when(shadow).then(None).otherwise("shape"),
+        coded=pl.col("coded") | in_county | shadow,
+    ).drop("council", "key", "county", "match", "ced_name", "ced_county")
 
 
 def parse() -> None:
@@ -316,6 +420,7 @@ def parse() -> None:
             )
         )
     lookup = pl.concat(lookups)
+    ced = divisions()
     for year in DAYS:
         records = []
         for url in ballot_pages(year):
@@ -366,7 +471,10 @@ def parse() -> None:
                 ons_name=pl.when("leeds").then("division").otherwise("ons_name"),
             )
             .drop("leeds")
+            .with_columns(coded=pl.col("gss").str.starts_with("gss:"), shape=pl.lit(f"wd{year % 100}"))
         )
+        if year == 2026:
+            found = locate_divisions(found, ced)
         press = pl.col("source").str.to_lowercase().str.contains("|".join(PRESS).replace(".", r"\."))
         found = found.with_columns(
             status=pl.when(pl.col("system").is_null())
@@ -377,7 +485,7 @@ def parse() -> None:
             .then(pl.lit("not first past the post"))
             .when(pl.col("cancelled"))
             .then(pl.lit("cancelled"))
-            .when(pl.col("gss").is_null() | pl.col("gss").str.starts_with("gss:").not_())
+            .when(pl.col("coded").not_())
             .then(pl.lit("no GSS code"))
             .when(pl.col("la_code").is_null())
             .then(pl.lit("code not in the ONS ward lookup"))
@@ -477,7 +585,10 @@ def parse() -> None:
         with conn.cursor() as cursor, cursor.copy("copy feature from stdin") as copy:
             for year in DAYS:
                 for key, codes in (
-                    (f"wd{year % 100}", set(loaded.filter(pl.col("year") == year)["ward_code"])),
+                    *(
+                        (layer, set(loaded.filter((pl.col("year") == year) & (pl.col("shape") == layer))["ward_code"]))
+                        for layer in (f"wd{year % 100}", *(["ced26"] if year == 2026 else []))
+                    ),
                     (f"lad{year % 100}", set(loaded.filter(pl.col("year") == year)["la_code"])),
                 ):
                     _, field, count, _, _ = LAYERS[key]
@@ -548,8 +659,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"English and Welsh council elections {', '.join(map(str, days))} by ward, compiled by Democracy "
-            "Club from the councils' declarations, with ONS ward and council shapes",
+            summary=f"English and Welsh council elections {', '.join(map(str, days))} by ward and county division, compiled "
+            "by Democracy Club from the councils' declarations, with ONS ward, division, and council shapes",
             polity="GB",
         )
 
@@ -652,8 +763,9 @@ def emit() -> Path:
             )
             for url in layer_pages(key):
                 cs.artifact(raw.cached(SOURCE, url), ons[key])
-            for url in lookup_pages(int(key[-2:]) + 2000):
-                cs.artifact(raw.cached(SOURCE, url), ons[key])
+            if key.startswith("wd"):
+                for url in lookup_pages(int(key[-2:]) + 2000):
+                    cs.artifact(raw.cached(SOURCE, url), ons[key])
 
         paths = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
         councils: dict[str, tuple[UUID, UUID, UUID, str, str]] = {}
@@ -695,7 +807,11 @@ def emit() -> Path:
                         cs.add("area", id=area, scheme_code="gb.lad")
                         cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=None)
                         cs.add(
-                            "area_parent", area_id=area, parent_id=countries[code[0]], valid_from=None, valid_to=None
+                            "area_parent",
+                            area_id=area,
+                            parent_id=countries["W" if code.startswith("W0") else "E"],
+                            valid_from=None,
+                            valid_to=None,
                         )
                         name(area, label)
                     if polity in cs.minted:
@@ -710,7 +826,7 @@ def emit() -> Path:
                         cs.add(
                             "polity_parent",
                             polity_id=polity,
-                            parent_id=cs.polity("GB-WLS" if code[0] == "W" else "GB-ENG"),
+                            parent_id=cs.polity("GB-WLS" if code.startswith("W0") else "GB-ENG"),
                         )
                         cs.add("polity_territory", polity_id=polity, area_id=area)
                         name(polity, council_name)
@@ -726,7 +842,8 @@ def emit() -> Path:
                         cs.add("body", id=body, polity_id=polity, kind="council")
                         name(body, council_name)
                     councils[code] = (area, polity, body, path, council_name)
-                    geometry.setdefault(area, (f"lad{year % 100}", code, day))
+                    if not code.startswith("E10") and code not in {code for code, _ in SHADOWS.values()}:
+                        geometry.setdefault(area, (f"lad{year % 100}", code, day))
                 area, polity, body, path, council_name = councils[code]
                 election = cs.key("gb.election", f"{day}:local:{code}")
                 if election not in elections:
@@ -756,7 +873,8 @@ def emit() -> Path:
                         cs.add("area_code", area_id=ward_area, code=ward_code, valid_from=None, valid_to=None)
                         cs.add("area_parent", area_id=ward_area, parent_id=area, valid_from=None, valid_to=None)
                         name(ward_area, display)
-                    geometry.setdefault(ward_area, (f"wd{year % 100}", ward_code, day))
+                    if ward["shape"] is not None:
+                        geometry.setdefault(ward_area, (ward["shape"], ward_code, day))
                 unit = cs.unit("gb.ward", ward_code)
                 if unit in cs.minted and unit not in seen:
                     seen.add(unit)
@@ -789,10 +907,11 @@ def emit() -> Path:
                     term="remainder" if ward["by"] else None,
                 )
                 by = " by-election" if ward["by"] else ""
-                name(contest, f"{display} ward{by}, {council_name}, {year}")
+                part = "division" if code.startswith("E10") else "ward"
+                name(contest, f"{display} {part}{by}, {council_name}, {year}")
                 cs.add(
                     "slug",
-                    path=f"{path}/{day}-local/{slug(display)}-{ward_code.lower()}{'-by-election' if ward['by'] else ''}",
+                    path=f"{path}/{day}-local/{slug(display)}-{slug(ward_code)}{'-by-election' if ward['by'] else ''}",
                     entity_id=contest,
                 )
                 cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=ward["ballot"])
