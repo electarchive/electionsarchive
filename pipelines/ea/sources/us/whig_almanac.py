@@ -50,7 +50,7 @@ KEYS = {
 }
 VOLUMES = {year: (PDF, LANDING, day, pages) for year, (_, _, day, pages) in ITEMS.items()}
 ERRATA: set[tuple[int, tuple[str, int]]] = set()
-REREAD = ("1848-11-07:VT:president", "1844:MD:president")
+REREAD = ("1848-11-07:VT:president", "1844:MD:president", "1844:LA:president")
 CHECKED = {
     1848: ("ME", "VT", "MA", "RI", "NH", "CT", "NY", "NJ", "PA", "DE", "MD", "VA", "NC", "AL", "GA", "LA", "MS")
     + ("TN", "KY", "OH", "IN", "IL", "MO", "MI", "WI", "IA"),
@@ -58,7 +58,11 @@ CHECKED = {
     + ("TN", "KY", "OH", "IN", "IL"),
 }
 WARDS = ("I", "II", "III", "IV", "V", "VI", "VII", "X", "XIII", "VIII", "IX", "XIV", "XI", "XII", "XV", "XVI", "XVII")
-UNREAD = {("NY", f"Ward {ward}"): 54 for ward in (*WARDS, "XVIII")} | {("NY", "New-York City"): 54}
+UNREAD = {("NY", f"Ward {ward}"): 54 for ward in (*WARDS, "XVIII")} | {
+    ("NY", "New-York City"): 54,
+    ("LA", "Bossier"): 58,
+}
+BEFORE = {("LA", "bossier"): "caddo"}
 NAMES = {
     **{("NY", f"Ward {ward}"): "36061" for ward in (*WARDS, "XVIII")},
     ("NY", "New-York City"): "36061",
@@ -551,7 +555,8 @@ def build() -> None:
                 )
     for row, (county, page) in unread.items():
         NAMED[row], pages[row], seen[row] = county, page, {}
-        order.insert(max(i for i, other in enumerate(order) if other[0] == row[0]) + 1, row)
+        at = [i for i, other in enumerate(order) if other == (row[0], BEFORE.get(row))]
+        order.insert(at[0] if at else max(i for i, other in enumerate(order) if other[0] == row[0]) + 1, row)
         for (state, name, year, candidate), votes in checked.items():
             if (state, name) == row:
                 seen[row][(year, candidate)] = {}
