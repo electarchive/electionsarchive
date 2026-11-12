@@ -2554,6 +2554,7 @@ type LoadAsk = {
   facts: keyof typeof FACTS;
   isFirst: boolean;
   only: Array<number> | null;
+  isBrief: boolean;
   units: Record<string, Array<number>>;
 };
 
@@ -2994,10 +2995,20 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
     names(
       [
         ...new Set([
-          ...options.flatMap((row) =>
-            [row.party, row.person, row.alliance].filter((id) => id != null),
+          ...owned.flatMap((rows, request) =>
+            rows.flatMap((row) =>
+              [
+                row.party,
+                asks[request]?.isBrief === true && row.outcome == null
+                  ? null
+                  : row.person,
+                row.alliance,
+              ].filter((id) => id != null),
+            ),
           ),
-          ...backing.map((row) => row.person),
+          ...backing.flatMap((row) =>
+            asks[row.request]?.isBrief === true ? [] : [row.person],
+          ),
         ]),
       ],
       date,
@@ -3451,6 +3462,7 @@ async function load(
   spread: Map<number, Array<[number, number]>> | null = null,
   isFirst = false,
   only: Array<number> | null = null,
+  isBrief = false,
 ) {
   if (areaKs.length === 0) {
     return assembleLoad(null, outcomes, spread);
@@ -3465,6 +3477,7 @@ async function load(
     facts,
     isFirst,
     only,
+    isBrief,
     units: facts === "pool" ? await unlocated() : {},
   };
   return assembleLoad(
@@ -3864,6 +3877,13 @@ async function chamber(
             [shape.nation ?? 0],
             contest.date ?? "infinity",
             shape.roots,
+            [],
+            null,
+            "area",
+            null,
+            false,
+            null,
+            true,
           ),
         ),
     names(
