@@ -1,3 +1,7 @@
+import base64
+import io
+import json
+import re
 import struct
 import subprocess
 from datetime import date
@@ -5,8 +9,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from PIL import Image
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset
 from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
@@ -85,9 +92,120 @@ METHOD = (
 )
 
 
+PLEBISCITE = date(1898, 9, 29)
+VOLUME = "https://www.canadiana.ca/view/oocihm.9_08052_33_14"
+VOLUME_TITLE = (
+    "Report on the Prohibition Plebiscite held on the 29th day of September, 1898 (Clerk of the Crown in Chancery), "
+    "Sessional Papers of the Dominion of Canada, 1899, volume 14, Sessional Paper No. 20"
+)
+PLEBISCITE_PAGES = range(45, 355)
+MODEL = "claude-haiku-5-5"
+PROMPT = "1"
+LONGEST = 1568
+MEASURES = ("for", "against", "polled", "rejected", "spoiled", "electors", "population")
+READ_SYSTEM = (
+    "You read one page of the 1898 Canadian prohibition plebiscite report. The page is a table of polling divisions "
+    "grouped by electoral district. The image joins two strips: on the left, the column that names the electoral "
+    "district (and the margin note such as 'ADDINGTON (Continued-Suite)'); on the right, the number columns in this "
+    "order: votes for prohibition, votes against prohibition, total number of votes polled, rejected ballots, spoiled "
+    "ballots, number of voters on the revised voters' list, population of the constituency by the last census, and "
+    "remarks. A district ends with a line 'Totals-Totaux' set between rules after its last polling division (the label "
+    "may be cut off; the row has larger figures) and then a 'Majority for/against prohibition' line. Report every "
+    "Totals line on the page with the electoral district it closes, copying the figures exactly as printed (dots or "
+    "blanks are null). Copy any remark printed on the Totals line or flagged with an asterisk or dagger on it, such "
+    "as 'Should be 3,975'. Also list every electoral district named on the page."
+)
+READ_SCHEMA: dict[str, object] = {
+    "type": "object",
+    "properties": {
+        "districts": {"type": "array", "items": {"type": "string"}},
+        "totals": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "district": {"type": "string"},
+                    **{measure: {"type": ["integer", "null"]} for measure in MEASURES},
+                    "majority": {"type": ["integer", "null"]},
+                    "majority_side": {"type": ["string", "null"], "enum": ["for", "against", None]},
+                    "remarks": {"type": "string"},
+                },
+                "required": ["district", *MEASURES, "majority", "majority_side", "remarks"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["districts", "totals"],
+    "additionalProperties": False,
+}
+
+
+def page_images() -> list[str]:
+    html = raw.cached(SOURCE, VOLUME).path.read_text()
+    return [f"{uri}/full/max/0/default.jpg" for uri in re.findall(r'data-uri="([^"]+)/info.json"', html)]
+
+
+def rotated(seq: int) -> Image.Image:
+    return Image.open(raw.cached(SOURCE, page_images()[seq - 1]).path).convert("L").rotate(-90, expand=True)
+
+
+def strips(image: Image.Image) -> Image.Image:
+    width, height = image.size
+    label = image.crop((int(width * 0.02), 0, int(width * 0.16), height))
+    body = image.crop((int(width * 0.37), 0, int(width * 0.88), height))
+    joined = Image.new("L", (label.width + 8 + body.width, height), 255)
+    joined.paste(label, (0, 0))
+    joined.paste(Image.new("L", (4, height), 0), (label.width + 2, 0))
+    joined.paste(body, (label.width + 8, 0))
+    joined.thumbnail((LONGEST, LONGEST))
+    return joined
+
+
+def read_key(seq: int) -> str:
+    return f"anthropic-batch:{MODEL}/{PROMPT}/1898/{seq}"
+
+
+def read(seq: int) -> dict:
+    message = json.loads(raw.cached(SOURCE, read_key(seq)).path.read_text())
+    return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, REPORT, suffix=".pdf")
     raw.fetch(SOURCE, WORDING, suffix=".html")
+    raw.fetch(SOURCE, VOLUME, suffix=".html")
+    images = page_images()
+    price_in, price_out = batch.PRICES[MODEL]
+    wanted: dict[str, batch.Want] = {}
+    for seq in PLEBISCITE_PAGES:
+        raw.fetch(SOURCE, images[seq - 1], suffix=".jpg")
+        tile = strips(rotated(seq))
+        buffer = io.BytesIO()
+        tile.save(buffer, "PNG")
+        params = MessageCreateParamsNonStreaming(
+            model=MODEL,
+            max_tokens=4000,
+            system=READ_SYSTEM,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        ImageBlockParam(
+                            type="image",
+                            source={
+                                "type": "base64",
+                                "media_type": "image/png",
+                                "data": base64.b64encode(buffer.getvalue()).decode(),
+                            },
+                        ),
+                        TextBlockParam(type="text", text="Read the Totals lines on this page."),
+                    ],
+                }
+            ],
+            output_config={"effort": "low", "format": {"type": "json_schema", "schema": READ_SCHEMA}},
+        )
+        wanted[read_key(seq)] = (params, (tile.width * tile.height / 750 * price_in + 1500 * price_out) / 1e6)
+    print(batch.ensure(SOURCE, "plebiscite-1898", wanted)[1])
 
 
 def box(code: str, column: str) -> tuple[float, float, float, float]:
