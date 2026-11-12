@@ -1,0 +1,321 @@
+{
+ "polity": "US-WV",
+ "publisher": "George W. Atkinson and Alvaro F. Gibbens",
+ "license": "Public domain",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://archive.org/download/prominentmenofwe00atki/page/n{page}.jpg",
+  "item": "https://archive.org/details/prominentmenofwe00atki"
+ },
+ "title": "Prominent Men of West Virginia (1890), State elections for Governor from 1864 to 1888, by counties",
+ "contests": {
+  "g1868": {
+   "year": 1868,
+   "chamber": "governor",
+   "day": "1868-11-03",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1872": {
+   "year": 1872,
+   "chamber": "governor",
+   "day": "1872-11-05",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1876": {
+   "year": 1876,
+   "chamber": "governor",
+   "day": "1876-11-07",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1880": {
+   "year": 1880,
+   "chamber": "governor",
+   "day": "1880-11-02",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1884": {
+   "year": 1884,
+   "chamber": "governor",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "g1888": {
+   "year": 1888,
+   "chamber": "governor",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 125,
+   "id": "125-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.13,
+    0.525,
+    0.985
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 A. I. Boreman, No opposition",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1866 A. I. Boreman, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1866 Ben H. Smith, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1868 W. E. Stevenson, Republican",
+     "contest": "g1868",
+     "candidate": "William E. Stevenson"
+    },
+    {
+     "label": "1868 J. N. Camden, Democrat",
+     "contest": "g1868",
+     "candidate": "James M. Camden"
+    },
+    {
+     "label": "1870 J. J. Jacob, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1870 W. E. Stevenson, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 J. J. Jacob, Ind. Democrat",
+     "contest": "g1872",
+     "candidate": "John J. Jacob"
+    },
+    {
+     "label": "1872 J. N. Camden, Democrat",
+     "contest": "g1872",
+     "candidate": "Johnson N. Camden"
+    }
+   ],
+   "header": [
+    0.0,
+    0.33
+   ]
+  },
+  {
+   "page": 125,
+   "id": "125-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.525,
+    0.13,
+    0.91,
+    0.985
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1876 H. M. Matthews, Democrat",
+     "contest": "g1876",
+     "candidate": "Henry M. Mathews"
+    },
+    {
+     "label": "1876 Nathan Goff, Republican",
+     "contest": "g1876",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1880 J. B. Jackson, Democrat",
+     "contest": "g1880",
+     "candidate": "Jacob B. Jackson"
+    },
+    {
+     "label": "1880 G. C. Sturgiss, Republican",
+     "contest": "g1880",
+     "candidate": "George C. Sturgiss"
+    },
+    {
+     "label": "1880 N. B. French, Union Labor",
+     "contest": "g1880",
+     "candidate": "N. B. French"
+    },
+    {
+     "label": "1884 E. W. Wilson, Democrat",
+     "contest": "g1884",
+     "candidate": "E. Willis Wilson"
+    },
+    {
+     "label": "1884 Edwin Maxwell, Republican",
+     "contest": "g1884",
+     "candidate": "Edwin Maxwell"
+    },
+    {
+     "label": "1888 Nathan Goff, Republican",
+     "contest": "g1888",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1888 A. B. Fleming, Democrat",
+     "contest": "g1888",
+     "candidate": "A. Brooks Fleming"
+    }
+   ],
+   "stub": [
+    0.03,
+    0.14
+   ],
+   "header": [
+    0.0,
+    0.33
+   ]
+  },
+  {
+   "page": 126,
+   "id": "126-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.0,
+    0.531,
+    0.77
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 A. I. Boreman, No opposition",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1866 A. I. Boreman, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1866 Ben H. Smith, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1868 W. E. Stevenson, Republican",
+     "contest": "g1868",
+     "candidate": "William E. Stevenson"
+    },
+    {
+     "label": "1868 J. N. Camden, Democrat",
+     "contest": "g1868",
+     "candidate": "James M. Camden"
+    },
+    {
+     "label": "1870 J. J. Jacob, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1870 W. E. Stevenson, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 J. J. Jacob, Ind. Democrat",
+     "contest": "g1872",
+     "candidate": "John J. Jacob"
+    },
+    {
+     "label": "1872 J. N. Camden, Democrat",
+     "contest": "g1872",
+     "candidate": "Johnson N. Camden"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  },
+  {
+   "page": 126,
+   "id": "126-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.531,
+    0.0,
+    0.945,
+    0.77
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1876 H. M. Matthews, Democrat",
+     "contest": "g1876",
+     "candidate": "Henry M. Mathews"
+    },
+    {
+     "label": "1876 Nathan Goff, Republican",
+     "contest": "g1876",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1880 J. B. Jackson, Democrat",
+     "contest": "g1880",
+     "candidate": "Jacob B. Jackson"
+    },
+    {
+     "label": "1880 G. C. Sturgiss, Republican",
+     "contest": "g1880",
+     "candidate": "George C. Sturgiss"
+    },
+    {
+     "label": "1880 N. B. French, Union Labor",
+     "contest": "g1880",
+     "candidate": "N. B. French"
+    },
+    {
+     "label": "1884 E. W. Wilson, Democrat",
+     "contest": "g1884",
+     "candidate": "E. Willis Wilson"
+    },
+    {
+     "label": "1884 Edwin Maxwell, Republican",
+     "contest": "g1884",
+     "candidate": "Edwin Maxwell"
+    },
+    {
+     "label": "1888 Nathan Goff, Republican",
+     "contest": "g1888",
+     "candidate": "Nathan Jr. Goff"
+    },
+    {
+     "label": "1888 A. B. Fleming, Democrat",
+     "contest": "g1888",
+     "candidate": "A. Brooks Fleming"
+    }
+   ],
+   "stub": [
+    0.02,
+    0.14
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  }
+ ]
+}

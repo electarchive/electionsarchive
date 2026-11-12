@@ -1,0 +1,351 @@
+{
+ "polity": "US-WV",
+ "publisher": "George W. Atkinson and Alvaro F. Gibbens",
+ "license": "Public domain",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://archive.org/download/prominentmenofwe00atki/page/n{page}.jpg",
+  "item": "https://archive.org/details/prominentmenofwe00atki"
+ },
+ "title": "Prominent Men of West Virginia (1890), State elections for President from 1864 to 1888, by counties",
+ "contests": {
+  "p1864": {
+   "year": 1864,
+   "chamber": "president",
+   "day": "1864-11-08",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "p1872": {
+   "year": 1872,
+   "chamber": "president",
+   "day": "1872-11-05",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "p1876": {
+   "year": 1876,
+   "chamber": "president",
+   "day": "1876-11-07",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "p1880": {
+   "year": 1880,
+   "chamber": "president",
+   "day": "1880-11-02",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "p1884": {
+   "year": 1884,
+   "chamber": "president",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": null
+  },
+  "p1888": {
+   "year": 1888,
+   "chamber": "president",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 123,
+   "id": "123-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.01,
+    0.09,
+    0.51,
+    0.975
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 Lincoln, Republican",
+     "contest": "p1864",
+     "candidate": "Abraham Lincoln"
+    },
+    {
+     "label": "1864 McClellan, Democrat",
+     "contest": "p1864",
+     "candidate": "George B. McClellan"
+    },
+    {
+     "label": "1868 Grant, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1868 Seymour, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Grant, Republican",
+     "contest": "p1872",
+     "candidate": "Ulysses S. Grant"
+    },
+    {
+     "label": "1872 Greeley, Democrat",
+     "contest": "p1872",
+     "candidate": "Horace Greeley"
+    },
+    {
+     "label": "1872 Chas. O'Conor, Democrat",
+     "contest": "p1872",
+     "candidate": "Charles O'Conor"
+    },
+    {
+     "label": "1876 S. J. Tilden, Democrat",
+     "contest": "p1876",
+     "candidate": "Samuel J. Tilden"
+    },
+    {
+     "label": "1876 R. B. Hayes, Republican",
+     "contest": "p1876",
+     "candidate": "Rutherford B. Hayes"
+    },
+    {
+     "label": "1876 Peter Cooper, Greenback",
+     "contest": "p1876",
+     "candidate": "Peter Cooper"
+    }
+   ],
+   "header": [
+    0.0,
+    0.28
+   ]
+  },
+  {
+   "page": 123,
+   "id": "123-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.09,
+    0.935,
+    0.975
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1880 Hancock, Democrat",
+     "contest": "p1880",
+     "candidate": "Winfield S. Hancock"
+    },
+    {
+     "label": "1880 Garfield, Republican",
+     "contest": "p1880",
+     "candidate": "James A. Garfield"
+    },
+    {
+     "label": "1880 Weaver, Greenback",
+     "contest": "p1880",
+     "candidate": "James B. Weaver"
+    },
+    {
+     "label": "1884 Cleveland, Democrat",
+     "contest": "p1884",
+     "candidate": "Grover Cleveland"
+    },
+    {
+     "label": "1884 Blaine, Republican",
+     "contest": "p1884",
+     "candidate": "James G. Blaine"
+    },
+    {
+     "label": "1884 St. John, Prohib.",
+     "contest": "p1884",
+     "candidate": "John St. John"
+    },
+    {
+     "label": "1884 Butler, Green'k",
+     "contest": "p1884",
+     "candidate": "Benjamin Butler"
+    },
+    {
+     "label": "1888 Cleveland, Democrat",
+     "contest": "p1888",
+     "candidate": "Grover Cleveland"
+    },
+    {
+     "label": "1888 Harrison, Republican",
+     "contest": "p1888",
+     "candidate": "Benjamin Harrison"
+    },
+    {
+     "label": "1888 Streeter, Union Labor",
+     "contest": "p1888",
+     "candidate": "Alson Streeter"
+    },
+    {
+     "label": "1888 Fisk, Prohibition",
+     "contest": "p1888",
+     "candidate": "Clinton Fisk"
+    }
+   ],
+   "stub": [
+    0.01,
+    0.1
+   ],
+   "header": [
+    0.0,
+    0.28
+   ]
+  },
+  {
+   "page": 124,
+   "id": "124-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.535,
+    0.73
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1864 Lincoln, Republican",
+     "contest": "p1864",
+     "candidate": "Abraham Lincoln"
+    },
+    {
+     "label": "1864 McClellan, Democrat",
+     "contest": "p1864",
+     "candidate": "George B. McClellan"
+    },
+    {
+     "label": "1868 Grant, Republican",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1868 Seymour, Democrat",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1872 Grant, Republican",
+     "contest": "p1872",
+     "candidate": "Ulysses S. Grant"
+    },
+    {
+     "label": "1872 Greeley, Democrat",
+     "contest": "p1872",
+     "candidate": "Horace Greeley"
+    },
+    {
+     "label": "1872 Chas. O'Conor, Democrat",
+     "contest": "p1872",
+     "candidate": "Charles O'Conor"
+    },
+    {
+     "label": "1876 S. J. Tilden, Democrat",
+     "contest": "p1876",
+     "candidate": "Samuel J. Tilden"
+    },
+    {
+     "label": "1876 R. B. Hayes, Republican",
+     "contest": "p1876",
+     "candidate": "Rutherford B. Hayes"
+    },
+    {
+     "label": "1876 Peter Cooper, Greenback",
+     "contest": "p1876",
+     "candidate": "Peter Cooper"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  },
+  {
+   "page": 124,
+   "id": "124-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.535,
+    0.0,
+    0.95,
+    0.73
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1880 Hancock, Democrat",
+     "contest": "p1880",
+     "candidate": "Winfield S. Hancock"
+    },
+    {
+     "label": "1880 Garfield, Republican",
+     "contest": "p1880",
+     "candidate": "James A. Garfield"
+    },
+    {
+     "label": "1880 Weaver, Greenback",
+     "contest": "p1880",
+     "candidate": "James B. Weaver"
+    },
+    {
+     "label": "1884 Cleveland, Democrat",
+     "contest": "p1884",
+     "candidate": "Grover Cleveland"
+    },
+    {
+     "label": "1884 Blaine, Republican",
+     "contest": "p1884",
+     "candidate": "James G. Blaine"
+    },
+    {
+     "label": "1884 St. John, Prohib.",
+     "contest": "p1884",
+     "candidate": "John St. John"
+    },
+    {
+     "label": "1884 Butler, Green'k",
+     "contest": "p1884",
+     "candidate": "Benjamin Butler"
+    },
+    {
+     "label": "1888 Cleveland, Democrat",
+     "contest": "p1888",
+     "candidate": "Grover Cleveland"
+    },
+    {
+     "label": "1888 Harrison, Republican",
+     "contest": "p1888",
+     "candidate": "Benjamin Harrison"
+    },
+    {
+     "label": "1888 Streeter, Union Labor",
+     "contest": "p1888",
+     "candidate": "Alson Streeter"
+    },
+    {
+     "label": "1888 Fisk, Prohibition",
+     "contest": "p1888",
+     "candidate": "Clinton Fisk"
+    }
+   ],
+   "stub": [
+    0.0,
+    0.1
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row."
+  }
+ ]
+}

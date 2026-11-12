@@ -1,0 +1,721 @@
+{
+ "polity": "US-WV",
+ "publisher": "George W. Atkinson and Alvaro F. Gibbens",
+ "license": "Public domain",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://archive.org/download/prominentmenofwe00atki/page/n{page}.jpg",
+  "item": "https://archive.org/details/prominentmenofwe00atki"
+ },
+ "title": "Prominent Men of West Virginia (1890), Congressional elections from 1880 to 1888, by counties",
+ "contests": {
+  "h1880-1": {
+   "year": 1880,
+   "chamber": "house",
+   "day": "1880-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1880-2": {
+   "year": 1880,
+   "chamber": "house",
+   "day": "1880-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1880-3": {
+   "year": 1880,
+   "chamber": "house",
+   "day": "1880-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1882-1": {
+   "year": 1882,
+   "chamber": "house",
+   "day": "1882-11-07",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1882-2": {
+   "year": 1882,
+   "chamber": "house",
+   "day": "1882-11-07",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1882-3": {
+   "year": 1882,
+   "chamber": "house",
+   "day": "1882-11-07",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1882-4": {
+   "year": 1882,
+   "chamber": "house",
+   "day": "1882-11-07",
+   "special": false,
+   "state": "WV",
+   "district": 4
+  },
+  "h1884-1": {
+   "year": 1884,
+   "chamber": "house",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1884-2": {
+   "year": 1884,
+   "chamber": "house",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1884-3": {
+   "year": 1884,
+   "chamber": "house",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1884-4": {
+   "year": 1884,
+   "chamber": "house",
+   "day": "1884-11-04",
+   "special": false,
+   "state": "WV",
+   "district": 4
+  },
+  "h1886-1": {
+   "year": 1886,
+   "chamber": "house",
+   "day": "1886-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1886-2": {
+   "year": 1886,
+   "chamber": "house",
+   "day": "1886-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1886-3": {
+   "year": 1886,
+   "chamber": "house",
+   "day": "1886-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1886-4": {
+   "year": 1886,
+   "chamber": "house",
+   "day": "1886-11-02",
+   "special": false,
+   "state": "WV",
+   "district": 4
+  },
+  "h1888-1": {
+   "year": 1888,
+   "chamber": "house",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": 1
+  },
+  "h1888-2": {
+   "year": 1888,
+   "chamber": "house",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": 2
+  },
+  "h1888-3": {
+   "year": 1888,
+   "chamber": "house",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": 3
+  },
+  "h1888-4": {
+   "year": 1888,
+   "chamber": "house",
+   "day": "1888-11-06",
+   "special": false,
+   "state": "WV",
+   "district": 4
+  }
+ },
+ "pages": [
+  {
+   "page": 139,
+   "id": "139-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.08,
+    0.43,
+    0.985
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1880 First Dist. Benj. Wilson",
+     "contest": "h1880-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1880 First Dist. Jno. A. Hutchinson",
+     "contest": "h1880-1",
+     "candidate": "John H. Hutchinson"
+    },
+    {
+     "label": "1880 First Dist. James Bassell",
+     "contest": "h1880-1",
+     "candidate": "James Bassil"
+    },
+    {
+     "label": "1880 Second Dist. John B. Hoge",
+     "contest": "h1880-2",
+     "candidate": "John Blair Hoge"
+    },
+    {
+     "label": "1880 Second Dist. J. T. Hoke",
+     "contest": "h1880-2",
+     "candidate": "J. T. Hoke"
+    },
+    {
+     "label": "1880 Second Dist. D. D. T. Farnsworth",
+     "contest": "h1880-2",
+     "candidate": "D. Farnsworth"
+    },
+    {
+     "label": "1880 Third Dist. John E. Kenna",
+     "contest": "h1880-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1880 Third Dist. H. S. Walker",
+     "contest": "h1880-3",
+     "candidate": "H. I. Walker"
+    }
+   ],
+   "header": [
+    0.0,
+    0.25
+   ]
+  },
+  {
+   "page": 139,
+   "id": "139-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.43,
+    0.08,
+    0.91,
+    0.985
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1882 First Dist. Nathan Goff, Jr.",
+     "contest": "h1882-1",
+     "candidate": "Nathan Goff"
+    },
+    {
+     "label": "1882 First Dist. John H. Good",
+     "contest": "h1882-1",
+     "candidate": "John H. Good"
+    },
+    {
+     "label": "1882 First Dist. L. C. Shinn",
+     "contest": "h1882-1",
+     "candidate": "S. L. Shiner"
+    },
+    {
+     "label": "1882 Second Dist. W. L. Wilson",
+     "contest": "h1882-2",
+     "candidate": "William Lyne Wilson"
+    },
+    {
+     "label": "1882 Second Dist. John W. Mason",
+     "contest": "h1882-2",
+     "candidate": "John W. Mason"
+    },
+    {
+     "label": "1882 Second Dist. B. M. Kitchen",
+     "contest": "h1882-2",
+     "candidate": "B. M. Kitchen"
+    },
+    {
+     "label": "1882 Third Dist. John E. Kenna",
+     "contest": "h1882-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1882 Third Dist. E. L. Buttrick",
+     "contest": "h1882-3",
+     "candidate": "E. S. Buttrick"
+    },
+    {
+     "label": "1882 Third Dist. P. B. Reynolds",
+     "contest": "h1882-3",
+     "candidate": "P. B. Reynolds"
+    },
+    {
+     "label": "1882 Fourth Dist. Eustace Gibson",
+     "contest": "h1882-4",
+     "candidate": "Eustace Gibson"
+    },
+    {
+     "label": "1882 Fourth Dist. George Loomis",
+     "contest": "h1882-4",
+     "candidate": "George Loomis"
+    },
+    {
+     "label": "1882 Fourth Dist. A. R. Barbee",
+     "contest": "h1882-4",
+     "candidate": "A. R. Barber"
+    }
+   ],
+   "stub": [
+    0.0,
+    0.09
+   ],
+   "header": [
+    0.0,
+    0.25
+   ]
+  },
+  {
+   "page": 140,
+   "id": "140-a",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    0.469,
+    0.82
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1880 First Dist. Benj. Wilson",
+     "contest": "h1880-1",
+     "candidate": "Benjamin Wilson"
+    },
+    {
+     "label": "1880 First Dist. Jno. A. Hutchinson",
+     "contest": "h1880-1",
+     "candidate": "John H. Hutchinson"
+    },
+    {
+     "label": "1880 First Dist. James Bassell",
+     "contest": "h1880-1",
+     "candidate": "James Bassil"
+    },
+    {
+     "label": "1880 Second Dist. John B. Hoge",
+     "contest": "h1880-2",
+     "candidate": "John Blair Hoge"
+    },
+    {
+     "label": "1880 Second Dist. J. T. Hoke",
+     "contest": "h1880-2",
+     "candidate": "J. T. Hoke"
+    },
+    {
+     "label": "1880 Second Dist. D. D. T. Farnsworth",
+     "contest": "h1880-2",
+     "candidate": "D. Farnsworth"
+    },
+    {
+     "label": "1880 Third Dist. John E. Kenna",
+     "contest": "h1880-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1880 Third Dist. H. S. Walker",
+     "contest": "h1880-3",
+     "candidate": "H. I. Walker"
+    }
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. Ignore the footnote marks before some numbers."
+  },
+  {
+   "page": 140,
+   "id": "140-b",
+   "turn": 270,
+   "orientation": "counties_down",
+   "crop": [
+    0.469,
+    0.0,
+    0.955,
+    0.82
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1882 First Dist. Nathan Goff, Jr.",
+     "contest": "h1882-1",
+     "candidate": "Nathan Goff"
+    },
+    {
+     "label": "1882 First Dist. John H. Good",
+     "contest": "h1882-1",
+     "candidate": "John H. Good"
+    },
+    {
+     "label": "1882 First Dist. L. C. Shinn",
+     "contest": "h1882-1",
+     "candidate": "S. L. Shiner"
+    },
+    {
+     "label": "1882 Second Dist. W. L. Wilson",
+     "contest": "h1882-2",
+     "candidate": "William Lyne Wilson"
+    },
+    {
+     "label": "1882 Second Dist. John W. Mason",
+     "contest": "h1882-2",
+     "candidate": "John W. Mason"
+    },
+    {
+     "label": "1882 Second Dist. B. M. Kitchen",
+     "contest": "h1882-2",
+     "candidate": "B. M. Kitchen"
+    },
+    {
+     "label": "1882 Third Dist. John E. Kenna",
+     "contest": "h1882-3",
+     "candidate": "John Edward Kenna"
+    },
+    {
+     "label": "1882 Third Dist. E. L. Buttrick",
+     "contest": "h1882-3",
+     "candidate": "E. S. Buttrick"
+    },
+    {
+     "label": "1882 Third Dist. P. B. Reynolds",
+     "contest": "h1882-3",
+     "candidate": "P. B. Reynolds"
+    },
+    {
+     "label": "1882 Fourth Dist. Eustace Gibson",
+     "contest": "h1882-4",
+     "candidate": "Eustace Gibson"
+    },
+    {
+     "label": "1882 Fourth Dist. George Loomis",
+     "contest": "h1882-4",
+     "candidate": "George Loomis"
+    },
+    {
+     "label": "1882 Fourth Dist. A. R. Barbee",
+     "contest": "h1882-4",
+     "candidate": "A. R. Barber"
+    }
+   ],
+   "stub": [
+    0.0,
+    0.09
+   ],
+   "hint": "The column headings are printed on the previous page and are not on this page; the columns keep the same order. Read the Total row. Ignore the footnote marks before some numbers."
+  },
+  {
+   "page": 141,
+   "id": "141",
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.13,
+    0.96,
+    0.89
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "1883 Third District C. P. Snyder",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1883 Third District Jas. H. Brown",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "1884 First Dist. John Brannon",
+     "contest": "h1884-1",
+     "candidate": "John Brannon"
+    },
+    {
+     "label": "1884 First Dist. N. Goff, Jr.",
+     "contest": "h1884-1",
+     "candidate": "Nathan Goff"
+    },
+    {
+     "label": "1884 Second Dist. Wm. L. Wilson",
+     "contest": "h1884-2",
+     "candidate": "William Lyne Wilson"
+    },
+    {
+     "label": "1884 Second Dist. F. M. Reynolds",
+     "contest": "h1884-2",
+     "candidate": "Francis M. Reynolds"
+    },
+    {
+     "label": "1884 Third Dist. C. P. Snyder",
+     "contest": "h1884-3",
+     "candidate": "Charles Philip Snyder"
+    },
+    {
+     "label": "1884 Third Dist. J. W. Davis",
+     "contest": "h1884-3",
+     "candidate": "James W. Davis"
+    },
+    {
+     "label": "1884 Fourth Dist. Eustace Gibson",
+     "contest": "h1884-4",
+     "candidate": "Eustace Gibson"
+    },
+    {
+     "label": "1884 Fourth Dist. A. R. Barbee",
+     "contest": "h1884-4",
+     "candidate": "A. R. Barbee"
+    }
+   ],
+   "header": [
+    0.0,
+    0.22
+   ]
+  },
+  {
+   "page": 142,
+   "id": "142",
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.09,
+    0.97,
+    0.845
+   ],
+   "bands": 2,
+   "columns": [
+    {
+     "label": "First District John Brannon",
+     "contest": "h1886-1",
+     "candidate": "John Bannon"
+    },
+    {
+     "label": "First District N. Goff, Jr.",
+     "contest": "h1886-1",
+     "candidate": "Nathan Goff"
+    },
+    {
+     "label": "First District L. E. Peters",
+     "contest": "h1886-1",
+     "candidate": "L. E. Peters"
+    },
+    {
+     "label": "Second District W. L. Wilson",
+     "contest": "h1886-2",
+     "candidate": "William Lyne Wilson"
+    },
+    {
+     "label": "Second District W. H. H. Flick",
+     "contest": "h1886-2",
+     "candidate": "W. H. H. Flick"
+    },
+    {
+     "label": "Second District John L. Siler",
+     "contest": "h1886-2",
+     "candidate": "John T. Siler"
+    },
+    {
+     "label": "Third District J. H. Brown",
+     "contest": "h1886-3",
+     "candidate": "James H. Brown"
+    },
+    {
+     "label": "Third District C. P. Snyder",
+     "contest": "h1886-3",
+     "candidate": "Charles Philip Snyder"
+    },
+    {
+     "label": "Third District J. W. Claypool",
+     "contest": "h1886-3",
+     "candidate": "J. W. Claypool"
+    },
+    {
+     "label": "Fourth Dist. C. E. Hogg",
+     "contest": "h1886-4",
+     "candidate": "Charles Edgar Hogg"
+    },
+    {
+     "label": "Fourth Dist. J. A. Hutchinson",
+     "contest": "h1886-4",
+     "candidate": "John H. Hutchinson"
+    },
+    {
+     "label": "Fourth Dist. W. H. Smith",
+     "contest": "h1886-4",
+     "candidate": "William H. Smith"
+    }
+   ],
+   "header": [
+    0.0,
+    0.22
+   ]
+  },
+  {
+   "page": 143,
+   "id": "143-1",
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.185,
+    0.965,
+    0.445
+   ],
+   "bands": 1,
+   "columns": [
+    {
+     "label": "John O. Pendleton",
+     "contest": "h1888-1",
+     "candidate": "John Overton Pendleton"
+    },
+    {
+     "label": "Geo. W. Atkinson",
+     "contest": "h1888-1",
+     "candidate": "George W. Atkinson"
+    },
+    {
+     "label": "J. E. Stealey",
+     "contest": "h1888-1",
+     "candidate": "J. E. Stealy"
+    },
+    {
+     "label": "B. F. Meyer",
+     "contest": "h1888-1",
+     "candidate": "B. F. Meyer"
+    }
+   ],
+   "hint": "Read only the one district table inside this crop; its Total row has no label."
+  },
+  {
+   "page": 143,
+   "id": "143-2",
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.525,
+    0.965,
+    0.845
+   ],
+   "bands": 1,
+   "columns": [
+    {
+     "label": "W. L. Wilson",
+     "contest": "h1888-2",
+     "candidate": "William Lyne Wilson"
+    },
+    {
+     "label": "W. H. H. Flick",
+     "contest": "h1888-2",
+     "candidate": "W. H. H. Flick"
+    },
+    {
+     "label": "Frank Burt",
+     "contest": "h1888-2",
+     "candidate": "Frank Burt"
+    },
+    {
+     "label": "Spencer Sturm",
+     "contest": "h1888-2",
+     "candidate": "Spencer W. Sturm"
+    }
+   ],
+   "hint": "Read only the one district table inside this crop; its Total row has no label."
+  },
+  {
+   "page": 144,
+   "id": "144-3",
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.09,
+    0.88,
+    0.395
+   ],
+   "bands": 1,
+   "columns": [
+    {
+     "label": "J. D. Alderson",
+     "contest": "h1888-3",
+     "candidate": "John Duffy Alderson"
+    },
+    {
+     "label": "James H. McGinnis",
+     "contest": "h1888-3",
+     "candidate": "James H. McGinnis"
+    }
+   ],
+   "hint": "Read only the one district table inside this crop; its Total row has no label."
+  },
+  {
+   "page": 144,
+   "id": "144-4",
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.425,
+    0.88,
+    0.675
+   ],
+   "bands": 1,
+   "columns": [
+    {
+     "label": "Jas. M. Jackson",
+     "contest": "h1888-4",
+     "candidate": "James Monroe Jackson"
+    },
+    {
+     "label": "Chas. B. Smith",
+     "contest": "h1888-4",
+     "candidate": "C. B. Smith"
+    },
+    {
+     "label": "Geo. W. Hayes",
+     "contest": "h1888-4",
+     "candidate": "G. W. Hays"
+    },
+    {
+     "label": "W. M. Weekly",
+     "contest": "h1888-4",
+     "candidate": "W. M. Weekley"
+    }
+   ],
+   "hint": "Read only the one district table inside this crop; its Total row has no label."
+  }
+ ]
+}
