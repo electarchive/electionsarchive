@@ -1,0 +1,247 @@
+{
+  "polity": "US-NY",
+  "publisher": "New York State Board of Elections",
+  "title": "Vote: General Election, November 8, 1988, New York State",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0313/micro_IA40706932_0313.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0313"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "NY",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "NY",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "MICHAEL S. DUKAKIS / LLOYD M. BENTSEN DEMOCRATIC",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "GEORGE BUSH / DAN QUAYLE REPUBLICAN",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "GEORGE BUSH / DAN QUAYLE CONSERVATIVE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLIAM A. MARRA / JOAN ANDREWS RIGHT TO LIFE",
+          "contest": "president",
+          "candidate": "William A. Marra"
+        },
+        {
+          "label": "MICHAEL S. DUKAKIS / LLOYD M. BENTSEN LIBERAL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LARRY HOLMES / GLORIA LARIVA WORKERS WORLD",
+          "contest": "president",
+          "candidate": "Larry Holmes"
+        },
+        {
+          "label": "JAMES WARREN / KATE MI... SOCIALIST WORKERS",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.269,
+        0.049,
+        0.949,
+        0.992
+      ],
+      "hint": "Read only the table headed 'STATE OF NEW YORK - STATE BOARD OF ELECTIONS VOTES CAST NOVEMBER 8, 1988 FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1124
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "RON PAUL / ANDRE MARROU",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "LENORA B. FULANI / JOYCE DATTNER",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "ED WINN / BARRY PORTER",
+          "contest": "president",
+          "candidate": "Edward Winn"
+        },
+        {
+          "label": "JOHN ERWIN BOYDSTON / RON EDWARDS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLA KENOYER / RON DAVIS",
+          "contest": "president",
+          "candidate": "Willa Kenoyer"
+        },
+        {
+          "label": "BLANK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VOID",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.304,
+        0.004,
+        0.916,
+        0.926
+      ],
+      "hint": "Read only the table headed 'President'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1128
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "DANIEL P. MOYNIHAN DEMOCRATIC",
+          "contest": "senate",
+          "candidate": "Daniel P. Moynihan"
+        },
+        {
+          "label": "ROBERT R. McMILLAN REPUBLICAN",
+          "contest": "senate",
+          "candidate": "Robert R. McMillan"
+        },
+        {
+          "label": "ROBERT R. McMILLAN CONSERVATIVE",
+          "contest": "senate",
+          "candidate": "Robert R. McMillan"
+        },
+        {
+          "label": "AURELIE R. NATHANSON RIGHT TO LIFE",
+          "contest": "senate",
+          "candidate": "Adelle R. Nathanson"
+        },
+        {
+          "label": "DANIEL P. MOYNIHAN LIBERAL",
+          "contest": "senate",
+          "candidate": "Daniel P. Moynihan"
+        },
+        {
+          "label": "LYDIA BAYONETA WORKERS WORLD",
+          "contest": "senate",
+          "candidate": "Lydia Bayoneta"
+        },
+        {
+          "label": "JAMES HARRIS SOCIALIST WORKERS (partial)",
+          "contest": "senate",
+          "candidate": "James E. Harris Jr."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.292,
+        0.019,
+        0.983,
+        0.949
+      ],
+      "hint": "Read only the table headed 'VOTES CAST NOVEMBER 8, 1986 FOR UNITED STATES SENATOR'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0817
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "WILLIAM P. MACMILLEN LIBERTARIAN",
+          "contest": "senate",
+          "candidate": "William P. MacMillen"
+        },
+        {
+          "label": "CHARLENE MITCHELL INDEPENDENT PROGRESSIVE",
+          "contest": "senate",
+          "candidate": "Charlene Mitchell"
+        },
+        {
+          "label": "BLANK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "VOID",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SCATTERING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.309,
+        0.013,
+        0.81,
+        0.943
+      ],
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0828
+      ]
+    }
+  ]
+}
