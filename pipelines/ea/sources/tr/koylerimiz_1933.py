@@ -331,6 +331,13 @@ def page_rows(number: int, words: list[tuple], layout: list[float]) -> list[dict
                         max(w[3] for w in entry["parts"][-1]) + 1.5,
                     ),
                     "y": round(entry["y"]),
+                    "span": (
+                        name_x - 4,
+                        max(w[2] for w in entry["parts"][-1]) + 2,
+                        min(w[1] for w in entry["parts"][0]) - 2,
+                        max(w[3] for w in entry["parts"][-1]) + 2,
+                    ),
+                    "single": len(entry["parts"]) == 1,
                     "name": name,
                     "stars": stars,
                     "province_printed": province_text,
@@ -395,6 +402,24 @@ def read(image: Image.Image, box: tuple[float, float, float, float], folder: str
     return words
 
 
+def doubtful(name: str) -> bool:
+    return bool(re.search(r"[Iİ]{2}|\s\S{1,2}$", name))
+
+
+def retyped(row: dict, words: list[tuple]) -> str | None:
+    x0, x1, y0, y1 = row["span"]
+    near = [
+        w for w in words if x0 <= (w[0] + w[2]) / 2 <= x1 and y0 <= (w[1] + w[3]) / 2 <= y1 and LETTERS.search(w[4])
+    ]
+    if not near:
+        return None
+    name = re.sub(r"[^\w\s()-]|[\d_]", "", " ".join(w[4] for w in sorted(near, key=lambda w: w[0])))
+    name = turkish_upper(re.sub(r"\s+", " ", name)).strip(" -")
+    if len(name) < 3 or doubtful(name):
+        return None
+    return name
+
+
 def readings(row: dict) -> list[tuple[str, str]]:
     return [(row["province_printed"], row["kaza_printed"]), (row["province_alt"], row["kaza_alt"])]
 
@@ -425,8 +450,17 @@ def parse(path: Path) -> pl.DataFrame:
             image = np.asarray(page.resize((page.size[0] * 2 // 3, page.size[1] * 2 // 3)))
             tops = [r["box"][2] for r in found]
             seen: dict[tuple, list[tuple]] = {}
+            names: dict[int, list[tuple]] = {}
             for row in found:
                 row["drawn"] = drawn(image, row["box"])
+                province_x = row["columns"][0]
+                if row["group"] not in names:
+                    names[row["group"]] = read(
+                        page, (row["span"][0], min(tops) - 8, province_x - 3, max(tops) + 20), folder
+                    )
+                row["name_abbyy"] = row["name"]
+                if row["single"] and doubtful(row["name"]):
+                    row["name"] = retyped(row, names[row["group"]]) or row["name"]
                 province_x, kaza_x, end = row["columns"]
                 if row["columns"] not in seen:
                     seen[row["columns"]] = read(page, (province_x - 3, min(tops) - 8, end, max(tops) + 20), folder)
@@ -492,6 +526,7 @@ def parse(path: Path) -> pl.DataFrame:
                 "column": row["group"],
                 "y": round(row["box"][2], 1),
                 "koy": row["name"],
+                "koy_abbyy": row["name_abbyy"],
                 "vilayet": row["vilayet"] or "",
                 "kaza": row["kaza"],
                 "mark": "*" * min(max(row["drawn"], stars(row["stars"])), 2),
