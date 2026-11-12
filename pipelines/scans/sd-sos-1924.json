@@ -429,5 +429,9 @@
         0.1247
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Washington": "SD:washington",
+    "Unorganized Counties\u2014Armstrong": "46001"
+  }
 }
