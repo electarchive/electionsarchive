@@ -37,6 +37,41 @@ STATEWIDE = [
 ]
 
 
+CITY_PORTALS = {
+    ("mi_detroit", None): ("MI", "26163", "Detroit"),
+    ("enhanced_voting", "https://app.enhancedvoting.com/results/public/city-detroit-mi"): ("MI", "26163", "Detroit"),
+    ("tx_austin", None): ("TX", "48453", "Austin"),
+    ("tx_fortworth", None): ("TX", "48439", "Fort Worth"),
+    ("tx_frisco", None): ("TX", "48085", "Frisco"),
+}
+DROPPED = {"tx_citysum"}
+
+
+def cities() -> dict[tuple[str, str | None], UUID]:
+    with connect() as conn:
+        found = {
+            (state, county, name): polity
+            for state, county, name, polity in conn.execute(
+                "select state, county, name, polity_id from coverage_government"
+                " where kind = 'municipality' and polity_id is not null"
+            ).fetchall()
+        }
+    return {portal: found[where] for portal, where in CITY_PORTALS.items()}
+
+
+def rekey(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    polities = cities()
+    out = []
+    for row in rows:
+        if row["platform"] in DROPPED:
+            continue
+        match = polities.get((str(row["platform"]), None)) or polities.get(
+            (str(row["platform"]), str(row["url_pattern"]))
+        )
+        out.append(row | {"polity_id": match, "serves": "municipal"} if match else row)
+    return out
+
+
 def key(row: Mapping[str, object]) -> UUID:
     return uuid5(NAMESPACE, f"results_access\x1f{row['polity_id']}\x1f{row['platform']}\x1f{row['url_pattern']}")
 
@@ -61,7 +96,7 @@ def write(rows: list[dict[str, object]]) -> Path:
             polity="US",
         )
         cs.manifest["scope"] = {"polity": "US", "sweeps": ["results_access"]}
-        merged = {key(row): row for row in rows}
+        merged = {key(row): row for row in rekey(rows)}
         for row in STATEWIDE:
             spec: dict[str, object] = {k: v for k, v in row.items() if k != "iso"} | {
                 "polity_id": cs.polity(str(row["iso"]))
