@@ -12731,7 +12731,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
         first_rounds = dict(
             conn.execute(
                 """select distinct regexp_replace(x.value, '^[0-9-]+:', ''), co.id from external_id x
-                   join changeset c on c.id = x.changeset_id and c.pipeline = 'us.fl_primary_2026'
+                   join changeset c on c.id = x.changeset_id and c.pipeline in ('us.fl_primary_2026', 'us.ca_june_2026')
                    join contest co on co.id = x.entity_id join entity e on e.id = co.id and e.retired_by is null
                    join result_set rs on rs.contest_id = co.id join outcome o on o.result_set_id = rs.id and o.kind = 'advanced'
                    where x.scheme = 'us.contest' and x.value !~ ':commission:'
