@@ -28,7 +28,14 @@ ROUNDS = {
     2004: (date(2004, 3, 21), date(2004, 3, 28)),
     2010: (date(2010, 3, 14), date(2010, 3, 21)),
     2015: (date(2015, 12, 6), date(2015, 12, 13)),
+    2017: (date(2017, 12, 3), date(2017, 12, 10)),
     2021: (date(2021, 6, 20), date(2021, 6, 27)),
+}
+R17 = f"{STATIC}/resources/election-des-conseillers-a-lassemblee-de-corse-des-3-et-10-decembre-2017"
+CORSE_FILES = {
+    1: f"{R17}-resultats-du-1er-tour/20171205-083829/Corse_2017_result_communes_T1.xlsx",
+    2: f"{R17}-resultats-du-2nd-tour-et-liste-des-elus/20171212-115734/Corse_2017_result_communes_T2.xlsx",
+    "candidatures": f"{R17}-candidatures-du-1er-tour/20171109-110828/Corse_2017_Candidatures_T1.xls",
 }
 FILES = {
     (1998, 1, "region"): (R98, "Régions"),
@@ -107,7 +114,7 @@ TOTALS = {
 
 
 def fetch() -> None:
-    for url, _ in FILES.values():
+    for url in [url for url, _ in FILES.values()] + list(CORSE_FILES.values()):
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
     raw.fetch(SOURCE, CDSP, suffix=".zip")
 
@@ -210,6 +217,112 @@ def heads_1998(lists: list[dict[str, object]]) -> None:
             entry["long"] = title
 
 
+def sheet(url: str, index: int) -> list[list[object]]:
+    frame = pl.read_excel(
+        raw.cached(SOURCE, url).path, sheet_id=index, engine="calamine", has_header=False, infer_schema_length=0
+    )
+    return [list(row) for row in frame.iter_rows()]
+
+
+def corse_head(text: str) -> str:
+    return re.sub(r"^(M\.|Mme)\s+", "", text.strip())
+
+
+def read_corse() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    panels: dict[str, tuple[int, str]] = {}
+    for row in sheet(CORSE_FILES["candidatures"], 1)[1:]:
+        if row[2] is not None and str(row[2]).strip() == "1":
+            panels[f"{str(row[4]).strip()} {str(row[5]).strip()}"] = (int(str(row[0])), str(row[1]).strip())
+    totals: list[dict[str, object]] = []
+    lists: list[dict[str, object]] = []
+    for round_ in (1, 2):
+        summary = sheet(CORSE_FILES[round_], 1)
+        entry: dict[str, object] = {"year": 2017, "round": round_, "level": "region", "unit": "94", "label": "Corse"}
+        for row in summary:
+            if str(row[0]).startswith("Rappel"):
+                break
+            for field, key in TOTALS.items():
+                if row[0] == field:
+                    entry[key] = number(row[1])
+        totals.append(entry)
+        start = next(i for i, row in enumerate(summary) if row[0] == "Liste conduite par")
+        for order, row in enumerate(summary[start + 1 :], 1):
+            if row[1] is None or not str(row[0]).strip().startswith(("M.", "Mme")):
+                break
+            head = corse_head(str(row[0]))
+            panel, name = panels[head]
+            lists.append(
+                {
+                    "year": 2017,
+                    "round": round_,
+                    "level": "region",
+                    "unit": "94",
+                    "order": panel,
+                    "panel": panel,
+                    "nuance": None,
+                    "short": name,
+                    "long": name,
+                    "head": head,
+                    "votes": number(row[1]),
+                    "seats": number(row[4]),
+                }
+            )
+        detail = sheet(CORSE_FILES[round_], 2)
+        header_at = next(i for i, row in enumerate(detail) if row[0] == "Code du département")
+        header = detail[header_at]
+        heads = [corse_head(str(cell)) for cell in detail[header_at - 1] if cell not in (None, "")]
+        first = header.index("Exprimés") + 1
+        sums: dict[str, dict[str, int]] = {}
+        for row in detail[header_at + 1 :]:
+            if row[0] not in ("2A", "2B"):
+                continue
+            unit = str(row[0])
+            bucket = sums.setdefault(unit, {})
+            for key in ("Inscrits", "Abstentions", "Votants", "Blancs", "Nuls", "Exprimés"):
+                bucket[key] = bucket.get(key, 0) + (number(row[header.index(key)]) or 0)
+            for index, head in enumerate(heads):
+                bucket[head] = bucket.get(head, 0) + (number(row[first + 2 * index]) or 0)
+        for unit, bucket in sums.items():
+            totals.append(
+                {
+                    "year": 2017,
+                    "round": round_,
+                    "level": "departement",
+                    "unit": unit,
+                    "label": unit,
+                    "registered": bucket["Inscrits"],
+                    "voters": bucket["Votants"],
+                    "invalid": None,
+                    "null": bucket["Nuls"],
+                    "blank": bucket["Blancs"],
+                    "valid": bucket["Exprimés"],
+                }
+            )
+            for head in heads:
+                panel, name = panels[head]
+                lists.append(
+                    {
+                        "year": 2017,
+                        "round": round_,
+                        "level": "departement",
+                        "unit": unit,
+                        "order": panel,
+                        "panel": panel,
+                        "nuance": None,
+                        "short": name,
+                        "long": name,
+                        "head": head,
+                        "votes": bucket[head],
+                        "seats": None,
+                    }
+                )
+        for field in ("registered", "voters", "valid", "null", "blank"):
+            total = sum(int(str(t[field])) for t in totals if t["round"] == round_ and t["level"] == "departement")
+            if total != entry[field]:
+                raise ValueError(f"2017 round {round_}: départements sum to {total}, not {entry[field]} ({field})")
+    return totals, lists
+
+
 def parse() -> None:
     totals: list[dict[str, object]] = []
     lists: list[dict[str, object]] = []
@@ -218,6 +331,9 @@ def parse() -> None:
         totals += found_totals
         lists += found_lists
     heads_1998(lists)
+    found_totals, found_lists = read_corse()
+    totals += found_totals
+    lists += found_lists
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "lists.parquet")
@@ -286,6 +402,7 @@ DATASETS = {
     2004: ("https://www.data.gouv.fr/datasets/536993a5a3a729239d204258", "Licence Ouverte v1.0"),
     2010: ("https://www.data.gouv.fr/datasets/536993a8a3a729239d204260", "Licence Ouverte v1.0"),
     2015: ("https://www.data.gouv.fr/datasets/56a0a693c751df54fbade715", "Licence Ouverte v1.0"),
+    2017: ("https://www.data.gouv.fr/datasets/5a264a9fc751df3f8b173f8b", "Licence Ouverte v1.0"),
     2021: ("https://www.data.gouv.fr/datasets/60d1c3d14fc2e0fda6816678", "Public record"),
 }
 ENGLISH = {
@@ -632,7 +749,7 @@ ROUND_ONE_NOTE = (
 
 def system_of(code: str, year: int) -> str:
     if code == "94":
-        return "corse-2004" if year == 2004 else "corse-2010" if year < 2021 else "corse-2018"
+        return "corse-2004" if year == 2004 else "corse-2010" if year < 2017 else "corse-2018"
     if code in ASSEMBLIES and year >= 2015:
         return "ctu"
     return "regional"
@@ -675,8 +792,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "French regional elections of 1998 by département constituency, and of 2004, 2010, 2015, and 2021, both "
-                "rounds, by region and by département with each list's seats, from the Interior Ministry's results files"
+                "French regional elections of 1998 by département constituency, and of 2004, 2010, 2015, and 2021, "
+                "and the Corsican territorial election of 2017, both rounds, by region and by département with each "
+                "list's seats, from the Interior Ministry's results files"
             ),
             polity="FR",
         )
@@ -688,7 +806,7 @@ def emit() -> Path:
         nation = cs.area("fr.nation", "FR")
         sources: dict[int, UUID] = {}
         for year, (url, license) in DATASETS.items():
-            title = f"Élections régionales {year}"
+            title = "Élections territoriales de Corse 2017" if year == 2017 else f"Élections régionales {year}"
             sources[year] = cs.source("Ministère de l'Intérieur", title)
             cs.add(
                 "source",
@@ -704,6 +822,9 @@ def emit() -> Path:
             )
             for (file_year, _, _), (file_url, _) in FILES.items():
                 if file_year == year:
+                    cs.artifact(raw.cached(SOURCE, file_url), sources[year])
+            if year == 2017:
+                for file_url in CORSE_FILES.values():
                     cs.artifact(raw.cached(SOURCE, file_url), sources[year])
 
         cs.add("scheme", code="fr.region", polity_id=france, kind="administrative", rank=1, noun="region")
@@ -1000,7 +1121,8 @@ def emit() -> Path:
                     )
 
         for year, days in ROUNDS.items():
-            regions = OLD_REGIONS if year < 2015 else NEW_REGIONS
+            regions = OLD_REGIONS if year < 2015 else {"94": NEW_REGIONS["94"]} if year == 2017 else NEW_REGIONS
+            territorial = year == 2017
             umbrella = cs.key(f"{SOURCE}.election", str(year))
             cs.add(
                 "election",
@@ -1011,9 +1133,18 @@ def emit() -> Path:
                 date_to=days[1],
                 status="held",
             )
-            name(umbrella, f"{year} French regional elections", "en")
-            name(umbrella, f"Élections régionales de {year}", "fr", "native")
-            cs.add("slug", path=f"fr/{days[0]}-regional", entity_id=umbrella)
+            name(
+                umbrella,
+                f"{year} Corsican territorial election" if territorial else f"{year} French regional elections",
+                "en",
+            )
+            name(
+                umbrella,
+                f"Élections territoriales de Corse de {year}" if territorial else f"Élections régionales de {year}",
+                "fr",
+                "native",
+            )
+            cs.add("slug", path=f"fr/{days[0]}-{'territorial' if territorial else 'regional'}", entity_id=umbrella)
             by_dept = departements(year)
             for code in regions:
                 label = labels[code]
@@ -1053,7 +1184,8 @@ def emit() -> Path:
                         status="held",
                     )
                     suffix = ", second round" if round_ == 2 else ""
-                    name(elections[round_], f"{year} {ENGLISH.get(label, label)} regional election{suffix}", "en")
+                    election_name = "Corsican territorial" if territorial else f"{ENGLISH.get(label, label)} regional"
+                    name(elections[round_], f"{year} {election_name} election{suffix}", "en")
                     kind_path = "general" if round_ == 1 else "runoff"
                     cs.add("slug", path=f"{path}/{day}-{kind_path}", entity_id=elections[round_])
                     contest_key = f"{year}:{code}:{round_}"
@@ -1072,7 +1204,7 @@ def emit() -> Path:
                         default_result_kind="counted",
                     )
                     round_word = "first" if round_ == 1 else "second"
-                    name(contest, f"{year} {ENGLISH.get(label, label)} regional election, {round_word} round", "en")
+                    name(contest, f"{year} {election_name} election, {round_word} round", "en")
                     cs.add("slug", path=f"{path}/{day}-{kind_path}/{slug(body_key.split(':')[-1])}", entity_id=contest)
                     previous = contest
                     entries = rows[round_]
@@ -1102,7 +1234,7 @@ def emit() -> Path:
                         option = cs.key(f"{SOURCE}.option", f"{contest_key}:{order}")
                         options[entry["nuance"], entry["short"]] = option
                         nuance = nuances.get((year, str(entry["nuance"])))
-                        if nuance is None:
+                        if nuance is None and not territorial:
                             raise ValueError(f"{year}: no label for nuance {entry['nuance']}")
                         cs.add(
                             "contest_option",
@@ -1132,7 +1264,7 @@ def emit() -> Path:
                             outcomes.append((option, "won" if won else "lost", won or None))
                         elif head in next_heads:
                             outcomes.append((option, "advanced", None))
-                        elif int(entry["votes"]) * 10 >= int(total["valid"]):
+                        elif int(entry["votes"]) * 10 >= int(total["valid"]) or (territorial and not entry["votes"]):
                             outcomes.append((option, "withdrew", None))
                         else:
                             outcomes.append((option, "eliminated", None))
@@ -1213,6 +1345,8 @@ def emit() -> Path:
         if mismatched:
             raise ValueError("seat allocation does not match:\n" + "\n".join(mismatched))
         for body_key, history in sizes.items():
+            if body_key == "94":
+                history = [item for item in history if item[1].year != 2021]
             for index, (seats, start) in enumerate(history):
                 if body_key == "94" and start.year == 2015:
                     end: date | None = CORSICA_TERRITORIAL
