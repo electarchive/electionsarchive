@@ -1,5 +1,9 @@
 #!/bin/bash
 cd "$HOME/electionsarchive/pipelines" || exit 1
+stale=$(psql electionsarchive -tAc "select count(*) from changeset where status = 'published' and published_at > (select coalesce(max(built_at), '-infinity') from contest_cover)")
+if [ "$stale" != 0 ] || [ "$(psql electionsarchive -tAc 'select not exists (select 1 from contest_cover)')" = t ]; then
+  ../data/logs/gate.sh uv run ea covers || echo "covers failed"
+fi
 late=$(psql electionsarchive -tAc "select count(*) from changeset where status = 'published' and published_at > (select coalesce(min(built_at), '-infinity') from polity_record)")
 [ "$late" = 0 ] && { echo "polity records are newer than every publish"; exit 0; }
 ../data/logs/gate.sh uv run ea records || exit $?
