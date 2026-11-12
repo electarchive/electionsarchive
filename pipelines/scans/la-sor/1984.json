@@ -1,0 +1,92 @@
+{
+  "polity": "US-LA",
+  "publisher": "Louisiana Secretary of State",
+  "title": "Report of the Secretary of State, 1983–1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706919_0110/micro_IA40706919_0110.pdf",
+    "item": "https://archive.org/details/micro_IA40706919_0110"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "LA",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "DEMOCRATIC PARTY",
+          "contest": "president",
+          "candidate": "Walter Mondale (Democratic)"
+        },
+        {
+          "label": "REPUBLICAN PARTY",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "CITIZEN'S PARTY",
+          "contest": "president",
+          "candidate": "Sonia Johnson (Citizens)"
+        },
+        {
+          "label": "INDEPENDENT PARTY",
+          "contest": "president",
+          "candidate": "Lyndon LaRouche (Independent)"
+        },
+        {
+          "label": "LIBERTARIAN PARTY",
+          "contest": "president",
+          "candidate": "David Bergland (Libertarian)"
+        },
+        {
+          "label": "NEW ALLIANCE PARTY",
+          "contest": "president",
+          "candidate": "Dennis Serrette (New Alliance)"
+        },
+        {
+          "label": "POPULIST PARTY",
+          "contest": "president",
+          "candidate": "Bob Richards (Populist)"
+        },
+        {
+          "label": "SOCIALIST WORKERS PARTY",
+          "contest": "president",
+          "candidate": "Mel Mason (Socialist Workers)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.129,
+        0.225,
+        0.816,
+        0.772
+      ],
+      "hint": "Read only the table headed 'Election Proclamation, State of Louisiana, Electors for President and Vice-President of the United States (Insert I)'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0768
+      ]
+    }
+  ],
+  "unit_codes": {
+    "W. Baton Rouge": "22121",
+    "E. B. Rouge": "22033",
+    "E. Baton Rouge": "22033",
+    "Washington Parish": "22117",
+    "W. Carroll": "22123",
+    "E. Carroll": "22035",
+    "W. Feliciana": "22125",
+    "E. Feliciana": "22037"
+  }
+}
