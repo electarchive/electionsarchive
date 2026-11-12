@@ -6427,22 +6427,34 @@ async function atlas(input: {
       k: number;
       scheme: string;
     }>(sql`
-      select a.id, a.k, a.scheme_code as scheme
-      from area_parent p
-      join area a on a.id = p.area_id
-      join contest c on c.allocation_parent_id = ${owner.id}::uuid and c.district_area_id = p.parent_id
-      cross join lateral (
-        select from result_set rs
+      with sets as materialized (
+        select c.id as cid, rs.k, c.district_area_id as parent
+        from contest c
+        join result_set rs on rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
+        where c.allocation_parent_id = ${owner.id}::uuid
+      ),
+      kids as materialized (
+        select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+        from area_parent p join area a on a.id = p.area_id
+        where p.parent_id = any(${sql.param(shown.map((kid) => kid.id))}::uuid[])
+          and p.valid @> ${day}::date
+          and p.parent_id in (select parent from sets)
+      ),
+      hits as materialized (
+        select s.cid, s.parent, r.area_k from sets s
+        join result_rollup_sum r on r.result_set_k = s.k and r.measure = any(${COUNTED})
+        union
+        select s.cid, s.parent, u.area_k from sets s
         cross join lateral (
-          select from result_rollup r
-          where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED})
-          limit 1
-        ) r
-        where rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
-        limit 1
-      ) hit
-      where p.parent_id = any(${sql.param(shown.map((kid) => kid.id))}::uuid[])
-        and p.valid @> ${day}::date
+          select x.area_k, x.unit_k, x.result_set_k from result_rollup_unit x where x.result_set_k = s.k offset 0
+        ) u
+        where u.area_k in (select k from kids) and exists (
+          select from result_value v
+          where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+        )
+      )
+      select kids.id, kids.k, kids.scheme
+      from kids join hits h on h.parent = kids.parent and h.area_k = kids.k
     `);
     const tiers = Map.groupBy(below.rows, (row) => row.scheme);
     found = [
@@ -11308,32 +11320,46 @@ export const contests = {
         group: string | null;
         at: number | null;
       }>(sql`
-        with recursive placed as materialized (
+        with recursive raw as materialized (
           select u.k, u.id, u.code, u.scheme_code as scheme, u.kind::text as kind, u.area_id, u.parent_id
           from unnest(${sql.param(candidates)}::int[]) c(k)
           join reporting_unit u on u.k = c.k
           where u.area_relation = 'within' and u.kind in ('standard', 'aggregate')
             and u.area_id is not null
-            and not exists (
-              select from area a join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
-              where a.id = u.area_id and a.scheme_code = u.scheme_code
-            )
         ),
-        up(unit, id, depth) as (
-          select p.k, p.area_id, 0 from placed p
+        covered as materialized (
+          select a.id, a.scheme_code from area a
+          where a.id = any(array(select distinct area_id from raw))
+            and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
+        ),
+        placed as materialized (
+          select * from raw r
+          where not exists (select from covered c where c.id = r.area_id and c.scheme_code = r.scheme)
+        ),
+        links as materialized (
+          select p.k as unit, p.area_id as start from placed p
           union all
-          select p.k, m.area_id, 0 from placed p
-          join reporting_unit_area m on m.unit_id = p.id and not m.approximate and m.valid @> ${day}::date
+          select p.k, m.area_id from placed p
+          cross join lateral (
+            select x.area_id from reporting_unit_area x
+            where x.unit_id = p.id and not x.approximate and x.valid @> ${day}::date offset 0
+          ) m
+        ),
+        anc(start, id, depth) as (
+          select s.start, s.start, 0 from (select distinct start from links) s
           union all
-          select up.unit, ap.parent_id, up.depth + 1 from up
-          join area_parent ap on ap.area_id = up.id and ap.valid @> ${day}::date
-          where up.depth < 6 and up.id <> ${area.id}::uuid
+          select anc.start, ap.parent_id, anc.depth + 1 from anc
+          join area_parent ap on ap.area_id = anc.id and ap.valid @> ${day}::date
+          where anc.depth < 6 and anc.id <> ${area.id}::uuid
+        ),
+        up as (
+          select l.unit, anc.id, anc.depth from links l join anc on anc.start = l.start
         ),
         reached as materialized (
           select a.id, a.scheme_code = ${input.level ?? ""}
             and exists (select from area_geometry ag where ag.area_id = a.id and ag.valid @> ${day}::date) as "isLevel"
           from area a
-          where a.id = any(array(select distinct id from up))
+          where a.id = any(array(select distinct id from anc))
         ),
         chains as (
           select up.unit, ${chain.length === 0} or bool_or(up.id = ${area.id}::uuid) as inside,
