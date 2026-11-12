@@ -880,6 +880,50 @@ def _cadence(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _figures(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "area_figure" not in stage.tables:
+        return []
+    staged = stage.staged("area_figure")
+    return [
+        (
+            "figure.duplicate",
+            sql.SQL(
+                """select s.area_id, null::uuid,
+                          jsonb_build_object('kind', s.kind, 'date', s.date, 'source', s.source_id,
+                                             'values', array_agg(distinct s.value order by s.value))
+                   from {staged} s group by s.area_id, s.kind, s.date, s.source_id
+                   having count(distinct s.value) > 1"""
+            ).format(staged=staged),
+        ),
+        (
+            "figure.value",
+            sql.SQL(
+                """select s.area_id, null::uuid, jsonb_build_object('kind', s.kind, 'date', s.date, 'value', s.value)
+                   from {staged} s where s.value is null or s.value <= 0"""
+            ).format(staged=staged),
+        ),
+        (
+            "figure.area_absent",
+            sql.SQL(
+                """select distinct s.area_id, null::uuid, jsonb_build_object('kind', s.kind, 'date', s.date)
+                   from {staged} s
+                   where (exists (select from {parents} p where p.area_id = s.area_id)
+                          and not exists (select from {parents} p where p.area_id = s.area_id
+                                          and daterange(p.valid_from, p.valid_to, '[)') @> s.date))
+                      or exists (select from {members} m join {events} e on e.id = m.event_id
+                                 where m.area_id = s.area_id and e.date is not null
+                                   and ((e.kind = 'created' and m.role = 'to' and e.date > s.date)
+                                        or (e.kind = 'dissolved' and m.role = 'from' and e.date <= s.date)))"""
+            ).format(
+                staged=staged,
+                parents=stage.either("area_parent", "area_id", "valid_from", "valid_to"),
+                members=stage.either("area_event_member", "event_id", "area_id", "role"),
+                events=stage.either("area_event", "id", "kind", "date"),
+            ),
+        ),
+    ]
+
+
 def run(conn: Connection, stage: Stage) -> list[Finding]:
     findings: list[Finding] = []
     if "electoral_system" in stage.tables:
@@ -910,6 +954,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_capitals(stage),
         *_held_translations(stage),
         *_cadence(stage),
+        *_figures(stage),
     ]:
         findings.extend(
             Finding(

@@ -95,6 +95,7 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		areaEvents: r.many.areaEvent(),
 		areaEventMembers: r.many.areaEventMember(),
+		areaFigures: r.many.areaFigure(),
 		areaGeometries: r.many.areaGeometry(),
 		areaKinds: r.many.areaKind(),
 		areaMemberships: r.many.areaMembership(),
@@ -628,6 +629,7 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		areaCodes: r.many.areaCode(),
 		areaEventMembers: r.many.areaEventMember(),
+		areaFigures: r.many.areaFigure(),
 		areaGeometries: r.many.areaGeometry(),
 		areaKinds: r.many.areaKind(),
 		areaMembershipsAreaId: r.many.areaMembership({
@@ -690,6 +692,7 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_source_id_via_areaEvent"
 		}),
 		areaEvents: r.many.areaEvent(),
+		areaFigures: r.many.areaFigure(),
 		areaGeometries: r.many.areaGeometry(),
 		areaKinds: r.many.areaKind(),
 		areaUniverses: r.many.areaUniverse(),
@@ -745,6 +748,20 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.source.id
 		}),
 		areaEventMembers: r.many.areaEventMember(),
+	},
+	areaFigure: {
+		area: r.one.area({
+			from: r.areaFigure.areaId,
+			to: r.area.id
+		}),
+		changeset: r.one.changeset({
+			from: r.areaFigure.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.areaFigure.sourceId,
+			to: r.source.id
+		}),
 	},
 	areaEventMember: {
 		area: r.one.area({

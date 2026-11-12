@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm"
 
 export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting", "ex_officio", "indirect"])
 export const allianceKind = pgEnum("alliance_kind", ["electoral_alliance", "joint_list", "federation", "apparentement"])
+export const areaFigureKind = pgEnum("area_figure_kind", ["population"])
 export const areaEventKind = pgEnum("area_event_kind", ["created", "dissolved", "renamed", "recoded", "split", "merged", "absorbed", "boundary_changed", "transferred"])
 export const areaEventRole = pgEnum("area_event_role", ["from", "to"])
 export const areaRelation = pgEnum("area_relation", ["equals", "within", "unlocated"])
@@ -253,6 +254,37 @@ export const areaEvent = pgTable("area_event", {
 	}),
 	index("area_event_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 ]);
+
+export const areaFigure = pgTable("area_figure", {
+	areaId: uuid("area_id").notNull(),
+	kind: areaFigureKind().notNull(),
+	date: date().notNull(),
+	datePrecision: datePrecision("date_precision").default("day").notNull(),
+	value: bigint({ mode: "number" }).notNull(),
+	sourceId: uuid("source_id").notNull(),
+	locator: text(),
+	changesetId: uuid("changeset_id").notNull(),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.areaId],
+		foreignColumns: [area.id],
+		name: "area_figure_area_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.changesetId],
+		foreignColumns: [changeset.id],
+		name: "area_figure_changeset_id_fkey"
+	}),
+	foreignKey({
+		columns: [table.sourceId],
+		foreignColumns: [source.id],
+		name: "area_figure_source_id_fkey"
+	}),
+	primaryKey({ columns: [table.areaId, table.kind, table.date, table.sourceId], name: "area_figure_pkey"}),
+	index("area_figure_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("area_figure_source_id_idx").using("btree", table.sourceId.asc().nullsLast()),
+check("area_figure_value_check", sql`(value > 0)`),]);
 
 export const areaEventMember = pgTable("area_event_member", {
 	eventId: uuid("event_id").notNull(),

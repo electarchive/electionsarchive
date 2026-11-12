@@ -45,6 +45,7 @@ ENTITIES = [
     "area_code",
     "area_parent",
     "area_event",
+    "area_figure",
     "boundary_set",
     "reporting_unit",
     "reporting_unit_area",
