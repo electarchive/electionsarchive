@@ -47,6 +47,117 @@ NOTE_BE = (
 )
 KEYS = {"KPD": "KPD:1990"}
 HISTORY = "https://www.bundeswahlleiterin.de/dam/jcr/a333e523-0717-42ad-a772-d5ad7e7e97cc/ltw_erg_gesamt.pdf"
+EARLY_BY = "https://statistik.bayern.de/mam/produkte/jahrbuch/jb2024_08_wahlen.pdf"
+EARLY_BY_SEATS = "https://www.bayern.landtag.de/fileadmin/scripts/get_file/Fraktionsstaerken_seit_1946.pdf"
+EARLY_BUND = "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/DEHeft_derivate_00021350/StatBer-8-05-010.pdf"
+EARLY_BB = "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet/BBHeft_derivate_00014662/SB_B07-03-03_1993j05_BBa.pdf"
+EARLY_BB_SEATS = "https://www.chronik-der-mauer.de/system/files/dokument_pdf/58719_cdm-901014-landtagswahlen.pdf"
+EARLY_SOURCES = {
+    "BY": (
+        "Bayerisches Landesamt für Statistik",
+        "Bayern in Zahlen: Statistisches Jahrbuch für Bayern 2024, VIII. Wahlen, C. Landtagswahl",
+        EARLY_BY,
+        None,
+    ),
+    "HE": (
+        "Statistisches Bundesamt",
+        (
+            "Die Bundestagswahlen 1949 und 1953 und die Landtagswahlen 1946 bis 1956 (Statistische Berichte "
+            "VIII/5/10), compiled from the statistical offices of the Länder"
+        ),
+        EARLY_BUND,
+        "Nachdruck, auch auszugsweise, nur mit Quellenangabe gestattet",
+    ),
+    "BB": (
+        "Landesamt für Datenverarbeitung und Statistik Brandenburg",
+        (
+            "Statistischer Bericht B VII 3-3: Kommunalwahl 1993 im Land Brandenburg, with the results of the 1990 "
+            "Landtag election in table 2"
+        ),
+        EARLY_BB,
+        None,
+    ),
+}
+EARLY_SOURCES["HH"] = EARLY_SOURCES["HE"]
+EARLY = (
+    {
+        "state": "BY",
+        "day": date(1946, 12, 1),
+        "registered": 4210636,
+        "voters": 3189552,
+        "invalid": 141215,
+        "valid": 3048337,
+        "seats": 180,
+        "parties": (
+            ("CSU", 1593908, 104),
+            ("SPD", 871760, 54),
+            ("FDP", 172242, 9),
+            ("KPD", 185023, 0),
+            ("WAV", 225404, 13),
+        ),
+        "extra": (
+            "The voters, invalid, and valid figures are those of the Bayerisches Landesamt für Statistik. The party "
+            f"votes are from the Statistisches Bundesamt's compilation ({EARLY_BUND}), and the seats are from the "
+            f"Bavarian Landtag ({EARLY_BY_SEATS})."
+        ),
+    },
+    {
+        "state": "HE",
+        "day": date(1946, 12, 1),
+        "registered": 2380109,
+        "voters": 1741416,
+        "invalid": 132028,
+        "valid": 1609388,
+        "seats": 90,
+        "parties": (("CDU", 498158, 28), ("SPD", 687431, 38), ("LDP", 252207, 14), ("KPD", 171592, 10)),
+        "extra": (
+            "The source compiles the figures from the Hessisches Statistisches Landesamt. Voters also adopted the "
+            "constitution of Hesse in a referendum on the same day."
+        ),
+    },
+    {
+        "state": "HH",
+        "day": date(1946, 10, 13),
+        "registered": 968454,
+        "voters": 765008,
+        "invalid": 29415,
+        "valid": 735593,
+        "seats": 110,
+        "parties": (
+            ("CDU", 196069, 16),
+            ("SPD", 317215, 83),
+            ("FDP", 133393, 7),
+            ("KPD", 76509, 4),
+            ("Sonstige", 12407, 0),
+        ),
+        "extra": (
+            "The source compiles the figures from the Statistisches Landesamt Hamburg. The other parties' row adds "
+            "the 2,519 votes of the DKP/DRP to the 9,888 votes of other parties and independents."
+        ),
+    },
+    {
+        "state": "BB",
+        "day": date(1990, 10, 14),
+        "registered": 1963926,
+        "voters": 1317288,
+        "invalid": 38533,
+        "valid": 1278755,
+        "seats": 88,
+        "parties": (
+            ("SPD", 488585, 36),
+            ("PDS", 171391, 13),
+            ("CDU", 376612, 27),
+            ("FDP", 84743, 6),
+            ("GRÜNE/B 90", 118195, 6),
+            ("Sonstige", 39229, 0),
+        ),
+        "extra": (
+            "Each voter had two votes. The votes shown are second votes (Zweitstimmen), which decide the seats. The "
+            "source prints the row GRÜNE/B90, and the seats are from the official transcript of the final result "
+            f"({EARLY_BB_SEATS}), which names the list that won six seats Bündnis 90."
+        ),
+    },
+)
 HISTORY_PUBLISHER = "Die Bundeswahlleiterin"
 HISTORY_TITLE = "Ergebnisse früherer Landtagswahlen, Stand: 13. Oktober 2026"
 LAENDER = {
@@ -331,6 +442,8 @@ def fetch() -> None:
         for url in urls:
             raw.fetch(SOURCE, url, suffix=f".{url.rsplit('.', 1)[1]}")
     raw.fetch(SOURCE, HISTORY, suffix=".pdf")
+    for url in (EARLY_BY, EARLY_BY_SEATS, EARLY_BUND, EARLY_BB, EARLY_BB_SEATS):
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def history_count(text: str) -> int | None:
@@ -497,6 +610,30 @@ def parse_history() -> None:
                 }
             )
             election["seats"] = sum(row["seats"] for row in results if row["index"] == election["index"])
+    for early in EARLY:
+        index = len(elections)
+        elections.append(
+            {
+                "index": index,
+                "state": early["state"],
+                "day": early["day"],
+                "heading": f"Wahl am {early['day']:%d.%m.%Y}",
+                "notes": [],
+                "page": None,
+                "registered": early["registered"],
+                "voters": early["voters"],
+                "invalid": early["invalid"],
+                "valid": early["valid"],
+                "seats": early["seats"],
+                "folded": None,
+                "extra": early["extra"],
+                "source": early["state"],
+            }
+        )
+        for position, (label, votes, seats) in enumerate(early["parties"], 1):
+            results.append(
+                {"index": index, "position": position, "label": label, "votes": votes, "share": None, "seats": seats}
+            )
     election_frame = pl.DataFrame(elections, infer_schema_length=None)
     result_frame = pl.DataFrame(results, infer_schema_length=None)
     problems = []
@@ -908,7 +1045,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, and every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin",
+            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, and every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin and the Länder statistical offices",
             polity="DE",
         )
 
@@ -1317,6 +1454,21 @@ def emit_history(
         license_url=None,
     )
     cs.artifact(raw.cached(SOURCE, HISTORY), source)
+    early_sources: dict[str, UUID] = {}
+    for abbreviation, (publisher, title, url, license_) in EARLY_SOURCES.items():
+        early_sources[abbreviation] = cs.source(publisher, title)
+        if list(early_sources.values()).count(early_sources[abbreviation]) == 1:
+            cs.add(
+                "source",
+                id=early_sources[abbreviation],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license=license_,
+                license_url=None,
+            )
+            cs.artifact(raw.cached(SOURCE, url), early_sources[abbreviation])
     second_from: dict[str, date] = {}
     for state, notes in elections.select("state", "notes").iter_rows():
         for note in notes:
@@ -1384,7 +1536,15 @@ def emit_history(
             path = f"de/{abbreviation.lower()}/{day}-general"
             cs.add("slug", path=path, entity_id=election)
 
-            def make_set(key: str, contest: UUID | None, election: UUID = election, day: date = day) -> UUID:
+            row_source = early_sources[abbreviation] if row["source"] is not None else source
+
+            def make_set(
+                key: str,
+                contest: UUID | None,
+                election: UUID = election,
+                day: date = day,
+                row_source: UUID = row_source,
+            ) -> UUID:
                 set_id = cs.key(f"{SOURCE}.result_set", f"{abbreviation}:{day}:{key}")
                 cs.add(
                     "result_set",
@@ -1394,7 +1554,7 @@ def emit_history(
                     stage="official",
                     kind="counted",
                     status="active",
-                    source_id=source,
+                    source_id=row_source,
                     is_default=True,
                     completeness=1,
                 )
@@ -1458,6 +1618,8 @@ def emit_history(
                 )
             if abbreviation == "HH" and day.year in (1957, 1961):
                 notes.append("The source prints 360 as the total of seats; the parties' seats add up to 120.")
+            if row["extra"] is not None:
+                notes.append(row["extra"])
             if row["folded"] is not None:
                 notes.append(
                     f"From row {row['folded']} on, the source repeats party abbreviations from above and prints seat "
