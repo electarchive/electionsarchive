@@ -265,10 +265,10 @@ const pooled = (list: SQL) => sql`
     offset 0
   )
 `;
-const pooledIds = (list: SQL, parent: SQL) => sql`
+const pooledIds = (list: SQL, parent: SQL, kind: SQL) => sql`
   select array(
     select pl.id from contest_option pl
-    where pl.id in (${list}, ${parent}) and pl.kind = 'list' and exists (
+    where (${kind} = 'list' or ${parent} is not null) and pl.id in (${list}, ${parent}) and pl.kind = 'list' and exists (
       select from contest_option ch
       join outcome y on y.option_id = ch.id and y.kind = 'elected' and y.candidacy_id is null
       where y.result_set_id in (select id from newest)
@@ -2810,7 +2810,7 @@ async function fetchLoads(asks: Array<LoadAsk>, head: LoadAsk) {
                 ) then oc.seats end as seats
             from base o
             left join entity_merge pm on pm.entity_id = o.party_id
-            left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`)}) pf on true
+            left join lateral (${pooledIds(sql`o.id`, sql`o.parent_option_id`, sql`o.kind::text`)}) pf on true
             left join lateral (
               select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)) filter (where x.kind <> 'declined'))[1] as kind,
                 (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified', 'declined']::outcome_kind[], x.kind)) filter (where x.notes is not null))[1] as note,
