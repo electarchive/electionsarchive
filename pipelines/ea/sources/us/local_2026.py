@@ -13340,17 +13340,7 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     magnitude, uncertain = 1, False
             elif state == "MN" and magnitude is None and not group["seats"][0]:
                 magnitude, system = 1, cs.key("us.electoral_system", "fptp")
-            if (
-                (
-                    state in ("IN", "MD", "MN")
-                    or state in ("KY", "CA", "ceda")
-                    and group["seats"][0]
-                    or cited is not None
-                    or magnitude == 1
-                )
-                and magnitude is not None
-                and system in plurality.values()
-            ):
+            if magnitude is not None and system in plurality.values():
                 system = plurality[magnitude > 1]
             if state in ("CA", "ceda") and magnitude == 1 and system == cs.key("us.electoral_system", "two_round"):
                 system = plurality[False]
