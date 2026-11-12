@@ -1,0 +1,103 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1922, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1922montrich/officialmontanag1922montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1922montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "senate": {
+   "year": 1922,
+   "chamber": "senate",
+   "day": "1922-11-07",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1922,
+   "chamber": "house",
+   "day": "1922-11-07",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1922,
+   "chamber": "house",
+   "day": "1922-11-07",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2-fed",
+   "columns": [
+    {
+     "label": "Burton K. Wheeler",
+     "contest": "senate",
+     "candidate": "Burton K. Wheeler"
+    },
+    {
+     "label": "Carl W. Riddick",
+     "contest": "senate",
+     "candidate": "Carl W. Riddick"
+    },
+    {
+     "label": "George H. Ambrose",
+     "contest": "senate",
+     "candidate": "George H. Ambrose"
+    },
+    {
+     "label": "John M. Evans",
+     "contest": "house1",
+     "candidate": "John M. Evans"
+    },
+    {
+     "label": "Washington Jay McCormick",
+     "contest": "house1",
+     "candidate": "Wash. J. McCormick"
+    },
+    {
+     "label": "Mrs. Lulu F. Dawley",
+     "contest": "house1",
+     "candidate": "Lulu F. Dawley"
+    },
+    {
+     "label": "Preston B. Moss",
+     "contest": "house2",
+     "candidate": "Preston B. Moss"
+    },
+    {
+     "label": "Scott Leavitt",
+     "contest": "house2",
+     "candidate": "Scott Leavitt"
+    },
+    {
+     "label": "Second District Socialist (no candidate)",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.19,
+    0.357,
+    0.955
+   ],
+   "bands": 2,
+   "header": [
+    0.0,
+    0.34
+   ],
+   "hint": "The nine data columns are United States Senator (Democratic, Republican, Socialist), Representative in Congress First District (Democratic, Republican, Socialist), and Second District (Democratic, Republican, Socialist). Blank or dotted cells are empty strings."
+  }
+ ]
+}
