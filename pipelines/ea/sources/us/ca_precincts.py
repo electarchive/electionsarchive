@@ -25,6 +25,7 @@ def emit(
     method: str,
     state_code: str = "CA",
     names_only: bool = False,
+    declared: dict[str, tuple[str, ...]] | None = None,
 ) -> Path:
     days = sorted(set(rows["day"]))
     with connect() as conn:
@@ -223,6 +224,35 @@ def emit(
                 valid_from_precision="day",
                 valid_to_precision="day",
             )
+        for external, labels in (declared or {}).items():
+            found = conn.execute(
+                """select rs.id, o.id, o.ballot_label, rs.election_id, rs.contest_id, rs.stage, rs.kind, rs.source_id,
+                          rs.completeness
+                   from external_id x
+                   join result_set rs on rs.contest_id = x.entity_id and rs.is_default
+                   join changeset c on c.id = rs.changeset_id
+                   join contest_option o on o.contest_id = rs.contest_id and o.kind = 'candidate'
+                   where x.scheme = 'us.contest' and x.value = %s and c.pipeline = %s""",
+                [external, pipeline],
+            ).fetchall()
+            if not found or not set(labels) <= {row[2] for row in found}:
+                raise ValueError(f"{external} has no default set of {pipeline} with options {labels}")
+            result_set, _, _, election, contest, stage, kind, set_source, completeness = found[0]
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                status="active",
+                source_id=set_source,
+                is_default=True,
+                completeness=completeness,
+            )
+            for _, option, label, *_ in found:
+                if label in labels:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
         print(report)
         if values:
             cs.frame("result_value", pl.concat(values))

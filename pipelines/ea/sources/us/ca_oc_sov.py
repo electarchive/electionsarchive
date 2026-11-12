@@ -11,7 +11,7 @@ from ea.sources.us import ca_precincts
 from ea.store import DATA
 
 SOURCE = "us.ca_oc_sov"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Orange County Registrar of Voters"
 TITLE = "Statement of Votes, plain-text extract"
@@ -22,6 +22,10 @@ METHOD = (
     "matched to the contest by candidate and checked against its official totals."
 )
 DATE = re.compile(r"[A-Z][a-z]+ \d{1,2}, ?\d{4}")
+WINNERS = {
+    "ceda:201800310": ("Theodore R. Howard",),
+    "ceda:201200566": ("Ross Chun", "William A. 'Bill' Phillips", "Mike Munzing"),
+}
 UNUSED = re.compile(r"(?i)write-?ins?|^(?:over|under)votes?$|^total")
 
 
@@ -105,4 +109,5 @@ def emit() -> Path:
         title=TITLE,
         listing=LISTING,
         method=METHOD,
+        declared=WINNERS,
     )
