@@ -13,7 +13,7 @@ from ea.sources.ie.referendums import act, local
 from ea.store import DATA, connect
 
 SOURCE = "ie.presidential"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BOOKLET = "https://www.presidentialelection.ie/wp-content/uploads/2026/01/Presidential-Elections-1938-2025.pdf"
 PAGE = "https://www.presidentialelection.ie/previous-presidential-elections/index.html"
@@ -140,6 +140,18 @@ CONTESTED = {
     2025: (date(2025, 10, 24), ["connolly", "gavin", "humphreys"], "connolly", {53: 1}, {}),
 }
 SPECIAL = {1974, 1976}
+TENURES = (
+    ("hyde", 1938, date(1938, 6, 25), date(1945, 6, 25), "term_end"),
+    ("okelly", 1945, date(1945, 6, 25), date(1959, 6, 25), "term_end"),
+    ("devalera", 1959, date(1959, 6, 25), date(1973, 6, 25), "term_end"),
+    ("childers", 1973, date(1973, 6, 25), date(1974, 11, 17), "died"),
+    ("odalaigh", 1974, date(1974, 12, 19), date(1976, 10, 22), "resigned"),
+    ("hillery", 1976, date(1976, 12, 3), date(1990, 12, 3), "term_end"),
+    ("robinson", 1990, date(1990, 12, 3), date(1997, 9, 12), "resigned"),
+    ("mcaleese", 1997, date(1997, 11, 11), date(2011, 11, 11), "term_end"),
+    ("higgins", 2011, date(2011, 11, 11), date(2025, 11, 11), "term_end"),
+    ("connolly", 2025, date(2025, 11, 11), None, None),
+)
 BALLOT = {
     "mccartan": "Patrick McCartan",
     "maceoin": "Seán MacEoin",
@@ -571,8 +583,10 @@ def emit() -> Path:
             )
             return option
 
+        contests: dict[int, UUID] = {}
         for year, (day, key, ballot, declared) in TACIT.items():
             contest, result_set, contest_key = contest_for(year, day, True)
+            contests[year] = contest
             option = candidate(contest, contest_key, key, ballot, None)
             cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
             cs.add("note", entity_id=result_set, kind="methodology", body_md=TACIT_NOTE + declared)
@@ -580,6 +594,7 @@ def emit() -> Path:
         values = []
         for year, (day, names, winner, tables, excluded) in CONTESTED.items():
             contest, result_set, contest_key = contest_for(year, day, False)
+            contests[year] = contest
             options = {
                 key: candidate(contest, contest_key, key, BALLOT[key], position)
                 for position, key in enumerate(names, 1)
@@ -629,6 +644,20 @@ def emit() -> Path:
                     option_id=option,
                     kind="elected" if key == winner else ("eliminated" if key in gone else "lost"),
                 )
+        for key, year, start, end, cause in TENURES:
+            cs.add(
+                "tenure",
+                id=cs.key(f"{SOURCE}.tenure", f"{key}:{start}"),
+                person_id=person(key),
+                office_id=office,
+                from_date=start,
+                from_precision="day",
+                to_date=end,
+                to_precision="day",
+                acquired_via="elected",
+                contest_id=contests[year],
+                ended_via=cause,
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(
