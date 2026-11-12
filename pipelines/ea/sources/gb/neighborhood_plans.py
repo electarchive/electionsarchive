@@ -26,6 +26,11 @@ PAGES = {
         "neighbourhood-plan-referendum-results"
     ),
     "E07000084": "https://www.basingstoke.gov.uk/NP-referendum-results",
+    "E06000061": (
+        "https://www.northnorthants.gov.uk/elections-and-voting/election-results/"
+        "neighbourhood-planning-referendum-results"
+    ),
+    "E07000085": "https://www.easthants.gov.uk/elections/election-results",
 }
 DOCUMENTS = "https://elections.wiltshire.gov.uk/Home/Document/"
 OFFICE = {
