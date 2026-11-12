@@ -11266,6 +11266,8 @@ def parse() -> None:
                 label = "Brownsboro"
             if st == "NE" and label == "De Witt":
                 label = "DeWitt"
+            if st == "AR" and label == "Fredonia (Biscoe)":
+                label = "Biscoe"
             if st == "MI" and full == "Minden City village":
                 label = "Minden"
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
@@ -11280,7 +11282,7 @@ def parse() -> None:
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'KS', 'WY', 'NY', 'TN')"""
-        ).fetchall():
+        ).fetchall() + [("AR", "05117", "Biscoe")]:
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
                 geoid, district, full = hits[0]
@@ -11999,7 +12001,7 @@ def parse() -> None:
                                     (r"^(?:town |city )?clerk recorder$", "clerk-recorder"),
                                     (
                                         (
-                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator|attorney)$"
+                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|recorder|moderator|administrator|attorney)$"
                                             r"|^(?:town )?(?:clerk and )?tax collector$"
                                         ),
                                         "office",
@@ -12180,6 +12182,7 @@ def parse() -> None:
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
+                                "recorder": "Recorder",
                                 "attorney": "Attorney",
                                 "clerk-treasurer": "Clerk-Treasurer",
                                 "recorder-treasurer": "Recorder-Treasurer",
