@@ -36,12 +36,16 @@ PAGE_PREFIXES = (
     "https://elections.shropshire.gov.uk/",
     "https://hardenvillagecouncil.gov.uk/",
     "https://www.middevon.gov.uk/your-council/",
+    "https://www.cherwell.gov.uk/info/",
 )
 HANDWRITTEN = (
     "https://info.ambervalley.gov.uk/docarc/",
     "/ashby_de_la_zouch_neighbourhood_plan_referendum_result/",
     "/ellistown_and_battleflat_neighbourhood_plan_referendum_result/",
     "/lockington_cum_hemington_neighbourhood_plan_referendum_result/",
+    "/download/downloads/id/4521/",
+    "/download/downloads/id/8012/",
+    "/download/downloads/id/8854/",
 )
 PAGES = {
     "E06000052": (
