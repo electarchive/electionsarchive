@@ -3,6 +3,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import zipfile
 from collections import Counter
 from datetime import UTC, date, datetime
@@ -63,6 +64,16 @@ NC_OFFICE = re.compile(
     r"BOARD OF COMMISSIONERS|BOARD OF EDUCATION|SHERIFF|CLERK OF SUPERIOR COURT|REGISTER OF DEEDS|SOIL AND WATER[A-Z ]*?(?= DISTRICT|$)"
 )
 NC_TOWN = re.compile(r"(?:CITY|TOWN|VILLAGE) OF (.+?) (MAYOR|COUNCIL(?: MEMBER)?(?: [A-Z ]+)?|COMMISSIONER[A-Z ]*)")
+KY_DIR = DATA / "inbox" / "manual" / "MF-606"
+KY_FILES = ("Gen26_Results.pdf", "26general_sovc_2.pdf")
+KY_TOWN = re.compile(r"\s*([A-Z][A-Z ]+?) (MAYOR|COMMISSIONER|COUNCILMEMBER|COUNCIL) \1")
+KY_AS_OF = datetime(2026, 11, 5, 19, 44, tzinfo=UTC)
+KY_TITLE = "Statement of Votes Cast, 2026 General Election, Jefferson County, Kentucky"
+KY_NOTE = (
+    "Jefferson County Clerk's Statement of Votes Cast for the November 3, 2026 general election, printed "
+    "November 5, 2026. Candidate totals are read from the clerk's results report and checked against the totals "
+    "row of the statement; write-in votes are the printed write-in totals."
+)
 NC_PARTY = re.compile(r"\s*\((DEM|REP|LIB|UNA|GRE|CST)\)$")
 
 
@@ -112,12 +123,64 @@ def fetch() -> None:
             print("NC: no zip")
         else:
             store("NC", url, content, ".zip")
+    if "KY" in ONLY:
+        for name in KY_FILES:
+            url = f"https://www.jeffersoncountyclerk.org/{name}"
+            store("KY", url, (KY_DIR / name).read_bytes(), ".pdf")
     PARSED.mkdir(parents=True, exist_ok=True)
     (PARSED / "pages.json").write_text(json.dumps(pages))
     print({state: len(urls) for state, urls in pages.items()})
 
 
+def ky_totals(text: str) -> list[Counter[int]]:
+    return [
+        Counter(int(number.replace(",", "")) for number in re.findall(r"\d[\d,]*", line.split("Totals", 1)[1]))
+        for line in text.splitlines()
+        if line.strip().startswith("Totals ")
+    ]
+
+
 def rows(state: str, url: str, path):
+    if state == "KY":
+        if not url.endswith("Gen26_Results.pdf"):
+            return
+        statement = ky_totals(
+            subprocess.run(
+                ["pdftotext", "-layout", KY_DIR / KY_FILES[1], "-"], capture_output=True, check=True
+            ).stdout.decode()
+        )
+        lines = subprocess.run(["pdftotext", "-layout", path, "-"], capture_output=True, check=True).stdout.decode()
+        lines = lines.splitlines()
+        for i, line in enumerate(lines):
+            town = KY_TOWN.fullmatch(line.rstrip())
+            if town is None:
+                continue
+            counted = []
+            for other in lines[i + 1 :]:
+                if other.startswith("Total Votes Cast"):
+                    counted.append(("Total", int(re.search(r"\d[\d,]*", other)[0].replace(",", ""))))
+                    break
+                found = re.match(r"(\S.*?)\s{2,}(\d[\d,]*)\b", other)
+                if found:
+                    counted.append((found[1], int(found[2].replace(",", ""))))
+            needed = Counter(votes for _, votes in counted)
+            if not any(not needed - row for row in statement):
+                print(f"KY {town[0].strip()}: no totals row of the statement of votes cast matches; left out")
+                continue
+            if all(name == "Write-In Totals" for name, _ in counted[:-1]):
+                continue
+            for name, votes in counted[:-1]:
+                yield {
+                    "contest": f"{town[1].title()} {'Mayor' if town[2] == 'MAYOR' else 'Council'}",
+                    "geo": "",
+                    "county": "21111",
+                    "candidate": name,
+                    "write_in": name == "Write-In Totals",
+                    "votes": votes,
+                    "reporting": None,
+                    "total": None,
+                }
+        return
     if state == "MN":
         county = url.endswith("allracesbyprecinct.txt")
         totals: dict[tuple[str, str, str, str], list[int]] = {}
@@ -262,6 +325,9 @@ def derive(
                 f"LA:{code}:{held}" for code in places[plain(town[3])]
             ]
         return []
+    if state == "KY":
+        found = re.fullmatch(r"(.+) (Mayor|Council)", name)
+        return [f"KY:21-{slug(found[1])}:{found[2].lower()}"] if found else []
     if state == "NC":
         unexpired = "(UNEXPIRED)" in name
         name = re.sub(r"\s*\(UNEXPIRED\)", "", name)
@@ -318,7 +384,11 @@ def emit():
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"Unofficial election night results of {DAY} for local contests, from the states' reporting sites",
+            summary=(
+                "Official results of the Jefferson County, Kentucky small-city contests, from the clerk's results report and statement of votes cast"
+                if set(frame["state"]) == {"KY"}
+                else f"Unofficial election night results of {DAY} for local contests, from the states' reporting sites"
+            ),
             polity="US",
         )
         counties: dict[tuple[str, str], UUID] = {}
@@ -448,11 +518,19 @@ def emit():
         for state, contest_key, contest, group, place in work:
             election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
             if state not in sources:
-                publisher, site, _ = OFFICIAL.get(
-                    state,
-                    ("Minnesota Secretary of State", "https://www.sos.mn.gov/elections-voting/election-results/", ""),
+                publisher, site, _ = (
+                    ("Jefferson County Clerk", "https://www.jeffersoncountyclerk.org/", "")
+                    if state == "KY"
+                    else OFFICIAL.get(
+                        state,
+                        (
+                            "Minnesota Secretary of State",
+                            "https://www.sos.mn.gov/elections-voting/election-results/",
+                            "",
+                        ),
+                    )
                 )
-                title = f"Unofficial Election Night Results {DAY}: {state} local"
+                title = KY_TITLE if state == "KY" else f"Unofficial Election Night Results {DAY}: {state} local"
                 sources[state] = cs.source(publisher, title)
                 if sources[state] in cs.minted:
                     cs.add(
@@ -539,8 +617,12 @@ def emit():
                 stats["all-zero skipped"] += 1
                 continue
             reporting = group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
-            as_of = datetime.strptime(next(iter(pages[state].values())).rsplit("@", 1)[1], "%Y%m%dT%H%M%SZ").replace(
-                tzinfo=UTC
+            as_of = (
+                KY_AS_OF
+                if state == "KY"
+                else datetime.strptime(next(iter(pages[state].values())).rsplit("@", 1)[1], "%Y%m%dT%H%M%SZ").replace(
+                    tzinfo=UTC
+                )
             )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             is_default = (
@@ -557,7 +639,7 @@ def emit():
                 id=result_set,
                 election_id=election,
                 contest_id=contest,
-                stage="preliminary",
+                stage="official" if state == "KY" else "preliminary",
                 kind="counted",
                 status="active",
                 source_id=sources[state],
@@ -565,7 +647,7 @@ def emit():
                 is_default=is_default,
                 completeness=reporting[0] / reporting[1] if reporting[1] else None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=KY_NOTE if state == "KY" else NOTE)
             for (unit, option), votes in sums.items():
                 cs.add(
                     "result_value",

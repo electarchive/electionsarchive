@@ -7587,7 +7587,10 @@ KY_BALLOT_CITY_NAMES = (
     ("FULTON", "CITY LEGISLATIVE BODY", "HICKMAN CITY COMMISSION", "Samantha", "McClure"),
     ("HARDIN", "CITY LEGISLATIVE BODY", "SONORA COMMISSIONER", "Kevin Cody", "Philpott"),
 )
-KY_BALLOT_FIRST_NAMES = {("CAMPBELL", "SIZEMORE", "Christopher"): "Chris"}
+KY_BALLOT_FIRST_NAMES = {
+    ("CAMPBELL", "SIZEMORE", "Christopher"): "Chris",
+    ("JEFFERSON", "LOCKARD", "Caroyln"): "Carolyn",
+}
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -8641,6 +8644,8 @@ def parse() -> None:
                 else None
             )
             side = "NONPARTISAN"
+        elif "Write-In Candidates" in line:
+            heading = None
         elif found := re.match(r"\s*(Republican|Democratic) Candidate", line):
             side = f"{found[1].upper()} PARTY"
         elif (
