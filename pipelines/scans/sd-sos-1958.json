@@ -121,5 +121,10 @@
         0.0836
       ]
     }
-  ]
+  ],
+  "unit_codes": {
+    "Shannon attached to Fall River": "46102",
+    "Todd attached to Tripp": "46121",
+    "Washabaugh attached to Jackson": "46131"
+  }
 }
