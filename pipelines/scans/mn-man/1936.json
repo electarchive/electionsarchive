@@ -36,6 +36,61 @@
   },
   "pages": [
     {
+      "page": 174,
+      "id": "174-0",
+      "columns": [
+        {
+          "label": "Total Number of Ballots Cast and Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican LANDON and KNOX (Dr. Frank J. Lexa)",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "Democrat ROOSEVELT and GARNER (G. M. Helland)",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Industrial AIKEN and TEICHERT (Grant H. Campbell)",
+          "contest": "president",
+          "candidate": "Industrial"
+        },
+        {
+          "label": "Union LEMKE and O'BRIEN (Endre B. Anderson)",
+          "contest": "president",
+          "candidate": "William Lemke (Union)"
+        },
+        {
+          "label": "Communist BROWDER and FORD (Nat Ross)",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Socialist THOMAS and NELSON (Carl Pemble)",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.05,
+        0.14,
+        0.99,
+        0.94
+      ],
+      "hint": "Read only the table headed 'VOTE BY COUNTIES OF PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.375
+      ],
+      "turn": 90
+    },
+    {
       "page": 175,
       "id": "175-0",
       "columns": [
@@ -160,6 +215,10 @@
       "header": [
         0.0,
         0.1934
+      ],
+      "stub": [
+        0.02,
+        0.125
       ]
     }
   ]

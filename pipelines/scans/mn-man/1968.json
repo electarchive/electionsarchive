@@ -251,6 +251,60 @@
       "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
     {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "Total Number of White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NIXON-AGNEW REPUBLICAN",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "HUMPHREY-MUSKIE DEMOCRATIC-FARMER-LABOR",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "WALLACE-GRIFFIN AMERICAN PARTY",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "HALSTEAD-BOUTELLE SOCIALIST WORKERS PARTY",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        },
+        {
+          "label": "BLOMEN-TAYLOR INDUSTRIAL GOVERNMENT",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "MITCHELL-ZAGARELL COMMUNIST PARTY",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "CLEAVER-TERRY PEACE AND FREEDOM PARTY",
+          "contest": "president",
+          "candidate": "Peace and Freedom"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.03,
+        0.93,
+        0.3
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings."
+    },
+    {
       "page": 15,
       "id": "15-0",
       "columns": [
@@ -1297,5 +1351,9 @@
       ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

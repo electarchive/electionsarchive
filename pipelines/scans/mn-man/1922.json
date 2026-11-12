@@ -336,5 +336,9 @@
       ],
       "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

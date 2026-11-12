@@ -92,6 +92,50 @@
   },
   "pages": [
     {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "JOHNSON HUMPHREY DFL",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        },
+        {
+          "label": "Goldwater Miller Republ.",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "Hass Blomen Indust. Govt.",
+          "contest": "president",
+          "candidate": "Industrial Government"
+        },
+        {
+          "label": "DeBerry Shaw Socialist Workers",
+          "contest": "president",
+          "candidate": "Socialist Workers"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.683,
+        0.203,
+        0.91,
+        0.915
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2275
+      ],
+      "stub": [
+        0.095,
+        0.226
+      ],
+      "subtotals": true
+    },
+    {
       "page": 3,
       "id": "3-0",
       "columns": [
@@ -128,7 +172,12 @@
       "header": [
         0.0,
         0.2243
-      ]
+      ],
+      "stub": [
+        0.098,
+        0.228
+      ],
+      "subtotals": true
     },
     {
       "page": 4,
@@ -167,7 +216,12 @@
       "header": [
         0.0,
         0.1961
-      ]
+      ],
+      "stub": [
+        0.1,
+        0.23
+      ],
+      "subtotals": true
     },
     {
       "page": 5,
@@ -206,7 +260,12 @@
       "header": [
         0.0,
         0.3184
-      ]
+      ],
+      "stub": [
+        0.1,
+        0.29
+      ],
+      "subtotals": true
     },
     {
       "page": 6,
@@ -245,7 +304,8 @@
       "header": [
         0.0,
         0.3162
-      ]
+      ],
+      "subtotals": true
     },
     {
       "page": 7,
@@ -284,7 +344,12 @@
       "header": [
         0.0,
         0.297
-      ]
+      ],
+      "stub": [
+        0.1,
+        0.292
+      ],
+      "subtotals": true
     },
     {
       "page": 16,
@@ -643,5 +708,12 @@
       ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  },
+  "unit_codes": {
+    "ramsay": "27123"
+  }
 }

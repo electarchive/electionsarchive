@@ -485,6 +485,43 @@
       "header": [
         0.0,
         0.4216
+      ],
+      "stub": [
+        0.105,
+        0.207
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "KARL F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "ELMER L. ANDERSEN Republican",
+          "contest": "governor",
+          "candidate": "Elmer L. Andersen"
+        },
+        {
+          "label": "WILLIAM BRAATZ Industrial Govt.",
+          "contest": "governor",
+          "candidate": "William Braatz"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.673,
+        0.035,
+        0.826,
+        0.293
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "stub": [
+        0.105,
+        0.207
       ]
     },
     {
@@ -1042,13 +1079,13 @@
         },
         {
           "label": "ROLVAAG DFL",
-          "contest": "governor",
-          "candidate": "Karl F. Rolvaag"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "ANDERSEN REP.",
-          "contest": "governor",
-          "candidate": "Elmer L. Andersen"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "PERCENT DFL",
@@ -1076,13 +1113,13 @@
         },
         {
           "label": "ROLVAAG DFL",
-          "contest": "governor",
-          "candidate": "Karl F. Rolvaag"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "ANDERSEN REP.",
-          "contest": "governor",
-          "candidate": "Elmer L. Andersen"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "PERCENT DFL",
@@ -1711,5 +1748,9 @@
       ],
       "hint": "Read only the table headed 'EIGHTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

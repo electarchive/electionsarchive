@@ -228,7 +228,7 @@ def main() -> None:
                 else statewide.step(args.name)
                 if args.action == "statewide"
                 else statewide.emit(args.name)
-                if args.action == "emit" and not (scans.MANIFESTS / f"{args.name}.json").exists()
+                if args.action == "emit" and not (scans.MANIFESTS / f"{args.name.split(',')[0]}.json").exists()
                 else getattr(scans, args.action)(args.name)
             )
         case "live":

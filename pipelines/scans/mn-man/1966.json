@@ -92,6 +92,130 @@
   },
   "pages": [
     {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Total Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pink Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. MONDALE DFL",
+          "contest": "senate",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "R. A. FORSYTHE Rep.",
+          "contest": "senate",
+          "candidate": "Robert A. Forsythe"
+        },
+        {
+          "label": "WM. BRAATZ Ind. Gov.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "JOS. JOHNSON Socialist Workers",
+          "contest": "senate",
+          "candidate": "Joseph Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.14,
+        0.915,
+        0.945
+      ],
+      "hint": "Read only the table headed 'RETURNS OF GENERAL ELECTION IN STATE OF MINNESOTA, NOVEMBER 8, 1966. OFFICIAL CANVASS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.267
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Total Persons Who Voted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pink Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "White Ballots Counted",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. F. MONDALE DFL",
+          "contest": "senate",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "R. A. FORSYTHE Rep.",
+          "contest": "senate",
+          "candidate": "Robert A. Forsythe"
+        },
+        {
+          "label": "WM. BRAATZ Ind. Gov.",
+          "contest": "senate",
+          "candidate": "William Braatz"
+        },
+        {
+          "label": "JOS. JOHNSON Socialist Workers",
+          "contest": "senate",
+          "candidate": "Joseph Johnson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.02,
+        0.915,
+        0.9
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "bands": 2
+    },
+    {
       "page": 4,
       "id": "4-0",
       "columns": [
@@ -288,47 +412,47 @@
       "id": "7-0",
       "columns": [
         {
-          "label": "",
+          "label": "K. F. ROLVAAG DFL",
+          "contest": "governor",
+          "candidate": "Karl F. Rolvaag"
+        },
+        {
+          "label": "HAROLD LeVANDER Rep.",
+          "contest": "governor",
+          "candidate": "Harold Levander"
+        },
+        {
+          "label": "KENNETH SACHS Ind. Gov.",
+          "contest": "governor",
+          "candidate": "Kenneth Sachs"
+        },
+        {
+          "label": "R. E. SHORT DFL",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "",
+          "label": "J. B. GOETZ Rep.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "",
+          "label": "J. L. DONOVAN DFL",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "",
+          "label": "W. J. O'BRIEN REP.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "",
+          "label": "R. E. HANSEN DFL",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
+          "label": "STAFFORD KING Rep.",
           "contest": null,
           "candidate": ""
         }
@@ -336,70 +460,11 @@
       "orientation": "counties_down",
       "crop": [
         0.09,
-        0.048,
-        0.905,
-        0.466
+        0.05,
+        0.94,
+        0.72
       ],
-      "hint": "Read only the table headed 'SEVENTH DISTRICT'; ignore any other table visible in the image."
-    },
-    {
-      "page": 7,
-      "id": "7-1",
-      "columns": [
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.09,
-        0.458,
-        0.905,
-        0.701
-      ],
-      "hint": "Read only the table headed 'EIGHTH DISTRICT'; ignore any other table visible in the image."
+      "hint": "This page continues the table of the previous page and prints no headings."
     },
     {
       "page": 24,
@@ -979,5 +1044,9 @@
       ],
       "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

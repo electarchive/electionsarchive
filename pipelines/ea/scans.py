@@ -46,6 +46,8 @@ class Page(TypedDict):
     discover: NotRequired[str | list[str]]
     hint: NotRequired[str]
     crop: NotRequired[list[float]]
+    stub: NotRequired[list[float]]
+    subtotals: NotRequired[bool]
     dpi: NotRequired[int]
     bands: NotRequired[int]
     header: NotRequired[list[float]]
@@ -79,6 +81,7 @@ class Manifest(TypedDict):
     license: NotRequired[str]
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
+    unit_parts: NotRequired[dict[str, str]]
     unit_scheme: NotRequired[Literal["town", "split"]]
     authoritative: NotRequired[str]
     extend: NotRequired[bool]
@@ -160,7 +163,7 @@ SUBTOTAL = re.compile(
     r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$|^(.*\s)?(pluralit(y|ies)|majorit(y|ies))$"
     r"|^\S+ dist(rict)? totals?$"
 )
-TOTAL = re.compile(r"^(state ?wide |state |grand |county |district )?totals?\b|^state ?wide$|^all counties$")
+TOTAL = re.compile(r"^(state ?wide |state (grand )?|grand |county |district )?totals?\b|^state ?wide$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
 EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
@@ -347,6 +350,14 @@ def bands(
         image = render(manifest, spec, dpi)
         width, height = image.size
         crop = image.crop((round(x0 * width), round(y0 * height), round(x1 * width), round(y1 * height)))
+        if "stub" in spec:
+            names = image.crop(
+                (round(spec["stub"][0] * width), round(y0 * height), round(spec["stub"][1] * width), round(y1 * height))
+            )
+            joined = Image.new(image.mode, (names.width + crop.width, crop.height), "white")
+            joined.paste(names, (0, 0))
+            joined.paste(crop, (names.width, 0))
+            crop = joined
         overlap = round(crop.height * 0.02) if count > 1 else 0
         header = None
         if count > 1 and "header" in spec and spec["header"][1] > spec["header"][0]:
@@ -615,6 +626,7 @@ def cells(
     errors: dict[str, str] = {}
     lines = calibrate(manifest["name"], plan)
     extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
+    parts = [(re.compile(pattern, re.IGNORECASE), code) for pattern, code in manifest.get("unit_parts", {}).items()]
     towns = manifest.get("unit_scheme") == "town"
     folded = towns or manifest.get("unit_scheme") == "split"
     home: dict[str, str] = {}
@@ -653,6 +665,9 @@ def cells(
         found = county(stem)
         if found is not None or towns:
             return found, None
+        for pattern, code in parts:
+            if pattern.search(label):
+                return stem, code
         inner = re.fullmatch(r"(.+?)\s*[(\[](.+?)[)\]]\s*", label)
         if inner is not None and stem_of(inner[1]) in extra and (owner := county(stem_of(inner[2]))) is not None:
             return extra[stem_of(inner[1])], owner
@@ -666,6 +681,7 @@ def cells(
         across = spec.get("orientation") == "counties_across"
         wards = spec.get("wards")
         (x0, y0, x1, y1), _, _ = framing(spec, reader)
+        shift = (spec["stub"][1] - spec["stub"][0]) / (x1 - x0) if "stub" in spec else 0.0
         number = str(spec.get("id", spec["page"]))
         for custom, request in plan.items():
             if request.section != number:
@@ -734,7 +750,11 @@ def cells(
                     else row["label"]
                 )
                 heading = WARD.sub("", named)
-                if SUBTOTAL.match(slug(row["label"])) or row["label"].strip() in {"%", "%."}:
+                if (
+                    SUBTOTAL.match(slug(row["label"]))
+                    or row["label"].strip() in {"%", "%."}
+                    or (spec.get("subtotals") and re.fullmatch(r"totals?", slug(row["label"])))
+                ):
                     continue
                 texts = row["values"]
                 if header and slug(header[0]["label"]) and texts and re.fullmatch(r"[A-WYZa-wyz]", texts[0].strip()):
@@ -783,9 +803,9 @@ def cells(
                         )
                     )
                     box = [
-                        x0 + (x1 - x0) * left,
+                        x0 + (x1 - x0) * max(0.0, left * (1 + shift) - shift),
                         y0 + (y1 - y0) * (start + (stop - start) * top),
-                        x0 + (x1 - x0) * right,
+                        x0 + (x1 - x0) * max(0.0, right * (1 + shift) - shift),
                         y0 + (y1 - y0) * (start + (stop - start) * bottom),
                     ]
                     edge = min(top, 1 - bottom)
@@ -827,7 +847,9 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
                 entry.printed = (entry.printed or 0) + printed[(page, index)] if again else printed[(page, index)]
             for (found, code, position), (value, box) in values.items():
                 if found == page and position == index:
-                    if not folded and any(seen == code and other != page for other, seen in entry.cells):
+                    if not (folded or spec.get("subtotals")) and any(
+                        seen == code and other != page for other, seen in entry.cells
+                    ):
                         continue
                     entry.total += value
                     before = entry.cells.get((page, code))
@@ -1315,12 +1337,10 @@ def write_totals(manifest: Manifest, table: pl.DataFrame) -> Path:
     return path
 
 
-def emit(name: str) -> Path:
+def passed(name: str, ids: dict[str, UUID]) -> tuple[Manifest, pl.DataFrame, dict[str, str]] | Path:
     manifest = load(name)
     contests = manifest["contests"]
     frame = pl.read_parquet(WORK / name / "tables.parquet")
-    with connect() as conn:
-        ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
     missing = {label for label, contest in contests.items() if contest.get("create") and key_of(contest) not in ids}
     if missing:
         listed = {
@@ -1383,135 +1403,161 @@ def emit(name: str) -> Path:
                 )
                 if part
             )
+    return manifest, frame, caveats
+
+
+def emit(name: str) -> Path:
+    folder, _, last = name.rpartition("/")
+    with connect() as conn:
+        ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
+    volumes: list[tuple[str, Manifest, pl.DataFrame, dict[str, str]]] = []
+    for one in (f"{folder}/{part}" if folder else part for part in last.split(",")):
+        found = passed(one, ids)
+        if isinstance(found, Path):
+            return found
+        volumes.append((one, *found))
+    lead = volumes[0][1]
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"{manifest['title']}: county tables read from the scan {'text layer' if manifest.get('text_layer') else 'by a vision model'} and checked against the printed and held totals",
-            polity=manifest["polity"],
-        )
-        source = cs.source(manifest["publisher"], manifest["title"])
-        cs.add(
-            "source",
-            id=source,
-            kind=manifest.get("kind", "official_body"),
-            publisher=manifest["publisher"],
-            title=manifest["title"],
-            url=manifest["file"].get("item", manifest["file"]["url"]),
-            license=manifest.get("license", "Public record"),
+            summary=f"{lead['title']}{f' and {len(volumes) - 1} more volumes of its series' if len(volumes) > 1 else ''}: county tables read from the scan {'text layer' if lead.get('text_layer') else 'by a vision model'} and checked against the printed and held totals",
+            polity=lead["polity"],
         )
         PAGES.mkdir(parents=True, exist_ok=True)
-        pages: dict[int, str] = {}
-        each = "{page}" in manifest["file"]["url"]
-        file: UUID | None = None
-        specs = {spec["page"]: spec for spec in manifest["pages"]}
-        for number in sorted(set(frame["page"])):
-            stored = artifact(manifest, specs[number])
-            if each or file is None:
-                file = cs.artifact(stored, source)
-            image = PAGES / f"{stored.sha256}-{number}.png"
-            if not image.exists():
-                render(manifest, specs[number], 100).save(image)
-            width, height = Image.open(image).size
-            page = cs.page(file, 1 if each else number)
-            pages[number] = str(page)
+        sources: dict[str, UUID] = {}
+        frames: list[pl.DataFrame] = []
+        for one, manifest, frame, _ in volumes:
+            source = sources[f"SC{one}"] = cs.source(manifest["publisher"], manifest["title"])
             cs.add(
-                "source_page",
-                id=page,
-                artifact_id=file,
-                page_number=1 if each else number,
-                image_key=f"pages/{SOURCE}/{image.name}",
-                width=width,
-                height=height,
+                "source",
+                id=source,
+                kind=manifest.get("kind", "official_body"),
+                publisher=manifest["publisher"],
+                title=manifest["title"],
+                url=manifest["file"].get("item", manifest["file"]["url"]),
+                license=manifest.get("license", "Public record"),
             )
-        frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1))
-        for (code,) in frame.filter(pl.col("kind") == "aggregate").select("code").unique().iter_rows():
-            if conn.execute(
-                "select 1 from reporting_unit where scheme_code = 'us.aggregate' and code = %s", [code]
-            ).fetchone():
-                continue
-            polity, parent, area = conn.execute(
-                """select p.id, u.id, u.area_id from reporting_unit u join polity p on p.id = u.polity_id
-                   where u.scheme_code = 'us.state' and p.iso_code = %s""",
-                [manifest["polity"]],
-            ).fetchone() or (None, None, None)
-            cs.add(
-                "reporting_unit",
-                id=cs.unit("us.aggregate", code),
-                polity_id=polity,
-                scheme_code="us.aggregate",
-                code=code,
-                parent_id=parent,
-                area_relation="within",
-                area_id=area,
-                kind="aggregate",
-                valid_from=None,
-                valid_to=None,
+            pages: dict[int, str] = {}
+            each = "{page}" in manifest["file"]["url"]
+            file: UUID | None = None
+            specs = {spec["page"]: spec for spec in manifest["pages"]}
+            for number in sorted(set(frame["page"])):
+                stored = artifact(manifest, specs[number])
+                if each or file is None:
+                    file = cs.artifact(stored, source)
+                image = PAGES / f"{stored.sha256}-{number}.png"
+                if not image.exists():
+                    render(manifest, specs[number], 100).save(image)
+                width, height = Image.open(image).size
+                page = cs.page(file, 1 if each else number)
+                pages[number] = str(page)
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=file,
+                    page_number=1 if each else number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+            frame = frame.with_columns(
+                page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1)
             )
+            frames.append(frame)
+            for (code,) in frame.filter(pl.col("kind") == "aggregate").select("code").unique().iter_rows():
+                if conn.execute(
+                    "select 1 from reporting_unit where scheme_code = 'us.aggregate' and code = %s", [code]
+                ).fetchone():
+                    continue
+                polity, parent, area = conn.execute(
+                    """select p.id, u.id, u.area_id from reporting_unit u join polity p on p.id = u.polity_id
+                       where u.scheme_code = 'us.state' and p.iso_code = %s""",
+                    [manifest["polity"]],
+                ).fetchone() or (None, None, None)
+                cs.add(
+                    "reporting_unit",
+                    id=cs.unit("us.aggregate", code),
+                    polity_id=polity,
+                    scheme_code="us.aggregate",
+                    code=code,
+                    parent_id=parent,
+                    area_relation="within",
+                    area_id=area,
+                    kind="aggregate",
+                    valid_from=None,
+                    valid_to=None,
+                )
         medsl.attach(
             cs,
             conn,
-            frame,
-            {f"SC{name}": source},
-            strict=not manifest.get("authoritative_loose"),
-            authoritative=manifest.get("authoritative"),
-            extend=bool(manifest.get("extend")),
-            empty=bool(manifest.get("empty")),
-            restage=bool(manifest.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
+            pl.concat(frames, how="diagonal_relaxed"),
+            sources,
+            strict=not lead.get("authoritative_loose"),
+            authoritative=lead.get("authoritative"),
+            extend=bool(lead.get("extend")),
+            empty=bool(lead.get("empty")),
+            restage=bool(lead.get("restage")) or "EA_SCANS_RESTAGE" in os.environ,
         )
-        warded = {
-            key_of(contests[column["contest"]])
-            for spec in manifest["pages"]
-            if spec.get("wards")
-            for column in spec.get("columns", [])
-            if column["contest"] is not None
-        }
-        targets = {row["id"]: row["contest_id"] for row in cs.rows.get("result_set", [])}
-        for held, contest in conn.execute(
-            "select id, contest_id from result_set where source_id = %s and contest_id = any(%s)",
-            [source, [ids[key_of(contest)] for contest in contests.values() if key_of(contest) in ids]],
-        ).fetchall():
-            targets.setdefault(held, contest)
-        for held, contest in targets.items():
-            found = conn.execute(
-                "select value from external_id where scheme = 'us.contest' and entity_id = %s", [contest]
-            ).fetchone()
-            text = (
-                (
-                    "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
-                    if manifest.get("text_layer")
-                    else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band; its position comes from matching the model's figures to an OCR pass over the same image, so it is approximate."
-                )
-                + (
-                    " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
-                    if towns
-                    else ""
-                )
-                + (
-                    " The county's votes are the sum of its wards' returns, with any soldiers' vote, and the box is the first ward's."
-                    if found is not None and found[0] in warded
-                    else ""
-                )
-                + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else "")
-                + (f" {manifest['caveat']}" if manifest.get("caveat") else "")
-            )
-            current = False
-            for note, written in conn.execute(
-                """select n.id, n.body_md from note n join changeset c on c.id = n.changeset_id
-                   where n.entity_id = %s and n.kind = 'caveat' and c.pipeline = %s""",
-                [held, SOURCE],
+        for one, manifest, _, caveats in volumes:
+            contests = manifest["contests"]
+            towns = manifest.get("unit_scheme") == "town"
+            source = sources[f"SC{one}"]
+            warded = {
+                key_of(contests[column["contest"]])
+                for spec in manifest["pages"]
+                if spec.get("wards")
+                for column in spec.get("columns", [])
+                if column["contest"] is not None
+            }
+            targets = {
+                row["id"]: row["contest_id"] for row in cs.rows.get("result_set", []) if row["source_id"] == source
+            }
+            for held, contest in conn.execute(
+                "select id, contest_id from result_set where source_id = %s and contest_id = any(%s)",
+                [source, [ids[key_of(contest)] for contest in contests.values() if key_of(contest) in ids]],
             ).fetchall():
-                if written == text:
-                    current = True
-                else:
-                    cs.add(
-                        "note_drop",
-                        note_id=note,
-                        entity_id=held,
-                        body_md=written,
-                        reason="A later emit words the caveat anew.",
+                targets.setdefault(held, contest)
+            for held, contest in targets.items():
+                found = conn.execute(
+                    "select value from external_id where scheme = 'us.contest' and entity_id = %s", [contest]
+                ).fetchone()
+                text = (
+                    (
+                        "Read from the scan's text layer, every column checked against the printed state total. Each cell's box is its column's band by its row's band, so it is approximate."
+                        if manifest.get("text_layer")
+                        else "Read from the scan by a vision model. Each cell's box is its column's band by its row's band; its position comes from matching the model's figures to an OCR pass over the same image, so it is approximate."
                     )
-            if not current:
-                cs.add("note", entity_id=held, kind="caveat", body_md=text)
+                    + (
+                        " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
+                        if towns
+                        else ""
+                    )
+                    + (
+                        " The county's votes are the sum of its wards' returns, with any soldiers' vote, and the box is the first ward's."
+                        if found is not None and found[0] in warded
+                        else ""
+                    )
+                    + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else "")
+                    + (f" {manifest['caveat']}" if manifest.get("caveat") else "")
+                )
+                current = False
+                for note, written in conn.execute(
+                    """select n.id, n.body_md from note n join changeset c on c.id = n.changeset_id
+                       where n.entity_id = %s and n.kind = 'caveat' and c.pipeline = %s""",
+                    [held, SOURCE],
+                ).fetchall():
+                    if written == text:
+                        current = True
+                    else:
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=held,
+                            body_md=written,
+                            reason="A later emit words the caveat anew.",
+                        )
+                if not current:
+                    cs.add("note", entity_id=held, kind="caveat", body_md=text)
         return cs.write()

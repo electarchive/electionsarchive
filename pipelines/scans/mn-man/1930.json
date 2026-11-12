@@ -162,9 +162,9 @@
       "orientation": "counties_down",
       "crop": [
         0.139,
-        0.645,
+        0.62,
         0.881,
-        0.865
+        0.822
       ],
       "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     },
@@ -366,5 +366,9 @@
       ],
       "hint": "Read only the table headed 'TENTH CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

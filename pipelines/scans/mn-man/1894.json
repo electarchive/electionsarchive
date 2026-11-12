@@ -112,6 +112,10 @@
       "header": [
         0.0,
         0.2235
+      ],
+      "stub": [
+        0.1,
+        0.358
       ]
     },
     {
@@ -367,8 +371,8 @@
       "columns": [
         {
           "label": "Andrew R. Keifer, R.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house4",
+          "candidate": "Andrew Robert Kiefer"
         },
         {
           "label": "Edw. J. Darragh, D.",
@@ -445,8 +449,8 @@
         },
         {
           "label": "Kitt'lHal-vorsen, Peo.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house6",
+          "candidate": "Kittl Halvorsen"
         }
       ],
       "orientation": "counties_down",
@@ -492,5 +496,8 @@
       ],
       "hint": "Read only the table headed 'SEVENTH CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "unit_codes": {
+    "kamsey": "27123"
+  }
 }

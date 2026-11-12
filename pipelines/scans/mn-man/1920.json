@@ -123,13 +123,13 @@
         },
         {
           "label": "Democrat\u2014Jas. M. Cox",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
         },
         {
           "label": "Industrial\u2014W. W Cox",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Cox (Socialist Labor)"
         },
         {
           "label": "Socialist\u2014Debs",
@@ -172,13 +172,13 @@
         },
         {
           "label": "Democrat\u2014Jas. M. Cox",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
         },
         {
           "label": "Industrial\u2014W. W. Cox",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Cox (Socialist Labor)"
         },
         {
           "label": "Socialist\u2014Debs",
@@ -527,7 +527,15 @@
       "header": [
         0.0,
         0.1453
+      ],
+      "stub": [
+        0.04,
+        0.104
       ]
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

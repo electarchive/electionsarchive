@@ -239,7 +239,7 @@
         0.103,
         0.106,
         0.478,
-        0.224
+        0.335
       ],
       "hint": "Read only the table headed 'Sixth Congressional District'; ignore any other table visible in the image."
     },
@@ -260,10 +260,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.455,
-        0.216,
-        0.876,
-        0.259
+        0.49,
+        0.106,
+        0.89,
+        0.245
       ],
       "hint": "Read only the table headed 'Eighth Congressional District'; ignore any other table visible in the image."
     },
@@ -284,10 +284,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.455,
-        0.297,
-        0.876,
-        0.424
+        0.49,
+        0.268,
+        0.89,
+        0.495
       ],
       "hint": "Read only the table headed 'Ninth Congressional District'; ignore any other table visible in the image."
     },
@@ -389,5 +389,9 @@
         0.2907
       ]
     }
-  ]
+  ],
+  "unit_parts": {
+    "hennepin|minneapolis": "27053",
+    "ramsey|st\\.? ?paul": "27123"
+  }
 }

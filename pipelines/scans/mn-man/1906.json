@@ -367,8 +367,8 @@
       "columns": [
         {
           "label": "Davis, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house3",
+          "candidate": "Charles Russell Davis"
         }
       ],
       "orientation": "counties_down",
@@ -473,8 +473,8 @@
       "columns": [
         {
           "label": "Volstead, Rep.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house7",
+          "candidate": "Andrew John Volstead"
         }
       ],
       "orientation": "counties_down",

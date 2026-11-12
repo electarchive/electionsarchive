@@ -157,7 +157,7 @@ The steps run in order, and each step is a single call that advances the batch o
 - `ea scans prepare <name>` renders the crops, fills the official totals, and prints the number of requests.
 - `ea scans run <name>` advances the reading. It reads the first pass, checks the tables, sends a second read for pages that fail, and writes `tables.parquet`, `review.json`, and `report.md`.
 - `ea scans status` lists every manifest and its open jobs.
-- `ea scans emit <name>` writes the tables that passed through the normal changeset path.
+- `ea scans emit <name>` writes the tables that passed through the normal changeset path. A comma-separated list of volumes in one folder (`mn-man/1964,1966`) goes into a single changeset.
 
 A column passes when its county rows sum to its printed total, or, if no total is printed, to the official total within the greater of 50 votes or one percent. A page passes when every column passes. A page that still fails after the second read goes to `review.json`, and nothing on that list is published. A person settles it by writing the corrected cells and a note into `overrides.json` in the same folder.
 

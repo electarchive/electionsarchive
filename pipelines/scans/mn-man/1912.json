@@ -503,7 +503,11 @@
         0.633,
         0.638
       ],
-      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'Governor'; ignore any other table visible in the image.",
+      "stub": [
+        0.02,
+        0.19
+      ]
     },
     {
       "page": 150,
@@ -690,8 +694,8 @@
       "columns": [
         {
           "label": "A. J. Volstead",
-          "contest": null,
-          "candidate": ""
+          "contest": "house7",
+          "candidate": "Andrew John Volstead"
         }
       ],
       "orientation": "counties_down",
