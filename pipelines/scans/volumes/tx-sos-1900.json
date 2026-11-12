@@ -42,5 +42,32 @@
     128,
     129
   ],
-  "autorotate": true
+  "autorotate": true,
+  "slates": {
+    "democratic": {
+      "candidate": "Bryan",
+      "elector": 11,
+      "of": 15
+    },
+    "republican": {
+      "candidate": "McKinley",
+      "elector": 6,
+      "of": 15
+    },
+    "people s": {
+      "candidate": "Barker",
+      "elector": 1,
+      "of": 15
+    },
+    "prohibition": {
+      "candidate": "Woolley",
+      "elector": 1,
+      "of": 2
+    },
+    "socialist labor": {
+      "candidate": "Malloney",
+      "elector": 2,
+      "of": 2
+    }
+  }
 }

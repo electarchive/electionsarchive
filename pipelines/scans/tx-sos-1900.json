@@ -215,8 +215,8 @@
         },
         {
           "label": "Dan S. Chessher.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "Jacob F. Wolters.",
@@ -310,8 +310,8 @@
         },
         {
           "label": "Dan S. Chessher.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "Jacob F. Wolters.",
@@ -400,8 +400,8 @@
         },
         {
           "label": "Dan S. Chessher.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "Jacob F. Wolters.",
@@ -489,8 +489,8 @@
         },
         {
           "label": "Dan S. Chessher.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "Jacob F. Wolters.",
@@ -579,8 +579,8 @@
         },
         {
           "label": "I",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "J",
@@ -674,8 +674,8 @@
         },
         {
           "label": "I",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
         },
         {
           "label": "J",
@@ -713,100 +713,176 @@
       "id": "114-0",
       "columns": [
         {
-          "label": "H. O. Mannine",
+          "label": "Paul Fricke.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "R. A. Caldwell",
+          "label": "W. F. Crawford.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Henry E. Taylor",
+          "label": "Henry F. McGregor.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "A. G. Armstrong",
+          "label": "Wm. R. Roberts.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Wm. H. Chrisfield",
+          "label": "H. C. Manning.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Carl Beck",
+          "label": "R. A. Caldwell.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Henry E. Taylor.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Harry A. Grimm",
+          "label": "C. W. Starling.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Armstrong.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. H. Christian.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl Beck.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry A. Griffin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. Westhoff.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. S. Brockerbrow.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. B. Worsham.",
           "contest": null,
           "candidate": ""
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.132,
-        0.146,
-        0.928,
-        1.0
+        0.058,
+        0.14,
+        0.889,
+        0.93
       ],
-      "hint": "Read only the table headed 'RETURNS OF AN ELECTION HELD NOVEMBER 6, 1900, For Electors for President and Vice-President\u2014continued.'; ignore any other table visible in the image.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1803
-      ]
+      "hint": "Read only the REPUBLICAN table of electors, Anderson to Camp; several of its fifteen elector headings are printed faintly or as single letters.",
+      "turn": -90
     },
     {
       "page": 115,
       "id": "115-0",
       "columns": [
         {
-          "label": "H. O. Mannine",
+          "label": "Paul Fricke.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "R. A. Caldwell",
+          "label": "W. F. Crawford.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Henry E. Taylor",
+          "label": "Henry F. McGregor.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "A. G. Armstrong",
+          "label": "Wm. R. Roberts.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Wm. H. Chrisfield",
+          "label": "H. C. Manning.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Carl Beck",
+          "label": "R. A. Caldwell.",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Henry E. Taylor.",
           "contest": null,
           "candidate": ""
         },
         {
-          "label": "Harry A. Grimm",
+          "label": "C. W. Starling.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Armstrong.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. H. Christian.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Carl Beck.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harry A. Griffin.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. Westhoff.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. S. Brockerbrow.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. B. Worsham.",
           "contest": null,
           "candidate": ""
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.132,
+        0.058,
         0.0,
-        0.928,
+        0.889,
         1.0
       ],
       "hint": "This page continues the table of the previous page and prints no headings.",
@@ -843,8 +919,8 @@
         },
         {
           "label": "R. A. Caldwell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
         },
         {
           "label": "Henry E. Taylor.",
@@ -938,8 +1014,8 @@
         },
         {
           "label": "R. A. Caldwell.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
         },
         {
           "label": "Henry E. Taylor.",
@@ -1028,8 +1104,8 @@
         },
         {
           "label": "R. A. Caldwell",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
         },
         {
           "label": "I",
@@ -1123,8 +1199,8 @@
         },
         {
           "label": "R. A. Caldwell",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
         },
         {
           "label": "I",
@@ -1188,8 +1264,8 @@
       "columns": [
         {
           "label": "Milton Park.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
         },
         {
           "label": "J. R. Allen.",
@@ -1238,8 +1314,8 @@
         },
         {
           "label": "S. M. Woolsey.",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "J. E. Greer.",
@@ -1283,8 +1359,8 @@
       "columns": [
         {
           "label": "Milton Park.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
         },
         {
           "label": "J. R. Allen.",
@@ -1333,8 +1409,8 @@
         },
         {
           "label": "S. M. Woolsey.",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "J. E. Greer.",
@@ -1368,108 +1444,13 @@
       "turn": -90
     },
     {
-      "page": 122,
-      "id": "122-0",
-      "columns": [
-        {
-          "label": "W. A. Blayon",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "S. M. Woolsey",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
-        },
-        {
-          "label": "J. E. Greer",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "W. C. Frazier",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "J. P. Gilbert",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "J. E. Luse",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.07,
-        0.458,
-        0.913,
-        1.0
-      ],
-      "hint": "Read only the table headed \"PEOPLE'S.\"; ignore any other table visible in the image.",
-      "turn": -90,
-      "bands": 2,
-      "header": [
-        0.0,
-        -0.0369
-      ]
-    },
-    {
-      "page": 123,
-      "id": "123-0",
-      "columns": [
-        {
-          "label": "W. A. Blayon",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "S. M. Woolsey",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
-        },
-        {
-          "label": "J. E. Greer",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "W. C. Frazier",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "J. P. Gilbert",
-          "contest": null,
-          "candidate": ""
-        },
-        {
-          "label": "J. E. Luse",
-          "contest": null,
-          "candidate": ""
-        }
-      ],
-      "orientation": "counties_down",
-      "crop": [
-        0.07,
-        0.0,
-        0.913,
-        1.0
-      ],
-      "hint": "This page continues the table of the previous page and prints no headings.",
-      "turn": -90
-    },
-    {
       "page": 124,
       "id": "124-0",
       "columns": [
         {
           "label": "Milton Park.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
         },
         {
           "label": "J. R. Allen.",
@@ -1518,8 +1499,8 @@
         },
         {
           "label": "S. M. Woolsey.",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "J. E. Greer.",
@@ -1563,8 +1544,8 @@
       "columns": [
         {
           "label": "Milton Park.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Wharton Barker (Populist)"
         },
         {
           "label": "J. R. Allen.",
@@ -1613,8 +1594,8 @@
         },
         {
           "label": "S. M. Woolsey.",
-          "contest": "president",
-          "candidate": "John Woolley (Prohibition)"
+          "contest": null,
+          "candidate": ""
         },
         {
           "label": "J. E. Greer.",
@@ -1653,8 +1634,8 @@
       "columns": [
         {
           "label": "E. C. Heath",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
         },
         {
           "label": "D. N. Hancock",
@@ -1668,8 +1649,8 @@
         },
         {
           "label": "S. Silvermann",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
         },
         {
           "label": "Scattering",
@@ -1697,8 +1678,8 @@
       "columns": [
         {
           "label": "E. C. Heath",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
         },
         {
           "label": "D. N. Hancock",
@@ -1712,8 +1693,8 @@
         },
         {
           "label": "S. Silvermann",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
         },
         {
           "label": "Scattering",
@@ -1736,8 +1717,8 @@
       "columns": [
         {
           "label": "E. O. Heath",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
         },
         {
           "label": "D. N. Hancock",
@@ -1751,8 +1732,8 @@
         },
         {
           "label": "S. Silvermann",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
         },
         {
           "label": "Scattering",
@@ -1780,8 +1761,8 @@
       "columns": [
         {
           "label": "E. O. Heath",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "John Woolley (Prohibition)"
         },
         {
           "label": "D. N. Hancock",
@@ -1795,8 +1776,8 @@
         },
         {
           "label": "S. Silvermann",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Joseph F. Malloney (Socialist Labor)"
         },
         {
           "label": "Scattering",

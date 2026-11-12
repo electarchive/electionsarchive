@@ -55,5 +55,37 @@
     268,
     269
   ],
-  "autorotate": true
+  "autorotate": true,
+  "slates": {
+    "democratic": {
+      "candidate": "Parker",
+      "elector": 1,
+      "of": 18
+    },
+    "republican": {
+      "candidate": "Roosevelt",
+      "elector": 1,
+      "of": 18
+    },
+    "people s": {
+      "candidate": "Watson",
+      "elector": 1,
+      "of": 18
+    },
+    "prohibition": {
+      "candidate": "Swallow",
+      "elector": 1,
+      "of": 18
+    },
+    "socialist": {
+      "candidate": "Debs",
+      "elector": 1,
+      "of": 18
+    },
+    "socialist and labor": {
+      "candidate": "Corregan",
+      "elector": 1,
+      "of": 2
+    }
+  }
 }

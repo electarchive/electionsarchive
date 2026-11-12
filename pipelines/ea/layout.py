@@ -54,6 +54,12 @@ class LayoutPage(TypedDict):
     tables: list[LayoutTable]
 
 
+class Slate(TypedDict):
+    candidate: str
+    elector: int
+    of: int
+
+
 class Volume(TypedDict):
     year: int
     day: str
@@ -74,6 +80,7 @@ class Volume(TypedDict):
     extend: NotRequired[bool]
     empty: NotRequired[bool]
     turn: NotRequired[int]
+    slates: NotRequired[dict[str, Slate]]
 
 
 def schema(offices: list[str]) -> dict[str, object]:
@@ -310,8 +317,12 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 continue
             open_table = None
             for index, table in enumerate(found):
-                if table["party"] or table["special"]:
+                electors = volume.get("slates", {}) if table["office"] == "president" else {}
+                if (table["party"] and not electors) or table["special"]:
                     notes.append(f"{leaf}: {table['title']!r} skipped ({table['party'] or 'special'})")
+                    continue
+                if not (0 <= table["x0"] < table["x1"] <= 1000 and 0 <= table["y0"] < table["y1"] <= 1000):
+                    notes.append(f"{leaf}: {table['title']!r} skipped (box outside the page)")
                     continue
                 if table["office"] == "mixed" and not (volume.get("create") or volume.get("mixed")):
                     notes.append(f"{leaf}: {table['title']!r} mixes offices")
@@ -324,6 +335,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 ]:
                     notes.append(f"{leaf}: {table['title']!r} columns for other offices: {'; '.join(left)}")
                 built: list[scans.Column] = []
+                by_index: dict[int, scans.Column] = {}
                 for office in dict.fromkeys(
                     column["office"]
                     for column in table["columns"]
@@ -342,7 +354,26 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                     }
                     key = scans.key_of(contest)
                     candidates = [c for c in table["columns"] if c["role"] == "candidate" and c["office"] == office]
-                    if key in ids:
+                    if key in ids and office == "president" and electors:
+                        matched = {}
+                        members: dict[str, list[int]] = {}
+                        for position, column in enumerate(table["columns"]):
+                            if column["role"] == "candidate" and column["office"] == office:
+                                members.setdefault(scans.slug(column["party"] or table["party"]), []).append(position)
+                        for party, positions in members.items():
+                            slate = electors.get(party)
+                            if slate is None or len(positions) != slate["of"]:
+                                notes.append(f"{leaf}: {table['title']!r} has {len(positions)} {party!r} electors")
+                                continue
+                            chosen = scans.match([slate["candidate"]], scans.options(conn, ids[key]), label)[0][0]
+                            if chosen["contest"] is None:
+                                notes.append(f"{leaf}: no {label} option for {slate['candidate']!r}")
+                                continue
+                            position = positions[slate["elector"] - 1]
+                            by_index[position] = scans.Column(
+                                label=table["columns"][position]["label"], contest=label, candidate=chosen["candidate"]
+                            )
+                    elif key in ids:
                         named, unmatched[label] = scans.match(
                             [column["label"] for column in candidates], scans.options(conn, ids[key]), label
                         )
@@ -377,12 +408,15 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                         continue
                     contests[label] = contest
                     built.extend(matched.values())
+                    built.extend(by_index.values())
                 if not built:
                     continue
                 by_label = {column["label"]: column for column in built}
                 cols = [
-                    by_label.get(column["label"]) or {"label": column["label"], "contest": None, "candidate": ""}
-                    for column in table["columns"]
+                    by_index.get(position)
+                    or (None if by_index else by_label.get(column["label"]))
+                    or {"label": column["label"], "contest": None, "candidate": ""}
+                    for position, column in enumerate(table["columns"])
                 ]
                 beside = [
                     other

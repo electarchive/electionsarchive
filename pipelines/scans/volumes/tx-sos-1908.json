@@ -58,5 +58,42 @@
     793,
     794
   ],
-  "autorotate": true
+  "autorotate": true,
+  "slates": {
+    "democratic": {
+      "candidate": "Bryan",
+      "elector": 1,
+      "of": 18
+    },
+    "republican": {
+      "candidate": "Taft",
+      "elector": 1,
+      "of": 18
+    },
+    "people s": {
+      "candidate": "Watson",
+      "elector": 1,
+      "of": 18
+    },
+    "prohibition": {
+      "candidate": "Chafin",
+      "elector": 1,
+      "of": 18
+    },
+    "socialist": {
+      "candidate": "Debs",
+      "elector": 1,
+      "of": 18
+    },
+    "independence": {
+      "candidate": "Hisgen",
+      "elector": 1,
+      "of": 18
+    },
+    "socialist labor": {
+      "candidate": "Gillhaus",
+      "elector": 1,
+      "of": 18
+    }
+  }
 }
