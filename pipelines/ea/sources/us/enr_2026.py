@@ -1646,6 +1646,7 @@ def plan(
             wide: bool,
             seat: tuple[str, str] | None = None,
             lead: str | None = None,
+            muni: bool = False,
         ):
             scored = []
             for contest, key, wanted in (
@@ -1669,7 +1670,11 @@ def plan(
                     ):
                         continue
                 elif (
-                    re.fullmatch(r"\d{5}|\d{10}", segment)
+                    muni
+                    and people <= {"yes", "no"}
+                    and ":measure:" in key
+                    and re.fullmatch(r"\d{5}", segment)
+                    or re.fullmatch(r"\d{5}|\d{10}", segment)
                     and (len(places) != 1 or codes.get((FIPS[state], plain(places[0])), places[0]) != segment[:5])
                     and not (named and named <= words)
                     and "regional-superintendent" not in key
@@ -1803,7 +1808,10 @@ def plan(
             lead = re.match(
                 r"\s*(?:constitutional\s+)?(?:amendment|question)\s+(?:no\.?\s*)?(\d+)\s*:", name, re.IGNORECASE
             )
-            best, ok = choose(people, words, places, wide, seat, lead[1] if lead else None)
+            muni = bool(
+                state == "AR" and re.search(r"\b(?:town|city) of\b", name, re.IGNORECASE) and people <= {"yes", "no"}
+            )
+            best, ok = choose(people, words, places, wide, seat, lead[1] if lead else None, muni)
             if not ok and retention and len(best) > 1:
                 best, ok = choose(
                     people,
