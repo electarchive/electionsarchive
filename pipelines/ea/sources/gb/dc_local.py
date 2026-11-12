@@ -1,6 +1,9 @@
+import io
 import json
 import os
+import re
 import time
+import zipfile
 from collections.abc import Callable
 from datetime import date
 from pathlib import Path
@@ -8,6 +11,7 @@ from uuid import UUID
 
 import httpx
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -212,6 +216,14 @@ COUNTIES = {
     "west-sussex": ("E10000032", "West Sussex"),
 }
 SHADOWS = {"east-surrey": ("ESY", "East Surrey"), "west-surrey": ("WSY", "West Surrey")}
+SURREY = (
+    "https://1897589978-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FcNpJpLP8RROUaWVQo5ea"
+    "%2Fuploads%2FFBcfLB0R9hLKW4Du7OnN%2FPreoperative_District_Borough_Unitary_Ward_Region%20Shapefile.zip"
+    "?alt=media&token=e7f34d3f-22ae-48a4-b57c-c683d58b27ff"
+)
+SURREY_AUTHORITIES = {"EAST_SURREY": "ESY", "WEST_SURREY": "WSY"}
+SURREY_TITLE = "Boundary-Line: East and West Surrey preoperative unitary ward boundaries"
+SURREY_LAYER = "sy26"
 DIVISION_SPELLINGS = {"harlow parndon and toddbrook": "harlow parndon and todbrook"}
 PRESS = (
     "birminghammail.co.uk",
@@ -263,7 +275,7 @@ METHODOLOGY = (
     "page it was copied from, kept on the result set as a citation. Not an official publication: an official set "
     "supersedes it where one is loaded. Seats and ward GSS codes come from Democracy Club's EveryElection register; "
     "county electoral divisions are matched to ONS's May 2026 division list by code or, where EveryElection gives none, by "
-    "name within the county; the Surrey shadow unitary wards have no ONS code and keep EveryElection's identifier; "
+    "name within the county; the Surrey shadow unitary wards have no ONS code, keep EveryElection's identifier, and take their shapes from Ordnance Survey's Boundary-Line; "
     "ballots whose source is a newspaper, broadcaster, social media post, Wikipedia, or the Local Elections Archive "
     "Project, ballots that cite no page, and ballots whose winners do not equal the seats contested, are not loaded. Votes for the rejected ballots are the printed spoilt ballots."
 )
@@ -455,6 +467,7 @@ def fetch() -> None:
     for year in LOOKUPS:
         for url in lookup_pages(year):
             raw.fetch(SOURCE, url, suffix=".json")
+    raw.fetch(SOURCE, SURREY, suffix=".zip")
     for year, day in DAYS.items():
         if year in ARCHIVED:
             raw.fetch(SOURCE, RESULTS.format(day=day), suffix=".csv")
@@ -489,6 +502,24 @@ def fetch() -> None:
         for key in (f"wd{year % 100}", f"lad{year % 100}", *(["ced26"] if year == 2026 else [])):
             for url in layer_pages(key):
                 raw.fetch(SOURCE, url, suffix=".geojson")
+
+
+def surrey_features() -> list[tuple[str, str]]:
+    with zipfile.ZipFile(raw.cached(SOURCE, SURREY).path) as z:
+        parts = {
+            name.rsplit(".", 1)[1].lower(): io.BytesIO(z.read(name))
+            for name in z.namelist()
+            if name.lower().endswith((".shp", ".shx", ".dbf"))
+        }
+    reader = shapefile.Reader(shp=parts["shp"], shx=parts["shx"], dbf=parts["dbf"], encoding="utf-8")
+    features = []
+    for record, shape in zip(reader.records(), reader.shapes(), strict=True):
+        name = re.sub(r" Ward( \(DET\))?$", "", record["NAME"])
+        slug_ = re.sub(r"[^a-z0-9]+", "-", name.replace("&", "").lower()).strip("-")
+        features.append((f"{SURREY_AUTHORITIES[record['FILE_NAME']]}:{slug_}", json.dumps(shape.__geo_interface__)))
+    if len(features) != 82 or len({code for code, _ in features}) != 81:
+        raise ValueError(f"surrey: {len(features)} shapes, expected 82 over 81 wards")
+    return features
 
 
 def division_key(text: str) -> str:
@@ -567,7 +598,7 @@ def locate_divisions(found: pl.DataFrame, divisions: pl.DataFrame) -> pl.DataFra
         .then(council.replace_strict({slug: name for slug, (_, name) in SHADOWS.items()}, default=None))
         .otherwise("la_name"),
         ons_name=pl.when(in_county).then("ced_name").when(shadow).then("division").otherwise("ons_name"),
-        shape=pl.when(in_county).then(pl.lit("ced26")).when(shadow).then(None).otherwise("shape"),
+        shape=pl.when(in_county).then(pl.lit("ced26")).when(shadow).then(pl.lit(SURREY_LAYER)).otherwise("shape"),
         coded=pl.col("coded") | in_county | shadow,
     ).drop("council", "key", "county", "match", "ced_name", "ced_county")
 
@@ -950,7 +981,7 @@ def parse() -> None:
             for key, codes in (
                 *(
                     (layer, set(loaded.filter((pl.col("year") == year) & (pl.col("shape") == layer))["ward_code"]))
-                    for layer in (f"wd{year % 100}", *(["ced26"] if year == 2026 else []))
+                    for layer in (f"wd{year % 100}", *([SURREY_LAYER, "ced26"] if year == 2026 else []))
                 ),
                 (f"lad{year % 100}", set(loaded.filter(pl.col("year") == year)["la_code"])),
             )
@@ -969,6 +1000,12 @@ def shapes_for(needed: dict[str, set[str]]) -> pl.DataFrame:
         conn.execute("create temp table feature (layer text, code text, geojson text) on commit drop")
         with conn.cursor() as cursor, cursor.copy("copy feature from stdin") as copy:
             for key, codes in needed.items():
+                if key == SURREY_LAYER:
+                    for code, geojson in surrey_features():
+                        if code in codes:
+                            copy.write_row((key, code, geojson))
+                            copy.write_row((key, code.split(":")[0], geojson))
+                    continue
                 _, field, count, _, _ = LAYERS[key]
                 features = [
                     feature
@@ -1013,11 +1050,10 @@ def emit() -> Path:
             .filter(pl.col("year").is_in(list(days)))
             .with_columns(
                 day=pl.col("year").replace_strict(days, return_dtype=pl.Date),
-                la_layer=pl.when(
-                    pl.col("la_code").str.starts_with("E10")
-                    | pl.col("la_code").is_in([code for code, _ in SHADOWS.values()])
-                )
+                la_layer=pl.when(pl.col("la_code").str.starts_with("E10"))
                 .then(None)
+                .when(pl.col("la_code").is_in([code for code, _ in SHADOWS.values()]))
+                .then(pl.lit(SURREY_LAYER))
                 .otherwise(pl.format("lad{}", pl.col("year") % 100)),
             )
         )
@@ -1216,6 +1252,26 @@ def emit() -> Path:
             if key.startswith("wd") and int(key[-2:]) + 2000 in LOOKUPS:
                 for url in lookup_pages(int(key[-2:]) + 2000):
                     cs.artifact(raw.cached(SOURCE, url), ons[key])
+
+        if SURREY_LAYER in layers:
+            ons[SURREY_LAYER] = cs.source("Ordnance Survey", SURREY_TITLE)
+            if ons[SURREY_LAYER] not in foreign:
+                cs.add(
+                    "source",
+                    id=ons[SURREY_LAYER],
+                    kind="official_body",
+                    publisher="Ordnance Survey",
+                    title=SURREY_TITLE,
+                    url="https://docs.os.uk/os-downloads/products/areas-and-zones-portfolio/boundary-line/boundary-line-downloads",
+                    license="Open Government Licence v3.0",
+                    license_url="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+                    attribution="Contains OS data © Crown copyright and database right, licensed under the Open Government Licence v3.0.",
+                    notes=(
+                        "Boundaries of the 81 wards of East and West Surrey under the Surrey (Structural Changes) Order 2026; "
+                        "each council's shape is the union of its wards."
+                    ),
+                )
+                cs.artifact(raw.cached(SOURCE, SURREY), ons[SURREY_LAYER])
 
         paths = {path for (path,) in conn.execute("select path from slug where path like 'gb/%%'").fetchall()}
         councils: dict[str, tuple[UUID, UUID, UUID, str, str]] = {}
