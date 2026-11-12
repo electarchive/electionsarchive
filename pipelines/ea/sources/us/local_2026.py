@@ -11415,7 +11415,7 @@ def parse() -> None:
             if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI", "NC", "IN"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
-                        """select distinct on (g.id) coalesce(g.county, case when g.state = 'IA' and x.value ~ '^town:' then substr(x.value, 6, 5) end), g.name, x.value, s.path, g.kind from coverage_government g
+                        """select distinct on (g.id) coalesce(g.county, case when g.state = 'IA' and x.value ~ '^town:' then substr(x.value, 6, 5) end, (select substr(sx.value, 9, 5) from external_id sx where sx.entity_id = g.polity_id and sx.scheme = 'us.polity' and sx.value ~ '^special:[0-9]{5}:' limit 1)), g.name, x.value, s.path, g.kind from coverage_government g
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
