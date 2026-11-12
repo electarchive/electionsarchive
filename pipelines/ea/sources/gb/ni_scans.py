@@ -132,7 +132,7 @@ def state() -> dict[str, object]:
     return json.loads(STATE.read_text()) if STATE.exists() else {"reads": {}}
 
 
-def submit() -> None:
+def submit(pattern: str = "") -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     current = state()
     reads = cast(dict[str, bool], current["reads"])
@@ -145,8 +145,12 @@ def submit() -> None:
         todo = [
             key
             for key in wanted
-            if f"read:{label}:{key}" not in held
-            and all(reads.get(f"{earlier}:{key}", earlier in LEGACY) is False for earlier in MODELS[:position])
+            if re.search(pattern, key)
+            and f"read:{label}:{key}" not in held
+            and all(
+                reads.get(f"{earlier}:{key}", False if earlier in LEGACY else None) is False
+                for earlier in MODELS[:position]
+            )
         ]
         if not todo:
             continue
@@ -209,14 +213,14 @@ def read(
             "name": surname_first(candidate["name"]),
             "party": (candidate["description"] or "").strip(),
             "elected": bool(candidate["elected"]),
-            "totals": [float(value or 0) for value in candidate["stages"]],
+            "totals": [ni_council.number(str(value)) or 0.0 for value in candidate["stages"]],
         }
         for candidate in sheet["candidates"]
     ]
     width = min(len(candidate["totals"]) for candidate in candidates)
     for candidate in candidates:
         candidate["totals"] = candidate["totals"][:width]
-    exhausted = ([float(value or 0) for value in sheet["non_transferable"]] + [0.0] * width)[:width]
+    exhausted = ([ni_council.number(str(value)) or 0.0 for value in sheet["non_transferable"]] + [0.0] * width)[:width]
     valid = float(str(sheet["valid"]).replace(",", ""))
     sums = {
         stage: sum(candidate["totals"][stage - 1] for candidate in candidates) + exhausted[stage - 1]

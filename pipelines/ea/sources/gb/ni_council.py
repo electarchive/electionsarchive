@@ -406,8 +406,17 @@ def finish(
     dea_code, dea_name, council_code = areas[key]
     completed = 0
     listed = 0
+    unsure = blanked = 0
     for candidate in candidates:
-        if year == 2011 and not candidate["party"].strip():
+        if "#" in candidate["name"]:
+            unsure += 1
+            cleaned = re.sub(r"\s+", " ", re.sub(r"#+\s*unsure\s*#*|#+", "", candidate["name"], flags=re.IGNORECASE))
+            cleaned = cleaned.strip()
+            if not re.search("[A-Za-z]", cleaned.partition(",")[0]):
+                cleaned = ""
+                blanked += 1
+            candidate["name"] = cleaned.strip(" ,")
+        if year == 2011 and candidate["name"] and not candidate["party"].strip():
             words = re.sub(r"^[\W\d_]+", "", candidate["name"]).replace(",", " ").split()
             surname = squeeze(
                 words[0]
@@ -476,6 +485,22 @@ def finish(
         notes.append(
             "The published sheet stops before the last stage. The candidates continuing at its last tied stage are treated as "
             "elected when they equal the vacancies, after excluding the lowest where one too many continues."
+        )
+    if unsure:
+        notes.append(
+            f"The sheet marks {unsure} candidate name{'s' if unsure > 1 else ''} as uncertain (“##unsure##”); "
+            + (
+                f"{blanked} whose surname the mark replaces {'are' if blanked > 1 else 'is'} stored without a name, "
+                "and the rest are stored as printed without the mark."
+                if blanked
+                else "they are stored as printed without the mark."
+            )
+        )
+    parties_unsure = sum("#" in str(candidate["party"]) for candidate in candidates)
+    if parties_unsure:
+        notes.append(
+            f"The sheet marks {parties_unsure} party description{'s' if parties_unsure > 1 else ''} as uncertain "
+            "(“##unsure##”); no party is stored for " + ("them." if parties_unsure > 1 else "it.")
         )
     if listed:
         notes.append(
@@ -1513,36 +1538,42 @@ def emit() -> Path:
                         row["stage"]: row["votes"]
                         for row in lines.filter(pl.col("number") == candidate["number"]).iter_rows(named=True)
                     }
-                    canonical = party_of(candidate["party"], year)
+                    unsure = "#" in candidate["party"]
+                    canonical = None if unsure else party_of(candidate["party"], year)
                     owner = party_id(canonical)
-                    independent = canonical is None and (
-                        re.sub(r"[\s0\-]+", "", candidate["party"]) == ""
-                        or re.match(r"ind|i$", candidate["party"].strip().lower()) is not None
+                    independent = (
+                        not unsure
+                        and canonical is None
+                        and (
+                            re.sub(r"[\s0\-]+", "", candidate["party"]) == ""
+                            or re.match(r"ind|i$", candidate["party"].strip().lower()) is not None
+                        )
                     )
                     full = display(candidate["name"])
                     option_key = f"{contest_key}:{candidate['number']}"
                     option = cs.key("gb.ni_council.option", option_key)
-                    person = cs.key("gb.ni_council.person", option_key)
-                    cs.add("person", id=person)
-                    name(person, full)
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
                         party_id=owner,
-                        ballot_label=full,
+                        ballot_label=full or None,
                     )
-                    cs.add(
-                        "candidacy",
-                        id=cs.key("gb.ni_council.candidacy", option_key),
-                        person_id=person,
-                        option_id=option,
-                        role="head",
-                        ballot_name=candidate["name"],
-                        member_of_party_id=owner,
-                        is_independent=independent,
-                    )
+                    if full:
+                        person = cs.key("gb.ni_council.person", option_key)
+                        cs.add("person", id=person)
+                        name(person, full)
+                        cs.add(
+                            "candidacy",
+                            id=cs.key("gb.ni_council.candidacy", option_key),
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=candidate["name"],
+                            member_of_party_id=owner,
+                            is_independent=independent,
+                        )
                     eliminated = False
                     located = (
                         {
