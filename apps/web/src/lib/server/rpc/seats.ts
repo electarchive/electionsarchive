@@ -936,6 +936,15 @@ export const seats = {
           where n.body = (select body from chamber)
           order by n.id, p.drawn desc
         ),
+        nbox as materialized (
+          select n.id, ST_Envelope(g.geom) as env
+          from now n join area_geometry g on g.area_id = n.area and g.valid @> n.drawn
+          where n.body = (select body from chamber)
+        ),
+        pbox as materialized (
+          select p.id, ST_Envelope(g.geom) as env
+          from prev p join area_geometry g on g.area_id = p.area and g.valid @> p.drawn
+        ),
         paired as materialized (
           select n.id, n.area, coalesce(k.same, g.same, false) as same, coalesce(
             k.prior,
@@ -949,11 +958,13 @@ export const seats = {
           from now n left join kept k on k.id = n.id
           left join lateral (
             select p.id, ST_Area(x.geom) >= 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom)) as same
-            from prev p
+            from nbox nb
+            join pbox pb on pb.env && nb.env
+            join prev p on p.id = pb.id
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
             cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
-            where k.prior is null and p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
+            where nb.id = n.id and k.prior is null and p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
               and (n.magnitude = 1 or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
             order by ST_Area(x.geom) desc limit 1
           ) g on true
