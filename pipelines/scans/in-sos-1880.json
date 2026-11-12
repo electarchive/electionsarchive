@@ -8,6 +8,7 @@
     "item": "https://archive.org/details/reportofsecretar1880indi"
   },
   "raw_source": "us.scans",
+  "extend": true,
   "contests": {
     "house1": {
       "year": 1880,
@@ -324,8 +325,9 @@
       "columns": [
         {
           "label": "R. B. F. Pierce.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house8",
+          "candidate": "R. B. F. Pierce",
+          "party": ""
         },
         {
           "label": "B. W. Hanna.",
