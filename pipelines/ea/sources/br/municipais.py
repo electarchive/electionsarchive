@@ -423,7 +423,7 @@ def emit() -> Path:
                 "election",
                 id=election,
                 polity_id=polities[code],
-                parent_id=umbrella if round == "1" else elections[(code, "1")],
+                parent_id=elections.get((code, "1"), umbrella),
                 kind="local" if round == "1" else "runoff",
                 date_from=day,
                 date_to=day,
@@ -445,7 +445,7 @@ def emit() -> Path:
         units: dict[str, str] = {}
         rows: list[dict[str, object]] = []
         for code in sorted(labels):
-            opened = days[(code, "1")]
+            opened = min(day for (town, _), day in days.items() if town == code)
             unit = cs.unit("br.municipality", code, opened)
             units[code] = str(unit)
             rows.append(
@@ -508,7 +508,7 @@ def emit() -> Path:
                 "alliance",
                 id=alliance,
                 kind="electoral_alliance",
-                election_id=umbrella if parts[1].startswith("F") else elections[(parts[1], "1")],
+                election_id=umbrella if parts[1].startswith("F") else elections.get((parts[1], "1"), umbrella),
             )
             if label and not label.startswith("#") and label.upper() != "PARTIDO ISOLADO":
                 name(alliance, proper(label))
