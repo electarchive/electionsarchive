@@ -160,12 +160,19 @@ def rows(state: str, url: str, path):
             if town is None:
                 continue
             counted = []
+            named = []
+            unassigned = None
             for other in lines[i + 1 :]:
                 if other.startswith("Total Votes Cast"):
                     counted.append(("Total", int(re.search(r"\d[\d,]*", other)[0].replace(",", ""))))
                     break
                 found = re.match(r"(\S.*?)\s{2,}(\d[\d,]*)\b", other)
-                if found:
+                written = re.match(r"\s+Write-In: (\S.*?)\s{2,}(\d[\d,]*)\b", other)
+                if written:
+                    named.append((written[1].title(), int(written[2].replace(",", ""))))
+                elif spare := re.match(r"\s+Not Assigned\s{2,}(\d[\d,]*)\b", other):
+                    unassigned = int(spare[1].replace(",", ""))
+                elif found:
                     counted.append((found[1], int(found[2].replace(",", ""))))
             needed = Counter(votes for _, votes in counted)
             if not any(not needed - row for row in statement):
@@ -173,9 +180,14 @@ def rows(state: str, url: str, path):
                 continue
             if all(name == "Write-In Totals" for name, _ in counted[:-1]):
                 continue
-            for name, votes in counted[:-1]:
+            contest = f"{town[1].title()} {'Mayor' if town[2] == 'MAYOR' else 'Council'}"
+            ballot = [
+                (name, unassigned if name == "Write-In Totals" and named and unassigned is not None else votes)
+                for name, votes in counted[:-1]
+            ] + named
+            for name, votes in ballot:
                 yield {
-                    "contest": f"{town[1].title()} {'Mayor' if town[2] == 'MAYOR' else 'Council'}",
+                    "contest": contest,
                     "geo": "",
                     "county": "21111",
                     "candidate": KY_PARTY.sub("", KY_PARTICLE.sub(r"\1 ", name)),

@@ -8651,7 +8651,7 @@ def parse() -> None:
     clerk: list[tuple[str, str, str, str]] = []
     heading: tuple[str, str] | None = None
     side = "NONPARTISAN"
-    for line in (
+    jefferson_lines = (
         subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, FILES["KY-21111-jefferson"]).path), "-"],
             capture_output=True,
@@ -8659,7 +8659,8 @@ def parse() -> None:
         )
         .stdout.decode()
         .splitlines()
-    ):
+    )
+    for line in jefferson_lines:
         if "Candidates for" in line:
             found = re.search(r"Candidates for (.+?) (MAYOR|COUNCIL|COMMISSIONER)\b", line)
             heading = (
@@ -8678,6 +8679,8 @@ def parse() -> None:
             and not re.match(r"Revised|Page|Candidate", found[1])
         ):
             clerk.append((*heading, side, found[1]))
+    if any(re.match(r"Jim Eaves\s+Old Brownsboro", line) for line in jefferson_lines):
+        clerk.append(("Old Brownsboro Place", "CITY LEGISLATIVE BODY", "NONPARTISAN", "Jim Eaves"))
     towns = {ky_ballots.city_letters(city): city for city, _, _, _ in clerk}
 
     def town(description: str | None) -> str | None:
