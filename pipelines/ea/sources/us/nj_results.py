@@ -302,7 +302,7 @@ def retry() -> bool:
 
 
 def joined(year: int, number: int, block: int, read: str) -> list[dict[str, object]]:
-    found: list[dict[str, object]] = []
+    found: list[dict[str, list[dict[str, list[object]]]]] = []
     index = 0
     while True:
         try:
