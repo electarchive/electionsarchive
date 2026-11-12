@@ -27,7 +27,50 @@ PUBLISHER = "New Jersey Division of Elections"
 DIGITIZED = 8
 PEOPLE = ("candidate", "ticket", "legend")
 DERIVED = 1
-CORRECTED = {(1946, "Smith", "Hudson"): 92991, (1946, "Brunner", "Hudson"): 155366}
+CORRECTED = {
+    (1946, "senate", "Smith", "Hudson"): 92991,
+    (1946, "senate", "Brunner", "Hudson"): 155366,
+    (1940, "governor", "Bateman", "Burlington"): 11,
+}
+HAND: dict[tuple[int, int, int], dict[str, object]] = {
+    (1954, 2, 1): {
+        "title": "Votes Cast for United States Senator",
+        "district": None,
+        "columns": [
+            "Charles R. Howell Democrat",
+            "Clifford P. Case Republican",
+            "Albert Ronis Socialist Labor",
+            "George Breitman Socialist Workers",
+            "Henry Krajewski American Third Party",
+            "Fred A. Hartley",
+        ],
+        "rows": [
+            {"label": "Atlantic", "values": [20315, 33936, 16, 15, 62, 72]},
+            {"label": "Bergen", "values": [84291, 131483, 164, 459, 4203, 817]},
+            {"label": "Burlington", "values": [25321, 21039, 6, 9, 47, 60]},
+            {"label": "Camden", "values": [63095, 46117, 95, 60, 501, 11]},
+            {"label": "Cape May", "values": [6622, 12308, 7, 1, 12, 14]},
+            {"label": "Cumberland", "values": [14711, 15328, 19, 5, 15, 22]},
+            {"label": "Essex", "values": [137245, 129375, 3033, 312, 4246, 1477]},
+            {"label": "Gloucester", "values": [17978, 20342, 15, 2, 14, 32]},
+            {"label": "Hudson", "values": [143503, 74830, 214, 1477, 14318, 395]},
+            {"label": "Hunterdon", "values": [6397, 8618, 1, 7, 59, 287]},
+            {"label": "Mercer", "values": [50306, 28944, 66, 135, 430, 30]},
+            {"label": "Middlesex", "values": [65128, 44474, 572, 91, 2559, 91]},
+            {"label": "Monmouth", "values": [35232, 46259, 19, 15, 257, 1223]},
+            {"label": "Morris", "values": [19988, 44087, 16, 25, 283, 1255]},
+            {"label": "Ocean", "values": [9001, 17390, 19, 8, 63, 199]},
+            {"label": "Passaic", "values": [58782, 57674, 161, 526, 1895, 58]},
+            {"label": "Salem", "values": [8319, 8599, 5, 2, 9, 6]},
+            {"label": "Somerset", "values": [13250, 18587, 72, 119, 491, 195]},
+            {"label": "Sussex", "values": [4756, 8768, 9, 7, 50, 93]},
+            {"label": "Union", "values": [63182, 83896, 311, 309, 5866, 606]},
+            {"label": "Warren", "values": [10736, 9474, 12, 6, 41, 85]},
+            {"label": "Total", "values": [858158, 861528, 4832, 3590, 35421, 7025]},
+        ],
+    }
+}
+ACCEPTED = {(1954, "Hartley"), (1973, "Sandman"), (1976, "Norcross")}
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
@@ -332,6 +375,8 @@ def joined(year: int, number: int, block: int, read: str) -> list[dict[str, obje
 
 
 def seen(year: int, number: int, block: int, read: str) -> list[dict[str, object]]:
+    if (year, number, block) in HAND:
+        return [HAND[(year, number, block)]]
     if (year, number, block) in RETRIES:
         return joined(year, number, block, read)
     message = json.loads(raw.cached(SOURCE, key(year, number, block, read)).path.read_text())
@@ -394,9 +439,12 @@ def parse() -> None:
                     continue
                 located = _locate(settled, inside, frame, first.across)
                 for k, (votes, status, unit, label) in list(settled.items()):
-                    for (y, name, county), fixed in CORRECTED.items():
-                        if y == year and name in label and county == unit and first.office == "senate":
+                    for (y, kind, name, county), fixed in CORRECTED.items():
+                        if y == year and kind == first.office and name in label and county == unit:
                             settled[k] = (fixed, "corrected", unit, label)
+                for k, (votes, status, unit, label) in list(settled.items()):
+                    if status == "unbalanced" and any(y == year and name in label for y, name in ACCEPTED):
+                        settled[k] = (votes, "printed", unit, label)
                 for (r, c), (votes, status, unit, label) in settled.items():
                     found, how = located[(r, c)]
                     rows.append(
@@ -929,7 +977,7 @@ def emit() -> Path:
                 cs.add("contest_option", id=pool, contest_id=contests[key], kind="others", ballot_label="Others")
                 lines = lines.with_columns(pl.col("option").fill_null(str(pool)))
             counted = int(lines["votes"].sum())
-            matched = lines.filter(pl.col("option").is_in([str(o) for o, *_ in known]))
+            matched = lines.filter(pl.col("option").is_in([str(o) for o, kind, *_ in known if kind in PEOPLE]))
             owned = sum(t for o, _, _, t in known if str(o) in set(matched["option"]))
             if not official or counted < 0.98 * official or abs(int(matched["votes"].sum()) - owned) > 0.02 * owned:
                 print(f"{key}: {counted} by county against {official} held, not emitted")
