@@ -234,13 +234,13 @@
         },
         {
           "label": "Anderson and Shackelford, Amer.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Anderson (American)"
         },
         {
           "label": "Bubar and Dodge, Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Bubar (Prohibition)"
         },
         {
           "label": "MacBride and Bergland, Ind.",
@@ -249,8 +249,8 @@
         },
         {
           "label": "Maddox and Dyke, Cons.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Maddox (Conservative)"
         },
         {
           "label": "McCarthy and Barrett, Ind.",
@@ -284,13 +284,13 @@
         },
         {
           "label": "Anderson and Shackelford, Amer.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Anderson (American)"
         },
         {
           "label": "Bubar and Dodge, Pro.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Bubar (Prohibition)"
         },
         {
           "label": "MacBride and Bergland, Ind.",
@@ -299,8 +299,8 @@
         },
         {
           "label": "Maddox and Dyke, Cons.",
-          "contest": null,
-          "candidate": ""
+          "contest": "president",
+          "candidate": "Maddox (Conservative)"
         },
         {
           "label": "McCarthy and Barrett, Ind.",
