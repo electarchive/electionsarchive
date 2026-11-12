@@ -67,6 +67,23 @@
       path={head.scope.home}>{m.scope_home({ place: head.scope.name })}</Preview
     >
   {/if}
+  {#if drilled}
+    {#each head.scope.memberships.filter((row) => row.isParent) as row (row.name)}
+      {const label = $derived(
+        (row.isPartial ? m.scope_member_partial : m.scope_member)({
+          place: row.name,
+        }),
+      )}
+      {#if row.path == null}
+        <span>{label}</span>
+      {:else}
+        <Preview
+          class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          path={row.path}>{label}</Preview
+        >
+      {/if}
+    {/each}
+  {/if}
   {#if incumbency != null}
     <span class="highlighter px-1 font-semibold text-foreground"
       ><Term

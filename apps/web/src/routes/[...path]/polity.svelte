@@ -15,7 +15,14 @@
   import { compactPlaces } from "#lib/compare.js";
   import Name from "#lib/components/name.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { capitalize, count, date, fold, percent } from "#lib/format.js";
+  import {
+    capitalize,
+    count,
+    date,
+    fold,
+    percent,
+    plural,
+  } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -51,6 +58,13 @@
   }
 
   const former = $derived(formerly(polity.former, getLocale()));
+  const memberGroups = $derived(
+    Map.groupBy(polity.memberships, (row) =>
+      row.isParent ? m.polity_member_of() : capitalize(plural(row.noun)),
+    )
+      .entries()
+      .toArray(),
+  );
 
   const uid = $props.id();
   const isLocal = $derived(isLocalOf(polity));
@@ -956,6 +970,42 @@
 
 {#if polity.places.total > 0 && !isState}
   {@render places()}
+{/if}
+
+{#if polity.memberships.length > 0}
+  <section
+    class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 lg:col-span-4"
+    aria-labelledby="{uid}-memberships"
+  >
+    {#each memberGroups as [heading, rows], index (heading)}
+      <h2
+        id={index === 0 ? `${uid}-memberships` : undefined}
+        class="text-[0.8125rem] font-bold"
+      >
+        {heading}
+      </h2>
+      <ul class="grid text-sm">
+        {#each rows as row (row.name)}
+          <li
+            class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 py-1 last:border-be-0"
+          >
+            {#if row.path == null}
+              <span class="truncate">{row.name}</span>
+            {:else}
+              <Preview class="truncate hover:highlighter" path={row.path}
+                >{row.name}</Preview
+              >
+            {/if}
+            {#if row.isPartial}
+              <span class="text-xs text-muted-foreground"
+                >{m.polity_member_partial()}</span
+              >
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    {/each}
+  </section>
 {/if}
 
 {#if isNational}

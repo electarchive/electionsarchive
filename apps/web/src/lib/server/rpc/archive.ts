@@ -1940,15 +1940,16 @@ async function survey(
     .filter((rows) => rows.length > tops.length && rows.length <= 10_000)
     .toArray()
     .flat();
-  const schemes = await db.execute<{
-    code: string;
-    noun: string;
-    kind: string;
-    rank: number;
-  }>(sql`
-    select code, noun, kind::text, rank from scheme
-    where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
-  `);
+  const [schemes, dated] = await Promise.all([
+    db.execute<{ code: string; noun: string; kind: string; rank: number }>(sql`
+      select code, noun, kind::text, rank from scheme
+      where code = any(${sql.param([...new Set([...found.rows, ...deep].map((row) => row.scheme))])}::text[])
+    `),
+    areaNouns(
+      [...found.rows, ...deep].map((row) => row.id),
+      date,
+    ),
+  ]);
   const scheme = new Map(schemes.rows.map((row) => [row.code, row]));
   const shaped = (
     row: { id: string; k: number; scheme: string },
@@ -1957,7 +1958,7 @@ async function survey(
     id: row.id,
     k: row.k,
     scheme: row.scheme,
-    noun: scheme.get(row.scheme)?.noun ?? "",
+    noun: dated.get(row.id) ?? scheme.get(row.scheme)?.noun ?? "",
     kind: scheme.get(row.scheme)?.kind ?? "",
     rank: scheme.get(row.scheme)?.rank ?? 0,
     isMember: members.has(row.id),
@@ -1975,6 +1976,52 @@ async function survey(
       .map((row) => shaped(row, null)),
     ...deep.toSorted((a, b) => a.k - b.k).map((row) => shaped(row, row.parent)),
   ];
+}
+
+async function areaNouns(ids: Array<string>, date: string) {
+  const found = await db.execute<{ id: string; noun: string }>(sql`
+    select k.area_id as id, sc.kinds ->> k.kind as noun
+    from area_kind k
+    join area a on a.id = k.area_id
+    join scheme sc on sc.code = a.scheme_code
+    where k.area_id = any(${sql.param(ids)}::uuid[]) and k.valid @> ${date}::date
+      and sc.kinds ? k.kind
+  `);
+  return new Map(found.rows.map((row) => [row.id, row.noun]));
+}
+
+async function areaMembers(area: string, date: string) {
+  const found = await db.execute<{
+    id: string;
+    noun: string;
+    path: string | null;
+    isPartial: boolean;
+    isParent: boolean;
+  }>(sql`
+    select a.id, coalesce(sc.kinds ->> k.kind, sc.noun) as noun, s.path, m.partial as "isPartial", m.area_id <> ${area}::uuid as "isParent"
+    from area_membership m
+    join area a on a.id = case when m.area_id = ${area}::uuid then m.parent_id else m.area_id end
+    join scheme sc on sc.code = a.scheme_code
+    left join area_kind k on k.area_id = a.id and k.valid @> ${date}::date
+    left join lateral (
+      select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
+      where t.area_id = a.id and t.valid @> ${date}::date limit 1
+    ) s on true
+    where (m.area_id = ${area}::uuid or m.parent_id = ${area}::uuid) and m.valid @> ${date}::date
+  `);
+  const labels = await names(
+    found.rows.map((row) => row.id),
+    date,
+  );
+  return found.rows
+    .map((row) => ({
+      name: labels.full.get(row.id) ?? "",
+      noun: row.noun,
+      path: row.path,
+      isPartial: row.isPartial,
+      isParent: row.isParent,
+    }))
+    .toSorted((a, b) => natural(a.name, b.name));
 }
 
 async function label(rows: Surveyed, date: string) {
@@ -2132,24 +2179,27 @@ async function contestFrame({
     ...ancestors.map((row) => row.area),
     ...chain.map((entry) => entry.id),
   ];
-  const away = new Set(
-    rowsOf(
-      await db.execute<{ id: string }>(sql`
-        select a.id from area a
-        where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
-          and (
-            a.scheme_code = 'world.country'
-            or (
-              exists (select from reporting_unit_area m where m.area_id = any(array[a.id]))
-              and not exists (
-                select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
-                where m.area_id = any(array[a.id]) and r.kind <> 'abroad_mission'
-              )
+  const scopedArea = scoped?.id ?? contest.place?.id;
+  const [nearby, memberships] = await Promise.all([
+    db.execute<{ id: string }>(sql`
+      select a.id from area a
+      where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
+        and (
+          a.scheme_code = 'world.country'
+          or (
+            exists (select from reporting_unit_area m where m.area_id = any(array[a.id]))
+            and not exists (
+              select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
+              where m.area_id = any(array[a.id]) and r.kind <> 'abroad_mission'
             )
           )
-      `),
-    ).map((row) => row.id),
-  );
+        )
+    `),
+    scopedArea == null
+      ? []
+      : areaMembers(scopedArea, contest.date ?? "infinity"),
+  ]);
+  const away = new Set(rowsOf(nearby).map((row) => row.id));
   const trail: Array<{
     name: string;
     path: string | null;
@@ -2225,6 +2275,7 @@ async function contestFrame({
       parent: isRoot ? null : (trail.at(-2)?.name ?? null),
       home,
       abroad,
+      memberships,
       trail,
     },
     isScoped: contest.isScoped,
@@ -6398,6 +6449,14 @@ async function pick(
   };
 }
 
+const Membership = v.object({
+  name: v.string(),
+  noun: v.string(),
+  path: v.nullable(v.string()),
+  isPartial: v.boolean(),
+  isParent: v.boolean(),
+});
+
 const Frame = {
   name: v.string(),
   kind: v.string(),
@@ -6418,6 +6477,7 @@ const Frame = {
     parent: v.nullable(v.string()),
     home: v.nullable(v.string()),
     abroad: v.nullable(v.object({ electorate: v.nullable(v.string()) })),
+    memberships: v.array(Membership),
     trail: v.array(
       v.object({
         name: v.string(),
@@ -23426,6 +23486,7 @@ export const polities = {
             population: v.nullable(v.number()),
           }),
         ),
+        memberships: v.array(Membership),
         holdings: v.array(
           v.object({
             level: v.string(),
@@ -23526,6 +23587,19 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
+      const memberships = db
+        .execute<{ id: string }>(
+          sql`
+            select t.area_id as id from polity_territory t
+            where t.polity_id = ${input.id}::uuid
+            order by upper(t.valid) desc nulls first limit 1
+          `,
+        )
+        .then(async (found) =>
+          found.rows[0] == null
+            ? []
+            : areaMembers(found.rows[0].id, "infinity"),
+        );
       const [
         found,
         subdivisions,
@@ -24012,6 +24086,7 @@ export const polities = {
           }))
           .filter((row) => row.name !== "")
           .toSorted((a, b) => natural(a.name, b.name)),
+        memberships: await memberships,
         holdings: holdings.rows.filter((row) => row.population > 0),
         within: subdivisions.rows[0]?.within ?? 0,
         dates: sizes.length,

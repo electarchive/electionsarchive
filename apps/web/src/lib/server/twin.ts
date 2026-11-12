@@ -2847,6 +2847,19 @@ function polityMarkdown(
             )
             .join("\n"),
         ]),
+    ...Map.groupBy(polity.memberships, (row) =>
+      row.isParent ? m.polity_member_of() : capitalize(plural(row.noun)),
+    )
+      .entries()
+      .flatMap(([heading, rows]) => [
+        `## ${heading}`,
+        rows
+          .map(
+            (row) =>
+              `- ${link(row.name, row.path)}${row.isPartial ? ` (${m.polity_member_partial()})` : ""}`,
+          )
+          .join("\n"),
+      ]),
     ...(polity.polities.length === 0
       ? []
       : [
@@ -5288,6 +5301,29 @@ function contestMarkdown(
           )
           .join(" / ")
       : "",
+    contest.scope.noun == null
+      ? ""
+      : [
+          `${capitalize(
+            contest.scope.abroad == null
+              ? m.scope_in({
+                  noun: contest.scope.noun,
+                  parent: contest.scope.parent ?? "",
+                })
+              : contest.scope.abroad.electorate == null
+                ? m.scope_abroad_plain({ noun: contest.scope.noun })
+                : m.scope_abroad({
+                    noun: contest.scope.noun,
+                    electorate: contest.scope.abroad.electorate,
+                  }),
+          )}.`,
+          ...contest.scope.memberships
+            .filter((row) => row.isParent)
+            .map(
+              (row) =>
+                `${(row.isPartial ? m.scope_member_partial : m.scope_member)({ place: link(row.name, row.path) })}.`,
+            ),
+        ].join(" "),
     ...contest.wording.map((row) => {
       const source = m.wording_source({ publisher: row.publisher });
       return row.kind === "link"
