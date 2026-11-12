@@ -1621,13 +1621,42 @@ async function survey(
         or ${valued(sql`kids.k`)}
         or ${named}
       `;
-  let found = await db.execute<{ id: string; k: number; scheme: string }>(
-    counted(sql`
+  const lazy = (within: SQL) => sql`
+    with sums as materialized (
+      select r.area_k as k from result_rollup_sum r
+      where r.result_set_k = any(${pool}) and r.measure = any(${COUNTED})
+    ),
+    units as materialized (
+      select distinct u.area_k as k from result_rollup_unit u where u.result_set_k = any(${pool})
+    ),
+    names as materialized (
+      select a.k from area a where a.id in (
+        select c.district_area_id from result_set s join contest c on c.id = s.contest_id where s.k = any(${pool})
+      )
+    ),
+    kids as materialized (
       select a.id, a.k, a.scheme_code as scheme
-      from area_parent p join area a on a.id = p.area_id
-      where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date
-    `),
-  );
+      from (select k from sums union select k from units union select k from names offset 0) h
+      join area a on a.k = h.k
+      cross join lateral (
+        select from area_parent p where p.area_id = a.id and p.valid @> ${date}::date and ${within} offset 0
+      ) p
+    )
+    select distinct kids.* from kids
+    where kids.k in (select k from sums)
+      or kids.k in (select k from names)
+      or (kids.k in (select k from units) and ${valued(sql`kids.k`)})
+  `;
+  const wide = (within: SQL) => sql`
+    select a.id, a.k, a.scheme_code as scheme
+    from area_parent p join area a on a.id = p.area_id
+    where p.valid @> ${date}::date and ${within}
+  `;
+  const kidsOf = async (within: SQL) =>
+    db.execute<{ id: string; k: number; scheme: string }>(
+      ks.length < 100 ? lazy(within) : counted(wide(within)),
+    );
+  let found = await kidsOf(sql`p.parent_id = ${area.id}::uuid`);
   const lone = Map.groupBy(found.rows, (row) => row.scheme)
     .values()
     .filter((group) => group.length === 1)
@@ -1635,14 +1664,10 @@ async function survey(
     .toArray();
   const deeper = new Set<string>();
   if (lone.length > 0) {
-    const through = await db.execute<{ id: string; k: number; scheme: string }>(
-      counted(sql`
-        select a.id, a.k, a.scheme_code as scheme
-        from area_parent p join area a on a.id = p.area_id
-        where p.parent_id = any(${sql.param(lone)}::uuid[]) and p.valid @> ${date}::date
-          and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
-      `),
-    );
+    const through = await kidsOf(sql`
+      p.parent_id = any(${sql.param(lone)}::uuid[])
+        and a.scheme_code <> all(${sql.param(found.rows.map((row) => row.scheme))}::text[])
+    `);
     for (const row of through.rows) {
       deeper.add(row.id);
       found.rows.push(row);
