@@ -790,6 +790,7 @@ def attach(
             continue
         taken.add(key)
         contest = contests[key]
+        parted = district is not None and key not in (at_large, at_large.replace(str(day), f"{day:%Y-%m}", 1))
         election, district_area, first, official = conn.execute(
             """select c.election_id, c.district_area_id, v.count_round,
                       coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
@@ -809,7 +810,7 @@ def attach(
             print(f"{key}: no official total or first round, skipped")
             continue
         again = restage
-        if district is not None and (chamber == "president" or at_large not in contests):
+        if parted:
             zeros = {
                 code: counties[code][1]
                 for code, votes in lines.filter(pl.col("kind").is_in(["county", "place"]))
@@ -1131,11 +1132,7 @@ def attach(
             )
         members: dict[str, str] = {}
         for code, kind in lines.select("code", "kind").unique().iter_rows():
-            if (
-                kind in ("county", "place")
-                and district is not None
-                and (chamber == "president" or at_large not in contests)
-            ):
+            if kind in ("county", "place") and parted:
                 part = f"{year}:{code}:{district}" + (":special" if special else "")
                 members[code] = str(cs.unit("us.county_part", part, on=day))
                 if code not in counties:
