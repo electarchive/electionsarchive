@@ -1608,10 +1608,13 @@ def plan(
                 (federal[contest] if contest in federal else published[contest][1]).add(person(label))
         seats: dict[UUID, tuple[str, str]] = {}
         heads: dict[UUID, set[str]] = {}
-        for contest, text in conn.execute(
-            "select entity_id, text from name where entity_id = any(%s)", [list(published)]
+        aliases: dict[str, set[UUID]] = {}
+        for contest, text, kind in conn.execute(
+            "select entity_id, text, kind from name where entity_id = any(%s)", [list(published)]
         ).fetchall():
             titles.setdefault(contest, set()).update(slug(text).split("-"))
+            if kind == "ballot":
+                aliases.setdefault(slug(text), set()).add(contest)
             if ":" in text:
                 heads.setdefault(contest, set()).update(
                     w for w in slug(text.split(":")[0]).split("-") if not w.isdigit() and w not in STOP | GENERIC
@@ -1817,6 +1820,10 @@ def plan(
             return best, False
 
         for (office, name, people), places in races.items():
+            exact = [contest for contest in aliases.get(slug(name), ()) if published[contest][1] == people]
+            if len(exact) == 1:
+                picks.append(((1.0, 9, 9, exact[0], published[exact[0]][0][0]), name, places, office))
+                continue
             numbered = re.match(r"\s*(?:proposition|prop)\.?\s+(\d+)\b", name, re.IGNORECASE)
             spelled = re.sub(
                 rf"\b({'|'.join(TENS)})[- ]({'|'.join(ORDINALS)})\b",

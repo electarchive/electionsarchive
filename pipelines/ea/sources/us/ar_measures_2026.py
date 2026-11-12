@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from datetime import UTC, date, datetime
@@ -9,6 +10,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import civmint, govmint
+from ea.sources.us.local_2026 import live_key
 from ea.store import DATA, connect
 
 SOURCE = "us.ar_measures_2026"
@@ -19,6 +21,9 @@ TITLE = "Notice of General Election, November 3, 2026: local measures"
 GARLAND = "https://garlandcountyvote.org/uploads/6/3/0/4/63045401/local_issues.pdf"
 SALINE = "https://salinecounty.org/Documents/Government/County%20Clerk/Elections/2026%20Elections/Election%20Notice%20for%20General%20Election%202026.pdf"
 PULASKI = "https://votepulaskiar.gov/wp-content/uploads/11032026_Notice-of-Election_v1.pdf"
+FEED = "https://results.tally-enr.com/results/arkansas/11b07106-031e-4d7c-911a-d01fb473d6dd/FullDataFile.json"
+FEED_TITLE = "Arkansas General Election, November 3, 2026: results by contest"
+LIVE = DATA / "live" / "raw" / "us.enr_2026.ar"
 COUNTIES = {
     "05051": (GARLAND, "Garland County Election Commission"),
     "05119": (PULASKI, "Pulaski County Election Commission"),
@@ -57,6 +62,7 @@ ROWS = [
         "county": "05119",
         "entity": "City of Jacksonville",
         "label": "Jacksonville Ward-Based Representation Initiative Ordinance",
+        "kind": "initiative",
         "wording": "An initiative ordinance of The People of the City of Jacksonville to abolish the at-large voting system, establish a ward-based voting system, provide for the election of two qualified ward representatives of the City Council to represent each ward, and set forth minimum qualifications for qualified ward representatives on the City Council.",
         "answers": ("For", "Against"),
     },
@@ -70,7 +76,171 @@ ROWS = [
 ]
 
 
+FEED_ROWS = [
+    (
+        "05071",
+        "City of Clarksville",
+        "Question One: Refunding Bonds",
+        "Question One (Refunding Bonds) Clarksville",
+        None,
+    ),
+    (
+        "05071",
+        "City of Clarksville",
+        "Question Two: Wastewater Treatment Plant Improvement Bonds",
+        "Question Two (Wastewater Treatment Plant Improvement Bonds) Clarksville",
+        None,
+    ),
+    (
+        "05071",
+        "City of Clarksville",
+        "Question Three: Parks and Recreation Improvement Bonds",
+        "Question Three (Parks and Recreation Improvement Bonds) Clarksville",
+        None,
+    ),
+    ("05031", "City of Brookland", "Refunding Bonds", "City of Brookland, Refunding Bonds", None),
+    (
+        "05031",
+        "City of Brookland",
+        "Municipal Building Improvement Bonds",
+        "City of Brookland, Mun. Building Imprv. Bonds",
+        None,
+    ),
+    ("05031", "City of Brookland", "Park Improvement Bonds", "City of Brookland, Park Improvement Bonds", None),
+    ("05031", "City of Brookland", "Sewer Improvement Bonds", "City of Brookland, Sewer Improvement Bonds", None),
+    ("05031", "City of Brookland", "Street Improvement Bonds", "City of Brookland, Street Improvement Bonds", None),
+    (
+        "05031",
+        "City of Brookland",
+        "Emergency Facilities Improvement Bonds",
+        "City of Brookland, Emerg. Facil. Imprv. Bonds",
+        None,
+    ),
+    (
+        "05031",
+        "Craighead County",
+        "County Ordinance: Combine the Offices of Treasurer and Collector",
+        "County Ordinance",
+        None,
+    ),
+    (
+        "05141",
+        "City of Fairfield Bay",
+        "Alcoholic Beverage Sunday Sales",
+        "City of Fairfield Bay Alcoholic Beverage Sunday Sales",
+        None,
+    ),
+    (
+        "05141",
+        "City of Shirley",
+        "Alcoholic Beverage Sunday Sales",
+        "City of Shirley Alcoholic Beverage Sunday Sales City of Shirley",
+        None,
+    ),
+    ("05009", "Boone County", "Sales and Use Tax", "Boone County, Sales and Use Tax", None),
+    ("05009", "City of Harrison", "Local Sales and Use Tax", "City of Harrison, Local Sales and Use Tax", None),
+    ("05093", "City of Blytheville", "Refunding Bonds", "Refunding Bonds Blytheville", None),
+    (
+        "05093",
+        "City of Blytheville",
+        "Ordinance No. 2107: Sales and Use Tax Extension",
+        "Ordinance No. 2107 Blytheville",
+        None,
+    ),
+    (
+        "05093",
+        "City of Blytheville",
+        "Ordinance 1: Firefighting Improvement Bonds",
+        "FIREFIGHTING IMPROVEMENT BONDS ORDINANCE 1",
+        None,
+    ),
+    (
+        "05093",
+        "City of Wilson",
+        "Ordinance No. 2024-02: Four-Year Aldermen Terms",
+        "Ordinance No. 2024-02 Wilson",
+        None,
+    ),
+    ("05137", "Town of Fifty Six", "2% Sales and Use Tax", "2% SALES AND USE TAX Town of Fifty Six", None),
+    ("05105", "Town of Casa", "Sales Tax Levy", "CITY OF CASA SALES TAX LEVY", None),
+    ("05045", "Greenbrier Volunteer Fire Department", "Fire Dues", "Greenbrier FD, Special Election", None),
+    ("05015", "City of Holiday Island", "Alcoholic Beverage Sunday Sales", "Holiday Island Sunday Sales", None),
+    ("05015", "City of Holiday Island", "2.5% Sales and Use Tax", "Holiday Island 2.5% Sales Tax", None),
+    ("05067", "Jackson County", "0.375% Sales and Use Tax", "0.375% SALES AND USE TAX", None),
+    (
+        "05065",
+        "City of Horseshoe Bend",
+        "Backyard Poultry Initiative",
+        "Horseshoe Bend Poultry Initiative",
+        "initiative",
+    ),
+    (
+        "05085",
+        "City of Ward",
+        "Four-Year Council Member Terms",
+        "THE ISSUE OF CHANGING THE TERM LENGTHS OF COUNCIL MEMBERS FROM TWO (2) YEARS TO FOUR (4) YEARS IN THE CITY OF WARD, ARKANSAS Ward City",
+        None,
+    ),
+    (
+        "05131",
+        "City of Fort Smith",
+        "Mayor-Council Form of Government",
+        "A PROPOSITION TO ORGANIZE THE CITY OF FORT SMITH, ARKANSAS UNDER THE MAYOR-COUNCIL FORM OF MUNICIPAL GOVERNMENT Fort Smith",
+        None,
+    ),
+    ("05131", "Town of Central City", "1% Sales and Use Tax", "1% Sales and Use Tax Central City", None),
+    ("05143", "City of Winslow", "Alcohol Sales", "CITY OF WINSLOW", None),
+    ("05143", "City of West Fork", "Alcohol Sales", "CITY OF WEST FORK", None),
+    ("05143", "City of West Fork", "Annexation", "CITY OF WEST FORK ANNEXATION", None),
+    (
+        "05047",
+        "City of Ozark",
+        "System Improvement Bonds and Replacement Tax",
+        "System Improvement Bonds and Replacement Tax Ozark",
+        None,
+    ),
+    (
+        "05047",
+        "City of Ozark",
+        "Refunding Bonds and Replacement Tax",
+        "Refunding Bonds and Replacement Tax Ozark",
+        None,
+    ),
+    ("05029", "City of Plumerville", "Sales Tax", "City of Plumerville Tax", None),
+    ("05029", "City of Oppelo", "Sales Tax", "City of Oppelo Tax", None),
+    ("05029", "Town of Menifee", "Annexation", "Menifee Annexation", None),
+    ("05017", "City of Dermott", "Ordinance No. 2026-02: Annexation", "Ordinance No. 2026-02 Annexation Dermott", None),
+    ("05007", "NEBCO Volunteer Fire Department", "Fire Dues", "NEBCO-Fire", None),
+    ("05007", "NEBCO Volunteer Fire Department", "EMS Dues", "NEBCO-EMS", None),
+    ("05101", "Newton County", "1% Sales and Use Tax for Jail Purposes", "1% SALE AND USE TAX FOR JAIL PURPOSES", None),
+    ("05039", "Dallas County", "1% Sales and Use Tax", "1% Sales and Use Tax Dallas County", None),
+    ("05073", "City of Lewisville", "2.5% Sales and Use Tax", "2.5% Sales and Use Tax Lewisville", None),
+    ("05123", "City of Forrest City", "Public Library Millage", "City of Forrest City, Public Library Millage", None),
+    ("05069", "City of Pine Bluff", "Alcoholic Beverage Sunday Sales", "City of Pine Bluff, Question", None),
+    ("05069", "City of Redfield", "Question", "City of Redfield, Question", None),
+    ("05033", "City of Alma", "Special Election Question", "City of Alma, Special Election", None),
+    ("05013", "Calhoun County", "1% Road Sales and Use Tax", "1% Road Sales & Use Tax", None),
+    (
+        "05139",
+        "City of El Dorado",
+        "Sunday Off-Premises Alcoholic Beverage Sales",
+        "SALE OF ALCOHOLIC BEVERAGES FOR OFF-PREMISES CONSUMPTION ON SUNDAY WITHIN THE CITY LIMITS OF EL DORADO, ARKANSAS",
+        None,
+    ),
+]
+
+
 def fetch() -> None:
+    folder = max(LIVE.iterdir())
+    index = json.loads((folder / "index.json").read_text())
+    raw.store(
+        SOURCE,
+        FEED,
+        (folder / index[FEED]).read_bytes(),
+        suffix=".json",
+        retrieved_at=datetime.strptime(folder.name, "%Y%m%dT%H%M%SZ").replace(tzinfo=UTC),
+        media_type="application/json",
+    )
     for url, _ in COUNTIES.values():
         try:
             raw.cached(SOURCE, url)
@@ -83,12 +253,35 @@ def fetch() -> None:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(
-        [
-            {key: value for key, value in row.items() if key != "answers"} | {"url": COUNTIES[row["county"]][0]}
-            for row in ROWS
-        ]
-    )
+    contests = {
+        contest["ContestName"]: contest
+        for contest in json.loads(raw.cached(SOURCE, FEED).path.read_bytes())["ContestData"]
+    }
+    rows = [
+        {"kind": None}
+        | {key: value for key, value in row.items() if key != "answers"}
+        | {"url": COUNTIES[row["county"]][0]}
+        for row in ROWS
+    ]
+    for county, entity, label, name, kind in FEED_ROWS:
+        choices = [choice["Name"].strip() for choice in contests[name]["Choices"]]
+        wording = (
+            " ".join(choice if choice.endswith(".") else f"{choice}." for choice in choices)
+            if all(len(choice) > 40 for choice in choices)
+            else None
+        )
+        rows.append(
+            {
+                "county": county,
+                "entity": entity,
+                "label": label,
+                "wording": wording,
+                "url": FEED,
+                "kind": kind,
+                "ballot": name,
+            }
+        )
+    frame = pl.DataFrame(rows, schema_overrides={"wording": pl.String, "kind": pl.String, "ballot": pl.String})
     frame.write_parquet(PARSED / "measures.parquet")
     print(frame.height)
 
@@ -108,16 +301,26 @@ def emit() -> Path:
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
         for county, (url, publisher) in COUNTIES.items():
-            sources[county] = cs.source(publisher, TITLE)
-            cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
-            cs.artifact(raw.cached(SOURCE, url), sources[county])
+            sources[url] = cs.source(publisher, TITLE)
+            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[url])
+        sources[FEED] = cs.source("Arkansas Secretary of State", FEED_TITLE)
+        cs.add(
+            "source",
+            id=sources[FEED],
+            kind="official_body",
+            publisher="Arkansas Secretary of State",
+            title=FEED_TITLE,
+            url=FEED,
+        )
+        cs.artifact(raw.cached(SOURCE, FEED), sources[FEED])
         parent = cs.key("us.election", f"{DAY}:AR")
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             entity = row["entity"]
             county_key = f"us.county:{row['county']}"
-            source = sources[row["county"]]
+            source = sources[row["url"]]
             option = None
             if re.match(r"(?i)(city|town|village) of ", entity):
                 option = civil.place(re.sub(r"(?i)^(city|town|village) of ", "", entity))
@@ -142,7 +345,7 @@ def emit() -> Path:
                 continue
             kept += 1
             polity, area, place, path, code = found[option]
-            election = cs.key("us.election", f"{DAY}:AR:{code}")
+            election, _ = live_key(cs, "us.election", f"{DAY}:AR:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
@@ -183,7 +386,7 @@ def emit() -> Path:
                 round_number=1,
                 default_result_kind="counted",
             )
-            cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+            cs.add("ballot_question", contest_id=contest, type=row["kind"] or "mandatory_referendum")
             cs.add(
                 "name",
                 entity_id=contest,
@@ -192,6 +395,8 @@ def emit() -> Path:
                 kind="official",
                 is_preferred=True,
             )
+            if row["ballot"] is not None:
+                cs.add("name", entity_id=contest, text=row["ballot"], lang="en", kind="ballot", is_preferred=False)
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("For", "Against")):
@@ -204,6 +409,8 @@ def emit() -> Path:
                     ballot_label=answer,
                 )
             cs.add("citation", entity_id=contest, source_id=source)
+            if row["wording"] is None:
+                continue
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,
