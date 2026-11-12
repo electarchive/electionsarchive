@@ -25,6 +25,7 @@ from ea.sources.us import (
     la_sos,
     me_canvass,
     measure_precincts,
+    measure_rules,
     mo_sos,
     ncsbe,
     openelections,
@@ -2922,4 +2923,24 @@ def emit() -> Path:
                 )
             landed[row["state"]] = landed.get(row["state"], 0) + 1
         print(f"{pairs.height} questions paired, {sorted(landed.items())} new defaults")
+        florida = measure_rules.systems(cs, {"referendum-fl-60"})["referendum-fl-60"]
+        plain = cs.key("us.electoral_system", "referendum")
+        for row in conn.execute(
+            """select c.id, c.election_id, c.district_area_id, c.round_number, c.default_result_kind
+               from contest c join election e on e.id = c.election_id
+               join polity p on p.id = e.polity_id
+               where p.iso_code = 'US-FL' and c.kind = 'ballot_question' and e.date_from >= '2012-01-01'
+                 and c.electoral_system_id = %s""",
+            [plain],
+        ).fetchall():
+            cs.add(
+                "contest",
+                id=row[0],
+                election_id=row[1],
+                kind="ballot_question",
+                district_area_id=row[2],
+                electoral_system_id=florida,
+                round_number=row[3],
+                default_result_kind=row[4],
+            )
         return cs.write()
