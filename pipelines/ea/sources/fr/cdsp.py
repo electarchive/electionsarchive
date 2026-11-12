@@ -351,6 +351,7 @@ VOTE_FIXES = {
 RELABELS = {
     (1993, 2, "2901", "RAINERO PIERO"): ("POIGNANT", "BERNARD", "SOC"),
 }
+CORRECTED = {key[:3] for key in (*VOTE_FIXES, *RELABELS)}
 NOTES = {
     "legi": (
         "Results by constituency, compiled by the Banque de données socio-politiques in Grenoble and Sciences Po's "
@@ -1381,7 +1382,7 @@ def emit() -> Path:
                             cs.add("note", entity_id=result_set, kind="caveat", body_md=TENDENCY_CAVEAT)
                         if fresh and number == 1 and (year, circ) in unsettled:
                             cs.add("note", entity_id=result_set, kind="caveat", body_md=UNSETTLED_CAVEAT)
-                        if fresh and circ in grouped:
+                        if (fresh or (year, number, circ) in CORRECTED) and circ in grouped:
                             for measure, value in grouped[circ].select("measure", "value").iter_rows():
                                 value_row(result_set, unit, None, measure, value)
                         for line in lines.sort("slot").iter_rows(named=True):
@@ -1459,7 +1460,7 @@ def emit() -> Path:
                                 )
                             if line["outcome"] is not None:
                                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=line["outcome"])
-                            if fresh:
+                            if fresh or (year, number, circ) in CORRECTED:
                                 value_row(result_set, unit, option, VOTES, line["votes"])
         dropped = set(
             conn.execute("select entity_id, text from name_drop where entity_id = any(%s)", [list(displays)]).fetchall()
