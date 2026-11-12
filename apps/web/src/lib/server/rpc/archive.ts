@@ -550,7 +550,7 @@ const sistersTogether = together(
         left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
           and b.kind = 'regional_branch' and b.valid @> ${day}::date
         left join entity_merge bm on bm.entity_id = b.parent_party_id
-        where not exists (select from contest k where k.allocation_parent_id = t.id)
+        where not exists (select from contest k where k.allocation_parent_id = t.id offset 0)
       ),
       winners as materialized (
         select distinct w.request, w.party from lines w
@@ -15105,9 +15105,9 @@ export async function alliances(election: string) {
     )
     select a.alliance_id as id, array_agg(distinct x.id::text) as parties
     from (
-      select distinct o.alliance_id from contest c
-      join contest_option o on o.contest_id = c.id
-      where c.election_id in (select id from tree) and o.alliance_id is not null
+      select distinct o.alliance_id from tree t
+      cross join lateral (select c.id from contest c where c.election_id = t.id offset 0) c
+      cross join lateral (select o.alliance_id from contest_option o where o.contest_id = c.id and o.alliance_id is not null offset 0) o
     ) a
     join alliance_member m on m.alliance_id = a.alliance_id
     left join entity_merge pm on pm.entity_id = m.party_id
@@ -15971,7 +15971,7 @@ export async function races(
                 ),
                 counted as (
                   select w.* from winners w
-                  where not exists (select from contest k where k.id = w.contest and k.kind = 'body_seats')
+                  where (select k.kind from contest k where k.id = w.contest) is distinct from 'body_seats'
                     or (
                       select coalesce(sum(l.seats), 0) from winners l
                       join contest lc on lc.id = l.contest and lc.kind = 'list_allocation'
