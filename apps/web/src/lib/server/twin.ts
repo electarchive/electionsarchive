@@ -422,7 +422,11 @@ async function settle(data: Awaited<ReturnType<typeof archive>>) {
   };
 }
 
-async function load(segments: Array<string>, search: URLSearchParams) {
+async function load(
+  segments: Array<string>,
+  search: URLSearchParams,
+  withBallot: boolean,
+) {
   const [head = "", ...rest] = segments;
   if (segments.length === 0) {
     return home();
@@ -475,7 +479,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return { kind: "sources" as const, ...(await listSources()) };
     }
   }
-  const raw = await archive(segments.join("/"), search);
+  const raw = await archive(segments.join("/"), search, withBallot);
   const indexed =
     raw.kind === "election" && raw.scope == null
       ? call(router.indices.election, { id: raw.id }).catch(() => null)
@@ -660,6 +664,7 @@ export async function twin(
     const data = await load(
       pathname.split("/").filter((segment) => segment !== ""),
       url.searchParams,
+      format === "json",
     );
     if (data.kind === "election" && data.scope != null) {
       headers.link = `<${url.origin}${pathname}?in=${data.scope.path}>; rel="canonical"`;

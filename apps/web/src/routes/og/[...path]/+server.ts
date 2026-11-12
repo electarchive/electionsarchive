@@ -107,7 +107,7 @@ async function card(segments: Array<string>, search: URLSearchParams) {
       color: found.party.color,
     };
   }
-  const data = await archive(segments.join("/"), search);
+  const data = await archive(segments.join("/"), search, false);
   if (data.kind === "polity") {
     const years = data.polity.elections.flatMap((election) =>
       election.year == null ? [] : [election.year],

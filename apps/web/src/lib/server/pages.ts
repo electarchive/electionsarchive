@@ -1214,7 +1214,11 @@ async function season(id: string) {
   return result[0]?.path ?? null;
 }
 
-export async function archive(path: string, search: URLSearchParams) {
+export async function archive(
+  path: string,
+  search: URLSearchParams,
+  withBallot = true,
+) {
   const segments = path.split("/");
   const result = await rows(`slug:v1:${path}`, async () =>
     db.execute<{
@@ -1310,11 +1314,13 @@ export async function archive(path: string, search: URLSearchParams) {
       group: search.get("group") ?? undefined,
     } as const;
     const got = call(router.contests.get, input);
-    const ballot = got
-      .then(async () =>
-        call(router.contests.ballot, { id: slug.entity_id, unit }),
-      )
-      .catch(() => []);
+    const ballot = withBallot
+      ? got
+          .then(async () =>
+            call(router.contests.ballot, { id: slug.entity_id, unit }),
+          )
+          .catch(() => [])
+      : Promise.resolve([]);
     const standing = (async () => {
       if (unit === "") {
         return null;
