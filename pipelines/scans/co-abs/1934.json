@@ -52,16 +52,20 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.187,
+        0.17,
         0.056,
         0.263,
-        0.904
+        0.95
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.2347
+        0.223
+      ],
+      "stub": [
+        0.017,
+        0.052
       ]
     }
   ],

@@ -29,10 +29,9 @@
           "candidate": "Alva B. Adams"
         },
         {
-          "label": "Karl C. Schurz\u2014P.L.",
+          "label": "Karl C. Schuyler\u2014R",
           "contest": "senate",
-          "candidate": "Karl C. Schuyler",
-          "party": "P.L."
+          "candidate": "Karl C. Schuyler"
         },
         {
           "label": "H. H. Marsh\u2014P.L.",
@@ -47,23 +46,23 @@
           "party": "C"
         },
         {
-          "label": "Clyde Whitehead\u2014S",
+          "label": "Carle Whitehead\u2014S",
           "contest": "senate",
           "candidate": "Carle Whitehead"
         }
       ],
       "orientation": "counties_down",
       "crop": [
-        0.022,
-        0.061,
-        0.168,
-        0.986
+        0.012,
+        0.12,
+        0.136,
+        0.975
       ],
       "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image.",
       "bands": 3,
       "header": [
         0.0,
-        0.0259
+        0.21
       ]
     }
   ],

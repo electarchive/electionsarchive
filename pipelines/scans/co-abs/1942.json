@@ -46,10 +46,10 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.058,
+        0.025,
         0.07,
-        0.157,
-        0.949
+        0.172,
+        0.96
       ],
       "hint": "Read only the table headed 'U. S. SENATOR 6-YEAR TERM'; ignore any other table visible in the image.",
       "bands": 2,
