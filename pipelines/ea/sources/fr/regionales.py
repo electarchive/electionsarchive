@@ -1,4 +1,7 @@
+import csv
+import io
 import re
+import zipfile
 from collections.abc import Mapping
 from datetime import date
 from pathlib import Path
@@ -12,11 +15,15 @@ from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.regionales"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 STATIC = "https://static.data.gouv.fr"
 R15 = f"{STATIC}/resources/elections-regionales-2015-et-des-assemblees-de-corse-de-guyane-et-de-martinique-resultats"
 R21 = f"{STATIC}/resources/elections-regionales-2021-resultats-du"
+R98 = f"{STATIC}/0d/899afa4aedca3c4077239ef7c346de3e38c9acbc1ee2adcff3425251e531ca.xls"
+CDSP = f"{STATIC}/resources/elections-regionales-1986-2010/community/20150204-171427/REGIONALES_1986-2010-csv.zip"
+CDSP_1998 = "REGIONALES_1986-2010-csv/cdsp_regio1998_circ.csv"
+DAY_1998 = date(1998, 3, 15)
 ROUNDS = {
     2004: (date(2004, 3, 21), date(2004, 3, 28)),
     2010: (date(2010, 3, 14), date(2010, 3, 21)),
@@ -24,6 +31,8 @@ ROUNDS = {
     2021: (date(2021, 6, 20), date(2021, 6, 27)),
 }
 FILES = {
+    (1998, 1, "region"): (R98, "Régions"),
+    (1998, 1, "departement"): (R98, "Départements"),
     (2004, 1, "region"): (
         f"{STATIC}/97/4fb8c291dfaa82ebc74ee253c28ea1c937dbe7d63bda03fd4a16f2a6b99890.xls",
         "Regions T1",
@@ -100,6 +109,7 @@ TOTALS = {
 def fetch() -> None:
     for url, _ in FILES.values():
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+    raw.fetch(SOURCE, CDSP, suffix=".zip")
 
 
 def number(value: object) -> int | None:
@@ -178,6 +188,28 @@ def read(year: int, round_: int, level: str) -> tuple[list[dict[str, object]], l
     return totals, lists
 
 
+def heads_1998(lists: list[dict[str, object]]) -> None:
+    with zipfile.ZipFile(raw.cached(SOURCE, CDSP).path) as archive:
+        rows = list(csv.reader(io.TextIOWrapper(archive.open(CDSP_1998), "latin1")))
+    votes: dict[tuple[str, str, str, str], int] = {}
+    for row in rows[1:]:
+        for offset in range(10, len(row) - 4, 5):
+            if row[offset + 4]:
+                key = (code_of(row[2]), row[offset + 1], row[offset + 2], row[offset + 3])
+                votes[key] = votes.get(key, 0) + int(row[offset + 4])
+    for entry in lists:
+        if entry["year"] != 1998 or entry["level"] != "departement":
+            continue
+        found = [key for key, count in votes.items() if key[0] == entry["unit"] and count == entry["votes"]]
+        if len(found) != 1:
+            raise ValueError(f"1998 {entry['unit']} {entry['short']}: {len(found)} CDSP lists with {entry['votes']}")
+        _, forename, surname, title = found[0]
+        entry["head"] = f"{surname} {forename.title()}".strip()
+        short = str(entry["short"])
+        if len(short) == 25 and title.startswith(short):
+            entry["long"] = title
+
+
 def parse() -> None:
     totals: list[dict[str, object]] = []
     lists: list[dict[str, object]] = []
@@ -185,6 +217,7 @@ def parse() -> None:
         found_totals, found_lists = read(year, round_, level)
         totals += found_totals
         lists += found_lists
+    heads_1998(lists)
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "lists.parquet")
@@ -249,10 +282,11 @@ def departements(year: int) -> dict[str, str]:
 
 REFORM = date(2016, 1, 1)
 DATASETS = {
+    1998: ("https://www.data.gouv.fr/datasets/elections-regionales-1998-571487", "Public record"),
     2004: ("https://www.data.gouv.fr/datasets/536993a5a3a729239d204258", "Licence Ouverte v1.0"),
     2010: ("https://www.data.gouv.fr/datasets/536993a8a3a729239d204260", "Licence Ouverte v1.0"),
     2015: ("https://www.data.gouv.fr/datasets/56a0a693c751df54fbade715", "Licence Ouverte v1.0"),
-    2021: ("https://www.data.gouv.fr/datasets/60d1c3d14fc2e0fda6816678", None),
+    2021: ("https://www.data.gouv.fr/datasets/60d1c3d14fc2e0fda6816678", "Public record"),
 }
 ENGLISH = {
     "Bretagne": "Brittany",
@@ -305,6 +339,20 @@ ASSEMBLIES = {"02": "Assemblée de Martinique", "03": "Assemblée de Guyane"}
 CORSICA_TERRITORIAL = date(2017, 12, 10)
 SECTIONED = {(2015, "03")}
 NUANCES = {
+    1998: {
+        "LXG": "Liste d'extrême gauche",
+        "LPC": "Liste du Parti communiste",
+        "LPS": "Liste du Parti socialiste",
+        "LMA": "Liste de la majorité",
+        "LDG": "Liste divers gauche",
+        "LEC": "Liste écologiste",
+        "LRG": "Liste régionaliste",
+        "LDV": "Liste divers",
+        "LDR": "Liste de droite",
+        "LDF": "Liste droite-Front national",
+        "LFN": "Liste du Front national",
+        "LXD": "Liste d'extrême droite",
+    },
     2004: {
         "LXG": "Liste d'extrême gauche",
         "LGA": "Liste de gauche",
@@ -388,7 +436,118 @@ RULES = {
     "lists": {"order": "closed", "vacancy": "next_on_list"},
 }
 BONUS = {"level": "list", "share": {"percent": 50, "strict": True, "rounds": [1]}}
+SEATS_1992 = {
+    "67": 27,
+    "68": 20,
+    "24": 12,
+    "33": 36,
+    "40": 10,
+    "47": 10,
+    "64": 17,
+    "03": 13,
+    "15": 6,
+    "43": 8,
+    "63": 20,
+    "21": 17,
+    "58": 9,
+    "71": 19,
+    "89": 12,
+    "22": 16,
+    "29": 25,
+    "35": 24,
+    "56": 18,
+    "18": 11,
+    "28": 13,
+    "36": 8,
+    "37": 17,
+    "41": 10,
+    "45": 18,
+    "08": 11,
+    "10": 11,
+    "51": 19,
+    "52": 8,
+    "90": 6,
+    "25": 18,
+    "39": 10,
+    "70": 9,
+    "971": 41,
+    "973": 31,
+    "91": 21,
+    "92": 27,
+    "75": 42,
+    "77": 21,
+    "93": 27,
+    "94": 24,
+    "95": 21,
+    "78": 26,
+    "11": 10,
+    "30": 18,
+    "34": 24,
+    "48": 3,
+    "66": 12,
+    "19": 14,
+    "23": 8,
+    "87": 21,
+    "54": 22,
+    "55": 7,
+    "57": 31,
+    "88": 13,
+    "972": 41,
+    "09": 6,
+    "12": 10,
+    "31": 32,
+    "32": 7,
+    "46": 6,
+    "65": 9,
+    "81": 13,
+    "82": 8,
+    "14": 21,
+    "50": 16,
+    "61": 10,
+    "27": 17,
+    "76": 38,
+    "59": 72,
+    "62": 41,
+    "44": 31,
+    "49": 21,
+    "53": 9,
+    "72": 16,
+    "85": 16,
+    "02": 17,
+    "60": 23,
+    "80": 17,
+    "16": 12,
+    "17": 18,
+    "79": 12,
+    "86": 13,
+    "04": 5,
+    "05": 4,
+    "06": 28,
+    "13": 49,
+    "83": 23,
+    "84": 14,
+    "974": 45,
+    "01": 14,
+    "07": 9,
+    "26": 12,
+    "38": 29,
+    "42": 22,
+    "69": 43,
+    "73": 11,
+    "74": 17,
+}
 SYSTEMS = {
+    "regional-1986": (
+        "French regional council list system (1986–1998)",
+        None,
+        (
+            "From 1986 to 1998 each département elected its share of the regional council, fixed by law, from closed "
+            "départemental lists in a single round. Seats were shared by the highest-average (D'Hondt) method among the "
+            "lists with at least 5 percent of the valid votes in the département. There was no majority bonus. From 1992 "
+            "the seats of each département were those of table 7 annexed to the Electoral Code, as replaced by law "
+            "91-1384 of 31 December 1991."
+        ),
+    ),
     "regional": (
         "French regional council list system",
         {"kind": "fraction", "fraction": 0.25, "rounding": "up"},
@@ -454,6 +613,16 @@ METHOD = (
     "Results by region from the Interior Ministry's results file. The ministry's figures by département, loaded "
     "as a second result set, add up exactly to these totals."
 )
+METHOD_1998 = (
+    "Votes by list from the Interior Ministry's 1998 results file by département. Heads of list come from the "
+    "Sciences Po CDSP file of the same results by constituency, matched to each list by its votes in the département."
+)
+NOTE_1998 = (
+    "Until 2004 each département elected its share of the regional council as a separate constituency. Neither "
+    "the Interior Ministry's results file nor any other official source found online gives the seats each list won, "
+    "so no outcomes are recorded. Corsica's 1998 election was annulled by the Conseil d'État and held again in 1999."
+)
+SIZE_1992 = date(1992, 3, 22)
 ROUND_ONE_NOTE = (
     "No list won an absolute majority, so no seats were allocated in this round. Lists that stood again in the "
     "second round under the same head of list are marked as advancing; lists with at least 10 percent of the valid "
@@ -469,9 +638,13 @@ def system_of(code: str, year: int) -> str:
     return "regional"
 
 
-def allocate(votes: dict[str, int], valid: int, seats: int, size: Mapping[str, object], bonus: bool) -> dict[str, int]:
+def allocate(
+    votes: dict[str, int], valid: int, seats: int, size: Mapping[str, object] | None, bonus: bool
+) -> dict[str, int]:
     leader = max(votes, key=lambda label: votes[label])
-    if size["kind"] == "fraction":
+    if size is None:
+        extra = 0
+    elif size["kind"] == "fraction":
         extra = -(-seats // 4) if bonus else 0
     else:
         extra = int(str(size["seats"])) if bonus else 0
@@ -502,8 +675,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "French regional elections of 2004, 2010, 2015, and 2021, both rounds, by region and by département, "
-                "with each list's seats, from the Interior Ministry's results files"
+                "French regional elections of 1998 by département constituency, and of 2004, 2010, 2015, and 2021, both "
+                "rounds, by region and by département with each list's seats, from the Interior Ministry's results files"
             ),
             polity="FR",
         )
@@ -525,7 +698,9 @@ def emit() -> Path:
                 title=title,
                 url=url,
                 license=license,
-                license_url=None if license is None else "https://www.etalab.gouv.fr/licence-ouverte-open-licence",
+                license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence"
+                if license.startswith("Licence Ouverte")
+                else None,
             )
             for (file_year, _, _), (file_url, _) in FILES.items():
                 if file_year == year:
@@ -549,6 +724,14 @@ def emit() -> Path:
             spans[code] = (REFORM, None)
         department_areas = {
             code: cs.area("fr.departement", code, date(2024, 1, 1)) for codes in members.values() for code in codes
+        }
+        dept_names = {
+            code: str(
+                conn.execute(
+                    "select text from name where entity_id = %s and lang = 'fr' and kind = 'official'", [area]
+                ).fetchall()[0][0]
+            )
+            for code, area in department_areas.items()
         }
         dept_source = conn.execute(
             "select g.source_id from area_geometry g where g.area_id = %s", [department_areas["01"]]
@@ -637,7 +820,7 @@ def emit() -> Path:
                 "electoral_system",
                 id=systems[key],
                 polity_id=france,
-                rules={**RULES, "bonus": {**BONUS, "size": size}},
+                rules=RULES if size is None else {**RULES, "bonus": {**BONUS, "size": size}},
                 rules_version=1,
             )
             name(systems[key], english, "en")
@@ -667,6 +850,155 @@ def emit() -> Path:
         sizes: dict[str, list[tuple[int, date]]] = {}
         values: list[dict[str, object]] = []
         mismatched: list[str] = []
+
+        def body_for(code: str, body_key: str) -> UUID:
+            if body_key not in bodies:
+                label = labels[code]
+                bodies[body_key] = cs.key(f"{SOURCE}.body", body_key)
+                cs.add("body", id=bodies[body_key], polity_id=polities[code], kind="unicameral")
+                council = ASSEMBLIES[code] if body_key.endswith(":assemblee") else COUNCILS[code]
+                name(bodies[body_key], council, "fr", "official")
+                english = (
+                    f"Assembly of {ENGLISH.get(label, label)}"
+                    if council.startswith("Assemblée")
+                    else f"Regional Council of {ENGLISH.get(label, label)}"
+                )
+                name(bodies[body_key], english, "en", "english")
+            return bodies[body_key]
+
+        cdsp = cs.source("Centre de données socio-politiques", "Élections régionales 1986–2010")
+        cs.add(
+            "source",
+            id=cdsp,
+            kind="academic",
+            publisher="Centre de données socio-politiques (Sciences Po)",
+            title="Élections régionales 1986–2010",
+            url="https://www.data.gouv.fr/datasets/elections-regionales-1986-2010",
+            license=None,
+            license_url=None,
+        )
+        cs.artifact(raw.cached(SOURCE, CDSP), cdsp)
+        umbrella = cs.key(f"{SOURCE}.election", "1998")
+        cs.add(
+            "election",
+            id=umbrella,
+            polity_id=france,
+            kind="local",
+            date_from=DAY_1998,
+            date_to=DAY_1998,
+            status="held",
+        )
+        name(umbrella, "1998 French regional elections", "en")
+        name(umbrella, "Élections régionales de 1998", "fr", "native")
+        cs.add("slug", path=f"fr/{DAY_1998}-regional", entity_id=umbrella)
+        cs.add("note", entity_id=umbrella, kind="context", body_md=NOTE_1998)
+        totals_1998 = totals.filter((pl.col("year") == 1998) & (pl.col("level") == "departement"))
+        held_1998 = {str(row["unit"]): row for row in totals_1998.iter_rows(named=True)}
+        for code, (label, codes) in OLD_REGIONS.items():
+            if code == "94":
+                continue
+            body = body_for(code, code)
+            sizes.setdefault(code, []).append((sum(SEATS_1992[d] for d in codes.split()), SIZE_1992))
+            path = f"fr/region-{slug(label)}"
+            election = cs.key(f"{SOURCE}.election", f"1998:{code}:1")
+            cs.add(
+                "election",
+                id=election,
+                polity_id=polities[code],
+                parent_id=umbrella,
+                kind="general",
+                date_from=DAY_1998,
+                date_to=DAY_1998,
+                status="held",
+            )
+            name(election, f"1998 {ENGLISH.get(label, label)} regional election", "en")
+            cs.add("slug", path=f"{path}/{DAY_1998}-general", entity_id=election)
+            for dept in codes.split():
+                total = held_1998[dept]
+                dept_label = dept_names[dept]
+                contest_key = f"1998:{code}:{dept}"
+                contest = cs.key(f"{SOURCE}.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=body,
+                    district_area_id=department_areas[dept],
+                    magnitude=SEATS_1992[dept],
+                    round_number=1,
+                    previous_round_id=None,
+                    electoral_system_id=systems["regional-1986"],
+                    default_result_kind="counted",
+                )
+                name(contest, f"1998 {ENGLISH.get(label, label)} regional election, {dept_label}", "en")
+                cs.add("slug", path=f"{path}/{DAY_1998}-general/{slug(dept_label)}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:departement")
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[1998],
+                    is_default=True,
+                    completeness=1,
+                )
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD_1998)
+                unit = cs.unit("fr.departement", dept, DAY_1998)
+                for field, measure in (("registered", 2), ("voters", 14), ("valid", 4), ("invalid", 5)):
+                    values.append(
+                        {
+                            "result_set_id": str(result_set),
+                            "unit_id": str(unit),
+                            "option_id": None,
+                            "measure": measure,
+                            "value": total[field],
+                        }
+                    )
+                entries = lists.filter(
+                    (pl.col("year") == 1998) & (pl.col("level") == "departement") & (pl.col("unit") == dept)
+                ).sort("order")
+                if entries["votes"].sum() != total["valid"]:
+                    raise ValueError(f"1998 {dept}: lists add to {entries['votes'].sum()}, valid {total['valid']}")
+                for entry in entries.iter_rows(named=True):
+                    order = str(entry["order"])
+                    option = cs.key(f"{SOURCE}.option", f"{contest_key}:{order}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="list",
+                        party_id=nuances[1998, str(entry["nuance"])],
+                        ballot_position=None,
+                        ballot_label=entry["long"] or entry["short"],
+                    )
+                    if entry["long"] and entry["short"] and entry["long"] != entry["short"]:
+                        name(option, entry["short"], "fr", "short")
+                    head = str(entry["head"])
+                    cs.add(
+                        "candidacy",
+                        id=cs.key(f"{SOURCE}.candidacy", f"{contest_key}:{order}"),
+                        person_id=person_for(head),
+                        option_id=option,
+                        role="head",
+                        list_position=1,
+                        ballot_name=head,
+                        member_of_party_id=None,
+                        is_independent=False,
+                    )
+                    values.append(
+                        {
+                            "result_set_id": str(result_set),
+                            "unit_id": str(unit),
+                            "option_id": str(option),
+                            "measure": 1,
+                            "value": entry["votes"],
+                        }
+                    )
+
         for year, days in ROUNDS.items():
             regions = OLD_REGIONS if year < 2015 else NEW_REGIONS
             umbrella = cs.key(f"{SOURCE}.election", str(year))
@@ -687,18 +1019,7 @@ def emit() -> Path:
                 label = labels[code]
                 polity = polities[code]
                 body_key = f"{code}:assemblee" if code in ASSEMBLIES and year >= 2015 else code
-                if body_key not in bodies:
-                    bodies[body_key] = cs.key(f"{SOURCE}.body", body_key)
-                    cs.add("body", id=bodies[body_key], polity_id=polity, kind="unicameral")
-                    council = ASSEMBLIES[code] if body_key.endswith(":assemblee") else COUNCILS[code]
-                    name(bodies[body_key], council, "fr", "official")
-                    english = (
-                        f"Assembly of {ENGLISH.get(label, label)}"
-                        if council.startswith("Assemblée")
-                        else f"Regional Council of {ENGLISH.get(label, label)}"
-                    )
-                    name(bodies[body_key], english, "en", "english")
-                body = bodies[body_key]
+                body = body_for(code, body_key)
                 system_key = system_of(code, year)
                 size_rule = SYSTEMS[system_key][1]
                 path = f"fr/region-{slug(label)}"
