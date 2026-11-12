@@ -1,0 +1,289 @@
+{
+  "polity": "US-OH",
+  "publisher": "Ohio Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Ohio Election Statistics 1920, general election held November 2, 1920",
+  "file": {
+    "url": "https://archive.org/download/ohioelectionsta02statgoog/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/ohioelectionsta02statgoog"
+  },
+  "contests": {
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "OH",
+      "district": null
+    },
+    "senate": {
+      "year": 1920,
+      "chamber": "senate",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "OH",
+      "district": null
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "OH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 19,
+      "id": "19-0",
+      "columns": [
+        {
+          "label": "Dem. James M. Cox",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Rep. Warren G. Harding",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Soc. Eugene V. Debs",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "S. T. R. C. Macauley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Dem. James M. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Pluralities Rep. Warren G. Harding",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.15,
+        0.863,
+        1.0
+      ],
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES BY COUNTIES FOR CANDIDATES FOR PRESIDENT (FIRST ELECTOR) AT THE ELECTION HELD NOVEMBER 2, 1920.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2165
+      ]
+    },
+    {
+      "page": 20,
+      "id": "20-0",
+      "columns": [
+        {
+          "label": "James M. Cox.",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Warren G. Harding.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Eugene V. Debs.",
+          "contest": "president",
+          "candidate": "Eugene Debs (Socialist)"
+        },
+        {
+          "label": "R. C. Macauley.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James M. Cox.",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Warren G. Harding.",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.338,
+        0.917,
+        0.612
+      ],
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES BY COUNTIES FOR CANDIDATES FOR PRESIDENT (FIRST ELECTOR) AT THE ELECTION HELD NOVEMBER 2, 1920\u2014Concluded.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "W. A. Julian",
+          "contest": "senate",
+          "candidate": "W. A. Julian"
+        },
+        {
+          "label": "Frank B. Willis",
+          "contest": "senate",
+          "candidate": "Frank B. Willis"
+        },
+        {
+          "label": "Henry B. Strong",
+          "contest": "senate",
+          "candidate": "Henry B. Strong"
+        },
+        {
+          "label": "Joseph W. Gottlieb",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. T. Marshall",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hugh L. Nichols",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.105,
+        0.914,
+        0.634
+      ],
+      "hint": "Read only the table headed 'TABLE SHOWING VOTES CAST BY COUNTIES FOR CANDIDATES FOR UNITED STATES SENATOR AND CHIEF JUSTICE OF THE SUPREME COURT AT THE ELECTION HELD NOVEMBER 2, 1920\u2014Concluded.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4669
+      ]
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "Dem.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Rep.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. T.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast for Governor",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.136,
+        0.096,
+        0.924,
+        1.0
+      ],
+      "hint": "Read only the table headed 'TABLE SHOWING THE VOTES CAST BY COUNTIES FOR CANDIDATES FOR GOVERNOR FOR 1920 AND 1918 AND THE TOTAL VOTE CAST FOR ALL CANDIDATES FOR THE AFORESAID YEARS.'; ignore any other table visible in the image.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2622
+      ]
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Vic Donahey",
+          "contest": "governor",
+          "candidate": "A. Victor Donahey"
+        },
+        {
+          "label": "Harry L. Davis",
+          "contest": "governor",
+          "candidate": "Harry L. Davis"
+        },
+        {
+          "label": "Frank B. Hamilton",
+          "contest": "governor",
+          "candidate": "Frank B. Hamilton"
+        },
+        {
+          "label": "Earl H. Foote",
+          "contest": "governor",
+          "candidate": "Earl H. Foote"
+        },
+        {
+          "label": "Total Vote Cast for Governor",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James M. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank B. Willis",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast for Governor, 1918",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.351,
+        0.864,
+        0.619
+      ],
+      "hint": "Read only the table headed 'TABLE SHOWING THE VOTES CAST BY COUNTIES FOR CANDIDATES FOR GOVERNOR FOR 1920 AND 1918 AND THE TOTAL VOTE CAST FOR ALL CANDIDATES FOR THE AFORESAID YEARS\u2014Concluded.'; ignore any other table visible in the image."
+    }
+  ]
+}
