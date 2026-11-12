@@ -12763,6 +12763,14 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             [tails],
         ).fetchall():
             known.setdefault(tail, []).append((person, text))
+        own_people = {
+            row[0]
+            for row in conn.execute(
+                """select e.id from entity e join changeset c on c.id = e.changeset_id
+                   where e.type = 'person' and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         identity_names = {
             entity: text
             for entity, text in conn.execute(
@@ -13460,8 +13468,12 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                     for person, held_text in known.get(tail, [])
                     if (tail, row["name"], held_text) in DIFFERENT_PEOPLE
                 }
-                pool = {
-                    person
+                fits = {
+                    (
+                        person,
+                        len(held) == len(tokens)
+                        and all(a.startswith(b) or b.startswith(a) for a, b in zip(held, tokens, strict=True)),
+                    )
                     for person, held_text in known.get(tail, [])
                     if held_text
                     and person not in barred
@@ -13481,6 +13493,11 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
                         or tokens[0] in held
                     )
                 }
+                pool = {person for person, _ in fits}
+                if len(pool) > 1:
+                    others = pool - own_people
+                    exact = {person for person, same in fits if same and person in others}
+                    pool = others if len(others) == 1 else exact if len(exact) == 1 else pool
                 if len(pool) == 1:
                     person = next(iter(pool))
                     counts["matched"] += 1
@@ -13686,7 +13703,9 @@ def emit_state(frame: pl.DataFrame, state: str, snapshot: Snapshot, offices: Off
             if election_feeds.get(row["id"], {None}) <= CANCELLATION_FEEDS:
                 row["status"] = "canceled"
         used = {str(row["person_id"]) for row in cs.rows.get("candidacy", [])}
-        retiring = [str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])]
+        retiring = [str(row["entity_id"]) for row in cs.rows.get("entity_retirement", [])] + [
+            str(row["id"]) for row in cs.rows.get("candidacy", [])
+        ]
         for person, value in conn.execute(
             """select p.id, x.value from person p join entity e on e.id = p.id and e.retired_by is null
                join external_id x on x.entity_id = p.id and x.scheme = %s
