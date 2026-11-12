@@ -1816,7 +1816,12 @@ export const seats = {
         from listed q
         left join lateral (
           select coalesce(pm.into_id, co.party_id)::text as party
-          from candidacy cy
+          from (
+            select q.member::uuid as id
+            union
+            select m.entity_id from entity_merge m where m.into_id = q.member::uuid
+          ) pid
+          join candidacy cy on cy.person_id = pid.id
           left join entity_merge cm on cm.entity_id = cy.person_id
           join contest_option co on co.id = cy.option_id
           join contest c on c.id = co.contest_id
