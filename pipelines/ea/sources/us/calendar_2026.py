@@ -1,17 +1,24 @@
+import csv
 import html
 import re
+from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import httpx
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.store import DATA, connect
+from ea.store import DATA, ROOT, connect
 
 SOURCE = "us.calendar_2026"
-VERSION = "2"
+VERSION = "3"
+UPCOMING = [
+    ROOT / "pipelines/ea/coverage_inputs/upcoming-elections-post-nov3-2026.tsv",
+    ROOT / "pipelines/ea/coverage_inputs/upcoming-elections-spring-2027.tsv",
+]
 PARSED = DATA / "parsed" / SOURCE
 LA_CANDIDATES = "https://voterportal.sos.la.gov/CandidateInquiry/StatewideCandidate/CandidateList"
 SOURCES = {
@@ -123,6 +130,20 @@ COURTS = {
 PARTIES = {"Democrat": "democratic-party", "Republican": "republican-party"}
 
 
+def upcoming() -> dict[str, list[dict[str, str]]]:
+    keyed: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for path in UPCOMING:
+        with path.open(newline="") as f:
+            for row in csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"):
+                if not row["date"] or row["date_basis"] not in ("statute", "calendar"):
+                    continue
+                kind = row["election_type"].lower()
+                named = ("runoff", "special", "primary") if path == UPCOMING[0] else ("runoff", "primary")
+                suffix = next((s for s in named if s in kind), None)
+                keyed[f"{row['date']}:{row['state']}" + (f":{suffix}" if suffix else "")].append(row)
+    return keyed
+
+
 def fetch() -> None:
     for name, (url, *_) in SOURCES.items():
         try:
@@ -217,7 +238,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The 2026 elections after November 3 as scheduled: the Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs, and Mississippi's November 3 Court of Appeals, chancery, and circuit court elections and District Attorney District 7 special election with their qualified candidates",
+            summary="The 2026 elections after November 3 as scheduled: the Georgia, Mississippi, Arkansas, and Louisiana runoff dates, the Louisiana, Arkansas, and Mississippi legislative special elections through January 2027 with their candidates, the November 3 Mississippi House 70 and 77 and Louisiana House 92 specials that can lead to December runoffs, and Mississippi's November 3 Court of Appeals, chancery, and circuit court elections and District Attorney District 7 special election with their qualified candidates; and every other dated runoff, special, and spring 2027 local election that the upcoming-elections inputs give from a statute or an official calendar, one per state, date, and kind",
             polity="US",
         )
 
@@ -260,6 +281,63 @@ def emit() -> Path:
             name(elections[key], title)
             cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=elections[key])
             cs.add("citation", entity_id=elections[key], source_id=sources[source], locator=None)
+        today = datetime.now(UTC).date()
+        listed = 0
+        for key, rows in upcoming().items():
+            if key in elections:
+                continue
+            day, state, *rest = key.split(":")
+            kind = rest[0] if rest else "local"
+            parent = conn.execute(
+                "select entity_id from external_id where scheme = 'us.election' and value = %s",
+                [f"2026-11-03:{state}"],
+            ).fetchone()
+            when = date.fromisoformat(day)
+            elections[key] = cs.key("us.election", key)
+            cs.add(
+                "election",
+                id=elections[key],
+                polity_id=cs.polity(f"US-{state}"),
+                parent_id=parent[0] if parent and kind == "runoff" and when.year == 2026 else None,
+                kind=kind,
+                date_from=when,
+                date_to=when,
+                status="scheduled" if when > today else "held",
+            )
+            (place,) = conn.execute(
+                """select n.text from polity p join name n on n.entity_id = p.id and n.lang = 'en' and n.is_preferred
+                   where p.iso_code = %s""",
+                [f"US-{state}"],
+            ).fetchone()
+            name(elections[key], f"{when:%B} {when.day}, {when.year} {place} {kind} elections")
+            cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=elections[key])
+            for row in rows:
+                host = urlsplit(row["source_url"]).netloc.removeprefix("www.")
+                title = (
+                    row["statute"]
+                    if row["date_basis"] == "statute"
+                    else f"{row['scope']}: {row['election_type']}, {when:%B} {when.day}, {when.year}"
+                )
+                cited = cs.source(host, title)
+                if cited in cs.minted and cited not in sources.values():
+                    sources[f"{host}:{title}"] = cited
+                    cs.add(
+                        "source",
+                        id=cited,
+                        kind="official_body" if host.endswith((".gov", ".us")) else "compendium",
+                        publisher=host,
+                        title=title,
+                        url=row["source_url"],
+                        license=None,
+                    )
+                cs.add(
+                    "citation",
+                    entity_id=elections[key],
+                    source_id=cited,
+                    locator={"section": row["statute"]} if row["statute"] else None,
+                )
+            listed += 1
+        print(f"{listed} elections from the upcoming-elections inputs")
         for key in ("2026-11-03:MS", "2026-11-03:LA"):
             elections[key] = cs.key("us.election", key)
 
@@ -502,7 +580,7 @@ def emit() -> Path:
             cs.add(
                 "entity_retirement",
                 entity_id=election,
-                reason="Unofficial results show a ticket won a majority on November 3, so no runoff is held.",
+                reason="No longer on an official calendar: no runoff was needed, or the date moved.",
             )
         print(counts, f"{len(stale)} elections retired")
         return cs.write()
