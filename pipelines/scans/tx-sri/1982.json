@@ -79,13 +79,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.072,
+        0.022,
         0.271,
         0.917,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1564
@@ -143,13 +143,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.057,
+        0.007,
         0.24,
         0.918,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1842
@@ -207,13 +207,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.072,
+        0.022,
         0.251,
         0.918,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1883
@@ -271,13 +271,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.052,
+        0.002,
         0.246,
         0.918,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.2109
@@ -335,13 +335,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.058,
+        0.008,
         0.246,
         0.918,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.2042
@@ -399,13 +399,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.063,
+        0.013,
         0.263,
         0.922,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1588
@@ -463,13 +463,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.064,
+        0.014,
         0.264,
         0.926,
         1.0
       ],
       "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1984
@@ -527,12 +527,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.053,
+        0.003,
         0.283,
         0.913,
         0.626
       ],
-      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'U.S. SENATE'; ignore any other table visible in the image.",
+      "bands": 3
     },
     {
       "page": 27,
@@ -586,12 +587,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.034,
+        0.0,
         0.22,
         0.932,
         0.615
       ],
-      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 3
     },
     {
       "page": 28,
@@ -645,13 +647,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.042,
+        0.0,
         0.216,
         0.926,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1837
@@ -709,13 +711,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.045,
+        0.0,
         0.21,
         0.926,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1835
@@ -773,13 +775,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.046,
+        0.0,
         0.208,
         0.933,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1919
@@ -837,13 +839,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.042,
+        0.0,
         0.205,
         0.928,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1962
@@ -901,13 +903,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.037,
+        0.0,
         0.188,
         0.928,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.181
@@ -965,13 +967,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.032,
+        0.0,
         0.191,
         0.933,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1842
@@ -1029,13 +1031,13 @@
       ],
       "orientation": "counties_down",
       "crop": [
-        0.034,
+        0.0,
         0.2,
         0.934,
         1.0
       ],
       "hint": "Read only the table headed 'GOVERNOR'; ignore any other table visible in the image.",
-      "bands": 2,
+      "bands": 3,
       "header": [
         0.0,
         0.1875

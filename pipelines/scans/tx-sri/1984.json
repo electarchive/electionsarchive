@@ -1,0 +1,1876 @@
+{
+  "polity": "US-TX",
+  "publisher": "Texas Secretary of State",
+  "title": "State of Texas, 1984 General Election, Official Election Tabulation (Secretary of State)",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706923_0062/micro_IA40706923_0062.pdf",
+    "item": "https://archive.org/details/micro_IA40706923_0062"
+  },
+  "raw_source": "us.sri",
+  "contests": {
+    "senate": {
+      "year": 1984,
+      "chamber": "senate",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": null
+    },
+    "house6": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 6
+    },
+    "house9": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 9
+    },
+    "house10": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 10
+    },
+    "house11": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 11
+    },
+    "house13": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 13
+    },
+    "house14": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 14
+    },
+    "house15": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 15
+    },
+    "house16": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 16
+    },
+    "house17": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 17
+    },
+    "house19": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 19
+    },
+    "house21": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 21
+    },
+    "house22": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 22
+    },
+    "house23": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 23
+    },
+    "house26": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 26
+    },
+    "house27": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 27
+    },
+    "house1": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 1
+    },
+    "house2": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 2
+    },
+    "house3": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 3
+    },
+    "house4": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "TX",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOUGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.269,
+        0.763,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0793
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS J-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMREL J-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.299,
+        0.761,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0785
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS 4-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SAMPSON 4-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.296,
+        0.773,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0795
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DUGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAHAM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS d-T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL w-T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.345,
+        0.77,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        -0.0076
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS d-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL d-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.293,
+        0.759,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.075
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "BUDGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS I-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.316,
+        0.761,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0833
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "DOUGETT D-I",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM RED",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS 4-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL 4-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.049,
+        0.298,
+        0.757,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE - THE STATE OF TEXAS, OFFICE OF THE SECRETARY OF STATE, 1984 GENERAL ELECTION OFFICIAL ELECTION TABULATION'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0726
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DUGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS X-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.286,
+        0.768,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0784
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS L-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL L-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.29,
+        0.764,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0775
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.284,
+        0.776,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.088
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "DORSETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM RED",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMMEL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.058,
+        0.283,
+        0.759,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0823
+      ]
+    },
+    {
+      "page": 12,
+      "id": "12-0",
+      "columns": [
+        {
+          "label": "BENTSEN DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBEL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.283,
+        0.764,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0823
+      ]
+    },
+    {
+      "page": 13,
+      "id": "13-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOUGHERTY DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.313,
+        0.76,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0771
+      ]
+    },
+    {
+      "page": 14,
+      "id": "14-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DUGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS d-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL d-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.293,
+        0.754,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0778
+      ]
+    },
+    {
+      "page": 15,
+      "id": "15-0",
+      "columns": [
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.052,
+        0.281,
+        0.758,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0821
+      ]
+    },
+    {
+      "page": 16,
+      "id": "16-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOGGETT DEM",
+          "contest": "senate",
+          "candidate": "Lloyd Doggett"
+        },
+        {
+          "label": "GRAMM REP",
+          "contest": "senate",
+          "candidate": "Phil Gramm"
+        },
+        {
+          "label": "DAVIS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GAMBREL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.271,
+        0.763,
+        0.776
+      ],
+      "hint": "Read only the table headed 'U.S. SENATOR STATEWIDE'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.103
+      ]
+    },
+    {
+      "page": 17,
+      "id": "17-0",
+      "columns": [
+        {
+          "label": "MCDANIEL DEM",
+          "contest": "house6",
+          "candidate": "Dan Kubiak"
+        },
+        {
+          "label": "BARTON REP",
+          "contest": "house6",
+          "candidate": "Joe Barton"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.087,
+        0.281,
+        0.79,
+        0.775
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 6'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.085
+      ]
+    },
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "BROOKS DEM",
+          "contest": "house9",
+          "candidate": "Jack Brooks"
+        },
+        {
+          "label": "MAHAN REP",
+          "contest": "house9",
+          "candidate": "Jim Mahan"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.307,
+        0.768,
+        0.494
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 9'; ignore any other table visible in the image."
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PICKLE DEM",
+          "contest": "house10",
+          "candidate": "J.J. \"Jake\" Pickle"
+        },
+        {
+          "label": "WILSON W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.302,
+        0.779,
+        0.549
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 10'; ignore any other table visible in the image."
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LEATH DEM",
+          "contest": "house11",
+          "candidate": "Marvin Leath"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.301,
+        0.775,
+        0.765
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 11'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0841
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HIGHTOWER DEM",
+          "contest": "house13",
+          "candidate": "Jack Hightower"
+        },
+        {
+          "label": "BUTLER REP",
+          "contest": "house13",
+          "candidate": "Beau Boulter"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.084,
+        0.296,
+        0.778,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 13'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0554
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HIGHTJ0ER DEM",
+          "contest": "house13",
+          "candidate": "Jack Hightower"
+        },
+        {
+          "label": "BOULTER REP",
+          "contest": "house13",
+          "candidate": "Beau Boulter"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.293,
+        0.78,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 13'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0594
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "HIGHTOWER DEM",
+          "contest": "house13",
+          "candidate": "Jack Hightower"
+        },
+        {
+          "label": "BUTLER REP",
+          "contest": "house13",
+          "candidate": "Beau Boulter"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.309,
+        0.78,
+        0.532
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 13'; ignore any other table visible in the image."
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "PATMAN DEM",
+          "contest": "house14",
+          "candidate": "Bill Patman"
+        },
+        {
+          "label": "SWEENEY REP",
+          "contest": "house14",
+          "candidate": "Mac Sweeney"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.078,
+        0.312,
+        0.779,
+        0.558
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 14'; ignore any other table visible in the image."
+    },
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PATMAN DEM",
+          "contest": "house14",
+          "candidate": "Bill Patman"
+        },
+        {
+          "label": "SWEENEY REP",
+          "contest": "house14",
+          "candidate": "Mac Sweeney"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.291,
+        0.781,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 14'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0691
+      ]
+    },
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "DE LA GARZA DEM",
+          "contest": "house15",
+          "candidate": "E. (Kika) de la Garza"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.083,
+        0.29,
+        0.782,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 15'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0549
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "DE LA GARZA DEM",
+          "contest": "house15",
+          "candidate": "E. (Kika) de la Garza"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.286,
+        0.793,
+        0.389
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 15'; ignore any other table visible in the image."
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "COLEMAN DEM",
+          "contest": "house16",
+          "candidate": "Ronald Coleman"
+        },
+        {
+          "label": "HAMMOND REP",
+          "contest": "house16",
+          "candidate": "Jack. Hammond"
+        },
+        {
+          "label": "TOTAL VOTES",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.277,
+        0.782,
+        0.589
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 16'; ignore any other table visible in the image."
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "STENHOLM DEM",
+          "contest": "house17",
+          "candidate": "Charles W. Stenholm"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.285,
+        0.789,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 17'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0559
+      ]
+    },
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "STENHOLM DEM",
+          "contest": "house17",
+          "candidate": "Charles W. Stenholm"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.081,
+        0.285,
+        0.789,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 17'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0559
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "STENHOLM DEM",
+          "contest": "house17",
+          "candidate": "Charles W. Stenholm"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.268,
+        0.774,
+        0.437
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 17'; ignore any other table visible in the image."
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "RICHARDS DEM",
+          "contest": "house19",
+          "candidate": "Don R. Richards"
+        },
+        {
+          "label": "COMBEST REP",
+          "contest": "house19",
+          "candidate": "Larry Combest"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.264,
+        0.785,
+        0.808
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 19'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0993
+      ]
+    },
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SULLIVAN DEM",
+          "contest": "house21",
+          "candidate": "Joe Sullivan"
+        },
+        {
+          "label": "LOEFFLER REP",
+          "contest": "house21",
+          "candidate": "Tom Loeffler"
+        },
+        {
+          "label": "SWILLING W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CAMPBELL W-T",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.267,
+        0.792,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. Representative District 21'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0628
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SULLIVAN DEM",
+          "contest": "house21",
+          "candidate": "Joe Sullivan"
+        },
+        {
+          "label": "LEFFLER RED",
+          "contest": "house21",
+          "candidate": "Tom Loeffler"
+        },
+        {
+          "label": "SPILLING W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CAMPBELL W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.103,
+        0.283,
+        0.801,
+        0.657
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 21'; ignore any other table visible in the image."
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "WILLIAMS DEM",
+          "contest": "house22",
+          "candidate": "Doug Williams"
+        },
+        {
+          "label": "DELAY REP",
+          "contest": "house22",
+          "candidate": "Tom DeLay"
+        },
+        {
+          "label": "EDWARDS W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.086,
+        0.308,
+        0.793,
+        0.48
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 22'; ignore any other table visible in the image."
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "BUSTAMANTE DEM",
+          "contest": "house23",
+          "candidate": "Albert G. Bustamante"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.073,
+        0.263,
+        0.775,
+        0.616
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 23'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WONDERSPIFF DEM",
+          "contest": "house26",
+          "candidate": "Tom Vandergriff"
+        },
+        {
+          "label": "ARMEY REP",
+          "contest": "house26",
+          "candidate": "Richard (Dick) Armey"
+        },
+        {
+          "label": "KENDALL I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.266,
+        0.799,
+        0.492
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 26'; ignore any other table visible in the image."
+    },
+    {
+      "page": 46,
+      "id": "46-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DOTIZ DEM",
+          "contest": "house27",
+          "candidate": "Solomon P. Ortiz"
+        },
+        {
+          "label": "MOORE REP",
+          "contest": "house27",
+          "candidate": "Richard Moore"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.08,
+        0.273,
+        0.801,
+        0.497
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 27'; ignore any other table visible in the image."
+    },
+    {
+      "page": 47,
+      "id": "47-0",
+      "columns": [
+        {
+          "label": "HALL DFM",
+          "contest": "house1",
+          "candidate": "Sam B. Hall Jr."
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.276,
+        0.804,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 1'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0525
+      ]
+    },
+    {
+      "page": 48,
+      "id": "48-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HALL DEM",
+          "contest": "house1",
+          "candidate": "Sam B. Hall Jr."
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.274,
+        0.781,
+        0.473
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 1'; ignore any other table visible in the image."
+    },
+    {
+      "page": 49,
+      "id": "49-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILSON DEM",
+          "contest": "house2",
+          "candidate": "Charles Wilson"
+        },
+        {
+          "label": "DUGAS REP",
+          "contest": "house2",
+          "candidate": "Louis Dugas Jr."
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.26,
+        0.778,
+        1.0
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 2'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0662
+      ]
+    },
+    {
+      "page": 50,
+      "id": "50-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILSON DEM",
+          "contest": "house2",
+          "candidate": "Charles Wilson"
+        },
+        {
+          "label": "DUGAS REP",
+          "contest": "house2",
+          "candidate": "Louis Dugas Jr."
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.059,
+        0.255,
+        0.771,
+        0.333
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 2'; ignore any other table visible in the image."
+    },
+    {
+      "page": 51,
+      "id": "51-0",
+      "columns": [
+        {
+          "label": "WESTBROOK DEM",
+          "contest": "house3",
+          "candidate": "Jim Westbrook"
+        },
+        {
+          "label": "BARTLETT REP",
+          "contest": "house3",
+          "candidate": "Steve Bartlett"
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.248,
+        0.778,
+        0.389
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 3'; ignore any other table visible in the image."
+    },
+    {
+      "page": 52,
+      "id": "52-0",
+      "columns": [
+        {
+          "label": "TOTAL PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HALL DEM",
+          "contest": "house4",
+          "candidate": "Ralph M. Hall"
+        },
+        {
+          "label": "BLUM REP",
+          "contest": "house4",
+          "candidate": "Thomas Blow"
+        },
+        {
+          "label": "BECKER W-I",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTE",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.25,
+        0.773,
+        0.655
+      ],
+      "hint": "Read only the table headed 'U.S. REPRESENTATIVE DISTRICT 4'; ignore any other table visible in the image."
+    }
+  ]
+}
