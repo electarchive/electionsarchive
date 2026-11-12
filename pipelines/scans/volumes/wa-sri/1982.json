@@ -1,0 +1,23 @@
+{
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "County-by-County Abstract of the 1982 State General Election",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706913_0403/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/micro_IA40706913_0403"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "United States Senator",
+    "house": "Representative in Congress, one table per congressional district, county rows"
+  },
+  "leaves": [
+    3,
+    4,
+    5,
+    6
+  ]
+}

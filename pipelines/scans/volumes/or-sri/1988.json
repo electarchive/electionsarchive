@@ -1,0 +1,22 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-OR",
+  "publisher": "Oregon Secretary of State",
+  "title": "Official Abstract of Votes, General Election, November 8, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706932_0395/micro_IA40706932_0395.pdf",
+    "item": "https://archive.org/details/micro_IA40706932_0395"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President), county rows; write-in tables on later pages are not read",
+    "house": "Representative in Congress, one table per congressional district, county rows"
+  },
+  "leaves": [
+    13,
+    16,
+    17
+  ]
+}

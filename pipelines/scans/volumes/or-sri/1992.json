@@ -1,0 +1,21 @@
+{
+  "year": 1992,
+  "day": "1992-11-03",
+  "polity": "US-OR",
+  "publisher": "Oregon Secretary of State",
+  "title": "Official Votes, General Election, November 3, 1992",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706946_0173/micro_IA40706946_0173.pdf",
+    "item": "https://archive.org/details/micro_IA40706946_0173"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President), county rows; write-in tables on later pages are not read",
+    "senate": "United States Senator"
+  },
+  "leaves": [
+    14,
+    17
+  ]
+}

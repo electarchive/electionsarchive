@@ -754,11 +754,12 @@ def emit(source: ModuleType) -> Path:
         contests: dict[str, UUID] = dict(
             conn.execute(
                 """select value, entity_id from external_id where scheme = 'us.contest'
-                   and (value like %s or value like %s or value like %s)""",
+                   and (value like %s or value like %s or value like %s or value like %s)""",
                 [
                     f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%",
                     f"%:{source.STATE or ''}:senate",
                     f"%:{source.STATE or ''}%:president",
+                    f"%:{source.STATE or ''}:governor",
                 ],
             ).fetchall()
         )

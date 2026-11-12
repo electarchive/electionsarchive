@@ -1,0 +1,22 @@
+{
+  "year": 1990,
+  "day": "1990-11-06",
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Returns, General Election, November 6, 1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706939_0420/micro_IA40706939_0420.pdf",
+    "item": "https://archive.org/details/micro_IA40706939_0420"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "house": "Representative in Congress, one table per congressional district, county rows"
+  },
+  "leaves": [
+    12,
+    13,
+    14,
+    15
+  ]
+}

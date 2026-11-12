@@ -1,0 +1,26 @@
+{
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Abstract of the Results of the November 6, 1984 General Election",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706920_0022/micro_IA40706920_0022.pdf",
+    "item": "https://archive.org/details/micro_IA40706920_0022"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President), county rows; write-in tables on later pages are not read",
+    "house": "Representative in Congress, one table per congressional district, county rows",
+    "governor": "Governor"
+  },
+  "leaves": [
+    35,
+    36,
+    37,
+    38,
+    39,
+    40
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "year": 1988,
+  "day": "1988-11-08",
+  "polity": "US-WA",
+  "publisher": "Washington Secretary of State",
+  "title": "Official Returns, State General Election, November 8, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706933_0132/micro_IA40706933_0132.pdf",
+    "item": "https://archive.org/details/micro_IA40706933_0132"
+  },
+  "raw_source": "us.sri",
+  "offices": {
+    "president": "presidential electors (President and Vice President), county rows; write-in tables on later pages are not read",
+    "senate": "United States Senator",
+    "house": "Representative in Congress, one table per congressional district, county rows",
+    "governor": "Governor"
+  },
+  "leaves": [
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ]
+}
