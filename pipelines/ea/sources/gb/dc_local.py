@@ -41,6 +41,7 @@ BY = PARSED / "by"
 RESULTS = "https://candidates.democracyclub.org.uk/media/csv-archives/results-{day}.csv"
 ARCHIVED = {2018, 2019, 2023}
 SAMPLED = {2026}
+DIVISIONS = {2018, 2019, 2023, 2024, 2025}
 TACIT = {2018, 2019}
 BALLOT = "https://candidates.democracyclub.org.uk/api/next/ballots/{ballot}/"
 CROSS_CHECKS: set[int] = set()
@@ -603,6 +604,47 @@ def locate_divisions(found: pl.DataFrame, divisions: pl.DataFrame) -> pl.DataFra
     ).drop("council", "key", "county", "match", "ced_name", "ced_county")
 
 
+def held_divisions() -> pl.DataFrame:
+    with connect() as conn:
+        rows = conn.execute(
+            """select ac.code, pc.code, pn.text, n.text
+               from area_code ac join area a on a.id = ac.area_id and a.scheme_code = 'gb.ward'
+               join area_parent ap on ap.area_id = a.id join area_code pc on pc.area_id = ap.parent_id
+               join name pn on pn.entity_id = ap.parent_id and pn.is_preferred and pn.lang = 'en'
+               join name n on n.entity_id = a.id and n.is_preferred and n.lang = 'en'
+               where ac.code like 'E58%%' and pc.code like 'E10%%'"""
+        ).fetchall()
+    frame = pl.DataFrame(
+        rows, schema={"code": pl.String, "county": pl.String, "county_name": pl.String, "name": pl.String}, orient="row"
+    )
+    if frame["code"].is_duplicated().any():
+        raise ValueError("a held county division has two parents")
+    return frame
+
+
+def place_divisions(found: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
+    found = found.join(
+        held.select(ward_code="code", county="county", county_name="county_name", division_name="name"),
+        on="ward_code",
+        how="left",
+        maintain_order="left",
+    )
+    placed = (
+        pl.col("la_code").is_null()
+        & pl.col("county").is_not_null()
+        & (
+            pl.col("ballot").str.split(".").list.get(1)
+            == pl.col("county_name").map_elements(slug, return_dtype=pl.String)
+        )
+    )
+    return found.with_columns(
+        la_code=pl.when(placed).then("county").otherwise("la_code"),
+        la_name=pl.when(placed).then("county_name").otherwise("la_name"),
+        ons_name=pl.when(placed).then("division_name").otherwise("ons_name"),
+        shape=pl.when(placed).then(None).otherwise("shape"),
+    ).drop("county", "county_name", "division_name")
+
+
 def statuses(council_file: pl.Expr) -> pl.Expr:
     press = pl.col("source").str.to_lowercase().str.contains("|".join(PRESS).replace(".", r"\."))
     return (
@@ -768,6 +810,7 @@ def parse() -> None:
     wards, candidates = [], []
     lookup = lookup_frame()
     ced = divisions()
+    held = held_divisions()
     for year in DAYS:
         records = []
         for url in ballot_pages(year):
@@ -820,8 +863,7 @@ def parse() -> None:
             .drop("leeds")
             .with_columns(coded=pl.col("gss").str.starts_with("gss:"), shape=pl.lit(f"wd{year % 100}"))
         )
-        if year == 2026:
-            found = locate_divisions(found, ced)
+        found = locate_divisions(found, ced) if year == 2026 else place_divisions(found, held)
         found = found.with_columns(
             status=statuses(pl.col("ballot").str.starts_with("local.croydon.") & pl.lit(year in CROYDON))
         )
@@ -861,6 +903,7 @@ def parse() -> None:
                     shape=pl.lit(f"wd{year % 100}"),
                 )
                 .join(lookup.filter(pl.col("year") == year).drop("year"), on="ward_code", how="left")
+                .pipe(place_divisions, held)
                 .with_columns(
                     status=pl.when(pl.col("coded").not_())
                     .then(pl.lit("no GSS code"))
@@ -1035,7 +1078,8 @@ def shapes_for(needed: dict[str, set[str]]) -> pl.DataFrame:
 def emit() -> Path:
     by_mode = "DC_BY" in os.environ
     years = by_years() if by_mode else []
-    days = {} if by_mode else {year: day for year, day in DAYS.items() if year in SAMPLED | CROSS_CHECKS}
+    full = set() if by_mode else SAMPLED | CROSS_CHECKS
+    days = {} if by_mode else {year: day for year, day in DAYS.items() if year in full | DIVISIONS}
     if by_mode:
         wards = pl.concat(
             [pl.read_parquet(BY / f"{year}-wards.parquet") for year in years], how="diagonal_relaxed"
@@ -1047,7 +1091,10 @@ def emit() -> Path:
     else:
         wards = (
             pl.read_parquet(PARSED / "wards.parquet")
-            .filter(pl.col("year").is_in(list(days)))
+            .filter(
+                pl.col("year").is_in(list(full))
+                | pl.col("year").is_in(list(days)) & pl.col("la_code").str.starts_with("E10").fill_null(False)
+            )
             .with_columns(
                 day=pl.col("year").replace_strict(days, return_dtype=pl.Date),
                 la_layer=pl.when(pl.col("la_code").str.starts_with("E10"))
@@ -1078,6 +1125,25 @@ def emit() -> Path:
                 pl.when("by").then(pl.lit(":by")).otherwise(pl.lit("")),
             ).is_in(published)
         )
+        held = {
+            value
+            for (value,) in conn.execute(
+                "select x.value from external_id x join changeset c on c.id = x.changeset_id "
+                "where x.scheme = 'gb.contest' and c.pipeline <> %s",
+                [SOURCE],
+            ).fetchall()
+        }
+        wards = wards.filter(
+            pl.col("year").is_in(list(full))
+            | pl.format(
+                "{}:local:{}{}",
+                pl.col("day").cast(pl.String),
+                "ward_code",
+                pl.when("by").then(pl.lit(":by")).otherwise(pl.lit("")),
+            )
+            .is_in(held)
+            .not_()
+        )
         defaults: dict[int, int] = {}
         handbook = {
             contest
@@ -1093,8 +1159,10 @@ def emit() -> Path:
             summary=f"English and Welsh council by-elections {', '.join(map(str, years))} off the May polling day, "
             "by ward, compiled by Democracy Club from the councils' declarations, with ONS ward and council shapes"
             if by_mode
-            else f"English and Welsh council elections {', '.join(map(str, days))} by ward and county division, "
-            "compiled by Democracy Club from the councils' declarations, with ONS ward, division, and council shapes",
+            else f"English and Welsh council elections {', '.join(map(str, sorted(full)))} by ward and county "
+            f"division, and county council by-elections held with the May polls of "
+            f"{', '.join(map(str, sorted(days.keys() - full)))}, compiled by Democracy Club from the councils' "
+            "declarations, with ONS ward, division, and council shapes",
             polity="GB",
         )
 
@@ -1116,10 +1184,19 @@ def emit() -> Path:
             known[leh.fold(text)] = id
         party_ids: dict[str, UUID | None] = {"Independent": None}
 
+        foreign = {
+            id
+            for (id,) in conn.execute(
+                "select s.id from source s join changeset c on c.id = s.changeset_id where c.pipeline <> %s",
+                [SOURCE],
+            ).fetchall()
+        }
         sources: dict[int, UUID] = {}
         for year, day in days.items():
             title = f"Candidate results, {day}"
             sources[year] = cs.source(DC, title)
+            if sources[year] in foreign:
+                continue
             cs.add(
                 "source",
                 id=sources[year],
@@ -1180,6 +1257,8 @@ def emit() -> Path:
                     cs.artifact(raw.cached(SOURCE, url), tacit_sources[year])
         leeds_sources: dict[tuple[str, int], UUID] = {}
         for year, day in days.items():
+            if year not in full:
+                continue
             if year in LEEDS:
                 title = f"Local election results, {day}"
                 leeds_sources[(LEEDS_CODE, year)] = cs.source("Leeds City Council", title)
@@ -1213,19 +1292,12 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, CROYDON[year]), leeds_sources[(CROYDON_CODE, year)])
         council_rows: dict[tuple[str, int, str], list[dict[str, object]]] = {}
         for row in (
-            pl.read_parquet(PARSED / "leeds.parquet").filter(pl.col("year").is_in(list(days))).iter_rows(named=True)
+            pl.read_parquet(PARSED / "leeds.parquet").filter(pl.col("year").is_in(list(full))).iter_rows(named=True)
         ):
             council_rows.setdefault((row["council"], row["year"], row["ward"]), []).append(row)
         used: set[tuple[str, int, str]] = set()
         ons: dict[str, UUID] = {}
         layers = {*wards["shape"].drop_nulls(), *wards["la_layer"].drop_nulls()}
-        foreign = {
-            id
-            for (id,) in conn.execute(
-                "select s.id from source s join changeset c on c.id = s.changeset_id where c.pipeline <> %s",
-                [SOURCE],
-            ).fetchall()
-        }
         for key, (service, _, _, _, title) in LAYERS.items():
             if key not in layers:
                 continue
@@ -1361,7 +1433,7 @@ def emit() -> Path:
                         geometry.setdefault(area, (ward["la_layer"], code, day))
                 area, polity, body, path, council_name = councils[code]
                 election = cs.key("gb.election", f"{day}:local:{code}")
-                if election not in elections and (year in days or election not in elsewhere):
+                if election not in elections and (year in full or election not in elsewhere):
                     elections.add(election)
                     cs.add(
                         "election",
@@ -1657,6 +1729,8 @@ def emit() -> Path:
         )
         for scheme in ("gb.ward", "gb.lad"):
             for year, day in sorted(days.items()):
+                if year not in full:
+                    continue
                 end = next((start for start in starts if start > day), None)
                 cs.add(
                     "boundary_set",
@@ -1667,6 +1741,6 @@ def emit() -> Path:
                     valid_to=end,
                     as_of=day,
                 )
-        if 2019 in days and defaults.get(2019) != 5044:
+        if 2019 in full and defaults.get(2019) != 5044:
             raise ValueError(f"{defaults.get(2019)} default result sets for 2019, not 5,044")
         return cs.write()
