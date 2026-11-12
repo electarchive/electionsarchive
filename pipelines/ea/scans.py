@@ -675,6 +675,21 @@ def cells(
             header, rows = table["header"], table["rows"]
             if not header and not rows:
                 continue
+            if not header and rows:
+                width = len(rows[0]["values"])
+                header = next(
+                    (
+                        sibling["header"]
+                        for other in plan.values()
+                        if other.section == number
+                        for found in {other.key} | {key(role, PROMPT, other.digest) for role in ORDER[:2]}
+                        if reader != "third"
+                        and found != request.key
+                        and not isinstance(sibling := parse(cached(found)), str)
+                        and len(sibling["header"]) == width
+                    ),
+                    header,
+                )
             labels = [index for index, entry in enumerate(header) if LABEL.match(slug(entry["label"]))]
             if labels:
                 rows = [
