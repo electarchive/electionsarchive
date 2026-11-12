@@ -593,7 +593,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 81634	141399	06	EVREN	2009	ÇATALPINAR KÖYÜ	köy	2014	ÇATALPINAR MAH.	mahalle	ilce	
 81636	141401	06	EVREN	2009	İBRAHİMBEYLİ KÖYÜ	köy	2014	İBRAHİMBEYLİ MAH.	mahalle	ilce	
 81637	141402	06	EVREN	2009	İNEBEYLİ KÖYÜ	köy	2014	İNEBEYLİ MAH.	mahalle	ilce	
-81396	140604	06	GÖLBAŞI/ANKARA	2009	AKÖRENÇARŞAK KÖYÜ	köy	2014	AKÖRENÇARŞAK MAH.	mahalle	province	
+81396	140604	06	GÖLBAŞI/ANKARA	2009	AKÖRENÇARŞAK KÖYÜ	köy	2014	AKÖRENÇARŞAK MAH.	mahalle	province	6360 art. 1(3)
 118884	140605	06	GÖLBAŞI/ANKARA	2009	ALTUNÇANAK KÖYÜ	köy	2014	ALTUNÇANAK MAH.	mahalle	ilce	
 81068	140600	06	GÖLBAŞI/ANKARA	2009	EMİRLER KÖYÜ	köy	2014	EMİRLER MAH.	mahalle	ilce	
 81069	140601	06	GÖLBAŞI/ANKARA	2009	GÖLBEK KÖYÜ	köy	2014	GÖLBEK MAH.	mahalle	ilce	
@@ -729,7 +729,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 81799	141781	06	KAZAN	2009	GÜVENÇ KÖYÜ	köy	2014	GÜVENÇ MAH.	mahalle	ilce	
 81802	141784	06	KAZAN	2009	KILIÇLAR KÖYÜ	köy	2014	KILIÇLAR MAH.	mahalle	ilce	
 81803	141785	06	KAZAN	2009	KINIK KÖYÜ	köy	2014	KINIK MAH.	mahalle	ilce	
-120713	141795	06	KAZAN	2009	SARAÇ KÖYÜ	köy	2014	SARAÇ MAH.	mahalle	province	
+120713	141795	06	KAZAN	2009	SARAÇ KÖYÜ	köy	2014	SARAÇ MAH.	mahalle	province	6360 art. 1(3)
 81805	141787	06	KAZAN	2009	SARIAYAK KÖYÜ	köy	2014	SARIAYAK MAH.	mahalle	ilce	
 81806	141788	06	KAZAN	2009	SOĞUCAK KÖYÜ	köy	2014	SOĞUCAK MAH.	mahalle	ilce	
 81810	141792	06	KAZAN	2009	TEKKE KÖYÜ	köy	2014	TEKKE MAH.	mahalle	ilce	
@@ -1163,7 +1163,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 75287	138000	07	AKSEKİ	2009	ÇUKURKÖY	köy	2014	ÇUKURKÖY MAH.	mahalle	ilce	
 82130	137659	07	AKSEKİ	2009	ÇİMİKÖY	köy	2014	ÇİMİKÖY MAH.	mahalle	ilce	
 82058	136673	07	AKSU	2009	ALAYLI KÖYÜ	köy	2014	ALAYLI MAH.	mahalle	ilce	
-82059	136674	07	AKSU	2009	FETTAHLI KÖYÜ	köy	2014	FETTAHLI MAH.	mahalle	province	
+82059	136674	07	AKSU	2009	FETTAHLI KÖYÜ	köy	2014	FETTAHLI MAH.	mahalle	province	6360 art. 1(3)
 82074	136683	07	AKSU	2009	GÖKDERE KÖYÜ	köy	2014	GÖKDERE MAH.	mahalle	ilce	
 82060	136675	07	AKSU	2009	GÜLOLUK KÖYÜ	köy	2014	GÜLOLUK MAH.	mahalle	ilce	
 82062	136677	07	AKSU	2009	KARAÇALLI KÖYÜ	köy	2014	KARAÇALLI MAH.	mahalle	ilce	
@@ -1801,7 +1801,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 83251	130299	09	KARACASU	2009	TEPECİK KÖYÜ	köy	2014	TEPECİK MAH.	mahalle	ilce	
 83252	130300	09	KARACASU	2009	YAYKIN KÖYÜ	köy	2014	YAYKIN MAH.	mahalle	ilce	
 83253	130301	09	KARACASU	2009	YAZIR KÖYÜ	köy	2014	YAZIR MAH.	mahalle	ilce	
-83064	130279	09	KARACASU	2009	YENİCE KÖYÜ	köy	2014	YENİCE MAH.	mahalle	province	
+83064	130279	09	KARACASU	2009	YENİCE KÖYÜ	köy	2014	YENİCE MAH.	mahalle	province	6360 art. 1(3)
 83254	130302	09	KARACASU	2009	YENİKÖY	köy	2014	YENİKÖY MAH.	mahalle	ilce	
 83248	130296	09	KARACASU	2009	YEŞİLKÖY	köy	2014	YEŞİLKÖY MAH.	mahalle	ilce	
 83255	130303	09	KARACASU	2009	YEŞİLYURT KÖYÜ	köy	2014	YEŞİLYURT MAH.	mahalle	ilce	
@@ -2130,7 +2130,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 83595	127906	10	ALTIEYLÜL	2009	AKÇAKÖY	köy	2014	AKÇAKÖY MAH.	mahalle	province	6360 annex list
 74224	127908	10	ALTIEYLÜL	2009	ALİAĞA KÖYÜ	köy	2014	ALİAĞA MAH.	mahalle	province	6360 annex list
 83597	127909	10	ALTIEYLÜL	2009	ASLIHAN KÖYÜ	köy	2014	ASLIHAN MAH.	mahalle	province	6360 annex list
-83598	127910	10	ALTIEYLÜL	2009	ASLIHANTEPECİĞİ KÖYÜ	köy	2014	ASLIHANTEPECİĞİ MAH.	mahalle	province	
+83598	127910	10	ALTIEYLÜL	2009	ASLIHANTEPECİĞİ KÖYÜ	köy	2014	ASLIHANTEPECİĞİ MAH.	mahalle	province	6360 art. 1(3)
 77173	127911	10	ALTIEYLÜL	2009	ATAKÖY	köy	2014	ATAKÖY MAH.	mahalle	province	6360 annex list
 83599	127912	10	ALTIEYLÜL	2009	ATKÖY	köy	2014	ATKÖY MAH.	mahalle	province	6360 annex list
 83600	127913	10	ALTIEYLÜL	2009	AYNAOĞLU KÖYÜ	köy	2014	AYNAOĞLU MAH.	mahalle	province	6360 annex list
@@ -2144,7 +2144,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 77176	127922	10	ALTIEYLÜL	2009	BEREKETLİ KÖYÜ	köy	2014	BEREKETLİ MAH.	mahalle	province	6360 annex list
 74227	127923	10	ALTIEYLÜL	2009	BEŞPINAR KÖYÜ	köy	2014	BEŞPINAR MAH.	mahalle	province	6360 annex list
 77178	127924	10	ALTIEYLÜL	2009	BOZEN KÖYÜ	köy	2014	BOZEN MAH.	mahalle	province	6360 annex list
-77177	127925	10	ALTIEYLÜL	2009	BOĞATEPE KÖYÜ	köy	2014	BOĞATEPE MAH.	mahalle	province	
+77177	127925	10	ALTIEYLÜL	2009	BOĞATEPE KÖYÜ	köy	2014	BOĞATEPE MAH.	mahalle	province	6360 art. 1(3)
 83606	127926	10	ALTIEYLÜL	2009	BÜYÜKBOSTANCI KÖYÜ	köy	2014	BÜYÜKBOSTANCI MAH.	mahalle	province	6360 annex list
 83607	127927	10	ALTIEYLÜL	2009	CİNGE KÖYÜ	köy	2014	CİNGE MAH.	mahalle	province	6360 annex list
 74230	127928	10	ALTIEYLÜL	2009	DALLIMANDIRA KÖYÜ	köy	2014	DALLIMANDIRA MAH.	mahalle	province	6360 annex list
@@ -2159,7 +2159,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 83618	127944	10	ALTIEYLÜL	2009	KABAKLI KÖYÜ	köy	2014	KABAKLI MAH.	mahalle	province	6360 annex list
 74233	127946	10	ALTIEYLÜL	2009	KARAKAVAK KÖYÜ	köy	2014	KARAKAVAK MAH.	mahalle	province	6360 annex list
 122988	127947	10	ALTIEYLÜL	2009	KARAKAYA KÖYÜ	köy	2014	KARAKAYA MAH.	mahalle	province	6360 annex list
-83620	127948	10	ALTIEYLÜL	2009	KARAMAN KÖYÜ	köy	2014	KARAMAN MAH.	mahalle	province	
+83620	127948	10	ALTIEYLÜL	2009	KARAMAN KÖYÜ	köy	2014	KARAMAN MAH.	mahalle	province	6360 art. 1(3)
 74234	127949	10	ALTIEYLÜL	2009	KARAMANLAR KÖYÜ	köy	2014	KARAMANLAR MAH.	mahalle	province	6360 annex list
 77185	127951	10	ALTIEYLÜL	2009	KILCILAR KÖYÜ	köy	2014	KILCILAR MAH.	mahalle	province	6360 annex list
 77188	127953	10	ALTIEYLÜL	2009	KOZDEREGÜVEM KÖYÜ	köy	2014	KOZDEREGÜVEM MAH.	mahalle	province	6360 annex list
@@ -2196,7 +2196,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 83609	127991	10	ALTIEYLÜL	2009	ÇAYIRHİSAR KÖYÜ	köy	2014	ÇAYIRHİSAR MAH.	mahalle	province	6360 annex list
 77180	127992	10	ALTIEYLÜL	2009	ÇINARLIDERE KÖYÜ	köy	2014	ÇINARLIDERE MAH.	mahalle	province	6360 annex list
 74229	127993	10	ALTIEYLÜL	2009	ÇUKURHÜSEYİN KÖYÜ	köy	2014	ÇUKURHÜSEYİN MAH.	mahalle	province	6360 annex list
-83611	127994	10	ALTIEYLÜL	2009	ÇİFTLİKKÖY	köy	2014	ÇİFTLİKKÖY MAH.	mahalle	province	
+83611	127994	10	ALTIEYLÜL	2009	ÇİFTLİKKÖY	köy	2014	ÇİFTLİKKÖY MAH.	mahalle	province	6360 art. 1(3)
 77181	127995	10	ALTIEYLÜL	2009	ÇİFTÇİDERE KÖYÜ	köy	2014	ÇİFTÇİDERE MAH.	mahalle	province	6360 annex list
 83616	127997	10	ALTIEYLÜL	2009	İNKAYA KÖYÜ	köy	2014	İNKAYA MAH.	mahalle	province	6360 annex list
 71867	131187	10	AYVALIK	2009	AKÇAPINAR KÖYÜ	köy	2014	AKÇAPINAR MAH.	mahalle	ilce	
@@ -2645,7 +2645,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 124619	127847	10	KARESİ	2009	BOĞAZKÖY	köy	2014	BOĞAZKÖY MAH.	mahalle	province	6360 annex list
 124620	127848	10	KARESİ	2009	BÜYÜKPINAR KÖYÜ	köy	2014	BÜYÜKPINAR MAH.	mahalle	province	6360 annex list
 122985	127849	10	KARESİ	2009	DAVUTLAR KÖYÜ	köy	2014	DAVUTLAR MAH.	mahalle	province	6360 annex list
-83612	127850	10	KARESİ	2009	DELİKLİTAŞ KÖYÜ	köy	2014	DELİKLİTAŞ MAH.	mahalle	province	
+83612	127850	10	KARESİ	2009	DELİKLİTAŞ KÖYÜ	köy	2014	DELİKLİTAŞ MAH.	mahalle	province	6360 art. 1(3)
 124621	127852	10	KARESİ	2009	DÜZOBA KÖYÜ	köy	2014	DÜZOBA MAH.	mahalle	province	6360 annex list
 124622	127855	10	KARESİ	2009	FETHİYE KÖYÜ	köy	2014	FETHİYE MAH.	mahalle	province	6360 annex list
 124623	127857	10	KARESİ	2009	HALKAPINAR KÖYÜ	köy	2014	HALKAPINAR MAH.	mahalle	province	6360 annex list
@@ -3982,7 +3982,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 88994	131069	20	ÇİVRİL	2009	İNCEKÖY	köy	2014	İNCEKÖY MAH.	mahalle	ilce	
 75156	131098	20	ÇİVRİL	2009	İSHAKLI KÖYÜ	köy	2014	İSHAKLI MAH.	mahalle	ilce	
 89020	131088	20	ÇİVRİL	2009	ŞENKÖY	köy	2014	ŞENKÖY MAH.	mahalle	ilce	
-77833	144010	21	BAĞLAR	2009	BUYURANSU KÖYÜ	köy	2014	BUYURANSU MAH.	mahalle	province	
+77833	144010	21	BAĞLAR	2009	BUYURANSU KÖYÜ	köy	2014	BUYURANSU MAH.	mahalle	province	6360 art. 1(3)
 119984	144011	21	BAĞLAR	2009	EKİNCE KÖYÜ	köy	2014	EKİNCE MAH.	mahalle	ilce	
 89293	144007	21	BAĞLAR	2009	KAMIŞPINAR KÖYÜ	köy	2014	KAMIŞPINAR MAH.	mahalle	ilce	
 89283	143994	21	BAĞLAR	2009	KARAHANKÖY	köy	2014	KARAHANKÖY MAH.	mahalle	ilce	
@@ -4304,7 +4304,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 89734	143102	21	KOCAKÖY	2009	BOZBAĞLAR KÖYÜ	köy	2014	BOZBAĞLAR MAH.	mahalle	ilce	
 89735	143103	21	KOCAKÖY	2009	BOZYER KÖYÜ	köy	2014	BOZYER MAH.	mahalle	ilce	
 118879	143110	21	KOCAKÖY	2009	GÖKÇEN KÖYÜ	köy	2014	GÖKÇEN MAH.	mahalle	ilce	
-89704	143096	21	KOCAKÖY	2009	GÖZEBAŞI KÖYÜ	köy	2014	GÖZEBAŞI MAH.	mahalle	province	
+89704	143096	21	KOCAKÖY	2009	GÖZEBAŞI KÖYÜ	köy	2014	GÖZEBAŞI MAH.	mahalle	province	6360 art. 1(3)
 89737	143105	21	KOCAKÖY	2009	GÜNALAN KÖYÜ	köy	2014	GÜNALAN MAH.	mahalle	ilce	
 89738	143106	21	KOCAKÖY	2009	SUÇIKTI KÖYÜ	köy	2014	SUÇIKTI MAH.	mahalle	ilce	
 89740	143108	21	KOCAKÖY	2009	TEPECİK KÖYÜ	köy	2014	TEPECİK MAH.	mahalle	ilce	
@@ -5277,9 +5277,9 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 91536	143350	25	OLUR	2009	ÇATAKSU KÖYÜ	köy	2014	ÇATAKSU MAH.	mahalle	ilce	
 91559	143477	25	OLUR	2009	ÜRÜNLÜ KÖYÜ	köy	2014	ÜRÜNLÜ MAH.	mahalle	ilce	
 91555	143471	25	OLUR	2009	ŞALPAZARI KÖYÜ	köy	2014	ŞALPAZARI MAH.	mahalle	ilce	
-90973	144085	25	PALANDÖKEN	2009	DEREBOĞAZI KÖYÜ	köy	2014	DEREBOĞAZI MAH.	mahalle	province	
+90973	144085	25	PALANDÖKEN	2009	DEREBOĞAZI KÖYÜ	köy	2014	DEREBOĞAZI MAH.	mahalle	province	6360 art. 1(3)
 90974	144086	25	PALANDÖKEN	2009	GÜZELYURT KÖYÜ	köy	2014	GÜZELYURT MAH.	mahalle	ilce	
-90975	144087	25	PALANDÖKEN	2009	YUKARIYENİCE KÖYÜ	köy	2014	YUKARIYENİCE MAH.	mahalle	province	
+90975	144087	25	PALANDÖKEN	2009	YUKARIYENİCE KÖYÜ	köy	2014	YUKARIYENİCE MAH.	mahalle	province	6360 art. 1(3)
 91581	143491	25	PASİNLER	2009	ACI KÖYÜ	köy	2014	ACI MAH.	mahalle	ilce	
 91583	143495	25	PASİNLER	2009	ALTINBAŞAK KÖYÜ	köy	2014	ALTINBAŞAK MAH.	mahalle	ilce	
 91586	143496	25	PASİNLER	2009	ARDIÇLI KÖYÜ	köy	2014	ARDIÇLI MAH.	mahalle	ilce	
@@ -5839,7 +5839,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 91832	144701	26	ODUNPAZARI	2009	KANLIPINAR KÖYÜ	köy	2014	KANLIPINAR MAH.	mahalle	ilce	
 91833	144702	26	ODUNPAZARI	2009	KARAALAN KÖYÜ	köy	2014	KARAALAN MAH.	mahalle	ilce	
 91834	144703	26	ODUNPAZARI	2009	KARACAŞEHİR KÖYÜ	köy	2014	KARACAŞEHİR MAH.	mahalle	ilce	
-91838	144705	26	ODUNPAZARI	2009	KARAHÜYÜK KÖYÜ	köy	2014	KARAHÜYÜK MAH.	mahalle	province	
+91838	144705	26	ODUNPAZARI	2009	KARAHÜYÜK KÖYÜ	köy	2014	KARAHÜYÜK MAH.	mahalle	province	6360 art. 1(3)
 91839	144706	26	ODUNPAZARI	2009	KARAMUSTAFA KÖYÜ	köy	2014	KARAMUSTAFA MAH.	mahalle	ilce	
 91840	144707	26	ODUNPAZARI	2009	KARAPAZAR KÖYÜ	köy	2014	KARAPAZAR MAH.	mahalle	ilce	
 91841	144708	26	ODUNPAZARI	2009	KARATEPE KÖYÜ	köy	2014	KARATEPE MAH.	mahalle	ilce	
@@ -6586,7 +6586,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 94349	128141	31	ARSUZ	2009	HARLISU KÖYÜ	köy	2014	HARLISU MAH.	mahalle	province	6360 annex list
 122236	128142	31	ARSUZ	2009	HAYMASEKİ KÖYÜ	köy	2014	HAYMASEKİ MAH.	mahalle	province	6360 annex list
 94350	128143	31	ARSUZ	2009	HELVALI KÖYÜ	köy	2014	HELVALI MAH.	mahalle	province	6360 annex list
-122237	128144	31	ARSUZ	2009	HÜYÜK KÖYÜ	köy	2014	HÜYÜK MAH.	mahalle	province	
+122237	128144	31	ARSUZ	2009	HÜYÜK KÖYÜ	köy	2014	HÜYÜK MAH.	mahalle	province	6360 art. 1(3)
 122238	128145	31	ARSUZ	2009	IŞIKLI KÖYÜ	köy	2014	IŞIKLI MAH.	mahalle	province	6360 annex list
 122239	128146	31	ARSUZ	2009	KALE KÖYÜ	köy	2014	KALE MAH.	mahalle	province	6360 annex list
 122240	128148	31	ARSUZ	2009	KARAGÖZ KÖYÜ	köy	2014	KARAGÖZ MAH.	mahalle	province	6360 annex list
@@ -6629,7 +6629,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 76424	128126	31	DEFNE	2009	ÇINARLI KÖYÜ	köy	2014	ÇINARLI MAH.	mahalle	province	6360 annex list
 76402	128127	31	DEFNE	2009	ÇÖKEK KÖYÜ	köy	2014	ÇÖKEK MAH.	mahalle	province	6360 annex list
 76409	128128	31	DEFNE	2009	ÖZBEK KÖYÜ	köy	2014	ÖZBEK MAH.	mahalle	province	6360 annex list
-76410	128129	31	DEFNE	2009	ÜZENGİLİ KÖYÜ	köy	2014	ÜZENGİLİ MAH.	mahalle	province	
+76410	128129	31	DEFNE	2009	ÜZENGİLİ KÖYÜ	köy	2014	ÜZENGİLİ MAH.	mahalle	province	6360 art. 1(3)
 94239	129982	31	DÖRTYOL	2009	KAPILI KÖYÜ	köy	2014	KAPILI MAH.	mahalle	ilce	
 94242	129983	31	DÖRTYOL	2009	KONAKLI KÖYÜ	köy	2014	KONAKLI MAH.	mahalle	ilce	
 94238	129981	31	DÖRTYOL	2009	ÇATKÖY	köy	2014	ÇATKÖY MAH.	mahalle	ilce	
@@ -7306,7 +7306,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 95059	138512	33	TOROSLAR	2009	TIRTAR KÖYÜ	köy	2014	TIRTAR MAH.	mahalle	ilce	
 95060	138805	33	TOROSLAR	2009	YAVCA KÖYÜ	köy	2014	YAVCA MAH.	mahalle	ilce	
 95048	138507	33	TOROSLAR	2009	YENİKÖY	köy	2014	YENİKÖY MAH.	mahalle	ilce	
-95061	138806	33	TOROSLAR	2009	YÜKSEKOLUK KÖYÜ	köy	2014	YÜKSEKOLUK MAH.	mahalle	province	
+95061	138806	33	TOROSLAR	2009	YÜKSEKOLUK KÖYÜ	köy	2014	YÜKSEKOLUK MAH.	mahalle	province	6360 art. 1(3)
 95015	138493	33	TOROSLAR	2009	ÇAMLIDERE KÖYÜ	köy	2014	ÇAMLIDERE MAH.	mahalle	ilce	
 95066	138808	33	TOROSLAR	2009	ÇANDIR KÖYÜ	köy	2014	ÇANDIR MAH.	mahalle	ilce	
 95055	138508	33	TOROSLAR	2009	ÇAĞLARCA KÖYÜ	köy	2014	ÇAĞLARCA MAH.	mahalle	ilce	
@@ -8342,7 +8342,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 99464	141495	38	TOMARZA	2009	AKDERE KÖYÜ	köy	2014	AKDERE MAH.	mahalle	ilce	
 122032	141525	38	TOMARZA	2009	AKMEZAR KÖYÜ	köy	2014	AKMEZAR MAH.	mahalle	ilce	
 122033	141526	38	TOMARZA	2009	ARSLANTAŞ KÖYÜ	köy	2014	ARSLANTAŞ MAH.	mahalle	ilce	
-120765	141494	38	TOMARZA	2009	AVŞARSÖĞÜTLÜ KÖYÜ	köy	2014	AVŞARSÖĞÜTLÜ MAH.	mahalle	province	
+120765	141494	38	TOMARZA	2009	AVŞARSÖĞÜTLÜ KÖYÜ	köy	2014	AVŞARSÖĞÜTLÜ MAH.	mahalle	province	6360 art. 1(3)
 99465	141496	38	TOMARZA	2009	BEKTAŞ KÖYÜ	köy	2014	BEKTAŞ MAH.	mahalle	ilce	
 99466	141497	38	TOMARZA	2009	BOSTANLIK KÖYÜ	köy	2014	BOSTANLIK MAH.	mahalle	ilce	
 99467	141498	38	TOMARZA	2009	BÖKE KÖYÜ	köy	2014	BÖKE MAH.	mahalle	ilce	
@@ -9740,11 +9740,11 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103102	132906	45	AHMETLİ	2009	HALİLKAHYA KÖYÜ	köy	2014	HALİLKAHYA MAH.	mahalle	ilce	
 103103	132907	45	AHMETLİ	2009	KARAKÖY	köy	2014	KARAKÖY MAH.	mahalle	ilce	
 103104	132908	45	AHMETLİ	2009	KARGIN KÖYÜ	köy	2014	KARGIN MAH.	mahalle	ilce	
-71276	132913	45	AHMETLİ	2009	KENDİRLİK KÖYÜ	köy	2014	KENDİRLİK MAH.	mahalle	province	
+71276	132913	45	AHMETLİ	2009	KENDİRLİK KÖYÜ	köy	2014	KENDİRLİK MAH.	mahalle	province	6360 art. 1(3)
 103105	132909	45	AHMETLİ	2009	KESTELLİ KÖYÜ	köy	2014	KESTELLİ MAH.	mahalle	ilce	
 103106	132910	45	AHMETLİ	2009	MANDALLI KÖYÜ	köy	2014	MANDALLI MAH.	mahalle	ilce	
 103107	132911	45	AHMETLİ	2009	SEYDİKÖY	köy	2014	SEYDİKÖY MAH.	mahalle	ilce	
-103653	132912	45	AHMETLİ	2009	YARAŞLI KÖYÜ	köy	2014	YARAŞLI MAH.	mahalle	province	
+103653	132912	45	AHMETLİ	2009	YARAŞLI KÖYÜ	köy	2014	YARAŞLI MAH.	mahalle	province	6360 art. 1(3)
 103124	132925	45	AKHİSAR	2009	AKKOCALI KÖYÜ	köy	2014	AKKOCALI MAH.	mahalle	ilce	
 103122	132923	45	AKHİSAR	2009	AKÇAALAN KÖYÜ	köy	2014	AKÇAALAN MAH.	mahalle	ilce	
 103123	132924	45	AKHİSAR	2009	AKÇEŞME KÖYÜ	köy	2014	AKÇEŞME MAH.	mahalle	ilce	
@@ -9887,7 +9887,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103238	133408	45	ALAŞEHİR	2009	ÇAMLIBEL KÖYÜ	köy	2014	ÇAMLIBEL MAH.	mahalle	ilce	
 103239	133409	45	ALAŞEHİR	2009	ÇARIKBOZDAĞ KÖYÜ	köy	2014	ÇARIKBOZDAĞ MAH.	mahalle	ilce	
 103240	133410	45	ALAŞEHİR	2009	ÇARIKKARALAR KÖYÜ	köy	2014	ÇARIKKARALAR MAH.	mahalle	ilce	
-103560	133462	45	ALAŞEHİR	2009	ÇARIKTEKKE KÖYÜ	köy	2014	ÇARIKTEKKE MAH.	mahalle	province	
+103560	133462	45	ALAŞEHİR	2009	ÇARIKTEKKE KÖYÜ	köy	2014	ÇARIKTEKKE MAH.	mahalle	province	6360 art. 1(3)
 103236	133185	45	ALAŞEHİR	2009	ÇAĞLAYAN KÖYÜ	köy	2014	ÇAĞLAYAN MAH.	mahalle	ilce	
 103241	133411	45	ALAŞEHİR	2009	ÇEŞNELİ KÖYÜ	köy	2014	ÇEŞNELİ MAH.	mahalle	ilce	
 103281	133441	45	ALAŞEHİR	2009	ÖRENCİK KÖYÜ	köy	2014	ÖRENCİK MAH.	mahalle	ilce	
@@ -10000,7 +10000,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103434	133795	45	GÖRDES	2009	DEREÇİFTLİK KÖYÜ	köy	2014	DEREÇİFTLİK MAH.	mahalle	ilce	
 103435	133796	45	GÖRDES	2009	DOĞANPINAR KÖYÜ	köy	2014	DOĞANPINAR MAH.	mahalle	ilce	
 103436	133798	45	GÖRDES	2009	DUTLUCA KÖYÜ	köy	2014	DUTLUCA MAH.	mahalle	ilce	
-103343	133780	45	GÖRDES	2009	DİKİLİTAŞ KÖYÜ	köy	2014	DİKİLİTAŞ MAH.	mahalle	province	
+103343	133780	45	GÖRDES	2009	DİKİLİTAŞ KÖYÜ	köy	2014	DİKİLİTAŞ MAH.	mahalle	province	6360 art. 1(3)
 103437	133799	45	GÖRDES	2009	EFENDİLİ KÖYÜ	köy	2014	EFENDİLİ MAH.	mahalle	ilce	
 103438	133800	45	GÖRDES	2009	FUNDACIK KÖYÜ	köy	2014	FUNDACIK MAH.	mahalle	ilce	
 103439	133801	45	GÖRDES	2009	GÜLPINAR KÖYÜ	köy	2014	GÜLPINAR MAH.	mahalle	ilce	
@@ -10124,7 +10124,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103524	132878	45	KÖPRÜBAŞI/MANİSA	2009	ESAT KÖYÜ	köy	2014	ESAT MAH.	mahalle	ilce	
 72852	132858	45	KÖPRÜBAŞI/MANİSA	2009	GÖKVELİLER KÖYÜ	köy	2014	GÖKVELİLER MAH.	mahalle	province	6360 annex list
 103525	132879	45	KÖPRÜBAŞI/MANİSA	2009	GÖLBAŞI KÖYÜ	köy	2014	GÖLBAŞI MAH.	mahalle	ilce	
-103348	132868	45	KÖPRÜBAŞI/MANİSA	2009	GÜLPINAR KÖYÜ	köy	2014	GÜLPINAR MAH.	mahalle	province	
+103348	132868	45	KÖPRÜBAŞI/MANİSA	2009	GÜLPINAR KÖYÜ	köy	2014	GÜLPINAR MAH.	mahalle	province	6360 art. 1(3)
 103526	132880	45	KÖPRÜBAŞI/MANİSA	2009	GÜNDOĞDU KÖYÜ	köy	2014	GÜNDOĞDU MAH.	mahalle	ilce	
 103528	132882	45	KÖPRÜBAŞI/MANİSA	2009	KARAELMACIK KÖYÜ	köy	2014	KARAELMACIK MAH.	mahalle	ilce	
 72858	132859	45	KÖPRÜBAŞI/MANİSA	2009	KARYAĞDI KÖYÜ	köy	2014	KARYAĞDI MAH.	mahalle	province	6360 annex list
@@ -10139,7 +10139,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103537	132891	45	KÖPRÜBAŞI/MANİSA	2009	KURTLAR KÖYÜ	köy	2014	KURTLAR MAH.	mahalle	ilce	
 103535	132889	45	KÖPRÜBAŞI/MANİSA	2009	KİLLİK KÖYÜ	köy	2014	KİLLİK MAH.	mahalle	ilce	
 103538	132892	45	KÖPRÜBAŞI/MANİSA	2009	MESTANLI KÖYÜ	köy	2014	MESTANLI MAH.	mahalle	ilce	
-103372	132869	45	KÖPRÜBAŞI/MANİSA	2009	RAĞILLAR KÖYÜ	köy	2014	RAĞILLAR MAH.	mahalle	province	
+103372	132869	45	KÖPRÜBAŞI/MANİSA	2009	RAĞILLAR KÖYÜ	köy	2014	RAĞILLAR MAH.	mahalle	province	6360 art. 1(3)
 103375	132865	45	KÖPRÜBAŞI/MANİSA	2009	SARAYCIK KÖYÜ	köy	2014	SARAYCIK MAH.	mahalle	province	6360 annex list
 103539	132893	45	KÖPRÜBAŞI/MANİSA	2009	SARGAÇ KÖYÜ	köy	2014	SARGAÇ MAH.	mahalle	ilce	
 72860	132861	45	KÖPRÜBAŞI/MANİSA	2009	SELVİLER KÖYÜ	köy	2014	SELVİLER MAH.	mahalle	province	6360 annex list
@@ -10151,7 +10151,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103542	132896	45	KÖPRÜBAŞI/MANİSA	2009	YEŞİLKÖY	köy	2014	YEŞİLKÖY MAH.	mahalle	ilce	
 72863	132864	45	KÖPRÜBAŞI/MANİSA	2009	YUMUKLAR KÖYÜ	köy	2014	YUMUKLAR MAH.	mahalle	province	6360 annex list
 103522	132876	45	KÖPRÜBAŞI/MANİSA	2009	ÇARIKLAR KÖYÜ	köy	2014	ÇARIKLAR MAH.	mahalle	ilce	
-103340	132867	45	KÖPRÜBAŞI/MANİSA	2009	ÇAVULLAR KÖYÜ	köy	2014	ÇAVULLAR MAH.	mahalle	province	
+103340	132867	45	KÖPRÜBAŞI/MANİSA	2009	ÇAVULLAR KÖYÜ	köy	2014	ÇAVULLAR MAH.	mahalle	province	6360 art. 1(3)
 72850	132857	45	KÖPRÜBAŞI/MANİSA	2009	ÇAYKÖY	köy	2014	ÇAYKÖY MAH.	mahalle	province	6360 annex list
 103527	132881	45	KÖPRÜBAŞI/MANİSA	2009	İKİZKUYU KÖYÜ	köy	2014	İKİZKUYU MAH.	mahalle	ilce	
 71249	135728	45	SALİHLİ	2009	AKYAR KÖYÜ	köy	2014	AKYAR MAH.	mahalle	ilce	
@@ -10430,7 +10430,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103061	128407	45	YUNUSEMRE	2009	GÖKÇELER KÖYÜ	köy	2014	GÖKÇELER MAH.	mahalle	province	6360 annex list
 124336	128408	45	YUNUSEMRE	2009	GÜLBAHÇE KÖYÜ	köy	2014	GÜLBAHÇE MAH.	mahalle	province	6360 annex list
 120081	128409	45	YUNUSEMRE	2009	GÜRLE KÖYÜ	köy	2014	GÜRLE MAH.	mahalle	province	6360 annex list
-103069	128412	45	YUNUSEMRE	2009	KALEKÖY	köy	2014	KALEKÖY MAH.	mahalle	province	
+103069	128412	45	YUNUSEMRE	2009	KALEKÖY	köy	2014	KALEKÖY MAH.	mahalle	province	6360 art. 1(3)
 120447	128413	45	YUNUSEMRE	2009	KARAAHMETLİ KÖYÜ	köy	2014	KARAAHMETLİ MAH.	mahalle	province	6360 annex list
 120082	128414	45	YUNUSEMRE	2009	KARAALİ KÖYÜ	köy	2014	KARAALİ MAH.	mahalle	province	6360 annex list
 120448	128415	45	YUNUSEMRE	2009	KARAHÜSEYİNLİ KÖYÜ	köy	2014	KARAHÜSEYİNLİ MAH.	mahalle	province	6360 annex list
@@ -10439,7 +10439,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 124338	128418	45	YUNUSEMRE	2009	KARAVELİLER KÖYÜ	köy	2014	KARAVELİLER MAH.	mahalle	province	6360 annex list
 124339	128419	45	YUNUSEMRE	2009	KARAYAĞCIHACILAR KÖYÜ	köy	2014	KARAYAĞCIHACILAR MAH.	mahalle	province	6360 annex list
 103074	128420	45	YUNUSEMRE	2009	KAYAPINAR KÖYÜ	köy	2014	KAYAPINAR MAH.	mahalle	province	6360 annex list
-120449	128424	45	YUNUSEMRE	2009	KIŞLAKÖY	köy	2014	KIŞLAKÖY MAH.	mahalle	province	
+120449	128424	45	YUNUSEMRE	2009	KIŞLAKÖY	köy	2014	KIŞLAKÖY MAH.	mahalle	province	6360 art. 1(3)
 124341	128425	45	YUNUSEMRE	2009	KOCAKORU KÖYÜ	köy	2014	KOCAKORU MAH.	mahalle	province	6360 annex list
 120450	128426	45	YUNUSEMRE	2009	KORUKÖY	köy	2014	KORUKÖY MAH.	mahalle	province	6360 annex list
 120451	128427	45	YUNUSEMRE	2009	KOZAKLAR KÖYÜ	köy	2014	KOZAKLAR MAH.	mahalle	province	6360 annex list
@@ -10463,7 +10463,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 120085	128460	45	YUNUSEMRE	2009	UZUNBURUN KÖYÜ	köy	2014	UZUNBURUN MAH.	mahalle	province	6360 annex list
 120465	128461	45	YUNUSEMRE	2009	UZUNLAR KÖYÜ	köy	2014	UZUNLAR MAH.	mahalle	province	6360 annex list
 120466	128462	45	YUNUSEMRE	2009	YAYLAKÖY	köy	2014	YAYLAKÖY MAH.	mahalle	province	6360 annex list
-120468	128465	45	YUNUSEMRE	2009	YUNTDAĞIKÖSELER KÖYÜ	köy	2014	YUNTDAĞIKÖSELER MAH.	mahalle	province	
+120468	128465	45	YUNUSEMRE	2009	YUNTDAĞIKÖSELER KÖYÜ	köy	2014	YUNTDAĞIKÖSELER MAH.	mahalle	province	6360 art. 1(3)
 120467	128466	45	YUNUSEMRE	2009	YUNTDAĞYENİCE KÖYÜ	köy	2014	YUNTDAĞYENİCE MAH.	mahalle	province	6360 annex list
 124332	128467	45	YUNUSEMRE	2009	ÇAMLICA KÖYÜ	köy	2014	ÇAMLICA MAH.	mahalle	province	6360 annex list
 124344	128468	45	YUNUSEMRE	2009	ÖRENCİK KÖYÜ	köy	2014	ÖRENCİK MAH.	mahalle	province	6360 annex list
@@ -10477,7 +10477,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 103070	128341	45	ŞEHZADELER	2009	KALEMLİ KÖYÜ	köy	2014	KALEMLİ MAH.	mahalle	province	6360 annex list
 103073	128344	45	ŞEHZADELER	2009	KARAYENİCE KÖYÜ	köy	2014	KARAYENİCE MAH.	mahalle	province	6360 annex list
 103068	128346	45	ŞEHZADELER	2009	KAĞAN KÖYÜ	köy	2014	KAĞAN MAH.	mahalle	province	6360 annex list
-124340	128347	45	ŞEHZADELER	2009	KIRANÇİFTLİĞİ KÖYÜ	köy	2014	KIRANÇİFTLİĞİ MAH.	mahalle	province	
+124340	128347	45	ŞEHZADELER	2009	KIRANÇİFTLİĞİ KÖYÜ	köy	2014	KIRANÇİFTLİĞİ MAH.	mahalle	province	6360 art. 1(3)
 76324	128356	45	ŞEHZADELER	2009	SANCAKLIKAYADİBİ KÖYÜ	köy	2014	SANCAKLIKAYADİBİ MAH.	mahalle	province	6360 annex list
 76325	128357	45	ŞEHZADELER	2009	SANCAKLIUZUNÇINAR KÖYÜ	köy	2014	SANCAKLIUZUNÇINAR MAH.	mahalle	province	6360 annex list
 76322	128358	45	ŞEHZADELER	2009	SANCAKLIÇEŞMEBAŞI KÖYÜ	köy	2014	SANCAKLIÇEŞMEBAŞI MAH.	mahalle	province	6360 annex list
@@ -10612,7 +10612,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 104092	128839	46	DULKADİROĞLU	2009	KAZANLIPINAR KÖYÜ	köy	2014	KAZANLIPINAR MAH.	mahalle	province	6360 annex list
 71899	128840	46	DULKADİROĞLU	2009	KEMALLI KÖYÜ	köy	2014	KEMALLI MAH.	mahalle	province	6360 annex list
 71900	128841	46	DULKADİROĞLU	2009	KILAĞLI KÖYÜ	köy	2014	KILAĞLI MAH.	mahalle	province	6360 annex list
-104096	128842	46	DULKADİROĞLU	2009	KOCOLAR KÖYÜ	köy	2014	KOCOLAR MAH.	mahalle	province	
+104096	128842	46	DULKADİROĞLU	2009	KOCOLAR KÖYÜ	köy	2014	KOCOLAR MAH.	mahalle	province	6360 art. 1(3)
 104097	128843	46	DULKADİROĞLU	2009	KOZLUDERE KÖYÜ	köy	2014	KOZLUDERE MAH.	mahalle	province	6360 annex list
 104102	128845	46	DULKADİROĞLU	2009	KUZUCAK KÖYÜ	köy	2014	KUZUCAK MAH.	mahalle	province	6360 annex list
 104106	128846	46	DULKADİROĞLU	2009	KÜPELİKIZ KÖYÜ	köy	2014	KÜPELİKIZ MAH.	mahalle	province	6360 annex list
@@ -10778,7 +10778,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 104145	128890	46	ONİKİŞUBAT	2009	ALTINOVA KÖYÜ	köy	2014	ALTINOVA MAH.	mahalle	province	6360 annex list
 121494	128891	46	ONİKİŞUBAT	2009	AVCILAR KÖYÜ	köy	2014	AVCILAR MAH.	mahalle	province	6360 annex list
 104028	128892	46	ONİKİŞUBAT	2009	AVŞAR KÖYÜ	köy	2014	AVŞAR MAH.	mahalle	province	6360 annex list
-104224	128893	46	ONİKİŞUBAT	2009	AYŞEPINARI KÖYÜ	köy	2014	AYŞEPINARI MAH.	mahalle	province	
+104224	128893	46	ONİKİŞUBAT	2009	AYŞEPINARI KÖYÜ	köy	2014	AYŞEPINARI MAH.	mahalle	province	6360 art. 1(3)
 121495	128895	46	ONİKİŞUBAT	2009	BEŞEN KÖYÜ	köy	2014	BEŞEN MAH.	mahalle	province	6360 annex list
 104033	128896	46	ONİKİŞUBAT	2009	BULUTOĞLU KÖYÜ	köy	2014	BULUTOĞLU MAH.	mahalle	province	6360 annex list
 104034	128897	46	ONİKİŞUBAT	2009	BÜYÜKSIR KÖYÜ	köy	2014	BÜYÜKSIR MAH.	mahalle	province	6360 annex list
@@ -10795,8 +10795,8 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 121500	128919	46	ONİKİŞUBAT	2009	HACININOĞLU KÖYÜ	köy	2014	HACININOĞLU MAH.	mahalle	province	6360 annex list
 121499	128920	46	ONİKİŞUBAT	2009	HACIİBRAHİMUŞAĞI KÖYÜ	köy	2014	HACIİBRAHİMUŞAĞI MAH.	mahalle	province	6360 annex list
 104068	128921	46	ONİKİŞUBAT	2009	HARTLAP KÖYÜ	köy	2014	HARTLAP MAH.	mahalle	province	6360 annex list
-104075	128927	46	ONİKİŞUBAT	2009	KALAKAYA KÖYÜ	köy	2014	KALAKAYA MAH.	mahalle	province	
-121506	128929	46	ONİKİŞUBAT	2009	KAPIKAYA KÖYÜ	köy	2014	KAPIKAYA MAH.	mahalle	province	
+104075	128927	46	ONİKİŞUBAT	2009	KALAKAYA KÖYÜ	köy	2014	KALAKAYA MAH.	mahalle	province	6360 art. 1(3)
+121506	128929	46	ONİKİŞUBAT	2009	KAPIKAYA KÖYÜ	köy	2014	KAPIKAYA MAH.	mahalle	province	6360 art. 1(3)
 104091	128936	46	ONİKİŞUBAT	2009	KAYNAR KÖYÜ	köy	2014	KAYNAR MAH.	mahalle	province	6360 annex list
 121507	128937	46	ONİKİŞUBAT	2009	KERTMEN KÖYÜ	köy	2014	KERTMEN MAH.	mahalle	province	6360 annex list
 122999	128938	46	ONİKİŞUBAT	2009	KERİMLİ KÖYÜ	köy	2014	KERİMLİ MAH.	mahalle	province	6360 annex list
@@ -10824,7 +10824,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 123006	128977	46	ONİKİŞUBAT	2009	SULUYAYLA KÖYÜ	köy	2014	SULUYAYLA MAH.	mahalle	province	6360 annex list
 104124	128978	46	ONİKİŞUBAT	2009	SUÇATI KÖYÜ	köy	2014	SUÇATI MAH.	mahalle	province	6360 annex list
 123007	128983	46	ONİKİŞUBAT	2009	TOPÇALI KÖYÜ	köy	2014	TOPÇALI MAH.	mahalle	province	6360 annex list
-123009	128985	46	ONİKİŞUBAT	2009	YENİDEMİR KÖYÜ	köy	2014	YENİDEMİR MAH.	mahalle	province	
+123009	128985	46	ONİKİŞUBAT	2009	YENİDEMİR KÖYÜ	köy	2014	YENİDEMİR MAH.	mahalle	province	6360 art. 1(3)
 123010	128987	46	ONİKİŞUBAT	2009	YENİYAPAN KÖYÜ	köy	2014	YENİYAPAN MAH.	mahalle	province	6360 annex list
 123011	128988	46	ONİKİŞUBAT	2009	YOLYANI KÖYÜ	köy	2014	YOLYANI MAH.	mahalle	province	6360 annex list
 104142	128992	46	ONİKİŞUBAT	2009	ZEYTİNDERE KÖYÜ	köy	2014	ZEYTİNDERE MAH.	mahalle	province	6360 annex list
@@ -10832,7 +10832,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 104054	128994	46	ONİKİŞUBAT	2009	ÇAKIRLAR KÖYÜ	köy	2014	ÇAKIRLAR MAH.	mahalle	province	6360 annex list
 121497	128995	46	ONİKİŞUBAT	2009	ÇAMLIBEL KÖYÜ	köy	2014	ÇAMLIBEL MAH.	mahalle	province	6360 annex list
 121510	128996	46	ONİKİŞUBAT	2009	ÇAMLICA KÖYÜ	köy	2014	ÇAMLICA MAH.	mahalle	province	6360 annex list
-104036	128998	46	ONİKİŞUBAT	2009	ÇAĞIRKAN KÖYÜ	köy	2014	ÇAĞIRKAN MAH.	mahalle	province	
+104036	128998	46	ONİKİŞUBAT	2009	ÇAĞIRKAN KÖYÜ	köy	2014	ÇAĞIRKAN MAH.	mahalle	province	6360 art. 1(3)
 104037	128999	46	ONİKİŞUBAT	2009	ÇAĞLAYAN KÖYÜ	köy	2014	ÇAĞLAYAN MAH.	mahalle	province	6360 annex list
 104038	129000	46	ONİKİŞUBAT	2009	ÇEVREPINAR KÖYÜ	köy	2014	ÇEVREPINAR MAH.	mahalle	province	6360 annex list
 104040	129002	46	ONİKİŞUBAT	2009	ÇOKRAN KÖYÜ	köy	2014	ÇOKRAN MAH.	mahalle	province	6360 annex list
@@ -10912,7 +10912,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 104562	133292	46	TÜRKOĞLU	2009	HOPURLU KÖYÜ	köy	2014	HOPURLU MAH.	mahalle	ilce	
 104564	133294	46	TÜRKOĞLU	2009	KADIOĞLUÇİFTLİĞİ KÖYÜ	köy	2014	KADIOĞLUÇİFTLİĞİ MAH.	mahalle	ilce	
 104565	133295	46	TÜRKOĞLU	2009	KALEDİBİ KÖYÜ	köy	2014	KALEDİBİ MAH.	mahalle	ilce	
-120229	145019	46	TÜRKOĞLU	2009	KELİBİŞLER KÖYÜ	köy	2014	KELİBİŞLER MAH.	mahalle	province	
+120229	145019	46	TÜRKOĞLU	2009	KELİBİŞLER KÖYÜ	köy	2014	KELİBİŞLER MAH.	mahalle	province	6360 art. 1(3)
 104571	133296	46	TÜRKOĞLU	2009	KIRMAKAYA KÖYÜ	köy	2014	KIRMAKAYA MAH.	mahalle	ilce	
 104572	133297	46	TÜRKOĞLU	2009	KIZILENİŞ KÖYÜ	köy	2014	KIZILENİŞ MAH.	mahalle	ilce	
 104573	133298	46	TÜRKOĞLU	2009	KUMÇATI KÖYÜ	köy	2014	KUMÇATI MAH.	mahalle	ilce	
@@ -10994,7 +10994,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 71401	128633	47	ARTUKLU	2009	YUKARIAYDINLI KÖYÜ	köy	2014	YUKARIAYDINLI MAH.	mahalle	province	6360 art. 2(21)
 71402	128634	47	ARTUKLU	2009	YUKARIHATUNLU KÖYÜ	köy	2014	YUKARIHATUNLU MAH.	mahalle	province	6360 art. 2(21)
 104665	128635	47	ARTUKLU	2009	YUKARIYENİKÖY	köy	2014	YUKARIYENİKÖY MAH.	mahalle	province	6360 art. 2(21)
-104947	128636	47	ARTUKLU	2009	YÜCE KÖYÜ	köy	2014	YÜCE MAH.	mahalle	province	
+104947	128636	47	ARTUKLU	2009	YÜCE KÖYÜ	köy	2014	YÜCE MAH.	mahalle	province	6360 art. 1(3)
 71383	128638	47	ARTUKLU	2009	ÇALIŞLI KÖYÜ	köy	2014	ÇALIŞLI MAH.	mahalle	province	6360 art. 2(21)
 71384	128639	47	ARTUKLU	2009	ÇATAK KÖYÜ	köy	2014	ÇATAK MAH.	mahalle	province	6360 art. 2(21)
 71385	128640	47	ARTUKLU	2009	ÇAYIRPINAR KÖYÜ	köy	2014	ÇAYIRPINAR MAH.	mahalle	province	6360 art. 2(21)
@@ -11002,7 +11002,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 71386	128642	47	ARTUKLU	2009	ÇIPLAKTEPE KÖYÜ	köy	2014	ÇIPLAKTEPE MAH.	mahalle	province	6360 art. 2(21)
 71387	128643	47	ARTUKLU	2009	ÇUKURYURT KÖYÜ	köy	2014	ÇUKURYURT MAH.	mahalle	province	6360 art. 2(21)
 104633	128644	47	ARTUKLU	2009	ÇİFTLİKKÖY	köy	2014	ÇİFTLİKKÖY MAH.	mahalle	province	6360 art. 2(21)
-104932	128645	47	ARTUKLU	2009	ÖZLÜCE KÖYÜ	köy	2014	ÖZLÜCE MAH.	mahalle	province	
+104932	128645	47	ARTUKLU	2009	ÖZLÜCE KÖYÜ	köy	2014	ÖZLÜCE MAH.	mahalle	province	6360 art. 1(3)
 104673	134064	47	DARGEÇİT	2009	AKYOL KÖYÜ	köy	2014	AKYOL MAH.	mahalle	ilce	
 104674	134065	47	DARGEÇİT	2009	ALAYUNT KÖYÜ	köy	2014	ALAYUNT MAH.	mahalle	ilce	
 104675	134066	47	DARGEÇİT	2009	ALTINOLUK KÖYÜ	köy	2014	ALTINOLUK MAH.	mahalle	ilce	
@@ -11812,7 +11812,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 121242	129652	48	SEYDİKEMER	2009	ÇOBANİSA KÖYÜ	köy	2014	ÇOBANİSA MAH.	mahalle	province	6360 annex list
 74431	129653	48	SEYDİKEMER	2009	ÇUKURİNCİR KÖYÜ	köy	2014	ÇUKURİNCİR MAH.	mahalle	province	6360 annex list
 76732	129654	48	SEYDİKEMER	2009	ÇÖKEK KÖYÜ	köy	2014	ÇÖKEK MAH.	mahalle	province	6360 annex list
-74435	129656	48	SEYDİKEMER	2009	İZZETTİNKÖY	köy	2014	İZZETTİNKÖY MAH.	mahalle	province	
+74435	129656	48	SEYDİKEMER	2009	İZZETTİNKÖY	köy	2014	İZZETTİNKÖY MAH.	mahalle	province	6360 art. 1(3)
 105483	138254	48	ULA	2009	AKÇAPINAR KÖYÜ	köy	2014	AKÇAPINAR MAH.	mahalle	ilce	
 105485	138255	48	ULA	2009	ARICILAR KÖYÜ	köy	2014	ARICILAR MAH.	mahalle	ilce	
 105486	138256	48	ULA	2009	ARMUTCUK KÖYÜ	köy	2014	ARMUTCUK MAH.	mahalle	ilce	
@@ -12433,7 +12433,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 107660	136790	54	ARİFİYE	2009	ADLİYE KÖYÜ	köy	2014	ADLİYE MAH.	mahalle	ilce	
 107661	136791	54	ARİFİYE	2009	AHMEDİYE KÖYÜ	köy	2014	AHMEDİYE MAH.	mahalle	ilce	
 107682	136793	54	ARİFİYE	2009	KEMALİYE KÖYÜ	köy	2014	KEMALİYE MAH.	mahalle	ilce	
-73928	136795	54	ARİFİYE	2009	KIŞLAÇAY KÖYÜ	köy	2014	KIŞLAÇAY MAH.	mahalle	province	
+73928	136795	54	ARİFİYE	2009	KIŞLAÇAY KÖYÜ	köy	2014	KIŞLAÇAY MAH.	mahalle	province	6360 art. 1(3)
 107695	136794	54	ARİFİYE	2009	YUKARIKİRAZCA KÖYÜ	köy	2014	YUKARIKİRAZCA MAH.	mahalle	ilce	
 107668	136792	54	ARİFİYE	2009	ÇINARDİBİ KÖYÜ	köy	2014	ÇINARDİBİ MAH.	mahalle	ilce	
 107669	136796	54	ERENLER	2009	DEĞİRMENDERE KÖYÜ	köy	2014	DEĞİRMENDERE MAH.	mahalle	ilce	
@@ -12471,7 +12471,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 107844	141565	54	GEYVE	2009	CECELER KÖYÜ	köy	2014	CECELER MAH.	mahalle	ilce	
 107849	141570	54	GEYVE	2009	DEMİRLER KÖYÜ	köy	2014	DEMİRLER MAH.	mahalle	ilce	
 107850	141571	54	GEYVE	2009	DEREKÖY	köy	2014	DEREKÖY MAH.	mahalle	ilce	
-108175	141617	54	GEYVE	2009	DOĞANCIL KÖYÜ	köy	2014	DOĞANCIL MAH.	mahalle	province	
+108175	141617	54	GEYVE	2009	DOĞANCIL KÖYÜ	köy	2014	DOĞANCIL MAH.	mahalle	province	6360 art. 1(3)
 107851	141572	54	GEYVE	2009	DOĞANTEPE KÖYÜ	köy	2014	DOĞANTEPE MAH.	mahalle	ilce	
 107852	141573	54	GEYVE	2009	DÜZAKÇAŞEHİR KÖYÜ	köy	2014	DÜZAKÇAŞEHİR MAH.	mahalle	ilce	
 107853	141574	54	GEYVE	2009	EPÇELER KÖYÜ	köy	2014	EPÇELER MAH.	mahalle	ilce	
@@ -12498,8 +12498,8 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 107871	141592	54	GEYVE	2009	MELEKŞEORUÇ KÖYÜ	köy	2014	MELEKŞEORUÇ MAH.	mahalle	ilce	
 107872	141593	54	GEYVE	2009	MELEKŞESOLAK KÖYÜ	köy	2014	MELEKŞESOLAK MAH.	mahalle	ilce	
 73931	141613	54	GEYVE	2009	NURUOSMANİYE KÖYÜ	köy	2014	NURUOSMANİYE MAH.	mahalle	ilce	
-108185	141618	54	GEYVE	2009	POYDULAR KÖYÜ	köy	2014	POYDULAR MAH.	mahalle	province	
-108186	141619	54	GEYVE	2009	SABIRLAR KÖYÜ	köy	2014	SABIRLAR MAH.	mahalle	province	
+108185	141618	54	GEYVE	2009	POYDULAR KÖYÜ	köy	2014	POYDULAR MAH.	mahalle	province	6360 art. 1(3)
+108186	141619	54	GEYVE	2009	SABIRLAR KÖYÜ	köy	2014	SABIRLAR MAH.	mahalle	province	6360 art. 1(3)
 107873	141594	54	GEYVE	2009	SAFİBEY KÖYÜ	köy	2014	SAFİBEY MAH.	mahalle	ilce	
 107874	141595	54	GEYVE	2009	SARAÇLI KÖYÜ	köy	2014	SARAÇLI MAH.	mahalle	ilce	
 107875	141596	54	GEYVE	2009	SARIGAZİ KÖYÜ	köy	2014	SARIGAZİ MAH.	mahalle	ilce	
@@ -12511,7 +12511,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 107882	141603	54	GEYVE	2009	UMURBEY KÖYÜ	köy	2014	UMURBEY MAH.	mahalle	ilce	
 107883	141604	54	GEYVE	2009	YAYLAK KÖYÜ	köy	2014	YAYLAK MAH.	mahalle	ilce	
 107845	141566	54	GEYVE	2009	ÇAMLIK KÖYÜ	köy	2014	ÇAMLIK MAH.	mahalle	ilce	
-108173	141616	54	GEYVE	2009	ÇAYKÖY	köy	2014	ÇAYKÖY MAH.	mahalle	province	
+108173	141616	54	GEYVE	2009	ÇAYKÖY	köy	2014	ÇAYKÖY MAH.	mahalle	province	6360 art. 1(3)
 107846	141567	54	GEYVE	2009	ÇENGEL KÖYÜ	köy	2014	ÇENGEL MAH.	mahalle	ilce	
 107848	141569	54	GEYVE	2009	ÇUKURKÖY	köy	2014	ÇUKURKÖY MAH.	mahalle	ilce	
 107847	141568	54	GEYVE	2009	ÇİNE KÖYÜ	köy	2014	ÇİNE MAH.	mahalle	ilce	
@@ -12774,26 +12774,26 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 108189	136763	54	TARAKLI	2009	YENİKÖY	köy	2014	YENİKÖY MAH.	mahalle	ilce	
 108172	136750	54	TARAKLI	2009	ÇAMTEPE KÖYÜ	köy	2014	ÇAMTEPE MAH.	mahalle	ilce	
 108181	136757	54	TARAKLI	2009	İÇDEDELER KÖYÜ	köy	2014	İÇDEDELER MAH.	mahalle	ilce	
-108862	140486	55	19 MAYIS	2009	AYDINPINAR KÖYÜ	köy	2014	AYDINPINAR MAH.	mahalle	province	
-108863	140488	55	19 MAYIS	2009	BEYLİK KÖYÜ	köy	2014	BEYLİK MAH.	mahalle	province	
-108865	140492	55	19 MAYIS	2009	CEREKLİ KÖYÜ	köy	2014	CEREKLİ MAH.	mahalle	province	
-108869	140501	55	19 MAYIS	2009	DAĞKÖY	köy	2014	DAĞKÖY MAH.	mahalle	province	
-108874	140503	55	19 MAYIS	2009	DÜZKÖY	köy	2014	DÜZKÖY MAH.	mahalle	province	
-108891	140541	55	19 MAYIS	2009	FINDIKLI KÖYÜ	köy	2014	FINDIKLI MAH.	mahalle	province	
-108876	140510	55	19 MAYIS	2009	HİBE KÖYÜ	köy	2014	HİBE MAH.	mahalle	province	
-108877	140513	55	19 MAYIS	2009	KARACAOĞLU KÖYÜ	köy	2014	KARACAOĞLU MAH.	mahalle	province	
-108878	140515	55	19 MAYIS	2009	KARAGÖL KÖYÜ	köy	2014	KARAGÖL MAH.	mahalle	province	
-108879	140518	55	19 MAYIS	2009	KERTME KÖYÜ	köy	2014	KERTME MAH.	mahalle	province	
-108881	140525	55	19 MAYIS	2009	KUŞKAYASI KÖYÜ	köy	2014	KUŞKAYASI MAH.	mahalle	province	
-108880	140522	55	19 MAYIS	2009	KÖSEDİK KÖYÜ	köy	2014	KÖSEDİK MAH.	mahalle	province	
-108882	140528	55	19 MAYIS	2009	ORMANCIK KÖYÜ	köy	2014	ORMANCIK MAH.	mahalle	province	
-108883	140532	55	19 MAYIS	2009	TEPEKÖY	köy	2014	TEPEKÖY MAH.	mahalle	province	
-108884	140536	55	19 MAYIS	2009	YEŞİLKÖY	köy	2014	YEŞİLKÖY MAH.	mahalle	province	
-108885	140538	55	19 MAYIS	2009	YEŞİLYURT KÖYÜ	köy	2014	YEŞİLYURT MAH.	mahalle	province	
-108866	140494	55	19 MAYIS	2009	ÇANDIR KÖYÜ	köy	2014	ÇANDIR MAH.	mahalle	province	
-108864	140491	55	19 MAYIS	2009	ÇEPİNLER KÖYÜ	köy	2014	ÇEPİNLER MAH.	mahalle	province	
-108867	140496	55	19 MAYIS	2009	ÇETİRLİPINAR KÖYÜ	köy	2014	ÇETİRLİPINAR MAH.	mahalle	province	
-108868	140498	55	19 MAYIS	2009	ÇİFTLİKKÖY	köy	2014	ÇİFTLİKKÖY MAH.	mahalle	province	
+108862	140486	55	19 MAYIS	2009	AYDINPINAR KÖYÜ	köy	2014	AYDINPINAR MAH.	mahalle	province	6360 art. 1(3)
+108863	140488	55	19 MAYIS	2009	BEYLİK KÖYÜ	köy	2014	BEYLİK MAH.	mahalle	province	6360 art. 1(3)
+108865	140492	55	19 MAYIS	2009	CEREKLİ KÖYÜ	köy	2014	CEREKLİ MAH.	mahalle	province	6360 art. 1(3)
+108869	140501	55	19 MAYIS	2009	DAĞKÖY	köy	2014	DAĞKÖY MAH.	mahalle	province	6360 art. 1(3)
+108874	140503	55	19 MAYIS	2009	DÜZKÖY	köy	2014	DÜZKÖY MAH.	mahalle	province	6360 art. 1(3)
+108891	140541	55	19 MAYIS	2009	FINDIKLI KÖYÜ	köy	2014	FINDIKLI MAH.	mahalle	province	6360 art. 1(3)
+108876	140510	55	19 MAYIS	2009	HİBE KÖYÜ	köy	2014	HİBE MAH.	mahalle	province	6360 art. 1(3)
+108877	140513	55	19 MAYIS	2009	KARACAOĞLU KÖYÜ	köy	2014	KARACAOĞLU MAH.	mahalle	province	6360 art. 1(3)
+108878	140515	55	19 MAYIS	2009	KARAGÖL KÖYÜ	köy	2014	KARAGÖL MAH.	mahalle	province	6360 art. 1(3)
+108879	140518	55	19 MAYIS	2009	KERTME KÖYÜ	köy	2014	KERTME MAH.	mahalle	province	6360 art. 1(3)
+108881	140525	55	19 MAYIS	2009	KUŞKAYASI KÖYÜ	köy	2014	KUŞKAYASI MAH.	mahalle	province	6360 art. 1(3)
+108880	140522	55	19 MAYIS	2009	KÖSEDİK KÖYÜ	köy	2014	KÖSEDİK MAH.	mahalle	province	6360 art. 1(3)
+108882	140528	55	19 MAYIS	2009	ORMANCIK KÖYÜ	köy	2014	ORMANCIK MAH.	mahalle	province	6360 art. 1(3)
+108883	140532	55	19 MAYIS	2009	TEPEKÖY	köy	2014	TEPEKÖY MAH.	mahalle	province	6360 art. 1(3)
+108884	140536	55	19 MAYIS	2009	YEŞİLKÖY	köy	2014	YEŞİLKÖY MAH.	mahalle	province	6360 art. 1(3)
+108885	140538	55	19 MAYIS	2009	YEŞİLYURT KÖYÜ	köy	2014	YEŞİLYURT MAH.	mahalle	province	6360 art. 1(3)
+108866	140494	55	19 MAYIS	2009	ÇANDIR KÖYÜ	köy	2014	ÇANDIR MAH.	mahalle	province	6360 art. 1(3)
+108864	140491	55	19 MAYIS	2009	ÇEPİNLER KÖYÜ	köy	2014	ÇEPİNLER MAH.	mahalle	province	6360 art. 1(3)
+108867	140496	55	19 MAYIS	2009	ÇETİRLİPINAR KÖYÜ	köy	2014	ÇETİRLİPINAR MAH.	mahalle	province	6360 art. 1(3)
+108868	140498	55	19 MAYIS	2009	ÇİFTLİKKÖY	köy	2014	ÇİFTLİKKÖY MAH.	mahalle	province	6360 art. 1(3)
 108279	136812	55	ALAÇAM	2009	AKBULUT KÖYÜ	köy	2014	AKBULUT MAH.	mahalle	ilce	
 108280	136813	55	ALAÇAM	2009	AKGÜNEY KÖYÜ	köy	2014	AKGÜNEY MAH.	mahalle	ilce	
 108281	136814	55	ALAÇAM	2009	ALİDEDEBÖLMESİ KÖYÜ	köy	2014	ALİDEDEBÖLMESİ MAH.	mahalle	ilce	
@@ -12880,7 +12880,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 108190	143062	55	ATAKUM	2009	AKALAN KÖYÜ	köy	2014	AKALAN MAH.	mahalle	ilce	
 108191	143064	55	ATAKUM	2009	AKSU KÖYÜ	köy	2014	AKSU MAH.	mahalle	ilce	
 108192	143068	55	ATAKUM	2009	ASLANDAMI KÖYÜ	köy	2014	ASLANDAMI MAH.	mahalle	ilce	
-108715	143320	55	ATAKUM	2009	AYVALI KÖYÜ	köy	2014	AYVALI MAH.	mahalle	province	
+108715	143320	55	ATAKUM	2009	AYVALI KÖYÜ	köy	2014	AYVALI MAH.	mahalle	province	6360 art. 1(3)
 108209	143076	55	ATAKUM	2009	ELMAÇUKURU KÖYÜ	köy	2014	ELMAÇUKURU MAH.	mahalle	ilce	
 108210	143080	55	ATAKUM	2009	ERİKLİ KÖYÜ	köy	2014	ERİKLİ MAH.	mahalle	ilce	
 108213	143084	55	ATAKUM	2009	GÜNEYKÖY	köy	2014	GÜNEYKÖY MAH.	mahalle	ilce	
@@ -14095,7 +14095,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 112234	132932	61	DÜZKÖY	2009	GÜRGENDAĞ KÖYÜ	köy	2014	GÜRGENDAĞ MAH.	mahalle	ilce	
 112235	132933	61	DÜZKÖY	2009	KÜÇÜKTEPEKÖY	köy	2014	KÜÇÜKTEPEKÖY MAH.	mahalle	ilce	
 112236	132934	61	DÜZKÖY	2009	TAŞOCAĞI KÖYÜ	köy	2014	TAŞOCAĞI MAH.	mahalle	ilce	
-112346	132935	61	DÜZKÖY	2009	YERLİCE KÖYÜ	köy	2014	YERLİCE MAH.	mahalle	province	
+112346	132935	61	DÜZKÖY	2009	YERLİCE KÖYÜ	köy	2014	YERLİCE MAH.	mahalle	province	6360 art. 1(3)
 112232	132753	61	DÜZKÖY	2009	ÇİĞDEMLİ KÖYÜ	köy	2014	ÇİĞDEMLİ MAH.	mahalle	ilce	
 112259	132937	61	HAYRAT	2009	DAĞÖNÜ KÖYÜ	köy	2014	DAĞÖNÜ MAH.	mahalle	ilce	
 112260	132938	61	HAYRAT	2009	DEREYURT KÖYÜ	köy	2014	DEREYURT MAH.	mahalle	ilce	
@@ -14592,7 +14592,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 73103	134577	63	BİRECİK	2009	CİBİNÖREN KÖYÜ	köy	2014	CİBİNÖREN MAH.	mahalle	ilce	
 73104	134578	63	BİRECİK	2009	DALOCAK KÖYÜ	köy	2014	DALOCAK MAH.	mahalle	ilce	
 73105	134579	63	BİRECİK	2009	DAMLICA KÖYÜ	köy	2014	DAMLICA MAH.	mahalle	ilce	
-113372	133014	63	BİRECİK	2009	DAĞÖREN KÖYÜ	köy	2014	DAĞÖREN MAH.	mahalle	province	
+113372	133014	63	BİRECİK	2009	DAĞÖREN KÖYÜ	köy	2014	DAĞÖREN MAH.	mahalle	province	6360 art. 1(3)
 73106	134580	63	BİRECİK	2009	DIŞLIK KÖYÜ	köy	2014	DIŞLIK MAH.	mahalle	ilce	
 113024	134543	63	BİRECİK	2009	DORUCAK KÖYÜ	köy	2014	DORUCAK MAH.	mahalle	ilce	
 113025	134544	63	BİRECİK	2009	DUYDUK KÖYÜ	köy	2014	DUYDUK MAH.	mahalle	ilce	
@@ -14715,10 +14715,10 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 122545	129072	63	EYYÜBİYE	2009	HACILAR KÖYÜ	köy	2014	HACILAR MAH.	mahalle	province	6360 annex list
 122538	129075	63	EYYÜBİYE	2009	HAMZABABA KÖYÜ	köy	2014	HAMZABABA MAH.	mahalle	province	6360 annex list
 112900	129076	63	EYYÜBİYE	2009	HANCIĞAZ KÖYÜ	köy	2014	HANCIĞAZ MAH.	mahalle	province	6360 annex list
-122497	129078	63	EYYÜBİYE	2009	HOROZKÖY	köy	2014	HOROZKÖY MAH.	mahalle	province	
+122497	129078	63	EYYÜBİYE	2009	HOROZKÖY	köy	2014	HOROZKÖY MAH.	mahalle	province	6360 art. 1(3)
 112902	129079	63	EYYÜBİYE	2009	KADIKENDİ KÖYÜ	köy	2014	KADIKENDİ MAH.	mahalle	province	6360 annex list
 122498	129081	63	EYYÜBİYE	2009	KAP KÖYÜ	köy	2014	KAP MAH.	mahalle	province	6360 annex list
-120678	129082	63	EYYÜBİYE	2009	KAPLANKÖY	köy	2014	KAPLANKÖY MAH.	mahalle	province	
+120678	129082	63	EYYÜBİYE	2009	KAPLANKÖY	köy	2014	KAPLANKÖY MAH.	mahalle	province	6360 art. 1(3)
 122499	129083	63	EYYÜBİYE	2009	KARAALİ KÖYÜ	köy	2014	KARAALİ MAH.	mahalle	province	6360 annex list
 122500	129084	63	EYYÜBİYE	2009	KARAHİSAR KÖYÜ	köy	2014	KARAHİSAR MAH.	mahalle	province	6360 annex list
 122501	129086	63	EYYÜBİYE	2009	KARAMAN KÖYÜ	köy	2014	KARAMAN MAH.	mahalle	province	6360 annex list
@@ -14754,7 +14754,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 122521	129129	63	EYYÜBİYE	2009	TURLUK KÖYÜ	köy	2014	TURLUK MAH.	mahalle	province	6360 annex list
 120701	129132	63	EYYÜBİYE	2009	ULAK KÖYÜ	köy	2014	ULAK MAH.	mahalle	province	6360 annex list
 122526	129133	63	EYYÜBİYE	2009	ULUCANLAR KÖYÜ	köy	2014	ULUCANLAR MAH.	mahalle	province	6360 annex list
-122527	129134	63	EYYÜBİYE	2009	ULUKÖY	köy	2014	ULUKÖY MAH.	mahalle	province	
+122527	129134	63	EYYÜBİYE	2009	ULUKÖY	köy	2014	ULUKÖY MAH.	mahalle	province	6360 art. 1(3)
 122528	129135	63	EYYÜBİYE	2009	UMUROBA KÖYÜ	köy	2014	UMUROBA MAH.	mahalle	province	6360 annex list
 122529	129137	63	EYYÜBİYE	2009	VERGİLİ KÖYÜ	köy	2014	VERGİLİ MAH.	mahalle	province	6360 annex list
 122531	129139	63	EYYÜBİYE	2009	YAMAÇALTI KÖYÜ	köy	2014	YAMAÇALTI MAH.	mahalle	province	6360 annex list
@@ -14769,14 +14769,14 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 122535	129152	63	EYYÜBİYE	2009	YUKARIYAZICI KÖYÜ	köy	2014	YUKARIYAZICI MAH.	mahalle	province	6360 annex list
 120696	129153	63	EYYÜBİYE	2009	YUKARIÇAYKUYU KÖYÜ	köy	2014	YUKARIÇAYKUYU MAH.	mahalle	province	6360 annex list
 122536	129154	63	EYYÜBİYE	2009	YUSUF KÖYÜ	köy	2014	YUSUF MAH.	mahalle	province	6360 annex list
-122537	129156	63	EYYÜBİYE	2009	ZEYNEPKÖY	köy	2014	ZEYNEPKÖY MAH.	mahalle	province	
+122537	129156	63	EYYÜBİYE	2009	ZEYNEPKÖY	köy	2014	ZEYNEPKÖY MAH.	mahalle	province	6360 art. 1(3)
 120672	129157	63	EYYÜBİYE	2009	ÇALIŞKANLAR KÖYÜ	köy	2014	ÇALIŞKANLAR MAH.	mahalle	province	6360 annex list
 112894	129158	63	EYYÜBİYE	2009	ÇAMURLU KÖYÜ	köy	2014	ÇAMURLU MAH.	mahalle	province	6360 annex list
 122514	129159	63	EYYÜBİYE	2009	ÖRENLİ KÖYÜ	köy	2014	ÖRENLİ MAH.	mahalle	province	6360 annex list
 122515	129160	63	EYYÜBİYE	2009	ÖZLÜ KÖYÜ	köy	2014	ÖZLÜ MAH.	mahalle	province	6360 annex list
 122544	129161	63	EYYÜBİYE	2009	ÜZERLİK KÖYÜ	köy	2014	ÜZERLİK MAH.	mahalle	province	6360 annex list
 112901	129162	63	EYYÜBİYE	2009	İKİZCE KÖYÜ	köy	2014	İKİZCE MAH.	mahalle	province	6360 annex list
-113250	146827	63	EYYÜBİYE	2009	ŞAHİNALAN KÖYÜ	köy	2014	ŞAHİNALAN MAH.	mahalle	province	
+113250	146827	63	EYYÜBİYE	2009	ŞAHİNALAN KÖYÜ	köy	2014	ŞAHİNALAN MAH.	mahalle	province	6360 art. 1(3)
 113141	133975	63	HALFETİ	2009	ALTINOVA KÖYÜ	köy	2014	ALTINOVA MAH.	mahalle	ilce	
 113145	133976	63	HALFETİ	2009	AŞAĞI GÖKLÜ KÖYÜ	köy	2014	AŞAĞI GÖKLÜ MAH.	mahalle	ilce	
 113146	133977	63	HALFETİ	2009	BALABAN KÖYÜ	köy	2014	BALABAN MAH.	mahalle	ilce	
@@ -14846,7 +14846,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 75852	129211	63	HALİLİYE	2009	GÜMÜŞTAŞ KÖYÜ	köy	2014	GÜMÜŞTAŞ MAH.	mahalle	province	6360 annex list
 75853	129212	63	HALİLİYE	2009	GÜRPINAR KÖYÜ	köy	2014	GÜRPINAR MAH.	mahalle	province	6360 annex list
 123550	129213	63	HALİLİYE	2009	GÜVENLİ KÖYÜ	köy	2014	GÜVENLİ MAH.	mahalle	province	6360 annex list
-123551	129214	63	HALİLİYE	2009	GÜZELKÖY	köy	2014	GÜZELKÖY MAH.	mahalle	province	
+123551	129214	63	HALİLİYE	2009	GÜZELKÖY	köy	2014	GÜZELKÖY MAH.	mahalle	province	6360 art. 1(3)
 112899	129215	63	HALİLİYE	2009	GÜZELYURT KÖYÜ	köy	2014	GÜZELYURT MAH.	mahalle	province	6360 annex list
 123548	129216	63	HALİLİYE	2009	GÜÇLÜ KÖYÜ	köy	2014	GÜÇLÜ MAH.	mahalle	province	6360 annex list
 123552	129217	63	HALİLİYE	2009	HALİME KÖYÜ	köy	2014	HALİME MAH.	mahalle	province	6360 annex list
@@ -14875,7 +14875,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 75862	129247	63	HALİLİYE	2009	KOÇAK KÖYÜ	köy	2014	KOÇAK MAH.	mahalle	province	6360 annex list
 75864	129248	63	HALİLİYE	2009	KÖRKUYU KÖYÜ	köy	2014	KÖRKUYU MAH.	mahalle	province	6360 annex list
 123571	129249	63	HALİLİYE	2009	KÖSECİK KÖYÜ	köy	2014	KÖSECİK MAH.	mahalle	province	6360 annex list
-123572	129250	63	HALİLİYE	2009	KÖSEKÖY	köy	2014	KÖSEKÖY MAH.	mahalle	province	
+123572	129250	63	HALİLİYE	2009	KÖSEKÖY	köy	2014	KÖSEKÖY MAH.	mahalle	province	6360 art. 1(3)
 123573	129251	63	HALİLİYE	2009	KÜÇÜKSENEMAĞARA KÖYÜ	köy	2014	KÜÇÜKSENEMAĞARA MAH.	mahalle	province	6360 annex list
 123575	129252	63	HALİLİYE	2009	MAMUCA KÖYÜ	köy	2014	MAMUCA MAH.	mahalle	province	6360 annex list
 123574	129253	63	HALİLİYE	2009	MAĞARACIK KÖYÜ	köy	2014	MAĞARACIK MAH.	mahalle	province	6360 annex list
@@ -14916,7 +14916,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 123537	129310	63	HALİLİYE	2009	ÇANAKÇI KÖYÜ	köy	2014	ÇANAKÇI MAH.	mahalle	province	6360 annex list
 123538	129311	63	HALİLİYE	2009	ÇATALLI KÖYÜ	köy	2014	ÇATALLI MAH.	mahalle	province	6360 annex list
 123539	129312	63	HALİLİYE	2009	ÇEKÇEK KÖYÜ	köy	2014	ÇEKÇEK MAH.	mahalle	province	6360 annex list
-123540	129313	63	HALİLİYE	2009	ÇUKURDORUÇ KÖYÜ	köy	2014	ÇUKURDORUÇ MAH.	mahalle	province	
+123540	129313	63	HALİLİYE	2009	ÇUKURDORUÇ KÖYÜ	köy	2014	ÇUKURDORUÇ MAH.	mahalle	province	6360 art. 1(3)
 112921	129316	63	HALİLİYE	2009	ÖRENCİK KÖYÜ	köy	2014	ÖRENCİK MAH.	mahalle	province	6360 annex list
 75873	129317	63	HALİLİYE	2009	ÜZÜMKARA KÖYÜ	köy	2014	ÜZÜMKARA MAH.	mahalle	province	6360 annex list
 75871	129318	63	HALİLİYE	2009	ÜÇGÖZE KÖYÜ	köy	2014	ÜÇGÖZE MAH.	mahalle	province	6360 annex list
@@ -15090,11 +15090,11 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 120665	129341	63	KARAKÖPRÜ	2009	AĞILCIK KÖYÜ	köy	2014	AĞILCIK MAH.	mahalle	province	6360 annex list
 71566	129342	63	KARAKÖPRÜ	2009	AĞIZHAN KÖYÜ	köy	2014	AĞIZHAN MAH.	mahalle	province	6360 annex list
 71571	129343	63	KARAKÖPRÜ	2009	AŞAĞIÇİFTLİK KÖYÜ	köy	2014	AŞAĞIÇİFTLİK MAH.	mahalle	province	6360 annex list
-112890	129344	63	KARAKÖPRÜ	2009	AŞIKKÖY	köy	2014	AŞIKKÖY MAH.	mahalle	province	
+112890	129344	63	KARAKÖPRÜ	2009	AŞIKKÖY	köy	2014	AŞIKKÖY MAH.	mahalle	province	6360 art. 1(3)
 71572	129345	63	KARAKÖPRÜ	2009	BAHÇELİ KÖYÜ	köy	2014	BAHÇELİ MAH.	mahalle	province	6360 annex list
 71574	129347	63	KARAKÖPRÜ	2009	BEZİRCİ KÖYÜ	köy	2014	BEZİRCİ MAH.	mahalle	province	6360 annex list
 120671	129348	63	KARAKÖPRÜ	2009	BOZKÖY	köy	2014	BOZKÖY MAH.	mahalle	province	6360 annex list
-71576	129349	63	KARAKÖPRÜ	2009	BUĞDAYHÜYÜK KÖYÜ	köy	2014	BUĞDAYHÜYÜK MAH.	mahalle	province	
+71576	129349	63	KARAKÖPRÜ	2009	BUĞDAYHÜYÜK KÖYÜ	köy	2014	BUĞDAYHÜYÜK MAH.	mahalle	province	6360 art. 1(3)
 71575	129350	63	KARAKÖPRÜ	2009	BÖLÜCEK KÖYÜ	köy	2014	BÖLÜCEK MAH.	mahalle	province	6360 annex list
 112892	129351	63	KARAKÖPRÜ	2009	BÜYÜKALANLI KÖYÜ	köy	2014	BÜYÜKALANLI MAH.	mahalle	province	6360 annex list
 71578	129352	63	KARAKÖPRÜ	2009	BÜYÜKKARGILI KÖYÜ	köy	2014	BÜYÜKKARGILI MAH.	mahalle	province	6360 annex list
@@ -15106,12 +15106,12 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 120664	129359	63	KARAKÖPRÜ	2009	DOLUNAY KÖYÜ	köy	2014	DOLUNAY MAH.	mahalle	province	6360 annex list
 71618	129360	63	KARAKÖPRÜ	2009	DOYUMLU KÖYÜ	köy	2014	DOYUMLU MAH.	mahalle	province	6360 annex list
 71583	129361	63	KARAKÖPRÜ	2009	DÜĞER KÖYÜ	köy	2014	DÜĞER MAH.	mahalle	province	6360 annex list
-120674	129362	63	KARAKÖPRÜ	2009	ERGÜNKÖY	köy	2014	ERGÜNKÖY MAH.	mahalle	province	
+120674	129362	63	KARAKÖPRÜ	2009	ERGÜNKÖY	köy	2014	ERGÜNKÖY MAH.	mahalle	province	6360 art. 1(3)
 71584	129363	63	KARAKÖPRÜ	2009	ESEMKULU KÖYÜ	köy	2014	ESEMKULU MAH.	mahalle	province	6360 annex list
-71585	129365	63	KARAKÖPRÜ	2009	ESTAĞFURULLAH KÖYÜ	köy	2014	ESTAĞFURULLAH MAH.	mahalle	province	
+71585	129365	63	KARAKÖPRÜ	2009	ESTAĞFURULLAH KÖYÜ	köy	2014	ESTAĞFURULLAH MAH.	mahalle	province	6360 art. 1(3)
 71586	129366	63	KARAKÖPRÜ	2009	GAZİBEY KÖYÜ	köy	2014	GAZİBEY MAH.	mahalle	province	6360 annex list
 71587	129367	63	KARAKÖPRÜ	2009	GELİBOLU KÖYÜ	köy	2014	GELİBOLU MAH.	mahalle	province	6360 annex list
-120675	129368	63	KARAKÖPRÜ	2009	GEÇİTKÖY	köy	2014	GEÇİTKÖY MAH.	mahalle	province	
+120675	129368	63	KARAKÖPRÜ	2009	GEÇİTKÖY	köy	2014	GEÇİTKÖY MAH.	mahalle	province	6360 art. 1(3)
 120676	129369	63	KARAKÖPRÜ	2009	GÖBEKLİ KÖYÜ	köy	2014	GÖBEKLİ MAH.	mahalle	province	6360 annex list
 71588	129370	63	KARAKÖPRÜ	2009	GÖLGEN KÖYÜ	köy	2014	GÖLGEN MAH.	mahalle	province	6360 annex list
 71589	129371	63	KARAKÖPRÜ	2009	GÖLPINAR KÖYÜ	köy	2014	GÖLPINAR MAH.	mahalle	province	6360 annex list
@@ -15130,7 +15130,7 @@ from_id	to_id	plate	ilce	from_year	from_name	from_kind	to_year	to_name	to_kind	m
 112913	129386	63	KARAKÖPRÜ	2009	KÖKSÜREN KÖYÜ	köy	2014	KÖKSÜREN MAH.	mahalle	province	6360 annex list
 71601	129387	63	KARAKÖPRÜ	2009	KÜLAFLI KÖYÜ	köy	2014	KÜLAFLI MAH.	mahalle	province	6360 annex list
 112915	129388	63	KARAKÖPRÜ	2009	KÜÇÜKALANLI KÖYÜ	köy	2014	KÜÇÜKALANLI MAH.	mahalle	province	6360 annex list
-113076	129389	63	KARAKÖPRÜ	2009	KÜÇÜKTÜLMEN KÖYÜ	köy	2014	KÜÇÜKTÜLMEN MAH.	mahalle	province	
+113076	129389	63	KARAKÖPRÜ	2009	KÜÇÜKTÜLMEN KÖYÜ	köy	2014	KÜÇÜKTÜLMEN MAH.	mahalle	province	6360 art. 1(3)
 112916	129390	63	KARAKÖPRÜ	2009	LÜLECİ KÖYÜ	köy	2014	LÜLECİ MAH.	mahalle	province	6360 annex list
 112917	129391	63	KARAKÖPRÜ	2009	MAŞUK KÖYÜ	köy	2014	MAŞUK MAH.	mahalle	province	6360 annex list
 71603	129394	63	KARAKÖPRÜ	2009	MUSTAFACIK KÖYÜ	köy	2014	MUSTAFACIK MAH.	mahalle	province	6360 annex list

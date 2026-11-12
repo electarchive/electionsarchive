@@ -48,6 +48,37 @@ NAMED_VILLAGES = {
     ("46", "PAZARCIK", "TÜRKOĞLU"): ("6360 art. 2(19)", ("Kelebişler", "Bayramgazi", "Cennetpınarı")),
     ("67", "ZONGULDAK MERKEZ", "KOZLU"): ("6360 art. 2(39)", ("Esenköy", "Yahma")),
 }
+METROPOLITAN_PLATES = {
+    "01",
+    "06",
+    "07",
+    "09",
+    "10",
+    "16",
+    "20",
+    "21",
+    "25",
+    "26",
+    "27",
+    "31",
+    "33",
+    "34",
+    "35",
+    "38",
+    "41",
+    "42",
+    "44",
+    "45",
+    "46",
+    "47",
+    "48",
+    "54",
+    "55",
+    "59",
+    "61",
+    "63",
+    "65",
+}
 LISTED_ILCES = {"AKKÖY (PAMUKKALE)": "PAMUKKALE"}
 ILCES_WITHOUT_OWN_MAHALLES = {(67, 1043): "KİLİMLİ", (67, 1044): "KOZLU"}
 
@@ -225,12 +256,14 @@ def law_basis(pair: dict[str, str | int], annexes: dict[str, str]) -> str | None
     if from_ilce == "AKKÖY" and to_ilce == "PAMUKKALE":
         return "6360 art. 2(5)"
     named = NAMED_VILLAGES.get((plate, from_ilce, to_ilce))
-    if named is not None:
-        return named[0] if any(fold(stem) == fold(village) for village in named[1]) else None
+    if named is not None and any(fold(stem) == fold(village) for village in named[1]):
+        return named[0]
     annex = annexes.get(fold(to_ilce))
     old_ilce = "merkez" if from_ilce.endswith(" MERKEZ") else fold(from_ilce)
     if annex is not None and re.search(r"\d" + fold(stem) + old_ilce, annex):
         return "6360 annex list"
+    if pair["from_kind"] == "köy" and pair["to_kind"] == "mahalle" and plate in METROPOLITAN_PLATES:
+        return "6360 art. 1(3)"
     return None
 
 
