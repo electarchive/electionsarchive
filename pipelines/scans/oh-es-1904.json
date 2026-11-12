@@ -226,7 +226,7 @@
         }
       ],
       "orientation": "counties_down",
-      "crop": [0.162, 0.769, 0.873, 1.0],
+      "crop": [0.162, 0.54, 0.873, 0.78],
       "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT.'; ignore any other table visible in the image."
     },
     {

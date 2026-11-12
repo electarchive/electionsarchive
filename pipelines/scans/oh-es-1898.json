@@ -503,7 +503,7 @@
         { "label": "Scattering.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",
-      "crop": [0.18, 0.583, 0.888, 0.971],
+      "crop": [0.18, 0.385, 0.888, 0.655],
       "hint": "Read only the table headed 'Fourteenth Congressional District.'; ignore any other table visible in the image."
     },
     {
@@ -512,8 +512,8 @@
       "columns": [
         {
           "label": "Republican. Henry Clay VanVoorhis.",
-          "contest": null,
-          "candidate": ""
+          "contest": "house15",
+          "candidate": "Henry Clay Van Voorhis"
         },
         {
           "label": "Democratic. Henry R. Stanbery.",
@@ -523,7 +523,7 @@
         { "label": "Scattering.", "contest": null, "candidate": "" }
       ],
       "orientation": "counties_down",
-      "crop": [0.18, 0.963, 0.888, 1.0],
+      "crop": [0.18, 0.645, 0.888, 0.9],
       "hint": "Read only the table headed 'Fifteenth Congressional District.'; ignore any other table visible in the image."
     },
     {
