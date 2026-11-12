@@ -399,19 +399,22 @@ def emit() -> Path:
         firsts = dict(candidates.filter("general").group_by("parliament").agg(pl.col("day").min()).iter_rows())
         areas: dict[tuple[str, int], UUID] = {}
         units: dict[tuple[str, int], UUID] = {}
-        spans: dict[str, set[int]] = defaultdict(set)
-        for item, order in candidates.select("district", "order").unique().iter_rows():
-            spans[item].add(order)
-        for item, order, province in (
-            candidates.select("district", "order", "province")
-            .unique(["district", "order"], maintain_order=True)
+        sittings = sorted(firsts)
+        for item, order, province, first_sitting, last_sitting in (
+            candidates.group_by("district", "order")
+            .agg(
+                pl.col("province").first(),
+                pl.col("parliament").min().alias("first"),
+                pl.col("parliament").max().alias("last"),
+            )
+            .sort("order", "district")
             .iter_rows()
         ):
             en, fr = ridings[item]
-            start = firsts[order]
+            start = firsts[first_sitting]
             following = [
                 *(later for later, scope in ORDERS.items() if later > order and (scope is None or province in scope)),
-                *(later for later in spans[item] if later > order),
+                *(later for later in sittings if later > last_sitting),
             ]
             end = firsts[min(following)] if following else ORDER_2003
             area = areas[item, order] = cs.area("ca.fed", item, start)
