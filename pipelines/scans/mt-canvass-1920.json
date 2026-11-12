@@ -1,0 +1,326 @@
+{
+ "polity": "US-MT",
+ "publisher": "Montana Secretary of State",
+ "title": "Official Montana general election returns 1920, by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialmontanag1920montrich/officialmontanag1920montrich.pdf",
+  "item": "https://archive.org/details/officialmontanag1920montrich"
+ },
+ "raw_source": "us.county_volumes",
+ "contests": {
+  "president": {
+   "year": 1920,
+   "chamber": "president",
+   "day": "1920-11-02",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "governor": {
+   "year": 1920,
+   "chamber": "governor",
+   "day": "1920-11-02",
+   "special": false,
+   "state": "MT",
+   "district": null
+  },
+  "house1": {
+   "year": 1920,
+   "chamber": "house",
+   "day": "1920-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 1
+  },
+  "house2": {
+   "year": 1920,
+   "chamber": "house",
+   "day": "1920-11-02",
+   "special": false,
+   "state": "MT",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.38
+   ],
+   "id": "2-pres",
+   "columns": [
+    {
+     "label": "Grover C. Cisel",
+     "contest": "president",
+     "candidate": "James Cox (Democratic)"
+    },
+    {
+     "label": "George E. Hurd",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mrs. J. M. Kennedy",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Joseph K. Toole",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ethel R. Farnsworth",
+     "contest": "president",
+     "candidate": "Warren G. Harding (Republican)"
+    },
+    {
+     "label": "Walter D. Kemmis",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "C. H. McLeod",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "T. C. Power",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Frank Apperton",
+     "contest": "president",
+     "candidate": "Parley Christensen (Farmer-Labor)"
+    },
+    {
+     "label": "Henry Weber",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "J. W. Richardson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "D. J. Ewing",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "crop": [
+    0.0,
+    0.16,
+    0.535,
+    1.0
+   ],
+   "hint": "Read only the presidential electors table: four Democratic, four Republican, and four Farmer-Labor presidential electors. The table runs past the bottom edge, so there is no total row here. Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  },
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.38
+   ],
+   "id": "2-house",
+   "columns": [
+    {
+     "label": "Burton Watson",
+     "contest": "house1",
+     "candidate": "Burton Watson"
+    },
+    {
+     "label": "Wash. J. McCormick",
+     "contest": "house1",
+     "candidate": "Wash. J. McCormick"
+    },
+    {
+     "label": "M. McCusker",
+     "contest": "house2",
+     "candidate": "M. McCusker"
+    },
+    {
+     "label": "Carl W. Riddick",
+     "contest": "house2",
+     "candidate": "Carl W. Riddick"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.16,
+    0.665,
+    1.0
+   ],
+   "hint": "Read only the Representatives in Congress table (First District Democratic and Republican, Second District Democratic and Republican), the four rightmost columns; skip the elector columns. Blank or dotted cells are empty strings. Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  },
+  {
+   "page": 2,
+   "orientation": "counties_down",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.38
+   ],
+   "id": "2-gov",
+   "columns": [
+    {
+     "label": "Burton K. Wheeler",
+     "contest": "governor",
+     "candidate": "Burton K. Wheeler"
+    },
+    {
+     "label": "Joseph M. Dixon",
+     "contest": "governor",
+     "candidate": "Joseph M. Dixon"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.16,
+    0.895,
+    1.0
+   ],
+   "hint": "Read only the Governor table (Democratic, Republican), the two rightmost columns; skip every other column. Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  },
+  {
+   "page": 4,
+   "orientation": "counties_down",
+   "id": "4-pres",
+   "columns": [
+    {
+     "label": "Grover C. Cisel",
+     "contest": "president",
+     "candidate": "James Cox (Democratic)"
+    },
+    {
+     "label": "George E. Hurd",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mrs. J. M. Kennedy",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Joseph K. Toole",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ethel R. Farnsworth",
+     "contest": "president",
+     "candidate": "Warren G. Harding (Republican)"
+    },
+    {
+     "label": "Walter D. Kemmis",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "C. H. McLeod",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "T. C. Power",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Frank Apperton",
+     "contest": "president",
+     "candidate": "Parley Christensen (Farmer-Labor)"
+    },
+    {
+     "label": "Henry Weber",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "J. W. Richardson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "D. J. Ewing",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "crop": [
+    0.0,
+    0.0,
+    0.535,
+    0.3
+   ],
+   "hint": "The headings are not printed on this page; the rows are numbered counties 32 (Phillips) to 53 (Golden Valley), then TOTAL. The 12 number columns, left to right, are four Democratic, four Republican, and four Farmer-Labor presidential electors. Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  },
+  {
+   "page": 4,
+   "orientation": "counties_down",
+   "id": "4-house",
+   "columns": [
+    {
+     "label": "Burton Watson",
+     "contest": "house1",
+     "candidate": "Burton Watson"
+    },
+    {
+     "label": "Wash. J. McCormick",
+     "contest": "house1",
+     "candidate": "Wash. J. McCormick"
+    },
+    {
+     "label": "M. McCusker",
+     "contest": "house2",
+     "candidate": "M. McCusker"
+    },
+    {
+     "label": "Carl W. Riddick",
+     "contest": "house2",
+     "candidate": "Carl W. Riddick"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.0,
+    0.629,
+    0.3
+   ],
+   "hint": "The headings are not printed on this page; the rows are numbered counties 32 (Phillips) to 53 (Golden Valley), then TOTAL. Read only the four rightmost number columns of the image (Congress First District Democratic and Republican, Second District Democratic and Republican); blank or dotted cells are empty strings. Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  },
+  {
+   "page": 4,
+   "orientation": "counties_down",
+   "id": "4-gov",
+   "columns": [
+    {
+     "label": "Burton K. Wheeler",
+     "contest": "governor",
+     "candidate": "Burton K. Wheeler"
+    },
+    {
+     "label": "Joseph M. Dixon",
+     "contest": "governor",
+     "candidate": "Joseph M. Dixon"
+    }
+   ],
+   "crop": [
+    0.0,
+    0.0,
+    0.848,
+    0.3
+   ],
+   "hint": "The headings are not printed on this page; the rows are numbered counties 32 (Phillips) to 53 (Golden Valley), then TOTAL. Read only the two rightmost number columns of the image (Governor, Democratic and Republican). Each row label is the county name only, without its printed row number; the row numbers are not a data column. Keep each county's figures on its own row."
+  }
+ ]
+}

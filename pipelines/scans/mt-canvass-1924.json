@@ -1,0 +1,179 @@
+{
+  "polity": "US-MT",
+  "publisher": "Montana Secretary of State",
+  "title": "Official Montana general election returns 1924, by county",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/officialmontanag1924montrich/officialmontanag1924montrich.pdf",
+    "item": "https://archive.org/details/officialmontanag1924montrich"
+  },
+  "raw_source": "us.county_volumes",
+  "contests": {
+    "senate": {
+      "year": 1924,
+      "chamber": "senate",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MT",
+      "district": null
+    },
+    "president": {
+      "year": 1924,
+      "chamber": "president",
+      "day": "1924-11-04",
+      "special": false,
+      "state": "MT",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Thomas J. Walsh (Democratic)",
+          "contest": "senate",
+          "candidate": "Thomas J. Walsh"
+        },
+        {
+          "label": "Frank B. Linderman (Republican)",
+          "contest": "senate",
+          "candidate": "Frank B. Linderman"
+        },
+        {
+          "label": "J. W. Anderson (Farmer-Labor)",
+          "contest": "senate",
+          "candidate": "J. W. Anderson"
+        },
+        {
+          "label": "Sam W. Tenkarden (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Charles F. Juttner (Socialist)",
+          "contest": "senate",
+          "candidate": "Charles F. Juttner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.203,
+        0.351,
+        0.446,
+        1.0
+      ],
+      "hint": "Read only the table headed 'United States Senator'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.5778
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "H. J. Calhoun",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Patrick Carney",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. E. LaFollette",
+          "contest": "president",
+          "candidate": "Robert La Follette (Progressive)"
+        },
+        {
+          "label": "Mrs. Henry L. Sherlock",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "May C. Bartos",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dr. James H. Irwin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. D. Kyle",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. E. Snell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. R. Duncan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John M. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Emma Salisbury",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ella Lord",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. R. Albin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mina A. Loveland",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edwin H. Manson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. E. Olsgard",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. Beach",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.404,
+        1.0,
+        1.0
+      ],
+      "hint": "Read only the table headed 'FOR PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.5554
+      ]
+    }
+  ]
+}
