@@ -183,13 +183,14 @@ def emit() -> Path:
             cs.add("note", entity_id=result, kind="methodology", body_md=NOTE)
             people: dict[tuple[str, str], object] = {}
             for person, text in conn.execute(
-                """select distinct ca.person_id, coalesce(ca.ballot_name, pn.text)
+                """select ca.person_id, coalesce(ca.ballot_name, pn.text)
                    from candidacy ca join contest_option o on o.id = ca.option_id
                    join contest co on co.id = o.contest_id join election el on el.id = co.election_id
                    join entity e on e.id = ca.id and e.retired_by is null
                    left join name pn on pn.entity_id = ca.person_id and pn.is_preferred and pn.lang = 'en'
-                   where (el.polity_id = %s or co.id = %s) and ca.person_id is not null""",
-                [polity, nov],
+                   where (el.polity_id = %s or co.id = %s) and ca.person_id is not null
+                   order by co.id = %s desc, el.date_from desc, ca.person_id""",
+                [polity, nov, nov],
             ).fetchall():
                 parts = _words(text or "")
                 if len(parts) >= 2:
