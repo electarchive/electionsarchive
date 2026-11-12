@@ -19,6 +19,12 @@ TYPES = {
     "Advisory": "plebiscite",
     "Policy/Position": "plebiscite",
 }
+DISTRICTS = {
+    "202400039": (
+        "06:06037:consolidated-fire-protection-district",
+        "Consolidated Fire Protection District of Los Angeles County",
+    )
+}
 REQUIRED = {"M": "a simple majority", "F": "55 percent", "T": "two-thirds"}
 METHOD = (
     "Yes and No votes as compiled by the California Elections Data Archive from the county election offices; for a "
@@ -121,7 +127,7 @@ def parse() -> None:
     )
 
 
-def emit() -> Path:
+def emit(only: frozenset[str] | None = None) -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
         cs = Changeset(
@@ -197,11 +203,14 @@ def emit() -> Path:
             official.setdefault((area, day), []).append((contest, yes or 0, no or 0))
         elections: set[UUID] = set()
         units: set[UUID] = set()
+        districts: set[UUID] = set()
         for measure, code, day, letter, question, kind, required, yes, no, passed in (
             frame.sort("day", "measure")
             .select("measure", "code", "day", "letter", "question", "type", "required", "yes", "no", "passed")
             .iter_rows()
         ):
+            if only is not None and measure not in only:
+                continue
             polity, area, place, path = polities[code]
             if (
                 survivor := next(
@@ -233,6 +242,29 @@ def emit() -> Path:
                     valid_from=None,
                 )
             units.add(unit)
+            if (special := DISTRICTS.get(measure)) is not None:
+                district_code, district_name = special
+                whole = area
+                area = cs.area("us.local_district", district_code)
+                unit = cs.unit("us.local_district", district_code)
+                if area in cs.minted and area not in districts:
+                    cs.add("area", id=area, scheme_code="us.local_district")
+                    cs.add("area_code", area_id=area, code=district_code, valid_from=None)
+                    cs.add("area_parent", area_id=area, parent_id=whole, valid_from=None)
+                    name(area, district_name)
+                if unit in cs.minted and unit not in districts:
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=polity,
+                        scheme_code="us.local_district",
+                        code=district_code,
+                        area_relation="equals",
+                        area_id=area,
+                        kind="standard",
+                        valid_from=None,
+                    )
+                districts.update((area, unit))
             parent_key = next((value for value in (f"{day}:CA", f"{day}:CA:primary") if value in parents), None)
             stage = "local" if parent_key is None else parents[parent_key]
             parent = cs.key("us.election", parent_key or f"{day}:CA")
@@ -325,7 +357,7 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(required=REQUIRED[required]))
-            if result_set in cs.minted:
+            if result_set in cs.minted or measure in DISTRICTS:
                 for answer, votes in (("Yes", yes), ("No", no)):
                     cs.add(
                         "result_value",
