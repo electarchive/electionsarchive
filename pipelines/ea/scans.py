@@ -158,6 +158,7 @@ LABEL = re.compile(r"^(counties|county)$")
 HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
 SUBTOTAL = re.compile(
     r"^(down ?state|downstate|percent(age)?s?|sub ?totals?)$|^(.*\s)?(pluralit(y|ies)|majorit(y|ies))$"
+    r"|^\S+ dist(rict)? totals?$"
 )
 TOTAL = re.compile(r"^(state ?wide |state |grand |county |district )?totals?\b|^state ?wide$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
@@ -628,7 +629,7 @@ def cells(
                 re.sub(
                     r"[\s,—–-]*[(\[]*\s*\bpart(\s+of)?\s*[)\]]*$",
                     "",
-                    re.sub(r"^.*\bdistrict\s*[-—–]+\s*|[\s,.;:]+$", "", label, flags=re.IGNORECASE),
+                    re.sub(r"^.*\bdistrict\s*[-—–]+\s*|^\d+\s+(?=[a-z])|[\s,.;:]+$", "", label, flags=re.IGNORECASE),
                     flags=re.IGNORECASE,
                 ),
                 flags=re.IGNORECASE,
@@ -1142,9 +1143,12 @@ def finalize(
                 continue
             seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
             if seen is not None:
-                cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
+                cellmap[key] = (
+                    int(item["value"]) if "value" in item else seen[0] + int(item["delta"]),
+                    item.get("box", seen[1]),
+                )
             elif "value" in item:
-                cellmap[key] = (int(item["value"]), [0.0, 0.0, 1.0, 1.0])
+                cellmap[key] = (int(item["value"]), item.get("box", [0.0, 0.0, 1.0, 1.0]))
         if how == "review" and fixes:
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
