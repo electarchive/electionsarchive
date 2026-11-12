@@ -1,0 +1,25 @@
+{
+  "year": 1930,
+  "day": "1930-11-04",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1931, consolidated vote of the general election held 1930-11-04",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1931/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1931"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "senate": "U.S. Senator (regular election only)",
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    713,
+    714,
+    733,
+    734,
+    735
+  ],
+  "create": true
+}

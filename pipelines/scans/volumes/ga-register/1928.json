@@ -1,0 +1,22 @@
+{
+  "year": 1928,
+  "day": "1928-11-06",
+  "polity": "US-GA",
+  "publisher": "Georgia Department of Archives and History",
+  "title": "Georgia's Official Register 1929, consolidated vote of the general election held 1928-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/GeorgiasOfficialRegister1929/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/GeorgiasOfficialRegister1929"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per congressional district"
+  },
+  "leaves": [
+    485,
+    486,
+    487
+  ],
+  "create": true
+}
