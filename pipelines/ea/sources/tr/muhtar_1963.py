@@ -339,6 +339,9 @@ def strip_reads(number: int, rows: list[dict]) -> None:
                 rows[nearest].setdefault("reads", {}).setdefault(label, []).append(value)
 
 
+TRUNCATION_GUARD = False
+
+
 def options(row: dict | None, label: str) -> list[int]:
     if row is None:
         return []
@@ -350,7 +353,17 @@ def options(row: dict | None, label: str) -> list[int]:
         *row.get("vision", {}).get(label, []),
     ]
     tally = Counter(v for v in found if v is not None)
-    return [v for v, _ in tally.most_common()]
+    ranked = [v for v, _ in tally.most_common()]
+    if not TRUNCATION_GUARD:
+        return ranked
+    return [
+        v
+        for v in ranked
+        if not any(
+            o != v and len(str(o)) > len(str(v)) and (str(o).startswith(str(v)) or str(o).endswith(str(v)))
+            for o in ranked
+        )
+    ]
 
 
 def agreed(row: dict, label: str) -> int | None:
@@ -629,6 +642,8 @@ def parse() -> None:
     settle(places)
     if not vision(rows):
         return
+    global TRUNCATION_GUARD
+    TRUNCATION_GUARD = True
     for row in rows:
         row.pop("final", None)
     settle(places)
